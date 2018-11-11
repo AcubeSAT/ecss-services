@@ -1,7 +1,5 @@
-#include <Message.h>
+#include "Message.hpp"
 #include <cstring>
-
-#include "Message.h"
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
     assert(dataSize < ECSS_MAX_MESSAGE_SIZE);
@@ -11,7 +9,6 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
         if (currentBit + numBits >= 8) {
             // Will have to shift the bits and insert the next ones later
             auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
-            auto maskedFirstBits = static_cast<uint8_t>(data >> (numBits - bitsToAddNow));
 
             this->data[dataSize] |= static_cast<uint8_t>(data >> (numBits - bitsToAddNow));
 
@@ -116,7 +113,11 @@ void Message::appendInteger(int32_t value) {
 }
 
 void Message::appendReal(float value) {
-    static_assert(sizeof(uint32_t) == sizeof(value));
+    static_assert(sizeof(uint32_t) == sizeof(value), "Floating point numbers must be 32 bits long");
 
     return appendWord(reinterpret_cast<uint32_t&>(value));
 }
+
+Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType,
+                 uint16_t applicationId) : serviceType(serviceType), messageType(messageType),
+                                           packetType(packetType), applicationId(applicationId) {}

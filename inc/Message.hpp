@@ -1,9 +1,9 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
+#include "ECSS_Definitions.hpp"
 #include <cstdint>
 #include <cassert>
-#include "ECSS_Definitions.h"
 
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
@@ -26,14 +26,16 @@ public:
     uint16_t applicationId;
 
     // 7.4.3.1b
-    uint16_t messageTypeCounter;
+    uint16_t messageTypeCounter = 0;
 
     // TODO: Find out if we need more than 16 bits for this
-    uint16_t dataSize;
+    uint16_t dataSize = 0;
 
-    // We allocate this data statically, in order to make sure there is predictability in the handling and
-    // storage of messages
-    uint8_t data[ECSS_MAX_MESSAGE_SIZE]; // Pointer to the contents of the message (excluding the PUS header)
+    // Pointer to the contents of the message (excluding the PUS header)
+    // We allocate this data statically, in order to make sure there is predictability in the
+    // handling and storage of messages
+    // TODO: Is it a good idea to not initialise this to 0?
+    uint8_t data[ECSS_MAX_MESSAGE_SIZE] = { '\0' };
 
 //private:
     uint8_t currentBit = 0;
@@ -70,6 +72,9 @@ public:
      */
     void appendString(uint8_t size, const char * value);
 public:
+    Message(uint8_t serviceType, uint8_t messageType, PacketType packetType,
+            uint16_t applicationId);
+
     /**
      * Adds a single-byte boolean value to the end of the message
      *
@@ -78,7 +83,8 @@ public:
     void appendBoolean(bool value);
 
     /**
-     * Adds an enumerated parameter consisting of an arbitrary number of bits to the end of the message
+     * Adds an enumerated parameter consisting of an arbitrary number of bits to the end of the
+     * message
      *
      * PTC = 1, PFC = \p bits
      */
