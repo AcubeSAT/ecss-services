@@ -1,4 +1,3 @@
-
 #include <Message.h>
 #include <cstring>
 
@@ -75,7 +74,7 @@ void Message::appendBoolean(bool value) {
 
 inline void Message::appendEnumerated(uint8_t bits, uint32_t value) {
     // TODO: Implement 32-bit enums, if needed
-    assert(value & 0xffff0000 != 0);
+    assert((value & 0xffff0000) != 0);
 
     return appendBits(bits, value);
 }

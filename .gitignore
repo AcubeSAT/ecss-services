@@ -1,5 +1,6 @@
 # Build files
 cmake-build-debug
+docs
 
 # Prerequisites
 *.d
