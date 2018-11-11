@@ -1,0 +1,28 @@
+image: rikorose/gcc-cmake
+
+before_script:
+  - apt-get update -qq && apt-get install -y -qq cppcheck vera++ clang-tidy
+  - g++ --version
+  - cppcheck --version
+  - vera++ --version
+  - cp ci/vera.profile /usr/lib/vera++/profiles/custom
+
+build:
+  script:
+    - cmake . -DCMAKE_CXX_FLAGS="-Werror"
+    - make -j4
+    - make clean
+    - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra" # Build again, but with more warnings
+    - make -j4
+
+cppcheck:
+  script:
+    - cppcheck --enable=all --error-exitcode=1 -I inc src
+
+vera:
+  script:
+    - vera++ --error --profile custom `find src inc -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'`
+
+clang-tidy:
+  script:
+    - cd ci && clang-tidy `find ../src/ -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` -- -std=c++11 -I../inc
