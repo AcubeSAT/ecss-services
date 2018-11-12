@@ -18,6 +18,9 @@ int main() {
 	TestService testService;
 	Message receivedPacket = Message(17, 1, Message::TC, 1);
 	testService.areYouAlive(receivedPacket);
+	receivedPacket = Message(17, 3, Message::TC, 1);
+	receivedPacket.appendInteger(static_cast<uint16_t>(7));
+	testService.onBoardConnection(receivedPacket);
 
 	return 0;
 }
