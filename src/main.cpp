@@ -1,4 +1,5 @@
 #include <iostream>
+#include <Services/TestService.hpp>
 #include "Message.hpp"
 
 int main() {
@@ -11,6 +12,12 @@ int main() {
 
 	std::cout << "Hello, World!" << std::endl;
 	std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
-//    std::cout << *(reinterpret_cast<float*>(packet.data + 7)) << std::endl;
+
+
+	// ST[17] test
+	TestService testService;
+	Message receivedPacket = Message(17, 1, Message::TC, 1);
+	testService.areYouAlive(receivedPacket);
+
 	return 0;
 }

@@ -5,7 +5,7 @@ project(ecss_services)
 set(CMAKE_CXX_STANDARD 17)
 
 # Specify the directories for #includes
-include_directories ("${PROJECT_SOURCE_DIR}/inc")
+include_directories("${PROJECT_SOURCE_DIR}/inc")
 
 # Specify the .cpp files for the executables
-add_executable(ecss_services src/main.cpp src/Message.cpp)
+add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Services/TestService.cpp)

@@ -17,7 +17,7 @@ Checks:          >
   -misc-non-private-member-variables-in-classes,
   performance-*,
   readability-*,
-WarningsAsErrors: '*,-misc-unused-parameters,-llvm-header-guard,-cppcoreguidelines-pro-type-member-init'
+WarningsAsErrors: '*,-misc-unused-parameters,-llvm-header-guard,-cppcoreguidelines-pro-type-member-init, -google-runtime-references'
 HeaderFilterRegex: '.*'
 AnalyzeTemporaryDtors: false
 ...
