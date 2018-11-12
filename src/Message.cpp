@@ -65,57 +65,11 @@ void Message::appendString(uint8_t size, const char *value) {
     dataSize += size;
 }
 
-void Message::appendBoolean(bool value) {
-    return appendByte(static_cast<uint8_t>(value));
-}
-
-inline void Message::appendEnumerated(uint8_t bits, uint32_t value) {
+void Message::appendEnumerated(uint8_t bits, uint32_t value) {
     // TODO: Implement 32-bit enums, if needed
     assert((value & 0xffff0000) != 0);
 
     return appendBits(bits, value);
-}
-
-inline void Message::appendEnumerated(uint8_t value) {
-    return appendByte(value);
-}
-
-inline void Message::appendEnumerated(uint16_t value) {
-    return appendHalfword(value);
-}
-
-inline void Message::appendEnumerated(uint32_t value) {
-    return appendWord(value);
-}
-
-inline void Message::appendInteger(uint8_t value) {
-    return appendByte(value);
-}
-
-inline void Message::appendInteger(uint16_t value) {
-    return appendHalfword(value);
-}
-
-inline void Message::appendInteger(uint32_t value) {
-    return appendWord(value);
-}
-
-inline void Message::appendInteger(int8_t value) {
-    return appendByte(static_cast<uint8_t>(value));
-}
-
-void Message::appendInteger(int16_t value) {
-    return appendHalfword(static_cast<uint8_t>(value));
-}
-
-void Message::appendInteger(int32_t value) {
-    return appendWord(static_cast<uint8_t>(value));
-}
-
-void Message::appendReal(float value) {
-    static_assert(sizeof(uint32_t) == sizeof(value), "Floating point numbers must be 32 bits long");
-
-    return appendWord(reinterpret_cast<uint32_t&>(value));
 }
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType,

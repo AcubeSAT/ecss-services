@@ -1,6 +1,3 @@
-
-#include <Services/TestService.hpp>
-
 #include "Services/TestService.hpp"
 
 void TestService::areYouAlive(const Message &request) {
