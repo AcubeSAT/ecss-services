@@ -8,7 +8,7 @@ int main() {
 	packet.appendString(5, "hello");
 	packet.appendBits(15, 0x28a8);
 	packet.appendBits(1, 1);
-	packet.appendReal(5.7);
+	packet.appendFloat(5.7);
 
 	std::cout << "Hello, World!" << std::endl;
 	std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
@@ -19,7 +19,7 @@ int main() {
 	Message receivedPacket = Message(17, 1, Message::TC, 1);
 	testService.areYouAlive(receivedPacket);
 	receivedPacket = Message(17, 3, Message::TC, 1);
-	receivedPacket.appendInteger(static_cast<uint16_t>(7));
+	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
 	return 0;

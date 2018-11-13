@@ -98,7 +98,7 @@ public:
 	 *
 	 * PTC = 1, PFC = 8
 	 */
-	void appendEnumerated(uint8_t value) {
+	void appendEnum8(uint8_t value) {
 		return appendByte(value);
 	};
 
@@ -107,7 +107,7 @@ public:
 	 *
 	 * PTC = 1, PFC = 16
 	 */
-	void appendEnumerated(uint16_t value) {
+	void appendEnum16(uint16_t value) {
 		return appendHalfword(value);
 	}
 
@@ -116,7 +116,7 @@ public:
 	 *
 	 * PTC = 1, PFC = 32
 	 */
-	void appendEnumerated(uint32_t value) {
+	void appendEnum32(uint32_t value) {
 		return appendWord(value);
 	}
 
@@ -125,7 +125,7 @@ public:
 	 *
 	 * PTC = 2, PFC = 4
 	 */
-	void appendInteger(uint8_t value) {
+	void appendUint8(uint8_t value) {
 		return appendByte(value);
 	}
 
@@ -134,7 +134,7 @@ public:
 	 *
 	 * PTC = 2, PFC = 8
 	 */
-	void appendInteger(uint16_t value) {
+	void appendUint16(uint16_t value) {
 		return appendHalfword(value);
 	}
 
@@ -143,7 +143,7 @@ public:
 	 *
 	 * PTC = 2, PFC = 14
 	 */
-	void appendInteger(uint32_t value) {
+	void appendUint32(uint32_t value) {
 		return appendWord(value);
 	}
 
@@ -152,7 +152,7 @@ public:
 	 *
 	 * PTC = 3, PFC = 4
 	 */
-	void appendInteger(int8_t value) {
+	void appendSint8(int8_t value) {
 		return appendByte(reinterpret_cast<uint8_t&>(value));
 	}
 
@@ -161,7 +161,7 @@ public:
 	 *
 	 * PTC = 3, PFC = 8
 	 */
-	void appendInteger(int16_t value) {
+	void appendSint16(int16_t value) {
 		return appendHalfword(reinterpret_cast<uint16_t&>(value));
 	}
 
@@ -170,7 +170,7 @@ public:
 	 *
 	 * PTC = 3, PFC = 14
 	 */
-	void appendInteger(int32_t value) {
+	void appendSint32(int32_t value) {
 		return appendWord(reinterpret_cast<uint32_t&>(value));
 	}
 
@@ -179,7 +179,7 @@ public:
 	 *
 	 * PTC = 5, PFC = 1
 	 */
-	void appendReal(float value) {
+	void appendFloat(float value) {
 		static_assert(sizeof(uint32_t) == sizeof(value), "Floating point numbers must be 32 bits long");
 
 		return appendWord(reinterpret_cast<uint32_t&>(value));

@@ -12,7 +12,7 @@ void TestService::onBoardConnection(const Message &request) {
 	Message report = createTM(4);
 
 	// TODO: This is not the correct way to do this! Fetching functions will be added later
-	report.appendInteger(request.data[1]);
+	report.appendUint8(request.data[1]);
 
 	storeMessage(report);
 }
