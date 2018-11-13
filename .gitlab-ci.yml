@@ -17,12 +17,12 @@ build:
 
 cppcheck:
   script:
-    - cppcheck --enable=all --error-exitcode=1 -I inc src
+    - bash -x ci/cppcheck.sh
 
 vera:
   script:
-    - vera++ --error --profile custom `find src inc -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'`
+    - bash -x ci/vera.sh
 
 clang-tidy:
   script:
-    - cd ci && clang-tidy `find ../src/ -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` -- -std=c++11 -I../inc
+    - bash -x ci/clang-tidy.sh
