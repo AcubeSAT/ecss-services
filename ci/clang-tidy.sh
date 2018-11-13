@@ -7,5 +7,8 @@
 # $ ci/clang-tidy.sh
 #
 
+echo -e "\033[0;34mRunning clang-tidy...\033[0m"
+
 cd "$(dirname "$0")"
-clang-tidy `find ../src/ -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` -- -std=c++11 -I../inc
+clang-tidy-4.0 `find ../src/ -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` \
+    -- -std=c++14 -I../inc
