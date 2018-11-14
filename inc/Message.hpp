@@ -89,14 +89,18 @@ public:
 	 * Adds an enumerated parameter consisting of an arbitrary number of bits to the end of the
 	 * message
 	 *
-	 * PTC = 1, PFC = \p bits
+	 * PTC = 2, PFC = \p bits
 	 */
-	void appendEnumerated(uint8_t bits, uint32_t value);
+	void appendEnumerated(uint8_t bits, uint32_t value) {
+		// TODO: Implement 32-bit enums, if needed
+
+		return appendBits(bits, value);
+	}
 
 	/**
 	 * Adds an enumerated parameter consisting of 1 byte to the end of the message
 	 *
-	 * PTC = 1, PFC = 8
+	 * PTC = 2, PFC = 8
 	 */
 	void appendEnum8(uint8_t value) {
 		return appendByte(value);
@@ -105,7 +109,7 @@ public:
 	/**
 	 * Adds an enumerated parameter consisting of 2 bytes to the end of the message
 	 *
-	 * PTC = 1, PFC = 16
+	 * PTC = 2, PFC = 16
 	 */
 	void appendEnum16(uint16_t value) {
 		return appendHalfword(value);
@@ -114,7 +118,7 @@ public:
 	/**
 	 * Adds an enumerated parameter consisting of 4 bytes to the end of the message
 	 *
-	 * PTC = 1, PFC = 32
+	 * PTC = 2, PFC = 32
 	 */
 	void appendEnum32(uint32_t value) {
 		return appendWord(value);
@@ -123,7 +127,7 @@ public:
 	/**
 	 * Adds a 1 byte unsigned integer to the end of the message
 	 *
-	 * PTC = 2, PFC = 4
+	 * PTC = 3, PFC = 4
 	 */
 	void appendUint8(uint8_t value) {
 		return appendByte(value);
@@ -132,7 +136,7 @@ public:
 	/**
 	 * Adds a 2 byte unsigned integer to the end of the message
 	 *
-	 * PTC = 2, PFC = 8
+	 * PTC = 3, PFC = 8
 	 */
 	void appendUint16(uint16_t value) {
 		return appendHalfword(value);
@@ -141,7 +145,7 @@ public:
 	/**
 	 * Adds a 4 byte unsigned integer to the end of the message
 	 *
-	 * PTC = 2, PFC = 14
+	 * PTC = 3, PFC = 14
 	 */
 	void appendUint32(uint32_t value) {
 		return appendWord(value);
@@ -150,28 +154,28 @@ public:
 	/**
 	 * Adds a 1 byte signed integer to the end of the message
 	 *
-	 * PTC = 3, PFC = 4
+	 * PTC = 4, PFC = 4
 	 */
 	void appendSint8(int8_t value) {
-		return appendByte(reinterpret_cast<uint8_t&>(value));
+		return appendByte(reinterpret_cast<uint8_t &>(value));
 	}
 
 	/**
 	 * Adds a 2 byte signed integer to the end of the message
 	 *
-	 * PTC = 3, PFC = 8
+	 * PTC = 4, PFC = 8
 	 */
 	void appendSint16(int16_t value) {
-		return appendHalfword(reinterpret_cast<uint16_t&>(value));
+		return appendHalfword(reinterpret_cast<uint16_t &>(value));
 	}
 
 	/**
 	 * Adds a 4 byte signed integer to the end of the message
 	 *
-	 * PTC = 3, PFC = 14
+	 * PTC = 4, PFC = 14
 	 */
 	void appendSint32(int32_t value) {
-		return appendWord(reinterpret_cast<uint32_t&>(value));
+		return appendWord(reinterpret_cast<uint32_t &>(value));
 	}
 
 	/**
@@ -180,7 +184,11 @@ public:
 	 * PTC = 5, PFC = 1
 	 */
 	void appendFloat(float value) {
-		static_assert(sizeof(uint32_t) == sizeof(value), "Floating point numbers must be 32 bits long");
+		static_assert(sizeof(uint32_t) == sizeof(value),
+		              "Floating point numbers must be 32 bits long");
+
+		return appendWord(reinterpret_cast<uint32_t &>(value));
+	}
 
 		return appendWord(reinterpret_cast<uint32_t&>(value));
 	}

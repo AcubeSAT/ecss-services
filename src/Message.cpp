@@ -1,11 +1,19 @@
 #include "Message.hpp"
 #include <cstring>
+#include <Message.hpp>
+
+
+Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType,
+                 uint16_t applicationId) : serviceType(serviceType), messageType(messageType),
+                                           packetType(packetType), applicationId(applicationId) {}
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
-	assert(dataSize < ECSS_MAX_MESSAGE_SIZE);
-	assert(numBits < 16);
+	// TODO: Add assertion that data does not contain 1s outside of numBits bits
+	assert(numBits <= 16);
 
 	while (numBits > 0) { // For every sequence of 8 bits...
+		assert(dataSize < ECSS_MAX_MESSAGE_SIZE);
+
 		if (currentBit + numBits >= 8) {
 			// Will have to shift the bits and insert the next ones later
 			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
@@ -65,13 +73,7 @@ void Message::appendString(uint8_t size, const char *value) {
 	dataSize += size;
 }
 
-void Message::appendEnumerated(uint8_t bits, uint32_t value) {
-	// TODO: Implement 32-bit enums, if needed
-	assert((value & 0xffff0000) != 0);
 
-	return appendBits(bits, value);
+	return value;
 }
 
-Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType,
-                 uint16_t applicationId) : serviceType(serviceType), messageType(messageType),
-                                           packetType(packetType), applicationId(applicationId) {}
