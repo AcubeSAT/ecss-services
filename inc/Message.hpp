@@ -7,6 +7,9 @@
 
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
+ *
+ * @todo Make sure that a message can't be written to or read from at the same time, or make
+ *       readable and writable message different classes
  */
 class Message {
 public:
@@ -40,6 +43,9 @@ public:
 //private:
 	uint8_t currentBit = 0;
 
+	// Next byte to read for read...() functions
+	uint16_t readPosition = 0;
+
 	/**
 	 * Appends the least significant \p numBits from \p data to the message
 	 *
@@ -71,6 +77,36 @@ public:
 	 * @todo See if more than uint8_t strings will be supported
 	 */
 	void appendString(uint8_t size, const char *value);
+
+	/**
+	 * Reads the next \p numBits bits from the the message in a big-endian format
+	 * @param numBits
+	 * @return A maximum number of 16 bits is returned (in big-endian format)
+	 */
+	uint16_t readBits(uint8_t numBits);
+
+	/**
+	 * Reads the next 1 byte from the message
+	 */
+	uint8_t readByte();
+
+	/**
+	 * Reads the next 2 bytes from the message
+	 */
+	uint16_t readHalfword();
+
+	/**
+	 * Reads the next 4 bytes from the message
+	 */
+	uint32_t readWord();
+
+	/**
+	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
+	 *
+	 * NOTE: We assume that \p string is already allocated, and its size is at least
+	 * ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string.
+	 */
+	void readString(char *string, uint8_t size);
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType,
@@ -190,7 +226,123 @@ public:
 		return appendWord(reinterpret_cast<uint32_t &>(value));
 	}
 
-		return appendWord(reinterpret_cast<uint32_t&>(value));
+	/**
+	 * Fetches a single-byte boolean value from the current position in the message
+	 *
+	 * PTC = 1, PFC = 0
+	 */
+	bool readBoolean() {
+		return static_cast<bool>(readByte());
+	}
+
+	/**
+	 * Fetches an enumerated parameter consisting of an arbitrary number of bits from the current
+	 * position in the message
+	 *
+	 * PTC = 2, PFC = \p bits
+	 */
+	uint32_t readEnumerated(uint8_t bits) {
+		return readBits(bits);
+	}
+
+	/**
+	 * Fetches an enumerated parameter consisting of 1 byte from the current position in the message
+	 *
+	 * PTC = 2, PFC = 8
+	 */
+	uint8_t readEnum8() {
+		return readByte();
+	}
+
+	/**
+	 * Fetches an enumerated parameter consisting of 2 bytes from the current position in the
+	 * message
+	 *
+	 * PTC = 2, PFC = 16
+	 */
+	uint16_t readEnum16() {
+		return readHalfword();
+	}
+
+	/**
+	 * Fetches an enumerated parameter consisting of 4 bytes from the current position in the
+	 * message
+	 *
+	 * PTC = 2, PFC = 32
+	 */
+	uint32_t readEnum32() {
+		return readWord();
+	}
+
+	/**
+	 * Fetches an 1-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 3, PFC = 4
+	 */
+	uint8_t readUint8() {
+		return readByte();
+	}
+
+	/**
+	 * Fetches a 2-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 3, PFC = 8
+	 */
+	uint16_t readUint16() {
+		return readHalfword();
+	}
+
+	/**
+	 * Fetches a 4-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 3, PFC = 14
+	 */
+	uint32_t readUint32() {
+		return readWord();
+	}
+
+	/**
+	 * Fetches an 1-byte signed integer from the current position in the message
+	 *
+	 * PTC = 4, PFC = 4
+	 */
+	int8_t readSint8() {
+		uint8_t value = readByte();
+		return reinterpret_cast<int8_t &>(value);
+	}
+
+	/**
+	 * Fetches a 2-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 4, PFC = 8
+	 */
+	int16_t readSint16() {
+		uint16_t value = readHalfword();
+		return reinterpret_cast<int16_t &>(value);
+	}
+
+	/**
+	 * Fetches a 4-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 4, PFC = 14
+	 */
+	int32_t readSint32() {
+		uint32_t value = readWord();
+		return reinterpret_cast<int32_t &>(value);
+	}
+
+	/**
+	 * Fetches an 4-byte single-precision floating point number from the current position in the
+	 * message
+	 *
+	 * PTC = 5, PFC = 1
+	 */
+	float readFloat() {
+		static_assert(sizeof(uint32_t) == sizeof(float),
+		              "Floating point numbers must be 32 bits long");
+
+		uint32_t value = readWord();
+		return reinterpret_cast<float &>(value);
 	}
 };
 

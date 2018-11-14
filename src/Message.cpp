@@ -67,13 +67,75 @@ void Message::appendWord(uint32_t value) {
 
 void Message::appendString(uint8_t size, const char *value) {
 	assert(dataSize + size <= ECSS_MAX_MESSAGE_SIZE);
+	assert(size < ECSS_MAX_STRING_SIZE);
 
 	memcpy(data + dataSize, value, size);
 
 	dataSize += size;
 }
 
+uint16_t Message::readBits(uint8_t numBits) {
+	assert(numBits <= 16);
+	// TODO: Add assert
+
+	uint16_t value = 0x0;
+
+	while (numBits > 0) {
+		assert(readPosition < ECSS_MAX_MESSAGE_SIZE);
+
+		if (currentBit + numBits >= 8) {
+			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
+
+			auto maskedData = static_cast<uint8_t>(data[readPosition] & ((1 << bitsToAddNow) - 1));
+			value |= maskedData << (numBits - bitsToAddNow);
+
+			numBits -= bitsToAddNow;
+			currentBit = 0;
+			readPosition++;
+		} else {
+			value |= (data[readPosition] >> (8 - currentBit - numBits)) & ((1 << numBits) - 1);
+			currentBit = currentBit + numBits;
+			numBits = 0;
+		}
+	}
 
 	return value;
 }
 
+uint8_t Message::readByte() {
+	assert(readPosition < ECSS_MAX_MESSAGE_SIZE);
+
+	uint8_t value = data[readPosition];
+	readPosition++;
+
+	return value;
+}
+
+uint16_t Message::readHalfword() {
+	assert(readPosition + 2 < ECSS_MAX_MESSAGE_SIZE);
+
+	uint16_t value = (data[readPosition] << 8) | data[readPosition + 1];
+	readPosition += 2;
+
+	return value;
+}
+
+uint32_t Message::readWord() {
+	assert(readPosition + 4 < ECSS_MAX_MESSAGE_SIZE);
+
+	uint32_t value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) |
+	                 (data[readPosition + 2] << 8) | data[readPosition + 3];
+	readPosition += 4;
+
+	return value;
+}
+
+void Message::readString(char *string, uint8_t size) {
+	assert(readPosition + size <= ECSS_MAX_MESSAGE_SIZE);
+	assert(size < ECSS_MAX_STRING_SIZE);
+
+	memcpy(string, data + readPosition, size);
+	string[size] = '\0';
+
+	readPosition += size;
+}

@@ -4,6 +4,8 @@
 // Todo: Specify maximum size for regular messages
 #define ECSS_MAX_MESSAGE_SIZE 1024
 
+#define ECSS_MAX_STRING_SIZE 256
+
 // 7.4.4.1c
 #define ECSS_PUS_VERSION 2
 

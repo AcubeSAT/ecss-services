@@ -9,10 +9,15 @@ int main() {
 	packet.appendBits(15, 0x28a8);
 	packet.appendBits(1, 1);
 	packet.appendFloat(5.7);
+	packet.appendSint32(-123456789);
 
 	std::cout << "Hello, World!" << std::endl;
 	std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
 
+	char string[6];
+	packet.readString(string, 5);
+	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
+	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
 	// ST[17] test
 	TestService testService;
