@@ -18,6 +18,8 @@ build:
 
 tests:
   stage: test
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
   script:
     - cmake .
     - make test -j4
