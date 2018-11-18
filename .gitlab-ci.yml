@@ -20,8 +20,13 @@ tests:
   stage: test
   script:
     - cmake .
-    - make tests -j4
-    - ./tests
+    - make test -j4
+    - ./test
+  after_script:
+    - ./test -r junit -o junit.xml
+  artifacts:
+    reports:
+      junit: junit.xml
 
 cppcheck:
   stage: build

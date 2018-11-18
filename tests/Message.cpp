@@ -75,7 +75,7 @@ TEST_CASE("Requirement 7.3.2 (Boolean)", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.3 (Enumerated)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.appendEnum8(230);
+	message.appendEnum8(231);
 	message.appendEnum16(15933);
 	message.appendEnum32(2000001);
 	message.appendEnumerated(12, 2052);
