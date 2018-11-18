@@ -17,7 +17,7 @@ public:
 	 * Get a message from the list of queued messages to send
 	 * @param number The number of the message, starting from 0 in chronological order
 	 */
-	static Message &get(unsigned long number) {
+	static Message &get(uint64_t number) {
 		return queuedMessages.at(number);
 	}
 
@@ -31,7 +31,7 @@ public:
 	/**
 	 * Counts the number of messages in the queue
 	 */
-	static unsigned long count() {
+	static uint64_t count() {
 		return queuedMessages.size();
 	}
 
