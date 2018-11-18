@@ -104,10 +104,12 @@ TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 	CHECK(message.readUint32() == 2000001);
 
 	SECTION("7.4.3") {
-		// Make sure the endianness of the message data is correct
-		// As per the ECSS standard, stored data should be big-endian. However, ARM and x86
-		// processors store data in little endian format. As a result, special care needs to be
-		// taken for compliance.
+		/**
+		 * Make sure the endianness of the message data is correct.
+		 * As per the ECSS standard, stored data should be big-endian. However, ARM and x86
+		 * processors store data in little endian format. As a result, special care needs to be
+		 * taken for compliance.
+		 */
 		CHECK(message.data[1] == 0x3e);
 		CHECK(message.data[2] == 0x3d);
 	}
