@@ -68,7 +68,7 @@ TEST_CASE("Requirement 7.3.2 (Boolean)", "[message][ecss]") {
 
 	REQUIRE(message.dataSize == 2);
 
-	CHECK(!message.readBoolean());
+	CHECK_FALSE(message.readBoolean());
 	CHECK(message.readBoolean());
 }
 

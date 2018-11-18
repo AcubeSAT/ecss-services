@@ -30,4 +30,3 @@ TEST_CASE("TM[17,3]", "[service][st17]") {
 	REQUIRE(response.dataSize == 2);
 	CHECK(response.readEnum16() == 40);
 }
-
