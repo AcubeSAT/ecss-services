@@ -17,7 +17,8 @@ int main() {
 
 	char string[6];
 	packet.readString(string, 5);
-	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
+	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1)
+	          << std::endl;
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
 	// ST[17] test
