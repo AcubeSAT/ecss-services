@@ -335,6 +335,8 @@ public:
 	 * Fetches an 4-byte single-precision floating point number from the current position in the
 	 * message
 	 *
+	 * @todo Check if endianness matters for this
+	 *
 	 * PTC = 5, PFC = 1
 	 */
 	float readFloat() {
