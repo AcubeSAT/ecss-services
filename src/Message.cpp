@@ -139,3 +139,8 @@ void Message::readString(char *string, uint8_t size) {
 
 	readPosition += size;
 }
+
+void Message::resetRead() {
+	readPosition = 0;
+	currentBit = 0;
+}

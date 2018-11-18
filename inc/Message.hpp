@@ -344,6 +344,11 @@ public:
 		uint32_t value = readWord();
 		return reinterpret_cast<float &>(value);
 	}
+
+	/**
+	 * Reset the message reading status, and start reading data from it again
+	 */
+	void resetRead();
 };
 
 
