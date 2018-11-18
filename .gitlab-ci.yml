@@ -23,7 +23,7 @@ tests:
   script:
     - cmake .
     - make test -j4
-    - ./test
+    - ./test --use-colour yes
   after_script:
     - ./test -r junit -o junit.xml
   artifacts:
