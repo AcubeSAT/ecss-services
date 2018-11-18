@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Services/TestService.hpp>
+#include "Services/ParameterService.hpp"
 #include "Message.hpp"
 
 int main() {
@@ -26,6 +27,13 @@ int main() {
 	receivedPacket = Message(17, 3, Message::TC, 1);
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
+
+	//ST[20] test
+	ParameterService paramService;
+	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
+	sentPacket.appendByte(10);  //the packet sent contains the ID of the desired parameter
+	Message returnedPacket = paramService.reportParameter(sentPacket);
+	std::cout << "Year: " << *returnedPacket.data << std::endl;
 
 	return 0;
 }
