@@ -18,6 +18,6 @@ add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Se
 
 IF(EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
 add_subdirectory(lib/Catch2)
-add_executable(test src/Message.cpp src/Service.cpp src/Services/TestService.cpp tests/tests.cpp tests/Message.cpp)
+add_executable(test src/Message.cpp src/Services/TestService.cpp tests/tests.cpp tests/Message.cpp tests/TestPlatform.cpp tests/Services/TestService.cpp)
 target_link_libraries(test Catch2::Catch2)
 ENDIF()
