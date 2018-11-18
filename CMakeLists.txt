@@ -16,6 +16,8 @@ add_custom_target(check
 # Specify the .cpp files for the executables
 add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Services/TestService.cpp)
 
+IF(EXISTS lib/Catch2)
 add_subdirectory(lib/Catch2)
 add_executable(tests src/Message.cpp src/Service.cpp src/Services/TestService.cpp tests/tests.cpp tests/Message.cpp)
 target_link_libraries(tests Catch2::Catch2)
+ENDIF()
