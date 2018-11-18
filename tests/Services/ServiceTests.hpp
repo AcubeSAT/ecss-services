@@ -17,7 +17,7 @@ public:
 	 * Get a message from the list of queued messages to send
 	 * @param number The number of the message, starting from 0 in chronological order
 	 */
-	static Message& get(unsigned long number) {
+	static Message &get(unsigned long number) {
 		return queuedMessages.at(number);
 	}
 

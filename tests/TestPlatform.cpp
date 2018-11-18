@@ -14,13 +14,13 @@ void Service::storeMessage(const Message &message) {
 struct ServiceTestsListener : Catch::TestEventListenerBase {
 	using TestEventListenerBase::TestEventListenerBase; // inherit constructor
 
-	void testCaseStarting( Catch::TestCaseInfo const& testInfo ) override {
+	void testCaseStarting(Catch::TestCaseInfo const &testInfo) override {
 		// Perform some setup before a test case is run
 	}
 
-	void testCaseEnded( Catch::TestCaseStats const& testCaseStats ) override {
+	void testCaseEnded(Catch::TestCaseStats const &testCaseStats) override {
 		// Tear-down after a test case is run
 		ServiceTests::reset();
 	}
 };
-CATCH_REGISTER_LISTENER( ServiceTestsListener )
+CATCH_REGISTER_LISTENER(ServiceTestsListener)
