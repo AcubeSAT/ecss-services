@@ -20,7 +20,7 @@ int main() {
 	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1)
 	          << std::endl;
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
-
+	/*
 	// ST[17] test
 	TestService testService;
 	Message receivedPacket = Message(17, 1, Message::TC, 1);
@@ -28,15 +28,16 @@ int main() {
 	receivedPacket = Message(17, 3, Message::TC, 1);
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
+	 */
 
 	// ST[01] test
 	// parameters take random values and works as expected
 	RequestVerificationService reqVerifService;
-	reqVerifService.successAcceptanceVerification(0, static_cast<uint8_t>(1), 2, 2, 10);
-	reqVerifService.failAcceptanceVerification(0, static_cast<uint8_t>(1), 2, 2, 10, 5);
-	reqVerifService.successExecutionVerification(0, static_cast<uint8_t>(1), 2, 2, 10);
-	reqVerifService.failExecutionVerification(0, static_cast<uint8_t>(1), 2, 2, 10, 6);
-	reqVerifService.failRoutingVerification(0, static_cast<uint8_t>(1), 2, 2, 10, 7);
+	reqVerifService.successAcceptanceVerification(0, true, 2, 2, 10);
+	reqVerifService.failAcceptanceVerification(0, true, 2, 2, 10, 5);
+	reqVerifService.successExecutionVerification(0, true, 2, 2, 10);
+	reqVerifService.failExecutionVerification(0, true, 2, 2, 10, 6);
+	reqVerifService.failRoutingVerification(0, true, 2, 2, 10, 7);
 
 	return 0;
 }
