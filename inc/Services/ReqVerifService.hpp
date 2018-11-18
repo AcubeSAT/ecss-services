@@ -1,0 +1,56 @@
+
+#ifndef ECSS_SERVICES_REQVERIFSERVICE_HPP
+#define ECSS_SERVICES_REQVERIFSERVICE_HPP
+
+#include "Service.hpp"
+
+/**
+ * Implementation of the ST[01] request verification service
+ *
+ * @todo All telemetry packets shall have a telemetry packet secondary header
+ */
+class ReqVerifService : public Service {
+public:
+	ReqVerifService() {
+		serviceType = 1;
+	}
+
+	/**
+	 * TM[1,1] successful acceptance verification report
+	 */
+	void successAcceptVerif(uint8_t packetVersionNum, uint8_t packetType, bool secondaryHeaderFlag,
+	                        uint16_t APID, uint8_t seqFlag, uint16_t packetSeqCount);
+
+	/**
+	 * TM[1,2] failed acceptance verification report
+	 */
+	void failAccessVerif(uint8_t packetVersionNum, uint8_t packetType, bool secondaryHeaderFlag,
+	                     uint16_t APID, uint8_t seqFlag, uint16_t packetSeqCount, uint16_t code);
+
+
+	/**
+ 	*  TM[1,7] successful completion of execution verification report
+ 	*/
+	void successExeVerif(uint8_t packetVersionNum, uint8_t packetType, bool secondaryHeaderFlag,
+	                     uint16_t APID, uint8_t seqFlag, uint16_t packetSeqCount);
+
+	/**
+ 	*  TM[1,8] failed completion of execution verification report
+ 	*/
+	void failExeVerif(uint8_t packetVersionNum, uint8_t packetType,
+	                  bool secondaryHeaderFlag,
+	                  uint16_t APID, uint8_t seqFlag, uint16_t packetSeqCount,
+	                  uint16_t code);
+
+	/**
+ 	*  TM[1,10] failed routing verification report
+ 	*/
+	void failRoutVerif(uint8_t packetVersionNum, uint8_t packetType,
+	                   bool secondaryHeaderFlag,
+	                   uint16_t APID, uint8_t seqFlag, uint16_t packetSeqCount,
+	                   uint16_t code);
+
+
+};
+
+#endif //ECSS_SERVICES_REQVERIFSERVICE_HPP

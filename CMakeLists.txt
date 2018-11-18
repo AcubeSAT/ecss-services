@@ -14,4 +14,4 @@ add_custom_target(check
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
 # Specify the .cpp files for the executables
-add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Services/TestService.cpp)
+add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Services/TestService.cpp src/Services/ReqVerifService.cpp)
