@@ -1,6 +1,6 @@
 #include <iostream>
 #include <Services/TestService.hpp>
-#include <Services/ReqVerifService.hpp>
+#include <Services/RequestVerificationService.hpp>
 #include "Message.hpp"
 
 int main() {
@@ -31,17 +31,17 @@ int main() {
 
 	// ST[01] test
 	// parameters take random values and works as expected
-	ReqVerifService reqVerifService;
+	RequestVerificationService reqVerifService;
 	receivedPacket = Message(1, 1, Message::TC, 2);
-	reqVerifService.successAcceptVerif(2, 0, 1, 2, 2, 10);
+	reqVerifService.successAcceptanceVerification(0, (uint8_t )1, 2, 2, 10);
 	receivedPacket = Message(1, 2, Message::TC, 2);
-	reqVerifService.failAccessVerif(2, 0, 1, 2, 2, 10, 5);
+	reqVerifService.failAcceptanceVerification(0, (uint8_t )1, 2, 2, 10, 5);
 	receivedPacket = Message(1, 7, Message::TC, 2);
-	reqVerifService.successExeVerif(2, 0, 1, 2, 2, 10);
+	reqVerifService.successExecutionVerification(0, (uint8_t )1, 2, 2, 10);
 	receivedPacket = Message(1, 8, Message::TC, 2);
-	reqVerifService.failExeVerif(2, 0, 1, 2, 2, 10, 6);
+	reqVerifService.failExecutionVerification(0, (uint8_t )1, 2, 2, 10, 6);
 	receivedPacket = Message(1, 10, Message::TC, 2);
-	reqVerifService.failRoutVerif(2, 0, 1, 2, 2, 10, 7);
+	reqVerifService.failRoutingVerification(0, (uint8_t )1, 2, 2, 10, 7);
 
 	return 0;
 }
