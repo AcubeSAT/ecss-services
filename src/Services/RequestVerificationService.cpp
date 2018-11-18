@@ -14,7 +14,7 @@ void RequestVerificationService::successAcceptanceVerification(uint8_t packetTyp
 
 	report.appendBits(3, ECSS_PUS_VERSION); //packet version number
 	report.appendBits(1, packetType);
-	report.appendBits(1, (uint16_t) secondaryHeaderFlag);
+	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
 	report.appendBits(11, APID);
 	report.appendBits(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -38,7 +38,7 @@ RequestVerificationService::failAcceptanceVerification(uint8_t packetType,
 
 	report.appendBits(3, ECSS_PUS_VERSION); //packet version number
 	report.appendBits(1, packetType);
-	report.appendBits(1, (uint16_t) secondaryHeaderFlag);
+	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
 	report.appendBits(11, APID);
 	report.appendBits(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -62,7 +62,7 @@ void RequestVerificationService::successExecutionVerification(uint8_t packetType
 
 	report.appendBits(3, ECSS_PUS_VERSION); //packet version number
 	report.appendBits(1, packetType);
-	report.appendBits(1, (uint16_t) secondaryHeaderFlag);
+	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
 	report.appendBits(11, APID);
 	report.appendBits(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -86,7 +86,7 @@ RequestVerificationService::failExecutionVerification(uint8_t packetType,
 
 	report.appendBits(3, ECSS_PUS_VERSION); //packet version number
 	report.appendBits(1, packetType);
-	report.appendBits(1, (uint16_t) secondaryHeaderFlag);
+	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
 	report.appendBits(11, APID);
 	report.appendBits(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -112,7 +112,7 @@ RequestVerificationService::failRoutingVerification(uint8_t packetType,
 
 	report.appendBits(3, ECSS_PUS_VERSION); //packet version number
 	report.appendBits(1, packetType);
-	report.appendBits(1, (uint16_t) secondaryHeaderFlag);
+	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
 	report.appendBits(11, APID);
 	report.appendBits(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
