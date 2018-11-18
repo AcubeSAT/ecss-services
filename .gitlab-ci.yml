@@ -1,12 +1,7 @@
 image: rikorose/gcc-cmake
 
 before_script:
-  - apt-get update -qq && apt-get install -y -qq cppcheck vera++ clang-tidy-4.0
   - g++ --version
-  - cppcheck --version
-  - vera++ --version
-  - clang-tidy-4.0 --version
-  - cp ci/vera.profile /usr/lib/vera++/profiles/custom
 
 build:
   script:
@@ -17,13 +12,23 @@ build:
     - make -j4
 
 cppcheck:
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq cppcheck
+    - cppcheck --version
   script:
     - bash -x ci/cppcheck.sh
 
 vera:
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq vera++
+    - vera++ --version
+    - cp ci/vera.profile /usr/lib/vera++/profiles/custom
   script:
     - bash -x ci/vera.sh
 
 clang-tidy:
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq clang-tidy-4.0
+    - clang-tidy-4.0 --version
   script:
     - bash -x ci/clang-tidy.sh
