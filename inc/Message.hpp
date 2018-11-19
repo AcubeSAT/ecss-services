@@ -335,6 +335,8 @@ public:
 	 * Fetches an 4-byte single-precision floating point number from the current position in the
 	 * message
 	 *
+	 * @todo Check if endianness matters for this
+	 *
 	 * PTC = 5, PFC = 1
 	 */
 	float readFloat() {
@@ -344,6 +346,11 @@ public:
 		uint32_t value = readWord();
 		return reinterpret_cast<float &>(value);
 	}
+
+	/**
+	 * Reset the message reading status, and start reading data from it again
+	 */
+	void resetRead();
 };
 
 
