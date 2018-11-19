@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Services/TestService.hpp>
 #include "Message.hpp"
+#include "Services/MemMangService.hpp"
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -26,6 +27,14 @@ int main() {
 	receivedPacket = Message(17, 3, Message::TC, 1);
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
+
+	// ST[06] testing
+	MemoryManagementService::RawDataMemoryManagement memMangService;
+	Message rcvPack = Message(6, 2, Message::TC, 1);
+	rcvPack.appendUint8(1); // Iteration count
+	rcvPack.appendUint32(0x45327845); // Start address
+	rcvPack.appendUint16(0); // Data read length
+	memMangService.dumpRawData(rcvPack);
 
 	return 0;
 }
