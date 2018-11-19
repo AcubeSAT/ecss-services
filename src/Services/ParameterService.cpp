@@ -12,7 +12,7 @@ ParameterService::ParameterService() {
 	 * This normally will be initialized with actual values on boot.
 	 */
 
-	for (int i = 0; i < 5; i++) {   // hack just to shut CLion up (warning about range-based for loops)
+	for (int i = 0; i < CONFIGLENGTH; i++) {
 
 		paramsList[i].paramId = 0;
 		paramsList[i].settingData = 0;
@@ -45,16 +45,16 @@ Message ParameterService::reportParameter(Message paramId) {
 	 */
 
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
-	uint16_t reqParamId = paramId.readHalfword(); // parameter ID must be accessed only once
+	uint16_t reqParamId = paramId.readUint16(); // parameter ID must be accessed only once
 
 	if (paramId.packetType == Message::TC && paramId.serviceType == 20 && paramId.messageType == 1) {
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < CONFIGLENGTH; i++) {
 
 			if (paramsList[i].paramId == reqParamId) {
 
-				reqParam.appendHalfword(paramsList[i].paramId);
-				reqParam.appendWord(paramsList[i].settingData);
+				reqParam.appendUint16(paramsList[i].paramId);
+				reqParam.appendUint32(paramsList[i].settingData);
 				break;
 			}
 		}
@@ -66,3 +66,4 @@ Message ParameterService::reportParameter(Message paramId) {
 /*void ParameterService::setParamData(Message paramId) {
 
 }*/
+

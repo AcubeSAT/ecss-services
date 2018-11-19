@@ -31,9 +31,13 @@ int main() {
 	//ST[20] test
 	ParameterService paramService;
 	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
-	sentPacket.appendHalfword(341);  //the packet sent contains the ID of the desired parameter
+	sentPacket.appendUint16(341);  //the packet sent contains the ID of the desired parameter
 	Message returnedPacket = paramService.reportParameter(sentPacket);
-	std::cout << "Parameter ID: " << returnedPacket.readHalfword() << "Parameter value: " << returnedPacket.readHalfword() << std::endl;
+
+	uint16_t id = returnedPacket.readUint16();
+	uint32_t val = returnedPacket.readUint32();
+
+	std::cout << "Parameter ID: " << std::dec << id << std::endl << "Parameter value: " << std::dec << val << std::endl;
 
 	return 0;
 }

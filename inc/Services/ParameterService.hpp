@@ -3,6 +3,7 @@
 
 #include "Service.hpp"
 #define CONFIGLENGTH 5
+
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C
