@@ -20,7 +20,7 @@ int main() {
 	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1)
 	          << std::endl;
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
-	/*
+
 	// ST[17] test
 	TestService testService;
 	Message receivedPacket = Message(17, 1, Message::TC, 1);
@@ -28,7 +28,6 @@ int main() {
 	receivedPacket = Message(17, 3, Message::TC, 1);
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
-	 */
 
 	// ST[01] test
 	// parameters take random values and works as expected
