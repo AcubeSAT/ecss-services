@@ -32,11 +32,11 @@ int main() {
 	// ST[01] test
 	// parameters take random values and works as expected
 	RequestVerificationService reqVerifService;
-	reqVerifService.successAcceptanceVerification(0, true, 2, 2, 10);
-	reqVerifService.failAcceptanceVerification(0, true, 2, 2, 10, 5);
-	reqVerifService.successExecutionVerification(0, true, 2, 2, 10);
-	reqVerifService.failExecutionVerification(0, true, 2, 2, 10, 6);
-	reqVerifService.failRoutingVerification(0, true, 2, 2, 10, 7);
+	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
+	reqVerifService.failAcceptanceVerification(Message::TC, true, 2, 2, 10, 5);
+	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
+	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
+	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
 
 	return 0;
 }
