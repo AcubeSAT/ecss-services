@@ -7,7 +7,8 @@
  * Implementation of the ST[01] request verification service
  *
  * @todo All telemetry packets shall have a telemetry packet secondary header
- * @todo See if it would be more efficient to use Messages as arguments instead of individual parameters
+ * @todo See if it would be more efficient to use Messages as arguments instead of individual
+ * 		 parameters
  */
 class RequestVerificationService : public Service {
 public:
