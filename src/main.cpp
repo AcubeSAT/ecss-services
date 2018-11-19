@@ -31,9 +31,9 @@ int main() {
 	//ST[20] test
 	ParameterService paramService;
 	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
-	sentPacket.appendByte(10);  //the packet sent contains the ID of the desired parameter
+	sentPacket.appendHalfword(341);  //the packet sent contains the ID of the desired parameter
 	Message returnedPacket = paramService.reportParameter(sentPacket);
-	std::cout << "Year: " << *returnedPacket.data << std::endl;
+	std::cout << "Parameter ID: " << returnedPacket.readHalfword() << "Parameter value: " << returnedPacket.readHalfword() << std::endl;
 
 	return 0;
 }

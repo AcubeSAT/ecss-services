@@ -1,14 +1,18 @@
 #include "Services/ParameterService.hpp"
+#define DEMOMODE
+
+#ifdef DEMOMODE
 #include <ctime>
+#endif
 
 ParameterService::ParameterService() {
-
+#ifdef DEMOMODE
 	/**
 	 * Initializes the parameter list with some dummy values for now.
 	 * This normally will be initialized with actual values on boot.
 	 */
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 5; i++) {   // hack just to shut CLion up (warning about range-based for loops)
 
 		paramsList[i].paramId = 0;
 		paramsList[i].settingData = 0;
@@ -16,41 +20,42 @@ ParameterService::ParameterService() {
 		paramsList[i].ptc = 1;
 	}
 
-	//Test code, setting up one of the parameter fields
+	// Test code, setting up one of the parameter fields
 
-	time_t currTime = time(NULL);
+	time_t currTime = time(nullptr);
 	struct tm* today = localtime(&currTime);
 
-	paramsList[2].paramId = 10;  //random parameter ID
-	paramsList[2].settingData = today -> tm_year;   //the current year
-	paramsList[2].ptc = 3;  //unsigned int
-	paramsList[2].pfc = 14;  //32 bits
+	paramsList[2].paramId = 341;                   // random parameter ID
+	paramsList[2].settingData = today -> tm_min;   // the minute of the current hour
+	paramsList[2].ptc = 3;                         // unsigned int
+	paramsList[2].pfc = 14;                        // 32 bits
+#endif
 }
 
 Message ParameterService::reportParameter(Message paramId) {
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
-	 * containing the current configuration.
+	 * containing the current configuration. No error checking for now, just whether
+	 * the package is of the correct type (in which case it returns an empty message)
 	 *
-	 * @param Message paramSpecifier: a valid TC[20, 1] packet carrying the requested parameter ID
+	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter ID
+	 * @return A TM[20, 2] packet containing the parameter ID
+	 * @todo Implement binary search for the lookup in order to be faster
 	 */
 
-	Message reqParam(20, 2, Message::TM, 1);    //empty TM[20, 2] parameter report message
-	//TODO: Try to have the parameter list always sorted so binary search can be a thing
+	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
+	uint16_t reqParamId = paramId.readHalfword(); // parameter ID must be accessed only once
 
-	if (paramId.packetType == Message::TC) {
+	if (paramId.packetType == Message::TC && paramId.serviceType == 20 && paramId.messageType == 1) {
 
-		if (paramId.serviceType == 20 && paramId.messageType == 1) {
+		for (int i = 0; i < 5; i++) {
 
-			//if TC is of the wrong type return an empty message for now
-			for (int i = 0; i < CONFIGLENGTH; i++) {    //5 is a dummy, as always
+			if (paramsList[i].paramId == reqParamId) {
 
-				if (paramsList[i].paramId == *paramId.data) {
-
-					reqParam.appendHalfword(paramsList[i].paramId);
-					reqParam.appendWord(paramsList[i].settingData);
-				}
+				reqParam.appendHalfword(paramsList[i].paramId);
+				reqParam.appendWord(paramsList[i].settingData);
+				break;
 			}
 		}
 	}
@@ -58,6 +63,6 @@ Message ParameterService::reportParameter(Message paramId) {
 	return reqParam;
 }
 
-void ParameterService::setParamData(Message paramId) {
+/*void ParameterService::setParamData(Message paramId) {
 
-}
+}*/
