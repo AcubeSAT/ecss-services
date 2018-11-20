@@ -34,11 +34,23 @@ int main() {
 
 	//Test code for reportParameter
 	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
-	sentPacket.appendUint16(341);  //the packet sent contains the ID of the desired parameter
-	Message returnedPacket = paramService.reportParameter(sentPacket);
+	sentPacket.appendUint16(2);  //number of contained IDs
+	sentPacket.appendUint16(0);  //first ID
+	sentPacket.appendUint16(1);  //second ID
+	Message returnedPacket = paramService.reportParameterIds(sentPacket);
 
-	std::cout << "Parameter ID: " << std::dec << returnedPacket.readUint16() << std::endl
-	          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
+	uint16_t numOfIds = returnedPacket.readUint16();
+
+	std::cout << std::endl << "Number of contained configs: " << numOfIds << std::endl;
+
+	for (int i = 0; i < numOfIds; i++) {
+
+		std::cout << "Parameter ID: " << std::dec << returnedPacket.readUint16() << std::endl
+		          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
+
+	}
+
+	std::cout << std::endl << "(First value is hours, second is minutes)" << std::endl;
 
 	return 0;
 }

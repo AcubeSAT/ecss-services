@@ -45,7 +45,7 @@ class ParameterService : public Service {
 public:
 	ParameterService();
 
-	Message reportParameterId(Message paramId);
+	Message reportParameterIds(Message paramIds);
 
 	void setParamData(Message newParamValues);
 

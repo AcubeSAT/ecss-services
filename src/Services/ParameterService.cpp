@@ -20,44 +20,52 @@ ParameterService::ParameterService() {
 	time_t currTime = time(nullptr);
 	struct tm *today = localtime(&currTime);
 
-	paramsList[0].paramId = 341;                   // random parameter ID
+	paramsList[0].paramId = 0;                     // random parameter ID
 	paramsList[0].settingData = today->tm_hour;    // the current hour
 	paramsList[0].ptc = 3;                         // unsigned int
 	paramsList[0].pfc = 14;                        // 32 bits
 
-	paramsList[1].paramId = 345;                   // random parameter ID
+	paramsList[1].paramId = 1;                     // random parameter ID
 	paramsList[1].settingData = today->tm_min;     // the current minute
 	paramsList[1].ptc = 3;                         // unsigned int
 	paramsList[1].pfc = 14;                        // 32 bits
 #endif
 }
 
-Message ParameterService::reportParameterId(Message paramId) {
+Message ParameterService::reportParameterIds(Message paramIds) {
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
-	 * containing the current configuration **for the parameter specified in the carried ID**.
+	 * containing the current configuration **for the parameters specified in the carried IDs**.
 	 * No sophisticated error checking for now, just whether the package is of the correct type
 	 * (in which case it returns an empty message)
 	 *
 	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter ID
 	 * @return A TM[20, 2] packet containing the parameter ID
-	 * @todo Implement binary search for the lookup in order to be faster
+	 * @todo Implement binary search for the lookup in order to be faster when the number of
+	 * params inevitably rises
+	 *
+	 * NOTE: Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
 
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
-	uint16_t reqParamId = paramId.readUint16(); // parameter ID must be accessed only once
 
-	if (paramId.packetType == Message::TC && paramId.serviceType == 20 &&
-	    paramId.messageType == 1) {
+	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
+	    paramIds.messageType == 1) {
 
-		for (int i = 0; i < CONFIGLENGTH; i++) {
+		uint16_t ids = paramIds.readUint16();        // first 16bits of the packet are # of IDs
 
-			if (paramsList[i].paramId == reqParamId) {
+		reqParam.appendUint16(ids);                  //include the number of contained IDs
 
-				reqParam.appendUint16(paramsList[i].paramId);  // first 16 bits are the parameter ID
-				reqParam.appendUint32(paramsList[i].settingData); // rest 32 are the current setting
-				break;
+		for (int i = 0; i < ids; i++) {
+
+			uint16_t currId = paramIds.readUint16();      // current ID to be appended
+
+			if (currId < CONFIGLENGTH) {  // check to prevent out-of-bounds access due to invalid id
+
+				reqParam.appendUint16(currId);      // append it to the new packet
+				reqParam.appendUint32(paramsList[currId].settingData);
+				// right after that append the settings
 			}
 		}
 	}
