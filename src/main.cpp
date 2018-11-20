@@ -31,6 +31,8 @@ int main() {
 
 	//ST[20] test
 	ParameterService paramService;
+
+	//Test code for reportParameter
 	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
 	sentPacket.appendUint16(341);  //the packet sent contains the ID of the desired parameter
 	Message returnedPacket = paramService.reportParameter(sentPacket);

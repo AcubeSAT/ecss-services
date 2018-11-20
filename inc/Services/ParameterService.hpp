@@ -45,9 +45,9 @@ class ParameterService : public Service {
 public:
 	ParameterService();
 
-	Message reportParameter(Message paramId);
+	Message reportParameterId(Message paramId);
 
-	//void setParamData(Message& newParamValues);
+	void setParamData(Message newParamValues);
 
 };
 
