@@ -24,7 +24,6 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	//uint8_t *readData = nullptr; // Pointer to store the data read from the memory
 	uint16_t readLength = 0; // Data length to read (updated for each new iteration)
 	uint32_t startAddress = 0; // Start address for the memory read (updated in each new iteration)
-	MemoryManagementService::MemoryID meId;
 
 	// Read the packet's values
 	iterationCount = request.readUint8();
