@@ -37,7 +37,8 @@ int main() {
 	uint16_t id = returnedPacket.readUint16();
 	uint32_t val = returnedPacket.readUint32();
 
-	std::cout << "Parameter ID: " << std::dec << id << std::endl << "Parameter value: " << std::dec << val << std::endl;
+	std::cout << "Parameter ID: " << std::dec << id << std::endl;  //set
+	std::cout << "Parameter value: " << std::dec << val << std::endl;
 
 	return 0;
 }
