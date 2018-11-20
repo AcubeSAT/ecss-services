@@ -17,7 +17,8 @@ int main() {
 
 	char string[6];
 	packet.readString(string, 5);
-	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
+	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1)
+	          << std::endl;
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
 	// ST[17] test
@@ -34,11 +35,10 @@ int main() {
 	sentPacket.appendUint16(341);  //the packet sent contains the ID of the desired parameter
 	Message returnedPacket = paramService.reportParameter(sentPacket);
 
-	uint16_t id = returnedPacket.readUint16();
-	uint32_t val = returnedPacket.readUint32();
+	std::cout << "Parameter ID: " << std::dec << returnedPacket.readUint16() << std::endl
+	          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
 
-	std::cout << "Parameter ID: " << std::dec << id << std::endl;  //set
-	std::cout << "Parameter value: " << std::dec << val << std::endl;
+
 
 	return 0;
 }

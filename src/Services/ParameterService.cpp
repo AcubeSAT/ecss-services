@@ -1,8 +1,11 @@
 #include "Services/ParameterService.hpp"
+
 #define DEMOMODE
 
 #ifdef DEMOMODE
+
 #include <ctime>
+
 #endif
 
 ParameterService::ParameterService() {
@@ -23,10 +26,10 @@ ParameterService::ParameterService() {
 	// Test code, setting up one of the parameter fields
 
 	time_t currTime = time(nullptr);
-	struct tm* today = localtime(&currTime);
+	struct tm *today = localtime(&currTime);
 
 	paramsList[2].paramId = 341;                   // random parameter ID
-	paramsList[2].settingData = today -> tm_min;   // the minute of the current hour
+	paramsList[2].settingData = today->tm_min;   // the minute of the current hour
 	paramsList[2].ptc = 3;                         // unsigned int
 	paramsList[2].pfc = 14;                        // 32 bits
 #endif
@@ -47,7 +50,8 @@ Message ParameterService::reportParameter(Message paramId) {
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
 	uint16_t reqParamId = paramId.readUint16(); // parameter ID must be accessed only once
 
-	if (paramId.packetType == Message::TC && paramId.serviceType == 20 && paramId.messageType == 1) {
+	if (paramId.packetType == Message::TC && paramId.serviceType == 20 &&
+	    paramId.messageType == 1) {
 
 		for (int i = 0; i < CONFIGLENGTH; i++) {
 

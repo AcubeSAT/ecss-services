@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
 #include "Service.hpp"
+
 #define CONFIGLENGTH 5
 
 /**
@@ -40,10 +41,12 @@ class ParameterService : public Service {
 
 	Parameter paramsList[CONFIGLENGTH];   // CONFIGLENGTH is just a dummy number for now, this should be statically set
 
-	public:
-		ParameterService();
-		Message reportParameter(Message paramId);
-		void setParamData(Message newParamValues);
+public:
+	ParameterService();
+
+	Message reportParameter(Message paramId);
+
+	void setParamData(Message newParamValues);
 
 };
 
