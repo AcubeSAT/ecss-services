@@ -67,7 +67,6 @@ Message ParameterService::reportParameter(Message paramId) {
 	return reqParam;
 }
 
-/*void ParameterService::setParamData(Message paramId) {
+/*void ParameterService::setParamData(Message& newParamValues) {
 
 }*/
-

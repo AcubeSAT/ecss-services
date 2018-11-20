@@ -39,14 +39,15 @@ struct Parameter {
 
 class ParameterService : public Service {
 
-	Parameter paramsList[CONFIGLENGTH];   // CONFIGLENGTH is just a dummy number for now, this should be statically set
+	Parameter paramsList[CONFIGLENGTH];
+	// CONFIGLENGTH is just a dummy number for now, this should be statically set
 
 public:
 	ParameterService();
 
 	Message reportParameter(Message paramId);
 
-	void setParamData(Message newParamValues);
+	//void setParamData(Message& newParamValues);
 
 };
 
