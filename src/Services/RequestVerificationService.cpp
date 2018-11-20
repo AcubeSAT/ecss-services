@@ -14,7 +14,7 @@ void RequestVerificationService::successAcceptanceVerification(Message::PacketTy
 
 	report.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	report.appendEnumerated(1, packetType);
-	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
+	report.appendBits(1, static_cast<uint8_t >(secondaryHeaderFlag));
 	report.appendEnumerated(11, apid);
 	report.appendEnumerated(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -37,7 +37,7 @@ RequestVerificationService::failAcceptanceVerification(Message::PacketType packe
 
 	report.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	report.appendEnumerated(1, packetType);
-	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
+	report.appendBits(1, static_cast<uint8_t >(secondaryHeaderFlag));
 	report.appendEnumerated(11, apid);
 	report.appendEnumerated(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -59,7 +59,7 @@ void RequestVerificationService::successExecutionVerification(Message::PacketTyp
 
 	report.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	report.appendEnumerated(1, packetType);
-	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
+	report.appendBits(1, static_cast<uint8_t >(secondaryHeaderFlag));
 	report.appendEnumerated(11, apid);
 	report.appendEnumerated(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -82,7 +82,7 @@ RequestVerificationService::failExecutionVerification(Message::PacketType packet
 
 	report.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	report.appendEnumerated(1, packetType);
-	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
+	report.appendBits(1, static_cast<uint8_t >(secondaryHeaderFlag));
 	report.appendEnumerated(11, apid);
 	report.appendEnumerated(2, seqFlag);
 	report.appendBits(14, packetSeqCount);
@@ -106,7 +106,7 @@ RequestVerificationService::failRoutingVerification(Message::PacketType packetTy
 
 	report.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	report.appendEnumerated(1, packetType);
-	report.appendBits(1, static_cast<uint16_t >(secondaryHeaderFlag));
+	report.appendBits(1, static_cast<uint8_t >(secondaryHeaderFlag));
 	report.appendEnumerated(11, apid);
 	report.appendEnumerated(2, seqFlag);
 	report.appendBits(14, packetSeqCount);

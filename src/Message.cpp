@@ -1,6 +1,5 @@
 #include "Message.hpp"
 #include <cstring>
-#include <Message.hpp>
 
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType,
