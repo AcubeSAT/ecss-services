@@ -29,12 +29,12 @@ int main() {
 	testService.onBoardConnection(receivedPacket);
 
 	// ST[06] testing
-	MemoryManagementService::RawDataMemoryManagement memMangService;
+	MemoryManagementService memMangService;
 	Message rcvPack = Message(6, 2, Message::TC, 1);
 	rcvPack.appendUint8(1); // Iteration count
 	rcvPack.appendUint32(0x45327845); // Start address
 	rcvPack.appendUint16(0); // Data read length
-	memMangService.dumpRawData(rcvPack);
+	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	return 0;
 }

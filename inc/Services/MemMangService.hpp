@@ -3,13 +3,10 @@
 
 #include "Service.hpp"
 #include <memory>
+#include <iostream>
 
 class MemoryManagementService : public Service {
 public:
-	MemoryManagementService() {
-		serviceType = 6;
-	}
-
 	// Memory type ID's
 	enum MemoryID {
 		RAM = 0,
@@ -17,6 +14,15 @@ public:
 		EXTERNAL = 2
 	};
 
+	MemoryManagementService();
+
+	/**
+	 * Raw data memory management subservice class
+	 *
+	 * @details A class defining the raw data memory management subservice functions.
+	 * 			As per the ECSS manual, each memory service has to have at most one raw memory
+	 * 			data management subservice
+	 */
 	class RawDataMemoryManagement {
 	private:
 		/**
@@ -28,6 +34,7 @@ public:
 		MemoryManagementService *mainService; // Used to access main class's members
 
 	public:
+		explicit RawDataMemoryManagement(MemoryManagementService *parent);
 		/**
 		 * TC[6,2] load raw values to memory
 		 *
@@ -45,7 +52,7 @@ public:
 		 * @param request: Provide the received message as a parameter
 		 */
 		void dumpRawData(Message &request);
-	};
+	} rawDataMemorySubservice;
 };
 
 #endif //ECSS_SERVICES_MEMMANGSERVICE_HPP

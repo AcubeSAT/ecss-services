@@ -1,6 +1,17 @@
 #include "Services/MemMangService.hpp"
 #include <iostream>
 
+// Define the constructors for the classes
+MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(this) {
+	serviceType = 6;
+	std::cout << "Constructor creation debuffing MemMeang Service" << std::endl;
+}
+
+MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
+	MemoryManagementService *parent) : mainService(parent) {}
+
+
+// Function declarations for the raw data memory management subservice
 void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
 
 }
@@ -12,6 +23,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	uint8_t *readData = nullptr; // Pointer to store the data read from the memory
 	uint16_t readLength = 0; // Data length to read (updated for each new iteration)
 	uint32_t startAddress = 0; // Start address for the memory read (updated in each new iteration)
+	MemoryManagementService::MemoryID meId;
 
 	// Read the packet's values
 	iterationCount = request.readUint8();
