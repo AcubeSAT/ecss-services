@@ -46,6 +46,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 	// todo: complete the function and fully specify it
 	mainService->storeMessage(report);
+	report.resetRead();
 }
 
 /*void MemoryManagementService::RawDataMemoryManagement::dumpedRawDataReport() {
