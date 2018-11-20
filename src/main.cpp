@@ -38,7 +38,5 @@ int main() {
 	std::cout << "Parameter ID: " << std::dec << returnedPacket.readUint16() << std::endl
 	          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
 
-
-
 	return 0;
 }
