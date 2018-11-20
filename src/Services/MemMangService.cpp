@@ -12,15 +12,16 @@ MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
 
 
 // Function declarations for the raw data memory management subservice
-void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
+/*void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
 
-}
+}*/
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &request) {
-	Message report = mainService->createTM(6); // Create the report message object of telemetry message subtype 6
+	// Create the report message object of telemetry message subtype 6
+	Message report = mainService->createTM(6);
 
 	uint8_t iterationCount = 0; // Get the iteration count
-	uint8_t *readData = nullptr; // Pointer to store the data read from the memory
+	//uint8_t *readData = nullptr; // Pointer to store the data read from the memory
 	uint16_t readLength = 0; // Data length to read (updated for each new iteration)
 	uint32_t startAddress = 0; // Start address for the memory read (updated in each new iteration)
 	MemoryManagementService::MemoryID meId;
@@ -30,11 +31,11 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	startAddress = request.readUint32();
 	readLength = request.readUint16();
 
-	readData = (uint8_t *)malloc(static_cast<std::size_t >(readLength + 1));
+	/*readData = (uint8_t *)malloc(static_cast<std::size_t >(readLength + 1));
 	for (std::size_t i = 0; i < readLength; i++) {
 		readData[i] = *(uint8_t *)(startAddress + i);
 	}
-	readData[readLength] = '\0';
+	readData[readLength] = '\0';*/
 
 	report.appendUint8(iterationCount); // Iteration count
 	report.appendUint32(startAddress); // Start address
@@ -47,6 +48,6 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	mainService->storeMessage(report);
 }
 
-void MemoryManagementService::RawDataMemoryManagement::dumpedRawDataReport() {
+/*void MemoryManagementService::RawDataMemoryManagement::dumpedRawDataReport() {
 
-}
+}*/
