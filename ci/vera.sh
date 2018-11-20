@@ -10,4 +10,4 @@
 echo -e "\033[0;34mRunning vera++...\033[0m"
 
 cd "$(dirname "$0")/.."
-vera++ --error --profile custom `find src inc -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'`
+vera++ --error --profile custom `find src inc tests -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'`
