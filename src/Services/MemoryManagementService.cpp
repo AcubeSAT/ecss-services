@@ -108,7 +108,6 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 		// This part is repeated N-times (N = iteration count)
 		report.appendUint64(startAddress); // Start address
-		report.appendUint16(readLength); // Data read length
 		report.appendOctetString(readLength, readData); // Save the read data
 	}
 	// todo: implement and append the checksum part of the reporting packet

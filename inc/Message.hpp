@@ -79,6 +79,16 @@ public:
 	void appendString(uint8_t size, const char *value);
 
 	/**
+	 * Appends \p size bytes to the message
+	 *
+	 * @param size The amount of byte to append
+	 * @param value An array containing at least \p size bytes
+	 * @todo See if more than uint8_t strings will be supported
+	 * @todo Is uint16_t size too much or not enough? It has to be defined
+	 */
+	void appendString(uint16_t size, uint8_t *value);
+
+	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
 	 * @param numBits
 	 * @return A maximum number of 16 bits is returned (in big-endian format)
@@ -107,6 +117,15 @@ public:
 	 * ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string.
 	 */
 	void readString(char *string, uint8_t size);
+
+	/**
+	* Reads the next \p size bytes from the message, and stores them into the allocated \p string
+	*
+	* NOTE: We assume that \p string is already allocated, and its size is at least
+	* ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string
+	* @todo Is uint16_t size too much or not enough? It has to be defined
+	*/
+	void readString(uint8_t *value, uint16_t size);
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType,
@@ -243,11 +262,8 @@ public:
 	 * PTC = 7, PFC = 0
 	 */
 	void appendOctetString(uint16_t size, uint8_t *byteString) {
-		assert(size < ECSS_MAX_STRING_SIZE);
-
-		for (std::size_t i = 0; i < size; i++) {
-			appendByte(byteString[i]);
-		}
+		appendUint16(size);
+		appendString(size, byteString);
 	}
 
 	/**
@@ -385,12 +401,8 @@ public:
 	 *
 	 * PTC = 7, PFC = 0
 	 */
-	void readOctetString(uint8_t *byteString, uint16_t size) {
-		assert(size < ECSS_MAX_STRING_SIZE);
-
-		for (std::size_t i = 0; i < size; i++) {
-			byteString[i] = readByte();
-		}
+	void readOctetString(uint16_t size, uint8_t *byteString) {
+		readString(byteString, size);
 	}
 
 	/**

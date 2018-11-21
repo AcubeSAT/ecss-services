@@ -17,10 +17,8 @@ TEST_CASE("TM[6,2]", "[service][st06]") {
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	receivedPacket.appendUint16(2); // Iteration count
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
-	receivedPacket.appendUint16(2); // Data length to append
 	receivedPacket.appendOctetString(2, data);
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(pStr + 2)); // Start address
-	receivedPacket.appendUint16(1);
 	receivedPacket.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(receivedPacket);
 
@@ -62,7 +60,7 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_1));
 	readSize = sizeof(testString_1)/ sizeof(testString_1[0]);
 	CHECK(response.readUint16() == readSize);
-	response.readOctetString(checkString, readSize);
+	response.readOctetString(readSize, checkString);
 	CHECK(checkString[0] == 'F');
 	CHECK(checkString[1] == 'S');
 	CHECK(checkString[2] == 't');
@@ -73,7 +71,7 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_2));
 	readSize = sizeof(testString_2)/ sizeof(testString_2[0]);
 	CHECK(response.readUint16() == readSize);
-	response.readOctetString(checkString, readSize);
+	response.readOctetString(readSize, checkString);
 	CHECK(checkString[0] == 'S');
 	CHECK(checkString[1] == 'e');
 	CHECK(checkString[2] == 'c');
@@ -86,7 +84,7 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_3));
 	readSize = sizeof(testString_3)/ sizeof(testString_3[0]);
 	CHECK(response.readUint16() == readSize);
-	response.readOctetString(checkString, readSize);
+	response.readOctetString(readSize, checkString);
 	CHECK(checkString[0] == 5);
 	CHECK(checkString[1] == 8);
 }

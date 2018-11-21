@@ -56,10 +56,8 @@ int main() {
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
-	rcvPack.appendUint16(2); // Data length to append
 	rcvPack.appendOctetString(2, data);
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
-	rcvPack.appendUint16(1);
 	rcvPack.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
 
