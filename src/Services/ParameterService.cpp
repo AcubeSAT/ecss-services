@@ -42,20 +42,43 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 	 *
 	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter ID
 	 * @return A TM[20, 2] packet containing the parameter ID
-	 * @todo Implement binary search for the lookup in order to be faster when the number of
-	 * params inevitably rises
+	 *
+	 * @todo Implement binary tree search for the lookup in order to be faster when the number of
+	 * params inevitably rises (NOT URGENT)
+	 * 
+	 * @todo Find a way to update the number of IDs so that exported packets contain only valid data
+	 * (Done, but method is kludgy (clones the message and figures out separately the number of
+	 * valid IDs). Should be enough for now.
 	 *
 	 * NOTE: Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
 
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
+	Message dummy = paramIds;      // dummy clone of the given msg, to figure out the # of valid IDs
 
 	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
 	    paramIds.messageType == 1) {
 
-		uint16_t ids = paramIds.readUint16();        // first 16bits of the packet are # of IDs
+		// FIGURING OUT THE # OF VALID IDs
 
-		reqParam.appendUint16(ids);                  //include the number of contained IDs
+		uint16_t ids = paramIds.readUint16();        // first 16bits of the packet are # of IDs
+		uint16_t validIds = 0;
+
+		dummy.readUint16();               // skip the number of IDs in the dummy, we already know it
+
+		for (int i = 0; i < ids; i++) {
+
+			uint16_t currId = dummy.readUint16();
+
+			if (currId < CONFIGLENGTH) {
+
+				validIds++;
+			}
+		}
+
+		// ACTUAL APPENDING STARTS HERE
+
+		reqParam.appendUint16(validIds);                  // include the number of valid IDs
 
 		for (int i = 0; i < ids; i++) {
 
@@ -66,6 +89,11 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 				reqParam.appendUint16(currId);      // append it to the new packet
 				reqParam.appendUint32(paramsList[currId].settingData);
 				// right after that append the settings
+			} else {
+
+				// generate failed execution notification
+
+				continue;       //ignore the faulty ID
 			}
 		}
 	}
