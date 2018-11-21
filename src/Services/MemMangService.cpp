@@ -48,7 +48,6 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 				if (tempMemory == nullptr) {
 					// todo: Add error logging and reporting
 					free(readData);
-					return;
 				} else {
 					readData = tempMemory;
 				}
@@ -104,7 +103,6 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 			if (tempMemory == nullptr) {
 				// todo: Add error logging and reporting
 				free(readData);
-				return;
 			} else {
 				readData = tempMemory;
 			}
