@@ -125,7 +125,7 @@ public:
 	* ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string
 	* @todo Is uint16_t size too much or not enough? It has to be defined
 	*/
-	void readString(uint8_t *value, uint16_t size);
+	void readString(uint8_t *string, uint16_t size);
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType,
