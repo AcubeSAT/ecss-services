@@ -50,6 +50,8 @@ public:
 		 * @details This function reads the raw data from the RAM memory and
 		 * 			triggers a TM[6,6] report
 		 * @param request: Provide the received message as a parameter
+		 * @todo In later embedded version, implement error checking for address validity for
+		 * 		 different memory types
 		 */
 		void dumpRawData(Message &request);
 	} rawDataMemorySubservice;
