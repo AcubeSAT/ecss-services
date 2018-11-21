@@ -12,6 +12,6 @@ void TestService::onBoardConnection(Message &request) {
 	Message report = createTM(4);
 
 	report.appendUint16(request.readUint16());
-	//just print it on the screen
+	// just print it on the screen
 	storeMessage(report);
 }

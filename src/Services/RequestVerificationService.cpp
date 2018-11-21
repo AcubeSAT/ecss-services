@@ -7,7 +7,7 @@ void RequestVerificationService::successAcceptanceVerification(Message::PacketTy
                                                                uint16_t packetSeqCount) {
 	// TM[1,1] successful acceptance verification report
 
-	//parameters have max values defined from standard
+	// parameters have max values defined from standard
 	assert(apid < 2048);
 	assert(seqFlag < 4);
 	assert(packetSeqCount < 16384);
@@ -32,7 +32,7 @@ RequestVerificationService::failAcceptanceVerification(Message::PacketType packe
                                                        uint16_t errorCode) {
 	// TM[1,2] failed acceptance verification report
 
-	//parameters have max values defined from standard
+	// parameters have max values defined from standard
 	assert(apid < 2048);
 	assert(seqFlag < 4);
 	assert(packetSeqCount < 16384);
@@ -56,7 +56,7 @@ void RequestVerificationService::successExecutionVerification(Message::PacketTyp
                                                               uint16_t packetSeqCount) {
 	// TM[1,7] successful completion of execution verification report
 
-	//parameters have max values defined from standard
+	// parameters have max values defined from standard
 	assert(apid < 2048);
 	assert(seqFlag < 4);
 	assert(packetSeqCount < 16384);
@@ -81,7 +81,7 @@ RequestVerificationService::failExecutionVerification(Message::PacketType packet
                                                       uint16_t errorCode) {
 	// TM[1,8] failed completion of execution verification report
 
-	//parameters have max values defined from standard
+	// parameters have max values defined from standard
 	assert(apid < 2048);
 	assert(seqFlag < 4);
 	assert(packetSeqCount < 16384);
@@ -107,7 +107,7 @@ RequestVerificationService::failRoutingVerification(Message::PacketType packetTy
                                                     uint16_t errorCode) {
 	// TM[1,10] failed routing verification report
 
-	//parameters have max values defined from standard
+	// parameters have max values defined from standard
 	assert(apid < 2048);
 	assert(seqFlag < 4);
 	assert(packetSeqCount < 16384);
