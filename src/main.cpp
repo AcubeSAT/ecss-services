@@ -31,9 +31,10 @@ int main() {
 	// ST[06] testing
 	MemoryManagementService memMangService;
 	Message rcvPack = Message(6, 2, Message::TC, 1);
-	rcvPack.appendUint8(1); // Iteration count
-	rcvPack.appendUint32(0x45327845); // Start address
-	rcvPack.appendUint16(0); // Data read length
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendUint16(1); // Iteration count
+	rcvPack.appendUint64(static_cast<uint64_t >((std::size_t)(string))); // Start address
+	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	return 0;
