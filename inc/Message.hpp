@@ -188,6 +188,16 @@ public:
 	}
 
 	/**
+	 * Adds an 8 byte unsigned integer to the end of the message
+	 *
+	 * PTC = 3, PFC = 16
+	 */
+	void appendUint64(uint64_t value) {
+		appendWord(static_cast<uint32_t >(value >> 32));
+		return appendWord(static_cast<uint32_t >(value));
+	}
+
+	/**
 	 * Adds a 1 byte signed integer to the end of the message
 	 *
 	 * PTC = 4, PFC = 4
@@ -224,6 +234,20 @@ public:
 		              "Floating point numbers must be 32 bits long");
 
 		return appendWord(reinterpret_cast<uint32_t &>(value));
+	}
+
+	/**
+	 * Adds a N-byte string to the end of the message
+	 *
+	 *
+	 * PTC = 7, PFC = 0
+	 */
+	void appendOctetString(uint16_t size, uint8_t *byteString) {
+		assert(size < ECSS_MAX_STRING_SIZE);
+
+		for (std::size_t i = 0; i < size; i++) {
+			appendByte(byteString[i]);
+		}
 	}
 
 	/**
@@ -302,6 +326,15 @@ public:
 	}
 
 	/**
+	 * Fetches an 8-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 3, PFC = 16
+	 */
+	uint64_t readUint64() {
+		return ((uint64_t)readWord() << 32) |(uint64_t)readWord();
+	}
+
+	/**
 	 * Fetches an 1-byte signed integer from the current position in the message
 	 *
 	 * PTC = 4, PFC = 4
@@ -346,6 +379,20 @@ public:
 		uint32_t value = readWord();
 		return reinterpret_cast<float &>(value);
 	}
+
+	/**
+	 * Fetches a N-byte string from the current position in the message
+	 *
+	 *
+	 * PTC = 7, PFC = 0
+	 */
+	 void readOctetString(uint8_t *byteString, uint16_t size) {
+		assert(size < ECSS_MAX_STRING_SIZE);
+
+		for (std::size_t i = 0; i < size; i++) {
+			byteString[i] = readByte();
+		}
+	 }
 
 	/**
 	 * Reset the message reading status, and start reading data from it again
