@@ -33,7 +33,7 @@ int main() {
 	Message rcvPack = Message(6, 2, Message::TC, 1);
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(1); // Iteration count
-	rcvPack.appendUint64(static_cast<uint64_t >((std::size_t)(string))); // Start address
+	rcvPack.appendUint64(static_cast<uint64_t >(reinterpret_cast<std::size_t >(string))); // Start address
 	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 

@@ -65,7 +65,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 	readData = static_cast<uint8_t *>( malloc(static_cast<std::size_t >(readLength)) );
 	for (std::size_t i = 0; i < readLength; i++) {
-		readData[i] = *((uint8_t *)((std::size_t)startAddress) + i);
+		readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
 	}
 
 	report.appendOctetString(readLength, readData);
