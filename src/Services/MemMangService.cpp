@@ -12,7 +12,7 @@ MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
 
 
 // Function declarations for the raw data memory management subservice
-void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
+//void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
 	/**
 	 * Bare in mind that there is currently no error checking for invalid parameters.
 	 * A future version will include error checking and the corresponding error report/notification,
@@ -21,7 +21,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 	 * @todo Add error checking and reporting for the parameters
 	 * @todo Add failure reporting
 	 */
-	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
+	/*uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 	uint8_t iterationCount = 0; // Get the iteration count
 	uint16_t dataLength = 0; // Data length to read (updated for each new iteration)
 	uint32_t startAddress = 0; // Start address for the memory read (updated in each new iteration)
@@ -32,12 +32,12 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 
 	if (memoryID == MemoryManagementService::MemoryID::RAM) {
 		for (std::size_t i = 0; i < dataLength; i++) {
-			//*(uint64_t *)startAddress = memoryData[i];
+			//\*(uint64_t *)startAddress = memoryData[i];
 		}
 	} else if (memoryID == MemoryManagementService::MemoryID::FLASH) {
 
 	}
-}
+}*/
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &request) {
 	// Create the report message object of telemetry message subtype 6

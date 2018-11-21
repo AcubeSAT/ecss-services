@@ -331,7 +331,7 @@ public:
 	 * PTC = 3, PFC = 16
 	 */
 	uint64_t readUint64() {
-		return ((uint64_t)readWord() << 32) |(uint64_t)readWord();
+		return (static_cast<uint64_t >(readWord()) << 32) | static_cast<uint64_t >(readWord());
 	}
 
 	/**
