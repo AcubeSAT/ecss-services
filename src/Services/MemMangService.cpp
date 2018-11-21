@@ -74,7 +74,3 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	report.resetRead(); // Reset the reading count
 	free(readData); // Free the allocated memory
 }
-
-/*void MemoryManagementService::RawDataMemoryManagement::dumpedRawDataReport() {
-
-}*/

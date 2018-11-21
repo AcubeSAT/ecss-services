@@ -25,12 +25,6 @@ public:
 	 */
 	class RawDataMemoryManagement {
 	private:
-		/**
-		 * TM[6,6] dumped raw memory data report
-		 *
-		 * @details This report is triggered through TC[6,5]
-		 */
-		void dumpedRawDataReport();
 		MemoryManagementService *mainService; // Used to access main class's members
 
 	public:
