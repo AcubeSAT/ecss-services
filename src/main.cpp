@@ -35,6 +35,7 @@ int main() {
 	*pStr = 'T';
 	*(pStr + 1) = 'G';
 	*(pStr + 2) = '\0';
+
 	MemoryManagementService memMangService;
 	Message rcvPack = Message(6, 5, Message::TC, 1);
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
@@ -47,10 +48,10 @@ int main() {
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(yetAnotherStr));
 	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
-
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(6, 2, Message::TC, 1);
+
 	uint8_t data[2] = {'h', 'R'};
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
@@ -61,8 +62,6 @@ int main() {
 	rcvPack.appendUint16(1);
 	rcvPack.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
-
-	std::cout << pStr << std::endl;
 
 	return 0;
 }
