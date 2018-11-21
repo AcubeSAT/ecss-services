@@ -25,22 +25,17 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 	assert(request.serviceType == 6);
 	assert(request.messageType == 2);
 
-	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
-
 	// Variable declaration
 	uint8_t *readData = nullptr, *tempMemory = nullptr; // Pointer to store the received data
-	uint16_t iterationCount = 0; // Get the iteration count
-	uint16_t dataLength = 0; // Data length to read (updated for each new iteration)
 	uint16_t allocatedLength = 0; // Length allocated for the readData array
-	uint64_t startAddress = 0; // Start address for the memory read (updated in each new iteration)
 
-	// Read the packet's values
-	iterationCount = request.readUint16();
+	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 	if (memoryID == MemoryManagementService::MemoryID::RAM) {
 		for (std::size_t j =0; j < iterationCount; j++) {
-			startAddress = request.readUint64(); // Start address of the memory
-			dataLength = request.readUint16(); // Data length to append
+			uint64_t startAddress = request.readUint64(); // Start address of the memory
+			uint16_t dataLength = request.readUint16(); // Data length to load
 
 			// Allocate more array space if needed
 			if (allocatedLength < dataLength) {
@@ -50,6 +45,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 					free(readData);
 				} else {
 					readData = tempMemory;
+					allocatedLength = dataLength;
 				}
 			}
 
@@ -77,16 +73,12 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 	// Variable declaration
 	uint8_t *readData = nullptr, *tempMemory = nullptr;; // Pointer to store the read data
-	uint16_t iterationCount = 0; // Get the iteration count
-	uint16_t readLength = 0; // Data length to read (updated for each new iteration)
 	uint16_t allocatedLength = 0; // Length allocated for the readData array
-	uint64_t startAddress = 0; // Start address for the memory read (updated in each new iteration)
 
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 	// todo: Add checks depending on the memory type
 
-	// Read the packet's values
-	iterationCount = request.readUint16();
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 	// Append the data to report message
 	report.appendEnum8(memoryID); // Memory ID
@@ -94,8 +86,8 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 	// Iterate N times, as specified in the command message
 	for (std::size_t j = 0; j < iterationCount; j++) {
-		startAddress = request.readUint64();
-		readLength = request.readUint16();
+		uint64_t startAddress = request.readUint64(); // Data length to read
+		uint16_t readLength = request.readUint16(); // Start address for the memory read
 
 		// Allocate more array space if needed
 		if (allocatedLength < readLength) {
@@ -105,6 +97,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 				free(readData);
 			} else {
 				readData = tempMemory;
+				allocatedLength = readLength;
 			}
 		}
 
