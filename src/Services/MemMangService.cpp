@@ -4,7 +4,6 @@
 // Define the constructors for the classes
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(this) {
 	serviceType = 6;
-	std::cout << "Constructor creation debuffing MemMeang Service" << std::endl;
 }
 
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
@@ -47,28 +46,40 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	uint8_t *readData = nullptr; // Pointer to store the data read from the memory
 	uint16_t iterationCount = 0; // Get the iteration count
 	uint16_t readLength = 0; // Data length to read (updated for each new iteration)
+	uint16_t allocatedLength = 0; // Length allocated for the readData array
 	uint64_t startAddress = 0; // Start address for the memory read (updated in each new iteration)
 
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
-
+	// todo: Add checks depending on the memory type
 
 	// Read the packet's values
 	iterationCount = request.readUint16();
-	startAddress = request.readUint64();
-	readLength = request.readUint16();
 
 	// Append the data to report message
 	report.appendEnum8(memoryID); // Memory ID
 	report.appendUint16(iterationCount); // Iteration count
-	report.appendUint64(startAddress); // Start address
-	report.appendUint16(readLength); // Data read length
 
-	readData = static_cast<uint8_t *>( malloc(static_cast<std::size_t >(readLength)) );
-	for (std::size_t i = 0; i < readLength; i++) {
-		readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+	// Iterate N times, as specified in the command message
+	for (std::size_t j = 0; j < iterationCount; j++) {
+		startAddress = request.readUint64();
+		readLength = request.readUint16();
+
+		// Allocate more array space if needed
+		if (allocatedLength < readLength) {
+			readData = static_cast<uint8_t *>(realloc(readData, readLength));
+		}
+
+		// Read memory data, an octet at a time
+		for (std::size_t i = 0; i < readLength; i++) {
+			readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+		}
+
+		// This part is repeated N-times (N = iteration count)
+		report.appendUint64(startAddress); // Start address
+		report.appendUint16(readLength); // Data read length
+		report.appendOctetString(readLength, readData); // Save the read data
 	}
-
-	report.appendOctetString(readLength, readData);
+	// todo: implement and append the checksum part of the reporting packet
 
 	mainService->storeMessage(report); // Save the report message
 	report.resetRead(); // Reset the reading count
