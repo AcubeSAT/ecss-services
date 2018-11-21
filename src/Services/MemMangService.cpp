@@ -1,5 +1,6 @@
 #include "Services/MemMangService.hpp"
 #include <iostream>
+#include <cerrno>
 
 // Define the constructors for the classes
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(this) {
@@ -67,6 +68,11 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 		// Allocate more array space if needed
 		if (allocatedLength < readLength) {
 			readData = static_cast<uint8_t *>(realloc(readData, readLength));
+			if (!readData) {
+				// todo: Add error logging and reporting
+				free(readData);
+				return;
+			}
 		}
 
 		// Read memory data, an octet at a time
