@@ -9,13 +9,13 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	// Checks for the class-members of the object response
+	// Checks for the data-members of the object response
 	CHECK(response.serviceType == 1);
 	CHECK(response.messageType == 1);
 	CHECK(response.packetType == 0); // packet type(TM = 0, TC = 1)
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
-	// Check for the value that is stored in data array(member-class of object response)
+	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == 2); // packet version number
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
@@ -30,13 +30,13 @@ TEST_CASE("TM[1,2]", "[service][st01]") {
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	// Checks for the class-members of the object response
+	// Checks for the data-members of the object response
 	CHECK(response.serviceType == 1);
 	CHECK(response.messageType == 2);
 	CHECK(response.packetType == 0); // packet type(TM = 0, TC = 1)
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
-	// Check for the value that is stored in data array(member-class of object response)
+	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == 2); // packet version number
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
@@ -52,13 +52,13 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	// Checks for the class-members of the object response
+	// Checks for the data-members of the object response
 	CHECK(response.serviceType == 1);
 	CHECK(response.messageType == 7);
 	CHECK(response.packetType == 0); // packet type(TM = 0, TC = 1)
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
-	// Check for the value that is stored in data array(member-class of object response)
+	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == 2); // packet version number
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
@@ -73,13 +73,13 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	// Checks for the class-members of the object response
+	// Checks for the data-members of the object response
 	CHECK(response.serviceType == 1);
 	CHECK(response.messageType == 8);
 	CHECK(response.packetType == 0); // packet type(TM = 0, TC = 1)
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
-	// Check for the value that is stored in data array(member-class of object response)
+	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == 2); // packet version number
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
@@ -95,13 +95,13 @@ TEST_CASE("TM[1,10]", "[service][st01]") {
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	// Checks for the class-members of the object response
+	// Checks for the data-members of the object response
 	CHECK(response.serviceType == 1);
 	CHECK(response.messageType == 10);
 	CHECK(response.packetType == 0); // packet type(TM = 0, TC = 1)
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
-	// Check for the value that is stored in data array(member-class of object response)
+	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == 2); // packet version number
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
