@@ -28,7 +28,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	// Variable declaration
-	uint8_t *readData = nullptr; // Pointer to store the data read from the memory
+	uint8_t *readData = nullptr, *tempMemory = nullptr; // Pointer to store the received data
 	uint16_t iterationCount = 0; // Get the iteration count
 	uint16_t dataLength = 0; // Data length to read (updated for each new iteration)
 	uint16_t allocatedLength = 0; // Length allocated for the readData array
@@ -44,11 +44,13 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 
 			// Allocate more array space if needed
 			if (allocatedLength < dataLength) {
-				readData = static_cast<uint8_t *>(realloc(readData, dataLength));
-				if (readData == nullptr) {
+				tempMemory = static_cast<uint8_t *>(realloc(readData, dataLength));
+				if (tempMemory == nullptr) {
 					// todo: Add error logging and reporting
 					free(readData);
 					return;
+				} else {
+					readData = tempMemory;
 				}
 			}
 
@@ -75,7 +77,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	Message report = mainService->createTM(6);
 
 	// Variable declaration
-	uint8_t *readData = nullptr; // Pointer to store the data read from the memory
+	uint8_t *readData = nullptr, *tempMemory = nullptr;; // Pointer to store the read data
 	uint16_t iterationCount = 0; // Get the iteration count
 	uint16_t readLength = 0; // Data length to read (updated for each new iteration)
 	uint16_t allocatedLength = 0; // Length allocated for the readData array
@@ -98,11 +100,13 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 		// Allocate more array space if needed
 		if (allocatedLength < readLength) {
-			readData = static_cast<uint8_t *>(realloc(readData, readLength));
-			if (readData == nullptr) {
+			tempMemory = static_cast<uint8_t *>(realloc(readData, readLength));
+			if (tempMemory == nullptr) {
 				// todo: Add error logging and reporting
 				free(readData);
 				return;
+			} else {
+				readData = tempMemory;
 			}
 		}
 
