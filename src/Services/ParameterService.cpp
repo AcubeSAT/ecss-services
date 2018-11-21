@@ -44,13 +44,13 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 	 * @return A TM[20, 2] packet containing the parameter ID
 	 *
 	 * @todo Implement binary tree search for the lookup in order to be faster when the number of
-	 * params inevitably rises (NOT URGENT)
-	 * 
-	 * @todo Find a way to update the number of IDs so that exported packets contain only valid data
-	 * (Done, but method is kludgy (clones the message and figures out separately the number of
-	 * valid IDs). Should be enough for now.
+	 * params inevitably rises (NOT URGENT YET)
 	 *
-	 * NOTE: Everything apart from the setting data is uint16 (setting data are uint32 for now)
+	 * NOTES:
+	 * Method for valid ID counting is a hack (clones the message and figures out the number
+	 * separately, due to message access being non-random). Should be enough for now.
+	 *
+	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
 
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
