@@ -27,13 +27,12 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 
 	// Variable declaration
 	uint8_t *readData = nullptr, *tempMemory = nullptr; // Pointer to store the received data
-	uint16_t allocatedLength = 0; // Length allocated for the readData array
 
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 	if (memoryID == MemoryManagementService::MemoryID::RAM) {
-		for (std::size_t j =0; j < iterationCount; j++) {
+		for (std::size_t j = 0, allocatedLength = 0; j < iterationCount; j++) {
 			uint64_t startAddress = request.readUint64(); // Start address of the memory
 			uint16_t dataLength = request.readUint16(); // Data length to load
 
@@ -73,7 +72,6 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 	// Variable declaration
 	uint8_t *readData = nullptr, *tempMemory = nullptr;; // Pointer to store the read data
-	uint16_t allocatedLength = 0; // Length allocated for the readData array
 
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 	// todo: Add checks depending on the memory type
@@ -85,7 +83,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	report.appendUint16(iterationCount); // Iteration count
 
 	// Iterate N times, as specified in the command message
-	for (std::size_t j = 0; j < iterationCount; j++) {
+	for (std::size_t j = 0, allocatedLength = 0; j < iterationCount; j++) {
 		uint64_t startAddress = request.readUint64(); // Data length to read
 		uint16_t readLength = request.readUint16(); // Start address for the memory read
 
