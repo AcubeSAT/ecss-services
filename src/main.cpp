@@ -52,5 +52,25 @@ int main() {
 
 	std::cout << std::endl << "(First value is hours, second is minutes)" << std::endl;
 
+	//Test code for setParameter
+	Message sentPacket2 = Message(20, 3, Message::TC, 1);  //application id is a dummy number (1)
+	sentPacket2.appendUint16(2);  //number of contained IDs
+	sentPacket2.appendUint16(0);  //first parameter ID
+	sentPacket2.appendUint32(63238);  //settings for first parameter
+	sentPacket2.appendUint16(1);  //2nd parameter ID
+	sentPacket2.appendUint32(45823);  //settings for 2nd parameter
+
+	paramService.setParameterIds(sentPacket2);
+	returnedPacket = paramService.reportParameterIds(sentPacket);
+
+	numOfIds = returnedPacket.readUint16();
+
+	for (int i = 0; i < numOfIds; i++) {
+
+		std::cout << "Parameter ID: " << std::dec << returnedPacket.readUint16() << std::endl
+		          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
+
+	}
+
 	return 0;
 }

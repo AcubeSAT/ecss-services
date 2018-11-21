@@ -47,7 +47,7 @@ public:
 
 	Message reportParameterIds(Message paramIds);
 
-	void setParamData(Message newParamValues);
+	void setParameterIds(Message newParamValues);
 
 };
 

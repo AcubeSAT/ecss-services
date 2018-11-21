@@ -9,10 +9,12 @@
 
 #endif
 
+uint16_t numOfValidIds(Message idMsg);
+
 ParameterService::ParameterService() {
 #ifdef DEMOMODE
 	/**
-	 * Initializes the parameter list with some dummy values for now.
+	 * Initializes the parameter list with some dummy values.
 	 */
 
 	// Test code, setting up some of the parameter fields
@@ -36,15 +38,17 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
-	 * containing the current configuration **for the parameters specified in the carried IDs**.
+	 * containing the current configuration
+	 * **for the parameters specified in the carried valid IDs**.
+	 *
 	 * No sophisticated error checking for now, just whether the package is of the correct type
-	 * (in which case it returns an empty message)
+	 * and whether the requested IDs are valid, ignoring the invalid ones.
 	 *
-	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter ID
-	 * @return A TM[20, 2] packet containing the parameter ID
+	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
+	 * @return A TM[20, 2] packet containing the valid parameter IDs and their settings.
+	 * @return Empty TM[20, 2] packet on wrong type.
 	 *
-	 * @todo Implement binary tree search for the lookup in order to be faster when the number of
-	 * params inevitably rises (NOT URGENT YET)
+	 * @todo Generate failure notifs where needed when ST[06] is ready
 	 *
 	 * NOTES:
 	 * Method for valid ID counting is a hack (clones the message and figures out the number
@@ -54,31 +58,12 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 	 */
 
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
-	Message dummy = paramIds;      // dummy clone of the given msg, to figure out the # of valid IDs
 
 	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
 	    paramIds.messageType == 1) {
 
-		// FIGURING OUT THE # OF VALID IDs
-
-		uint16_t ids = paramIds.readUint16();        // first 16bits of the packet are # of IDs
-		uint16_t validIds = 0;
-
-		dummy.readUint16();               // skip the number of IDs in the dummy, we already know it
-
-		for (int i = 0; i < ids; i++) {
-
-			uint16_t currId = dummy.readUint16();
-
-			if (currId < CONFIGLENGTH) {
-
-				validIds++;
-			}
-		}
-
-		// ACTUAL APPENDING STARTS HERE
-
-		reqParam.appendUint16(validIds);                  // include the number of valid IDs
+		uint16_t ids = paramIds.readUint16();
+		reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
 
 		for (int i = 0; i < ids; i++) {
 
@@ -92,8 +77,9 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 			} else {
 
 				// generate failed execution notification
+				// (depends on execution reporting subservice ST[06])
 
-				continue;       //ignore the faulty ID
+				continue;       //ignore the invalid ID
 			}
 		}
 	}
@@ -101,32 +87,66 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 	return reqParam;
 }
 
-void ParameterService::setParamData(Message newParamValues) {
+void ParameterService::setParameterIds(Message newParamValues) {
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
-	 * replaces the setting specified in the settingData field of the parameter with the ID
-	 * contained in the message with the value that the message carries. If the message type is
-	 * not correct, the settings stay as they are.
+	 * iterates over all contained parameter IDs and replaces the settings for each valid parameter,
+	 * while ignoring all invalid IDs.
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 * @return None
+	 *
+	 * @todo Generate failure notifications where needed (eg. when an invalid ID is encountered)
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
 
-	uint16_t reqParamId = newParamValues.readUint16();
-
 	if (newParamValues.packetType == Message::TC && newParamValues.serviceType == 20 &&
-		newParamValues.messageType == 1) {
+		newParamValues.messageType == 3) {
 
-		//TODO: Separate searching from rest of code
-		for (int i = 0; i < CONFIGLENGTH; i++) {
+		uint16_t ids = newParamValues.readUint16();  //get number of ID's
 
-			if (paramsList[i].paramId == reqParamId) {
+		for (int i = 0; i < ids; i++) {
 
-				paramsList[i].settingData = newParamValues.readUint32();
-				break;
+			uint16_t currId = newParamValues.readUint16();
+
+			if (currId < CONFIGLENGTH) {
+
+				paramsList[currId].settingData = newParamValues.readUint32();
+			} else {
+
+				// generate failure of execution with ST[06]
+				continue;       // ignore the invalid ID
 			}
 		}
 	}
+}
+
+uint16_t numOfValidIds(Message idMsg) {
+
+	idMsg.readPosition = 0;
+	// start reading from the beginning of the idMsg object
+	// (original obj. will not be influenced if this is called by value)
+
+	uint16_t ids = idMsg.readUint16();        // first 16bits of the packet are # of IDs
+	uint16_t validIds = 0;
+
+	for (int i = 0; i < ids; i++) {
+
+		uint16_t currId = idMsg.readUint16();
+
+		if (idMsg.messageType == 3) {
+
+			idMsg.readUint32();   //skip the 32bit settings blocks, we need only the IDs
+		}
+
+		if (currId < CONFIGLENGTH) {
+
+			validIds++;
+		}
+
+	}
+
+	return validIds;
+
 }
