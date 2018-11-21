@@ -31,8 +31,12 @@ int main() {
 	// ST[06] testing
 	char anotherStr[8] = "Fgthred";
 	char yetAnotherStr[2] = "F";
+	char *pStr = static_cast<char *>(malloc(4));
+	*pStr = 'T';
+	*(pStr + 1) = 'G';
+	*(pStr + 2) = '\0';
 	MemoryManagementService memMangService;
-	Message rcvPack = Message(6, 2, Message::TC, 1);
+	Message rcvPack = Message(6, 5, Message::TC, 1);
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
@@ -45,6 +49,20 @@ int main() {
 	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
 
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
+
+	rcvPack = Message(6, 2, Message::TC, 1);
+	uint8_t data[2] = {'h', 'R'};
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendUint16(2); // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
+	rcvPack.appendUint16(2); // Data length to append
+	rcvPack.appendOctetString(2, data);
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
+	rcvPack.appendUint16(1);
+	rcvPack.appendOctetString(1, data);
+	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
+
+	std::cout << pStr << std::endl;
 
 	return 0;
 }
