@@ -14,10 +14,10 @@ add_custom_target(check
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
 # Specify the .cpp files for the executables
-add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Services/TestService.cpp src/Services/MemMangService.cpp)
+add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Services/TestService.cpp src/Services/MemoryManagementService.cpp)
 
 IF(EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
 add_subdirectory(lib/Catch2)
-add_executable(tests src/Message.cpp src/Services/TestService.cpp src/Services/MemMangService.cpp test/tests.cpp test/Message.cpp test/TestPlatform.cpp test/Services/TestService.cpp test/Services/MemMangService.cpp)
+add_executable(tests src/Message.cpp src/Services/TestService.cpp src/Services/MemoryManagementService.cpp test/tests.cpp test/Message.cpp test/TestPlatform.cpp test/Services/TestService.cpp test/Services/MemoryManagementService.cpp)
 target_link_libraries(tests Catch2::Catch2)
 ENDIF()

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <Services/TestService.hpp>
 #include "Message.hpp"
-#include "Services/MemMangService.hpp"
+#include "Services/MemoryManagementService.hpp"
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);

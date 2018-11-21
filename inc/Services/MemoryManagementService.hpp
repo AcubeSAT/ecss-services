@@ -25,10 +25,11 @@ public:
 	 */
 	class RawDataMemoryManagement {
 	private:
-		MemoryManagementService *mainService; // Used to access main class's members
+		MemoryManagementService &mainService; // Used to access main class's members
 
 	public:
-		explicit RawDataMemoryManagement(MemoryManagementService *parent);
+		explicit RawDataMemoryManagement(MemoryManagementService &parent);
+
 		/**
 		 * TC[6,2] load raw values to memory
 		 *

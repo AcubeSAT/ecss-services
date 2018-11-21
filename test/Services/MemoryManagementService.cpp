@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include <Services/MemMangService.hpp>
+#include <Services/MemoryManagementService.hpp>
 #include <Message.hpp>
 #include "ServiceTests.hpp"
 

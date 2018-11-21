@@ -1,14 +1,14 @@
-#include "Services/MemMangService.hpp"
+#include "Services/MemoryManagementService.hpp"
 #include <iostream>
 #include <cerrno>
 
 // Define the constructors for the classes
-MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(this) {
+MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
 	serviceType = 6;
 }
 
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
-	MemoryManagementService *parent) : mainService(parent) {}
+	MemoryManagementService &parent) : mainService(parent) {}
 
 
 // Function declarations for the raw data memory management subservice
@@ -38,6 +38,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 
 			// Allocate more array space if needed
 			if (allocatedLength < dataLength) {
+				// todo: In embedded implementation use the malloc, due to FreeRTOS constraints
 				tempMemory = static_cast<uint8_t *>(realloc(readData, dataLength));
 				if (tempMemory == nullptr) {
 					// todo: Add error logging and reporting
@@ -68,7 +69,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	assert(request.messageType == 5);
 
 	// Create the report message object of telemetry message subtype 6
-	Message report = mainService->createTM(6);
+	Message report = mainService.createTM(6);
 
 	// Variable declaration
 	uint8_t *readData = nullptr, *tempMemory = nullptr;; // Pointer to store the read data
@@ -89,6 +90,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 		// Allocate more array space if needed
 		if (allocatedLength < readLength) {
+			// todo: In embedded implementation use the malloc, due to FreeRTOS constraints
 			tempMemory = static_cast<uint8_t *>(realloc(readData, readLength));
 			if (tempMemory == nullptr) {
 				// todo: Add error logging and reporting
@@ -111,7 +113,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	}
 	// todo: implement and append the checksum part of the reporting packet
 
-	mainService->storeMessage(report); // Save the report message
+	mainService.storeMessage(report); // Save the report message
 	request.resetRead(); // Reset the reading count
 	free(readData); // Free the allocated memory
 }

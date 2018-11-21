@@ -194,7 +194,7 @@ public:
 	 */
 	void appendUint64(uint64_t value) {
 		appendWord(static_cast<uint32_t >(value >> 32));
-		return appendWord(static_cast<uint32_t >(value));
+		appendWord(static_cast<uint32_t >(value));
 	}
 
 	/**
@@ -383,16 +383,15 @@ public:
 	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
-	 *
 	 * PTC = 7, PFC = 0
 	 */
-	 void readOctetString(uint8_t *byteString, uint16_t size) {
+	void readOctetString(uint8_t *byteString, uint16_t size) {
 		assert(size < ECSS_MAX_STRING_SIZE);
 
 		for (std::size_t i = 0; i < size; i++) {
 			byteString[i] = readByte();
 		}
-	 }
+	}
 
 	/**
 	 * Reset the message reading status, and start reading data from it again
