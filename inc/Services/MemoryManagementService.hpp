@@ -1,6 +1,13 @@
 #ifndef ECSS_SERVICES_MEMMANGSERVICE_HPP
 #define ECSS_SERVICES_MEMMANGSERVICE_HPP
 
+// Memory limits definitions
+#define FIRST_ADRESS_FLASH  0x08000000
+#define LAST_ADDRESS_FLASH  0x0801FFFF  // todo: Define the last memory address based on the MCU
+#define FIRST_ADDRESS_SRAM  0x20000000
+#define SRAM_MEMORY_SIZE    16          // Specify the RAM size in kBytes
+
+
 #include "Service.hpp"
 #include <memory>
 #include <iostream>
@@ -36,6 +43,7 @@ public:
 		 * @details This function loads new values to memory data areas
 		 * 			specified in the request
 		 * @param request: Provide the received message as a parameter
+		 * @todo Only allow aligned memory address to be start addresses
 		 */
 		void loadRawData(Message &request);
 
@@ -47,8 +55,21 @@ public:
 		 * @param request: Provide the received message as a parameter
 		 * @todo In later embedded version, implement error checking for address validity for
 		 * 		 different memory types
+		 * @todo Only allow aligned memory address to be start addresses
 		 */
 		void dumpRawData(Message &request);
+
+		/**
+		 * TC[6,9] check raw memory data
+		 *
+		 * @details This function reads the raw data from the specified memory and
+		 * 			triggers a TM[6,10] report
+		 * @param request: Provide the received message as a parameter
+		 * @todo In later embedded version, implement error checking for address validity for
+		 * 		 different memory types
+		 * @todo Only allow aligned memory address to be start addresses
+		 */
+		void checkRawData(Message &request);
 	} rawDataMemorySubservice;
 };
 

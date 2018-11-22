@@ -86,3 +86,45 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	mainService.storeMessage(report); // Save the report message
 	request.resetRead(); // Reset the reading count
 }
+
+void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &request) {
+	// Check if we have the correct packet
+	assert(request.serviceType == 6);
+	assert(request.messageType == 9);
+
+	// Create the report message object of telemetry message subtype 10
+	Message report = mainService.createTM(10);
+
+	// Variable declaration
+	uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
+
+	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
+	// todo: Add checks depending on the memory type
+
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count
+
+	// Append the data to report message
+	report.appendEnum8(memoryID); // Memory ID
+	report.appendUint16(iterationCount); // Iteration count
+
+	// Iterate N times, as specified in the command message
+	for (std::size_t j = 0; j < iterationCount; j++) {
+		uint64_t startAddress = request.readUint64(); // Data length to read
+		uint16_t readLength = request.readUint16(); // Start address for the memory read
+
+		// Read memory data and save them for checksum calculation
+		for (std::size_t i = 0; i < readLength; i++) {
+			readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+		}
+
+		// This part is repeated N-times (N = iteration count)
+		report.appendUint64(startAddress); // Start address
+		report.appendUint16(readLength); // Save the read data
+		// todo: Calculate and append checksum in the report
+		//report.appendBits(16, /* checksum bits */);
+	}
+	// todo: implement and append the checksum part of the reporting packet
+
+	mainService.storeMessage(report); // Save the report message
+	request.resetRead(); // Reset the reading count
+}
