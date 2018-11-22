@@ -400,20 +400,17 @@ public:
 	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
+	 * @details In the current implementation we assume that a preallocated array of
+	 * 			sufficient size is provided as the argument
+	 * @todo Specify if the provided array size is too small or too large
+	 *
 	 * PTC = 7, PFC = 0
 	 */
-	uint8_t *readOctetString(uint16_t *length) {
+	uint16_t readOctetString(uint8_t *byteString) {
 		uint16_t size = readUint16(); // Get the data length from the message
-		uint8_t *byteString = nullptr; // Pointer to store the string
-
-		byteString = static_cast<uint8_t *>(malloc(size));
-		if (byteString == nullptr) {
-			return nullptr;
-		}
 		readString(byteString, size); // Read the string data
-		*length = size; // Save the data length to the provided variable
 
-		return byteString; // Return the read string pointer
+		return size; // Return the read string pointer
 	}
 
 	/**
