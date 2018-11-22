@@ -1,7 +1,10 @@
 #include <iostream>
 #include <Services/TestService.hpp>
+<<<<<<< HEAD
 #include "Services/ParameterService.hpp"
+=======
 #include <Services/RequestVerificationService.hpp>
+>>>>>>> master
 #include "Message.hpp"
 
 int main() {
@@ -30,6 +33,7 @@ int main() {
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
+<<<<<<< HEAD
 	//ST[20] test
 	ParameterService paramService;
 
@@ -72,8 +76,8 @@ int main() {
 		          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
 
 	}
-
-// ST[01] test
+=======
+	// ST[01] test
 	// parameters take random values and works as expected
 	RequestVerificationService reqVerifService;
 	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
@@ -81,5 +85,7 @@ int main() {
 	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
 	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
 	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+>>>>>>> master
+
 	return 0;
 }

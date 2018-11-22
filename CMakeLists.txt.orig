@@ -14,8 +14,11 @@ add_custom_target(check
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
 # Specify the .cpp files for the executables
+<<<<<<< HEAD
+add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp src/Services/TestService.cpp inc/Services/ParameterService.hpp src/Services/ParameterService.cpp)
+=======
 add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp
-        src/Services/TestService.cpp src/Services/RequestVerificationService.cpp src/Services/ParameterService.cpp)
+        src/Services/TestService.cpp src/Services/RequestVerificationService.cpp)
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     add_subdirectory(lib/Catch2)
@@ -25,3 +28,4 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             test/Services/RequestVerificationService.cpp)
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()
+>>>>>>> master
