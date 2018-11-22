@@ -1,5 +1,6 @@
 #include <iostream>
 #include <Services/TestService.hpp>
+#include <Services/RequestVerificationService.hpp>
 #include "Message.hpp"
 
 int main() {
@@ -16,7 +17,8 @@ int main() {
 
 	char string[6];
 	packet.readString(string, 5);
-	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
+	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1)
+	          << std::endl;
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
 	// ST[17] test
@@ -26,6 +28,15 @@ int main() {
 	receivedPacket = Message(17, 3, Message::TC, 1);
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
+
+	// ST[01] test
+	// parameters take random values and works as expected
+	RequestVerificationService reqVerifService;
+	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
+	reqVerifService.failAcceptanceVerification(Message::TC, true, 2, 2, 10, 5);
+	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
+	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
+	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
 
 	return 0;
 }
