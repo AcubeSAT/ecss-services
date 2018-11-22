@@ -32,7 +32,7 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	uint8_t testString_2[8] = "SecStrT";
 	uint8_t testString_3[2] = {5, 8};
 
-	uint8_t checkString[8] = "\0";
+	uint8_t *checkString = nullptr;
 	uint16_t readSize = 0;
 
 	MemoryManagementService memMangService;
@@ -58,9 +58,8 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(response.readEnum8() == MemoryManagementService::MemoryID::RAM);
 	CHECK(response.readUint16() == 3);
 	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_1));
-	readSize = sizeof(testString_1)/ sizeof(testString_1[0]);
-	CHECK(response.readUint16() == readSize);
-	response.readOctetString(readSize, checkString);
+	checkString = response.readOctetString(&readSize);
+	CHECK(readSize == sizeof(testString_1)/ sizeof(testString_1[0]));
 	CHECK(checkString[0] == 'F');
 	CHECK(checkString[1] == 'S');
 	CHECK(checkString[2] == 't');
@@ -69,9 +68,8 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(checkString[5] == '\0');
 
 	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_2));
-	readSize = sizeof(testString_2)/ sizeof(testString_2[0]);
-	CHECK(response.readUint16() == readSize);
-	response.readOctetString(readSize, checkString);
+	checkString = response.readOctetString(&readSize);
+	CHECK(readSize == sizeof(testString_2)/ sizeof(testString_2[0]));
 	CHECK(checkString[0] == 'S');
 	CHECK(checkString[1] == 'e');
 	CHECK(checkString[2] == 'c');
@@ -82,9 +80,8 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(checkString[7] == '\0');
 
 	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_3));
-	readSize = sizeof(testString_3)/ sizeof(testString_3[0]);
-	CHECK(response.readUint16() == readSize);
-	response.readOctetString(readSize, checkString);
+	checkString = response.readOctetString(&readSize);
+	CHECK(readSize == sizeof(testString_3)/ sizeof(testString_3[0]));
 	CHECK(checkString[0] == 5);
 	CHECK(checkString[1] == 8);
 }

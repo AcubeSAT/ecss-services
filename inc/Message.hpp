@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include <cstdint>
 #include <cassert>
+#include <iostream>
 
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
@@ -401,8 +402,18 @@ public:
 	 *
 	 * PTC = 7, PFC = 0
 	 */
-	void readOctetString(uint16_t size, uint8_t *byteString) {
-		readString(byteString, size);
+	uint8_t *readOctetString(uint16_t *length) {
+		uint16_t size = readUint16(); // Get the data length from the message
+		uint8_t *byteString = nullptr; // Pointer to store the string
+
+		byteString = static_cast<uint8_t *>(malloc(size));
+		if (byteString == nullptr) {
+			return nullptr;
+		}
+		readString(byteString, size); // Read the string data
+		*length = size; // Save the data length to the provided variable
+
+		return byteString; // Return the read string pointer
 	}
 
 	/**

@@ -26,32 +26,16 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 	assert(request.messageType == 2);
 
 	// Variable declaration
-	uint8_t *readData = nullptr, *tempMemory = nullptr; // Pointer to store the received data
+	uint16_t dataLength = 0; // Data length to load
 
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 	if (memoryID == MemoryManagementService::MemoryID::RAM) {
-		for (std::size_t j = 0, allocatedLength = 0; j < iterationCount; j++) {
+		for (std::size_t j = 0; j < iterationCount; j++) {
 			uint64_t startAddress = request.readUint64(); // Start address of the memory
-			uint16_t dataLength = request.readUint16(); // Data length to load
-
-			// Allocate more array space if needed
-			if (allocatedLength < dataLength) {
-				// todo: In embedded implementation use the malloc, due to FreeRTOS constraints
-				tempMemory = static_cast<uint8_t *>(realloc(readData, dataLength));
-				if (tempMemory == nullptr) {
-					// todo: Add error logging and reporting
-					free(readData);
-				} else {
-					readData = tempMemory;
-					allocatedLength = dataLength;
-				}
-			}
-
-			for (std::size_t i = 0; i < dataLength; i++) {
-				readData[i] = request.readByte();
-			}
+			uint8_t *readData = request.readOctetString(&dataLength);
+			// todo: Error logging has to be included, if memory allocation above fails
 			// todo: Continue only if the checksum passes (when the checksum will be implemented)
 
 			for (std::size_t i = 0; i < dataLength; i++) {
