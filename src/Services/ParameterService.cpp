@@ -9,7 +9,7 @@
 
 #endif
 
-uint16_t numOfValidIds(Message idMsg);
+uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
 
 ParameterService::ParameterService() {
 #ifdef DEMOMODE
@@ -48,7 +48,7 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 	 * @return A TM[20, 2] packet containing the valid parameter IDs and their settings.
 	 * @return Empty TM[20, 2] packet on wrong type.
 	 *
-	 * @todo Generate failure notifs where needed when ST[06] is ready
+	 * @todo Generate failure notifs where needed when ST[01] is ready
 	 *
 	 * NOTES:
 	 * Method for valid ID counting is a hack (clones the message and figures out the number
@@ -71,14 +71,11 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 
 			if (currId < CONFIGLENGTH) {  // check to prevent out-of-bounds access due to invalid id
 
-				reqParam.appendUint16(currId);      // append it to the new packet
+				reqParam.appendUint16(currId);
 				reqParam.appendUint32(paramsList[currId].settingData);
-				// right after that append the settings
 			} else {
 
-				// generate failed execution notification
-				// (depends on execution reporting subservice ST[06])
-
+				// generate failure of execution notification for ST[06]
 				continue;       //ignore the invalid ID
 			}
 		}
@@ -115,7 +112,7 @@ void ParameterService::setParameterIds(Message newParamValues) {
 				paramsList[currId].settingData = newParamValues.readUint32();
 			} else {
 
-				// generate failure of execution with ST[06]
+				// generate failure of execution notification for ST[06]
 				continue;       // ignore the invalid ID
 			}
 		}

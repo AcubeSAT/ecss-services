@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
 #include "Service.hpp"
+// #include "Services/RequestVerificationService.hpp"
 
 #define CONFIGLENGTH 5
 
@@ -41,6 +42,8 @@ class ParameterService : public Service {
 
 	Parameter paramsList[CONFIGLENGTH];
 	// CONFIGLENGTH is just a dummy number for now, this should be statically set
+
+	// RequestVerificationService rvs;  // request verification service for error reporting
 
 public:
 	ParameterService();
