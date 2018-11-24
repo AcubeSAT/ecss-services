@@ -9,8 +9,6 @@
 
 #endif
 
-uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
-
 ParameterService::ParameterService() {
 #ifdef DEMOMODE
 	/**
@@ -119,7 +117,7 @@ void ParameterService::setParameterIds(Message newParamValues) {
 	}
 }
 
-uint16_t numOfValidIds(Message idMsg) {
+uint16_t ParameterService::numOfValidIds(Message idMsg) {
 
 	idMsg.readPosition = 0;
 	// start reading from the beginning of the idMsg object

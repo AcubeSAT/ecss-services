@@ -16,7 +16,7 @@
 /**
  * Generic parameter structure
  * PTC and PFC for each parameter shall be specified as in
- * ECSS-ECSS-E-ST-70-41C, chapter 7.3
+ * ECSS-E-ST-70-41C, chapter 7.3
  */
 struct Parameter {
 
@@ -39,11 +39,10 @@ struct Parameter {
  */
 
 class ParameterService : public Service {
-
+private:
 	Parameter paramsList[CONFIGLENGTH];
 	// CONFIGLENGTH is just a dummy number for now, this should be statically set
-
-	// RequestVerificationService rvs;  // request verification service for error reporting
+	static uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
 
 public:
 	ParameterService();
