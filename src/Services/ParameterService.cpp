@@ -32,7 +32,7 @@ ParameterService::ParameterService() {
 #endif
 }
 
-Message ParameterService::reportParameterIds(Message paramIds) {
+void ParameterService::reportParameterIds(Message paramIds) {
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
@@ -79,7 +79,7 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 		}
 	}
 
-	return reqParam;
+	storeMessage(reqParam);
 }
 
 void ParameterService::setParameterIds(Message newParamValues) {

@@ -47,7 +47,7 @@ private:
 public:
 	ParameterService();
 
-	Message reportParameterIds(Message paramIds);
+	void reportParameterIds(Message paramIds);
 
 	void setParameterIds(Message newParamValues);
 

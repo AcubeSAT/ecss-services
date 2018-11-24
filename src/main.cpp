@@ -30,7 +30,7 @@ int main() {
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
-	/*
+
 	//ST[20] test
 	ParameterService paramService;
 
@@ -39,8 +39,9 @@ int main() {
 	sentPacket.appendUint16(2);  //number of contained IDs
 	sentPacket.appendUint16(0);  //first ID
 	sentPacket.appendUint16(1);  //second ID
-	Message returnedPacket = paramService.reportParameterIds(sentPacket);
+	paramService.reportParameterIds(sentPacket);
 
+	/*
 	uint16_t numOfIds = returnedPacket.readUint16();
 
 	std::cout << std::endl << "Number of contained configs: " << numOfIds << std::endl;
