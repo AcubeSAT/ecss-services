@@ -32,8 +32,7 @@ ParameterService::ParameterService() {
 #endif
 }
 
-void ParameterService::reportParameterIds(Message paramIds) {
-
+Message ParameterService::reportParameterIds(Message paramIds) {
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
 	 * containing the current configuration
@@ -59,20 +58,16 @@ void ParameterService::reportParameterIds(Message paramIds) {
 
 	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
 	    paramIds.messageType == 1) {
-
 		uint16_t ids = paramIds.readUint16();
 		reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
 
 		for (int i = 0; i < ids; i++) {
-
 			uint16_t currId = paramIds.readUint16();      // current ID to be appended
 
 			if (currId < CONFIGLENGTH) {  // check to prevent out-of-bounds access due to invalid id
-
 				reqParam.appendUint16(currId);
 				reqParam.appendUint32(paramsList[currId].settingData);
 			} else {
-
 								// generate failure of execution notification for ST[06]
 				continue;       //ignore the invalid ID
 			}
@@ -80,10 +75,10 @@ void ParameterService::reportParameterIds(Message paramIds) {
 	}
 
 	storeMessage(reqParam);
+	return reqParam;   // this has to stay for now because no other way for testing
 }
 
 void ParameterService::setParameterIds(Message newParamValues) {
-
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
 	 * iterates over all contained parameter IDs and replaces the settings for each valid parameter,
@@ -98,18 +93,14 @@ void ParameterService::setParameterIds(Message newParamValues) {
 
 	if (newParamValues.packetType == Message::TC && newParamValues.serviceType == 20 &&
 		newParamValues.messageType == 3) {
-
 		uint16_t ids = newParamValues.readUint16();  //get number of ID's
 
 		for (int i = 0; i < ids; i++) {
-
 			uint16_t currId = newParamValues.readUint16();
 
 			if (currId < CONFIGLENGTH) {
-
 				paramsList[currId].settingData = newParamValues.readUint32();
 			} else {
-
 								// generate failure of execution notification for ST[06]
 				continue;       // ignore the invalid ID
 			}
@@ -118,7 +109,6 @@ void ParameterService::setParameterIds(Message newParamValues) {
 }
 
 uint16_t ParameterService::numOfValidIds(Message idMsg) {
-
 	idMsg.resetRead();
 	// start reading from the beginning of the idMsg object
 	// (original obj. will not be influenced if this is called by value)
@@ -127,21 +117,16 @@ uint16_t ParameterService::numOfValidIds(Message idMsg) {
 	uint16_t validIds = 0;
 
 	for (int i = 0; i < ids; i++) {
-
 		uint16_t currId = idMsg.readUint16();
 
 		if (idMsg.messageType == 3) {
-
 			idMsg.readUint32();   //skip the 32bit settings blocks, we need only the IDs
 		}
 
 		if (currId < CONFIGLENGTH) {
-
 			validIds++;
 		}
-
 	}
 
 	return validIds;
-
 }

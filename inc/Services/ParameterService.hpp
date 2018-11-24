@@ -19,7 +19,6 @@
  * ECSS-E-ST-70-41C, chapter 7.3
  */
 struct Parameter {
-
 	uint8_t ptc;            // Packet field type code (PTC)
 	uint8_t pfc;            // Packet field format code (PFC)
 	uint16_t paramId;       // Unique ID of the parameter
@@ -36,6 +35,7 @@ struct Parameter {
  * for parameter reporting and modification.
  *
  * @todo Ensure that the parameter list is sorted by ID
+ * @todo Convert reportParameterIds() to void when storeMessage() stores and doesn't print
  */
 
 class ParameterService : public Service {
@@ -47,7 +47,7 @@ private:
 public:
 	ParameterService();
 
-	void reportParameterIds(Message paramIds);
+	Message reportParameterIds(Message paramIds);
 
 	void setParameterIds(Message newParamValues);
 

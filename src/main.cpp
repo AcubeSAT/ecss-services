@@ -39,21 +39,7 @@ int main() {
 	sentPacket.appendUint16(2);  //number of contained IDs
 	sentPacket.appendUint16(0);  //first ID
 	sentPacket.appendUint16(1);  //second ID
-	paramService.reportParameterIds(sentPacket);
-
-	/*
-	uint16_t numOfIds = returnedPacket.readUint16();
-
-	std::cout << std::endl << "Number of contained configs: " << numOfIds << std::endl;
-
-	for (int i = 0; i < numOfIds; i++) {
-
-		std::cout << "Parameter ID: " << std::dec << returnedPacket.readUint16() << std::endl
-		          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
-
-	}
-
-	std::cout << std::endl << "(First value is hours, second is minutes)" << std::endl;
+	Message returnedPacket = paramService.reportParameterIds(sentPacket);
 
 	//Test code for setParameter
 	Message sentPacket2 = Message(20, 3, Message::TC, 1);  //application id is a dummy number (1)
@@ -65,15 +51,6 @@ int main() {
 
 	paramService.setParameterIds(sentPacket2);
 	returnedPacket = paramService.reportParameterIds(sentPacket);
-
-	numOfIds = returnedPacket.readUint16();
-
-	for (int i = 0; i < numOfIds; i++) {
-
-		std::cout << "Parameter ID: " << std::dec << returnedPacket.readUint16() << std::endl
-		          << "Parameter value: " << std::dec << returnedPacket.readUint32() << std::endl;
-
-	}*/
 
 // ST[01] test
 	// parameters take random values and works as expected
