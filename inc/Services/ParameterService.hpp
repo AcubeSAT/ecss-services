@@ -31,7 +31,7 @@ struct Parameter {
 };
 
 /**
- * Parameter manager
+ * Parameter manager - ST[20]
  * Holds the list with the parameters and provides functions
  * for parameter reporting and modification.
  *

@@ -20,7 +20,7 @@ TEST_CASE("Parameter Report Subservice") {
 		request.appendUint16(3);      // valid
 
 		report = pserv.reportParameterIds(request);
-		request.readPosition = 0;
+		request.resetRead();
 
 		uint16_t repIdCount = report.readUint16();
 		uint16_t reqIdCount = request.readUint16();

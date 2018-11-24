@@ -73,7 +73,7 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 				reqParam.appendUint32(paramsList[currId].settingData);
 			} else {
 
-				// generate failure of execution notification for ST[06]
+								// generate failure of execution notification for ST[06]
 				continue;       //ignore the invalid ID
 			}
 		}
@@ -110,7 +110,7 @@ void ParameterService::setParameterIds(Message newParamValues) {
 				paramsList[currId].settingData = newParamValues.readUint32();
 			} else {
 
-				// generate failure of execution notification for ST[06]
+								// generate failure of execution notification for ST[06]
 				continue;       // ignore the invalid ID
 			}
 		}
@@ -119,7 +119,7 @@ void ParameterService::setParameterIds(Message newParamValues) {
 
 uint16_t ParameterService::numOfValidIds(Message idMsg) {
 
-	idMsg.readPosition = 0;
+	idMsg.resetRead();
 	// start reading from the beginning of the idMsg object
 	// (original obj. will not be influenced if this is called by value)
 
