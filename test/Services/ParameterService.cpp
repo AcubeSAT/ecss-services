@@ -1,6 +1,7 @@
 #include "catch2/catch.hpp"
 #include "Services/ParameterService.hpp"
 #include "Message.hpp"
+#include "ServiceTests.hpp"
 
 #define CATCH_CONFIG_MAIN
 
@@ -19,7 +20,8 @@ TEST_CASE("Parameter Report Subservice") {
 		request.appendUint16(34672);  // faulty ID in this context
 		request.appendUint16(3);      // valid
 
-		report = pserv.reportParameterIds(request);
+		pserv.reportParameterIds(request);
+		report = ServiceTests::get(0);
 		request.resetRead();
 
 		uint16_t repIdCount = report.readUint16();
@@ -33,7 +35,9 @@ TEST_CASE("Parameter Report Subservice") {
 	SECTION("Wrong Message Type Handling Test") {
 
 		Message falseRequest(15, 3, Message::TM, 1);   //a totally wrong message
-		Message response = pserv.reportParameterIds(falseRequest);
+
+		pserv.reportParameterIds(falseRequest);
+		Message response = ServiceTests::get(0);
 		CHECK(response.messageType == 2);
 		CHECK(response.serviceType == 20);
 		CHECK(response.packetType == Message::TM);

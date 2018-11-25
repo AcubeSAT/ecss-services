@@ -35,7 +35,6 @@ struct Parameter {
  * for parameter reporting and modification.
  *
  * @todo Ensure that the parameter list is sorted by ID
- * @todo Convert reportParameterIds() to void when storeMessage() stores and doesn't print
  */
 
 class ParameterService : public Service {
@@ -56,11 +55,11 @@ public:
 	 * **for the parameters specified in the carried valid IDs**.
 	 *
 	 * No sophisticated error checking for now, just whether the package is of the correct type
-	 * and whether the requested IDs are valid, ignoring the invalid ones.
+	 * and whether the requested IDs are valid, ignoring the invalid ones. If no IDs are correct,
+	 * the returned message shall be empty.
 	 *
 	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
-	 * @return A TM[20, 2] packet containing the valid parameter IDs and their settings.
-	 * @return Empty TM[20, 2] packet on wrong type.
+	 * @return None (messages are stored using storeMessage())
 	 *
 	 * @todo Generate failure notifs where needed when ST[01] is ready
 	 *
@@ -70,7 +69,7 @@ public:
 	 *
 	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
-	Message reportParameterIds(Message paramIds);
+	void reportParameterIds(Message paramIds);
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,

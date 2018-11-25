@@ -28,7 +28,7 @@ ParameterService::ParameterService() {
 #endif
 }
 
-Message ParameterService::reportParameterIds(Message paramIds) {
+void ParameterService::reportParameterIds(Message paramIds) {
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
 
 	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
@@ -50,7 +50,6 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 	}
 
 	storeMessage(reqParam);
-	return reqParam;   // this has to stay for now because no other way for testing
 }
 
 void ParameterService::setParameterIds(Message newParamValues) {
