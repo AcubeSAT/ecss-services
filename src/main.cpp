@@ -39,7 +39,7 @@ int main() {
 	sentPacket.appendUint16(2);  //number of contained IDs
 	sentPacket.appendUint16(0);  //first ID
 	sentPacket.appendUint16(1);  //second ID
-	Message returnedPacket = paramService.reportParameterIds(sentPacket);
+	paramService.reportParameterIds(sentPacket);
 
 	//Test code for setParameter
 	Message sentPacket2 = Message(20, 3, Message::TC, 1);  //application id is a dummy number (1)
@@ -50,7 +50,7 @@ int main() {
 	sentPacket2.appendUint32(45823);  //settings for 2nd parameter
 
 	paramService.setParameterIds(sentPacket2);
-	returnedPacket = paramService.reportParameterIds(sentPacket);
+	paramService.reportParameterIds(sentPacket);
 
 // ST[01] test
 	// parameters take random values and works as expected
