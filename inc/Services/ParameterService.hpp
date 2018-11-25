@@ -45,10 +45,44 @@ private:
 	static uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
 
 public:
+	/**
+	 * Initializes the parameter list with some dummy values for now.
+	 */
 	ParameterService();
 
+	/**
+	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
+	 * containing the current configuration
+	 * **for the parameters specified in the carried valid IDs**.
+	 *
+	 * No sophisticated error checking for now, just whether the package is of the correct type
+	 * and whether the requested IDs are valid, ignoring the invalid ones.
+	 *
+	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
+	 * @return A TM[20, 2] packet containing the valid parameter IDs and their settings.
+	 * @return Empty TM[20, 2] packet on wrong type.
+	 *
+	 * @todo Generate failure notifs where needed when ST[01] is ready
+	 *
+	 * NOTES:
+	 * Method for valid ID counting is a hack (clones the message and figures out the number
+	 * separately, due to message access being non-random). Should be enough for now.
+	 *
+	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
+	 */
 	Message reportParameterIds(Message paramIds);
 
+	/**
+	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
+	 * iterates over all contained parameter IDs and replaces the settings for each valid parameter,
+	 * while ignoring all invalid IDs.
+	 *
+	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
+	 * @return None
+	 *
+	 * @todo Generate failure notifications where needed (eg. when an invalid ID is encountered)
+	 * @todo Use pointers for changing and storing addresses to comply with the standard
+	 */
 	void setParameterIds(Message newParamValues);
 
 };

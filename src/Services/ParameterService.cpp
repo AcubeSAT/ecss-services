@@ -11,10 +11,6 @@
 
 ParameterService::ParameterService() {
 #ifdef DEMOMODE
-	/**
-	 * Initializes the parameter list with some dummy values.
-	 */
-
 	// Test code, setting up some of the parameter fields
 
 	time_t currTime = time(nullptr);
@@ -33,27 +29,6 @@ ParameterService::ParameterService() {
 }
 
 Message ParameterService::reportParameterIds(Message paramIds) {
-	/**
-	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
-	 * containing the current configuration
-	 * **for the parameters specified in the carried valid IDs**.
-	 *
-	 * No sophisticated error checking for now, just whether the package is of the correct type
-	 * and whether the requested IDs are valid, ignoring the invalid ones.
-	 *
-	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
-	 * @return A TM[20, 2] packet containing the valid parameter IDs and their settings.
-	 * @return Empty TM[20, 2] packet on wrong type.
-	 *
-	 * @todo Generate failure notifs where needed when ST[01] is ready
-	 *
-	 * NOTES:
-	 * Method for valid ID counting is a hack (clones the message and figures out the number
-	 * separately, due to message access being non-random). Should be enough for now.
-	 *
-	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
-	 */
-
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
 
 	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
@@ -79,20 +54,8 @@ Message ParameterService::reportParameterIds(Message paramIds) {
 }
 
 void ParameterService::setParameterIds(Message newParamValues) {
-	/**
-	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
-	 * iterates over all contained parameter IDs and replaces the settings for each valid parameter,
-	 * while ignoring all invalid IDs.
-	 *
-	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
-	 * @return None
-	 *
-	 * @todo Generate failure notifications where needed (eg. when an invalid ID is encountered)
-	 * @todo Use pointers for changing and storing addresses to comply with the standard
-	 */
-
 	if (newParamValues.packetType == Message::TC && newParamValues.serviceType == 20 &&
-		newParamValues.messageType == 3) {
+	newParamValues.messageType == 3) {
 		uint16_t ids = newParamValues.readUint16();  //get number of ID's
 
 		for (int i = 0; i < ids; i++) {
