@@ -73,6 +73,15 @@ void Message::appendString(uint8_t size, const char *value) {
 	dataSize += size;
 }
 
+void Message::appendString(uint16_t size, uint8_t *value) {
+	assert(dataSize + size <= ECSS_MAX_MESSAGE_SIZE);
+	assert(size < ECSS_MAX_STRING_SIZE);
+
+	memcpy(data + dataSize, value, size);
+
+	dataSize += size;
+}
+
 uint16_t Message::readBits(uint8_t numBits) {
 	assert(numBits <= 16);
 	// TODO: Add assert
@@ -134,7 +143,16 @@ void Message::readString(char *string, uint8_t size) {
 	assert(size < ECSS_MAX_STRING_SIZE);
 
 	memcpy(string, data + readPosition, size);
-	string[size] = '\0';
+	string[size] = '\0'; // todo: Use that for now to avoid problems. Later to be removed
+
+	readPosition += size;
+}
+
+void Message::readString(uint8_t *string, uint16_t size) {
+	assert(readPosition + size <= ECSS_MAX_MESSAGE_SIZE);
+	assert(size < ECSS_MAX_STRING_SIZE);
+
+	memcpy(string, data + readPosition, size);
 
 	readPosition += size;
 }
