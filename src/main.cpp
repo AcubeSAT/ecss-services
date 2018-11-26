@@ -3,6 +3,7 @@
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Message.hpp"
+#include "Services/MemoryManagementService.hpp"
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -30,6 +31,7 @@ int main() {
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
+<<<<<<< src/main.cpp
 
 	//ST[20] test
 	ParameterService paramService;
@@ -52,7 +54,43 @@ int main() {
 	paramService.setParameterIds(sentPacket2);
 	paramService.reportParameterIds(sentPacket);
 
-// ST[01] test
+// ST[06] testing
+	char anotherStr[8] = "Fgthred";
+	char yetAnotherStr[2] = "F";
+	char *pStr = static_cast<char *>(malloc(4));
+	*pStr = 'T';
+	*(pStr + 1) = 'G';
+	*(pStr + 2) = '\0';
+
+	MemoryManagementService memMangService;
+	Message rcvPack = Message(6, 5, Message::TC, 1);
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendUint16(3); // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
+	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
+
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(anotherStr));
+	rcvPack.appendUint16(sizeof(anotherStr)/ sizeof(anotherStr[0]));
+
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(yetAnotherStr));
+	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
+	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
+
+	rcvPack = Message(6, 2, Message::TC, 1);
+
+	uint8_t data[2] = {'h', 'R'};
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendUint16(2); // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
+	rcvPack.appendOctetString(2, data);
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
+	rcvPack.appendOctetString(1, data);
+	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
+=======
+	
+
+	// ST[01] test
+>>>>>>> src/main.cpp
 	// parameters take random values and works as expected
 	RequestVerificationService reqVerifService;
 	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
