@@ -8,9 +8,7 @@
 TEST_CASE("Parameter Report Subservice") {
 	ParameterService pserv;
 
-	SECTION("Faulty Instruction Ignorance Test") {
-		//TODO: Find a better criterion than checking the first 16 bits
-
+	SECTION("Faulty Instruction Handling Test") {
 		Message request(20, 1, Message::TC, 1);
 		Message report(20, 2, Message::TM, 1);
 
@@ -22,12 +20,13 @@ TEST_CASE("Parameter Report Subservice") {
 		report = ServiceTests::get(0);
 		request.resetRead();
 
-		uint16_t repIdCount = report.readUint16();
-		uint16_t reqIdCount = request.readUint16();
+		report.readUint16();
+		request.readUint16();
 
-		REQUIRE(repIdCount < reqIdCount);
-		// in case there are ignored IDs the number of IDs in the report
-		// will be smaller than the original
+		while (report.readPosition <= report.dataSize) {
+			CHECK_FALSE(report.readUint16() == 34672);  //fail if faulty ID is present in report
+			report.readUint32();                   //ignore the carried settings
+		}
 	}
 
 	SECTION("Wrong Message Type Handling Test") {
@@ -71,8 +70,8 @@ TEST_CASE("Parameter Setting Subservice") {
 		after.readUint16();                    // skip the number of IDs
 
 		while (after.readPosition <= after.dataSize) {
-			CHECK(before.readUint16() == after.readUint16());   //check if all IDs are present
-			CHECK(after.readUint32() != 0xBAAAAAAD);      //check if any settings are BAAAAAAD :P
+			CHECK(before.readUint16() == after.readUint16());   // check if all IDs are present
+			CHECK_FALSE(after.readUint32() == 0xBAAAAAAD);   // fail if any settings are BAAAAAAD :P
 		}
 	}
 }
