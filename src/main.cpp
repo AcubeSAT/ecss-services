@@ -31,19 +31,18 @@ int main() {
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
-<<<<<<< src/main.cpp
 
-	//ST[20] test
+	// ST[20] test
 	ParameterService paramService;
 
-	//Test code for reportParameter
+	// Test code for reportParameter
 	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
 	sentPacket.appendUint16(2);  //number of contained IDs
 	sentPacket.appendUint16(0);  //first ID
 	sentPacket.appendUint16(1);  //second ID
 	paramService.reportParameterIds(sentPacket);
 
-	//Test code for setParameter
+	// Test code for setParameter
 	Message sentPacket2 = Message(20, 3, Message::TC, 1);  //application id is a dummy number (1)
 	sentPacket2.appendUint16(2);  //number of contained IDs
 	sentPacket2.appendUint16(0);  //first parameter ID
@@ -86,11 +85,9 @@ int main() {
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
-=======
 	
 
 	// ST[01] test
->>>>>>> src/main.cpp
 	// parameters take random values and works as expected
 	RequestVerificationService reqVerifService;
 	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
