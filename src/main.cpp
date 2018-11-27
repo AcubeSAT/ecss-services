@@ -42,10 +42,10 @@ int main() {
 	// ST[05] test [works]
 	char data[12] = "Hello World";
 	EventReportService eventReportService;
-	eventReportService.informativeEventReport(1,(const uint8_t *)data,11);
-	eventReportService.lowSeverityAnomalyReport(2,(const uint8_t *)data,11);
-	eventReportService.mediumSeverityAnomalyReport(3,(const uint8_t *)data,11);
-	eventReportService.highSeverityAnomalyReport(4,(const uint8_t *)data,11);
+	eventReportService.informativeEventReport(1, (const uint8_t *)data, 11);
+	eventReportService.lowSeverityAnomalyReport(2, (const uint8_t *)data, 11);
+	eventReportService.mediumSeverityAnomalyReport(3, (const uint8_t *)data, 11);
+	eventReportService.highSeverityAnomalyReport(4, (const uint8_t *)data, 11);
 
 	return 0;
 }
