@@ -1,7 +1,3 @@
-//
-// Created by athanasios on 27/11/2018.
-//
-
 #ifndef ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 #define ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 
