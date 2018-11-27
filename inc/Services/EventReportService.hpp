@@ -27,7 +27,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void informativeEventReport(uint16_t eventID, const uint8_t *data, uint8_t length);
+	void informativeEventReport(uint16_t eventID, uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,2] low severiity anomaly report

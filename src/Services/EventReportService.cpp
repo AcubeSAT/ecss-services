@@ -10,12 +10,13 @@
  * instead of reinterpret_cast as it is a dangerous cast
  */
 
-void EventReportService::informativeEventReport(uint16_t eventID, const uint8_t *data,
+void EventReportService::informativeEventReport(uint16_t eventID, uint8_t *data,
 																		uint8_t length){
 	// TM[5,1]
 	Message report = createTM(1);
-	report.appendBits(ECSS_EVENTS_BITS, eventID);
-	report.appendString(length, reinterpret_cast<const char*>(data));
+	report.appendEnum16(eventID);
+	report.appendString(length,data);
+
 	storeMessage(report);
 }
 
@@ -23,8 +24,9 @@ void EventReportService::lowSeverityAnomalyReport(uint16_t eventID, const uint8_
 																			uint8_t length ){
 	// TM[5,2]
 	Message report = createTM(2);
-	report.appendBits(ECSS_EVENTS_BITS, eventID);
-	report.appendString(length, reinterpret_cast<const char*>(data));
+	report.appendEnum16(eventID);
+	report.appendString(length,data);
+
 	storeMessage(report);
 }
 
@@ -32,8 +34,9 @@ void EventReportService::mediumSeverityAnomalyReport(uint16_t eventID, const uin
 																				uint8_t length){
 	// TM[5,3]
 	Message report = createTM(3);
-	report.appendBits(ECSS_EVENTS_BITS, eventID);
-	report.appendString(length, reinterpret_cast<const char*>(data));
+	report.appendEnum16(eventID);
+	report.appendString(length,data);
+
 	storeMessage(report);
 }
 
@@ -41,7 +44,8 @@ void EventReportService::highSeverityAnomalyReport(uint16_t eventID, const uint8
 																			uint8_t length){
 	// TM[5,4]
 	Message report = createTM(4);
-	report.appendBits(ECSS_EVENTS_BITS, eventID);
-	report.appendString(length, reinterpret_cast<const char*>(data));
+	report.appendEnum16(eventID);
+	report.appendString(length,data);
+
 	storeMessage(report);
 }

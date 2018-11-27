@@ -16,7 +16,7 @@ class Service {
 private:
 	uint16_t messageTypeCounter = 0;
 protected:
-	uint8_t serviceType;
+	uint8_t serviceType{};
 
 	/**
 	 * Creates a new empty telemetry package originating from this service

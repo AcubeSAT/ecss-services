@@ -96,12 +96,14 @@ TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 	message.appendUint8(230);
 	message.appendUint16(15933);
 	message.appendUint32(2000001);
+	message.appendUint64(12446744073709551615ULL);
 
-	REQUIRE(message.dataSize == 1 + 2 + 4);
+	REQUIRE(message.dataSize == 1 + 2 + 4 + 8);
 
 	CHECK(message.readUint8() == 230);
 	CHECK(message.readUint16() == 15933);
 	CHECK(message.readUint32() == 2000001);
+	CHECK(message.readUint64() == 12446744073709551615ULL);
 
 	SECTION("7.4.3") {
 		/**
