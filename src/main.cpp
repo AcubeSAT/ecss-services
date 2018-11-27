@@ -98,7 +98,7 @@ int main() {
 	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
 
 	// ST[05] test [works]
-	unsigned char eventReportData[12] = "Hello World";
+	const unsigned char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
 	eventReportService.informativeEventReport(1, eventReportData, 11);
 	eventReportService.lowSeverityAnomalyReport(2, eventReportData, 11);

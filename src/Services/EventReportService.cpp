@@ -10,7 +10,7 @@
  * instead of reinterpret_cast as it is a dangerous cast
  */
 
-void EventReportService::informativeEventReport(uint16_t eventID, uint8_t *data,
+void EventReportService::informativeEventReport(uint16_t eventID, const uint8_t *data,
 																		uint8_t length){
 	// TM[5,1]
 	Message report = createTM(1);
