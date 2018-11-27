@@ -1,0 +1,30 @@
+#include "Services/EventReportService.hpp"
+#include "Message.hpp"
+
+void EventReportService::informativeEventReport(const uint8_t *data, uint8_t length){
+	// TM[5,1]
+	Message report = createTM(1);
+
+	storeMessage(report);
+}
+
+void EventReportService::lowSeverityAnomalyReport(const uint8_t *data, uint8_t length){
+	// TM[5,2]
+	Message report = createTM(2);
+
+	storeMessage(report);
+}
+
+void EventReportService::mediumSeverityAnomalyReport(const uint8_t *data, uint8_t length){
+	// TM[5,3]
+	Message report = createTM(3);
+
+	storeMessage(report);
+}
+
+void EventReportService::highSeverityAnomalyReport(const uint8_t *data, uint8_t length){
+	// TM[5,4]
+	Message report = createTM(4);
+
+	storeMessage(report);
+}
