@@ -22,32 +22,48 @@ public:
 	 * Send report to inform the respective recipients about an event
 	 *
 	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 *
+	 * @param eventID event definition ID
+	 * @param data the data of the report
+	 * @param length the length of the data
 	 */
-	void informativeEventReport(const uint8_t *data, uint8_t length);
+	void informativeEventReport(uint16_t eventID, const uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
 	 * Send report when there is an anomaly event of low severity to the respective recipients
 	 *
 	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 *
+	 * @param eventID event definition ID
+	 * @param data the data of the report
+	 * @param length the length of the data
 	 */
-	void lowSeverityAnomalyReport(const uint8_t *data, uint8_t length);
+	void lowSeverityAnomalyReport(uint16_t eventID, const uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
 	 * Send report when there is an anomaly event of medium severity to the respective recipients
 	 *
 	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 *
+	 * @param eventID event definition ID
+	 * @param data the data of the report
+	 * @param length the length of the data
 	 */
-	void mediumSeverityAnomalyReport(const uint8_t *data, uint8_t length);
+	void mediumSeverityAnomalyReport(uint16_t eventID, const uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,4] high severity anomaly report
 	 * Send report when there is an anomaly event of hgih severity to the respective recipients
 	 *
 	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 *
+	 * @param eventID event definition ID
+	 * @param data the data of the report
+	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(const uint8_t *data, uint8_t length);
+	void highSeverityAnomalyReport(uint16_t eventID, const uint8_t *data, uint8_t length);
 
 };
 #endif //ECSS_SERVICES_EVENTREPORTSERVICE_HPP
