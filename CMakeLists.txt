@@ -15,7 +15,7 @@ add_custom_target(check
 
 # Specify the .cpp files for the executables
 add_executable(ecss_services src/main.cpp src/Message.cpp src/Service.cpp
-        src/Services/TestService.cpp src/Services/RequestVerificationService.cpp)
+        src/Services/TestService.cpp src/Services/RequestVerificationService.cpp src/Services/EventReportService.cpp inc/Services/EventReportService.hpp)
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     add_subdirectory(lib/Catch2)
