@@ -1,6 +1,7 @@
 #include <iostream>
-#include <Services/TestService.hpp>
-#include <Services/RequestVerificationService.hpp>
+#include "Services/TestService.hpp"
+#include "Services/ParameterService.hpp"
+#include "Services/RequestVerificationService.hpp"
 #include "Message.hpp"
 #include "Services/MemoryManagementService.hpp"
 
@@ -30,7 +31,29 @@ int main() {
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
-	// ST[06] testing
+
+	// ST[20] test
+	ParameterService paramService;
+
+	// Test code for reportParameter
+	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
+	sentPacket.appendUint16(2);  //number of contained IDs
+	sentPacket.appendUint16(0);  //first ID
+	sentPacket.appendUint16(1);  //second ID
+	paramService.reportParameterIds(sentPacket);
+
+	// Test code for setParameter
+	Message sentPacket2 = Message(20, 3, Message::TC, 1);  //application id is a dummy number (1)
+	sentPacket2.appendUint16(2);  //number of contained IDs
+	sentPacket2.appendUint16(0);  //first parameter ID
+	sentPacket2.appendUint32(63238);  //settings for first parameter
+	sentPacket2.appendUint16(1);  //2nd parameter ID
+	sentPacket2.appendUint32(45823);  //settings for 2nd parameter
+
+	paramService.setParameterIds(sentPacket2);
+	paramService.reportParameterIds(sentPacket);
+
+// ST[06] testing
 	char anotherStr[8] = "Fgthred";
 	char yetAnotherStr[2] = "F";
 	char *pStr = static_cast<char *>(malloc(4));
@@ -62,6 +85,7 @@ int main() {
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
+	
 
 	// ST[01] test
 	// parameters take random values and works as expected
@@ -71,6 +95,5 @@ int main() {
 	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
 	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
 	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
-
 	return 0;
 }
