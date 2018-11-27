@@ -2,10 +2,18 @@
 #define ECSS_SERVICES_MEMMANGSERVICE_HPP
 
 // Memory limits definitions
-#define FIRST_ADRESS_FLASH  0x08000000
-#define LAST_ADDRESS_FLASH  0x0801FFFF  // todo: Define the last memory address based on the MCU
-#define FIRST_ADDRESS_SRAM  0x20000000
-#define SRAM_MEMORY_SIZE    16          // Specify the RAM size in kBytes
+#define DTCMRAM_LOWER_LIM 0x20000000UL
+#define DTCMRAM_UPPER_LIM 0x20020000UL
+#define ITCMRAM_LOWER_LIM 0x00000000UL
+#define ITCMRAM_UPPER_LIM 0x00010000UL
+#define RAM_D1_LOWER_LIM 0x24000000UL
+#define RAM_D1_UPPER_LIM 0x24080000UL
+#define RAM_D2_LOWER_LIM 0x30000000UL
+#define RAM_D2_UPPER_LIM 0x30048000UL
+#define RAM_D3_LOWER_LIM 0x38000000UL
+#define RAM_D3_UPPER_LIM 0x38010000UL
+#define FLASH_LOWER_LIM 0x08000000UL
+#define FLASH_UPPER_LIM 0x08200000UL
 
 
 #include "Service.hpp"
@@ -16,9 +24,13 @@ class MemoryManagementService : public Service {
 public:
 	// Memory type ID's
 	enum MemoryID {
-		RAM = 0,
-		FLASH = 1,
-		EXTERNAL = 2
+		DTCMRAM = 0,
+		RAM_D1,
+		RAM_D2,
+		RAM_D3,
+		ITCMRAM,
+		FLASH,
+		EXTERNAL
 	};
 
 	MemoryManagementService();
@@ -33,6 +45,21 @@ public:
 	class RawDataMemoryManagement {
 	private:
 		MemoryManagementService &mainService; // Used to access main class's members
+
+		/**
+		 * Check whether the provided address is valid or not, based on the defined limit values
+		 *
+		 * @param memId: The ID of the memory to check is passed
+		 * @param address: Takes the address to be checked for validity
+		 */
+		bool addressValidator(MemoryManagementService::MemoryID memId, uint64_t address);
+
+		/**
+		 * Check if the provided memory ID is valid
+		 *
+		 * @param memId: The memory ID for validation
+		 */
+		bool memoryIdValidator(MemoryManagementService::MemoryID memId);
 
 	public:
 		explicit RawDataMemoryManagement(MemoryManagementService &parent);
