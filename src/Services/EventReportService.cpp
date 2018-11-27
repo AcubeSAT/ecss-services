@@ -15,7 +15,7 @@ void EventReportService::informativeEventReport(uint16_t eventID, uint8_t *data,
 	// TM[5,1]
 	Message report = createTM(1);
 	report.appendEnum16(eventID);
-	report.appendString(length,data);
+	report.appendString(length, data);
 
 	storeMessage(report);
 }
@@ -25,7 +25,7 @@ void EventReportService::lowSeverityAnomalyReport(uint16_t eventID, const uint8_
 	// TM[5,2]
 	Message report = createTM(2);
 	report.appendEnum16(eventID);
-	report.appendString(length,data);
+	report.appendString(length, data);
 
 	storeMessage(report);
 }
@@ -35,7 +35,7 @@ void EventReportService::mediumSeverityAnomalyReport(uint16_t eventID, const uin
 	// TM[5,3]
 	Message report = createTM(3);
 	report.appendEnum16(eventID);
-	report.appendString(length,data);
+	report.appendString(length, data);
 
 	storeMessage(report);
 }
@@ -45,7 +45,7 @@ void EventReportService::highSeverityAnomalyReport(uint16_t eventID, const uint8
 	// TM[5,4]
 	Message report = createTM(4);
 	report.appendEnum16(eventID);
-	report.appendString(length,data);
+	report.appendString(length, data);
 
 	storeMessage(report);
 }
