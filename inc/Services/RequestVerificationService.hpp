@@ -27,8 +27,7 @@ public:
 	 * @param seqFlag Sequence flags
 	 * @param packetSeqCount Packet sequence count
 	 */
-	void successAcceptanceVerification(Message::PacketType packetType, bool secondaryHeaderFlag,
-	                                   uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount);
+	void successAcceptanceVerification(Message &request);
 
 	/**
 	 * TM[1,2] failed acceptance verification report
@@ -41,9 +40,7 @@ public:
 	 * @param seqFlag Sequence flags
 	 * @param packetSeqCount Packet sequence count
 	 */
-	void failAcceptanceVerification(Message::PacketType packetType, bool secondaryHeaderFlag,
-	                                uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount,
-	                                uint16_t errorCode);
+	void failAcceptanceVerification(Message &request);
 
 
 	/**
@@ -57,8 +54,7 @@ public:
 	 * @param seqFlag Sequence flags
 	 * @param packetSeqCount Packet sequence count
  	*/
-	void successExecutionVerification(Message::PacketType packetType, bool secondaryHeaderFlag,
-	                                  uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount);
+	void successExecutionVerification(Message &request);
 
 	/**
  	*  TM[1,8] failed completion of execution verification report
@@ -71,10 +67,7 @@ public:
 	 * @param seqFlag Sequence flags
 	 * @param packetSeqCount Packet sequence count
  	*/
-	void failExecutionVerification(Message::PacketType packetType,
-	                               bool secondaryHeaderFlag,
-	                               uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount,
-	                               uint16_t errorCode);
+	void failExecutionVerification(Message &request);
 
 	/**
  	*  TM[1,10] failed routing verification report
@@ -87,10 +80,7 @@ public:
 	 * @param seqFlag Sequence flags
 	 * @param packetSeqCount Packet sequence count
  	*/
-	void failRoutingVerification(Message::PacketType packetType,
-	                             bool secondaryHeaderFlag,
-	                             uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount,
-	                             uint16_t errorCode);
+	void failRoutingVerification(Message &request);
 
 
 };

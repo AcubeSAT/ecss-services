@@ -5,7 +5,15 @@
 
 TEST_CASE("TM[1,1]", "[service][st01]") {
 	RequestVerificationService reqVerifService;
-	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
+
+	Message receivedMessage = Message(1, 1, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	reqVerifService.successAcceptanceVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -26,7 +34,16 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 
 TEST_CASE("TM[1,2]", "[service][st01]") {
 	RequestVerificationService reqVerifService;
-	reqVerifService.failAcceptanceVerification(Message::TC, true, 2, 2, 10, 5);
+
+	Message receivedMessage = Message(1, 2, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnum16(5); // error code
+	reqVerifService.failAcceptanceVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -48,7 +65,15 @@ TEST_CASE("TM[1,2]", "[service][st01]") {
 
 TEST_CASE("TM[1,7]", "[service][st01]") {
 	RequestVerificationService reqVerifService;
-	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
+
+	Message receivedMessage = Message(1, 7, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	reqVerifService.successExecutionVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -69,7 +94,16 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 
 TEST_CASE("TM[1,8]", "[service][st01]") {
 	RequestVerificationService reqVerifService;
-	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
+
+	Message receivedMessage = Message(1, 8, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnum16(6); // error code
+	reqVerifService.failExecutionVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -91,7 +125,16 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 
 TEST_CASE("TM[1,10]", "[service][st01]") {
 	RequestVerificationService reqVerifService;
-	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+
+	Message receivedMessage = Message(1, 10, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnum16(7); // error code
+	reqVerifService.failRoutingVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);

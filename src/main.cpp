@@ -66,13 +66,13 @@ int main() {
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
-	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
+	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(anotherStr));
-	rcvPack.appendUint16(sizeof(anotherStr)/ sizeof(anotherStr[0]));
+	rcvPack.appendUint16(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(yetAnotherStr));
-	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
+	rcvPack.appendUint16(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(6, 2, Message::TC, 1);
@@ -85,15 +85,57 @@ int main() {
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
-	
+
 
 	// ST[01] test
-	// parameters take random values and works as expected
+
 	RequestVerificationService reqVerifService;
-	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
-	reqVerifService.failAcceptanceVerification(Message::TC, true, 2, 2, 10, 5);
-	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
-	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
-	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+	Message receivedMessage = Message(1, 1, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	reqVerifService.successAcceptanceVerification(receivedMessage);
+
+	receivedMessage = Message(1, 2, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnum16(5); // error code
+	reqVerifService.failAcceptanceVerification(receivedMessage);
+
+	receivedMessage = Message(1, 7, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	reqVerifService.successExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(1, 8, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnum16(6); // error code
+	reqVerifService.failExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(1, 10, Message::TC, 3);
+	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
+	receivedMessage.appendEnumerated(1, Message::TC); // packet type
+	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
+	receivedMessage.appendEnumerated(11, 2); // application process ID
+	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnum16(7); // error code
+	reqVerifService.failRoutingVerification(receivedMessage);
 	return 0;
 }
