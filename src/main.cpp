@@ -94,48 +94,48 @@ int main() {
 	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
-	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
-	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnumerated(11, 2); // application process ID(dummy value)
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count(dummy value)
 	reqVerifService.successAcceptanceVerification(receivedMessage);
 
 	receivedMessage = Message(1, 2, Message::TC, 3);
 	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
-	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
-	receivedMessage.appendBits(14, 10); // packet sequence count
-	receivedMessage.appendEnum16(5); // error code
+	receivedMessage.appendEnumerated(11, 2); // application process ID(dummy value)
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count(dummy value)
+	receivedMessage.appendEnum16(5); // error code(dummy value)
 	reqVerifService.failAcceptanceVerification(receivedMessage);
 
 	receivedMessage = Message(1, 7, Message::TC, 3);
 	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
-	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
-	receivedMessage.appendBits(14, 10); // packet sequence count
+	receivedMessage.appendEnumerated(11, 2); // application process ID(dummy value)
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count(dummy value)
 	reqVerifService.successExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 8, Message::TC, 3);
 	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
-	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
-	receivedMessage.appendBits(14, 10); // packet sequence count
-	receivedMessage.appendEnum16(6); // error code
+	receivedMessage.appendEnumerated(11, 2); // application process ID(dummy value)
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count(dummy value)
+	receivedMessage.appendEnum16(6); // error code(dummy value)
 	reqVerifService.failExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 10, Message::TC, 3);
 	receivedMessage.appendEnumerated(3, ECSS_PUS_VERSION); // packet version number
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
-	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
-	receivedMessage.appendBits(14, 10); // packet sequence count
-	receivedMessage.appendEnum16(7); // error code
+	receivedMessage.appendEnumerated(11, 2); // application process ID(dummy value)
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
+	receivedMessage.appendBits(14, 10); // packet sequence count(dummy value)
+	receivedMessage.appendEnum16(7); // error code(dummy value)
 	reqVerifService.failRoutingVerification(receivedMessage);
 	return 0;
 }

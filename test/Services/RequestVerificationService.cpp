@@ -11,7 +11,7 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
 	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
 	receivedMessage.appendBits(14, 10); // packet sequence count
 	reqVerifService.successAcceptanceVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
@@ -28,7 +28,7 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
 	CHECK(response.readEnumerated(11) == 2); // application process ID
-	CHECK(response.readEnumerated(2) == 2); // sequence flags
+	CHECK(response.readEnumerated(2) == 3); // sequence flags
 	CHECK(response.readBits(14) == 10); // packet sequence count
 }
 
@@ -40,7 +40,7 @@ TEST_CASE("TM[1,2]", "[service][st01]") {
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
 	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
 	receivedMessage.appendBits(14, 10); // packet sequence count
 	receivedMessage.appendEnum16(5); // error code
 	reqVerifService.failAcceptanceVerification(receivedMessage);
@@ -58,7 +58,7 @@ TEST_CASE("TM[1,2]", "[service][st01]") {
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
 	CHECK(response.readEnumerated(11) == 2); // application process ID
-	CHECK(response.readEnumerated(2) == 2); // sequence flags
+	CHECK(response.readEnumerated(2) == 3); // sequence flags
 	CHECK(response.readBits(14) == 10); // packet sequence count
 	CHECK(response.readEnum16() == 5); // error code
 }
@@ -71,7 +71,7 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
 	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
 	receivedMessage.appendBits(14, 10); // packet sequence count
 	reqVerifService.successExecutionVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
@@ -88,7 +88,7 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
 	CHECK(response.readEnumerated(11) == 2); // application process ID
-	CHECK(response.readEnumerated(2) == 2); // sequence flags
+	CHECK(response.readEnumerated(2) == 3); // sequence flags
 	CHECK(response.readBits(14) == 10); // packet sequence count
 }
 
@@ -100,7 +100,7 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
 	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
 	receivedMessage.appendBits(14, 10); // packet sequence count
 	receivedMessage.appendEnum16(6); // error code
 	reqVerifService.failExecutionVerification(receivedMessage);
@@ -118,7 +118,7 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
 	CHECK(response.readEnumerated(11) == 2); // application process ID
-	CHECK(response.readEnumerated(2) == 2); // sequence flags
+	CHECK(response.readEnumerated(2) == 3); // sequence flags
 	CHECK(response.readBits(14) == 10); // packet sequence count
 	CHECK(response.readEnum16() == 6); // error code
 }
@@ -131,7 +131,7 @@ TEST_CASE("TM[1,10]", "[service][st01]") {
 	receivedMessage.appendEnumerated(1, Message::TC); // packet type
 	receivedMessage.appendBits(1, static_cast<uint8_t >(true)); // secondary header flag
 	receivedMessage.appendEnumerated(11, 2); // application process ID
-	receivedMessage.appendEnumerated(2, 2); // sequence Flags
+	receivedMessage.appendEnumerated(2, 3); // sequence Flags
 	receivedMessage.appendBits(14, 10); // packet sequence count
 	receivedMessage.appendEnum16(7); // error code
 	reqVerifService.failRoutingVerification(receivedMessage);
@@ -149,7 +149,7 @@ TEST_CASE("TM[1,10]", "[service][st01]") {
 	CHECK(response.readEnumerated(1) == 1); // packet type
 	CHECK(response.readBits(1) == true); // secondary header flag
 	CHECK(response.readEnumerated(11) == 2); // application process ID
-	CHECK(response.readEnumerated(2) == 2); // sequence flags
+	CHECK(response.readEnumerated(2) == 3); // sequence flags
 	CHECK(response.readBits(14) == 10); // packet sequence count
 	CHECK(response.readEnum16() == 7); // error code
 }
