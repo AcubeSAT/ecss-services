@@ -410,7 +410,7 @@ public:
 		uint16_t size = readUint16(); // Get the data length from the message
 		readString(byteString, size); // Read the string data
 
-		return size; // Return the read string pointer
+		return size; // Return the string size
 	}
 
 	/**
