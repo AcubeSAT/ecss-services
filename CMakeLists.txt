@@ -16,6 +16,8 @@ add_custom_target(check
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
         src/Message.cpp
+        src/Services/MemoryManagementService.cpp
+        src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         )
@@ -39,4 +41,4 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             ${test_SRC})
 
     target_link_libraries(tests Catch2::Catch2)
-ENDIF ()
+ENDIF()

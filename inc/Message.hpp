@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include <cstdint>
 #include <cassert>
+#include <iostream>
 
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
@@ -79,6 +80,16 @@ public:
 	void appendString(uint8_t size, const char *value);
 
 	/**
+	 * Appends \p size bytes to the message
+	 *
+	 * @param size The amount of byte to append
+	 * @param value An array containing at least \p size bytes
+	 * @todo See if more than uint8_t strings will be supported
+	 * @todo Is uint16_t size too much or not enough? It has to be defined
+	 */
+	void appendString(uint16_t size, uint8_t *value);
+
+	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
 	 * @param numBits
 	 * @return A maximum number of 16 bits is returned (in big-endian format)
@@ -107,6 +118,15 @@ public:
 	 * ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string.
 	 */
 	void readString(char *string, uint8_t size);
+
+	/**
+	* Reads the next \p size bytes from the message, and stores them into the allocated \p string
+	*
+	* NOTE: We assume that \p string is already allocated, and its size is at least
+	* ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string
+	* @todo Is uint16_t size too much or not enough? It has to be defined
+	*/
+	void readString(uint8_t *string, uint16_t size);
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType,
@@ -188,6 +208,16 @@ public:
 	}
 
 	/**
+	 * Adds an 8 byte unsigned integer to the end of the message
+	 *
+	 * PTC = 3, PFC = 16
+	 */
+	void appendUint64(uint64_t value) {
+		appendWord(static_cast<uint32_t >(value >> 32));
+		appendWord(static_cast<uint32_t >(value));
+	}
+
+	/**
 	 * Adds a 1 byte signed integer to the end of the message
 	 *
 	 * PTC = 4, PFC = 4
@@ -224,6 +254,17 @@ public:
 		              "Floating point numbers must be 32 bits long");
 
 		return appendWord(reinterpret_cast<uint32_t &>(value));
+	}
+
+	/**
+	 * Adds a N-byte string to the end of the message
+	 *
+	 *
+	 * PTC = 7, PFC = 0
+	 */
+	void appendOctetString(uint16_t size, uint8_t *byteString) {
+		appendUint16(size);
+		appendString(size, byteString);
 	}
 
 	/**
@@ -302,6 +343,15 @@ public:
 	}
 
 	/**
+	 * Fetches an 8-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 3, PFC = 16
+	 */
+	uint64_t readUint64() {
+		return (static_cast<uint64_t >(readWord()) << 32) | static_cast<uint64_t >(readWord());
+	}
+
+	/**
 	 * Fetches an 1-byte signed integer from the current position in the message
 	 *
 	 * PTC = 4, PFC = 4
@@ -345,6 +395,22 @@ public:
 
 		uint32_t value = readWord();
 		return reinterpret_cast<float &>(value);
+	}
+
+	/**
+	 * Fetches a N-byte string from the current position in the message
+	 *
+	 * @details In the current implementation we assume that a preallocated array of
+	 * 			sufficient size is provided as the argument
+	 * @todo Specify if the provided array size is too small or too large
+	 *
+	 * PTC = 7, PFC = 0
+	 */
+	uint16_t readOctetString(uint8_t *byteString) {
+		uint16_t size = readUint16(); // Get the data length from the message
+		readString(byteString, size); // Read the string data
+
+		return size; // Return the string size
 	}
 
 	/**

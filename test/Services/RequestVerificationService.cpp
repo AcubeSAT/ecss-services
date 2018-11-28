@@ -110,4 +110,3 @@ TEST_CASE("TM[1,10]", "[service][st01]") {
 	CHECK(response.readBits(14) == 10); // packet sequence count
 	CHECK(response.readEnum16() == 7); // error code
 }
-
