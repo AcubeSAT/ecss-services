@@ -48,7 +48,9 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 						*(reinterpret_cast<uint8_t *>(startAddress) + i) = readData[i];
 					}
 				} else {
-					// requestVerificationService.failExecutionVerification(request.packetType, );
+					// todo: Implement the fail report the correct way when we know all parameters
+					mainService.requestVerificationService.failExecutionVerification(
+						request.packetType, true, 1, 1, 10, 6);
 					/* Send failed completion of execution */
 				}
 			}
@@ -95,7 +97,8 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 				report.appendUint64(startAddress); // Start address
 				report.appendOctetString(readLength, readData); // Save the read data
 			} else {
-				// requestVerificationService.failExecutionVerification(request.packetType, );
+				mainService.requestVerificationService.failExecutionVerification(request.packetType,
+				                                                                 true, 1, 1, 10, 6);
 				/* Send wrong address failure report */
 			}
 		}
@@ -147,7 +150,8 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 				// todo: Calculate and append checksum in the report
 				//report.appendBits(16, /* checksum bits */);
 			} else {
-				// requestVerificationService.failExecutionVerification(request.packetType, );
+				mainService.requestVerificationService.failExecutionVerification(request.packetType,
+				                                                                 true, 1, 1, 10, 6);
 				/* Failure of execution */
 			}
 		}
