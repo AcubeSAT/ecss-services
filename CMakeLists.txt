@@ -17,21 +17,26 @@ add_custom_target(check
 add_library(common OBJECT
         src/Message.cpp
         src/Services/RequestVerificationService.cpp
-        src/Services/TestService.cpp)
+        src/Services/TestService.cpp
+        )
 
 # Specify the .cpp files for the executables
 add_executable(ecss_services
         src/main.cpp
         $<TARGET_OBJECTS:common>
-        src/Platform/x86/Service.cpp)
+        src/Platform/x86/Service.cpp
+        )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
+    file(GLOB test_main_SRC "test/*.cpp")
     file(GLOB test_SRC "test/**/*.cpp")
 
     add_subdirectory(lib/Catch2)
     add_executable(tests
             $<TARGET_OBJECTS:common>
+            ${test_main_SRC}
             ${test_SRC})
+
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()
