@@ -25,28 +25,36 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 	assert(request.serviceType == 6);
 	assert(request.messageType == 2);
 
-	// Variable declaration
-	uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
-
-	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count
+	// Read the memory ID from the request
+	auto memoryID = MemoryManagementService::MemoryID(request.readEnum8());
 
 	// Check for a valid memory ID first
-	if (memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
+	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
+		// Variable declaration
+		uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
+		uint16_t iterationCount = request.readUint16(); // Get the iteration count
+
 		if (memoryID == MemoryManagementService::MemoryID::FLASH) {
 			// todo: Define FLASH specific access code when we transfer to embedded
 		} else {
 			for (std::size_t j = 0; j < iterationCount; j++) {
 				uint64_t startAddress = request.readUint64(); // Start address of the memory
 				uint16_t dataLength = request.readOctetString(readData); // Data length to load
-				// todo: Error logging has to be included, if memory allocation above fails
 				// todo: Continue only if the checksum passes (when the checksum will be implemented)
 
-				for (std::size_t i = 0; i < dataLength; i++) {
-					*(reinterpret_cast<uint8_t *>(startAddress) + i) = readData[i];
+				if (mainService.addressValidator(memoryID, startAddress) &&
+				    mainService.addressValidator(memoryID, startAddress + dataLength)) {
+					for (std::size_t i = 0; i < dataLength; i++) {
+						*(reinterpret_cast<uint8_t *>(startAddress) + i) = readData[i];
+					}
+				} else {
+					// requestVerificationService.failExecutionVerification(request.packetType, );
+					/* Send failed completion of execution */
 				}
 			}
 		}
+	} else {
+		/* Generate a false start report */
 	}
 }
 
@@ -57,15 +65,12 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 	// Create the report message object of telemetry message subtype 6
 	Message report = mainService.createTM(6);
-
-	// Variable declaration
-	uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
-
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
-	// todo: Add checks depending on the memory type
 
 	// Check for a valid memory ID first
-	if (memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
+	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
+		// Variable declaration
+		uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 		// Append the data to report message
@@ -78,9 +83,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 			uint16_t readLength = request.readUint16(); // Start address for the memory read
 
 			// Read memory data, an octet at a time, checking for a valid address first
-			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
-				addressValidator(MemoryManagementService::MemoryID(memoryID),
-					startAddress + readLength)) {
+			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
+			                                 startAddress) &&
+			    mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
+			                                 startAddress + readLength)) {
 				for (std::size_t i = 0; i < readLength; i++) {
 					readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
 				}
@@ -89,6 +95,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 				report.appendUint64(startAddress); // Start address
 				report.appendOctetString(readLength, readData); // Save the read data
 			} else {
+				// requestVerificationService.failExecutionVerification(request.packetType, );
 				/* Send wrong address failure report */
 			}
 		}
@@ -108,44 +115,54 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 
 	// Create the report message object of telemetry message subtype 10
 	Message report = mainService.createTM(10);
-
-	// Variable declaration
-	uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
-
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
-	// todo: Add checks depending on the memory type
 
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count
+	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
+		// Variable declaration
+		uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
+		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
-	// Append the data to report message
-	report.appendEnum8(memoryID); // Memory ID
-	report.appendUint16(iterationCount); // Iteration count
+		// Append the data to report message
+		report.appendEnum8(memoryID); // Memory ID
+		report.appendUint16(iterationCount); // Iteration count
 
-	// Iterate N times, as specified in the command message
-	for (std::size_t j = 0; j < iterationCount; j++) {
-		uint64_t startAddress = request.readUint64(); // Data length to read
-		uint16_t readLength = request.readUint16(); // Start address for the memory read
+		// Iterate N times, as specified in the command message
+		for (std::size_t j = 0; j < iterationCount; j++) {
+			uint64_t startAddress = request.readUint64(); // Data length to read
+			uint16_t readLength = request.readUint16(); // Start address for the memory read
 
-		// Read memory data and save them for checksum calculation
-		for (std::size_t i = 0; i < readLength; i++) {
-			readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+			// Check whether the first and the last addresses are within the limits
+			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
+			                                 startAddress) &&
+			    mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
+			                                 startAddress + readLength)) {
+				// Read memory data and save them for checksum calculation
+				for (std::size_t i = 0; i < readLength; i++) {
+					readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+				}
+
+				// This part is repeated N-times (N = iteration count)
+				report.appendUint64(startAddress); // Start address
+				report.appendUint16(readLength); // Save the read data
+				// todo: Calculate and append checksum in the report
+				//report.appendBits(16, /* checksum bits */);
+			} else {
+				// requestVerificationService.failExecutionVerification(request.packetType, );
+				/* Failure of execution */
+			}
 		}
+		// todo: implement and append the checksum part of the reporting packet
 
-		// This part is repeated N-times (N = iteration count)
-		report.appendUint64(startAddress); // Start address
-		report.appendUint16(readLength); // Save the read data
-		// todo: Calculate and append checksum in the report
-		//report.appendBits(16, /* checksum bits */);
+		mainService.storeMessage(report); // Save the report message
+		request.resetRead(); // Reset the reading count
+	} else {
+		/* Failed start of execution */
 	}
-	// todo: implement and append the checksum part of the reporting packet
-
-	mainService.storeMessage(report); // Save the report message
-	request.resetRead(); // Reset the reading count
 }
 
 
 // Private function declaration section
-bool MemoryManagementService::RawDataMemoryManagement::addressValidator(
+bool MemoryManagementService::addressValidator(
 	MemoryManagementService::MemoryID memId, uint64_t address) {
 	bool validIndicator = false;
 
@@ -189,13 +206,13 @@ bool MemoryManagementService::RawDataMemoryManagement::addressValidator(
 	return validIndicator;
 }
 
-inline bool MemoryManagementService::RawDataMemoryManagement::memoryIdValidator(
+inline bool MemoryManagementService::memoryIdValidator(
 	MemoryManagementService::MemoryID memId) {
 	return (memId == MemoryManagementService::MemoryID::RAM_D1) ||
-		(memId == MemoryManagementService::MemoryID::RAM_D2) ||
-		(memId == MemoryManagementService::MemoryID::RAM_D3) ||
-		(memId == MemoryManagementService::MemoryID::DTCMRAM) ||
-		(memId == MemoryManagementService::MemoryID::ITCMRAM) ||
-		(memId == MemoryManagementService::MemoryID::FLASH) ||
-		(memId == MemoryManagementService::MemoryID::EXTERNAL);
+	       (memId == MemoryManagementService::MemoryID::RAM_D2) ||
+	       (memId == MemoryManagementService::MemoryID::RAM_D3) ||
+	       (memId == MemoryManagementService::MemoryID::DTCMRAM) ||
+	       (memId == MemoryManagementService::MemoryID::ITCMRAM) ||
+	       (memId == MemoryManagementService::MemoryID::FLASH) ||
+	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
 }

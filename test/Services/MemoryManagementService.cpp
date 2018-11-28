@@ -14,7 +14,7 @@ TEST_CASE("TM[6,2]", "[service][st06]") {
 	MemoryManagementService memMangService;
 
 	Message receivedPacket = Message(6, 2, Message::TC, 1);
-	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(2); // Iteration count
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
 	receivedPacket.appendOctetString(2, data);
@@ -37,7 +37,7 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 
 	MemoryManagementService memMangService;
 	Message receivedPacket = Message(6, 5, Message::TC, 1);
-	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(3); // Iteration count (Equal to 3 test strings)
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(testString_1)); // Start address
 	receivedPacket.appendUint16(sizeof(testString_1)/ sizeof(testString_1[0])); // Data read length
@@ -55,7 +55,7 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(response.messageType == 6);
 	REQUIRE(response.dataSize == 49);
 
-	CHECK(response.readEnum8() == MemoryManagementService::MemoryID::RAM);
+	CHECK(response.readEnum8() == MemoryManagementService::MemoryID::EXTERNAL);
 	CHECK(response.readUint16() == 3);
 	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_1));
 	readSize = response.readOctetString(checkString);

@@ -16,9 +16,11 @@
 #define FLASH_UPPER_LIM 0x08200000UL
 
 
-#include "Service.hpp"
 #include <memory>
 #include <iostream>
+#include "Service.hpp"
+#include "Services/RequestVerificationService.hpp"
+
 
 class MemoryManagementService : public Service {
 public:
@@ -45,21 +47,6 @@ public:
 	class RawDataMemoryManagement {
 	private:
 		MemoryManagementService &mainService; // Used to access main class's members
-
-		/**
-		 * Check whether the provided address is valid or not, based on the defined limit values
-		 *
-		 * @param memId: The ID of the memory to check is passed
-		 * @param address: Takes the address to be checked for validity
-		 */
-		bool addressValidator(MemoryManagementService::MemoryID memId, uint64_t address);
-
-		/**
-		 * Check if the provided memory ID is valid
-		 *
-		 * @param memId: The memory ID for validation
-		 */
-		bool memoryIdValidator(MemoryManagementService::MemoryID memId);
 
 	public:
 		explicit RawDataMemoryManagement(MemoryManagementService &parent);
@@ -98,6 +85,24 @@ public:
 		 */
 		void checkRawData(Message &request);
 	} rawDataMemorySubservice;
+
+private:
+	RequestVerificationService requestVerificationService;
+
+	/**
+		 * Check whether the provided address is valid or not, based on the defined limit values
+		 *
+		 * @param memId: The ID of the memory to check is passed
+		 * @param address: Takes the address to be checked for validity
+		 */
+	bool addressValidator(MemoryManagementService::MemoryID memId, uint64_t address);
+
+	/**
+	 * Check if the provided memory ID is valid
+	 *
+	 * @param memId: The memory ID for validation
+	 */
+	bool memoryIdValidator(MemoryManagementService::MemoryID memId);
 };
 
 #endif //ECSS_SERVICES_MEMMANGSERVICE_HPP
