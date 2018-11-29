@@ -8,11 +8,13 @@
  */
 #define CSS_EVENTS_MAX_COUNT 16
 #define ECSS_EVENTS_BITS 16
-class EventReportService: public Service {
+
+class EventReportService : public Service {
 public:
-	EventReportService(){
+	EventReportService() {
 		serviceType = 5;
 	}
+
 	/**
 	 * TM[5,1] informative event report
 	 * Send report to inform the respective recipients about an event
@@ -62,4 +64,5 @@ public:
 	void highSeverityAnomalyReport(uint16_t eventID, const uint8_t *data, uint8_t length);
 
 };
+
 #endif //ECSS_SERVICES_EVENTREPORTSERVICE_HPP
