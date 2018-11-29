@@ -5,6 +5,11 @@
 /**
  * Implementation of ST[05] event reporting service
  * @todo add enum event definition id (and maybe some appending?)
+ *
+ * @todo changes enums event IDs
+ *
+ * Note: enum IDs are these just for test purposes
+ *
  */
 #define CSS_EVENTS_MAX_COUNT 16
 #define ECSS_EVENTS_BITS 16
@@ -14,6 +19,25 @@ public:
 	EventReportService() {
 		serviceType = 5;
 	}
+
+	enum InformationEvent {
+		UnknownEvent = 0,
+		WWDGReset = 1,
+		AssertionFail = 2,
+		MCUStart = 3,
+	};
+
+	enum LowSeverityAnomalyEvent {
+		LowSeverityUnknownEvent = 1,
+	};
+
+	enum MediumSeverityAnomalyEvent {
+		MediumSeverityUnknownEvent = 2,
+	};
+
+	enum HighSeverityAnomalyEvent {
+		HighSeverityUnknownEvent = 3,
+	};
 
 	/**
 	 * TM[5,1] informative event report
@@ -25,7 +49,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void informativeEventReport(uint16_t eventID, const uint8_t *data, uint8_t length);
+	void informativeEventReport(InformationEvent eventID, const uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
@@ -37,7 +61,8 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void lowSeverityAnomalyReport(uint16_t eventID, const uint8_t *data, uint8_t length);
+	void
+	lowSeverityAnomalyReport(LowSeverityAnomalyEvent eventID, const uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
@@ -49,7 +74,8 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void mediumSeverityAnomalyReport(uint16_t eventID, const uint8_t *data, uint8_t length);
+	void mediumSeverityAnomalyReport(MediumSeverityAnomalyEvent eventID, const uint8_t *data,
+	                                 uint8_t length);
 
 	/**
 	 * TM[5,4] high severity anomaly report
@@ -61,7 +87,8 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(uint16_t eventID, const uint8_t *data, uint8_t length);
+	void highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, const uint8_t *data,
+	                               uint8_t length);
 
 };
 

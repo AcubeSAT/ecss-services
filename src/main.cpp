@@ -67,13 +67,13 @@ int main() {
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
-	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
+	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(anotherStr));
-	rcvPack.appendUint16(sizeof(anotherStr)/ sizeof(anotherStr[0]));
+	rcvPack.appendUint16(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(yetAnotherStr));
-	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
+	rcvPack.appendUint16(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(6, 2, Message::TC, 1);
@@ -86,7 +86,7 @@ int main() {
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
-	
+
 
 	// ST[01] test
 	// parameters take random values and works as expected
@@ -100,10 +100,14 @@ int main() {
 	// ST[05] test [works]
 	const unsigned char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
-	eventReportService.informativeEventReport(1, eventReportData, 11);
-	eventReportService.lowSeverityAnomalyReport(2, eventReportData, 11);
-	eventReportService.mediumSeverityAnomalyReport(3, eventReportData, 11);
-	eventReportService.highSeverityAnomalyReport(4, eventReportData, 11);
+	eventReportService.informativeEventReport(EventReportService::UnknownEvent, eventReportData,
+	                                          11);
+	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent,
+	                                            eventReportData, 11);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent,
+	                                               eventReportData, 11);
+	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
+	                                             eventReportData, 11);
 
 	return 0;
 }
