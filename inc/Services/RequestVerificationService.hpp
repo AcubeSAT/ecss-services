@@ -28,7 +28,7 @@ public:
 	 * accepted successfully and the format is defined from the standard
 	 *
 	 * @todo The values of the data types that the data field(data[]) is consisted have
-	 * determined limits so when the declaration will happen should be treated with attention
+	 * determined limits so when the assign will happen should be treated with attention
 	 */
 	void successAcceptanceVerification(Message &request);
 
