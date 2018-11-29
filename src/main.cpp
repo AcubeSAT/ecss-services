@@ -2,6 +2,7 @@
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
+#include "Services/MemoryManagementService.hpp"
 #include "Message.hpp"
 #include "Services/MemoryManagementService.hpp"
 
