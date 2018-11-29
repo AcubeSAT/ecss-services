@@ -1,14 +1,6 @@
 #include "Services/EventReportService.hpp"
 #include "Message.hpp"
 
-/**
- * Note for the funtions informativeEventReport, lowSeverityReport, mediumSeverityReport,
- * highSeverityReport: I could use
- * for (int i=0; i<length; i++ {
- * 		report.appendByte(data[i]);
- * }
- * instead of reinterpret_cast as it is a dangerous cast
- */
 
 void EventReportService::informativeEventReport(uint16_t eventID, const uint8_t *data,
                                                 uint8_t length) {
