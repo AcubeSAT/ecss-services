@@ -92,7 +92,23 @@ public:
 	                             uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount,
 	                             uint16_t errorCode);
 
+	/**
+	 * It is responsible to call the suitable function that execute the proper subservice. The
+	 * way that the subservices are selected is for the time being based on the messageType(class
+	 * member of class Message) of the param message
+	 *
+	 * Note:The functions of this service takes dummy values as arguments for the time being
+	 *
+	 * @todo Error handling for the switch() in the implementation of this execute function
+	 */
+	void execute(Message &message);
 
+	/**
+	 *  The purpose of this instance is to access the execute function of this service when a
+	 *  MessageParser object is created
+	 */
+	static RequestVerificationService instance;
 };
+
 
 #endif //ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP
