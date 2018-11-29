@@ -82,4 +82,3 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]","[service][st05]") {
 	report.readString(checkString,10);
 	CHECK(strcmp(checkString, reinterpret_cast<const char*>(eventReportData)) == 0);
 }
-
