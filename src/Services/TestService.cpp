@@ -15,3 +15,19 @@ void TestService::onBoardConnection(Message &request) {
 	// just print it on the screen
 	storeMessage(report);
 }
+
+void TestService::execute(Message &message) {
+	switch (message.messageType) {
+		case 1:
+			areYouAlive(message);
+			break;
+		case 3:
+			onBoardConnection(message);
+			break;
+		default:
+			// cout is very bad for embedded systems
+			std::cout << "Error: There is not such a message type in ST[17] test";
+			assert(false);
+			break;
+	}
+}
