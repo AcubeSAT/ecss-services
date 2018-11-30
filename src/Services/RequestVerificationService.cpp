@@ -6,7 +6,7 @@ void RequestVerificationService::successAcceptanceVerification(Message &request)
 
 	Message report = createTM(1);
 
-	report.appendEnumerated(3, ECSS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
@@ -22,7 +22,7 @@ RequestVerificationService::failAcceptanceVerification(Message &request) {
 
 	Message report = createTM(2);
 
-	report.appendEnumerated(3, ECSS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
@@ -38,7 +38,7 @@ void RequestVerificationService::successExecutionVerification(Message &request) 
 
 	Message report = createTM(7);
 
-	report.appendEnumerated(3, ECSS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
@@ -54,7 +54,7 @@ RequestVerificationService::failExecutionVerification(Message &request) {
 
 	Message report = createTM(8);
 
-	report.appendEnumerated(3, ECSS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
@@ -71,7 +71,7 @@ RequestVerificationService::failRoutingVerification(Message &request) {
 
 	Message report = createTM(10);
 
-	report.appendEnumerated(3, ECSS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID

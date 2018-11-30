@@ -23,7 +23,7 @@ public:
 	/**
 	 * TM[1,1] successful acceptance verification report
 	 *
-	 * @param request Message& reference, that contains the necessary data to send the report.
+	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that accepted successfully
 	 *
@@ -33,7 +33,7 @@ public:
 	/**
 	 * TM[1,2] failed acceptance verification report
 	 *
-	 * @param request Message& reference, that contains the necessary data to send the report.
+	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic
 	 * info of the telecommand packet that failed to be accepted
 	 */
@@ -43,7 +43,7 @@ public:
 	/**
  	 * TM[1,7] successful completion of execution verification report
 	 *
-	 * @param request Message& reference, that contains the necessary data to send the report.
+	 * @param request Contains the necessary data to send the report.
 	 * The data is actually data members of Message that contain the basic info of the
 	 * telecommand packet that executed successfully
 	 *
@@ -53,9 +53,9 @@ public:
 	/**
 	 * TM[1,8] failed completion of execution verification report
 	 *
-	 * @param request Message& reference, that contains the necessary data to send the report.
+	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info of the
-	 * telecommand packet that failed  to be executed
+	 * telecommand packet that failed to be executed
 	 *
 	 */
 	void failExecutionVerification(Message &request);
@@ -63,7 +63,7 @@ public:
 	/**
 	 * TM[1,10] failed routing verification report
 	 *
-	 * @param request Message& reference, that contains the necessary data to send the report.
+	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info of the
 	 * telecommand packet that failed the routing
 	 *

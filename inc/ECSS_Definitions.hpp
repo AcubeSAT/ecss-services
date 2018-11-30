@@ -6,8 +6,8 @@
 
 #define ECSS_MAX_STRING_SIZE 256
 
-//7.4.1
-#define ECSS_PACKET_VERSION 0
+// 7.4.1
+#define CCSDS_PACKET_VERSION 0
 
 // 7.4.4.1c
 #define ECSS_PUS_VERSION 2

@@ -18,7 +18,7 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(response.readEnumerated(3) == ECSS_PACKET_VERSION); // packet version number
+	CHECK(response.readEnumerated(3) == CCSDS_PACKET_VERSION); // packet version number
 	CHECK(response.readEnumerated(1) == Message::TC); // packet type
 	CHECK(response.readBits(1) == 0); // secondary header flag
 	CHECK(response.readEnumerated(11) == 3); // application process ID
@@ -41,7 +41,7 @@ TEST_CASE("TM[1,2]", "[service][st01]") {
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(response.readEnumerated(3) == ECSS_PACKET_VERSION); // packet version number
+	CHECK(response.readEnumerated(3) == CCSDS_PACKET_VERSION); // packet version number
 	CHECK(response.readEnumerated(1) == Message::TC); // packet type
 	CHECK(response.readBits(1) == 0); // secondary header flag
 	CHECK(response.readEnumerated(11) == 3); // application process ID
@@ -65,7 +65,7 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(response.readEnumerated(3) == ECSS_PACKET_VERSION); // packet version number
+	CHECK(response.readEnumerated(3) == CCSDS_PACKET_VERSION); // packet version number
 	CHECK(response.readEnumerated(1) == Message::TC); // packet type
 	CHECK(response.readBits(1) == 0); // secondary header flag
 	CHECK(response.readEnumerated(11) == 3); // application process ID
@@ -87,7 +87,7 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(response.readEnumerated(3) == ECSS_PACKET_VERSION); // packet version number
+	CHECK(response.readEnumerated(3) == CCSDS_PACKET_VERSION); // packet version number
 	CHECK(response.readEnumerated(1) == Message::TC); // packet type
 	CHECK(response.readBits(1) == 0); // secondary header flag
 	CHECK(response.readEnumerated(11) == 3); // application process ID
@@ -111,7 +111,7 @@ TEST_CASE("TM[1,10]", "[service][st01]") {
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(response.readEnumerated(3) == ECSS_PACKET_VERSION); // packet version number
+	CHECK(response.readEnumerated(3) == CCSDS_PACKET_VERSION); // packet version number
 	CHECK(response.readEnumerated(1) == Message::TC); // packet type
 	CHECK(response.readBits(1) == 0); // secondary header flag
 	CHECK(response.readEnumerated(11) == 3); // application process ID
