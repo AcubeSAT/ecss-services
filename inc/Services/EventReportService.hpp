@@ -2,11 +2,12 @@
 #define ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 
 #include "Service.hpp"
+#include <bitset>
 /**
  * Implementation of ST[05] event reporting service
  * @todo add enum event definition id (and maybe some appending?)
  *
- * @todo changes enums event IDs
+ * @todo add more enums event IDs
  *
  * Note: enum IDs are these just for test purposes
  *
@@ -15,8 +16,12 @@
 #define ECSS_EVENTS_BITS 16
 
 class EventReportService : public Service {
+private:
+	static const uint8_t numberOfEvents = 7;
+	std::bitset<numberOfEvents> stateOfEvents;
 public:
 	EventReportService() {
+		stateOfEvents.set();
 		serviceType = 5;
 	}
 
