@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Helpers/CRCHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
