@@ -33,7 +33,7 @@ public:
 		 */
 		WWDGReset = 1,
 		/**
-		 * Dont
+		 * Assertion has failed
 		 */
 		AssertionFail = 2,
 		/**

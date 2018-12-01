@@ -27,8 +27,7 @@ EventReportService::lowSeverityAnomalyReport(LowSeverityAnomalyEvent eventID, co
 }
 
 void EventReportService::mediumSeverityAnomalyReport(MediumSeverityAnomalyEvent eventID,
-                                                     const uint8_t *data,
-                                                     uint8_t length) {
+                                                     const uint8_t *data, uint8_t length) {
 	// TM[5,3]
 	Message report = createTM(3);
 	report.appendEnum16(eventID);
