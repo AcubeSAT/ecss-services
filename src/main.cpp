@@ -1,7 +1,9 @@
 #include <iostream>
+#include "Helpers/CRCHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
+#include "Services/EventReportService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
@@ -67,13 +69,13 @@ int main() {
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
-	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
+	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(anotherStr));
-	rcvPack.appendUint16(sizeof(anotherStr)/ sizeof(anotherStr[0]));
+	rcvPack.appendUint16(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(yetAnotherStr));
-	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
+	rcvPack.appendUint16(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(6, 2, Message::TC, 1);
@@ -96,6 +98,18 @@ int main() {
 	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
 	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
 	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+
+	// ST[05] test [works]
+	const unsigned char eventReportData[12] = "Hello World";
+	EventReportService eventReportService;
+	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
+	                                          eventReportData, 11);
+	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent,
+	                                            eventReportData, 11);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent,
+	                                               eventReportData, 11);
+	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
+	                                             eventReportData, 11);
 
 	// MessageParser class test
 	std::cout << "\n";

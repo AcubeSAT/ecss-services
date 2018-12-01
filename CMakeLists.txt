@@ -17,6 +17,8 @@ add_custom_target(check
 add_library(common OBJECT
         src/Message.cpp
 	src/MessageParser.cpp
+        src/Helpers/CRCHelper.cpp
+	src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
