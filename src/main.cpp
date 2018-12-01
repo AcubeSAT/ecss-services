@@ -100,8 +100,8 @@ int main() {
 	// ST[05] test [works]
 	const unsigned char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
-	eventReportService.informativeEventReport(EventReportService::UnknownEvent, eventReportData,
-	                                          11);
+	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
+	                                          eventReportData, 11);
 	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent,
 	                                            eventReportData, 11);
 	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent,
