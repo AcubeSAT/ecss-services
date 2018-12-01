@@ -43,7 +43,7 @@ public:
 	 * TM[5,1] informative event report
 	 * Send report to inform the respective recipients about an event
 	 *
-	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 * Note: The parameters are defined by the standard
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
@@ -55,7 +55,7 @@ public:
 	 * TM[5,2] low severiity anomaly report
 	 * Send report when there is an anomaly event of low severity to the respective recipients
 	 *
-	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 * Note: The parameters are defined by the standard
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
@@ -68,7 +68,7 @@ public:
 	 * TM[5,3] medium severity anomaly report
 	 * Send report when there is an anomaly event of medium severity to the respective recipients
 	 *
-	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 * Note: The parameters are defined by the standard
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
@@ -79,34 +79,38 @@ public:
 
 	/**
 	 * TM[5,4] high severity anomaly report
-	 * Send report when there is an anomaly event of hgih severity to the respective recipients
+	 * Send report when there is an anomaly event of high severity to the respective recipients
 	 *
-	 * Note: The parameters are defined by the standard, but the event definition id is missing!
+	 * Note: The parameters are defined by the standard
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(HighSeverityAnomalyEvent, const uint8_t *data,
+	void highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, const uint8_t *data,
 	                               uint8_t length);
 
 	/**
-	 * TC[5,5]
+	 * TC[5,5] request to enable report generation
+	 * Telecommand to enable the report generation of event definitions
 	 */
 	void enableReportGeneration(uint8_t N);
 
 	/**
-	 * TC[5,6]
+	 * TC[5,6] request to disable report generation
+	 * Telecommand to disable the report generation of event definitions
 	 */
 	void disableReportGeneration(uint8_t N);
 
 	/**
-	 * TC[5,7]
+	 * TC[5,7] request to report the disabled event definitions
+	 *
 	 */
 	void requestListOfDisabledEvents();
 
 	/**
-	 * TM[5,8]
+	 * TM[5,8] disabled event definitions report
+	 * Telemetry package of a report of the disabled event definitions
 	 */
 	void listOfDisabledEventsReport();
 
