@@ -87,7 +87,7 @@ public:
 	 * @todo See if more than uint8_t strings will be supported
 	 * @todo Is uint16_t size too much or not enough? It has to be defined
 	 */
-	void appendString(uint16_t size, uint8_t *value);
+	void appendString(uint16_t size, const uint8_t *value);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format

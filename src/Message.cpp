@@ -73,7 +73,7 @@ void Message::appendString(uint8_t size, const char *value) {
 	dataSize += size;
 }
 
-void Message::appendString(uint16_t size, uint8_t *value) {
+void Message::appendString(uint16_t size, const uint8_t *value) {
 	assert(dataSize + size <= ECSS_MAX_MESSAGE_SIZE);
 	assert(size < ECSS_MAX_STRING_SIZE);
 
