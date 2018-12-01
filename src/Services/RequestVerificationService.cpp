@@ -124,3 +124,28 @@ RequestVerificationService::failRoutingVerification(Message::PacketType packetTy
 
 	storeMessage(report);
 }
+
+void RequestVerificationService::execute(Message &message) {
+	switch (message.messageType) {
+		case 1:
+			successAcceptanceVerification(Message::TC, true, 2, 2, 10);
+			break;
+		case 2:
+			failAcceptanceVerification(Message::TC, true, 2, 2, 10, 5);
+			break;
+		case 7:
+			successExecutionVerification(Message::TC, true, 2, 2, 10);
+			break;
+		case 8:
+			failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
+			break;
+		case 10:
+			failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+			break;
+		default:
+			// cout is very bad for embedded systems
+			std::cout << "Error: There is not such a message type in ST[01] service";
+			assert(false);
+			break;
+	}
+}

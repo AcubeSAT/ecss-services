@@ -20,7 +20,7 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 			this->data[dataSize] |= static_cast<uint8_t>(data >> (numBits - bitsToAddNow));
 
 			// Remove used bits
-			data &= (1 << bitsToAddNow) - 1;
+			data &= (1 << (numBits - bitsToAddNow)) - 1;
 			numBits -= bitsToAddNow;
 
 			currentBit = 0;

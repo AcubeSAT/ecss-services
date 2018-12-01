@@ -87,8 +87,28 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, const uint8_t *data,
+	void highSeverityAnomalyReport(HighSeverityAnomalyEvent, const uint8_t *data,
 	                               uint8_t length);
+
+	/**
+	 * TC[5,5]
+	 */
+	void enableReportGeneration(uint8_t N);
+
+	/**
+	 * TC[5,6]
+	 */
+	void disableReportGeneration(uint8_t N);
+
+	/**
+	 * TC[5,7]
+	 */
+	void requestListOfDisabledEvents();
+
+	/**
+	 * TM[5,8]
+	 */
+	void listOfDisabledEventsReport();
 
 };
 
