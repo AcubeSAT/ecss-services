@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Helpers/CRCHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
@@ -55,7 +56,7 @@ int main() {
 	paramService.setParameterIds(sentPacket2);
 	paramService.reportParameterIds(sentPacket);
 
-// ST[06] testing
+	// ST[06] testing
 	char anotherStr[8] = "Fgthred";
 	char yetAnotherStr[2] = "F";
 	char *pStr = static_cast<char *>(malloc(4));
@@ -68,13 +69,13 @@ int main() {
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
-	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
+	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(anotherStr));
-	rcvPack.appendUint16(sizeof(anotherStr) / sizeof(anotherStr[0]));
+	rcvPack.appendUint16(sizeof(anotherStr)/ sizeof(anotherStr[0]));
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(yetAnotherStr));
-	rcvPack.appendUint16(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
+	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(6, 2, Message::TC, 1);
@@ -109,6 +110,28 @@ int main() {
 	                                               eventReportData, 11);
 	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
 	                                             eventReportData, 11);
+
+	// MessageParser class test
+	std::cout << "\n";
+	// ST[17] test
+	Message message = Message(17, 1, Message::TC, 1);
+	MessageParser messageParser;
+	messageParser.execute(message);
+	message = Message(17, 3, Message::TC, 1);
+	message.appendUint16(7);
+	messageParser.execute(message);
+
+	// ST[01] test
+	message = Message(1, 1, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 2, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 7, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 8, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 10, Message::TC, 2);
+	messageParser.execute(message);
 
 	return 0;
 }

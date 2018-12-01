@@ -18,6 +18,8 @@ add_library(common OBJECT
         src/Message.cpp
 	src/Services/EventReportService.cpp
 	src/MessageParser.cpp
+        src/Helpers/CRCHelper.cpp
+	src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
