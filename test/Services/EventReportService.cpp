@@ -27,7 +27,7 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
 }
 
-TEST_CASE("Loww Severity Anomaly Report TM[5,2]", "[service][st05]") {
+TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	EventReportService eventReportService;
 	const unsigned char eventReportData[] = "HelloWorld";
 	char checkString[255];
