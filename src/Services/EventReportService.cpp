@@ -1,9 +1,6 @@
-
 #include <Services/EventReportService.hpp>
-
 #include "Services/EventReportService.hpp"
 #include "Message.hpp"
-
 
 void EventReportService::informativeEventReport(InformationEvent eventID, const uint8_t *data,
                                                 uint8_t length) {
