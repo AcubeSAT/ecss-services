@@ -62,4 +62,3 @@ void EventReportService::requestListOfDisabledEvents() {
 void EventReportService::listOfDisabledEventsReport() {
 
 }
-
