@@ -23,6 +23,21 @@ public:
 	 * @todo Only respond if we have the correct APID
 	 */
 	void onBoardConnection(Message &request);
+
+	/**
+	 * It is responsible to call the suitable function that execute the proper subservice. The
+	 * way that the subservices are selected is for the time being based on the messageType(class
+	 * member of class Message) of the param message
+	 *
+	 * @todo Error handling for the switch() in the implementation of this execute function
+	 */
+	void execute(Message &message);
+
+	/**
+	 *  The purpose of this instance is to access the execute function of this service when a
+	 *  MessageParser object is created
+	 */
+	static TestService instance;
 };
 
 

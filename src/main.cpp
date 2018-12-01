@@ -3,6 +3,7 @@
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Message.hpp"
+#include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
 
 int main() {
@@ -53,7 +54,7 @@ int main() {
 	paramService.setParameterIds(sentPacket2);
 	paramService.reportParameterIds(sentPacket);
 
-// ST[06] testing
+	// ST[06] testing
 	char anotherStr[8] = "Fgthred";
 	char yetAnotherStr[2] = "F";
 	char *pStr = static_cast<char *>(malloc(4));
@@ -85,7 +86,7 @@ int main() {
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
-	
+
 
 	// ST[01] test
 	// parameters take random values and works as expected
@@ -95,5 +96,28 @@ int main() {
 	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
 	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
 	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+
+	// MessageParser class test
+	std::cout << "\n";
+	// ST[17] test
+	Message message = Message(17, 1, Message::TC, 1);
+	MessageParser messageParser;
+	messageParser.execute(message);
+	message = Message(17, 3, Message::TC, 1);
+	message.appendUint16(7);
+	messageParser.execute(message);
+
+	// ST[01] test
+	message = Message(1, 1, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 2, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 7, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 8, Message::TC, 2);
+	messageParser.execute(message);
+	message = Message(1, 10, Message::TC, 2);
+	messageParser.execute(message);
+
 	return 0;
 }
