@@ -20,22 +20,55 @@ public:
 		serviceType = 5;
 	}
 
+	/**
+	 * Type of the information event
+	 */
 	enum InformationEvent {
-		UnknownEvent = 0,
+		/**
+		 * An unknown event occured
+		 */
+		InformativeUnknownEvent = 0,
+		/**
+		 * Watchdogs have reset
+		 */
 		WWDGReset = 1,
+		/**
+		 * Dont
+		 */
 		AssertionFail = 2,
+		/**
+		 * Microcontroller has started
+		 */
 		MCUStart = 3,
 	};
 
+	/**
+	 * Type of the low severity anomaly event
+	 */
 	enum LowSeverityAnomalyEvent {
+		/**
+		 * An unknown anomaly of low severity anomalyhas occurred
+		 */
 		LowSeverityUnknownEvent = 1,
 	};
 
+	/**
+	 * Type of the medium severity anomaly event
+	 */
 	enum MediumSeverityAnomalyEvent {
+		/**
+		 * An unknown anomaly of medium severity has occurred
+		 */
 		MediumSeverityUnknownEvent = 2,
 	};
 
+	/**
+	 * Type of the high severity anomaly event
+	 */
 	enum HighSeverityAnomalyEvent {
+		/**
+		 * An unknown anomaly of high severity has occurred
+		 */
 		HighSeverityUnknownEvent = 3,
 	};
 

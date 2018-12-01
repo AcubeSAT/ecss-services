@@ -1,3 +1,6 @@
+
+#include <Services/EventReportService.hpp>
+
 #include "Services/EventReportService.hpp"
 #include "Message.hpp"
 
@@ -44,3 +47,20 @@ EventReportService::highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, 
 
 	storeMessage(report);
 }
+
+void EventReportService::enableReportGeneration(uint8_t N) {
+
+}
+
+void EventReportService::disableReportGeneration(uint8_t N) {
+
+}
+
+void EventReportService::requestListOfDisabledEvents() {
+
+}
+
+void EventReportService::listOfDisabledEventsReport() {
+
+}
+
