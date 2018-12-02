@@ -44,12 +44,6 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 
 				// Continue only if the checksum passes
 				if (mainService.dataValidator(readData, checksum, dataLength)) {
-					// todo: Send a failed of execution report
-					// todo: Remove the print statements in the final version
-					// todo: The final implementation of exit on failure has to be well defined
-					std::cout << "We encountered a problem validating CRC!" << std::endl;
-					continue; // Continue to the next command
-				} else {
 					if (mainService.addressValidator(memoryID, startAddress) &&
 					    mainService.addressValidator(memoryID, startAddress + dataLength)) {
 						for (std::size_t i = 0; i < dataLength; i++) {
@@ -69,6 +63,12 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 							request.packetType, true, 1, 1, 10, 6);
 						// todo: Send a failed of execution report
 					}
+				} else {
+					// todo: Send a failed of execution report
+					// todo: Remove the print statements in the final version
+					// todo: The final implementation of exit on failure has to be well defined
+					std::cout << "We encountered a problem validating CRC!" << std::endl;
+					continue; // Continue to the next command
 				}
 			}
 		}
@@ -238,5 +238,5 @@ inline bool MemoryManagementService::memoryIdValidator(
 
 inline bool MemoryManagementService::dataValidator(const uint8_t *data, uint16_t checksum,
                                                    uint16_t length) {
-	return (checksum != CRCHelper::calculateCRC(data, length));
+	return (checksum == CRCHelper::calculateCRC(data, length));
 }
