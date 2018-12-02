@@ -43,24 +43,32 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 				uint16_t checksum = request.readBits(16); // Get the CRC checksum from the message
 
 				// Continue only if the checksum passes
-				if (checksum != CRCHelper::validateCRC(readData, dataLength)) {
+				if (mainService.dataValidator(readData, checksum, dataLength)) {
 					// todo: Send a failed of execution report
 					// todo: Remove the print statements in the final version
 					// todo: The final implementation of exit on failure has to be well defined
 					std::cout << "We encountered a problem validating CRC!" << std::endl;
-					return; // Make sure we get out of the loop and no other command is executed
-				}
-
-				if (mainService.addressValidator(memoryID, startAddress) &&
-				    mainService.addressValidator(memoryID, startAddress + dataLength)) {
-					for (std::size_t i = 0; i < dataLength; i++) {
-						*(reinterpret_cast<uint8_t *>(startAddress) + i) = readData[i];
-					}
+					continue; // Continue to the next command
 				} else {
-					// todo: Implement the fail report the correct way when we know all parameters
-					mainService.requestVerificationService.failExecutionVerification(
-						request.packetType, true, 1, 1, 10, 6);
-					// todo: Send a failed of execution report
+					if (mainService.addressValidator(memoryID, startAddress) &&
+					    mainService.addressValidator(memoryID, startAddress + dataLength)) {
+						for (std::size_t i = 0; i < dataLength; i++) {
+							*(reinterpret_cast<uint8_t *>(startAddress) + i) = readData[i];
+						}
+
+						// Read the loaded data for checksum validation and perform a check
+						for (std::size_t i = 0; i < dataLength; i++) {
+							readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+						}
+						if (checksum != CRCHelper::calculateCRC(readData, dataLength)) {
+							// todo: Generate a failed completion of execution report
+						}
+					} else {
+						// todo: Implement the fail report the correct way when all parameters known
+						mainService.requestVerificationService.failExecutionVerification(
+							request.packetType, true, 1, 1, 10, 6);
+						// todo: Send a failed of execution report
+					}
 				}
 			}
 		}
@@ -226,4 +234,9 @@ inline bool MemoryManagementService::memoryIdValidator(
 	       (memId == MemoryManagementService::MemoryID::ITCMRAM) ||
 	       (memId == MemoryManagementService::MemoryID::FLASH) ||
 	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
+}
+
+inline bool MemoryManagementService::dataValidator(const uint8_t *data, uint16_t checksum,
+                                                   uint16_t length) {
+	return (checksum != CRCHelper::calculateCRC(data, length));
 }
