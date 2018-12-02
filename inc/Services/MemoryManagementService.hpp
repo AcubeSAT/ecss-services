@@ -1,26 +1,12 @@
 #ifndef ECSS_SERVICES_MEMMANGSERVICE_HPP
 #define ECSS_SERVICES_MEMMANGSERVICE_HPP
 
-// Memory limits definitions
-#define DTCMRAM_LOWER_LIM 0x20000000UL
-#define DTCMRAM_UPPER_LIM 0x20020000UL
-#define ITCMRAM_LOWER_LIM 0x00000000UL
-#define ITCMRAM_UPPER_LIM 0x00010000UL
-#define RAM_D1_LOWER_LIM 0x24000000UL
-#define RAM_D1_UPPER_LIM 0x24080000UL
-#define RAM_D2_LOWER_LIM 0x30000000UL
-#define RAM_D2_UPPER_LIM 0x30048000UL
-#define RAM_D3_LOWER_LIM 0x38000000UL
-#define RAM_D3_UPPER_LIM 0x38010000UL
-#define FLASH_LOWER_LIM 0x08000000UL
-#define FLASH_UPPER_LIM 0x08200000UL
-
-
 #include <memory>
 #include <iostream>
 #include "Service.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "Platform/ARM/MemoryAddressLimits_STM32F7.hpp"
 
 
 class MemoryManagementService : public Service {

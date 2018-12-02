@@ -134,7 +134,7 @@ TEST_CASE("Requirement 7.3.5 (Signed integer)", "[message][ecss]") {
 
 	SECTION("7.4.3") {
 		// Make sure the endianness of the message data is correct
-		// As per the ECSS standard, stored data should be big-endian. However, ARM and x86
+		// As per the ECSS standard, stored data should be big-endian. However, ARM and ARM
 		// processors store data in little endian format. As a result, special care needs to be
 		// taken for compliance.
 		CHECK(message.data[1] == 0xe4);
