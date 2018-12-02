@@ -40,7 +40,16 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 			for (std::size_t j = 0; j < iterationCount; j++) {
 				uint64_t startAddress = request.readUint64(); // Start address of the memory
 				uint16_t dataLength = request.readOctetString(readData); // Data length to load
-				// todo: Continue only if the checksum passes (when the checksum will be implemented)
+				uint16_t checksum = request.readBits(16); // Get the CRC checksum from the message
+
+				// Continue only if the checksum passes
+				if (checksum != CRCHelper::validateCRC(readData, dataLength)) {
+					// todo: Send a failed of execution report
+					// todo: Remove the print statements in the final version
+					// todo: The final implementation of exit on failure has to be well defined
+					std::cout << "We encountered a problem validating CRC!" << std::endl;
+					return; // Make sure we get out of the loop and no other command is executed
+				}
 
 				if (mainService.addressValidator(memoryID, startAddress) &&
 				    mainService.addressValidator(memoryID, startAddress + dataLength)) {
@@ -51,12 +60,12 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 					// todo: Implement the fail report the correct way when we know all parameters
 					mainService.requestVerificationService.failExecutionVerification(
 						request.packetType, true, 1, 1, 10, 6);
-					/* Send failed completion of execution */
+					// todo: Send a failed of execution report
 				}
 			}
 		}
 	} else {
-		/* Generate a false start report */
+		// todo: Send a failed start of execution
 	}
 }
 
@@ -96,18 +105,18 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 				// This part is repeated N-times (N = iteration count)
 				report.appendUint64(startAddress); // Start address
 				report.appendOctetString(readLength, readData); // Save the read data
+				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
 				mainService.requestVerificationService.failExecutionVerification(request.packetType,
 				                                                                 true, 1, 1, 10, 6);
-				/* Send wrong address failure report */
+				// todo: Send a failed of execution report
 			}
 		}
-		// todo: implement and append the checksum part of the reporting packet
 
 		mainService.storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
 	} else {
-		/* Generate a false start report */
+		// todo: Send a failed start of execution
 	}
 }
 
@@ -147,20 +156,18 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 				// This part is repeated N-times (N = iteration count)
 				report.appendUint64(startAddress); // Start address
 				report.appendUint16(readLength); // Save the read data
-				// todo: Calculate and append checksum in the report
-				//report.appendBits(16, /* checksum bits */);
+				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength)); // Append CRC
 			} else {
 				mainService.requestVerificationService.failExecutionVerification(request.packetType,
 				                                                                 true, 1, 1, 10, 6);
-				/* Failure of execution */
+				// todo: Send a failed of execution report
 			}
 		}
-		// todo: implement and append the checksum part of the reporting packet
 
 		mainService.storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
 	} else {
-		/* Failed start of execution */
+		// todo: Send a failed start of execution report
 	}
 }
 
