@@ -104,6 +104,12 @@ private:
 	 * @param memId: The memory ID for validation
 	 */
 	bool memoryIdValidator(MemoryManagementService::MemoryID memId);
+
+	/**
+	 * Validate the data according to checksum calculation
+	 *
+	 */
+	bool dataValidator(const uint8_t *data, uint16_t checksum, uint16_t length);
 };
 
 #endif //ECSS_SERVICES_MEMMANGSERVICE_HPP
