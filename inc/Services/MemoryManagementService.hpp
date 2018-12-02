@@ -20,6 +20,7 @@
 #include <iostream>
 #include "Service.hpp"
 #include "Services/RequestVerificationService.hpp"
+#include "Helpers/CRCHelper.hpp"
 
 
 class MemoryManagementService : public Service {
