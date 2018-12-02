@@ -1,7 +1,10 @@
 #include <Services/EventReportService.hpp>
 #include "Services/EventReportService.hpp"
 #include "Message.hpp"
-
+/**
+ *
+ * @todo: this code is error prone, depending on parameters given, add fail safes
+ */
 void EventReportService::informativeEventReport(Event eventID, const uint8_t *data,
                                                 uint8_t length) {
 	// TM[5,1]

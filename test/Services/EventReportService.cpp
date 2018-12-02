@@ -42,7 +42,7 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 1);
+	CHECK(report.readEnum16() == 4);
 	report.readString(checkString, 10);
 	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
 }
@@ -62,7 +62,7 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 2);
+	CHECK(report.readEnum16() == 5);
 	report.readString(checkString, 10);
 	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
 }
@@ -82,7 +82,7 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 3);
+	CHECK(report.readEnum16() == 6);
 	report.readString(checkString, 10);
 	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
 }
