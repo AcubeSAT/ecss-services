@@ -69,13 +69,13 @@ int main() {
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
-	rcvPack.appendUint16(sizeof(string)/ sizeof(string[0])); // Data read length
+	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(anotherStr));
-	rcvPack.appendUint16(sizeof(anotherStr)/ sizeof(anotherStr[0]));
+	rcvPack.appendUint16(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(yetAnotherStr));
-	rcvPack.appendUint16(sizeof(yetAnotherStr)/ sizeof(yetAnotherStr[0]));
+	rcvPack.appendUint16(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(6, 2, Message::TC, 1);
@@ -99,7 +99,7 @@ int main() {
 	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
 	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
 
-	// ST[05] test [works]
+	// ST[05] (5,1 to 5,4) test [works]
 	const unsigned char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
 	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
@@ -132,6 +132,19 @@ int main() {
 	messageParser.execute(message);
 	message = Message(1, 10, Message::TC, 2);
 	messageParser.execute(message);
+
+	//ST[05] (5,5 to 5,8)
+	EventReportService::Event eventIDs[] =
+		{EventReportService::HighSeverityUnknownEvent,
+		 EventReportService::HighSeverityUnknownEvent};
+	std::cout << eventReportService.stateOfEvents[0];
+
+	eventReportService.enableReportGeneration(2, eventIDs);
+	std::cout << eventReportService.stateOfEvents[0];
+	std::cout << eventReportService.stateOfEvents[1];
+	std::cout << eventReportService.stateOfEvents[3];
+	std::cout << eventReportService.stateOfEvents[4];
+	std::cout << eventReportService.stateOfEvents[6];
 
 	return 0;
 }

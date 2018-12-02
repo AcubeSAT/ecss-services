@@ -16,7 +16,7 @@
 #define ECSS_EVENTS_BITS 16
 
 class EventReportService : public Service {
-private:
+public:
 	static const uint8_t numberOfEvents = 7;
 	std::bitset<numberOfEvents> stateOfEvents;
 public:
@@ -28,53 +28,35 @@ public:
 	/**
 	 * Type of the information event
 	 */
-	enum InformationEvent {
+	enum Event {
 		/**
 		 * An unknown event occured
 		 */
-		InformativeUnknownEvent = 0,
+			InformativeUnknownEvent = 0,
 		/**
 		 * Watchdogs have reset
 		 */
-		WWDGReset = 1,
+			WWDGReset = 1,
 		/**
 		 * Assertion has failed
 		 */
-		AssertionFail = 2,
+			AssertionFail = 2,
 		/**
 		 * Microcontroller has started
 		 */
-		MCUStart = 3,
-	};
-
-	/**
-	 * Type of the low severity anomaly event
-	 */
-	enum LowSeverityAnomalyEvent {
+			MCUStart = 3,
 		/**
 		 * An unknown anomaly of low severity anomalyhas occurred
 		 */
-		LowSeverityUnknownEvent = 1,
-	};
-
-	/**
-	 * Type of the medium severity anomaly event
-	 */
-	enum MediumSeverityAnomalyEvent {
+			LowSeverityUnknownEvent = 4,
 		/**
 		 * An unknown anomaly of medium severity has occurred
 		 */
-		MediumSeverityUnknownEvent = 2,
-	};
-
-	/**
-	 * Type of the high severity anomaly event
-	 */
-	enum HighSeverityAnomalyEvent {
+			MediumSeverityUnknownEvent = 5,
 		/**
 		 * An unknown anomaly of high severity has occurred
 		 */
-		HighSeverityUnknownEvent = 3,
+			HighSeverityUnknownEvent = 6
 	};
 
 	/**
@@ -87,7 +69,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void informativeEventReport(InformationEvent eventID, const uint8_t *data, uint8_t length);
+	void informativeEventReport(Event eventID, const uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
@@ -100,7 +82,7 @@ public:
 	 * @param length the length of the data
 	 */
 	void
-	lowSeverityAnomalyReport(LowSeverityAnomalyEvent eventID, const uint8_t *data, uint8_t length);
+	lowSeverityAnomalyReport(Event eventID, const uint8_t *data, uint8_t length);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
@@ -112,7 +94,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void mediumSeverityAnomalyReport(MediumSeverityAnomalyEvent eventID, const uint8_t *data,
+	void mediumSeverityAnomalyReport(Event eventID, const uint8_t *data,
 	                                 uint8_t length);
 
 	/**
@@ -125,20 +107,20 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, const uint8_t *data,
+	void highSeverityAnomalyReport(Event eventID, const uint8_t *data,
 	                               uint8_t length);
 
 	/**
 	 * TC[5,5] request to enable report generation
 	 * Telecommand to enable the report generation of event definitions
 	 */
-	void enableReportGeneration(uint8_t N);
+	void enableReportGeneration(uint8_t length, Event *eventID);
 
 	/**
 	 * TC[5,6] request to disable report generation
 	 * Telecommand to disable the report generation of event definitions
 	 */
-	void disableReportGeneration(uint8_t N);
+	void disableReportGeneration(uint8_t length, Event *eventID);
 
 	/**
 	 * TC[5,7] request to report the disabled event definitions

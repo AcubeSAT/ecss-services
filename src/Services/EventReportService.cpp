@@ -2,7 +2,7 @@
 #include "Services/EventReportService.hpp"
 #include "Message.hpp"
 
-void EventReportService::informativeEventReport(InformationEvent eventID, const uint8_t *data,
+void EventReportService::informativeEventReport(Event eventID, const uint8_t *data,
                                                 uint8_t length) {
 	// TM[5,1]
 	Message report = createTM(1);
@@ -13,7 +13,7 @@ void EventReportService::informativeEventReport(InformationEvent eventID, const 
 }
 
 void
-EventReportService::lowSeverityAnomalyReport(LowSeverityAnomalyEvent eventID, const uint8_t *data,
+EventReportService::lowSeverityAnomalyReport(Event eventID, const uint8_t *data,
                                              uint8_t length) {
 	// TM[5,2]
 	Message report = createTM(2);
@@ -23,7 +23,7 @@ EventReportService::lowSeverityAnomalyReport(LowSeverityAnomalyEvent eventID, co
 	storeMessage(report);
 }
 
-void EventReportService::mediumSeverityAnomalyReport(MediumSeverityAnomalyEvent eventID,
+void EventReportService::mediumSeverityAnomalyReport(Event eventID,
                                                      const uint8_t *data, uint8_t length) {
 	// TM[5,3]
 	Message report = createTM(3);
@@ -34,7 +34,7 @@ void EventReportService::mediumSeverityAnomalyReport(MediumSeverityAnomalyEvent 
 }
 
 void
-EventReportService::highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, const uint8_t *data,
+EventReportService::highSeverityAnomalyReport(Event eventID, const uint8_t *data,
                                               uint8_t length) {
 	// TM[5,4]
 	Message report = createTM(4);
@@ -44,12 +44,17 @@ EventReportService::highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, 
 	storeMessage(report);
 }
 
-void EventReportService::enableReportGeneration(uint8_t N) {
-
+void EventReportService::enableReportGeneration(uint8_t length, Event *eventID) {
+	// TC[5,5]
+	for (uint8_t i = 0; i < length; i++) {
+		stateOfEvents[static_cast<uint8_t> (eventID[i])] = 1;
+	}
 }
 
-void EventReportService::disableReportGeneration(uint8_t N) {
-
+void EventReportService::disableReportGeneration(uint8_t length, Event *eventID) {
+	for (uint8_t i = 0; i < length; i++) {
+		stateOfEvents[static_cast<uint8_t> (eventID[i])] = 0;
+	}
 }
 
 void EventReportService::requestListOfDisabledEvents() {
