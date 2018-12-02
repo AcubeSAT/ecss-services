@@ -94,3 +94,40 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(checkString[1] == 8);
 	CHECK(checksum == CRCHelper::calculateCRC(checkString, readSize));
 }
+
+TEST_CASE("TM[6,9]", "[service][st06]") {
+	uint8_t testString_1[6] = "FStrT";
+	uint8_t testString_2[8] = "SecStrT";
+	uint16_t readSize = 0, checksum = 0;
+
+	MemoryManagementService memMangService;
+	Message receivedPacket = Message(6, 9, Message::TC, 1);
+	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	receivedPacket.appendUint16(2); // Iteration count
+	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(testString_1)); // Start address
+	receivedPacket.appendUint16(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
+
+	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(testString_2));
+	receivedPacket.appendUint16(sizeof(testString_2) / sizeof(testString_2[0]));
+	memMangService.rawDataMemorySubservice.checkRawData(receivedPacket);
+	REQUIRE(ServiceTests::hasOneMessage());
+
+	Message response = ServiceTests::get(0);
+	CHECK(response.serviceType == 6);
+	CHECK(response.messageType == 10);
+	REQUIRE(response.dataSize == 27);
+
+	CHECK(response.readEnum8() == MemoryManagementService::MemoryID::EXTERNAL);
+	CHECK(response.readUint16() == 2);
+	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_1));
+	readSize = response.readUint16();
+	checksum = response.readBits(16);
+	CHECK(readSize == sizeof(testString_1) / sizeof(testString_1[0]));
+	CHECK(checksum == CRCHelper::calculateCRC(testString_1, readSize));
+
+	CHECK(response.readUint64() == reinterpret_cast<uint64_t >(testString_2));
+	readSize = response.readUint16();
+	checksum = response.readBits(16);
+	CHECK(readSize == sizeof(testString_2) / sizeof(testString_2[0]));
+	CHECK(checksum == CRCHelper::calculateCRC(testString_2, readSize));
+}
