@@ -4,7 +4,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="true" />
     <Objective-C-extensions>
       <extensions>
-        <pair source="cpp" header="hpp" fileNamingConvention="NONE" />
+        <pair source="cpp" header="hpp" fileNamingConvention="PASCAL_CASE" />
         <pair source="c" header="h" fileNamingConvention="NONE" />
       </extensions>
     </Objective-C-extensions>

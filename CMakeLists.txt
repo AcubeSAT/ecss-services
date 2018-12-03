@@ -15,6 +15,7 @@ add_custom_target(check
 
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
+        src/ErrorHandler.cpp
         src/Message.cpp
 	src/Services/EventReportService.cpp
 	src/MessageParser.cpp
