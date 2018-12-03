@@ -55,21 +55,19 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 							readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
 						}
 						if (checksum != CRCHelper::calculateCRC(readData, dataLength)) {
-							// todo: Generate a failed completion of execution report
+							ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 						}
 					} else {
 						// todo: Implement the fail report the correct way when all parameters known
 						mainService.requestVerificationService.failExecutionVerification(
 							request.packetType, true, 1, 1, 10, 6);
-						// todo: Send a failed of execution report
+						ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 					}
 				} else {
-					// todo: Send a failed of execution report
-					// todo: Remove the print statements in the final version
 					// todo: The final implementation of exit on failure has to be well defined
 					mainService.requestVerificationService.failExecutionVerification(
 						request.packetType, true, 1, 1, 10, 6);
-					std::cout << "We encountered a problem validating CRC!" << std::endl;
+					ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 					continue; // Continue to the next command
 				}
 			}
@@ -119,7 +117,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 			} else {
 				mainService.requestVerificationService.failExecutionVerification(request.packetType,
 				                                                                 true, 1, 1, 10, 6);
-				// todo: Send a failed of execution report
+				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
 		}
 
@@ -170,7 +168,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 			} else {
 				mainService.requestVerificationService.failExecutionVerification(request.packetType,
 				                                                                 true, 1, 1, 10, 6);
-				// todo: Send a failed of execution report
+				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
 		}
 
