@@ -77,13 +77,13 @@ void EventReportService::requestListOfDisabledEvents() {
 }
 
 void EventReportService::listOfDisabledEventsReport() {
-	// TC[5,8]
+	// TM[5,8]
 	Message report = createTM(8);
 
 	// Any chance we'll have more than uint8_t (>255 events) ? This will produce an error!
-	uint8_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.any();
+	uint8_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
 	report.appendByte(numberOfDisabledEvents);
-	for (uint8_t i = 0; i < numberOfDisabledEvents; i++) {
+	for (uint8_t i = 0; i < stateOfEvents.size(); i++) {
 		if (stateOfEvents[i] == 0) {
 			report.appendEnum8(i);
 		}

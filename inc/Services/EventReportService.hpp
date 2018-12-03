@@ -60,7 +60,7 @@ public:
 		/**
 		 * When an execution of a notification/event fails to start
 		 */
-		    FailedStartOfExecution = 7
+			FailedStartOfExecution = 7
 	};
 
 	/**
@@ -138,7 +138,11 @@ public:
 	 */
 	void listOfDisabledEventsReport();
 
-	std::bitset<numberOfEvents> getStateOfEvents(){
+	/**
+	 * Getter for stateOfEvents bitset
+	 * @return stateOfEvents, just in case the whole bitset is needed
+	 */
+	std::bitset<numberOfEvents> getStateOfEvents() {
 		return stateOfEvents;
 	}
 

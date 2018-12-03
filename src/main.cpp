@@ -133,18 +133,14 @@ int main() {
 	message = Message(1, 10, Message::TC, 2);
 	messageParser.execute(message);
 
-	//ST[05] (5,5 to 5,8)
-	EventReportService::Event eventIDs[] =
-		{EventReportService::HighSeverityUnknownEvent,
-		 EventReportService::HighSeverityUnknownEvent};
-	std::cout << eventReportService.getStateOfEvents()[0];
-
-	eventReportService.enableReportGeneration(2, eventIDs);
-	std::cout << eventReportService.getStateOfEvents()[0];
-	std::cout << eventReportService.getStateOfEvents()[1];
-	std::cout << eventReportService.getStateOfEvents()[3];
-	std::cout << eventReportService.getStateOfEvents()[4];
-	std::cout << eventReportService.getStateOfEvents()[6];
+	//ST[05] (5,5 to 5,8) test [works]
+	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
+										 EventReportService::MediumSeverityUnknownEvent};
+	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
+	eventReportService.disableReportGeneration(2, eventIDs);
+	eventReportService.listOfDisabledEventsReport();
+	eventReportService.enableReportGeneration(1,eventIDs2);
+	eventReportService.requestListOfDisabledEvents();
 
 	return 0;
 }

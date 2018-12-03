@@ -87,22 +87,52 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
 }
 
-TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]"){
-
+TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
+	EventReportService eventReportService;
+	eventReportService.getStateOfEvents().reset();
+	EventReportService::Event eventID[] = {EventReportService::AssertionFail,
+	                                       EventReportService::LowSeverityUnknownEvent};
+	eventReportService.enableReportGeneration(2, eventID);
+	CHECK(eventReportService.getStateOfEvents()[2] == 1);
+	CHECK(eventReportService.getStateOfEvents()[4] == 1);
 }
 
-TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]"){
-
+TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
+	EventReportService eventReportService;
+	EventReportService::Event eventID[] = {EventReportService::InformativeUnknownEvent,
+	                                       EventReportService::MediumSeverityUnknownEvent};
+	eventReportService.disableReportGeneration(2, eventID);
+	CHECK(eventReportService.getStateOfEvents()[0] == 0);
+	CHECK(eventReportService.getStateOfEvents()[5] == 0);
 }
 
-TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]"){
+TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
+	EventReportService eventReportService;
+	eventReportService.requestListOfDisabledEvents();
+	REQUIRE(ServiceTests::hasOneMessage());
 
+	Message report = ServiceTests::get(0);
+	// Check if there is message of type 8 created
+	CHECK(report.messageType == 8);
 }
 
-TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]"){
+TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
+	EventReportService eventReportService;
+	EventReportService::Event eventID[] = {EventReportService::MCUStart,
+	                                       EventReportService::HighSeverityUnknownEvent};
+	// Disable 3rd and 6th
+	eventReportService.disableReportGeneration(2, eventID);
+	eventReportService.listOfDisabledEventsReport();
+	REQUIRE(ServiceTests::hasOneMessage());
 
-}
-
-TEST_CASE("Getter for stateOfEvents variable"){
-
+	Message report = ServiceTests::get(0);
+	// Check for the data-members of the report Message created
+	CHECK(report.serviceType == 5);
+	CHECK(report.messageType == 8);
+	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
+	REQUIRE(report.dataSize == 3);
+	// Check for the information stored in report
+	CHECK(report.readByte() == 2);
+	CHECK(report.readEnum8() == 3);
+	CHECK(report.readEnum8() == 6);
 }
