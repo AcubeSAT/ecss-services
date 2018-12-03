@@ -16,7 +16,7 @@
 #define ECSS_EVENTS_BITS 16
 
 class EventReportService : public Service {
-public:
+private:
 	static const uint8_t numberOfEvents = 7;
 	std::bitset<numberOfEvents> stateOfEvents;
 public:
@@ -124,7 +124,7 @@ public:
 
 	/**
 	 * TC[5,7] request to report the disabled event definitions
-	 *
+	 * Note: No arguments, according to the standard.
 	 */
 	void requestListOfDisabledEvents();
 
