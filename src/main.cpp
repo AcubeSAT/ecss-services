@@ -139,7 +139,7 @@ int main() {
 	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
 	eventReportService.disableReportGeneration(2, eventIDs);
 	eventReportService.listOfDisabledEventsReport();
-	eventReportService.enableReportGeneration(1,eventIDs2);
+	eventReportService.enableReportGeneration(1, eventIDs2);
 	eventReportService.requestListOfDisabledEvents();
 
 	return 0;
