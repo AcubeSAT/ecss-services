@@ -8,6 +8,8 @@
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "ErrorHandler.hpp"
+
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -145,6 +147,15 @@ int main() {
 	messageParser.execute(message);
 	message = Message(1, 10, Message::TC, 2);
 	messageParser.execute(message);
+
+	// ErrorHandler test
+	std::cout << std::flush;
+	std::cerr << std::flush;
+	ErrorHandler::reportError(receivedPacket, ErrorHandler::MessageTooShort);
+	ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
+	Message errorMessage(0, 0, Message::TC, 1);
+	errorMessage.appendBits(2, 7);
+	errorMessage.appendByte(15);
 
 	return 0;
 }

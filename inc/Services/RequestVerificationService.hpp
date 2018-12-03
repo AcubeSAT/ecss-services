@@ -6,6 +6,9 @@
 /**
  * Implementation of the ST[01] request verification service
  *
+ * Note: ST[01]'s messages should not contain calls to the ErrorHandler, as the ErrorHandler
+ * calls ST[01] functions again. Doing so would risk an infinite recursive loop.
+ *
  * @todo All telemetry packets shall have a telemetry packet secondary header
  * @todo See if it would be more efficient to use Messages as arguments instead of individual
  * parameters
