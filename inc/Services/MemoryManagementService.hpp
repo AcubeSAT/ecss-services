@@ -6,6 +6,7 @@
 #include "Service.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "ErrorHandler.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 
 
