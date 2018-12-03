@@ -67,6 +67,8 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 					// todo: Send a failed of execution report
 					// todo: Remove the print statements in the final version
 					// todo: The final implementation of exit on failure has to be well defined
+					mainService.requestVerificationService.failExecutionVerification(
+						request.packetType, true, 1, 1, 10, 6);
 					std::cout << "We encountered a problem validating CRC!" << std::endl;
 					continue; // Continue to the next command
 				}
@@ -171,6 +173,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 				// todo: Send a failed of execution report
 			}
 		}
+
 
 		mainService.storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
