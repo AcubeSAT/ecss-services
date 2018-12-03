@@ -137,14 +137,14 @@ int main() {
 	EventReportService::Event eventIDs[] =
 		{EventReportService::HighSeverityUnknownEvent,
 		 EventReportService::HighSeverityUnknownEvent};
-	std::cout << eventReportService.stateOfEvents[0];
+	std::cout << eventReportService.getStateOfEvents()[0];
 
 	eventReportService.enableReportGeneration(2, eventIDs);
-	std::cout << eventReportService.stateOfEvents[0];
-	std::cout << eventReportService.stateOfEvents[1];
-	std::cout << eventReportService.stateOfEvents[3];
-	std::cout << eventReportService.stateOfEvents[4];
-	std::cout << eventReportService.stateOfEvents[6];
+	std::cout << eventReportService.getStateOfEvents()[0];
+	std::cout << eventReportService.getStateOfEvents()[1];
+	std::cout << eventReportService.getStateOfEvents()[3];
+	std::cout << eventReportService.getStateOfEvents()[4];
+	std::cout << eventReportService.getStateOfEvents()[6];
 
 	return 0;
 }

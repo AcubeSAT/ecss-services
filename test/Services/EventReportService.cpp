@@ -86,3 +86,23 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	report.readString(checkString, 10);
 	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
 }
+
+TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]"){
+
+}
+
+TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]"){
+
+}
+
+TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]"){
+
+}
+
+TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]"){
+
+}
+
+TEST_CASE("Getter for stateOfEvents variable"){
+
+}

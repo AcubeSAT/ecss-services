@@ -134,6 +134,8 @@ public:
 	 */
 	void listOfDisabledEventsReport();
 
+	std::bitset<numberOfEvents> getStateOfEvents();
+
 };
 
 #endif //ECSS_SERVICES_EVENTREPORTSERVICE_HPP

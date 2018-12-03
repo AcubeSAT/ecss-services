@@ -83,3 +83,7 @@ void EventReportService::listOfDisabledEventsReport() {
 
 	storeMessage(report);
 }
+
+std::bitset<7> EventReportService::getStateOfEvents() {
+	return stateOfEvents;
+}
