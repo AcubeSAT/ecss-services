@@ -6,7 +6,7 @@
 #include "Service.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
-#include "Platform/ARM/MemoryAddressLimits_STM32F7.hpp"
+#include "Platform/STM32F7/MemoryAddressLimits.hpp"
 
 
 class MemoryManagementService : public Service {
