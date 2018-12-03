@@ -43,7 +43,7 @@ public:
 		 *
 		 * @details This function loads new values to memory data areas
 		 * 			specified in the request
-		 * @param request: Provide the received message as a parameter
+		 * @param request Provide the received message as a parameter
 		 * @todo Only allow aligned memory address to be start addresses
 		 */
 		void loadRawData(Message &request);
@@ -53,7 +53,7 @@ public:
 		 *
 		 * @details This function reads the raw data from the RAM memory and
 		 * 			triggers a TM[6,6] report
-		 * @param request: Provide the received message as a parameter
+		 * @param request Provide the received message as a parameter
 		 * @todo In later embedded version, implement error checking for address validity for
 		 * 		 different memory types
 		 * @todo Only allow aligned memory address to be start addresses
@@ -65,7 +65,7 @@ public:
 		 *
 		 * @details This function reads the raw data from the specified memory and
 		 * 			triggers a TM[6,10] report
-		 * @param request: Provide the received message as a parameter
+		 * @param request Provide the received message as a parameter
 		 * @todo In later embedded version, implement error checking for address validity for
 		 * 		 different memory types
 		 * @todo Only allow aligned memory address to be start addresses
@@ -79,15 +79,15 @@ private:
 	/**
 		 * Check whether the provided address is valid or not, based on the defined limit values
 		 *
-		 * @param memId: The ID of the memory to check is passed
-		 * @param address: Takes the address to be checked for validity
+		 * @param memId The ID of the memory to check is passed
+		 * @param address Takes the address to be checked for validity
 		 */
 	bool addressValidator(MemoryManagementService::MemoryID memId, uint64_t address);
 
 	/**
 	 * Check if the provided memory ID is valid
 	 *
-	 * @param memId: The memory ID for validation
+	 * @param memId The memory ID for validation
 	 */
 	bool memoryIdValidator(MemoryManagementService::MemoryID memId);
 
