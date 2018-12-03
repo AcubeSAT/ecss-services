@@ -17,7 +17,7 @@
 
 class EventReportService : public Service {
 private:
-	static const uint8_t numberOfEvents = 7;
+	static const uint8_t numberOfEvents = 7; // Might need to change the uint8_t
 	std::bitset<numberOfEvents> stateOfEvents;
 public:
 	EventReportService() {
@@ -56,7 +56,11 @@ public:
 		/**
 		 * An unknown anomaly of high severity has occurred
 		 */
-			HighSeverityUnknownEvent = 6
+			HighSeverityUnknownEvent = 6,
+		/**
+		 * When an execution of a notification/event fails to start
+		 */
+		    FailedStartOfExecution = 7
 	};
 
 	/**
@@ -134,7 +138,9 @@ public:
 	 */
 	void listOfDisabledEventsReport();
 
-	std::bitset<numberOfEvents> getStateOfEvents();
+	std::bitset<numberOfEvents> getStateOfEvents(){
+		return stateOfEvents;
+	}
 
 };
 

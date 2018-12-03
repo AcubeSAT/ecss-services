@@ -3,7 +3,7 @@
 #include "Message.hpp"
 
 /**
- *
+ * @todo: Add message type in TCs
  * @todo: this code is error prone, depending on parameters given, add fail safes (probably?)
  */
 void EventReportService::informativeEventReport(Event eventID, const uint8_t *data,
@@ -50,6 +50,10 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const uint8_t *data
 
 void EventReportService::enableReportGeneration(uint8_t length, Event *eventID) {
 	// TC[5,5]
+	/**
+	 * @todo: Add informationEventReport with notification if failed start of execution
+	 * according to standard 6.5.5.2.e
+	 */
 	for (uint8_t i = 0; i < length; i++) {
 		stateOfEvents[static_cast<uint8_t> (eventID[i])] = 1;
 	}
@@ -57,6 +61,10 @@ void EventReportService::enableReportGeneration(uint8_t length, Event *eventID) 
 
 void EventReportService::disableReportGeneration(uint8_t length, Event *eventID) {
 	// TC[5,6]
+	/**
+	 * @todo: Add informationEventReport with notification if failed start of execution
+	 * according to standard 6.5.5.2.e
+	 */
 	for (uint8_t i = 0; i < length; i++) {
 		stateOfEvents[static_cast<uint8_t> (eventID[i])] = 0;
 	}
@@ -82,8 +90,4 @@ void EventReportService::listOfDisabledEventsReport() {
 	}
 
 	storeMessage(report);
-}
-
-std::bitset<7> EventReportService::getStateOfEvents() {
-	return stateOfEvents;
 }
