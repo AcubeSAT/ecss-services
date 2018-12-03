@@ -1,5 +1,7 @@
 #include "Message.hpp"
+#include "macros.hpp"
 #include <cstring>
+#include <ErrorHandler.hpp>
 
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType,
@@ -8,10 +10,10 @@ Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType p
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
 	// TODO: Add assertion that data does not contain 1s outside of numBits bits
-	assert(numBits <= 16);
+	assertI(numBits <= 16, ErrorHandler::TooManyBitsAppend);
 
 	while (numBits > 0) { // For every sequence of 8 bits...
-		assert(dataSize < ECSS_MAX_MESSAGE_SIZE);
+		assertI(dataSize < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 
 		if (currentBit + numBits >= 8) {
 			// Will have to shift the bits and insert the next ones later
@@ -35,16 +37,16 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 }
 
 void Message::appendByte(uint8_t value) {
-	assert(dataSize < ECSS_MAX_MESSAGE_SIZE);
-	assert(currentBit == 0);
+	assertI(dataSize < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	assertI(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
 	data[dataSize] = value;
 	dataSize++;
 }
 
 void Message::appendHalfword(uint16_t value) {
-	assert(dataSize + 2 <= ECSS_MAX_MESSAGE_SIZE);
-	assert(currentBit == 0);
+	assertI(dataSize + 2 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	assertI(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
 	data[dataSize] = static_cast<uint8_t>((value >> 8) & 0xFF);
 	data[dataSize + 1] = static_cast<uint8_t>(value & 0xFF);
@@ -53,8 +55,8 @@ void Message::appendHalfword(uint16_t value) {
 }
 
 void Message::appendWord(uint32_t value) {
-	assert(dataSize + 4 <= ECSS_MAX_MESSAGE_SIZE);
-	assert(currentBit == 0);
+	assertI(dataSize + 4 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	assertI(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
 	data[dataSize] = static_cast<uint8_t>((value >> 24) & 0xFF);
 	data[dataSize + 1] = static_cast<uint8_t>((value >> 16) & 0xFF);
@@ -65,8 +67,8 @@ void Message::appendWord(uint32_t value) {
 }
 
 void Message::appendString(uint8_t size, const char *value) {
-	assert(dataSize + size <= ECSS_MAX_MESSAGE_SIZE);
-	assert(size < ECSS_MAX_STRING_SIZE);
+	assertI(dataSize + size < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	assertI(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooLarge);
 
 	memcpy(data + dataSize, value, size);
 
@@ -74,8 +76,8 @@ void Message::appendString(uint8_t size, const char *value) {
 }
 
 void Message::appendString(uint16_t size, const uint8_t *value) {
-	assert(dataSize + size <= ECSS_MAX_MESSAGE_SIZE);
-	assert(size < ECSS_MAX_STRING_SIZE);
+	assertI(dataSize + size <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	assertI(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooLarge);
 
 	memcpy(data + dataSize, value, size);
 
@@ -83,13 +85,13 @@ void Message::appendString(uint16_t size, const uint8_t *value) {
 }
 
 uint16_t Message::readBits(uint8_t numBits) {
-	assert(numBits <= 16);
+	assertR(numBits <= 16, ErrorHandler::TooManyBitsRead);
 	// TODO: Add assert
 
 	uint16_t value = 0x0;
 
 	while (numBits > 0) {
-		assert(readPosition < ECSS_MAX_MESSAGE_SIZE);
+		assertR(readPosition < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
 		if (currentBit + numBits >= 8) {
 			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
@@ -111,7 +113,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 }
 
 uint8_t Message::readByte() {
-	assert(readPosition < ECSS_MAX_MESSAGE_SIZE);
+	assertR(readPosition < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
 	uint8_t value = data[readPosition];
 	readPosition++;
@@ -120,7 +122,7 @@ uint8_t Message::readByte() {
 }
 
 uint16_t Message::readHalfword() {
-	assert(readPosition + 2 < ECSS_MAX_MESSAGE_SIZE);
+	assertR(readPosition + 2 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
 	uint16_t value = (data[readPosition] << 8) | data[readPosition + 1];
 	readPosition += 2;
@@ -129,7 +131,7 @@ uint16_t Message::readHalfword() {
 }
 
 uint32_t Message::readWord() {
-	assert(readPosition + 4 < ECSS_MAX_MESSAGE_SIZE);
+	assertR(readPosition + 4 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
 	uint32_t value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) |
 	                 (data[readPosition + 2] << 8) | data[readPosition + 3];
@@ -139,8 +141,8 @@ uint32_t Message::readWord() {
 }
 
 void Message::readString(char *string, uint8_t size) {
-	assert(readPosition + size <= ECSS_MAX_MESSAGE_SIZE);
-	assert(size < ECSS_MAX_STRING_SIZE);
+	assertR(readPosition + size <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+	assertR(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
 	string[size] = '\0'; // todo: Use that for now to avoid problems. Later to be removed
@@ -149,8 +151,8 @@ void Message::readString(char *string, uint8_t size) {
 }
 
 void Message::readString(uint8_t *string, uint16_t size) {
-	assert(readPosition + size <= ECSS_MAX_MESSAGE_SIZE);
-	assert(size < ECSS_MAX_STRING_SIZE);
+	assertR(readPosition + size <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+	assertR(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
 
