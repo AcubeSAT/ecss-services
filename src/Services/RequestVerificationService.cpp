@@ -1,7 +1,7 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Message.hpp"
 
-void RequestVerificationService::successAcceptanceVerification(Message &request) {
+void RequestVerificationService::successAcceptanceVerification(const Message &request) {
 	// TM[1,1] successful acceptance verification report
 
 	Message report = createTM(1);
@@ -17,7 +17,7 @@ void RequestVerificationService::successAcceptanceVerification(Message &request)
 }
 
 void
-RequestVerificationService::failAcceptanceVerification(Message &request) {
+RequestVerificationService::failAcceptanceVerification(const Message &request) {
 	// TM[1,2] failed acceptance verification report
 
 	Message report = createTM(2);
@@ -33,7 +33,7 @@ RequestVerificationService::failAcceptanceVerification(Message &request) {
 	storeMessage(report);
 }
 
-void RequestVerificationService::successExecutionVerification(Message &request) {
+void RequestVerificationService::successExecutionVerification(const Message &request) {
 	// TM[1,7] successful completion of execution verification report
 
 	Message report = createTM(7);
@@ -49,7 +49,7 @@ void RequestVerificationService::successExecutionVerification(Message &request) 
 }
 
 void
-RequestVerificationService::failExecutionVerification(Message &request) {
+RequestVerificationService::failExecutionVerification(const Message &request) {
 	// TM[1,8] failed completion of execution verification report
 
 	Message report = createTM(8);
@@ -66,7 +66,7 @@ RequestVerificationService::failExecutionVerification(Message &request) {
 }
 
 void
-RequestVerificationService::failRoutingVerification(Message &request) {
+RequestVerificationService::failRoutingVerification(const Message &request) {
 	// TM[1,10] failed routing verification report
 
 	Message report = createTM(10);
@@ -82,7 +82,7 @@ RequestVerificationService::failRoutingVerification(Message &request) {
 	storeMessage(report);
 }
 
-void RequestVerificationService::execute(Message &message) {
+void RequestVerificationService::execute(const Message &message) {
 	switch (message.messageType) {
 		case 1:
 			successAcceptanceVerification(message);

@@ -28,7 +28,7 @@ public:
 	 * of the telecommand packet that accepted successfully
 	 *
 	 */
-	void successAcceptanceVerification(Message &request);
+	void successAcceptanceVerification(const Message &request);
 
 	/**
 	 * TM[1,2] failed acceptance verification report
@@ -37,7 +37,7 @@ public:
 	 * The data is actually some data members of Message that contain the basic
 	 * info of the telecommand packet that failed to be accepted
 	 */
-	void failAcceptanceVerification(Message &request);
+	void failAcceptanceVerification(const Message &request);
 
 
 	/**
@@ -48,7 +48,7 @@ public:
 	 * telecommand packet that executed successfully
 	 *
  	 */
-	void successExecutionVerification(Message &request);
+	void successExecutionVerification(const Message &request);
 
 	/**
 	 * TM[1,8] failed completion of execution verification report
@@ -58,7 +58,7 @@ public:
 	 * telecommand packet that failed to be executed
 	 *
 	 */
-	void failExecutionVerification(Message &request);
+	void failExecutionVerification(const Message &request);
 
 	/**
 	 * TM[1,10] failed routing verification report
@@ -68,7 +68,7 @@ public:
 	 * telecommand packet that failed the routing
 	 *
  	 */
-	void failRoutingVerification(Message &request);
+	void failRoutingVerification(const Message &request);
 
 	/**
 	 * It is responsible to call the suitable function that execute the proper subservice. The
@@ -79,7 +79,7 @@ public:
 	 *
 	 * @todo Error handling for the switch() in the implementation of this execute function
 	 */
-	void execute(Message &message);
+	void execute(const Message &message);
 
 	/**
 	 *  The purpose of this instance is to access the execute function of this service when a
