@@ -4,7 +4,6 @@
 #include <memory>
 #include <iostream>
 #include "Service.hpp"
-#include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
@@ -75,8 +74,6 @@ public:
 	} rawDataMemorySubservice;
 
 private:
-	RequestVerificationService requestVerificationService;
-
 	/**
 		 * Check whether the provided address is valid or not, based on the defined limit values
 		 *

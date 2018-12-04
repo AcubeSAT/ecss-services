@@ -58,15 +58,9 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 							ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 						}
 					} else {
-						// todo: Implement the fail report the correct way when all parameters known
-						mainService.requestVerificationService.failExecutionVerification(
-							request.packetType, true, 1, 1, 10, 6);
 						ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 					}
 				} else {
-					// todo: The final implementation of exit on failure has to be well defined
-					mainService.requestVerificationService.failExecutionVerification(
-						request.packetType, true, 1, 1, 10, 6);
 					ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 					continue; // Continue to the next command
 				}
@@ -115,8 +109,6 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 				report.appendOctetString(readLength, readData); // Save the read data
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
-				mainService.requestVerificationService.failExecutionVerification(request.packetType,
-				                                                                 true, 1, 1, 10, 6);
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
 		}
@@ -166,8 +158,6 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 				report.appendUint16(readLength); // Save the read data
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength)); // Append CRC
 			} else {
-				mainService.requestVerificationService.failExecutionVerification(request.packetType,
-				                                                                 true, 1, 1, 10, 6);
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
 		}
