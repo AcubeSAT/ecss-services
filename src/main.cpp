@@ -3,6 +3,7 @@
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
+#include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
@@ -106,13 +107,23 @@ int main() {
 
 
 	// ST[01] test
-	// parameters take random values and works as expected
+
 	RequestVerificationService reqVerifService;
-	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
-	reqVerifService.failAcceptanceVerification(Message::TC, true, 2, 2, 10, 5);
-	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
-	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
-	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+
+	Message receivedMessage = Message(1, 1, Message::TC, 3);
+	reqVerifService.successAcceptanceVerification(receivedMessage);
+
+	receivedMessage = Message(1, 2, Message::TC, 3);
+	reqVerifService.failAcceptanceVerification(receivedMessage);
+
+	receivedMessage = Message(1, 7, Message::TC, 3);
+	reqVerifService.successExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(1, 8, Message::TC, 3);
+	reqVerifService.failExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(1, 10, Message::TC, 3);
+	reqVerifService.failRoutingVerification(receivedMessage);
 
 	// ST[05] test [works]
 	const unsigned char eventReportData[12] = "Hello World";
@@ -128,6 +139,7 @@ int main() {
 
 	// MessageParser class test
 	std::cout << "\n";
+
 	// ST[17] test
 	Message message = Message(17, 1, Message::TC, 1);
 	MessageParser messageParser;
@@ -137,15 +149,15 @@ int main() {
 	messageParser.execute(message);
 
 	// ST[01] test
-	message = Message(1, 1, Message::TC, 2);
+	message = Message(1, 1, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 2, Message::TC, 2);
+	message = Message(1, 2, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 7, Message::TC, 2);
+	message = Message(1, 7, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 8, Message::TC, 2);
+	message = Message(1, 8, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 10, Message::TC, 2);
+	message = Message(1, 10, Message::TC, 3);
 	messageParser.execute(message);
 
 	// ErrorHandler test
