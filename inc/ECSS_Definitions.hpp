@@ -12,4 +12,7 @@
 // 7.4.4.1c
 #define ECSS_PUS_VERSION 2
 
+// 9.3.1a.1.e
+#define ECSS_SEQUENCE_FLAGS 0x3
+
 #endif //ECSS_SERVICES_ECSS_DEFINITIONS_H

@@ -9,5 +9,8 @@
     <libraryRoots>
       <file path="$PROJECT_DIR$/lib" />
     </libraryRoots>
+    <excludeRoots>
+      <file path="$PROJECT_DIR$/docs" />
+    </excludeRoots>
   </component>
 </project>

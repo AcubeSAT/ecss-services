@@ -26,11 +26,18 @@ public:
 	// As specified in CCSDS 133.0-B-1 (TM or TC)
 	PacketType packetType;
 
-	// Maximum value of 2047 (5.4.2.1c)
+	/**
+	 * The destination APID of the message
+	 *
+	 * Maximum value of 2047 (5.4.2.1c)
+	 */
 	uint16_t applicationId;
 
 	// 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
+
+	// 7.4.1, as defined in CCSDS 133.0-B-1
+	uint16_t packetSequenceCount = 0;
 
 	// TODO: Find out if we need more than 16 bits for this
 	uint16_t dataSize = 0;
@@ -87,7 +94,7 @@ public:
 	 * @todo See if more than uint8_t strings will be supported
 	 * @todo Is uint16_t size too much or not enough? It has to be defined
 	 */
-	void appendString(uint16_t size, uint8_t *value);
+	void appendString(uint16_t size, const uint8_t *value);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format

@@ -1,11 +1,14 @@
 #include <iostream>
+#include "Helpers/CRCHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "Services/EventReportService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "ErrorHandler.hpp"
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -108,6 +111,18 @@ int main() {
 	receivedMessage = Message(1, 10, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage);
 
+	// ST[05] test [works]
+	const unsigned char eventReportData[12] = "Hello World";
+	EventReportService eventReportService;
+	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
+	                                          eventReportData, 11);
+	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent,
+	                                            eventReportData, 11);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent,
+	                                               eventReportData, 11);
+	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
+	                                             eventReportData, 11);
+
 	// MessageParser class test
 	std::cout << "\n";
 
@@ -130,6 +145,15 @@ int main() {
 	messageParser.execute(message);
 	message = Message(1, 10, Message::TC, 3);
 	messageParser.execute(message);
+
+	// ErrorHandler test
+	std::cout << std::flush;
+	std::cerr << std::flush;
+	ErrorHandler::reportError(receivedPacket, ErrorHandler::MessageTooShort);
+	ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
+	Message errorMessage(0, 0, Message::TC, 1);
+	errorMessage.appendBits(2, 7);
+	errorMessage.appendByte(15);
 
 	return 0;
 }
