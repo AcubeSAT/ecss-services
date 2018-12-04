@@ -143,7 +143,7 @@ int main() {
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
 
-	//ST[05] (5,5 to 5,8) test [works]
+	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
 										 EventReportService::MediumSeverityUnknownEvent};
 	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
