@@ -17,7 +17,7 @@
 
 class EventReportService : public Service {
 private:
-	static const uint8_t numberOfEvents = 7; // Might need to change the uint8_t
+	static const uint16_t numberOfEvents = 7;
 	std::bitset<numberOfEvents> stateOfEvents;
 public:
 	EventReportService() {
@@ -118,13 +118,13 @@ public:
 	 * TC[5,5] request to enable report generation
 	 * Telecommand to enable the report generation of event definitions
 	 */
-	void enableReportGeneration(uint8_t length, Event *eventID);
+	void enableReportGeneration(uint16_t length, Event *eventID);
 
 	/**
 	 * TC[5,6] request to disable report generation
 	 * Telecommand to disable the report generation of event definitions
 	 */
-	void disableReportGeneration(uint8_t length, Event *eventID);
+	void disableReportGeneration(uint16_t length, Event *eventID);
 
 	/**
 	 * TC[5,7] request to report the disabled event definitions

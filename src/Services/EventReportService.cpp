@@ -48,27 +48,27 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const uint8_t *data
 	storeMessage(report);
 }
 
-void EventReportService::enableReportGeneration(uint8_t length, Event *eventID) {
+void EventReportService::enableReportGeneration(uint16_t length, Event *eventID) {
 	// TC[5,5]
 	/**
 	 * @todo: Report an error if length>numberOfEvents
 	 */
 	if (length <= numberOfEvents) {
-		for (uint8_t i = 0; i < length; i++) {
-			stateOfEvents[static_cast<uint8_t> (eventID[i])] = 1;
+		for (uint16_t i = 0; i < length; i++) {
+			stateOfEvents[static_cast<uint16_t> (eventID[i])] = 1;
 		}
 	}
-
 }
 
-void EventReportService::disableReportGeneration(uint8_t length, Event *eventID) {
+void EventReportService::disableReportGeneration(uint16_t length, Event *eventID) {
 	// TC[5,6]
 	/**
-	 * @todo: Add informationEventReport with notification if failed start of execution
-	 * according to standard 6.5.5.2.e
+	 * @todo: Report an error if length>numberOfEvents
 	 */
-	for (uint8_t i = 0; i < length; i++) {
-		stateOfEvents[static_cast<uint8_t> (eventID[i])] = 0;
+	if (length <= numberOfEvents) {
+		for (uint16_t i = 0; i < length; i++) {
+			stateOfEvents[static_cast<uint16_t> (eventID[i])] = 0;
+		}
 	}
 }
 
@@ -83,11 +83,11 @@ void EventReportService::listOfDisabledEventsReport() {
 	Message report = createTM(8);
 
 	// Any chance we'll have more than uint8_t (>255 events) ? This will produce an error!
-	uint8_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
+	uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
 	report.appendByte(numberOfDisabledEvents);
-	for (uint8_t i = 0; i < stateOfEvents.size(); i++) {
+	for (uint16_t i = 0; i < stateOfEvents.size(); i++) {
 		if (stateOfEvents[i] == 0) {
-			report.appendEnum8(i);
+			report.appendEnum16(i);
 		}
 	}
 
