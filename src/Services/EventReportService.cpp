@@ -51,12 +51,14 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const uint8_t *data
 void EventReportService::enableReportGeneration(uint8_t length, Event *eventID) {
 	// TC[5,5]
 	/**
-	 * @todo: Add informationEventReport with notification if failed start of execution
-	 * according to standard 6.5.5.2.e
+	 * @todo: Report an error if length>numberOfEvents
 	 */
-	for (uint8_t i = 0; i < length; i++) {
-		stateOfEvents[static_cast<uint8_t> (eventID[i])] = 1;
+	if (length <= numberOfEvents) {
+		for (uint8_t i = 0; i < length; i++) {
+			stateOfEvents[static_cast<uint8_t> (eventID[i])] = 1;
+		}
 	}
+
 }
 
 void EventReportService::disableReportGeneration(uint8_t length, Event *eventID) {
