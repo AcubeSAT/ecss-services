@@ -130,9 +130,9 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	CHECK(report.serviceType == 5);
 	CHECK(report.messageType == 8);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
-	REQUIRE(report.dataSize == 3);
+	REQUIRE(report.dataSize == 6);
 	// Check for the information stored in report
-	CHECK(report.readHalfWord() == 2);
+	CHECK(report.readHalfword() == 2);
 	CHECK(report.readEnum16() == 3);
 	CHECK(report.readEnum16() == 6);
 }

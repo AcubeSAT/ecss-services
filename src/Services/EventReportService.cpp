@@ -83,7 +83,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	Message report = createTM(8);
 
 	uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
-	report.appendByte(numberOfDisabledEvents);
+	report.appendHalfword(numberOfDisabledEvents);
 	for (uint16_t i = 0; i < stateOfEvents.size(); i++) {
 		if (stateOfEvents[i] == 0) {
 			report.appendEnum16(i);
