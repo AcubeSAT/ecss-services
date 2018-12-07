@@ -17,14 +17,13 @@ add_custom_target(check
 add_library(common OBJECT
         src/ErrorHandler.cpp
         src/Message.cpp
-	    src/MessageParser.cpp
+        src/MessageParser.cpp
         src/Helpers/CRCHelper.cpp
-	    src/Services/EventReportService.cpp
+        src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
-        src/Services/TestService.cpp
-        )
+        src/Services/TestService.cpp src/Helpers/TimeHelper.cpp)
 
 # Specify the .cpp files for the executables
 add_executable(ecss_services
@@ -42,7 +41,7 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     add_executable(tests
             $<TARGET_OBJECTS:common>
             ${test_main_SRC}
-            ${test_SRC})
+            ${test_SRC} test/Helpers/TimeHelper.cpp)
 
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Helpers/CRCHelper.hpp"
+#include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
@@ -155,5 +156,10 @@ int main() {
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
 
+	// TimeHelper test
+	Message receive = Message(9, 2, Message::TC, 1); // random values
+	TimeHelper::implementCUCTimeFormat(60, receive);
+	for (int i = 0; i < 5; i++)
+		std::cout << static_cast<int>(receive.data[i]) << " ";
 	return 0;
 }
