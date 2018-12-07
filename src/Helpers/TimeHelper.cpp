@@ -1,7 +1,7 @@
 #include "Helpers/TimeHelper.hpp"
 
 void TimeHelper::implementCUCTimeFormat(uint32_t seconds, Message &data) {
-	// the total number of octets including the p-field (1 octet) and the 4 time units is 5
+	// the total number of octets including the p-field (1 octet) and t-field(4 octets) is 5
 
 	// define the P-field
 	uint8_t bit0 = 0; // P-field extension(‘zero’: no extension; ‘one’: field is extended)
