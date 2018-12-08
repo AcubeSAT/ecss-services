@@ -8,7 +8,9 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
+
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -68,7 +70,7 @@ int main() {
 
 	MemoryManagementService memMangService;
 	Message rcvPack = Message(6, 5, Message::TC, 1);
-	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
 	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
@@ -83,13 +85,25 @@ int main() {
 	rcvPack = Message(6, 2, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
-	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
 	rcvPack.appendOctetString(2, data);
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2)); // Append the CRC value
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
+
+	rcvPack = Message(6, 9, Message::TC, 1);
+
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.appendUint16(2); // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(data)); // Start address
+	rcvPack.appendUint16(2);
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(data + 1)); // Start address
+	rcvPack.appendUint16(1);
+	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
 
 	// ST[01] test

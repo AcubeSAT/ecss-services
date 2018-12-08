@@ -4,7 +4,9 @@
 
 void Service::storeMessage(const Message &message) {
 	// Just print it to the screen
-	std::cout << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "[" << std::dec
+	std::cout << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
+	          << std::hex
+	          // << std::dec
 	          << static_cast<int>(message.serviceType) << ","
 	          << static_cast<int>(message.messageType) << "] message!\n";
 	//std::cout << std::hex << std::setfill('0') << std::setw(2);
