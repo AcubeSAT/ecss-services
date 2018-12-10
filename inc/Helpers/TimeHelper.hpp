@@ -6,7 +6,7 @@
 
 /**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.
- * The ECSS standard supports two time formats:the CUC and CSD that are described in
+ * The ECSS standard supports two time formats: the CUC and CSD that are described in
  * CCSDS 301.0-B-4 standard
  * The chosen time format is CUC. The reasons for this selection are the followings:
  * 1)It is more flexible from the CSD. The designer is free to decide how much memory will use
@@ -23,21 +23,19 @@ public:
 	 * Implement the CUC time format
 	 *
 	 * @details The CUC time format consists of two main fields: the time code preamble field
-	 * (P-field) and the time specification field(T-field).The P-Field is the metadata for the
+	 * (P-field) and the time specification field(T-field). The P-Field is the metadata for the
 	 * T-Field. The T-Field contains the value of the time unit and the designer decides what the
 	 * time unit will be, so this is a subject for discussion. The recommended time unit from the
 	 * standard is the second and it is probably the best solution for accuracy.
 	 * @param seconds the seconds provided from the RTC. This function in general should have
 	 * parameters corresponding with the RTC. For the time being we assume that the RTC has a
 	 * 32-bit counter that counts seconds(the RTC in Nucleo F103RB!)
- 	 * @param data it is needed to access the data-member data of class Message. Remember this
- 	 * function will be used from the ST[09] service to generate time reports
  	 * @todo check if we need milliseconds(fractions of the time unit)
  	 * @todo the time unit should be declared in the metadata. But how?
  	 * @todo check if we need to define other epoch than the 1 January 1958
  	 * @todo time security for critical time operations
 	 */
-	static void implementCUCTimeFormat(uint32_t seconds, Message &data);
+	static uint64_t implementCUCTimeFormat(uint32_t seconds);
 };
 
 #endif //ECSS_SERVICES_TIMEHELPER_HPP

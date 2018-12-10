@@ -157,11 +157,8 @@ int main() {
 	errorMessage.appendByte(15);
 
 	// TimeHelper test
-	Message receive = Message(9, 2, Message::TC, 1); // random values
-	TimeHelper::implementCUCTimeFormat(60, receive);
-	for (int i = 0; i < 5; i++) {
-		std::cout << static_cast<int>(receive.data[i]) << " ";
-	}
+	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
+	std::cout << "\n" << test;
 
 	return 0;
 }
