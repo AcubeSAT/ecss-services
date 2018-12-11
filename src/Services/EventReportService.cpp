@@ -81,7 +81,7 @@ void EventReportService::enableReportGeneration(uint16_t length, Event *eventID)
 void EventReportService::disableReportGeneration(uint16_t length, Event *eventID) {
 	// TC[5,6]
 	/**
-	 * @todo: Report an error if length>numberOfEvents
+	 * @todo: Report an error if length > numberOfEvents
 	 */
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {

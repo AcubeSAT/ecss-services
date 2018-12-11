@@ -53,6 +53,9 @@ public:
 
 	/**
 	 * Type of the information event
+	 *
+	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
+	 * changes.
 	 */
 	enum Event {
 		/**
