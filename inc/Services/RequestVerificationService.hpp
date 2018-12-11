@@ -6,12 +6,13 @@
 /**
  * Implementation of the ST[01] request verification service
  *
- * Note: ST[01]'s messages should not contain calls to the ErrorHandler, as the ErrorHandler
- * calls ST[01] functions again. Doing so would risk an infinite recursive loop.
+ * Note:For the time being, the cause(routing, acceptance, execution), that functions of ST[01]
+ * should be called, hasn't been implemented yet. In main.cpp there are some random calls with
+ * dummy values.
  *
  * @todo All telemetry packets shall have a telemetry packet secondary header
- * @todo See if it would be more efficient to use Messages as arguments instead of individual
- * parameters
+ * @todo See if the deduced data defined from the standard should still be ignored. This deduced
+ * data exists only in reports that send failure signs(for example the TM[1,2])
  */
 class RequestVerificationService : public Service {
 public:
@@ -21,79 +22,53 @@ public:
 
 	/**
 	 * TM[1,1] successful acceptance verification report
-	 * Send report when the Cubesat accepts successfully commands
 	 *
-	 * Note:The parameters are the necessary information, defined from the standard, that the report
-	 * should contain
+	 * @param request Contains the necessary data to send the report.
+	 * The data is actually some data members of Message that contain the basic info
+	 * of the telecommand packet that accepted successfully
 	 *
-	 * @param apid Application process ID
-	 * @param seqFlag Sequence flags
-	 * @param packetSeqCount Packet sequence count
 	 */
-	void successAcceptanceVerification(Message::PacketType packetType, bool secondaryHeaderFlag,
-	                                   uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount);
+	void successAcceptanceVerification(const Message &request);
 
 	/**
 	 * TM[1,2] failed acceptance verification report
-	 *Send report when the Cubesat don't accept commands
 	 *
-	 * Note:The parameters are the necessary information, defined from the standard, that the report
-	 * should contain
-	 *
-	 * @param apid Application process ID
-	 * @param seqFlag Sequence flags
-	 * @param packetSeqCount Packet sequence count
+	 * @param request Contains the necessary data to send the report.
+	 * The data is actually some data members of Message that contain the basic
+	 * info of the telecommand packet that failed to be accepted
 	 */
-	void failAcceptanceVerification(Message::PacketType packetType, bool secondaryHeaderFlag,
-	                                uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount,
-	                                uint16_t errorCode);
+	void failAcceptanceVerification(const Message &request);
 
 
 	/**
- 	*  TM[1,7] successful completion of execution verification report
-	 *  Send report when the Cubesat completes an execution
+ 	 * TM[1,7] successful completion of execution verification report
 	 *
-	 * Note:The parameters are the necessary information, defined from the standard, that the report
-	 * should contain
+	 * @param request Contains the necessary data to send the report.
+	 * The data is actually data members of Message that contain the basic info of the
+	 * telecommand packet that executed successfully
 	 *
-	 * @param apid Application process ID
-	 * @param seqFlag Sequence flags
-	 * @param packetSeqCount Packet sequence count
- 	*/
-	void successExecutionVerification(Message::PacketType packetType, bool secondaryHeaderFlag,
-	                                  uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount);
+ 	 */
+	void successExecutionVerification(const Message &request);
 
 	/**
- 	*  TM[1,8] failed completion of execution verification report
-	 *  Send report when the Cubesat don't complete an execution
+	 * TM[1,8] failed completion of execution verification report
 	 *
-	 * Note:The parameters are the necessary information, defined from the standard, that the report
-	 * should contain
+	 * @param request Contains the necessary data to send the report.
+	 * The data is actually some data members of Message that contain the basic info of the
+	 * telecommand packet that failed to be executed
 	 *
-	 * @param apid Application process ID
-	 * @param seqFlag Sequence flags
-	 * @param packetSeqCount Packet sequence count
- 	*/
-	void failExecutionVerification(Message::PacketType packetType,
-	                               bool secondaryHeaderFlag,
-	                               uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount,
-	                               uint16_t errorCode);
+	 */
+	void failExecutionVerification(const Message &request);
 
 	/**
- 	*  TM[1,10] failed routing verification report
-	 *  Send report when the routing of a request has failed
+	 * TM[1,10] failed routing verification report
 	 *
-	 * Note:The parameters are the necessary information, defined from the standard, that the report
-	 * should contain
+	 * @param request Contains the necessary data to send the report.
+	 * The data is actually some data members of Message that contain the basic info of the
+	 * telecommand packet that failed the routing
 	 *
-	 * @param apid Application process ID
-	 * @param seqFlag Sequence flags
-	 * @param packetSeqCount Packet sequence count
- 	*/
-	void failRoutingVerification(Message::PacketType packetType,
-	                             bool secondaryHeaderFlag,
-	                             uint16_t apid, uint8_t seqFlag, uint16_t packetSeqCount,
-	                             uint16_t errorCode);
+ 	 */
+	void failRoutingVerification(const Message &request);
 
 	/**
 	 * It is responsible to call the suitable function that execute the proper subservice. The
@@ -104,7 +79,7 @@ public:
 	 *
 	 * @todo Error handling for the switch() in the implementation of this execute function
 	 */
-	void execute(Message &message);
+	void execute(const Message &message);
 
 	/**
 	 *  The purpose of this instance is to access the execute function of this service when a

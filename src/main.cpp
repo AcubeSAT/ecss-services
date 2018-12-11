@@ -3,11 +3,14 @@
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
+#include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
+
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -67,7 +70,7 @@ int main() {
 
 	MemoryManagementService memMangService;
 	Message rcvPack = Message(6, 5, Message::TC, 1);
-	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
 	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
@@ -82,23 +85,45 @@ int main() {
 	rcvPack = Message(6, 2, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
-	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
 	rcvPack.appendOctetString(2, data);
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2)); // Append the CRC value
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
+
+	rcvPack = Message(6, 9, Message::TC, 1);
+
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.appendUint16(2); // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(data)); // Start address
+	rcvPack.appendUint16(2);
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(data + 1)); // Start address
+	rcvPack.appendUint16(1);
+	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
 
 	// ST[01] test
-	// parameters take random values and works as expected
+
 	RequestVerificationService reqVerifService;
-	reqVerifService.successAcceptanceVerification(Message::TC, true, 2, 2, 10);
-	reqVerifService.failAcceptanceVerification(Message::TC, true, 2, 2, 10, 5);
-	reqVerifService.successExecutionVerification(Message::TC, true, 2, 2, 10);
-	reqVerifService.failExecutionVerification(Message::TC, true, 2, 2, 10, 6);
-	reqVerifService.failRoutingVerification(Message::TC, true, 2, 2, 10, 7);
+
+	Message receivedMessage = Message(1, 1, Message::TC, 3);
+	reqVerifService.successAcceptanceVerification(receivedMessage);
+
+	receivedMessage = Message(1, 2, Message::TC, 3);
+	reqVerifService.failAcceptanceVerification(receivedMessage);
+
+	receivedMessage = Message(1, 7, Message::TC, 3);
+	reqVerifService.successExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(1, 8, Message::TC, 3);
+	reqVerifService.failExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(1, 10, Message::TC, 3);
+	reqVerifService.failRoutingVerification(receivedMessage);
 
 	// ST[05] (5,1 to 5,4) test [works]
 	const unsigned char eventReportData[12] = "Hello World";
@@ -114,6 +139,7 @@ int main() {
 
 	// MessageParser class test
 	std::cout << "\n";
+
 	// ST[17] test
 	Message message = Message(17, 1, Message::TC, 1);
 	MessageParser messageParser;
@@ -123,15 +149,15 @@ int main() {
 	messageParser.execute(message);
 
 	// ST[01] test
-	message = Message(1, 1, Message::TC, 2);
+	message = Message(1, 1, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 2, Message::TC, 2);
+	message = Message(1, 2, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 7, Message::TC, 2);
+	message = Message(1, 7, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 8, Message::TC, 2);
+	message = Message(1, 8, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 10, Message::TC, 2);
+	message = Message(1, 10, Message::TC, 3);
 	messageParser.execute(message);
 
 	// ErrorHandler test

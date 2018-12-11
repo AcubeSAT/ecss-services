@@ -9,42 +9,21 @@ static RequestVerificationService requestVerificationService;
 
 template<>
 void ErrorHandler::reportError(const Message &message, AcceptanceErrorType errorCode) {
-	requestVerificationService.failAcceptanceVerification(
-		message.packetType,
-		true,
-		message.applicationId,
-		ECSS_SEQUENCE_FLAGS,
-		message.packetSequenceCount,
-		static_cast<uint16_t>(errorCode)
-	);
+	requestVerificationService.failAcceptanceVerification(message);
 
 	logError(message, errorCode);
 }
 
 template<>
 void ErrorHandler::reportError(const Message &message, ExecutionErrorType errorCode) {
-	requestVerificationService.failExecutionVerification(
-		message.packetType,
-		true,
-		message.applicationId,
-		ECSS_SEQUENCE_FLAGS,
-		message.packetSequenceCount,
-		static_cast<uint16_t>(errorCode)
-	);
+	requestVerificationService.failExecutionVerification(message);
 
 	logError(message, errorCode);
 }
 
 template<>
 void ErrorHandler::reportError(const Message &message, RoutingErrorType errorCode) {
-	requestVerificationService.failRoutingVerification(
-		message.packetType,
-		true,
-		message.applicationId,
-		ECSS_SEQUENCE_FLAGS,
-		message.packetSequenceCount,
-		static_cast<uint16_t>(errorCode)
-	);
+	requestVerificationService.failRoutingVerification(message);
 
 	logError(message, errorCode);
 }

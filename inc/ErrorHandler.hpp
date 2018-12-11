@@ -81,7 +81,15 @@ public:
 	 * changes.
 	 */
 	enum ExecutionErrorType {
-		UnknownExecutionError = 0
+		UnknownExecutionError = 0,
+		/**
+		 * Checksum comparison failed
+		 */
+			ChecksumFailed = 1,
+		/**
+		 * Address of a memory is out of the defined range for the type of memory
+		 */
+			AddressOutOfRange = 2,
 	};
 
 	/**

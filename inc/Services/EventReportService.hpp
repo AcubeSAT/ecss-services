@@ -20,9 +20,20 @@ private:
 	static const uint16_t numberOfEvents = 7;
 	std::bitset<numberOfEvents> stateOfEvents;
 public:
+	// Variables that count the event occurrences per severity level
+	uint16_t lowSeverityReportsCount;
+	uint16_t mediumSeverityReportCount;
+	uint16_t highSeverityReportCount;
+
+	uint16_t disabledEventsCount;
+
 	EventReportService() {
 		stateOfEvents.set();
 		serviceType = 5;
+		lowSeverityReportsCount = 0;
+		mediumSeverityReportCount = 0;
+		highSeverityReportCount = 0;
+		disabledEventsCount = 0;
 	}
 
 	/**
@@ -145,6 +156,13 @@ public:
 	std::bitset<numberOfEvents> getStateOfEvents() {
 		return stateOfEvents;
 	}
+	/**
+	 * Getter for count of disabled events
+	 */
+	 uint16_t getDisabledEventsCount(){
+		uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
+	 	return numberOfDisabledEvents;
+	 }
 
 };
 
