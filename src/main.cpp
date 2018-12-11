@@ -6,10 +6,12 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/TimeManagementService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "ErrorHandler.hpp"
+
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -158,7 +160,10 @@ int main() {
 
 	// TimeHelper test
 	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
-	std::cout << "\n" << test;
+	std::cout << "\n" << test << "\n";
 
+	// ST[09] test
+	TimeManagementService timeReport;
+	timeReport.cucTimeReport(60);
 	return 0;
 }

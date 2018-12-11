@@ -25,6 +25,7 @@ add_library(common OBJECT
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         src/Helpers/TimeHelper.cpp
+        src/Services/TimeManagementService.cpp
         )
 
 # Specify the .cpp files for the executables
