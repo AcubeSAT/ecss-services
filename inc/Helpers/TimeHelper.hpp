@@ -20,7 +20,7 @@
 class TimeHelper {
 public:
 	/**
-	 * Implement the CUC time format
+	 * Generate the CUC time format
 	 *
 	 * @details The CUC time format consists of two main fields: the time code preamble field
 	 * (P-field) and the time specification field(T-field). The P-Field is the metadata for the
