@@ -10,5 +10,3 @@ void TimeManagementService::cucTimeReport(uint32_t seconds) {
 
 	storeMessage(timeReport);
 }
-
-
