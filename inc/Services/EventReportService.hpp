@@ -27,6 +27,11 @@ public:
 
 	uint16_t disabledEventsCount;
 
+	uint16_t lastInformativeEventReportID;
+	uint16_t lastLowSeverityReportID;
+	uint16_t lastMediumSeverityReportID;
+	uint16_t lastHighSeverityReportID;
+
 	EventReportService() {
 		stateOfEvents.set();
 		serviceType = 5;
