@@ -9,50 +9,60 @@
 void EventReportService::informativeEventReport(Event eventID, const uint8_t *data,
                                                 uint8_t length) {
 	// TM[5,1]
-	Message report = createTM(1);
-	report.appendEnum16(eventID);
-	report.appendString(length, data);
-	lastInformativeEventReportID = static_cast<uint16_t >(eventID);
+	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1){
+		Message report = createTM(1);
+		report.appendEnum16(eventID);
+		report.appendString(length, data);
 
-	storeMessage(report);
+		storeMessage(report);
+	}
 }
 
 void
 EventReportService::lowSeverityAnomalyReport(Event eventID, const uint8_t *data,
                                              uint8_t length) {
+	lowSeverityEventCount++;
 	// TM[5,2]
-	lowSeverityReportsCount++;
-	Message report = createTM(2);
-	report.appendEnum16(eventID);
-	report.appendString(length, data);
-	lastLowSeverityReportID = static_cast<uint16_t >(eventID);
+	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
+		lowSeverityReportsCount++;
+		Message report = createTM(2);
+		report.appendEnum16(eventID);
+		report.appendString(length, data);
+		lastLowSeverityReportID = static_cast<uint16_t >(eventID);
 
-	storeMessage(report);
+		storeMessage(report);
+	}
 }
 
 void EventReportService::mediumSeverityAnomalyReport(Event eventID,
                                                      const uint8_t *data, uint8_t length) {
+	mediumSeverityEventCount++;
 	// TM[5,3]
-	mediumSeverityReportCount++;
-	Message report = createTM(3);
-	report.appendEnum16(eventID);
-	report.appendString(length, data);
-	lastMediumSeverityReportID = static_cast<uint16_t >(eventID);
+	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
+		mediumSeverityReportCount++;
+		Message report = createTM(3);
+		report.appendEnum16(eventID);
+		report.appendString(length, data);
+		lastMediumSeverityReportID = static_cast<uint16_t >(eventID);
 
-	storeMessage(report);
+		storeMessage(report);
+	}
 }
 
 void
 EventReportService::highSeverityAnomalyReport(Event eventID, const uint8_t *data,
                                               uint8_t length) {
+	highSeverityEventCount++;
 	// TM[5,4]
-	highSeverityReportCount++;
-	Message report = createTM(4);
-	report.appendEnum16(eventID);
-	report.appendString(length, data);
-	lastHighSeverityReportID = static_cast<uint16_t >(eventID);
+	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
+		highSeverityReportCount++;
+		Message report = createTM(4);
+		report.appendEnum16(eventID);
+		report.appendString(length, data);
+		lastHighSeverityReportID = static_cast<uint16_t >(eventID);
 
-	storeMessage(report);
+		storeMessage(report);
+	}
 }
 
 void EventReportService::enableReportGeneration(uint16_t length, Event *eventID) {

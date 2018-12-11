@@ -20,14 +20,18 @@ private:
 	static const uint16_t numberOfEvents = 7;
 	std::bitset<numberOfEvents> stateOfEvents;
 public:
-	// Variables that count the event occurrences per severity level
+	// Variables that count the event reports per severity level
 	uint16_t lowSeverityReportsCount;
 	uint16_t mediumSeverityReportCount;
 	uint16_t highSeverityReportCount;
 
+	// Variables that count the event occurences per severity level
+	uint16_t lowSeverityEventCount;
+	uint16_t mediumSeverityEventCount;
+	uint16_t highSeverityEventCount;
+
 	uint16_t disabledEventsCount;
 
-	uint16_t lastInformativeEventReportID;
 	uint16_t lastLowSeverityReportID;
 	uint16_t lastMediumSeverityReportID;
 	uint16_t lastHighSeverityReportID;
@@ -39,7 +43,9 @@ public:
 		mediumSeverityReportCount = 0;
 		highSeverityReportCount = 0;
 		disabledEventsCount = 0;
-		lastInformativeEventReportID = -1;
+		lowSeverityEventCount = 0;
+		mediumSeverityEventCount = 0;
+		highSeverityEventCount = 0;
 		lastLowSeverityReportID = -1;
 		lastMediumSeverityReportID = -1;
 		lastHighSeverityReportID = -1;
