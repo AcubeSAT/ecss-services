@@ -104,6 +104,11 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	eventReportService.disableReportGeneration(2, eventID);
 	CHECK(eventReportService.getStateOfEvents()[0] == 0);
 	CHECK(eventReportService.getStateOfEvents()[5] == 0);
+
+	const unsigned char eventReportData[] = "HelloWorld";
+	eventReportService.highSeverityAnomalyReport(EventReportService::InformativeUnknownEvent,
+	                                             eventReportData, 10);
+	CHECK(ServiceTests::hasOneMessage() == false);
 }
 
 TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
