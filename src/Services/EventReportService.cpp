@@ -9,7 +9,7 @@
 void EventReportService::informativeEventReport(Event eventID, const uint8_t *data,
                                                 uint8_t length) {
 	// TM[5,1]
-	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1){
+	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
 		Message report = createTM(1);
 		report.appendEnum16(eventID);
 		report.appendString(length, data);
@@ -65,36 +65,53 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const uint8_t *data
 	}
 }
 
-void EventReportService::enableReportGeneration(uint16_t length, Event *eventID) {
+void EventReportService::enableReportGeneration(Message message) {
 	// TC[5,5]
-	/**
-	 * @todo: Report an error if length>numberOfEvents
-	 */
-	if (length <= numberOfEvents) {
+	if (message.serviceType == 5 && message.packetType == Message::TC && message.messageType == 5) {
+		/**
+		* @todo: Report an error if length > numberOfEvents
+		*/
+		uint16_t length = message.readUint16();
+		Event eventID[length];
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[static_cast<uint16_t> (eventID[i])] = 1;
+			eventID[i] = static_cast<Event >(message.readEnum16());
 		}
+		if (length <= numberOfEvents) {
+			for (uint16_t i = 0; i < length; i++) {
+				stateOfEvents[static_cast<uint16_t> (eventID[i])] = 1;
+			}
+		}
+		disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 	}
-	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
-void EventReportService::disableReportGeneration(uint16_t length, Event *eventID) {
+void EventReportService::disableReportGeneration(Message message) {
 	// TC[5,6]
-	/**
-	 * @todo: Report an error if length > numberOfEvents
-	 */
-	if (length <= numberOfEvents) {
+	if (message.serviceType == 5 && message.packetType == Message::TC && message.messageType
+	                                                                     == 6) {
+		/**
+		* @todo: Report an error if length > numberOfEvents
+		*/
+		uint16_t length = message.readUint16();
+		Event eventID[length];
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[static_cast<uint16_t> (eventID[i])] = 0;
+			eventID[i] = static_cast<Event >(message.readEnum16());
 		}
+		if (length <= numberOfEvents) {
+			for (uint16_t i = 0; i < length; i++) {
+				stateOfEvents[static_cast<uint16_t> (eventID[i])] = 0;
+			}
+		}
+		disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 	}
-	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
-void EventReportService::requestListOfDisabledEvents() {
+void EventReportService::requestListOfDisabledEvents(Message message) {
 	// TC[5,7]
 	// I think this is all that is needed here.
-	listOfDisabledEventsReport();
+	if (message.serviceType == 5 && message.packetType == Message::TC && message.messageType == 7) {
+		listOfDisabledEventsReport();
+	}
 }
 
 void EventReportService::listOfDisabledEventsReport() {

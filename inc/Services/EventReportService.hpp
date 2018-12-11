@@ -147,23 +147,26 @@ public:
 	 * TC[5,5] request to enable report generation
 	 * Telecommand to enable the report generation of event definitions
 	 */
-	void enableReportGeneration(uint16_t length, Event *eventID);
+	void enableReportGeneration(Message message);
 
 	/**
 	 * TC[5,6] request to disable report generation
 	 * Telecommand to disable the report generation of event definitions
+	 * @param message
 	 */
-	void disableReportGeneration(uint16_t length, Event *eventID);
+	void disableReportGeneration(Message message);
 
 	/**
 	 * TC[5,7] request to report the disabled event definitions
 	 * Note: No arguments, according to the standard.
+	 * @param message
 	 */
-	void requestListOfDisabledEvents();
+	void requestListOfDisabledEvents(Message message);
 
 	/**
 	 * TM[5,8] disabled event definitions report
 	 * Telemetry package of a report of the disabled event definitions
+	 * @param message
 	 */
 	void listOfDisabledEventsReport();
 

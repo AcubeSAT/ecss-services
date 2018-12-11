@@ -92,7 +92,11 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	eventReportService.getStateOfEvents().reset();
 	EventReportService::Event eventID[] = {EventReportService::AssertionFail,
 	                                       EventReportService::LowSeverityUnknownEvent};
-	eventReportService.enableReportGeneration(2, eventID);
+	Message message(5, 5, Message::TC, 1);
+	message.appendUint16(2);
+	message.appendEnum16(eventID[0]);
+	message.appendEnum16(eventID[1]);
+	eventReportService.enableReportGeneration(message);
 	CHECK(eventReportService.getStateOfEvents()[2] == 1);
 	CHECK(eventReportService.getStateOfEvents()[4] == 1);
 }
@@ -101,7 +105,11 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	EventReportService eventReportService;
 	EventReportService::Event eventID[] = {EventReportService::InformativeUnknownEvent,
 	                                       EventReportService::MediumSeverityUnknownEvent};
-	eventReportService.disableReportGeneration(2, eventID);
+	Message message(5, 6, Message::TC, 1);
+	message.appendUint16(2);
+	message.appendEnum16(eventID[0]);
+	message.appendEnum16(eventID[1]);
+	eventReportService.disableReportGeneration(message);
 	CHECK(eventReportService.getStateOfEvents()[0] == 0);
 	CHECK(eventReportService.getStateOfEvents()[5] == 0);
 
@@ -113,7 +121,8 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 
 TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
 	EventReportService eventReportService;
-	eventReportService.requestListOfDisabledEvents();
+	Message message(5, 7, Message::TC, 1);
+	eventReportService.requestListOfDisabledEvents(message);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -125,8 +134,12 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	EventReportService eventReportService;
 	EventReportService::Event eventID[] = {EventReportService::MCUStart,
 	                                       EventReportService::HighSeverityUnknownEvent};
+	Message message(5, 6, Message::TC, 1);
+	message.appendUint16(2);
+	message.appendEnum16(eventID[0]);
+	message.appendEnum16(eventID[1]);
 	// Disable 3rd and 6th
-	eventReportService.disableReportGeneration(2, eventID);
+	eventReportService.disableReportGeneration(message);
 	eventReportService.listOfDisabledEventsReport();
 	REQUIRE(ServiceTests::hasOneMessage());
 
@@ -145,7 +158,10 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	EventReportService eventReportService;
 	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
-	eventReportService.disableReportGeneration(1, eventID);
+	Message message(5, 6, Message::TC, 1);
+	message.appendUint16(1);
+	message.appendEnum16(eventID[0]);
+	eventReportService.disableReportGeneration(message);
 
 	const unsigned char eventReportData[] = "HelloWorld";
 
