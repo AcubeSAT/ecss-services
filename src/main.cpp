@@ -173,10 +173,20 @@ int main() {
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
 										 EventReportService::MediumSeverityUnknownEvent};
 	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
-	eventReportService.disableReportGeneration(2, eventIDs);
+	Message eventMessage(5, 6, Message::TC, 1);
+	eventMessage.appendUint16(2);
+	eventMessage.appendEnum16(eventIDs[0]);
+	eventMessage.appendEnum16(eventIDs[1]);
+
+	Message eventMessage2(5, 5, Message::TC, 1);
+	eventMessage2.appendUint16(1);
+	eventMessage2.appendEnum16(eventIDs2[0]);
+
+	Message eventMessage3(5, 7, Message::TC, 1);
+	eventReportService.disableReportGeneration(eventMessage);
 	eventReportService.listOfDisabledEventsReport();
-	eventReportService.enableReportGeneration(1, eventIDs2);
-	eventReportService.requestListOfDisabledEvents();
+	eventReportService.enableReportGeneration(eventMessage2);
+	eventReportService.requestListOfDisabledEvents(eventMessage3);
 
 	return 0;
 }
