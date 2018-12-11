@@ -21,6 +21,8 @@ public:
 	}
 
 	/**
+	 * TM[9,2] CUC time report
+	 *
 	 * @param seconds the seconds provided from the RTC. This function in general should have
 	 * parameters corresponding with the RTC. For the time being we assume that the RTC has a
 	 * 32-bit counter that counts seconds(the RTC in Nucleo F103RB!)
