@@ -136,3 +136,8 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	CHECK(report.readEnum16() == 3);
 	CHECK(report.readEnum16() == 6);
 }
+
+TEST_CASE("List of observables 6.5.6", "[service][st05]") {
+	EventReportService eventReportService;
+
+}

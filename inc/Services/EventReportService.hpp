@@ -39,6 +39,10 @@ public:
 		mediumSeverityReportCount = 0;
 		highSeverityReportCount = 0;
 		disabledEventsCount = 0;
+		lastInformativeEventReportID = -1;
+		lastLowSeverityReportID = -1;
+		lastMediumSeverityReportID = -1;
+		lastHighSeverityReportID = -1;
 	}
 
 	/**
@@ -161,13 +165,14 @@ public:
 	std::bitset<numberOfEvents> getStateOfEvents() {
 		return stateOfEvents;
 	}
+
 	/**
 	 * Getter for count of disabled events
 	 */
-	 uint16_t getDisabledEventsCount(){
+	uint16_t getDisabledEventsCount() {
 		uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
-	 	return numberOfDisabledEvents;
-	 }
+		return numberOfDisabledEvents;
+	}
 
 };
 
