@@ -21,7 +21,7 @@ private:
 	std::bitset<numberOfEvents> stateOfEvents;
 public:
 	// Variables that count the event reports per severity level
-	uint16_t lowSeverityReportsCount;
+	uint16_t lowSeverityReportCount;
 	uint16_t mediumSeverityReportCount;
 	uint16_t highSeverityReportCount;
 
@@ -39,16 +39,16 @@ public:
 	EventReportService() {
 		stateOfEvents.set();
 		serviceType = 5;
-		lowSeverityReportsCount = 0;
+		lowSeverityReportCount = 0;
 		mediumSeverityReportCount = 0;
 		highSeverityReportCount = 0;
 		disabledEventsCount = 0;
 		lowSeverityEventCount = 0;
 		mediumSeverityEventCount = 0;
 		highSeverityEventCount = 0;
-		lastLowSeverityReportID = -1;
-		lastMediumSeverityReportID = -1;
-		lastHighSeverityReportID = -1;
+		lastLowSeverityReportID = 65535;
+		lastMediumSeverityReportID = 65535;
+		lastHighSeverityReportID = 65535;
 	}
 
 	/**
@@ -171,15 +171,6 @@ public:
 	std::bitset<numberOfEvents> getStateOfEvents() {
 		return stateOfEvents;
 	}
-
-	/**
-	 * Getter for count of disabled events
-	 */
-	uint16_t getDisabledEventsCount() {
-		uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
-		return numberOfDisabledEvents;
-	}
-
 };
 
 #endif //ECSS_SERVICES_EVENTREPORTSERVICE_HPP

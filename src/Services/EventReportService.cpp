@@ -24,7 +24,7 @@ EventReportService::lowSeverityAnomalyReport(Event eventID, const uint8_t *data,
 	lowSeverityEventCount++;
 	// TM[5,2]
 	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
-		lowSeverityReportsCount++;
+		lowSeverityReportCount++;
 		Message report = createTM(2);
 		report.appendEnum16(eventID);
 		report.appendString(length, data);
@@ -75,6 +75,7 @@ void EventReportService::enableReportGeneration(uint16_t length, Event *eventID)
 			stateOfEvents[static_cast<uint16_t> (eventID[i])] = 1;
 		}
 	}
+	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
 void EventReportService::disableReportGeneration(uint16_t length, Event *eventID) {
@@ -87,6 +88,7 @@ void EventReportService::disableReportGeneration(uint16_t length, Event *eventID
 			stateOfEvents[static_cast<uint16_t> (eventID[i])] = 0;
 		}
 	}
+	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
 void EventReportService::requestListOfDisabledEvents() {

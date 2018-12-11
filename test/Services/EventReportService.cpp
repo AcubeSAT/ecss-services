@@ -144,5 +144,28 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 
 TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	EventReportService eventReportService;
+	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
+	eventReportService.disableReportGeneration(1, eventID);
 
+	const unsigned char eventReportData[] = "HelloWorld";
+
+	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
+	                                             eventReportData,
+	                                             10);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent,
+		                                         eventReportData,
+		                                         10);
+	CHECK(eventReportService.lowSeverityReportCount == 0);
+	CHECK(eventReportService.mediumSeverityReportCount == 1);
+	CHECK(eventReportService.highSeverityReportCount == 0);
+
+	CHECK(eventReportService.lowSeverityEventCount == 0);
+	CHECK(eventReportService.mediumSeverityEventCount == 1);
+	CHECK(eventReportService.highSeverityEventCount == 1);
+
+	CHECK(eventReportService.disabledEventsCount == 1);
+
+	CHECK(eventReportService.lastLowSeverityReportID == 65535);
+	CHECK(eventReportService.lastMediumSeverityReportID == 5);
+	CHECK(eventReportService.lastHighSeverityReportID == 65535);
 }
