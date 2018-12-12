@@ -47,7 +47,7 @@ public:
 	 */
 	enum LowSeverityAnomalyEvent {
 		/**
-		 * An unknown anomaly of low severity anomalyhas occurred
+		 * An unknown anomaly of low severity anomaly has occurred
 		 */
 			LowSeverityUnknownEvent = 1,
 	};
@@ -82,7 +82,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void informativeEventReport(InformationEvent eventID, const uint8_t *data, uint8_t length);
+	void informativeEventReport(InformationEvent eventID, String<64> data);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
@@ -95,7 +95,7 @@ public:
 	 * @param length the length of the data
 	 */
 	void
-	lowSeverityAnomalyReport(LowSeverityAnomalyEvent eventID, const uint8_t *data, uint8_t length);
+	lowSeverityAnomalyReport(LowSeverityAnomalyEvent eventID, String<64> data);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
@@ -107,8 +107,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void mediumSeverityAnomalyReport(MediumSeverityAnomalyEvent eventID, const uint8_t *data,
-	                                 uint8_t length);
+	void mediumSeverityAnomalyReport(MediumSeverityAnomalyEvent eventID, String<64> data);
 
 	/**
 	 * TM[5,4] high severity anomaly report
@@ -120,8 +119,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, const uint8_t *data,
-	                               uint8_t length);
+	void highSeverityAnomalyReport(HighSeverityAnomalyEvent eventID, String<64> data);
 
 };
 

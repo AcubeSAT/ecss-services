@@ -1,10 +1,16 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
+// Forward declaration of the Message class, needed for the ErrorHandler
+class Message;
+
 #include "ECSS_Definitions.hpp"
 #include <cstdint>
 #include <cassert>
-#include <iostream>
+#include <etl/String.hpp>
+#include <etl/wstring.h>
+#include "ErrorHandler.hpp"
+#include "macros.hpp"
 
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
@@ -78,23 +84,12 @@ public:
 	void appendWord(uint32_t value);
 
 	/**
-	 * Appends \p size bytes to the message
+	 * Appends a number of bytes to the message
 	 *
-	 * @param size The amount of byte to append
-	 * @param value An array containing at least \p size bytes
-	 * @todo See if more than uint8_t strings will be supported
+	 * @param string The string to insert
 	 */
-	void appendString(uint8_t size, const char *value);
-
-	/**
-	 * Appends \p size bytes to the message
-	 *
-	 * @param size The amount of byte to append
-	 * @param value An array containing at least \p size bytes
-	 * @todo See if more than uint8_t strings will be supported
-	 * @todo Is uint16_t size too much or not enough? It has to be defined
-	 */
-	void appendString(uint16_t size, const uint8_t *value);
+	template<const size_t SIZE>
+	void appendString(const String<SIZE> & string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -269,9 +264,14 @@ public:
 	 *
 	 * PTC = 7, PFC = 0
 	 */
-	void appendOctetString(uint16_t size, uint8_t *byteString) {
-		appendUint16(size);
-		appendString(size, byteString);
+	template<const size_t SIZE>
+	void appendOctetString(const String<SIZE> & string) {
+		// Make sure that the string is large enough to count
+		assertI(string.size() <= (std::numeric_limits<uint16_t>::max)(),
+			ErrorHandler::StringTooLarge);
+
+		appendUint16(string.size());
+		appendString(string);
 	}
 
 	/**
@@ -425,6 +425,17 @@ public:
 	 */
 	void resetRead();
 };
+
+template<const size_t SIZE>
+inline void Message::appendString(const String<SIZE> & string) {
+	assertI(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	// TODO: Do we need to keep this check? How does etl::string handle it?
+	assertI(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
+
+	memcpy(data + dataSize, string.data(), string.size());
+
+	dataSize += string.size();
+}
 
 
 #endif //ECSS_SERVICES_PACKET_H

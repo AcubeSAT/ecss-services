@@ -18,10 +18,10 @@ TEST_CASE("TM[6,2]", "[service][st06]") {
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(2); // Iteration count
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
-	receivedPacket.appendOctetString(2, data);
+	receivedPacket.appendOctetString(String<2>(data));
 	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 2)); // Append CRC
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(pStr + 2)); // Start address
-	receivedPacket.appendOctetString(1, data); // Append CRC
+	receivedPacket.appendOctetString(String<1>(data)); // Append CRC
 	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 1));
 	memMangService.rawDataMemorySubservice.loadRawData(receivedPacket);
 
