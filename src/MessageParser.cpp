@@ -1,4 +1,7 @@
+#include <cstring>
+#include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
+#include "macros.hpp"
 #include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
 

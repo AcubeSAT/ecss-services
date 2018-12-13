@@ -2,6 +2,7 @@
 #include <Services/TestService.hpp>
 #include <Services/RequestVerificationService.hpp>
 #include <Message.hpp>
+#include <cstring>
 #include "MessageParser.hpp"
 #include "Services/ServiceTests.hpp"
 
