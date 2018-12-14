@@ -17,9 +17,9 @@ add_custom_target(check
 add_library(common OBJECT
         src/ErrorHandler.cpp
         src/Message.cpp
-	    src/MessageParser.cpp
+	src/MessageParser.cpp
         src/Helpers/CRCHelper.cpp
-	    src/Services/EventReportService.cpp
+	src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
@@ -41,5 +41,6 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             $<TARGET_OBJECTS:common>
             ${test_main_SRC}
             ${test_SRC})
+
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()

@@ -125,7 +125,7 @@ int main() {
 	receivedMessage = Message(1, 10, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage);
 
-	// ST[05] test [works]
+	// ST[05] (5,1 to 5,4) test [works]
 	const unsigned char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
 	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
@@ -168,6 +168,25 @@ int main() {
 	Message errorMessage(0, 0, Message::TC, 1);
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
+
+	// ST[05] (5,5 to 5,8) test [works]
+	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
+										 EventReportService::MediumSeverityUnknownEvent};
+	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
+	Message eventMessage(5, 6, Message::TC, 1);
+	eventMessage.appendUint16(2);
+	eventMessage.appendEnum16(eventIDs[0]);
+	eventMessage.appendEnum16(eventIDs[1]);
+
+	Message eventMessage2(5, 5, Message::TC, 1);
+	eventMessage2.appendUint16(1);
+	eventMessage2.appendEnum16(eventIDs2[0]);
+
+	Message eventMessage3(5, 7, Message::TC, 1);
+	eventReportService.disableReportGeneration(eventMessage);
+	eventReportService.listOfDisabledEventsReport();
+	eventReportService.enableReportGeneration(eventMessage2);
+	eventReportService.requestListOfDisabledEvents(eventMessage3);
 
 	return 0;
 }
