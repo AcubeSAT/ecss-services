@@ -13,32 +13,61 @@ void EventActionService::addEventActionDefinitions(Message message){
 
 void EventActionService::deleteEventActionDefinitions(Message message) {
 	// TC[19,2]
+	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
+	                                                                     == 19){
+
+	}
 }
 
 void EventActionService::deleteAllEventActionDefinitions(Message message) {
 	// TC[19,3]
+	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
+	                                                                     == 19){
+
+	}
 }
 
 void EventActionService::enableEventActionDefinitions(Message message) {
 	// TC[19,4]
+	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
+	                                                                     == 19){
+
+	}
 }
 
 void EventActionService::disableEventActionDefinitions(Message message) {
 	// TC[19,5]
+	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
+	                                                                     == 19){
+
+	}
 }
 
 void EventActionService::requestEventActionDefinitionStatus(Message message) {
 	// TC[19,6]
+	if (message.messageType == 6 && message.packetType == Message::TC && message.serviceType
+	                                                                     == 19){
+
+	}
 }
 
 void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
+
 }
 
 void EventActionService::enableEventActionFunction(Message message) {
 	// TC[19,8]
+	if (message.messageType == 8 && message.packetType == Message::TC && message.serviceType
+	                                                                     == 19){
+
+	}
 }
 
 void EventActionService::disableEventActionFunction(Message message) {
 	// TC[19,9]
+	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
+	                                                                     == 19){
+
+	}
 }
