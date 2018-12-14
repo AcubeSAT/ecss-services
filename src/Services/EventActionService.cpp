@@ -18,6 +18,10 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 	// TC[19,2]
 	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19){
+		int N = message.readUint16();
+		for (uint16_t i = 0; i < N; i++){
+
+		}
 
 	}
 }
@@ -34,6 +38,10 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	// TC[19,4]
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19){
+		int N = message.readUint16();
+		for (uint16_t i = 0; i < N; i++){
+
+		}
 
 	}
 }
@@ -42,6 +50,10 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	// TC[19,5]
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19){
+		int N = message.readUint16();
+		for (uint16_t i = 0; i < N; i++){
+
+		}
 
 	}
 }
