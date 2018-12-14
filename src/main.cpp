@@ -164,6 +164,7 @@ int main() {
 
 	// ST[09] test
 	TimeManagementService timeReport;
-	timeReport.cucTimeReport(60);
+	timeReport.cucTimeReport();
+
 	return 0;
 }

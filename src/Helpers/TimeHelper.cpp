@@ -30,10 +30,14 @@ uint64_t TimeHelper::implementCUCTimeFormat(uint32_t seconds) {
 	/**
 	 * Define time format including P-field and T-Field
 	 *
-	 * Note: Only the 40 bits of the 64 will be used for the timeFormat(0-7 : P-field, 8-39:
-	 * T-field)
+	 * Notes:
+	 * Only the 40 bits of the 64 will be used for the timeFormat(0-7 : P-field, 8-39: T-field)
+	 *
+	 * Shift operators have high priority. That's why we should do a type-casting first so we
+	 * don't lose valuable bits
 	*/
-	uint64_t timeFormat = (totalSeconds << 8 | pField);
+	uint64_t timeFormat = (static_cast<uint64_t>(totalSeconds) << 8 | pField);
+
 
 	return timeFormat;
 }
