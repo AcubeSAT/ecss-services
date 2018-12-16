@@ -86,8 +86,15 @@ public:
 	/**
 	 * Setter for event-action status
 	 */
-	void setEventActionStatus(EventActionStatus){
+	void setEventActionStatus(EventActionStatus e){
+		eventActionStatus = e;
+	}
 
+	/**
+	 * Setter for event-action function status
+	 */
+	void setEventActionFunctionStatus(EventActionFunctionStatus e){
+		eventActionFunctionStatus = e;
 	}
 };
 
