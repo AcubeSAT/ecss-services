@@ -16,16 +16,19 @@ public:
 
 	/**
 	 * Event-action status
-	 *
-	 * Note: In the standard 8.19.3.a and 8.19.3.b there are two enums with the same enum values
-	 * (event-action status and event-action function status). I discarded the function one,
-	 * because I think one enum is enough.
 	 */
 	enum eventActionStatus{
 		disabled = 0,
 		enabled = 1,
 	};
 
+	/**
+	 * Event-action function status
+	 */
+	enum eventActionFunctionStatus {
+		disabledFunction = 1,
+		enabledFunction = 0,
+	};
 	/**
 	 * TC[19,1] add event-action definitions
 	 */
