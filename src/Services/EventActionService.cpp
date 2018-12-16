@@ -68,7 +68,9 @@ void EventActionService::requestEventActionDefinitionStatus(Message message) {
 
 void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
+	Message report = createTM(7);
 
+	storeMessage(report);
 }
 
 void EventActionService::enableEventActionFunction(Message message) {
