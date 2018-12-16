@@ -9,15 +9,24 @@
  * status
  */
 class EventActionService : public Service {
+/**
+ * @todo: check if this should be private or not
+ */
+private:
+	uint8_t eventActionStatus;
+	uint8_t eventActionFunctionStatus;
 public:
 	EventActionService() {
 		serviceType = 19;
+		eventActionStatus = EventActionStatus::enabled;
+		eventActionFunctionStatus = EventActionFunctionStatus::enabledFunction;
 	}
+
 
 	/**
 	 * Event-action status
 	 */
-	enum eventActionStatus{
+	enum EventActionStatus{
 		disabled = 0,
 		enabled = 1,
 	};
@@ -25,7 +34,7 @@ public:
 	/**
 	 * Event-action function status
 	 */
-	enum eventActionFunctionStatus {
+	enum EventActionFunctionStatus {
 		disabledFunction = 1,
 		enabledFunction = 0,
 	};
@@ -73,6 +82,13 @@ public:
 	 * TC[19,9] disable the event-actioni function
 	 */
 	void disableEventActionFunction(Message message);
+
+	/**
+	 * Setter for event-action status
+	 */
+	void setEventActionStatus(EventActionStatus){
+
+	}
 };
 
 #endif //ECSS_SERVICES_EVENTACTIONSERVICE_HPP
