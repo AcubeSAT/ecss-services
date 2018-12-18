@@ -77,6 +77,7 @@ void EventActionService::enableEventActionFunction(Message message) {
 	// TC[19,8]
 	if (message.messageType == 8 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19){
+		setEventActionFunctionStatus(EventActionFunctionStatus::enabledFunction);
 	}
 }
 
@@ -84,5 +85,6 @@ void EventActionService::disableEventActionFunction(Message message) {
 	// TC[19,9]
 	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19){
+		setEventActionFunctionStatus(EventActionFunctionStatus::disabledFunction);
 	}
 }
