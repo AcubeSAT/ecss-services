@@ -5,38 +5,26 @@
 /**
  * Implementation of ST[19] event-action Service
  *
- * @todo: check if two enums are need for both event-action status and event-action definition
- * status
+ * @todo: Do something with the applicationID.
  */
 class EventActionService : public Service {
 /**
  * @todo: check if this should be private or not
  */
 private:
-	uint8_t eventActionStatus;
 	uint8_t eventActionFunctionStatus;
 public:
 	EventActionService() {
 		serviceType = 19;
-		eventActionStatus = EventActionStatus::enabled;
-		eventActionFunctionStatus = EventActionFunctionStatus::enabledFunction;
+		eventActionFunctionStatus = enabledFunction;
 	}
-
-
-	/**
-	 * Event-action status
-	 */
-	enum EventActionStatus{
-		disabled = 0,
-		enabled = 1,
-	};
 
 	/**
 	 * Event-action function status
 	 */
 	enum EventActionFunctionStatus {
-		disabledFunction = 1,
-		enabledFunction = 0,
+		disabledFunction = 0,
+		enabledFunction = 1,
 	};
 	/**
 	 * TC[19,1] add event-action definitions
@@ -82,13 +70,6 @@ public:
 	 * TC[19,9] disable the event-actioni function
 	 */
 	void disableEventActionFunction(Message message);
-
-	/**
-	 * Setter for event-action status
-	 */
-	void setEventActionStatus(EventActionStatus e){
-		eventActionStatus = e;
-	}
 
 	/**
 	 * Setter for event-action function status
