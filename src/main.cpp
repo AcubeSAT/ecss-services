@@ -6,6 +6,7 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/TimeManagementService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
@@ -173,7 +174,11 @@ int main() {
 
 	// TimeHelper test
 	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
-	std::cout << "\n" << test;
+	std::cout << "\n" << test << "\n";
+
+	// ST[09] test
+	TimeManagementService timeReport;
+	timeReport.cucTimeReport();
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
