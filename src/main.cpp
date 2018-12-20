@@ -9,7 +9,9 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
+
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -69,7 +71,7 @@ int main() {
 
 	MemoryManagementService memMangService;
 	Message rcvPack = Message(6, 5, Message::TC, 1);
-	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(string)); // Start address
 	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
@@ -84,13 +86,25 @@ int main() {
 	rcvPack = Message(6, 2, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
-	rcvPack.appendEnum8(MemoryManagementService::MemoryID::RAM); // Memory ID
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
 	rcvPack.appendOctetString(2, data);
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2)); // Append the CRC value
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
 	rcvPack.appendOctetString(1, data);
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
+
+	rcvPack = Message(6, 9, Message::TC, 1);
+
+	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.appendUint16(2); // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(data)); // Start address
+	rcvPack.appendUint16(2);
+	rcvPack.appendUint64(reinterpret_cast<uint64_t >(data + 1)); // Start address
+	rcvPack.appendUint16(1);
+	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
 
 	// ST[01] test
@@ -112,7 +126,7 @@ int main() {
 	receivedMessage = Message(1, 10, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage);
 
-	// ST[05] test [works]
+	// ST[05] (5,1 to 5,4) test [works]
 	const unsigned char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
 	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
@@ -156,9 +170,29 @@ int main() {
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
 
+
 	// TimeHelper test
 	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
 	std::cout << "\n" << test;
+
+	// ST[05] (5,5 to 5,8) test [works]
+	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
+										 EventReportService::MediumSeverityUnknownEvent};
+	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
+	Message eventMessage(5, 6, Message::TC, 1);
+	eventMessage.appendUint16(2);
+	eventMessage.appendEnum16(eventIDs[0]);
+	eventMessage.appendEnum16(eventIDs[1]);
+
+	Message eventMessage2(5, 5, Message::TC, 1);
+	eventMessage2.appendUint16(1);
+	eventMessage2.appendEnum16(eventIDs2[0]);
+
+	Message eventMessage3(5, 7, Message::TC, 1);
+	eventReportService.disableReportGeneration(eventMessage);
+	eventReportService.listOfDisabledEventsReport();
+	eventReportService.enableReportGeneration(eventMessage2);
+	eventReportService.requestListOfDisabledEvents(eventMessage3);
 
 	return 0;
 }
