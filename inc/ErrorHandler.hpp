@@ -50,6 +50,11 @@ public:
 		 * A string is larger than the largest allowed string
 		 */
 			StringTooLarge = 4,
+
+		/**
+		 * An error in the header of a packet makes it unable to be parsed
+		 */
+			UnacceptablePacket = 5,
 	};
 
 	/**
@@ -72,6 +77,10 @@ public:
 		 * Cannot read a string, because it is larger than the largest allowed string
 		 */
 			StringTooShort = 4,
+		/**
+		 * Cannot parse a Message, because there is an error in its secondary header
+		 */
+		    UnacceptableMessage = 5,
 	};
 
 	/**
