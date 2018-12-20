@@ -11,7 +11,7 @@
  * The chosen time format is CUC. The reasons for this selection are the followings:
  * 1)It is more flexible from the CSD. The designer is free to decide how much memory will use
  * for the time unit and what that time unit will be(seconds, minutes, hours etc.).
- * 2)It can use TAI(international atomic time) as reference time scale. So there is not need
+ * 2)It can use TAI(international atomic time) as reference time scale. So there is no need
  * to worry about leap seconds(code UTC-based)
  *
  * Note: The implementation of the time formats are in general RTC-dependent. First, we need to
@@ -20,7 +20,7 @@
 class TimeHelper {
 public:
 	/**
-	 * Implement the CUC time format
+	 * Generate the CUC time format
 	 *
 	 * @details The CUC time format consists of two main fields: the time code preamble field
 	 * (P-field) and the time specification field(T-field). The P-Field is the metadata for the
