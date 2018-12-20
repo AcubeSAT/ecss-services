@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Helpers/CRCHelper.hpp"
+#include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
@@ -168,6 +169,11 @@ int main() {
 	Message errorMessage(0, 0, Message::TC, 1);
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
+
+
+	// TimeHelper test
+	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
+	std::cout << "\n" << test;
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
