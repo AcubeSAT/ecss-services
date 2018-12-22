@@ -1,7 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
-#include "Message.hpp"
+// Forward declaration of the class, since its header file depends on the ErrorHandler
+class Message;
 
 /**
  * A class that handles unexpected software errors, including internal errors or errors due to

@@ -1,21 +1,24 @@
 #include <iostream>
 #include "Helpers/CRCHelper.hpp"
+#include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/TimeManagementService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
+#include "etl/String.hpp"
 
 
 int main() {
 	Message packet = Message(0, 0, Message::TC, 1);
 
-	packet.appendString(5, "hello");
+	packet.appendString<5>("hello");
 	packet.appendBits(15, 0x28a8);
 	packet.appendBits(1, 1);
 	packet.appendFloat(5.7);
@@ -88,10 +91,10 @@ int main() {
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr)); // Start address
-	rcvPack.appendOctetString(2, data);
+	rcvPack.appendOctetString(String<2>(data, 2));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2)); // Append the CRC value
 	rcvPack.appendUint64(reinterpret_cast<uint64_t >(pStr + 1)); // Start address
-	rcvPack.appendOctetString(1, data);
+	rcvPack.appendOctetString(String<1>(data, 1));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
 
@@ -125,17 +128,17 @@ int main() {
 	receivedMessage = Message(1, 10, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage);
 
-	// ST[05] test [works]
-	const unsigned char eventReportData[12] = "Hello World";
+	// ST[05] (5,1 to 5,4) test [works]
+	const char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
 	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
-	                                          eventReportData, 11);
+	                                          eventReportData);
 	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent,
-	                                            eventReportData, 11);
+	                                            eventReportData);
 	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent,
-	                                               eventReportData, 11);
+	                                               eventReportData);
 	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
-	                                             eventReportData, 11);
+	                                             eventReportData);
 
 	// MessageParser class test
 	std::cout << "\n";
@@ -168,6 +171,34 @@ int main() {
 	Message errorMessage(0, 0, Message::TC, 1);
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
+
+
+	// TimeHelper test
+	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
+	std::cout << "\n" << test << "\n";
+
+	// ST[09] test
+	TimeManagementService timeReport;
+	timeReport.cucTimeReport();
+
+	// ST[05] (5,5 to 5,8) test [works]
+	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
+										 EventReportService::MediumSeverityUnknownEvent};
+	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
+	Message eventMessage(5, 6, Message::TC, 1);
+	eventMessage.appendUint16(2);
+	eventMessage.appendEnum16(eventIDs[0]);
+	eventMessage.appendEnum16(eventIDs[1]);
+
+	Message eventMessage2(5, 5, Message::TC, 1);
+	eventMessage2.appendUint16(1);
+	eventMessage2.appendEnum16(eventIDs2[0]);
+
+	Message eventMessage3(5, 7, Message::TC, 1);
+	eventReportService.disableReportGeneration(eventMessage);
+	eventReportService.listOfDisabledEventsReport();
+	eventReportService.enableReportGeneration(eventMessage2);
+	eventReportService.requestListOfDisabledEvents(eventMessage3);
 
 	return 0;
 }

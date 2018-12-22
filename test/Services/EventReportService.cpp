@@ -9,10 +9,10 @@
  */
 TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	EventReportService eventReportService;
-	const unsigned char eventReportData[] = "HelloWorld";
+	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
-	                                          eventReportData, 10);
+	                                          eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -24,15 +24,15 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.readEnum16() == 0);
 	report.readString(checkString, 10);
-	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
+	CHECK(strcmp(checkString, eventReportData) == 0);
 }
 
 TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	EventReportService eventReportService;
-	const unsigned char eventReportData[] = "HelloWorld";
+	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent,
-	                                            eventReportData, 10);
+	                                            eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -42,17 +42,17 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 1);
+	CHECK(report.readEnum16() == 4);
 	report.readString(checkString, 10);
-	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
+	CHECK(strcmp(checkString, eventReportData) == 0);
 }
 
 TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	EventReportService eventReportService;
-	const unsigned char eventReportData[] = "HelloWorld";
+	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.mediumSeverityAnomalyReport
-		(EventReportService::MediumSeverityUnknownEvent, eventReportData, 10);
+		(EventReportService::MediumSeverityUnknownEvent, eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -62,17 +62,17 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 2);
+	CHECK(report.readEnum16() == 5);
 	report.readString(checkString, 10);
-	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
+	CHECK(strcmp(checkString, eventReportData) == 0);
 }
 
 TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	EventReportService eventReportService;
-	const unsigned char eventReportData[] = "HelloWorld";
+	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
-	                                             eventReportData, 10);
+	                                             eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -82,7 +82,104 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 3);
+	CHECK(report.readEnum16() == 6);
 	report.readString(checkString, 10);
-	CHECK(strcmp(checkString, reinterpret_cast<const char *>(eventReportData)) == 0);
+	CHECK(strcmp(checkString, eventReportData) == 0);
+}
+
+TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
+	EventReportService eventReportService;
+	eventReportService.getStateOfEvents().reset();
+	EventReportService::Event eventID[] = {EventReportService::AssertionFail,
+	                                       EventReportService::LowSeverityUnknownEvent};
+	Message message(5, 5, Message::TC, 1);
+	message.appendUint16(2);
+	message.appendEnum16(eventID[0]);
+	message.appendEnum16(eventID[1]);
+	eventReportService.enableReportGeneration(message);
+	CHECK(eventReportService.getStateOfEvents()[2] == 1);
+	CHECK(eventReportService.getStateOfEvents()[4] == 1);
+}
+
+TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
+	EventReportService eventReportService;
+	EventReportService::Event eventID[] = {EventReportService::InformativeUnknownEvent,
+	                                       EventReportService::MediumSeverityUnknownEvent};
+	Message message(5, 6, Message::TC, 1);
+	message.appendUint16(2);
+	message.appendEnum16(eventID[0]);
+	message.appendEnum16(eventID[1]);
+	eventReportService.disableReportGeneration(message);
+	CHECK(eventReportService.getStateOfEvents()[0] == 0);
+	CHECK(eventReportService.getStateOfEvents()[5] == 0);
+
+	const String<64> eventReportData = "HelloWorld";
+	eventReportService.highSeverityAnomalyReport(EventReportService::InformativeUnknownEvent,
+	                                             eventReportData);
+	CHECK(ServiceTests::hasOneMessage() == false);
+}
+
+TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
+	EventReportService eventReportService;
+	Message message(5, 7, Message::TC, 1);
+	eventReportService.requestListOfDisabledEvents(message);
+	REQUIRE(ServiceTests::hasOneMessage());
+
+	Message report = ServiceTests::get(0);
+	// Check if there is message of type 8 created
+	CHECK(report.messageType == 8);
+}
+
+TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
+	EventReportService eventReportService;
+	EventReportService::Event eventID[] = {EventReportService::MCUStart,
+	                                       EventReportService::HighSeverityUnknownEvent};
+	Message message(5, 6, Message::TC, 1);
+	message.appendUint16(2);
+	message.appendEnum16(eventID[0]);
+	message.appendEnum16(eventID[1]);
+	// Disable 3rd and 6th
+	eventReportService.disableReportGeneration(message);
+	eventReportService.listOfDisabledEventsReport();
+	REQUIRE(ServiceTests::hasOneMessage());
+
+	Message report = ServiceTests::get(0);
+	// Check for the data-members of the report Message created
+	CHECK(report.serviceType == 5);
+	CHECK(report.messageType == 8);
+	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
+	REQUIRE(report.dataSize == 6);
+	// Check for the information stored in report
+	CHECK(report.readHalfword() == 2);
+	CHECK(report.readEnum16() == 3);
+	CHECK(report.readEnum16() == 6);
+}
+
+TEST_CASE("List of observables 6.5.6", "[service][st05]") {
+	EventReportService eventReportService;
+	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
+	Message message(5, 6, Message::TC, 1);
+	message.appendUint16(1);
+	message.appendEnum16(eventID[0]);
+	eventReportService.disableReportGeneration(message);
+
+	const String<64> eventReportData = "HelloWorld";
+
+	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
+	                                             eventReportData);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent,
+		                                         eventReportData);
+	CHECK(eventReportService.lowSeverityReportCount == 0);
+	CHECK(eventReportService.mediumSeverityReportCount == 1);
+	CHECK(eventReportService.highSeverityReportCount == 0);
+
+	CHECK(eventReportService.lowSeverityEventCount == 0);
+	CHECK(eventReportService.mediumSeverityEventCount == 1);
+	CHECK(eventReportService.highSeverityEventCount == 1);
+
+	CHECK(eventReportService.disabledEventsCount == 1);
+
+	CHECK(eventReportService.lastLowSeverityReportID == 65535);
+	CHECK(eventReportService.lastMediumSeverityReportID == 5);
+	CHECK(eventReportService.lastHighSeverityReportID == 65535);
 }

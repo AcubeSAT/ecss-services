@@ -66,24 +66,6 @@ void Message::appendWord(uint32_t value) {
 	dataSize += 4;
 }
 
-void Message::appendString(uint8_t size, const char *value) {
-	assertI(dataSize + size < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
-	assertI(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooLarge);
-
-	memcpy(data + dataSize, value, size);
-
-	dataSize += size;
-}
-
-void Message::appendString(uint16_t size, const uint8_t *value) {
-	assertI(dataSize + size <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
-	assertI(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooLarge);
-
-	memcpy(data + dataSize, value, size);
-
-	dataSize += size;
-}
-
 uint16_t Message::readBits(uint8_t numBits) {
 	assertR(numBits <= 16, ErrorHandler::TooManyBitsRead);
 	// TODO: Add assert

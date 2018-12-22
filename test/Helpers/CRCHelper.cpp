@@ -1,7 +1,7 @@
 #include "catch2/catch.hpp"
 #include "Helpers/CRCHelper.hpp"
 
-TEST_CASE("CRC calculation - Basic string tests") {
+TEST_CASE("CRC calculation - Basic String tests") {
 	CHECK(CRCHelper::calculateCRC((uint8_t*) "Raccoon Squad!", 14) == 0x08FC);
 	CHECK(CRCHelper::calculateCRC((uint8_t*) "ASAT", 4) == 0xBFFA);
 	CHECK(CRCHelper::calculateCRC((uint8_t*) "All your space are belong to us", 31) == 0x545F);
