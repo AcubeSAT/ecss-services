@@ -19,7 +19,7 @@
  * This class is a child of etl::string that provides some extra functionality that might be
  * useful to us. For the full documentation, look at https://www.etlcpp.com/string.html
  *
- * Strings defined using the String class do NOT have a null-terminating byte
+ * Strings defined using the String class <b>do NOT have a null-terminating byte</b>
  *
  * @tparam MAX_SIZE The maximum size of the strings
  */
