@@ -1,6 +1,7 @@
 #include "Services/MemoryManagementService.hpp"
 #include <iostream>
 #include <cerrno>
+#include <etl/String.hpp>
 
 // Define the constructors for the classes
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
@@ -106,7 +107,8 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 				// This part is repeated N-times (N = iteration count)
 				report.appendUint64(startAddress); // Start address
-				report.appendOctetString(readLength, readData); // Save the read data
+				report.appendOctetString(String<1024>(readData, readLength)); // Save the
+				// read data
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);

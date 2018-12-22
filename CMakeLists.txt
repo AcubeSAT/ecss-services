@@ -5,7 +5,7 @@ project(ecss_services)
 set(CMAKE_CXX_STANDARD 17)
 
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc")
+include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include")
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -19,12 +19,12 @@ add_library(common OBJECT
         src/Message.cpp
         src/MessageParser.cpp
         src/Helpers/CRCHelper.cpp
+        src/Helpers/TimeHelper.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
-        src/Helpers/TimeHelper.cpp
         src/Services/TimeManagementService.cpp
         )
 
@@ -32,7 +32,8 @@ add_library(common OBJECT
 add_executable(ecss_services
         src/main.cpp
         $<TARGET_OBJECTS:common>
-        src/Platform/x86/Service.cpp)
+        src/Platform/x86/Service.cpp
+        )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
@@ -44,6 +45,5 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             $<TARGET_OBJECTS:common>
             ${test_main_SRC}
             ${test_SRC})
-
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()

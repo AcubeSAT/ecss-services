@@ -6,43 +6,40 @@
  * @todo: Add message type in TCs
  * @todo: this code is error prone, depending on parameters given, add fail safes (probably?)
  */
-void EventReportService::informativeEventReport(Event eventID, const uint8_t *data,
-                                                uint8_t length) {
+void EventReportService::informativeEventReport(Event eventID, String<64> data) {
 	// TM[5,1]
 	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
 		Message report = createTM(1);
 		report.appendEnum16(eventID);
-		report.appendString(length, data);
+		report.appendString(data);
 
 		storeMessage(report);
 	}
 }
 
 void
-EventReportService::lowSeverityAnomalyReport(Event eventID, const uint8_t *data,
-                                             uint8_t length) {
+EventReportService::lowSeverityAnomalyReport(Event eventID, String<64> data) {
 	lowSeverityEventCount++;
 	// TM[5,2]
 	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
 		lowSeverityReportCount++;
 		Message report = createTM(2);
 		report.appendEnum16(eventID);
-		report.appendString(length, data);
+		report.appendString(data);
 		lastLowSeverityReportID = static_cast<uint16_t >(eventID);
 
 		storeMessage(report);
 	}
 }
 
-void EventReportService::mediumSeverityAnomalyReport(Event eventID,
-                                                     const uint8_t *data, uint8_t length) {
+void EventReportService::mediumSeverityAnomalyReport(Event eventID, String<64> data) {
 	mediumSeverityEventCount++;
 	// TM[5,3]
 	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
 		mediumSeverityReportCount++;
 		Message report = createTM(3);
 		report.appendEnum16(eventID);
-		report.appendString(length, data);
+		report.appendString(data);
 		lastMediumSeverityReportID = static_cast<uint16_t >(eventID);
 
 		storeMessage(report);
@@ -50,15 +47,14 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID,
 }
 
 void
-EventReportService::highSeverityAnomalyReport(Event eventID, const uint8_t *data,
-                                              uint8_t length) {
+EventReportService::highSeverityAnomalyReport(Event eventID, String<64> data) {
 	highSeverityEventCount++;
 	// TM[5,4]
 	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
 		highSeverityReportCount++;
 		Message report = createTM(4);
 		report.appendEnum16(eventID);
-		report.appendString(length, data);
+		report.appendString(data);
 		lastHighSeverityReportID = static_cast<uint16_t >(eventID);
 
 		storeMessage(report);
