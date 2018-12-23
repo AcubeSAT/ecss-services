@@ -2,21 +2,39 @@
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
 #include "Service.hpp"
+#include "MessageParser.hpp"
+#include "etl/String.hpp"
 /**
  * Implementation of ST[19] event-action Service
  *
+ * ECSS 8.19 && 6.19
+ *
+ * Note towards the reviewers: Please double-check the string sizes that I use, the string
+ * initialization or rather the lack of it. Pay attention especially in parts of the code that I
+ * use strings <3 .
+ *
  * @todo: Do something with the applicationID.
+ * @todo: check if eventActionFunctionStatus should be private or not
+ * @todo: check if eventAction array of definitions should be private or not
+ * @todo: check size of eventActionDefinitionArray
  */
 class EventActionService : public Service {
-/**
- * @todo: check if this should be private or not
- */
 private:
+	uint16_t nextEventDefinitionIndex;
 	uint8_t eventActionFunctionStatus;
+	// Maybe an array of available slots??? Coz there will be random empty slots after deletion
+	struct EventActionDefinition {
+		uint8_t empty = 1; // 1 means empty, 0 means full
+		uint16_t applicationId = 0;
+		uint16_t eventDefinitionID = 65535;
+		String<ECSS_MAX_STRING_SIZE> request = "";
+	};
+	EventActionDefinition eventActionDefinitionArray[256];
 public:
 	EventActionService() {
 		serviceType = 19;
 		eventActionFunctionStatus = enabledFunction;
+		nextEventDefinitionIndex = 0;
 	}
 
 	/**
@@ -70,6 +88,12 @@ public:
 	 * TC[19,9] disable the event-actioni function
 	 */
 	void disableEventActionFunction(Message message);
+
+	/**
+	 * Custom function that is called right after an event takes place, to initiate
+	 * the execution of the action
+	 */
+	void executeAction();
 
 	/**
 	 * Setter for event-action function status

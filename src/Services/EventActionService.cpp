@@ -1,14 +1,22 @@
 #include "Services/EventActionService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
-
+/**
+ * @todo: Should a check be added for lastAddedEventDefinitionIndex to not exceed the
+ * eventActionDefinitionArray ?
+ */
 void EventActionService::addEventActionDefinitions(Message message){
 	// TC[19,1]
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19){
+		uint8_t *data;
 		uint16_t N = message.readUint16();
 		for (uint16_t i = 0; i < N; i++){
-
+			eventActionDefinitionArray[].applicationId = message
+				.readEnum16();
+			eventActionDefinitionArray[].eventDefinitionID = message.readEnum16();
+			message.readString(data,ECSS_MAX_STRING_SIZE);
+			eventActionDefinitionArray[].request = String<256>(data);
 		}
 
 	}
@@ -86,5 +94,12 @@ void EventActionService::disableEventActionFunction(Message message) {
 	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19){
 		setEventActionFunctionStatus(EventActionFunctionStatus::disabledFunction);
+	}
+}
+
+void EventActionService::executeAction() {
+	// Custom function
+	if (enabledFunction){
+
 	}
 }
