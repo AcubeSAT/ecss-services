@@ -42,12 +42,10 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 																		 == 19) {
 		uint16_t N = message.readUint16();
 		uint8_t index = 0;
-		uint16_t applicationID;
-		uint16_t eventDefinitionID;
 		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
-			applicationID = message.readEnum16();
-			eventDefinitionID = message.readEnum16();
+			uint16_t applicationID = message.readEnum16();
+			uint16_t eventDefinitionID = message.readEnum16();
 			while (eventActionDefinitionArray[index].applicationId != applicationID ||
 			eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID){
 				if (index == 255){ // 255 should be changed depending on size of the array
