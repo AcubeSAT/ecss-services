@@ -138,7 +138,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 
 void EventActionService::executeAction() {
 	// Custom function
-	if (enabledFunction) {
+	if (eventActionFunctionStatus == enabledFunction) {
 
 	}
 }
