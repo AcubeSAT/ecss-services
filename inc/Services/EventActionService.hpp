@@ -4,6 +4,7 @@
 #include "Service.hpp"
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
+
 /**
  * Implementation of ST[19] event-action Service
  *
@@ -20,21 +21,20 @@
  */
 class EventActionService : public Service {
 private:
-	uint16_t nextEventDefinitionIndex;
-	uint8_t eventActionFunctionStatus;
-	// Maybe an array of available slots??? Coz there will be random empty slots after deletion
+	uint8_t eventActionFunctionStatus; // Indicates if actions are enabled
 	struct EventActionDefinition {
 		uint8_t empty = 1; // 1 means empty, 0 means full
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535;
 		String<ECSS_MAX_STRING_SIZE> request = "";
 	};
+	// If the size is changed maybe then indexOfAvailableSlots as well as the initiating loop in the
+	// constructor should be changed from uint16_t
 	EventActionDefinition eventActionDefinitionArray[256];
 public:
 	EventActionService() {
 		serviceType = 19;
 		eventActionFunctionStatus = enabledFunction;
-		nextEventDefinitionIndex = 0;
 	}
 
 	/**
@@ -44,6 +44,7 @@ public:
 		disabledFunction = 0,
 		enabledFunction = 1,
 	};
+
 	/**
 	 * TC[19,1] add event-action definitions
 	 */
@@ -98,7 +99,7 @@ public:
 	/**
 	 * Setter for event-action function status
 	 */
-	void setEventActionFunctionStatus(EventActionFunctionStatus e){
+	void setEventActionFunctionStatus(EventActionFunctionStatus e) {
 		eventActionFunctionStatus = e;
 	}
 };
