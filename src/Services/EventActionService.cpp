@@ -138,14 +138,20 @@ void EventActionService::requestEventActionDefinitionStatus(Message message) {
 	// TC[19,6]
 	if (message.messageType == 6 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
-
+		eventActionStatusReport();
 	}
 }
 
 void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
 	Message report = createTM(7);
-
+	for (uint16_t i = 0; i < 256; i++) {
+		if (eventActionDefinitionArray[i].empty == 0) {
+			report.appendEnum16(eventActionDefinitionArray[i].applicationId);
+			report.appendEnum16(eventActionDefinitionArray[i].eventDefinitionID);
+			report.appendUint8(stateOfEventAction[i]);
+		}
+	}
 	storeMessage(report);
 }
 
