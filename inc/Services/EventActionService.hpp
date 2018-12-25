@@ -4,6 +4,7 @@
 #include "Service.hpp"
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
+#include <bitset>
 
 /**
  * Implementation of ST[19] event-action Service
@@ -22,6 +23,7 @@
 class EventActionService : public Service {
 private:
 	uint8_t eventActionFunctionStatus; // Indicates if actions are enabled
+	std::bitset<256> stateOfEventAction;
 	struct EventActionDefinition {
 		uint8_t empty = 1; // 1 means empty, 0 means full
 		uint16_t applicationId = 0;
@@ -35,6 +37,7 @@ public:
 	EventActionService() {
 		serviceType = 19;
 		eventActionFunctionStatus = enabledFunction;
+		stateOfEventAction.set();
 	}
 
 	/**

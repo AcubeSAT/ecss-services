@@ -86,8 +86,23 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
+		uint8_t index = 0;
+		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
-
+			uint16_t applicationID = message.readEnum16();
+			uint16_t eventDefinitionID = message.readEnum16();
+			while (eventActionDefinitionArray[index].applicationId != applicationID ||
+			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID){
+				if (index == 255){ // 255 should be changed depending on size of the array
+					flag = 1;
+					break;
+				}
+				index++;
+			}
+			if (flag == 0){ // Found
+				stateOfEventAction[index] = 1;
+			}
+			index = 0;
 		}
 
 	}
@@ -98,10 +113,24 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
+		uint8_t index = 0;
+		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
-
+			uint16_t applicationID = message.readEnum16();
+			uint16_t eventDefinitionID = message.readEnum16();
+			while (eventActionDefinitionArray[index].applicationId != applicationID ||
+			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID){
+				if (index == 255){ // 255 should be changed depending on size of the array
+					flag = 1;
+					break;
+				}
+				index++;
+			}
+			if (flag == 0){ // Found
+				stateOfEventAction[index] = 0;
+			}
+			index = 0;
 		}
-
 	}
 }
 
