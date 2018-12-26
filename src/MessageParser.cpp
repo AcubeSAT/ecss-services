@@ -8,7 +8,6 @@
 
 TestService TestService::instance;
 RequestVerificationService RequestVerificationService::instance;
-EventActionService EventActionService::instance;
 
 void MessageParser::execute(Message &message) {
 	switch (message.serviceType) {
@@ -18,8 +17,6 @@ void MessageParser::execute(Message &message) {
 		case 17:
 			TestService::instance.execute(message);
 			break;
-		case 19:
-			EventActionService::instance.execute(message);
 		default:
 			// cout is very bad for embedded systems
 			std::cout << "This service hasn't been implemented yet or it doesn't exist";

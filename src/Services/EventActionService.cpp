@@ -170,7 +170,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 		setEventActionFunctionStatus(EventActionFunctionStatus::disabledFunction);
 	}
 }
-
+// Should I use the name execute here instead of executeAction?
 void EventActionService::execute(Message &message) {
 	// Custom function
 	if (eventActionFunctionStatus == enabledFunction) {
