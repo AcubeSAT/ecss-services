@@ -20,7 +20,7 @@ class Message;
  */
 class Message {
 public:
-	Message (){}
+	Message () = default;
 
 	enum PacketType {
 		TM = 0, // Telemetry
