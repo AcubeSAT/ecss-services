@@ -97,7 +97,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction();
+	void execute(Message &message);
 
 	/**
 	 * Setter for event-action function status
@@ -105,6 +105,11 @@ public:
 	void setEventActionFunctionStatus(EventActionFunctionStatus e) {
 		eventActionFunctionStatus = e;
 	}
+
+	/**
+	 * The purpose of this instance is to access the execute function
+	 */
+	 static EventActionService instance;
 };
 
 #endif //ECSS_SERVICES_EVENTACTIONSERVICE_HPP

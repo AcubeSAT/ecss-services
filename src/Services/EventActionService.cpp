@@ -171,7 +171,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 	}
 }
 
-void EventActionService::executeAction() {
+void EventActionService::execute(Message &message) {
 	// Custom function
 	if (eventActionFunctionStatus == enabledFunction) {
 
