@@ -35,18 +35,17 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	Message parse(uint8_t * data, uint32_t length);
+	Message parse(uint8_t *data, uint32_t length);
 
 	/**
 	 * @todo: elaborate on this comment
 	 * Create a message so that a string can be parsed
+	 *
+	 * Note: conversion of char* to unsigned char* should flow without any problems according to
+	 * this great analysis:
+	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	Message parseTC(String<256> data, ){
-		Message message;
-		message.packetType = Message::TC;
-		parseTC(data, 15, message);
-		return message;
-	}
+	Message parseRequestTC(String<256> data);
 
 private:
 	/**

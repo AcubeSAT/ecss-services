@@ -97,7 +97,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction(Message &message);
+	void executeAction(uint16_t eventID);
 
 	/**
 	 * Setter for event-action function status

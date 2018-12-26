@@ -171,9 +171,20 @@ void EventActionService::disableEventActionFunction(Message message) {
 	}
 }
 // Should I use the name execute here instead of executeAction?
-void EventActionService::execute(Message &message) {
+void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus == enabledFunction) {
-
+		uint16_t i = 0;
+		while (i < 256){
+			if (eventActionDefinitionArray[i].empty == 0){
+				if (eventActionDefinitionArray[i].eventDefinitionID == eventID){
+					break;
+				}
+			}
+			i++;
+		}
+		MessageParser messageParser;
+		Message message = messageParser.parseRequestTC(eventActionDefinitionArray[i].request);
+		messageParser.execute(message);
 	}
 }
