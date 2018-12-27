@@ -1,5 +1,5 @@
 #include <Services/EventReportService.hpp>
-#include "Services/EventReportService.hpp"
+#include <Services/EventActionService.hpp>
 #include "Message.hpp"
 
 /**
@@ -14,6 +14,8 @@ void EventReportService::informativeEventReport(Event eventID, String<64> data) 
 		report.appendString(data);
 
 		storeMessage(report);
+		EventActionService eventActionService;
+		eventActionService.executeAction(eventID);
 	}
 }
 
@@ -29,6 +31,8 @@ EventReportService::lowSeverityAnomalyReport(Event eventID, String<64> data) {
 		lastLowSeverityReportID = static_cast<uint16_t >(eventID);
 
 		storeMessage(report);
+		EventActionService eventActionService;
+		eventActionService.executeAction(eventID);
 	}
 }
 
@@ -43,6 +47,8 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, String<64> d
 		lastMediumSeverityReportID = static_cast<uint16_t >(eventID);
 
 		storeMessage(report);
+		EventActionService eventActionService;
+		eventActionService.executeAction(eventID);
 	}
 }
 
@@ -58,6 +64,8 @@ EventReportService::highSeverityAnomalyReport(Event eventID, String<64> data) {
 		lastHighSeverityReportID = static_cast<uint16_t >(eventID);
 
 		storeMessage(report);
+		EventActionService eventActionService;
+		eventActionService.executeAction(eventID);
 	}
 }
 

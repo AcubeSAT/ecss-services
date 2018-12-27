@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 
 #include "Service.hpp"
+#include <Services/EventActionService.hpp> // Not sure if this is needed here or just in .cpp file
 #include <bitset>
 /**
  * Implementation of ST[05] event reporting service
