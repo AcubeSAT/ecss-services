@@ -13,7 +13,7 @@ void EventReportService::informativeEventReport(Event eventID, String<64> data) 
 		report.appendEnum16(eventID);
 		report.appendString(data);
 		EventActionService eventActionService;
-//		eventActionService.executeAction(eventID);
+		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}

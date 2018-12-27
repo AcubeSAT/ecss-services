@@ -7,10 +7,11 @@
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st09]") {
 	EventActionService eventActionService;
 	Message message(19, 1, Message::TC, 0);
+
 }
 
 TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st09]") {
-	
+
 }
 
 TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st09]") {

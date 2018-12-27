@@ -16,18 +16,18 @@ void EventActionService::addEventActionDefinitions(Message message) {
 		uint8_t index = 0;
 		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
-			while (eventActionDefinitionArray[index].empty == 0){
-				if (index == 255){ // 255 should be changed depending on size of the array
+			while (eventActionDefinitionArray[index].empty == 0) {
+				if (index == 255) { // 255 should be changed depending on size of the array
 					flag = 1;
 					break;
 				}
 				index++;
 			}
-			if (flag == 1){
+			if (flag == 1) {
 				eventActionDefinitionArray[index].empty = 0;
 				eventActionDefinitionArray[index].applicationId = message.readEnum16();
 				eventActionDefinitionArray[index].eventDefinitionID = message.readEnum16();
-				message.readString(data, ECSS_MAX_STRING_SIZE);
+				message.readString(data, ECSS_MAX_STRING_SIZE); // ECSS_MAX_STRING_SIZE??
 				eventActionDefinitionArray[index].request = String<256>(data);
 				index++;
 			}
@@ -39,7 +39,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 void EventActionService::deleteEventActionDefinitions(Message message) {
 	// TC[19,2]
 	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
-																		 == 19) {
+	                                                                     == 19) {
 		uint16_t N = message.readUint16();
 		uint8_t index = 0;
 		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
@@ -47,14 +47,14 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (eventActionDefinitionArray[index].applicationId != applicationID ||
-			eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID){
-				if (index == 255){ // 255 should be changed depending on size of the array
+			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID) {
+				if (index == 255) { // 255 should be changed depending on size of the array
 					flag = 1;
 					break;
 				}
 				index++;
 			}
-			if (flag == 0){ // Found
+			if (flag == 0) { // Found
 				eventActionDefinitionArray[index].empty = 1;
 				eventActionDefinitionArray[index].eventDefinitionID = 65535;
 				eventActionDefinitionArray[index].request = "";
@@ -71,7 +71,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message message) {
 	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		for (uint16_t index = 0; index < 256; index++) {
-			if (eventActionDefinitionArray[index].empty == 0){
+			if (eventActionDefinitionArray[index].empty == 0) {
 				eventActionDefinitionArray[index].empty = 1;
 				eventActionDefinitionArray[index].eventDefinitionID = 65535;
 				eventActionDefinitionArray[index].request = "";
@@ -92,14 +92,14 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (eventActionDefinitionArray[index].applicationId != applicationID ||
-			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID){
-				if (index == 255){ // 255 should be changed depending on size of the array
+			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID) {
+				if (index == 255) { // 255 should be changed depending on size of the array
 					flag = 1;
 					break;
 				}
 				index++;
 			}
-			if (flag == 0){ // Found
+			if (flag == 0) { // Found
 				stateOfEventAction[index] = 1;
 			}
 			index = 0;
@@ -119,14 +119,14 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (eventActionDefinitionArray[index].applicationId != applicationID ||
-			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID){
-				if (index == 255){ // 255 should be changed depending on size of the array
+			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID) {
+				if (index == 255) { // 255 should be changed depending on size of the array
 					flag = 1;
 					break;
 				}
 				index++;
 			}
-			if (flag == 0){ // Found
+			if (flag == 0) { // Found
 				stateOfEventAction[index] = 0;
 			}
 			index = 0;
@@ -170,20 +170,21 @@ void EventActionService::disableEventActionFunction(Message message) {
 		setEventActionFunctionStatus(EventActionFunctionStatus::disabledFunction);
 	}
 }
+
 // Should I use the name execute here instead of executeAction?
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus == enabledFunction) {
 		uint16_t i = 0;
-		while (i < 256){
-			if (eventActionDefinitionArray[i].empty == 0){
-				if (eventActionDefinitionArray[i].eventDefinitionID == eventID){
+		while (i < 256) {
+			if (eventActionDefinitionArray[i].empty == 0) {
+				if (eventActionDefinitionArray[i].eventDefinitionID == eventID) {
 					break;
 				}
 			}
 			i++;
 		}
-		if (i != 256){ // If i == 256 that means that no matching eventId was found
+		if (i != 256) { // If i == 256 that means that no matching eventId was found
 			MessageParser messageParser;
 			Message message = messageParser.parseRequestTC(eventActionDefinitionArray[i].request);
 			messageParser.execute(message);
