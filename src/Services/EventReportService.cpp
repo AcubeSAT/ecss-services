@@ -12,10 +12,10 @@ void EventReportService::informativeEventReport(Event eventID, String<64> data) 
 		Message report = createTM(1);
 		report.appendEnum16(eventID);
 		report.appendString(data);
+		EventActionService eventActionService;
+//		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
-		EventActionService eventActionService;
-		eventActionService.executeAction(eventID);
 	}
 }
 

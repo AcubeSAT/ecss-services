@@ -183,8 +183,10 @@ void EventActionService::executeAction(uint16_t eventID) {
 			}
 			i++;
 		}
-		MessageParser messageParser;
-		Message message = messageParser.parseRequestTC(eventActionDefinitionArray[i].request);
-		messageParser.execute(message);
+		if (i != 256){ // If i == 256 that means that no matching eventId was found
+			MessageParser messageParser;
+			Message message = messageParser.parseRequestTC(eventActionDefinitionArray[i].request);
+			messageParser.execute(message);
+		}
 	}
 }
