@@ -6,6 +6,7 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/FunctionManagementService.hpp"
 #include "Services/TimeManagementService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
@@ -199,6 +200,9 @@ int main() {
 	eventReportService.listOfDisabledEventsReport();
 	eventReportService.enableReportGeneration(eventMessage2);
 	eventReportService.requestListOfDisabledEvents(eventMessage3);
+
+	// ST[08] test
+	FunctionManagementService fms;
 
 	return 0;
 }

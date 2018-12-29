@@ -26,7 +26,7 @@ add_library(common OBJECT
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         src/Services/TimeManagementService.cpp
-        )
+        src/Services/FunctionManagementService.cpp)
 
 # Specify the .cpp files for the executables
 add_executable(ecss_services
