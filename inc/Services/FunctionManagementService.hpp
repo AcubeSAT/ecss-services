@@ -10,31 +10,42 @@
 #include "etl/String.hpp"
 #include "Message.hpp"
 
+#define FUNCMAPSIZE        128      // size of the function map in bytes (temporary, arbitrary)
+#define MAXFUNCNAMELENGTH  32      // max length of the function name (temporary, arbitrary)
+#define MAXARGLENGTH       32       // maximum argument byte string length
+
 /**
  * Implementation of the ST[08] function management service
  *
- * This class implements a basic framework for the ST[08] service as described in ECSS-E-ST-70-41C,
- * pages 157-159. Final implementation is dependent on subsystem requirements which are, as of this
- * writing, undefined yet.
- * *
+ * This class implements a skeleton framework for the ST[08] service as described in
+ * ECSS-E-ST-70-41C, pages 157-159. Final implementation is dependent on subsystem requirements
+ * which are, as of this writing, undefined yet.
+ *
+ * WARNING! Any string handling in this class involves non-null-terminated strings!
+ *
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
 
-#define FUNCMAPSIZE     5        // size of the function map (temporary, arbitrary)
-#define MAXFUNCNAMELEN  128      // max length of the function (temporary, arbitrary)
-#define MAXFUNCARGS     64       // maximum arguments that a function can hold
-#define MAXARGLENGTH    32       // maximum argument name length
-
-typedef String<MAXFUNCNAMELEN> funcName;
+typedef String<MAXFUNCNAMELENGTH> functionName;
+typedef etl::map<functionName, void(*)(String<MAXARGLENGTH>), (const size_t) FUNCMAPSIZE>
+PointerMap;
 
 class FunctionManagementService {
-	etl::map<funcName, void*, (const size_t) FUNCMAPSIZE> funcPtrIndex;
-	// map of function names to their pointers
+	/**
+	 * Map of the function names to their respective pointers. Size controlled by FUNCMAPSIZE
+	 */
+	 PointerMap funcPtrIndex;
 
 public:
-	//FunctionManagementService(); // dummy constructor (commented out to pacify clang-tidy)
+	/**
+	 * Constructs the function pointer index. All functions to be included shall be visible to it.
+	 * @param None
+	 */
+	FunctionManagementService();
+
 	/**
 	 * Calls the function described in the TC[8,1] message *msg*, passing the arguments contained
+	 * WARNING: Do not include any spaces in the arguments, they are ignored and replaced with NULL
 	 * @param msg A TC[8,1] message
 	 */
 	void call(Message msg);

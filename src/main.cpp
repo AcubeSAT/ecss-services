@@ -202,7 +202,15 @@ int main() {
 	eventReportService.requestListOfDisabledEvents(eventMessage3);
 
 	// ST[08] test
+	Message callMessage(8, 1, Message::TC, 1);
+	String<256> str = String<256>("");
+	str.append("dummy1");
+	str.append(MAXFUNCNAMELENGTH - 6, ' ');
+	str.append("THISSENTENCEISFALSE!");
+
+	callMessage.appendString<256>(str);
 	FunctionManagementService fms;
+	fms.call(callMessage);
 
 	return 0;
 }

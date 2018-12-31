@@ -1,49 +1,72 @@
 #include "Services/FunctionManagementService.hpp"
 
-// Dummy functions which will populate the map
-float dummy1(float a, int b) {
-	return a * b;
+// Dummy functions which will populate the map.
+// This one prints whatever bytes are contained in the argument.
+void dummy1(const String<MAXARGLENGTH> a) {
+	std::cout << a.c_str() << std::endl;
 }
 
-void dummy2(char c) {
-	std::cout << c << std::endl;
-}
 
-//FunctionManagementService::FunctionManagementService() {
-//	funcPtrIndex.insert(std::make_pair(String<MAXFUNCNAMELEN>("dummy1"), reinterpret_cast<void*>
-//	(&dummy1)));
-//	funcPtrIndex.insert(std::make_pair(String<MAXFUNCNAMELEN>("dummy2"), reinterpret_cast<void*>
-//	(&dummy2)));
-//
-//	//reinterpret_cast<float(*)(float, int)>(funcPtrIndex["dummy1"])(3.14, 45);
-//	//reinterpret_cast<void(*)(char)>(funcPtrIndex["dummy2"])('h');
-//}
+FunctionManagementService::FunctionManagementService() {
+	String<MAXFUNCNAMELENGTH> str("");
+	str.append("dummy1");
+	str.append(MAXFUNCNAMELENGTH - 6, '\0');
+	void(*dummyPtr)(String<MAXARGLENGTH>) = &dummy1;
+	funcPtrIndex.insert(std::make_pair(str, dummyPtr));
+}
 
 void FunctionManagementService::call(Message msg){
-	uint8_t funcName[MAXFUNCNAMELEN];  // the function's name
+	assert(msg.messageType == 1);
+	assert(msg.serviceType == 8);
 
-	// initialize the function name array
-	for (int i = 0; i < MAXFUNCNAMELEN; i++) {
-		funcName[i] = 0;
+	uint8_t funcName[MAXFUNCNAMELENGTH];  // the function's name
+	uint8_t funcArgs[MAXARGLENGTH];    // arguments for the function
+
+	// initialize the function name and the argument arrays
+	for (int i = 0; i < MAXFUNCNAMELENGTH; i++) {
+		funcName[i] = '\0';
+		funcArgs[i] = '\0';
 	}
 
 	// isolate the function's name from the incoming message
-	for (int i = 0; i < MAXFUNCNAMELEN; i++) {
+	for (int i = 0; i < MAXFUNCNAMELENGTH; i++) {
 		uint8_t currByte = msg.readByte();
-		if (currByte == 0x00) {
-			funcName[i] = currByte;
-			break;
+		if (currByte == 0x20) {
+			continue;
 		}
 		funcName[i] = currByte;
 	}
 
-	// isolate the number of args (currently an unsigned 32-bit number, the standard doesn't
-	// specify a maximum number)
-	uint32_t numOfArgs = msg.readUint32();
-	for (int i = 0; i < numOfArgs; i++) {
-		// TODO: find a way to deduce the argument types as contained or store them somehow
-		//  (finding a way to store them is better because it also solves the pointer casting
-		//  problem)
+	// isolate the string containing the args (if string length exceeds max, the remaining bytes
+	// are silently ignored)
+	for (int i = 0; i < MAXARGLENGTH; i++) {
+		uint8_t currByte = msg.readByte();
+		if (currByte == 0x20) {
+			continue;
+		}
+		funcArgs[i] = currByte;
 	}
 
+	// locate the appropriate function pointer
+	String<MAXFUNCNAMELENGTH> name(funcName);
+	PointerMap::iterator iter = funcPtrIndex.find(name);
+	void(*selected)(String<MAXARGLENGTH>) = nullptr;
+
+	if (iter == funcPtrIndex.end()) {
+		std::cout << "ERROR: Malformed query." << std::endl;
+	}
+	else {
+		selected = *iter->second;
+	}
+
+	// send proper exec failure notification and terminate if name is incorrect
+	if (selected == nullptr) {
+		/**
+		 * @todo Send failed start of execution
+		 */
+		return;
+	}
+
+	//  execute the function if there are no obvious flaws (defined in the standard, pg.158)
+	selected(funcArgs);
 }
