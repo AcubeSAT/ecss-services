@@ -12,47 +12,26 @@ void EventActionService::addEventActionDefinitions(Message message) {
 
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
 																						19) {
-		char x[64];
-		uint16_t N = message.readUint16();
 		uint16_t index = 0;
 		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
-		for (uint16_t i = 0; i < N; i++) {
-			while (eventActionDefinitionArray[index].empty == 0) {
-				if (index == 255) { // 255 should be changed depending on size of the array
-					flag = 1;
-					break;
-				}
-				std::cout << "index: " << index << " empty: " << (unsigned)
-				eventActionDefinitionArray[index].empty << " \n";
-				index++;
+		while (eventActionDefinitionArray[index].empty == 0) {
+			if (index == 255) { // 255 should be changed depending on size of the array
+				flag = 1;
+				break;
 			}
-
-
-			if (flag == 0) {
-				char data[128];
-				std::cout << "Inside the flag == 0 " << "index: " << index << " empty: " <<
-				(unsigned)
-					eventActionDefinitionArray[index].empty << " \n";
-				eventActionDefinitionArray[index].empty = 0;
-				eventActionDefinitionArray[index].applicationId = message.readEnum16();
-				eventActionDefinitionArray[index].eventDefinitionID = message.readEnum16();
-				if (index == 0){
-					message.readString(data, 3); // ECSS_MAX_STRING_SIZE??
-				} else {
-					message.readString(data, 3); // ECSS_MAX_STRING_SIZE??
-				}
-				eventActionDefinitionArray[index].request = String<64>(data);
-				std::cout << "char data: " << data << " String<64>(data): " << String<64>(data)
-				    .data() << " \n";
-				std::cout << "String: " << eventActionDefinitionArray[index].request.data() << " \n";
-				index++;
-
-			}
+			index++;
 		}
-
+		if (flag == 0) {
+			char data[128];
+			eventActionDefinitionArray[index].empty = 0;
+			eventActionDefinitionArray[index].applicationId = message.readEnum16();
+			eventActionDefinitionArray[index].eventDefinitionID = message.readEnum16();
+			// Tests pass with message.dataSize - 3, message.dataSize - 4, but not
+			// message.dataSize - 5
+			message.readString(data, message.dataSize);
+			eventActionDefinitionArray[index].request = String<64>(data);
+		}
 	}
-	//std::cout << eventActionDefinitionArray[0].empty;
-
 }
 
 void EventActionService::deleteEventActionDefinitions(Message message) {
