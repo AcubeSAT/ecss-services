@@ -45,7 +45,7 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	Message parseRequestTC(String<256> data);
+	Message parseRequestTC(String<64> data);
 
 private:
 	/**

@@ -200,5 +200,27 @@ int main() {
 	eventReportService.enableReportGeneration(eventMessage2);
 	eventReportService.requestListOfDisabledEvents(eventMessage3);
 
+	//ST[19] test
+
+	EventActionService eventActionService;
+	char checkstring[256];
+	Message eventActionDefinition(19, 1, Message::TC, 1);
+	eventActionDefinition.appendUint16(2);
+	eventActionDefinition.appendEnum16(0);
+	eventActionDefinition.appendEnum16(2);
+	String<64> TCdata = "hi";
+
+	eventActionDefinition.appendString(TCdata);
+	eventActionService.addEventActionDefinitions(eventActionDefinition);
+//	message.readString(checkstring, 2);
+//	std::cout << eventActionService.eventActionDefinitionArray[0].empty;//
+	// .compare
+	// (checkstring)
+	// ==0);
+//	CHECK(message.readEnum16() == 1);
+//	CHECK(message.readEnum16() == 3);
+//	message.readString(checkstring, 3);
+//	CHECK(eventActionService.eventActionDefinitionArray[1].request.compare(data) == 0);
+
 	return 0;
 }

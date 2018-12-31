@@ -21,14 +21,14 @@
  * @todo: check size of eventActionDefinitionArray
  */
 class EventActionService : public Service {
-private:
+public:
 	uint8_t eventActionFunctionStatus; // Indicates if actions are enabled
 	std::bitset<256> stateOfEventAction;
 	struct EventActionDefinition {
 		uint8_t empty = 1; // 1 means empty, 0 means full
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535;
-		String<ECSS_MAX_STRING_SIZE> request = "";
+		String<64> request = "";
 	};
 	// If the size is changed maybe then indexOfAvailableSlots as well as the initiating loop in the
 	// constructor should be changed from uint16_t
@@ -50,6 +50,10 @@ public:
 
 	/**
 	 * TC[19,1] add event-action definitions
+	 *
+	 * Note: We have abolished multiple additions in one Telecommand packet. Only one
+	 * event-action definition will be added per TC packet. That means there will be just an
+	 * application ID, an event definition ID and the TC request.
 	 */
 	void addEventActionDefinitions(Message message);
 

@@ -9,11 +9,12 @@
  */
 void EventActionService::addEventActionDefinitions(Message message) {
 	// TC[19,1]
-	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
-		uint8_t *data;
+
+	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
+																						19) {
+		char x[64];
 		uint16_t N = message.readUint16();
-		uint8_t index = 0;
+		uint16_t index = 0;
 		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
 			while (eventActionDefinitionArray[index].empty == 0) {
@@ -21,19 +22,37 @@ void EventActionService::addEventActionDefinitions(Message message) {
 					flag = 1;
 					break;
 				}
+				std::cout << "index: " << index << " empty: " << (unsigned)
+				eventActionDefinitionArray[index].empty << " \n";
 				index++;
 			}
-			if (flag == 1) {
+
+
+			if (flag == 0) {
+				char data[128];
+				std::cout << "Inside the flag == 0 " << "index: " << index << " empty: " <<
+				(unsigned)
+					eventActionDefinitionArray[index].empty << " \n";
 				eventActionDefinitionArray[index].empty = 0;
 				eventActionDefinitionArray[index].applicationId = message.readEnum16();
 				eventActionDefinitionArray[index].eventDefinitionID = message.readEnum16();
-				message.readString(data, ECSS_MAX_STRING_SIZE); // ECSS_MAX_STRING_SIZE??
-				eventActionDefinitionArray[index].request = String<256>(data);
+				if (index == 0){
+					message.readString(data, 3); // ECSS_MAX_STRING_SIZE??
+				} else {
+					message.readString(data, 3); // ECSS_MAX_STRING_SIZE??
+				}
+				eventActionDefinitionArray[index].request = String<64>(data);
+				std::cout << "char data: " << data << " String<64>(data): " << String<64>(data)
+				    .data() << " \n";
+				std::cout << "String: " << eventActionDefinitionArray[index].request.data() << " \n";
 				index++;
+
 			}
 		}
 
 	}
+	//std::cout << eventActionDefinitionArray[0].empty;
+
 }
 
 void EventActionService::deleteEventActionDefinitions(Message message) {

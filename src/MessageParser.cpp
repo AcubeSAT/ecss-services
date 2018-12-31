@@ -76,7 +76,7 @@ void MessageParser::parseTC(uint8_t *data, uint16_t length, Message &message) {
 	message.dataSize = length;
 }
 
-Message MessageParser::parseRequestTC(String<256> data) {
+Message MessageParser::parseRequestTC(String<64> data) {
 	Message message;
 	uint8_t *dataInt = (unsigned char *) data.data();
 	message.packetType = Message::TC;
