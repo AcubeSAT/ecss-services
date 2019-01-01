@@ -44,19 +44,15 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (eventActionDefinitionArray[index].applicationId != applicationID ||
-			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID) {
-				if (index == 255) { // 255 should be changed depending on size of the array
-					flag = 1;
-					break;
+			while (index<256){
+				if (eventActionDefinitionArray[index].applicationId == applicationID &&
+			       eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
+					eventActionDefinitionArray[index].empty = 1;
+					eventActionDefinitionArray[index].eventDefinitionID = 65535;
+					eventActionDefinitionArray[index].request = "";
+					eventActionDefinitionArray[index].applicationId = 0;
 				}
 				index++;
-			}
-			if (flag == 0) { // Found
-				eventActionDefinitionArray[index].empty = 1;
-				eventActionDefinitionArray[index].eventDefinitionID = 65535;
-				eventActionDefinitionArray[index].request = "";
-				eventActionDefinitionArray[index].applicationId = 0;
 			}
 			index = 0;
 		}
@@ -89,20 +85,15 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (eventActionDefinitionArray[index].applicationId != applicationID ||
-			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID) {
-				if (index == 255) { // 255 should be changed depending on size of the array
-					flag = 1;
-					break;
+			while (index<256){
+				if (eventActionDefinitionArray[index].applicationId == applicationID &&
+				    eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
+					stateOfEventAction[index] = 1;
 				}
 				index++;
 			}
-			if (flag == 0) { // Found
-				stateOfEventAction[index] = 1;
-			}
 			index = 0;
 		}
-
 	}
 }
 
@@ -116,16 +107,12 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (eventActionDefinitionArray[index].applicationId != applicationID ||
-			       eventActionDefinitionArray[index].eventDefinitionID != eventDefinitionID) {
-				if (index == 255) { // 255 should be changed depending on size of the array
-					flag = 1;
-					break;
+			while (index<256){
+				if (eventActionDefinitionArray[index].applicationId == applicationID &&
+				    eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
+					stateOfEventAction[index] = 0;
 				}
 				index++;
-			}
-			if (flag == 0) { // Found
-				stateOfEventAction[index] = 0;
 			}
 			index = 0;
 		}

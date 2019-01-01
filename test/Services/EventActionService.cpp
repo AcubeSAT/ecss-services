@@ -104,7 +104,6 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st09]") {
 
 TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st09]") {
 	EventActionService eventActionService;
-	char checkString[256];
 	Message message0(19, 1, Message::TC, 0);
 	message0.appendEnum16(1);
 	message0.appendEnum16(0);
@@ -148,6 +147,13 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st09]") {
 }
 
 TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st09]") {
+	EventActionService eventActionService;
+	Message message0(19, 1, Message::TC, 0);
+	message0.appendEnum16(1);
+	message0.appendEnum16(0);
+	String<64> data = "0";
+	message0.appendString(data);
+	eventActionService.addEventActionDefinitions(message0);
 
 }
 

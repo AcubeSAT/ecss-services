@@ -17,6 +17,8 @@
  *
 
  * @todo: check if executeAction should accept applicationID too
+ * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
+ * multiple instances are accessed, should I find a more efficient way to access them?
  * @todo: check if eventActionFunctionStatus should be private or not
  * @todo: check if eventAction array of definitions should be private or not
  * @todo: check size of eventActionDefinitionArray
