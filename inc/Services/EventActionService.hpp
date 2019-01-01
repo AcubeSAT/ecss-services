@@ -15,7 +15,8 @@
  * initialization or rather the lack of it. Pay attention especially in parts of the code that I
  * use strings <3 .
  *
- * @todo: Do something with the applicationID.
+
+ * @todo: check if executeAction should accept applicationID too
  * @todo: check if eventActionFunctionStatus should be private or not
  * @todo: check if eventAction array of definitions should be private or not
  * @todo: check size of eventActionDefinitionArray

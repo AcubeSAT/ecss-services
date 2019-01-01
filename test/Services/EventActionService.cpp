@@ -170,9 +170,19 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st09]") {
 }
 
 TEST_CASE("Enable event-action function TC[19,8]", "[service][st09]") {
-
+	EventActionService eventActionService;
+	Message message(19, 8, Message::TC, 0);
+	eventActionService.enableEventActionFunction(message);
+	CHECK(eventActionService.eventActionFunctionStatus == EventActionService::enabledFunction);
 }
 
 TEST_CASE("Disable event-action function TC[19,1]", "[service][st09]") {
+	EventActionService eventActionService;
+	Message message(19, 9, Message::TC, 0);
+	eventActionService.disableEventActionFunction(message);
+	CHECK(eventActionService.eventActionFunctionStatus == EventActionService::disabledFunction);
+}
+
+TEST_CASE("Execute a TC request", "[service][st09]"){
 
 }

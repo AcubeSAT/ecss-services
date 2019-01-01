@@ -170,6 +170,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 }
 
 // Should I use the name execute here instead of executeAction?
+// Should I use applicationID too?
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus == enabledFunction) {
@@ -177,15 +178,11 @@ void EventActionService::executeAction(uint16_t eventID) {
 		while (i < 256) {
 			if (eventActionDefinitionArray[i].empty == 0) {
 				if (eventActionDefinitionArray[i].eventDefinitionID == eventID) {
-					break;
-				}
+					MessageParser messageParser;
+					Message message = messageParser.parseRequestTC(eventActionDefinitionArray[i].request);
+					messageParser.execute(message);				}
 			}
 			i++;
-		}
-		if (i != 256) { // If i == 256 that means that no matching eventId was found
-			MessageParser messageParser;
-			Message message = messageParser.parseRequestTC(eventActionDefinitionArray[i].request);
-			messageParser.execute(message);
 		}
 	}
 }
