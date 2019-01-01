@@ -156,7 +156,13 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st09]") {
 }
 
 TEST_CASE("Request event-action definition status TC[19,6]", "[service][st09]") {
+	EventActionService eventActionService;
+	Message message(19, 6, Message::TC, 0);
+	eventActionService.requestEventActionDefinitionStatus(message);
+	REQUIRE(ServiceTests::hasOneMessage());
 
+	Message report = ServiceTests::get(0);
+	CHECK(report.messageType == 7);
 }
 
 TEST_CASE("Event-action status report TM[19,7]", "[service][st09]") {
