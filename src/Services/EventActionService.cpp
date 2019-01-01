@@ -40,13 +40,12 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
 		uint8_t index = 0;
-		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index<256){
+			while (index<255){
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-			       eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
+			       eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					eventActionDefinitionArray[index].empty = 1;
 					eventActionDefinitionArray[index].eventDefinitionID = 65535;
 					eventActionDefinitionArray[index].request = "";
@@ -81,11 +80,10 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
 		uint8_t index = 0;
-		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index<256){
+			while (index<255){
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
 					stateOfEventAction[index] = 1;
@@ -103,11 +101,10 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
 		uint8_t index = 0;
-		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index<256){
+			while (index<255){
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
 					stateOfEventAction[index] = 0;

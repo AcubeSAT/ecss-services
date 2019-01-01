@@ -40,7 +40,7 @@ public:
 	EventActionService() {
 		serviceType = 19;
 		eventActionFunctionStatus = enabledFunction;
-		stateOfEventAction.set();
+		stateOfEventAction.reset();
 	}
 
 	/**
