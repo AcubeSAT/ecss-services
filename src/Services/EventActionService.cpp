@@ -127,6 +127,13 @@ void EventActionService::requestEventActionDefinitionStatus(Message message) {
 void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
 	Message report = createTM(7);
+	uint8_t count = 0;
+	for (uint16_t i = 0; i < 256; i++) {
+		if (eventActionDefinitionArray[i].empty == 0) {
+			count++;
+		}
+	}
+	report.appendUint8(count);
 	for (uint16_t i = 0; i < 256; i++) {
 		if (eventActionDefinitionArray[i].empty == 0) {
 			report.appendEnum16(eventActionDefinitionArray[i].applicationId);
