@@ -80,6 +80,6 @@ Message MessageParser::parseRequestTC(String<64> data) {
 	Message message;
 	uint8_t *dataInt = reinterpret_cast<uint8_t *>(data.data());
 	message.packetType = Message::TC;
-	parseTC(dataInt, 256, message); // Maybe instead of 256 shoule there be a variable?
+	parseTC(dataInt, 64, message); // Maybe instead of 256 should there be a variable?
 	return message;
 }

@@ -30,6 +30,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			// message.dataSize - 5
 			message.readString(data, message.dataSize);
 			eventActionDefinitionArray[index].request = String<64>(data);
+			stateOfEventAction[index] = 1;
 		}
 	}
 }
@@ -39,7 +40,7 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		uint8_t index = 0;
+		uint16_t index = 0;
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
@@ -50,6 +51,7 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 					eventActionDefinitionArray[index].eventDefinitionID = 65535;
 					eventActionDefinitionArray[index].request = "";
 					eventActionDefinitionArray[index].applicationId = 0;
+					stateOfEventAction[index] = 0;
 				}
 				index++;
 			}
@@ -79,7 +81,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		uint8_t index = 0;
+		uint16_t index = 0;
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
@@ -100,11 +102,11 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		uint8_t index = 0;
+		uint16_t index = 0;
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index < 255) {
+			while (index < 256) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					stateOfEventAction[index] = 0;
