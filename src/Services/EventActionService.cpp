@@ -85,7 +85,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (index<255){
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-				    eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
+				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					stateOfEventAction[index] = 1;
 				}
 				index++;
@@ -106,7 +106,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (index<255){
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-				    eventActionDefinitionArray[index].eventDefinitionID== eventDefinitionID) {
+				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					stateOfEventAction[index] = 0;
 				}
 				index++;
