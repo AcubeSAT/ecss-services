@@ -11,7 +11,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 	// TC[19,1]
 
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
-																						19) {
+	                                                                     19) {
 		uint16_t index = 0;
 		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
 		while (eventActionDefinitionArray[index].empty == 0) {
@@ -43,9 +43,9 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index<255){
+			while (index < 255) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-			       eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					eventActionDefinitionArray[index].empty = 1;
 					eventActionDefinitionArray[index].eventDefinitionID = 65535;
 					eventActionDefinitionArray[index].request = "";
@@ -83,7 +83,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index<255){
+			while (index < 255) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					stateOfEventAction[index] = 1;
@@ -104,7 +104,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index<255){
+			while (index < 255) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					stateOfEventAction[index] = 0;
@@ -170,8 +170,10 @@ void EventActionService::executeAction(uint16_t eventID) {
 			if (eventActionDefinitionArray[i].empty == 0) {
 				if (eventActionDefinitionArray[i].eventDefinitionID == eventID) {
 					MessageParser messageParser;
-					Message message = messageParser.parseRequestTC(eventActionDefinitionArray[i].request);
-					messageParser.execute(message);				}
+					Message message = messageParser.parseRequestTC(
+						eventActionDefinitionArray[i].request);
+					messageParser.execute(message);
+				}
 			}
 			i++;
 		}
