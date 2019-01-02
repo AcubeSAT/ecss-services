@@ -6,7 +6,6 @@ void dummy1(const String<MAXARGLENGTH> a) {
 	std::cout << a.c_str() << std::endl;
 }
 
-
 FunctionManagementService::FunctionManagementService() {
 	String<MAXFUNCNAMELENGTH> str("");
 	str.append("dummy1");
@@ -52,10 +51,7 @@ void FunctionManagementService::call(Message msg){
 	PointerMap::iterator iter = funcPtrIndex.find(name);
 	void(*selected)(String<MAXARGLENGTH>) = nullptr;
 
-	if (iter == funcPtrIndex.end()) {
-		std::cout << "ERROR: Malformed query." << std::endl;
-	}
-	else {
+	if (iter != funcPtrIndex.end()) {
 		selected = *iter->second;
 	}
 
@@ -67,6 +63,6 @@ void FunctionManagementService::call(Message msg){
 		return;
 	}
 
-	//  execute the function if there are no obvious flaws (defined in the standard, pg.158)
+	// execute the function if there are no obvious flaws (defined in the standard, pg.158)
 	selected(funcArgs);
 }

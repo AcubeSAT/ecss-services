@@ -2,7 +2,7 @@
 #define ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
 
 #include <cstdint>
-#include <iostream> // TEMPORARY!
+#include <iostream> // USED BY THE SAMPLE FUNCTIONS ONLY!!
 #include <utility>
 #include <typeinfo>
 
@@ -10,9 +10,9 @@
 #include "etl/String.hpp"
 #include "Message.hpp"
 
-#define FUNCMAPSIZE        128      // size of the function map in bytes (temporary, arbitrary)
+#define FUNCMAPSIZE        128     // size of the function map in bytes (temporary, arbitrary)
 #define MAXFUNCNAMELENGTH  32      // max length of the function name (temporary, arbitrary)
-#define MAXARGLENGTH       32       // maximum argument byte string length
+#define MAXARGLENGTH       32      // maximum argument byte string length (temporary, arbitrary)
 
 /**
  * Implementation of the ST[08] function management service
@@ -21,7 +21,10 @@
  * ECSS-E-ST-70-41C, pages 157-159. Final implementation is dependent on subsystem requirements
  * which are, as of this writing, undefined yet.
  *
- * WARNING! Any string handling in this class involves non-null-terminated strings!
+ * Caveats:
+ * 1) Any string handling in this class involves **non-null-terminated strings**.
+ *
+ * You have been warned.
  *
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
@@ -38,7 +41,8 @@ class FunctionManagementService {
 
 public:
 	/**
-	 * Constructs the function pointer index. All functions to be included shall be visible to it.
+	 * Constructs the function pointer index with all the necessary functions at initialization time
+	 * These functions need to be in scope.
 	 * @param None
 	 */
 	FunctionManagementService();
