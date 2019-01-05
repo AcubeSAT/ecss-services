@@ -17,7 +17,40 @@ TEST_CASE("FMS - Call Tests") {
 		CHECK(fms.call(msg) == 1);
 	}
 
-	/**
-	 * @todo Add more tests
-	 */
+	SECTION("Too long message") {
+		fms.include(String<MAXFUNCNAMELENGTH>("test"), &test);
+		Message msg(8, 1, Message::TC, 1);
+		msg.appendString(String<MAXFUNCNAMELENGTH>("test"));
+		msg.appendString(String<65>
+		    ("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
+		CHECK(fms.call(msg) == 4);
+	}
 }
+
+TEST_CASE("FMS - Insert Tests") {
+
+	SECTION("Insertion to full pointer map") {
+		FunctionManagementService fms;
+		std::string name;  // FOR TESTING ONLY!
+
+		// make sure the pointer map is full to the brim
+		for (int i = 0; i < 15000; i++) {
+			name = "test" + i;
+			String<MAXFUNCNAMELENGTH> funcName(name.c_str());
+
+			if (~fms.funcPtrIndex.full()) {  // not ! because vera whines about "using negation
+				// in its short form"
+				fms.include(funcName, &test);
+			}
+			else {
+				break;
+			}
+		}
+
+		CHECK(fms.include(String<MAXFUNCNAMELENGTH>("testall"), &test) == 2);
+	}
+}
+
+/**
+ * @todo Add more tests
+ */

@@ -14,7 +14,10 @@
 #define MAXFUNCNAMELENGTH  32      // max length of the function name (temporary, arbitrary)
 #define MAXARGLENGTH       32      // maximum argument byte string length (temporary, arbitrary)
 
-#define TESTMODE                   // REMOVE BEFORE FLIGHT!
+/**
+ * @todo: Undef TESTMODE before flight!!!!
+ */
+#define TESTMODE                   // REMOVE BEFORE FLIGHT!(used by Catch to gain visibility @ test)
 
 /**
  * Implementation of the ST[08] function management service
@@ -24,9 +27,9 @@
  * which are, as of this writing, undefined yet.
  *
  * Caveats:
- * 1) Any string handling in this class involves **non-null-terminated strings**.
- * 2) Any remaining characters in the function name part of TC[08] shall be padded with spaces
- * (0x32).
+ * 1) Function names shall be exactly MAXFUNCNAMELENGTH-lengthed in order to be properly read
+ * and stored!  (not sure if this is a caveat though, as ECSS-E-ST-70-41C stipulates for ST[08]
+ * that all function names must be fixed-length character strings)
  *
  * You have been warned.
  *
@@ -58,8 +61,7 @@ public:
 
 	/**
 	 * Calls the function described in the TC[8,1] message *msg*, passing the arguments contained
-	 * WARNING: Do not include any spaces in the arguments, they are ignored and replaced with NULL
-	 *
+	 * and, if non-existent, generates a failed start of execution notification.
 	 * @param msg A TC[8,1] message
 	 */
 	 #ifdef TESTMODE
@@ -76,7 +78,11 @@ public:
 	 * @param ptr pointer to a function of void return type and a MAXARGLENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
+#ifdef TESTMODE
+	int include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)(String<MAXARGLENGTH>));
+#else
 	void include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)(String<MAXARGLENGTH>));
+#endif
 };
 
 #endif //ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP

@@ -1,17 +1,35 @@
 #include "Services/FunctionManagementService.hpp"
 
+#ifdef TESTMODE
+//void foo(String<MAXARGLENGTH> b) {
+//	std::cout << "SPAAAACE!" << std::endl;
+//}
+//
+//void bar(String<MAXARGLENGTH> b) {
+//	std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
+//}
+//
+//void baz(String<MAXARGLENGTH> b) {
+//	std::cout << "QWERTYUIOP" << std::endl;
+//}
+//
 //void dummy1(const String<MAXARGLENGTH> a) {
 //	std::cout << a.c_str() << std::endl;
 //}
-
-/*
+//
+//FunctionManagementService::FunctionManagementService() {
+//	// Sample inclusion of functions in the pointer map.
+//	include(String<MAXFUNCNAMELENGTH>("dummy1"), &dummy1);
+//	include(String<MAXFUNCNAMELENGTH>("foo"), &foo);
+//	include(String<MAXFUNCNAMELENGTH>("bar"), &bar);
+//	include(String<MAXFUNCNAMELENGTH>("baz"), &baz);
+//	// All the functions that should be included in the pointer map at initialization shall be here.
+//}
+#else
 FunctionManagementService::FunctionManagementService() {
-	// Sample inclusion of a function in the pointer map.
-	// include(String<MAXFUNCNAMELENGTH>("dummy1"), &dummy1);
-
-	// All the functions that should be included in the pointer map at initialization shall be here.
+	// INSERT YOUR OWN FUNCTIONS HERE AS ABOVE!
 }
-*/
+#endif
 
 #ifdef TESTMODE
 int FunctionManagementService::call(Message msg){
@@ -21,29 +39,14 @@ int FunctionManagementService::call(Message msg){
 	uint8_t funcName[MAXFUNCNAMELENGTH];  // the function's name
 	uint8_t funcArgs[MAXARGLENGTH];    // arguments for the function
 
-	// initialize the function name and the argument arrays
-	for (int i = 0; i < MAXFUNCNAMELENGTH; i++) {
-		funcName[i] = '\0';
-		funcArgs[i] = '\0';
-	}
+	msg.readString(funcName, MAXFUNCNAMELENGTH);
+	msg.readString(funcArgs, MAXARGLENGTH);
 
-	// isolate the function's name from the incoming message
-	for (int i = 0; i < MAXFUNCNAMELENGTH; i++) {
-		uint8_t currByte = msg.readByte();
-		if (currByte == 0x20) {
-			continue;
-		}
-		funcName[i] = currByte;
-	}
-
-	// isolate the string containing the args (if string length exceeds max, the remaining bytes
-	// are silently ignored)
-	for (int i = 0; i < MAXARGLENGTH; i++) {
-		uint8_t currByte = msg.readByte();
-		if (currByte == 0x20) {
-			continue;
-		}
-		funcArgs[i] = currByte;
+	if (msg.dataSize > MAXFUNCNAMELENGTH + MAXARGLENGTH) {
+		/**
+		 * @todo Send failed start of execution (too long message)
+		 */
+		 return 4;  // arbitrary
 	}
 
 	// locate the appropriate function pointer
@@ -56,15 +59,33 @@ int FunctionManagementService::call(Message msg){
 	}
 	else {
 		/**
-		 * @todo Send failed start of execution
+		 * @todo Send failed start of execution (function not found)
 		 */
-		return 1;
+		return 1;  // arbitrary
 	}
 
 	// execute the function if there are no obvious flaws (defined in the standard, pg.158)
 	selected(funcArgs);
 	return 0;
 }
+
+// TEST VERSION OF include()!
+int FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)
+	(String<MAXARGLENGTH>)) {
+
+	if (funcPtrIndex.full()) {
+		/**
+		 * @todo Generate suitable notification (index is full)
+		 */
+		return 2;  // arbitrary, for testing purposes
+	}
+
+	funcName.append(MAXFUNCNAMELENGTH - funcName.length(), '\0');
+	funcPtrIndex.insert(std::make_pair(funcName, ptr));
+
+	return 0;
+}
+
 #else
 void FunctionManagementService::call(Message msg){
 	assert(msg.messageType == 1);
@@ -73,29 +94,14 @@ void FunctionManagementService::call(Message msg){
 	uint8_t funcName[MAXFUNCNAMELENGTH];  // the function's name
 	uint8_t funcArgs[MAXARGLENGTH];    // arguments for the function
 
-	// initialize the function name and the argument arrays
-	for (int i = 0; i < MAXFUNCNAMELENGTH; i++) {
-		funcName[i] = '\0';
-		funcArgs[i] = '\0';
-	}
+	msg.readString(funcName, MAXFUNCNAMELENGTH);
+	msg.readString(funcArgs, MAXARGLENGTH);
 
-	// isolate the function's name from the incoming message
-	for (int i = 0; i < MAXFUNCNAMELENGTH; i++) {
-		uint8_t currByte = msg.readByte();
-		if (currByte == 0x20) {
-			continue;
-		}
-		funcName[i] = currByte;
-	}
-
-	// isolate the string containing the args (if string length exceeds max, the remaining bytes
-	// are silently ignored)
-	for (int i = 0; i < MAXARGLENGTH; i++) {
-		uint8_t currByte = msg.readByte();
-		if (currByte == 0x20) {
-			continue;
-		}
-		funcArgs[i] = currByte;
+	if (msg.readPosition < MAXFUNCNAMELENGTH + MAXARGLENGTH) {
+		/**
+		 * @todo Send failed start of execution (too long message)
+		 */
+		return;
 	}
 
 	// locate the appropriate function pointer
@@ -108,7 +114,7 @@ void FunctionManagementService::call(Message msg){
 	}
 	else {
 		/**
-		 * @todo Send failed start of execution
+		 * @todo Send failed start of execution (function not found)
 		 */
 		return;
 	}
@@ -120,23 +126,21 @@ void FunctionManagementService::call(Message msg){
 void FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName,
 	void (*ptr)(String<MAXARGLENGTH>)) {
 
-	if (funcName.length() <= MAXFUNCNAMELENGTH) {
-		funcName.append(MAXFUNCNAMELENGTH - funcName.length(), '\0');
-	}
-	else {
+	if (funcName.length() > MAXFUNCNAMELENGTH) {
+		/**
+		 * @todo Generate suitable notification (function name exceeds maximum allowed length)
+		 */
 		return;
 	}
-
-	funcPtrIndex.insert(std::make_pair(funcName, ptr));
+	else if (funcPtrIndex.full()) {
+		/**
+		 * @todo Generate suitable notification (index is full)
+		 */
+		return;
+	}
+	else {
+		funcName.append(MAXFUNCNAMELENGTH - funcName.length(), '\0');
+		funcPtrIndex.insert(std::make_pair(funcName, ptr));
+	}
 }
 #endif
-
-void FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)
-(String<MAXARGLENGTH>)) {
-
-	if (funcName.length() <= MAXFUNCNAMELENGTH) {
-		funcName.append(MAXFUNCNAMELENGTH - funcName.length(), '\0');
-	}
-
-	funcPtrIndex.insert(std::make_pair(funcName, ptr));
-}
