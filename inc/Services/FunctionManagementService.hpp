@@ -9,6 +9,7 @@
 #include "etl/map.h"
 #include "etl/String.hpp"
 #include "Message.hpp"
+#include "Service.hpp"
 
 #define FUNCMAPSIZE        128     // size of the function map in bytes (temporary, arbitrary)
 #define MAXFUNCNAMELENGTH  32      // max length of the function name (temporary, arbitrary)
@@ -40,7 +41,7 @@ typedef String<MAXFUNCNAMELENGTH> functionName;
 typedef etl::map<functionName, void(*)(String<MAXARGLENGTH>), FUNCMAPSIZE>
 PointerMap;
 
-class FunctionManagementService {
+class FunctionManagementService : public Service {
 	/**
 	 * Map of the function names to their respective pointers. Size controlled by FUNCMAPSIZE
 	 */
