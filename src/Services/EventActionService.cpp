@@ -22,7 +22,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			index++;
 		}
 		if (flag == 0) {
-			char data[128];
+			char data[64];
 			eventActionDefinitionArray[index].empty = false;
 			eventActionDefinitionArray[index].enabled = true;
 			eventActionDefinitionArray[index].applicationId = message.readEnum16();
@@ -40,8 +40,8 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		uint16_t index = 0;
 		for (uint16_t i = 0; i < N; i++) {
+			uint16_t index = 0;
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (index < 255) {
@@ -55,7 +55,6 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 				}
 				index++;
 			}
-			index = 0;
 		}
 
 	}
@@ -82,8 +81,8 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		uint16_t index = 0;
 		for (uint16_t i = 0; i < N; i++) {
+			uint16_t index = 0;
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (index < 255) {
@@ -93,7 +92,6 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 				}
 				index++;
 			}
-			index = 0;
 		}
 	}
 }
@@ -103,8 +101,8 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		uint16_t index = 0;
 		for (uint16_t i = 0; i < N; i++) {
+			uint16_t index = 0;
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			while (index < 256) {
@@ -114,7 +112,6 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 				}
 				index++;
 			}
-			index = 0;
 		}
 	}
 }
