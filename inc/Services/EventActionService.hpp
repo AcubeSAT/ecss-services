@@ -39,16 +39,13 @@ public:
 public:
 	EventActionService() {
 		serviceType = 19;
-		eventActionFunctionStatus = enabledFunction;
+		eventActionFunctionStatus = true;
 	}
 
 	/**
 	 * Event-action function status
 	 */
-	enum EventActionFunctionStatus {
-		disabledFunction = 0,
-		enabledFunction = 1,
-	};
+	bool enabledActionFunctionStatus;
 
 	/**
 	 * TC[19,1] add event-action definitions
@@ -108,8 +105,8 @@ public:
 	/**
 	 * Setter for event-action function status
 	 */
-	void setEventActionFunctionStatus(EventActionFunctionStatus e) {
-		eventActionFunctionStatus = e;
+	void setEventActionFunctionStatus(bool status) {
+		eventActionFunctionStatus = status;
 	}
 };
 

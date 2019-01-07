@@ -148,7 +148,7 @@ void EventActionService::enableEventActionFunction(Message message) {
 	// TC[19,8]
 	if (message.messageType == 8 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
-		setEventActionFunctionStatus(EventActionFunctionStatus::enabledFunction);
+		setEventActionFunctionStatus(true);
 	}
 }
 
@@ -156,7 +156,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 	// TC[19,9]
 	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
-		setEventActionFunctionStatus(EventActionFunctionStatus::disabledFunction);
+		setEventActionFunctionStatus(false);
 	}
 }
 
@@ -164,7 +164,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 // Should I use applicationID too?
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
-	if (eventActionFunctionStatus == enabledFunction) {
+	if (eventActionFunctionStatus) {
 		uint16_t i = 0;
 		while (i < 256) {
 			if (eventActionDefinitionArray[i].empty == false &&
