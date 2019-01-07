@@ -1,10 +1,13 @@
 #ifndef ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
+#define ECSS_EVENT_SERVICE_STRING_SIZE 64
+
 #include "Service.hpp"
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
 #include <bitset>
+#include <Services/EventReportService.hpp>
 
 /**
  * Implementation of ST[19] event-action Service
@@ -15,7 +18,7 @@
  * initialization or rather the lack of it. Pay attention especially in parts of the code that I
  * use strings <3 .
  *
-
+ * @todo: (Possible) Use a etl::map for eventActionDefinitionArray
  * @todo: check if executeAction should accept applicationID too
  * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
  * multiple instances are accessed, should I find a more efficient way to access them?
@@ -24,6 +27,13 @@
  * @todo: check size of eventActionDefinitionArray
  */
 class EventActionService : public Service {
+private:
+	/**
+	 * Custom function that is called right after an event takes place, to initiate
+	 * the execution of the action
+	 */
+	void executeAction(uint16_t eventID);
+
 public:
 	uint8_t eventActionFunctionStatus; // Indicates if actions are enabled
 	struct EventActionDefinition {
@@ -39,7 +49,7 @@ public:
 	// If the size is changed maybe then indexOfAvailableSlots as well as the initiating loop in the
 	// constructor should be changed from uint16_t
 	EventActionDefinition eventActionDefinitionArray[256];
-public:
+
 	EventActionService() {
 		serviceType = 19;
 		eventActionFunctionStatus = true;
@@ -98,12 +108,6 @@ public:
 	 * TC[19,9] disable the event-actioni function
 	 */
 	void disableEventActionFunction(Message message);
-
-	/**
-	 * Custom function that is called right after an event takes place, to initiate
-	 * the execution of the action
-	 */
-	private void executeAction(uint16_t eventID);
 
 	/**
 	 * Setter for event-action function status

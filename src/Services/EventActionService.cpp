@@ -4,7 +4,7 @@
 
 /**
  * @todo: Should a check be added for index to not exceed the size of eventActionDefinitionArray
- * ? Also check if there is needed a uint16_t (in case of changing the size of
+ * ? Also check if there a uint16_t is needed (in case of changing the size of
  * eventActionDefinitionArray
  */
 void EventActionService::addEventActionDefinitions(Message message) {
@@ -12,17 +12,16 @@ void EventActionService::addEventActionDefinitions(Message message) {
 
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
 	                                                                     19) {
-		uint16_t index = 0;
-		uint8_t flag = 0; // used as boolean 0 is false, 1 is true
-		while (eventActionDefinitionArray[index].empty == false) {
-			if (index == 255) { // 255 should be changed depending on size of the array
-				flag = 1;
+		bool flag = true;
+		uint16_t index;
+		for (index = 0; index < 256; index++) {
+			if (eventActionDefinitionArray[index].empty == true) {
+				flag = false;
 				break;
 			}
-			index++;
 		}
-		if (flag == 0) {
-			char data[64];
+		if (!flag) {
+			char data[ECSS_EVENT_SERVICE_STRING_SIZE];
 			eventActionDefinitionArray[index].empty = false;
 			eventActionDefinitionArray[index].enabled = true;
 			eventActionDefinitionArray[index].applicationId = message.readEnum16();
@@ -30,7 +29,8 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			// Tests pass with message.dataSize - 3, message.dataSize - 4, but not
 			// message.dataSize - 5
 			message.readString(data, message.dataSize);
-			eventActionDefinitionArray[index].request = String<64>(data);
+			eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
+				data);
 		}
 	}
 }

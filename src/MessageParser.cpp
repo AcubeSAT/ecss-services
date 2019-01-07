@@ -76,10 +76,11 @@ void MessageParser::parseTC(uint8_t *data, uint16_t length, Message &message) {
 	message.dataSize = length;
 }
 
-Message MessageParser::parseRequestTC(String<64> data) {
+Message MessageParser::parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data) {
 	Message message;
 	uint8_t *dataInt = reinterpret_cast<uint8_t *>(data.data());
 	message.packetType = Message::TC;
-	parseTC(dataInt, 64, message); // Maybe instead of 256 should there be a variable?
+	parseTC(dataInt, ECSS_EVENT_SERVICE_STRING_SIZE,
+	        message); // Maybe instead of 256 should there be a variable?
 	return message;
 }

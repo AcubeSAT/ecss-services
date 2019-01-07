@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_MESSAGEPARSER_HPP
 #define ECSS_SERVICES_MESSAGEPARSER_HPP
 
+#include <Services/EventActionService.hpp>
 #include "Message.hpp"
 
 /**
@@ -45,7 +46,7 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	Message parseRequestTC(String<64> data);
+	Message parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data);
 
 private:
 	/**
