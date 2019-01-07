@@ -7,7 +7,7 @@ void test(String<MAXARGLENGTH> a) {
 	std::cout << a.c_str() << std::endl;
 }
 
-TEST_CASE("FMS - Call Tests") {
+TEST_CASE("ST[08] - Call Tests") {
 	FunctionManagementService fms;
 
 	SECTION("Malformed name") {
@@ -27,7 +27,7 @@ TEST_CASE("FMS - Call Tests") {
 	}
 }
 
-TEST_CASE("FMS - Insert Tests") {
+TEST_CASE("ST[08] - Insert Tests") {
 
 	SECTION("Insertion to full pointer map") {
 		FunctionManagementService fms;

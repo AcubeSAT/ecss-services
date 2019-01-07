@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_ETL_STRING_HPP
 #define ECSS_SERVICES_ETL_STRING_HPP
 
-
 #include <cstddef>
 #include <etl/cstring.h>
 
