@@ -7,6 +7,7 @@
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Services/TimeManagementService.hpp"
+#include "Services/EventActionService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
@@ -230,8 +231,9 @@ int main() {
 
 	eventActionService.disableEventActionDefinitions(eventActionDefinition3);
 	std::cout << "Status of position 0,1,2 should be 000:" << eventActionService
-		.stateOfEventAction[0] << eventActionService.stateOfEventAction[1] << eventActionService
-		          .stateOfEventAction[2];
+		.eventActionDefinitionArray[0].enabled << eventActionService
+		.eventActionDefinitionArray[1].enabled <<
+		eventActionService.eventActionDefinitionArray[2].enabled;
 
 	Message eventActionDefinition5(19, 4, Message::TC, 1);
 	eventActionDefinition5.appendUint16(2);
@@ -241,8 +243,9 @@ int main() {
 	eventActionDefinition5.appendUint16(3);
 	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
 	std::cout << "\nStatus of position 0,1,2 should be 111:" << eventActionService
-		.stateOfEventAction[0] << eventActionService.stateOfEventAction[1] << eventActionService
-		          .stateOfEventAction[2];
+		.eventActionDefinitionArray[0].enabled << eventActionService
+		.eventActionDefinitionArray[1].enabled <<
+		eventActionService.eventActionDefinitionArray[2].enabled;
 
 	Message eventActionDefinition4(19, 2, Message::TC, 1);
 	eventActionDefinition4.appendUint16(1);
