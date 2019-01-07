@@ -1,35 +1,34 @@
 #include "Services/FunctionManagementService.hpp"
 
-#ifdef TESTMODE
-//void foo(String<MAXARGLENGTH> b) {
-//	std::cout << "SPAAAACE!" << std::endl;
-//}
-//
-//void bar(String<MAXARGLENGTH> b) {
-//	std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
-//}
-//
-//void baz(String<MAXARGLENGTH> b) {
-//	std::cout << "QWERTYUIOP" << std::endl;
-//}
-//
-//void dummy1(const String<MAXARGLENGTH> a) {
-//	std::cout << a.c_str() << std::endl;
-//}
-//
-//FunctionManagementService::FunctionManagementService() {
-//	// Sample inclusion of functions in the pointer map.
-//	include(String<FUNCNAMELENGTH>("dummy1"), &dummy1);
-//	include(String<FUNCNAMELENGTH>("foo"), &foo);
-//	include(String<FUNCNAMELENGTH>("bar"), &bar);
-//	include(String<FUNCNAMELENGTH>("baz"), &baz);
-//	// All the functions that should be included in the pointer map at initialization shall be here.
-//}
-#else
-FunctionManagementService::FunctionManagementService() {
-	// INSERT YOUR OWN FUNCTIONS HERE AS ABOVE!
-}
-#endif
+/**
+ * Usage of the include() function:
+ *
+ * void foo(String<MAXARGLENGTH> b) {
+ * 		std::cout << "SPAAAACE!" << std::endl;
+ * 	}
+ *
+ * void bar(String<MAXARGLENGTH> b) {
+ * 		std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
+ * 	}
+ *
+ * void baz(String<MAXARGLENGTH> b) {
+ * 		std::cout << "QWERTYUIOP" << std::endl;
+ * 	}
+ *
+ * 	FunctionManagementService::FunctionManagementService() {
+ * 		include(String<FUNCNAMELENGTH>("foo"), &foo);
+ * 		include(String<FUNCNAMELENGTH>("bar"), &bar);
+ * 		include(String<FUNCNAMELENGTH>("baz"), &baz);
+ * 	}
+ */
+
+/*
+ * FunctionManagementService::FunctionManagementService() {
+ * All the functions that should be included in the pointer map at initialization shall be here.
+ * and included as in the examples above.
+ *
+ * }
+ */
 
 int FunctionManagementService::call(Message msg){
 	assert(msg.messageType == 1);
