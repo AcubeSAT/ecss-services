@@ -26,12 +26,12 @@
 class EventActionService : public Service {
 public:
 	uint8_t eventActionFunctionStatus; // Indicates if actions are enabled
-	std::bitset<256> stateOfEventAction;
 	struct EventActionDefinition {
-		uint8_t empty = 1; // 1 means empty, 0 means full
+		bool empty = true; // 1 means empty, 0 means full
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535;
 		String<64> request = "";
+		bool enabled = false;
 	};
 	// If the size is changed maybe then indexOfAvailableSlots as well as the initiating loop in the
 	// constructor should be changed from uint16_t
@@ -40,7 +40,6 @@ public:
 	EventActionService() {
 		serviceType = 19;
 		eventActionFunctionStatus = enabledFunction;
-		stateOfEventAction.set();
 	}
 
 	/**
