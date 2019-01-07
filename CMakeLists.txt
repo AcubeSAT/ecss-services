@@ -26,8 +26,7 @@ add_library(common OBJECT
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         src/Services/TimeManagementService.cpp
-	inc/Services/EventActionService.hpp
-	src/Services/EventActionService.cpp
+    	src/Services/EventActionService.cpp
         )
 
 # Specify the .cpp files for the executables
@@ -46,6 +45,6 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     add_executable(tests
             $<TARGET_OBJECTS:common>
             ${test_main_SRC}
-            ${test_SRC} test/Services/EventActionService.cpp)
+            )
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()
