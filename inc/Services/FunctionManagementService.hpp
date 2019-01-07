@@ -39,16 +39,16 @@
 
 typedef String<MAXFUNCNAMELENGTH> functionName;
 typedef etl::map<functionName, void(*)(String<MAXARGLENGTH>), FUNCMAPSIZE>
-PointerMap;
+FunctionMap;
 
 class FunctionManagementService : public Service {
 	/**
 	 * Map of the function names to their respective pointers. Size controlled by FUNCMAPSIZE
 	 */
 #ifdef TESTMODE
-public: PointerMap funcPtrIndex;
+public: FunctionMap funcPtrIndex;
 #else
-	PointerMap funcPtrIndex;
+	FunctionMap funcPtrIndex;
 #endif
 
 public:
@@ -62,28 +62,22 @@ public:
 
 	/**
 	 * Calls the function described in the TC[8,1] message *msg*, passing the arguments contained
-	 * and, if non-existent, generates a failed start of execution notification.
+	 * and, if non-existent, generates a failed start of execution notification. Returns an unneeded
+	 * int, for testing purposes.
 	 * @param msg A TC[8,1] message
 	 */
-	 #ifdef TESTMODE
 	int call(Message msg);
-	 #else
-	void call(Message msg);
-	 #endif
 
 	/**
 	 * Includes a new function in the pointer map. This enables it to be called by way of a valid
-	 * TC [8,1] message.
+	 * TC [8,1] message. After inclusion it returns an unneeded int signalling insertion success
+	 * (0) or failure (2). These returns are there for testing purposes only.
 	 *
 	 * @param funcName the function's name. Max. length is MAXFUNCNAMELENGTH bytes.
 	 * @param ptr pointer to a function of void return type and a MAXARGLENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
-#ifdef TESTMODE
 	int include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)(String<MAXARGLENGTH>));
-#else
-	void include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)(String<MAXARGLENGTH>));
-#endif
 };
 
 #endif //ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP

@@ -31,7 +31,6 @@ FunctionManagementService::FunctionManagementService() {
 }
 #endif
 
-#ifdef TESTMODE
 int FunctionManagementService::call(Message msg){
 	assert(msg.messageType == 1);
 	assert(msg.serviceType == 8);
@@ -51,7 +50,7 @@ int FunctionManagementService::call(Message msg){
 
 	// locate the appropriate function pointer
 	String<MAXFUNCNAMELENGTH> name(funcName);
-	PointerMap::iterator iter = funcPtrIndex.find(name);
+	FunctionMap::iterator iter = funcPtrIndex.find(name);
 	void(*selected)(String<MAXARGLENGTH>);
 
 	if (iter != funcPtrIndex.end()) {
@@ -69,7 +68,6 @@ int FunctionManagementService::call(Message msg){
 	return 0;
 }
 
-// TEST VERSION OF include()!
 int FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)
 	(String<MAXARGLENGTH>)) {
 
@@ -85,62 +83,3 @@ int FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName, void(
 
 	return 0;
 }
-
-#else
-void FunctionManagementService::call(Message msg){
-	assert(msg.messageType == 1);
-	assert(msg.serviceType == 8);
-
-	uint8_t funcName[MAXFUNCNAMELENGTH];  // the function's name
-	uint8_t funcArgs[MAXARGLENGTH];    // arguments for the function
-
-	msg.readString(funcName, MAXFUNCNAMELENGTH);
-	msg.readString(funcArgs, MAXARGLENGTH);
-
-	if (msg.readPosition < MAXFUNCNAMELENGTH + MAXARGLENGTH) {
-		/**
-		 * @todo Send failed start of execution (too long message)
-		 */
-		return;
-	}
-
-	// locate the appropriate function pointer
-	String<MAXFUNCNAMELENGTH> name(funcName);
-	PointerMap::iterator iter = funcPtrIndex.find(name);
-	void(*selected)(String<MAXARGLENGTH>);
-
-	if (iter != funcPtrIndex.end()) {
-		selected = *iter->second;
-	}
-	else {
-		/**
-		 * @todo Send failed start of execution (function not found)
-		 */
-		return;
-	}
-
-	// execute the function if there are no obvious flaws (defined in the standard, pg.158)
-	selected(funcArgs);
-}
-
-void FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName,
-	void (*ptr)(String<MAXARGLENGTH>)) {
-
-	if (funcName.length() > MAXFUNCNAMELENGTH) {
-		/**
-		 * @todo Generate suitable notification (function name exceeds maximum allowed length)
-		 */
-		return;
-	}
-	else if (funcPtrIndex.full()) {
-		/**
-		 * @todo Generate suitable notification (index is full)
-		 */
-		return;
-	}
-	else {
-		funcName.append(MAXFUNCNAMELENGTH - funcName.length(), '\0');
-		funcPtrIndex.insert(std::make_pair(funcName, ptr));
-	}
-}
-#endif
