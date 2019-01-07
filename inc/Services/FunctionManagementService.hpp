@@ -12,7 +12,7 @@
 #include "Service.hpp"
 
 #define FUNCMAPSIZE        128     // size of the function map in bytes (temporary, arbitrary)
-#define MAXFUNCNAMELENGTH  32      // max length of the function name (temporary, arbitrary)
+#define FUNCNAMELENGTH     32      // max length of the function name (temporary, arbitrary)
 #define MAXARGLENGTH       32      // maximum argument byte string length (temporary, arbitrary)
 
 /**
@@ -37,7 +37,7 @@
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
 
-typedef String<MAXFUNCNAMELENGTH> functionName;
+typedef String<FUNCNAMELENGTH> functionName;
 typedef etl::map<functionName, void(*)(String<MAXARGLENGTH>), FUNCMAPSIZE>
 FunctionMap;
 
@@ -77,7 +77,7 @@ public:
 	 * @param ptr pointer to a function of void return type and a MAXARGLENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
-	int include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)(String<MAXARGLENGTH>));
+	int include(String<FUNCNAMELENGTH> funcName, void(*ptr)(String<MAXARGLENGTH>));
 };
 
 #endif //ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP

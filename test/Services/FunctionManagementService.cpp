@@ -11,16 +11,16 @@ TEST_CASE("FMS - Call Tests") {
 	FunctionManagementService fms;
 
 	SECTION("Malformed name") {
-		fms.include(String<MAXFUNCNAMELENGTH>("test"), &test);
+		fms.include(String<FUNCNAMELENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
-		msg.appendString(String<MAXFUNCNAMELENGTH>("t3st"));
+		msg.appendString(String<FUNCNAMELENGTH>("t3st"));
 		CHECK(fms.call(msg) == 1);
 	}
 
 	SECTION("Too long message") {
-		fms.include(String<MAXFUNCNAMELENGTH>("test"), &test);
+		fms.include(String<FUNCNAMELENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
-		msg.appendString(String<MAXFUNCNAMELENGTH>("test"));
+		msg.appendString(String<FUNCNAMELENGTH>("test"));
 		msg.appendString(String<65>
 		    ("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
 		CHECK(fms.call(msg) == 4);
@@ -36,7 +36,7 @@ TEST_CASE("FMS - Insert Tests") {
 		// make sure the pointer map is full to the brim
 		for (int i = 0; i < 15000; i++) {
 			name = "test" + i;
-			String<MAXFUNCNAMELENGTH> funcName(name.c_str());
+			String<FUNCNAMELENGTH> funcName(name.c_str());
 
 			if (~fms.funcPtrIndex.full()) {  // not ! because vera whines about "using negation
 				// in its short form"
@@ -47,7 +47,7 @@ TEST_CASE("FMS - Insert Tests") {
 			}
 		}
 
-		CHECK(fms.include(String<MAXFUNCNAMELENGTH>("testall"), &test) == 2);
+		CHECK(fms.include(String<FUNCNAMELENGTH>("testall"), &test) == 2);
 	}
 }
 

@@ -19,10 +19,10 @@
 //
 //FunctionManagementService::FunctionManagementService() {
 //	// Sample inclusion of functions in the pointer map.
-//	include(String<MAXFUNCNAMELENGTH>("dummy1"), &dummy1);
-//	include(String<MAXFUNCNAMELENGTH>("foo"), &foo);
-//	include(String<MAXFUNCNAMELENGTH>("bar"), &bar);
-//	include(String<MAXFUNCNAMELENGTH>("baz"), &baz);
+//	include(String<FUNCNAMELENGTH>("dummy1"), &dummy1);
+//	include(String<FUNCNAMELENGTH>("foo"), &foo);
+//	include(String<FUNCNAMELENGTH>("bar"), &bar);
+//	include(String<FUNCNAMELENGTH>("baz"), &baz);
 //	// All the functions that should be included in the pointer map at initialization shall be here.
 //}
 #else
@@ -35,13 +35,13 @@ int FunctionManagementService::call(Message msg){
 	assert(msg.messageType == 1);
 	assert(msg.serviceType == 8);
 
-	uint8_t funcName[MAXFUNCNAMELENGTH];  // the function's name
+	uint8_t funcName[FUNCNAMELENGTH];  // the function's name
 	uint8_t funcArgs[MAXARGLENGTH];    // arguments for the function
 
-	msg.readString(funcName, MAXFUNCNAMELENGTH);
+	msg.readString(funcName, FUNCNAMELENGTH);
 	msg.readString(funcArgs, MAXARGLENGTH);
 
-	if (msg.dataSize > MAXFUNCNAMELENGTH + MAXARGLENGTH) {
+	if (msg.dataSize > FUNCNAMELENGTH + MAXARGLENGTH) {
 		/**
 		 * @todo Send failed start of execution (too long message)
 		 */
@@ -49,7 +49,7 @@ int FunctionManagementService::call(Message msg){
 	}
 
 	// locate the appropriate function pointer
-	String<MAXFUNCNAMELENGTH> name(funcName);
+	String<FUNCNAMELENGTH> name(funcName);
 	FunctionMap::iterator iter = funcPtrIndex.find(name);
 	void(*selected)(String<MAXARGLENGTH>);
 
@@ -68,7 +68,7 @@ int FunctionManagementService::call(Message msg){
 	return 0;
 }
 
-int FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName, void(*ptr)
+int FunctionManagementService::include(String<FUNCNAMELENGTH> funcName, void(*ptr)
 	(String<MAXARGLENGTH>)) {
 
 	if (funcPtrIndex.full()) {
@@ -78,7 +78,7 @@ int FunctionManagementService::include(String<MAXFUNCNAMELENGTH> funcName, void(
 		return 2;  // arbitrary, for testing purposes
 	}
 
-	funcName.append(MAXFUNCNAMELENGTH - funcName.length(), '\0');
+	funcName.append(FUNCNAMELENGTH - funcName.length(), '\0');
 	funcPtrIndex.insert(std::make_pair(funcName, ptr));
 
 	return 0;
