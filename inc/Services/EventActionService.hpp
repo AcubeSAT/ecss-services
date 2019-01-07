@@ -33,6 +33,9 @@ public:
 		String<64> request = "";
 		bool enabled = false;
 	};
+
+	friend EventReportService;
+
 	// If the size is changed maybe then indexOfAvailableSlots as well as the initiating loop in the
 	// constructor should be changed from uint16_t
 	EventActionDefinition eventActionDefinitionArray[256];
@@ -100,7 +103,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction(uint16_t eventID);
+	private void executeAction(uint16_t eventID);
 
 	/**
 	 * Setter for event-action function status
