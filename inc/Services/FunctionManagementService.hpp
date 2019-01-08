@@ -11,9 +11,9 @@
 #include "Message.hpp"
 #include "Service.hpp"
 
-#define FUNCMAPSIZE        128     // size of the function map in bytes (temporary, arbitrary)
-#define FUNCNAMELENGTH     32      // max length of the function name (temporary, arbitrary)
-#define MAXARGLENGTH       32      // maximum argument byte string length (temporary, arbitrary)
+#define FUNCMAPSIZE     128     // size of the function map (number of elements)
+#define FUNCNAMELENGTH  32      // max length of the function name
+#define MAXARGLENGTH    32      // maximum argument byte string length
 
 /**
  * @todo: Undef TESTMODE before flight!!!!
