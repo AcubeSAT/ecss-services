@@ -25,9 +25,13 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			eventActionDefinitionArray[index].eventDefinitionID = message.readEnum16();
 			// Tests pass with message.dataSize - 3, message.dataSize - 4, but not
 			// message.dataSize - 5
-			message.readString(data, message.dataSize);
-			eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
-				data);
+			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) { // Should this be >= ?
+				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
+			} else {
+				message.readString(data, message.dataSize);
+				eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
+					data);
+			}
 		}
 	}
 }
