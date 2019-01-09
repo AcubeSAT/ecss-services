@@ -3,8 +3,7 @@
 #include "MessageParser.hpp"
 
 /**
- * @todo: Should a check be added for index to not exceed the size of eventActionDefinitionArray
- * ? Also check if there a uint16_t is needed (in case of changing the size of
+ * @todo: Check if a uint16_t is needed (in case of changing the size of
  * eventActionDefinitionArray
  */
 void EventActionService::addEventActionDefinitions(Message message) {
@@ -14,7 +13,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 	                                                                     19) {
 		bool flag = true;
 		uint16_t index;
-		for (index = 0; index < 256; index++) {
+		for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 			if (eventActionDefinitionArray[index].empty == true) {
 				flag = false;
 				break;
@@ -41,10 +40,9 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
 		for (uint16_t i = 0; i < N; i++) {
-			uint16_t index = 0;
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index < 255) {
+			for (uint16_t index = 0; index< ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					eventActionDefinitionArray[index].empty = true;
@@ -53,7 +51,6 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 					eventActionDefinitionArray[index].applicationId = 0;
 					eventActionDefinitionArray[index].enabled = false;
 				}
-				index++;
 			}
 		}
 
@@ -64,7 +61,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message message) {
 	// TC[19,3]
 	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
-		for (uint16_t index = 0; index < 256; index++) {
+		for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 			if (eventActionDefinitionArray[index].empty == false) {
 				eventActionDefinitionArray[index].empty = true;
 				eventActionDefinitionArray[index].enabled = false;
@@ -82,15 +79,13 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
 		for (uint16_t i = 0; i < N; i++) {
-			uint16_t index = 0;
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index < 255) {
+			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					eventActionDefinitionArray[index].enabled = true;
 				}
-				index++;
 			}
 		}
 	}
@@ -102,15 +97,13 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
 		for (uint16_t i = 0; i < N; i++) {
-			uint16_t index = 0;
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			while (index < 256) {
+			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					eventActionDefinitionArray[index].enabled = false;
 				}
-				index++;
 			}
 		}
 	}
@@ -128,13 +121,13 @@ void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
 	Message report = createTM(7);
 	uint8_t count = 0;
-	for (uint16_t i = 0; i < 256; i++) {
+	for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
 		if (eventActionDefinitionArray[i].empty == false) {
 			count++;
 		}
 	}
 	report.appendUint8(count);
-	for (uint16_t i = 0; i < 256; i++) {
+	for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
 		if (eventActionDefinitionArray[i].empty == false) {
 			report.appendEnum16(eventActionDefinitionArray[i].applicationId);
 			report.appendEnum16(eventActionDefinitionArray[i].eventDefinitionID);
@@ -165,8 +158,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
-		uint16_t i = 0;
-		while (i < 256) {
+		for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
 			if (eventActionDefinitionArray[i].empty == false &&
 			    eventActionDefinitionArray[i].enabled ==
 			    true) {
@@ -177,7 +169,6 @@ void EventActionService::executeAction(uint16_t eventID) {
 					messageParser.execute(message);
 				}
 			}
-			i++;
 		}
 	}
 }

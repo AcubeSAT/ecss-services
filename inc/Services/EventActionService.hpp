@@ -3,6 +3,8 @@
 
 #define ECSS_EVENT_SERVICE_STRING_SIZE 64
 
+#define ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE 256
+
 #include "Service.hpp"
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
@@ -14,9 +16,6 @@
  *
  * ECSS 8.19 && 6.19
  *
- * Note towards the reviewers: Please double-check the string sizes that I use, the string
- * initialization or rather the lack of it. Pay attention especially in parts of the code that I
- * use strings <3 .
  *
  * @todo: (Possible) Use a etl::map for eventActionDefinitionArray
  * @todo: check if executeAction should accept applicationID too
@@ -47,7 +46,7 @@ public:
 
 	// If the size is changed maybe then indexOfAvailableSlots as well as the initiating loop in the
 	// constructor should be changed from uint16_t
-	EventActionDefinition eventActionDefinitionArray[256];
+	EventActionDefinition eventActionDefinitionArray[ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE];
 
 	EventActionService() {
 		serviceType = 19;
