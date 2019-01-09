@@ -11,15 +11,13 @@ void EventActionService::addEventActionDefinitions(Message message) {
 
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
 	                                                                     19) {
-		bool flag = true;
 		uint16_t index;
 		for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 			if (eventActionDefinitionArray[index].empty == true) {
-				flag = false;
 				break;
 			}
 		}
-		if (flag == false) {
+		if (index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE) {
 			char data[ECSS_EVENT_SERVICE_STRING_SIZE];
 			eventActionDefinitionArray[index].empty = false;
 			eventActionDefinitionArray[index].enabled = true;
@@ -42,7 +40,7 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 		for (uint16_t i = 0; i < N; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			for (uint16_t index = 0; index< ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
+			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
 					eventActionDefinitionArray[index].empty = true;
