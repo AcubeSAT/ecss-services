@@ -13,12 +13,12 @@ void EventActionService::addEventActionDefinitions(Message message) {
 	                                                                     19) {
 		uint16_t index;
 		for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
+			// @todo: throw an error if it's full
 			if (eventActionDefinitionArray[index].empty == true) {
 				break;
 			}
 		}
 		if (index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE) {
-			char data[ECSS_EVENT_SERVICE_STRING_SIZE];
 			eventActionDefinitionArray[index].empty = false;
 			eventActionDefinitionArray[index].enabled = true;
 			eventActionDefinitionArray[index].applicationId = message.readEnum16();
@@ -28,6 +28,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) { // Should this be >= ?
 				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 			} else {
+				char data[ECSS_EVENT_SERVICE_STRING_SIZE];
 				message.readString(data, message.dataSize);
 				eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
 					data);
