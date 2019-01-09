@@ -35,7 +35,6 @@ private:
 	void executeAction(uint16_t eventID);
 
 public:
-	uint8_t eventActionFunctionStatus; // Indicates if actions are enabled
 	struct EventActionDefinition {
 		bool empty = true; // 1 means empty, 0 means full
 		uint16_t applicationId = 0;
@@ -58,7 +57,7 @@ public:
 	/**
 	 * Event-action function status
 	 */
-	bool enabledActionFunctionStatus;
+	bool eventActionFunctionStatus;
 
 	/**
 	 * TC[19,1] add event-action definitions

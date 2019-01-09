@@ -20,7 +20,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 				break;
 			}
 		}
-		if (!flag) {
+		if (flag == false) {
 			char data[ECSS_EVENT_SERVICE_STRING_SIZE];
 			eventActionDefinitionArray[index].empty = false;
 			eventActionDefinitionArray[index].enabled = true;
