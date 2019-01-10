@@ -23,9 +23,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			eventActionDefinitionArray[index].enabled = true;
 			eventActionDefinitionArray[index].applicationId = message.readEnum16();
 			eventActionDefinitionArray[index].eventDefinitionID = message.readEnum16();
-			// Tests pass with message.dataSize - 3, message.dataSize - 4, but not
-			// message.dataSize - 5
-			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) { // TODO: Fix this
+			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) { // TODO: Should this be >=
 				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 			} else {
 				char data[ECSS_EVENT_SERVICE_STRING_SIZE];
