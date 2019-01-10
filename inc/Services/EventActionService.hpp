@@ -16,7 +16,7 @@
  *
  * ECSS 8.19 && 6.19
  *
- *
+ * @todo: Use an etl::list instead of eventActionDefinitionArray
  * @todo: (Possible) Use a etl::map for eventActionDefinitionArray
  * @todo: check if executeAction should accept applicationID too
  * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
