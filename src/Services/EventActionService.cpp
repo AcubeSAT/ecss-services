@@ -27,7 +27,6 @@ void EventActionService::addEventActionDefinitions(Message message) {
 				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 			} else {
 				char data[ECSS_EVENT_SERVICE_STRING_SIZE];
-				std::cout << message.dataSize;
 				message.readString(data, message.dataSize - 4);
 				eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
 					data);
