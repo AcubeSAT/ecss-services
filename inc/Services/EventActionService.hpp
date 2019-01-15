@@ -35,7 +35,8 @@ private:
 
 public:
 	struct EventActionDefinition {
-		bool empty = true; // 1 means empty, 0 means full
+		bool empty = true;
+		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535;
 		String<64> request = "";
