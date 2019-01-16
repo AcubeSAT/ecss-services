@@ -12,24 +12,37 @@ void EventActionService::addEventActionDefinitions(Message message) {
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
 	                                                                     19) {
 		uint16_t index;
+		uint16_t applicationID = message.readEnum16();
+		uint16_t eventDefinitionID = message.readEnum16();
+		bool accepted = true;
 		for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-			// @todo: throw an error if it's full
-			if (eventActionDefinitionArray[index].empty == true) {
-				break;
+			if (eventActionDefinitionArray[index].applicationId == applicationID &&
+			    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
+			    eventActionDefinitionArray[index].enabled == true) {
+				// @todo: throw a failed start of execution error
+				accepted = false;
 			}
 		}
-		if (index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE) {
-			eventActionDefinitionArray[index].empty = false;
-			eventActionDefinitionArray[index].enabled = true;
-			eventActionDefinitionArray[index].applicationId = message.readEnum16();
-			eventActionDefinitionArray[index].eventDefinitionID = message.readEnum16();
-			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
-				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
-			} else {
-				char data[ECSS_EVENT_SERVICE_STRING_SIZE];
-				message.readString(data, message.dataSize - 4);
-				eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
-					data);
+		if (accepted){
+			for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
+				// @todo: throw an error if it's full
+				if (eventActionDefinitionArray[index].empty == true) {
+					break;
+				}
+			}
+			if (index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE) {
+				eventActionDefinitionArray[index].empty = false;
+				eventActionDefinitionArray[index].enabled = false;
+				eventActionDefinitionArray[index].applicationId = applicationID;
+				eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID();
+				if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
+					ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
+				} else {
+					char data[ECSS_EVENT_SERVICE_STRING_SIZE];
+					message.readString(data, message.dataSize - 4);
+					eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
+						data);
+				}
 			}
 		}
 	}
@@ -45,7 +58,8 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 			uint16_t eventDefinitionID = message.readEnum16();
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
+				    eventActionDefinitionArray[index].enabled == false) {
 					eventActionDefinitionArray[index].empty = true;
 					eventActionDefinitionArray[index].eventDefinitionID = 65535;
 					eventActionDefinitionArray[index].request = "";
@@ -62,6 +76,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message message) {
 	// TC[19,3]
 	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
+		setEventActionFunctionStatus(false);
 		for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 			if (eventActionDefinitionArray[index].empty == false) {
 				eventActionDefinitionArray[index].empty = true;
@@ -79,12 +94,20 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		for (uint16_t i = 0; i < N; i++) {
-			uint16_t applicationID = message.readEnum16();
-			uint16_t eventDefinitionID = message.readEnum16();
+		if (N != 0){
+			for (uint16_t i = 0; i < N; i++) {
+				uint16_t applicationID = message.readEnum16();
+				uint16_t eventDefinitionID = message.readEnum16();
+				for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
+					if (eventActionDefinitionArray[index].applicationId == applicationID &&
+					    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+						eventActionDefinitionArray[index].enabled = true;
+					}
+				}
+			}
+		} else {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+				if (eventActionDefinitionArray[index].empty == false){
 					eventActionDefinitionArray[index].enabled = true;
 				}
 			}
@@ -97,12 +120,20 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t N = message.readUint16();
-		for (uint16_t i = 0; i < N; i++) {
-			uint16_t applicationID = message.readEnum16();
-			uint16_t eventDefinitionID = message.readEnum16();
+		if (N != 0){
+			for (uint16_t i = 0; i < N; i++) {
+				uint16_t applicationID = message.readEnum16();
+				uint16_t eventDefinitionID = message.readEnum16();
+				for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
+					if (eventActionDefinitionArray[index].applicationId == applicationID &&
+					    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+						eventActionDefinitionArray[index].enabled = false;
+					}
+				}
+			}
+		} else {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+				if (eventActionDefinitionArray[index].empty == false){
 					eventActionDefinitionArray[index].enabled = false;
 				}
 			}
