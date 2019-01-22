@@ -30,7 +30,7 @@
  * }
  */
 
-int FunctionManagementService::call(Message msg){
+int FunctionManagementService::call(Message msg) {
 	assert(msg.messageType == 1);
 	assert(msg.serviceType == 8);
 
