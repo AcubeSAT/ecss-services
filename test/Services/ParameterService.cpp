@@ -3,8 +3,6 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 
-#define CATCH_CONFIG_MAIN
-
 TEST_CASE("Parameter Report Subservice") {
 	ParameterService pserv;
 
