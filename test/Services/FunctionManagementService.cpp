@@ -1,8 +1,6 @@
 #include "catch2/catch.hpp"
 #include "Services/FunctionManagementService.hpp"
 
-#define CATCH_CONFIG_MAIN
-
 void test(String<MAXARGLENGTH> a) {
 	std::cout << a.c_str() << std::endl;
 }
