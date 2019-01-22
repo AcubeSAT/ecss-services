@@ -36,8 +36,7 @@ TEST_CASE("ST[08] - Insert Tests") {
 			name = "test" + i;
 			String<FUNCNAMELENGTH> funcName(name.c_str());
 
-			if (~fms.funcPtrIndex.full()) {  // not ! because vera whines about "using negation
-				// in its short form"
+			if (not fms.funcPtrIndex.full()) {
 				fms.include(funcName, &test);
 			}
 			else {
