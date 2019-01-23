@@ -14,7 +14,7 @@ TEST_CASE("Parameter Report Subservice") {
 
 		request.appendUint16(2);      // number of requested IDs
 		request.appendUint16(34672);  // faulty ID in this context
-		request.appendUint16(3);      // valid
+		request.appendUint16(1);      // valid
 
 		pserv.reportParameterIds(request);
 		report = ServiceTests::get(0);
@@ -49,14 +49,16 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message reportRequest(20, 1, Message::TC, 1);
 
 		setRequest.appendUint16(2);           // correct number of IDs
-		setRequest.appendUint16(3);           // correct ID
+		setRequest.appendUint16(1);           // correct ID in this context
 		setRequest.appendUint32(3735928559);  // 0xDEADBEEF in hex (new setting)
 		setRequest.appendUint16(16742);       // faulty ID in this context
 		setRequest.appendUint32(3131746989);  // 0xBAAAAAAD (this shouldn't be found in the report)
 
 		reportRequest.appendUint16(2);
 		reportRequest.appendUint16(16742);
-		reportRequest.appendUint16(3);
+		reportRequest.appendUint16(1);       // used to be 3, which pointed the bug with
+		// numOfValidIds out, now is 1 in order to be a valid ID (a separate test for
+		// numOfValidIds shall be introduced)
 
 		pserv.reportParameterIds(reportRequest);
 		Message before = ServiceTests::get(0);
