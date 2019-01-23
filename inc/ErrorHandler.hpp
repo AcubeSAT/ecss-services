@@ -56,6 +56,11 @@ public:
 		 * An error in the header of a packet makes it unable to be parsed
 		 */
 			UnacceptablePacket = 5,
+
+		/**
+		 * Asked a Message type that it doesn't exist
+		 */
+			UnknownMessageType = 6,
 	};
 
 	/**

@@ -16,7 +16,7 @@ void ErrorHandler::reportError(const Message &message, AcceptanceErrorType error
 
 template<>
 void ErrorHandler::reportError(const Message &message, ExecutionErrorType errorCode) {
-	requestVerificationService.failExecutionVerification(message);
+	requestVerificationService.failCompletionExecutionVerification(message);
 
 	logError(message, errorCode);
 }
