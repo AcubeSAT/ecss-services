@@ -19,14 +19,14 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == false);
 	CHECK(report.readBits(11) == 47);
-	CHECK(report.readBits(2) == 0);
+	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == 0);
+	CHECK(report.readEnum16() == ErrorHandler::MessageTooShort);
 }
 
 TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 56);
-	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownExecutionError);
+	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownCompletionExecutionError);
 
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -41,9 +41,9 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == false);
 	CHECK(report.readBits(11) == 56);
-	CHECK(report.readBits(2) == 0);
+	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == 0);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownCompletionExecutionError);
 }
 
 TEST_CASE("Error: Failed Routing", "[errors]") {
@@ -63,7 +63,7 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == false);
 	CHECK(report.readBits(11) == 71);
-	CHECK(report.readBits(2) == 0);
+	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == 0);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownRoutingError);
 }

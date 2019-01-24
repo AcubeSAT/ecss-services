@@ -5,7 +5,7 @@
 #include <cstring>
 #include "MessageParser.hpp"
 #include "Services/ServiceTests.hpp"
-
+/*
 TEST_CASE("ST[01] message execution", "[MessageParser][st01]") {
 	MessageParser messageParser;
 
@@ -44,7 +44,7 @@ TEST_CASE("ST[01] message execution", "[MessageParser][st01]") {
 	CHECK(response.messageType == 10);
 	CHECK(response.packetType == Message::TM);
 }
-
+*/
 TEST_CASE("ST[17] message execution", "[MessageParser][st17]") {
 	MessageParser messageParser;
 
