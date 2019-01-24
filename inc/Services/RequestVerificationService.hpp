@@ -37,6 +37,7 @@ public:
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic
 	 * info of the telecommand packet that failed to be accepted
+	 * @param errorCode The cause of creating this type of report
 	 */
 	void failAcceptanceVerification(const Message &request, ErrorHandler::AcceptanceErrorType
 	errorCode);
@@ -56,6 +57,7 @@ public:
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its start of execution has failed
+	 * @param errorCode The cause of creating this type of report
 	 */
 	void failStartExecutionVerification(const Message &request,
 		ErrorHandler::StartExecutionErrorType
@@ -76,6 +78,7 @@ public:
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its progress of execution has failed
+	 * @param errorCode The cause of creating this type of report
 	 */
 	void failProgressExecutionVerification(const Message &request,
 		ErrorHandler::ProgressExecutionErrorType errorCode);
@@ -95,6 +98,7 @@ public:
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info of the
 	 * telecommand packet that failed to be executed completely
+	 * @param errorCode The cause of creating this type of report
 	 */
 	void failCompletionExecutionVerification(const Message &request,
 		ErrorHandler::CompletionExecutionErrorType errorCode);
@@ -105,6 +109,7 @@ public:
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info of the
 	 * telecommand packet that failed the routing
+	 * @param errorCode The cause of creating this type of report
  	 */
 	void failRoutingVerification(const Message &request, ErrorHandler::RoutingErrorType errorCode);
 
@@ -121,8 +126,8 @@ public:
 	//void execute(const Message &message);
 
 	/**
-	 *  The purpose of this instance is to access the execute function of this service when a
-	 *  MessageParser object is created
+	 * The purpose of this instance is to access the execute function of this service when a
+	 * MessageParser object is created
 	 */
 	static RequestVerificationService instance;
 };

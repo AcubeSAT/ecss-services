@@ -129,7 +129,7 @@ public:
 	};
 
 	/**
-	 * The error code for failed completion of execution reports, as specified in ECSS 6.1.3.3d
+	 * The error code for failed routing reports, as specified in ECSS 6.1.3.3d
 	 *
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
 	 * changes.
