@@ -38,7 +38,8 @@ public:
 	 * The data is actually some data members of Message that contain the basic
 	 * info of the telecommand packet that failed to be accepted
 	 */
-	void failAcceptanceVerification(const Message &request);
+	void failAcceptanceVerification(const Message &request, ErrorHandler::AcceptanceErrorType
+	errorCode);
 
 	/**
 	 * TM[1,3] successful start of execution verification report
@@ -56,7 +57,8 @@ public:
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its start of execution has failed
 	 */
-	void failStartExecutionVerification(const Message &request);
+	void failStartExecutionVerification(const Message &request, ErrorHandler::ExecutionErrorType
+	errorCode);
 
 	/**
 	 * TM[1,5] successful progress of execution verification report
@@ -74,7 +76,8 @@ public:
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its progress of execution has failed
 	 */
-	void failProgressExecutionVerification(const Message &request);
+	void failProgressExecutionVerification(const Message &request,
+		ErrorHandler::ExecutionErrorType errorCode);
 
 	/**
  	 * TM[1,7] successful completion of execution verification report
@@ -92,7 +95,8 @@ public:
 	 * The data is actually some data members of Message that contain the basic info of the
 	 * telecommand packet that failed to be executed completely
 	 */
-	void failCompletionExecutionVerification(const Message &request);
+	void failCompletionExecutionVerification(const Message &request,
+		ErrorHandler::ExecutionErrorType errorCode);
 
 	/**
 	 * TM[1,10] failed routing verification report
@@ -101,7 +105,7 @@ public:
 	 * The data is actually some data members of Message that contain the basic info of the
 	 * telecommand packet that failed the routing
  	 */
-	void failRoutingVerification(const Message &request);
+	void failRoutingVerification(const Message &request, ErrorHandler::RoutingErrorType errorCode);
 
 	/**
 	 * It is responsible to call the suitable function that execute the proper subservice. The
@@ -110,9 +114,10 @@ public:
 	 *
 	 * Note:The functions of this service takes dummy values as arguments for the time being
 	 *
-	 * @todo Error handling for the switch() in the implementation of this execute function
+	 * @todo execute() needs to be redefined. The /p message isn't enough to call some
+	 * subservices. More arguments are needed.
 	 */
-	void execute(const Message &message);
+	//void execute(const Message &message);
 
 	/**
 	 *  The purpose of this instance is to access the execute function of this service when a

@@ -9,21 +9,21 @@ static RequestVerificationService requestVerificationService;
 
 template<>
 void ErrorHandler::reportError(const Message &message, AcceptanceErrorType errorCode) {
-	requestVerificationService.failAcceptanceVerification(message);
+	requestVerificationService.failAcceptanceVerification(message, errorCode);
 
 	logError(message, errorCode);
 }
 
 template<>
 void ErrorHandler::reportError(const Message &message, ExecutionErrorType errorCode) {
-	requestVerificationService.failCompletionExecutionVerification(message);
+	requestVerificationService.failCompletionExecutionVerification(message, errorCode);
 
 	logError(message, errorCode);
 }
 
 template<>
 void ErrorHandler::reportError(const Message &message, RoutingErrorType errorCode) {
-	requestVerificationService.failRoutingVerification(message);
+	requestVerificationService.failRoutingVerification(message, errorCode);
 
 	logError(message, errorCode);
 }

@@ -20,6 +20,8 @@ public:
 	 *
 	 * @todo The implementation of the execute function should correspond to the numbers of the
 	 * services/activities that have been created
+	 * @todo execute() needs to be redefined. The /p message isn't enough to call some
+	 * subservices. More arguments are needed.
 	 */
 	void execute(Message &message);
 

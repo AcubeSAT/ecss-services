@@ -117,28 +117,28 @@ int main() {
 	reqVerifService.successAcceptanceVerification(receivedMessage);
 
 	receivedMessage = Message(1, 2, Message::TC, 3);
-	reqVerifService.failAcceptanceVerification(receivedMessage);
+	reqVerifService.failAcceptanceVerification(receivedMessage, ErrorHandler::UnknownAcceptanceError);
 
 	receivedMessage = Message(1, 3, Message::TC, 3);
 	reqVerifService.successStartExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 4, Message::TC, 3);
-	reqVerifService.failStartExecutionVerification(receivedMessage);
+	reqVerifService.failStartExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionError);
 
 	receivedMessage = Message(1, 5, Message::TC, 3);
 	reqVerifService.successProgressExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 6, Message::TC, 3);
-	reqVerifService.failProgressExecutionVerification(receivedMessage);
+	reqVerifService.failProgressExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionError);
 
 	receivedMessage = Message(1, 7, Message::TC, 3);
 	reqVerifService.successCompletionExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 8, Message::TC, 3);
-	reqVerifService.failCompletionExecutionVerification(receivedMessage);
+	reqVerifService.failCompletionExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionError);
 
 	receivedMessage = Message(1, 10, Message::TC, 3);
-	reqVerifService.failRoutingVerification(receivedMessage);
+	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
 
 	// ST[05] (5,1 to 5,4) test [works]
 	const char eventReportData[12] = "Hello World";
@@ -165,15 +165,15 @@ int main() {
 
 	// ST[01] test
 	message = Message(1, 1, Message::TC, 3);
-	messageParser.execute(message);
+	//messageParser.execute(message);
 	message = Message(1, 2, Message::TC, 3);
-	messageParser.execute(message);
+	//messageParser.execute(message);
 	message = Message(1, 7, Message::TC, 3);
-	messageParser.execute(message);
+	//messageParser.execute(message);
 	message = Message(1, 8, Message::TC, 3);
-	messageParser.execute(message);
+	//messageParser.execute(message);
 	message = Message(1, 10, Message::TC, 3);
-	messageParser.execute(message);
+	//messageParser.execute(message);
 
 	// ErrorHandler test
 	std::cout << std::flush;
