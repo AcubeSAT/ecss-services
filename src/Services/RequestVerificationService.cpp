@@ -50,7 +50,7 @@ void RequestVerificationService::successStartExecutionVerification(const Message
 }
 
 void RequestVerificationService::failStartExecutionVerification(const Message &request,
-	ErrorHandler::ExecutionErrorType errorCode) {
+	ErrorHandler::StartExecutionErrorType errorCode) {
 	// TM[1,4] failed start of execution verification report
 
 	Message report = createTM(4);
@@ -82,7 +82,7 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 }
 
 void RequestVerificationService::failProgressExecutionVerification(const Message &request,
-	ErrorHandler::ExecutionErrorType errorCode) {
+	ErrorHandler::ProgressExecutionErrorType errorCode) {
 	// TM[1,6] failed progress of execution verification report
 
 	Message report = createTM(6);
@@ -115,7 +115,7 @@ void RequestVerificationService::successCompletionExecutionVerification(const Me
 
 void
 RequestVerificationService::failCompletionExecutionVerification(const Message &request,
-	ErrorHandler::ExecutionErrorType errorCode) {
+	ErrorHandler::CompletionExecutionErrorType errorCode) {
 	// TM[1,8] failed completion of execution verification report
 
 	Message report = createTM(8);

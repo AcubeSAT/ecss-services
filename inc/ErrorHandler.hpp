@@ -90,13 +90,34 @@ public:
 	};
 
 	/**
+	 * The error code for failed start of execution reports, as specified in ECSS 5.3.5.2.3g
+	 *
+	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
+	 * changes.
+	 */
+	enum StartExecutionErrorType {
+		UnknownStartExecutionError = 0,
+	};
+
+	/**
+	 * The error code for failed progress of execution reports, as specified in ECSS 5.3.5.2.3g
+	 *
+	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
+	 * changes.
+	 */
+	enum ProgressExecutionErrorType {
+		UnknownProgressExecutionError = 0,
+	};
+
+
+	/**
 	 * The error code for failed completion of execution reports, as specified in ECSS 5.3.5.2.3g
 	 *
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
 	 * changes.
 	 */
-	enum ExecutionErrorType {
-		UnknownExecutionError = 0,
+	enum CompletionExecutionErrorType {
+		UnknownCompletionExecutionError = 0,
 		/**
 		 * Checksum comparison failed
 		 */

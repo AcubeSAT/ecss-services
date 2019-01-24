@@ -123,19 +123,22 @@ int main() {
 	reqVerifService.successStartExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 4, Message::TC, 3);
-	reqVerifService.failStartExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionError);
+	reqVerifService.failStartExecutionVerification(receivedMessage,
+		ErrorHandler::UnknownStartExecutionError);
 
 	receivedMessage = Message(1, 5, Message::TC, 3);
 	reqVerifService.successProgressExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 6, Message::TC, 3);
-	reqVerifService.failProgressExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionError);
+	reqVerifService.failProgressExecutionVerification(receivedMessage,
+		ErrorHandler::UnknownProgressExecutionError);
 
 	receivedMessage = Message(1, 7, Message::TC, 3);
 	reqVerifService.successCompletionExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 8, Message::TC, 3);
-	reqVerifService.failCompletionExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionError);
+	reqVerifService.failCompletionExecutionVerification(receivedMessage,
+		ErrorHandler::UnknownCompletionExecutionError);
 
 	receivedMessage = Message(1, 10, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);

@@ -57,7 +57,8 @@ public:
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its start of execution has failed
 	 */
-	void failStartExecutionVerification(const Message &request, ErrorHandler::ExecutionErrorType
+	void failStartExecutionVerification(const Message &request,
+		ErrorHandler::StartExecutionErrorType
 	errorCode);
 
 	/**
@@ -77,7 +78,7 @@ public:
 	 * of the telecommand packet that its progress of execution has failed
 	 */
 	void failProgressExecutionVerification(const Message &request,
-		ErrorHandler::ExecutionErrorType errorCode);
+		ErrorHandler::ProgressExecutionErrorType errorCode);
 
 	/**
  	 * TM[1,7] successful completion of execution verification report
@@ -96,7 +97,7 @@ public:
 	 * telecommand packet that failed to be executed completely
 	 */
 	void failCompletionExecutionVerification(const Message &request,
-		ErrorHandler::ExecutionErrorType errorCode);
+		ErrorHandler::CompletionExecutionErrorType errorCode);
 
 	/**
 	 * TM[1,10] failed routing verification report
