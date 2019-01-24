@@ -24,6 +24,52 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	CHECK(report.readEnum16() == ErrorHandler::MessageTooShort);
 }
 
+TEST_CASE("Error: Failed Execution Start", "[errors]") {
+	Message failedMessage(38, 32, Message::TC, 56);
+	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownStartExecutionError);
+
+	REQUIRE(ServiceTests::hasOneMessage());
+	Message report = ServiceTests::get(0);
+
+	// Check that a TM[1,3] message was returned
+	CHECK(report.serviceType == 1);
+	CHECK(report.messageType == 4);
+	CHECK(report.packetType == Message::TM);
+	REQUIRE(report.dataSize == 6);
+
+	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
+	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
+	CHECK(report.readBits(1) == false);
+	CHECK(report.readBits(11) == 56);
+	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
+	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownStartExecutionError);
+}
+
+TEST_CASE("Error: Failed Execution Progress", "[errors]") {
+	Message failedMessage(38, 32, Message::TC, 56);
+	ErrorHandler::reportProgressError(failedMessage, ErrorHandler::UnknownProgressExecutionError,
+		ErrorHandler::UnknownStepID);
+
+	REQUIRE(ServiceTests::hasOneMessage());
+	Message report = ServiceTests::get(0);
+
+	// Check that a TM[1,6] message was returned
+	CHECK(report.serviceType == 1);
+	CHECK(report.messageType == 6);
+	CHECK(report.packetType == Message::TM);
+	REQUIRE(report.dataSize == 8);
+
+	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
+	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
+	CHECK(report.readBits(1) == false);
+	CHECK(report.readBits(11) == 56);
+	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
+	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownStartExecutionError);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownStepID);
+}
+
 TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 56);
 	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownCompletionExecutionError);
