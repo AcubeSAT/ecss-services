@@ -69,6 +69,7 @@ public:
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its progress of execution is successful
+	 * @param step Step identifier
 	 */
 	void successProgressExecutionVerification(const Message &request, ErrorHandler::stepID step);
 
@@ -79,6 +80,7 @@ public:
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its progress of execution has failed
 	 * @param errorCode The cause of creating this type of report
+	 * @param step Step identifier
 	 */
 	void failProgressExecutionVerification(const Message &request,
 		ErrorHandler::ProgressExecutionErrorType errorCode, ErrorHandler::stepID step);
