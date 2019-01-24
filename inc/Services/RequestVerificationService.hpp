@@ -70,7 +70,7 @@ public:
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its progress of execution is successful
 	 */
-	void successProgressExecutionVerification(const Message &request);
+	void successProgressExecutionVerification(const Message &request, ErrorHandler::stepID step);
 
 	/**
 	 * TM[1,6] failed progress of execution verification report
@@ -81,7 +81,7 @@ public:
 	 * @param errorCode The cause of creating this type of report
 	 */
 	void failProgressExecutionVerification(const Message &request,
-		ErrorHandler::ProgressExecutionErrorType errorCode);
+		ErrorHandler::ProgressExecutionErrorType errorCode, ErrorHandler::stepID step);
 
 	/**
  	 * TM[1,7] successful completion of execution verification report

@@ -66,7 +66,8 @@ void RequestVerificationService::failStartExecutionVerification(const Message &r
 	storeMessage(report);
 }
 
-void RequestVerificationService::successProgressExecutionVerification(const Message &request) {
+void RequestVerificationService::successProgressExecutionVerification(const Message &request,
+	ErrorHandler::stepID step) {
 	// TM[1,5] successful progress of execution verification report
 
 	Message report = createTM(5);
@@ -77,12 +78,13 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags(not implemented)
 	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendEnum16(step); // step ID
 
 	storeMessage(report);
 }
 
 void RequestVerificationService::failProgressExecutionVerification(const Message &request,
-	ErrorHandler::ProgressExecutionErrorType errorCode) {
+	ErrorHandler::ProgressExecutionErrorType errorCode, ErrorHandler::stepID step) {
 	// TM[1,6] failed progress of execution verification report
 
 	Message report = createTM(6);
@@ -93,6 +95,7 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags(not implemented)
 	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendEnum16(step); // step ID
 	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cxxabi.h>
 #include <ErrorHandler.hpp>
-
 #include "Services/RequestVerificationService.hpp"
+
 
 // TODO: Use service singleton, as soon as singletons are ready
 static RequestVerificationService requestVerificationService;
@@ -21,9 +21,9 @@ void ErrorHandler::reportError(const Message &message, StartExecutionErrorType e
 	logError(message, errorCode);
 }
 
-template<>
-void ErrorHandler::reportError(const Message &message, ProgressExecutionErrorType errorCode) {
-	requestVerificationService.failProgressExecutionVerification(message, errorCode);
+void ErrorHandler::reportProgressError(const Message &message, ProgressExecutionErrorType
+errorCode, stepID step) {
+	requestVerificationService.failProgressExecutionVerification(message, errorCode, step);
 
 	logError(message, errorCode);
 }

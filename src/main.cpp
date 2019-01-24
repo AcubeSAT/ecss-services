@@ -127,11 +127,12 @@ int main() {
 		ErrorHandler::UnknownStartExecutionError);
 
 	receivedMessage = Message(1, 5, Message::TC, 3);
-	reqVerifService.successProgressExecutionVerification(receivedMessage);
+	reqVerifService.successProgressExecutionVerification(receivedMessage,
+		ErrorHandler::UnknownStepID);
 
 	receivedMessage = Message(1, 6, Message::TC, 3);
 	reqVerifService.failProgressExecutionVerification(receivedMessage,
-		ErrorHandler::UnknownProgressExecutionError);
+		ErrorHandler::UnknownProgressExecutionError, ErrorHandler::UnknownStepID);
 
 	receivedMessage = Message(1, 7, Message::TC, 3);
 	reqVerifService.successCompletionExecutionVerification(receivedMessage);

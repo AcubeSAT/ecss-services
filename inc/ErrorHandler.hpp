@@ -86,7 +86,7 @@ public:
 		/**
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
-		    UnacceptableMessage = 5,
+			UnacceptableMessage = 5,
 	};
 
 	/**
@@ -107,6 +107,16 @@ public:
 	 */
 	enum ProgressExecutionErrorType {
 		UnknownProgressExecutionError = 0,
+	};
+
+	/**
+	 * This enumeration type corresponds with reports about the progress of the execution
+	 * of a request. For example if the execution of a request is a long process, then we can divide
+	 * the process into steps and take feedback that depends on the step identifier
+	 * @todo configure step ID for the suitable requests
+	*/
+	enum stepID {
+		UnknownStepID = 0
 	};
 
 
@@ -154,13 +164,27 @@ public:
 	 * Report a failure and, if applicable, store a failure report message
 	 *
 	 * @tparam ErrorType The Type struct of the error; can be AcceptanceErrorType,
-	 * 					 ExecutionErrorType, or RoutingErrorType.
+	 * StartExecutionErrorType,CompletionExecutionErrorType,  or RoutingErrorType.
 	 * @param message The incoming message that prompted the failure
 	 * @param errorCode The error's code, as defined in ErrorHandler
 	 * @todo See if this needs to include InternalErrorType
 	 */
 	template<typename ErrorType>
 	static void reportError(const Message &message, ErrorType errorCode);
+
+	/**
+ 	 * Report a failure about the progress of the execution of a request
+ 	 *
+ 	 * Note:This function is different from reportError, because we need one more /p(stepID)
+ 	 * to call the proper function for reporting the progress of the execution of a request
+ 	 *
+ 	 * @param message The incoming message that prompted the failure
+ 	 * @param errorCode The error's code, when a failed progress of the execution of a request
+ 	 * occurs
+ 	 * @param step Step identifier
+ 	 */
+	static void reportProgressError(const Message &message, ProgressExecutionErrorType errorCode,
+	                                stepID step);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.
