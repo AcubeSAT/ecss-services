@@ -168,12 +168,20 @@ int main() {
 	messageParser.execute(message);
 
 	// ST[01] test
-	//message = Message(1, 1, Message::TC, 3);
-	//messageParser.execute(message);
+	message = Message(1, 1, Message::TC, 3);
+	messageParser.execute(message);
 	//message = Message(1, 2, Message::TC, 3);
 	//messageParser.execute(message);
-	//message = Message(1, 7, Message::TC, 3);
+	message = Message(1, 3, Message::TC, 3);
+	messageParser.execute(message);
+	//message = Message(1, 4, Message::TC, 3);
 	//messageParser.execute(message);
+	//message = Message(1, 5, Message::TC, 3)
+	//messageParser.execute(message);
+	//message = Message(1, 6, Message::TC, 3)
+	//messageParser.execute(message);
+	message = Message(1, 7, Message::TC, 3);
+	messageParser.execute(message);
 	//message = Message(1, 8, Message::TC, 3);
 	//messageParser.execute(message);
 	//message = Message(1, 10, Message::TC, 3);

@@ -10,9 +10,9 @@ RequestVerificationService RequestVerificationService::instance;
 
 void MessageParser::execute(Message &message) {
 	switch (message.serviceType) {
-		//case 1:
-			//RequestVerificationService::instance.execute(message);
-			//break;
+		case 1:
+			RequestVerificationService::instance.execute(message);
+			break;
 		case 17:
 			TestService::instance.execute(message);
 			break;

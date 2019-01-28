@@ -125,7 +125,7 @@ public:
 	 * @todo execute() needs to be redefined. The /p message isn't enough to call some
 	 * subservices. More arguments are needed.
 	 */
-	//void execute(const Message &message);
+	void execute(const Message &message);
 
 	/**
 	 * The purpose of this instance is to access the execute function of this service when a

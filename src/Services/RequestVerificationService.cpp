@@ -152,39 +152,39 @@ RequestVerificationService::failRoutingVerification(const Message &request,
 	storeMessage(report);
 }
 
-/*
+
 void RequestVerificationService::execute(const Message &message) {
 	switch (message.messageType) {
 		case 1:
 			successAcceptanceVerification(message);
 			break;
-		case 2:
-			failAcceptanceVerification(message);
-			break;
+		//case 2:
+			//failAcceptanceVerification(message);
+			//break;
 		case 3:
 			successStartExecutionVerification(message);
 			break;
-		case 4:
-			failStartExecutionVerification(message);
-			break;
-		case 5:
-			successProgressExecutionVerification(message);
-			break;
-		case 6:
-			failProgressExecutionVerification(message);
-			break;
+		//case 4:
+			//failStartExecutionVerification(message);
+			//break;
+		//case 5:
+			//successProgressExecutionVerification(message);
+			//break;
+		//case 6:
+			//failProgressExecutionVerification(message);
+			//break;
 		case 7:
 			successCompletionExecutionVerification(message);
 			break;
-		case 8:
-			failCompletionExecutionVerification(message);
-			break;
-		case 10:
-			failRoutingVerification(message);
-			break;
+		//case 8:
+			//failCompletionExecutionVerification(message);
+			//break;
+		//case 10:
+			//failRoutingVerification(message);
+			//break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
 			break;
 	}
 }
- */
+
