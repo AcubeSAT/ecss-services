@@ -66,8 +66,26 @@ void RequestVerificationService::failStartExecutionVerification(const Message &r
 	storeMessage(report);
 }
 
+/**
+ *  StepID documentation
+ *
+ *  For example:
+ *
+ *  steps of UnknownProcess1 and their IDs:
+ *  1)UnknownStep1 = 0
+ *  2)UnknownStep2 = 1
+ *
+ *  steps of UnknownProcess2 and their IDs:
+ *  1)UnknownStep3 = 2
+ *  2)UnknownStep4 = 3
+ *  3)UnknownStep5 = 4
+ *
+ *  ...
+ *
+ */
+
 void RequestVerificationService::successProgressExecutionVerification(const Message &request,
-	ErrorHandler::stepID step) {
+	uint8_t stepID) {
 	// TM[1,5] successful progress of execution verification report
 
 	Message report = createTM(5);
@@ -78,13 +96,13 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
 	report.appendBits(14, 0); // packet sequence count(not implemented)
-	report.appendEnum16(step); // step ID
+	report.appendByte(stepID); // step ID
 
 	storeMessage(report);
 }
 
 void RequestVerificationService::failProgressExecutionVerification(const Message &request,
-	ErrorHandler::ExecutionProgressErrorType errorCode, ErrorHandler::stepID step) {
+	ErrorHandler::ExecutionProgressErrorType errorCode, uint8_t stepID) {
 	// TM[1,6] failed progress of execution verification report
 
 	Message report = createTM(6);
@@ -95,7 +113,7 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
 	report.appendBits(14, 0); // packet sequence count(not implemented)
-	report.appendEnum16(step); // step ID
+	report.appendByte(stepID); // step ID
 	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);

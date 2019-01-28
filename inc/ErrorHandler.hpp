@@ -4,6 +4,8 @@
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
 
+#include <stdint.h> // for the uint_8t stepID
+
 /**
  * A class that handles unexpected software errors, including internal errors or errors due to
  * invalid & incorrect input data.
@@ -116,9 +118,9 @@ public:
 	 *
 	 * @todo configure step ID for the suitable requests
 	*/
-	enum stepID {
-		UnknownStepID = 0
-	};
+	//enum stepID {
+		//UnknownStepID = 0
+	//};
 
 
 	/**
@@ -182,10 +184,12 @@ public:
  	 * @param message The incoming message that prompted the failure
  	 * @param errorCode The error's code, when a failed progress of the execution of a request
  	 * occurs
- 	 * @param step Step identifier
+ 	 * @param stepID If the execution of a request is a long process, then we can divide
+	 * the process into steps. Each step goes with its own definition, the stepID. Each value
+	 * ,that the stepID is assigned, should be documented.
  	 */
 	static void reportProgressError(const Message &message, ExecutionProgressErrorType errorCode,
-	                                stepID step);
+	                                uint8_t stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.

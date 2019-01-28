@@ -103,8 +103,7 @@ TEST_CASE("TM[1,5]", "[service][st01]") {
 	RequestVerificationService reqVerifService;
 
 	Message receivedMessage = Message(1, 5, Message::TC, 3);
-	reqVerifService.successProgressExecutionVerification(receivedMessage,
-	                                                     ErrorHandler::UnknownStepID);
+	reqVerifService.successProgressExecutionVerification(receivedMessage, 0);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -113,7 +112,7 @@ TEST_CASE("TM[1,5]", "[service][st01]") {
 	CHECK(response.messageType == 5);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
-	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
+	REQUIRE(response.dataSize == 5); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDS_PACKET_VERSION); // packet version number
 	CHECK(response.readEnumerated(1) == Message::TC); // packet type
@@ -121,7 +120,7 @@ TEST_CASE("TM[1,5]", "[service][st01]") {
 	CHECK(response.readEnumerated(11) == 3); // application process ID
 	CHECK(response.readEnumerated(2) == ECSS_SEQUENCE_FLAGS); // sequence flags
 	CHECK(response.readBits(14) == 0); // packet sequence count
-	CHECK(response.readEnum16() == ErrorHandler::UnknownStepID); // step ID
+	CHECK(response.readByte() == 0); // step ID
 }
 
 TEST_CASE("TM[1,6]", "[service][st01]") {
@@ -130,7 +129,7 @@ TEST_CASE("TM[1,6]", "[service][st01]") {
 	Message receivedMessage = Message(1, 5, Message::TC, 3);
 	reqVerifService.failProgressExecutionVerification(receivedMessage,
 	                                                  ErrorHandler::UnknownExecutionProgressError,
-	                                                  ErrorHandler::UnknownStepID);
+	                                                  0);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -139,7 +138,7 @@ TEST_CASE("TM[1,6]", "[service][st01]") {
 	CHECK(response.messageType == 6);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
-	REQUIRE(response.dataSize == 8); // dataSize is the number of bytes of data array
+	REQUIRE(response.dataSize == 7); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDS_PACKET_VERSION); // packet version number
 	CHECK(response.readEnumerated(1) == Message::TC); // packet type
@@ -147,7 +146,7 @@ TEST_CASE("TM[1,6]", "[service][st01]") {
 	CHECK(response.readEnumerated(11) == 3); // application process ID
 	CHECK(response.readEnumerated(2) == ECSS_SEQUENCE_FLAGS); // sequence flags
 	CHECK(response.readBits(14) == 0); // packet sequence count
-	CHECK(response.readEnum16() == ErrorHandler::UnknownStepID); // step ID
+	CHECK(response.readByte() == 0); // step ID
 	CHECK(response.readEnum16() == ErrorHandler::UnknownExecutionProgressError);
 }
 

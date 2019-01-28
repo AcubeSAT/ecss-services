@@ -69,9 +69,12 @@ public:
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its progress of execution is successful
-	 * @param step Step identifier
+ 	 * @param stepID If the execution of a request is a long process, then we can divide
+	 * the process into steps. Each step goes with its own definition, the stepID.
+	 * @todo Each value,that the stepID is assigned, should be documented.
+	 * @todo error handling for undocumented assigned values to stepID
 	 */
-	void successProgressExecutionVerification(const Message &request, ErrorHandler::stepID step);
+	void successProgressExecutionVerification(const Message &request, uint8_t stepID);
 
 	/**
 	 * TM[1,6] failed progress of execution verification report
@@ -80,10 +83,13 @@ public:
 	 * The data is actually some data members of Message that contain the basic info
 	 * of the telecommand packet that its progress of execution has failed
 	 * @param errorCode The cause of creating this type of report
-	 * @param step Step identifier
+	 * @param stepID If the execution of a request is a long process, then we can divide
+	 * the process into steps. Each step goes with its own definition, the stepID.
+	 * @todo Each value,that the stepID is assigned, should be documented.
+	 * @todo error handling for undocumented assigned values to stepID
 	 */
 	void failProgressExecutionVerification(const Message &request,
-		ErrorHandler::ExecutionProgressErrorType errorCode, ErrorHandler::stepID step);
+		ErrorHandler::ExecutionProgressErrorType errorCode, uint8_t stepID);
 
 	/**
  	 * TM[1,7] successful completion of execution verification report

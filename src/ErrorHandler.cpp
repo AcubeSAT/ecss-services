@@ -22,8 +22,8 @@ void ErrorHandler::reportError(const Message &message, ExecutionStartErrorType e
 }
 
 void ErrorHandler::reportProgressError(const Message &message, ExecutionProgressErrorType
-errorCode, stepID step) {
-	requestVerificationService.failProgressExecutionVerification(message, errorCode, step);
+errorCode, uint8_t stepID) {
+	requestVerificationService.failProgressExecutionVerification(message, errorCode, stepID);
 
 	logError(message, errorCode);
 }
