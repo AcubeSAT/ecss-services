@@ -95,8 +95,8 @@ public:
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
 	 * changes.
 	 */
-	enum StartExecutionErrorType {
-		UnknownStartExecutionError = 0,
+	enum ExecutionStartErrorType {
+		UnknownExecutionStartError = 0,
 	};
 
 	/**
@@ -105,8 +105,8 @@ public:
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
 	 * changes.
 	 */
-	enum ProgressExecutionErrorType {
-		UnknownProgressExecutionError = 0,
+	enum ExecutionProgressErrorType {
+		UnknownExecutionProgressError = 0,
 	};
 
 	/**
@@ -127,8 +127,8 @@ public:
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
 	 * changes.
 	 */
-	enum CompletionExecutionErrorType {
-		UnknownCompletionExecutionError = 0,
+	enum ExecutionCompletionErrorType {
+		UnknownExecutionCompletionError = 0,
 		/**
 		 * Checksum comparison failed
 		 */
@@ -184,7 +184,7 @@ public:
  	 * occurs
  	 * @param step Step identifier
  	 */
-	static void reportProgressError(const Message &message, ProgressExecutionErrorType errorCode,
+	static void reportProgressError(const Message &message, ExecutionProgressErrorType errorCode,
 	                                stepID step);
 
 	/**

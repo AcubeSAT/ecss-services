@@ -79,7 +79,7 @@ TEST_CASE("TM[1,4]", "[service][st01]") {
 
 	Message receivedMessage = Message(1, 2, Message::TC, 3);
 	reqVerifService.failStartExecutionVerification(receivedMessage,
-	                                               ErrorHandler::UnknownStartExecutionError);
+	                                               ErrorHandler::UnknownExecutionStartError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -96,7 +96,7 @@ TEST_CASE("TM[1,4]", "[service][st01]") {
 	CHECK(response.readEnumerated(11) == 3); // application process ID
 	CHECK(response.readEnumerated(2) == ECSS_SEQUENCE_FLAGS); // sequence flags
 	CHECK(response.readBits(14) == 0); // packet sequence count
-	CHECK(response.readEnum16() == ErrorHandler::UnknownAcceptanceError); // error code
+	CHECK(response.readEnum16() == ErrorHandler::UnknownExecutionStartError); // error code
 }
 
 TEST_CASE("TM[1,5]", "[service][st01]") {
@@ -129,7 +129,7 @@ TEST_CASE("TM[1,6]", "[service][st01]") {
 
 	Message receivedMessage = Message(1, 5, Message::TC, 3);
 	reqVerifService.failProgressExecutionVerification(receivedMessage,
-	                                                  ErrorHandler::UnknownProgressExecutionError,
+	                                                  ErrorHandler::UnknownExecutionProgressError,
 	                                                  ErrorHandler::UnknownStepID);
 	REQUIRE(ServiceTests::hasOneMessage());
 
@@ -148,7 +148,7 @@ TEST_CASE("TM[1,6]", "[service][st01]") {
 	CHECK(response.readEnumerated(2) == ECSS_SEQUENCE_FLAGS); // sequence flags
 	CHECK(response.readBits(14) == 0); // packet sequence count
 	CHECK(response.readEnum16() == ErrorHandler::UnknownStepID); // step ID
-	CHECK(response.readEnum16() == ErrorHandler::UnknownProgressExecutionError);
+	CHECK(response.readEnum16() == ErrorHandler::UnknownExecutionProgressError);
 }
 
 TEST_CASE("TM[1,7]", "[service][st01]") {
@@ -179,7 +179,7 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 
 	Message receivedMessage = Message(1, 8, Message::TC, 3);
 	reqVerifService.failCompletionExecutionVerification(receivedMessage,
-	                                                    ErrorHandler::UnknownCompletionExecutionError);
+		ErrorHandler::UnknownExecutionCompletionError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -195,7 +195,7 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 	CHECK(response.readEnumerated(11) == 3); // application process ID
 	CHECK(response.readEnumerated(2) == ECSS_SEQUENCE_FLAGS); // sequence flags
 	CHECK(response.readBits(14) == 0); // packet sequence count
-	CHECK(response.readEnum16() == ErrorHandler::UnknownCompletionExecutionError); // error code
+	CHECK(response.readEnum16() == ErrorHandler::UnknownExecutionCompletionError); // error code
 }
 
 TEST_CASE("TM[1,10]", "[service][st01]") {

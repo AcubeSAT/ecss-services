@@ -26,7 +26,7 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 
 TEST_CASE("Error: Failed Execution Start", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 56);
-	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownStartExecutionError);
+	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownExecutionStartError);
 
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -43,12 +43,12 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::UnknownStartExecutionError);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionStartError);
 }
 
 TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 56);
-	ErrorHandler::reportProgressError(failedMessage, ErrorHandler::UnknownProgressExecutionError,
+	ErrorHandler::reportProgressError(failedMessage, ErrorHandler::UnknownExecutionProgressError,
 		ErrorHandler::UnknownStepID);
 
 	REQUIRE(ServiceTests::hasOneMessage());
@@ -66,13 +66,13 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::UnknownStartExecutionError);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionProgressError);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownStepID);
 }
 
 TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 56);
-	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownCompletionExecutionError);
+	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownExecutionCompletionError);
 
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -89,7 +89,7 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::UnknownCompletionExecutionError);
+	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionCompletionError);
 }
 
 TEST_CASE("Error: Failed Routing", "[errors]") {

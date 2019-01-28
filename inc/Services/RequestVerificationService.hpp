@@ -60,7 +60,7 @@ public:
 	 * @param errorCode The cause of creating this type of report
 	 */
 	void failStartExecutionVerification(const Message &request,
-		ErrorHandler::StartExecutionErrorType
+		ErrorHandler::ExecutionStartErrorType
 	errorCode);
 
 	/**
@@ -83,7 +83,7 @@ public:
 	 * @param step Step identifier
 	 */
 	void failProgressExecutionVerification(const Message &request,
-		ErrorHandler::ProgressExecutionErrorType errorCode, ErrorHandler::stepID step);
+		ErrorHandler::ExecutionProgressErrorType errorCode, ErrorHandler::stepID step);
 
 	/**
  	 * TM[1,7] successful completion of execution verification report
@@ -103,7 +103,7 @@ public:
 	 * @param errorCode The cause of creating this type of report
 	 */
 	void failCompletionExecutionVerification(const Message &request,
-		ErrorHandler::CompletionExecutionErrorType errorCode);
+		ErrorHandler::ExecutionCompletionErrorType errorCode);
 
 	/**
 	 * TM[1,10] failed routing verification report

@@ -15,13 +15,13 @@ void ErrorHandler::reportError(const Message &message, AcceptanceErrorType error
 }
 
 template<>
-void ErrorHandler::reportError(const Message &message, StartExecutionErrorType errorCode) {
+void ErrorHandler::reportError(const Message &message, ExecutionStartErrorType errorCode) {
 	requestVerificationService.failStartExecutionVerification(message, errorCode);
 
 	logError(message, errorCode);
 }
 
-void ErrorHandler::reportProgressError(const Message &message, ProgressExecutionErrorType
+void ErrorHandler::reportProgressError(const Message &message, ExecutionProgressErrorType
 errorCode, stepID step) {
 	requestVerificationService.failProgressExecutionVerification(message, errorCode, step);
 
@@ -29,7 +29,7 @@ errorCode, stepID step) {
 }
 
 template<>
-void ErrorHandler::reportError(const Message &message, CompletionExecutionErrorType errorCode) {
+void ErrorHandler::reportError(const Message &message, ExecutionCompletionErrorType errorCode) {
 	requestVerificationService.failCompletionExecutionVerification(message, errorCode);
 
 	logError(message, errorCode);
