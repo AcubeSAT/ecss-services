@@ -205,4 +205,3 @@ void RequestVerificationService::execute(const Message &message) {
 			break;
 	}
 }
-

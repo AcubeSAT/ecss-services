@@ -112,18 +112,6 @@ public:
 	};
 
 	/**
-	 * This enumeration type corresponds with reports about the progress of the execution
-	 * of a request. For example if the execution of a request is a long process, then we can divide
-	 * the process into steps and take feedback that depends on the step identifier
-	 *
-	 * @todo configure step ID for the suitable requests
-	*/
-	//enum stepID {
-		//UnknownStepID = 0
-	//};
-
-
-	/**
 	 * The error code for failed completion of execution reports, as specified in ECSS 5.3.5.2.3g
 	 *
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
