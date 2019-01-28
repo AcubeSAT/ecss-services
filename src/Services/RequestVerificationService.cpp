@@ -66,24 +66,6 @@ void RequestVerificationService::failStartExecutionVerification(const Message &r
 	storeMessage(report);
 }
 
-/**
- *  StepID documentation
- *
- *  For example:
- *
- *  steps of UnknownProcess1 and their IDs:
- *  1)UnknownStep1 = 0
- *  2)UnknownStep2 = 1
- *
- *  steps of UnknownProcess2 and their IDs:
- *  1)UnknownStep3 = 2
- *  2)UnknownStep4 = 3
- *  3)UnknownStep5 = 4
- *
- *  ...
- *
- */
-
 void RequestVerificationService::successProgressExecutionVerification(const Message &request,
 	uint8_t stepID) {
 	// TM[1,5] successful progress of execution verification report
