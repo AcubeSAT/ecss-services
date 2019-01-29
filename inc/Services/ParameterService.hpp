@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
 #include "Service.hpp"
+#include "etl/map.h"
 
 #define CONFIGLENGTH 5
 
@@ -17,10 +18,11 @@
  * PTC and PFC for each parameter shall be specified as in
  * ECSS-E-ST-70-41C, chapter 7.3
  */
+
+typedef uint16_t ParamId;  // parameter IDs are given sequentially
 struct Parameter {
 	uint8_t ptc;            // Packet field type code (PTC)
 	uint8_t pfc;            // Packet field format code (PFC)
-	uint16_t paramId;       // Unique ID of the parameter
 
 	uint32_t settingData;
 	// Actual data defining the operation of a peripheral or subsystem.
@@ -33,13 +35,15 @@ struct Parameter {
  * Holds the list with the parameters and provides functions
  * for parameter reporting and modification.
  *
- * @todo Ensure that the parameter list is sorted by ID
+ * The parameter list is stored in a map with the parameter IDs as keys and values
+ * corresponding Parameter structs containing the PTC, PFC and the parameter's value.
  */
+
 
 class ParameterService : public Service {
 private:
-	Parameter paramsList[CONFIGLENGTH];
-	// CONFIGLENGTH is just a dummy number for now, this should be statically set
+
+	etl::map<ParamId, Parameter, CONFIGLENGTH> paramsList;
 	static uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
 
 public:
