@@ -16,15 +16,25 @@ ParameterService::ParameterService() {
 	time_t currTime = time(nullptr);
 	struct tm *today = localtime(&currTime);
 
-	paramsList[0].paramId = 0;                     // random parameter ID
-	paramsList[0].settingData = today->tm_hour;    // the current hour
-	paramsList[0].ptc = 3;                         // unsigned int
-	paramsList[0].pfc = 14;                        // 32 bits
+	Parameter test1, test2;
 
-	paramsList[1].paramId = 1;                     // random parameter ID
-	paramsList[1].settingData = today->tm_min;     // the current minute
-	paramsList[1].ptc = 3;                         // unsigned int
-	paramsList[1].pfc = 14;                        // 32 bits
+	test1.settingData = today->tm_hour;    // the current hour
+	test1.ptc = 3;                         // unsigned int
+	test1.pfc = 14;                        // 32 bits
+
+	test2.settingData = today->tm_min;     // the current minute
+	test2.ptc = 3;                         // unsigned int
+	test2.pfc = 14;                        // 32 bits
+
+	// MAKE SURE THE IDS ARE UNIQUE WHEN INSERTING!
+	/**
+	 * @todo: Make a separate insert() function for parameter insertion to protect from blunders
+	 * if needed to
+	 */
+
+	paramsList.insert(std::make_pair(0, test1));
+	paramsList.insert(std::make_pair(1, test2));
+
 #endif
 }
 
@@ -39,11 +49,17 @@ void ParameterService::reportParameterIds(Message paramIds) {
 		for (int i = 0; i < ids; i++) {
 			uint16_t currId = paramIds.readUint16();      // current ID to be appended
 
-			if (currId < CONFIGLENGTH) {  // (crappy) check to prevent out-of-bounds access due to
-				// invalid id, see numOfValidIds
+			etl::map<ParamId, Parameter, CONFIGLENGTH>::iterator iter = paramsList.find(currId);
+			if (iter != paramsList.end()) {
 				reqParam.appendUint16(currId);
 				reqParam.appendUint32(paramsList[currId].settingData);
-			} else {
+			}
+//			if (currId < CONFIGLENGTH) {  // (crappy) check to prevent out-of-bounds access due to
+//				// invalid id, see numOfValidIds
+//				reqParam.appendUint16(currId);
+//				reqParam.appendUint32(paramsList[currId].settingData);
+//			}
+			else {
 								// generate failure of execution notification for ST[06]
 				continue;       //ignore the invalid ID
 			}
