@@ -44,7 +44,7 @@ class ParameterService : public Service {
 private:
 
 	etl::map<ParamId, Parameter, CONFIGLENGTH> paramsList;
-	static uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
+	uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
 
 public:
 	/**
