@@ -49,8 +49,7 @@ void ParameterService::reportParameterIds(Message paramIds) {
 		for (int i = 0; i < ids; i++) {
 			uint16_t currId = paramIds.readUint16();      // current ID to be appended
 
-			etl::map<ParamId, Parameter, CONFIGLENGTH>::iterator iter = paramsList.find(currId);
-			if (iter != paramsList.end()) {
+			if (paramsList.find(currId) != paramsList.end()) {
 				reqParam.appendUint16(currId);
 				reqParam.appendUint32(paramsList[currId].settingData);
 			}
@@ -77,9 +76,13 @@ void ParameterService::setParameterIds(Message newParamValues) {
 		for (int i = 0; i < ids; i++) {
 			uint16_t currId = newParamValues.readUint16();
 
-			if (currId < CONFIGLENGTH) {  // crappy criterion, see numOfValidIds
+			if (paramsList.find(currId) != paramsList.end()) {
 				paramsList[currId].settingData = newParamValues.readUint32();
-			} else {
+			}
+
+//			if (currId < CONFIGLENGTH) {  // crappy criterion, see numOfValidIds
+//				paramsList[currId].settingData = newParamValues.readUint32();
+			else {
 								// generate failure of execution notification for ST[06]
 				continue;       // ignore the invalid ID
 			}
@@ -111,7 +114,10 @@ uint16_t ParameterService::numOfValidIds(Message idMsg) {
 
 		// FIXES: 1) Implement a linear search
 		// 2) (possibly better) Rewrite everything to use a hash map, since IDs are unique
-		if (currId < CONFIGLENGTH) {
+//		if (currId < CONFIGLENGTH) {
+//			validIds++;
+//		}
+		if (paramsList.find(currId) != paramsList.end()) {
 			validIds++;
 		}
 	}
