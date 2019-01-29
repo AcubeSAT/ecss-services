@@ -53,14 +53,10 @@ void ParameterService::reportParameterIds(Message paramIds) {
 				reqParam.appendUint16(currId);
 				reqParam.appendUint32(paramsList[currId].settingData);
 			}
-//			if (currId < CONFIGLENGTH) {  // (crappy) check to prevent out-of-bounds access due to
-//				// invalid id, see numOfValidIds
-//				reqParam.appendUint16(currId);
-//				reqParam.appendUint32(paramsList[currId].settingData);
-//			}
+
 			else {
 								// generate failure of execution notification for ST[06]
-				continue;       //ignore the invalid ID
+				continue;       // ignore the invalid ID
 			}
 		}
 	}
@@ -80,8 +76,6 @@ void ParameterService::setParameterIds(Message newParamValues) {
 				paramsList[currId].settingData = newParamValues.readUint32();
 			}
 
-//			if (currId < CONFIGLENGTH) {  // crappy criterion, see numOfValidIds
-//				paramsList[currId].settingData = newParamValues.readUint32();
 			else {
 								// generate failure of execution notification for ST[06]
 				continue;       // ignore the invalid ID
@@ -105,18 +99,6 @@ uint16_t ParameterService::numOfValidIds(Message idMsg) {
 			idMsg.readUint32();   //skip the 32bit settings blocks, we need only the IDs
 		}
 
-		// IMPORTANT TODO: currId < CONFIGLENGTH is a crappy criterion for determining whether an ID
-		// actually exists!
-		// COUNTERARGUMENT: Array of 5 structs with only 2 parameters stored => rest exist but
-		// are filled with garbage => look like valid parameters but they don't actually have any
-		// useful data => not ignored by numOfValidIds => garbage creeps into messages => tests fail
-		// (and only on some PCs)
-
-		// FIXES: 1) Implement a linear search
-		// 2) (possibly better) Rewrite everything to use a hash map, since IDs are unique
-//		if (currId < CONFIGLENGTH) {
-//			validIds++;
-//		}
 		if (paramsList.find(currId) != paramsList.end()) {
 			validIds++;
 		}
