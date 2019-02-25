@@ -18,3 +18,7 @@ void TimeManagementService::cucTimeReport() {
 
 	storeMessage(timeReport);
 }
+
+void TimeManagementService::parseTime(Message &messageTime) {
+
+}

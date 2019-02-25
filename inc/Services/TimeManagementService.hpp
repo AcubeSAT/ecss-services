@@ -31,6 +31,18 @@ public:
 	 * or should ignore the standard?
 	 */
 	void cucTimeReport();
+
+	/**
+	 * TC[9,128]
+	 *
+	 * This function is a custom subservice(mission specific) with message type 128(as defined
+	 * from the standard for custom message types, 5.3.3.1.f) and it parses the data of the
+	 * time-management telecommand packet
+	 *
+	 * @param messageTime The class-member `data` of /p has the data for  the time configuration
+	 * (a CUC format as described in the documentation of the class TimeHelper)
+	 */
+	 void parseTime(Message &messageTime);
 };
 
 
