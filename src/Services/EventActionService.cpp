@@ -34,7 +34,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 				eventActionDefinitionArray[index].empty = false;
 				eventActionDefinitionArray[index].enabled = false;
 				eventActionDefinitionArray[index].applicationId = applicationID;
-				eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID();
+				eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID;
 				if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
 					ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 				} else {
