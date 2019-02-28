@@ -172,14 +172,9 @@ int main() {
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
 
-
-	// TimeHelper test
-	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
-	std::cout << "\n" << test << "\n";
-
 	// ST[09] test
 	TimeManagementService timeReport;
-	timeReport.cucTimeReport();
+	timeReport.cdsTimeReport();
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,

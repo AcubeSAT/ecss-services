@@ -2,40 +2,38 @@
 #define ECSS_SERVICES_TIMEHELPER_HPP
 
 #include <cstdint>
+#include <ctime>
 #include <Message.hpp>
 
 /**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.
  * The ECSS standard supports two time formats: the CUC and CSD that are described in
- * CCSDS 301.0-B-4 standard
- * The chosen time format is CUC. The reasons for this selection are the followings:
- * 1)It is more flexible from the CSD. The designer is free to decide how much memory will use
- * for the time unit and what that time unit will be(seconds, minutes, hours etc.).
- * 2)It can use TAI(international atomic time) as reference time scale. So there is no need
- * to worry about leap seconds(code UTC-based)
+ * CCSDS 301.0-B-4 standard. The chosen time format is CDS and it is UTC-based(UTC: Coordinated
+ * Universal Time)
  *
- * Note: The implementation of the time formats are in general RTC-dependent. First, we need to
- * get the time data from the RTC, so we know what time is it and then format it!
+ * Note:
+ * Since this code is UTC-based, the leap second correction must be made and leap seconds should
+ * be considered in the difference between timestamps if a critical time-difference is needed
+ *
  */
 class TimeHelper {
 public:
+
 	/**
-	 * Generate the CUC time format
+	 * Generate the CDS time format(3.3 in CCSDS 301.0-B-4 standard)
 	 *
-	 * @details The CUC time format consists of two main fields: the time code preamble field
+	 * @details The CDS time format consists of two main fields: the time code preamble field
 	 * (P-field) and the time specification field(T-field). The P-Field is the metadata for the
-	 * T-Field. The T-Field contains the value of the time unit and the designer decides what the
-	 * time unit will be, so this is a subject for discussion. The recommended time unit from the
-	 * standard is the second and it is probably the best solution for accuracy.
-	 * @param seconds the seconds provided from the RTC. This function in general should have
-	 * parameters corresponding with the RTC. For the time being we assume that the RTC has a
-	 * 32-bit counter that counts seconds(the RTC in Nucleo F103RB!)
- 	 * @todo check if we need milliseconds(fractions of the time unit)
- 	 * @todo the time unit should be declared in the metadata. But how?
- 	 * @todo check if we need to define other epoch than the 1 January 1958
+	 * T-Field. The T-Field is consisted of two segments: 1)the `DAY` and the 2)`ms of
+	 * day` segments. The P-field won't be included in the code, because as the ECSS standards
+	 * claims, it can be just implicitly declared.
+	 * @param timeInfo is the data provided from RTC(Real Time Clock)
+ 	 * @todo check if we need to define other epoch than the 1 January 1970
  	 * @todo time security for critical time operations
+ 	 * @todo declare the implicit P-field
+ 	 * @todo check if we need milliseconds
 	 */
-	static uint64_t implementCUCTimeFormat(uint32_t seconds);
+	static uint64_t implementCDSTimeFormat(struct tm* timeInfo);
 };
 
 #endif //ECSS_SERVICES_TIMEHELPER_HPP
