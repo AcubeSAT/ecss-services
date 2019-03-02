@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
 #include "Service.hpp"
+#include "ErrorHandler.hpp"
 #include "etl/map.h"
 
 #define CONFIGLENGTH 5
