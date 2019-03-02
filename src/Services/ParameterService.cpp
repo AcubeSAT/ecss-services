@@ -55,8 +55,7 @@ void ParameterService::reportParameterIds(Message paramIds) {
 			}
 
 			else {
-								// generate failure of execution notification for ST[06]
-				continue;       // ignore the invalid ID
+				continue;  // generate failure of execution notification (todo) for ST[06] & ignore
 			}
 		}
 	}
@@ -77,8 +76,7 @@ void ParameterService::setParameterIds(Message newParamValues) {
 			}
 
 			else {
-								// generate failure of execution notification for ST[06]
-				continue;       // ignore the invalid ID
+				continue;   // generate failure of execution notification (todo) for ST[06] & ignore
 			}
 		}
 	}
