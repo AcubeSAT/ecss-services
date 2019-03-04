@@ -91,7 +91,7 @@ public:
      * @param seconds elapsed seconds since Unix epoch
 	 * @return the UTC date based on the /p
 	 */
-	static struct TimeAndDate parseCDSTimeFormat(uint8_t *data, uint8_t length);
+	static struct TimeAndDate parseCDSTimeFormat(const uint8_t *data, uint8_t length);
 
 	/**
 	 * Dummy function created only to access mkUTCtime for testing

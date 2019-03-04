@@ -96,13 +96,13 @@ uint64_t TimeHelper::implementCDSTimeFormat(struct TimeAndDate &TimeInfo) {
 	 * Agency-defined epoch,that it will be 1 January 1970(1/1/1970) 00:00:00(hours:minutes:seconds)
 	 * This epoch is configured from the current implementation, using mktime() function
 	 */
-	uint16_t elapsedDays = static_cast<uint16_t>(seconds / 86400);
+	auto elapsedDays = static_cast<uint16_t>(seconds / 86400);
 
 	/**
 	 * The `ms of day` segment, 32 bits as defined in standard. The `ms of the day` and DAY`
 	 * should give the time passed from the defined epoch (1/1/1970)
 	 */
-	uint32_t msOfDay = static_cast<uint32_t >((seconds % 86400) * 1000);
+	auto msOfDay = static_cast<uint32_t >((seconds % 86400) * 1000);
 
 	/**
 	 * Define CDS time format
@@ -118,7 +118,7 @@ uint64_t TimeHelper::implementCDSTimeFormat(struct TimeAndDate &TimeInfo) {
 	return timeFormat;
 }
 
-struct TimeAndDate TimeHelper::parseCDSTimeFormat(uint8_t *data, uint8_t length) {
+struct TimeAndDate TimeHelper::parseCDSTimeFormat(const uint8_t *data, uint8_t length) {
 	// check if we have the correct length of the packet data
 	assertI(length != 48, ErrorHandler::InternalErrorType::UnknownInternalError);
 
