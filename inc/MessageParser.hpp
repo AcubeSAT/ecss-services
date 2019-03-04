@@ -32,7 +32,7 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	Message parse(uint8_t * data, uint32_t length);
+	Message parse(uint8_t *data, uint32_t length);
 
 private:
 	/**

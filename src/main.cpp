@@ -174,7 +174,15 @@ int main() {
 
 	// ST[09] test
 	TimeManagementService timeReport;
-	timeReport.cdsTimeReport();
+	struct TimeAndDate timeInfo = {0};
+	// 10/04/1998 10:15:00
+	timeInfo.year = 1998;
+	timeInfo.month = 4;
+	timeInfo.day = 10;
+	timeInfo.hour = 10;
+	timeInfo.minute = 15;
+	timeInfo.second = 0;
+	timeReport.cdsTimeReport(timeInfo);
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
