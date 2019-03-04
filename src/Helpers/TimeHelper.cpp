@@ -1,21 +1,25 @@
 #include "Helpers/TimeHelper.hpp"
 
 bool TimeHelper::IsLeapYear(uint16_t year) {
-
-	if (year % 4 != 0) return false;
-	if (year % 100 != 0) return true;
+	if (year % 4 != 0) {
+		return false;
+	}
+	if (year % 100 != 0) {
+		return true;
+	}
 	return (year % 400) == 0;
 }
 
 uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &timeInfo) {
-
 	uint32_t secs = 0;
-	for (uint16_t y = 1970; y < timeInfo.year; ++y)
+	for (uint16_t y = 1970; y < timeInfo.year; ++y) {
 		secs += (IsLeapYear(y) ? 366 : 365) * SecondsPerDay;
+	}
 	for (uint16_t m = 1; m < timeInfo.month; ++m) {
 		secs += DaysOfMonth[m - 1] * SecondsPerDay;
-		if (m == 2 && IsLeapYear(timeInfo.year))
+		if (m == 2 && IsLeapYear(timeInfo.year)) {
 			secs += SecondsPerDay;
+		}
 	}
 	secs += (timeInfo.day - 1) * SecondsPerDay;
 	secs += timeInfo.hour * SecondsPerHour;
@@ -114,16 +118,16 @@ uint64_t TimeHelper::implementCDSTimeFormat(struct TimeAndDate &TimeInfo) {
 	return timeFormat;
 }
 
-struct TimeAndDate TimeHelper::parseCDSTimeFormat(uint8_t *timeData, uint8_t length) {
+struct TimeAndDate TimeHelper::parseCDSTimeFormat(uint8_t *data, uint8_t length) {
 	// check if we have the correct length of the packet data
 	assertI(length != 48, ErrorHandler::InternalErrorType::UnknownInternalError);
 
-	uint16_t elapsedDays = (static_cast<uint16_t >(timeData[0])) << 8 | static_cast<uint16_t >
-	(timeData[1]);
-	uint32_t msOfDay = (static_cast<uint32_t >(timeData[2])) << 24 |
-	                   (static_cast<uint32_t >(timeData[3])) << 16 |
-	                   (static_cast<uint32_t >(timeData[4])) << 8 |
-	                   static_cast<uint32_t >(timeData[5]);
+	uint16_t elapsedDays = (static_cast<uint16_t >(data[0])) << 8 | static_cast<uint16_t >
+	(data[1]);
+	uint32_t msOfDay = (static_cast<uint32_t >(data[2])) << 24 |
+	                   (static_cast<uint32_t >(data[3])) << 16 |
+	                   (static_cast<uint32_t >(data[4])) << 8 |
+	                   static_cast<uint32_t >(data[5]);
 
 	uint32_t seconds = elapsedDays * 86400 + msOfDay / 1000;
 
