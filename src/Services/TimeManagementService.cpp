@@ -20,4 +20,3 @@ struct TimeAndDate TimeManagementService::cdsTimeRequest(Message &message) {
 
 	return timeInfo;
 }
-

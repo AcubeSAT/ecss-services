@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <Message.hpp>
-#include <iostream> // used only for the temporary `printUTCtime` function
 
 /**
  * The time and date provided from Real Time Clock(Real Time Clock)
@@ -68,6 +67,8 @@ private:
 	struct TimeAndDate utcTime(uint32_t seconds);
 
 public:
+
+	TimeHelper() = default;
 
 	/**
 	 * Generate the CDS time format(3.3 in CCSDS 301.0-B-4 standard)

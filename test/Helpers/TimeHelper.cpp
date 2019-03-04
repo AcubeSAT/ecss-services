@@ -61,4 +61,3 @@ TEST_CASE("Time format implementation", "[CUC]") {
 	}
 
 }
-
