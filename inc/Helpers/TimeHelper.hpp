@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <Message.hpp>
+#include <iostream> // used only for the temporary `printUTCtime` function
 
 /**
  * The time and date provided from Real Time Clock(Real Time Clock)
@@ -29,7 +30,7 @@ struct TimeAndDate {
  * Universal Time)
  *
  * Note:
- * Since this code is UTC-based, the leap second correction must be made. The leap seconds that 
+ * Since this code is UTC-based, the leap second correction must be made. The leap seconds that
  * have been occured between timestamps should be considered if a critical time-difference is needed
  *
  */
@@ -47,15 +48,24 @@ private:
 	bool IsLeapYear(uint16_t year);
 
 	/**
-     * Make GMT(UTC) time. This is a reimplemented mktime() of <ctime> library in an
-     * embedded systems way
+     * Convert UTC date to elapsed seconds since Unix epoch(1/1/1970 00:00:00). This is a
+     * reimplemented mktime() of <ctime> library in an embedded systems way
      *
-     * @param timeInfo the time information/data from the RTC(UTC format)
+     * @param TimeInfo the time information/data from the RTC(UTC format)
      * @return the elapsed seconds between a given UTC date(after the Unix epoch) and Unix epoch
-     * (1/1/1970 00:00:00)
      * @todo change the epoch for computer-efficiency
      */
-	uint32_t mkgmtime(struct TimeAndDate &timeInfo);
+	uint32_t mkUTCtime(struct TimeAndDate &timeInfo);
+
+	/**
+     * Convert elapsed seconds since Unix epoxh to UTC date. This is a reimplemented gmtime() of
+     * <ctime> library in an embedded systems way
+     *
+     * @param seconds elapsed seconds since Unix epoch
+     * @return the UTC date based on the /p
+     * @todo change the epoch for computer efficiency
+     */
+	struct TimeAndDate utcTime(uint32_t seconds);
 
 public:
 
@@ -67,26 +77,42 @@ public:
 	 * T-Field. The T-Field is consisted of two segments: 1)the `DAY` and the 2)`ms of
 	 * day` segments. The P-field won't be included in the code, because as the ECSS standards
 	 * claims, it can be just implicitly declared.
-	 * @param timeInfo is the data provided from RTC(Real Time Clock)
+	 * @param TimeInfo is the data provided from RTC(Real Time Clock)
  	 * @todo check if we need to define other epoch than the 1 January 1970
  	 * @todo time security for critical time operations
  	 * @todo declare the implicit P-field
  	 * @todo check if we need milliseconds
 	 */
-	static uint64_t implementCDSTimeFormat(struct TimeAndDate &timeInfo);
+	static uint64_t implementCDSTimeFormat(struct TimeAndDate &TimeInfo);
 
 	/**
-	 * Dummy function created only to access mkgmtime for testing
+	 * Parse the CDS time format(3.3 in CCSDS 301.0-B-4 standard)
+     * @param seconds elapsed seconds since Unix epoch
+	 * @return the UTC date based on the /p
+	 */
+	static struct TimeAndDate parseCDSTimeFormat(uint8_t *data, uint8_t length);
+
+	/**
+	 * Dummy function created only to access mkUTCtime for testing
 	 *
 	 * @todo Delete this function
 	 */
-	uint32_t get_mkgmtime(struct TimeAndDate &timeInfo) {
-		return mkgmtime(timeInfo);
+	uint32_t get_mkUTCtime(struct TimeAndDate &TimeInfo) {
+		return mkUTCtime(TimeInfo);
 	}
 
+	/**
+	 * Dummy function created only to access utcTime for testing
+	 *
+	 * @todo Delete this function
+	 */
+	struct TimeAndDate get_utcTime(uint32_t seconds) {
+		return utcTime(seconds);
+	}
 };
 
-// used to access `mkgmtime` function in the static `implementCDSTimeFormat` function
-static TimeHelper mkgmtimeAccess;
+// used to access `mkgmtime` function and `gmtime` function in the static  `implementCDSTimeFormat`
+// and in the static `parseCDSTimeFormat functions
+static TimeHelper Access;
 
 #endif //ECSS_SERVICES_TIMEHELPER_HPP
