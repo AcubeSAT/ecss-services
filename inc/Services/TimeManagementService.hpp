@@ -50,7 +50,7 @@ public:
 
 	void cdsTimeReport(struct TimeAndDate &TimeInfo);
 
-    /**
+	/**
 	 * TC[9,128] CDS time request
 	 *
 	 * This function is a custom subservice(mission specific) with message type 128(as defined
@@ -58,12 +58,11 @@ public:
 	 * time-management telecommand packet. This data is formatted according to the CDS time code
 	 * format(check class `TimeHelper` for the format)
 	 *
-     * @param timeData the data of the parsed space packet for the ST[09] time management
-     * @param length the size of the time data
+	 * @param timeData the data of the parsed space packet for the ST[09] time management
+	 * @param length the size of the time data
 	 */
 	struct TimeAndDate cdsTimeRequest(Message &message);
 };
 
 
 #endif //ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP
-

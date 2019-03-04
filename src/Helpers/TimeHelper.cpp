@@ -36,7 +36,7 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	TimeInfo.second = 0;
 
 	// calculate years
-	while (seconds  >= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay ) {
+	while (seconds >= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay) {
 		TimeInfo.year++;
 		seconds -= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay;
 	}
@@ -45,9 +45,9 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	uint8_t i = 0;
 	while (seconds >= (DaysOfMonth[i] * SecondsPerDay)) {
 		TimeInfo.month++;
-		seconds -=  (DaysOfMonth[i] * SecondsPerDay);
+		seconds -= (DaysOfMonth[i] * SecondsPerDay);
 		i++;
-		if (i == 1 && (seconds  >= (IsLeapYear(TimeInfo.year) ? 29 : 28) * SecondsPerDay)) {
+		if (i == 1 && (seconds >= (IsLeapYear(TimeInfo.year) ? 29 : 28) * SecondsPerDay)) {
 			TimeInfo.month++;
 			seconds -= (IsLeapYear(TimeInfo.year) ? 29 : 28) * SecondsPerDay;
 			i++;
@@ -55,19 +55,19 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	}
 
 	// calculate days
-	while(seconds >= SecondsPerDay){
+	while (seconds >= SecondsPerDay) {
 		TimeInfo.day++;
 		seconds -= SecondsPerDay;
 	}
 
 	// calculate hours
-	while(seconds >= SecondsPerHour){
+	while (seconds >= SecondsPerHour) {
 		TimeInfo.hour++;
 		seconds -= SecondsPerHour;
 	}
 
 	// calculate minutes
-	while(seconds >= SecondsPerMinute){
+	while (seconds >= SecondsPerMinute) {
 		TimeInfo.minute++;
 		seconds -= SecondsPerMinute;
 	}
