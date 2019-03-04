@@ -30,7 +30,8 @@ struct TimeAndDate {
  *
  * Note:
  * Since this code is UTC-based, the leap second correction must be made. The leap seconds that
- * have been occured between timestamps should be considered if a critical time-difference is needed
+ * have been occurred between timestamps should be considered if a critical time-difference is
+ * needed
  *
  */
 class TimeHelper {
@@ -54,10 +55,10 @@ private:
      * @return the elapsed seconds between a given UTC date(after the Unix epoch) and Unix epoch
      * @todo change the epoch for computer-efficiency
      */
-	uint32_t mkUTCtime(struct TimeAndDate &timeInfo);
+	uint32_t mkUTCtime(struct TimeAndDate &TimeInfo);
 
 	/**
-     * Convert elapsed seconds since Unix epoxh to UTC date. This is a reimplemented gmtime() of
+     * Convert elapsed seconds since Unix epoch to UTC date. This is a reimplemented gmtime() of
      * <ctime> library in an embedded systems way
      *
      * @param seconds elapsed seconds since Unix epoch
@@ -88,13 +89,14 @@ public:
 
 	/**
 	 * Parse the CDS time format(3.3 in CCSDS 301.0-B-4 standard)
+	 *
      * @param seconds elapsed seconds since Unix epoch
 	 * @return the UTC date based on the /p
 	 */
 	static struct TimeAndDate parseCDSTimeFormat(const uint8_t *data, uint8_t length);
 
 	/**
-	 * Dummy function created only to access mkUTCtime for testing
+	 * Dummy function created only to access `mkUTCtime` for testing
 	 *
 	 * @todo Delete this function
 	 */
@@ -103,7 +105,7 @@ public:
 	}
 
 	/**
-	 * Dummy function created only to access utcTime for testing
+	 * Dummy function created only to access `utcTime` for testing
 	 *
 	 * @todo Delete this function
 	 */
@@ -112,8 +114,10 @@ public:
 	}
 };
 
-// used to access `mkgmtime` function and `gmtime` function in the static  `implementCDSTimeFormat`
-// and in the static `parseCDSTimeFormat functions
+/**
+ * Used to access `mkgmtime` function and `gmtime` function in the static  `implementCDSTimeFormat`
+ * and in the static `parseCDSTimeFormat` functions
+ */
 static TimeHelper Access;
 
 #endif //ECSS_SERVICES_TIMEHELPER_HPP

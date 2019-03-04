@@ -10,26 +10,25 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 	return (year % 400) == 0;
 }
 
-uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &timeInfo) {
+uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
 	uint32_t secs = 0;
-	for (uint16_t y = 1970; y < timeInfo.year; ++y) {
+	for (uint16_t y = 1970; y < TimeInfo.year; ++y) {
 		secs += (IsLeapYear(y) ? 366 : 365) * SecondsPerDay;
 	}
-	for (uint16_t m = 1; m < timeInfo.month; ++m) {
+	for (uint16_t m = 1; m < TimeInfo.month; ++m) {
 		secs += DaysOfMonth[m - 1] * SecondsPerDay;
-		if (m == 2 && IsLeapYear(timeInfo.year)) {
+		if (m == 2 && IsLeapYear(TimeInfo.year)) {
 			secs += SecondsPerDay;
 		}
 	}
-	secs += (timeInfo.day - 1) * SecondsPerDay;
-	secs += timeInfo.hour * SecondsPerHour;
-	secs += timeInfo.minute * SecondsPerMinute;
-	secs += timeInfo.second;
+	secs += (TimeInfo.day - 1) * SecondsPerDay;
+	secs += TimeInfo.hour * SecondsPerHour;
+	secs += TimeInfo.minute * SecondsPerMinute;
+	secs += TimeInfo.second;
 	return secs;
 }
 
 struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
-
 	struct TimeAndDate TimeInfo = {0};
 	// Unix epoch 1/1/1970 00:00:00
 	TimeInfo.year = 1970;
@@ -92,15 +91,14 @@ uint64_t TimeHelper::implementCDSTimeFormat(struct TimeAndDate &TimeInfo) {
 	uint32_t seconds = Access.mkUTCtime(TimeInfo);
 
 	/**
-	 * The `DAY` segment, 16 bits as defined from standard. Actually the days passed from an
-	 * Agency-defined epoch,that it will be 1 January 1970(1/1/1970) 00:00:00(hours:minutes:seconds)
-	 * This epoch is configured from the current implementation, using mktime() function
+	 * The `DAY` segment, 16 bits as defined from standard. Actually the days passed since Unix
+	 * epoch
 	 */
 	auto elapsedDays = static_cast<uint16_t>(seconds / 86400);
 
 	/**
 	 * The `ms of day` segment, 32 bits as defined in standard. The `ms of the day` and DAY`
-	 * should give the time passed from the defined epoch (1/1/1970)
+	 * should give the time passed since Unix epoch
 	 */
 	auto msOfDay = static_cast<uint32_t >((seconds % 86400) * 1000);
 
