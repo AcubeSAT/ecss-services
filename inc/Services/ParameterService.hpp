@@ -5,7 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "etl/map.h"
 
-// Number of stored parameters. CONFIGLENGTH is just a dummy number for now, this should be statically set
+// Number of stored parameters. CONFIGLENGTH is just a dummy number for now.
 #define CONFIGLENGTH 5
 
 /**
