@@ -5,6 +5,6 @@ In this repository you can find the implementation of the ECSS services, based o
 ## Directories
 - **ci**: GitLab CI configuration files
 - **inc**: All headers and libraries used in the code
-- **lib**: External linraries used in the code
+- **lib**: External libraries used in the code
 - **src**: All source files are included here
 - **test**: Unit test implementation
