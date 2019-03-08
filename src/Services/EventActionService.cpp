@@ -59,7 +59,7 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
-				    eventActionDefinitionArray[index].enabled == false) {
+				    eventActionDefinitionArray[index].enabled == true) {
 					eventActionDefinitionArray[index].empty = true;
 					eventActionDefinitionArray[index].eventDefinitionID = 65535;
 					eventActionDefinitionArray[index].request = "";

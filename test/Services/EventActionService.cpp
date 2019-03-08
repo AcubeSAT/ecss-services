@@ -169,14 +169,16 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st09]") {
 	eventActionService.addEventActionDefinitions(message0);
 	Message message1(19, 1, Message::TC, 0);
 	message1.appendEnum16(1);
-	message1.appendEnum16(0);
+	message1.appendEnum16(1);
 	data = "00";
 	message1.appendString(data);
 	eventActionService.addEventActionDefinitions(message1);
 	Message message2(19, 4, Message::TC, 0);
-	message2.appendUint16(1);
+	message2.appendUint16(2);
 	message2.appendEnum16(1);
 	message2.appendEnum16(0);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
 	eventActionService.enableEventActionDefinitions(message2);
 	CHECK(eventActionService.eventActionDefinitionArray[0].enabled == 1);
 	CHECK(eventActionService.eventActionDefinitionArray[1].enabled == 1);
