@@ -32,7 +32,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			}
 			if (index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE) {
 				eventActionDefinitionArray[index].empty = false;
-				eventActionDefinitionArray[index].enabled = false;
+				eventActionDefinitionArray[index].enabled = true;
 				eventActionDefinitionArray[index].applicationId = applicationID;
 				eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID;
 				if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
