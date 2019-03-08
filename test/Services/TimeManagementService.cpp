@@ -6,8 +6,8 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeManagementService timeService;
 
 	struct TimeAndDate TimeInfo = {0};
-	// 10/04/1998 10:15:00
-	TimeInfo.year = 1998;
+	// 10/04/2020 10:15:00
+	TimeInfo.year = 2020;
 	TimeInfo.month = 4;
 	TimeInfo.day = 10;
 	TimeInfo.hour = 10;
@@ -34,7 +34,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	message.appendWord(static_cast<uint32_t >(timeFormat));
 
 	TimeInfo = timeService.cdsTimeRequest(message);
-	CHECK(TimeInfo.year == 1998);
+	CHECK(TimeInfo.year == 2020);
 	CHECK(TimeInfo.month == 4);
 	CHECK(TimeInfo.day == 10);
 	CHECK(TimeInfo.hour == 10);

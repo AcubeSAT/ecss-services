@@ -11,8 +11,8 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 }
 
 uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
-	uint32_t secs = 0;
-	for (uint16_t y = 1970; y < TimeInfo.year; ++y) {
+	uint32_t secs = 1546300800; // elapsed seconds since 1/1/2019 00:00:00 (UTC date)
+	for (uint16_t y = 2019; y < TimeInfo.year; ++y) { //
 		secs += (IsLeapYear(y) ? 366 : 365) * SecondsPerDay;
 	}
 	for (uint16_t m = 1; m < TimeInfo.month; ++m) {
@@ -50,11 +50,6 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 		TimeInfo.month++;
 		seconds -= (DaysOfMonth[i] * SecondsPerDay);
 		i++;
-		if (i == 1 && (seconds >= (IsLeapYear(TimeInfo.year) ? 29 : 28) * SecondsPerDay)) {
-			TimeInfo.month++;
-			seconds -= (IsLeapYear(TimeInfo.year) ? 29 : 28) * SecondsPerDay;
-			i++;
-		}
 	}
 
 	// calculate days
@@ -81,7 +76,7 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	return TimeInfo;
 }
 
-uint64_t TimeHelper::implementCDSTimeFormat(struct TimeAndDate &TimeInfo) {
+uint64_t TimeHelper::implementCDStimeFormat(struct TimeAndDate &TimeInfo) {
 	/**
 	 * Define the T-field. The total number of octets for the implementation of T-field is 6(2 for
 	 * the `DAY` and 4 for the `ms of day`
@@ -116,7 +111,7 @@ uint64_t TimeHelper::implementCDSTimeFormat(struct TimeAndDate &TimeInfo) {
 	return timeFormat;
 }
 
-struct TimeAndDate TimeHelper::parseCDSTimeFormat(const uint8_t *data, uint8_t length) {
+struct TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data, uint8_t length) {
 	// check if we have the correct length of the packet data
 	assertI(length != 48, ErrorHandler::InternalErrorType::UnknownInternalError);
 

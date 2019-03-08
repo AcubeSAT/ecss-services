@@ -85,7 +85,7 @@ public:
  	 * @todo declare the implicit P-field
  	 * @todo check if we need milliseconds
 	 */
-	static uint64_t implementCDSTimeFormat(struct TimeAndDate &TimeInfo);
+	static uint64_t implementCDStimeFormat(struct TimeAndDate &TimeInfo);
 
 	/**
 	 * Parse the CDS time format(3.3 in CCSDS 301.0-B-4 standard)
@@ -93,7 +93,7 @@ public:
      * @param seconds elapsed seconds since Unix epoch
 	 * @return the UTC date based on the /p
 	 */
-	static struct TimeAndDate parseCDSTimeFormat(const uint8_t *data, uint8_t length);
+	static struct TimeAndDate parseCDStimeFormat(const uint8_t *data, uint8_t length);
 
 	/**
 	 * Dummy function created only to access `mkUTCtime` for testing
