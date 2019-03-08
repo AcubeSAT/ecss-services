@@ -27,6 +27,12 @@
  */
 class EventActionService : public Service {
 private:
+
+	/**
+	 * Event-action function status
+	 */
+	bool eventActionFunctionStatus;
+
 	/**
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
@@ -53,11 +59,6 @@ public:
 		serviceType = 19;
 		eventActionFunctionStatus = true;
 	}
-
-	/**
-	 * Event-action function status
-	 */
-	bool eventActionFunctionStatus;
 
 	/**
 	 * TC[19,1] add event-action definitions
