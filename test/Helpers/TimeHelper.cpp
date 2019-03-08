@@ -49,7 +49,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		CHECK(TimeInfo.minute == 15);
 		CHECK(TimeInfo.second == 0);
 
-		seconds = 1546300800;
+		seconds = 1546300800; // elapsed seconds between 1/1/2019 00:00:00 and Unix epoch
 
 		TimeInfo = time.get_utcTime(seconds);
 		CHECK(TimeInfo.year == 2019);
@@ -58,6 +58,67 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		CHECK(TimeInfo.hour == 0);
 		CHECK(TimeInfo.minute == 0);
 		CHECK(TimeInfo.second == 0);
+
+		seconds = 1550966400; // elapsed seconds between 24/2/2019 00:00:00 and Unix epoch
+
+		TimeInfo = time.get_utcTime(seconds);
+		CHECK(TimeInfo.year == 2019);
+		CHECK(TimeInfo.month == 2);
+		CHECK(TimeInfo.day == 24);
+		CHECK(TimeInfo.hour == 0);
+		CHECK(TimeInfo.minute == 0);
+		CHECK(TimeInfo.second == 0);
+
+		seconds = 1551571200; // elapsed seconds between 3/3/2019 00:00:00 and Unix epoch
+
+		TimeInfo = time.get_utcTime(seconds);
+		CHECK(TimeInfo.year == 2019);
+		CHECK(TimeInfo.month == 3);
+		CHECK(TimeInfo.day == 3);
+		CHECK(TimeInfo.hour == 0);
+		CHECK(TimeInfo.minute == 0);
+		CHECK(TimeInfo.second == 0);
+
+		seconds = 1742907370; // elapsed seconds between 25/3/2025 12:56:10 and Unix epoch
+
+		TimeInfo = time.get_utcTime(seconds);
+		CHECK(TimeInfo.year == 2025);
+		CHECK(TimeInfo.month == 3);
+		CHECK(TimeInfo.day == 25);
+		CHECK(TimeInfo.hour == 12);
+		CHECK(TimeInfo.minute == 56);
+		CHECK(TimeInfo.second == 10);
+
+		seconds = 1583020800; // elapsed seconds between 1/3/2020 00:00:00 and Unix epoch
+
+		TimeInfo = time.get_utcTime(seconds);
+		CHECK(TimeInfo.year == 2020);
+		CHECK(TimeInfo.month == 3);
+		CHECK(TimeInfo.day == 1);
+		CHECK(TimeInfo.hour == 0);
+		CHECK(TimeInfo.minute == 0);
+		CHECK(TimeInfo.second == 0);
+
+		seconds = 1582934400; // elapsed seconds between 2/29/2020 00:00:00 and Unix epoch
+
+		TimeInfo = time.get_utcTime(seconds);
+		CHECK(TimeInfo.year == 2020);
+		CHECK(TimeInfo.month == 2);
+		CHECK(TimeInfo.day == 29);
+		CHECK(TimeInfo.hour == 0);
+		CHECK(TimeInfo.minute == 0);
+		CHECK(TimeInfo.second == 0);
+
+		seconds = 1577923200; // elapsed seconds between 2/1/2020 00:00:00 and Unix epoch
+
+		TimeInfo = time.get_utcTime(seconds);
+		CHECK(TimeInfo.year == 2020);
+		CHECK(TimeInfo.month == 1);
+		CHECK(TimeInfo.day == 2);
+		CHECK(TimeInfo.hour == 0);
+		CHECK(TimeInfo.minute == 0);
+		CHECK(TimeInfo.second == 0);
+
 	}
 
 }
