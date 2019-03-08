@@ -5,6 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "etl/map.h"
 
+// Number of stored parameters. CONFIGLENGTH is just a dummy number for now, this should be statically set
 #define CONFIGLENGTH 5
 
 /**
@@ -43,7 +44,6 @@ struct Parameter {
 
 class ParameterService : public Service {
 private:
-
 	etl::map<ParamId, Parameter, CONFIGLENGTH> paramsList;
 	uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
 
