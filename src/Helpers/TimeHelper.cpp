@@ -40,8 +40,8 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 
 	// calculate years
 	while (seconds >= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay) {
-		TimeInfo.year++;
 		seconds -= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay;
+		TimeInfo.year++;
 	}
 
 	// calculate months
@@ -50,6 +50,16 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 		TimeInfo.month++;
 		seconds -= (DaysOfMonth[i] * SecondsPerDay);
 		i++;
+		if (i == 1 && IsLeapYear(TimeInfo.year)) {
+			if (seconds <= (28 * SecondsPerDay)) {
+				break;
+			} else {
+				TimeInfo.month++;
+				seconds -= 29 * SecondsPerDay;
+				i++;
+			}
+
+		}
 	}
 
 	// calculate days
