@@ -115,7 +115,7 @@ public:
 };
 
 /**
- * Used to access `mkgmtime` function and `gmtime` function in the static  `implementCDSTimeFormat`
+ * Used to access `mkUTCtime` function and `utcTime` function in the static `implementCDSTimeFormat`
  * and in the static `parseCDSTimeFormat` functions
  */
 static TimeHelper Access;
