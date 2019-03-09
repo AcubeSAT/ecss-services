@@ -58,9 +58,10 @@ public:
 	 * containing the current configuration
 	 * **for the parameters specified in the carried valid IDs**.
 	 *
-	 * No sophisticated error checking for now, just whether the package is of the correct type
-	 * and whether the requested IDs are valid, ignoring the invalid ones. If no IDs are correct,
-	 * the returned message shall be empty.
+	 * No sophisticated error checking for now, just whether the packet is of the correct type
+	 * and whether the requested IDs are valid, ignoring the invalid ones.
+	 * If the packet has an incorrect header, an InternalError::UnacceptablePacket is raised.
+	 * If no IDs are correct, the returned message shall be empty.
 	 *
 	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
 	 * @return None (messages are stored using storeMessage())

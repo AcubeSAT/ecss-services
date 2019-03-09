@@ -41,22 +41,29 @@ ParameterService::ParameterService() {
 void ParameterService::reportParameterIds(Message paramIds) {
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
 
-	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
-	    paramIds.messageType == 1) {
-		uint16_t ids = paramIds.readUint16();
-		reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
+//	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
+//	    paramIds.messageType == 1) {
 
-		for (int i = 0; i < ids; i++) {
-			uint16_t currId = paramIds.readUint16();      // current ID to be appended
+    // assertion: correct message, packet and service type (at failure throws an
+    // InternalError::UnacceptablePacket)
+	ErrorHandler::assertInternal(paramIds.packetType == Message::TC
+	&& paramIds.messageType == 1
+	&& paramIds.serviceType == 20,
+	ErrorHandler::InternalErrorType::UnacceptablePacket);
 
-			if (paramsList.find(currId) != paramsList.end()) {
-				reqParam.appendUint16(currId);
-				reqParam.appendUint32(paramsList[currId].settingData);
-			}
+	uint16_t ids = paramIds.readUint16();
+	reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
 
-			else {
-				continue;  // generate failure of execution notification (todo) for ST[06] & ignore
-			}
+	for (int i = 0; i < ids; i++) {
+		uint16_t currId = paramIds.readUint16();      // current ID to be appended
+
+		if (paramsList.find(currId) != paramsList.end()) {
+			reqParam.appendUint16(currId);
+			reqParam.appendUint32(paramsList[currId].settingData);
+		}
+
+		else {
+			continue;  // generate failure of execution notification (todo) for ST[06] & ignore
 		}
 	}
 
@@ -64,20 +71,24 @@ void ParameterService::reportParameterIds(Message paramIds) {
 }
 
 void ParameterService::setParameterIds(Message newParamValues) {
-	if (newParamValues.packetType == Message::TC && newParamValues.serviceType == 20 &&
-	newParamValues.messageType == 3) {
-		uint16_t ids = newParamValues.readUint16();  //get number of ID's
 
-		for (int i = 0; i < ids; i++) {
-			uint16_t currId = newParamValues.readUint16();
+	// assertion: correct message, packet and service type (at failure throws an
+	// InternalError::UnacceptablePacket which gets logged)
+	ErrorHandler::assertInternal(newParamValues.packetType == Message::TC
+	                             && newParamValues.messageType == 1
+	                             && newParamValues.serviceType == 20,
+	                             ErrorHandler::InternalErrorType::UnacceptablePacket);
+	uint16_t ids = newParamValues.readUint16();  //get number of ID's
 
-			if (paramsList.find(currId) != paramsList.end()) {
-				paramsList[currId].settingData = newParamValues.readUint32();
-			}
+	for (int i = 0; i < ids; i++) {
+		uint16_t currId = newParamValues.readUint16();
 
-			else {
-				continue;   // generate failure of execution notification (todo) for ST[06] & ignore
-			}
+		if (paramsList.find(currId) != paramsList.end()) {
+			paramsList[currId].settingData = newParamValues.readUint32();
+		}
+
+		else {
+			continue;   // generate failure of execution notification (todo) for ST[06] & ignore
 		}
 	}
 }
