@@ -53,12 +53,10 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 		if (i == 1 && IsLeapYear(TimeInfo.year)) {
 			if (seconds <= (28 * SecondsPerDay)) {
 				break;
-			} else {
-				TimeInfo.month++;
-				seconds -= 29 * SecondsPerDay;
-				i++;
 			}
-
+			TimeInfo.month++;
+			seconds -= 29 * SecondsPerDay;
+			i++;
 		}
 	}
 
