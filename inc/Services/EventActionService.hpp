@@ -8,7 +8,6 @@
 #include "Service.hpp"
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
-#include <bitset>
 #include <Services/EventReportService.hpp>
 
 /**
@@ -51,8 +50,6 @@ public:
 
 	friend EventReportService;
 
-	// If the size is changed maybe then indexOfAvailableSlots as well as the initiating loop in the
-	// constructor should be changed from uint16_t
 	EventActionDefinition eventActionDefinitionArray[ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE];
 
 	EventActionService() {
