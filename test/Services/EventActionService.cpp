@@ -254,14 +254,14 @@ TEST_CASE("Enable event-action function TC[19,8]", "[service][st09]") {
 	EventActionService eventActionService;
 	Message message(19, 8, Message::TC, 0);
 	eventActionService.enableEventActionFunction(message);
-	CHECK(eventActionService.eventActionFunctionStatus == true);
+	CHECK(eventActionService.getEventActionFunctionStatus() == true);
 }
 
 TEST_CASE("Disable event-action function TC[19,9]", "[service][st09]") {
 	EventActionService eventActionService;
 	Message message(19, 9, Message::TC, 0);
 	eventActionService.disableEventActionFunction(message);
-	CHECK(eventActionService.eventActionFunctionStatus == false);
+	CHECK(eventActionService.getEventActionFunctionStatus() == false);
 }
 
 TEST_CASE("Execute a TC request", "[service][st09]"){

@@ -29,8 +29,8 @@ class EventActionService : public Service {
 private:
 
 	/**
-	 * Event-action function status
-	 */
+	* Event-action function status
+	*/
 	bool eventActionFunctionStatus;
 
 	/**
@@ -115,6 +115,15 @@ public:
 	void setEventActionFunctionStatus(bool status) {
 		eventActionFunctionStatus = status;
 	}
+
+	/**
+	 * Getter for event-action function status
+	 * @return eventActionFunctionStatus
+	 */
+	bool getEventActionFunctionStatus(){
+		return eventActionFunctionStatus;
+	}
+
 };
 
 #endif //ECSS_SERVICES_EVENTACTIONSERVICE_HPP
