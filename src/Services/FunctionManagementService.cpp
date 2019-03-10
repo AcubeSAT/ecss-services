@@ -31,8 +31,8 @@
  */
 
 int FunctionManagementService::call(Message msg) {
-	assert(msg.messageType == 1);
-	assert(msg.serviceType == 8);
+	ErrorHandler::assertInternal(msg.messageType == 1 && msg.serviceType == 8,
+	                             ErrorHandler::InternalErrorType::UnacceptablePacket);
 
 	uint8_t funcName[FUNCNAMELENGTH];  // the function's name
 	uint8_t funcArgs[MAXARGLENGTH];    // arguments for the function
@@ -44,18 +44,17 @@ int FunctionManagementService::call(Message msg) {
 		/**
 		 * @todo Send failed start of execution (too long message)
 		 */
-		 return 4;  // arbitrary
+		return 4;  // arbitrary
 	}
 
 	// locate the appropriate function pointer
 	String<FUNCNAMELENGTH> name(funcName);
 	FunctionMap::iterator iter = funcPtrIndex.find(name);
-	void(*selected)(String<MAXARGLENGTH>);
+	void (*selected)(String<MAXARGLENGTH>);
 
 	if (iter != funcPtrIndex.end()) {
 		selected = *iter->second;
-	}
-	else {
+	} else {
 		/**
 		 * @todo Send failed start of execution (function not found)
 		 */
