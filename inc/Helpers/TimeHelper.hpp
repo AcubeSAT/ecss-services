@@ -36,10 +36,10 @@ struct TimeAndDate {
  */
 class TimeHelper {
 private:
-	int SecondsPerMinute = 60;
-	int SecondsPerHour = 3600;
-	int SecondsPerDay = 86400;
-	int DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	uint8_t SecondsPerMinute = 60;
+	uint16_t SecondsPerHour = 3600;
+	uint32_t SecondsPerDay = 86400;
+	uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	/**
 	 * @param year The year that will be examined if it is a leap year(366 days)
@@ -51,9 +51,13 @@ private:
      * Convert UTC date to elapsed seconds since Unix epoch(1/1/1970 00:00:00). This is a
      * reimplemented mktime() of <ctime> library in an embedded systems way
      *
+     * Note:
+     * This function can convert UTC dates after 1 January 2019
+     *
      * @param TimeInfo the time information/data from the RTC(UTC format)
      * @return the elapsed seconds between a given UTC date(after the Unix epoch) and Unix epoch
-     * @todo change the epoch for computer-efficiency
+     * @todo check if we need to change the epoch to ,the recommended from the standard, 1 January
+     * 1958
      */
 	uint32_t mkUTCtime(struct TimeAndDate &TimeInfo);
 
@@ -61,9 +65,13 @@ private:
      * Convert elapsed seconds since Unix epoch to UTC date. This is a reimplemented gmtime() of
      * <ctime> library in an embedded systems way
      *
+     * Note:
+     * This function can convert elapsed seconds after 1 January 2019 since Unix epoch
+     *
      * @param seconds elapsed seconds since Unix epoch
      * @return the UTC date based on the /p
-     * @todo change the epoch for computer efficiency
+     * @todo check if we need to change the epoch to ,the recommended from the standard, 1 January
+     * 1958
      */
 	struct TimeAndDate utcTime(uint32_t seconds);
 
@@ -80,7 +88,6 @@ public:
 	 * day` segments. The P-field won't be included in the code, because as the ECSS standards
 	 * claims, it can be just implicitly declared.
 	 * @param TimeInfo is the data provided from RTC(Real Time Clock)
- 	 * @todo check if we need to define other epoch than the 1 January 1970
  	 * @todo time security for critical time operations
  	 * @todo declare the implicit P-field
  	 * @todo check if we need milliseconds
@@ -90,8 +97,9 @@ public:
 	/**
 	 * Parse the CDS time format(3.3 in CCSDS 301.0-B-4 standard)
 	 *
-     * @param seconds elapsed seconds since Unix epoch
-	 * @return the UTC date based on the /p
+     * @param data time information provided from the ground segment
+     * @param length the size of the time information
+	 * @return the UTC date
 	 */
 	static struct TimeAndDate parseCDStimeFormat(const uint8_t *data, uint8_t length);
 
