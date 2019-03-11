@@ -18,8 +18,7 @@ void MessageParser::execute(Message &message) {
 			TestService::instance.execute(message);
 			break;
 		default:
-			// cout is very bad for embedded systems
-			std::cout << "This service hasn't been implemented yet or it doesn't exist";
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
 			break;
 	}
 }

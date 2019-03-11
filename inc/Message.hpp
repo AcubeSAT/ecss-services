@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
+
 // Forward declaration of the Message class, needed for the ErrorHandler
 class Message;
 
