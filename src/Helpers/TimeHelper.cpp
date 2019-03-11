@@ -29,11 +29,11 @@ uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
 }
 
 struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
+	seconds -= 1546300800; // elapsed seconds between 1/1/2019 00:00:00 (UTC date)
 	struct TimeAndDate TimeInfo = {0};
-	// Unix epoch 1/1/1970 00:00:00
-	TimeInfo.year = 1970;
+	TimeInfo.year = 2019;
 	TimeInfo.month = 1;
-	TimeInfo.day = 1;
+	TimeInfo.day = 0;
 	TimeInfo.hour = 0;
 	TimeInfo.minute = 0;
 	TimeInfo.second = 0;
@@ -61,22 +61,17 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	}
 
 	// calculate days
-	while (seconds >= SecondsPerDay) {
-		TimeInfo.day++;
-		seconds -= SecondsPerDay;
-	}
+	TimeInfo.day = seconds/SecondsPerDay;
+	seconds -= TimeInfo.day * SecondsPerDay;
+	TimeInfo.day++; // add 1 day because we start count from 1 January(and not 0 January!)
 
 	// calculate hours
-	while (seconds >= SecondsPerHour) {
-		TimeInfo.hour++;
-		seconds -= SecondsPerHour;
-	}
+	TimeInfo.hour = seconds/SecondsPerHour;
+	seconds -= TimeInfo.hour * SecondsPerHour;
 
 	// calculate minutes
-	while (seconds >= SecondsPerMinute) {
-		TimeInfo.minute++;
-		seconds -= SecondsPerMinute;
-	}
+	TimeInfo.minute = seconds/SecondsPerMinute;
+	seconds -= TimeInfo.minute * SecondsPerMinute;
 
 	// calculate seconds
 	TimeInfo.second = seconds;
