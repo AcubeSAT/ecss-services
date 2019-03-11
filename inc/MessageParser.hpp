@@ -1,16 +1,20 @@
 #ifndef ECSS_SERVICES_MESSAGEPARSER_HPP
 #define ECSS_SERVICES_MESSAGEPARSER_HPP
 
+#include <Services/EventActionService.hpp>
 #include "Message.hpp"
 
 /**
  * A generic class responsible for the execution of the incoming telemetry and telecommand
  * packets.
  *
+ * @todo Make the connection between the ST[01]-request verification service and the services
+ * that initiate it
  * @todo Implement the execute function in the upcoming services or generally in the upcoming
  * activities
  *
  */
+
 class MessageParser {
 public:
 
@@ -32,7 +36,17 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	Message parse(uint8_t * data, uint32_t length);
+	Message parse(uint8_t *data, uint32_t length);
+
+	/**
+	 * @todo: elaborate on this comment
+	 * Create a message so that a string can be parsed
+	 *
+	 * Note: conversion of char* to unsigned char* should flow without any problems according to
+	 * this great analysis:
+	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
+	 */
+	Message parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data);
 
 private:
 	/**

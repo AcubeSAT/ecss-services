@@ -51,7 +51,6 @@ public:
 		 * A string is larger than the largest allowed string
 		 */
 			StringTooLarge = 4,
-
 		/**
 		 * An error in the header of a packet makes it unable to be parsed
 		 */

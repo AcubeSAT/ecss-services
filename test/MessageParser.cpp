@@ -78,3 +78,7 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 	CHECK(message.messageType == 31);
 	CHECK(memcmp(message.data, "hello", 5) == 0);
 }
+
+TEST_CASE("TC data parsing into a message", "[MessageParser]") {
+
+}

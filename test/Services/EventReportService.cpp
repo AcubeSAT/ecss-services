@@ -5,7 +5,7 @@
 #include <cstring>
 
 /*
- * @todo Change the reinterpret_cast
+ * @todo: Change the reinterpret_cast
  */
 TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	EventReportService eventReportService;

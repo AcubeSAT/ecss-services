@@ -5,10 +5,9 @@
 #include <bitset>
 /**
  * Implementation of ST[05] event reporting service
- * @todo add enum event definition id (and maybe some appending?)
  *
- * @todo add more enums event IDs
- *
+ * @todo: add more enums event IDs
+ * @todo: Make sure there isn't an event ID == 0, because there's a confliction with another service
  * Note: enum IDs are these just for test purposes
  *
  */

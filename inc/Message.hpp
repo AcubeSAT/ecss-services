@@ -20,6 +20,8 @@ class Message;
  */
 class Message {
 public:
+	Message () = default;
+
 	enum PacketType {
 		TM = 0, // Telemetry
 		TC = 1 // Telecommand
