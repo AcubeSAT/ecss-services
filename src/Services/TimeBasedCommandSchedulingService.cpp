@@ -69,7 +69,7 @@ void TimeBasedCommandSchedulingService::timeShiftAllActivities(Message &request)
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
-	assert(request.messageType == 5);
+	assert(request.messageType == 15);
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
@@ -87,7 +87,7 @@ void TimeBasedCommandSchedulingService::timeShiftActivitiesByID(Message &request
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
-	assert(request.messageType == 5);
+	assert(request.messageType == 7);
 
 	uint32_t relativeOffset = request.readUint32(); // Get the offset first
 	/*
@@ -104,6 +104,34 @@ void TimeBasedCommandSchedulingService::timeShiftActivitiesByID(Message &request
 		* the received parameters
 		*/
 	}
+}
+
+void TimeBasedCommandSchedulingService::deleteActivitiesByID(Message &request) {
+
+	// Check if the correct packet is being processed
+	assert(request.serviceType == 11);
+	assert(request.messageType == 5);
+
+}
+
+void TimeBasedCommandSchedulingService::detailReportAllActivities(Message &request) {
+
+	// Check if the correct packet is being processed
+	assert(request.serviceType == 11);
+	assert(request.messageType == 16);
+
+	// todo: add an extra check for the vector size to make sure it matches with
+	//  currentNumberOfActivities?
+	for (auto const& activity : scheduledActivities) {
+		// Create the report message object of telemetry message subtype 10 for each activity
+		Message report = createTM(10);
+		// todo: append sub-schedule and group ID if they are defined
+		// todo: append the release time of the current activity "activity.requestReleaseTime;"
+		// todo: append the request contained in the activity "activity.request;"
+		storeMessage(report); // Save the report
+		request.resetRead(); // todo: define if this statement is required
+	}
+
 }
 
 
