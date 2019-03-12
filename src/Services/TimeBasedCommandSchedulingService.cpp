@@ -65,5 +65,45 @@ void TimeBasedCommandSchedulingService::insertActivities(Message &request) {
 
 }
 
+void TimeBasedCommandSchedulingService::timeShiftAllActivities(Message &request) {
+
+	// Check if the correct packet is being processed
+	assert(request.serviceType == 11);
+	assert(request.messageType == 5);
+
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	for (std::size_t i = 0; i < iterationCount; i++) {
+		uint32_t relativeOffset = request.readUint32();
+		// todo: define the enumeration types for the source ID and application process ID
+		uint16_t receivedSequenceCount = request.readUint16(); // Get the sequence count
+		/*
+		* Perform a search in the vector containing the activity definitions to find a match for
+		* the received parameters
+		*/
+	}
+}
+
+void TimeBasedCommandSchedulingService::timeShiftActivitiesByID(Message &request) {
+
+	// Check if the correct packet is being processed
+	assert(request.serviceType == 11);
+	assert(request.messageType == 5);
+
+	uint32_t relativeOffset = request.readUint32(); // Get the offset first
+	/*
+	 * Search for the earliest activity in the schedule. If the release time of the earliest
+	 * activity + relativeOffset is earlier than current_time + time_margin, reject the request
+	 * and generate a failed start of execution.
+	 */
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	for (std::size_t i = 0; i < iterationCount; i++) {
+		// todo: define the enumeration types for the source ID and application process ID
+		uint16_t receivedSequenceCount = request.readUint16(); // Get the sequence count
+		/*
+		* Perform a search in the vector containing the activity definitions to find a match for
+		* the received parameters
+		*/
+	}
+}
 
 
