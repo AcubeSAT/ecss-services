@@ -42,6 +42,10 @@ void ErrorHandler::reportError(const Message &message, RoutingErrorType errorCod
 	logError(message, errorCode);
 }
 
+void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode) {
+	logError(UnknownInternalError);
+}
+
 template<typename ErrorType>
 void ErrorHandler::logError(const Message &message, ErrorType errorType) {
 	std::cerr

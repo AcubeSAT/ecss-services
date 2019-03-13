@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <Message.hpp>
-#include <ErrorHandler.hpp>
 
 /**
  * Supporting class for tests against ECSS services
@@ -12,7 +11,6 @@
  */
 class ServiceTests {
 	static std::vector<Message> queuedMessages;
-	static std::vector<ErrorHandler::InternalErrorType> internalErrors;
 
 public:
 	/**
@@ -24,26 +22,10 @@ public:
 	}
 
 	/**
-	 * Get an error from the list of logged errors
-	 * @param number The number of the error, starting from 0 in chronological order
-	 */
-	static ErrorHandler::InternalErrorType &getError(uint64_t number) { // uint32 just for
-		// overloading
-		return internalErrors.at(number);
-	}
-
-	/**
 	 * Add a message to the queue of messages to be sent
 	 */
 	static void queue(const Message &message) {
 		queuedMessages.push_back(message);
-	}
-
-	/**
-	 * Add an error to the queue of logged errors
-	 */
-	static void storeError(const ErrorHandler::InternalErrorType &error) {
-		internalErrors.push_back(error);
 	}
 
 	/**
@@ -61,11 +43,10 @@ public:
 	}
 
 	/**
-	 * Remove all the queued messages and errors from the lists, starting over from 0 items again
+	 * Remove all the queued messages from the list, starting over from 0 items again
 	 */
 	static void reset() {
 		queuedMessages.clear();
-		internalErrors.clear();
 	}
 };
 
