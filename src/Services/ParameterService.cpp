@@ -40,23 +40,20 @@ ParameterService::ParameterService() {
 
 void ParameterService::reportParameterIds(Message paramIds) {
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
+	ErrorHandler::assertInternal(paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
+	                             paramIds.messageType == 1,
+	                             ErrorHandler::InternalErrorType::UnacceptablePacket);
+	uint16_t ids = paramIds.readUint16();
+	reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
 
-	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
-	    paramIds.messageType == 1) {
-		uint16_t ids = paramIds.readUint16();
-		reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
+	for (int i = 0; i < ids; i++) {
+		uint16_t currId = paramIds.readUint16();      // current ID to be appended
 
-		for (int i = 0; i < ids; i++) {
-			uint16_t currId = paramIds.readUint16();      // current ID to be appended
-
-			if (paramsList.find(currId) != paramsList.end()) {
-				reqParam.appendUint16(currId);
-				reqParam.appendUint32(paramsList[currId].settingData);
-			}
-
-			else {
-				continue;  // generate failure of execution notification (todo) for ST[06] & ignore
-			}
+		if (paramsList.find(currId) != paramsList.end()) {
+			reqParam.appendUint16(currId);
+			reqParam.appendUint32(paramsList[currId].settingData);
+		} else {
+			continue;  // generate failure of execution notification (todo) for ST[06] & ignore
 		}
 	}
 
@@ -65,7 +62,7 @@ void ParameterService::reportParameterIds(Message paramIds) {
 
 void ParameterService::setParameterIds(Message newParamValues) {
 	if (newParamValues.packetType == Message::TC && newParamValues.serviceType == 20 &&
-	newParamValues.messageType == 3) {
+	    newParamValues.messageType == 3) {
 		uint16_t ids = newParamValues.readUint16();  //get number of ID's
 
 		for (int i = 0; i < ids; i++) {
@@ -73,9 +70,7 @@ void ParameterService::setParameterIds(Message newParamValues) {
 
 			if (paramsList.find(currId) != paramsList.end()) {
 				paramsList[currId].settingData = newParamValues.readUint32();
-			}
-
-			else {
+			} else {
 				continue;   // generate failure of execution notification (todo) for ST[06] & ignore
 			}
 		}
