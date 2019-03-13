@@ -48,7 +48,7 @@ Message MessageParser::parse(uint8_t *data, uint32_t length) {
 	if (packetType == Message::TC) {
 		parseTC(data + 6, packetDataLength, message);
 	} else {
-		assert(false); // Not implemented yet
+		parseTM(data + 6, packetDataLength, message);
 	}
 
 	return message;
@@ -81,4 +81,25 @@ Message MessageParser::parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> dat
 	message.packetType = Message::TC;
 	parseTC(dataInt, ECSS_EVENT_SERVICE_STRING_SIZE, message);
 	return message;
+}
+
+void MessageParser::parseTM(uint8_t *data, uint16_t length, Message &message) {
+	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
+
+	// Individual fields of the TM header
+	uint8_t pusVersion = data[0] >> 4;
+	uint8_t serviceType = data[1];
+	uint8_t messageType = data[2];
+
+	ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
+
+	// Remove the length of the header
+	length -= 5;
+
+	// Copy the data to the message
+	// TODO: See if memcpy is needed for this
+	message.serviceType = serviceType;
+	message.messageType = messageType;
+	memcpy(message.data, data + 5, length);
+	message.dataSize = length;
 }
