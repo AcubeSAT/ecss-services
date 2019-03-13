@@ -1,7 +1,7 @@
-#include "Services/TimeBasedCommandSchedulingService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 
 
-void TimeBasedCommandSchedulingService::enableScheduleExecution(Message &request) {
+void TimeBasedSchedulingService::enableScheduleExecution(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
@@ -10,7 +10,7 @@ void TimeBasedCommandSchedulingService::enableScheduleExecution(Message &request
 	executionFunctionStatus = true; // Enable the service
 }
 
-void TimeBasedCommandSchedulingService::disableScheduleExecution(Message &request) {
+void TimeBasedSchedulingService::disableScheduleExecution(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
@@ -19,7 +19,7 @@ void TimeBasedCommandSchedulingService::disableScheduleExecution(Message &reques
 	executionFunctionStatus = false; // Disable the service
 }
 
-void TimeBasedCommandSchedulingService::resetSchedule(Message &request) {
+void TimeBasedSchedulingService::resetSchedule(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
@@ -30,7 +30,7 @@ void TimeBasedCommandSchedulingService::resetSchedule(Message &request) {
 	// todo: Add resetting for sub-schedules and groups, if defined
 }
 
-void TimeBasedCommandSchedulingService::insertActivities(Message &request) {
+void TimeBasedSchedulingService::insertActivities(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
@@ -65,7 +65,7 @@ void TimeBasedCommandSchedulingService::insertActivities(Message &request) {
 
 }
 
-void TimeBasedCommandSchedulingService::timeShiftAllActivities(Message &request) {
+void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
@@ -83,7 +83,7 @@ void TimeBasedCommandSchedulingService::timeShiftAllActivities(Message &request)
 	}
 }
 
-void TimeBasedCommandSchedulingService::timeShiftActivitiesByID(Message &request) {
+void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
@@ -106,7 +106,7 @@ void TimeBasedCommandSchedulingService::timeShiftActivitiesByID(Message &request
 	}
 }
 
-void TimeBasedCommandSchedulingService::deleteActivitiesByID(Message &request) {
+void TimeBasedSchedulingService::deleteActivitiesByID(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
@@ -114,7 +114,7 @@ void TimeBasedCommandSchedulingService::deleteActivitiesByID(Message &request) {
 
 }
 
-void TimeBasedCommandSchedulingService::detailReportAllActivities(Message &request) {
+void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);

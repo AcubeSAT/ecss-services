@@ -1,8 +1,8 @@
-#ifndef ECSS_SERVICES_TIMEBASEDCOMMANDSCHEDULINGSERVICE_HPP
-#define ECSS_SERVICES_TIMEBASEDCOMMANDSCHEDULINGSERVICE_HPP
+#ifndef ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
+#define ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 
 #include <iostream>
-#include <vector>
+#include "etl/vector.h"
 #include "Service.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
@@ -15,7 +15,7 @@
 #define TIME_MARGIN_FOR_ACTIVATION  60 // todo: define the time margin for the command activation
 
 
-class TimeBasedCommandSchedulingService : public Service {
+class TimeBasedSchedulingService : public Service {
 public:
 
 
@@ -105,4 +105,4 @@ private:
 
 };
 
-#endif //ECSS_SERVICES_TIMEBASEDCOMMANDSCHEDULINGSERVICE_HPP
+#endif //ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
