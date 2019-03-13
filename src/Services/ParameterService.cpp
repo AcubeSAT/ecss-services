@@ -2,12 +2,8 @@
 
 #define DEMOMODE
 
-#ifdef DEMOMODE
-
 #include <ctime>
 #include <cstdlib>
-
-#endif
 
 ParameterService::ParameterService() {
 #ifdef DEMOMODE
@@ -41,16 +37,12 @@ ParameterService::ParameterService() {
 void ParameterService::reportParameterIds(Message paramIds) {
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
 
-//	if (paramIds.packetType == Message::TC && paramIds.serviceType == 20 &&
-//	    paramIds.messageType == 1) {
-
     // assertion: correct message, packet and service type (at failure throws an
     // InternalError::UnacceptablePacket)
 	ErrorHandler::assertInternal(paramIds.packetType == Message::TC
 	&& paramIds.messageType == 1
 	&& paramIds.serviceType == 20,
 	ErrorHandler::InternalErrorType::UnacceptablePacket);
-
 	uint16_t ids = paramIds.readUint16();
 	reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
 
