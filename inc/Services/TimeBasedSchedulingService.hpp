@@ -4,8 +4,10 @@
 #include <iostream>
 #include "etl/vector.h"
 #include "Service.hpp"
-#include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
+#include "MessageParser.hpp"
+#include "Helpers/CRCHelper.hpp"
+#include "Helpers/TimeHelper.hpp"
 
 // Define whether groups and/or sub-schedules are in use
 #define GROUPS_ENABLED          0
@@ -25,12 +27,12 @@ private:
 
 	// Hold the data for the scheduled activity definition
 	struct ScheduledActivity {
-		//Message request; // Hold the received command request
+		Message request; // Hold the received command request
 		uint32_t requestReleaseTime = 0; // Keep the command release time
 		// todo: If we decide to use sub-schedules, the ID of that has to be defined
 		// todo: If groups are used, then the group ID has to be defined here
 	};
-	std::vector<ScheduledActivity> scheduledActivities; // Scheduled activity definitions
+	etl::vector<ScheduledActivity, MAX_NUMBER_OF_ACTIVITIES> scheduledActivities; // Scheduled activity definitions
 
 
 public:
