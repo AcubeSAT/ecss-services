@@ -1,4 +1,5 @@
 #include <cstring>
+#include <Services/EventActionService.hpp>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "macros.hpp"
@@ -17,8 +18,7 @@ void MessageParser::execute(Message &message) {
 			TestService::instance.execute(message);
 			break;
 		default:
-			// cout is very bad for embedded systems
-			std::cout << "This service hasn't been implemented yet or it doesn't exist";
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
 			break;
 	}
 }
@@ -48,7 +48,7 @@ Message MessageParser::parse(uint8_t *data, uint32_t length) {
 	if (packetType == Message::TC) {
 		parseTC(data + 6, packetDataLength, message);
 	} else {
-		assert(false); // Not implemented yet
+		parseTM(data + 6, packetDataLength, message);
 	}
 
 	return message;
@@ -58,6 +58,35 @@ void MessageParser::parseTC(uint8_t *data, uint16_t length, Message &message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
+	uint8_t pusVersion = data[0] >> 4;
+	uint8_t serviceType = data[1];
+	uint8_t messageType = data[2];
+
+	ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
+
+	// Remove the length of the header
+	length -= 5;
+
+	// Copy the data to the message
+	// TODO: See if memcpy is needed for this
+	message.serviceType = serviceType;
+	message.messageType = messageType;
+	memcpy(message.data, data + 5, length);
+	message.dataSize = length;
+}
+
+Message MessageParser::parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data) {
+	Message message;
+	uint8_t *dataInt = reinterpret_cast<uint8_t *>(data.data());
+	message.packetType = Message::TC;
+	parseTC(dataInt, ECSS_EVENT_SERVICE_STRING_SIZE, message);
+	return message;
+}
+
+void MessageParser::parseTM(uint8_t *data, uint16_t length, Message &message) {
+	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
+
+	// Individual fields of the TM header
 	uint8_t pusVersion = data[0] >> 4;
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];

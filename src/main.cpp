@@ -7,6 +7,7 @@
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Services/TimeManagementService.hpp"
+#include "Services/EventActionService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "Services/MemoryManagementService.hpp"
@@ -117,16 +118,31 @@ int main() {
 	reqVerifService.successAcceptanceVerification(receivedMessage);
 
 	receivedMessage = Message(1, 2, Message::TC, 3);
-	reqVerifService.failAcceptanceVerification(receivedMessage);
+	reqVerifService.failAcceptanceVerification(receivedMessage, ErrorHandler::UnknownAcceptanceError);
+
+	receivedMessage = Message(1, 3, Message::TC, 3);
+	reqVerifService.successStartExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(1, 4, Message::TC, 3);
+	reqVerifService.failStartExecutionVerification(receivedMessage,
+		ErrorHandler::UnknownExecutionStartError);
+
+	receivedMessage = Message(1, 5, Message::TC, 3);
+	reqVerifService.successProgressExecutionVerification(receivedMessage, 0);
+
+	receivedMessage = Message(1, 6, Message::TC, 3);
+	reqVerifService.failProgressExecutionVerification(receivedMessage,
+		ErrorHandler::UnknownExecutionProgressError, 0);
 
 	receivedMessage = Message(1, 7, Message::TC, 3);
-	reqVerifService.successExecutionVerification(receivedMessage);
+	reqVerifService.successCompletionExecutionVerification(receivedMessage);
 
 	receivedMessage = Message(1, 8, Message::TC, 3);
-	reqVerifService.failExecutionVerification(receivedMessage);
+	reqVerifService.failCompletionExecutionVerification(receivedMessage,
+		ErrorHandler::UnknownExecutionCompletionError);
 
 	receivedMessage = Message(1, 10, Message::TC, 3);
-	reqVerifService.failRoutingVerification(receivedMessage);
+	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
 
 	// ST[05] (5,1 to 5,4) test [works]
 	const char eventReportData[12] = "Hello World";
@@ -154,14 +170,22 @@ int main() {
 	// ST[01] test
 	message = Message(1, 1, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 2, Message::TC, 3);
+	//message = Message(1, 2, Message::TC, 3);
+	//messageParser.execute(message);
+	message = Message(1, 3, Message::TC, 3);
 	messageParser.execute(message);
+	//message = Message(1, 4, Message::TC, 3);
+	//messageParser.execute(message);
+	//message = Message(1, 5, Message::TC, 3)
+	//messageParser.execute(message);
+	//message = Message(1, 6, Message::TC, 3)
+	//messageParser.execute(message);
 	message = Message(1, 7, Message::TC, 3);
 	messageParser.execute(message);
-	message = Message(1, 8, Message::TC, 3);
-	messageParser.execute(message);
-	message = Message(1, 10, Message::TC, 3);
-	messageParser.execute(message);
+	//message = Message(1, 8, Message::TC, 3);
+	//messageParser.execute(message);
+	//message = Message(1, 10, Message::TC, 3);
+	//messageParser.execute(message);
 
 	// ErrorHandler test
 	std::cout << std::flush;
@@ -183,7 +207,7 @@ int main() {
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
-										 EventReportService::MediumSeverityUnknownEvent};
+	                                        EventReportService::MediumSeverityUnknownEvent};
 	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
 	Message eventMessage(5, 6, Message::TC, 1);
 	eventMessage.appendUint16(2);
@@ -199,6 +223,68 @@ int main() {
 	eventReportService.listOfDisabledEventsReport();
 	eventReportService.enableReportGeneration(eventMessage2);
 	eventReportService.requestListOfDisabledEvents(eventMessage3);
+
+	// ST[19] test
+
+	EventActionService eventActionService;
+	Message eventActionDefinition(19, 1, Message::TC, 1);
+	eventActionDefinition.appendEnum16(0);
+	eventActionDefinition.appendEnum16(2);
+	String<64> TCdata = "hi";
+	eventActionDefinition.appendString(TCdata);
+	eventActionService.addEventActionDefinitions(eventActionDefinition);
+	Message eventActionDefinition1(19, 1, Message::TC, 1);
+	eventActionDefinition1.appendEnum16(0);
+	eventActionDefinition1.appendEnum16(2);
+	TCdata = "hi1";
+	eventActionDefinition1.appendString(TCdata);
+	eventActionService.addEventActionDefinitions(eventActionDefinition1);
+	Message eventActionDefinition2(19, 1, Message::TC, 1);
+	eventActionDefinition2.appendEnum16(0);
+	eventActionDefinition2.appendEnum16(3);
+	TCdata = "hi2";
+	eventActionDefinition2.appendString(TCdata);
+	eventActionService.addEventActionDefinitions(eventActionDefinition2);
+	Message eventActionDefinition3(19, 5, Message::TC, 1);
+	eventActionDefinition3.appendUint16(2);
+	eventActionDefinition3.appendUint16(0);
+	eventActionDefinition3.appendUint16(2);
+	eventActionDefinition3.appendUint16(0);
+	eventActionDefinition3.appendUint16(3);
+
+	eventActionService.disableEventActionDefinitions(eventActionDefinition3);
+	std::cout << "Status of position 0,1,2 should be 000:" << eventActionService
+		.eventActionDefinitionArray[0].enabled << eventActionService
+		.eventActionDefinitionArray[1].enabled <<
+		eventActionService.eventActionDefinitionArray[2].enabled;
+
+	Message eventActionDefinition5(19, 4, Message::TC, 1);
+	eventActionDefinition5.appendUint16(2);
+	eventActionDefinition5.appendUint16(0);
+	eventActionDefinition5.appendUint16(2);
+	eventActionDefinition5.appendUint16(0);
+	eventActionDefinition5.appendUint16(3);
+	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
+	std::cout << "\nStatus of position 0,1,2 should be 111:" << eventActionService
+		.eventActionDefinitionArray[0].enabled << eventActionService
+		.eventActionDefinitionArray[1].enabled <<
+		eventActionService.eventActionDefinitionArray[2].enabled;
+
+	Message eventActionDefinition4(19, 2, Message::TC, 1);
+	eventActionDefinition4.appendUint16(1);
+	eventActionDefinition4.appendUint16(0);
+	eventActionDefinition4.appendUint16(2);
+
+	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
+	std::cout << "\nPositions 0,1 empty should be 11:" << (uint16_t) eventActionService
+		.eventActionDefinitionArray[0].empty
+	          << (uint16_t) eventActionService.eventActionDefinitionArray[1].empty;
+
+	Message eventActionDefinition6(19, 3, Message::TC, 1);
+	eventActionService.deleteAllEventActionDefinitions(eventActionDefinition6);
+	std::cout << "\nPositions 0,1 empty should be 1:" << (uint16_t) eventActionService
+		.eventActionDefinitionArray[0].empty;
+
 
 	return 0;
 }
