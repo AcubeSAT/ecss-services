@@ -28,6 +28,9 @@ TEST_CASE("Parameter Report Subservice") {
 		}
 	}
 
+	// **WARNING**
+	// TODO: Update this test (and all tests in general) to use the error handler's output when
+	//  checking for assertions.
 	SECTION("Wrong Message Type Handling Test") {
 		Message falseRequest(15, 3, Message::TM, 1);   // a totally wrong message
 
@@ -47,7 +50,7 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message setRequest(20, 3, Message::TC, 1);
 		Message reportRequest(20, 1, Message::TC, 1);
 
-		setRequest.appendUint16(2);           // correct number of IDs
+		setRequest.appendUint16(2);           // total number of IDs
 		setRequest.appendUint16(1);           // correct ID in this context
 		setRequest.appendUint32(3735928559);  // 0xDEADBEEF in hex (new setting)
 		setRequest.appendUint16(16742);       // faulty ID in this context
