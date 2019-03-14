@@ -2,9 +2,9 @@
 #include <Services/TimeManagementService.hpp>
 #include "ServiceTests.hpp"
 
-TEST_CASE("TM[9,2]", "[service][st09]") {
-	TimeManagementService timeFormat;
+TimeManagementService & timeFormat = Services.timeManagement;
 
+TEST_CASE("TM[9,2]", "[service][st09]") {
 	uint32_t seconds;
 	seconds = time(nullptr);
 

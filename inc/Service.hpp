@@ -5,6 +5,8 @@
 #include "Message.hpp"
 #include <iostream> // This file should be removed
 
+class ServicePool;
+
 /**
  * A spacecraft service, as defined in ECSS-E-ST-70-41C
  *
@@ -17,6 +19,10 @@ class Service {
 private:
 	uint16_t messageTypeCounter = 0;
 protected:
+	/**
+	 * The service type of this Service. For example, ST[12]'s serviceType is `12`.
+	 * Specify this value in the constructor of your service.
+	 */
 	uint8_t serviceType{};
 
 	/**
@@ -45,6 +51,40 @@ protected:
 	 * this, but this particular function does actually nothing.
 	 */
 	void execute(Message &message);
+
+	/**
+	 * Default protected constructor for this Service
+	 */
+	Service() = default;
+public:
+	/**
+	 * @brief Unimplemented copy constructor
+	 *
+	 * Does not allow Services should be copied. There should be only one instance for each Service.
+	 */
+	Service (Service const&) = delete;
+
+	/**
+	 * Unimplemented assignment operation
+	 *
+	 * Does not allow changing the instances of Services, as Services are singletons.
+	 */
+	void operator=(Service const&) = delete;
+
+	/**
+	 * Default destructor
+	 */
+	~Service() = default;
+
+	/**
+	 * Default move constructor
+	 */
+	Service(Service && service) noexcept = default;
+
+	/**
+	 * Default move assignment operator
+	 */
+	Service & operator=(Service && service) noexcept = default;
 };
 
 
