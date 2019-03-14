@@ -219,17 +219,20 @@ public:
 
 		if (typeid(ErrorType) == typeid(AcceptanceErrorType)) {
 			return Acceptance;
-		} else if (typeid(ErrorType) == typeid(ExecutionStartErrorType)) {
-			return ExecutionStart;
-		} else if (typeid(ErrorType) == typeid(ExecutionProgressErrorType)) {
-			return ExecutionProgress;
-		} else if (typeid(ErrorType) == typeid(ExecutionCompletionErrorType)) {
-			return ExecutionCompletion;
-		} else if (typeid(ErrorType) == typeid(RoutingErrorType)) {
-			return Routing;
-		} else {
-			return Internal;
 		}
+		if (typeid(ErrorType) == typeid(ExecutionStartErrorType)) {
+			return ExecutionStart;
+		}
+		if (typeid(ErrorType) == typeid(ExecutionProgressErrorType)) {
+			return ExecutionProgress;
+		}
+		if (typeid(ErrorType) == typeid(ExecutionCompletionErrorType)) {
+			return ExecutionCompletion;
+		}
+		if (typeid(ErrorType) == typeid(RoutingErrorType)) {
+			return Routing;
+		}
+		return Internal;
 	}
 };
 

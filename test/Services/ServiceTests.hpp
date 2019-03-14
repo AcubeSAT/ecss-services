@@ -23,6 +23,12 @@ class ServiceTests {
 	 */
 	static std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> thrownErrors;
 
+	/**
+	 * Whether an error assertion function was called, indicating that we are expecting to see
+	 * Errors thrown after this Message
+	 */
+	static bool expectingErrors;
+
 public:
 	/**
 	 * Get a message from the list of queued messages to send
@@ -65,10 +71,54 @@ public:
 	}
 
 	/**
-	 * Remove all the queued messages from the list, starting over from 0 items again
+	 * Remove all the queued messages & errors from the list, starting over from 0 items again
 	 */
 	static void reset() {
 		queuedMessages.clear();
+		thrownErrors.clear();
+		expectingErrors = false;
+	}
+
+	/**
+	 * Return whether an error assertion function was called, which means that we are expecting this
+	 * request to contain errors
+	 * @return
+	 */
+	static bool isExpectingErrors() {
+		return expectingErrors;
+	}
+
+	/**
+	 * Find if there are *no* thrown errors
+	 * @return True if 0 errors were thrown after the message
+	 * @todo Implement a way to run this assertion at the end of every test
+	 */
+	static bool hasNoErrors() {
+		return thrownErrors.empty();
+	}
+
+	/**
+	 * Find the number of thrown errors after the processing of this Message.
+	 */
+	static uint64_t countErrors() {
+		expectingErrors = true;
+
+		return thrownErrors.size();
+	}
+
+	/**
+	 * Find if an error
+	 * @tparam ErrorType An enumeration of ErrorHandler
+	 * @param errorType The error code of the Error, corresponding to the correct type as
+	 * specified in ErrorHandler
+	 */
+	template<typename ErrorType>
+	static bool thrownError(ErrorType errorType) {
+		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource(errorType);
+
+		expectingErrors = true;
+
+		return thrownErrors.find(std::make_pair(errorSource, errorType)) != thrownErrors.end();
 	}
 };
 
