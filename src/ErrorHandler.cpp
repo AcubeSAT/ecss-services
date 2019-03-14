@@ -43,28 +43,5 @@ void ErrorHandler::reportError(const Message &message, RoutingErrorType errorCod
 }
 
 void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode) {
-	logError(UnknownInternalError);
-}
-
-template<typename ErrorType>
-void ErrorHandler::logError(const Message &message, ErrorType errorType) {
-	std::cerr
-		/*
-		 * Gets the error class name from the template
-		 * Note: This is g++-dependent code and should only be used for debugging.
-		 */
-		<< abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr)
-		<< " Error " << "[" << static_cast<uint16_t>(message.serviceType) << "," <<
-		static_cast<uint16_t>(message.messageType) << "]: " << errorType << std::endl;
-}
-
-template<typename ErrorType>
-void ErrorHandler::logError(ErrorType errorType) {
-	std::cerr
-		/*
-		 * Gets the error class name from the template
-		 * Note: This is g++-dependent code and should only be used for debugging.
-		 */
-		<< abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr)
-		<< " Error: " << errorType << std::endl;
+	logError(errorCode);
 }

@@ -15,20 +15,13 @@ class Message;
 class ErrorHandler {
 private:
 	/**
-	 * Log the error to a logging facility. Currently, this just displays the error on the screen.
-	 *
-	 * @todo This function MUST be moved as platform-dependent code. Currently, it uses g++ specific
-	 * functions for desktop.
+	 * Log the error to a logging facility. Platform-dependent.
 	 */
 	template<typename ErrorType>
 	static void logError(const Message &message, ErrorType errorType);
 
 	/**
-	 * Log an error without a Message to a logging facility. Currently, this just displays the error
-	 * on the screen.
-	 *
-	 * @todo This function MUST be moved as platform-dependent code. Currently, it uses g++ specific
-	 * functions for desktop.
+	 * Log an error without a Message to a logging facility. Platform-dependent.
 	 */
 	template<typename ErrorType>
 	static void logError(ErrorType errorType);
@@ -210,6 +203,32 @@ public:
 	static void assertRequest(bool condition, const Message &message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
+		}
+	}
+
+	/**
+	 * Convert a parameter given in C++ to an ErrorSource that can be easily used in comparisons.
+	 * @tparam ErrorType One of the enums specified in ErrorHandler.
+	 * @param error An error code of a specific type
+	 * @return The corresponding ErrorSource
+	 */
+	template<typename ErrorType>
+	inline static ErrorSource findErrorSource(ErrorType error) {
+		// While this may seem like a "hacky" way to convert enums to ErrorSource, it should be
+		// optimised by the compiler to constant time.
+
+		if (typeid(ErrorType) == typeid(AcceptanceErrorType)) {
+			return Acceptance;
+		} else if (typeid(ErrorType) == typeid(ExecutionStartErrorType)) {
+			return ExecutionStart;
+		} else if (typeid(ErrorType) == typeid(ExecutionProgressErrorType)) {
+			return ExecutionProgress;
+		} else if (typeid(ErrorType) == typeid(ExecutionCompletionErrorType)) {
+			return ExecutionCompletion;
+		} else if (typeid(ErrorType) == typeid(RoutingErrorType)) {
+			return Routing;
+		} else {
+			return Internal;
 		}
 	}
 };

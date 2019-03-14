@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_TESTS_SERVICES_SERVICETESTS_HPP
 
 #include <vector>
+#include <map>
 #include <Message.hpp>
 
 /**
@@ -10,7 +11,17 @@
  * @todo See if members of this class can be made non-static
  */
 class ServiceTests {
+	/**
+	 * The list of Messages that have been sent as a result of all the processing.
+	 */
 	static std::vector<Message> queuedMessages;
+
+	/**
+	 * The list of Errors that the ErrorHandler caught
+	 * @var A multimap with keys (ErrorSource, ErrorType) and values of 1
+	 * @todo If errors get more complex, this should hold the complete error information
+	 */
+	static std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> thrownErrors;
 
 public:
 	/**
@@ -26,6 +37,17 @@ public:
 	 */
 	static void queue(const Message &message) {
 		queuedMessages.push_back(message);
+	}
+
+	/**
+	 * Add one error to the list of occurred errors.
+	 *
+	 * @param errorSource The source of the error.
+	 * @param errorCode The integer code of the error, coming directly from one of the ErrorCode
+	 * enumerations in ErrorHandler.
+	 */
+	static void addError(ErrorHandler::ErrorSource errorSource, uint16_t errorCode) {
+		thrownErrors.emplace(std::make_pair(errorSource, errorCode), 1);
 	}
 
 	/**
