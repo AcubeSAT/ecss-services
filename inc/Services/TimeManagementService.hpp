@@ -6,9 +6,9 @@
 #include "Helpers/TimeHelper.hpp"
 
 /**
- * Implementation of the ST[09] time management
+ * Implementation of the ST[09] time management.
  *
- * Notes:
+ * @notes
  * There is a noticeable difference between setting the time using GPS and setting the time
  * using space packets from the ground segment. The GPS module sent the actual time of UTC(123519
  * is 12:35:19 UTC),while space packets,for time configuration,sent the elapsed time units
@@ -35,7 +35,7 @@ public:
 	}
 
 	/**
-	 * TM[9,3] CDS time report
+	 * TM[9,3] CDS time report.
 	 *
 	 * This function sends reports with the spacecraft time that is formatted according to the CDS
 	 * time code format(check class `TimeHelper` for the format)
@@ -51,14 +51,15 @@ public:
 	void cdsTimeReport(struct TimeAndDate &TimeInfo);
 
 	/**
-	 * TC[9,128] CDS time request
+	 * TC[9,128] CDS time request.
 	 *
 	 * This function is a custom subservice(mission specific) with message type 128(as defined
 	 * from the standard for custom message types, 5.3.3.1.f) and it parses the data of the
 	 * time-management telecommand packet. This data is formatted according to the CDS time code
 	 * format(check class `TimeHelper` for the format)
 	 *
-	 * @param message the Message that will be parsed for its time-data
+	 * @param message the message that will be parsed for its time-data. The data of the \p message
+	 * should be a fixed size of 48 bits
 	 */
 	struct TimeAndDate cdsTimeRequest(Message &message);
 };

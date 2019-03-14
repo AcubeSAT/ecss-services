@@ -19,7 +19,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		uint16_t elapsedDays = currTime / 86400;
 		uint32_t msOfDay = currTime % 86400 * 1000;
 		uint64_t timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
-		CHECK(TimeHelper::implementCDStimeFormat(TimeInfo) == timeFormat);
+		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
 
 		// 1/1/2019 00:00:00
 		TimeInfo.year = 2019;
@@ -34,7 +34,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		elapsedDays = currTime / 86400;
 		msOfDay = currTime % 86400 * 1000;
 		timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
-		CHECK(TimeHelper::implementCDStimeFormat(TimeInfo) == timeFormat);
+		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
 	}
 
 	SECTION("Convert elapsed seconds since Unix epoch to UTC date"){

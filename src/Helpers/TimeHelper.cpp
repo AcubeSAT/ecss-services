@@ -11,8 +11,8 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 }
 
 uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
-	uint32_t secs = 1546300800; // elapsed seconds since 1/1/2019 00:00:00 (UTC date)
-	for (uint16_t y = 2019; y < TimeInfo.year; ++y) { //
+	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00(UTC date)
+	for (uint16_t y = 2019; y < TimeInfo.year; ++y) {
 		secs += (IsLeapYear(y) ? 366 : 365) * SecondsPerDay;
 	}
 	for (uint16_t m = 1; m < TimeInfo.month; ++m) {
@@ -29,7 +29,7 @@ uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
 }
 
 struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
-	seconds -= 1546300800; // elapsed seconds between 1/1/2019 00:00:00 (UTC date)
+	seconds -= 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00(UTC date)
 	struct TimeAndDate TimeInfo = {0};
 	TimeInfo.year = 2019;
 	TimeInfo.month = 1;
@@ -79,7 +79,7 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	return TimeInfo;
 }
 
-uint64_t TimeHelper::implementCDStimeFormat(struct TimeAndDate &TimeInfo) {
+uint64_t TimeHelper::generateCDStimeFormat(struct TimeAndDate &TimeInfo) {
 	/**
 	 * Define the T-field. The total number of octets for the implementation of T-field is 6(2 for
 	 * the `DAY` and 4 for the `ms of day`
@@ -100,24 +100,12 @@ uint64_t TimeHelper::implementCDStimeFormat(struct TimeAndDate &TimeInfo) {
 	 */
 	auto msOfDay = static_cast<uint32_t >((seconds % 86400) * 1000);
 
-	/**
-	 * Define CDS time format
-	 *
-	 * Notes:
-	 * Only the 48 bits of the 64 will be used for the timeFormat
-	 *
-	 * Shift operators have high priority. That's why we should do a type-casting first so we
-	 * don't lose valuable bits
-	*/
 	uint64_t timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
 
 	return timeFormat;
 }
 
-struct TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data, uint8_t length) {
-	// check if we have the correct length of the packet data
-	assertI(length != 48, ErrorHandler::InternalErrorType::UnknownInternalError);
-
+struct TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
 	uint16_t elapsedDays = (static_cast<uint16_t >(data[0])) << 8 | static_cast<uint16_t >
 	(data[1]);
 	uint32_t msOfDay = (static_cast<uint32_t >(data[2])) << 24 |
