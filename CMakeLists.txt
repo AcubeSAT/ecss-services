@@ -18,6 +18,7 @@ add_library(common OBJECT
         src/ErrorHandler.cpp
         src/Message.cpp
 	    src/MessageParser.cpp
+        src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
         src/Helpers/TimeHelper.cpp
         src/Services/EventReportService.cpp
