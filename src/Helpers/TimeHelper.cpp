@@ -10,7 +10,7 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 	return (year % 400) == 0;
 }
 
-uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
+uint32_t TimeHelper::mkUTCtime(TimeAndDate &TimeInfo) {
 	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00(UTC date)
 	for (uint16_t y = 2019; y < TimeInfo.year; ++y) {
 		secs += (IsLeapYear(y) ? 366 : 365) * SecondsPerDay;
@@ -79,99 +79,7 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	return TimeInfo;
 }
 
-bool TimeHelper::IsAfter(struct TimeAndDate &Now, struct TimeAndDate &Date, bool
-equalCondition) {
-	// compare years
-	if (Now.year < Date.year) {
-		return true;
-	} else if (Now.year > Date.year) {
-		return false;
-	}
-
-	// compare months
-	if (Now.month < Date.month) {
-		return true;
-	} else if (Now.month > Date.month) {
-		return false;
-	}
-
-	// compare days
-	if (Now.day < Date.day) {
-		return true;
-	} else if (Now.day > Date.day) {
-		return false;
-	}
-
-	// compare hours
-	if (Now.hour < Date.hour) {
-		return true;
-	} else if (Now.hour > Date.hour) {
-		return false;
-	}
-
-	// compare minutes
-	if (Now.minute < Date.minute) {
-		return true;
-	} else if (Now.minute > Date.minute) {
-		return false;
-	}
-
-	// compare seconds
-	if (Now.second < Date.second) {
-		return true;
-	} else if (Now.second > Date.second) {
-		return false;
-	} else if (Now.second == Date.second)
-		return equalCondition;
-}
-
-bool TimeHelper::IsBefore(struct TimeAndDate &Now, struct TimeAndDate &Date, bool
-equalCondition) {
-	// compare years
-	if (Now.year > Date.year) {
-		return true;
-	} else if (Now.year < Date.year) {
-		return false;
-	}
-
-	// compare months
-	if (Now.month > Date.month) {
-		return true;
-	} else if (Now.month < Date.month) {
-		return false;
-	}
-
-	// compare days
-	if (Now.day > Date.day) {
-		return true;
-	} else if (Now.day < Date.day) {
-		return false;
-	}
-
-	// compare hours
-	if (Now.hour > Date.hour) {
-		return true;
-	} else if (Now.hour < Date.hour) {
-		return false;
-	}
-
-	// compare minutes
-	if (Now.minute > Date.minute) {
-		return true;
-	} else if (Now.minute < Date.minute) {
-		return false;
-	}
-
-	// compare seconds
-	if (Now.second > Date.second) {
-		return true;
-	} else if (Now.second < Date.second) {
-		return false;
-	} else if (Now.second == Date.second)
-		return equalCondition;
-}
-
-uint64_t TimeHelper::generateCDStimeFormat(struct TimeAndDate &TimeInfo) {
+uint64_t TimeHelper::generateCDStimeFormat(TimeAndDate &TimeInfo) {
 	/**
 	 * Define the T-field. The total number of octets for the implementation of T-field is 6(2 for
 	 * the `DAY` and 4 for the `ms of day`
@@ -197,7 +105,7 @@ uint64_t TimeHelper::generateCDStimeFormat(struct TimeAndDate &TimeInfo) {
 	return timeFormat;
 }
 
-struct TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
+TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
 	uint16_t elapsedDays = (static_cast<uint16_t >(data[0])) << 8 | static_cast<uint16_t >
 	(data[1]);
 	uint32_t msOfDay = (static_cast<uint32_t >(data[2])) << 24 |
