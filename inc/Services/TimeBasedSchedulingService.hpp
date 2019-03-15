@@ -104,6 +104,14 @@ public:
 	void detailReportAllActivities(Message &request);
 
 	/**
+	 * TC[11,9] detail-report activities identified by request identifier
+	 *
+	 * @details Send a detailed report about the status of the requested activities
+	 * @param request Provide the received message as a parameter
+	 */
+	void detailReporActivitiesByID(Message &request);
+
+	/**
 	 * TC[11,5] delete time-based scheduled activities identified by a request identifier
 	 *
 	 * @details Delete certain activities by using the unique request identifier

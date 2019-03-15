@@ -204,7 +204,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 		// Create the report message object of telemetry message subtype 10 for each activity
 		Message report = createTM(10);
 		// todo: append sub-schedule and group ID if they are defined
-		
+
 		report.appendUint32(activity.requestReleaseTime); // todo: Replace with the time parser
 		report.appendString(msgParser.convertTCToStr(activity.request));
 
@@ -214,4 +214,40 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 
 }
 
+void TimeBasedSchedulingService::detailReporActivitiesByID(Message &request) {
 
+	// Check if the correct packet is being processed
+	assert(request.serviceType == 11);
+	assert(request.messageType == 9);
+
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	for (std::size_t i = 0; i < iterationCount; i++) {
+		// Parse the request ID
+		RequestID receivedRequestID; // Save the received request ID
+		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
+		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
+		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+
+		// Try to find the activity with the requested request ID
+		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+		                                             scheduledActivities.end(), [&receivedRequestID]
+			                                             (ScheduledActivity const &currentElement) {
+				return receivedRequestID != currentElement
+					.requestID;
+			});
+
+		if (requestIDMatch != scheduledActivities.end()) {
+			// Create the report message object of telemetry message subtype 10 for each activity
+			Message report = createTM(10);
+			// todo: append sub-schedule and group ID if they are defined
+
+			report.appendUint32(requestIDMatch->requestReleaseTime); // todo: Time parser here
+			report.appendString(msgParser.convertTCToStr(requestIDMatch->request));
+
+			storeMessage(report); // Save the report
+			request.resetRead(); // todo: define if this statement is required
+		} else {
+			// todo: Generate failed start of execution for the failed instruction
+		}
+	}
+}
