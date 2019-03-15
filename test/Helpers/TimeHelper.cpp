@@ -37,7 +37,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
 	}
 
-	SECTION("Convert elapsed seconds since Unix epoch to UTC date"){
+	SECTION("Convert elapsed seconds since Unix epoch to UTC date") {
 		uint32_t seconds = 1586513700; // elapsed seconds between 10/04/2020 10:15:00 and Unix epoch
 
 		TimeHelper time;
@@ -119,6 +119,159 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		CHECK(TimeInfo.minute == 0);
 		CHECK(TimeInfo.second == 0);
 
+	}
+
+	SECTION("Date comparison") {
+		SECTION("Different year") {
+			struct TimeAndDate Now = {0};
+			// 10/04/2021 10:15:00
+			Now.year = 2021;
+			Now.month = 4;
+			Now.day = 10;
+			Now.hour = 10;
+			Now.minute = 15;
+			Now.second = 0;
+
+			struct TimeAndDate Date = {0};
+			// 10/04/2020 10:15:00
+			Date.year = 2020;
+			Date.month = 4;
+			Date.day = 10;
+			Date.hour = 10;
+			Date.minute = 15;
+			Date.second = 0;
+
+			CHECK(TimeHelper::IsAfter(Now, Date, true) == false);
+			CHECK(TimeHelper::IsAfter(Date, Now, true) == true);
+			CHECK(TimeHelper::IsBefore(Now, Date, true) == true);
+			CHECK(TimeHelper::IsBefore(Date, Now, true) == false);
+		}
+
+		SECTION("Different month") {
+
+			struct TimeAndDate Now = {0};
+			// 10/05/2020 10:15:00
+			Now.year = 2020;
+			Now.month = 5;
+			Now.day = 10;
+			Now.hour = 10;
+			Now.minute = 15;
+			Now.second = 0;
+
+			struct TimeAndDate Date = {0};
+			// 10/04/2020 10:15:00
+			Date.year = 2020;
+			Date.month = 4;
+			Date.day = 10;
+			Date.hour = 10;
+			Date.minute = 15;
+			Date.second = 0;
+
+			CHECK(TimeHelper::IsAfter(Now, Date, true) == false);
+			CHECK(TimeHelper::IsAfter(Date, Now, true) == true);
+			CHECK(TimeHelper::IsBefore(Now, Date, true) == true);
+			CHECK(TimeHelper::IsBefore(Date, Now, true) == false);
+		}
+
+		SECTION("Different day") {
+			struct TimeAndDate Now = {0};
+			// 11/04/2020 10:15:00
+			Now.year = 2020;
+			Now.month = 5;
+			Now.day = 11;
+			Now.hour = 10;
+			Now.minute = 15;
+			Now.second = 0;
+
+			struct TimeAndDate Date = {0};
+			// 10/04/2020 10:15:00
+			Date.year = 2020;
+			Date.month = 4;
+			Date.day = 10;
+			Date.hour = 10;
+			Date.minute = 15;
+			Date.second = 0;
+
+			CHECK(TimeHelper::IsAfter(Now, Date, true) == false);
+			CHECK(TimeHelper::IsAfter(Date, Now, true) == true);
+			CHECK(TimeHelper::IsBefore(Now, Date, true) == true);
+			CHECK(TimeHelper::IsBefore(Date, Now, true) == false);
+		}
+
+		SECTION("Different hour") {
+			struct TimeAndDate Now = {0};
+			// 10/04/2020 11:15:00
+			Now.year = 2020;
+			Now.month = 4;
+			Now.day = 10;
+			Now.hour = 11;
+			Now.minute = 15;
+			Now.second = 0;
+
+			struct TimeAndDate Date = {0};
+			// 10/04/2020 10:15:00
+			Date.year = 2020;
+			Date.month = 4;
+			Date.day = 10;
+			Date.hour = 10;
+			Date.minute = 15;
+			Date.second = 0;
+
+			CHECK(TimeHelper::IsAfter(Now, Date, true) == false);
+			CHECK(TimeHelper::IsAfter(Date, Now, true) == true);
+			CHECK(TimeHelper::IsBefore(Now, Date, true) == true);
+			CHECK(TimeHelper::IsBefore(Date, Now, true) == false);
+		}
+
+		SECTION("Different minute") {
+			struct TimeAndDate Now = {0};
+			// 11/04/2020 10:16:00
+			Now.year = 2020;
+			Now.month = 4;
+			Now.day = 10;
+			Now.hour = 10;
+			Now.minute = 16;
+			Now.second = 0;
+
+			struct TimeAndDate Date = {0};
+			// 10/04/2020 10:15:00
+			Date.year = 2020;
+			Date.month = 4;
+			Date.day = 10;
+			Date.hour = 10;
+			Date.minute = 15;
+			Date.second = 0;
+
+			CHECK(TimeHelper::IsAfter(Now, Date, true) == false);
+			CHECK(TimeHelper::IsAfter(Date, Now, true) == true);
+			CHECK(TimeHelper::IsBefore(Now, Date, true) == true);
+			CHECK(TimeHelper::IsBefore(Date, Now, true) == false);
+		}
+
+		SECTION("Different second") {
+			struct TimeAndDate Now = {0};
+			// 11/04/2020 10:15:01
+			Now.year = 2020;
+			Now.month = 4;
+			Now.day = 10;
+			Now.hour = 10;
+			Now.minute = 15;
+			Now.second = 1;
+
+			struct TimeAndDate Date = {0};
+			// 10/04/2020 10:15:00
+			Date.year = 2020;
+			Date.month = 4;
+			Date.day = 10;
+			Date.hour = 10;
+			Date.minute = 15;
+			Date.second = 0;
+
+			CHECK(TimeHelper::IsAfter(Now, Date, true) == false);
+			CHECK(TimeHelper::IsAfter(Date, Now, true) == true);
+			CHECK(TimeHelper::IsBefore(Now, Date, true) == true);
+			CHECK(TimeHelper::IsBefore(Date, Now, true) == false);
+		}
 	}
 
 }

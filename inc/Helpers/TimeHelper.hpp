@@ -92,7 +92,7 @@ public:
 	 * @return true if \p Now is greater than \p DateExamined. The equality depends on the \p
 	 * equalCondition
 	 */
-	bool IsAfter(struct TimeAndDate &Now, struct TimeAndDate &Date, bool equalCondition);
+	static bool IsAfter(struct TimeAndDate &Now, struct TimeAndDate &Date, bool equalCondition);
 
 	/**
 	 * @param Now the date provided from the Real Time Clock(UTC format)
@@ -103,7 +103,7 @@ public:
 	 * @return true if \p Now is smaller than \p DateExamined. The equality depends on the \p
 	 * equalCondition
 	 */
-	bool IsBefore(struct TimeAndDate &Now, struct TimeAndDate &Date, bool equalCondition);
+	static bool IsBefore(struct TimeAndDate &Now, struct TimeAndDate &Date, bool equalCondition);
 
 	/**
 	 * Generate the CDS time format(3.3 in CCSDS 301.0-B-4 standard).

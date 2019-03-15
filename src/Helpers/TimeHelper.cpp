@@ -82,52 +82,6 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 bool TimeHelper::IsAfter(struct TimeAndDate &Now, struct TimeAndDate &Date, bool
 equalCondition) {
 	// compare years
-	if (Now.year > Date.year) {
-		return true;
-	} else if (Now.year < Date.year) {
-		return false;
-	}
-
-	// compare months
-	if (Now.month > Date.month) {
-		return true;
-	} else if (Now.month < Date.month) {
-		return false;
-	}
-
-	// compare days
-	if (Now.day > Date.day) {
-		return true;
-	} else if (Now.day < Date.day) {
-		return false;
-	}
-
-	// compare hours
-	if (Now.hour > Date.hour) {
-		return true;
-	} else if (Now.hour < Date.hour) {
-		return false;
-	}
-
-	// compare minutes
-	if (Now.minute > Date.minute) {
-		return true;
-	} else if (Now.minute < Date.minute) {
-		return false;
-	}
-
-	// compare seconds
-	if (Now.second > Date.second) {
-		return true;
-	} else if (Now.second < Date.second) {
-		return false;
-	} else if (Now.second == Date.second)
-		return equalCondition;
-}
-
-bool TimeHelper::IsBefore(struct TimeAndDate &Now, struct TimeAndDate &Date, bool
-equalCondition) {
-	// compare years
 	if (Now.year < Date.year) {
 		return true;
 	} else if (Now.year > Date.year) {
@@ -166,6 +120,52 @@ equalCondition) {
 	if (Now.second < Date.second) {
 		return true;
 	} else if (Now.second > Date.second) {
+		return false;
+	} else if (Now.second == Date.second)
+		return equalCondition;
+}
+
+bool TimeHelper::IsBefore(struct TimeAndDate &Now, struct TimeAndDate &Date, bool
+equalCondition) {
+	// compare years
+	if (Now.year > Date.year) {
+		return true;
+	} else if (Now.year < Date.year) {
+		return false;
+	}
+
+	// compare months
+	if (Now.month > Date.month) {
+		return true;
+	} else if (Now.month < Date.month) {
+		return false;
+	}
+
+	// compare days
+	if (Now.day > Date.day) {
+		return true;
+	} else if (Now.day < Date.day) {
+		return false;
+	}
+
+	// compare hours
+	if (Now.hour > Date.hour) {
+		return true;
+	} else if (Now.hour < Date.hour) {
+		return false;
+	}
+
+	// compare minutes
+	if (Now.minute > Date.minute) {
+		return true;
+	} else if (Now.minute < Date.minute) {
+		return false;
+	}
+
+	// compare seconds
+	if (Now.second > Date.second) {
+		return true;
+	} else if (Now.second < Date.second) {
 		return false;
 	} else if (Now.second == Date.second)
 		return equalCondition;
