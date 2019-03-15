@@ -6,7 +6,7 @@
 /**
  * A class that represents the time and date.
  *
- * @notes
+ * @note
  * This struct is similar to the `struct tm` of <ctime> library but it is more embedded-friendly
  */
 class TimeAndDate {

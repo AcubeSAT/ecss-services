@@ -1,9 +1,6 @@
 #include "Helpers/TimeHelper.hpp"
 
 bool TimeAndDate::operator<(const TimeAndDate &Date) {
-	//@note clang tidy complaints when using else after return so that's why there are these
-	// numerous if checks. Sorry for the ugly code...
-
 	// compare years
 	if (this->year < Date.year) {
 		return true;
@@ -50,13 +47,9 @@ bool TimeAndDate::operator<(const TimeAndDate &Date) {
 	}
 
 	return false;
-
 }
 
 bool TimeAndDate::operator>(const TimeAndDate &Date) {
-	//@note clang tidy complaints when using else after return so that's why there are these
-	// numerous if checks. Sorry for the ugly code...
-
 	// compare years
 	if (this->year > Date.year) {
 		return true;
@@ -103,13 +96,9 @@ bool TimeAndDate::operator>(const TimeAndDate &Date) {
 	}
 
 	return false;
-
 }
 
 bool TimeAndDate::operator<=(const TimeAndDate &Date) {
-	//@note clang tidy complaints when using else after return so that's why there are these
-	// numerous if checks. Sorry for the ugly code...
-
 	// compare years
 	if (this->year < Date.year) {
 		return true;
@@ -159,13 +148,9 @@ bool TimeAndDate::operator<=(const TimeAndDate &Date) {
 	}
 
 	return true;
-
 }
 
 bool TimeAndDate::operator>=(const TimeAndDate &Date) {
-	//@note clang tidy complaints when using else after return so that's why there are these
-	// numerous if checks. Sorry for the ugly code...
-
 	// compare years
 	if (this->year > Date.year) {
 		return true;
@@ -215,7 +200,6 @@ bool TimeAndDate::operator>=(const TimeAndDate &Date) {
 	}
 
 	return true;
-
 }
 
 bool TimeAndDate::operator==(const TimeAndDate &Date) {
@@ -250,5 +234,4 @@ bool TimeAndDate::operator==(const TimeAndDate &Date) {
 	}
 
 	return true;
-
 }

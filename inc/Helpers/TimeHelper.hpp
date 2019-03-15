@@ -60,7 +60,7 @@ private:
      * @todo check if we need to change the epoch to ,the recommended from the standard, 1 January
      * 1958
      */
-	 TimeAndDate utcTime(uint32_t seconds);
+	TimeAndDate utcTime(uint32_t seconds);
 
 public:
 
