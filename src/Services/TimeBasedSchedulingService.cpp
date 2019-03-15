@@ -66,7 +66,15 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 			newActivity.requestID.applicationID = request.applicationId;
 			newActivity.requestID.sequenceCount = request.packetSequenceCount;
 
-			scheduledActivities.push_back(newActivity); // Insert the new activity in the schedule
+			const auto releaseTimeOrder = etl::find_if_not(scheduledActivities.begin(),
+			                                               scheduledActivities.end(),
+			                                               [=]
+				                                               (ScheduledActivity const &currentElement) {
+				                                               return releaseTime >=
+				                                                      currentElement.requestReleaseTime;
+			                                               });
+			// Add activities ordered by release time as per the standard requirement
+			scheduledActivities.emplace(releaseTimeOrder, newActivity);
 		}
 	}
 }
@@ -148,7 +156,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 			                                             });
 
 			if (requestIDMatch != scheduledActivities.end()) {
-                requestIDMatch->requestReleaseTime += relativeOffset; // Add the required offset
+				requestIDMatch->requestReleaseTime += relativeOffset; // Add the required offset
 			} else {
 				// todo: Generate failed start of execution for the failed instruction
 			}
@@ -192,15 +200,13 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 16);
 
-	// todo: add an extra check for the vector size to make sure it matches with
-	//  currentNumberOfActivities?
 	for (auto const &activity : scheduledActivities) {
 		// Create the report message object of telemetry message subtype 10 for each activity
 		Message report = createTM(10);
 		// todo: append sub-schedule and group ID if they are defined
-		// todo: append the release time of the current activity "activity.requestReleaseTime;"
 		// todo: append the request contained in the activity "activity.request;"
 		// todo: important todo, implement append TC packet in the Message header
+		report.appendUint32(activity.requestReleaseTime); // todo: Replace with the time parser
 		storeMessage(report); // Save the report
 		request.resetRead(); // todo: define if this statement is required
 	}
