@@ -200,13 +200,14 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 16);
 
-	for (auto const &activity : scheduledActivities) {
+	for (auto& activity : scheduledActivities) {
 		// Create the report message object of telemetry message subtype 10 for each activity
 		Message report = createTM(10);
 		// todo: append sub-schedule and group ID if they are defined
-		// todo: append the request contained in the activity "activity.request;"
-		// todo: important todo, implement append TC packet in the Message header
+		
 		report.appendUint32(activity.requestReleaseTime); // todo: Replace with the time parser
+		report.appendString(msgParser.convertTCToStr(activity.request));
+
 		storeMessage(report); // Save the report
 		request.resetRead(); // todo: define if this statement is required
 	}
