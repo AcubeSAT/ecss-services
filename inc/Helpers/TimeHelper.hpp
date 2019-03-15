@@ -82,6 +82,29 @@ public:
 
 	TimeHelper() = default;
 
+
+	/**
+	 * @param Now the date provided from the Real Time Clock(UTC format)
+	 * @param Date the date that will be compared with the \p Now
+	 * @param equalCondition if it is true, then this function returns true when the dates
+	 * are equal. If the \p equalCondition is false, then this function returns false when
+	 * the dates are equal
+	 * @return true if \p Now is greater than \p DateExamined. The equality depends on the \p
+	 * equalCondition
+	 */
+	bool IsAfter(struct TimeAndDate &Now, struct TimeAndDate &Date, bool equalCondition);
+
+	/**
+	 * @param Now the date provided from the Real Time Clock(UTC format)
+	 * @param Date the date that will be compared with the \p Now
+	 * @param equalCondition if it is true, then this function returns true when the dates
+	 * are equal. If the \p equalCondition is false, then this function returns false when
+	 * the dates are equal.
+	 * @return true if \p Now is smaller than \p DateExamined. The equality depends on the \p
+	 * equalCondition
+	 */
+	bool IsBefore(struct TimeAndDate &Now, struct TimeAndDate &Date, bool equalCondition);
+
 	/**
 	 * Generate the CDS time format(3.3 in CCSDS 301.0-B-4 standard).
 	 *
