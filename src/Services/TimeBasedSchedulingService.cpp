@@ -107,31 +107,51 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 7);
 
+	// Temporary variables
+	uint32_t current_time = 0;
+
 	uint32_t relativeOffset = request.readUint32(); // Get the offset first
 	/*
 	 * Search for the earliest activity in the schedule. If the release time of the earliest
 	 * activity + relativeOffset is earlier than current_time + time_margin, reject the request
 	 * and generate a failed start of execution.
 	 */
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	for (std::size_t i = 0; i < iterationCount; i++) {
-		// Parse the request ID
-		RequestID receivedRequestID; // Save the received request ID
-		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
-		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
-		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+	const auto releaseTimes = etl::minmax_element(scheduledActivities.begin(),
+	                                              scheduledActivities.end(),
+	                                              [](ScheduledActivity const &leftSide,
+	                                                 ScheduledActivity const &
+	                                                 rightSide) {
+		                                              return leftSide.requestReleaseTime <
+		                                                     rightSide.requestReleaseTime;
+	                                              });
 
-		// Try to find the activity with the requested request ID
-		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
-		                                             scheduledActivities.end(), [&receivedRequestID]
-			                                             (ScheduledActivity const &currentElement) {
-				return receivedRequestID != currentElement.requestID;
-			});
+	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
+	    (current_time + TIME_MARGIN_FOR_ACTIVATION)) {
+		// todo: generate a failed start of execution error
+	} else {
 
-		if (requestIDMatch != scheduledActivities.end()) {
-			scheduledActivities.erase(requestIDMatch); // Delete activity from the schedule
-		} else {
-			// todo: Generate failed start of execution for the failed instruction
+		uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+		for (std::size_t i = 0; i < iterationCount; i++) {
+			// Parse the request ID
+			RequestID receivedRequestID; // Save the received request ID
+			receivedRequestID.sourceID = request.readUint8(); // Get the source ID
+			receivedRequestID.applicationID = request.readUint16(); // Get the application ID
+			receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+
+			// Try to find the activity with the requested request ID
+			const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+			                                             scheduledActivities.end(),
+			                                             [&receivedRequestID]
+				                                             (ScheduledActivity const &currentElement) {
+				                                             return receivedRequestID !=
+				                                                    currentElement.requestID;
+			                                             });
+
+			if (requestIDMatch != scheduledActivities.end()) {
+                requestIDMatch->requestReleaseTime += relativeOffset; // Add the required offset
+			} else {
+				// todo: Generate failed start of execution for the failed instruction
+			}
 		}
 	}
 }
