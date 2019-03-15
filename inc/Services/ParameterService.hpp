@@ -66,7 +66,6 @@ public:
 	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
 	 * @return None (messages are stored using storeMessage())
 	 *
-	 * @todo Generate failure notifs where needed when ST[01] is ready
 	 *
 	 * NOTES:
 	 * Method for valid ID counting is a hack (clones the message and figures out the number
@@ -84,7 +83,6 @@ public:
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 * @return None
 	 *
-	 * @todo Generate failure notifications where needed (eg. when an invalid ID is encountered)
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
 	void setParameterIds(Message newParamValues);
