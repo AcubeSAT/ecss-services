@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "etl/vector.h"
+#include "etl/iterator.h"
 #include "etl/String.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
@@ -17,7 +18,7 @@
 #define MAX_NUMBER_OF_ACTIVITIES    10 // todo: Define the maximum number of activities
 #define TIME_MARGIN_FOR_ACTIVATION  60 // todo: Define the time margin for the command activation
 #define MAX_DELTA_OF_RELEASE_TIME   60 // todo: Define the maximum delta between the specified
-										// release time and the actual release time
+// release time and the actual release time
 
 
 class TimeBasedSchedulingService : public Service {
@@ -29,9 +30,22 @@ private:
 	uint8_t currentNumberOfActivities = 0; // Keep track of the number of activities
 	MessageParser msgParser; // Parse TC packets
 
+	// Define the request ID structure
+	struct RequestID {
+		uint16_t applicationID = 0;
+		uint16_t sequenceCount = 0;
+		uint8_t sourceID = 0;
+
+		bool operator!=(const RequestID &rightSide) const {
+			return (sequenceCount != rightSide.sequenceCount) or
+			       (applicationID != rightSide.applicationID) or (sourceID != rightSide.sourceID);
+		}
+	};
+
 	// Hold the data for the scheduled activity definition
 	struct ScheduledActivity {
 		Message request; // Hold the received command request
+		RequestID requestID; // Request ID, characteristic of the definition
 		uint32_t requestReleaseTime = 0; // Keep the command release time
 		// todo: If we decide to use sub-schedules, the ID of that has to be defined
 		// todo: If groups are used, then the group ID has to be defined here
