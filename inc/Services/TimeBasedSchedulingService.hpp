@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "etl/vector.h"
+#include "etl/String.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
@@ -13,8 +14,10 @@
 #define GROUPS_ENABLED          0
 #define SUB_SCHEDULES_ENABLED   0
 
-#define MAX_NUMBER_OF_ACTIVITIES    10 // todo: define the maximum number of activities
-#define TIME_MARGIN_FOR_ACTIVATION  60 // todo: define the time margin for the command activation
+#define MAX_NUMBER_OF_ACTIVITIES    10 // todo: Define the maximum number of activities
+#define TIME_MARGIN_FOR_ACTIVATION  60 // todo: Define the time margin for the command activation
+#define MAX_DELTA_OF_RELEASE_TIME   60 // todo: Define the maximum delta between the specified
+										// release time and the actual release time
 
 
 class TimeBasedSchedulingService : public Service {
@@ -22,8 +25,9 @@ public:
 
 
 private:
-	bool executionFunctionStatus; // True indicates "enabled" and False "disabled" state
+	bool executionFunctionStatus = false; // True indicates "enabled" and False "disabled" state
 	uint8_t currentNumberOfActivities = 0; // Keep track of the number of activities
+	MessageParser msgParser; // Parse TC packets
 
 	// Hold the data for the scheduled activity definition
 	struct ScheduledActivity {
