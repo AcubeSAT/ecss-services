@@ -251,3 +251,45 @@ void TimeBasedSchedulingService::detailReporActivitiesByID(Message &request) {
 		}
 	}
 }
+
+void TimeBasedSchedulingService::summaryReporActivitiesByID(Message &request) {
+
+	// Check if the correct packet is being processed
+	assert(request.serviceType == 11);
+	assert(request.messageType == 12);
+
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	for (std::size_t i = 0; i < iterationCount; i++) {
+		// Parse the request ID
+		RequestID receivedRequestID; // Save the received request ID
+		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
+		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
+		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+
+		// Try to find the activity with the requested request ID
+		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+		                                             scheduledActivities.end(), [&receivedRequestID]
+			                                             (ScheduledActivity const &currentElement) {
+				return receivedRequestID != currentElement
+					.requestID;
+			});
+
+		if (requestIDMatch != scheduledActivities.end()) {
+			// Create the report message object of telemetry message subtype 13 for each activity
+			Message report = createTM(13);
+			// todo: append sub-schedule and group ID if they are defined
+
+			report.appendUint32(requestIDMatch->requestReleaseTime); // todo: Time parser here
+
+			// todo: Replace with enumeration wherever is required (source ID and app ID)
+			report.appendUint8(requestIDMatch->requestID.sourceID);
+			report.appendUint16(requestIDMatch->requestID.applicationID);
+			report.appendUint16(requestIDMatch->requestID.sequenceCount);
+
+			storeMessage(report); // Save the report
+			request.resetRead(); // todo: define if this statement is required
+		} else {
+			// todo: Generate failed start of execution for the failed instruction
+		}
+	}
+}
