@@ -5,7 +5,7 @@
 TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeManagementService timeService;
 
-	struct TimeAndDate TimeInfo = {0};
+	TimeAndDate TimeInfo;
 	// 10/04/2020 10:15:00
 	TimeInfo.year = 2020;
 	TimeInfo.month = 4;

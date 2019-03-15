@@ -5,7 +5,7 @@
 TEST_CASE("Date comparison", "[operands]") {
 
 	SECTION("Different year") {
-		TimeAndDate Now = {0};
+		TimeAndDate Now;
 		// 10/04/2021 10:15:00
 		Now.year = 2021;
 		Now.month = 4;
@@ -14,7 +14,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		Now.minute = 15;
 		Now.second = 0;
 
-		TimeAndDate Date = {0};
+		TimeAndDate Date;
 		// 10/04/2020 10:15:00
 		Date.year = 2020;
 		Date.month = 4;
@@ -38,7 +38,7 @@ TEST_CASE("Date comparison", "[operands]") {
 
 	SECTION("Different month") {
 
-		TimeAndDate Now = {0};
+		TimeAndDate Now;
 		// 10/05/2020 10:15:00
 		Now.year = 2020;
 		Now.month = 5;
@@ -47,7 +47,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		Now.minute = 15;
 		Now.second = 0;
 
-		TimeAndDate Date = {0};
+		TimeAndDate Date;
 		// 10/04/2020 10:15:00
 		Date.year = 2020;
 		Date.month = 4;
@@ -70,7 +70,7 @@ TEST_CASE("Date comparison", "[operands]") {
 	}
 
 	SECTION("Different day") {
-		TimeAndDate Now = {0};
+		TimeAndDate Now;
 		// 11/04/2020 10:15:00
 		Now.year = 2020;
 		Now.month = 5;
@@ -79,7 +79,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		Now.minute = 15;
 		Now.second = 0;
 
-		TimeAndDate Date = {0};
+		TimeAndDate Date;
 		// 10/04/2020 10:15:00
 		Date.year = 2020;
 		Date.month = 4;
@@ -102,7 +102,7 @@ TEST_CASE("Date comparison", "[operands]") {
 	}
 
 	SECTION("Different hour") {
-		TimeAndDate Now = {0};
+		TimeAndDate Now;
 		// 10/04/2020 11:15:00
 		Now.year = 2020;
 		Now.month = 4;
@@ -111,7 +111,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		Now.minute = 15;
 		Now.second = 0;
 
-		TimeAndDate Date = {0};
+		TimeAndDate Date;
 		// 10/04/2020 10:15:00
 		Date.year = 2020;
 		Date.month = 4;
@@ -134,7 +134,7 @@ TEST_CASE("Date comparison", "[operands]") {
 	}
 
 	SECTION("Different minute") {
-		TimeAndDate Now = {0};
+		TimeAndDate Now;
 		// 10/04/2020 10:16:00
 		Now.year = 2020;
 		Now.month = 4;
@@ -143,7 +143,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		Now.minute = 16;
 		Now.second = 0;
 
-		TimeAndDate Date = {0};
+		TimeAndDate Date;
 		// 10/04/2020 10:15:00
 		Date.year = 2020;
 		Date.month = 4;
@@ -166,7 +166,7 @@ TEST_CASE("Date comparison", "[operands]") {
 	}
 
 	SECTION("Different second") {
-		TimeAndDate Now = {0};
+		TimeAndDate Now;
 		// 10/04/2020 10:15:01
 		Now.year = 2020;
 		Now.month = 4;
@@ -175,7 +175,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		Now.minute = 15;
 		Now.second = 1;
 
-		TimeAndDate Date = {0};
+		TimeAndDate Date;
 		// 10/04/2020 10:15:00
 		Date.year = 2020;
 		Date.month = 4;
@@ -198,7 +198,7 @@ TEST_CASE("Date comparison", "[operands]") {
 	}
 
 	SECTION("Same date"){
-		TimeAndDate Now = {0};
+		TimeAndDate Now;
 		// 10/04/2020 10:15:01
 		Now.year = 2020;
 		Now.month = 4;
@@ -207,7 +207,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		Now.minute = 15;
 		Now.second = 0;
 
-		TimeAndDate Date = {0};
+		TimeAndDate Date;
 		// 10/04/2020 10:15:00
 		Date.year = 2020;
 		Date.month = 4;

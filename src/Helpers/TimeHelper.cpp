@@ -30,7 +30,7 @@ uint32_t TimeHelper::mkUTCtime(TimeAndDate &TimeInfo) {
 
 struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	seconds -= 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00(UTC date)
-	struct TimeAndDate TimeInfo = {0};
+	TimeAndDate TimeInfo;
 	TimeInfo.year = 2019;
 	TimeInfo.month = 1;
 	TimeInfo.day = 0;

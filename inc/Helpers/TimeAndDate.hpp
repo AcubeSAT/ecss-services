@@ -18,6 +18,11 @@ public:
 	uint8_t minute;
 	uint8_t second;
 
+	TimeAndDate();
+
+	TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t
+	second);
+
 	/**
 	 * Compare two timestamps.
 	 *

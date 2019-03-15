@@ -174,7 +174,7 @@ int main() {
 
 	// ST[09] test
 	TimeManagementService timeReport;
-	struct TimeAndDate timeInfo = {0};
+	TimeAndDate timeInfo;
 	// 10/04/1998 10:15:00
 	timeInfo.year = 1998;
 	timeInfo.month = 4;

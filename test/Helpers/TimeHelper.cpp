@@ -4,7 +4,7 @@
 TEST_CASE("Time format implementation", "[CUC]") {
 
 	SECTION("Convert UTC date to elapsed seconds since Unix epoch") {
-		TimeAndDate TimeInfo = {0};
+		TimeAndDate TimeInfo;
 		// 10/04/2020 10:15:00
 		TimeInfo.year = 2020;
 		TimeInfo.month = 4;
