@@ -36,6 +36,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 4);
 
+	// todo: Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
 		// todo: Get the group ID first, if groups are used
@@ -44,25 +45,30 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		// Temporary definitions until the Time helper is ready
 		uint32_t releaseTime = 0; // Temporary release time
 		uint32_t currentTime = 50; // Temporary current time
-		Message receivedTCPacket; // Temporary message field
+
+		// Get the TC packet request
+		uint8_t requestData[ECSS_EVENT_SERVICE_STRING_SIZE];
+		request.readString(requestData, ECSS_EVENT_SERVICE_STRING_SIZE);
+		Message receivedTCPacket = msgParser.parseRequestTC(requestData);
 
 		if ((currentNumberOfActivities >= MAX_NUMBER_OF_ACTIVITIES) || (releaseTime <
 		                                                                (currentTime +
 		                                                                 TIME_MARGIN_FOR_ACTIVATION))) {
 			// todo: Send a failed start of execution
 		} else {
-			ScheduledActivity newActivity;
+			ScheduledActivity newActivity; // Create the new activity
+
+			// Assign the attributes to the newly created activity
 			newActivity.request = receivedTCPacket;
 			newActivity.requestReleaseTime = releaseTime;
 
-			scheduledActivities.push_back(newActivity); // Insert the new activity into the schedule
-		}
-		// If the verification passes then do the following
-		// Create a new scheduled activity in the schedule
-		// Place the request specified in that instruction into the new scheduled activity
-		// Set the release time of the new activity to the specified one
-	}
+			// todo: When implemented save the source ID
+			newActivity.requestID.applicationID = request.applicationId;
+			newActivity.requestID.sequenceCount = request.packetSequenceCount;
 
+			scheduledActivities.push_back(newActivity); // Insert the new activity in the schedule
+		}
+	}
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
@@ -74,12 +80,19 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
 	// Temporary variables
 	uint32_t current_time = 0;
 
-	const auto[earliestRelease, latestRelease] = etl::minmax_element(scheduledActivities.front()
-		                                                                 .requestReleaseTime,
-	                                                                 scheduledActivities.back().requestReleaseTime);
+	// Find the earliest release time. It will be the first element of the iterator pair
+	const auto releaseTimes = etl::minmax_element(scheduledActivities.begin(),
+	                                              scheduledActivities.end(),
+	                                              [](ScheduledActivity const &leftSide,
+	                                                 ScheduledActivity const &
+	                                                 rightSide) {
+		                                              return leftSide.requestReleaseTime <
+		                                                     rightSide.requestReleaseTime;
+	                                              });
 
 	uint32_t relativeOffset = request.readUint32(); // Get the relative offset
-	if ((earliestRelease + relativeOffset) < (current_time + TIME_MARGIN_FOR_ACTIVATION)) {
+	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
+	    (current_time + TIME_MARGIN_FOR_ACTIVATION)) {
 		// todo: generate a failed start of execution error
 	} else {
 		for (auto &activity : scheduledActivities) {
@@ -102,12 +115,24 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 	 */
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
-		// todo: define the enumeration types for the source ID and application process ID
-		uint16_t receivedSequenceCount = request.readUint16(); // Get the sequence count
-		/*
-		* Perform a search in the vector containing the activity definitions to find a match for
-		* the received parameters
-		*/
+		// Parse the request ID
+		RequestID receivedRequestID; // Save the received request ID
+		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
+		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
+		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+
+		// Try to find the activity with the requested request ID
+		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+		                                             scheduledActivities.end(), [&receivedRequestID]
+			                                             (ScheduledActivity const &currentElement) {
+				return receivedRequestID != currentElement.requestID;
+			});
+
+		if (requestIDMatch != scheduledActivities.end()) {
+			scheduledActivities.erase(requestIDMatch); // Delete activity from the schedule
+		} else {
+			// todo: Generate failed start of execution for the failed instruction
+		}
 	}
 }
 
@@ -117,6 +142,28 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 5);
 
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	for (std::size_t i = 0; i < iterationCount; i++) {
+		// Parse the request ID
+		RequestID receivedRequestID; // Save the received request ID
+		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
+		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
+		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+
+		// Try to find the activity with the requested request ID
+		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+		                                             scheduledActivities.end(), [&receivedRequestID]
+			                                             (ScheduledActivity const &currentElement) {
+				return receivedRequestID != currentElement
+					.requestID;
+			});
+
+		if (requestIDMatch != scheduledActivities.end()) {
+			scheduledActivities.erase(requestIDMatch); // Delete activity from the schedule
+		} else {
+			// todo: Generate failed start of execution for the failed instruction
+		}
+	}
 }
 
 void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
