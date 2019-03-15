@@ -1,4 +1,3 @@
-#include <cstring>
 #include <Services/EventActionService.hpp>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
@@ -80,6 +79,13 @@ Message MessageParser::parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> dat
 	uint8_t *dataInt = reinterpret_cast<uint8_t *>(data.data());
 	message.packetType = Message::TC;
 	parseTC(dataInt, ECSS_EVENT_SERVICE_STRING_SIZE, message);
+	return message;
+}
+
+Message MessageParser::parseRequestTC(uint8_t* data) {
+	Message message;
+	message.packetType = Message::TC;
+	parseTC(data, ECSS_EVENT_SERVICE_STRING_SIZE, message);
 	return message;
 }
 
