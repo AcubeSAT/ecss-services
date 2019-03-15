@@ -89,6 +89,15 @@ Message MessageParser::parseRequestTC(uint8_t* data) {
 	return message;
 }
 
+String<ECSS_EVENT_SERVICE_STRING_SIZE> MessageParser::convertTCToStr(Message &message) {
+	String<ECSS_EVENT_SERVICE_STRING_SIZE> dataString("");
+	dataString[0] = ECSS_PUS_VERSION << 4; // Assign the pusVersion = 2
+	dataString[1] = message.serviceType;
+	dataString[2] = message.messageType;
+	dataString.insert(5, reinterpret_cast<char *>(message.data), ECSS_EVENT_SERVICE_STRING_SIZE -
+	5);
+}
+
 void MessageParser::parseTM(uint8_t *data, uint16_t length, Message &message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 

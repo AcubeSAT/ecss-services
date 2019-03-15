@@ -52,6 +52,8 @@ public:
 
 	Message parseRequestTC(uint8_t* data);
 
+	String<ECSS_EVENT_SERVICE_STRING_SIZE> convertTCToStr(Message& message);
+
 private:
 	/**
 	 * Parse the ECSS Telecommand packet secondary header
