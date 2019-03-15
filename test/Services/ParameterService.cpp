@@ -62,6 +62,7 @@ TEST_CASE("Parameter Setting Subservice") {
 		// numOfValidIds out, now is 1 in order to be a valid ID (a separate test for
 		// numOfValidIds shall be introduced)
 
+		ServiceTests::reset();
 		pserv.reportParameterIds(reportRequest);
 		Message before = ServiceTests::get(0);
 
