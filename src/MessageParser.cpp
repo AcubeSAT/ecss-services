@@ -61,7 +61,9 @@ void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &messa
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
 
-	ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
+	// todo: Fix this parsing function, because it assumes PUS header in data, which is not true
+	//  with the current implementation
+	// ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
 	length -= 5;
@@ -90,12 +92,13 @@ Message MessageParser::parseRequestTC(uint8_t* data) {
 }
 
 String<ECSS_EVENT_SERVICE_STRING_SIZE> MessageParser::convertTCToStr(Message &message) {
-	String<ECSS_EVENT_SERVICE_STRING_SIZE> dataString("");
-	dataString[0] = ECSS_PUS_VERSION << 4; // Assign the pusVersion = 2
-	dataString[1] = message.serviceType;
-	dataString[2] = message.messageType;
-	dataString.insert(5, reinterpret_cast<char *>(message.data), ECSS_EVENT_SERVICE_STRING_SIZE -
-	5);
+	uint8_t tempString[ECSS_EVENT_SERVICE_STRING_SIZE] = {0};
+
+	tempString[0] = ECSS_PUS_VERSION << 4; // Assign the pusVersion = 2
+	tempString[1] = message.serviceType;
+	tempString[2] = message.messageType;
+	memcpy(tempString + 5, message.data, ECSS_EVENT_SERVICE_STRING_SIZE - 5);
+	String<ECSS_EVENT_SERVICE_STRING_SIZE> dataString(tempString);
 
 	return dataString;
 }
