@@ -73,8 +73,9 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 				                                               return releaseTime >=
 				                                                      currentElement.requestReleaseTime;
 			                                               });
+
 			// Add activities ordered by release time as per the standard requirement
-			scheduledActivities.emplace(releaseTimeOrder, newActivity);
+			scheduledActivities.insert(releaseTimeOrder, newActivity);
 		}
 	}
 }
@@ -200,7 +201,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 16);
 
-	for (auto& activity : scheduledActivities) {
+	for (auto &activity : scheduledActivities) {
 		// Create the report message object of telemetry message subtype 10 for each activity
 		Message report = createTM(10);
 		// todo: append sub-schedule and group ID if they are defined
