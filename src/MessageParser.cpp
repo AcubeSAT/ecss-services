@@ -96,6 +96,8 @@ String<ECSS_EVENT_SERVICE_STRING_SIZE> MessageParser::convertTCToStr(Message &me
 	dataString[2] = message.messageType;
 	dataString.insert(5, reinterpret_cast<char *>(message.data), ECSS_EVENT_SERVICE_STRING_SIZE -
 	5);
+
+	return dataString;
 }
 
 void MessageParser::parseTM(const uint8_t *data, uint16_t length, Message &message) {
