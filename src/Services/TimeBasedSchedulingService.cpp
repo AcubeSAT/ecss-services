@@ -43,19 +43,18 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		// todo: Read the absolute time using the helper functions from the time service
 
 		// Temporary definitions until the Time helper is ready
-		uint32_t releaseTime = 0; // Temporary release time
 		uint32_t currentTime = 50; // Temporary current time
 
-		// Get the TC packet request
-		uint8_t requestData[ECSS_EVENT_SERVICE_STRING_SIZE];
-		request.readString(requestData, ECSS_EVENT_SERVICE_STRING_SIZE);
-		Message receivedTCPacket = msgParser.parseRequestTC(requestData);
-
+		uint32_t releaseTime = request.readUint32(); // Get the specified release time
 		if ((currentNumberOfActivities >= MAX_NUMBER_OF_ACTIVITIES) || (releaseTime <
 		                                                                (currentTime +
 		                                                                 TIME_MARGIN_FOR_ACTIVATION))) {
 			// todo: Send a failed start of execution
 		} else {
+			// Get the TC packet request
+			uint8_t requestData[ECSS_EVENT_SERVICE_STRING_SIZE];
+			request.readString(requestData, ECSS_EVENT_SERVICE_STRING_SIZE);
+			Message receivedTCPacket = msgParser.parseRequestTC(requestData);
 			ScheduledActivity newActivity; // Create the new activity
 
 			// Assign the attributes to the newly created activity
