@@ -21,12 +21,12 @@ class Message;
  */
 class Message {
 public:
-	Message () = default;
+	Message() = default;
 
-
+	// Define the message comparison operator
 	bool operator==(const Message &msg) const {
-		return 	(this->packetType == msg.packetType) && (this->data == msg.data) &&
-		(this->messageType == msg.messageType) && (this->serviceType == msg.serviceType);
+		return (this->packetType == msg.packetType) &&
+		       (this->messageType == msg.messageType) && (this->serviceType == msg.serviceType);
 	}
 
 	enum PacketType {
@@ -102,7 +102,7 @@ public:
 	 * @param string The string to insert
 	 */
 	template<const size_t SIZE>
-	void appendString(const String<SIZE> & string);
+	void appendString(const String<SIZE> &string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -278,10 +278,10 @@ public:
 	 * PTC = 7, PFC = 0
 	 */
 	template<const size_t SIZE>
-	void appendOctetString(const String<SIZE> & string) {
+	void appendOctetString(const String<SIZE> &string) {
 		// Make sure that the string is large enough to count
 		assertI(string.size() <= (std::numeric_limits<uint16_t>::max)(),
-			ErrorHandler::StringTooLarge);
+		        ErrorHandler::StringTooLarge);
 
 		appendUint16(string.size());
 		appendString(string);
@@ -440,7 +440,7 @@ public:
 };
 
 template<const size_t SIZE>
-inline void Message::appendString(const String<SIZE> & string) {
+inline void Message::appendString(const String<SIZE> &string) {
 	assertI(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
 	assertI(string.size() <= string.capacity(), ErrorHandler::StringTooLarge);
