@@ -18,7 +18,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 		for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 			if (eventActionDefinitionArray[index].applicationId == applicationID &&
 			    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
-			    eventActionDefinitionArray[index].enabled == true) {
+			    eventActionDefinitionArray[index].enabled) {
 				// @todo: throw a failed start of execution error
 				accepted = false;
 			}
@@ -26,7 +26,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 		if (accepted){
 			for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				// @todo: throw an error if it's full
-				if (eventActionDefinitionArray[index].empty == true) {
+				if (eventActionDefinitionArray[index].empty) {
 					break;
 				}
 			}
@@ -59,7 +59,7 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				if (eventActionDefinitionArray[index].applicationId == applicationID &&
 				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
-				    eventActionDefinitionArray[index].enabled == true) {
+				    eventActionDefinitionArray[index].enabled) {
 					eventActionDefinitionArray[index].empty = true;
 					eventActionDefinitionArray[index].eventDefinitionID = 65535;
 					eventActionDefinitionArray[index].request = "";
@@ -78,7 +78,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message message) {
 	                                                                     == 19) {
 		setEventActionFunctionStatus(false);
 		for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-			if (eventActionDefinitionArray[index].empty == false) {
+			if (not eventActionDefinitionArray[index].empty) {
 				eventActionDefinitionArray[index].empty = true;
 				eventActionDefinitionArray[index].enabled = false;
 				eventActionDefinitionArray[index].eventDefinitionID = 65535;
@@ -107,7 +107,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 			}
 		} else {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (eventActionDefinitionArray[index].empty == false){
+				if (not eventActionDefinitionArray[index].empty){
 					eventActionDefinitionArray[index].enabled = true;
 				}
 			}
@@ -133,7 +133,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 			}
 		} else {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (eventActionDefinitionArray[index].empty == false){
+				if (not eventActionDefinitionArray[index].empty){
 					eventActionDefinitionArray[index].enabled = false;
 				}
 			}
@@ -154,13 +154,13 @@ void EventActionService::eventActionStatusReport() {
 	Message report = createTM(7);
 	uint8_t count = 0;
 	for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
-		if (eventActionDefinitionArray[i].empty == false) {
+		if (not eventActionDefinitionArray[i].empty) {
 			count++;
 		}
 	}
 	report.appendUint8(count);
 	for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
-		if (eventActionDefinitionArray[i].empty == false) {
+		if (not eventActionDefinitionArray[i].empty) {
 			report.appendEnum16(eventActionDefinitionArray[i].applicationId);
 			report.appendEnum16(eventActionDefinitionArray[i].eventDefinitionID);
 			report.appendBoolean(eventActionDefinitionArray[i].enabled);
@@ -191,7 +191,7 @@ void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
 		for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
-			if (eventActionDefinitionArray[i].empty == false &&
+			if (not eventActionDefinitionArray[i].empty &&
 			    eventActionDefinitionArray[i].enabled ==
 			    true) {
 				if (eventActionDefinitionArray[i].eventDefinitionID == eventID) {

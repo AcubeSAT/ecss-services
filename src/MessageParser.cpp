@@ -78,7 +78,7 @@ void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &messa
 
 Message MessageParser::parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data) {
 	Message message;
-	uint8_t *dataInt = reinterpret_cast<uint8_t *>(data.data());
+	auto *dataInt = reinterpret_cast<uint8_t *>(data.data());
 	message.packetType = Message::TC;
 	parseTC(dataInt, ECSS_EVENT_SERVICE_STRING_SIZE, message);
 	return message;
