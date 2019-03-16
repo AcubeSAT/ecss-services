@@ -13,17 +13,17 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 uint32_t TimeHelper::mkUTCtime(TimeAndDate &TimeInfo) {
 	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00(UTC date)
 	for (uint16_t y = 2019; y < TimeInfo.year; ++y) {
-		secs += (IsLeapYear(y) ? 366 : 365) * SecondsPerDay;
+		secs += (IsLeapYear(y) ? 366 : 365) * SECONDS_PER_DAY;
 	}
 	for (uint16_t m = 1; m < TimeInfo.month; ++m) {
-		secs += DaysOfMonth[m - 1] * SecondsPerDay;
+		secs += DaysOfMonth[m - 1] * SECONDS_PER_DAY;
 		if (m == 2 && IsLeapYear(TimeInfo.year)) {
-			secs += SecondsPerDay;
+			secs += SECONDS_PER_DAY;
 		}
 	}
-	secs += (TimeInfo.day - 1) * SecondsPerDay;
-	secs += TimeInfo.hour * SecondsPerHour;
-	secs += TimeInfo.minute * SecondsPerMinute;
+	secs += (TimeInfo.day - 1) * SECONDS_PER_DAY;
+	secs += TimeInfo.hour * SECONDS_PER_HOUR;
+	secs += TimeInfo.minute * SECONDS_PER_MINUTE;
 	secs += TimeInfo.second;
 	return secs;
 }
@@ -39,39 +39,39 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	TimeInfo.second = 0;
 
 	// calculate years
-	while (seconds >= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay) {
-		seconds -= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay;
+	while (seconds >= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SECONDS_PER_DAY) {
+		seconds -= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SECONDS_PER_DAY;
 		TimeInfo.year++;
 	}
 
 	// calculate months
 	uint8_t i = 0;
-	while (seconds >= (DaysOfMonth[i] * SecondsPerDay)) {
+	while (seconds >= (DaysOfMonth[i] * SECONDS_PER_DAY)) {
 		TimeInfo.month++;
-		seconds -= (DaysOfMonth[i] * SecondsPerDay);
+		seconds -= (DaysOfMonth[i] * SECONDS_PER_DAY);
 		i++;
 		if (i == 1 && IsLeapYear(TimeInfo.year)) {
-			if (seconds <= (28 * SecondsPerDay)) {
+			if (seconds <= (28 * SECONDS_PER_DAY)) {
 				break;
 			}
 			TimeInfo.month++;
-			seconds -= 29 * SecondsPerDay;
+			seconds -= 29 * SECONDS_PER_DAY;
 			i++;
 		}
 	}
 
 	// calculate days
-	TimeInfo.day = seconds / SecondsPerDay;
-	seconds -= TimeInfo.day * SecondsPerDay;
+	TimeInfo.day = seconds / SECONDS_PER_DAY;
+	seconds -= TimeInfo.day * SECONDS_PER_DAY;
 	TimeInfo.day++; // add 1 day because we start count from 1 January(and not 0 January!)
 
 	// calculate hours
-	TimeInfo.hour = seconds / SecondsPerHour;
-	seconds -= TimeInfo.hour * SecondsPerHour;
+	TimeInfo.hour = seconds / SECONDS_PER_HOUR;
+	seconds -= TimeInfo.hour * SECONDS_PER_HOUR;
 
 	// calculate minutes
-	TimeInfo.minute = seconds / SecondsPerMinute;
-	seconds -= TimeInfo.minute * SecondsPerMinute;
+	TimeInfo.minute = seconds / SECONDS_PER_MINUTE;
+	seconds -= TimeInfo.minute * SECONDS_PER_MINUTE;
 
 	// calculate seconds
 	TimeInfo.second = seconds;
@@ -92,13 +92,13 @@ uint64_t TimeHelper::generateCDStimeFormat(TimeAndDate &TimeInfo) {
 	 * The `DAY` segment, 16 bits as defined from standard. Actually the days passed since Unix
 	 * epoch
 	 */
-	auto elapsedDays = static_cast<uint16_t>(seconds / 86400);
+	auto elapsedDays = static_cast<uint16_t>(seconds / SECONDS_PER_DAY);
 
 	/**
 	 * The `ms of day` segment, 32 bits as defined in standard. The `ms of the day` and DAY`
 	 * should give the time passed since Unix epoch
 	 */
-	auto msOfDay = static_cast<uint32_t >((seconds % 86400) * 1000);
+	auto msOfDay = static_cast<uint32_t >((seconds % SECONDS_PER_DAY) * 1000);
 
 	uint64_t timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
 
