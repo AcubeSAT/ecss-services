@@ -38,17 +38,16 @@ TEST_CASE("TC[11,2]", "[service][st11]") {
 	TimeBasedSchedulingService timeSchedulingService;
 	timeSchedulingService.disableScheduleExecution(receivedMessage);
 	CHECK(not unit_test::Tester::executionFunctionStatus(timeSchedulingService));
-	auto sch = unit_test::Tester::scheduledActivities(timeSchedulingService);
 }
 
 TEST_CASE("TC[11,4]", "[service][st11]") {
 	Message receivedMessage(11, 4, Message::TC, 1),
-			testMessage1(6, 5, Message::TC, 4), testMessage2(6, 5, Message::TC, 6),
-			testMessage3(6, 5, Message::TC, 7);
+			testMessage1(6, 5, Message::TC, 4), testMessage2(4, 5, Message::TC, 6),
+			testMessage3(3, 2, Message::TC, 7);
 	MessageParser msgParser;
 
 
-	receivedMessage.appendUint16(3);
+	receivedMessage.appendUint16(3); // Number od instructions
 
 	// Test activity 1
 	testMessage1.appendUint16(4253); // todo: Append dummy data
@@ -57,12 +56,12 @@ TEST_CASE("TC[11,4]", "[service][st11]") {
 
 	// Test activity 2
 	testMessage2.appendUint16(45667); // todo: Append dummy data
-	receivedMessage.appendUint32(1556435); // todo: Append actual time
+	receivedMessage.appendUint32(1); // todo: Append actual time
 	receivedMessage.appendString(msgParser.convertTCToStr(testMessage2));
 
 	// Test activity 3
 	testMessage3.appendUint16(456); // todo: Append dummy data
-	receivedMessage.appendUint32(1556435); // todo: Append actual time
+	receivedMessage.appendUint32(1726435); // todo: Append actual time
 	receivedMessage.appendString(msgParser.convertTCToStr(testMessage3));
 
 
@@ -70,9 +69,15 @@ TEST_CASE("TC[11,4]", "[service][st11]") {
 	timeBasedSchedulingService.insertActivities(receivedMessage);
 
 	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedSchedulingService);
-	// std::cout << scheduledActivities.size() << std::endl;
+	CHECK(scheduledActivities.size() == 2); // Two will be inserted (Second is invalid)
 	REQUIRE(scheduledActivities.at(0).requestReleaseTime == 1556435);
-	REQUIRE(scheduledActivities.at(1).requestReleaseTime == 1556435);
-	REQUIRE(scheduledActivities.at(2).requestReleaseTime == 1556435);
+	REQUIRE(scheduledActivities.at(1).requestReleaseTime == 1726435);
+	//CHECK(memcmp(&scheduledActivities.at(0).request, &testMessage2, sizeof(Message)));
+	std::cout << scheduledActivities.at(0).request.data << " " << testMessage1.data << std::endl;
+	if (scheduledActivities.at(0).request == testMessage1) {
+		std::cout << "Message are the same!!" << std::endl;
+	}
+	//CHECK(scheduledActivities.at(0).request == testMessage1);
+	//REQUIRE(scheduledActivities.at(2).requestReleaseTime == 1556435);
 	//REQUIRE(scheduledActivities.at(0).requestID.applicationID == 45);
 }

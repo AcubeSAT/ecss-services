@@ -23,6 +23,12 @@ class Message {
 public:
 	Message () = default;
 
+
+	bool operator==(const Message &msg) const {
+		return 	(this->packetType == msg.packetType) && (this->data == msg.data) &&
+		(this->messageType == msg.messageType) && (this->serviceType == msg.serviceType);
+	}
+
 	enum PacketType {
 		TM = 0, // Telemetry
 		TC = 1 // Telecommand

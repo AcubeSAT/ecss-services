@@ -50,9 +50,10 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		                                                                (currentTime +
 		                                                                 TIME_MARGIN_FOR_ACTIVATION))) {
 			// todo: Send a failed start of execution
+			request.readPosition += ECSS_EVENT_SERVICE_STRING_SIZE;
 		} else {
 			// Get the TC packet request
-			uint8_t requestData[ECSS_EVENT_SERVICE_STRING_SIZE];
+			uint8_t requestData[ECSS_EVENT_SERVICE_STRING_SIZE] = {0};
 			request.readString(requestData, ECSS_EVENT_SERVICE_STRING_SIZE);
 			Message receivedTCPacket = msgParser.parseRequestTC(requestData);
 			ScheduledActivity newActivity; // Create the new activity

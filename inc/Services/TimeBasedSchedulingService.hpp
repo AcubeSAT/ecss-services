@@ -22,7 +22,7 @@
 
 namespace unit_test {
 	struct Tester;
-}
+} // namespace unit_test
 
 class TimeBasedSchedulingService : public Service {
 public:
