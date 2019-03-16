@@ -6,9 +6,9 @@
  * @todo: Add message type in TCs
  * @todo: this code is error prone, depending on parameters given, add fail safes (probably?)
  */
-void EventReportService::informativeEventReport(Event eventID, String<64> data) {
+void EventReportService::informativeEventReport(Event eventID, const String<64> & data) {
 	// TM[5,1]
-	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
+	if (stateOfEvents[static_cast<uint16_t> (eventID)]) {
 		Message report = createTM(1);
 		report.appendEnum16(eventID);
 		report.appendString(data);
@@ -20,10 +20,10 @@ void EventReportService::informativeEventReport(Event eventID, String<64> data) 
 }
 
 void
-EventReportService::lowSeverityAnomalyReport(Event eventID, String<64> data) {
+EventReportService::lowSeverityAnomalyReport(Event eventID, const String<64> & data) {
 	lowSeverityEventCount++;
 	// TM[5,2]
-	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
+	if (stateOfEvents[static_cast<uint16_t> (eventID)]) {
 		lowSeverityReportCount++;
 		Message report = createTM(2);
 		report.appendEnum16(eventID);
@@ -36,10 +36,10 @@ EventReportService::lowSeverityAnomalyReport(Event eventID, String<64> data) {
 	}
 }
 
-void EventReportService::mediumSeverityAnomalyReport(Event eventID, String<64> data) {
+void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<64> & data) {
 	mediumSeverityEventCount++;
 	// TM[5,3]
-	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
+	if (stateOfEvents[static_cast<uint16_t> (eventID)]) {
 		mediumSeverityReportCount++;
 		Message report = createTM(3);
 		report.appendEnum16(eventID);
@@ -53,10 +53,10 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, String<64> d
 }
 
 void
-EventReportService::highSeverityAnomalyReport(Event eventID, String<64> data) {
+EventReportService::highSeverityAnomalyReport(Event eventID, const String<64> & data) {
 	highSeverityEventCount++;
 	// TM[5,4]
-	if (stateOfEvents[static_cast<uint16_t> (eventID)] == 1) {
+	if (stateOfEvents[static_cast<uint16_t> (eventID)]) {
 		highSeverityReportCount++;
 		Message report = createTM(4);
 		report.appendEnum16(eventID);
@@ -82,7 +82,7 @@ void EventReportService::enableReportGeneration(Message message) {
 		}
 		if (length <= numberOfEvents) {
 			for (uint16_t i = 0; i < length; i++) {
-				stateOfEvents[static_cast<uint16_t> (eventID[i])] = 1;
+				stateOfEvents[static_cast<uint16_t> (eventID[i])] = true;
 			}
 		}
 		disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
@@ -103,7 +103,7 @@ void EventReportService::disableReportGeneration(Message message) {
 		}
 		if (length <= numberOfEvents) {
 			for (uint16_t i = 0; i < length; i++) {
-				stateOfEvents[static_cast<uint16_t> (eventID[i])] = 0;
+				stateOfEvents[static_cast<uint16_t> (eventID[i])] = false;
 			}
 		}
 		disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
