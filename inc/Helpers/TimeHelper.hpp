@@ -4,6 +4,10 @@
 #include <cstdint>
 #include <Message.hpp>
 
+#define SECONDS_PER_MINUTE 60
+#define SECONDS_PER_HOUR 3600
+#define SECONDS_PER_DAY 86400
+
 /**
  * The time and date provided from Real Time Clock(Real Time Clock).
  *
@@ -37,9 +41,6 @@ struct TimeAndDate {
  */
 class TimeHelper {
 private:
-	const uint8_t SecondsPerMinute = 60;
-	const uint16_t SecondsPerHour = 3600;
-	const uint32_t SecondsPerDay = 86400;
 	const uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	/**
