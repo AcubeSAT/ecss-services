@@ -67,7 +67,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTC(uint8_t *data, uint16_t length, Message &message);
+	void parseTC(const uint8_t *data, uint16_t length, Message &message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -78,7 +78,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTM(uint8_t *data, uint16_t length, Message &message);
+	void parseTM(const uint8_t *data, uint16_t length, Message &message);
 };
 
 

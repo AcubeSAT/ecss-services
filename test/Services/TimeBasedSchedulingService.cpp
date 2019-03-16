@@ -37,7 +37,7 @@ TEST_CASE("TC[11,2]", "[service][st11]") {
 
 	TimeBasedSchedulingService timeSchedulingService;
 	timeSchedulingService.disableScheduleExecution(receivedMessage);
-	CHECK(!unit_test::Tester::executionFunctionStatus(timeSchedulingService));
+	CHECK(not unit_test::Tester::executionFunctionStatus(timeSchedulingService));
 	auto sch = unit_test::Tester::scheduledActivities(timeSchedulingService);
 }
 

@@ -53,7 +53,9 @@ private:
 		// todo: If we decide to use sub-schedules, the ID of that has to be defined
 		// todo: If groups are used, then the group ID has to be defined here
 	};
-	etl::vector<ScheduledActivity, MAX_NUMBER_OF_ACTIVITIES> scheduledActivities; // Scheduled activity definitions
+
+	// Scheduled activity definitions
+	etl::vector<ScheduledActivity, MAX_NUMBER_OF_ACTIVITIES> scheduledActivities;
 
 	// Enable tester access to private members
 	friend struct ::unit_test::Tester;

@@ -53,7 +53,7 @@ Message MessageParser::parse(uint8_t *data, uint32_t length) {
 	return message;
 }
 
-void MessageParser::parseTC(uint8_t *data, uint16_t length, Message &message) {
+void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -98,7 +98,7 @@ String<ECSS_EVENT_SERVICE_STRING_SIZE> MessageParser::convertTCToStr(Message &me
 	5);
 }
 
-void MessageParser::parseTM(uint8_t *data, uint16_t length, Message &message) {
+void MessageParser::parseTM(const uint8_t *data, uint16_t length, Message &message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
