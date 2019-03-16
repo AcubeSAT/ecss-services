@@ -20,6 +20,9 @@
 #define MAX_DELTA_OF_RELEASE_TIME   60 // todo: Define the maximum delta between the specified
 // release time and the actual release time
 
+namespace unit_test {
+	struct Tester;
+}
 
 class TimeBasedSchedulingService : public Service {
 public:
@@ -51,6 +54,9 @@ private:
 		// todo: If groups are used, then the group ID has to be defined here
 	};
 	etl::vector<ScheduledActivity, MAX_NUMBER_OF_ACTIVITIES> scheduledActivities; // Scheduled activity definitions
+
+	// Enable tester access to private members
+	friend struct ::unit_test::Tester;
 
 
 public:
@@ -98,7 +104,7 @@ public:
 	 * TC[11,16] detail-report all activities
 	 *
 	 * @details Send a detailed report about the status of all the activities
-				on the current schedule
+				on the current schedule. Generates a TM[11,10] response
 	 * @param request Provide the received message as a parameter
 	 */
 	void detailReportAllActivities(Message &request);
@@ -106,7 +112,8 @@ public:
 	/**
 	 * TC[11,9] detail-report activities identified by request identifier
 	 *
-	 * @details Send a detailed report about the status of the requested activities
+	 * @details Send a detailed report about the status of the requested activities. Generates a
+	 * 			TM[11,10] response
 	 * @param request Provide the received message as a parameter
 	 */
 	void detailReporActivitiesByID(Message &request);
@@ -114,7 +121,8 @@ public:
 	/**
 	 * TC[11,12] summary-report activities identified by request identifier
 	 *
-	 * @details Send a summary report about the status of the requested activities
+	 * @details Send a summary report about the status of the requested activities. Generates a
+	 * 			TM[11,13] response
 	 * @param request Provide the received message as a parameter
 	 */
 	void summaryReporActivitiesByID(Message &request);
@@ -137,7 +145,6 @@ public:
 
 
 private:
-
 
 };
 
