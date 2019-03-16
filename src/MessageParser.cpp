@@ -63,7 +63,7 @@ void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &messa
 
 	// todo: Fix this parsing function, because it assumes PUS header in data, which is not true
 	//  with the current implementation
-	// ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
 	length -= 5;
