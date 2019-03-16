@@ -38,4 +38,53 @@ TEST_CASE("TC[11,2]", "[service][st11]") {
 	TimeBasedSchedulingService timeSchedulingService;
 	timeSchedulingService.disableScheduleExecution(receivedMessage);
 	CHECK(!unit_test::Tester::executionFunctionStatus(timeSchedulingService));
+	auto sch = unit_test::Tester::scheduledActivities(timeSchedulingService);
+}
+
+TEST_CASE("TC[11,4]", "[service][st11]") {
+	Message receivedMessage, testMessage1, testMessage2, testMessage3;
+	// MessageParser msgParser;
+
+	receivedMessage.serviceType = 11;
+	receivedMessage.messageType = 4;
+
+	receivedMessage.appendUint16(3);
+/*
+	// Test activity 1
+	testMessage1.serviceType = 6;
+	testMessage1.messageType = 5;
+	testMessage1.applicationId = 45;
+	testMessage1.packetSequenceCount = 67;
+	testMessage1.appendUint16(456); // todo: Append dummy data
+	receivedMessage.appendUint32(1556435); // todo: Append actual time
+	receivedMessage.appendOctetString(msgParser.convertTCToStr(testMessage1));
+
+	// Test activity 2
+	testMessage2.serviceType = 6;	receivedMessage.appendUint32(1556435); // todo: Append actual time
+	receivedMessage.appendOctetString(msgParser.convertTCToStr(testMessage1));
+	testMessage2.messageType = 5;
+	testMessage2.applicationId = 45;
+	testMessage2.packetSequenceCount = 67;
+	testMessage2.appendUint16(456); // todo: Append dummy data
+	receivedMessage.appendUint32(1556435); // todo: Append actual time
+	receivedMessage.appendOctetString(msgParser.convertTCToStr(testMessage2));
+*/
+	// Test activity 3
+	// testMessage3.serviceType = 6;
+	// testMessage3.messageType = 5;
+	// testMessage3.applicationId = 45;
+	// testMessage3.packetSequenceCount = 67;
+	// testMessage3.appendUint16(456); // todo: Append dummy data
+	// receivedMessage.appendUint32(1556435); // todo: Append actual time
+	// receivedMessage.appendString(msgParser.convertTCToStr(testMessage3));
+
+
+	TimeBasedSchedulingService timeBasedSchedulingService;
+	timeBasedSchedulingService.insertActivities(receivedMessage);
+
+ /*
+	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedSchedulingService);
+	REQUIRE(scheduledActivities.at(0).requestReleaseTime == 1556435);
+	REQUIRE(scheduledActivities.at(0).requestID.applicationID == 45);
+*/
 }
