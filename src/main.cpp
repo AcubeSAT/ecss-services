@@ -302,7 +302,7 @@ int main() {
 
 	// Insert activities in the schedule
 	receivedMsg = Message(11, 4, Message::TC, 1);
-	receivedMessage.appendUint16(2); // Total number of requests
+	receivedMsg.appendUint16(2); // Total number of requests
 
 	receivedMsg.appendUint32(currentTime + 1556435);
 	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
