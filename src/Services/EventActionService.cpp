@@ -23,7 +23,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 				accepted = false;
 			}
 		}
-		if (accepted){
+		if (accepted) {
 			for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 				// @todo: throw an error if it's full
 				if (eventActionDefinitionArray[index].empty) {
@@ -36,7 +36,8 @@ void EventActionService::addEventActionDefinitions(Message message) {
 				eventActionDefinitionArray[index].applicationId = applicationID;
 				eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID;
 				if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
-					ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
+					ErrorHandler::reportInternalError(
+						ErrorHandler::InternalErrorType::MessageTooLarge);
 				} else {
 					char data[ECSS_EVENT_SERVICE_STRING_SIZE];
 					message.readString(data, message.dataSize - 4);
@@ -94,7 +95,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0){
+		if (numberOfEventActionDefinitions != 0) {
 			for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 				uint16_t applicationID = message.readEnum16();
 				uint16_t eventDefinitionID = message.readEnum16();
@@ -107,7 +108,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 			}
 		} else {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (not eventActionDefinitionArray[index].empty){
+				if (not eventActionDefinitionArray[index].empty) {
 					eventActionDefinitionArray[index].enabled = true;
 				}
 			}
@@ -120,7 +121,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0){
+		if (numberOfEventActionDefinitions != 0) {
 			for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 				uint16_t applicationID = message.readEnum16();
 				uint16_t eventDefinitionID = message.readEnum16();
@@ -133,7 +134,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 			}
 		} else {
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (not eventActionDefinitionArray[index].empty){
+				if (not eventActionDefinitionArray[index].empty) {
 					eventActionDefinitionArray[index].enabled = false;
 				}
 			}
@@ -159,11 +160,11 @@ void EventActionService::eventActionStatusReport() {
 		}
 	}
 	report.appendUint8(count);
-	for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
-		if (not eventActionDefinitionArray[i].empty) {
-			report.appendEnum16(eventActionDefinitionArray[i].applicationId);
-			report.appendEnum16(eventActionDefinitionArray[i].eventDefinitionID);
-			report.appendBoolean(eventActionDefinitionArray[i].enabled);
+	for (const auto &definition : eventActionDefinitionArray) {
+		if (not definition.empty) {
+			report.appendEnum16(definition.applicationId);
+			report.appendEnum16(definition.eventDefinitionID);
+			report.appendBoolean(definition.enabled);
 		}
 	}
 	storeMessage(report);
@@ -190,14 +191,13 @@ void EventActionService::disableEventActionFunction(Message message) {
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
-		for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
-			if (not eventActionDefinitionArray[i].empty &&
-			    eventActionDefinitionArray[i].enabled ==
-			    true) {
-				if (eventActionDefinitionArray[i].eventDefinitionID == eventID) {
+		for (const auto &definition : eventActionDefinitionArray) {
+			if (not definition.empty &&
+			    definition.enabled) {
+				if (definition.eventDefinitionID == eventID) {
 					MessageParser messageParser;
 					Message message = messageParser.parseRequestTC(
-						eventActionDefinitionArray[i].request);
+						definition.request);
 					messageParser.execute(message);
 				}
 			}
