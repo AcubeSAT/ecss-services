@@ -62,6 +62,8 @@ private:
 
 
 public:
+	TimeBasedSchedulingService();
+
 	/**
 	 * TC[11,1] enable the time-based schedule execution function
 	 *
