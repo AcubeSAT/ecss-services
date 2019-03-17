@@ -2,7 +2,7 @@
 #define ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 
 #include "Service.hpp"
-#include <bitset>
+#include <etl/bitset.h>
 /**
  * Implementation of ST[05] event reporting service
  *
@@ -17,7 +17,7 @@
 class EventReportService : public Service {
 private:
 	static const uint16_t numberOfEvents = 7;
-	std::bitset<numberOfEvents> stateOfEvents;
+	etl::bitset<numberOfEvents> stateOfEvents;
 public:
 	// Variables that count the event reports per severity level
 	uint16_t lowSeverityReportCount;
@@ -170,7 +170,7 @@ public:
 	 * Getter for stateOfEvents bitset
 	 * @return stateOfEvents, just in case the whole bitset is needed
 	 */
-	std::bitset<numberOfEvents> getStateOfEvents() {
+	etl::bitset<numberOfEvents> getStateOfEvents() {
 		return stateOfEvents;
 	}
 };
