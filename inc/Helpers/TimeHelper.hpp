@@ -33,8 +33,8 @@ struct TimeAndDate {
  * 301.0-B-4 standard. The chosen time format is CDS and it is UTC-based (UTC: Coordinated
  * Universal Time). It consists of two main fields: the time code preamble field (P-field) and
  * the time specification field (T-field). The P-Field is the metadata for the T-Field. The
- * T-Field is consisted of two segments: 1)the `DAY` and the 2)`ms of day` segments. The P-field
- * won't be included in the code, because as the ECSS standards claims, it can be
+ * T-Field is consisted of two segments: 1) the `DAY` and the 2) `ms of day` segments.
+ * The P-field won't be included in the code, because as the ECSS standards claims, it can be
  * just implicitly declared.
  *
  * @note
@@ -65,8 +65,8 @@ public:
      *
      * @param TimeInfo the time information/data from the RTC (UTC format)
      * @return the elapsed seconds between a given UTC date (after the Unix epoch) and Unix epoch
-     * @todo check if we need to change the epoch to the recommended from the standard, 1 January
-     * 1958
+     * @todo check if we need to change the epoch to the recommended one from the standard, 1
+     * January 1958
      */
 	static uint32_t mkUTCtime(struct TimeAndDate &TimeInfo);
 
@@ -80,8 +80,8 @@ public:
      *
      * @param seconds elapsed seconds since Unix epoch
      * @return the UTC date based on the \p seconds
-     * @todo check if we need to change the epoch to ,the recommended from the standard, 1 January
-     * 1958
+     * @todo check if we need to change the epoch to the recommended one from the standard, 1
+     * January 1958
      */
 	static struct TimeAndDate utcTime(uint32_t seconds);
 
@@ -92,7 +92,7 @@ public:
 	 * Converts a UTC date to CDS time format.
 	 *
 	 * @param TimeInfo is the data provided from RTC (UTC)
-	 * @return TimeFormat the CDS time format. More specific, 48 bits are used for the  T-field
+	 * @return TimeFormat the CDS time format. More specific, 48 bits are used for the T-field
 	 * (16 for the `DAY` and 32 for the `ms of day`)
  	 * @todo time security for critical time operations
  	 * @todo declare the implicit P-field
