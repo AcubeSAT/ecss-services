@@ -27,6 +27,7 @@ void TimeBasedSchedulingService::resetSchedule(Message &request) {
 
 	executionFunctionStatus = false; // Disable the service
 	scheduledActivities.clear(); // Delete all scheduled activities
+	currentNumberOfActivities = 0;
 	// todo: Add resetting for sub-schedules and groups, if defined
 }
 
@@ -76,6 +77,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 
 			// Add activities ordered by release time as per the standard requirement
 			scheduledActivities.insert(releaseTimeOrder, newActivity);
+			currentNumberOfActivities++;
 		}
 	}
 }
@@ -99,10 +101,11 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
 		                                                     rightSide.requestReleaseTime;
 	                                              });
 
-	uint32_t relativeOffset = request.readUint32(); // Get the relative offset
+	int32_t relativeOffset = request.readSint32(); // Get the relative offset
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
 	    (current_time + TIME_MARGIN_FOR_ACTIVATION)) {
 		// todo: generate a failed start of execution error
+		std::cerr << "Relative offset error" << std::endl;
 	} else {
 		for (auto &activity : scheduledActivities) {
 			activity.requestReleaseTime += relativeOffset; // Time shift each activity
@@ -189,6 +192,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message &request) {
 
 		if (requestIDMatch != scheduledActivities.end()) {
 			scheduledActivities.erase(requestIDMatch); // Delete activity from the schedule
+			currentNumberOfActivities--;
 		} else {
 			// todo: Generate failed start of execution for the failed instruction
 		}
