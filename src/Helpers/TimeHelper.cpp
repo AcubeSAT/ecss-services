@@ -86,7 +86,7 @@ uint64_t TimeHelper::generateCDStimeFormat(struct TimeAndDate &TimeInfo) {
 	 */
 
 
-	uint32_t seconds = Access.mkUTCtime(TimeInfo);
+	uint32_t seconds = mkUTCtime(TimeInfo);
 
 	/**
 	 * The `DAY` segment, 16 bits as defined from standard. Actually the days passed since Unix
@@ -115,5 +115,5 @@ struct TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
 
 	uint32_t seconds = elapsedDays * SECONDS_PER_DAY + msOfDay / 1000;
 
-	return Access.utcTime(seconds);
+	return utcTime(seconds);
 }

@@ -15,7 +15,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeInfo.second = 0;
 
 	TimeHelper time;
-	uint32_t currTime = time.get_mkUTCtime(TimeInfo);
+	uint32_t currTime = TimeHelper::mkUTCtime(TimeInfo);
 
 	uint16_t elapsedDays = currTime/86400;
 	uint32_t msOfDay = currTime % 86400 * 1000;
@@ -50,7 +50,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeInfo.minute = 0;
 	TimeInfo.second = 0;
 
-	currTime = time.get_mkUTCtime(TimeInfo);
+	currTime = TimeHelper::mkUTCtime(TimeInfo);
 
 	elapsedDays = currTime/86400;
 	msOfDay = currTime % 86400 * 1000;

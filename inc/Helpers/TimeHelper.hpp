@@ -40,14 +40,16 @@ struct TimeAndDate {
  *
  */
 class TimeHelper {
-private:
-	const uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+public:
+	static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+	TimeHelper() = default;
 
 	/**
 	 * @param year The year that will be examined if it is a leap year(366 days)
 	 * @return if the \p year is a leap year returns true and if it isn't returns false
 	 */
-	bool IsLeapYear(uint16_t year);
+	static bool IsLeapYear(uint16_t year);
 
 	/**
      * Convert UTC date to elapsed seconds since Unix epoch(1/1/1970 00:00:00).
@@ -62,7 +64,7 @@ private:
      * @todo check if we need to change the epoch to ,the recommended from the standard, 1 January
      * 1958
      */
-	uint32_t mkUTCtime(struct TimeAndDate &TimeInfo);
+	static uint32_t mkUTCtime(struct TimeAndDate &TimeInfo);
 
 	/**
      * Convert elapsed seconds since Unix epoch to UTC date.
@@ -77,11 +79,8 @@ private:
      * @todo check if we need to change the epoch to ,the recommended from the standard, 1 January
      * 1958
      */
-	struct TimeAndDate utcTime(uint32_t seconds);
+	static struct TimeAndDate utcTime(uint32_t seconds);
 
-public:
-
-	TimeHelper() = default;
 
 	/**
 	 * Generate the CDS time format(3.3 in CCSDS 301.0-B-4 standard).
@@ -108,30 +107,7 @@ public:
 	 * @return the UTC date
 	 */
 	static struct TimeAndDate parseCDStimeFormat(const uint8_t *data);
-
-	/**
-	 * Dummy function created only to access `mkUTCtime` for testing
-	 *
-	 * @todo Delete this function
-	 */
-	uint32_t get_mkUTCtime(struct TimeAndDate &TimeInfo) {
-		return mkUTCtime(TimeInfo);
-	}
-
-	/**
-	 * Dummy function created only to access `utcTime` for testing
-	 *
-	 * @todo Delete this function
-	 */
-	struct TimeAndDate get_utcTime(uint32_t seconds) {
-		return utcTime(seconds);
-	}
 };
 
-/**
- * Used to access `mkUTCtime` function and `utcTime` function in the static `implementCDSTimeFormat`
- * and in the static `parseCDSTimeFormat` functions
- */
-static TimeHelper Access;
 
 #endif //ECSS_SERVICES_TIMEHELPER_HPP
