@@ -55,22 +55,18 @@ TEST_CASE("TC(11,4) Activity Insertion", "[service][st11]") {
 	testMessage1.serviceType = 6;
 	testMessage1.messageType = 5;
 	testMessage1.packetType = Message::TC;
-	testMessage1.applicationId = 4;
 
 	testMessage2.serviceType = 4;
 	testMessage2.messageType = 5;
 	testMessage2.packetType = Message::TC;
-	testMessage2.applicationId = 6;
 
 	testMessage3.serviceType = 3;
 	testMessage3.messageType = 2;
 	testMessage3.packetType = Message::TC;
-	testMessage3.applicationId = 7;
 
 	testMessage4.serviceType = 12;
 	testMessage4.messageType = 23;
 	testMessage4.packetType = Message::TC;
-	testMessage4.applicationId = 5;
 
 
 	Message receivedMessage(11, 4, Message::TC, 1);
@@ -148,14 +144,30 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities (Positive shift)", "[se
 
 TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeSchedulingService);
-	Message receivedMessage(11, 7, Message::TC, 1);
-	receivedMessage.appendUint16(4);
+	const int32_t timeShift = 6789; // Relative time-shift value
 
+	// Verify that everything is in place
 	CHECK(scheduledActivities->size() == 4);
 	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeSchedulingService) == 4);
+
+	Message receivedMessage(11, 7, Message::TC, 1);
+	receivedMessage.appendSint32(timeShift); // Time-shift value
+	receivedMessage.appendUint16(1); // Just one instruction to time-shift an activity
+	receivedMessage.appendUint8(0); // Source ID is not implemented
+	receivedMessage.appendUint16(4); // todo: Remove the dummy ID when implemented
+	receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
+
+	testMessage2.applicationId = 4; // todo: Remove the dummy application ID
+	scheduledActivities->at(2).requestID.applicationID = 4; // Append a dummy application ID
+
+	timeSchedulingService.timeShiftActivitiesByID(receivedMessage);
+
+	REQUIRE(scheduledActivities->at(2).requestReleaseTime == currentTime + 1957232 + timeShift);
+	REQUIRE(scheduledActivities->at(2).request == testMessage2);
+
 }
 
-
+/*
 TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]") {
 	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeSchedulingService);
 
@@ -176,7 +188,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 	CHECK(scheduledActivities->size() == 4);
 	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeSchedulingService) == 4);
 }
-
+*/
 TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]") {
 	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeSchedulingService);
 
@@ -204,21 +216,28 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 		REQUIRE(receivedTCPacket == scheduledActivities->at(i).request);
 	}
 }
-
+/*
 TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeSchedulingService);
 
 	Message receivedMessage(11, 5, Message::TC, 1);
 	receivedMessage.appendUint16(1); // Just one instruction to delete an activity
 	receivedMessage.appendUint8(0); // Source ID is not implemented
-	receivedMessage.appendUint16(testMessage2.applicationId);
-	receivedMessage.appendUint16(testMessage2.packetSequenceCount);
+	receivedMessage.appendUint16(4); // todo: Remove the dummy ID when implemented
+	receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
+
+	testMessage2.applicationId = 4; // todo: Remove the dummy application ID
+	scheduledActivities->at(0).requestID.applicationID = 4; // Append a dummy application ID
 
 	CHECK(scheduledActivities->size() == 4);
 	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeSchedulingService) == 4);
 	timeSchedulingService.deleteActivitiesByID(receivedMessage);
 
-}
+	CHECK(*unit_test::Tester::currentNumberOfActivities(timeSchedulingService) == 3);
+	REQUIRE(scheduledActivities->size() == 3);
+	REQUIRE(scheduledActivities->at(2).requestReleaseTime == currentTime + 17248435);
+	REQUIRE(scheduledActivities->at(2).request == testMessage4);
+}*/
 
 TEST_CASE("TC(11,3) Reset schedule", "[service][st11]") {
 	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeSchedulingService);

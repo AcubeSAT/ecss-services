@@ -127,7 +127,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 	// Temporary variables
 	uint32_t current_time = 0;
 
-	uint32_t relativeOffset = request.readUint32(); // Get the offset first
+	int32_t relativeOffset = request.readSint32(); // Get the offset first
 	/*
 	 * Search for the earliest activity in the schedule. If the release time of the earliest
 	 * activity + relativeOffset is earlier than current_time + time_margin, reject the request
