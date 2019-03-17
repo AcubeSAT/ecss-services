@@ -8,7 +8,7 @@ before_script:
   - g++ --version
   - cat /etc/*-release
 
-build:
+.build:
   stage: build
   variables:
       GIT_SUBMODULE_STRATEGY: normal
@@ -21,7 +21,7 @@ build:
     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -fdiagnostics-color=always" # Build again, but with more warnings
     - make -j4
 
-tests:
+.tests:
   stage: test
   variables:
     GIT_SUBMODULE_STRATEGY: normal
@@ -40,10 +40,13 @@ cppcheck:
   before_script:
     - apt-get update -qq && apt-get install -y -qq cppcheck
     - cppcheck --version
+    - cppcheck --doc
   script:
     - ci/cppcheck.sh
+  tags:
+    - helit
 
-vera:
+.vera:
   stage: build
   before_script:
     - apt-get update -qq && apt-get install -y -qq vera++
@@ -52,7 +55,7 @@ vera:
   script:
     - ci/vera.sh
 
-clang-tidy:
+.clang-tidy:
   stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: normal

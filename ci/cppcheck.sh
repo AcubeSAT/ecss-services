@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Static code analysis using cppchecl
+# Static code analysis using cppcheck
 #
 # Usage:
 # $ ci/cppcheck.sh
