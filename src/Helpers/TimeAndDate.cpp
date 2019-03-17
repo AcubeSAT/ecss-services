@@ -16,12 +16,12 @@ TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour
 	// check if the parameters makes sense
 
 	// @todo change the condition of the assertion for the \p year
-	assertI(2019 <= year < 2025, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(1 <= month <= 12, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(1 <= day <= 31, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= hour <= 24, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= minute <= 60, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= second <= 60, ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(2019 <= year && year <= 2025, ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(1 <= month && month <= 12, ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(1 <= day && month <= 31, ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(0 <= hour && hour <= 24, ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(0 <= minute && minute <= 60, ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(0 <= second && second <= 60, ErrorHandler::InternalErrorType::InvalidDate);
 
 	this->year = year;
 	this->month = month;
@@ -171,4 +171,3 @@ bool TimeAndDate::operator<=(const TimeAndDate &Date) {
 bool TimeAndDate::operator>=(const TimeAndDate &Date) {
 	return (*this > Date || *this == Date);
 }
-
