@@ -48,11 +48,11 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	Message parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data);
+	Message parseRequestTC(String<ECSS_TC_REQUEST_STRING_SIZE> data);
 
 	Message parseRequestTC(uint8_t* data);
 
-	String<ECSS_EVENT_SERVICE_STRING_SIZE> convertTCToStr(Message& message);
+	String<ECSS_TC_REQUEST_STRING_SIZE> convertTCToStr(Message& message);
 
 private:
 	/**

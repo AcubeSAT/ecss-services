@@ -15,4 +15,15 @@
 // 9.3.1a.1.e
 #define ECSS_SEQUENCE_FLAGS 0x3
 
+#define ECSS_MAX_REQUEST_COUNT 20 // todo: Needs to be defined
+
+#define ECSS_TC_REQUEST_STRING_SIZE 64
+
+#define ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES    10 // todo: Define the maximum number of activities
+
+#define ECSS_TIME_MARGIN_FOR_ACTIVATION  60 // todo: Define the time margin for the command activation
+
+#define ECSS_MAX_DELTA_OF_RELEASE_TIME   60 // todo: Define the maximum delta between the specified
+// release time and the actual release time
+
 #endif //ECSS_SERVICES_ECSS_DEFINITIONS_H

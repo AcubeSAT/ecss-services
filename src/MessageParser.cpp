@@ -76,29 +76,29 @@ void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &messa
 	message.dataSize = length;
 }
 
-Message MessageParser::parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data) {
+Message MessageParser::parseRequestTC(String<ECSS_TC_REQUEST_STRING_SIZE> data) {
 	Message message;
 	auto *dataInt = reinterpret_cast<uint8_t *>(data.data());
 	message.packetType = Message::TC;
-	parseTC(dataInt, ECSS_EVENT_SERVICE_STRING_SIZE, message);
+	parseTC(dataInt, ECSS_TC_REQUEST_STRING_SIZE, message);
 	return message;
 }
 
 Message MessageParser::parseRequestTC(uint8_t* data) {
 	Message message;
 	message.packetType = Message::TC;
-	parseTC(data, ECSS_EVENT_SERVICE_STRING_SIZE, message);
+	parseTC(data, ECSS_TC_REQUEST_STRING_SIZE, message);
 	return message;
 }
 
-String<ECSS_EVENT_SERVICE_STRING_SIZE> MessageParser::convertTCToStr(Message &message) {
-	uint8_t tempString[ECSS_EVENT_SERVICE_STRING_SIZE] = {0};
+String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::convertTCToStr(Message &message) {
+	uint8_t tempString[ECSS_TC_REQUEST_STRING_SIZE] = {0};
 
 	tempString[0] = ECSS_PUS_VERSION << 4; // Assign the pusVersion = 2
 	tempString[1] = message.serviceType;
 	tempString[2] = message.messageType;
-	memcpy(tempString + 5, message.data, ECSS_EVENT_SERVICE_STRING_SIZE - 5);
-	String<ECSS_EVENT_SERVICE_STRING_SIZE> dataString(tempString);
+	memcpy(tempString + 5, message.data, ECSS_TC_REQUEST_STRING_SIZE - 5);
+	String<ECSS_TC_REQUEST_STRING_SIZE> dataString(tempString);
 
 	return dataString;
 }

@@ -15,10 +15,6 @@
 #define GROUPS_ENABLED          0
 #define SUB_SCHEDULES_ENABLED   0
 
-#define MAX_NUMBER_OF_ACTIVITIES    10 // todo: Define the maximum number of activities
-#define TIME_MARGIN_FOR_ACTIVATION  60 // todo: Define the time margin for the command activation
-#define MAX_DELTA_OF_RELEASE_TIME   60 // todo: Define the maximum delta between the specified
-// release time and the actual release time
 
 namespace unit_test {
 	struct Tester;
@@ -55,7 +51,7 @@ private:
 	};
 
 	// Scheduled activity definitions
-	etl::vector<ScheduledActivity, MAX_NUMBER_OF_ACTIVITIES> scheduledActivities;
+	etl::vector<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> scheduledActivities;
 
 	// Enable tester access to private members
 	friend struct ::unit_test::Tester;
@@ -120,7 +116,7 @@ public:
 	 * 			TM[11,10] response
 	 * @param request Provide the received message as a parameter
 	 */
-	void detailReporActivitiesByID(Message &request);
+	void detailReportActivitiesByID(Message &request);
 
 	/**
 	 * TC[11,12] summary-report activities identified by request identifier
@@ -129,7 +125,7 @@ public:
 	 * 			TM[11,13] response
 	 * @param request Provide the received message as a parameter
 	 */
-	void summaryReporActivitiesByID(Message &request);
+	void summaryReportActivitiesByID(Message &request);
 
 	/**
 	 * TC[11,5] delete time-based scheduled activities identified by a request identifier
