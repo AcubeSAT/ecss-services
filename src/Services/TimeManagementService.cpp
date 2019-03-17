@@ -14,9 +14,9 @@ void TimeManagementService::cdsTimeReport(struct TimeAndDate &TimeInfo) {
 }
 
 struct TimeAndDate TimeManagementService::cdsTimeRequest(Message &message) {
-	// TC{9,128] CDS time request
+	// TC[9,128] CDS time request
 
-	// check if we have the correct size of the data. The size should be 6(48 bits)
+	// check if we have the correct size of the data. The size should be 6 (48 bits)
 	ErrorHandler::assertRequest(message.dataSize == 6, message,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
