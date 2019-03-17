@@ -1,6 +1,11 @@
 #include "Services/TimeBasedSchedulingService.hpp"
 
 
+TimeBasedSchedulingService::TimeBasedSchedulingService() {
+	serviceType = 11;
+}
+
+
 void TimeBasedSchedulingService::enableScheduleExecution(Message &request) {
 
 	// Check if the correct packet is being processed
@@ -205,18 +210,18 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 16);
 
+	// Create the report message object of telemetry message subtype 10 for each activity
+	Message report = createTM(10);
+	report.appendUint16(currentNumberOfActivities);
+
 	for (auto &activity : scheduledActivities) {
-		// Create the report message object of telemetry message subtype 10 for each activity
-		Message report = createTM(10);
 		// todo: append sub-schedule and group ID if they are defined
 
 		report.appendUint32(activity.requestReleaseTime); // todo: Replace with the time parser
 		report.appendString(msgParser.convertTCToStr(activity.request));
-
-		storeMessage(report); // Save the report
-		request.resetRead(); // todo: define if this statement is required
 	}
-
+	storeMessage(report); // Save the report
+	request.resetRead(); // todo: define if this statement is required
 }
 
 void TimeBasedSchedulingService::detailReporActivitiesByID(Message &request) {
