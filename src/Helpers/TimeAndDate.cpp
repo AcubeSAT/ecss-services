@@ -14,8 +14,6 @@ TimeAndDate::TimeAndDate() {
 TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute,
                          uint8_t second) {
 	// check if the parameters makes sense
-
-	// @todo change the condition of the assertion for the \p year
 	assertI(2019 <= year, ErrorHandler::InternalErrorType::InvalidDate);
 	assertI(1 <= month && month <= 12, ErrorHandler::InternalErrorType::InvalidDate);
 	assertI(1 <= day && month <= 31, ErrorHandler::InternalErrorType::InvalidDate);
