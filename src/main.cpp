@@ -286,7 +286,7 @@ int main() {
 		.eventActionDefinitionArray[0].empty);
 
 
-	/* ST[11] test
+	// ST[11] test
 	TimeBasedSchedulingService timeBasedSchedulingService;
 	MessageParser msgParser;
 	auto currentTime = static_cast<uint32_t >(time(nullptr)); // Get the current system time
@@ -319,7 +319,7 @@ int main() {
 
 	// Report the activities
 	receivedMsg = Message(11, 16, Message::TC, 1);
-	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);*/
+	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);
 
 	return 0;
 }
