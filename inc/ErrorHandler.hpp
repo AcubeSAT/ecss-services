@@ -58,7 +58,8 @@ public:
 			UnacceptablePacket = 5,
 
 		/**
-		 * A date that isn't valid according to Gregorian calendar (the well-known civil calendar)
+		 * A date that isn't valid according to the Gregorian calendar or cannot be parsed by the
+		 * TimeHelper
 		 */
 		    InvalidDate = 6,
 	};
