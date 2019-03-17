@@ -4,6 +4,15 @@
 
 TEST_CASE("Date comparison", "[operands]") {
 
+	SECTION("Invalid date") {
+		TimeAndDate InvalidDate0(1900, 2, 2, 4, 5, 6); // error in year
+		TimeAndDate InvalidDate1(2030, 70, 2, 4, 5, 6); // error in month
+		TimeAndDate InvalidDate2(2030, 2, 73, 4, 5, 6); // error in day
+		TimeAndDate InvalidDate3(2030, 2, 2, 74, 5, 6); // error in hour
+		TimeAndDate InvalidDate4(2030, 2, 2, 4, 75, 6); // error in minute
+		TimeAndDate InvalidDate5(2030, 2, 2, 4, 5, 76); // error in seconds
+	}
+
 	SECTION("Different year") {
 		TimeAndDate Now;
 		// 10/04/2021 10:15:00
@@ -197,7 +206,7 @@ TEST_CASE("Date comparison", "[operands]") {
 		CHECK((Now == Date) == false);
 	}
 
-	SECTION("Same date"){
+	SECTION("Same date") {
 		TimeAndDate Now;
 		// 10/04/2020 10:15:01
 		Now.year = 2020;
