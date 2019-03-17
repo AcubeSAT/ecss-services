@@ -52,15 +52,16 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		uint32_t currentTime = 50; // Temporary current time
 
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
-		if ((currentNumberOfActivities >= MAX_NUMBER_OF_ACTIVITIES) || (releaseTime <
-		                                                                (currentTime +
-		                                                                 TIME_MARGIN_FOR_ACTIVATION))) {
+		if ((currentNumberOfActivities >= ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES) ||
+		    (releaseTime <
+		     (currentTime +
+		      ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
 			// todo: Send a failed start of execution
-			request.readPosition += ECSS_EVENT_SERVICE_STRING_SIZE;
+			request.readPosition += ECSS_TC_REQUEST_STRING_SIZE;
 		} else {
 			// Get the TC packet request
-			uint8_t requestData[ECSS_EVENT_SERVICE_STRING_SIZE] = {0};
-			request.readString(requestData, ECSS_EVENT_SERVICE_STRING_SIZE);
+			uint8_t requestData[ECSS_TC_REQUEST_STRING_SIZE] = {0};
+			request.readString(requestData, ECSS_TC_REQUEST_STRING_SIZE);
 			Message receivedTCPacket = msgParser.parseRequestTC(requestData);
 			ScheduledActivity newActivity; // Create the new activity
 
@@ -108,7 +109,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
 
 	int32_t relativeOffset = request.readSint32(); // Get the relative offset
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
-	    (current_time + TIME_MARGIN_FOR_ACTIVATION)) {
+	    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
 		// todo: generate a failed start of execution error
 		std::cerr << "Relative offset error" << std::endl;
 	} else {
@@ -143,7 +144,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 	                                              });
 
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
-	    (current_time + TIME_MARGIN_FOR_ACTIVATION)) {
+	    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
 		// todo: generate a failed start of execution error
 	} else {
 
@@ -224,12 +225,17 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 	request.resetRead(); // todo: define if this statement is required
 }
 
-void TimeBasedSchedulingService::detailReporActivitiesByID(Message &request) {
+void TimeBasedSchedulingService::detailReportActivitiesByID(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
 	assert(request.messageType == 9);
 
+	// Create the report message object of telemetry message subtype 10 for each activity
+	Message report = createTM(10);
+	etl::vector<etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator, ECSS_MAX_REQUEST_COUNT>
+		matchedActivities;
+
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
 		// Parse the request ID
@@ -247,27 +253,45 @@ void TimeBasedSchedulingService::detailReporActivitiesByID(Message &request) {
 			});
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			// Create the report message object of telemetry message subtype 10 for each activity
-			Message report = createTM(10);
-			// todo: append sub-schedule and group ID if they are defined
+			const auto releaseTimeOrder = etl::find_if_not(matchedActivities.begin(),
+			                                               matchedActivities.end(),
+			                                               [=]
+				                                               (etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator const
+				                                                &currentElement) {
+				                                               return
+					                                               requestIDMatch->requestReleaseTime >=
+					                                               currentElement->requestReleaseTime;
+			                                               });
 
-			report.appendUint32(requestIDMatch->requestReleaseTime); // todo: Time parser here
-			report.appendString(msgParser.convertTCToStr(requestIDMatch->request));
+			// Add activities ordered by release time as per the standard requirement
+			matchedActivities.insert(releaseTimeOrder, requestIDMatch);
 
-			storeMessage(report); // Save the report
-			request.resetRead(); // todo: define if this statement is required
 		} else {
 			// todo: Generate failed start of execution for the failed instruction
 		}
 	}
+
+	// todo: append sub-schedule and group ID if they are defined
+	report.appendUint16(static_cast<uint16_t >(matchedActivities.size()));
+	for (const auto &match : matchedActivities) {
+		report.appendUint32(match->requestReleaseTime); // todo: Time parser here
+		report.appendString(msgParser.convertTCToStr(match->request));
+	}
+	storeMessage(report); // Save the report
+	request.resetRead(); // todo: define if this statement is required
 }
 
-void TimeBasedSchedulingService::summaryReporActivitiesByID(Message &request) {
+void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 
 	// Check if the correct packet is being processed
 	assert(request.serviceType == 11);
 	assert(request.messageType == 12);
 
+	// Create the report message object of telemetry message subtype 13 for each activity
+	Message report = createTM(13);
+	etl::vector<etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator, ECSS_MAX_REQUEST_COUNT>
+		matchedActivities;
+
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
 		// Parse the request ID
@@ -285,21 +309,33 @@ void TimeBasedSchedulingService::summaryReporActivitiesByID(Message &request) {
 			});
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			// Create the report message object of telemetry message subtype 13 for each activity
-			Message report = createTM(13);
-			// todo: append sub-schedule and group ID if they are defined
+			const auto releaseTimeOrder = etl::find_if_not(matchedActivities.begin(),
+			                                               matchedActivities.end(),
+			                                               [=]
+				                                               (etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator const
+				                                                &currentElement) {
+				                                               return
+					                                               requestIDMatch->requestReleaseTime >=
+					                                               currentElement->requestReleaseTime;
+			                                               });
 
-			report.appendUint32(requestIDMatch->requestReleaseTime); // todo: Time parser here
+			// Add activities ordered by release time as per the standard requirement
+			matchedActivities.insert(releaseTimeOrder, requestIDMatch);
 
-			// todo: Replace with enumeration wherever is required (source ID and app ID)
-			report.appendUint8(requestIDMatch->requestID.sourceID);
-			report.appendUint16(requestIDMatch->requestID.applicationID);
-			report.appendUint16(requestIDMatch->requestID.sequenceCount);
-
-			storeMessage(report); // Save the report
-			request.resetRead(); // todo: define if this statement is required
 		} else {
 			// todo: Generate failed start of execution for the failed instruction
 		}
 	}
+
+	// todo: append sub-schedule and group ID if they are defined
+	report.appendUint16(static_cast<uint16_t >(matchedActivities.size()));
+	for (const auto &match : matchedActivities) {
+		// todo: append sub-schedule and group ID if they are defined
+		report.appendUint32(match->requestReleaseTime); // todo: Time parser here
+		report.appendUint8(match->requestID.sourceID);
+		report.appendUint16(match->requestID.applicationID);
+		report.appendUint16(match->requestID.sequenceCount);
+	}
+	storeMessage(report); // Save the report
+	request.resetRead(); // todo: define if this statement is required
 }
