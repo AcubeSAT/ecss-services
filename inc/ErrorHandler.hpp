@@ -56,6 +56,11 @@ public:
 		 * An error in the header of a packet makes it unable to be parsed
 		 */
 			UnacceptablePacket = 5,
+
+		/**
+		 * A date that isn't valid according to Gregorian calendar (the well-known civil calendar)
+		 */
+		    InvalidDate = 6,
 	};
 
 	/**
