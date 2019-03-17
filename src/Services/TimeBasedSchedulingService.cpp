@@ -52,9 +52,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
 		if ((currentNumberOfActivities >= ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES) ||
-		    (releaseTime <
-		     (currentTime +
-		      ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
+		    (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
 			// todo: Send a failed start of execution
 			request.readPosition += ECSS_TC_REQUEST_STRING_SIZE;
 		} else {

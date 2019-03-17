@@ -31,18 +31,14 @@ auto currentTime = static_cast<uint32_t >(time(nullptr)); // Get the current sys
 
 
 TEST_CASE("TC(11,1) Enable Schedule Execution", "[service][st11]") {
-	Message receivedMessage;
-	receivedMessage.serviceType = 11;
-	receivedMessage.messageType = 1;
+	Message receivedMessage(11, 1, Message::TC, 1);
 
 	timeSchedulingService.enableScheduleExecution(receivedMessage);
 	CHECK(unit_test::Tester::executionFunctionStatus(timeSchedulingService));
 }
 
 TEST_CASE("TC(11,2) Disable Schedule Execution", "[service][st11]") {
-	Message receivedMessage;
-	receivedMessage.serviceType = 11;
-	receivedMessage.messageType = 2;
+	Message receivedMessage(11, 2, Message::TC, 1);
 
 	timeSchedulingService.disableScheduleExecution(receivedMessage);
 	CHECK(not unit_test::Tester::executionFunctionStatus(timeSchedulingService));
