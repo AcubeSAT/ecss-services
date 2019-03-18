@@ -15,7 +15,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.second = 0;
 
 		TimeHelper time;
-		uint32_t currTime = TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::mkUTCtime(TimeInfo);
 
 		// invalid month
 		TimeInfo.year = 2018;
@@ -25,7 +25,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::mkUTCtime(TimeInfo);
 
 		// invalid day
 		TimeInfo.year = 2018;
@@ -35,7 +35,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::mkUTCtime(TimeInfo);
 
 		// invalid hour
 		TimeInfo.year = 2018;
@@ -45,7 +45,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::mkUTCtime(TimeInfo);
 
 		// invalid minute
 		TimeInfo.year = 2018;
@@ -55,7 +55,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 200;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::mkUTCtime(TimeInfo);
 
 		// invalid second
 		TimeInfo.year = 2018;
@@ -65,7 +65,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 122;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::mkUTCtime(TimeInfo);
 	}
 
 	SECTION("Convert UTC date to elapsed seconds since Unix epoch") {
