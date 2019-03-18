@@ -31,10 +31,11 @@ add_library(common OBJECT
         )
 
 # Specify the .cpp files for the executables
+file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
 add_executable(ecss_services
         src/main.cpp
         $<TARGET_OBJECTS:common>
-        src/Platform/x86/Service.cpp
+        ${x86_main_SRC}
         )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
