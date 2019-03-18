@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <Message.hpp>
+#include <ServicePool.hpp>
 
 /**
  * Supporting class for tests against ECSS services
@@ -43,10 +44,12 @@ public:
 	}
 
 	/**
-	 * Remove all the queued messages from the list, starting over from 0 items again
+	 * Reset the testing environment, starting from zero for all parameters
 	 */
 	static void reset() {
 		queuedMessages.clear();
+
+		Services.reset();
 	}
 };
 

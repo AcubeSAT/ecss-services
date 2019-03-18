@@ -19,7 +19,7 @@ Checks:          >
   performance-*,
   readability-*,
   zircon-*
-WarningsAsErrors: '*,-misc-unused-parameters,-llvm-header-guard,-cppcoreguidelines-pro-type-member-init,-google-runtime-references,-clang-diagnostic-tautological-constant-out-of-range-compare,-readability-redundant-declaration,-modernize-use-equals-default,-fuchsia-statically-constructed-objects,-hicpp-signed-bitwise,-cert-err58-cpp'
+WarningsAsErrors: '*,-misc-unused-parameters,-llvm-header-guard,-cppcoreguidelines-pro-type-member-init,-google-runtime-references,-clang-diagnostic-tautological-constant-out-of-range-compare,-readability-redundant-declaration',-modernize-use-equals-default,-fuchsia-statically-constructed-objects,-hicpp-signed-bitwise,-cert-err58-cpp',-clang-diagnostic-error,-misc-noexcept-move-constructor'
 HeaderFilterRegex: 'ecss-services\/((?!lib\/).)*$'
 AnalyzeTemporaryDtors: false
 ...

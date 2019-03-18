@@ -165,7 +165,7 @@ public:
 	/**
  	 * Report a failure about the progress of the execution of a request
  	 *
- 	 * Note:This function is different from reportError, because we need one more /p(stepID)
+ 	 * @note This function is different from reportError, because we need one more \p stepID
  	 * to call the proper function for reporting the progress of the execution of a request
  	 *
  	 * @param message The incoming message that prompted the failure
@@ -183,6 +183,7 @@ public:
 	 *
 	 * Note that these errors correspond to bugs or faults in the software, and should be treated
 	 * differently. Such an error may prompt a task or software reset.
+	 *
 	 */
 	static void reportInternalError(InternalErrorType errorCode);
 
