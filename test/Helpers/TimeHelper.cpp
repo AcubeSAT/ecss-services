@@ -15,7 +15,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.second = 0;
 
 		TimeHelper time;
-		TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid month
 		TimeInfo.year = 2018;
@@ -25,7 +25,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid day
 		TimeInfo.year = 2018;
@@ -35,7 +35,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid hour
 		TimeInfo.year = 2018;
@@ -45,7 +45,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid minute
 		TimeInfo.year = 2018;
@@ -55,7 +55,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 200;
 		TimeInfo.second = 0;
 
-		TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid second
 		TimeInfo.year = 2018;
@@ -65,7 +65,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 122;
 
-		TimeHelper::mkUTCtime(TimeInfo);
+		TimeHelper::utcToSeconds(TimeInfo);
 	}
 
 	SECTION("Convert UTC date to elapsed seconds since Unix epoch") {
@@ -79,7 +79,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.second = 0;
 
 		TimeHelper time;
-		uint32_t currTime = TimeHelper::mkUTCtime(TimeInfo);
+		uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 		uint16_t elapsedDays = currTime / 86400;
 		uint32_t msOfDay = currTime % 86400 * 1000;
@@ -94,7 +94,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 0;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 		elapsedDays = currTime / 86400;
 		msOfDay = currTime % 86400 * 1000;
@@ -109,7 +109,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 0;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		currTime = TimeHelper::utcToSeconds(TimeInfo);
 		CHECK(currTime == 1607126400);
 
 		// 10/12/2020 00:00:00
@@ -120,7 +120,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 0;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		currTime = TimeHelper::utcToSeconds(TimeInfo);
 		CHECK(currTime == 1607558400);
 
 		// 15/12/2020 00:00:00
@@ -131,7 +131,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 0;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		currTime = TimeHelper::utcToSeconds(TimeInfo);
 		CHECK(currTime == 1607990400);
 
 		// 20/12/2020 00:00:00
@@ -142,7 +142,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 0;
 		TimeInfo.second = 0;
 
-		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		currTime = TimeHelper::utcToSeconds(TimeInfo);
 		CHECK(currTime == 1608422400);
 	}
 
@@ -150,7 +150,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		uint32_t seconds = 1586513700; // elapsed seconds between 10/04/2020 10:15:00 and Unix epoch
 
 		TimeHelper time;
-		struct TimeAndDate TimeInfo = TimeHelper::utcTime(seconds);
+		struct TimeAndDate TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2020);
 		CHECK(TimeInfo.month == 4);
 		CHECK(TimeInfo.day == 10);
@@ -160,7 +160,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		seconds = 1546300800; // elapsed seconds between 1/1/2019 00:00:00 and Unix epoch
 
-		TimeInfo = TimeHelper::utcTime(seconds);
+		TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2019);
 		CHECK(TimeInfo.month == 1);
 		CHECK(TimeInfo.day == 1);
@@ -170,7 +170,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		seconds = 1550966400; // elapsed seconds between 24/2/2019 00:00:00 and Unix epoch
 
-		TimeInfo = TimeHelper::utcTime(seconds);
+		TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2019);
 		CHECK(TimeInfo.month == 2);
 		CHECK(TimeInfo.day == 24);
@@ -180,7 +180,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		seconds = 1551571200; // elapsed seconds between 3/3/2019 00:00:00 and Unix epoch
 
-		TimeInfo = TimeHelper::utcTime(seconds);
+		TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2019);
 		CHECK(TimeInfo.month == 3);
 		CHECK(TimeInfo.day == 3);
@@ -190,7 +190,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		seconds = 1742907370; // elapsed seconds between 25/3/2025 12:56:10 and Unix epoch
 
-		TimeInfo = TimeHelper::utcTime(seconds);
+		TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2025);
 		CHECK(TimeInfo.month == 3);
 		CHECK(TimeInfo.day == 25);
@@ -200,7 +200,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		seconds = 1583020800; // elapsed seconds between 1/3/2020 00:00:00 and Unix epoch
 
-		TimeInfo = TimeHelper::utcTime(seconds);
+		TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2020);
 		CHECK(TimeInfo.month == 3);
 		CHECK(TimeInfo.day == 1);
@@ -210,7 +210,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		seconds = 1582934400; // elapsed seconds between 2/29/2020 00:00:00 and Unix epoch
 
-		TimeInfo = TimeHelper::utcTime(seconds);
+		TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2020);
 		CHECK(TimeInfo.month == 2);
 		CHECK(TimeInfo.day == 29);
@@ -220,7 +220,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		seconds = 1577923200; // elapsed seconds between 2/1/2020 00:00:00 and Unix epoch
 
-		TimeInfo = TimeHelper::utcTime(seconds);
+		TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2020);
 		CHECK(TimeInfo.month == 1);
 		CHECK(TimeInfo.day == 2);

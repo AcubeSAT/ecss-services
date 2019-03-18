@@ -10,7 +10,7 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 	return (year % 400) == 0;
 }
 
-uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
+uint32_t TimeHelper::utcToSeconds(struct TimeAndDate &TimeInfo) {
 	// the date, that \p TimeInfo represents, should be greater than or equal to 1/1/2019 and the
 	// date should be valid according to Gregorian calendar
 	assertI(TimeInfo.year >= 2019, ErrorHandler::InternalErrorType::InvalidDate);
@@ -42,7 +42,7 @@ uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
 	return secs;
 }
 
-struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
+struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
 	// elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
 	assertI(seconds >= 1546300800, ErrorHandler::InternalErrorType::InvalidDate);
 
@@ -103,7 +103,7 @@ uint64_t TimeHelper::generateCDStimeFormat(struct TimeAndDate &TimeInfo) {
 	 */
 
 
-	uint32_t seconds = mkUTCtime(TimeInfo);
+	uint32_t seconds = utcToSeconds(TimeInfo);
 
 	/**
 	 * The `DAY` segment, 16 bits as defined from standard. Actually the days passed since Unix
@@ -132,5 +132,5 @@ struct TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
 
 	uint32_t seconds = elapsedDays * SECONDS_PER_DAY + msOfDay / 1000;
 
-	return utcTime(seconds);
+	return secondsToUTC(seconds);
 }

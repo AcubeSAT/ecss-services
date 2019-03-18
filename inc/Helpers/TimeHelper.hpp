@@ -68,7 +68,7 @@ public:
      * @todo check if we need to change the epoch to the recommended one from the standard, 1
      * January 1958
      */
-	static uint32_t mkUTCtime(struct TimeAndDate &TimeInfo);
+	static uint32_t utcToSeconds(struct TimeAndDate &TimeInfo);
 
 	/**
      * Convert elapsed seconds since Unix epoch to UTC date.
@@ -83,8 +83,7 @@ public:
      * @todo check if we need to change the epoch to the recommended one from the standard, 1
      * January 1958
      */
-	static struct TimeAndDate utcTime(uint32_t seconds);
-
+	static struct TimeAndDate secondsToUTC(uint32_t seconds);
 
 	/**
 	 * Generate the CDS time format (3.3 in CCSDS 301.0-B-4 standard).
