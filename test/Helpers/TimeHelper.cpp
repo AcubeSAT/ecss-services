@@ -3,6 +3,71 @@
 
 TEST_CASE("Time format implementation", "[CUC]") {
 
+	SECTION("Invalid date") {
+		struct TimeAndDate TimeInfo = {0};
+
+		// invalid year
+		TimeInfo.year = 2018;
+		TimeInfo.month = 4;
+		TimeInfo.day = 10;
+		TimeInfo.hour = 10;
+		TimeInfo.minute = 15;
+		TimeInfo.second = 0;
+
+		TimeHelper time;
+		uint32_t currTime = TimeHelper::mkUTCtime(TimeInfo);
+
+		// invalid month
+		TimeInfo.year = 2018;
+		TimeInfo.month = 60;
+		TimeInfo.day = 10;
+		TimeInfo.hour = 10;
+		TimeInfo.minute = 15;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+
+		// invalid day
+		TimeInfo.year = 2018;
+		TimeInfo.month = 4;
+		TimeInfo.day = 35;
+		TimeInfo.hour = 10;
+		TimeInfo.minute = 15;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+
+		// invalid hour
+		TimeInfo.year = 2018;
+		TimeInfo.month = 4;
+		TimeInfo.day = 10;
+		TimeInfo.hour = 100;
+		TimeInfo.minute = 15;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+
+		// invalid minute
+		TimeInfo.year = 2018;
+		TimeInfo.month = 4;
+		TimeInfo.day = 10;
+		TimeInfo.hour = 10;
+		TimeInfo.minute = 200;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+
+		// invalid second
+		TimeInfo.year = 2018;
+		TimeInfo.month = 4;
+		TimeInfo.day = 10;
+		TimeInfo.hour = 10;
+		TimeInfo.minute = 15;
+		TimeInfo.second = 122;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+	}
+
 	SECTION("Convert UTC date to elapsed seconds since Unix epoch") {
 		struct TimeAndDate TimeInfo = {0};
 		// 10/04/2020 10:15:00
