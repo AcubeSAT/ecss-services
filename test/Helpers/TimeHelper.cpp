@@ -100,6 +100,17 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		msOfDay = currTime % 86400 * 1000;
 		timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
 		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
+
+		// 5/12/2020 00:00:00
+		TimeInfo.year = 2020;
+		TimeInfo.month = 12;
+		TimeInfo.day = 5;
+		TimeInfo.hour = 0;
+		TimeInfo.minute = 0;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		CHECK(currTime == 1607126400);
 	}
 
 	SECTION("Convert elapsed seconds since Unix epoch to UTC date"){
