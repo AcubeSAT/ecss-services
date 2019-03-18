@@ -44,7 +44,7 @@ uint32_t TimeHelper::mkUTCtime(struct TimeAndDate &TimeInfo) {
 
 struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	// elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
-	assertI(seconds >= 1546300800, ErrorHandler::InternalErrorType::UnknownInternalError);
+	assertI(seconds >= 1546300800, ErrorHandler::InternalErrorType::InvalidDate);
 
 	seconds -= 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
 	struct TimeAndDate TimeInfo = {0};
