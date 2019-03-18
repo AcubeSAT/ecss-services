@@ -56,7 +56,13 @@ public:
 		 * An error in the header of a packet makes it unable to be parsed
 		 */
 			UnacceptablePacket = 5,
-	};
+
+		/**
+ 		 * A date that isn't valid according to the Gregorian calendar or cannot be parsed by the
+ 		 * TimeHelper
+ 		 */
+			InvalidDate = 6,
+};
 
 	/**
 	 * The error code for failed acceptance reports, as specified in ECSS 6.1.4.3d
