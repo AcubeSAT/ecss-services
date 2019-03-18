@@ -11,14 +11,24 @@
  * @todo See if members of this class can be made non-static
  */
 class ServiceTests {
+protected:
 	/**
 	 * The list of Messages that have been sent as a result of all the processing.
+	 *
+	 * Whenever a Message is sent from anywhere in the code, it is stored in this array. The
+	 * testing code can fetch these Messages using the ServiceTests::get() method.
 	 */
 	static std::vector<Message> queuedMessages;
 
 	/**
-	 * The list of Errors that the ErrorHandler caught
-	 * @var A multimap with keys (ErrorSource, ErrorType) and values of 1
+	 * The list of Errors that the ErrorHandler caught.
+	 *
+	 * Whenever an Error is thrown anywhere in the code, it is collected in the thrownErrors
+	 * array. Then, the user can tests whether or which types of errors were thrown, using
+	 * the ServiceTests::hasNoErrors() and ServiceTests::thrownError() functions.
+	 *
+	 * A multimap with keys (ErrorHandler::ErrorSource, ErrorHandler::ErrorType) and values of `1`.
+	 *
 	 * @todo If errors get more complex, this should hold the complete error information
 	 */
 	static std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> thrownErrors;
@@ -39,7 +49,7 @@ public:
 	}
 
 	/**
-	 * Add a message to the queue of messages to be sent
+	 * Add a message to the queue of messages having been sent
 	 */
 	static void queue(const Message &message) {
 		queuedMessages.push_back(message);
@@ -47,6 +57,9 @@ public:
 
 	/**
 	 * Add one error to the list of occurred errors.
+	 *
+	 * @note This function will be called automatically by the ErrorHandler, and should not be
+	 * used in tests.
 	 *
 	 * @param errorSource The source of the error.
 	 * @param errorCode The integer code of the error, coming directly from one of the ErrorCode
