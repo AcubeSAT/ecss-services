@@ -18,8 +18,8 @@ cppcheck --enable=all --inline-suppr --suppress=unusedFunction --suppress=missin
 echo -e "\033[33mRunning cppcheck with MISRA rule compliance tests...\033[0m"
 
 # grab the MISRA addon and the cppcheck addon interface from github
-curl https://raw.githubusercontent.com/danmar/cppcheck/master/addons/misra.py > misra.py
-curl https://raw.githubusercontent.com/danmar/cppcheck/master/addons/cppcheckdata.py > cppcheckdata.py
+curl https://raw.githubusercontent.com/danmar/cppcheck/f4b5b156d720c712f6ce99f6e01d8c1b3f800d52/addons/misra.py > misra.py
+curl https://raw.githubusercontent.com/danmar/cppcheck/f4b5b156d720c712f6ce99f6e01d8c1b3f800d52/addons/cppcheckdata.py > cppcheckdata.py
 
 # generate dump files (XML representations of AST etc.) for all headers, source files etc.
 for file in $(find inc/ src/ -type f)
