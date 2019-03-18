@@ -8,7 +8,7 @@
  * A class that represents the time and date.
  *
  * @note
- * This class represents UTC date
+ * This class represents UTC (Coordinated Universal Time) date
  */
 class TimeAndDate {
 public:
@@ -22,16 +22,13 @@ public:
 	/**
 	 * Assign the instances with the Unix epoch 1/1/1970 00:00:00
 	 */
-	TimeAndDate(); //
+	TimeAndDate();
 
 	/**
-	 * @param year the year as it used in Gregorian calendar (the well known civil calendar). For
-	 * example 2019
-	 * @param month the month as it used in Gregorian calendar. There isn't 0 month so we are
-	 * start counting from 1!
-	 * @param day the day as it used in Gregorian calendar. There isn't 0 day so we are start
-	 * counting from 1!
-	 * @param hour UTC (Coordinated Universal Time) hour in 24 format
+	 * @param year the year as it used in Gregorian calendar
+	 * @param month the month as it used in Gregorian calendar
+	 * @param day the day as it used in Gregorian calendar
+	 * @param hour UTC hour in 24 format
 	 * @param minute UTC minutes
 	 * @param second UTC seconds
 	 */
