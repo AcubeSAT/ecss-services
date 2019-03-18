@@ -111,6 +111,39 @@ TEST_CASE("Time format implementation", "[CUC]") {
 
 		currTime = TimeHelper::mkUTCtime(TimeInfo);
 		CHECK(currTime == 1607126400);
+
+		// 10/12/2020 00:00:00
+		TimeInfo.year = 2020;
+		TimeInfo.month = 12;
+		TimeInfo.day = 10;
+		TimeInfo.hour = 0;
+		TimeInfo.minute = 0;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		CHECK(currTime == 1607558400);
+
+		// 15/12/2020 00:00:00
+		TimeInfo.year = 2020;
+		TimeInfo.month = 12;
+		TimeInfo.day = 15;
+		TimeInfo.hour = 0;
+		TimeInfo.minute = 0;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		CHECK(currTime == 1607990400);
+
+		// 20/12/2020 00:00:00
+		TimeInfo.year = 2020;
+		TimeInfo.month = 12;
+		TimeInfo.day = 20;
+		TimeInfo.hour = 0;
+		TimeInfo.minute = 0;
+		TimeInfo.second = 0;
+
+		currTime = TimeHelper::mkUTCtime(TimeInfo);
+		CHECK(currTime == 1608422400);
 	}
 
 	SECTION("Convert elapsed seconds since Unix epoch to UTC date"){
