@@ -38,9 +38,9 @@ before_script:
 cppcheck:
   stage: build
   before_script:
-    - apt-get update -qq && apt-get install -y -qq cppcheck
+    - echo deb http://deb.debian.org/debian sid main > /etc/apt/sources.list  
+    - apt-get update -qq && apt-get -t sid install -y -qq cppcheck
     - cppcheck --version
-    - cppcheck --doc
   script:
     - ci/cppcheck.sh
   tags:
