@@ -1,5 +1,5 @@
 #include "Services/RequestVerificationService.hpp"
-#include "Message.hpp"
+
 
 void RequestVerificationService::successAcceptanceVerification(const Message &request) {
 	// TM[1,1] successful acceptance verification report
@@ -10,14 +10,15 @@ void RequestVerificationService::successAcceptanceVerification(const Message &re
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
-	report.appendEnumerated(2, 0); // sequence flags(not implemented)
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
 	report.appendBits(14, 0); // packet sequence count(not implemented)
 
 	storeMessage(report);
 }
 
 void
-RequestVerificationService::failAcceptanceVerification(const Message &request) {
+RequestVerificationService::failAcceptanceVerification(const Message &request,
+	ErrorHandler::AcceptanceErrorType errorCode) {
 	// TM[1,2] failed acceptance verification report
 
 	Message report = createTM(2);
@@ -26,14 +27,81 @@ RequestVerificationService::failAcceptanceVerification(const Message &request) {
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
-	report.appendEnumerated(2, 0); // sequence flags(not implemented)
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
 	report.appendBits(14, 0); // packet sequence count(not implemented)
-	report.appendEnum16(0); // error code(not implemented)
+	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);
 }
 
-void RequestVerificationService::successExecutionVerification(const Message &request) {
+void RequestVerificationService::successStartExecutionVerification(const Message &request) {
+	// TM[1,3] successful start of execution verification report
+
+	Message report = createTM(3);
+
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(1, request.packetType); // packet type
+	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendEnumerated(11, request.applicationId); // application process ID
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
+	report.appendBits(14, 0); // packet sequence count
+
+	storeMessage(report);
+}
+
+void RequestVerificationService::failStartExecutionVerification(const Message &request,
+	ErrorHandler::ExecutionStartErrorType errorCode) {
+	// TM[1,4] failed start of execution verification report
+
+	Message report = createTM(4);
+
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(1, request.packetType); // packet type
+	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendEnumerated(11, request.applicationId); // application process ID
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
+	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendEnum16(errorCode); // error code
+
+	storeMessage(report);
+}
+
+void RequestVerificationService::successProgressExecutionVerification(const Message &request,
+	uint8_t stepID) {
+	// TM[1,5] successful progress of execution verification report
+
+	Message report = createTM(5);
+
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(1, request.packetType); // packet type
+	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendEnumerated(11, request.applicationId); // application process ID
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
+	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendByte(stepID); // step ID
+
+	storeMessage(report);
+}
+
+void RequestVerificationService::failProgressExecutionVerification(const Message &request,
+	ErrorHandler::ExecutionProgressErrorType errorCode, uint8_t stepID) {
+	// TM[1,6] failed progress of execution verification report
+
+	Message report = createTM(6);
+
+	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
+	report.appendEnumerated(1, request.packetType); // packet type
+	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendEnumerated(11, request.applicationId); // application process ID
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
+	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendByte(stepID); // step ID
+	report.appendEnum16(errorCode); // error code
+
+	storeMessage(report);
+}
+
+void RequestVerificationService::successCompletionExecutionVerification(const Message &request) {
 	// TM[1,7] successful completion of execution verification report
 
 	Message report = createTM(7);
@@ -42,14 +110,15 @@ void RequestVerificationService::successExecutionVerification(const Message &req
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
-	report.appendEnumerated(2, 0); // sequence flags(not implemented)
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
 	report.appendBits(14, 0); // packet sequence count(not implemented)
 
 	storeMessage(report);
 }
 
 void
-RequestVerificationService::failExecutionVerification(const Message &request) {
+RequestVerificationService::failCompletionExecutionVerification(const Message &request,
+	ErrorHandler::ExecutionCompletionErrorType errorCode) {
 	// TM[1,8] failed completion of execution verification report
 
 	Message report = createTM(8);
@@ -58,15 +127,16 @@ RequestVerificationService::failExecutionVerification(const Message &request) {
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
-	report.appendEnumerated(2, 0); // sequence flags(not implemented)
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
 	report.appendBits(14, 0); // packet sequence count(not implemented)
-	report.appendEnum16(0); // error code(not implemented)
+	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);
 }
 
 void
-RequestVerificationService::failRoutingVerification(const Message &request) {
+RequestVerificationService::failRoutingVerification(const Message &request,
+	ErrorHandler::RoutingErrorType errorCode) {
 	// TM[1,10] failed routing verification report
 
 	Message report = createTM(10);
@@ -75,34 +145,45 @@ RequestVerificationService::failRoutingVerification(const Message &request) {
 	report.appendEnumerated(1, request.packetType); // packet type
 	report.appendBits(1, 0); // secondary header flag(not implemented)
 	report.appendEnumerated(11, request.applicationId); // application process ID
-	report.appendEnumerated(2, 0); // sequence flags(not implemented)
+	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
 	report.appendBits(14, 0); // packet sequence count(not implemented)
-	report.appendEnum16(0); // error code(not implemented)
+	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);
 }
+
 
 void RequestVerificationService::execute(const Message &message) {
 	switch (message.messageType) {
 		case 1:
 			successAcceptanceVerification(message);
 			break;
-		case 2:
-			failAcceptanceVerification(message);
+		//case 2:
+			//failAcceptanceVerification(message);
+			//break;
+		case 3:
+			successStartExecutionVerification(message);
 			break;
+		//case 4:
+			//failStartExecutionVerification(message);
+			//break;
+		//case 5:
+			//successProgressExecutionVerification(message);
+			//break;
+		//case 6:
+			//failProgressExecutionVerification(message);
+			//break;
 		case 7:
-			successExecutionVerification(message);
+			successCompletionExecutionVerification(message);
 			break;
-		case 8:
-			failExecutionVerification(message);
-			break;
-		case 10:
-			failRoutingVerification(message);
-			break;
+		//case 8:
+			//failCompletionExecutionVerification(message);
+			//break;
+		//case 10:
+			//failRoutingVerification(message);
+			//break;
 		default:
-			// cout is very bad for embedded systems
-			std::cout << "Error: There is not such a message type in ST[01] service";
-			assert(false);
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
 			break;
 	}
 }

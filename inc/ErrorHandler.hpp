@@ -4,6 +4,8 @@
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
 
+#include <stdint.h> // for the uint_8t stepID
+
 /**
  * A class that handles unexpected software errors, including internal errors or errors due to
  * invalid & incorrect input data.
@@ -13,20 +15,13 @@ class Message;
 class ErrorHandler {
 private:
 	/**
-	 * Log the error to a logging facility. Currently, this just displays the error on the screen.
-	 *
-	 * @todo This function MUST be moved as platform-dependent code. Currently, it uses g++ specific
-	 * functions for desktop.
+	 * Log the error to a logging facility. Platform-dependent.
 	 */
 	template<typename ErrorType>
 	static void logError(const Message &message, ErrorType errorType);
 
 	/**
-	 * Log an error without a Message to a logging facility. Currently, this just displays the error
-	 * on the screen.
-	 *
-	 * @todo This function MUST be moved as platform-dependent code. Currently, it uses g++ specific
-	 * functions for desktop.
+	 * Log an error without a Message to a logging facility. Platform-dependent.
 	 */
 	template<typename ErrorType>
 	static void logError(ErrorType errorType);
@@ -51,7 +46,6 @@ public:
 		 * A string is larger than the largest allowed string
 		 */
 			StringTooLarge = 4,
-
 		/**
 		 * An error in the header of a packet makes it unable to be parsed
 		 */
@@ -62,7 +56,11 @@ public:
  		 * TimeHelper
  		 */
 			InvalidDate = 6,
-};
+		/**
+		 * Asked a Message type that doesn't exist
+		 */
+			UnknownMessageType = 6,
+	};
 
 	/**
 	 * The error code for failed acceptance reports, as specified in ECSS 6.1.4.3d
@@ -87,7 +85,27 @@ public:
 		/**
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
-		    UnacceptableMessage = 5,
+			UnacceptableMessage = 5,
+	};
+
+	/**
+	 * The error code for failed start of execution reports, as specified in ECSS 5.3.5.2.3g
+	 *
+	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
+	 * changes.
+	 */
+	enum ExecutionStartErrorType {
+		UnknownExecutionStartError = 0,
+	};
+
+	/**
+	 * The error code for failed progress of execution reports, as specified in ECSS 5.3.5.2.3g
+	 *
+	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
+	 * changes.
+	 */
+	enum ExecutionProgressErrorType {
+		UnknownExecutionProgressError = 0,
 	};
 
 	/**
@@ -96,8 +114,8 @@ public:
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
 	 * changes.
 	 */
-	enum ExecutionErrorType {
-		UnknownExecutionError = 0,
+	enum ExecutionCompletionErrorType {
+		UnknownExecutionCompletionError = 0,
 		/**
 		 * Checksum comparison failed
 		 */
@@ -109,7 +127,7 @@ public:
 	};
 
 	/**
-	 * The error code for failed completion of execution reports, as specified in ECSS 6.1.3.3d
+	 * The error code for failed routing reports, as specified in ECSS 6.1.3.3d
 	 *
 	 * Note: Numbers are kept in code explicitly, so that there is no uncertainty when something
 	 * changes.
@@ -134,7 +152,7 @@ public:
 	 * Report a failure and, if applicable, store a failure report message
 	 *
 	 * @tparam ErrorType The Type struct of the error; can be AcceptanceErrorType,
-	 * 					 ExecutionErrorType, or RoutingErrorType.
+	 * StartExecutionErrorType,CompletionExecutionErrorType,  or RoutingErrorType.
 	 * @param message The incoming message that prompted the failure
 	 * @param errorCode The error's code, as defined in ErrorHandler
 	 * @todo See if this needs to include InternalErrorType
@@ -143,10 +161,27 @@ public:
 	static void reportError(const Message &message, ErrorType errorCode);
 
 	/**
+ 	 * Report a failure about the progress of the execution of a request
+ 	 *
+ 	 * @note This function is different from reportError, because we need one more \p stepID
+ 	 * to call the proper function for reporting the progress of the execution of a request
+ 	 *
+ 	 * @param message The incoming message that prompted the failure
+ 	 * @param errorCode The error's code, when a failed progress of the execution of a request
+ 	 * occurs
+ 	 * @param stepID If the execution of a request is a long process, then we can divide
+	 * the process into steps. Each step goes with its own definition, the stepID. Each value
+	 * ,that the stepID is assigned, should be documented.
+ 	 */
+	static void reportProgressError(const Message &message, ExecutionProgressErrorType errorCode,
+	                                uint8_t stepID);
+
+	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.
 	 *
 	 * Note that these errors correspond to bugs or faults in the software, and should be treated
 	 * differently. Such an error may prompt a task or software reset.
+	 *
 	 */
 	static void reportInternalError(InternalErrorType errorCode);
 
@@ -175,6 +210,35 @@ public:
 		if (not condition) {
 			reportError(message, errorCode);
 		}
+	}
+
+	/**
+	 * Convert a parameter given in C++ to an ErrorSource that can be easily used in comparisons.
+	 * @tparam ErrorType One of the enums specified in ErrorHandler.
+	 * @param error An error code of a specific type
+	 * @return The corresponding ErrorSource
+	 */
+	template<typename ErrorType>
+	inline static ErrorSource findErrorSource(ErrorType error) {
+		// While this may seem like a "hacky" way to convert enums to ErrorSource, it should be
+		// optimised by the compiler to constant time.
+
+		if (typeid(ErrorType) == typeid(AcceptanceErrorType)) {
+			return Acceptance;
+		}
+		if (typeid(ErrorType) == typeid(ExecutionStartErrorType)) {
+			return ExecutionStart;
+		}
+		if (typeid(ErrorType) == typeid(ExecutionProgressErrorType)) {
+			return ExecutionProgress;
+		}
+		if (typeid(ErrorType) == typeid(ExecutionCompletionErrorType)) {
+			return ExecutionCompletion;
+		}
+		if (typeid(ErrorType) == typeid(RoutingErrorType)) {
+			return Routing;
+		}
+		return Internal;
 	}
 };
 

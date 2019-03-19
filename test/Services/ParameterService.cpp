@@ -3,11 +3,9 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 
-#define CATCH_CONFIG_MAIN
+ParameterService & pserv = Services.parameterManagement;
 
 TEST_CASE("Parameter Report Subservice") {
-	ParameterService pserv;
-
 	SECTION("Faulty Instruction Handling Test") {
 		Message request(20, 1, Message::TC, 1);
 		Message report(20, 2, Message::TM, 1);
@@ -42,8 +40,6 @@ TEST_CASE("Parameter Report Subservice") {
 }
 
 TEST_CASE("Parameter Setting Subservice") {
-	ParameterService pserv;
-
 	SECTION("Faulty Instruction Handling Test") {
 		Message setRequest(20, 3, Message::TC, 1);
 		Message reportRequest(20, 1, Message::TC, 1);

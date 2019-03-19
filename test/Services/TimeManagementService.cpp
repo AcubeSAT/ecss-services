@@ -2,9 +2,9 @@
 #include <Services/TimeManagementService.hpp>
 #include "ServiceTests.hpp"
 
-TEST_CASE("TM[9,3]", "[service][st09]") {
-	TimeManagementService timeService;
+TimeManagementService & timeService = Services.timeManagement;
 
+TEST_CASE("TM[9,3]", "[service][st09]") {
 	struct TimeAndDate TimeInfo = {0};
 	// 10/04/2020 10:15:00
 	TimeInfo.year = 2020;
@@ -14,7 +14,6 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeInfo.minute = 15;
 	TimeInfo.second = 0;
 
-	TimeHelper time;
 	uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 	uint16_t elapsedDays = currTime/86400;
