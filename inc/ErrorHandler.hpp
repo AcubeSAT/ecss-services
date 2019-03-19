@@ -52,7 +52,12 @@ public:
 			UnacceptablePacket = 5,
 
 		/**
-		 * Asked a Message type that it doesn't exist
+ 		 * A date that isn't valid according to the Gregorian calendar or cannot be parsed by the
+ 		 * TimeHelper
+ 		 */
+			InvalidDate = 6,
+		/**
+		 * Asked a Message type that doesn't exist
 		 */
 			UnknownMessageType = 6,
 	};

@@ -197,14 +197,17 @@ int main() {
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
 
-
-	// TimeHelper test
-	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
-	std::cout << "\n" << test << "\n";
-
 	// ST[09] test
-	TimeManagementService & timeReport = Services.timeManagement;
-	timeReport.cucTimeReport();
+    TimeManagementService & timeReport = Services.timeManagement;
+	struct TimeAndDate timeInfo = {0};
+	// 10/04/1998 10:15:00
+	timeInfo.year = 1998;
+	timeInfo.month = 4;
+	timeInfo.day = 10;
+	timeInfo.hour = 10;
+	timeInfo.minute = 15;
+	timeInfo.second = 0;
+	timeReport.cdsTimeReport(timeInfo);
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
