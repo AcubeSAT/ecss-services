@@ -1,6 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
+#include <type_traits>
+
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
 
@@ -223,19 +225,19 @@ public:
 		// While this may seem like a "hacky" way to convert enums to ErrorSource, it should be
 		// optimised by the compiler to constant time.
 
-		if (typeid(ErrorType) == typeid(AcceptanceErrorType)) {
+		if (std::is_same<ErrorType, AcceptanceErrorType>()) {
 			return Acceptance;
 		}
-		if (typeid(ErrorType) == typeid(ExecutionStartErrorType)) {
+		if (std::is_same<ErrorType, ExecutionStartErrorType>()) {
 			return ExecutionStart;
 		}
-		if (typeid(ErrorType) == typeid(ExecutionProgressErrorType)) {
+		if (std::is_same<ErrorType, ExecutionProgressErrorType>()) {
 			return ExecutionProgress;
 		}
-		if (typeid(ErrorType) == typeid(ExecutionCompletionErrorType)) {
+		if (std::is_same<ErrorType, ExecutionCompletionErrorType>()) {
 			return ExecutionCompletion;
 		}
-		if (typeid(ErrorType) == typeid(RoutingErrorType)) {
+		if (std::is_same<ErrorType, RoutingErrorType>()) {
 			return Routing;
 		}
 		return Internal;
