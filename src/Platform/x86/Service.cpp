@@ -2,7 +2,10 @@
 #include <iomanip>
 #include "Service.hpp"
 
-void Service::storeMessage(const Message &message) {
+void Service::storeMessage(Message & message) {
+	// appends the remaining bits to complete a byte
+	message.finalize();
+
 	// Just print it to the screen
 	std::cout << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
 	          << std::hex
