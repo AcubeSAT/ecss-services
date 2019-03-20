@@ -59,7 +59,7 @@ public:
 		/**
 		 * Asked a Message type that doesn't exist
 		 */
-			UnknownMessageType = 6,
+			UnknownMessageType = 7,
 	};
 
 	/**

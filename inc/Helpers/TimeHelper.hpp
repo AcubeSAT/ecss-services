@@ -3,28 +3,11 @@
 
 #include <cstdint>
 #include <Message.hpp>
+#include "TimeAndDate.hpp"
 
 #define SECONDS_PER_MINUTE 60
 #define SECONDS_PER_HOUR 3600
 #define SECONDS_PER_DAY 86400
-
-/**
- * The time and date provided from Real Time Clock (Real Time Clock).
- *
- * @notes
- * This struct is similar to the `struct tm` of <ctime> library but it is more embedded-friendly
- *
- * For the current implementation this struct takes dummy values, because RTC hasn't been
- * implemented
- */
-struct TimeAndDate {
-	uint16_t year;
-	uint8_t month;
-	uint8_t day;
-	uint8_t hour;
-	uint8_t minute;
-	uint8_t second;
-};
 
 /**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.
@@ -68,7 +51,7 @@ public:
      * @todo check if we need to change the epoch to the recommended one from the standard, 1
      * January 1958
      */
-	static uint32_t utcToSeconds(struct TimeAndDate &TimeInfo);
+	static uint32_t utcToSeconds(TimeAndDate &TimeInfo);
 
 	/**
      * Convert elapsed seconds since Unix epoch to UTC date.
@@ -83,7 +66,7 @@ public:
      * @todo check if we need to change the epoch to the recommended one from the standard, 1
      * January 1958
      */
-	static struct TimeAndDate secondsToUTC(uint32_t seconds);
+	static TimeAndDate secondsToUTC(uint32_t seconds);
 
 	/**
 	 * Generate the CDS time format (3.3 in CCSDS 301.0-B-4 standard).
@@ -102,11 +85,11 @@ public:
 	/**
 	 * Parse the CDS time format (3.3 in CCSDS 301.0-B-4 standard)
 	 *
-     * @param data time information provided from the ground segment. The length of the data is a
-     * fixed size of 48 bits
+	 * @param data time information provided from the ground segment. The length of the data is a
+	 * fixed size of 48 bits
 	 * @return the UTC date
 	 */
-	static struct TimeAndDate parseCDStimeFormat(const uint8_t *data);
+	static TimeAndDate parseCDStimeFormat(const uint8_t *data);
 };
 
 

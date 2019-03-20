@@ -198,8 +198,8 @@ int main() {
 	errorMessage.appendByte(15);
 
 	// ST[09] test
-    TimeManagementService & timeReport = Services.timeManagement;
-	struct TimeAndDate timeInfo = {0};
+	TimeManagementService & timeReport = Services.timeManagement;
+	TimeAndDate timeInfo;
 	// 10/04/1998 10:15:00
 	timeInfo.year = 1998;
 	timeInfo.month = 4;

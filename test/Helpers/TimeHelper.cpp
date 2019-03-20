@@ -4,7 +4,7 @@
 TEST_CASE("Time format implementation", "[CUC]") {
 
 	SECTION("Invalid date") {
-		struct TimeAndDate TimeInfo = {0};
+		TimeAndDate TimeInfo;
 
 		// invalid year
 		TimeInfo.year = 2018;
@@ -69,7 +69,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 	}
 
 	SECTION("Convert UTC date to elapsed seconds since Unix epoch") {
-		struct TimeAndDate TimeInfo = {0};
+		TimeAndDate TimeInfo;
 		// 10/04/2020 10:15:00
 		TimeInfo.year = 2020;
 		TimeInfo.month = 4;
@@ -146,11 +146,11 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		CHECK(currTime == 1608422400);
 	}
 
-	SECTION("Convert elapsed seconds since Unix epoch to UTC date"){
+	SECTION("Convert elapsed seconds since Unix epoch to UTC date") {
 		uint32_t seconds = 1586513700; // elapsed seconds between 10/04/2020 10:15:00 and Unix epoch
 
 		TimeHelper time;
-		struct TimeAndDate TimeInfo = TimeHelper::secondsToUTC(seconds);
+		TimeAndDate TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2020);
 		CHECK(TimeInfo.month == 4);
 		CHECK(TimeInfo.day == 10);
@@ -227,7 +227,5 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		CHECK(TimeInfo.hour == 0);
 		CHECK(TimeInfo.minute == 0);
 		CHECK(TimeInfo.second == 0);
-
 	}
-
 }

@@ -48,7 +48,7 @@ public:
 	 * or should ignore the standard?
 	 */
 
-	void cdsTimeReport(struct TimeAndDate &TimeInfo);
+	void cdsTimeReport(TimeAndDate &TimeInfo);
 
 	/**
 	 * TC[9,128] CDS time request.
@@ -61,7 +61,7 @@ public:
 	 * @param message the message that will be parsed for its time-data. The data of the \p message
 	 * should be a fixed size of 48 bits
 	 */
-	struct TimeAndDate cdsTimeRequest(Message &message);
+	 TimeAndDate cdsTimeRequest(Message &message);
 };
 
 

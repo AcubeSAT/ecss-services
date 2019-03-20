@@ -17,9 +17,10 @@ add_custom_target(check
 add_library(common OBJECT
         src/ErrorHandler.cpp
         src/Message.cpp
-	    src/MessageParser.cpp
+        src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
+        src/Helpers/TimeAndDate.cpp
         src/Helpers/TimeHelper.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
@@ -27,7 +28,7 @@ add_library(common OBJECT
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         src/Services/TimeManagementService.cpp
-    	src/Services/EventActionService.cpp
+        src/Services/EventActionService.cpp
         )
 
 # Specify the .cpp files for the executables

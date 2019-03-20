@@ -41,5 +41,5 @@ void ErrorHandler::reportError(const Message &message, RoutingErrorType errorCod
 }
 
 void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode) {
-	logError(UnknownInternalError);
+	logError(errorCode);
 }

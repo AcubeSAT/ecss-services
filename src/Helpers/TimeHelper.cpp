@@ -10,7 +10,7 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 	return (year % 400) == 0;
 }
 
-uint32_t TimeHelper::utcToSeconds(struct TimeAndDate &TimeInfo) {
+uint32_t TimeHelper::utcToSeconds(TimeAndDate &TimeInfo) {
 	// the date, that \p TimeInfo represents, should be greater than or equal to 1/1/2019 and the
 	// date should be valid according to Gregorian calendar
 	assertI(TimeInfo.year >= 2019, ErrorHandler::InternalErrorType::InvalidDate);
@@ -47,7 +47,7 @@ struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
 	assertI(seconds >= 1546300800, ErrorHandler::InternalErrorType::InvalidDate);
 
 	seconds -= 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
-	struct TimeAndDate TimeInfo = {0};
+	TimeAndDate TimeInfo;
 	TimeInfo.year = 2019;
 	TimeInfo.month = 1;
 	TimeInfo.day = 0;
@@ -96,12 +96,11 @@ struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
 	return TimeInfo;
 }
 
-uint64_t TimeHelper::generateCDStimeFormat(struct TimeAndDate &TimeInfo) {
+uint64_t TimeHelper::generateCDStimeFormat(TimeAndDate &TimeInfo) {
 	/**
-	 * Define the T-field. The total number of octets for the implementation of T-field is 6 (2 for
+	 * Define the T-field. The total number of octets for the implementation of T-field is 6(2 for
 	 * the `DAY` and 4 for the `ms of day`
 	 */
-
 
 	uint32_t seconds = utcToSeconds(TimeInfo);
 
@@ -122,7 +121,7 @@ uint64_t TimeHelper::generateCDStimeFormat(struct TimeAndDate &TimeInfo) {
 	return timeFormat;
 }
 
-struct TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
+TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
 	uint16_t elapsedDays = (static_cast<uint16_t >(data[0])) << 8 | static_cast<uint16_t >
 	(data[1]);
 	uint32_t msOfDay = (static_cast<uint32_t >(data[2])) << 24 |

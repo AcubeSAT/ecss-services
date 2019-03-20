@@ -1,6 +1,6 @@
 #include "Services/TimeManagementService.hpp"
 
-void TimeManagementService::cdsTimeReport(struct TimeAndDate &TimeInfo) {
+void TimeManagementService::cdsTimeReport(TimeAndDate &TimeInfo) {
 	// TM[9,3] CDS time report
 
 	Message timeReport = createTM(3);
@@ -13,14 +13,14 @@ void TimeManagementService::cdsTimeReport(struct TimeAndDate &TimeInfo) {
 	storeMessage(timeReport);
 }
 
-struct TimeAndDate TimeManagementService::cdsTimeRequest(Message &message) {
-	// TC[9,128] CDS time request
+TimeAndDate TimeManagementService::cdsTimeRequest(Message &message) {
+	// TC{9,128] CDS time request
 
 	// check if we have the correct size of the data. The size should be 6 (48 bits)
 	ErrorHandler::assertRequest(message.dataSize == 6, message,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	struct TimeAndDate timeInfo = TimeHelper::parseCDStimeFormat(message.data);
+	TimeAndDate timeInfo = TimeHelper::parseCDStimeFormat(message.data);
 
 	return timeInfo;
 }
