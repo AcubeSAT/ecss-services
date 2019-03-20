@@ -37,6 +37,9 @@ ParameterService::ParameterService() {
 void ParameterService::reportParameterIds(Message& paramIds) {
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
 
+	paramIds.resetRead();  // since we're passing a reference, the reading position shall be reset
+	// to its default before any read operations (to ensure the correct data is being read)
+
 	// assertion: correct message, packet and service type (at failure throws an
 	// InternalError::UnacceptablePacket)
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
