@@ -99,7 +99,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
 		                                              return leftSide.requestReleaseTime <
 		                                                     rightSide.requestReleaseTime;
 	                                              });
-
+	// todo: Define what the time format is going to be
 	int32_t relativeOffset = request.readSint32(); // Get the relative offset
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
 	    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
@@ -214,7 +214,6 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 		report.appendString(msgParser.convertTCToStr(activity.request));
 	}
 	storeMessage(report); // Save the report
-	request.resetRead(); // todo: define if this statement is required
 }
 
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message &request) {
@@ -264,11 +263,10 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message &request) {
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t >(matchedActivities.size()));
 	for (const auto &match : matchedActivities) {
-		report.appendUint32(match->requestReleaseTime);
+		report.appendUint32(match->requestReleaseTime); // todo: Replace with the time parser
 		report.appendString(msgParser.convertTCToStr(match->request));
 	}
 	storeMessage(report); // Save the report
-	request.resetRead(); // todo: define if this statement is required
 }
 
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
@@ -324,5 +322,4 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 		report.appendUint16(match->requestID.sequenceCount);
 	}
 	storeMessage(report); // Save the report
-	request.resetRead(); // todo: define if this statement is required
 }
