@@ -86,7 +86,7 @@ TEST_CASE("TC(11,4) Activity Insertion", "[service][st11]") {
 
 	// Test activity 4
 	testMessage4.appendUint16(934); // Append dummy data
-	receivedMessage.appendUint32(currentTime + 17248435); // todo: Append actual time
+	receivedMessage.appendUint32(currentTime + 17248435);
 	receivedMessage.appendString(msgParser.convertTCToStr(testMessage4));
 
 	// Insert activities in the schedule. They have to be inserted sorted

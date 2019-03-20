@@ -23,6 +23,7 @@ class Message {
 public:
 	Message() = default;
 
+	// todo: Decide on the final format of this comparison operator
 	// Define the message comparison operator
 	bool operator==(const Message &msg) const {
 		return (this->packetType == msg.packetType) &&
