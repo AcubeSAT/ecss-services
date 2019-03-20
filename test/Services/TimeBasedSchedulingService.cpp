@@ -11,13 +11,17 @@ namespace unit_test {
 			return tmService.executionFunctionStatus;
 		}
 
+		/*
+		 * Read the private member scheduled activities and since it is a list and it can't be
+		 * accessed, get each element and save it to a vector.
+		 */
 		static auto scheduledActivities(TimeBasedSchedulingService &tmService) {
 			std::vector<TimeBasedSchedulingService::ScheduledActivity*>listElements;
 
 			for (auto &element : tmService.scheduledActivities) {
 				listElements.push_back(&element);
 			}
-			return listElements;
+			return listElements; // Return the list elements
 		}
 	};
 }
