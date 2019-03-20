@@ -132,12 +132,6 @@ public:
 	 * subservices. More arguments are needed.
 	 */
 	void execute(const Message &message);
-
-	/**
-	 * The purpose of this instance is to access the execute function of this service when a
-	 * MessageParser object is created
-	 */
-	static RequestVerificationService instance;
 };
 
 

@@ -101,7 +101,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void informativeEventReport(Event eventID, String<64> data);
+	void informativeEventReport(Event eventID, const String<64> & data);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
@@ -113,7 +113,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void lowSeverityAnomalyReport(Event eventID, String<64> data);
+	void lowSeverityAnomalyReport(Event eventID, const String<64> & data);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
@@ -125,7 +125,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void mediumSeverityAnomalyReport(Event eventID, String<64> data);
+	void mediumSeverityAnomalyReport(Event eventID, const String<64> & data);
 
 	/**
 	 * TM[5,4] high severity anomaly report
@@ -137,7 +137,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(Event eventID, String<64> data);
+	void highSeverityAnomalyReport(Event eventID, const String<64> & data);
 
 	/**
 	 * TC[5,5] request to enable report generation

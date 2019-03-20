@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ServicePool.hpp>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
@@ -35,7 +36,7 @@ int main() {
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
 	// ST[17] test
-	TestService testService;
+	TestService & testService = Services.testService;
 	Message receivedPacket = Message(17, 1, Message::TC, 1);
 	testService.areYouAlive(receivedPacket);
 	receivedPacket = Message(17, 3, Message::TC, 1);
@@ -44,7 +45,7 @@ int main() {
 
 
 	// ST[20] test
-	ParameterService paramService;
+	ParameterService & paramService = Services.parameterManagement;
 
 	// Test code for reportParameter
 	Message sentPacket = Message(20, 1, Message::TC, 1);  //application id is a dummy number (1)
@@ -67,12 +68,12 @@ int main() {
 	// ST[06] testing
 	char anotherStr[8] = "Fgthred";
 	char yetAnotherStr[2] = "F";
-	char *pStr = static_cast<char *>(malloc(4));
+	char pStr[4];
 	*pStr = 'T';
 	*(pStr + 1) = 'G';
 	*(pStr + 2) = '\0';
 
-	MemoryManagementService memMangService;
+	MemoryManagementService & memMangService = Services.memoryManagement;
 	Message rcvPack = Message(6, 5, Message::TC, 1);
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
@@ -112,7 +113,7 @@ int main() {
 
 	// ST[01] test
 
-	RequestVerificationService reqVerifService;
+	RequestVerificationService & reqVerifService = Services.requestVerification;
 
 	Message receivedMessage = Message(1, 1, Message::TC, 3);
 	reqVerifService.successAcceptanceVerification(receivedMessage);
@@ -196,14 +197,17 @@ int main() {
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
 
-
-	// TimeHelper test
-	uint64_t test = TimeHelper::implementCUCTimeFormat(1200);
-	std::cout << "\n" << test << "\n";
-
 	// ST[09] test
-	TimeManagementService timeReport;
-	timeReport.cucTimeReport();
+	TimeManagementService & timeReport = Services.timeManagement;
+	TimeAndDate timeInfo;
+	// 10/04/1998 10:15:00
+	timeInfo.year = 1998;
+	timeInfo.month = 4;
+	timeInfo.day = 10;
+	timeInfo.hour = 10;
+	timeInfo.minute = 15;
+	timeInfo.second = 0;
+	timeReport.cdsTimeReport(timeInfo);
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
@@ -226,7 +230,7 @@ int main() {
 
 	// ST[19] test
 
-	EventActionService eventActionService;
+	EventActionService & eventActionService = Services.eventAction;
 	Message eventActionDefinition(19, 1, Message::TC, 1);
 	eventActionDefinition.appendEnum16(0);
 	eventActionDefinition.appendEnum16(2);
@@ -276,14 +280,14 @@ int main() {
 	eventActionDefinition4.appendUint16(2);
 
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
-	std::cout << "\nPositions 0,1 empty should be 11:" << (uint16_t) eventActionService
-		.eventActionDefinitionArray[0].empty
-	          << (uint16_t) eventActionService.eventActionDefinitionArray[1].empty;
+	std::cout << "\nPositions 0,1 empty should be 11:" << static_cast<uint16_t>(eventActionService
+		.eventActionDefinitionArray[0].empty)
+	          << static_cast<uint16_t>(eventActionService.eventActionDefinitionArray[1].empty);
 
 	Message eventActionDefinition6(19, 3, Message::TC, 1);
 	eventActionService.deleteAllEventActionDefinitions(eventActionDefinition6);
-	std::cout << "\nPositions 0,1 empty should be 1:" << (uint16_t) eventActionService
-		.eventActionDefinitionArray[0].empty;
+	std::cout << "\nPositions 0,1 empty should be 1:" << static_cast<uint16_t>(eventActionService
+		.eventActionDefinitionArray[0].empty);
 
 
 	return 0;

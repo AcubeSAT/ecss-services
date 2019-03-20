@@ -110,3 +110,17 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 TEST_CASE("TC data parsing into a message", "[MessageParser]") {
 
 }
+
+TEST_CASE("TM message parsing", "[MessageParser]") {
+	MessageParser messageParser;
+	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x0c, 0x20, 0x16, 0x11, 0x00, 0x00, 0x68,
+					 0x65, 0x6c, 0x6c, 0x6f,
+					 0x68, 0x69};
+	Message message = messageParser.parse(packet, 18);
+	CHECK(message.packetType == Message::TM);
+	CHECK(message.applicationId == 2);
+	CHECK(message.dataSize == 7);
+	CHECK(message.serviceType == 22);
+	CHECK(message.messageType == 17);
+	CHECK(memcmp(message.data, "hellohi", 7) == 0);
+}
