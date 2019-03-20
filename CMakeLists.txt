@@ -18,7 +18,9 @@ add_library(common OBJECT
         src/ErrorHandler.cpp
         src/Message.cpp
         src/MessageParser.cpp
+        src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
+        src/Helpers/TimeAndDate.cpp
         src/Helpers/TimeHelper.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
@@ -26,14 +28,15 @@ add_library(common OBJECT
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         src/Services/TimeManagementService.cpp
-        src/Helpers/TimeAndDate.cpp
+        src/Services/EventActionService.cpp
         )
 
 # Specify the .cpp files for the executables
+file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
 add_executable(ecss_services
         src/main.cpp
         $<TARGET_OBJECTS:common>
-        src/Platform/x86/Service.cpp
+        ${x86_main_SRC}
         )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
@@ -45,6 +48,7 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     add_executable(tests
             $<TARGET_OBJECTS:common>
             ${test_main_SRC}
-            ${test_SRC})
+            ${test_SRC}
+            )
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()

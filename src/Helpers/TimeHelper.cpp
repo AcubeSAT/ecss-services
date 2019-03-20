@@ -10,8 +10,22 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 	return (year % 400) == 0;
 }
 
-uint32_t TimeHelper::mkUTCtime(TimeAndDate &TimeInfo) {
-	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00(UTC date)
+uint32_t TimeHelper::utcToSeconds(TimeAndDate &TimeInfo) {
+	// the date, that \p TimeInfo represents, should be greater than or equal to 1/1/2019 and the
+	// date should be valid according to Gregorian calendar
+	assertI(TimeInfo.year >= 2019, ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(1 <= TimeInfo.month && TimeInfo.month <= 12,
+	        ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(1 <= TimeInfo.day && TimeInfo.day <= 31,
+	        ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(0 <= TimeInfo.hour && TimeInfo.hour <= 24,
+	        ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(0 <= TimeInfo.minute && TimeInfo.minute <= 60,
+	        ErrorHandler::InternalErrorType::InvalidDate);
+	assertI(0 <= TimeInfo.second && TimeInfo.second <= 60,
+	        ErrorHandler::InternalErrorType::InvalidDate);
+
+	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
 	for (uint16_t y = 2019; y < TimeInfo.year; ++y) {
 		secs += (IsLeapYear(y) ? 366 : 365) * SECONDS_PER_DAY;
 	}
@@ -28,8 +42,11 @@ uint32_t TimeHelper::mkUTCtime(TimeAndDate &TimeInfo) {
 	return secs;
 }
 
-struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
-	seconds -= 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00(UTC date)
+struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
+	// elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
+	assertI(seconds >= 1546300800, ErrorHandler::InternalErrorType::InvalidDate);
+
+	seconds -= 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
 	TimeAndDate TimeInfo;
 	TimeInfo.year = 2019;
 	TimeInfo.month = 1;
@@ -63,7 +80,7 @@ struct TimeAndDate TimeHelper::utcTime(uint32_t seconds) {
 	// calculate days
 	TimeInfo.day = seconds / SECONDS_PER_DAY;
 	seconds -= TimeInfo.day * SECONDS_PER_DAY;
-	TimeInfo.day++; // add 1 day because we start count from 1 January(and not 0 January!)
+	TimeInfo.day++; // add 1 day because we start count from 1 January (and not 0 January!)
 
 	// calculate hours
 	TimeInfo.hour = seconds / SECONDS_PER_HOUR;
@@ -85,8 +102,7 @@ uint64_t TimeHelper::generateCDStimeFormat(TimeAndDate &TimeInfo) {
 	 * the `DAY` and 4 for the `ms of day`
 	 */
 
-
-	uint32_t seconds = Access.mkUTCtime(TimeInfo);
+	uint32_t seconds = utcToSeconds(TimeInfo);
 
 	/**
 	 * The `DAY` segment, 16 bits as defined from standard. Actually the days passed since Unix
@@ -113,7 +129,7 @@ TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
 	                   (static_cast<uint32_t >(data[4])) << 8 |
 	                   static_cast<uint32_t >(data[5]);
 
-	uint32_t seconds = elapsedDays * 86400 + msOfDay / 1000;
+	uint32_t seconds = elapsedDays * SECONDS_PER_DAY + msOfDay / 1000;
 
-	return Access.utcTime(seconds);
+	return secondsToUTC(seconds);
 }

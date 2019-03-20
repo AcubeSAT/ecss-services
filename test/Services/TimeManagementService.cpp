@@ -2,10 +2,11 @@
 #include <Services/TimeManagementService.hpp>
 #include "ServiceTests.hpp"
 
-TEST_CASE("TM[9,3]", "[service][st09]") {
-	TimeManagementService timeService;
+TimeManagementService & timeService = Services.timeManagement;
 
+TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeAndDate TimeInfo;
+
 	// 10/04/2020 10:15:00
 	TimeInfo.year = 2020;
 	TimeInfo.month = 4;
@@ -14,8 +15,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeInfo.minute = 15;
 	TimeInfo.second = 0;
 
-	TimeHelper time;
-	uint32_t currTime = time.get_mkUTCtime(TimeInfo);
+	uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 	uint16_t elapsedDays = currTime/86400;
 	uint32_t msOfDay = currTime % 86400 * 1000;
@@ -50,7 +50,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeInfo.minute = 0;
 	TimeInfo.second = 0;
 
-	currTime = time.get_mkUTCtime(TimeInfo);
+	currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 	elapsedDays = currTime/86400;
 	msOfDay = currTime % 86400 * 1000;

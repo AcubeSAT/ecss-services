@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
+
 // Forward declaration of the Message class, needed for the ErrorHandler
 class Message;
 
@@ -20,6 +21,8 @@ class Message;
  */
 class Message {
 public:
+	Message () = default;
+
 	enum PacketType {
 		TM = 0, // Telemetry
 		TC = 1 // Telecommand
