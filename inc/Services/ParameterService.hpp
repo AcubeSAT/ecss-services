@@ -73,7 +73,7 @@ public:
 	 *
 	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
-	void reportParameterIds(Message paramIds);
+	void reportParameterIds(Message& paramIds);
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
@@ -85,7 +85,7 @@ public:
 	 *
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
-	void setParameterIds(Message newParamValues);
+	void setParameterIds(Message& newParamValues);
 
 };
 
