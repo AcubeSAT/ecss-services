@@ -50,8 +50,21 @@ public:
 	 */
 	Message parseRequestTC(String<ECSS_TC_REQUEST_STRING_SIZE> data);
 
+	/**
+	 * @brief Overloaded version
+	 * @param data A uint8_t array of the TC packet data
+	 * @return Parsed message
+	 */
 	Message parseRequestTC(uint8_t* data);
 
+	/**
+	 * @brief Converts a TC packet of type Message to a String
+	 * @details Convert a parsed TC message to a string in order to be used by the services
+	 * @param message The Message object to be parsed to a String
+	 * @return A String class containing the parsed TC request
+	 * @attention The returned String has a fixed size, therefore the message size is considered
+	 * fixed and equal to the ECSS_TC_REQUEST_STRING_SIZE definition.
+	 */
 	String<ECSS_TC_REQUEST_STRING_SIZE> convertTCToStr(Message& message);
 
 private:
