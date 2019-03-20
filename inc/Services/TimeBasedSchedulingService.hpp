@@ -37,7 +37,6 @@ namespace unit_test {
 } // namespace unit_test
 
 /**
- * @class TimeBasedSchedulingService
  * @brief An implementation of the ECSS standard ST[11] service
  *
  * @details This service is taking care of the timed release of a received TC packet from the
@@ -113,6 +112,10 @@ private:
 
 
 public:
+	/**
+	 * @brief Class constructor
+	 * @details Initializes the serviceType
+	 */
 	TimeBasedSchedulingService();
 
 	/**
@@ -149,11 +152,11 @@ public:
 	 * report is requested by he corresponding service.
 	 * @param request Provide the received message as a parameter
 	 * @todo Definition of the time format is required
-	 * @throws failed_start_of_execution If there is request to be inserted and the maximum
-	 * number of activities in the current schedule has been reached, then a failed start of
-	 * execution report is being issued. Also if the release time of the request is less than a
-	 * set time margin, defined in ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time a
-	 * failed start of execution report is issued.
+	 * @throws ExecutionStartError If there is request to be inserted and the maximum
+	 * number of activities in the current schedule has been reached, then an @ref
+	 * ErrorHandler::ExecutionStartErrorType is being issued.  Also if the release time of the
+	 * request is less than a set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
+	 * from the current time a @ref ErrorHandler::ExecutionStartErrorType is also issued.
 	 */
 	void insertActivities(Message &request);
 
@@ -164,9 +167,9 @@ public:
 	 * received and tested against the current time.
 	 * @param request Provide the received message as a parameter
 	 * @todo Definition of the time format is required for the relative time format
-	 * @throws failed_start_of_execution If the release time of the request is less than a
-	 * set time margin, defined in ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time a
-	 * failed start of execution report is issued for that instruction.
+	 * @throws ExecutionStartError If the release time of the request is less than a
+	 * set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time an
+	 * @ref ErrorHandler::ExecutionStartErrorType report is issued for that instruction.
 	 */
 	void timeShiftAllActivities(Message &request);
 
@@ -188,9 +191,9 @@ public:
 	 * contained in the report, in an ascending order based on their release time.
 	 * @param request Provide the received message as a parameter
 	 * @todo Replace time parsing with the time parser
-	 * @throws failed_start_of_execution If a requested activity, identified by the provided
-	 * request identifier is not found in the schedule issue a failed start of execution report
-	 * for that instruction.
+	 * @throws ExecutionStartError If a requested activity, identified by the provided
+	 * request identifier is not found in the schedule issue an @ref
+	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
 	void detailReportActivitiesByID(Message &request);
 
@@ -201,9 +204,9 @@ public:
 	 * TM[11,13] response, with activities ordered in an ascending order, based on their release
 	 * time.
 	 * @param request Provide the received message as a parameter
-	 * @throws failed_start_of_execution If a requested activity, identified by the provided
-	 * request identifier is not found in the schedule issue a failed start of execution report
-	 * for that instruction.
+	 * @throws ExecutionStartError If a requested activity, identified by the provided
+	 * request identifier is not found in the schedule issue an @ref
+	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
 	void summaryReportActivitiesByID(Message &request);
 
@@ -212,9 +215,9 @@ public:
 	 *
 	 * @details Delete certain activities by using the unique request identifier.
 	 * @param request Provide the received message as a parameter
-	 * @throws failed_start_of_execution If a requested activity, identified by the provided
-	 * request identifier is not found in the schedule issue a failed start of execution report
-	 * for that instruction.
+	 * @throws ExecutionStartError If a requested activity, identified by the provided
+	 * request identifier is not found in the schedule issue an @ref
+	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
 	void deleteActivitiesByID(Message &request);
 
@@ -224,11 +227,11 @@ public:
 	 * @details Time-shift certain activities by using the unique request identifier
 	 * @param request Provide the received message as a parameter
 	 * @todo Definition of the time format is required
-	 * @throws failed_start_of_execution If the requested time offset is less than the earliest
-	 * time from the currently scheduled activities plus the ECSS_TIME_MARGIN_FOR_ACTIVATION,
-	 * then the request is rejected and a failed start of execution report is issued. Also if an
-	 * activity with a specified request identifier is not found, generate a failed start of
-	 * execution for that specific instruction.
+	 * @throws ExecutionStartError If the requested time offset is less than the earliest
+	 * time from the currently scheduled activities plus the @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
+	 * then the request is rejected and an @ref ErrorHandler::ExecutionStartErrorType is issued.
+	 * Also if an activity with a specified request identifier is not found, generate a failed
+	 * start of execution for that specific instruction.
 	 */
 	void timeShiftActivitiesByID(Message &request);
 };
