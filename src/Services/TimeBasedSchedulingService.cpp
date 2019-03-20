@@ -119,47 +119,45 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 	uint32_t current_time = TimeGetter::getUnixSeconds(); // Get the current system time
 
 	int32_t relativeOffset = request.readSint32(); // Get the offset first
-	/*
-	 * Search for the earliest activity in the schedule. If the release time of the earliest
-	 * activity + relativeOffset is earlier than current_time + time_margin, reject the request
-	 * and generate a failed start of execution.
-	 */
-	const auto releaseTimes = etl::minmax_element(scheduledActivities.begin(),
-	                                              scheduledActivities.end(),
-	                                              [](ScheduledActivity const &leftSide,
-	                                                 ScheduledActivity const &
-	                                                 rightSide) {
-		                                              return leftSide.requestReleaseTime <
-		                                                     rightSide.requestReleaseTime;
-	                                              });
 
-	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
-	    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
-		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
-	} else {
+	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	for (std::size_t i = 0; i < iterationCount; i++) {
+		// Parse the request ID
+		RequestID receivedRequestID; // Save the received request ID
+		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
+		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
+		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
 
-		uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-		for (std::size_t i = 0; i < iterationCount; i++) {
-			// Parse the request ID
-			RequestID receivedRequestID; // Save the received request ID
-			receivedRequestID.sourceID = request.readUint8(); // Get the source ID
-			receivedRequestID.applicationID = request.readUint16(); // Get the application ID
-			receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+		// Try to find the activity with the requested request ID
+		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+		                                             scheduledActivities.end(),
+                                             [&receivedRequestID]
+	                                             (ScheduledActivity const &currentElement) {
+	                                             return receivedRequestID !=
+	                                                    currentElement.requestID;
+                                             });
 
-			// Try to find the activity with the requested request ID
-			const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
-			                                             scheduledActivities.end(),
-	                                             [&receivedRequestID]
-		                                             (ScheduledActivity const &currentElement) {
-		                                             return receivedRequestID !=
-		                                                    currentElement.requestID;
-	                                             });
-
-			if (requestIDMatch != scheduledActivities.end()) {
-				requestIDMatch->requestReleaseTime += relativeOffset; // Add the required offset
+		if (requestIDMatch != scheduledActivities.end()) {
+			// If the relative offset does not meet the restrictions issue an error
+			if ((requestIDMatch->requestReleaseTime + relativeOffset) <
+			    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
+				ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 			} else {
-				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+				requestIDMatch->requestReleaseTime += relativeOffset; // Add the time offset
+
+				const auto releaseTimeOrder = etl::find_if_not(scheduledActivities.begin(),
+				                                               scheduledActivities.end(),
+	                                               [=]
+		                                               (ScheduledActivity const &currentElement) {
+		                                               return
+			                                               requestIDMatch->requestReleaseTime >=
+			                                               currentElement.requestReleaseTime;
+	                                               });
+				scheduledActivities.insert(releaseTimeOrder, *requestIDMatch);
+				scheduledActivities.erase(requestIDMatch);
 			}
+		} else {
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
 }
