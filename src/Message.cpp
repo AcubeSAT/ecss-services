@@ -36,6 +36,11 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 	}
 }
 
+void Message::finalize() {
+	if(currentBit != 0)
+	dataSize++;
+}
+
 void Message::appendByte(uint8_t value) {
 	assertI(dataSize < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	assertI(currentBit == 0, ErrorHandler::ByteBetweenBits);
