@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 #define ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 
-#include <iostream>
 #include "etl/vector.h"
 #include "etl/iterator.h"
 #include "etl/String.hpp"
