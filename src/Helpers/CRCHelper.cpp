@@ -9,7 +9,7 @@ uint16_t CRCHelper::calculateCRC(const uint8_t* message, uint32_t length) {
 	// CRC16-CCITT generator polynomial (as specified in standard)
 	uint16_t polynomial = 0x1021u;
 
-	for (int i = 0; i < length; i++) {
+	for (uint32_t i = 0; i < length; i++) {
 		// "copy" (XOR w/ existing contents) the current msg bits into the MSB of the shift register
 		shiftReg ^= (message[i] << 8u);
 

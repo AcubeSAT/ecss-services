@@ -1,6 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
+#include <type_traits>
+
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
 
@@ -15,20 +17,13 @@ class Message;
 class ErrorHandler {
 private:
 	/**
-	 * Log the error to a logging facility. Currently, this just displays the error on the screen.
-	 *
-	 * @todo This function MUST be moved as platform-dependent code. Currently, it uses g++ specific
-	 * functions for desktop.
+	 * Log the error to a logging facility. Platform-dependent.
 	 */
 	template<typename ErrorType>
 	static void logError(const Message &message, ErrorType errorType);
 
 	/**
-	 * Log an error without a Message to a logging facility. Currently, this just displays the error
-	 * on the screen.
-	 *
-	 * @todo This function MUST be moved as platform-dependent code. Currently, it uses g++ specific
-	 * functions for desktop.
+	 * Log an error without a Message to a logging facility. Platform-dependent.
 	 */
 	template<typename ErrorType>
 	static void logError(ErrorType errorType);
@@ -59,9 +54,14 @@ public:
 			UnacceptablePacket = 5,
 
 		/**
-		 * Asked a Message type that it doesn't exist
+ 		 * A date that isn't valid according to the Gregorian calendar or cannot be parsed by the
+ 		 * TimeHelper
+ 		 */
+			InvalidDate = 6,
+		/**
+		 * Asked a Message type that doesn't exist
 		 */
-			UnknownMessageType = 6,
+			UnknownMessageType = 7,
 	};
 
 	/**
@@ -165,7 +165,7 @@ public:
 	/**
  	 * Report a failure about the progress of the execution of a request
  	 *
- 	 * Note:This function is different from reportError, because we need one more /p(stepID)
+ 	 * @note This function is different from reportError, because we need one more \p stepID
  	 * to call the proper function for reporting the progress of the execution of a request
  	 *
  	 * @param message The incoming message that prompted the failure
@@ -183,6 +183,7 @@ public:
 	 *
 	 * Note that these errors correspond to bugs or faults in the software, and should be treated
 	 * differently. Such an error may prompt a task or software reset.
+	 *
 	 */
 	static void reportInternalError(InternalErrorType errorCode);
 
@@ -211,6 +212,35 @@ public:
 		if (not condition) {
 			reportError(message, errorCode);
 		}
+	}
+
+	/**
+	 * Convert a parameter given in C++ to an ErrorSource that can be easily used in comparisons.
+	 * @tparam ErrorType One of the enums specified in ErrorHandler.
+	 * @param error An error code of a specific type
+	 * @return The corresponding ErrorSource
+	 */
+	template<typename ErrorType>
+	inline static ErrorSource findErrorSource(ErrorType error) {
+		// While this may seem like a "hacky" way to convert enums to ErrorSource, it should be
+		// optimised by the compiler to constant time.
+
+		if (std::is_same<ErrorType, AcceptanceErrorType>()) {
+			return Acceptance;
+		}
+		if (std::is_same<ErrorType, ExecutionStartErrorType>()) {
+			return ExecutionStart;
+		}
+		if (std::is_same<ErrorType, ExecutionProgressErrorType>()) {
+			return ExecutionProgress;
+		}
+		if (std::is_same<ErrorType, ExecutionCompletionErrorType>()) {
+			return ExecutionCompletion;
+		}
+		if (std::is_same<ErrorType, RoutingErrorType>()) {
+			return Routing;
+		}
+		return Internal;
 	}
 };
 

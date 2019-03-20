@@ -1,20 +1,19 @@
 #include <Services/EventActionService.hpp>
+#include <ServicePool.hpp>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "macros.hpp"
 #include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
 
-TestService TestService::instance;
-RequestVerificationService RequestVerificationService::instance;
 
 void MessageParser::execute(Message &message) {
 	switch (message.serviceType) {
 		case 1:
-			RequestVerificationService::instance.execute(message);
+			Services.requestVerification.execute(message);
 			break;
 		case 17:
-			TestService::instance.execute(message);
+			Services.testService.execute(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
