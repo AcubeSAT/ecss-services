@@ -1,9 +1,7 @@
 #ifndef ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 #define ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 
-#include "etl/vector.h"
-#include "etl/iterator.h"
-#include "etl/String.hpp"
+#include "etl/list.h"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
@@ -96,10 +94,23 @@ private:
 	/**
 	 * @brief Hold the scheduled activities
 	 *
-	 * @details The scheduled activities in this vector are ordered by their release time, as the
+	 * @details The scheduled activities in this list are ordered by their release time, as the
 	 * standard requests.
 	 */
-	etl::vector<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> scheduledActivities;
+	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> scheduledActivities;
+
+
+	/**
+	 * @brief Sort the activities by their release time
+	 *
+	 * @details The ECSS standard requires that the activities are sorted in the TM message
+	 * response. Also it is better to have the activities sorted.
+	 */
+	inline void sortActivitiesReleaseTime(etl::list<ScheduledActivity,
+		ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> &schedActivities) {
+		schedActivities.sort([](ScheduledActivity const &leftSide, ScheduledActivity const
+		&rightSide) { return leftSide.requestReleaseTime < rightSide.requestReleaseTime; });
+	}
 
 	/**
 	 * @brief Define a friend in order to be able to access private members during testing
