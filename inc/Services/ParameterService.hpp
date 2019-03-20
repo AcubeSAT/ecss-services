@@ -2,9 +2,11 @@
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
 #include "Service.hpp"
-// #include "Services/RequestVerificationService.hpp"
+#include "ErrorHandler.hpp"
+#include "etl/map.h"
 
-#define CONFIGLENGTH 5
+// Number of stored parameters. MAX_PARAMS is just a dummy number for now.
+#define MAX_PARAMS 5
 
 /**
  * Implementation of the ST[20] parameter management service,
@@ -18,10 +20,11 @@
  * PTC and PFC for each parameter shall be specified as in
  * ECSS-E-ST-70-41C, chapter 7.3
  */
+
+typedef uint16_t ParamId;  // parameter IDs are given sequentially
 struct Parameter {
 	uint8_t ptc;            // Packet field type code (PTC)
 	uint8_t pfc;            // Packet field format code (PFC)
-	uint16_t paramId;       // Unique ID of the parameter
 
 	uint32_t settingData;
 	// Actual data defining the operation of a peripheral or subsystem.
@@ -34,14 +37,15 @@ struct Parameter {
  * Holds the list with the parameters and provides functions
  * for parameter reporting and modification.
  *
- * @todo Ensure that the parameter list is sorted by ID
+ * The parameter list is stored in a map with the parameter IDs as keys and values
+ * corresponding Parameter structs containing the PTC, PFC and the parameter's value.
  */
+
 
 class ParameterService : public Service {
 private:
-	Parameter paramsList[CONFIGLENGTH];
-	// CONFIGLENGTH is just a dummy number for now, this should be statically set
-	static uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
+	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
+	uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
 
 public:
 	/**
@@ -54,14 +58,14 @@ public:
 	 * containing the current configuration
 	 * **for the parameters specified in the carried valid IDs**.
 	 *
-	 * No sophisticated error checking for now, just whether the package is of the correct type
-	 * and whether the requested IDs are valid, ignoring the invalid ones. If no IDs are correct,
-	 * the returned message shall be empty.
+	 * No sophisticated error checking for now, just whether the packet is of the correct type
+	 * and whether the requested IDs are valid, ignoring the invalid ones.
+	 * If the packet has an incorrect header, an InternalError::UnacceptablePacket is raised.
+	 * If no IDs are correct, the returned message shall be empty.
 	 *
 	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
 	 * @return None (messages are stored using storeMessage())
 	 *
-	 * @todo Generate failure notifs where needed when ST[01] is ready
 	 *
 	 * NOTES:
 	 * Method for valid ID counting is a hack (clones the message and figures out the number
@@ -69,7 +73,7 @@ public:
 	 *
 	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
-	void reportParameterIds(Message paramIds);
+	void reportParameterIds(Message& paramIds);
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
@@ -79,10 +83,9 @@ public:
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 * @return None
 	 *
-	 * @todo Generate failure notifications where needed (eg. when an invalid ID is encountered)
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
-	void setParameterIds(Message newParamValues);
+	void setParameterIds(Message& newParamValues);
 
 };
 

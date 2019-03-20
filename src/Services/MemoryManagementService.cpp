@@ -15,7 +15,7 @@ MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
 // Function declarations for the raw data memory management subservice
 void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
 	/**
-	 * Bare in mind that there is currently no error checking for invalid parameters.
+	 * Bear in mind that there is currently no error checking for invalid parameters.
 	 * A future version will include error checking and the corresponding error report/notification,
 	 * as the manual implies.
 	 *
