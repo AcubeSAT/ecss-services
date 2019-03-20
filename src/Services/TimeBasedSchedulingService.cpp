@@ -66,18 +66,10 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 			newActivity.requestID.applicationID = request.applicationId;
 			newActivity.requestID.sequenceCount = request.packetSequenceCount;
 
-			const auto releaseTimeOrder = etl::find_if_not(scheduledActivities.begin(),
-			                                               scheduledActivities.end(),
-	                                               [=]
-		                                               (ScheduledActivity const &currentElement) {
-		                                               return releaseTime >=
-		                                                      currentElement.requestReleaseTime;
-	                                               });
-
-			// Add activities ordered by release time as per the standard requirement
-			scheduledActivities.insert(releaseTimeOrder, newActivity);
+			scheduledActivities.push_back(newActivity); // Insert the new activities
 		}
 	}
+	sortActivitiesReleaseTime(scheduledActivities); // Sort activities by their release time
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
@@ -129,13 +121,13 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
 
 		// Try to find the activity with the requested request ID
-		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
-		                                             scheduledActivities.end(),
-                                             [&receivedRequestID]
-	                                             (ScheduledActivity const &currentElement) {
-	                                             return receivedRequestID !=
-	                                                    currentElement.requestID;
-                                             });
+		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+		                                       scheduledActivities.end(),
+		                                       [&receivedRequestID]
+			                                       (ScheduledActivity const &currentElement) {
+			                                       return receivedRequestID !=
+			                                              currentElement.requestID;
+		                                       });
 
 		if (requestIDMatch != scheduledActivities.end()) {
 			// If the relative offset does not meet the restrictions issue an error
@@ -144,22 +136,12 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 				ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 			} else {
 				requestIDMatch->requestReleaseTime += relativeOffset; // Add the time offset
-
-				const auto releaseTimeOrder = etl::find_if_not(scheduledActivities.begin(),
-				                                               scheduledActivities.end(),
-	                                               [=]
-		                                               (ScheduledActivity const &currentElement) {
-		                                               return
-			                                               requestIDMatch->requestReleaseTime >=
-			                                               currentElement.requestReleaseTime;
-	                                               });
-				scheduledActivities.insert(releaseTimeOrder, *requestIDMatch);
-				scheduledActivities.erase(requestIDMatch);
 			}
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
+	sortActivitiesReleaseTime(scheduledActivities); // Sort activities by their release time
 }
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message &request) {
@@ -219,8 +201,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message &request) {
 
 	// Create the report message object of telemetry message subtype 10 for each activity
 	Message report = createTM(10);
-	etl::vector<etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator,
-		ECSS_MAX_REQUEST_COUNT> matchedActivities;
+	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
@@ -239,27 +220,19 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message &request) {
 			});
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			const auto releaseTimeOrder = etl::find_if_not(matchedActivities.begin(),
-			                                               matchedActivities.end(),
-                   [=](etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator const
-                       &currentElement) {
-                return requestIDMatch->requestReleaseTime >=
-                           currentElement->requestReleaseTime;
-                   });
-
-			// Add activities ordered by release time as per the standard requirement
-			matchedActivities.insert(releaseTimeOrder, requestIDMatch);
-
+			matchedActivities.push_back(*requestIDMatch); // Save the matched activity
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
 
+    sortActivitiesReleaseTime(matchedActivities); // Sort activities by their release time
+
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t >(matchedActivities.size()));
-	for (const auto &match : matchedActivities) {
-		report.appendUint32(match->requestReleaseTime); // todo: Replace with the time parser
-		report.appendString(msgParser.convertTCToStr(match->request));
+	for (auto &match : matchedActivities) {
+		report.appendUint32(match.requestReleaseTime); // todo: Replace with the time parser
+		report.appendString(msgParser.convertTCToStr(match.request));
 	}
 	storeMessage(report); // Save the report
 }
@@ -272,8 +245,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 
 	// Create the report message object of telemetry message subtype 13 for each activity
 	Message report = createTM(13);
-	etl::vector<etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator,
-	ECSS_MAX_REQUEST_COUNT> matchedActivities;
+	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
@@ -284,37 +256,29 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
 
 		// Try to find the activity with the requested request ID
-		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
-		                                             scheduledActivities.end(), [&receivedRequestID]
-			                                             (ScheduledActivity const &currentElement) {
+		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(),
+		                                       scheduledActivities.end(), [&receivedRequestID]
+			                                       (ScheduledActivity const &currentElement) {
 				return receivedRequestID != currentElement
 					.requestID;
 			});
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			const auto releaseTimeOrder = etl::find_if_not(matchedActivities.begin(),
-			                                               matchedActivities.end(),
-			[=](etl::ivector<TimeBasedSchedulingService::ScheduledActivity>::iterator const
-			&currentElement) {
-				return requestIDMatch->requestReleaseTime >=
-				       currentElement->requestReleaseTime;});
-
-			// Add activities ordered by release time as per the standard requirement
-			matchedActivities.insert(releaseTimeOrder, requestIDMatch);
-
+			matchedActivities.push_back(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
+	sortActivitiesReleaseTime(matchedActivities); // Sort activities by their release time
 
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t >(matchedActivities.size()));
-	for (const auto &match : matchedActivities) {
+	for (auto &match : matchedActivities) {
 		// todo: append sub-schedule and group ID if they are defined
-		report.appendUint32(match->requestReleaseTime);
-		report.appendUint8(match->requestID.sourceID);
-		report.appendUint16(match->requestID.applicationID);
-		report.appendUint16(match->requestID.sequenceCount);
+		report.appendUint32(match.requestReleaseTime);
+		report.appendUint8(match.requestID.sourceID);
+		report.appendUint16(match.requestID.applicationID);
+		report.appendUint16(match.requestID.sequenceCount);
 	}
 	storeMessage(report); // Save the report
 }

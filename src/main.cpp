@@ -325,5 +325,9 @@ int main() {
 	receivedMsg = Message(11, 16, Message::TC, 1);
 	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);
 
+	// Report the activities by ID
+	receivedMsg = Message(11, 12, Message::TC, 1);
+	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
+
 	return 0;
 }
