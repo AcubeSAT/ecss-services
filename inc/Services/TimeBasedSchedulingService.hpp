@@ -10,6 +10,9 @@
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeHelper.hpp"
 
+// Include platform specific files
+#include "Platform/x86/TimeGetter.hpp"
+
 /**
  * @def SUB_SCHEDULES_ENABLED
  * @brief Indicates whether sub-schedules are supported
@@ -97,17 +100,17 @@ private:
 	/**
 	 * @brief Hold the scheduled activities
 	 *
-	 * The scheduled activities in this vector are ordered by their release time, as the standard
-	 * requests.
+	 * @details The scheduled activities in this vector are ordered by their release time, as the
+	 * standard requests.
 	 */
 	etl::vector<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> scheduledActivities;
 
 	/**
 	 * @brief Define a friend in order to be able to access private members during testing
 	 *
-	 * The private members defined in this class, must not in any way be public to avoid misuse.
-	 * During testing, access to private members for verification is required, so an access friend
-	 * structure is defined here.
+	 * @details The private members defined in this class, must not in any way be public to avoid
+	 * misuse. During testing, access to private members for verification is required, so an
+	 * access friend structure is defined here.
 	 */
 	friend struct ::unit_test::Tester;
 
@@ -148,7 +151,6 @@ public:
 	 * execution of the schedule and also to make things easier whenever a release time sorted
 	 * report is requested by he corresponding service.
 	 * @param request Provide the received message as a parameter
-	 * @todo Remove the temporary variable for the current time
 	 * @throws failed_start_of_execution If there is request to be inserted and the maximum
 	 * number of activities in the current schedule has been reached, then a failed start of
 	 * execution report is being issued. Also if the release time of the request is less than a
@@ -163,7 +165,6 @@ public:
 	 * @details All scheduled activities are shifted per user request. The relative time offset
 	 * received and tested against the current time.
 	 * @param request Provide the received message as a parameter
-	 * @todo Remove the temporary variable for the current time
 	 * @throws failed_start_of_execution If the release time of the request is less than a
 	 * set time margin, defined in ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time a
 	 * failed start of execution report is issued for that instruction.
@@ -225,7 +226,6 @@ public:
 	 *
 	 * @details Time-shift certain activities by using the unique request identifier
 	 * @param request Provide the received message as a parameter
-	 * @todo Remove the temporary variable for the current time
 	 * @throws failed_start_of_execution If the requested time offset is less than the earliest
 	 * time from the currently scheduled activities plus the ECSS_TIME_MARGIN_FOR_ACTIVATION,
 	 * then the request is rejected and a failed start of execution report is issued. Also if an

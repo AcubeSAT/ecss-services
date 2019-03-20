@@ -45,10 +45,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	for (std::size_t i = 0; i < iterationCount; i++) {
 		// todo: Get the group ID first, if groups are used
-		// todo: Read the absolute time using the helper functions from the time service
-
-		// Temporary definitions until the Time helper is ready
-		uint32_t currentTime = 50; // Temporary current time
+		uint32_t currentTime = TimeGetter::getUnixSeconds(); // Get the current system time
 
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
 		if ((currentNumberOfActivities >= ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES) ||
@@ -91,8 +88,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 15);
 
-	// Temporary variables
-	uint32_t current_time = 0;
+	uint32_t current_time = TimeGetter::getUnixSeconds(); // Get the current system time
 
 	// Find the earliest release time. It will be the first element of the iterator pair
 	const auto releaseTimes = etl::minmax_element(scheduledActivities.begin(),
@@ -122,8 +118,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 	assert(request.serviceType == 11);
 	assert(request.messageType == 7);
 
-	// Temporary variables
-	uint32_t current_time = 0;
+	uint32_t current_time = TimeGetter::getUnixSeconds(); // Get the current system time
 
 	int32_t relativeOffset = request.readSint32(); // Get the offset first
 	/*
