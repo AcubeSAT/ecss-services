@@ -34,7 +34,7 @@ ParameterService::ParameterService() {
 #endif
 }
 
-void ParameterService::reportParameterIds(Message paramIds) {
+void ParameterService::reportParameterIds(Message& paramIds) {
 	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
 
 	// assertion: correct message, packet and service type (at failure throws an
@@ -65,7 +65,7 @@ void ParameterService::reportParameterIds(Message paramIds) {
 	storeMessage(reqParam);
 }
 
-void ParameterService::setParameterIds(Message newParamValues) {
+void ParameterService::setParameterIds(Message& newParamValues) {
 
 	// assertion: correct message, packet and service type (at failure throws an
 	// InternalError::UnacceptablePacket which gets logged)
