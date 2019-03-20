@@ -153,6 +153,7 @@ public:
 	 * execution of the schedule and also to make things easier whenever a release time sorted
 	 * report is requested by he corresponding service.
 	 * @param request Provide the received message as a parameter
+	 * @todo Definition of the time format is required
 	 * @throws failed_start_of_execution If there is request to be inserted and the maximum
 	 * number of activities in the current schedule has been reached, then a failed start of
 	 * execution report is being issued. Also if the release time of the request is less than a
@@ -167,6 +168,7 @@ public:
 	 * @details All scheduled activities are shifted per user request. The relative time offset
 	 * received and tested against the current time.
 	 * @param request Provide the received message as a parameter
+	 * @todo Definition of the time format is required for the relative time format
 	 * @throws failed_start_of_execution If the release time of the request is less than a
 	 * set time margin, defined in ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time a
 	 * failed start of execution report is issued for that instruction.
@@ -180,7 +182,6 @@ public:
 	 * on the current schedule. Generates a TM[11,10] response.
 	 * @param request Provide the received message as a parameter
 	 * @todo Replace the time parsing with the time parser
-	 * @todo Define whether the request.resetRead() will be handled by the storeMessage
 	 */
 	void detailReportAllActivities(Message &request);
 
@@ -191,7 +192,7 @@ public:
 	 * provided request identifier. Generates a TM[11,10] response. The matched activities are
 	 * contained in the report, in an ascending order based on their release time.
 	 * @param request Provide the received message as a parameter
-	 * @todo Define whether the request.resetRead() will be handled by the storeMessage
+	 * @todo Replace time parsing with the time parser
 	 * @throws failed_start_of_execution If a requested activity, identified by the provided
 	 * request identifier is not found in the schedule issue a failed start of execution report
 	 * for that instruction.
@@ -205,7 +206,6 @@ public:
 	 * TM[11,13] response, with activities ordered in an ascending order, based on their release
 	 * time.
 	 * @param request Provide the received message as a parameter
-	 * @todo Define whether the request.resetRead() will be handled by the storeMessage
 	 * @throws failed_start_of_execution If a requested activity, identified by the provided
 	 * request identifier is not found in the schedule issue a failed start of execution report
 	 * for that instruction.
@@ -228,6 +228,7 @@ public:
 	 *
 	 * @details Time-shift certain activities by using the unique request identifier
 	 * @param request Provide the received message as a parameter
+	 * @todo Definition of the time format is required
 	 * @throws failed_start_of_execution If the requested time offset is less than the earliest
 	 * time from the currently scheduled activities plus the ECSS_TIME_MARGIN_FOR_ACTIVATION,
 	 * then the request is rejected and a failed start of execution report is issued. Also if an
