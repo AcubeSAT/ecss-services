@@ -43,8 +43,6 @@ cppcheck:
     - cppcheck --version
   script:
     - ci/cppcheck.sh
-  tags:
-    - helit
 
 cppcheck-misra:
   stage: build
@@ -55,8 +53,6 @@ cppcheck-misra:
     - cppcheck --version
   script:
     - ci/cppcheck-misra.sh
-  tags:
-    - helit
 
 .vera:
   stage: build
