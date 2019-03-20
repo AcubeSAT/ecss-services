@@ -31,7 +31,6 @@ void TimeBasedSchedulingService::resetSchedule(Message &request) {
 
 	executionFunctionStatus = false; // Disable the service
 	scheduledActivities.clear(); // Delete all scheduled activities
-	currentNumberOfActivities = 0;
 	// todo: Add resetting for sub-schedules and groups, if defined
 }
 
@@ -48,7 +47,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		uint32_t currentTime = TimeGetter::getUnixSeconds(); // Get the current system time
 
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
-		if ((currentNumberOfActivities >= ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES) ||
+		if ((scheduledActivities.size() >= ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES) ||
 		    (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.readPosition += ECSS_TC_REQUEST_STRING_SIZE;
@@ -77,7 +76,6 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 
 			// Add activities ordered by release time as per the standard requirement
 			scheduledActivities.insert(releaseTimeOrder, newActivity);
-			currentNumberOfActivities++;
 		}
 	}
 }
@@ -190,7 +188,6 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message &request) {
 
 		if (requestIDMatch != scheduledActivities.end()) {
 			scheduledActivities.erase(requestIDMatch); // Delete activity from the schedule
-			currentNumberOfActivities--;
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
@@ -205,7 +202,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 
 	// Create the report message object of telemetry message subtype 10 for each activity
 	Message report = createTM(10);
-	report.appendUint16(currentNumberOfActivities);
+	report.appendUint16(static_cast<uint16_t >(scheduledActivities.size()));
 
 	for (auto &activity : scheduledActivities) {
 		// todo: append sub-schedule and group ID if they are defined

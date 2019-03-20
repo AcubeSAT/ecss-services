@@ -12,10 +12,6 @@ namespace unit_test {
 			return tmService.executionFunctionStatus;
 		}
 
-		static uint8_t *currentNumberOfActivities(TimeBasedSchedulingService &tmService) {
-			return &tmService.currentNumberOfActivities;
-		}
-
 		static auto scheduledActivities(TimeBasedSchedulingService &tmService) {
 			return &tmService.scheduledActivities;
 		}
@@ -104,9 +100,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 	TimeBasedSchedulingService timeService;
 	auto scheduledActivities = activityInsertion(timeService);
 
-	CHECK(scheduledActivities->size() == 4);
-
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
+	REQUIRE(scheduledActivities->size() == 4);
 	REQUIRE(scheduledActivities->at(0).requestReleaseTime == currentTime + 1556435);
 	REQUIRE(scheduledActivities->at(1).requestReleaseTime == currentTime + 1726435);
 	REQUIRE(scheduledActivities->at(2).requestReleaseTime == currentTime + 1957232);
@@ -126,7 +120,6 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities (Positive shift)", "[se
 	receivedMessage.appendSint32(timeShift);
 
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	timeService.timeShiftAllActivities(receivedMessage);
 
 	REQUIRE(scheduledActivities->at(0).requestReleaseTime == currentTime + 1556435 + timeShift);
@@ -144,7 +137,6 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities (Negative shift)", "[se
 	receivedMessage.appendSint32(-timeShift);
 
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	timeService.timeShiftAllActivities(receivedMessage);
 
 	REQUIRE(scheduledActivities->at(0).requestReleaseTime == currentTime + 1556435 - timeShift);
@@ -161,7 +153,6 @@ TEST_CASE("TC[11,7] Time shift activities by ID (Positive Shift)", "[service][st
 
 	// Verify that everything is in place
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	scheduledActivities->at(2).requestID.applicationID = 4; // Append a dummy application ID
 
 	Message receivedMessage(11, 7, Message::TC, 1);
@@ -185,7 +176,6 @@ TEST_CASE("TC[11,7] Time shift activities by ID (Negative Shift)", "[service][st
 
 	// Verify that everything is in place
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	scheduledActivities->at(2).requestID.applicationID = 4; // Append a dummy application ID
 
 	Message receivedMessage(11, 7, Message::TC, 1);
@@ -209,7 +199,6 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 
 	// Verify that everything is in place
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	scheduledActivities->at(0).requestID.applicationID = 8; // Append a dummy application ID
 	scheduledActivities->at(2).requestID.applicationID = 4; // Append a dummy application ID
 
@@ -255,7 +244,6 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 
 	// Verify that everything is in place
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	scheduledActivities->at(0).requestID.applicationID = 8; // Append a dummy application ID
 	scheduledActivities->at(2).requestID.applicationID = 4; // Append a dummy application ID
 
@@ -311,7 +299,6 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 
 	uint16_t iterationCount = response.readUint16();
 	REQUIRE(iterationCount == scheduledActivities->size());
-	REQUIRE(iterationCount == *unit_test::Tester::currentNumberOfActivities(timeService));
 
 	for (uint16_t i = 0; i < iterationCount; i++) {
 		uint32_t receivedReleaseTime = response.readUint32();
@@ -332,7 +319,6 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 
 	// Verify that everything is in place
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	scheduledActivities->at(2).requestID.applicationID = 4; // Append a dummy application ID
 
 	Message receivedMessage(11, 5, Message::TC, 1);
@@ -342,10 +328,8 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 	receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
 
 	CHECK(scheduledActivities->size() == 4);
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 4);
 	timeService.deleteActivitiesByID(receivedMessage);
 
-	CHECK(*unit_test::Tester::currentNumberOfActivities(timeService) == 3);
 	REQUIRE(scheduledActivities->size() == 3);
 	REQUIRE(scheduledActivities->at(2).requestReleaseTime == currentTime + 17248435);
 	REQUIRE(scheduledActivities->at(2).request == testMessage4);
@@ -359,6 +343,5 @@ TEST_CASE("TC[11,3] Reset schedule", "[service][st11]") {
 
 	timeService.resetSchedule(receivedMessage);
 	REQUIRE(scheduledActivities->empty());
-	REQUIRE(*unit_test::Tester::currentNumberOfActivities(timeService) == 0);
 	REQUIRE(not unit_test::Tester::executionFunctionStatus(timeService));
 }

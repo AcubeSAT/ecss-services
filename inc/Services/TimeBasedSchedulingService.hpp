@@ -55,11 +55,6 @@ private:
 	 */
 	bool executionFunctionStatus = false; // True indicates "enabled" and False "disabled" state
 
-	/**
-	 * @brief Number of activities currently in the schedule
-	 * @todo Define the maximum allowed number of activities in the schedule
-	 */
-	uint8_t currentNumberOfActivities = 0; // Keep track of the number of activities
 	MessageParser msgParser; // Parse TC packets
 
 	/**
