@@ -7,9 +7,9 @@
 # $ ci/cppcheck-misra.sh
 #
 
-echo -e "\033[0;34mStarting cppcheck...\033[0m"
+echo -e "\u001b[34;1mStarting cppcheck...\u001b[0m"
 
-echo -e "\033[0;34mRunning cppcheck with MISRA C(2012) rule compliance tests...\033[0m"
+echo -e "\u001b[34;1mRunning cppcheck with MISRA C(2012) rule compliance tests...\u001b[0m"
 
 # grab the MISRA addon and the cppcheck addon interface from github
 curl https://raw.githubusercontent.com/danmar/cppcheck/f4b5b156d720c712f6ce99f6e01d8c1b3f800d52/addons/misra.py > misra.py
