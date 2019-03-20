@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "Service.hpp"
 
-void Service::storeMessage(Message & message) {
+void Service::storeMessage(Message &message) {
 	// appends the remaining bits to complete a byte
 	message.finalize();
 

@@ -72,8 +72,6 @@ public:
 	void appendBits(uint8_t numBits, uint16_t data);
 
 	/**
-	 * Define the spare field in telemetry and telecommand user data field (7.4.3.2.c and 7.4.4.2.c)
-	 *
 	 * Appends the remaining bits to complete a byte, in case the appendBits() is the last call
 	 * and the packet data field isn't integer multiple of bytes
 	 *
