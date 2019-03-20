@@ -17,7 +17,7 @@
  * @def SUB_SCHEDULES_ENABLED
  * @brief Indicates whether sub-schedules are supported
  *
- * @detailsSub-schedules are currently not implemented so this has no effect
+ * @details Sub-schedules are currently not implemented so this has no effect
  */
 /**
  * @def GROUPS_ENABLED
@@ -42,6 +42,8 @@ namespace unit_test {
  *
  * @details This service is taking care of the timed release of a received TC packet from the
  * ground.
+ * @todo Define whether the parsed absolute release time is saved in the scheduled activity as an
+ * uint32_t or in the time format specified by the time management service.
  */
 class TimeBasedSchedulingService : public Service {
 private:

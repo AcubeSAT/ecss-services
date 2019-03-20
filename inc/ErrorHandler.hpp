@@ -98,6 +98,8 @@ public:
 	 */
 	enum ExecutionStartErrorType {
 		UnknownExecutionStartError = 0,
+		SubServiceExecutionStartError = 1,
+		InstructionExecutionStartError = 2,
 	};
 
 	/**

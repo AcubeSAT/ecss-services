@@ -50,7 +50,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
 		if ((currentNumberOfActivities >= ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES) ||
 		    (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
-			// todo: Send a failed start of execution
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.readPosition += ECSS_TC_REQUEST_STRING_SIZE;
 		} else {
 			// Get the TC packet request
@@ -103,8 +103,8 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message &request) {
 	int32_t relativeOffset = request.readSint32(); // Get the relative offset
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
 	    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
-		// todo: generate a failed start of execution error
-		std::cerr << "Relative offset error" << std::endl;
+		// Report the error
+		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	} else {
 		for (auto &activity : scheduledActivities) {
 			activity.requestReleaseTime += relativeOffset; // Time shift each activity
@@ -137,7 +137,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) <
 	    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
-		// todo: generate a failed start of execution error
+		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	} else {
 
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
@@ -160,7 +160,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 			if (requestIDMatch != scheduledActivities.end()) {
 				requestIDMatch->requestReleaseTime += relativeOffset; // Add the required offset
 			} else {
-				// todo: Generate failed start of execution for the failed instruction
+				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			}
 		}
 	}
@@ -192,7 +192,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message &request) {
 			scheduledActivities.erase(requestIDMatch); // Delete activity from the schedule
 			currentNumberOfActivities--;
 		} else {
-			// todo: Generate failed start of execution for the failed instruction
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
 }
@@ -210,7 +210,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message &request) {
 	for (auto &activity : scheduledActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 
-		report.appendUint32(activity.requestReleaseTime); // todo: Replace with the time parser
+		report.appendUint32(activity.requestReleaseTime);
 		report.appendString(msgParser.convertTCToStr(activity.request));
 	}
 	storeMessage(report); // Save the report
@@ -257,14 +257,14 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message &request) {
 			matchedActivities.insert(releaseTimeOrder, requestIDMatch);
 
 		} else {
-			// todo: Generate failed start of execution for the failed instruction
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
 
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t >(matchedActivities.size()));
 	for (const auto &match : matchedActivities) {
-		report.appendUint32(match->requestReleaseTime); // todo: Time parser here
+		report.appendUint32(match->requestReleaseTime);
 		report.appendString(msgParser.convertTCToStr(match->request));
 	}
 	storeMessage(report); // Save the report
@@ -310,7 +310,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 			matchedActivities.insert(releaseTimeOrder, requestIDMatch);
 
 		} else {
-			// todo: Generate failed start of execution for the failed instruction
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
 
@@ -318,7 +318,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 	report.appendUint16(static_cast<uint16_t >(matchedActivities.size()));
 	for (const auto &match : matchedActivities) {
 		// todo: append sub-schedule and group ID if they are defined
-		report.appendUint32(match->requestReleaseTime); // todo: Time parser here
+		report.appendUint32(match->requestReleaseTime);
 		report.appendUint8(match->requestID.sourceID);
 		report.appendUint16(match->requestID.applicationID);
 		report.appendUint16(match->requestID.sequenceCount);
