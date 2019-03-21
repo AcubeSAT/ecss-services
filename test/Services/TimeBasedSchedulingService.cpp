@@ -5,6 +5,11 @@
 #include <ctime>
 #include <vector>
 
+/*
+ * A namespace defined explicitly for the purposes of testing. This namespace contains a
+ * structure, which has been declared as a friend in the TimeBasedSchedulingService class, so
+ * that it can access the private members required for testing validation.
+ */
 namespace unit_test {
 	struct Tester {
 		static bool executionFunctionStatus(TimeBasedSchedulingService &tmService) {
