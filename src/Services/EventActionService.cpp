@@ -191,8 +191,7 @@ void EventActionService::executeAction(uint16_t eventID) {
 	if (eventActionFunctionStatus) {
 		for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
 			if (not eventActionDefinitionArray[i].empty &&
-			    eventActionDefinitionArray[i].enabled ==
-			    true) {
+			    eventActionDefinitionArray[i].enabled) {
 				if (eventActionDefinitionArray[i].eventDefinitionID == eventID) {
 					MessageParser messageParser;
 					Message message = messageParser.parseRequestTC(
