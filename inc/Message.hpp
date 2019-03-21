@@ -67,7 +67,6 @@ public:
 	 * Appends the least significant \p numBits from \p data to the message
 	 *
 	 * Note: data MUST NOT contain any information beyond the most significant \p numBits bits
-	 * @todo Error handling for failed asserts
 	 */
 	void appendBits(uint8_t numBits, uint16_t data);
 

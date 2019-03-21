@@ -68,7 +68,6 @@ void Message::appendWord(uint32_t value) {
 
 uint16_t Message::readBits(uint8_t numBits) {
 	assertR(numBits <= 16, ErrorHandler::TooManyBitsRead);
-	// TODO: Add assert
 
 	uint16_t value = 0x0;
 

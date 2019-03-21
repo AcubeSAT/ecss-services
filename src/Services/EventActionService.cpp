@@ -4,7 +4,7 @@
 
 /**
  * @todo: Check if a uint16_t is needed (in case of changing the size of
- * eventActionDefinitionArray
+ * eventActionDefinitionArray)
  */
 void EventActionService::addEventActionDefinitions(Message message) {
 	// TC[19,1]
@@ -185,8 +185,7 @@ void EventActionService::disableEventActionFunction(Message message) {
 	}
 }
 
-// Should I use the name execute here instead of executeAction?
-// Should I use applicationID too?
+// TODO: Should I use applicationID too?
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
