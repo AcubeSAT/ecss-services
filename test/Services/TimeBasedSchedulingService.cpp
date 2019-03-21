@@ -111,10 +111,10 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 	REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435);
 	REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232);
 	REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435);
-	REQUIRE(scheduledActivities.at(0)->request == testMessage1);
-	REQUIRE(scheduledActivities.at(1)->request == testMessage3);
-	REQUIRE(scheduledActivities.at(2)->request == testMessage2);
-	REQUIRE(scheduledActivities.at(3)->request == testMessage4);
+	REQUIRE(Message::isSameType(scheduledActivities.at(0)->request, testMessage1));
+	REQUIRE(Message::isSameType(scheduledActivities.at(1)->request, testMessage3));
+	REQUIRE(Message::isSameType(scheduledActivities.at(2)->request, testMessage2));
+	REQUIRE(Message::isSameType(scheduledActivities.at(3)->request, testMessage4));
 }
 
 TEST_CASE("TC[11,15] Time shift all scheduled activities (Positive shift)", "[service][st11]") {
@@ -172,7 +172,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID (Positive Shift)", "[service][st
 	timeService.timeShiftActivitiesByID(receivedMessage);
 
 	REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232 + timeShift);
-	REQUIRE(scheduledActivities.at(2)->request == testMessage2);
+	REQUIRE(Message::isSameType(scheduledActivities.at(2)->request, testMessage2));
 }
 
 TEST_CASE("TC[11,7] Time shift activities by ID (Negative Shift)", "[service][st11]") {
@@ -195,7 +195,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID (Negative Shift)", "[service][st
 	timeService.timeShiftActivitiesByID(receivedMessage);
 
 	REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232 - timeShift);
-	REQUIRE(scheduledActivities.at(2)->request == testMessage2);
+	REQUIRE(Message::isSameType(scheduledActivities.at(2)->request, testMessage2));
 }
 
 
@@ -236,10 +236,10 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 
 		if (i == 0) {
 			REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
-			REQUIRE(receivedTCPacket == scheduledActivities.at(0)->request);
+			REQUIRE(Message::isSameType(scheduledActivities.at(0)->request, testMessage1));
 		} else {
 			REQUIRE(receivedReleaseTime == scheduledActivities.at(2)->requestReleaseTime);
-			REQUIRE(receivedTCPacket == scheduledActivities.at(2)->request);
+			REQUIRE(Message::isSameType(scheduledActivities.at(2)->request, testMessage2));
 		}
 	}
 }
@@ -315,7 +315,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 		receivedTCPacket = msgParser.parseRequestTC(receivedDataStr);
 
 		REQUIRE(receivedReleaseTime == scheduledActivities.at(i)->requestReleaseTime);
-		REQUIRE(receivedTCPacket == scheduledActivities.at(i)->request);
+		REQUIRE(Message::isSameType(scheduledActivities.at(i)->request, receivedTCPacket));
 	}
 }
 
@@ -339,7 +339,7 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 
 	REQUIRE(scheduledActivities.size() == 3);
 	REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 17248435);
-	REQUIRE(scheduledActivities.at(2)->request == testMessage4);
+	REQUIRE(Message::isSameType(scheduledActivities.at(2)->request, testMessage4));
 }
 
 TEST_CASE("TC[11,3] Reset schedule", "[service][st11]") {

@@ -23,11 +23,21 @@ class Message {
 public:
 	Message() = default;
 
-	// todo: Decide on the final format of this comparison operator
-	// Define the message comparison operator
-	bool operator==(const Message &msg) const {
-		return (this->packetType == msg.packetType) &&
-		       (this->messageType == msg.messageType) && (this->serviceType == msg.serviceType);
+	/**
+	 * @brief Compare two messages
+	 * @details Check whether two Message objects are of the same type
+	 * @param msg1 First message for comparison
+	 * @param msg2 Second message for comparison
+	 * @return A boolean value indicating whether the messages are of the same type
+	 */
+	static bool isSameType(const Message &msg1, const Message &msg2) {
+		for (uint16_t i = 0; i < ECSS_MAX_MESSAGE_SIZE; i++) {
+			if (msg1.data[i] != msg2.data[i]) {
+				return false;
+			}
+		}
+		return (msg1.packetType == msg2.packetType) &&
+		       (msg1.messageType == msg2.messageType) && (msg1.serviceType == msg2.serviceType);
 	}
 
 	enum PacketType {
