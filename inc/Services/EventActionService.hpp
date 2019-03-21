@@ -9,6 +9,7 @@
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
 #include <Services/EventReportService.hpp>
+#include "etl/map.h"
 
 /**
  * Implementation of ST[19] event-action Service
