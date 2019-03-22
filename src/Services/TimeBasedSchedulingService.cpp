@@ -47,7 +47,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		uint32_t currentTime = TimeGetter::getSeconds(); // Get the current system time
 
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
-		if ((scheduledActivities.size() >= ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES) ||
+		if ((not scheduledActivities.available()) ||
 		    (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.readPosition += ECSS_TC_REQUEST_STRING_SIZE;
