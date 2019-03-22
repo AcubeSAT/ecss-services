@@ -50,6 +50,8 @@ def prettyprint(errors):
     for key in errors:
         for error in errors[key]:
             print("\033[1mFile \033[93m{0}\033[91m violates rule \033[93m#{1}\033[91m of the MISRA C 2012 standard at line \033[93m{2}\033[91m".format(key, error[1], error[0]))
+    print ""
+    print ""
     print("\033[1m=================================================\033[0m\n")
 
 
