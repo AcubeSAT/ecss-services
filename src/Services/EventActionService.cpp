@@ -17,8 +17,8 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 			if (eventActionDefinitionArray[index].applicationId == applicationID &&
 			    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
 			    eventActionDefinitionArray[index].enabled) {
-                ErrorHandler::reportError(message, ErrorHandler::SubServiceExecutionStartError);
 				accepted = false;
+				ErrorHandler::reportError(message, ErrorHandler::SubServiceExecutionStartError);
 			}
 		}
 		if (accepted) {
