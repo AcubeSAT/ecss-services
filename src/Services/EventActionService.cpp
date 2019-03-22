@@ -1,12 +1,10 @@
 #include "Services/EventActionService.hpp"
-#include "Message.hpp"
-#include "MessageParser.hpp"
 
 /**
  * @todo: Check if a uint16_t is needed (in case of changing the size of
  * eventActionDefinitionArray)
  */
-void EventActionService::addEventActionDefinitions(Message message) {
+void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
@@ -19,13 +17,13 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			if (eventActionDefinitionArray[index].applicationId == applicationID &&
 			    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
 			    eventActionDefinitionArray[index].enabled) {
-				// @todo: throw a failed start of execution error
+                ErrorHandler::reportError(message, ErrorHandler::SubServiceExecutionStartError);
 				accepted = false;
 			}
 		}
 		if (accepted) {
 			for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				// @todo: throw an error if it's full
+                ErrorHandler::reportError(message, ErrorHandler::InstructionExecutionStartError);
 				if (eventActionDefinitionArray[index].empty) {
 					break;
 				}
@@ -49,7 +47,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::deleteEventActionDefinitions(Message message) {
+void EventActionService::deleteEventActionDefinitions(Message &message) {
 	// TC[19,2]
 	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -73,7 +71,7 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::deleteAllEventActionDefinitions(Message message) {
+void EventActionService::deleteAllEventActionDefinitions(Message &message) {
 	// TC[19,3]
 	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -90,7 +88,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::enableEventActionDefinitions(Message message) {
+void EventActionService::enableEventActionDefinitions(Message &message) {
 	// TC[19,4]
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -116,7 +114,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::disableEventActionDefinitions(Message message) {
+void EventActionService::disableEventActionDefinitions(Message &message) {
 	// TC[19,5]
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -142,7 +140,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::requestEventActionDefinitionStatus(Message message) {
+void EventActionService::requestEventActionDefinitionStatus(Message &message) {
 	// TC[19,6]
 	if (message.messageType == 6 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -170,7 +168,7 @@ void EventActionService::eventActionStatusReport() {
 	storeMessage(report);
 }
 
-void EventActionService::enableEventActionFunction(Message message) {
+void EventActionService::enableEventActionFunction(Message &message) {
 	// TC[19,8]
 	if (message.messageType == 8 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -178,7 +176,7 @@ void EventActionService::enableEventActionFunction(Message message) {
 	}
 }
 
-void EventActionService::disableEventActionFunction(Message message) {
+void EventActionService::disableEventActionFunction(Message &message) {
 	// TC[19,9]
 	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {

@@ -143,21 +143,21 @@ public:
 	 * TC[5,5] request to enable report generation
 	 * Telecommand to enable the report generation of event definitions
 	 */
-	void enableReportGeneration(Message message);
+	void enableReportGeneration(Message& message);
 
 	/**
 	 * TC[5,6] request to disable report generation
 	 * Telecommand to disable the report generation of event definitions
 	 * @param message
 	 */
-	void disableReportGeneration(Message message);
+	void disableReportGeneration(Message& message);
 
 	/**
 	 * TC[5,7] request to report the disabled event definitions
 	 * Note: No arguments, according to the standard.
 	 * @param message
 	 */
-	void requestListOfDisabledEvents(Message message);
+	void requestListOfDisabledEvents(Message& message);
 
 	/**
 	 * TM[5,8] disabled event definitions report
