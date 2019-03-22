@@ -12,7 +12,7 @@ MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
 	MemoryManagementService &parent) : mainService(parent) {}
 
 
-// Function declarations for the raw data memory management subservice
+// Function declarations for the raw data memory management sub-service
 void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
 	/**
 	 * Bear in mind that there is currently no error checking for invalid parameters.
@@ -68,7 +68,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 			}
 		}
 	} else {
-		// todo: Send a failed start of execution
+        ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	}
 }
 
@@ -118,7 +118,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 		mainService.storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
 	} else {
-		// todo: Send a failed start of execution
+		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	}
 }
 
@@ -168,7 +168,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 		mainService.storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
 	} else {
-		// todo: Send a failed start of execution report
+        ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	}
 }
 
