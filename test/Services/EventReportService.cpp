@@ -6,9 +6,6 @@
 
 EventReportService & eventReportService = Services.eventReport;
 
-/*
- * @todo: Change the reinterpret_cast
- */
 TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];

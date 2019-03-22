@@ -1,6 +1,8 @@
 # ECSS-E-ST-40-71C Services
 
-In this repository you can find the implementation of the ECSS services, based on the ECSS-E-ST-40-71C standard. 
+In this repository you can find the implementation of the ECSS services, based
+on the [ECSS-E-ST-40-71C](https://ecss.nl/standard/ecss-e-st-70-41c-space-engineering-telemetry-and-telecommand-packet-utilization-15-april-2016/)
+standard.
 
 ## Directories
 - **ci**: GitLab CI configuration files

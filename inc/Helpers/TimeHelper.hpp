@@ -78,7 +78,6 @@ public:
 	 * (16 for the `DAY` and 32 for the `ms of day`)
  	 * @todo time security for critical time operations
  	 * @todo declare the implicit P-field
- 	 * @todo check if we need milliseconds
 	 */
 	static uint64_t generateCDStimeFormat(struct TimeAndDate &TimeInfo);
 

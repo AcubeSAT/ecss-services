@@ -126,10 +126,7 @@ public:
 	 * way that the subservices are selected is for the time being based on the messageType(class
 	 * member of class Message) of the param message
 	 *
-	 * Note:The functions of this service takes dummy values as arguments for the time being
-	 *
-	 * @todo execute() needs to be redefined. The /p message isn't enough to call some
-	 * subservices. More arguments are needed.
+	 * Note: The functions of this service takes dummy values as arguments for the time being
 	 */
 	void execute(const Message &message);
 };
