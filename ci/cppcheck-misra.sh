@@ -18,7 +18,7 @@ find inc/ src/ -type f \( -iname "*.cpp" -or -iname "*.hpp" \) | xargs cppcheck 
 
 # run the MISRA checks against the dumps and send the results to a file
 echo -e "\u001b[34;1mRunning MISRA C(2012) rule compliance tests...\u001b[0m"
-find inc/ src/ -type f -name "*.dump" | xargs python3 ci/misra.py >> ci/report.msr 2>&1
+find inc/ src/ -type f -name "*.dump" | xargs python3.6 ci/misra.py >> ci/report.msr 2>&1
 
 # pre-process the generated report to remove all useless strings
 echo -e "\u001b[34;1mPre-processing report...\u001b[0m"
