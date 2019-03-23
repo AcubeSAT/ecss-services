@@ -56,9 +56,9 @@ class Summarizer(object):
 
         print(self.bold + self.red + "=================================================\n" + self.end)
         print(self.bold + self.red + "       Static analysis results: Error Summary        \n" + self.end)
-        for key in errors:
-            for error in errors[key]:
-                name_string = f"{self.bold}{self.red}File {self.yellow}{key}{self.red}"
+        for file_name in errors:
+            for error in sorted(errors[file_name], key=lambda x: x[0]):
+                name_string = f"{self.bold}{self.red}File {self.yellow}{file_name}{self.red}"
                 rule_violated_string = f"violates rule {self.yellow}#{error[1]}{self.red} of the MISRA C 2012 standard"
                 line_number_string = f"at line {self.yellow}{error[0]}{self.end}"
                 
