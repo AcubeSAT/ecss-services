@@ -1,7 +1,6 @@
 #!/bin/env python3
 
 from sys import argv
-from sys import exit
 from collections import Counter
 
 """
@@ -33,22 +32,21 @@ class Summarizer(object):
         if len(self.file_lines) == 0:
             print(bold + green + "Static analysis for MISRA compliance complete. No errors found." + end)
             return 0
-        else:
-            for line in self.file_lines:  # remove duplicate lines
-                if line not in lines_seen:
-                    lines_seen.add(line)
+        for line in self.file_lines:  # remove duplicate lines
+            if line not in lines_seen:
+                lines_seen.add(line)
             
-                    line_contents = line.split(':')
-                    file_name = line_contents[0] # first part is the filename (index 0)
-                    error = (line_contents[1], line_contents[2].strip('\n')) # index 1 is the line number, index 2 is the number of violated rule
+                line_contents = line.split(':')
+                file_name = line_contents[0] # first part is the filename (index 0)
+                error = (line_contents[1], line_contents[2].strip('\n')) # index 1 is the line number, index 2 is the number of violated rule
 
-                    if file_name not in errors_map.keys():
-                        errors_map[file_name] = list()  # create a new list for the new filename and append the tuple in it
-                        errors_map[file_name].append(error)
-                    else:
-                        errors_map[file_name].append(error) # do not append if it already exists
+                if file_name not in errors_map.keys():
+                    errors_map[file_name] = list()  # create a new list for the new filename and append the tuple in it
+                    errors_map[file_name].append(error)
+                else:
+                    errors_map[file_name].append(error) # do not append if it already exists
             
-            return errors_map # return the completed error dictionary
+        return errors_map # return the completed error dictionary
 
 
     def pretty_print(self, errors):
