@@ -7,7 +7,6 @@ class Message;
 
 #include "ECSS_Definitions.hpp"
 #include <cstdint>
-#include <cassert>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
 #include "ErrorHandler.hpp"
@@ -430,6 +429,39 @@ public:
 	 * Reset the message reading status, and start reading data from it again
 	 */
 	void resetRead();
+
+	/**
+	 * Compare the message type to an expected one. An unexpected message type will throw an
+	 * OtherMessageType error.
+	 *
+	 * @return True if the message is of correct type, false if not
+	 */
+	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType,
+		uint8_t expectedMessageType) {
+		if (packetType != expectedPacketType || serviceType != expectedServiceType ||
+		    messageType != expectedMessageType) {
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
+	 * expectedMessageType)
+	 */
+	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+		return assertType(TC, expectedServiceType, expectedMessageType);
+	}
+
+	/**
+	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
+	 * expectedMessageType)
+	 */
+	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+		return assertType(TM, expectedServiceType, expectedMessageType);
+	}
 };
 
 template<const size_t SIZE>
@@ -442,6 +474,5 @@ inline void Message::appendString(const String<SIZE> & string) {
 
 	dataSize += string.size();
 }
-
 
 #endif //ECSS_SERVICES_PACKET_H

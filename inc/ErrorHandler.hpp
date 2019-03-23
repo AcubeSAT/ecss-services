@@ -52,7 +52,6 @@ public:
 		 * An error in the header of a packet makes it unable to be parsed
 		 */
 			UnacceptablePacket = 5,
-
 		/**
  		 * A date that isn't valid according to the Gregorian calendar or cannot be parsed by the
  		 * TimeHelper
@@ -62,6 +61,10 @@ public:
 		 * Asked a Message type that doesn't exist
 		 */
 			UnknownMessageType = 7,
+		/**
+		 * A function received a Message that was not of the correct type
+		 */
+		    OtherMessageType = 8,
 	};
 
 	/**
@@ -222,9 +225,7 @@ public:
 	 */
 	template<typename ErrorType>
 	inline static ErrorSource findErrorSource(ErrorType error) {
-		// While this may seem like a "hacky" way to convert enums to ErrorSource, it should be
-		// optimised by the compiler to constant time.
-
+		// Static type checking
 		if (std::is_same<ErrorType, AcceptanceErrorType>()) {
 			return Acceptance;
 		}
