@@ -61,7 +61,7 @@ class Summarizer(object):
                 name_string = f"{self.bold}{self.red}File {self.yellow}{key}{self.red}"
                 rule_violated_string = f"violates rule {self.yellow}#{error[1]}{self.red} of the MISRA C 2012 standard"
                 line_number_string = f"at line {self.yellow}{error[0]}{self.end}"
-
+                
                 print(f"{name_string.ljust(75)} {rule_violated_string} {line_number_string}")
 
         print("")

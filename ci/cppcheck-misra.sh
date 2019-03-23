@@ -26,5 +26,4 @@ sed -i -r 's/(.*Script.*)|(.*Checking.*)|(.*MISRA.*)//gm; /(^$)/d; s/(\s\(.*\)\s
 
 # run the summarizer for a nice, clean summary of errors
 echo -e "\u001b[34;1mSummarizing results...\u001b[0m"
-python3 --version
-python3 ci/summarizer.py ci/report.msr
+python3.6 ci/summarizer.py ci/report.msr
