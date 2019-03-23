@@ -8,17 +8,18 @@ from collections import Counter
 Naive parser and pretty printer for the MISRA reports by cppcheck
 """
 
-red = "\033[91m"
-yellow = "\033[93m"
-green = "\033[92m"
-bold = "\033[1m"
-end = "\033[0m"
-
 class Summarizer(object):
     def __init__(self, report_name):
         with open(report_name, 'r') as f:
             self.file_lines = f.readlines()
         f.close()
+        
+        self.red = "\033[91m"
+        self.yellow = "\033[93m"
+        self.green = "\033[92m"
+        self.bold = "\033[1m"
+        self.end = "\033[0m"
+
 
     def analyze(self):
         """
@@ -55,19 +56,19 @@ class Summarizer(object):
         Pretty-prints the contents of the error dictionary with colors and stuff
         """
 
-        print(bold + red + "=================================================\n" + end)
-        print(bold + red + "       Static analysis results: Error Summary        \n" + end)
+        print(self.bold + self.red + "=================================================\n" + self.end)
+        print(self.bold + self.red + "       Static analysis results: Error Summary        \n" + self.end)
         for key in errors:
             for error in errors[key]:
-                name_string = f"{bold}{red}File {yellow}{key}{red}"
-                rule_violated_string = f"violates rule {yellow}#{error[1]}{red} of the MISRA C 2012 standard"
-                line_number_string = f"at line {yellow}{error[0]}{end}"
+                name_string = f"{self.bold}{self.red}File {self.yellow}{key}{self.red}"
+                rule_violated_string = f"violates rule {self.yellow}#{error[1]}{self.red} of the MISRA C 2012 standard"
+                line_number_string = f"at line {self.yellow}{error[0]}{self.end}"
 
                 print(f"{name_string.ljust(75)} {rule_violated_string} {line_number_string}")
 
         print("")
         print("")
-        print(bold + red +"=================================================" + end)
+        print(self.bold + self.red +"=================================================" + self.end)
 
 
 if __name__ == "__main__":
