@@ -23,8 +23,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 	 * @todo Add failure reporting
 	 */
 	// Check if we have the correct packet
-	assert(request.serviceType == 6);
-	assert(request.messageType == 2);
+	request.assertTC(6, 2);
 
 	// Read the memory ID from the request
 	auto memoryID = MemoryManagementService::MemoryID(request.readEnum8());
@@ -74,8 +73,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &request) {
 	// Check if we have the correct packet
-	assert(request.serviceType == 6);
-	assert(request.messageType == 5);
+	request.assertTC(6, 5);
 
 	// Create the report message object of telemetry message subtype 6
 	Message report = mainService.createTM(6);
@@ -124,8 +122,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 
 void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &request) {
 	// Check if we have the correct packet
-	assert(request.serviceType == 6);
-	assert(request.messageType == 9);
+	request.assertTC(6, 9);
 
 	// Create the report message object of telemetry message subtype 10
 	Message report = mainService.createTM(10);
