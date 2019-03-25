@@ -16,6 +16,12 @@
  *
  * ECSS 8.19 && 6.19
  *
+ * Note: Make sure the check the note in the addEventActionDefintion()
+ *
+ * Note: The application ID was decided to be abolished as an identifier of the event-action
+ * definition
+ * IMPORTANT: Every event action definition ID should be different, regardless of the application ID
+ *
  * @todo: Use an etl::list instead of eventActionDefinitionArray
  * @todo: (Possible) Use a etl::map for eventActionDefinitionArray
  * @todo: check if executeAction should accept applicationID too
@@ -41,8 +47,7 @@ private:
 
 public:
 	struct EventActionDefinition {
-		bool empty = true;
-		// TODO: APID = 0 is the Ground Station APID. This should be changed
+		//+@TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535;
 		String<64> request = "";
@@ -50,6 +55,9 @@ public:
 	};
 
 	friend EventReportService;
+
+	etl::map<uint16_t, EventActionDefinition, ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE>
+	    eventActionDefinitionMap;
 
 	EventActionDefinition eventActionDefinitionArray[ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE];
 
