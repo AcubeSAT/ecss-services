@@ -116,7 +116,7 @@ void EventActionService::eventActionStatusReport() {
 	for (auto element : eventActionDefinitionMap){
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
-		report.appendEnum16(element.second.enabled);
+		report.appendBoolean(element.second.enabled);
 	}
 	storeMessage(report);
 }
