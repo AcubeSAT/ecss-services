@@ -30,11 +30,12 @@
  * }
  */
 
-int FunctionManagementService::call(Message msg) {
+int FunctionManagementService::call(Message& msg) {
 	/**
 	 * @todo: Add test for message and service type using the ErrorHandler
 	 * @todo: Convert all functions to void (use error reports for tests instead of return numbers)
 	 */
+	msg.resetRead();
 	ErrorHandler::assertInternal(msg.messageType == 1 && msg.serviceType == 8,
 	                             ErrorHandler::InternalErrorType::UnacceptablePacket);
 

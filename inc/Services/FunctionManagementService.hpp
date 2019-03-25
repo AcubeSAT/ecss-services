@@ -67,7 +67,7 @@ public:
 	 * int, for testing purposes.
 	 * @param msg A TC[8,1] message
 	 */
-	int call(Message msg);
+	int call(Message& msg);
 
 	/**
 	 * Includes a new function in the pointer map. This enables it to be called by way of a valid
