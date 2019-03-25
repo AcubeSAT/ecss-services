@@ -3,6 +3,7 @@
 #include <Message.hpp>
 #include "ServiceTests.hpp"
 #include <etl/String.hpp>
+#include <etl/map.h>
 #include <cstring>
 #include <iostream>
 #include <ServicePool.hpp>
@@ -18,14 +19,11 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st09]") {
 	message.appendString(data);
 
 	eventActionService.addEventActionDefinitions(message);
-	CHECK(eventActionService.eventActionDefinitionArray[0].empty == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[0].applicationId == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[0].eventDefinitionID == 2);
-	CHECK(eventActionService.eventActionDefinitionArray[0].enabled == 1);
-	CHECK(message.readEnum16() == 0);
-	CHECK(message.readEnum16() == 2);
-	message.readString(checkstring, 3);
-	CHECK(eventActionService.eventActionDefinitionArray[0].request.compare(data) == 0);
+
+	CHECK(eventActionService.eventActionDefinitionMap[2].applicationId == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[2].eventDefinitionID == 2);
+	CHECK(eventActionService.eventActionDefinitionMap[2].enabled == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[2].request.compare(data) == 0);
 
 	Message message2(19, 1, Message::TC, 0);
 	message2.appendEnum16(1);
@@ -34,14 +32,10 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st09]") {
 	message2.appendString(data);
 
 	eventActionService.addEventActionDefinitions(message2);
-	CHECK(eventActionService.eventActionDefinitionArray[1].empty == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[1].applicationId == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[1].eventDefinitionID == 3);
-	CHECK(eventActionService.eventActionDefinitionArray[1].enabled == 1);
-
-	CHECK(message2.readEnum16() == 1);
-	CHECK(message2.readEnum16() == 3);
-	CHECK(eventActionService.eventActionDefinitionArray[1].request.compare(data) == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[3].applicationId == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[3].eventDefinitionID == 3);
+	CHECK(eventActionService.eventActionDefinitionMap[3].enabled == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[3].request.compare(data) == 0);
 }
 
 TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st09]") {
@@ -84,35 +78,30 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st09]") {
 	message.appendEnum16(2);
 	eventActionService.deleteEventActionDefinitions(message);
 
-	CHECK(eventActionService.eventActionDefinitionArray[0].empty == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[0].applicationId == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[0].eventDefinitionID == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[0].request.compare("0") == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[0].enabled == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[0].applicationId == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[0].eventDefinitionID == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[0].request.compare("0") == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[0].enabled == 1);
 
-	CHECK(eventActionService.eventActionDefinitionArray[1].empty == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[1].applicationId == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[1].eventDefinitionID == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[1].request.compare("1") == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[1].enabled == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[1].applicationId == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[1].eventDefinitionID == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[1].request.compare("1") == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[1].enabled == 1);
 
-	CHECK(eventActionService.eventActionDefinitionArray[2].empty == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[2].applicationId == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[2].eventDefinitionID == 65535);
-	CHECK(eventActionService.eventActionDefinitionArray[2].request.compare("") == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[2].enabled == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[2].applicationId == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[2].eventDefinitionID == 65535);
+	CHECK(eventActionService.eventActionDefinitionMap[2].request.compare("") == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[2].enabled == 0);
 
-	CHECK(eventActionService.eventActionDefinitionArray[3].empty == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[3].applicationId == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[3].eventDefinitionID == 3);
-	CHECK(eventActionService.eventActionDefinitionArray[3].request.compare("3") == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[3].enabled == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[3].applicationId == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[3].eventDefinitionID == 3);
+	CHECK(eventActionService.eventActionDefinitionMap[3].request.compare("3") == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[3].enabled == 1);
 
-	CHECK(eventActionService.eventActionDefinitionArray[4].empty == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[4].applicationId == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[4].eventDefinitionID == 65535);
-	CHECK(eventActionService.eventActionDefinitionArray[4].request.compare("") == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[4].enabled == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[4].applicationId == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[4].eventDefinitionID == 65535);
+	CHECK(eventActionService.eventActionDefinitionMap[4].request.compare("") == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[4].enabled == 0);
 
 }
 
@@ -152,10 +141,9 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st09]") {
 	eventActionService.deleteAllEventActionDefinitions(message);
 
 	for (int i = 0; i < 256; i++){
-		CHECK(eventActionService.eventActionDefinitionArray[i].empty == 1);
-		CHECK(eventActionService.eventActionDefinitionArray[i].applicationId == 0);
-		CHECK(eventActionService.eventActionDefinitionArray[i].eventDefinitionID == 65535);
-		CHECK(eventActionService.eventActionDefinitionArray[i].request.compare("") == 0);
+		CHECK(eventActionService.eventActionDefinitionMap[i].applicationId == 0);
+		CHECK(eventActionService.eventActionDefinitionMap[i].eventDefinitionID == 65535);
+		CHECK(eventActionService.eventActionDefinitionMap[i].request.compare("") == 0);
 	}
 }
 
@@ -179,8 +167,8 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st09]") {
 	message2.appendEnum16(1);
 	message2.appendEnum16(1);
 	eventActionService.enableEventActionDefinitions(message2);
-	CHECK(eventActionService.eventActionDefinitionArray[0].enabled == 1);
-	CHECK(eventActionService.eventActionDefinitionArray[1].enabled == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[0].enabled == 1);
+	CHECK(eventActionService.eventActionDefinitionMap[1].enabled == 1);
 
 }
 
@@ -202,8 +190,8 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st09]") {
 	message2.appendEnum16(1);
 	message2.appendEnum16(0);
 	eventActionService.disableEventActionDefinitions(message2);
-	CHECK(eventActionService.eventActionDefinitionArray[0].enabled == 0);
-	CHECK(eventActionService.eventActionDefinitionArray[1].enabled == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[0].enabled == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[1].enabled == 0);
 }
 
 TEST_CASE("Request event-action definition status TC[19,6]", "[service][st09]") {

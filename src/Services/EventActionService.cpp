@@ -2,14 +2,14 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 
-void EventActionService::addEventActionDefinitions(Message message) {
+void EventActionService::addEventActionDefinitions(Message& message) {
 	// TC[19,1]
 
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
 	                                                                     19) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
-		if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
+		if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
 			EventActionDefinition temp;
 			temp.enabled = true;
 			temp.applicationId = applicationID;
@@ -30,7 +30,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::deleteEventActionDefinitions(Message message) {
+void EventActionService::deleteEventActionDefinitions(Message& message) {
 	// TC[19,2]
 	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -43,7 +43,7 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::deleteAllEventActionDefinitions(Message message) {
+void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 	// TC[19,3]
 	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -52,7 +52,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::enableEventActionDefinitions(Message message) {
+void EventActionService::enableEventActionDefinitions(Message& message) {
 	// TC[19,4]
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -76,7 +76,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::disableEventActionDefinitions(Message message) {
+void EventActionService::disableEventActionDefinitions(Message& message) {
 	// TC[19,5]
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -100,7 +100,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	}
 }
 
-void EventActionService::requestEventActionDefinitionStatus(Message message) {
+void EventActionService::requestEventActionDefinitionStatus(Message& message) {
 	// TC[19,6]
 	if (message.messageType == 6 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -121,7 +121,7 @@ void EventActionService::eventActionStatusReport() {
 	storeMessage(report);
 }
 
-void EventActionService::enableEventActionFunction(Message message) {
+void EventActionService::enableEventActionFunction(Message& message) {
 	// TC[19,8]
 	if (message.messageType == 8 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -129,7 +129,7 @@ void EventActionService::enableEventActionFunction(Message message) {
 	}
 }
 
-void EventActionService::disableEventActionFunction(Message message) {
+void EventActionService::disableEventActionFunction(Message& message) {
 	// TC[19,9]
 	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
