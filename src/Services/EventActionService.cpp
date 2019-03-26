@@ -2,9 +2,6 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 
-// todo: Replace the checks for the message.messageType, message.packetType and message
-//  .ServiceType with assertions
-
 void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 
@@ -89,7 +86,7 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 				}
 			}
 		} else {
-			for (auto element : eventActionDefinitionMap) {
+			for (auto& element : eventActionDefinitionMap) {
 				element.second.enabled = true;
 			}
 		}
@@ -117,7 +114,7 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 				}
 			}
 		} else {
-			for (auto element : eventActionDefinitionMap) {
+			for (auto& element : eventActionDefinitionMap) {
 				element.second.enabled = false;
 			}
 		}
@@ -137,7 +134,7 @@ void EventActionService::eventActionStatusReport() {
 	Message report = createTM(7);
 	uint8_t count = eventActionDefinitionMap.size();
 	report.appendUint8(count);
-	for (auto element : eventActionDefinitionMap) {
+	for (const auto& element : eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
 		report.appendBoolean(element.second.enabled);
