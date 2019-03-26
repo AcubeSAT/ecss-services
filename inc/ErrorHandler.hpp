@@ -108,18 +108,18 @@ public:
 		 * made to add an existing event action
 		 * definition
 		 */
-		 EventActionAddExistingDefinitionError = 1,
-		 /**
-		  * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
-		  * was made to delete an event action definition that was enabled
-		  */
-		  EventActionDeleteEnabledDefinitionError = 2,
-		  /**
-		   * In the Event Action Service, an access attempt was made to an unknown event
-		   * action definition
-		   */
-		   EventActionUnknownDefinitionError = 3,
-		};
+		EventActionAddExistingDefinitionError = 1,
+		/**
+		 * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
+		 * was made to delete an event action definition that was enabled
+		 */
+		EventActionDeleteEnabledDefinitionError = 2,
+		/**
+		 * In the Event Action Service, an access attempt was made to an unknown event
+		 * action definition
+		 */
+		EventActionUnknownDefinitionError = 3,
+	};
 
 	/**
 	 * The error code for failed progress of execution reports, as specified in ECSS 5.3.5.2.3g
