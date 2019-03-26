@@ -21,7 +21,7 @@ class Message;
  */
 class Message {
 public:
-	Message () = default;
+	Message() = default;
 
 	enum PacketType {
 		TM = 0, // Telemetry
@@ -63,12 +63,26 @@ public:
 	// Next byte to read for read...() functions
 	uint16_t readPosition = 0;
 
+
 	/**
 	 * Appends the least significant \p numBits from \p data to the message
 	 *
 	 * Note: data MUST NOT contain any information beyond the most significant \p numBits bits
 	 */
 	void appendBits(uint8_t numBits, uint16_t data);
+
+	/**
+	 * Appends the remaining bits to complete a byte, in case the appendBits() is the last call
+	 * and the packet data field isn't integer multiple of bytes
+	 *
+	 * @note Actually we should append the bits so the total length of the packets is an integer
+	 * multiple of the padding word size declared for the application process
+	 * @todo Confirm that the overall packet size is an integer multiple of the padding word size
+	 * declared for every application process
+	 * @todo check if wee need to define the spare field for the telemetry and telecommand
+	 * secondary headers
+	 */
+	void finalize();
 
 	/**
 	 * Appends 1 byte to the message
@@ -95,7 +109,7 @@ public:
 	 * @param string The string to insert
 	 */
 	template<const size_t SIZE>
-	void appendString(const String<SIZE> & string);
+	void appendString(const String<SIZE> &string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -271,10 +285,10 @@ public:
 	 * PTC = 7, PFC = 0
 	 */
 	template<const size_t SIZE>
-	void appendOctetString(const String<SIZE> & string) {
+	void appendOctetString(const String<SIZE> &string) {
 		// Make sure that the string is large enough to count
 		assertI(string.size() <= (std::numeric_limits<uint16_t>::max)(),
-			ErrorHandler::StringTooLarge);
+		        ErrorHandler::StringTooLarge);
 
 		appendUint16(string.size());
 		appendString(string);
@@ -433,7 +447,7 @@ public:
 };
 
 template<const size_t SIZE>
-inline void Message::appendString(const String<SIZE> & string) {
+inline void Message::appendString(const String<SIZE> &string) {
 	assertI(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
 	assertI(string.size() < string.capacity(), ErrorHandler::StringTooLarge);

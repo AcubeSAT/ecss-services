@@ -62,6 +62,11 @@ public:
 		 * Asked a Message type that doesn't exist
 		 */
 			UnknownMessageType = 7,
+
+		/**
+		 * Asked to append unnecessary spare bits
+		 */
+			InvalidSpareBits = 8,
 	};
 
 	/**
@@ -199,7 +204,6 @@ public:
 	 *
 	 * Note that these errors correspond to bugs or faults in the software, and should be treated
 	 * differently. Such an error may prompt a task or software reset.
-	 *
 	 */
 	static void reportInternalError(InternalErrorType errorCode);
 
