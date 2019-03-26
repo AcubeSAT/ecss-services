@@ -103,12 +103,26 @@ public:
 	// Next byte to read for read...() functions
 	uint16_t readPosition = 0;
 
+
 	/**
 	 * Appends the least significant \p numBits from \p data to the message
 	 *
 	 * Note: data MUST NOT contain any information beyond the most significant \p numBits bits
 	 */
 	void appendBits(uint8_t numBits, uint16_t data);
+
+	/**
+	 * Appends the remaining bits to complete a byte, in case the appendBits() is the last call
+	 * and the packet data field isn't integer multiple of bytes
+	 *
+	 * @note Actually we should append the bits so the total length of the packets is an integer
+	 * multiple of the padding word size declared for the application process
+	 * @todo Confirm that the overall packet size is an integer multiple of the padding word size
+	 * declared for every application process
+	 * @todo check if wee need to define the spare field for the telemetry and telecommand
+	 * secondary headers
+	 */
+	void finalize();
 
 	/**
 	 * Appends 1 byte to the message

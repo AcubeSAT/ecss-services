@@ -36,6 +36,15 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 	}
 }
 
+void Message::finalize() {
+	// Define the spare field in telemetry and telecommand user data field (7.4.3.2.c and 7.4.4.2.c)
+
+	if (currentBit != 0) {
+		currentBit = 0;
+		dataSize++;
+	}
+}
+
 void Message::appendByte(uint8_t value) {
 	assertI(dataSize < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	assertI(currentBit == 0, ErrorHandler::ByteBetweenBits);
