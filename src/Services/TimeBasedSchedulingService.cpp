@@ -50,7 +50,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 		if ((not scheduledActivities.available()) ||
 		    (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
-			request.readPosition += ECSS_TC_REQUEST_STRING_SIZE;
+			request.skipBytes(ECSS_TC_REQUEST_STRING_SIZE);
 		} else {
 			// Get the TC packet request
 			uint8_t requestData[ECSS_TC_REQUEST_STRING_SIZE] = {0};
