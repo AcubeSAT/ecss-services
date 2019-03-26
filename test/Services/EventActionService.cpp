@@ -11,7 +11,6 @@
 EventActionService & eventActionService = Services.eventAction;
 
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st09]") {
-	char checkstring[256];
 	Message message(19, 1, Message::TC, 0);
 	message.appendEnum16(0);
 	message.appendEnum16(2);
@@ -70,13 +69,20 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st09]") {
 	message4.appendString(data);
 	eventActionService.addEventActionDefinitions(message4);
 
-	Message message(19, 2, Message::TC, 0);
+	Message message(19, 5, Message::TC, 0);
 	message.appendUint16(2);
 	message.appendEnum16(1);
 	message.appendEnum16(4);
 	message.appendEnum16(1);
 	message.appendEnum16(2);
-	eventActionService.deleteEventActionDefinitions(message);
+	eventActionService.disableEventActionDefinitions(message);
+	Message message5(19, 2, Message::TC, 0);
+	message5.appendUint16(2);
+	message5.appendEnum16(1);
+	message5.appendEnum16(4);
+	message5.appendEnum16(1);
+	message5.appendEnum16(2);
+	eventActionService.deleteEventActionDefinitions(message5);
 
 	CHECK(eventActionService.eventActionDefinitionMap[0].applicationId == 1);
 	CHECK(eventActionService.eventActionDefinitionMap[0].eventDefinitionID == 0);
@@ -160,16 +166,24 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st09]") {
 	data = "00";
 	message1.appendString(data);
 	eventActionService.addEventActionDefinitions(message1);
-	Message message2(19, 4, Message::TC, 0);
+	Message message2(19, 5, Message::TC, 0);
 	message2.appendUint16(2);
 	message2.appendEnum16(1);
 	message2.appendEnum16(0);
 	message2.appendEnum16(1);
 	message2.appendEnum16(1);
-	eventActionService.enableEventActionDefinitions(message2);
+	eventActionService.disableEventActionDefinitions(message2);
+	CHECK(eventActionService.eventActionDefinitionMap[0].enabled == 0);
+	CHECK(eventActionService.eventActionDefinitionMap[1].enabled == 0);
+	Message message3(19, 4, Message::TC, 0);
+	message3.appendUint16(2);
+	message3.appendEnum16(1);
+	message3.appendEnum16(0);
+	message3.appendEnum16(1);
+	message3.appendEnum16(1);
+	eventActionService.enableEventActionDefinitions(message3);
 	CHECK(eventActionService.eventActionDefinitionMap[0].enabled == 1);
 	CHECK(eventActionService.eventActionDefinitionMap[1].enabled == 1);
-
 }
 
 TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st09]") {

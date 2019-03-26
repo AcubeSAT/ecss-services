@@ -2,7 +2,7 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 
-void EventActionService::addEventActionDefinitions(Message& message) {
+void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 
 	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
@@ -23,14 +23,13 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 			}
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 		} else {
-			// @todo: throw a failed start of execution error
-			//ErrorHandler::reportError
-			//(ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
+			ErrorHandler::reportError(message,
+				ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
 		}
 	}
 }
 
-void EventActionService::deleteEventActionDefinitions(Message& message) {
+void EventActionService::deleteEventActionDefinitions(Message &message) {
 	// TC[19,2]
 	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -38,12 +37,28 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			eventActionDefinitionMap.erase(eventDefinitionID);
+			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()){
+				// I need this to buffer the first readEnum16, since cpp check fails if I don't
+				// use it anywhere
+				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
+				if (eventActionDefinitionMap[eventDefinitionID].enabled == true){
+					ErrorHandler::reportError(message,
+						ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
+					std::cout << "hi";
+
+				} else {
+					eventActionDefinitionMap.erase(eventDefinitionID);
+					std::cout << "hi";
+				}
+			} else {
+				ErrorHandler::reportError(message,
+					ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
+			}
 		}
 	}
 }
 
-void EventActionService::deleteAllEventActionDefinitions(Message& message) {
+void EventActionService::deleteAllEventActionDefinitions(Message &message) {
 	// TC[19,3]
 	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -52,21 +67,28 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::enableEventActionDefinitions(Message& message) {
+void EventActionService::enableEventActionDefinitions(Message &message) {
 	// TC[19,4]
 	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0){
+		if (numberOfEventActionDefinitions != 0) {
 			for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 				uint16_t applicationID = message.readEnum16();
 				uint16_t eventDefinitionID = message.readEnum16();
 				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
-				.end()){
+					.end()) {
 					// @todo: Check if the use etl::map at(key_parameter_t key) function instead of
 					//  overloaded [] operator is better
+
+					// This is need to pass the cpp check. The applicationId should be used
+					// somewhere
+					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 					eventActionDefinitionMap[eventDefinitionID].enabled = true;
-				}
+				} else {
+				ErrorHandler::reportError(message,
+					ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
+			}
 			}
 		} else {
 			for (auto element : eventActionDefinitionMap) {
@@ -76,20 +98,24 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::disableEventActionDefinitions(Message& message) {
+void EventActionService::disableEventActionDefinitions(Message &message) {
 	// TC[19,5]
 	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
 		uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0){
+		if (numberOfEventActionDefinitions != 0) {
 			for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 				uint16_t applicationID = message.readEnum16();
 				uint16_t eventDefinitionID = message.readEnum16();
 				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
-					.end()){
+					.end()) {
 					// @todo: Check if the use etl::map at(key_parameter_t key) function instead of
 					//  overloaded [] operator is better
 					eventActionDefinitionMap[eventDefinitionID].enabled = false;
+				} else {
+					std::cout << "disable event action error";
+					ErrorHandler::reportError(message,
+						ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
 				}
 			}
 		} else {
@@ -100,7 +126,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::requestEventActionDefinitionStatus(Message& message) {
+void EventActionService::requestEventActionDefinitionStatus(Message &message) {
 	// TC[19,6]
 	if (message.messageType == 6 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -113,7 +139,7 @@ void EventActionService::eventActionStatusReport() {
 	Message report = createTM(7);
 	uint8_t count = eventActionDefinitionMap.size();
 	report.appendUint8(count);
-	for (auto element : eventActionDefinitionMap){
+	for (auto element : eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
 		report.appendBoolean(element.second.enabled);
@@ -121,7 +147,7 @@ void EventActionService::eventActionStatusReport() {
 	storeMessage(report);
 }
 
-void EventActionService::enableEventActionFunction(Message& message) {
+void EventActionService::enableEventActionFunction(Message &message) {
 	// TC[19,8]
 	if (message.messageType == 8 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -129,7 +155,7 @@ void EventActionService::enableEventActionFunction(Message& message) {
 	}
 }
 
-void EventActionService::disableEventActionFunction(Message& message) {
+void EventActionService::disableEventActionFunction(Message &message) {
 	// TC[19,9]
 	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
 	                                                                     == 19) {
@@ -141,10 +167,10 @@ void EventActionService::disableEventActionFunction(Message& message) {
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
-		if (eventActionDefinitionMap.find(eventID) != eventActionDefinitionMap.end()){
+		if (eventActionDefinitionMap.find(eventID) != eventActionDefinitionMap.end()) {
 			// @todo: Check if the use etl::map at(key_parameter_t key) function instead of
 			//  overloaded [] operator is better
-			if (eventActionDefinitionMap[eventID].enabled){
+			if (eventActionDefinitionMap[eventID].enabled) {
 				MessageParser messageParser;
 				Message message = messageParser.parseRequestTC(
 					eventActionDefinitionMap[eventID].request);

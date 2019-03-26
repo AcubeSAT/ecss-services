@@ -98,6 +98,7 @@ public:
 	 */
 	enum ExecutionStartErrorType {
 		UnknownExecutionStartError = 0,
+		FailedStartOfExecutionError = 1,
 	};
 
 	/**

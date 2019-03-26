@@ -236,6 +236,7 @@ int main() {
 	eventActionDefinition.appendEnum16(2);
 	String<64> TCdata = "hi";
 	eventActionDefinition.appendString(TCdata);
+	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.addEventActionDefinitions(eventActionDefinition);
 	Message eventActionDefinition1(19, 1, Message::TC, 1);
 	eventActionDefinition1.appendEnum16(0);
@@ -249,45 +250,57 @@ int main() {
 	TCdata = "hi2";
 	eventActionDefinition2.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition2);
+	Message eventActionDefinition7(19, 1, Message::TC, 1);
+	eventActionDefinition7.appendEnum16(0);
+	eventActionDefinition7.appendEnum16(4);
+	TCdata = "hi2";
+	eventActionDefinition7.appendString(TCdata);
+	eventActionService.addEventActionDefinitions(eventActionDefinition7);
 	Message eventActionDefinition3(19, 5, Message::TC, 1);
-	eventActionDefinition3.appendUint16(2);
+	eventActionDefinition3.appendUint16(3);
 	eventActionDefinition3.appendUint16(0);
 	eventActionDefinition3.appendUint16(2);
 	eventActionDefinition3.appendUint16(0);
 	eventActionDefinition3.appendUint16(3);
+	eventActionDefinition3.appendUint16(0);
+	eventActionDefinition3.appendUint16(4);
 
 	eventActionService.disableEventActionDefinitions(eventActionDefinition3);
-	std::cout << "Status of position 0,1,2 should be 000:" << eventActionService
-		.eventActionDefinitionArray[0].enabled << eventActionService
-		.eventActionDefinitionArray[1].enabled <<
-		eventActionService.eventActionDefinitionArray[2].enabled;
+	std::cout << "Status should be 000:" << eventActionService
+		.eventActionDefinitionMap[2].enabled << eventActionService
+		.eventActionDefinitionMap[3].enabled <<
+		eventActionService.eventActionDefinitionMap[4].enabled;
 
 	Message eventActionDefinition5(19, 4, Message::TC, 1);
-	eventActionDefinition5.appendUint16(2);
+	eventActionDefinition5.appendUint16(3);
 	eventActionDefinition5.appendUint16(0);
 	eventActionDefinition5.appendUint16(2);
 	eventActionDefinition5.appendUint16(0);
 	eventActionDefinition5.appendUint16(3);
+	eventActionDefinition5.appendUint16(0);
+	eventActionDefinition5.appendUint16(4);
+
 	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
-	std::cout << "\nStatus of position 0,1,2 should be 111:" << eventActionService
-		.eventActionDefinitionArray[0].enabled << eventActionService
-		.eventActionDefinitionArray[1].enabled <<
-		eventActionService.eventActionDefinitionArray[2].enabled;
+	std::cout << "\nStatus should be 111:" << eventActionService
+		.eventActionDefinitionMap[2].enabled << eventActionService
+		.eventActionDefinitionMap[3].enabled <<
+		eventActionService.eventActionDefinitionMap[4].enabled << "\n";
 
 	Message eventActionDefinition4(19, 2, Message::TC, 1);
 	eventActionDefinition4.appendUint16(1);
 	eventActionDefinition4.appendUint16(0);
 	eventActionDefinition4.appendUint16(2);
 
+	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
-	std::cout << "\nPositions 0,1 empty should be 11:" << static_cast<uint16_t>(eventActionService
-		.eventActionDefinitionArray[0].empty)
-	          << static_cast<uint16_t>(eventActionService.eventActionDefinitionArray[1].empty);
 
-	Message eventActionDefinition6(19, 3, Message::TC, 1);
-	eventActionService.deleteAllEventActionDefinitions(eventActionDefinition6);
-	std::cout << "\nPositions 0,1 empty should be 1:" << static_cast<uint16_t>(eventActionService
-		.eventActionDefinitionArray[0].empty);
+	Message eventActionDefinition6(19, 5, Message::TC, 1);
+	eventActionDefinition4.appendUint16(1);
+	eventActionDefinition4.appendUint16(0);
+	eventActionDefinition4.appendUint16(2);
+	eventActionService.disableEventActionDefinitions(eventActionDefinition6);
+	std::cout << "After this message there should NOT be a failed start of execution error \n";
+	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
 
 
 	return 0;
