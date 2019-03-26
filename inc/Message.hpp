@@ -467,6 +467,16 @@ public:
 	}
 
 	/**
+	 * @brief Skip read bytes in the read string
+	 * @details Skips the provided number of bytes, by incrementing the readPosition and this is
+	 * done to avoid accessing the `readPosition` variable directly
+	 * @param numberOfBytes The number of bytes to be skipped
+	 */
+	void skipBytes(uint16_t numberOfBytes) {
+		readPosition += numberOfBytes;
+	}
+
+	/**
 	 * Reset the message reading status, and start reading data from it again
 	 */
 	void resetRead();
