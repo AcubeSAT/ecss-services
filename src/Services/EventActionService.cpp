@@ -2,9 +2,6 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 
-// todo: Replace the checks for the message.messageType, message.packetType and message
-//  .ServiceType with assertions
-
 void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 
