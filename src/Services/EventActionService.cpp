@@ -24,7 +24,7 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 		} else {
 			ErrorHandler::reportError(message,
-				ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
+				ErrorHandler::ExecutionStartErrorType::EventActionAddExistingDefinitionError);
 		}
 	}
 }
@@ -37,22 +37,20 @@ void EventActionService::deleteEventActionDefinitions(Message &message) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()){
+			if (eventActionDefinitionMap.find(eventDefinitionID) !=
+			    eventActionDefinitionMap.end()) {
 				// I need this to buffer the first readEnum16, since cpp check fails if I don't
 				// use it anywhere
 				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
-				if (eventActionDefinitionMap[eventDefinitionID].enabled == true){
+				if (eventActionDefinitionMap[eventDefinitionID].enabled == true) {
 					ErrorHandler::reportError(message,
-						ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
-					std::cout << "hi";
-
+					ErrorHandler::ExecutionStartErrorType::EventActionDeleteEnabledDefinitionError);
 				} else {
 					eventActionDefinitionMap.erase(eventDefinitionID);
-					std::cout << "hi";
 				}
 			} else {
 				ErrorHandler::reportError(message,
-					ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
+				    ErrorHandler::ExecutionStartErrorType::EventActionDeleteUnknownDefinitionError);
 			}
 		}
 	}
@@ -86,9 +84,9 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 					eventActionDefinitionMap[eventDefinitionID].enabled = true;
 				} else {
-				ErrorHandler::reportError(message,
-					ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
-			}
+					ErrorHandler::reportError(message,
+					ErrorHandler::ExecutionStartErrorType::EventActionEnableUnknownDefinitionError);
+				}
 			}
 		} else {
 			for (auto element : eventActionDefinitionMap) {
@@ -117,9 +115,8 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 					eventActionDefinitionMap[eventDefinitionID].enabled = false;
 				} else {
-					std::cout << "disable event action error";
 					ErrorHandler::reportError(message,
-						ErrorHandler::ExecutionStartErrorType::FailedStartOfExecutionError);
+				ErrorHandler::ExecutionStartErrorType::EventActionDisableUnknownDefinitionError);
 				}
 			}
 		} else {

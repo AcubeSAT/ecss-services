@@ -98,8 +98,33 @@ public:
 	 */
 	enum ExecutionStartErrorType {
 		UnknownExecutionStartError = 0,
-		FailedStartOfExecutionError = 1,
-	};
+		/**
+		 * In the Event Action Service, in the addEventActionDefinition function an attempt was
+		 * made to add an existing event action
+		 * definition
+		 */
+		 EventActionAddExistingDefinitionError = 1,
+		 /**
+		  * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
+		  * was made to delete an event action definition that was enabled
+		  */
+		  EventActionDeleteEnabledDefinitionError = 2,
+		  /**
+		   * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
+		   * was made to delete an unknown event action definition
+		   */
+		   EventActionDeleteUnknownDefinitionError = 3,
+			/**
+			* In the Event Action Service, in the enableEventActionDefinition function, an attempt
+			* was made to enable an unknown event action definition
+			*/
+			EventActionEnableUnknownDefinitionError = 4,
+			/**
+	   		* In the Event Action Service, in the disableEventActionDefinition function, an attempt
+	   		* was made to disable an unknown event action definition
+	   		*/
+			EventActionDisableUnknownDefinitionError = 5,
+		};
 
 	/**
 	 * The error code for failed progress of execution reports, as specified in ECSS 5.3.5.2.3g
