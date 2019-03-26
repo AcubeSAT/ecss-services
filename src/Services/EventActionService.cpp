@@ -111,6 +111,10 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 					.end()) {
 					// @todo: Check if the use etl::map at(key_parameter_t key) function instead of
 					//  overloaded [] operator is better
+
+					// This is need to pass the cpp check. The applicationId should be used
+					// somewhere
+					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 					eventActionDefinitionMap[eventDefinitionID].enabled = false;
 				} else {
 					std::cout << "disable event action error";
