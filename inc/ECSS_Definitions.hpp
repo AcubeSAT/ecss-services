@@ -8,6 +8,13 @@
 // 7.4.1
 #define CCSDS_PACKET_VERSION 0
 
+/**
+ * @brief Maximum length of a String converted TC packet message
+ * @details This definition refers to the maximum length that an embedded TC packet, meaning a TC
+ * packet contained in a message request as a part of the request.
+ */
+#define ECSS_TC_REQUEST_STRING_SIZE 64
+
 // 7.4.4.1c
 #define ECSS_PUS_VERSION 2
 

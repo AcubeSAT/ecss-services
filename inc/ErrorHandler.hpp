@@ -110,20 +110,10 @@ public:
 		  */
 		  EventActionDeleteEnabledDefinitionError = 2,
 		  /**
-		   * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
-		   * was made to delete an unknown event action definition
+		   * In the Event Action Service, an access attempt was made to an unknown event
+		   * action definition
 		   */
-		   EventActionDeleteUnknownDefinitionError = 3,
-			/**
-			* In the Event Action Service, in the enableEventActionDefinition function, an attempt
-			* was made to enable an unknown event action definition
-			*/
-			EventActionEnableUnknownDefinitionError = 4,
-			/**
-	   		* In the Event Action Service, in the disableEventActionDefinition function, an attempt
-	   		* was made to disable an unknown event action definition
-	   		*/
-			EventActionDisableUnknownDefinitionError = 5,
+		   EventActionUnknownDefinitionError = 3,
 		};
 
 	/**

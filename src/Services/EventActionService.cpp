@@ -2,6 +2,9 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 
+// todo: Replace the checks for the message.messageType, message.packetType and message
+//  .ServiceType with assertions
+
 void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 
@@ -14,17 +17,17 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 			temp.enabled = true;
 			temp.applicationId = applicationID;
 			temp.eventDefinitionID = eventDefinitionID;
-			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
-				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
+			if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
+				ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 			} else {
-				char data[ECSS_EVENT_SERVICE_STRING_SIZE];
+				char data[ECSS_TC_REQUEST_STRING_SIZE];
 				message.readString(data, message.dataSize - 4);
-				temp.request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(data);
+				temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
 			}
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 		} else {
 			ErrorHandler::reportError(message,
-				ErrorHandler::ExecutionStartErrorType::EventActionAddExistingDefinitionError);
+				ErrorHandler::EventActionAddExistingDefinitionError);
 		}
 	}
 }
@@ -44,13 +47,13 @@ void EventActionService::deleteEventActionDefinitions(Message &message) {
 				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 				if (eventActionDefinitionMap[eventDefinitionID].enabled == true) {
 					ErrorHandler::reportError(message,
-					ErrorHandler::ExecutionStartErrorType::EventActionDeleteEnabledDefinitionError);
+					ErrorHandler::EventActionDeleteEnabledDefinitionError);
 				} else {
 					eventActionDefinitionMap.erase(eventDefinitionID);
 				}
 			} else {
 				ErrorHandler::reportError(message,
-				    ErrorHandler::ExecutionStartErrorType::EventActionDeleteUnknownDefinitionError);
+				    ErrorHandler::EventActionUnknownDefinitionError);
 			}
 		}
 	}
@@ -76,16 +79,13 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 				uint16_t eventDefinitionID = message.readEnum16();
 				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
 					.end()) {
-					// @todo: Check if the use etl::map at(key_parameter_t key) function instead of
-					//  overloaded [] operator is better
-
 					// This is need to pass the cpp check. The applicationId should be used
 					// somewhere
 					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 					eventActionDefinitionMap[eventDefinitionID].enabled = true;
 				} else {
 					ErrorHandler::reportError(message,
-					ErrorHandler::ExecutionStartErrorType::EventActionEnableUnknownDefinitionError);
+					ErrorHandler::EventActionUnknownDefinitionError);
 				}
 			}
 		} else {
@@ -107,16 +107,13 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 				uint16_t eventDefinitionID = message.readEnum16();
 				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
 					.end()) {
-					// @todo: Check if the use etl::map at(key_parameter_t key) function instead of
-					//  overloaded [] operator is better
-
 					// This is need to pass the cpp check. The applicationId should be used
 					// somewhere
 					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 					eventActionDefinitionMap[eventDefinitionID].enabled = false;
 				} else {
 					ErrorHandler::reportError(message,
-				ErrorHandler::ExecutionStartErrorType::EventActionDisableUnknownDefinitionError);
+				ErrorHandler::EventActionUnknownDefinitionError);
 				}
 			}
 		} else {
@@ -169,8 +166,6 @@ void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
 		if (eventActionDefinitionMap.find(eventID) != eventActionDefinitionMap.end()) {
-			// @todo: Check if the use etl::map at(key_parameter_t key) function instead of
-			//  overloaded [] operator is better
 			if (eventActionDefinitionMap[eventID].enabled) {
 				MessageParser messageParser;
 				Message message = messageParser.parseRequestTC(
