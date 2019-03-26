@@ -272,7 +272,7 @@ public:
 	template<const size_t SIZE>
 	void appendOctetString(const String<SIZE> & string) {
 		// Make sure that the string is large enough to count
-		assertI(string.size() <= (std::numeric_limits<uint16_t>::max)(),
+		ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(),
 			ErrorHandler::StringTooLarge);
 
 		appendUint16(string.size());
@@ -466,9 +466,9 @@ public:
 
 template<const size_t SIZE>
 inline void Message::appendString(const String<SIZE> & string) {
-	assertI(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
-	assertI(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
+	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
 
 	memcpy(data + dataSize, string.data(), string.size());
 
