@@ -42,7 +42,7 @@ void TimeBasedSchedulingService::insertActivities(Message &request) {
 
 	// todo: Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	for (std::size_t i = 0; i < iterationCount; i++) {
+	while (iterationCount--) {
 		// todo: Get the group ID first, if groups are used
 		uint32_t currentTime = TimeGetter::getSeconds(); // Get the current system time
 
@@ -111,9 +111,8 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 	uint32_t current_time = TimeGetter::getSeconds(); // Get the current system time
 
 	int32_t relativeOffset = request.readSint32(); // Get the offset first
-
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	for (std::size_t i = 0; i < iterationCount; i++) {
+	while (iterationCount--) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
@@ -133,7 +132,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message &request) {
 			// If the relative offset does not meet the restrictions issue an error
 			if ((requestIDMatch->requestReleaseTime + relativeOffset) <
 			    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
-				ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
+				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			} else {
 				requestIDMatch->requestReleaseTime += relativeOffset; // Add the time offset
 			}
@@ -151,7 +150,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message &request) {
 	assert(request.messageType == 5);
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	for (std::size_t i = 0; i < iterationCount; i++) {
+	while (iterationCount--) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
@@ -204,7 +203,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message &request) {
 	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	for (std::size_t i = 0; i < iterationCount; i++) {
+	while (iterationCount--) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
@@ -248,7 +247,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	for (std::size_t i = 0; i < iterationCount; i++) {
+	while (iterationCount--) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
