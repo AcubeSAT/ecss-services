@@ -44,7 +44,7 @@ protected:
 	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
 	 * we just print the message to the screen
 	 */
-	void storeMessage(const Message &message);
+	void storeMessage(Message &message);
 
 	/**
 	 * This function declared only to remind us that every service must have a function like
@@ -56,20 +56,21 @@ protected:
 	 * Default protected constructor for this Service
 	 */
 	Service() = default;
+
 public:
 	/**
 	 * @brief Unimplemented copy constructor
 	 *
 	 * Does not allow Services should be copied. There should be only one instance for each Service.
 	 */
-	Service (Service const&) = delete;
+	Service(Service const &) = delete;
 
 	/**
 	 * Unimplemented assignment operation
 	 *
 	 * Does not allow changing the instances of Services, as Services are singletons.
 	 */
-	void operator=(Service const&) = delete;
+	void operator=(Service const &) = delete;
 
 	/**
 	 * Default destructor
@@ -79,12 +80,12 @@ public:
 	/**
 	 * Default move constructor
 	 */
-	Service(Service && service) noexcept = default;
+	Service(Service &&service) noexcept = default;
 
 	/**
 	 * Default move assignment operator
 	 */
-	Service & operator=(Service && service) noexcept = default;
+	Service &operator=(Service &&service) noexcept = default;
 };
 
 
