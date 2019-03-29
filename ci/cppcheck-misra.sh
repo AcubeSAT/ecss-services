@@ -26,4 +26,4 @@ sed -i -r 's/(.*Script.*)|(.*Checking.*)|(.*MISRA.*)//gm; /(^$)/d; s/(\s\(.*\)\s
 
 # run the summarizer for a nice, clean summary of errors
 echo -e "\u001b[34;1mSummarizing results...\u001b[0m"
-python3.6 ci/summarizer.py ci/report.msr
+ci/summarizer.py --report ci/report.msr --suppress 5.2 5.3 12.1 15.5 # these are random, will be replaced
