@@ -7,7 +7,6 @@ class Message;
 
 #include "ECSS_Definitions.hpp"
 #include <cstdint>
-#include <cassert>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
 #include "ErrorHandler.hpp"
@@ -21,7 +20,7 @@ class Message;
  */
 class Message {
 public:
-	Message () = default;
+	Message() = default;
 
 	enum PacketType {
 		TM = 0, // Telemetry
@@ -67,9 +66,21 @@ public:
 	 * Appends the least significant \p numBits from \p data to the message
 	 *
 	 * Note: data MUST NOT contain any information beyond the most significant \p numBits bits
-	 * @todo Error handling for failed asserts
 	 */
 	void appendBits(uint8_t numBits, uint16_t data);
+
+	/**
+	 * Appends the remaining bits to complete a byte, in case the appendBits() is the last call
+	 * and the packet data field isn't integer multiple of bytes
+	 *
+	 * @note Actually we should append the bits so the total length of the packets is an integer
+	 * multiple of the padding word size declared for the application process
+	 * @todo Confirm that the overall packet size is an integer multiple of the padding word size
+	 * declared for every application process
+	 * @todo check if wee need to define the spare field for the telemetry and telecommand
+	 * secondary headers
+	 */
+	void finalize();
 
 	/**
 	 * Appends 1 byte to the message
@@ -96,7 +107,7 @@ public:
 	 * @param string The string to insert
 	 */
 	template<const size_t SIZE>
-	void appendString(const String<SIZE> & string);
+	void appendString(const String<SIZE> &string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -272,9 +283,9 @@ public:
 	 * PTC = 7, PFC = 0
 	 */
 	template<const size_t SIZE>
-	void appendOctetString(const String<SIZE> & string) {
+	void appendOctetString(const String<SIZE> &string) {
 		// Make sure that the string is large enough to count
-		assertI(string.size() <= (std::numeric_limits<uint16_t>::max)(),
+		ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(),
 			ErrorHandler::StringTooLarge);
 
 		appendUint16(string.size());
@@ -431,18 +442,50 @@ public:
 	 * Reset the message reading status, and start reading data from it again
 	 */
 	void resetRead();
+
+	/**
+	 * Compare the message type to an expected one. An unexpected message type will throw an
+	 * OtherMessageType error.
+	 *
+	 * @return True if the message is of correct type, false if not
+	 */
+	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType,
+		uint8_t expectedMessageType) {
+		if (packetType != expectedPacketType || serviceType != expectedServiceType ||
+		    messageType != expectedMessageType) {
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
+	 * expectedMessageType)
+	 */
+	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+		return assertType(TC, expectedServiceType, expectedMessageType);
+	}
+
+	/**
+	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
+	 * expectedMessageType)
+	 */
+	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+		return assertType(TM, expectedServiceType, expectedMessageType);
+	}
 };
 
 template<const size_t SIZE>
-inline void Message::appendString(const String<SIZE> & string) {
-	assertI(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+inline void Message::appendString(const String<SIZE> &string) {
+	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
-	assertI(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
+	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
 
 	memcpy(data + dataSize, string.data(), string.size());
 
 	dataSize += string.size();
 }
-
 
 #endif //ECSS_SERVICES_PACKET_H

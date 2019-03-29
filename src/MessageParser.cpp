@@ -1,21 +1,20 @@
 #include <cstring>
 #include <Services/EventActionService.hpp>
+#include <ServicePool.hpp>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "macros.hpp"
 #include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
 
-TestService TestService::instance;
-RequestVerificationService RequestVerificationService::instance;
 
 void MessageParser::execute(Message &message) {
 	switch (message.serviceType) {
 		case 1:
-			RequestVerificationService::instance.execute(message);
+			Services.requestVerification.execute(message);
 			break;
 		case 17:
-			TestService::instance.execute(message);
+			Services.testService.execute(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
@@ -24,7 +23,7 @@ void MessageParser::execute(Message &message) {
 }
 
 Message MessageParser::parse(uint8_t *data, uint32_t length) {
-	assertI(length >= 6, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(length >= 6, ErrorHandler::UnacceptablePacket);
 
 	uint16_t packetHeaderIdentification = (data[0] << 8) | data[1];
 	uint16_t packetSequenceControl = (data[2] << 8) | data[3];
@@ -38,10 +37,10 @@ Message MessageParser::parse(uint8_t *data, uint32_t length) {
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
 
 	// Returning an internal error, since the Message is not available yet
-	assertI(versionNumber == 0, ErrorHandler::UnacceptablePacket);
-	assertI(secondaryHeaderFlag == 1, ErrorHandler::UnacceptablePacket);
-	assertI(sequenceFlags == 0x3, ErrorHandler::UnacceptablePacket);
-	assertI(packetDataLength == length - 6, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(versionNumber == 0, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(secondaryHeaderFlag == 1, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(sequenceFlags == 0x3, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(packetDataLength == length - 6, ErrorHandler::UnacceptablePacket);
 
 	Message message(0, 0, packetType, APID);
 

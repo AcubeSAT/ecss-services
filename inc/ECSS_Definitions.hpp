@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_ECSS_DEFINITIONS_H
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
-// Todo: Specify maximum size for regular messages
 #define ECSS_MAX_MESSAGE_SIZE 1024
 
 #define ECSS_MAX_STRING_SIZE 256

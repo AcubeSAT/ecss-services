@@ -4,11 +4,9 @@
 #include "ServiceTests.hpp"
 #include <cstring>
 
-/*
- * @todo: Change the reinterpret_cast
- */
+EventReportService & eventReportService = Services.eventReport;
+
 TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
-	EventReportService eventReportService;
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent,
@@ -28,7 +26,6 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 }
 
 TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
-	EventReportService eventReportService;
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent,
@@ -48,7 +45,6 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 }
 
 TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
-	EventReportService eventReportService;
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.mediumSeverityAnomalyReport
@@ -68,7 +64,6 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 }
 
 TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
-	EventReportService eventReportService;
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
 	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent,
@@ -88,7 +83,6 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 }
 
 TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
-	EventReportService eventReportService;
 	eventReportService.getStateOfEvents().reset();
 	EventReportService::Event eventID[] = {EventReportService::AssertionFail,
 	                                       EventReportService::LowSeverityUnknownEvent};
@@ -102,7 +96,6 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 }
 
 TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
-	EventReportService eventReportService;
 	EventReportService::Event eventID[] = {EventReportService::InformativeUnknownEvent,
 	                                       EventReportService::MediumSeverityUnknownEvent};
 	Message message(5, 6, Message::TC, 1);
@@ -120,7 +113,6 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 }
 
 TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
-	EventReportService eventReportService;
 	Message message(5, 7, Message::TC, 1);
 	eventReportService.requestListOfDisabledEvents(message);
 	REQUIRE(ServiceTests::hasOneMessage());
@@ -131,7 +123,6 @@ TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
 }
 
 TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
-	EventReportService eventReportService;
 	EventReportService::Event eventID[] = {EventReportService::MCUStart,
 	                                       EventReportService::HighSeverityUnknownEvent};
 	Message message(5, 6, Message::TC, 1);
@@ -156,7 +147,6 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 }
 
 TEST_CASE("List of observables 6.5.6", "[service][st05]") {
-	EventReportService eventReportService;
 	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
 	Message message(5, 6, Message::TC, 1);
 	message.appendUint16(1);
