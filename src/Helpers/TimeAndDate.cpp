@@ -14,12 +14,12 @@ TimeAndDate::TimeAndDate() {
 TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute,
                          uint8_t second) {
 	// check if the parameters make sense
-	assertI(2019 <= year, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(1 <= month && month <= 12, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(1 <= day && day <= 31, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= hour && hour <= 24, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= minute && minute <= 60, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= second && second <= 60, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(2019 <= year, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(1 <= month && month <= 12, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(1 <= day && day <= 31, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(0 <= hour && hour <= 24, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(0 <= minute && minute <= 60, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(0 <= second && second <= 60, ErrorHandler::InternalErrorType::InvalidDate);
 
 	this->year = year;
 	this->month = month;
