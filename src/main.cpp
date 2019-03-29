@@ -234,15 +234,15 @@ int main() {
 	Message eventActionDefinition(19, 1, Message::TC, 1);
 	eventActionDefinition.appendEnum16(0);
 	eventActionDefinition.appendEnum16(2);
-	String<64> TCdata = "hi";
+	String<64> TCdata = "0123456789123456789123456789123456789123456789123456789123456789";
 	eventActionDefinition.appendString(TCdata);
-	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.addEventActionDefinitions(eventActionDefinition);
 	Message eventActionDefinition1(19, 1, Message::TC, 1);
 	eventActionDefinition1.appendEnum16(0);
 	eventActionDefinition1.appendEnum16(2);
 	TCdata = "hi1";
 	eventActionDefinition1.appendString(TCdata);
+	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.addEventActionDefinitions(eventActionDefinition1);
 	Message eventActionDefinition2(19, 1, Message::TC, 1);
 	eventActionDefinition2.appendEnum16(0);
