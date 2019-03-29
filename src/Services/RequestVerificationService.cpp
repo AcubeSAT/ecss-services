@@ -152,7 +152,8 @@ RequestVerificationService::failRoutingVerification(const Message &request,
 	storeMessage(report);
 }
 
-
+// TODO: This function should not be here. These are TM messages, but `execute` should accept a
+// TC message.
 void RequestVerificationService::execute(const Message &message) {
 	switch (message.messageType) {
 		case 1:
