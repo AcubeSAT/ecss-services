@@ -4,9 +4,8 @@
 
 void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
+	message.assertTC(19, 1);
 
-	if (message.messageType == 1 && message.packetType == Message::TC && message.serviceType ==
-	                                                                     19) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
 		if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
@@ -30,9 +29,8 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 }
 
 void EventActionService::deleteEventActionDefinitions(Message &message) {
-	// TC[19,2]
-	if (message.messageType == 2 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
+	message.assertTC(19, 2);
+
 		uint16_t numberOfEventActionDefinitions = message.readUint16();
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
@@ -58,22 +56,21 @@ void EventActionService::deleteEventActionDefinitions(Message &message) {
 
 void EventActionService::deleteAllEventActionDefinitions(Message &message) {
 	// TC[19,3]
-	if (message.messageType == 3 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
-		setEventActionFunctionStatus(false);
+	message.assertTC(19, 3);
+
+	setEventActionFunctionStatus(false);
 		eventActionDefinitionMap.clear();
-	}
 }
 
 void EventActionService::enableEventActionDefinitions(Message &message) {
 	// TC[19,4]
-	if (message.messageType == 4 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
-		uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0) {
-			for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-				uint16_t applicationID = message.readEnum16();
-				uint16_t eventDefinitionID = message.readEnum16();
+	message.assertTC(19, 4);
+
+	uint16_t numberOfEventActionDefinitions = message.readUint16();
+		if (numberOfEventActionDefinitions != 0){
+		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+			uint16_t applicationID = message.readEnum16();
+			uint16_t eventDefinitionID = message.readEnum16();
 				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
 					.end()) {
 					// This is need to pass the cpp check. The applicationId should be used
@@ -83,25 +80,24 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 				} else {
 					ErrorHandler::reportError(message,
 					ErrorHandler::EventActionUnknownDefinitionError);
-				}
 			}
-		} else {
+		}
+	} else {
 			for (auto& element : eventActionDefinitionMap) {
 				element.second.enabled = true;
-			}
 		}
 	}
 }
 
 void EventActionService::disableEventActionDefinitions(Message &message) {
 	// TC[19,5]
-	if (message.messageType == 5 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
-		uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0) {
-			for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-				uint16_t applicationID = message.readEnum16();
-				uint16_t eventDefinitionID = message.readEnum16();
+	message.assertTC(19, 5);
+
+	uint16_t numberOfEventActionDefinitions = message.readUint16();
+		if (numberOfEventActionDefinitions != 0){
+		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+			uint16_t applicationID = message.readEnum16();
+			uint16_t eventDefinitionID = message.readEnum16();
 				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
 					.end()) {
 					// This is need to pass the cpp check. The applicationId should be used
@@ -111,22 +107,20 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 				} else {
 					ErrorHandler::reportError(message,
 				ErrorHandler::EventActionUnknownDefinitionError);
-				}
 			}
-		} else {
+		}
+	} else {
 			for (auto& element : eventActionDefinitionMap) {
 				element.second.enabled = false;
-			}
 		}
 	}
 }
 
 void EventActionService::requestEventActionDefinitionStatus(Message &message) {
 	// TC[19,6]
-	if (message.messageType == 6 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
-		eventActionStatusReport();
-	}
+	message.assertTC(19, 6);
+
+	eventActionStatusReport();
 }
 
 void EventActionService::eventActionStatusReport() {
@@ -144,18 +138,16 @@ void EventActionService::eventActionStatusReport() {
 
 void EventActionService::enableEventActionFunction(Message &message) {
 	// TC[19,8]
-	if (message.messageType == 8 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
-		setEventActionFunctionStatus(true);
-	}
+	message.assertTC(19, 8);
+
+	setEventActionFunctionStatus(true);
 }
 
 void EventActionService::disableEventActionFunction(Message &message) {
 	// TC[19,9]
-	if (message.messageType == 9 && message.packetType == Message::TC && message.serviceType
-	                                                                     == 19) {
-		setEventActionFunctionStatus(false);
-	}
+	message.assertTC(19, 9);
+
+	setEventActionFunctionStatus(false);
 }
 
 // TODO: Should I use applicationID too?

@@ -13,16 +13,16 @@ bool TimeHelper::IsLeapYear(uint16_t year) {
 uint32_t TimeHelper::utcToSeconds(TimeAndDate &TimeInfo) {
 	// the date, that \p TimeInfo represents, should be greater than or equal to 1/1/2019 and the
 	// date should be valid according to Gregorian calendar
-	assertI(TimeInfo.year >= 2019, ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(1 <= TimeInfo.month && TimeInfo.month <= 12,
+	ASSERT_INTERNAL(TimeInfo.year >= 2019, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(1 <= TimeInfo.month && TimeInfo.month <= 12,
 	        ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(1 <= TimeInfo.day && TimeInfo.day <= 31,
+	ASSERT_INTERNAL(1 <= TimeInfo.day && TimeInfo.day <= 31,
 	        ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= TimeInfo.hour && TimeInfo.hour <= 24,
+	ASSERT_INTERNAL(0 <= TimeInfo.hour && TimeInfo.hour <= 24,
 	        ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= TimeInfo.minute && TimeInfo.minute <= 60,
+	ASSERT_INTERNAL(0 <= TimeInfo.minute && TimeInfo.minute <= 60,
 	        ErrorHandler::InternalErrorType::InvalidDate);
-	assertI(0 <= TimeInfo.second && TimeInfo.second <= 60,
+	ASSERT_INTERNAL(0 <= TimeInfo.second && TimeInfo.second <= 60,
 	        ErrorHandler::InternalErrorType::InvalidDate);
 
 	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
@@ -44,7 +44,7 @@ uint32_t TimeHelper::utcToSeconds(TimeAndDate &TimeInfo) {
 
 struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
 	// elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
-	assertI(seconds >= 1546300800, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(seconds >= 1546300800, ErrorHandler::InternalErrorType::InvalidDate);
 
 	seconds -= 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
 	TimeAndDate TimeInfo;

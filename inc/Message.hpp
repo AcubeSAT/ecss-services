@@ -7,7 +7,6 @@ class Message;
 
 #include "ECSS_Definitions.hpp"
 #include <cstdint>
-#include <cassert>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
 #include "ErrorHandler.hpp"
@@ -62,7 +61,6 @@ public:
 
 	// Next byte to read for read...() functions
 	uint16_t readPosition = 0;
-
 
 	/**
 	 * Appends the least significant \p numBits from \p data to the message
@@ -287,8 +285,8 @@ public:
 	template<const size_t SIZE>
 	void appendOctetString(const String<SIZE> &string) {
 		// Make sure that the string is large enough to count
-		assertI(string.size() <= (std::numeric_limits<uint16_t>::max)(),
-		        ErrorHandler::StringTooLarge);
+		ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(),
+			ErrorHandler::StringTooLarge);
 
 		appendUint16(string.size());
 		appendString(string);
@@ -444,18 +442,50 @@ public:
 	 * Reset the message reading status, and start reading data from it again
 	 */
 	void resetRead();
+
+	/**
+	 * Compare the message type to an expected one. An unexpected message type will throw an
+	 * OtherMessageType error.
+	 *
+	 * @return True if the message is of correct type, false if not
+	 */
+	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType,
+		uint8_t expectedMessageType) {
+		if (packetType != expectedPacketType || serviceType != expectedServiceType ||
+		    messageType != expectedMessageType) {
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
+	 * expectedMessageType)
+	 */
+	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+		return assertType(TC, expectedServiceType, expectedMessageType);
+	}
+
+	/**
+	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
+	 * expectedMessageType)
+	 */
+	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+		return assertType(TM, expectedServiceType, expectedMessageType);
+	}
 };
 
 template<const size_t SIZE>
 inline void Message::appendString(const String<SIZE> &string) {
-	assertI(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
-	assertI(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
+	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
 
 	memcpy(data + dataSize, string.data(), string.size());
 
 	dataSize += string.size();
 }
-
 
 #endif //ECSS_SERVICES_PACKET_H
