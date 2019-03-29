@@ -8,7 +8,7 @@ before_script:
   - g++ --version
   - cat /etc/*-release
 
-.build:
+build:
   stage: build
   variables:
       GIT_SUBMODULE_STRATEGY: normal
