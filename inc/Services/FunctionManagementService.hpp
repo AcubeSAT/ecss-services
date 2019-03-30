@@ -42,22 +42,22 @@
  * Usage of the include() function:
  *
  * @code
- * void foo(String<MAXARGLENGTH> b) {
+ * void foo(String<MAX_ARG_LENGTH> b) {
  * 		std::cout << "SPAAAACE!" << std::endl;
  * 	}
  *
- * void bar(String<MAXARGLENGTH> b) {
+ * void bar(String<MAX_ARG_LENGTH> b) {
  * 		std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
  * 	}
  *
- * void baz(String<MAXARGLENGTH> b) {
+ * void baz(String<MAX_ARG_LENGTH> b) {
  * 		std::cout << "QWERTYUIOP" << std::endl;
  * 	}
  *
  * 	FunctionManagementService::FunctionManagementService() {
- * 		include(String<FUNCNAMELENGTH>("foo"), &foo);
- * 		include(String<FUNCNAMELENGTH>("bar"), &bar);
- * 		include(String<FUNCNAMELENGTH>("baz"), &baz);
+ * 		include(String<FUNC_NAME_LENGTH>("foo"), &foo);
+ * 		include(String<FUNC_NAME_LENGTH>("bar"), &bar);
+ * 		include(String<FUNC_NAME_LENGTH>("baz"), &baz);
  * 	}
  */
 
@@ -97,11 +97,11 @@ public:
 	 * TC [8,1] message. After inclusion it returns an unneeded int signalling insertion success
 	 * (0) or failure (2). These returns are there for testing purposes only.
 	 *
-	 * @param funcName the function's name. Max. length is MAXFUNCNAMELENGTH bytes.
-	 * @param ptr pointer to a function of void return type and a MAXARGLENGTH-lengthed byte
+	 * @param funcName the function's name. Max. length is FUNC_NAME_LENGTH bytes.
+	 * @param ptr pointer to a function of void return type and a MAX_ARG_LENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
-	int include(String<FUNCNAMELENGTH> funcName, void(*ptr)(String<MAXARGLENGTH>));
+	int include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)(String<MAX_ARG_LENGTH>));
 };
 
 #endif //ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP

@@ -9,13 +9,13 @@ int FunctionManagementService::call(Message& msg) {
 	ErrorHandler::assertInternal(msg.messageType == 1 && msg.serviceType == 8,
 	                             ErrorHandler::InternalErrorType::UnacceptablePacket);
 
-	uint8_t funcName[FUNCNAMELENGTH];  // the function's name
-	uint8_t funcArgs[MAXARGLENGTH];    // arguments for the function
+	uint8_t funcName[FUNC_NAME_LENGTH];  // the function's name
+	uint8_t funcArgs[MAX_ARG_LENGTH];    // arguments for the function
 
-	msg.readString(funcName, FUNCNAMELENGTH);
-	msg.readString(funcArgs, MAXARGLENGTH);
+	msg.readString(funcName, FUNC_NAME_LENGTH);
+	msg.readString(funcArgs, MAX_ARG_LENGTH);
 
-	if (msg.dataSize > FUNCNAMELENGTH + MAXARGLENGTH) {
+	if (msg.dataSize > FUNC_NAME_LENGTH + MAX_ARG_LENGTH) {
 		/**
 		 * @todo Send failed start of execution (too long message)
 		 */
@@ -23,9 +23,9 @@ int FunctionManagementService::call(Message& msg) {
 	}
 
 	// locate the appropriate function pointer
-	String<FUNCNAMELENGTH> name(funcName);
+	String<FUNC_NAME_LENGTH> name(funcName);
 	FunctionMap::iterator iter = funcPtrIndex.find(name);
-	void (*selected)(String<MAXARGLENGTH>);
+	void (*selected)(String<MAX_ARG_LENGTH>);
 
 	if (iter != funcPtrIndex.end()) {
 		selected = *iter->second;
@@ -41,8 +41,8 @@ int FunctionManagementService::call(Message& msg) {
 	return 0;
 }
 
-int FunctionManagementService::include(String<FUNCNAMELENGTH> funcName, void(*ptr)
-	(String<MAXARGLENGTH>)) {
+int FunctionManagementService::include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)
+	(String<MAX_ARG_LENGTH>)) {
 
 	if (funcPtrIndex.full()) {
 		/**
@@ -51,7 +51,7 @@ int FunctionManagementService::include(String<FUNCNAMELENGTH> funcName, void(*pt
 		return 2;  // arbitrary, for testing purposes
 	}
 
-	funcName.append(FUNCNAMELENGTH - funcName.length(), '\0');
+	funcName.append(FUNC_NAME_LENGTH - funcName.length(), '\0');
 	funcPtrIndex.insert(std::make_pair(funcName, ptr));
 
 	return 0;
