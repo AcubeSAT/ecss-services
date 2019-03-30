@@ -1,7 +1,7 @@
 #include "catch2/catch.hpp"
 #include "Services/FunctionManagementService.hpp"
 
-void test(String<MAXARGLENGTH> a) {
+void test(String<MAX_ARG_LENGTH> a) {
 	std::cout << a.c_str() << std::endl;
 }
 
@@ -9,16 +9,16 @@ TEST_CASE("ST[08] - Call Tests") {
 	FunctionManagementService fms;
 
 	SECTION("Malformed name") {
-		fms.include(String<FUNCNAMELENGTH>("test"), &test);
+		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
-		msg.appendString(String<FUNCNAMELENGTH>("t3st"));
+		msg.appendString(String<FUNC_NAME_LENGTH>("t3st"));
 		CHECK(fms.call(msg) == 1);
 	}
 
 	SECTION("Too long message") {
-		fms.include(String<FUNCNAMELENGTH>("test"), &test);
+		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
-		msg.appendString(String<FUNCNAMELENGTH>("test"));
+		msg.appendString(String<FUNC_NAME_LENGTH>("test"));
 		msg.appendString(String<65>
 		    ("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
 		CHECK(fms.call(msg) == 4);
@@ -34,7 +34,7 @@ TEST_CASE("ST[08] - Insert Tests") {
 		// make sure the pointer map is full to the brim
 		for (int i = 0; i < 15000; i++) {
 			name = "test" + i;
-			String<FUNCNAMELENGTH> funcName(name.c_str());
+			String<FUNC_NAME_LENGTH> funcName(name.c_str());
 
 			if (not fms.funcPtrIndex.full()) {
 				fms.include(funcName, &test);
@@ -44,7 +44,7 @@ TEST_CASE("ST[08] - Insert Tests") {
 			}
 		}
 
-		CHECK(fms.include(String<FUNCNAMELENGTH>("testall"), &test) == 2);
+		CHECK(fms.include(String<FUNC_NAME_LENGTH>("testall"), &test) == 2);
 	}
 }
 
