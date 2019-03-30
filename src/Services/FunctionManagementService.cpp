@@ -1,13 +1,13 @@
 #include "Services/FunctionManagementService.hpp"
 
-int FunctionManagementService::call(Message& msg) {
-	/**
-	 * @todo: Add test for message and service type using the ErrorHandler
-	 * @todo: Convert all functions to void (use error reports for tests instead of return numbers)
-	 */
+void FunctionManagementService::call(Message& msg) {
 	msg.resetRead();
-	ErrorHandler::assertInternal(msg.messageType == 1 && msg.serviceType == 8,
-	                             ErrorHandler::InternalErrorType::UnacceptablePacket);
+	ErrorHandler::assertRequest(msg.packetType == Message::TC, msg,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(msg.messageType == 1, msg,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(msg.serviceType == 8, msg,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint8_t funcName[FUNC_NAME_LENGTH];  // the function's name
 	uint8_t funcArgs[MAX_ARG_LENGTH];    // arguments for the function
@@ -16,10 +16,10 @@ int FunctionManagementService::call(Message& msg) {
 	msg.readString(funcArgs, MAX_ARG_LENGTH);
 
 	if (msg.dataSize > FUNC_NAME_LENGTH + MAX_ARG_LENGTH) {
-		/**
-		 * @todo Send failed start of execution (too long message)
-		 */
-		return 4;  // arbitrary
+		ErrorHandler::reportError(msg,
+			ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);  // report failed
+			// start of execution as requested by the standard
+			return;
 	}
 
 	// locate the appropriate function pointer
@@ -30,29 +30,23 @@ int FunctionManagementService::call(Message& msg) {
 	if (iter != funcPtrIndex.end()) {
 		selected = *iter->second;
 	} else {
-		/**
-		 * @todo Send failed start of execution (function not found)
-		 */
-		return 1;  // arbitrary
+		ErrorHandler::reportError(msg,
+			ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
+		return;
 	}
 
 	// execute the function if there are no obvious flaws (defined in the standard, pg.158)
 	selected(funcArgs);
-	return 0;
 }
 
-int FunctionManagementService::include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)
+void FunctionManagementService::include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)
 	(String<MAX_ARG_LENGTH>)) {
 
 	if (funcPtrIndex.full()) {
-		/**
-		 * @todo Generate suitable notification (index is full)
-		 */
-		return 2;  // arbitrary, for testing purposes
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::FunctionMapFull);
+		return;
 	}
 
 	funcName.append(FUNC_NAME_LENGTH - funcName.length(), '\0');
 	funcPtrIndex.insert(std::make_pair(funcName, ptr));
-
-	return 0;
 }

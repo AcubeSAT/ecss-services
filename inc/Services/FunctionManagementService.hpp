@@ -1,25 +1,15 @@
 #ifndef ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
 #define ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
 
-#include <cstdint>
-#include <iostream> // USED BY THE SAMPLE FUNCTIONS ONLY!!
-#include <utility>
-#include <typeinfo>
-
 #include "etl/map.h"
 #include "etl/String.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
+#include "ErrorHandler.hpp"
 
-#define FUNC_MAP_SIZE     128     // size of the function map (number of elements)
+#define FUNC_MAP_SIZE     5     // size of the function map (number of elements)
 #define FUNC_NAME_LENGTH  32      // max length of the function name
 #define MAX_ARG_LENGTH    32      // maximum argument byte string length
-
-/**
- * @todo: Undef TESTMODE before flight!!!!
- * @todo: Replace this with error handler code checking
- */
-#define TESTMODE                   // REMOVE BEFORE FLIGHT!(used by Catch to gain visibility @ test)
 
 /**
  * Implementation of the ST[08] function management service
@@ -67,13 +57,10 @@ FunctionMap;
 
 class FunctionManagementService : public Service {
 	/**
-	 * Map of the function names to their respective pointers. Size controlled by FUNCMAPSIZE
+	 * Map of the function names to their respective pointers. Size controlled by FUNC_MAP_SIZE
 	 */
-#ifdef TESTMODE
-public: FunctionMap funcPtrIndex;
-#else
 	FunctionMap funcPtrIndex;
-#endif
+
 
 public:
 	/**
@@ -90,18 +77,19 @@ public:
 	 * int, for testing purposes.
 	 * @param msg A TC[8,1] message
 	 */
-	int call(Message& msg);
+	void call(Message& msg);
 
 	/**
 	 * Includes a new function in the pointer map. This enables it to be called by way of a valid
-	 * TC [8,1] message. After inclusion it returns an unneeded int signalling insertion success
-	 * (0) or failure (2). These returns are there for testing purposes only.
+	 * TC [8,1] message.
 	 *
 	 * @param funcName the function's name. Max. length is FUNC_NAME_LENGTH bytes.
 	 * @param ptr pointer to a function of void return type and a MAX_ARG_LENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
-	int include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)(String<MAX_ARG_LENGTH>));
+	void include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)(String<MAX_ARG_LENGTH>));
+
+	int getMapSize() { return funcPtrIndex.size(); }
 };
 
 #endif //ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
