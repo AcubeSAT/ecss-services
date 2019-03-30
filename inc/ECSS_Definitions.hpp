@@ -9,7 +9,7 @@
 #define CCSDS_PACKET_VERSION 0
 
 // 7.4.4.1c
-#define ECSS_PUS_VERSION 2
+#define ECSS_PUS_VERSION 2U
 
 // 9.3.1a.1.e
 #define ECSS_SEQUENCE_FLAGS 0x3
@@ -34,11 +34,11 @@
 // todo: Define the maximum number of activities
 #define ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES    10
 
-// todo: Define the time margin for the command activation
 /**
  * @brief Time margin used in the time based command scheduling service ST[11]
  * @details This defines the time margin in seconds, from the current rime, that an activity must
  * have in order
+ * @todo Define the time margin for the command activation
  */
 #define ECSS_TIME_MARGIN_FOR_ACTIVATION  60
 

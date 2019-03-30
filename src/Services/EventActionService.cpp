@@ -34,12 +34,12 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			eventActionDefinitionArray[index].enabled = true;
 			eventActionDefinitionArray[index].applicationId = applicationID;
 			eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID;
-			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
+			if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
 				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 			} else {
-				char data[ECSS_EVENT_SERVICE_STRING_SIZE];
+				char data[ECSS_TC_REQUEST_STRING_SIZE];
 				message.readString(data, message.dataSize - 4);
-				eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
+				eventActionDefinitionArray[index].request = String<ECSS_TC_REQUEST_STRING_SIZE>(
 					data);
 			}
 		}
