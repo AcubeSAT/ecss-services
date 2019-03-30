@@ -78,10 +78,10 @@ class Summarizer(object):
     def suppression_info(self):
         """
         Pretty-prints the suppressed rule numbers.
-        :return:
         """
         if (len(self.suppression_list) != 0):
-            print("WARNING: Suppressed infractions of rules: ", end="")
+            print("\n")
+            print(self.bold + self.yellow + "WARNING: Suppressed infractions of rules: ", end="")
             print(f", ".join(self.suppression_list), end=".")
             print("")
             print("")
