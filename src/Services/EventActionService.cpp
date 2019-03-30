@@ -5,26 +5,24 @@
 void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 	message.assertTC(19, 1);
-
-		uint16_t applicationID = message.readEnum16();
-		uint16_t eventDefinitionID = message.readEnum16();
-		if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
-			EventActionDefinition temp;
-			temp.enabled = true;
-			temp.applicationId = applicationID;
-			temp.eventDefinitionID = eventDefinitionID;
-			if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
-				ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
-			} else {
-				char data[ECSS_TC_REQUEST_STRING_SIZE];
-				message.readString(data, message.dataSize - 4);
-				temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
-			}
-			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
+	uint16_t applicationID = message.readEnum16();
+	uint16_t eventDefinitionID = message.readEnum16();
+	if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
+		EventActionDefinition temp;
+		temp.enabled = true;
+		temp.applicationId = applicationID;
+		temp.eventDefinitionID = eventDefinitionID;
+		if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
+			ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 		} else {
-			ErrorHandler::reportError(message,
-				ErrorHandler::EventActionAddExistingDefinitionError);
+			char data[ECSS_TC_REQUEST_STRING_SIZE];
+			message.readString(data, message.dataSize - 4);
+			temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
 		}
+		eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
+	} else {
+		ErrorHandler::reportError(message,
+		                          ErrorHandler::EventActionAddExistingDefinitionError);
 	}
 }
 
