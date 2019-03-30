@@ -1,35 +1,5 @@
 #include "Services/FunctionManagementService.hpp"
 
-/**
- * Usage of the include() function:
- *
- * void foo(String<MAXARGLENGTH> b) {
- * 		std::cout << "SPAAAACE!" << std::endl;
- * 	}
- *
- * void bar(String<MAXARGLENGTH> b) {
- * 		std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
- * 	}
- *
- * void baz(String<MAXARGLENGTH> b) {
- * 		std::cout << "QWERTYUIOP" << std::endl;
- * 	}
- *
- * 	FunctionManagementService::FunctionManagementService() {
- * 		include(String<FUNCNAMELENGTH>("foo"), &foo);
- * 		include(String<FUNCNAMELENGTH>("bar"), &bar);
- * 		include(String<FUNCNAMELENGTH>("baz"), &baz);
- * 	}
- */
-
-/*
- * FunctionManagementService::FunctionManagementService() {
- * All the functions that should be included in the pointer map at initialization shall be here.
- * and included as in the examples above.
- *
- * }
- */
-
 int FunctionManagementService::call(Message& msg) {
 	/**
 	 * @todo: Add test for message and service type using the ErrorHandler

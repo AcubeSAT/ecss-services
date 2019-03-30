@@ -11,9 +11,9 @@
 #include "Message.hpp"
 #include "Service.hpp"
 
-#define FUNCMAPSIZE     128     // size of the function map (number of elements)
-#define FUNCNAMELENGTH  32      // max length of the function name
-#define MAXARGLENGTH    32      // maximum argument byte string length
+#define FUNC_MAP_SIZE     128     // size of the function map (number of elements)
+#define FUNC_NAME_LENGTH  32      // max length of the function name
+#define MAX_ARG_LENGTH    32      // maximum argument byte string length
 
 /**
  * @todo: Undef TESTMODE before flight!!!!
@@ -38,8 +38,31 @@
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
 
-typedef String<FUNCNAMELENGTH> functionName;
-typedef etl::map<functionName, void(*)(String<MAXARGLENGTH>), FUNCMAPSIZE>
+ /**
+ * Usage of the include() function:
+ *
+ * @code
+ * void foo(String<MAXARGLENGTH> b) {
+ * 		std::cout << "SPAAAACE!" << std::endl;
+ * 	}
+ *
+ * void bar(String<MAXARGLENGTH> b) {
+ * 		std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
+ * 	}
+ *
+ * void baz(String<MAXARGLENGTH> b) {
+ * 		std::cout << "QWERTYUIOP" << std::endl;
+ * 	}
+ *
+ * 	FunctionManagementService::FunctionManagementService() {
+ * 		include(String<FUNCNAMELENGTH>("foo"), &foo);
+ * 		include(String<FUNCNAMELENGTH>("bar"), &bar);
+ * 		include(String<FUNCNAMELENGTH>("baz"), &baz);
+ * 	}
+ */
+
+typedef String<FUNC_NAME_LENGTH> functionName;
+typedef etl::map<functionName, void(*)(String<MAX_ARG_LENGTH>), FUNC_MAP_SIZE>
 FunctionMap;
 
 class FunctionManagementService : public Service {
