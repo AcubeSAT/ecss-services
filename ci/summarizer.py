@@ -81,7 +81,7 @@ class Summarizer(object):
         :return:
         """
         if (len(self.suppression_list) != 0):
-            print(self.bold + self.yellow + "WARNING: Suppressed infractions of rules: ", end="")
+            print("WARNING: Suppressed infractions of rules: ", end="")
             print(f", ".join(self.suppression_list), end=".")
             print("")
             print("")
