@@ -173,3 +173,85 @@ TEST_CASE("Requirement 7.3.13 (Packet)", "[message][ecss]") {
 	CHECK(static_cast<int>(telemetry.packetType) == 0);
 	CHECK(static_cast<int>(telecommand.packetType) == 1);
 }
+
+TEST_CASE("Spare field", "[message]") {
+	Message message1(0, 0, Message::TM, 0);
+
+	message1.appendByte(1);
+	message1.appendHalfword(2);
+	message1.appendBits(1, 5);
+	message1.finalize();
+
+	CHECK(message1.dataSize == 4);
+
+	Message message2(0, 0, Message::TM, 0);
+	message2.appendByte(1);
+	message2.appendHalfword(2);
+	message2.appendBits(2, 5);
+	message2.finalize();
+
+	CHECK(message2.dataSize == 4);
+
+	Message message3(0, 0, Message::TM, 0);
+
+	message3.appendByte(1);
+	message3.appendHalfword(2);
+	message3.appendBits(3, 5);
+	message3.finalize();
+
+	CHECK(message3.dataSize == 4);
+
+	Message message4(0, 0, Message::TM, 0);
+
+	message4.appendByte(1);
+	message4.appendHalfword(2);
+	message4.appendBits(4, 5);
+	message4.finalize();
+
+	CHECK(message4.dataSize == 4);
+
+	Message message5(0, 0, Message::TM, 0);
+
+	message5.appendByte(1);
+	message5.appendHalfword(2);
+	message5.appendBits(5, 5);
+	message5.finalize();
+
+	CHECK(message5.dataSize == 4);
+
+	Message message6(0, 0, Message::TM, 0);
+
+	message6.appendByte(1);
+	message6.appendHalfword(2);
+	message6.appendBits(6, 5);
+	message6.finalize();
+
+	CHECK(message6.dataSize == 4);
+
+	Message message7(0, 0, Message::TM, 0);
+
+	message7.appendByte(1);
+	message7.appendHalfword(2);
+	message7.appendBits(7, 5);
+	message7.finalize();
+
+	CHECK(message7.dataSize == 4);
+
+	Message message8(0, 0, Message::TM, 0);
+
+	message8.appendByte(1);
+	message8.appendHalfword(2);
+	message8.appendBits(8, 5);
+	message8.finalize();
+
+	CHECK(message8.dataSize == 4);
+
+	Message message9(0, 0, Message::TM, 0);
+
+	message9.appendByte(1);
+	message9.appendHalfword(2);
+	message9.appendBits(0, 5);
+	message9.finalize();
+
+	CHECK(message9.dataSize == 3);
+}

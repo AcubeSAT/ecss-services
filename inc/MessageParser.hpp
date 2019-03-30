@@ -1,25 +1,20 @@
 #ifndef ECSS_SERVICES_MESSAGEPARSER_HPP
 #define ECSS_SERVICES_MESSAGEPARSER_HPP
 
+#include <Services/EventActionService.hpp>
 #include "Message.hpp"
 
 /**
  * A generic class responsible for the execution of the incoming telemetry and telecommand
  * packets.
- *
- * @todo Implement the execute function in the upcoming services or generally in the upcoming
- * activities
- *
  */
+
 class MessageParser {
 public:
 
 	/**
 	 * It is responsible to call the suitable function that executes the proper service. The way that
 	 * the services are selected is based on the serviceType of the \p message
-	 *
-	 * @todo The implementation of the execute function should correspond to the numbers of the
-	 * services/activities that have been created
 	 */
 	void execute(Message &message);
 
@@ -32,7 +27,17 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	Message parse(uint8_t * data, uint32_t length);
+	Message parse(uint8_t *data, uint32_t length);
+
+	/**
+	 * @todo: elaborate on this comment
+	 * Create a message so that a string can be parsed
+	 *
+	 * Note: conversion of char* to unsigned char* should flow without any problems according to
+	 * this great analysis:
+	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
+	 */
+	Message parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data);
 
 private:
 	/**
@@ -40,14 +45,22 @@ private:
 	 *
 	 * As specified in section 7.4.4.1 of the standard
 	 *
-	 * @todo Implement the acknowledgement flags
-	 * @todo Store and parse the source ID, if needed
-	 *
 	 * @param data The data of the header (not null-terminated)
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
 	void parseTC(uint8_t *data, uint16_t length, Message &message);
+
+	/**
+	 * Parse the ECSS Telemetry packet secondary header
+	 *
+	 * As specified in section 7.4.3.1 of the standard
+	 *
+	 * @param data The data of the header (not null-terminated)
+	 * @param length The size of the header
+	 * @param message The Message to modify based on the header
+	 */
+	void parseTM(uint8_t *data, uint16_t length, Message &message);
 };
 
 

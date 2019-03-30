@@ -16,13 +16,41 @@ TEST_CASE("ST[01] message execution", "[MessageParser][st01]") {
 	CHECK(response.messageType == 1);
 	CHECK(response.packetType == Message::TM);
 
-	message = Message(1, 2, Message::TC, 2);
+	//message = Message(1, 2, Message::TC, 2);
+	//messageParser.execute(message);
+	//response = ServiceTests::get(1);
+	//CHECK(response.serviceType == 1);
+	//CHECK(response.messageType == 2);
+	//CHECK(response.packetType == Message::TM);
+
+	message = Message(1, 3, Message::TC, 2);
 	messageParser.execute(message);
 	response = ServiceTests::get(1);
 	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 2);
+	CHECK(response.messageType == 3);
 	CHECK(response.packetType == Message::TM);
+	
+	//message = Message(1, 4, Message::TC, 2);
+	//messageParser.execute(message);
+	//response = ServiceTests::get(2);
+	//CHECK(response.serviceType == 1);
+	//CHECK(response.messageType == 4);
+	//CHECK(response.packetType == Message::TM);
+	
+	//message = Message(1, 5, Message::TC, 2);
+	//messageParser.execute(message);
+	//response = ServiceTests::get(2);
+	//CHECK(response.serviceType == 1);
+	//CHECK(response.messageType == 5);
+	//CHECK(response.packetType == Message::TM);
 
+	//message = Message(1, 6, Message::TC, 2);
+	//messageParser.execute(message);
+	//response = ServiceTests::get(2);
+	//CHECK(response.serviceType == 1);
+	//CHECK(response.messageType == 6);
+	//CHECK(response.packetType == Message::TM);
+	
 	message = Message(1, 7, Message::TC, 2);
 	messageParser.execute(message);
 	response = ServiceTests::get(2);
@@ -30,19 +58,19 @@ TEST_CASE("ST[01] message execution", "[MessageParser][st01]") {
 	CHECK(response.messageType == 7);
 	CHECK(response.packetType == Message::TM);
 
-	message = Message(1, 8, Message::TC, 2);
-	messageParser.execute(message);
-	response = ServiceTests::get(3);
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 8);
-	CHECK(response.packetType == Message::TM);
+	//message = Message(1, 8, Message::TC, 2);
+	//messageParser.execute(message);
+	//response = ServiceTests::get(3);
+	//CHECK(response.serviceType == 1);
+	//CHECK(response.messageType == 8);
+	//CHECK(response.packetType == Message::TM);
 
-	message = Message(1, 10, Message::TC, 2);
-	messageParser.execute(message);
-	response = ServiceTests::get(4);
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 10);
-	CHECK(response.packetType == Message::TM);
+	//message = Message(1, 10, Message::TC, 2);
+	//messageParser.execute(message);
+	//response = ServiceTests::get(4);
+	//CHECK(response.serviceType == 1);
+	//CHECK(response.messageType == 10);
+	//CHECK(response.packetType == Message::TM);
 }
 
 TEST_CASE("ST[17] message execution", "[MessageParser][st17]") {
@@ -77,4 +105,22 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 	CHECK(message.serviceType == 129);
 	CHECK(message.messageType == 31);
 	CHECK(memcmp(message.data, "hello", 5) == 0);
+}
+
+TEST_CASE("TC data parsing into a message", "[MessageParser]") {
+
+}
+
+TEST_CASE("TM message parsing", "[MessageParser]") {
+	MessageParser messageParser;
+	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x0c, 0x20, 0x16, 0x11, 0x00, 0x00, 0x68,
+					 0x65, 0x6c, 0x6c, 0x6f,
+					 0x68, 0x69};
+	Message message = messageParser.parse(packet, 18);
+	CHECK(message.packetType == Message::TM);
+	CHECK(message.applicationId == 2);
+	CHECK(message.dataSize == 7);
+	CHECK(message.serviceType == 22);
+	CHECK(message.messageType == 17);
+	CHECK(memcmp(message.data, "hellohi", 7) == 0);
 }

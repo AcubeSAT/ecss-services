@@ -1,4 +1,5 @@
 # Build files
+build
 cmake-build-debug
 docs
 
@@ -63,3 +64,4 @@ docs
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+.idea/**/markdown-*

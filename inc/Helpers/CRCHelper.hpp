@@ -20,7 +20,6 @@ class CRCHelper {
 	 */
 
 // TODO: Change this to hardware implementation or a trusted software one
-// TODO: Use CRC with received TC and transmitted TM packets
 public:
 	/**
 	 * Actual CRC calculation function.

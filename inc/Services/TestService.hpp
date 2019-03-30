@@ -32,12 +32,6 @@ public:
 	 * @todo Error handling for the switch() in the implementation of this execute function
 	 */
 	void execute(Message &message);
-
-	/**
-	 *  The purpose of this instance is to access the execute function of this service when a
-	 *  MessageParser object is created
-	 */
-	static TestService instance;
 };
 
 

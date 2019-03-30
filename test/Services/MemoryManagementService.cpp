@@ -4,6 +4,8 @@
 #include "ServiceTests.hpp"
 #include "Helpers/CRCHelper.hpp"
 
+MemoryManagementService & memMangService = Services.memoryManagement;
+
 TEST_CASE("TM[6,2]", "[service][st06]") {
 	// Required test variables
 	char *pStr = static_cast<char *>(malloc(4));
@@ -11,8 +13,6 @@ TEST_CASE("TM[6,2]", "[service][st06]") {
 	*(pStr + 1) = 'G';
 	*(pStr + 2) = '\0';
 	uint8_t data[2] = {'h', 'R'};
-
-	MemoryManagementService memMangService;
 
 	Message receivedPacket = Message(6, 2, Message::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
