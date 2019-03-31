@@ -30,11 +30,6 @@ public:
 	 * @return A boolean value indicating whether the messages are of the same type
 	 */
 	static bool isSameType(const Message &msg1, const Message &msg2) {
-		for (uint16_t i = 0; i < ECSS_MAX_MESSAGE_SIZE; i++) {
-			if (msg1.data[i] != msg2.data[i]) {
-				return false;
-			}
-		}
 		return (msg1.packetType == msg2.packetType) &&
 		       (msg1.messageType == msg2.messageType) && (msg1.serviceType == msg2.serviceType);
 	}
