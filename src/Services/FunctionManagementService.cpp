@@ -42,11 +42,11 @@ void FunctionManagementService::call(Message& msg) {
 void FunctionManagementService::include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)
 	(String<MAX_ARG_LENGTH>)) {
 
-	if (funcPtrIndex.full()) {
+	if (not funcPtrIndex.full()) {  // CAUTION: etl::map won't check by itself if it's full
+		// before attempting to insert a key-value pair, causing segmentation faults. Check first!
+		funcName.append(FUNC_NAME_LENGTH - funcName.length(), '\0');
+		funcPtrIndex.insert(std::make_pair(funcName, ptr));
+	} else {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::FunctionMapFull);
-		return;
 	}
-
-	funcName.append(FUNC_NAME_LENGTH - funcName.length(), '\0');
-	funcPtrIndex.insert(std::make_pair(funcName, ptr));
 }

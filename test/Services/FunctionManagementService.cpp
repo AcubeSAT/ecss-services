@@ -35,14 +35,18 @@ TEST_CASE("ST[08] - Call Tests") {
 	}
 }
 
-// WARNING! include() is malfunctioning - do not merge!
 
-//TEST_CASE("ST[08] - Insert Tests") {
-//
-//	SECTION("Insertion to full pointer map") {
-//		// make sure the pointer map is full to the brim
-//		ServiceTests::reset();
-//		std::string name = "test";  // FOR TESTING ONLY!
-//
-//	}
-//}
+TEST_CASE("ST[08] - Insert Tests") {
+
+	SECTION("Insertion to full pointer map") {
+		// make sure the pointer map is full to the brim
+		ServiceTests::reset();
+		std::string name = "test";  // FOR TESTING ONLY!
+
+		for (int i = 0; i < FUNC_MAP_SIZE + 1; i++) {
+			name += std::to_string(i); // different names to fill up the map
+			fms.include(String<FUNC_NAME_LENGTH>(name.c_str()), &test);
+		}
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::FunctionMapFull));
+	}
+}
