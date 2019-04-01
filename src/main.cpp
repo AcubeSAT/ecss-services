@@ -7,6 +7,7 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/FunctionManagementService.hpp"
 #include "Services/TimeManagementService.hpp"
 #include "Services/EventActionService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
