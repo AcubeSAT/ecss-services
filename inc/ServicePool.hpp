@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_SERVICEPOOL_HPP
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
+#include "Services/LargePacketTransferService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/TimeManagementService.hpp"
 #include "Services/EventReportService.hpp"
@@ -26,6 +27,7 @@ public:
 	EventActionService eventAction;
 	TestService testService;
 	ParameterService parameterManagement;
+	LargePacketTransferService largePacketTransferService;
 	FunctionManagementService functionManagement;
 
 	/**
