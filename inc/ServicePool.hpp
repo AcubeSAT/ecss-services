@@ -8,6 +8,7 @@
 #include "Services/ParameterService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "Services/FunctionManagementService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -25,6 +26,7 @@ public:
 	EventActionService eventAction;
 	TestService testService;
 	ParameterService parameterManagement;
+	FunctionManagementService functionManagement;
 
 	/**
 	 * The default ServicePool constructor
