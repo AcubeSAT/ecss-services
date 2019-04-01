@@ -34,12 +34,12 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			eventActionDefinitionArray[index].enabled = true;
 			eventActionDefinitionArray[index].applicationId = applicationID;
 			eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID;
-			if (message.dataSize - 4 > ECSS_EVENT_SERVICE_STRING_SIZE) {
+			if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
 				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 			} else {
-				char data[ECSS_EVENT_SERVICE_STRING_SIZE];
+				char data[ECSS_TC_REQUEST_STRING_SIZE];
 				message.readString(data, message.dataSize - 4);
-				eventActionDefinitionArray[index].request = String<ECSS_EVENT_SERVICE_STRING_SIZE>(
+				eventActionDefinitionArray[index].request = String<ECSS_TC_REQUEST_STRING_SIZE>(
 					data);
 			}
 		}
@@ -150,11 +150,11 @@ void EventActionService::eventActionStatusReport() {
 		}
 	}
 	report.appendUint8(count);
-	for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
-		if (not eventActionDefinitionArray[i].empty) {
-			report.appendEnum16(eventActionDefinitionArray[i].applicationId);
-			report.appendEnum16(eventActionDefinitionArray[i].eventDefinitionID);
-			report.appendBoolean(eventActionDefinitionArray[i].enabled);
+	for (const auto &definition : eventActionDefinitionArray) {
+		if (not definition.empty) {
+			report.appendEnum16(definition.applicationId);
+			report.appendEnum16(definition.eventDefinitionID);
+			report.appendBoolean(definition.enabled);
 		}
 	}
 	storeMessage(report);
@@ -178,13 +178,13 @@ void EventActionService::disableEventActionFunction(Message message) {
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
-		for (uint16_t i = 0; i < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; i++) {
-			if (not eventActionDefinitionArray[i].empty &&
-			    eventActionDefinitionArray[i].enabled) {
-				if (eventActionDefinitionArray[i].eventDefinitionID == eventID) {
+		for (const auto &definition : eventActionDefinitionArray) {
+			if (not definition.empty &&
+			    definition.enabled) {
+				if (definition.eventDefinitionID == eventID) {
 					MessageParser messageParser;
 					Message message = messageParser.parseRequestTC(
-						eventActionDefinitionArray[i].request);
+						definition.request);
 					messageParser.execute(message);
 				}
 			}

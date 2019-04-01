@@ -22,6 +22,41 @@ class Message {
 public:
 	Message() = default;
 
+	/**
+	 * @brief Compare two messages
+	 * @details Check whether two Message objects are of the same type
+	 * @param msg1 First message for comparison
+	 * @param msg2 Second message for comparison
+	 * @return A boolean value indicating whether the messages are of the same type
+	 */
+	static bool isSameType(const Message &msg1, const Message &msg2) {
+		return (msg1.packetType == msg2.packetType) &&
+		       (msg1.messageType == msg2.messageType) && (msg1.serviceType == msg2.serviceType);
+	}
+
+	/**
+	 * @brief Overload the equality operator to compare messages
+	 * @details Compare two @ref ::Message objects, based on their contents and type
+	 * @param The message content to compare against
+	 * @todo Activate the dataSize check when the Message object data field is defined with a
+	 * fixed size
+	 * @return The result of comparison
+	 */
+	bool operator==(const Message &msg) const {
+		// todo: Enable the following check when the message data field has a fixed size padded
+		//  with zeros. At the moment the data array is not padded with zeros to fulfil the
+		//  maximum set number of a TC request message.
+		//if (this->dataSize != msg.dataSize) return false;
+
+		for (uint16_t i = 0; i < ECSS_MAX_MESSAGE_SIZE; i++) {
+			if (this->data[i] != msg.data[i]) {
+				return false;
+			}
+		}
+		return (this->packetType == msg.packetType) &&
+		       (this->messageType == msg.messageType) && (this->serviceType == msg.serviceType);
+	}
+
 	enum PacketType {
 		TM = 0, // Telemetry
 		TC = 1 // Telecommand
@@ -436,6 +471,16 @@ public:
 		readString(byteString, size); // Read the string data
 
 		return size; // Return the string size
+	}
+
+	/**
+	 * @brief Skip read bytes in the read string
+	 * @details Skips the provided number of bytes, by incrementing the readPosition and this is
+	 * done to avoid accessing the `readPosition` variable directly
+	 * @param numberOfBytes The number of bytes to be skipped
+	 */
+	void skipBytes(uint16_t numberOfBytes) {
+		readPosition += numberOfBytes;
 	}
 
 	/**

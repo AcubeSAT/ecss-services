@@ -10,9 +10,9 @@
 #include "Services/FunctionManagementService.hpp"
 #include "Services/TimeManagementService.hpp"
 #include "Services/EventActionService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
-#include "Services/MemoryManagementService.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
@@ -290,6 +290,45 @@ int main() {
 	std::cout << "\nPositions 0,1 empty should be 1:" << static_cast<uint16_t>(eventActionService
 		.eventActionDefinitionArray[0].empty);
 
+
+	// ST[11] test
+	TimeBasedSchedulingService timeBasedSchedulingService;
+	MessageParser msgParser;
+	auto currentTime = static_cast<uint32_t >(time(nullptr)); // Get the current system time
+	std::cout << "\n\nST[11] service is running";
+	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
+
+	Message receivedMsg = Message(11, 1, Message::TC, 1);
+	Message testMessage1(6, 5, Message::TC, 1), testMessage2(4, 5, Message::TC, 1);
+	testMessage1.appendUint16(4253); // Append dummy data
+	testMessage2.appendUint16(45667); // Append dummy data
+
+	timeBasedSchedulingService.enableScheduleExecution(receivedMsg); // Enable the schedule
+
+	// Insert activities in the schedule
+	receivedMsg = Message(11, 4, Message::TC, 1);
+	receivedMsg.appendUint16(2); // Total number of requests
+
+	receivedMsg.appendUint32(currentTime + 1556435);
+	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
+
+	receivedMsg.appendUint32(currentTime + 1957232);
+	receivedMsg.appendString(msgParser.convertTCToStr(testMessage2));
+	timeBasedSchedulingService.insertActivities(receivedMsg);
+
+	// Time shift activities
+	receivedMsg = Message(11, 15, Message::TC, 1);
+	receivedMsg.appendSint32(-6789);
+	timeBasedSchedulingService.timeShiftAllActivities(receivedMsg);
+	std::cout << "Activities should be time shifted by: " << -6789 << " seconds." << std::endl;
+
+	// Report the activities
+	receivedMsg = Message(11, 16, Message::TC, 1);
+	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);
+
+	// Report the activities by ID
+	receivedMsg = Message(11, 12, Message::TC, 1);
+	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 	return 0;
 }
