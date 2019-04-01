@@ -5,6 +5,8 @@
 
 #define ECSS_MAX_STRING_SIZE 256
 
+#define ECSS_MAX_FIXED_OCTET_STRING_SIZE 256 // For the ST13 large packet transfer service
+
 // 7.4.1
 #define CCSDS_PACKET_VERSION 0
 
