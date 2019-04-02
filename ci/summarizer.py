@@ -1,4 +1,4 @@
-#!/bin/env python3.6
+#!/bin/env python3
 
 from argparse import ArgumentParser
 
