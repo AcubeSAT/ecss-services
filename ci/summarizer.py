@@ -1,5 +1,6 @@
 #!/bin/env python3
 
+import os
 from argparse import ArgumentParser
 
 """
@@ -38,6 +39,12 @@ class Summarizer(object):
                 file_name = line_contents[0]  # first part is the filename (index 0)
                 violation = (line_contents[1], line_contents[2].strip(
                     '\n'))  # index 1 is the line number, index 2 is the number of violated rule (both are strings)
+                
+                with open(os.path.abspath(file_name)) as code_file:
+                    code_lines = code_file.readlines()  # Read the source code file
+                    line_of_interest = code_lines[int(violation[0]) - 1]  # Get the desired violation line
+                if line_of_interest.find("// Ignore-MISRA") >= 0:
+                    continue
 
                 if file_name not in self.violations_map.keys():
                     self.violations_map[
@@ -45,7 +52,7 @@ class Summarizer(object):
                     # rule no.
                     self.violations_map[file_name].append(violation)
                 else:
-                    self.violations_map[file_name].append(violation)  # do not append if it already exists
+                    self.violations_map[file_name].append(violation)  # do not create a key if it already exists
 
         for e in self.suppression_list:
             for file_name in self.violations_map.keys():
@@ -54,6 +61,7 @@ class Summarizer(object):
 
         self.violations_map = {k: v for (k, v) in self.violations_map.items() if len(v) != 0}
         # "delete" all keys whose lists are empty
+
 
     def pretty_print_violations(self):
         """
@@ -64,6 +72,7 @@ class Summarizer(object):
         for file_name in self.violations_map:
             print("")
             for violation in sorted(self.violations_map[file_name], key=lambda x: int(x[0])):
+                
                 name_string = f"{self.bold}{self.red}File {self.yellow}{file_name}{self.red}"
                 rule_violated_string = f"violates rule {self.yellow}#{violation[1]}{self.red} " \
                     f"of the MISRA C 2012 standard"
