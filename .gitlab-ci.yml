@@ -38,8 +38,8 @@ tests:
 cppcheck:
   stage: build
   before_script:
-    - echo deb http://deb.debian.org/debian sid main > /etc/apt/sources.list  
-    - apt-get update -qq && apt-get -t sid install -y -qq cppcheck
+    - echo deb http://deb.debian.org/debian testing main > /etc/apt/sources.list  
+    - apt-get update -qq && apt-get -t testing install -y cppcheck
     - cppcheck --version
   script:
     - ci/cppcheck.sh
@@ -47,9 +47,9 @@ cppcheck:
 cppcheck-misra:
   stage: build
   before_script:
-  # install cppcheck from the sid repos in order to get the latest version
-    - echo deb http://deb.debian.org/debian sid main > /etc/apt/sources.list  
-    - apt-get update -qq && apt-get -t sid install -y -qq cppcheck && apt-get -t sid install -y python3.6
+  # install cppcheck from the testing repos in order to get the latest version
+    - echo deb http://deb.debian.org/debian testing main > /etc/apt/sources.list  
+    - apt-get update -qq && apt-get -t testing install -y cppcheck && apt-get -t testing install -y python3
     - cppcheck --version
   script:
     - ci/cppcheck-misra.sh
