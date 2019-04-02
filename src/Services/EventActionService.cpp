@@ -15,8 +15,8 @@ void EventActionService::addEventActionDefinitions(Message message) {
 	uint16_t eventDefinitionID = message.readEnum16();
 	bool accepted = true;
 	for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-		if (eventActionDefinitionArray[index].applicationId == applicationID &&
-		    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
+		if ((eventActionDefinitionArray[index].applicationId == applicationID) &&
+		    (eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) &&
 		    eventActionDefinitionArray[index].enabled) {
 			// @todo: throw a failed start of execution error
 			accepted = false;
@@ -34,7 +34,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			eventActionDefinitionArray[index].enabled = true;
 			eventActionDefinitionArray[index].applicationId = applicationID;
 			eventActionDefinitionArray[index].eventDefinitionID = eventDefinitionID;
-			if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
+			if ((message.dataSize - 4) > ECSS_TC_REQUEST_STRING_SIZE) {
 				ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 			} else {
 				char data[ECSS_TC_REQUEST_STRING_SIZE];
@@ -54,8 +54,8 @@ void EventActionService::deleteEventActionDefinitions(Message message) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
 		for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-			if (eventActionDefinitionArray[index].applicationId == applicationID &&
-			    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID &&
+			if ((eventActionDefinitionArray[index].applicationId == applicationID) &&
+			    (eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) &&
 			    eventActionDefinitionArray[index].enabled) {
 				eventActionDefinitionArray[index].empty = true;
 				eventActionDefinitionArray[index].eventDefinitionID = 65535;
@@ -88,13 +88,13 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	message.assertTC(19, 4);
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	if (numberOfEventActionDefinitions != 0){
+	if (numberOfEventActionDefinitions != 0u){
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+				if ((eventActionDefinitionArray[index].applicationId == applicationID) &&
+				    (eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID)) {
 					eventActionDefinitionArray[index].enabled = true;
 				}
 			}
@@ -113,13 +113,13 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 	message.assertTC(19, 5);
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	if (numberOfEventActionDefinitions != 0){
+	if (numberOfEventActionDefinitions != 0u) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-				if (eventActionDefinitionArray[index].applicationId == applicationID &&
-				    eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID) {
+				if ((eventActionDefinitionArray[index].applicationId == applicationID) &&
+				    (eventActionDefinitionArray[index].eventDefinitionID == eventDefinitionID)) {
 					eventActionDefinitionArray[index].enabled = false;
 				}
 			}

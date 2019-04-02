@@ -5,9 +5,9 @@
 #include <Message.hpp>
 #include "TimeAndDate.hpp"
 
-#define SECONDS_PER_MINUTE 60
-#define SECONDS_PER_HOUR 3600
-#define SECONDS_PER_DAY 86400
+#define SECONDS_PER_MINUTE 60u
+#define SECONDS_PER_HOUR 3600u
+#define SECONDS_PER_DAY 86400u
 
 /**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.

@@ -53,7 +53,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	uint16_t ids = paramIds.readUint16();
 	reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
 
-	for (int i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < ids; i++) {
 		uint16_t currId = paramIds.readUint16();      // current ID to be appended
 
 		if (paramsList.find(currId) != paramsList.end()) {
@@ -84,7 +84,7 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 
 	uint16_t ids = newParamValues.readUint16();  //get number of ID's
 
-	for (int i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < ids; i++) {
 		uint16_t currId = newParamValues.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
@@ -105,7 +105,7 @@ uint16_t ParameterService::numOfValidIds(Message idMsg) {
 	uint16_t ids = idMsg.readUint16();        // first 16bits of the packet are # of IDs
 	uint16_t validIds = 0;
 
-	for (int i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < ids; i++) {
 		uint16_t currId = idMsg.readUint16();
 
 		if (idMsg.messageType == 3) {

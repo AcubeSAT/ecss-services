@@ -2,11 +2,10 @@
 #define PROJECT_ERRORHANDLER_HPP
 
 #include <type_traits>
+#include <stdint.h> // for the uint_8t stepID
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
-
-#include <stdint.h> // for the uint_8t stepID
 
 /**
  * A class that handles unexpected software errors, including internal errors or errors due to
@@ -236,22 +235,25 @@ public:
 	template<typename ErrorType>
 	inline static ErrorSource findErrorSource(ErrorType error) {
 		// Static type checking
+		ErrorSource source = Internal;
+
 		if (std::is_same<ErrorType, AcceptanceErrorType>()) {
-			return Acceptance;
+			source = Acceptance;
 		}
 		if (std::is_same<ErrorType, ExecutionStartErrorType>()) {
-			return ExecutionStart;
+			source = ExecutionStart;
 		}
 		if (std::is_same<ErrorType, ExecutionProgressErrorType>()) {
-			return ExecutionProgress;
+			source = ExecutionProgress;
 		}
 		if (std::is_same<ErrorType, ExecutionCompletionErrorType>()) {
-			return ExecutionCompletion;
+			source = ExecutionCompletion;
 		}
 		if (std::is_same<ErrorType, RoutingErrorType>()) {
-			return Routing;
+			source = Routing;
 		}
-		return Internal;
+
+		return source;
 	}
 };
 

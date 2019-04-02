@@ -15,7 +15,7 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 	while (numBits > 0) { // For every sequence of 8 bits...
 		ASSERT_INTERNAL(dataSize < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 
-		if (currentBit + numBits >= 8) {
+		if ((currentBit + numBits) >= 8) {
 			// Will have to shift the bits and insert the next ones later
 			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
 
@@ -54,7 +54,7 @@ void Message::appendByte(uint8_t value) {
 }
 
 void Message::appendHalfword(uint16_t value) {
-	ASSERT_INTERNAL(dataSize + 2 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	ASSERT_INTERNAL((dataSize + 2) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
 	data[dataSize] = static_cast<uint8_t>((value >> 8) & 0xFF);
@@ -64,7 +64,7 @@ void Message::appendHalfword(uint16_t value) {
 }
 
 void Message::appendWord(uint32_t value) {
-	ASSERT_INTERNAL(dataSize + 4 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	ASSERT_INTERNAL((dataSize + 4) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
 	data[dataSize] = static_cast<uint8_t>((value >> 24) & 0xFF);
@@ -83,10 +83,11 @@ uint16_t Message::readBits(uint8_t numBits) {
 	while (numBits > 0) {
 		ASSERT_REQUEST(readPosition < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
-		if (currentBit + numBits >= 8) {
-			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
+		if ((currentBit + numBits) >= 8) {
+			uint8_t bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
 
-			auto maskedData = static_cast<uint8_t>(data[readPosition] & ((1 << bitsToAddNow) - 1));
+			uint8_t mask = ((1 << bitsToAddNow) - 1);
+			uint8_t maskedData = data[readPosition] & mask;
 			value |= maskedData << (numBits - bitsToAddNow);
 
 			numBits -= bitsToAddNow;

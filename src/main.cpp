@@ -322,10 +322,10 @@ int main() {
 	receivedMsg = Message(11, 4, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
-	receivedMsg.appendUint32(currentTime + 1556435);
+	receivedMsg.appendUint32(currentTime + 1556435u);
 	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
 
-	receivedMsg.appendUint32(currentTime + 1957232);
+	receivedMsg.appendUint32(currentTime + 1957232u);
 	receivedMsg.appendString(msgParser.convertTCToStr(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 

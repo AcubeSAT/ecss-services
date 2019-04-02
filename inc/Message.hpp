@@ -1,10 +1,6 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
-
-// Forward declaration of the Message class, needed for the ErrorHandler
-class Message;
-
 #include "ECSS_Definitions.hpp"
 #include <cstdint>
 #include <etl/String.hpp>
@@ -496,13 +492,15 @@ public:
 	 */
 	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType,
 		uint8_t expectedMessageType) {
-		if (packetType != expectedPacketType || serviceType != expectedServiceType ||
-		    messageType != expectedMessageType) {
+		bool status = true;
+
+		if ((packetType != expectedPacketType) || (serviceType != expectedServiceType) ||
+		    (messageType != expectedMessageType)) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
-			return false;
+			status = false;
 		}
 
-		return true;
+		return status;
 	}
 
 	/**
