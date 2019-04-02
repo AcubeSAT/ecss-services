@@ -111,7 +111,7 @@ public:
 		 * made to add an existing event action
 		 * definition
 		 */
-		EventActionAddExistingDefinitionError = 1,
+		EventActionAddEnabledDefinitionError = 1,
 		/**
 		 * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
 		 * was made to delete an event action definition that was enabled

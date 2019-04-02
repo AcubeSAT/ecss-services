@@ -14,14 +14,25 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 			char data[ECSS_TC_REQUEST_STRING_SIZE];
 			message.readString(data, message.dataSize - 4);
 			EventActionDefinition temp;
-			temp.enabled = true;
+			temp.enabled = false;
 			temp.applicationId = applicationID;
 			temp.eventDefinitionID = eventDefinitionID;
 			temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 		}
 	} else {
-		ErrorHandler::reportError(message, ErrorHandler::EventActionAddExistingDefinitionError);
+		if (eventActionDefinitionMap[eventDefinitionID].enabled == false) {
+			if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
+				ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
+			} else {
+				char data[ECSS_TC_REQUEST_STRING_SIZE];
+				message.readString(data, message.dataSize - 4);
+				eventActionDefinitionMap[eventDefinitionID].request =
+					String<ECSS_TC_REQUEST_STRING_SIZE>(data);
+			}
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::EventActionAddEnabledDefinitionError);
+		}
 	}
 }
 
@@ -99,7 +110,7 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 				eventActionDefinitionMap[eventDefinitionID].enabled = false;
 			} else {
 				ErrorHandler::reportError(message,
-				                        ErrorHandler::EventActionUnknownDefinitionError);
+				                          ErrorHandler::EventActionUnknownDefinitionError);
 			}
 		}
 	} else {
