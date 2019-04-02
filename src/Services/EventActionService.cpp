@@ -130,8 +130,8 @@ void EventActionService::requestEventActionDefinitionStatus(Message &message) {
 void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
 	Message report = createTM(7);
-	uint8_t count = eventActionDefinitionMap.size();
-	report.appendUint8(count);
+	uint16_t count = eventActionDefinitionMap.size();
+	report.appendUint16(count);
 	for (const auto &element : eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
