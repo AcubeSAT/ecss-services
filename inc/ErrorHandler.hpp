@@ -69,7 +69,11 @@ public:
 		/**
 		 * A function received a Message that was not of the correct type
 		 */
-		    OtherMessageType = 9,
+			OtherMessageType = 9,
+		/**
+		 * Attempt to insert new function in a full function map (ST[08])
+		 */
+			FunctionMapFull = 10,
 	};
 
 	/**
@@ -106,6 +110,8 @@ public:
 	 */
 	enum ExecutionStartErrorType {
 		UnknownExecutionStartError = 0,
+		SubServiceExecutionStartError = 1,
+		InstructionExecutionStartError = 2,
 	};
 
 	/**
