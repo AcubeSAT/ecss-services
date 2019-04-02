@@ -122,14 +122,14 @@ uint64_t TimeHelper::generateCDStimeFormat(TimeAndDate &TimeInfo) {
 }
 
 TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t *data) {
-	uint16_t elapsedDays = (static_cast<uint16_t >(data[0])) << 8) | (static_cast<uint16_t >
+	uint16_t elapsedDays = ((static_cast<uint16_t >(data[0])) << 8) | (static_cast<uint16_t >
 		(data[1]));
-	uint32_t msOfDay = (static_cast<uint32_t >(data[2])) << 24 |
-	                   (static_cast<uint32_t >(data[3])) << 16 |
-	                   (static_cast<uint32_t >(data[4])) << 8 |
-	                   static_cast<uint32_t >(data[5]);
+	uint32_t msOfDay = ((static_cast<uint32_t >(data[2])) << 24) |
+	                   ((static_cast<uint32_t >(data[3]))) << 16 |
+	                   ((static_cast<uint32_t >(data[4]))) << 8 |
+	                   (static_cast<uint32_t >(data[5]));
 
-	uint32_t seconds = elapsedDays * SECONDS_PER_DAY + msOfDay / 1000;
+	uint32_t seconds = (elapsedDays * SECONDS_PER_DAY) + (msOfDay / 1000u);
 
 	return secondsToUTC(seconds);
 }

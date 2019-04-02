@@ -86,7 +86,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 		if ((currentBit + numBits) >= 8) {
 			uint8_t bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
 
-			uint8_t mask = ((1 << bitsToAddNow) - 1);
+			uint8_t mask = ((1u << bitsToAddNow) - 1u);
 			uint8_t maskedData = data[readPosition] & mask;
 			value |= maskedData << (numBits - bitsToAddNow);
 
@@ -113,7 +113,7 @@ uint8_t Message::readByte() {
 }
 
 uint16_t Message::readHalfword() {
-	ASSERT_REQUEST(readPosition + 2 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+	ASSERT_REQUEST((readPosition + 2) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
 	uint16_t value = (data[readPosition] << 8) | data[readPosition + 1];
 	readPosition += 2;
@@ -122,7 +122,7 @@ uint16_t Message::readHalfword() {
 }
 
 uint32_t Message::readWord() {
-	ASSERT_REQUEST(readPosition + 4 <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+	ASSERT_REQUEST((readPosition + 4) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
 	uint32_t value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) |
 	                 (data[readPosition + 2] << 8) | data[readPosition + 3];
@@ -132,7 +132,7 @@ uint32_t Message::readWord() {
 }
 
 void Message::readString(char *string, uint8_t size) {
-	ASSERT_REQUEST(readPosition + size <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+	ASSERT_REQUEST((readPosition + size) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
@@ -142,7 +142,7 @@ void Message::readString(char *string, uint8_t size) {
 }
 
 void Message::readString(uint8_t *string, uint16_t size) {
-	ASSERT_REQUEST(readPosition + size <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+	ASSERT_REQUEST((readPosition + size) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
