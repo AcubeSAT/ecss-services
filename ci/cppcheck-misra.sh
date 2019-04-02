@@ -18,7 +18,8 @@ find inc/ src/ -type f \( -iname "*.cpp" -or -iname "*.hpp" \) | xargs cppcheck 
 
 # run the MISRA checks against the dumps and send the results to a file
 echo -e "\u001b[34;1mRunning MISRA C(2012) rule compliance tests...\u001b[0m"
-find inc/ src/ -type f -name "*.dump" | xargs python3.6 ci/misra.py >> ci/report.msr 2>&1
+echo > ci/report.msr # clear the report file
+find inc/ src/ -type f -name "*.dump" | xargs python3 ci/misra.py >> ci/report.msr 2>&1
 
 # pre-process the generated report to remove all useless strings
 echo -e "\u001b[34;1mPre-processing report...\u001b[0m"
@@ -26,6 +27,5 @@ sed -i -r 's/(.*Script.*)|(.*Checking.*)|(.*MISRA.*)//gm; /(^$)/d; s/(\s\(.*\)\s
 
 # run the summarizer for a nice, clean summary of errors
 echo -e "\u001b[34;1mSummarizing results...\u001b[0m"
-# python3 ci/summarizer.py --report ci/report.msr --suppress 3.1 5.1 5.2 14.4 18.8 
-cat ci/report.msr
+python3 ci/summarizer.py --report ci/report.msr --suppress 3.1 5.1 5.2 14.4 18.8
 
