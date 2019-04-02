@@ -4,7 +4,22 @@ import os
 from argparse import ArgumentParser
 
 """
-Naive parser and pretty printer for the MISRA reports by cppcheck
+Naive parser and pretty printer for the MISRA reports by cppcheck.
+
+Usage:
+python3 summarizer.py --report <report-file-generated-from-cppcheck-misra.sh> 
+--suppress <list-of-rule-numbers-to-be-suppressed> (as they are given on the
+MISRA handbook)
+
+e.g.: python3 summarizer.py --report ci/report.msr --suppress 5.2 10.4 15.5
+
+You can also mark lines you wish to be skipped by adding 
+"// Ignore-MISRA" at a suitable position on the line you want to ignore
+from assessing (NOTE: the double slashes are part of the string!)
+
+(Credits to @dimst23 for the feature!)
+
+TODO: Keep track of line numbers and filenames of suppressed lines.
 """
 
 
