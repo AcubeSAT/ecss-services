@@ -5,6 +5,7 @@
 void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 	message.assertTC(19, 1);
+	message.resetRead();
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
 	if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
@@ -38,6 +39,7 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 
 void EventActionService::deleteEventActionDefinitions(Message &message) {
 	message.assertTC(19, 2);
+	message.resetRead();
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 		uint16_t applicationID = message.readEnum16();
@@ -69,7 +71,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message &message) {
 void EventActionService::enableEventActionDefinitions(Message &message) {
 	// TC[19,4]
 	message.assertTC(19, 4);
-
+	message.resetRead();
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
@@ -96,6 +98,7 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 void EventActionService::disableEventActionDefinitions(Message &message) {
 	// TC[19,5]
 	message.assertTC(19, 5);
+	message.resetRead();
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0) {
