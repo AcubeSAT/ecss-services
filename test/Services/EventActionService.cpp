@@ -14,12 +14,19 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 
 	Message message(19, 1, Message::TC, 0);
 	message.appendEnum16(0);
-	message.appendEnum16(2);
-	String<64> data = "123";
+	message.appendEnum16(5);
+	String<128> data = "0123456789012345678901234567890123456789012345678901234567890123456789";
 	message.appendString(data);
 
 	eventActionService.addEventActionDefinitions(message);
-
+	CHECK(ServiceTests::thrownError(ErrorHandler::MessageTooLarge));
+	CHECK(ServiceTests::countErrors() == 1);
+	Message message1(19, 1, Message::TC, 0);
+	message1.appendEnum16(0);
+	message1.appendEnum16(2);
+	data = "01234";
+	message1.appendString(data);
+	eventActionService.addEventActionDefinitions(message1);
 	CHECK(eventActionService.eventActionDefinitionMap[2].applicationId == 0);
 	CHECK(eventActionService.eventActionDefinitionMap[2].eventDefinitionID == 2);
 	CHECK(eventActionService.eventActionDefinitionMap[2].enabled == 1);
@@ -30,12 +37,21 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	message2.appendEnum16(3);
 	data = "456";
 	message2.appendString(data);
-
 	eventActionService.addEventActionDefinitions(message2);
 	CHECK(eventActionService.eventActionDefinitionMap[3].applicationId == 1);
 	CHECK(eventActionService.eventActionDefinitionMap[3].eventDefinitionID == 3);
 	CHECK(eventActionService.eventActionDefinitionMap[3].enabled == 1);
 	CHECK(eventActionService.eventActionDefinitionMap[3].request.compare(data) == 0);
+
+	Message message3(19, 1, Message::TC, 0);
+	message3.appendEnum16(1);
+	message3.appendEnum16(3);
+	data = "456";
+	message3.appendString(data);
+	eventActionService.addEventActionDefinitions(message3);
+
+	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionAddExistingDefinitionError));
+	CHECK(ServiceTests::countErrors() == 2);
 }
 
 TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
@@ -115,6 +131,22 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	CHECK(eventActionService.eventActionDefinitionMap[4].request.compare("") == 0);
 	CHECK(eventActionService.eventActionDefinitionMap[4].enabled == 0);
 
+	Message message6(19, 2, Message::TC, 0);
+	message6.appendUint16(1);
+	message6.appendEnum16(1);
+	message6.appendEnum16(3);
+	eventActionService.deleteEventActionDefinitions(message6);
+
+	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionDeleteEnabledDefinitionError));
+	CHECK(ServiceTests::countErrors() == 1);
+
+	Message message7(19, 2, Message::TC, 0);
+	message7.appendUint16(1);
+	message7.appendEnum16(1);
+	message7.appendEnum16(10);
+	eventActionService.deleteEventActionDefinitions(message7);
+	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownDefinitionError));
+	CHECK(ServiceTests::countErrors() == 2);
 }
 
 TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
@@ -164,6 +196,7 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 }
 
 TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
+
 	Message message0(19, 1, Message::TC, 0);
 	message0.appendEnum16(1);
 	message0.appendEnum16(0);
@@ -198,6 +231,14 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 
 	CHECK(eventActionService.eventActionDefinitionMap[0].enabled == 1);
 	CHECK(eventActionService.eventActionDefinitionMap[1].enabled == 1);
+
+	Message message7(19, 2, Message::TC, 0);
+	message7.appendUint16(1);
+	message7.appendEnum16(1);
+	message7.appendEnum16(10);
+	eventActionService.enableEventActionDefinitions(message7);
+	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownDefinitionError));
+	CHECK(ServiceTests::countErrors() == 1);
 }
 
 TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
@@ -223,6 +264,14 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 
 	CHECK(eventActionService.eventActionDefinitionMap[0].enabled == 0);
 	CHECK(eventActionService.eventActionDefinitionMap[1].enabled == 0);
+
+	Message message7(19, 2, Message::TC, 0);
+	message7.appendUint16(1);
+	message7.appendEnum16(1);
+	message7.appendEnum16(10);
+	eventActionService.enableEventActionDefinitions(message7);
+	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownDefinitionError));
+	CHECK(ServiceTests::countErrors() == 1);
 }
 
 TEST_CASE("Request event-action definition status TC[19,6]", "[service][st19]") {

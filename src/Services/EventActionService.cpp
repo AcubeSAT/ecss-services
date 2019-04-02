@@ -8,46 +8,41 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
 	if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
-		EventActionDefinition temp;
-		temp.enabled = true;
-		temp.applicationId = applicationID;
-		temp.eventDefinitionID = eventDefinitionID;
 		if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
 			ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 		} else {
 			char data[ECSS_TC_REQUEST_STRING_SIZE];
 			message.readString(data, message.dataSize - 4);
+			EventActionDefinition temp;
+			temp.enabled = true;
+			temp.applicationId = applicationID;
+			temp.eventDefinitionID = eventDefinitionID;
 			temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
+			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 		}
-		eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 	} else {
-		ErrorHandler::reportError(message,
-		                          ErrorHandler::EventActionAddExistingDefinitionError);
+		ErrorHandler::reportError(message, ErrorHandler::EventActionAddExistingDefinitionError);
 	}
 }
 
 void EventActionService::deleteEventActionDefinitions(Message &message) {
 	message.assertTC(19, 2);
-
-		uint16_t numberOfEventActionDefinitions = message.readUint16();
-		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-			uint16_t applicationID = message.readEnum16();
-			uint16_t eventDefinitionID = message.readEnum16();
-			if (eventActionDefinitionMap.find(eventDefinitionID) !=
-			    eventActionDefinitionMap.end()) {
-				// I need this to buffer the first readEnum16, since cpp check fails if I don't
-				// use it anywhere
-				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
-				if (eventActionDefinitionMap[eventDefinitionID].enabled == true) {
-					ErrorHandler::reportError(message,
-					ErrorHandler::EventActionDeleteEnabledDefinitionError);
-				} else {
-					eventActionDefinitionMap.erase(eventDefinitionID);
-				}
-			} else {
+	uint16_t numberOfEventActionDefinitions = message.readUint16();
+	for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		uint16_t applicationID = message.readEnum16();
+		uint16_t eventDefinitionID = message.readEnum16();
+		if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
+			// I need this to buffer the first readEnum16, since cpp check fails if I don't
+			// use it anywhere
+			eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
+			if (eventActionDefinitionMap[eventDefinitionID].enabled == true) {
 				ErrorHandler::reportError(message,
-				    ErrorHandler::EventActionUnknownDefinitionError);
+				                          ErrorHandler::EventActionDeleteEnabledDefinitionError);
+			} else {
+				eventActionDefinitionMap.erase(eventDefinitionID);
 			}
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownDefinitionError);
 		}
 	}
 }
@@ -57,7 +52,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message &message) {
 	message.assertTC(19, 3);
 
 	setEventActionFunctionStatus(false);
-		eventActionDefinitionMap.clear();
+	eventActionDefinitionMap.clear();
 }
 
 void EventActionService::enableEventActionDefinitions(Message &message) {
@@ -65,24 +60,24 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 	message.assertTC(19, 4);
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0){
+	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
-					.end()) {
-					// This is need to pass the cpp check. The applicationId should be used
-					// somewhere
-					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
-					eventActionDefinitionMap[eventDefinitionID].enabled = true;
-				} else {
-					ErrorHandler::reportError(message,
-					ErrorHandler::EventActionUnknownDefinitionError);
+			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
+				.end()) {
+				// This is need to pass the cpp check. The applicationId should be used
+				// somewhere
+				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
+				eventActionDefinitionMap[eventDefinitionID].enabled = true;
+			} else {
+				ErrorHandler::reportError(message,
+				                          ErrorHandler::EventActionUnknownDefinitionError);
 			}
 		}
 	} else {
-			for (auto& element : eventActionDefinitionMap) {
-				element.second.enabled = true;
+		for (auto &element : eventActionDefinitionMap) {
+			element.second.enabled = true;
 		}
 	}
 }
@@ -92,24 +87,24 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 	message.assertTC(19, 5);
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-		if (numberOfEventActionDefinitions != 0){
+	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-				if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
-					.end()) {
-					// This is need to pass the cpp check. The applicationId should be used
-					// somewhere
-					eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
-					eventActionDefinitionMap[eventDefinitionID].enabled = false;
-				} else {
-					ErrorHandler::reportError(message,
-				ErrorHandler::EventActionUnknownDefinitionError);
+			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
+				.end()) {
+				// This is need to pass the cpp check. The applicationId should be used
+				// somewhere
+				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
+				eventActionDefinitionMap[eventDefinitionID].enabled = false;
+			} else {
+				ErrorHandler::reportError(message,
+				                        ErrorHandler::EventActionUnknownDefinitionError);
 			}
 		}
 	} else {
-			for (auto& element : eventActionDefinitionMap) {
-				element.second.enabled = false;
+		for (auto &element : eventActionDefinitionMap) {
+			element.second.enabled = false;
 		}
 	}
 }
@@ -126,7 +121,7 @@ void EventActionService::eventActionStatusReport() {
 	Message report = createTM(7);
 	uint8_t count = eventActionDefinitionMap.size();
 	report.appendUint8(count);
-	for (const auto& element : eventActionDefinitionMap) {
+	for (const auto &element : eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
 		report.appendBoolean(element.second.enabled);
