@@ -2,7 +2,7 @@
 #include "Message.hpp"
 #include "MessageParser.hpp"
 
-// todo: check in every function that resetRead() does not mess anything up
+
 void EventActionService::addEventActionDefinitions(Message &message) {
 	// TC[19,1]
 	message.assertTC(19, 1);
