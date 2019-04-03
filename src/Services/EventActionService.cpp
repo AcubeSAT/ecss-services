@@ -29,8 +29,7 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 			} else {
 				char data[ECSS_TC_REQUEST_STRING_SIZE];
 				message.readString(data, message.dataSize - 4);
-				eventActionDefinitionMap[eventDefinitionID].request =
-					String<ECSS_TC_REQUEST_STRING_SIZE>(data);
+				eventActionDefinitionMap[eventDefinitionID].request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
 			}
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::EventActionAddEnabledDefinitionError);
@@ -50,8 +49,7 @@ void EventActionService::deleteEventActionDefinitions(Message &message) {
 			// use it anywhere
 			eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 			if (eventActionDefinitionMap[eventDefinitionID].enabled == true) {
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::EventActionDeleteEnabledDefinitionError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
 			} else {
 				eventActionDefinitionMap.erase(eventDefinitionID);
 			}
@@ -78,15 +76,13 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
-				.end()) {
+			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
 				// This is need to pass the cpp check. The applicationId should be used
 				// somewhere
 				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 				eventActionDefinitionMap[eventDefinitionID].enabled = true;
 			} else {
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::EventActionUnknownDefinitionError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownDefinitionError);
 			}
 		}
 	} else {
@@ -113,8 +109,7 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
 				eventActionDefinitionMap[eventDefinitionID].enabled = false;
 			} else {
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::EventActionUnknownDefinitionError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownDefinitionError);
 			}
 		}
 	} else {

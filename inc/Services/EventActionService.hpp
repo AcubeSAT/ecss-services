@@ -56,7 +56,7 @@ public:
 	friend EventReportService;
 
 	etl::map<uint16_t, EventActionDefinition, ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE>
-	    eventActionDefinitionMap;
+		eventActionDefinitionMap;
 
 	EventActionService() {
 		serviceType = 19;
@@ -123,10 +123,9 @@ public:
 	 * Getter for event-action function status
 	 * @return eventActionFunctionStatus
 	 */
-	bool getEventActionFunctionStatus(){
+	bool getEventActionFunctionStatus() {
 		return eventActionFunctionStatus;
 	}
-
 };
 
 #endif //ECSS_SERVICES_EVENTACTIONSERVICE_HPP
