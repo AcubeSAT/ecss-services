@@ -58,8 +58,6 @@ public:
 	etl::map<uint16_t, EventActionDefinition, ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE>
 	    eventActionDefinitionMap;
 
-	EventActionDefinition eventActionDefinitionArray[ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE];
-
 	EventActionService() {
 		serviceType = 19;
 		eventActionFunctionStatus = true;
