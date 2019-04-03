@@ -37,7 +37,24 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	Message parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data);
+	Message parseRequestTC(String<ECSS_TC_REQUEST_STRING_SIZE> data);
+
+	/**
+	 * @brief Overloaded version
+	 * @param data A uint8_t array of the TC packet data
+	 * @return Parsed message
+	 */
+	Message parseRequestTC(uint8_t* data);
+
+	/**
+	 * @brief Converts a TC packet of type Message to a String
+	 * @details Convert a parsed TC message to a string in order to be used by the services
+	 * @param message The Message object to be parsed to a String
+	 * @return A String class containing the parsed TC request
+	 * @attention The returned String has a fixed size, therefore the message size is considered
+	 * fixed and equal to the ECSS_TC_REQUEST_STRING_SIZE definition.
+	 */
+	String<ECSS_TC_REQUEST_STRING_SIZE> convertTCToStr(Message& message);
 
 private:
 	/**
@@ -49,7 +66,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTC(uint8_t *data, uint16_t length, Message &message);
+	void parseTC(const uint8_t *data, uint16_t length, Message &message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -60,7 +77,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTM(uint8_t *data, uint16_t length, Message &message);
+	void parseTM(const uint8_t *data, uint16_t length, Message &message);
 };
 
 

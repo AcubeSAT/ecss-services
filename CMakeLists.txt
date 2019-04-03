@@ -28,7 +28,10 @@ add_library(common OBJECT
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         src/Services/TimeManagementService.cpp
-        src/Services/EventActionService.cpp
+        src/Services/LargePacketTransferService.cpp
+    	src/Services/EventActionService.cpp
+        src/Services/TimeBasedSchedulingService.cpp
+        src/Services/FunctionManagementService.cpp
         )
 
 # Specify the .cpp files for the executables

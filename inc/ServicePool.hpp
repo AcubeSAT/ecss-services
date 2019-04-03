@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_SERVICEPOOL_HPP
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
+#include "Services/LargePacketTransferService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/TimeManagementService.hpp"
 #include "Services/EventReportService.hpp"
@@ -8,6 +9,7 @@
 #include "Services/ParameterService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "Services/FunctionManagementService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -25,6 +27,8 @@ public:
 	EventActionService eventAction;
 	TestService testService;
 	ParameterService parameterManagement;
+	LargePacketTransferService largePacketTransferService;
+	FunctionManagementService functionManagement;
 
 	/**
 	 * The default ServicePool constructor

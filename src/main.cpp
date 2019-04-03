@@ -7,11 +7,14 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/FunctionManagementService.hpp"
 #include "Services/TimeManagementService.hpp"
 #include "Services/EventActionService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
+#include "ServicePool.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
-#include "Services/MemoryManagementService.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
@@ -239,14 +242,14 @@ int main() {
 	eventActionService.addEventActionDefinitions(eventActionDefinition);
 	Message eventActionDefinition1(19, 1, Message::TC, 1);
 	eventActionDefinition1.appendEnum16(0);
-	eventActionDefinition1.appendEnum16(2);
+	eventActionDefinition1.appendEnum16(3);
 	TCdata = "hi1";
 	eventActionDefinition1.appendString(TCdata);
 	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.addEventActionDefinitions(eventActionDefinition1);
 	Message eventActionDefinition2(19, 1, Message::TC, 1);
 	eventActionDefinition2.appendEnum16(0);
-	eventActionDefinition2.appendEnum16(3);
+	eventActionDefinition2.appendEnum16(4);
 	TCdata = "hi2";
 	eventActionDefinition2.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition2);
@@ -302,6 +305,52 @@ int main() {
 	std::cout << "After this message there should NOT be a failed start of execution error \n";
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
 
+
+	// ST13 test
+
+	LargePacketTransferService largePacketTransferService;
+	String<256> dataToTransfer = "12345678";
+	largePacketTransferService.firstDownlinkPartReport(1, 1, dataToTransfer);
+
+
+	// ST[11] test
+	TimeBasedSchedulingService timeBasedSchedulingService;
+	MessageParser msgParser;
+	auto currentTime = static_cast<uint32_t >(time(nullptr)); // Get the current system time
+	std::cout << "\n\nST[11] service is running";
+	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
+
+	Message receivedMsg = Message(11, 1, Message::TC, 1);
+	Message testMessage1(6, 5, Message::TC, 1), testMessage2(4, 5, Message::TC, 1);
+	testMessage1.appendUint16(4253); // Append dummy data
+	testMessage2.appendUint16(45667); // Append dummy data
+
+	timeBasedSchedulingService.enableScheduleExecution(receivedMsg); // Enable the schedule
+
+	// Insert activities in the schedule
+	receivedMsg = Message(11, 4, Message::TC, 1);
+	receivedMsg.appendUint16(2); // Total number of requests
+
+	receivedMsg.appendUint32(currentTime + 1556435);
+	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
+
+	receivedMsg.appendUint32(currentTime + 1957232);
+	receivedMsg.appendString(msgParser.convertTCToStr(testMessage2));
+	timeBasedSchedulingService.insertActivities(receivedMsg);
+
+	// Time shift activities
+	receivedMsg = Message(11, 15, Message::TC, 1);
+	receivedMsg.appendSint32(-6789);
+	timeBasedSchedulingService.timeShiftAllActivities(receivedMsg);
+	std::cout << "Activities should be time shifted by: " << -6789 << " seconds." << std::endl;
+
+	// Report the activities
+	receivedMsg = Message(11, 16, Message::TC, 1);
+	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);
+
+	// Report the activities by ID
+	receivedMsg = Message(11, 12, Message::TC, 1);
+	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 	return 0;
 }

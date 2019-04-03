@@ -6,7 +6,7 @@
 class CRCHelper {
 
 	/**
-	 * CRC32 calculation helper class
+	 * CRC16 calculation helper class
 	 * This class declares a function which calculates the CRC16 checksum of the given data.
 	 *
 	 * For now the actual implementation is the CRC16/CCITT variant (ECSS-E-ST-70-41C, pg.615)
@@ -25,7 +25,7 @@ public:
 	 * Actual CRC calculation function.
 	 * @param  message (pointer to the data to be checksummed)
 	 * @param  length (size in bytes)
-	 * @return the CRC32 checksum of the input data
+	 * @return the CRC16 checksum of the input data
 	 */
 	static uint16_t calculateCRC(const uint8_t* message, uint32_t length);
 

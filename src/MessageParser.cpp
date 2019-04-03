@@ -1,4 +1,3 @@
-#include <cstring>
 #include <Services/EventActionService.hpp>
 #include <ServicePool.hpp>
 #include "ErrorHandler.hpp"
@@ -53,7 +52,7 @@ Message MessageParser::parse(uint8_t *data, uint32_t length) {
 	return message;
 }
 
-void MessageParser::parseTC(uint8_t *data, uint16_t length, Message &message) {
+void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -61,6 +60,8 @@ void MessageParser::parseTC(uint8_t *data, uint16_t length, Message &message) {
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
 
+	// todo: Fix this parsing function, because it assumes PUS header in data, which is not true
+	//  with the current implementation
 	ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
@@ -74,15 +75,34 @@ void MessageParser::parseTC(uint8_t *data, uint16_t length, Message &message) {
 	message.dataSize = length;
 }
 
-Message MessageParser::parseRequestTC(String<ECSS_EVENT_SERVICE_STRING_SIZE> data) {
+Message MessageParser::parseRequestTC(String<ECSS_TC_REQUEST_STRING_SIZE> data) {
 	Message message;
 	auto *dataInt = reinterpret_cast<uint8_t *>(data.data());
 	message.packetType = Message::TC;
-	parseTC(dataInt, ECSS_EVENT_SERVICE_STRING_SIZE, message);
+	parseTC(dataInt, ECSS_TC_REQUEST_STRING_SIZE, message);
 	return message;
 }
 
-void MessageParser::parseTM(uint8_t *data, uint16_t length, Message &message) {
+Message MessageParser::parseRequestTC(uint8_t* data) {
+	Message message;
+	message.packetType = Message::TC;
+	parseTC(data, ECSS_TC_REQUEST_STRING_SIZE, message);
+	return message;
+}
+
+String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::convertTCToStr(Message &message) {
+	uint8_t tempString[ECSS_TC_REQUEST_STRING_SIZE] = {0};
+
+	tempString[0] = ECSS_PUS_VERSION << 4; // Assign the pusVersion = 2
+	tempString[1] = message.serviceType;
+	tempString[2] = message.messageType;
+	memcpy(tempString + 5, message.data, ECSS_TC_REQUEST_STRING_SIZE - 5);
+	String<ECSS_TC_REQUEST_STRING_SIZE> dataString(tempString);
+
+	return dataString;
+}
+
+void MessageParser::parseTM(const uint8_t *data, uint16_t length, Message &message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
