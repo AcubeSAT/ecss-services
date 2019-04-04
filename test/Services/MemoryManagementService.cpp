@@ -6,7 +6,7 @@
 
 MemoryManagementService & memMangService = Services.memoryManagement;
 
-TEST_CASE("TM[6,2]", "[service][st06]") {
+TEST_CASE("TC[6,2]", "[service][st06]") {
 	// Required test variables
 	char *pStr = static_cast<char *>(malloc(4));
 	*pStr = 'T';
@@ -30,7 +30,7 @@ TEST_CASE("TM[6,2]", "[service][st06]") {
 	CHECK(pStr[2] == 'h');
 }
 
-TEST_CASE("TM[6,5]", "[service][st06]") {
+TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint8_t testString_1[6] = "FStrT";
 	uint8_t testString_2[8] = "SecStrT";
 	uint8_t testString_3[2] = {5, 8};
@@ -95,7 +95,7 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	CHECK(checksum == CRCHelper::calculateCRC(checkString, readSize));
 }
 
-TEST_CASE("TM[6,9]", "[service][st06]") {
+TEST_CASE("TC[6,9]", "[service][st06]") {
 	uint8_t testString_1[6] = "FStrT";
 	uint8_t testString_2[8] = "SecStrT";
 	uint16_t readSize = 0, checksum = 0;
