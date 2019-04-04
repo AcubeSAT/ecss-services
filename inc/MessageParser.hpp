@@ -5,18 +5,21 @@
 #include "Message.hpp"
 
 /**
- * A generic class responsible for the execution of the incoming telemetry and telecommand
- * packets.
+ * A generic class responsible for the execution and the parsing of the incoming telemetry and telecommand
+ * packets
  */
 
 class MessageParser {
 public:
 
 	/**
-	 * It is responsible to call the suitable function that executes the proper service. The way that
-	 * the services are selected is based on the serviceType of the \p message
+	 * It is responsible to call the requested service that executes a telecommand packet.
+	 *
+	 * @param Message Contains the necessary parameters to call the suitable subservice
+ 	 * @todo Implement the execute() in the upcoming services or generally in the upcoming
+ 	 * activities
 	 */
-	void execute(Message &message);
+	static void execute(Message &message);
 
 	/**
 	 * Parse a message that contains the CCSDS and ECSS packet headers, as well as the data
