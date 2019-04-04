@@ -81,7 +81,7 @@ public:
 
 	/**
 	 * Includes a new function in the pointer map. This enables it to be called by way of a valid
-	 * TC [8,1] message.
+	 * TC[8,1] message.
 	 *
 	 * @param funcName the function's name. Max. length is FUNC_NAME_LENGTH bytes.
 	 * @param ptr pointer to a function of void return type and a MAX_ARG_LENGTH-lengthed byte
@@ -90,6 +90,15 @@ public:
 	void include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)(String<MAX_ARG_LENGTH>));
 
 	int getMapSize() { return funcPtrIndex.size(); }
+
+	/**
+	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param param Contains the necessary parameters to call the suitable subservice
+	 */
+	void execute(Message &param);
 };
 
 #endif //ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP

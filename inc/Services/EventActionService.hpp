@@ -5,7 +5,6 @@
 #define ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE 256
 
 #include "Service.hpp"
-#include "MessageParser.hpp"
 #include "etl/String.hpp"
 #include <Services/EventReportService.hpp>
 
@@ -120,6 +119,14 @@ public:
 		return eventActionFunctionStatus;
 	}
 
+	/**
+	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param message Contains the necessary parameters to call the suitable subservice
+	 */
+	void execute(const Message &message);
 };
 
 #endif //ECSS_SERVICES_EVENTACTIONSERVICE_HPP

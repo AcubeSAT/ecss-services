@@ -87,6 +87,15 @@ public:
 	 */
 	void setParameterIds(Message& newParamValues);
 
+	/**
+	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param param Contains the necessary parameters to call the suitable subservice
+	 */
+	void execute(Message &message);
+
 };
 
 #endif //ECSS_SERVICES_PARAMETERSERVICE_HPP
