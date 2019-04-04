@@ -223,4 +223,3 @@ void EventActionService::execute(const Message &message) {
 			break;
 	}
 }
-
