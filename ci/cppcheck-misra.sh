@@ -7,10 +7,18 @@
 # $ ci/cppcheck-misra.sh
 #
 
+# make sure we are in the correct directory, regardless of where the script was called from
+cd "$(dirname "$0")/.."
+
 echo -e "\u001b[34;1mGetting prerequisites...\u001b[0m"
 # grab the MISRA addon and the cppcheck addon interface from github
 curl https://raw.githubusercontent.com/danmar/cppcheck/f4b5b156d720c712f6ce99f6e01d8c1b3f800d52/addons/misra.py > ci/misra.py
 curl https://raw.githubusercontent.com/danmar/cppcheck/f4b5b156d720c712f6ce99f6e01d8c1b3f800d52/addons/cppcheckdata.py > ci/cppcheckdata.py
+
+# clean up old files
+echo -e "\u001b[34;1mRemoving old files...\u001b[0m"
+echo > ci/report.msr # clear the report file
+find inc/ src/ -type f -name "*.dump" | xargs rm
 
 # generate dump files (XML representations of AST etc.) for all headers, source files etc.
 echo -e "\u001b[34;1mGenerating dump files...\u001b[0m"
@@ -18,7 +26,6 @@ find inc/ src/ -type f \( -iname "*.cpp" -or -iname "*.hpp" \) | xargs cppcheck 
 
 # run the MISRA checks against the dumps and send the results to a file
 echo -e "\u001b[34;1mRunning MISRA C(2012) rule compliance tests...\u001b[0m"
-echo > ci/report.msr # clear the report file
 find inc/ src/ -type f -name "*.dump" | xargs python3 ci/misra.py >> ci/report.msr 2>&1
 
 # pre-process the generated report to remove all useless strings
