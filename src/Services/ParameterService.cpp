@@ -119,3 +119,16 @@ uint16_t ParameterService::numOfValidIds(Message idMsg) {
 
 	return validIds;
 }
+
+void ParameterService::execute(Message  &message) {
+	switch (message.messageType) {
+		case 1:
+			reportParameterIds(message); // TC[20,1]
+			break;
+		case 3:
+			setParameterIds(message); // TC[20,3]
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			break;
+	}
+}

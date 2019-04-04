@@ -27,9 +27,7 @@ void TestService::execute(Message &message) {
 			onBoardConnection(message);
 			break;
 		default:
-			// cout is very bad for embedded systems
-			std::cout << "Error: There is not such a message type in ST[17] test";
-			assert(false);
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
 			break;
 	}
 }

@@ -191,3 +191,36 @@ void EventActionService::executeAction(uint16_t eventID) {
 		}
 	}
 }
+
+void EventActionService::execute(const Message &message) {
+	switch (message.messageType) {
+		case 1:
+			addEventActionDefinitions(message); // TC[19,1]
+			break;
+		case 2:
+			deleteEventActionDefinitions(message); // TC[19,2]
+			break;
+		case 3:
+			deleteAllEventActionDefinitions(message); // TC[19,3]
+			break;
+		case 4:
+			enableEventActionDefinitions(message); // TC[19,4]
+			break;
+		case 5:
+			disableEventActionDefinitions(message); // TC[19,5]
+			break;
+		case 6:
+			requestEventActionDefinitionStatus(message); // TC[19,6]
+			break;
+		case 8:
+			enableEventActionFunction(message); // TC[19,8]
+			break;
+		case 9:
+			disableEventActionFunction(message); // TC[19,9]
+			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			break;
+	}
+}
+

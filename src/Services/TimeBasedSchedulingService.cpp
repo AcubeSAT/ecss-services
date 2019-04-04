@@ -281,3 +281,29 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 	}
 	storeMessage(report); // Save the report
 }
+
+void TimeBasedSchedulingService::execute(Message &message) {
+	switch (message.messageType) {
+		case 1:
+			enableScheduleExecution(message); // TC[11,1]
+			break;
+		case 2:
+			disableScheduleExecution(message); // TC[11,2]
+			break;
+		case 3:
+			resetSchedule(message); // TC[11,3]
+			break;
+		case 4:
+			insertActivities(message); // TC[11,4]
+			break;
+		case 15:
+			timeShiftActivitiesByID(message); // TC[11,15]
+			break;
+		case 16:
+			detailReportAllActivities(message); // TC[11,16]
+			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			break;
+	}
+}

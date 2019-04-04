@@ -130,3 +130,17 @@ void EventReportService::listOfDisabledEventsReport() {
 
 	storeMessage(report);
 }
+
+void EventReportService::execute(const Message &message) {
+	switch (message.messageType) {
+		case 5: enableReportGeneration(message); // TC[5,5]
+			break;
+		case 6: disableReportGeneration(message); // TC[5,6]
+			break;
+		case 7: requestListOfDisabledEvents(message); // TC[5,7]
+			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			break;
+	}
+}
