@@ -243,7 +243,7 @@ void MemoryManagementService::RawDataMemoryManagement::execute(Message &message)
 			checkRawData(message); // TC[6,9]
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

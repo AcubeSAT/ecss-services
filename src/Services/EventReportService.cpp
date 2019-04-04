@@ -140,7 +140,7 @@ void EventReportService::execute(const Message &message) {
 		case 7: requestListOfDisabledEvents(message); // TC[5,7]
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

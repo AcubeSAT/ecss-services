@@ -219,7 +219,7 @@ void EventActionService::execute(const Message &message) {
 			disableEventActionFunction(message); // TC[19,9]
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

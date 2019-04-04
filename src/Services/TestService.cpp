@@ -27,7 +27,7 @@ void TestService::execute(Message &message) {
 			onBoardConnection(message);
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

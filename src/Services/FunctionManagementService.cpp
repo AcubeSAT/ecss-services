@@ -57,7 +57,7 @@ void FunctionManagementService::execute(Message &message) {
 			call(message); // TC[8,1]
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

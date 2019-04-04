@@ -32,7 +32,7 @@ void TimeManagementService::execute(Message &message) {
 			cdsTimeRequest(message); // TC[9,128]
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

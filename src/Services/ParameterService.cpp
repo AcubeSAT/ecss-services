@@ -128,7 +128,7 @@ void ParameterService::execute(Message  &message) {
 		case 3:
 			setParameterIds(message); // TC[20,3]
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

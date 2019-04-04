@@ -303,7 +303,7 @@ void TimeBasedSchedulingService::execute(Message &message) {
 			detailReportAllActivities(message); // TC[11,16]
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }

@@ -24,7 +24,7 @@ void MessageParser::execute(Message &message) {
 			Services.eventAction.execute(message);
 			break;
 		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 			break;
 	}
 }
