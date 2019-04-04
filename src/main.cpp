@@ -191,6 +191,9 @@ int main() {
 	//message = Message(1, 10, Message::TC, 3);
 	//messageParser.execute(message);
 
+	Message trivialMessage = Message();
+	MessageParser::execute(trivialMessage);
+
 	// ErrorHandler test
 	std::cout << std::flush;
 	std::cerr << std::flush;
