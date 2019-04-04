@@ -18,11 +18,11 @@ uint32_t TimeHelper::utcToSeconds(TimeAndDate &TimeInfo) {
 	        ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= TimeInfo.day) && (TimeInfo.day <= 31),
 	        ErrorHandler::InternalErrorType::InvalidDate);
-	ASSERT_INTERNAL((0 <= TimeInfo.hour) && (TimeInfo.hour <= 24),
+	ASSERT_INTERNAL(TimeInfo.hour <= 24,
 	        ErrorHandler::InternalErrorType::InvalidDate);
-	ASSERT_INTERNAL((0 <= TimeInfo.minute) && (TimeInfo.minute <= 60),
+	ASSERT_INTERNAL(TimeInfo.minute <= 60,
 	        ErrorHandler::InternalErrorType::InvalidDate);
-	ASSERT_INTERNAL((0 <= TimeInfo.second) && (TimeInfo.second <= 60),
+	ASSERT_INTERNAL(TimeInfo.second <= 60,
 	        ErrorHandler::InternalErrorType::InvalidDate);
 
 	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
@@ -30,7 +30,7 @@ uint32_t TimeHelper::utcToSeconds(TimeAndDate &TimeInfo) {
 		secs += (IsLeapYear(y) ? 366 : 365) * SECONDS_PER_DAY;
 	}
 	for (uint16_t m = 1; m < TimeInfo.month; ++m) {
-		secs += DaysOfMonth[m - 1] * SECONDS_PER_DAY;
+		secs += DaysOfMonth[m - 1u] * SECONDS_PER_DAY;
 		if ((m == 2u) && IsLeapYear(TimeInfo.year)) {
 			secs += SECONDS_PER_DAY;
 		}

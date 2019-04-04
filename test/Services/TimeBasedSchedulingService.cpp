@@ -23,9 +23,12 @@ namespace unit_test {
 		static auto scheduledActivities(TimeBasedSchedulingService &tmService) {
 			std::vector<TimeBasedSchedulingService::ScheduledActivity*>listElements;
 
-			for (auto &element : tmService.scheduledActivities) {
-				listElements.push_back(&element);
-			}
+			std::transform(tmService.scheduledActivities.begin(),
+				tmService.scheduledActivities.end(),
+				std::back_inserter(listElements),
+				[](auto & activity) -> auto { return &activity; }
+			);
+
 			return listElements; // Return the list elements
 		}
 	};
@@ -427,12 +430,12 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 
 TEST_CASE("TC[11,3] Reset schedule", "[service][st11]") {
 	TimeBasedSchedulingService timeService;
-	auto scheduledActivities = activityInsertion(timeService);
+	activityInsertion(timeService);
 
 	Message receivedMessage(11, 3, Message::TC, 1);
 
 	timeService.resetSchedule(receivedMessage);
-	scheduledActivities = unit_test::Tester::scheduledActivities(timeService); // Get the new list
+	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeService); // Get the new list
 
 	REQUIRE(scheduledActivities.empty());
 	REQUIRE(not unit_test::Tester::executionFunctionStatus(timeService));

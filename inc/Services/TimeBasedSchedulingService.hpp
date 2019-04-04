@@ -109,9 +109,9 @@ private:
 	inline void sortActivitiesReleaseTime(etl::list<ScheduledActivity,
 		ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> &schedActivities) {
 		schedActivities.sort([](ScheduledActivity const &leftSide, ScheduledActivity const
-		&rightSide) { 
+		&rightSide) {
 			// cppcheck-suppress
-			return leftSide.requestReleaseTime < rightSide.requestReleaseTime; 
+			return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 		});
 	}
 
