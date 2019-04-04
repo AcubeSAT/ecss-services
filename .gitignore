@@ -3,6 +3,13 @@ build
 cmake-build-debug
 docs
 
+# Dump and continuous integration files
+*.dump
+__pycache__
+/ci/cppcheckdata.py
+/ci/misra.py
+/ci/report.msr
+
 # Prerequisites
 *.d
 
@@ -65,3 +72,6 @@ docs
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 .idea/**/markdown-*
+
+# IDEs
+.vscode

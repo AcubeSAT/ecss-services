@@ -11,6 +11,7 @@ add_custom_target(check
         COMMAND ./cppcheck.sh
         COMMAND ./vera.sh
         COMMAND ./clang-tidy.sh
+        COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
 # Specify the .cpp files common across all targets

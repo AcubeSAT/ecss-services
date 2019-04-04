@@ -15,7 +15,7 @@ void FunctionManagementService::call(Message& msg) {
 	msg.readString(funcName, FUNC_NAME_LENGTH);
 	msg.readString(funcArgs, MAX_ARG_LENGTH);
 
-	if (msg.dataSize > FUNC_NAME_LENGTH + MAX_ARG_LENGTH) {
+	if (msg.dataSize > (FUNC_NAME_LENGTH + MAX_ARG_LENGTH)) {
 		ErrorHandler::reportError(msg,
 			ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);  // report failed
 			// start of execution as requested by the standard

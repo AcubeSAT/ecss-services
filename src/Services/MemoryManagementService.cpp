@@ -177,32 +177,32 @@ bool MemoryManagementService::addressValidator(
 
 	switch (memId) {
 		case MemoryManagementService::MemoryID::DTCMRAM:
-			if (address >= DTCMRAM_LOWER_LIM && address <= DTCMRAM_UPPER_LIM) {
+			if ((address >= DTCMRAM_LOWER_LIM) && (address <= DTCMRAM_UPPER_LIM)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::ITCMRAM:
-			if (address >= ITCMRAM_LOWER_LIM && address <= ITCMRAM_UPPER_LIM) {
+			if ((address >= ITCMRAM_LOWER_LIM) && (address <= ITCMRAM_UPPER_LIM)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::RAM_D1:
-			if (address >= RAM_D1_LOWER_LIM && address <= RAM_D1_UPPER_LIM) {
+			if ((address >= RAM_D1_LOWER_LIM) && (address <= RAM_D1_UPPER_LIM)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::RAM_D2:
-			if (address >= RAM_D2_LOWER_LIM && address <= RAM_D2_UPPER_LIM) {
+			if ((address >= RAM_D2_LOWER_LIM) && (address <= RAM_D2_UPPER_LIM)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::RAM_D3:
-			if (address >= RAM_D3_LOWER_LIM && address <= RAM_D3_UPPER_LIM) {
+			if ((address >= RAM_D3_LOWER_LIM) && (address <= RAM_D3_UPPER_LIM)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::FLASH:
-			if (address >= FLASH_LOWER_LIM && address <= FLASH_UPPER_LIM) {
+			if ((address >= FLASH_LOWER_LIM) && (address <= FLASH_UPPER_LIM)) {
 				validIndicator = true;
 			}
 			break;

@@ -38,7 +38,6 @@ TEST_CASE("TM[6,5]", "[service][st06]") {
 	uint8_t checkString[ECSS_MAX_STRING_SIZE];
 	uint16_t readSize = 0, checksum = 0;
 
-	MemoryManagementService memMangService;
 	Message receivedPacket = Message(6, 5, Message::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(3); // Iteration count (Equal to 3 test strings)
@@ -100,7 +99,6 @@ TEST_CASE("TM[6,9]", "[service][st06]") {
 	uint8_t testString_2[8] = "SecStrT";
 	uint16_t readSize = 0, checksum = 0;
 
-	MemoryManagementService memMangService;
 	Message receivedPacket = Message(6, 9, Message::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(2); // Iteration count
