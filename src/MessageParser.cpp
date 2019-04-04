@@ -6,14 +6,22 @@
 #include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
 
-
 void MessageParser::execute(Message &message) {
 	switch (message.serviceType) {
-		case 1:
-			Services.requestVerification.execute(message);
+		case 5:
+			Services.eventReport.execute(message);
+			break;
+		case 6:
+			Services.memoryManagement.rawDataMemorySubservice.execute(message);
+			break;
+		case 8:
+			Services.functionManagement.execute(message);
 			break;
 		case 17:
 			Services.testService.execute(message);
+			break;
+		case 19:
+			Services.eventAction.execute(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::UnknownMessageType);
