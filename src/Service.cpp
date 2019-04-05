@@ -26,6 +26,7 @@ void Service::execute(Message& message) {
 			break;
 		case 20:
 			Services.parameterManagement.execute(message); // ST[20]
+			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
