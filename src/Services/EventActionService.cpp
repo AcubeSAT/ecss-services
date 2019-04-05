@@ -13,10 +13,10 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	bool flag = true; // This variable checks if the message can be added or not. Couldn't think of a better name
 	if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
 		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
-		for (auto element = range.first; element != range.second; ++element) {
+		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
 				flag = false;
-				ErrorHandler::reportError(message, ErrorHandler::EventActionIDExists);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionEventActionDefinitionIDExistsError);
 			}
 		}
 	}
@@ -41,23 +41,28 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	message.assertTC(19, 2);
 	message.resetRead();
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
+	bool eventActionDefinitionIDexists = false;
 	for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 		message.skipBytes(2);
 		uint16_t eventDefinitionID = message.readEnum16();
 		uint16_t eventActionDefinitionID = message.readEnum16();
 		if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
 			auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
-			for (auto element = range.first; element != range.second; ++element) {
+			for (auto& element = range.first; element != range.second; ++element) {
 				if (element->second.eventActionDefinitionID == eventActionDefinitionID){
 					if (element->second.enabled == true){
 						ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
 					} else {
+						eventActionDefinitionIDexists = true;
 						eventActionDefinitionMap.erase(element);
 					}
 				}
 			}
+			if (eventActionDefinitionIDexists == false){
+				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionIDError);
+			}
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownDefinitionError);
+			ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 		}
 	}
 }
@@ -75,17 +80,25 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	message.assertTC(19, 4);
 	message.resetRead();
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
+	bool eventActionDefinitionIDexists = false;
 	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-			uint16_t applicationID = message.readEnum16();
+			message.skipBytes(2);
 			uint16_t eventDefinitionID = message.readEnum16();
+			uint16_t eventActionDefinitionID = message.readEnum16();
 			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
-				// This is need to pass the cpp check. The applicationId should be used
-				// somewhere
-				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
-				eventActionDefinitionMap[eventDefinitionID].enabled = true;
+				auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
+				for (auto& element = range.first; element != range.second; ++element) {
+					if (element->second.eventActionDefinitionID == eventActionDefinitionID){
+						element->second.enabled = true;
+						eventActionDefinitionIDexists = true;
+					}
+				}
+				if (eventActionDefinitionIDexists == false){
+					ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionIDError);
+				}
 			} else {
-				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownDefinitionError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 			}
 		}
 	} else {
@@ -101,18 +114,25 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	message.resetRead();
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
+	bool eventActionDefinitionIDexists = false;
 	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-			uint16_t applicationID = message.readEnum16();
+			message.skipBytes(2);
 			uint16_t eventDefinitionID = message.readEnum16();
-			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap
-				.end()) {
-				// This is need to pass the cpp check. The applicationId should be used
-				// somewhere
-				eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
-				eventActionDefinitionMap[eventDefinitionID].enabled = false;
+			uint16_t eventActionDefinitionID = message.readEnum16();
+			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
+				auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
+				for (auto& element = range.first; element != range.second; ++element) {
+					if (element->second.eventActionDefinitionID == eventActionDefinitionID){
+						element->second.enabled = false;
+						eventActionDefinitionIDexists = true;
+					}
+				}
+				if (eventActionDefinitionIDexists == false){
+					ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionIDError);
+				}
 			} else {
-				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownDefinitionError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 			}
 		}
 	} else {
@@ -137,6 +157,7 @@ void EventActionService::eventActionStatusReport() {
 	for (const auto& element : eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
+		report.appendEnum16(element.second.eventActionDefinitionID);
 		report.appendBoolean(element.second.enabled);
 	}
 	storeMessage(report);
