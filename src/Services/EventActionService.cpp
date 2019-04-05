@@ -50,10 +50,10 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 			auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
 			for (auto& element = range.first; element != range.second; ++element) {
 				if (element->second.eventActionDefinitionID == eventActionDefinitionID){
+					eventActionDefinitionIDexists = true;
 					if (element->second.enabled == true){
 						ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
 					} else {
-						eventActionDefinitionIDexists = true;
 						eventActionDefinitionMap.erase(element);
 					}
 				}
@@ -80,9 +80,9 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	message.assertTC(19, 4);
 	message.resetRead();
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	bool eventActionDefinitionIDexists = false;
 	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+			bool eventActionDefinitionIDexists = false;
 			message.skipBytes(2);
 			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
@@ -114,9 +114,9 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	message.resetRead();
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	bool eventActionDefinitionIDexists = false;
 	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+			bool eventActionDefinitionIDexists = false;
 			message.skipBytes(2);
 			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
