@@ -296,8 +296,20 @@ void TimeBasedSchedulingService::execute(Message &message) {
 		case 4:
 			insertActivities(message); // TC[11,4]
 			break;
+		case 5:
+			deleteActivitiesByID(message); // TC[11,5]
+			break;
+		case 7:
+			timeShiftActivitiesByID(message); // TC[11,7]
+			break;
+		case 9:
+			detailReportActivitiesByID(message); // TC[11,9]
+			break;
+		case 12:
+			summaryReportActivitiesByID(message); // TC[11,12]
+			break;
 		case 15:
-			timeShiftActivitiesByID(message); // TC[11,15]
+			timeShiftAllActivities(message); // TC[11,15]
 			break;
 		case 16:
 			detailReportAllActivities(message); // TC[11,16]
