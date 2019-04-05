@@ -182,11 +182,13 @@ void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
 		if (eventActionDefinitionMap.find(eventID) != eventActionDefinitionMap.end()) {
-			if (eventActionDefinitionMap[eventID].enabled) {
-				MessageParser messageParser;
-				Message message = messageParser.parseRequestTC(
-					eventActionDefinitionMap[eventID].request);
-				messageParser.execute(message);
+			auto range = eventActionDefinitionMap.equal_range(eventID);
+			for (auto& element = range.first; element != range.second; ++element){
+				if (element->second.enabled == true){
+					MessageParser messageParser;
+					Message message = messageParser.parseRequestTC(element->second.request);
+					messageParser.execute(message);
+				}
 			}
 		}
 	}
