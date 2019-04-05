@@ -112,10 +112,9 @@ public:
 		UnknownExecutionStartError = 0,
 		/**
 		 * In the Event Action Service, in the addEventActionDefinition function an attempt was
-		 * made to add an existing event action
-		 * definition
+		 * made to add an event Action Definition with an eventActionDefinitionID that exists
 		 */
-		EventActionAddEnabledDefinitionError = 1,
+		EventActionIDExists = 1,
 		/**
 		 * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
 		 * was made to delete an event action definition that was enabled

@@ -3,57 +3,58 @@
 #include "MessageParser.hpp"
 
 
-void EventActionService::addEventActionDefinitions(Message &message) {
+void EventActionService::addEventActionDefinitions(Message& message) {
 	// TC[19,1]
 	message.assertTC(19, 1);
 	message.resetRead();
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
 	uint16_t eventActionDefinitionID = message.readEnum16();
-	if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
-		if (message.dataSize - 6 > ECSS_TC_REQUEST_STRING_SIZE) {
-			ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
-		} else {
-			char data[ECSS_TC_REQUEST_STRING_SIZE];
-			message.readString(data, message.dataSize - 6);
-			EventActionDefinition temp;
-			temp.enabled = false;
-			temp.applicationId = applicationID;
-			temp.eventDefinitionID = eventDefinitionID;
-			temp.eventActionDefinitionID = eventActionDefinitionID;
-			temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
-			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
-		}
-	} else {
-		if (eventActionDefinitionMap[eventDefinitionID].enabled == false) {
-			if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
-				ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
-			} else {
-				char data[ECSS_TC_REQUEST_STRING_SIZE];
-				message.readString(data, message.dataSize - 4);
-				eventActionDefinitionMap[eventDefinitionID].request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
+	bool flag = true; // This variable checks if the message can be added or not. Couldn't think of a better name
+	if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
+		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
+		for (auto element = range.first; element != range.second; ++element) {
+			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
+				flag = false;
+				ErrorHandler::reportError(message, ErrorHandler::EventActionIDExists);
 			}
-		} else {
-			ErrorHandler::reportError(message, ErrorHandler::EventActionAddEnabledDefinitionError);
 		}
+	}
+	if (message.dataSize - 6 > ECSS_TC_REQUEST_STRING_SIZE) {
+		flag = false;
+		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
+	}
+	if (flag){
+		char data[ECSS_TC_REQUEST_STRING_SIZE];
+		message.readString(data, message.dataSize - 6);
+		EventActionDefinition temp;
+		temp.enabled = false;
+		temp.applicationId = applicationID;
+		temp.eventDefinitionID = eventDefinitionID;
+		temp.eventActionDefinitionID = eventActionDefinitionID;
+		temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
+		eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 	}
 }
 
-void EventActionService::deleteEventActionDefinitions(Message &message) {
+void EventActionService::deleteEventActionDefinitions(Message& message) {
 	message.assertTC(19, 2);
 	message.resetRead();
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-		uint16_t applicationID = message.readEnum16();
+		message.skipBytes(2);
 		uint16_t eventDefinitionID = message.readEnum16();
+		uint16_t eventActionDefinitionID = message.readEnum16();
 		if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
-			// I need this to buffer the first readEnum16, since cpp check fails if I don't
-			// use it anywhere
-			eventActionDefinitionMap[eventDefinitionID].applicationId = applicationID;
-			if (eventActionDefinitionMap[eventDefinitionID].enabled == true) {
-				ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
-			} else {
-				eventActionDefinitionMap.erase(eventDefinitionID);
+			auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
+			for (auto element = range.first; element != range.second; ++element) {
+				if (element->second.eventActionDefinitionID == eventActionDefinitionID){
+					if (element->second.enabled == true){
+						ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
+					} else {
+						eventActionDefinitionMap.erase(element);
+					}
+				}
 			}
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownDefinitionError);
@@ -61,7 +62,7 @@ void EventActionService::deleteEventActionDefinitions(Message &message) {
 	}
 }
 
-void EventActionService::deleteAllEventActionDefinitions(Message &message) {
+void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 	// TC[19,3]
 	message.assertTC(19, 3);
 
@@ -69,7 +70,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message &message) {
 	eventActionDefinitionMap.clear();
 }
 
-void EventActionService::enableEventActionDefinitions(Message &message) {
+void EventActionService::enableEventActionDefinitions(Message& message) {
 	// TC[19,4]
 	message.assertTC(19, 4);
 	message.resetRead();
@@ -88,13 +89,13 @@ void EventActionService::enableEventActionDefinitions(Message &message) {
 			}
 		}
 	} else {
-		for (auto &element : eventActionDefinitionMap) {
+		for (auto& element : eventActionDefinitionMap) {
 			element.second.enabled = true;
 		}
 	}
 }
 
-void EventActionService::disableEventActionDefinitions(Message &message) {
+void EventActionService::disableEventActionDefinitions(Message& message) {
 	// TC[19,5]
 	message.assertTC(19, 5);
 	message.resetRead();
@@ -115,13 +116,13 @@ void EventActionService::disableEventActionDefinitions(Message &message) {
 			}
 		}
 	} else {
-		for (auto &element : eventActionDefinitionMap) {
+		for (auto& element : eventActionDefinitionMap) {
 			element.second.enabled = false;
 		}
 	}
 }
 
-void EventActionService::requestEventActionDefinitionStatus(Message &message) {
+void EventActionService::requestEventActionDefinitionStatus(Message& message) {
 	// TC[19,6]
 	message.assertTC(19, 6);
 
@@ -133,7 +134,7 @@ void EventActionService::eventActionStatusReport() {
 	Message report = createTM(7);
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
-	for (const auto &element : eventActionDefinitionMap) {
+	for (const auto& element : eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
 		report.appendBoolean(element.second.enabled);
@@ -141,14 +142,14 @@ void EventActionService::eventActionStatusReport() {
 	storeMessage(report);
 }
 
-void EventActionService::enableEventActionFunction(Message &message) {
+void EventActionService::enableEventActionFunction(Message& message) {
 	// TC[19,8]
 	message.assertTC(19, 8);
 
 	setEventActionFunctionStatus(true);
 }
 
-void EventActionService::disableEventActionFunction(Message &message) {
+void EventActionService::disableEventActionFunction(Message& message) {
 	// TC[19,9]
 	message.assertTC(19, 9);
 
