@@ -1,22 +1,21 @@
 #ifndef ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
-
-#define ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE 256
-
 #include "Service.hpp"
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
 #include <Services/EventReportService.hpp>
-#include "etl/map.h"
+#include "etl/multimap.h"
 
 /**
  * Implementation of ST[19] event-action Service
  *
  * ECSS 8.19 && 6.19
  *
- * Note: Make sure the check the note in the addEventActionDefintion()
- *
+ * Note: Make sure the check the note in the addEventActionDefinition()
+ * Note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
+ * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions
+ * be executed when one event takes place. This defies the standard.
  * Note: The application ID was decided to be abolished as an identifier of the event-action
  * definition
  * IMPORTANT: Every event action definition ID should be different, regardless of the application ID
@@ -48,14 +47,15 @@ public:
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationId = 0;
-		uint16_t eventDefinitionID = 65535;
+		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
+		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
 		String<64> request = "";
 		bool enabled = false;
 	};
 
 	friend EventReportService;
 
-	etl::map<uint16_t, EventActionDefinition, ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE>
+	etl::multimap<uint16_t, EventActionDefinition, ECSS_EVENT_ACTION_STRUCT_MAP_SIZE>
 		eventActionDefinitionMap;
 
 	EventActionService() {

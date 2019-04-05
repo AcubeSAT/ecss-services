@@ -51,6 +51,11 @@
  */
 #define ECSS_TIME_MARGIN_FOR_ACTIVATION  60
 
+/**
+ * @brief Size of the multimap that holds every event-action definition
+ */
+#define ECSS_EVENT_ACTION_STRUCT_MAP_SIZE 256
+
 // todo: Define the maximum delta between the specified
 #define ECSS_MAX_DELTA_OF_RELEASE_TIME   60
 // release time and the actual release time

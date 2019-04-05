@@ -9,16 +9,18 @@ void EventActionService::addEventActionDefinitions(Message &message) {
 	message.resetRead();
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
+	uint16_t eventActionDefinitionID = message.readEnum16();
 	if (eventActionDefinitionMap.find(eventDefinitionID) == eventActionDefinitionMap.end()) {
-		if (message.dataSize - 4 > ECSS_TC_REQUEST_STRING_SIZE) {
+		if (message.dataSize - 6 > ECSS_TC_REQUEST_STRING_SIZE) {
 			ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 		} else {
 			char data[ECSS_TC_REQUEST_STRING_SIZE];
-			message.readString(data, message.dataSize - 4);
+			message.readString(data, message.dataSize - 6);
 			EventActionDefinition temp;
 			temp.enabled = false;
 			temp.applicationId = applicationID;
 			temp.eventDefinitionID = eventDefinitionID;
+			temp.eventActionDefinitionID = eventActionDefinitionID;
 			temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 		}
