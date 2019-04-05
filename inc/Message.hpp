@@ -25,9 +25,9 @@ public:
 	 * @param msg2 Second message for comparison
 	 * @return A boolean value indicating whether the messages are of the same type
 	 */
-	static bool isSameType(const Message &msg1, const Message &msg2) {
-		return (msg1.packetType == msg2.packetType) &&
-		       (msg1.messageType == msg2.messageType) && (msg1.serviceType == msg2.serviceType);
+	static bool isSameType(const Message& msg1, const Message& msg2) {
+		return (msg1.packetType == msg2.packetType) && (msg1.messageType == msg2.messageType) &&
+		       (msg1.serviceType == msg2.serviceType);
 	}
 
 	/**
@@ -38,19 +38,19 @@ public:
 	 * fixed size
 	 * @return The result of comparison
 	 */
-	bool operator==(const Message &msg) const {
+	bool operator==(const Message& msg) const {
 		// todo: Enable the following check when the message data field has a fixed size padded
 		//  with zeros. At the moment the data array is not padded with zeros to fulfil the
 		//  maximum set number of a TC request message.
-		//if (this->dataSize != msg.dataSize) return false;
+		// if (this->dataSize != msg.dataSize) return false;
 
 		for (uint16_t i = 0; i < ECSS_MAX_MESSAGE_SIZE; i++) {
 			if (this->data[i] != msg.data[i]) {
 				return false;
 			}
 		}
-		return (this->packetType == msg.packetType) &&
-		       (this->messageType == msg.messageType) && (this->serviceType == msg.serviceType);
+		return (this->packetType == msg.packetType) && (this->messageType == msg.messageType) &&
+		       (this->serviceType == msg.serviceType);
 	}
 
 	enum PacketType {
@@ -87,7 +87,7 @@ public:
 	// TODO: Is it a good idea to not initialise this to 0?
 	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = {'\0'};
 
-//private:
+	// private:
 	uint8_t currentBit = 0;
 
 	// Next byte to read for read...() functions
@@ -137,8 +137,8 @@ public:
 	 *
 	 * @param string The string to insert
 	 */
-	template<const size_t SIZE>
-	void appendString(const String<SIZE> &string);
+	template <const size_t SIZE>
+	void appendString(const String<SIZE>& string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -168,20 +168,19 @@ public:
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
 	 * ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string.
 	 */
-	void readString(char *string, uint8_t size);
+	void readString(char* string, uint8_t size);
 
 	/**
-	* Reads the next \p size bytes from the message, and stores them into the allocated \p string
-	*
-	* NOTE: We assume that \p string is already allocated, and its size is at least
-	* ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string
-	* @todo Is uint16_t size too much or not enough? It has to be defined
-	*/
-	void readString(uint8_t *string, uint16_t size);
+	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
+	 *
+	 * NOTE: We assume that \p string is already allocated, and its size is at least
+	 * ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string
+	 * @todo Is uint16_t size too much or not enough? It has to be defined
+	 */
+	void readString(uint8_t* string, uint16_t size);
 
 public:
-	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType,
-	        uint16_t applicationId);
+	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message
@@ -264,8 +263,8 @@ public:
 	 * PTC = 3, PFC = 16
 	 */
 	void appendUint64(uint64_t value) {
-		appendWord(static_cast<uint32_t >(value >> 32));
-		appendWord(static_cast<uint32_t >(value));
+		appendWord(static_cast<uint32_t>(value >> 32));
+		appendWord(static_cast<uint32_t>(value));
 	}
 
 	/**
@@ -274,7 +273,7 @@ public:
 	 * PTC = 4, PFC = 4
 	 */
 	void appendSint8(int8_t value) {
-		return appendByte(reinterpret_cast<uint8_t &>(value));
+		return appendByte(reinterpret_cast<uint8_t&>(value));
 	}
 
 	/**
@@ -283,7 +282,7 @@ public:
 	 * PTC = 4, PFC = 8
 	 */
 	void appendSint16(int16_t value) {
-		return appendHalfword(reinterpret_cast<uint16_t &>(value));
+		return appendHalfword(reinterpret_cast<uint16_t&>(value));
 	}
 
 	/**
@@ -292,7 +291,7 @@ public:
 	 * PTC = 4, PFC = 14
 	 */
 	void appendSint32(int32_t value) {
-		return appendWord(reinterpret_cast<uint32_t &>(value));
+		return appendWord(reinterpret_cast<uint32_t&>(value));
 	}
 
 	/**
@@ -301,10 +300,9 @@ public:
 	 * PTC = 5, PFC = 1
 	 */
 	void appendFloat(float value) {
-		static_assert(sizeof(uint32_t) == sizeof(value),
-		              "Floating point numbers must be 32 bits long");
+		static_assert(sizeof(uint32_t) == sizeof(value), "Floating point numbers must be 32 bits long");
 
-		return appendWord(reinterpret_cast<uint32_t &>(value));
+		return appendWord(reinterpret_cast<uint32_t&>(value));
 	}
 
 	/**
@@ -313,11 +311,10 @@ public:
 	 *
 	 * PTC = 7, PFC = 0
 	 */
-	template<const size_t SIZE>
-	void appendOctetString(const String<SIZE> &string) {
+	template <const size_t SIZE>
+	void appendOctetString(const String<SIZE>& string) {
 		// Make sure that the string is large enough to count
-		ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(),
-			ErrorHandler::StringTooLarge);
+		ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
 
 		appendUint16(string.size());
 		appendString(string);
@@ -404,7 +401,7 @@ public:
 	 * PTC = 3, PFC = 16
 	 */
 	uint64_t readUint64() {
-		return (static_cast<uint64_t >(readWord()) << 32) | static_cast<uint64_t >(readWord());
+		return (static_cast<uint64_t>(readWord()) << 32) | static_cast<uint64_t>(readWord());
 	}
 
 	/**
@@ -414,7 +411,7 @@ public:
 	 */
 	int8_t readSint8() {
 		uint8_t value = readByte();
-		return reinterpret_cast<int8_t &>(value);
+		return reinterpret_cast<int8_t&>(value);
 	}
 
 	/**
@@ -424,7 +421,7 @@ public:
 	 */
 	int16_t readSint16() {
 		uint16_t value = readHalfword();
-		return reinterpret_cast<int16_t &>(value);
+		return reinterpret_cast<int16_t&>(value);
 	}
 
 	/**
@@ -434,7 +431,7 @@ public:
 	 */
 	int32_t readSint32() {
 		uint32_t value = readWord();
-		return reinterpret_cast<int32_t &>(value);
+		return reinterpret_cast<int32_t&>(value);
 	}
 
 	/**
@@ -446,11 +443,10 @@ public:
 	 * PTC = 5, PFC = 1
 	 */
 	float readFloat() {
-		static_assert(sizeof(uint32_t) == sizeof(float),
-		              "Floating point numbers must be 32 bits long");
+		static_assert(sizeof(uint32_t) == sizeof(float), "Floating point numbers must be 32 bits long");
 
 		uint32_t value = readWord();
-		return reinterpret_cast<float &>(value);
+		return reinterpret_cast<float&>(value);
 	}
 
 	/**
@@ -462,7 +458,7 @@ public:
 	 *
 	 * PTC = 7, PFC = 0
 	 */
-	uint16_t readOctetString(uint8_t *byteString) {
+	uint16_t readOctetString(uint8_t* byteString) {
 		uint16_t size = readUint16(); // Get the data length from the message
 		readString(byteString, size); // Read the string data
 
@@ -490,8 +486,7 @@ public:
 	 *
 	 * @return True if the message is of correct type, false if not
 	 */
-	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType,
-		uint8_t expectedMessageType) {
+	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType, uint8_t expectedMessageType) {
 		bool status = true;
 
 		if ((packetType != expectedPacketType) || (serviceType != expectedServiceType) ||
@@ -520,8 +515,8 @@ public:
 	}
 };
 
-template<const size_t SIZE>
-inline void Message::appendString(const String<SIZE> &string) {
+template <const size_t SIZE>
+inline void Message::appendString(const String<SIZE>& string) {
 	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
 	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
@@ -531,4 +526,4 @@ inline void Message::appendString(const String<SIZE> &string) {
 	dataSize += string.size();
 }
 
-#endif //ECSS_SERVICES_PACKET_H
+#endif // ECSS_SERVICES_PACKET_H

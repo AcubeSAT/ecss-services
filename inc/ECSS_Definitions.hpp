@@ -34,7 +34,7 @@
 #define ECSS_TC_REQUEST_STRING_SIZE 64
 
 // todo: Define the maximum number of activities
-#define ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES    10
+#define ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES 10
 
 /**
  * @brief Time margin used in the time based command scheduling service ST[11]
@@ -42,10 +42,10 @@
  * have in order
  * @todo Define the time margin for the command activation
  */
-#define ECSS_TIME_MARGIN_FOR_ACTIVATION  60
+#define ECSS_TIME_MARGIN_FOR_ACTIVATION 60
 
 // todo: Define the maximum delta between the specified
-#define ECSS_MAX_DELTA_OF_RELEASE_TIME   60
+#define ECSS_MAX_DELTA_OF_RELEASE_TIME 60
 // release time and the actual release time
 
-#endif //ECSS_SERVICES_ECSS_DEFINITIONS_H
+#endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

@@ -18,13 +18,13 @@ private:
 	/**
 	 * Log the error to a logging facility. Platform-dependent.
 	 */
-	template<typename ErrorType>
-	static void logError(const Message &message, ErrorType errorType);
+	template <typename ErrorType>
+	static void logError(const Message& message, ErrorType errorType);
 
 	/**
 	 * Log an error without a Message to a logging facility. Platform-dependent.
 	 */
-	template<typename ErrorType>
+	template <typename ErrorType>
 	static void logError(ErrorType errorType);
 
 public:
@@ -34,45 +34,45 @@ public:
 		 * While writing (creating) a message, an amount of bytes was tried to be added but
 		 * resulted in failure, since the message storage was not enough.
 		 */
-			MessageTooLarge = 1,
+		MessageTooLarge = 1,
 		/**
 		 * Asked to append a number of bits larger than supported
 		 */
-			TooManyBitsAppend = 2,
+		TooManyBitsAppend = 2,
 		/**
 		 * Asked to append a byte, while the previous byte was not complete
 		 */
-			ByteBetweenBits = 3,
+		ByteBetweenBits = 3,
 		/**
 		 * A string is larger than the largest allowed string
 		 */
-			StringTooLarge = 4,
+		StringTooLarge = 4,
 		/**
 		 * An error in the header of a packet makes it unable to be parsed
 		 */
-			UnacceptablePacket = 5,
+		UnacceptablePacket = 5,
 		/**
- 		 * A date that isn't valid according to the Gregorian calendar or cannot be parsed by the
- 		 * TimeHelper
- 		 */
-			InvalidDate = 6,
+		 * A date that isn't valid according to the Gregorian calendar or cannot be parsed by the
+		 * TimeHelper
+		 */
+		InvalidDate = 6,
 		/**
 		 * Asked a Message type that doesn't exist
 		 */
-			UnknownMessageType = 7,
+		UnknownMessageType = 7,
 
 		/**
 		 * Asked to append unnecessary spare bits
 		 */
-			InvalidSpareBits = 8,
+		InvalidSpareBits = 8,
 		/**
 		 * A function received a Message that was not of the correct type
 		 */
-			OtherMessageType = 9,
+		OtherMessageType = 9,
 		/**
 		 * Attempt to insert new function in a full function map (ST[08])
 		 */
-			FunctionMapFull = 10,
+		FunctionMapFull = 10,
 	};
 
 	/**
@@ -86,19 +86,19 @@ public:
 		/**
 		 * The received message does not contain enough information as specified
 		 */
-			MessageTooShort = 1,
+		MessageTooShort = 1,
 		/**
 		 * Asked to read a number of bits larger than supported
 		 */
-			TooManyBitsRead = 2,
+		TooManyBitsRead = 2,
 		/**
 		 * Cannot read a string, because it is larger than the largest allowed string
 		 */
-			StringTooShort = 4,
+		StringTooShort = 4,
 		/**
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
-			UnacceptableMessage = 5,
+		UnacceptableMessage = 5,
 	};
 
 	/**
@@ -134,11 +134,11 @@ public:
 		/**
 		 * Checksum comparison failed
 		 */
-			ChecksumFailed = 1,
+		ChecksumFailed = 1,
 		/**
 		 * Address of a memory is out of the defined range for the type of memory
 		 */
-			AddressOutOfRange = 2,
+		AddressOutOfRange = 2,
 	};
 
 	/**
@@ -148,7 +148,7 @@ public:
 	 * changes.
 	 */
 	enum RoutingErrorType {
-		UnknownRoutingError = 0
+		UnknownRoutingError = 0,
 	};
 
 	/**
@@ -160,7 +160,7 @@ public:
 		ExecutionStart,
 		ExecutionProgress,
 		ExecutionCompletion,
-		Routing
+		Routing,
 	};
 
 	/**
@@ -172,24 +172,23 @@ public:
 	 * @param errorCode The error's code, as defined in ErrorHandler
 	 * @todo See if this needs to include InternalErrorType
 	 */
-	template<typename ErrorType>
-	static void reportError(const Message &message, ErrorType errorCode);
+	template <typename ErrorType>
+	static void reportError(const Message& message, ErrorType errorCode);
 
 	/**
- 	 * Report a failure about the progress of the execution of a request
- 	 *
- 	 * @note This function is different from reportError, because we need one more \p stepID
- 	 * to call the proper function for reporting the progress of the execution of a request
- 	 *
- 	 * @param message The incoming message that prompted the failure
- 	 * @param errorCode The error's code, when a failed progress of the execution of a request
- 	 * occurs
- 	 * @param stepID If the execution of a request is a long process, then we can divide
+	 * Report a failure about the progress of the execution of a request
+	 *
+	 * @note This function is different from reportError, because we need one more \p stepID
+	 * to call the proper function for reporting the progress of the execution of a request
+	 *
+	 * @param message The incoming message that prompted the failure
+	 * @param errorCode The error's code, when a failed progress of the execution of a request
+	 * occurs
+	 * @param stepID If the execution of a request is a long process, then we can divide
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
- 	 */
-	static void reportProgressError(const Message &message, ExecutionProgressErrorType errorCode,
-	                                uint8_t stepID);
+	 */
+	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, uint8_t stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.
@@ -219,8 +218,8 @@ public:
 	 *
 	 * Creates an error if \p condition is false. The created error corresponds to a \p message.
 	 */
-	template<typename ErrorType>
-	static void assertRequest(bool condition, const Message &message, ErrorType errorCode) {
+	template <typename ErrorType>
+	static void assertRequest(bool condition, const Message& message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
 		}
@@ -232,7 +231,7 @@ public:
 	 * @param error An error code of a specific type
 	 * @return The corresponding ErrorSource
 	 */
-	template<typename ErrorType>
+	template <typename ErrorType>
 	inline static ErrorSource findErrorSource(ErrorType error) {
 		// Static type checking
 		ErrorSource source = Internal;
@@ -257,4 +256,4 @@ public:
 	}
 };
 
-#endif //PROJECT_ERRORHANDLER_HPP
+#endif // PROJECT_ERRORHANDLER_HPP

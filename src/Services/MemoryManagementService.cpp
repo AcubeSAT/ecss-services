@@ -8,12 +8,11 @@ MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*th
 	serviceType = 6;
 }
 
-MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(
-	MemoryManagementService &parent) : mainService(parent) {}
-
+MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
+    : mainService(parent) {}
 
 // Function declarations for the raw data memory management subservice
-void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &request) {
+void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& request) {
 	/**
 	 * Bear in mind that there is currently no error checking for invalid parameters.
 	 * A future version will include error checking and the corresponding error report/notification,
@@ -47,12 +46,12 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 					if (mainService.addressValidator(memoryID, startAddress) &&
 					    mainService.addressValidator(memoryID, startAddress + dataLength)) {
 						for (std::size_t i = 0; i < dataLength; i++) {
-							*(reinterpret_cast<uint8_t *>(startAddress) + i) = readData[i];
+							*(reinterpret_cast<uint8_t*>(startAddress) + i) = readData[i];
 						}
 
 						// Read the loaded data for checksum validation and perform a check
 						for (std::size_t i = 0; i < dataLength; i++) {
-							readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+							readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 						}
 						if (checksum != CRCHelper::calculateCRC(readData, dataLength)) {
 							ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
@@ -71,7 +70,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message &requ
 	}
 }
 
-void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &request) {
+void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
 	// Check if we have the correct packet
 	request.assertTC(6, 5);
 
@@ -95,12 +94,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 			uint16_t readLength = request.readUint16(); // Start address for the memory read
 
 			// Read memory data, an octet at a time, checking for a valid address first
-			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
-			                                 startAddress) &&
-			    mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
-			                                 startAddress + readLength)) {
+			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
+			    mainService.addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
 				for (std::size_t i = 0; i < readLength; i++) {
-					readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
 				// This part is repeated N-times (N = iteration count)
@@ -120,7 +117,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message &requ
 	}
 }
 
-void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &request) {
+void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
 	// Check if we have the correct packet
 	request.assertTC(6, 9);
 
@@ -143,13 +140,11 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 			uint16_t readLength = request.readUint16(); // Start address for the memory read
 
 			// Check whether the first and the last addresses are within the limits
-			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
-			                                 startAddress) &&
-			    mainService.addressValidator(MemoryManagementService::MemoryID(memoryID),
-			                                 startAddress + readLength)) {
+			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
+			    mainService.addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
 				// Read memory data and save them for checksum calculation
 				for (std::size_t i = 0; i < readLength; i++) {
-					readData[i] = *(reinterpret_cast<uint8_t *>(startAddress) + i);
+					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
 				// This part is repeated N-times (N = iteration count)
@@ -161,7 +156,6 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 			}
 		}
 
-
 		mainService.storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
 	} else {
@@ -169,10 +163,8 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message &req
 	}
 }
 
-
 // Private function declaration section
-bool MemoryManagementService::addressValidator(
-	MemoryManagementService::MemoryID memId, uint64_t address) {
+bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID memId, uint64_t address) {
 	bool validIndicator = false;
 
 	switch (memId) {
@@ -215,8 +207,7 @@ bool MemoryManagementService::addressValidator(
 	return validIndicator;
 }
 
-inline bool MemoryManagementService::memoryIdValidator(
-	MemoryManagementService::MemoryID memId) {
+inline bool MemoryManagementService::memoryIdValidator(MemoryManagementService::MemoryID memId) {
 	return (memId == MemoryManagementService::MemoryID::RAM_D1) ||
 	       (memId == MemoryManagementService::MemoryID::RAM_D2) ||
 	       (memId == MemoryManagementService::MemoryID::RAM_D3) ||
@@ -226,7 +217,6 @@ inline bool MemoryManagementService::memoryIdValidator(
 	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
 }
 
-inline bool MemoryManagementService::dataValidator(const uint8_t *data, uint16_t checksum,
-                                                   uint16_t length) {
+inline bool MemoryManagementService::dataValidator(const uint8_t* data, uint16_t checksum, uint16_t length) {
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }

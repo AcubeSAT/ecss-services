@@ -18,8 +18,7 @@ uint16_t CRCHelper::calculateCRC(const uint8_t* message, uint32_t length) {
 			if ((shiftReg & 0x8000u) != 0u) {
 				// toss out of the register the MSB and divide (XOR) its content with the generator
 				shiftReg = ((shiftReg << 1u) ^ polynomial);
-			}
-			else {
+			} else {
 				// just toss out the MSB and make room for a new bit
 				shiftReg <<= 1u;
 			}
@@ -28,7 +27,7 @@ uint16_t CRCHelper::calculateCRC(const uint8_t* message, uint32_t length) {
 	return shiftReg;
 }
 
-uint16_t CRCHelper::validateCRC(const uint8_t *message, uint32_t length) {
+uint16_t CRCHelper::validateCRC(const uint8_t* message, uint32_t length) {
 	return calculateCRC(message, length);
 	// CRC result of a correct msg w/checksum appended is 0
 }

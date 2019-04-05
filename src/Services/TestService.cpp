@@ -1,6 +1,6 @@
 #include "Services/TestService.hpp"
 
-void TestService::areYouAlive(Message &request) {
+void TestService::areYouAlive(Message& request) {
 	request.assertTC(17, 1);
 	// TM[17,2] are-you-alive connection test report
 	Message report = createTM(2);
@@ -8,7 +8,7 @@ void TestService::areYouAlive(Message &request) {
 	storeMessage(report);
 }
 
-void TestService::onBoardConnection(Message &request) {
+void TestService::onBoardConnection(Message& request) {
 	request.assertTC(17, 3);
 	// TM[17,4] on-board connection test report
 	Message report = createTM(4);
@@ -18,7 +18,7 @@ void TestService::onBoardConnection(Message &request) {
 	storeMessage(report);
 }
 
-void TestService::execute(Message &message) {
+void TestService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
 			areYouAlive(message);

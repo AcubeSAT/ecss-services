@@ -11,12 +11,11 @@
 
 class MessageParser {
 public:
-
 	/**
 	 * It is responsible to call the suitable function that executes the proper service. The way that
 	 * the services are selected is based on the serviceType of the \p message
 	 */
-	void execute(Message &message);
+	void execute(Message& message);
 
 	/**
 	 * Parse a message that contains the CCSDS and ECSS packet headers, as well as the data
@@ -27,7 +26,7 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	Message parse(uint8_t *data, uint32_t length);
+	Message parse(uint8_t* data, uint32_t length);
 
 	/**
 	 * @todo: elaborate on this comment
@@ -66,7 +65,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTC(const uint8_t *data, uint16_t length, Message &message);
+	void parseTC(const uint8_t* data, uint16_t length, Message& message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -77,8 +76,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTM(const uint8_t *data, uint16_t length, Message &message);
+	void parseTM(const uint8_t* data, uint16_t length, Message& message);
 };
 
-
-#endif //ECSS_SERVICES_MESSAGEPARSER_HPP
+#endif // ECSS_SERVICES_MESSAGEPARSER_HPP

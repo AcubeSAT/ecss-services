@@ -45,14 +45,14 @@ public:
 	 * Get a message from the list of queued messages to send
 	 * @param number The number of the message, starting from 0 in chronological order
 	 */
-	static Message &get(uint64_t number) {
+	static Message& get(uint64_t number) {
 		return queuedMessages.at(number);
 	}
 
 	/**
 	 * Add a message to the queue of messages having been sent
 	 */
-	static void queue(const Message &message) {
+	static void queue(const Message& message) {
 		queuedMessages.push_back(message);
 	}
 
@@ -95,7 +95,7 @@ public:
 		Services.reset();
 	}
 
-/**
+	/**
 	 * Return whether an error assertion function was called, which means that we are expecting this
 	 * request to contain errors
 	 * @return
@@ -128,7 +128,7 @@ public:
 	 * @param errorType The error code of the Error, corresponding to the correct type as
 	 * specified in ErrorHandler
 	 */
-	template<typename ErrorType>
+	template <typename ErrorType>
 	static bool thrownError(ErrorType errorType) {
 		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource(errorType);
 
@@ -138,4 +138,4 @@ public:
 	}
 };
 
-#endif //ECSS_SERVICES_TESTS_SERVICES_SERVICETESTS_HPP
+#endif // ECSS_SERVICES_TESTS_SERVICES_SERVICETESTS_HPP

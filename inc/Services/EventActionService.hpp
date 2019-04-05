@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
-
 #define ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE 256
 
 #include "Service.hpp"
@@ -25,10 +24,9 @@
  */
 class EventActionService : public Service {
 private:
-
 	/**
-	* Event-action function status
-	*/
+	 * Event-action function status
+	 */
 	bool eventActionFunctionStatus;
 
 	/**
@@ -116,10 +114,9 @@ public:
 	 * Getter for event-action function status
 	 * @return eventActionFunctionStatus
 	 */
-	bool getEventActionFunctionStatus(){
+	bool getEventActionFunctionStatus() {
 		return eventActionFunctionStatus;
 	}
-
 };
 
-#endif //ECSS_SERVICES_EVENTACTIONSERVICE_HPP
+#endif // ECSS_SERVICES_EVENTACTIONSERVICE_HPP

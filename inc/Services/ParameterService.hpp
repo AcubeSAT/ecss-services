@@ -21,10 +21,10 @@
  * ECSS-E-ST-70-41C, chapter 7.3
  */
 
-typedef uint16_t ParamId;  // parameter IDs are given sequentially
+typedef uint16_t ParamId; // parameter IDs are given sequentially
 struct Parameter {
-	uint8_t ptc;            // Packet field type code (PTC)
-	uint8_t pfc;            // Packet field format code (PFC)
+	uint8_t ptc; // Packet field type code (PTC)
+	uint8_t pfc; // Packet field format code (PFC)
 
 	uint32_t settingData;
 	// Actual data defining the operation of a peripheral or subsystem.
@@ -41,11 +41,10 @@ struct Parameter {
  * corresponding Parameter structs containing the PTC, PFC and the parameter's value.
  */
 
-
 class ParameterService : public Service {
 private:
 	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
-	uint16_t numOfValidIds(Message idMsg);  //count the valid ids in a given TC[20, 1]
+	uint16_t numOfValidIds(Message idMsg); // count the valid ids in a given TC[20, 1]
 
 public:
 	/**
@@ -86,7 +85,6 @@ public:
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
 	void setParameterIds(Message& newParamValues);
-
 };
 
-#endif //ECSS_SERVICES_PARAMETERSERVICE_HPP
+#endif // ECSS_SERVICES_PARAMETERSERVICE_HPP

@@ -21,17 +21,17 @@
  * @def GROUPS_ENABLED
  * @brief Indicates whether scheduling groups are enabled
  */
-#define GROUPS_ENABLED          0
-#define SUB_SCHEDULES_ENABLED   0
-
+#define GROUPS_ENABLED 0
+#define SUB_SCHEDULES_ENABLED 0
 
 /**
  * @brief Namespace to access private members during test
  *
  * @details Define a namespace for the access of the private members to avoid conflicts
  */
-namespace unit_test {
-	struct Tester;
+namespace unit_test
+{
+struct Tester;
 } // namespace unit_test
 
 /**
@@ -68,9 +68,9 @@ private:
 		uint16_t sequenceCount = 0;
 		uint8_t sourceID = 0;
 
-		bool operator!=(const RequestID &rightSide) const {
-			return (sequenceCount != rightSide.sequenceCount) or
-			       (applicationID != rightSide.applicationID) or (sourceID != rightSide.sourceID);
+		bool operator!=(const RequestID& rightSide) const {
+			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or
+			       (sourceID != rightSide.sourceID);
 		}
 	};
 
@@ -99,17 +99,15 @@ private:
 	 */
 	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> scheduledActivities;
 
-
 	/**
 	 * @brief Sort the activities by their release time
 	 *
 	 * @details The ECSS standard requires that the activities are sorted in the TM message
 	 * response. Also it is better to have the activities sorted.
 	 */
-	inline void sortActivitiesReleaseTime(etl::list<ScheduledActivity,
-		ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> &schedActivities) {
-		schedActivities.sort([](ScheduledActivity const &leftSide, ScheduledActivity const
-		&rightSide) {
+	inline void
+	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES>& schedActivities) {
+		schedActivities.sort([](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 			// cppcheck-suppress
 			return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 		});
@@ -124,7 +122,6 @@ private:
 	 */
 	friend struct ::unit_test::Tester;
 
-
 public:
 	/**
 	 * @brief Class constructor
@@ -138,7 +135,7 @@ public:
 	 * @details Enables the time-based command execution scheduling
 	 * @param request Provide the received message as a parameter
 	 */
-	void enableScheduleExecution(Message &request);
+	void enableScheduleExecution(Message& request);
 
 	/**
 	 * @breif TC[11,2] disable the time-based schedule execution function
@@ -146,7 +143,7 @@ public:
 	 * @details Disables the time-based command execution scheduling
 	 * @param request Provide the received message as a parameter
 	 */
-	void disableScheduleExecution(Message &request);
+	void disableScheduleExecution(Message& request);
 
 	/**
 	 * @brief TC[11,3] reset the time-based schedule
@@ -155,7 +152,7 @@ public:
 	 * activities.
 	 * @param request Provide the received message as a parameter
 	 */
-	void resetSchedule(Message &request);
+	void resetSchedule(Message& request);
 
 	/**
 	 * @brief TC[11,4] insert activities into the time based schedule
@@ -172,7 +169,7 @@ public:
 	 * request is less than a set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
 	 * from the current time a @ref ErrorHandler::ExecutionStartErrorType is also issued.
 	 */
-	void insertActivities(Message &request);
+	void insertActivities(Message& request);
 
 	/**
 	 * @brief TC[11,15] time-shift all scheduled activities
@@ -185,7 +182,7 @@ public:
 	 * set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time an
 	 * @ref ErrorHandler::ExecutionStartErrorType report is issued for that instruction.
 	 */
-	void timeShiftAllActivities(Message &request);
+	void timeShiftAllActivities(Message& request);
 
 	/**
 	 * @brief TC[11,16] detail-report all activities
@@ -195,7 +192,7 @@ public:
 	 * @param request Provide the received message as a parameter
 	 * @todo Replace the time parsing with the time parser
 	 */
-	void detailReportAllActivities(Message &request);
+	void detailReportAllActivities(Message& request);
 
 	/**
 	 * @brief TC[11,9] detail-report activities identified by request identifier
@@ -209,7 +206,7 @@ public:
 	 * request identifier is not found in the schedule issue an @ref
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
-	void detailReportActivitiesByID(Message &request);
+	void detailReportActivitiesByID(Message& request);
 
 	/**
 	 * @brief TC[11,12] summary-report activities identified by request identifier
@@ -222,7 +219,7 @@ public:
 	 * request identifier is not found in the schedule issue an @ref
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
-	void summaryReportActivitiesByID(Message &request);
+	void summaryReportActivitiesByID(Message& request);
 
 	/**
 	 * @brief TC[11,5] delete time-based scheduled activities identified by a request identifier
@@ -233,7 +230,7 @@ public:
 	 * request identifier is not found in the schedule issue an @ref
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
-	void deleteActivitiesByID(Message &request);
+	void deleteActivitiesByID(Message& request);
 
 	/**
 	 * @brief TC[11,7] time-shift scheduled activities identified by a request identifier
@@ -247,7 +244,7 @@ public:
 	 * Also if an activity with a specified request identifier is not found, generate a failed
 	 * start of execution for that specific instruction.
 	 */
-	void timeShiftActivitiesByID(Message &request);
+	void timeShiftActivitiesByID(Message& request);
 };
 
-#endif //ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
+#endif // ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP

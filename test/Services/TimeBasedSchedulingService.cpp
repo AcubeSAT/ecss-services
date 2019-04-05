@@ -10,37 +10,35 @@
  * structure, which has been declared as a friend in the TimeBasedSchedulingService class, so
  * that it can access the private members required for testing validation.
  */
-namespace unit_test {
-	struct Tester {
-		static bool executionFunctionStatus(TimeBasedSchedulingService &tmService) {
-			return tmService.executionFunctionStatus;
-		}
+namespace unit_test
+{
+struct Tester {
+	static bool executionFunctionStatus(TimeBasedSchedulingService& tmService) {
+		return tmService.executionFunctionStatus;
+	}
 
-		/*
-		 * Read the private member scheduled activities and since it is a list and it can't be
-		 * accessed, get each element and save it to a vector.
-		 */
-		static auto scheduledActivities(TimeBasedSchedulingService &tmService) {
-			std::vector<TimeBasedSchedulingService::ScheduledActivity*>listElements;
+	/*
+	 * Read the private member scheduled activities and since it is a list and it can't be
+	 * accessed, get each element and save it to a vector.
+	 */
+	static auto scheduledActivities(TimeBasedSchedulingService& tmService) {
+		std::vector<TimeBasedSchedulingService::ScheduledActivity*> listElements;
 
-			std::transform(tmService.scheduledActivities.begin(),
-				tmService.scheduledActivities.end(),
-				std::back_inserter(listElements),
-				[](auto & activity) -> auto { return &activity; }
-			);
+		std::transform(tmService.scheduledActivities.begin(), tmService.scheduledActivities.end(),
+		               std::back_inserter(listElements), [](auto& activity) -> auto { return &activity; });
 
-			return listElements; // Return the list elements
-		}
-	};
-}
+		return listElements; // Return the list elements
+	}
+};
+} // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
 MessageParser msgParser;
-auto currentTime = static_cast<uint32_t >(time(nullptr)); // Get the current system time
+auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
 bool messagesPopulated = false; // Indicate whether the test messages are initialized
 
 // Run this function to set the service up before moving on with further testing
-auto activityInsertion(TimeBasedSchedulingService &timeService) {
+auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	if (not messagesPopulated) {
 		// Initialize the test messages
 		testMessage1.serviceType = 6;
@@ -92,7 +90,6 @@ auto activityInsertion(TimeBasedSchedulingService &timeService) {
 
 	return unit_test::Tester::scheduledActivities(timeService); // Return the activities vector
 }
-
 
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 	TimeBasedSchedulingService timeService;
@@ -151,8 +148,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 - timeShift);
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 - timeShift);
 		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232 - timeShift);
-		REQUIRE(
-			scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435 - timeShift);
+		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435 - timeShift);
 	}
 
 	SECTION("Negative Shift") {
@@ -164,8 +160,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 + timeShift);
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 + timeShift);
 		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232 + timeShift);
-		REQUIRE(
-			scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435 + timeShift);
+		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435 + timeShift);
 	}
 
 	SECTION("Error throwing") {
@@ -338,17 +333,13 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 			if (i == 0) {
 				REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
 				REQUIRE(receivedSourceID == scheduledActivities.at(0)->requestID.sourceID);
-				REQUIRE(
-					receivedApplicationID == scheduledActivities.at(0)->requestID.applicationID);
-				REQUIRE(
-					receivedSequenceCount == scheduledActivities.at(0)->requestID.sequenceCount);
+				REQUIRE(receivedApplicationID == scheduledActivities.at(0)->requestID.applicationID);
+				REQUIRE(receivedSequenceCount == scheduledActivities.at(0)->requestID.sequenceCount);
 			} else {
 				REQUIRE(receivedReleaseTime == scheduledActivities.at(2)->requestReleaseTime);
 				REQUIRE(receivedSourceID == scheduledActivities.at(2)->requestID.sourceID);
-				REQUIRE(
-					receivedApplicationID == scheduledActivities.at(2)->requestID.applicationID);
-				REQUIRE(
-					receivedSequenceCount == scheduledActivities.at(2)->requestID.sequenceCount);
+				REQUIRE(receivedApplicationID == scheduledActivities.at(2)->requestID.applicationID);
+				REQUIRE(receivedSequenceCount == scheduledActivities.at(2)->requestID.sequenceCount);
 			}
 		}
 	}

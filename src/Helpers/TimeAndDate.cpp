@@ -1,6 +1,5 @@
 #include "Helpers/TimeHelper.hpp"
 
-
 TimeAndDate::TimeAndDate() {
 	// Unix epoch 1/1/1970
 	year = 1970;
@@ -11,8 +10,7 @@ TimeAndDate::TimeAndDate() {
 	second = 0;
 }
 
-TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute,
-                         uint8_t second) {
+TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
 	// check if the parameters make sense
 	ASSERT_INTERNAL(2019 <= year, ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= month) && (month <= 12), ErrorHandler::InternalErrorType::InvalidDate);
@@ -29,7 +27,7 @@ TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour
 	this->second = second;
 }
 
-bool TimeAndDate::operator<(const TimeAndDate &Date) {
+bool TimeAndDate::operator<(const TimeAndDate& Date) {
 	// compare years
 	if (this->year < Date.year) {
 		return true;
@@ -78,7 +76,7 @@ bool TimeAndDate::operator<(const TimeAndDate &Date) {
 	return false;
 }
 
-bool TimeAndDate::operator>(const TimeAndDate &Date) {
+bool TimeAndDate::operator>(const TimeAndDate& Date) {
 	// compare years
 	if (this->year > Date.year) {
 		return true;
@@ -127,7 +125,7 @@ bool TimeAndDate::operator>(const TimeAndDate &Date) {
 	return false;
 }
 
-bool TimeAndDate::operator==(const TimeAndDate &Date) {
+bool TimeAndDate::operator==(const TimeAndDate& Date) {
 	// compare years
 	if (this->year != Date.year) {
 		return false;
@@ -161,11 +159,10 @@ bool TimeAndDate::operator==(const TimeAndDate &Date) {
 	return true;
 }
 
-
-bool TimeAndDate::operator<=(const TimeAndDate &Date) {
+bool TimeAndDate::operator<=(const TimeAndDate& Date) {
 	return ((*this < Date) || (*this == Date));
 }
 
-bool TimeAndDate::operator>=(const TimeAndDate &Date) {
+bool TimeAndDate::operator>=(const TimeAndDate& Date) {
 	return ((*this > Date) || (*this == Date));
 }

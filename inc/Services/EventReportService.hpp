@@ -18,6 +18,7 @@ class EventReportService : public Service {
 private:
 	static const uint16_t numberOfEvents = 7;
 	etl::bitset<numberOfEvents> stateOfEvents;
+
 public:
 	// Variables that count the event reports per severity level
 	uint16_t lowSeverityReportCount;
@@ -60,35 +61,35 @@ public:
 		/**
 		 * An unknown event occured
 		 */
-			InformativeUnknownEvent = 0,
+		InformativeUnknownEvent = 0,
 		/**
 		 * Watchdogs have reset
 		 */
-			WWDGReset = 1,
+		WWDGReset = 1,
 		/**
 		 * Assertion has failed
 		 */
-			AssertionFail = 2,
+		AssertionFail = 2,
 		/**
 		 * Microcontroller has started
 		 */
-			MCUStart = 3,
+		MCUStart = 3,
 		/**
 		 * An unknown anomaly of low severity anomalyhas occurred
 		 */
-			LowSeverityUnknownEvent = 4,
+		LowSeverityUnknownEvent = 4,
 		/**
 		 * An unknown anomaly of medium severity has occurred
 		 */
-			MediumSeverityUnknownEvent = 5,
+		MediumSeverityUnknownEvent = 5,
 		/**
 		 * An unknown anomaly of high severity has occurred
 		 */
-			HighSeverityUnknownEvent = 6,
+		HighSeverityUnknownEvent = 6,
 		/**
 		 * When an execution of a notification/event fails to start
 		 */
-			FailedStartOfExecution = 7
+		FailedStartOfExecution = 7
 	};
 
 	/**
@@ -101,7 +102,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void informativeEventReport(Event eventID, const String<64> & data);
+	void informativeEventReport(Event eventID, const String<64>& data);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
@@ -113,7 +114,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void lowSeverityAnomalyReport(Event eventID, const String<64> & data);
+	void lowSeverityAnomalyReport(Event eventID, const String<64>& data);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
@@ -125,7 +126,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void mediumSeverityAnomalyReport(Event eventID, const String<64> & data);
+	void mediumSeverityAnomalyReport(Event eventID, const String<64>& data);
 
 	/**
 	 * TM[5,4] high severity anomaly report
@@ -137,7 +138,7 @@ public:
 	 * @param data the data of the report
 	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(Event eventID, const String<64> & data);
+	void highSeverityAnomalyReport(Event eventID, const String<64>& data);
 
 	/**
 	 * TC[5,5] request to enable report generation
@@ -175,4 +176,4 @@ public:
 	}
 };
 
-#endif //ECSS_SERVICES_EVENTREPORTSERVICE_HPP
+#endif // ECSS_SERVICES_EVENTREPORTSERVICE_HPP

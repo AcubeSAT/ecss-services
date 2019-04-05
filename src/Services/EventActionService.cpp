@@ -22,7 +22,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			accepted = false;
 		}
 	}
-	if (accepted){
+	if (accepted) {
 		for (index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
 			// @todo: throw an error if it's full
 			if (eventActionDefinitionArray[index].empty) {
@@ -39,8 +39,7 @@ void EventActionService::addEventActionDefinitions(Message message) {
 			} else {
 				char data[ECSS_TC_REQUEST_STRING_SIZE];
 				message.readString(data, message.dataSize - 4);
-				eventActionDefinitionArray[index].request = String<ECSS_TC_REQUEST_STRING_SIZE>(
-					data);
+				eventActionDefinitionArray[index].request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
 			}
 		}
 	}
@@ -88,7 +87,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 	message.assertTC(19, 4);
 
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	if (numberOfEventActionDefinitions != 0u){
+	if (numberOfEventActionDefinitions != 0u) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
@@ -101,7 +100,7 @@ void EventActionService::enableEventActionDefinitions(Message message) {
 		}
 	} else {
 		for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-			if (not eventActionDefinitionArray[index].empty){
+			if (not eventActionDefinitionArray[index].empty) {
 				eventActionDefinitionArray[index].enabled = true;
 			}
 		}
@@ -126,7 +125,7 @@ void EventActionService::disableEventActionDefinitions(Message message) {
 		}
 	} else {
 		for (uint16_t index = 0; index < ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE; index++) {
-			if (not eventActionDefinitionArray[index].empty){
+			if (not eventActionDefinitionArray[index].empty) {
 				eventActionDefinitionArray[index].enabled = false;
 			}
 		}
@@ -150,7 +149,7 @@ void EventActionService::eventActionStatusReport() {
 		}
 	}
 	report.appendUint8(count);
-	for (const auto &definition : eventActionDefinitionArray) {
+	for (const auto& definition : eventActionDefinitionArray) {
 		if (not definition.empty) {
 			report.appendEnum16(definition.applicationId);
 			report.appendEnum16(definition.eventDefinitionID);
@@ -178,13 +177,11 @@ void EventActionService::disableEventActionFunction(Message message) {
 void EventActionService::executeAction(uint16_t eventID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
-		for (const auto &definition : eventActionDefinitionArray) {
-			if (not definition.empty &&
-			    definition.enabled) {
+		for (const auto& definition : eventActionDefinitionArray) {
+			if (not definition.empty && definition.enabled) {
 				if (definition.eventDefinitionID == eventID) {
 					MessageParser messageParser;
-					Message message = messageParser.parseRequestTC(
-						definition.request);
+					Message message = messageParser.parseRequestTC(definition.request);
 					messageParser.execute(message);
 				}
 			}

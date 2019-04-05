@@ -3,10 +3,8 @@
 #include <cstring>
 #include <ErrorHandler.hpp>
 
-
-Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType,
-                 uint16_t applicationId) : serviceType(serviceType), messageType(messageType),
-                                           packetType(packetType), applicationId(applicationId) {}
+Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
+    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
 	// TODO: Add assertion that data does not contain 1s outside of numBits bits
@@ -124,14 +122,14 @@ uint16_t Message::readHalfword() {
 uint32_t Message::readWord() {
 	ASSERT_REQUEST((readPosition + 4) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
-	uint32_t value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) |
-	                 (data[readPosition + 2] << 8) | data[readPosition + 3];
+	uint32_t value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) | (data[readPosition + 2] << 8) |
+	                 data[readPosition + 3];
 	readPosition += 4;
 
 	return value;
 }
 
-void Message::readString(char *string, uint8_t size) {
+void Message::readString(char* string, uint8_t size) {
 	ASSERT_REQUEST((readPosition + size) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
@@ -141,7 +139,7 @@ void Message::readString(char *string, uint8_t size) {
 	readPosition += size;
 }
 
-void Message::readString(uint8_t *string, uint16_t size) {
+void Message::readString(uint8_t* string, uint16_t size) {
 	ASSERT_REQUEST((readPosition + size) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
