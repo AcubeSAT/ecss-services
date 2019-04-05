@@ -1,7 +1,7 @@
 #include "Service.hpp"
 #include "ServicePool.hpp"
 
-void Service::execute(Message &message) {
+void Service::execute(Message& message) {
 	switch (message.serviceType) {
 		case 5:
 			Services.eventReport.execute(message); // ST[05]
@@ -28,6 +28,5 @@ void Service::execute(Message &message) {
 			Services.parameterManagement.execute(message); // ST[20]
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
-			break;
 	}
 }

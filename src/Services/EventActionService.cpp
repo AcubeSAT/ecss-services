@@ -192,7 +192,7 @@ void EventActionService::executeAction(uint16_t eventID) {
 	}
 }
 
-void EventActionService::execute(const Message &message) {
+void EventActionService::execute(const Message& message) {
 	switch (message.messageType) {
 		case 1:
 			addEventActionDefinitions(message); // TC[19,1]
@@ -220,6 +220,5 @@ void EventActionService::execute(const Message &message) {
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
-			break;
 	}
 }

@@ -120,7 +120,7 @@ uint16_t ParameterService::numOfValidIds(Message idMsg) {
 	return validIds;
 }
 
-void ParameterService::execute(Message  &message) {
+void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
 			reportParameterIds(message); // TC[20,1]
@@ -129,6 +129,5 @@ void ParameterService::execute(Message  &message) {
 			setParameterIds(message); // TC[20,3]
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
-			break;
 	}
 }

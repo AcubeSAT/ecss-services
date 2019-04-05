@@ -31,7 +31,7 @@ public:
 	 *
 	 * @todo Error handling for the switch() in the implementation of this execute function
 	 */
-	void execute(Message &message);
+	void execute(Message& message);
 };
 
 

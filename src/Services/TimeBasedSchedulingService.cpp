@@ -282,7 +282,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message &request) {
 	storeMessage(report); // Save the report
 }
 
-void TimeBasedSchedulingService::execute(Message &message) {
+void TimeBasedSchedulingService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
 			enableScheduleExecution(message); // TC[11,1]
@@ -316,6 +316,5 @@ void TimeBasedSchedulingService::execute(Message &message) {
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
-			break;
 	}
 }

@@ -18,7 +18,7 @@ void TestService::onBoardConnection(Message &request) {
 	storeMessage(report);
 }
 
-void TestService::execute(Message &message) {
+void TestService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
 			areYouAlive(message);
@@ -28,6 +28,5 @@ void TestService::execute(Message &message) {
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
-			break;
 	}
 }

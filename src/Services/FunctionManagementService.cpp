@@ -51,13 +51,12 @@ void FunctionManagementService::include(String<FUNC_NAME_LENGTH> funcName, void(
 	}
 }
 
-void FunctionManagementService::execute(Message &message) {
+void FunctionManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
 			call(message); // TC[8,1]
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
-			break;
 	}
 }
