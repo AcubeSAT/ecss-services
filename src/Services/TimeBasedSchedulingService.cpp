@@ -37,12 +37,12 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 
 	// todo: Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	while (iterationCount--) {
+	while (iterationCount-- != 0) {
 		// todo: Get the group ID first, if groups are used
 		uint32_t currentTime = TimeGetter::getSeconds(); // Get the current system time
 
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
-		if ((not scheduledActivities.available()) || (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
+		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.skipBytes(ECSS_TC_REQUEST_STRING_SIZE);
 		} else {
@@ -100,7 +100,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 
 	int32_t relativeOffset = request.readSint32(); // Get the offset first
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	while (iterationCount--) {
+	while (iterationCount-- != 0) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
@@ -134,7 +134,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 	assert(request.messageType == 5);
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	while (iterationCount--) {
+	while (iterationCount-- != 0) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
@@ -183,7 +183,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	while (iterationCount--) {
+	while (iterationCount-- != 0) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
@@ -224,7 +224,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
-	while (iterationCount--) {
+	while (iterationCount-- != 0) {
 		// Parse the request ID
 		RequestID receivedRequestID; // Save the received request ID
 		receivedRequestID.sourceID = request.readUint8(); // Get the source ID

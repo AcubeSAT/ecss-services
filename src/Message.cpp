@@ -82,7 +82,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 		ASSERT_REQUEST(readPosition < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 
 		if ((currentBit + numBits) >= 8) {
-			uint8_t bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
+			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
 
 			uint8_t mask = ((1u << bitsToAddNow) - 1u);
 			uint8_t maskedData = data[readPosition] & mask;
