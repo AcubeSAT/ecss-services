@@ -47,12 +47,6 @@ protected:
 	void storeMessage(Message &message);
 
 	/**
-	 * This function declared only to remind us that every service must have a function like
-	 * this, but this particular function does actually nothing.
-	 */
-	void execute(Message &message);
-
-	/**
 	 * Default protected constructor for this Service
 	 */
 	Service() = default;
@@ -86,6 +80,16 @@ public:
 	 * Default move assignment operator
 	 */
 	Service &operator=(Service &&service) noexcept = default;
+
+	/**
+     * This function takes as input TC packets and and calls the proper services' functions that have been
+	 * implemented to handle TC packets.
+	 *
+	 * @param Message Contains the necessary parameters to call the suitable subservice
+ 	 * @todo Implement the execute() in the upcoming services or generally in the upcoming
+ 	 * activities
+	 */
+	static void execute(Message &message);
 };
 
 
