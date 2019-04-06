@@ -82,11 +82,11 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-			bool eventActionDefinitionIDexists = false;
 			message.skipBytes(2);
 			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
 			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
+				bool eventActionDefinitionIDexists = false;
 				auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
 				for (auto& element = range.first; element != range.second; ++element) {
 					if (element->second.eventActionDefinitionID == eventActionDefinitionID){
@@ -116,11 +116,11 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
-			bool eventActionDefinitionIDexists = false;
 			message.skipBytes(2);
 			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
 			if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
+				bool eventActionDefinitionIDexists = false;
 				auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
 				for (auto& element = range.first; element != range.second; ++element) {
 					if (element->second.eventActionDefinitionID == eventActionDefinitionID){
