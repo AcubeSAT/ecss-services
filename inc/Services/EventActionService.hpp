@@ -12,7 +12,7 @@
  *
  * ECSS 8.19 && 6.19
  *
- * Note: Make sure the check the note in the addEventActionDefinition()
+ * Note: Make sure to check the note in the addEventActionDefinition()
  * Note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
  * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions
  * be executed when one event takes place. This defies the standard.

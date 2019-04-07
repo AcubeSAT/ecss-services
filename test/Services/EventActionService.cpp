@@ -53,7 +53,13 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(3)->second.request.compare(data) == 0);
 
 	// Adding the same message to check for error
-	eventActionService.addEventActionDefinitions(message2);
+	Message message3(19, 1, Message::TC, 0);
+	message3.appendEnum16(1);
+	message3.appendEnum16(3);
+	message3.appendEnum16(1);
+	data = "456";
+	message3.appendString(data);
+	eventActionService.addEventActionDefinitions(message3);
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionEventActionDefinitionIDExistsError));
 	CHECK(ServiceTests::countErrors() == 2);
 }
