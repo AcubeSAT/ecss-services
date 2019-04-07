@@ -33,6 +33,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	message.appendHalfword(static_cast<uint16_t >(timeFormat >> 32));
 	message.appendWord(static_cast<uint32_t >(timeFormat));
 
+	MessageParser::execute(message);
 	TimeInfo = timeService.cdsTimeRequest(message);
 	CHECK(TimeInfo.year == 2020);
 	CHECK(TimeInfo.month == 4);

@@ -23,7 +23,7 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(pStr + 2)); // Start address
 	receivedPacket.appendOctetString(String<1>(data)); // Append CRC
 	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 1));
-	Service::execute(receivedPacket);
+	MessageParser::execute(receivedPacket);
 
 	CHECK(pStr[0] == 'h');
 	CHECK(pStr[1] == 'R');
@@ -50,7 +50,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(testString_3));
 	receivedPacket.appendUint16(sizeof(testString_3) / sizeof(testString_3[0]));
-	Service::execute(receivedPacket);
+	MessageParser::execute(receivedPacket);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -109,7 +109,7 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t >(testString_2));
 	receivedPacket.appendUint16(sizeof(testString_2) / sizeof(testString_2[0]));
-	Service::execute(receivedPacket);
+	MessageParser::execute(receivedPacket);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);

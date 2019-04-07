@@ -90,7 +90,7 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	message.appendUint16(2);
 	message.appendEnum16(eventID[0]);
 	message.appendEnum16(eventID[1]);
-	Service::execute(message);
+	MessageParser::execute(message);
 	CHECK(eventReportService.getStateOfEvents()[2] == 1);
 	CHECK(eventReportService.getStateOfEvents()[4] == 1);
 }
@@ -102,7 +102,7 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	message.appendUint16(2);
 	message.appendEnum16(eventID[0]);
 	message.appendEnum16(eventID[1]);
-	Service::execute(message);
+	MessageParser::execute(message);
 	CHECK(eventReportService.getStateOfEvents()[0] == 0);
 	CHECK(eventReportService.getStateOfEvents()[5] == 0);
 
@@ -114,7 +114,7 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 
 TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
 	Message message(5, 7, Message::TC, 1);
-	Service::execute(message);
+	MessageParser::execute(message);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -130,7 +130,7 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	message.appendEnum16(eventID[0]);
 	message.appendEnum16(eventID[1]);
 	// Disable 3rd and 6th
-	Service::execute(message);
+	MessageParser::execute(message);
 	eventReportService.listOfDisabledEventsReport();
 	REQUIRE(ServiceTests::hasOneMessage());
 
@@ -151,7 +151,7 @@ TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	Message message(5, 6, Message::TC, 1);
 	message.appendUint16(1);
 	message.appendEnum16(eventID[0]);
-	Service::execute(message);
+	MessageParser::execute(message);
 
 	const String<64> eventReportData = "HelloWorld";
 

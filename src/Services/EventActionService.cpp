@@ -185,7 +185,7 @@ void EventActionService::executeAction(uint16_t eventID) {
 					MessageParser messageParser;
 					Message message = messageParser.parseRequestTC(
 						definition.request);
-					Service::execute(message);
+					MessageParser::execute(message);
 				}
 			}
 		}

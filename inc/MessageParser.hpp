@@ -13,6 +13,16 @@ class MessageParser {
 public:
 
 	/**
+     * This function takes as input TC packets and and calls the proper services' functions that have been
+	 * implemented to handle TC packets.
+	 *
+	 * @param Message Contains the necessary parameters to call the suitable subservice
+ 	 * @todo Implement the execute() in the upcoming services or generally in the upcoming
+ 	 * activities
+	 */
+	static void execute(Message &message);
+
+	/**
 	 * Parse a message that contains the CCSDS and ECSS packet headers, as well as the data
 	 *
 	 * As defined in CCSDS 133.0-B-1

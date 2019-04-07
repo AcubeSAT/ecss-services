@@ -97,7 +97,7 @@ TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(11, 1, Message::TC, 1);
 
-	Service::execute(receivedMessage);//timeService.enableScheduleExecution(receivedMessage);
+	MessageParser::execute(receivedMessage);//timeService.enableScheduleExecution(receivedMessage);
 	CHECK(unit_test::Tester::executionFunctionStatus(timeBasedService));
 }
 
@@ -105,7 +105,7 @@ TEST_CASE("TC[11,2] Disable Schedule Execution", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(11, 2, Message::TC, 1);
 
-	Service::execute(receivedMessage);//timeService.disableScheduleExecution(receivedMessage);
+	MessageParser::execute(receivedMessage);//timeService.disableScheduleExecution(receivedMessage);
 	CHECK(not unit_test::Tester::executionFunctionStatus(timeBasedService));
 }
 
@@ -128,7 +128,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 		receivedMessage.appendUint16(1); // Total number of requests
 
 		receivedMessage.appendUint32(currentTime - 15564350);
-		Service::execute(receivedMessage);//timeService.insertActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.insertActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
@@ -145,7 +145,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		receivedMessage.appendSint32(-timeShift);
 
 		CHECK(scheduledActivities.size() == 4);
-		Service::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
 
 		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 - timeShift);
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 - timeShift);
@@ -157,7 +157,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		receivedMessage.appendSint32(timeShift);
 
 		CHECK(scheduledActivities.size() == 4);
-		Service::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
 
 		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 + timeShift);
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 + timeShift);
@@ -169,7 +169,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		receivedMessage.appendSint32(-6789000); // Provide a huge time shift to cause an error
 
 		CHECK(scheduledActivities.size() == 4);
-		Service::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::SubServiceExecutionStartError));
 	}

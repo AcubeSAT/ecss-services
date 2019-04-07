@@ -161,7 +161,7 @@ int main() {
 	                                             eventReportData);
 
 	Message trivialMessage = Message();
-	Service::execute(trivialMessage);
+	MessageParser::execute(trivialMessage);
 
 	// ErrorHandler test
 	std::cout << std::flush;
