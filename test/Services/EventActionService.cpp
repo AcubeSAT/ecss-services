@@ -60,7 +60,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	data = "456";
 	message3.appendString(data);
 	eventActionService.addEventActionDefinitions(message3);
-	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionEventActionDefinitionIDExistsError));
+	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionDefinitionIDExistsError));
 	CHECK(ServiceTests::countErrors() == 2);
 }
 
@@ -401,7 +401,7 @@ TEST_CASE("Enable event-action function TC[19,8]", "[service][st19]") {
 
 	Message message(19, 8, Message::TC, 0);
 	eventActionService.enableEventActionFunction(message);
-	CHECK(eventActionService.getEventActionFunctionStatus() == true);
+	CHECK(eventActionService.getEventActionFunctionStatus());
 }
 
 TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
@@ -410,7 +410,7 @@ TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
 
 	Message message(19, 9, Message::TC, 0);
 	eventActionService.disableEventActionFunction(message);
-	CHECK(eventActionService.getEventActionFunctionStatus() == false);
+	CHECK(eventActionService.getEventActionFunctionStatus());
 }
 
 TEST_CASE("Execute a TC request", "[service][st19]"){

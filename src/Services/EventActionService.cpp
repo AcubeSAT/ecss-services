@@ -15,7 +15,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
 				canBeAdded = false;
-				ErrorHandler::reportError(message, ErrorHandler::EventActionEventActionDefinitionIDExistsError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
 			}
 		}
 	}

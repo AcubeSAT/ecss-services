@@ -111,11 +111,10 @@ public:
 	enum ExecutionStartErrorType {
 		UnknownExecutionStartError = 0,
 		/**
-		 * EventAction refers to the service, EventActionIDefinitionID refers to the variable
 		 * In the Event Action Service, in the addEventActionDefinition function an attempt was
 		 * made to add an event Action Definition with an eventActionDefinitionID that exists
 		 */
-		EventActionEventActionDefinitionIDExistsError = 1,
+		EventActionDefinitionIDExistsError = 1,
 		/**
 		 * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
 		 * was made to delete an event action definition that was enabled
@@ -126,13 +125,14 @@ public:
 		 * action definition
 		 */
 		EventActionUnknownEventDefinitionError = 3,
-		SubServiceExecutionStartError = 4,
-		InstructionExecutionStartError = 5,
 		/**
 		 * EventAction refers to the service, EventActionIDefinitionID refers to the variable
 		 * In the Event Action Service, an access attempt was made to an unknown eventActionDefinitionID
 		 */
-		EventActionUnknownEventActionDefinitionIDError = 6,
+		EventActionUnknownEventActionDefinitionIDError = 4,
+		SubServiceExecutionStartError = 5,
+		InstructionExecutionStartError = 6,
+
 	};
 
 	/**
