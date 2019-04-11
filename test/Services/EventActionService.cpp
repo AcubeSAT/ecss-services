@@ -407,10 +407,9 @@ TEST_CASE("Enable event-action function TC[19,8]", "[service][st19]") {
 TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
 
 	// A message to disable event action function
-
 	Message message(19, 9, Message::TC, 0);
 	eventActionService.disableEventActionFunction(message);
-	CHECK(eventActionService.getEventActionFunctionStatus());
+	CHECK(eventActionService.getEventActionFunctionStatus() == false);
 }
 
 TEST_CASE("Execute a TC request", "[service][st19]"){
