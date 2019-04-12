@@ -12,6 +12,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	bool canBeAdded = true;
 	if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
 		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
+		if(etl::find_if_not(range.first, range.second, ))
 		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
 				canBeAdded = false;
