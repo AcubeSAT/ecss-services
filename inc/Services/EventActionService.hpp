@@ -4,7 +4,7 @@
 #include "Service.hpp"
 #include "MessageParser.hpp"
 #include "etl/String.hpp"
-#include <Services/EventReportService.hpp>
+#include "Services/EventReportService.hpp"
 #include "etl/multimap.h"
 
 /**
@@ -12,22 +12,18 @@
  *
  * ECSS 8.19 && 6.19
  *
- * Note: Make sure to check the note in the addEventActionDefinition()
- * Note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
+ * @note: Make sure to check the note in the addEventActionDefinition()
+ * @note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
  * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions
  * be executed when one event takes place. This defies the standard.
- * Note: The application ID was decided to be abolished as an identifier of the event-action
+ * @note: The application ID was decided to be abolished as an identifier of the event-action
  * definition
- * IMPORTANT: Every event action definition ID should be different, regardless of the application ID
+ * @attention: Every event action definition ID should be different, regardless of the application ID
  *
- * @todo: Use an etl::list instead of eventActionDefinitionArray
- * @todo: (Possible) Use a etl::map for eventActionDefinitionArray
- * @todo: check if executeAction should accept applicationID too
  * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
  * multiple instances are accessed, should I find a more efficient way to access them?
  * @todo: check if eventActionFunctionStatus should be private or not
- * @todo: check if eventAction array of definitions should be private or not
- * @todo: check size of eventActionDefinitionArray
+ * @todo: check if eventAction map of definitions should be private or not
  */
 class EventActionService : public Service {
 private:
