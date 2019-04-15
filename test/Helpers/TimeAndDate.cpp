@@ -1,9 +1,7 @@
 #include "catch2/catch.hpp"
 #include "Helpers/TimeAndDate.hpp"
 
-
 TEST_CASE("Date comparison", "[operands]") {
-
 	SECTION("Invalid date") {
 		TimeAndDate InvalidDate0(1900, 2, 2, 4, 5, 6); // error in year
 		TimeAndDate InvalidDate1(2030, 70, 2, 4, 5, 6); // error in month
@@ -46,7 +44,6 @@ TEST_CASE("Date comparison", "[operands]") {
 	}
 
 	SECTION("Different month") {
-
 		TimeAndDate Now;
 		// 10/05/2020 10:15:00
 		Now.year = 2020;

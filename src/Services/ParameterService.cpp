@@ -10,17 +10,17 @@ ParameterService::ParameterService() {
 	// Test code, setting up some of the parameter fields
 
 	time_t currTime = time(nullptr);
-	struct tm *today = localtime(&currTime);
+	struct tm* today = localtime(&currTime);
 
 	Parameter test1, test2;
 
-	test1.settingData = today->tm_hour;    // the current hour
-	test1.ptc = 3;                         // unsigned int
-	test1.pfc = 14;                        // 32 bits
+	test1.settingData = today->tm_hour; // the current hour
+	test1.ptc = 3; // unsigned int
+	test1.pfc = 14; // 32 bits
 
-	test2.settingData = today->tm_min;     // the current minute
-	test2.ptc = 3;                         // unsigned int
-	test2.pfc = 14;                        // 32 bits
+	test2.settingData = today->tm_min; // the current minute
+	test2.ptc = 3; // unsigned int
+	test2.pfc = 14; // 32 bits
 
 	// MAKE SURE THE IDS ARE UNIQUE WHEN INSERTING!
 	/**
@@ -36,9 +36,9 @@ ParameterService::ParameterService() {
 
 void ParameterService::reportParameterIds(Message& paramIds) {
 	paramIds.assertTC(20, 1);
-	Message reqParam(20, 2, Message::TM, 1);    // empty TM[20, 2] parameter report message
+	Message reqParam(20, 2, Message::TM, 1); // empty TM[20, 2] parameter report message
 
-	paramIds.resetRead();  // since we're passing a reference, the reading position shall be reset
+	paramIds.resetRead(); // since we're passing a reference, the reading position shall be reset
 	// to its default before any read operations (to ensure the correct data is being read)
 
 	// assertion: correct message, packet and service type (at failure throws an
@@ -51,18 +51,17 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t ids = paramIds.readUint16();
-	reqParam.appendUint16(numOfValidIds(paramIds));   // include the number of valid IDs
+	reqParam.appendUint16(numOfValidIds(paramIds)); // include the number of valid IDs
 
-	for (int i = 0; i < ids; i++) {
-		uint16_t currId = paramIds.readUint16();      // current ID to be appended
+	for (uint16_t i = 0; i < ids; i++) {
+		uint16_t currId = paramIds.readUint16(); // current ID to be appended
 
 		if (paramsList.find(currId) != paramsList.end()) {
 			reqParam.appendUint16(currId);
 			reqParam.appendUint32(paramsList[currId].settingData);
 		} else {
-			ErrorHandler::reportError(paramIds,
-				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue;  // generate failed start of execution notification & ignore
+			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
+			continue; // generate failed start of execution notification & ignore
 		}
 	}
 
@@ -76,23 +75,23 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	// InternalError::UnacceptablePacket which gets logged)
 
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
-		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(newParamValues.messageType == 3, newParamValues,
-		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(newParamValues.serviceType == 20, newParamValues,
-		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t ids = newParamValues.readUint16();  //get number of ID's
+	uint16_t ids = newParamValues.readUint16(); // get number of ID's
 
-	for (int i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < ids; i++) {
 		uint16_t currId = newParamValues.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
 			paramsList[currId].settingData = newParamValues.readUint32();
 		} else {
 			ErrorHandler::reportError(newParamValues,
-				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue;   // generate failed start of execution notification & ignore
+			                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
+			continue; // generate failed start of execution notification & ignore
 		}
 	}
 }
@@ -102,14 +101,14 @@ uint16_t ParameterService::numOfValidIds(Message idMsg) {
 	// start reading from the beginning of the idMsg object
 	// (original obj. will not be influenced if this is called by value)
 
-	uint16_t ids = idMsg.readUint16();        // first 16bits of the packet are # of IDs
+	uint16_t ids = idMsg.readUint16(); // first 16bits of the packet are # of IDs
 	uint16_t validIds = 0;
 
-	for (int i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < ids; i++) {
 		uint16_t currId = idMsg.readUint16();
 
 		if (idMsg.messageType == 3) {
-			idMsg.readUint32();   //skip the 32bit settings blocks, we need only the IDs
+			idMsg.readUint32(); // skip the 32bit settings blocks, we need only the IDs
 		}
 
 		if (paramsList.find(currId) != paramsList.end()) {

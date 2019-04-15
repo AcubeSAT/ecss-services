@@ -15,4 +15,4 @@
  */
 #define ASSERT_REQUEST(cond, error) (ErrorHandler::assertRequest((cond), *this, (error)))
 
-#endif //ECSS_SERVICES_MACROS_HPP
+#endif // ECSS_SERVICES_MACROS_HPP

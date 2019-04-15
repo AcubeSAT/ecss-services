@@ -2,7 +2,6 @@
 #include "Helpers/TimeHelper.hpp"
 
 TEST_CASE("Time format implementation", "[CUC]") {
-
 	SECTION("Invalid date") {
 		TimeAndDate TimeInfo;
 

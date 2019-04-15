@@ -2,10 +2,10 @@
 #include "Helpers/CRCHelper.hpp"
 
 TEST_CASE("CRC calculation - Basic String tests") {
-	CHECK(CRCHelper::calculateCRC((uint8_t*) "Raccoon Squad!", 14) == 0x08FC);
-	CHECK(CRCHelper::calculateCRC((uint8_t*) "ASAT", 4) == 0xBFFA);
-	CHECK(CRCHelper::calculateCRC((uint8_t*) "All your space are belong to us", 31) == 0x545F);
-	CHECK(CRCHelper::calculateCRC((uint8_t*) "SPAAAAAAAAACE!", 14) == 0xB441);
+	CHECK(CRCHelper::calculateCRC((uint8_t*)"Raccoon Squad!", 14) == 0x08FC);
+	CHECK(CRCHelper::calculateCRC((uint8_t*)"ASAT", 4) == 0xBFFA);
+	CHECK(CRCHelper::calculateCRC((uint8_t*)"All your space are belong to us", 31) == 0x545F);
+	CHECK(CRCHelper::calculateCRC((uint8_t*)"SPAAAAAAAAACE!", 14) == 0xB441);
 }
 
 TEST_CASE("CRC calculation - Basic byte tests") {
@@ -40,8 +40,7 @@ TEST_CASE("CRC validation - Basic tests") {
 	uint8_t data4[6] = {'A', 0x43, 0x52, 0xDF, 0xBF, 0xFA};
 	// ASAT, but "corrupted" with the last 2 bytes the original checksum of the 'ASAT' string
 
-	uint8_t data5[9] = {'C', 'U', 'B', 'E', 'S', 'A', 'T', 0x53, 0x15};  //corrupted CRC checksum
-
+	uint8_t data5[9] = {'C', 'U', 'B', 'E', 'S', 'A', 'T', 0x53, 0x15}; // corrupted CRC checksum
 
 	CHECK(CRCHelper::validateCRC(data1, 7) == 0x0);
 	CHECK(CRCHelper::validateCRC(data2, 6) == 0x0);

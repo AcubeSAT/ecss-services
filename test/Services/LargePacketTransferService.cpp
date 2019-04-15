@@ -5,11 +5,10 @@
 #include <cstring>
 #include <etl/String.hpp>
 
-LargePacketTransferService &lPT = Services.largePacketTransferService;
+LargePacketTransferService& lPT = Services.largePacketTransferService;
 
 TEST_CASE("First Downlink Part Report TM[13,1]", "[service][st13]") {
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>
-		("12345678");
+	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>("12345678");
 	lPT.firstDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -24,8 +23,7 @@ TEST_CASE("First Downlink Part Report TM[13,1]", "[service][st13]") {
 }
 
 TEST_CASE("Intermediate Downlink Part Report TM[13,2]", "[service][st13]") {
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>(
-		"12345678");
+	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>("12345678");
 	lPT.intermediateDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -40,8 +38,7 @@ TEST_CASE("Intermediate Downlink Part Report TM[13,2]", "[service][st13]") {
 }
 
 TEST_CASE("Last Downlink Part Report TM[13,3]", "[service][st13]") {
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>(
-		"12345678");
+	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>("12345678");
 	lPT.lastDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);

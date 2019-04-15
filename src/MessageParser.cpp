@@ -6,8 +6,7 @@
 #include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
 
-
-void MessageParser::execute(Message &message) {
+void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
 		case 1:
 			Services.requestVerification.execute(message);
@@ -21,7 +20,7 @@ void MessageParser::execute(Message &message) {
 	}
 }
 
-Message MessageParser::parse(uint8_t *data, uint32_t length) {
+Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(length >= 6, ErrorHandler::UnacceptablePacket);
 
 	uint16_t packetHeaderIdentification = (data[0] << 8) | data[1];
@@ -36,10 +35,10 @@ Message MessageParser::parse(uint8_t *data, uint32_t length) {
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
 
 	// Returning an internal error, since the Message is not available yet
-	ASSERT_INTERNAL(versionNumber == 0, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(secondaryHeaderFlag == 1, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(sequenceFlags == 0x3, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(packetDataLength == length - 6, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(versionNumber == 0u, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(secondaryHeaderFlag == 1u, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(sequenceFlags == 0x3u, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(packetDataLength == (length - 6u), ErrorHandler::UnacceptablePacket);
 
 	Message message(0, 0, packetType, APID);
 
@@ -52,7 +51,7 @@ Message MessageParser::parse(uint8_t *data, uint32_t length) {
 	return message;
 }
 
-void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &message) {
+void MessageParser::parseTC(const uint8_t* data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -62,7 +61,7 @@ void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &messa
 
 	// todo: Fix this parsing function, because it assumes PUS header in data, which is not true
 	//  with the current implementation
-	ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(pusVersion == 2u, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
 	length -= 5;
@@ -77,7 +76,7 @@ void MessageParser::parseTC(const uint8_t *data, uint16_t length, Message &messa
 
 Message MessageParser::parseRequestTC(String<ECSS_TC_REQUEST_STRING_SIZE> data) {
 	Message message;
-	auto *dataInt = reinterpret_cast<uint8_t *>(data.data());
+	auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
 	message.packetType = Message::TC;
 	parseTC(dataInt, ECSS_TC_REQUEST_STRING_SIZE, message);
 	return message;
@@ -90,7 +89,7 @@ Message MessageParser::parseRequestTC(uint8_t* data) {
 	return message;
 }
 
-String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::convertTCToStr(Message &message) {
+String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::convertTCToStr(Message& message) {
 	uint8_t tempString[ECSS_TC_REQUEST_STRING_SIZE] = {0};
 
 	tempString[0] = ECSS_PUS_VERSION << 4; // Assign the pusVersion = 2
@@ -102,7 +101,7 @@ String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::convertTCToStr(Message &messa
 	return dataString;
 }
 
-void MessageParser::parseTM(const uint8_t *data, uint16_t length, Message &message) {
+void MessageParser::parseTM(const uint8_t* data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
@@ -110,7 +109,7 @@ void MessageParser::parseTM(const uint8_t *data, uint16_t length, Message &messa
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
 
-	ErrorHandler::assertRequest(pusVersion == 2, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(pusVersion == 2u, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
 	length -= 5;

@@ -5,9 +5,9 @@
 #include <Message.hpp>
 #include "TimeAndDate.hpp"
 
-#define SECONDS_PER_MINUTE 60
-#define SECONDS_PER_HOUR 3600
-#define SECONDS_PER_DAY 86400
+#define SECONDS_PER_MINUTE 60u
+#define SECONDS_PER_HOUR 3600u
+#define SECONDS_PER_DAY 86400u
 
 /**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.
@@ -39,33 +39,33 @@ public:
 	static bool IsLeapYear(uint16_t year);
 
 	/**
-     * Convert UTC date to elapsed seconds since Unix epoch (1/1/1970 00:00:00).
-     *
-     * This is a reimplemented mktime() of <ctime> library in an embedded systems way
-     *
-     * @note
-     * This function can convert UTC dates after 1 January 2019 to elapsed seconds since Unix epoch
-     *
-     * @param TimeInfo the time information/data from the RTC (UTC format)
-     * @return the elapsed seconds between a given UTC date (after the Unix epoch) and Unix epoch
-     * @todo check if we need to change the epoch to the recommended one from the standard, 1
-     * January 1958
-     */
-	static uint32_t utcToSeconds(TimeAndDate &TimeInfo);
+	 * Convert UTC date to elapsed seconds since Unix epoch (1/1/1970 00:00:00).
+	 *
+	 * This is a reimplemented mktime() of <ctime> library in an embedded systems way
+	 *
+	 * @note
+	 * This function can convert UTC dates after 1 January 2019 to elapsed seconds since Unix epoch
+	 *
+	 * @param TimeInfo the time information/data from the RTC (UTC format)
+	 * @return the elapsed seconds between a given UTC date (after the Unix epoch) and Unix epoch
+	 * @todo check if we need to change the epoch to the recommended one from the standard, 1
+	 * January 1958
+	 */
+	static uint32_t utcToSeconds(TimeAndDate& TimeInfo);
 
 	/**
-     * Convert elapsed seconds since Unix epoch to UTC date.
-     *
-     * This is a reimplemented gmtime() of <ctime> library in an embedded systems way
-     *
-     * @note
-     * This function can convert elapsed seconds since Unix epoch to UTC dates after 1 January 2019
-     *
-     * @param seconds elapsed seconds since Unix epoch
-     * @return the UTC date based on the \p seconds
-     * @todo check if we need to change the epoch to the recommended one from the standard, 1
-     * January 1958
-     */
+	 * Convert elapsed seconds since Unix epoch to UTC date.
+	 *
+	 * This is a reimplemented gmtime() of <ctime> library in an embedded systems way
+	 *
+	 * @note
+	 * This function can convert elapsed seconds since Unix epoch to UTC dates after 1 January 2019
+	 *
+	 * @param seconds elapsed seconds since Unix epoch
+	 * @return the UTC date based on the \p seconds
+	 * @todo check if we need to change the epoch to the recommended one from the standard, 1
+	 * January 1958
+	 */
 	static TimeAndDate secondsToUTC(uint32_t seconds);
 
 	/**
@@ -76,10 +76,10 @@ public:
 	 * @param TimeInfo is the data provided from RTC (UTC)
 	 * @return TimeFormat the CDS time format. More specific, 48 bits are used for the T-field
 	 * (16 for the `DAY` and 32 for the `ms of day`)
- 	 * @todo time security for critical time operations
- 	 * @todo declare the implicit P-field
+	 * @todo time security for critical time operations
+	 * @todo declare the implicit P-field
 	 */
-	static uint64_t generateCDStimeFormat(struct TimeAndDate &TimeInfo);
+	static uint64_t generateCDStimeFormat(struct TimeAndDate& TimeInfo);
 
 	/**
 	 * Parse the CDS time format (3.3 in CCSDS 301.0-B-4 standard)
@@ -88,8 +88,7 @@ public:
 	 * fixed size of 48 bits
 	 * @return the UTC date
 	 */
-	static TimeAndDate parseCDStimeFormat(const uint8_t *data);
+	static TimeAndDate parseCDStimeFormat(const uint8_t* data);
 };
 
-
-#endif //ECSS_SERVICES_TIMEHELPER_HPP
+#endif // ECSS_SERVICES_TIMEHELPER_HPP

@@ -27,10 +27,9 @@
  */
 class EventActionService : public Service {
 private:
-
 	/**
-	* Event-action function status
-	*/
+	 * Event-action function status
+	 */
 	bool eventActionFunctionStatus;
 
 	/**
@@ -124,4 +123,4 @@ public:
 	}
 };
 
-#endif //ECSS_SERVICES_EVENTACTIONSERVICE_HPP
+#endif // ECSS_SERVICES_EVENTACTIONSERVICE_HPP

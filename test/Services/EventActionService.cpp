@@ -8,7 +8,7 @@
 #include <iostream>
 #include <ServicePool.hpp>
 
-EventActionService & eventActionService = Services.eventAction;
+EventActionService& eventActionService = Services.eventAction;
 
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 

@@ -2,7 +2,7 @@
 #include <Services/TimeManagementService.hpp>
 #include "ServiceTests.hpp"
 
-TimeManagementService & timeService = Services.timeManagement;
+TimeManagementService& timeService = Services.timeManagement;
 
 TEST_CASE("TM[9,3]", "[service][st09]") {
 	TimeAndDate TimeInfo;
@@ -17,7 +17,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 
 	uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
 
-	uint16_t elapsedDays = currTime/86400;
+	uint16_t elapsedDays = currTime / 86400;
 	uint32_t msOfDay = currTime % 86400 * 1000;
 	uint64_t timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
 
@@ -27,11 +27,11 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	CHECK(response.messageType == 3);
 	CHECK(response.packetType == Message::TM);
 	CHECK(response.readHalfword() == static_cast<uint16_t>(timeFormat >> 32));
-	CHECK(response.readWord() == static_cast<uint32_t >(timeFormat));
+	CHECK(response.readWord() == static_cast<uint32_t>(timeFormat));
 
 	Message message = Message(9, 128, Message::TC, 3);
-	message.appendHalfword(static_cast<uint16_t >(timeFormat >> 32));
-	message.appendWord(static_cast<uint32_t >(timeFormat));
+	message.appendHalfword(static_cast<uint16_t>(timeFormat >> 32));
+	message.appendWord(static_cast<uint32_t>(timeFormat));
 
 	TimeInfo = timeService.cdsTimeRequest(message);
 	CHECK(TimeInfo.year == 2020);
@@ -40,7 +40,6 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	CHECK(TimeInfo.hour == 10);
 	CHECK(TimeInfo.minute == 15);
 	CHECK(TimeInfo.second == 0);
-
 
 	// 1/1/2019 00:00:00
 	TimeInfo.year = 2019;
@@ -52,7 +51,7 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 
 	currTime = TimeHelper::utcToSeconds(TimeInfo);
 
-	elapsedDays = currTime/86400;
+	elapsedDays = currTime / 86400;
 	msOfDay = currTime % 86400 * 1000;
 	timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
 
@@ -62,11 +61,11 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 	CHECK(response.messageType == 3);
 	CHECK(response.packetType == Message::TM);
 	CHECK(response.readHalfword() == static_cast<uint16_t>(timeFormat >> 32));
-	CHECK(response.readWord() == static_cast<uint32_t >(timeFormat));
+	CHECK(response.readWord() == static_cast<uint32_t>(timeFormat));
 
 	message = Message(9, 128, Message::TC, 3);
-	message.appendHalfword(static_cast<uint16_t >(timeFormat >> 32));
-	message.appendWord(static_cast<uint32_t >(timeFormat));
+	message.appendHalfword(static_cast<uint16_t>(timeFormat >> 32));
+	message.appendWord(static_cast<uint32_t>(timeFormat));
 
 	TimeInfo = timeService.cdsTimeRequest(message);
 	CHECK(TimeInfo.year == 2019);

@@ -4,7 +4,6 @@
 #include <cstdint>
 
 class CRCHelper {
-
 	/**
 	 * CRC16 calculation helper class
 	 * This class declares a function which calculates the CRC16 checksum of the given data.
@@ -19,7 +18,7 @@ class CRCHelper {
 	 * @author (class code & dox) Grigoris Pavlakis <grigpavl@ece.auth.gr>
 	 */
 
-// TODO: Change this to hardware implementation or a trusted software one
+	// TODO: Change this to hardware implementation or a trusted software one
 public:
 	/**
 	 * Actual CRC calculation function.
@@ -36,7 +35,7 @@ public:
 	 * @param  length (in bytes, plus 2 bytes for the CRC checksum)
 	 * @return 0 when the data is valid, a nonzero uint16 when the data is corrupted
 	 */
-	 static uint16_t validateCRC(const uint8_t* message, uint32_t length);
+	static uint16_t validateCRC(const uint8_t* message, uint32_t length);
 };
 
-#endif //ECSS_SERVICES_CRCHELPER_HPP
+#endif // ECSS_SERVICES_CRCHELPER_HPP

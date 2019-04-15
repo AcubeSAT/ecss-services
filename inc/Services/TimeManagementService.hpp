@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP
 #define ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP
 
-
 #include <Service.hpp>
 #include "Helpers/TimeHelper.hpp"
 
@@ -48,7 +47,7 @@ public:
 	 * or should ignore the standard?
 	 */
 
-	void cdsTimeReport(TimeAndDate &TimeInfo);
+	void cdsTimeReport(TimeAndDate& TimeInfo);
 
 	/**
 	 * TC[9,128] CDS time request.
@@ -61,8 +60,7 @@ public:
 	 * @param message the message that will be parsed for its time-data. The data of the \p message
 	 * should be a fixed size of 48 bits
 	 */
-	 TimeAndDate cdsTimeRequest(Message &message);
+	TimeAndDate cdsTimeRequest(Message& message);
 };
 
-
-#endif //ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP
+#endif // ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP

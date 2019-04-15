@@ -3,7 +3,7 @@
 #include <Message.hpp>
 #include "ServiceTests.hpp"
 
-TestService & testService = Services.testService;
+TestService& testService = Services.testService;
 
 TEST_CASE("TM[17,1]", "[service][st17]") {
 	Message receivedPacket = Message(17, 1, Message::TC, 1);

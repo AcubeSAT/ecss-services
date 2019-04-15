@@ -49,5 +49,4 @@ public:
  */
 extern ServicePool Services;
 
-
-#endif //ECSS_SERVICES_SERVICEPOOL_HPP
+#endif // ECSS_SERVICES_SERVICEPOOL_HPP
