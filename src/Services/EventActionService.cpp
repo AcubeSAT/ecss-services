@@ -19,7 +19,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 			}
 		}
 	}
-	if (message.dataSize - 6 > ECSS_TC_REQUEST_STRING_SIZE) {
+	if ((message.dataSize - 6) > ECSS_TC_REQUEST_STRING_SIZE) {
 		canBeAdded = false;
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 	}
