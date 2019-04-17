@@ -10,7 +10,6 @@
 EventActionService & eventActionService = Services.eventAction;
 
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
-	EventActionService & eventActionService = Services.eventAction;
 
 	char checkstring[256];
 	Message message(19, 1, Message::TC, 0);

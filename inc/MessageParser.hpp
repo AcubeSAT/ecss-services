@@ -20,7 +20,7 @@ public:
  	 * @todo Implement the execute() in the upcoming services or generally in the upcoming
  	 * activities
 	 */
-	static void execute(Message &message);
+	static void execute(Message& message);
 
 	/**
 	 * Parse a message that contains the CCSDS and ECSS packet headers, as well as the data
