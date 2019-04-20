@@ -7,7 +7,7 @@
 #include <iostream>
 #include <ServicePool.hpp>
 
-EventActionService & eventActionService = Services.eventAction;
+EventActionService& eventActionService = Services.eventAction;
 
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 
@@ -114,7 +114,6 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	CHECK(eventActionService.eventActionDefinitionArray[4].eventDefinitionID == 65535);
 	CHECK(eventActionService.eventActionDefinitionArray[4].request.compare("") == 0);
 	CHECK(eventActionService.eventActionDefinitionArray[4].enabled == 0);
-
 }
 
 TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
@@ -152,7 +151,7 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 	Message message(19, 3, Message::TC, 0);
 	eventActionService.deleteAllEventActionDefinitions(message);
 
-	for (int i = 0; i < 256; i++){
+	for (int i = 0; i < 256; i++) {
 		CHECK(eventActionService.eventActionDefinitionArray[i].empty == 1);
 		CHECK(eventActionService.eventActionDefinitionArray[i].applicationId == 0);
 		CHECK(eventActionService.eventActionDefinitionArray[i].eventDefinitionID == 65535);
@@ -182,7 +181,6 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 	MessageParser::execute(message2);
 	CHECK(eventActionService.eventActionDefinitionArray[0].enabled == 1);
 	CHECK(eventActionService.eventActionDefinitionArray[1].enabled == 1);
-
 }
 
 TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
@@ -259,6 +257,4 @@ TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
 	CHECK(eventActionService.getEventActionFunctionStatus() == false);
 }
 
-TEST_CASE("Execute a TC request", "[service][st19]"){
-
-}
+TEST_CASE("Execute a TC request", "[service][st09]") {}

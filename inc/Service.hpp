@@ -18,6 +18,7 @@ class ServicePool;
 class Service {
 private:
 	uint16_t messageTypeCounter = 0;
+
 protected:
 	/**
 	 * The service type of this Service. For example, ST[12]'s serviceType is `12`.
@@ -44,7 +45,7 @@ protected:
 	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
 	 * we just print the message to the screen
 	 */
-	void storeMessage(Message &message);
+	void storeMessage(Message& message);
 
 	/**
 	 * This function declared only to remind us that every service must have a function like
@@ -63,14 +64,14 @@ public:
 	 *
 	 * Does not allow Services should be copied. There should be only one instance for each Service.
 	 */
-	Service(Service const &) = delete;
+	Service(Service const&) = delete;
 
 	/**
 	 * Unimplemented assignment operation
 	 *
 	 * Does not allow changing the instances of Services, as Services are singletons.
 	 */
-	void operator=(Service const &) = delete;
+	void operator=(Service const&) = delete;
 
 	/**
 	 * Default destructor
@@ -80,13 +81,12 @@ public:
 	/**
 	 * Default move constructor
 	 */
-	Service(Service &&service) noexcept = default;
+	Service(Service&& service) noexcept = default;
 
 	/**
 	 * Default move assignment operator
 	 */
-	Service &operator=(Service &&service) noexcept = default;
+	Service& operator=(Service&& service) noexcept = default;
 };
 
-
-#endif //ECSS_SERVICES_SERVICE_HPP
+#endif // ECSS_SERVICES_SERVICE_HPP

@@ -91,6 +91,7 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	return unit_test::Tester::scheduledActivities(timeService); // Return the activities vector
 }
 
+
 TimeBasedSchedulingService & timeBasedService = Services.timeBasedScheduling;
 
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {

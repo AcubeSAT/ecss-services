@@ -12,4 +12,4 @@
 // Only GCC is used as a compiler
 #include "etl/profiles/gcc_linux_x86.h"
 
-#endif //ECSS_SERVICES_ETL_PROFILE_H
+#endif // ECSS_SERVICES_ETL_PROFILE_H

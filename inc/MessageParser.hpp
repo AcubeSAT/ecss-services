@@ -11,7 +11,6 @@
 
 class MessageParser {
 public:
-
 	/**
      * This function takes as input TC packets and and calls the proper services' functions that have been
 	 * implemented to handle TC packets.
@@ -31,7 +30,7 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	Message parse(uint8_t *data, uint32_t length);
+	Message parse(uint8_t* data, uint32_t length);
 
 	/**
 	 * @todo: elaborate on this comment
@@ -70,7 +69,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTC(const uint8_t *data, uint16_t length, Message &message);
+	void parseTC(const uint8_t* data, uint16_t length, Message& message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -81,8 +80,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseTM(const uint8_t *data, uint16_t length, Message &message);
+	void parseTM(const uint8_t* data, uint16_t length, Message& message);
 };
 
-
-#endif //ECSS_SERVICES_MESSAGEPARSER_HPP
+#endif // ECSS_SERVICES_MESSAGEPARSER_HPP

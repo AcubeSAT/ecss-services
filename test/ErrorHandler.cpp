@@ -48,8 +48,7 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 
 TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 56);
-	ErrorHandler::reportProgressError(failedMessage, ErrorHandler::UnknownExecutionProgressError,
-		0);
+	ErrorHandler::reportProgressError(failedMessage, ErrorHandler::UnknownExecutionProgressError, 0);
 
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);

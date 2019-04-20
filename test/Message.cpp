@@ -43,9 +43,7 @@ TEST_CASE("Bit manipulations", "[message]") {
 }
 
 TEST_CASE("Requirement 5.3.1", "[message][ecss]") {
-	SECTION("5.3.1a") {
-
-	}
+	SECTION("5.3.1a") {}
 
 	SECTION("5.3.1b") {
 		REQUIRE(sizeof(Message::serviceType) == 1);

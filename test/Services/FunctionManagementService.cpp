@@ -4,14 +4,13 @@
 #include "ServiceTests.hpp"
 #include <iostream>
 
-FunctionManagementService & fms = Services.functionManagement;
+FunctionManagementService& fms = Services.functionManagement;
 
 void test(String<MAX_ARG_LENGTH> a) {
 	std::cout << a.c_str() << std::endl;
 }
 
 TEST_CASE("ST[08] - Call Tests") {
-
 	SECTION("Malformed name") {
 		ServiceTests::reset();
 		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
@@ -35,13 +34,11 @@ TEST_CASE("ST[08] - Call Tests") {
 	}
 }
 
-
 TEST_CASE("ST[08] - Insert Tests") {
-
 	SECTION("Insertion to full pointer map") {
 		// make sure the pointer map is full to the brim
 		ServiceTests::reset();
-		std::string name = "test";  // FOR TESTING ONLY!
+		std::string name = "test"; // FOR TESTING ONLY!
 
 		for (int i = 0; i < FUNC_MAP_SIZE + 1; i++) {
 			name += std::to_string(i); // different names to fill up the map

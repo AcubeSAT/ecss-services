@@ -3,7 +3,7 @@
 #include <Message.hpp>
 #include "ServiceTests.hpp"
 
-RequestVerificationService & reqVerifService = Services.requestVerification;
+RequestVerificationService& reqVerifService = Services.requestVerification;
 
 TEST_CASE("TM[1,1]", "[service][st01]") {
 	Message receivedMessage = Message(1, 1, Message::TC, 3);
@@ -28,8 +28,7 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 
 TEST_CASE("TM[1,2]", "[service][st01]") {
 	Message receivedMessage = Message(1, 2, Message::TC, 3);
-	reqVerifService.failAcceptanceVerification(receivedMessage,
-	                                           ErrorHandler::UnknownAcceptanceError);
+	reqVerifService.failAcceptanceVerification(receivedMessage, ErrorHandler::UnknownAcceptanceError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -72,8 +71,7 @@ TEST_CASE("TM[1,3]", "[service][st01]") {
 
 TEST_CASE("TM[1,4]", "[service][st01]") {
 	Message receivedMessage = Message(1, 2, Message::TC, 3);
-	reqVerifService.failStartExecutionVerification(receivedMessage,
-	                                               ErrorHandler::UnknownExecutionStartError);
+	reqVerifService.failStartExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionStartError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -117,9 +115,7 @@ TEST_CASE("TM[1,5]", "[service][st01]") {
 
 TEST_CASE("TM[1,6]", "[service][st01]") {
 	Message receivedMessage = Message(1, 5, Message::TC, 3);
-	reqVerifService.failProgressExecutionVerification(receivedMessage,
-	                                                  ErrorHandler::UnknownExecutionProgressError,
-	                                                  0);
+	reqVerifService.failProgressExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionProgressError, 0);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -163,8 +159,7 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 
 TEST_CASE("TM[1,8]", "[service][st01]") {
 	Message receivedMessage = Message(1, 8, Message::TC, 3);
-	reqVerifService.failCompletionExecutionVerification(receivedMessage,
-		ErrorHandler::UnknownExecutionCompletionError);
+	reqVerifService.failCompletionExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionCompletionError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);

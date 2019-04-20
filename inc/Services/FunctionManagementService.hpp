@@ -7,9 +7,9 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 
-#define FUNC_MAP_SIZE     5     // size of the function map (number of elements)
-#define FUNC_NAME_LENGTH  32      // max length of the function name
-#define MAX_ARG_LENGTH    32      // maximum argument byte string length
+#define FUNC_MAP_SIZE 5 // size of the function map (number of elements)
+#define FUNC_NAME_LENGTH 32 // max length of the function name
+#define MAX_ARG_LENGTH 32 // maximum argument byte string length
 
 /**
  * Implementation of the ST[08] function management service
@@ -28,7 +28,7 @@
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
 
- /**
+/**
  * Usage of the include() function:
  *
  * @code
@@ -52,15 +52,13 @@
  */
 
 typedef String<FUNC_NAME_LENGTH> functionName;
-typedef etl::map<functionName, void(*)(String<MAX_ARG_LENGTH>), FUNC_MAP_SIZE>
-FunctionMap;
+typedef etl::map<functionName, void (*)(String<MAX_ARG_LENGTH>), FUNC_MAP_SIZE> FunctionMap;
 
 class FunctionManagementService : public Service {
 	/**
 	 * Map of the function names to their respective pointers. Size controlled by FUNC_MAP_SIZE
 	 */
 	FunctionMap funcPtrIndex;
-
 
 public:
 	/**
@@ -87,9 +85,11 @@ public:
 	 * @param ptr pointer to a function of void return type and a MAX_ARG_LENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
-	void include(String<FUNC_NAME_LENGTH> funcName, void(*ptr)(String<MAX_ARG_LENGTH>));
+	void include(String<FUNC_NAME_LENGTH> funcName, void (*ptr)(String<MAX_ARG_LENGTH>));
 
-	int getMapSize() { return funcPtrIndex.size(); }
+	int getMapSize() {
+		return funcPtrIndex.size();
+	}
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
@@ -101,4 +101,4 @@ public:
 	void execute(Message& param);
 };
 
-#endif //ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
+#endif // ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP

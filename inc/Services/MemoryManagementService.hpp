@@ -8,7 +8,6 @@
 #include "ErrorHandler.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 
-
 class MemoryManagementService : public Service {
 public:
 	// Memory type ID's
@@ -19,7 +18,7 @@ public:
 		RAM_D3,
 		ITCMRAM,
 		FLASH,
-		EXTERNAL
+		EXTERNAL,
 	};
 
 	MemoryManagementService();
@@ -33,10 +32,10 @@ public:
 	 */
 	class RawDataMemoryManagement {
 	private:
-		MemoryManagementService &mainService; // Used to access main class's members
+		MemoryManagementService& mainService; // Used to access main class's members
 
 	public:
-		explicit RawDataMemoryManagement(MemoryManagementService &parent);
+		explicit RawDataMemoryManagement(MemoryManagementService& parent);
 
 		/**
 		 * TC[6,2] load raw values to memory
@@ -46,7 +45,7 @@ public:
 		 * @param request Provide the received message as a parameter
 		 * @todo Only allow aligned memory address to be start addresses
 		 */
-		void loadRawData(Message &request);
+		void loadRawData(Message& request);
 
 		/**
 		 * TC[6,5] read raw memory values
@@ -58,7 +57,7 @@ public:
 		 * 		 different memory types
 		 * @todo Only allow aligned memory address to be start addresses
 		 */
-		void dumpRawData(Message &request);
+		void dumpRawData(Message& request);
 
 		/**
 		 * TC[6,9] check raw memory data
@@ -84,11 +83,11 @@ public:
 
 private:
 	/**
-		 * Check whether the provided address is valid or not, based on the defined limit values
-		 *
-		 * @param memId The ID of the memory to check is passed
-		 * @param address Takes the address to be checked for validity
-		 */
+	 * Check whether the provided address is valid or not, based on the defined limit values
+	 *
+	 * @param memId The ID of the memory to check is passed
+	 * @param address Takes the address to be checked for validity
+	 */
 	bool addressValidator(MemoryManagementService::MemoryID memId, uint64_t address);
 
 	/**
@@ -102,7 +101,7 @@ private:
 	 * Validate the data according to checksum calculation
 	 *
 	 */
-	bool dataValidator(const uint8_t *data, uint16_t checksum, uint16_t length);
+	bool dataValidator(const uint8_t* data, uint16_t checksum, uint16_t length);
 };
 
-#endif //ECSS_SERVICES_MEMMANGSERVICE_HPP
+#endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

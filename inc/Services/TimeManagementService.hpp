@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP
 #define ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP
 
-
 #include <Service.hpp>
 #include "Helpers/TimeHelper.hpp"
 
@@ -48,7 +47,7 @@ public:
 	 * or should ignore the standard?
 	 */
 
-	void cdsTimeReport(TimeAndDate &TimeInfo);
+	void cdsTimeReport(TimeAndDate& TimeInfo);
 
 	/**
 	 * TC[9,128] CDS time request.
@@ -73,5 +72,4 @@ public:
 	void execute(Message& message);
 };
 
-
-#endif //ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP
+#endif // ECSS_SERVICES_TIMEMANAGEMENTSERVICE_HPP

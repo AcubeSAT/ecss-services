@@ -32,9 +32,8 @@ public:
 	 *
 	 * @param data The array of uint8_t data
 	 */
-	String(const uint8_t * data) // NOLINTNEXTLINE(google-explicit-constructor)
-		: etl::string<MAX_SIZE>(reinterpret_cast<const char*>(data), MAX_SIZE) {
-	}
+	String(const uint8_t* data) // NOLINTNEXTLINE(google-explicit-constructor)
+	    : etl::string<MAX_SIZE>(reinterpret_cast<const char*>(data), MAX_SIZE) {}
 
 	/**
 	 * String constructor from a uint8_t array
@@ -44,9 +43,7 @@ public:
 	 * @param data The array of uint8_t data
 	 * @param count The number of bytes to include
 	 */
-	String(const uint8_t * data, size_t count)
-		: etl::string<MAX_SIZE>(reinterpret_cast<const char*>(data), count) {
-	}
+	String(const uint8_t* data, size_t count) : etl::string<MAX_SIZE>(reinterpret_cast<const char*>(data), count) {}
 
 	/**
 	 * Declaration of the constructor from const char*s that calls the parent constructor
@@ -58,10 +55,7 @@ public:
 	 *
 	 */
 	String(const char* text) // NOLINTNEXTLINE(google-explicit-constructor)
-		: etl::string<MAX_SIZE>(text)
-	{
-	}
+	    : etl::string<MAX_SIZE>(text) {}
 };
 
-
-#endif //ECSS_SERVICES_ETL_STRING_HPP
+#endif // ECSS_SERVICES_ETL_STRING_HPP

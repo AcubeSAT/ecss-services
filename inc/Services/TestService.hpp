@@ -15,14 +15,14 @@ public:
 	/**
 	 * TC[17,1] perform an are-you-alive connection test
 	 */
-	void areYouAlive(Message &request);
+	void areYouAlive(Message& request);
 
 	/**
 	 * TC[17,3] perform an on-board connection test
 	 *
 	 * @todo Only respond if we have the correct APID
 	 */
-	void onBoardConnection(Message &request);
+	void onBoardConnection(Message& request);
 
 	/**
 	 * It is responsible to call the suitable function that execute the proper subservice. The
@@ -34,5 +34,4 @@ public:
 	void execute(Message& message);
 };
 
-
-#endif //ECSS_SERVICES_TESTSERVICE_HPP
+#endif // ECSS_SERVICES_TESTSERVICE_HPP
