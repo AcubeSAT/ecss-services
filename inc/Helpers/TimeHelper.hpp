@@ -126,7 +126,7 @@ public:
 	 * fixed size of 32 bits
 	 * @return the UTC date
 	 */
-	static TimeAndDate parseCUCtimeFormat(uint8_t* data);
+	static TimeAndDate parseCUCtimeFormat(const uint8_t* data);
 };
 
 #endif // ECSS_SERVICES_TIMEHELPER_HPP
