@@ -125,3 +125,14 @@ TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t* data) {
 
 	return secondsToUTC(seconds);
 }
+
+uint32_t TimeHelper::generateCUCtimeFormat(struct TimeAndDate& TimeInfo) {
+	return utcToSeconds(TimeInfo);
+}
+
+TimeAndDate TimeHelper::parseCUCtimeFormat(const uint8_t* data) {
+	uint32_t seconds = ((static_cast<uint32_t>(data[0])) << 24) | ((static_cast<uint32_t>(data[1]))) << 16 |
+	                   ((static_cast<uint32_t>(data[2]))) << 8 | (static_cast<uint32_t>(data[3]));
+
+	return secondsToUTC(seconds);
+}
