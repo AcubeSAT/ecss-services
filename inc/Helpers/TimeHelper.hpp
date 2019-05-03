@@ -8,7 +8,7 @@
 #define SECONDS_PER_MINUTE 60u
 #define SECONDS_PER_HOUR 3600u
 #define SECONDS_PER_DAY 86400u
-#define LEAP_SECONDS 27
+#define LEAP_SECONDS 27 // @todo keep the leap seconds up to date
 
 /**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.
