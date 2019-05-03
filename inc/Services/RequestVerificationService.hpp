@@ -115,7 +115,6 @@ public:
 	 * The data is actually some data members of Message that contain the basic info of the
 	 * telecommand packet that failed the routing
 	 * @param errorCode The cause of creating this type of report
-<<<<<<< HEAD
  	 */
 	void failRoutingVerification(const Message &request, ErrorHandler::RoutingErrorType errorCode);
 };
