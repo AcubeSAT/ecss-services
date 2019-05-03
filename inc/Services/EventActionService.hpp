@@ -1,25 +1,28 @@
 #ifndef ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
-#define ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE 256
-
 #include "Service.hpp"
 #include "etl/String.hpp"
-#include <Services/EventReportService.hpp>
+#include "Services/EventReportService.hpp"
+#include "etl/multimap.h"
 
 /**
  * Implementation of ST[19] event-action Service
  *
  * ECSS 8.19 && 6.19
  *
- * @todo: Use an etl::list instead of eventActionDefinitionArray
- * @todo: (Possible) Use a etl::map for eventActionDefinitionArray
- * @todo: check if executeAction should accept applicationID too
+ * @note: Make sure to check the note in the addEventActionDefinition()
+ * @note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
+ * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions
+ * be executed when one event takes place. This defies the standard.
+ * @note: The application ID was decided to be abolished as an identifier of the event-action
+ * definition
+ * @attention: Every event action definition ID should be different, regardless of the application ID
+ *
  * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
  * multiple instances are accessed, should I find a more efficient way to access them?
  * @todo: check if eventActionFunctionStatus should be private or not
- * @todo: check if eventAction array of definitions should be private or not
- * @todo: check size of eventActionDefinitionArray
+ * @todo: check if eventAction map of definitions should be private or not
  */
 class EventActionService : public Service {
 private:
@@ -36,17 +39,18 @@ private:
 
 public:
 	struct EventActionDefinition {
-		bool empty = true;
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationId = 0;
-		uint16_t eventDefinitionID = 65535;
+		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
+		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
 		String<64> request = "";
 		bool enabled = false;
 	};
 
 	friend EventReportService;
 
-	EventActionDefinition eventActionDefinitionArray[ECSS_EVENT_ACTION_STRUCT_ARRAY_SIZE];
+	etl::multimap<uint16_t, EventActionDefinition, ECSS_EVENT_ACTION_STRUCT_MAP_SIZE>
+		eventActionDefinitionMap;
 
 	EventActionService() {
 		serviceType = 19;
@@ -60,32 +64,32 @@ public:
 	 * event-action definition will be added per TC packet. That means there will be just an
 	 * application ID, an event definition ID and the TC request.
 	 */
-	void addEventActionDefinitions(Message message);
+	void addEventActionDefinitions(Message& message);
 
 	/**
 	 * TC[19,2] delete event-action definitions
 	 */
-	void deleteEventActionDefinitions(Message message);
+	void deleteEventActionDefinitions(Message& message);
 
 	/**
 	 * TC[19,3] delete all event-action definitions
 	 */
-	void deleteAllEventActionDefinitions(Message message);
+	void deleteAllEventActionDefinitions(Message& message);
 
 	/**
 	 * TC[19,4] enable event-action definitions
 	 */
-	void enableEventActionDefinitions(Message message);
+	void enableEventActionDefinitions(Message& message);
 
 	/**
 	 * TC[19,5] disable event-action definitions
 	 */
-	void disableEventActionDefinitions(Message message);
+	void disableEventActionDefinitions(Message& message);
 
 	/**
 	 * TC[19,6] report the status of each event-action definition
 	 */
-	void requestEventActionDefinitionStatus(Message message);
+	void requestEventActionDefinitionStatus(Message& message);
 
 	/**
 	 * TM[19,7] event-action status report
@@ -95,12 +99,12 @@ public:
 	/**
 	 * TC[19,8] enable the event-action function
 	 */
-	void enableEventActionFunction(Message message);
+	void enableEventActionFunction(Message& message);
 
 	/**
 	 * TC[19,9] disable the event-actioni function
 	 */
-	void disableEventActionFunction(Message message);
+	void disableEventActionFunction(Message& message);
 
 	/**
 	 * Setter for event-action function status
