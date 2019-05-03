@@ -124,7 +124,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(const Message& message);
+	void execute(Message& message);
 };
 
 #endif // ECSS_SERVICES_EVENTACTIONSERVICE_HPP

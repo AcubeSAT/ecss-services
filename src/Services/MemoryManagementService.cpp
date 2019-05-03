@@ -221,16 +221,16 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, uint16_t
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
 
-void MemoryManagementService::RawDataMemoryManagement::execute(Message& message) {
+void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case 2:
-			loadRawData(message); // TC[6,2]
+			rawDataMemorySubservice.loadRawData(message); // TC[6,2]
 			break;
 		case 5:
-			dumpRawData(message); // TC[6,5]
+			rawDataMemorySubservice.dumpRawData(message); // TC[6,5]
 			break;
 		case 9:
-			checkRawData(message); // TC[6,9]
+			rawDataMemorySubservice.checkRawData(message); // TC[6,9]
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

@@ -129,7 +129,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	storeMessage(report);
 }
 
-void EventReportService::execute(const Message& message) {
+void EventReportService::execute(Message& message) {
 	switch (message.messageType) {
 		case 5: enableReportGeneration(message); // TC[5,5]
 			break;

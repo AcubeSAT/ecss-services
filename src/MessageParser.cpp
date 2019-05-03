@@ -12,7 +12,7 @@ void MessageParser::execute(Message& message) {
 			Services.eventReport.execute(message); // ST[05]
 			break;
 		case 6:
-			Services.memoryManagement.rawDataMemorySubservice.execute(message); // ST[06]
+			Services.memoryManagement.execute(message); // ST[06]
 			break;
 		case 8:
 			Services.functionManagement.execute(message); // ST[08]
