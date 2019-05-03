@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_SERVICEPOOL_HPP
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
+#include <Services/TimeBasedSchedulingService.hpp>
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/TimeManagementService.hpp"
@@ -29,6 +30,7 @@ public:
 	ParameterService parameterManagement;
 	LargePacketTransferService largePacketTransferService;
 	FunctionManagementService functionManagement;
+	TimeBasedSchedulingService timeBasedScheduling;
 
 	/**
 	 * The default ServicePool constructor

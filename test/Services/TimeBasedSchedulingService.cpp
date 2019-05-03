@@ -12,24 +12,24 @@
  */
 namespace unit_test
 {
-struct Tester {
-	static bool executionFunctionStatus(TimeBasedSchedulingService& tmService) {
-		return tmService.executionFunctionStatus;
-	}
+	struct Tester {
+		static bool executionFunctionStatus(TimeBasedSchedulingService& tmService) {
+			return tmService.executionFunctionStatus;
+		}
 
-	/*
-	 * Read the private member scheduled activities and since it is a list and it can't be
-	 * accessed, get each element and save it to a vector.
-	 */
-	static auto scheduledActivities(TimeBasedSchedulingService& tmService) {
-		std::vector<TimeBasedSchedulingService::ScheduledActivity*> listElements;
+		/*
+		 * Read the private member scheduled activities and since it is a list and it can't be
+		 * accessed, get each element and save it to a vector.
+		 */
+		static auto scheduledActivities(TimeBasedSchedulingService& tmService) {
+			std::vector<TimeBasedSchedulingService::ScheduledActivity*> listElements;
 
-		std::transform(tmService.scheduledActivities.begin(), tmService.scheduledActivities.end(),
-		               std::back_inserter(listElements), [](auto& activity) -> auto { return &activity; });
+			std::transform(tmService.scheduledActivities.begin(), tmService.scheduledActivities.end(),
+				std::back_inserter(listElements), [](auto& activity) -> auto { return &activity; });
 
-		return listElements; // Return the list elements
-	}
-};
+			return listElements; // Return the list elements
+		}
+	};
 } // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
@@ -91,25 +91,28 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	return unit_test::Tester::scheduledActivities(timeService); // Return the activities vector
 }
 
+
+TimeBasedSchedulingService & timeBasedService = Services.timeBasedScheduling;
+
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
+	Services.reset();
 	Message receivedMessage(11, 1, Message::TC, 1);
 
-	timeService.enableScheduleExecution(receivedMessage);
-	CHECK(unit_test::Tester::executionFunctionStatus(timeService));
+	MessageParser::execute(receivedMessage);//timeService.enableScheduleExecution(receivedMessage);
+	CHECK(unit_test::Tester::executionFunctionStatus(timeBasedService));
 }
 
 TEST_CASE("TC[11,2] Disable Schedule Execution", "[service][st11]") {
+	Services.reset();
 	Message receivedMessage(11, 2, Message::TC, 1);
-	TimeBasedSchedulingService timeService;
 
-	timeService.disableScheduleExecution(receivedMessage);
-	CHECK(not unit_test::Tester::executionFunctionStatus(timeService));
+	MessageParser::execute(receivedMessage);//timeService.disableScheduleExecution(receivedMessage);
+	CHECK(not unit_test::Tester::executionFunctionStatus(timeBasedService));
 }
 
 TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
-	auto scheduledActivities = activityInsertion(timeService);
+	Services.reset();
+	auto scheduledActivities = activityInsertion(timeBasedService);
 
 	REQUIRE(scheduledActivities.size() == 4);
 	REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435);
@@ -126,24 +129,24 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 		receivedMessage.appendUint16(1); // Total number of requests
 
 		receivedMessage.appendUint32(currentTime - 15564350);
-		timeService.insertActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.insertActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
 }
 
 TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
+	Services.reset();
 	Message receivedMessage(11, 15, Message::TC, 1);
 
-	auto scheduledActivities = activityInsertion(timeService);
+	auto scheduledActivities = activityInsertion(timeBasedService);
 	const int32_t timeShift = 6789;
 
 	SECTION("Positive Shift") {
 		receivedMessage.appendSint32(-timeShift);
 
 		CHECK(scheduledActivities.size() == 4);
-		timeService.timeShiftAllActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
 
 		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 - timeShift);
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 - timeShift);
@@ -155,7 +158,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		receivedMessage.appendSint32(timeShift);
 
 		CHECK(scheduledActivities.size() == 4);
-		timeService.timeShiftAllActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
 
 		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 + timeShift);
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 + timeShift);
@@ -167,17 +170,17 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		receivedMessage.appendSint32(-6789000); // Provide a huge time shift to cause an error
 
 		CHECK(scheduledActivities.size() == 4);
-		timeService.timeShiftAllActivities(receivedMessage);
+		MessageParser::execute(receivedMessage);//timeService.timeShiftAllActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::SubServiceExecutionStartError));
 	}
 }
 
 TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
+	Services.reset();
 	Message receivedMessage(11, 7, Message::TC, 1);
 
-	auto scheduledActivities = activityInsertion(timeService);
+	auto scheduledActivities = activityInsertion(timeBasedService);
 	scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 	CHECK(scheduledActivities.size() == 4);
 
@@ -190,8 +193,8 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
 
-		timeService.timeShiftActivitiesByID(receivedMessage);
-		scheduledActivities = unit_test::Tester::scheduledActivities(timeService);
+		timeBasedService.timeShiftActivitiesByID(receivedMessage);
+		scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
 
 		// Make sure the new value is inserted sorted
 		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 1957232 + timeShift);
@@ -205,8 +208,8 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
 
-		timeService.timeShiftActivitiesByID(receivedMessage);
-		scheduledActivities = unit_test::Tester::scheduledActivities(timeService);
+		timeBasedService.timeShiftActivitiesByID(receivedMessage);
+		scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
 
 		// Output should be sorted
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1957232 - 250000);
@@ -220,7 +223,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.appendUint16(80); // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0); // Dummy sequence count
 
-		timeService.timeShiftActivitiesByID(receivedMessage);
+		timeBasedService.timeShiftActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
 
@@ -231,16 +234,16 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
 
-		timeService.timeShiftActivitiesByID(receivedMessage);
+		timeBasedService.timeShiftActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
 }
 
 TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
+	Services.reset();
 	Message receivedMessage(11, 9, Message::TC, 1);
 
-	auto scheduledActivities = activityInsertion(timeService);
+	auto scheduledActivities = activityInsertion(timeBasedService);
 
 	SECTION("Detailed activity report") {
 		// Verify that everything is in place
@@ -257,7 +260,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
 
-		timeService.detailReportActivitiesByID(receivedMessage);
+		timeBasedService.detailReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::hasOneMessage());
 
 		Message response = ServiceTests::get(0);
@@ -290,16 +293,16 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		receivedMessage.appendUint16(80); // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0); // Dummy sequence count
 
-		timeService.detailReportActivitiesByID(receivedMessage);
+		timeBasedService.detailReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
 }
 
 TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
+	Services.reset();
 	Message receivedMessage(11, 12, Message::TC, 1);
 
-	auto scheduledActivities = activityInsertion(timeService);
+	auto scheduledActivities = activityInsertion(timeBasedService);
 
 	SECTION("Summary report") {
 		// Verify that everything is in place
@@ -316,7 +319,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
 
-		timeService.summaryReportActivitiesByID(receivedMessage);
+		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::hasOneMessage());
 
 		Message response = ServiceTests::get(0);
@@ -350,17 +353,17 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		receivedMessage.appendUint16(80); // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0); // Dummy sequence count
 
-		timeService.summaryReportActivitiesByID(receivedMessage);
+		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
 }
 
 TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
-	auto scheduledActivities = activityInsertion(timeService);
+	Services.reset();
+	auto scheduledActivities = activityInsertion(timeBasedService);
 
 	Message receivedMessage(11, 16, Message::TC, 1);
-	timeService.detailReportAllActivities(receivedMessage);
+	timeBasedService.detailReportAllActivities(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
@@ -384,10 +387,10 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 }
 
 TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
+	Services.reset();
 	Message receivedMessage(11, 5, Message::TC, 1);
 
-	auto scheduledActivities = activityInsertion(timeService);
+	auto scheduledActivities = activityInsertion(timeBasedService);
 
 	SECTION("Activity deletion") {
 		// Verify that everything is in place
@@ -400,8 +403,8 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 		receivedMessage.appendUint16(0); // todo: Remove the dummy sequence count
 
 		CHECK(scheduledActivities.size() == 4);
-		timeService.deleteActivitiesByID(receivedMessage);
-		scheduledActivities = unit_test::Tester::scheduledActivities(timeService);
+		timeBasedService.deleteActivitiesByID(receivedMessage);
+		scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
 
 		REQUIRE(scheduledActivities.size() == 3);
 		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 17248435);
@@ -414,20 +417,20 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 		receivedMessage.appendUint16(80); // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0); // Dummy sequence count
 
-		timeService.deleteActivitiesByID(receivedMessage);
+		timeBasedService.deleteActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
 }
 
 TEST_CASE("TC[11,3] Reset schedule", "[service][st11]") {
-	TimeBasedSchedulingService timeService;
-	activityInsertion(timeService);
+	Services.reset();
+	activityInsertion(timeBasedService);
 
 	Message receivedMessage(11, 3, Message::TC, 1);
 
-	timeService.resetSchedule(receivedMessage);
-	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeService); // Get the new list
+	timeBasedService.resetSchedule(receivedMessage);
+	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService); // Get the new list
 
 	REQUIRE(scheduledActivities.empty());
-	REQUIRE(not unit_test::Tester::executionFunctionStatus(timeService));
+	REQUIRE(not unit_test::Tester::executionFunctionStatus(timeBasedService));
 }

@@ -149,36 +149,8 @@ int main() {
 	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent, eventReportData);
 	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent, eventReportData);
 
-	// MessageParser class test
-	std::cout << "\n";
-
-	// ST[17] test
-	Message message = Message(17, 1, Message::TC, 1);
-	MessageParser messageParser;
-	messageParser.execute(message);
-	message = Message(17, 3, Message::TC, 1);
-	message.appendUint16(7);
-	messageParser.execute(message);
-
-	// ST[01] test
-	message = Message(1, 1, Message::TC, 3);
-	messageParser.execute(message);
-	// message = Message(1, 2, Message::TC, 3);
-	// messageParser.execute(message);
-	message = Message(1, 3, Message::TC, 3);
-	messageParser.execute(message);
-	// message = Message(1, 4, Message::TC, 3);
-	// messageParser.execute(message);
-	// message = Message(1, 5, Message::TC, 3)
-	// messageParser.execute(message);
-	// message = Message(1, 6, Message::TC, 3)
-	// messageParser.execute(message);
-	message = Message(1, 7, Message::TC, 3);
-	messageParser.execute(message);
-	// message = Message(1, 8, Message::TC, 3);
-	// messageParser.execute(message);
-	// message = Message(1, 10, Message::TC, 3);
-	// messageParser.execute(message);
+	Message trivialMessage = Message();
+	MessageParser::execute(trivialMessage);
 
 	// ErrorHandler test
 	std::cout << std::flush;

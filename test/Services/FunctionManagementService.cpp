@@ -16,7 +16,7 @@ TEST_CASE("ST[08] - Call Tests") {
 		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
 		msg.appendString(String<FUNC_NAME_LENGTH>("t3st"));
-		fms.call(msg);
+		MessageParser::execute(msg);
 		CHECK(ServiceTests::get(0).messageType == 4);
 		CHECK(ServiceTests::get(0).serviceType == 1);
 	}
@@ -26,8 +26,9 @@ TEST_CASE("ST[08] - Call Tests") {
 		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
 		msg.appendString(String<FUNC_NAME_LENGTH>("test"));
-		msg.appendString(String<65>("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
-		fms.call(msg);
+		msg.appendString(String<65>
+		    ("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
+		MessageParser::execute(msg);
 		CHECK(ServiceTests::get(0).messageType == 4);
 		CHECK(ServiceTests::get(0).serviceType == 1);
 	}

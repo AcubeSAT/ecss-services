@@ -115,17 +115,8 @@ public:
 	 * The data is actually some data members of Message that contain the basic info of the
 	 * telecommand packet that failed the routing
 	 * @param errorCode The cause of creating this type of report
-	 */
-	void failRoutingVerification(const Message& request, ErrorHandler::RoutingErrorType errorCode);
-
-	/**
-	 * It is responsible to call the suitable function that execute the proper subservice. The
-	 * way that the subservices are selected is for the time being based on the messageType(class
-	 * member of class Message) of the param message
-	 *
-	 * Note: The functions of this service takes dummy values as arguments for the time being
-	 */
-	void execute(const Message& message);
+ 	 */
+	void failRoutingVerification(const Message &request, ErrorHandler::RoutingErrorType errorCode);
 };
 
 #endif // ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP

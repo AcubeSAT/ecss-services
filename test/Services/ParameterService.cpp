@@ -14,7 +14,7 @@ TEST_CASE("Parameter Report Subservice") {
 		request.appendUint16(34672); // faulty ID in this context
 		request.appendUint16(1); // valid
 
-		pserv.reportParameterIds(request);
+		MessageParser::execute(request);
 		report = ServiceTests::get(0);
 		request.resetRead();
 
@@ -33,7 +33,7 @@ TEST_CASE("Parameter Report Subservice") {
 	SECTION("Wrong Message Type Handling Test") {
 		Message falseRequest(15, 3, Message::TM, 1); // a totally wrong message
 
-		pserv.reportParameterIds(falseRequest);
+		MessageParser::execute(falseRequest);
 		Message errorNotif = ServiceTests::get(0);
 		CHECK(errorNotif.messageType == 4); // check for proper failed start of
 		// execution notification
@@ -67,19 +67,19 @@ TEST_CASE("Parameter Setting Subservice") {
 		// Since every reporting and setting is called with the same (sometimes faulty) parameters,
 		// and there are errors generated (as should be) it is important to catch and check for
 		// them in order to preserve the integrity of the test.
-		pserv.reportParameterIds(reportRequest);
+		MessageParser::execute(reportRequest);
 		Message errorNotif1 = ServiceTests::get(0);
 		CHECK(errorNotif1.messageType == 4);
 		CHECK(errorNotif1.serviceType == 1);
 
 		Message before = ServiceTests::get(1);
 
-		pserv.setParameterIds(setRequest);
+		MessageParser::execute(setRequest);
 		Message errorNotif2 = ServiceTests::get(2);
 		CHECK(errorNotif2.messageType == 4);
 		CHECK(errorNotif2.serviceType == 1);
 
-		pserv.reportParameterIds(reportRequest);
+		MessageParser::execute(reportRequest);
 		Message errorNotif3 = ServiceTests::get(3);
 		CHECK(errorNotif3.messageType == 4);
 		CHECK(errorNotif3.serviceType == 1);

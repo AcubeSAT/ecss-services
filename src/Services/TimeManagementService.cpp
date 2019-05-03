@@ -24,3 +24,14 @@ TimeAndDate TimeManagementService::cdsTimeRequest(Message& message) {
 
 	return timeInfo;
 }
+
+void TimeManagementService::execute(Message& message) {
+	switch (message.messageType) {
+		case 128:
+			cdsTimeRequest(message); // TC[9,128]
+			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+			break;
+	}
+}
