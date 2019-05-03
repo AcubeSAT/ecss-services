@@ -8,7 +8,14 @@
 #define SECONDS_PER_MINUTE 60u
 #define SECONDS_PER_HOUR 3600u
 #define SECONDS_PER_DAY 86400u
-#define LEAP_SECONDS 27 // @todo keep the leap seconds up to date
+
+/**
+ * @todo If we use CUC time format then we should keep leap seconds up to date. Leap seconds are added in undefined
+ * periods of time, so we should find a way to adjust to these changes either in runtime using GPS or sending a new
+ * compiled code (changing the defined leap seconds) from the ground segment
+ */
+#define LEAP_SECONDS 27
+
 
 /**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.
@@ -87,7 +94,7 @@ public:
 	 * @todo time security for critical time operations
 	 * @todo declare the implicit P-field
 	 */
-	static uint64_t generateCDStimeFormat(struct TimeAndDate& TimeInfo);
+	static uint64_t generateCDSTimeFormat(struct TimeAndDate& TimeInfo);
 
 	/**
 	 * Parse the CDS time format (3.3 in CCSDS 301.0-B-4 standard)
@@ -117,7 +124,7 @@ public:
 	 * @todo time security for critical time operations
 	 * @todo declare the implicit P-field
 	 */
-	static uint32_t generateCUCtimeFormat(struct TimeAndDate& TimeInfo);
+	static uint32_t generateCUCTimeFormat(struct TimeAndDate& TimeInfo);
 
 	/**
 	 * Parse the CUC time format (3.3 in CCSDS 301.0-B-4 standard)
@@ -126,7 +133,7 @@ public:
 	 * fixed size of 32 bits
 	 * @return the UTC date
 	 */
-	static TimeAndDate parseCUCtimeFormat(const uint8_t* data);
+	static TimeAndDate parseCUCTimeFormat(const uint8_t* data);
 };
 
 #endif // ECSS_SERVICES_TIMEHELPER_HPP

@@ -91,7 +91,7 @@ struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
 	return TimeInfo;
 }
 
-uint64_t TimeHelper::generateCDStimeFormat(TimeAndDate& TimeInfo) {
+uint64_t TimeHelper::generateCDSTimeFormat(TimeAndDate& TimeInfo) {
 	/**
 	 * Define the T-field. The total number of octets for the implementation of T-field is 6(2 for
 	 * the `DAY` and 4 for the `ms of day`
@@ -126,11 +126,11 @@ TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t* data) {
 	return secondsToUTC(seconds);
 }
 
-uint32_t TimeHelper::generateCUCtimeFormat(struct TimeAndDate& TimeInfo) {
+uint32_t TimeHelper::generateCUCTimeFormat(struct TimeAndDate& TimeInfo) {
 	return (utcToSeconds(TimeInfo) + LEAP_SECONDS);
 }
 
-TimeAndDate TimeHelper::parseCUCtimeFormat(const uint8_t* data) {
+TimeAndDate TimeHelper::parseCUCTimeFormat(const uint8_t* data) {
 	uint32_t seconds = ((static_cast<uint32_t>(data[0])) << 24) | ((static_cast<uint32_t>(data[1]))) << 16 |
 	                   ((static_cast<uint32_t>(data[2]))) << 8 | (static_cast<uint32_t>(data[3]));
 	seconds -= LEAP_SECONDS;

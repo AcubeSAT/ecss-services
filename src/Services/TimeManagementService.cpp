@@ -5,7 +5,7 @@ void TimeManagementService::cdsTimeReport(TimeAndDate& TimeInfo) {
 
 	Message timeReport = createTM(3);
 
-	uint64_t timeFormat = TimeHelper::generateCDStimeFormat(TimeInfo);
+	uint64_t timeFormat = TimeHelper::generateCDSTimeFormat(TimeInfo);
 
 	timeReport.appendHalfword(static_cast<uint16_t>(timeFormat >> 32));
 	timeReport.appendWord(static_cast<uint32_t>(timeFormat));

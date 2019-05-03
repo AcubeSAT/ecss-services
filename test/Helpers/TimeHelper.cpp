@@ -81,7 +81,7 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		uint16_t elapsedDays = currTime / 86400;
 		uint32_t msOfDay = currTime % 86400 * 1000;
 		uint64_t timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
-		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
+		CHECK(TimeHelper::generateCDSTimeFormat(TimeInfo) == timeFormat);
 
 		// 1/1/2019 00:00:00
 		TimeInfo.year = 2019;
@@ -96,7 +96,7 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		elapsedDays = currTime / 86400;
 		msOfDay = currTime % 86400 * 1000;
 		timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
-		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
+		CHECK(TimeHelper::generateCDSTimeFormat(TimeInfo) == timeFormat);
 
 		// 5/12/2020 00:00:00
 		TimeInfo.year = 2020;
@@ -239,11 +239,11 @@ TEST_CASE("Time format implementation for CUC", "[CUC]") {
 	uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 	uint32_t timeFormat = currTime + LEAP_SECONDS;
-	CHECK(TimeHelper::generateCUCtimeFormat(TimeInfo) == timeFormat);
+	CHECK(TimeHelper::generateCUCTimeFormat(TimeInfo) == timeFormat);
 
 	Message message = Message(9, 128, Message::TC, 3);
 	message.appendWord(timeFormat);
-	CHECK((TimeHelper::parseCUCtimeFormat(message.data) == TimeInfo) == true);
+	CHECK((TimeHelper::parseCUCTimeFormat(message.data) == TimeInfo) == true);
 
 	// 1/1/2019 00:00:00
 	TimeInfo.year = 2019;
@@ -256,9 +256,9 @@ TEST_CASE("Time format implementation for CUC", "[CUC]") {
 	currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 	timeFormat = currTime + LEAP_SECONDS; // TAI format
-	CHECK(TimeHelper::generateCUCtimeFormat(TimeInfo) == timeFormat);
+	CHECK(TimeHelper::generateCUCTimeFormat(TimeInfo) == timeFormat);
 
 	message = Message(9, 128, Message::TC, 3);
 	message.appendWord(timeFormat);
-	CHECK((TimeHelper::parseCUCtimeFormat(message.data) == TimeInfo) == true);
+	CHECK((TimeHelper::parseCUCTimeFormat(message.data) == TimeInfo) == true);
 }
