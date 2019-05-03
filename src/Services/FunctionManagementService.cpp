@@ -53,5 +53,6 @@ void FunctionManagementService::execute(Message& message) {
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+			break;
 	}
 }
