@@ -87,6 +87,9 @@ mv docs/html/* public/${DOCUMENT_PATH}
 git branch -a | grep "remote" | xargs -n 1 -i sh -c "path=\"{}\"; basename \"\$path\"" > branches_list
 ls -d public/coverage/*/ | xargs -n 1 -i sh -c "name=\"{}\"; basename \"\$name\"" > directory_list
 
+# Condition the directory list (Remove unwanted instances)
+sed -i -e '/gcovr/d;/inc/d;/src/d' directory_list
+
 # Output for debugging purposes
 echo -e "\e[1;36mBranch names list\e[0m"
 cat branches_list
