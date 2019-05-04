@@ -1,19 +1,33 @@
 image: lycantropos/cmake
 
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+# Global caching directive for pip
+cache:
+  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+  paths:
+    - .cache/pip
+
 stages:
   - build
   - test
+  - deploy
 
 before_script:
+  - apt-get update -qq && apt-get -qq -y install python3-pip && python3 -m pip install --upgrade pip
+  - python3 -V
+  - python3 -m pip --version
   - g++ --version
   - cat /etc/*-release
+  - python3 -m pip install gcovr
 
 build:
   stage: build
   variables:
-      GIT_SUBMODULE_STRATEGY: normal
-      GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
-      CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
+    GIT_SUBMODULE_STRATEGY: normal
+    GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
+    CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
   script:
     - cmake . -DCMAKE_CXX_FLAGS="-Werror -fdiagnostics-color=always"
     - make -j4
@@ -23,15 +37,17 @@ build:
 
 tests:
   stage: test
+  coverage: '/^TOTAL.*\s+(\d+\%)$/'
   variables:
     GIT_SUBMODULE_STRATEGY: normal
   script:
     - cmake .
     - make tests -j4
-    - ./tests --use-colour yes
+    - ./tests --use-colour yes  # Run the tests
   after_script:
     - ./tests -r junit -o junit.xml
   artifacts:
+    expire_in: 1 week
     reports:
       junit: junit.xml
 
@@ -75,4 +91,24 @@ clang-tidy:
     - clang-tidy-7 --version
   script:
     # Running with `script` to give clang a tty so that it outputs colours
-    - script -ec "bash -x ci/clang-tidy.sh"
+    - script -c "bash -x ci/clang-tidy.sh"
+
+pages:
+  stage: deploy
+  when: always  # Deploy always and on build or test failure, generate just the documentation
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - public
+  variables:
+    GIT_SUBMODULE_STRATEGY: normal
+  script:
+    - apt-get install -qq -y doxygen graphviz lcov
+  after_script:
+    - ./ci/pages_deploy.sh
+    - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage  # Print directory contents for debugging
+  artifacts:
+    paths:
+      - public # Upload the resulting website
+  only:
+    - branches # Deploy on all branches
