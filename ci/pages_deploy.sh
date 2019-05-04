@@ -15,8 +15,8 @@ PAGE_TITLE="${CI_COMMIT_REF_NAME}"
 if [[ ${CI_COMMIT_REF_NAME} == "master" ]];
 then
     ROOT_PATH=""
-    COVERAGE_PATH="coverage/"
-    DOCUMENT_PATH="docs/"
+    COVERAGE_PATH="coverage"
+    DOCUMENT_PATH="docs"
 else
     ROOT_PATH="${CI_COMMIT_REF_NAME}"
     COVERAGE_PATH="coverage/${CI_COMMIT_REF_NAME}"
