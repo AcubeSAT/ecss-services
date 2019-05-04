@@ -1,0 +1,15 @@
+.coverLegendCovLo, .coverLegendCovMed, .coverLegendCovHi {
+    border-radius: 15px;
+}
+
+#td.headerCovTableEntry {
+    border-radius: 15px;
+}
+
+.headerCovTableEntryLo, .headerCovTableEntryMed, .headerCovTableEntryHi {
+    border-radius: 15px;
+}
+
+.headerCovTableEntry {
+    border-radius: 15px;
+}

@@ -4,3 +4,6 @@
 [submodule "lib/etl"]
 	path = lib/etl
 	url = https://github.com/ETLCPP/etl.git
+[submodule "ci/page_style/doxygen_dark_theme"]
+	path = ci/page_style/doxygen_dark_theme
+	url = https://github.com/MaJerle/doxygen_dark_theme.git
