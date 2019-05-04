@@ -1,7 +1,7 @@
 #include "catch2/catch.hpp"
 #include "Helpers/TimeHelper.hpp"
 
-TEST_CASE("Time format implementation", "[CUC]") {
+TEST_CASE("Time format implementation for CDS", "[CDS]") {
 	SECTION("Invalid date") {
 		TimeAndDate TimeInfo;
 
@@ -13,7 +13,6 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		TimeHelper time;
 		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid month
@@ -77,13 +76,12 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		TimeInfo.minute = 15;
 		TimeInfo.second = 0;
 
-		TimeHelper time;
 		uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
 
 		uint16_t elapsedDays = currTime / 86400;
 		uint32_t msOfDay = currTime % 86400 * 1000;
 		uint64_t timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
-		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
+		CHECK(TimeHelper::generateCDSTimeFormat(TimeInfo) == timeFormat);
 
 		// 1/1/2019 00:00:00
 		TimeInfo.year = 2019;
@@ -98,7 +96,7 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		elapsedDays = currTime / 86400;
 		msOfDay = currTime % 86400 * 1000;
 		timeFormat = (static_cast<uint64_t>(elapsedDays) << 32 | msOfDay);
-		CHECK(TimeHelper::generateCDStimeFormat(TimeInfo) == timeFormat);
+		CHECK(TimeHelper::generateCDSTimeFormat(TimeInfo) == timeFormat);
 
 		// 5/12/2020 00:00:00
 		TimeInfo.year = 2020;
@@ -148,7 +146,6 @@ TEST_CASE("Time format implementation", "[CUC]") {
 	SECTION("Convert elapsed seconds since Unix epoch to UTC date") {
 		uint32_t seconds = 1586513700; // elapsed seconds between 10/04/2020 10:15:00 and Unix epoch
 
-		TimeHelper time;
 		TimeAndDate TimeInfo = TimeHelper::secondsToUTC(seconds);
 		CHECK(TimeInfo.year == 2020);
 		CHECK(TimeInfo.month == 4);
@@ -227,4 +224,41 @@ TEST_CASE("Time format implementation", "[CUC]") {
 		CHECK(TimeInfo.minute == 0);
 		CHECK(TimeInfo.second == 0);
 	}
+}
+
+TEST_CASE("Time format implementation for CUC", "[CUC]") {
+	TimeAndDate TimeInfo;
+	// 10/04/2020 10:15:00
+	TimeInfo.year = 2020;
+	TimeInfo.month = 4;
+	TimeInfo.day = 10;
+	TimeInfo.hour = 10;
+	TimeInfo.minute = 15;
+	TimeInfo.second = 0;
+
+	uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
+
+	uint32_t timeFormat = currTime + LEAP_SECONDS;
+	CHECK(TimeHelper::generateCUCTimeFormat(TimeInfo) == timeFormat);
+
+	Message message = Message(9, 128, Message::TC, 3);
+	message.appendWord(timeFormat);
+	CHECK((TimeHelper::parseCUCTimeFormat(message.data) == TimeInfo) == true);
+
+	// 1/1/2019 00:00:00
+	TimeInfo.year = 2019;
+	TimeInfo.month = 1;
+	TimeInfo.day = 1;
+	TimeInfo.hour = 0;
+	TimeInfo.minute = 0;
+	TimeInfo.second = 0;
+
+	currTime = TimeHelper::utcToSeconds(TimeInfo);
+
+	timeFormat = currTime + LEAP_SECONDS; // TAI format
+	CHECK(TimeHelper::generateCUCTimeFormat(TimeInfo) == timeFormat);
+
+	message = Message(9, 128, Message::TC, 3);
+	message.appendWord(timeFormat);
+	CHECK((TimeHelper::parseCUCTimeFormat(message.data) == TimeInfo) == true);
 }

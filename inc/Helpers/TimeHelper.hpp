@@ -10,18 +10,33 @@
 #define SECONDS_PER_DAY 86400u
 
 /**
+ * @todo If we use CUC time format then we should keep leap seconds up to date. Leap seconds are added in undefined
+ * periods of time, so we should find a way to adjust to these changes either in runtime using GPS or sending a new
+ * compiled code (changing the defined leap seconds) from the ground segment
+ */
+#define LEAP_SECONDS 27
+
+
+/**
  * This class formats the spacecraft time and cooperates closely with the ST[09] time management.
  *
  * The ECSS standard supports two time formats: the CUC and CSD that are described in CCSDS
- * 301.0-B-4 standard. The chosen time format is CDS and it is UTC-based (UTC: Coordinated
- * Universal Time). It consists of two main fields: the time code preamble field (P-field) and
- * the time specification field (T-field). The P-Field is the metadata for the T-Field. The
- * T-Field is consisted of two segments: 1) the `DAY` and the 2) `ms of day` segments.
- * The P-field won't be included in the code, because as the ECSS standards claims, it can be
- * just implicitly declared.
+ * 301.0-B-4 standard.
  *
- * @note
- * Since this code is UTC-based, the leap second correction must be made. The leap seconds that
+ * The CDS is UTC-based (UTC: Coordinated Universal Time). It consists of two main fields: the
+ * time code preamble field (P-field) and the time specification field (T-field). The P-Field is the metadata for the
+ * T-Field. The T-Field is consisted of two segments: 1) the `DAY` and the 2) `ms of day` segments. The P-field won't
+ * be included in the code, because as the ECSS standards claims, it can be just implicitly declared.
+ *
+ * The CUC is TAI-based (TAI: International Atomic Time). It consists of two main fields: the time code preamble field
+ * (P-field) and the time specification field(T-field). The T-Field contains the value of the time unit and the designer
+ * decides what the time unit will be, so this is a subject for discussion. The recommended time unit from the
+ * standard is the second and it is probably the best solution for accuracy.
+ *
+ * @notes
+ * The defined epoch for both time formats is 1 January 1958 00:00:00
+ *
+ * Since CDS format is UTC-based, the leap second correction must be made. The leap seconds that
  * have been occurred between timestamps should be considered if a critical time-difference is
  * needed
  *
@@ -79,7 +94,7 @@ public:
 	 * @todo time security for critical time operations
 	 * @todo declare the implicit P-field
 	 */
-	static uint64_t generateCDStimeFormat(struct TimeAndDate& TimeInfo);
+	static uint64_t generateCDSTimeFormat(struct TimeAndDate& TimeInfo);
 
 	/**
 	 * Parse the CDS time format (3.3 in CCSDS 301.0-B-4 standard)
@@ -89,6 +104,36 @@ public:
 	 * @return the UTC date
 	 */
 	static TimeAndDate parseCDStimeFormat(const uint8_t* data);
+
+	/**
+	 * Generate the CUC time format (3.3 in CCSDS 301.0-B-4 standard).
+	 *
+	 * Converts a UTC date to CUC time format.
+	 *
+	 * @notes
+	 * The T-field is specified for the seconds passed from the defined epoch 1 January 1958. We use 4 octets(32
+	 * bits) for the time unit (seconds) because 32 bits for the seconds are enough to count 136 years! But if we use 24
+	 * bits for the seconds then it will count 0,5 years and this isn't enough. Remember we can use only integers
+	 * numbers of octets for the time unit (second)
+	 *
+	 * The CUC time format doesn't include leap seconds, so we need to add them because we assume that
+	 * the RTC will provide UTC format.
+	 *
+	 * @param TimeInfo is the data provided from RTC (UTC)
+	 * @return TimeFormat the CUC time format. More specific, 32 bits are used for the T-field (seconds since 1/1/1958)
+	 * @todo time security for critical time operations
+	 * @todo declare the implicit P-field
+	 */
+	static uint32_t generateCUCTimeFormat(struct TimeAndDate& TimeInfo);
+
+	/**
+	 * Parse the CUC time format (3.3 in CCSDS 301.0-B-4 standard)
+	 *
+	 * @param data time information provided from the ground segment. The length of the data is a
+	 * fixed size of 32 bits
+	 * @return the UTC date
+	 */
+	static TimeAndDate parseCUCTimeFormat(const uint8_t* data);
 };
 
 #endif // ECSS_SERVICES_TIMEHELPER_HPP
