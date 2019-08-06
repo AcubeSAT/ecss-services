@@ -69,6 +69,13 @@ public:
 	 * @param string This will change when these function will be modified
 	 */
 	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> lastUplinkPart(const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
+
+	/**
+	 * Function that splits large messages
+	 * @param Message that is exceeds the standards and has to be split down
+	 * @param largeMessageTransactionIdentifier that is a value we assign to this splitting of the large message
+	 */
+	void split(Message& message, uint16_t largeMessageTransactionIdentifier);
 };
 
 #endif // ECSS_SERVICES_LARGEPACKETTRANSFERSERVICE_HPP
