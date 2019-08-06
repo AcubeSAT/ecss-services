@@ -39,7 +39,6 @@ add_library(common OBJECT
 # Specify the .cpp files for the executables
 file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
 add_executable(ecss_services
-        src/main.cpp
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )
