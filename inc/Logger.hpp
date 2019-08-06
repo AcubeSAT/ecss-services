@@ -23,9 +23,9 @@
 	#define LOGLEVEL Logger::disabled
 #endif
 
-#define _ac_LOGGER_ENABLED_LEVEL(level) (( (Logger::LogLevelType) LOGLEVEL) >= ( (Logger::LogLevelType) level))
+#define _ac_LOGGER_ENABLED_LEVEL(level) (( (Logger::LogLevelType) LOGLEVEL) <= ( (Logger::LogLevelType) level))
 
-#define LOG(level, message) Logger::log(level, message)
+#define LOG(level, message) if (_ac_LOGGER_ENABLED_LEVEL(level)) { Logger::log(level, message); }
 
 #define LOG_TRACE(message)     LOG(Logger::trace, message)
 #define LOG_DEBUG(message)     LOG(Logger::debug, message)
