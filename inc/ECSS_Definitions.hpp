@@ -53,4 +53,9 @@
 #define ECSS_MAX_DELTA_OF_RELEASE_TIME 60
 // release time and the actual release time
 
+/**
+ * @brief The maximum size of a log message
+ */
+#define LOGGER_MAX_MESSAGE_SIZE 512
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
