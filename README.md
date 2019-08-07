@@ -12,4 +12,4 @@ standard.
 - **test**: Unit test implementation
 
 ## Documentation
-Full documentation about this project based on code comments is available at https://helit.org/ecss-docs/docs/html/.
+Full documentation about this project based on code comments is available at https://acubesat.gitlab.io/obc/ecss-services/docs/.
