@@ -3,37 +3,41 @@
 
 #include <cstdint>
 #include <etl/String.hpp>
+#include <etl/to_string.h>
 #include <ECSS_Definitions.hpp>
 
 #if defined LOGLEVEL_TRACE
-	#define LOGLEVEL Logger::trace
+#define LOGLEVEL Logger::trace
 #elif defined LOGLEVEL_DEBUG
-	#define LOGLEVEL Logger::debug
+#define LOGLEVEL Logger::debug
 #elif defined LOGLEVEL_INFO
-	#define LOGLEVEL Logger::info
+#define LOGLEVEL Logger::info
 #elif defined LOGLEVEL_NOTICE
-	#define LOGLEVEL Logger::notice
+#define LOGLEVEL Logger::notice
 #elif defined LOGLEVEL_WARNING
-	#define LOGLEVEL Logger::warning
+#define LOGLEVEL Logger::warning
 #elif defined LOGLEVEL_ERROR
-	#define LOGLEVEL Logger::error
+#define LOGLEVEL Logger::error
 #elif defined LOGLEVEL_EMERGENCY
-	#define LOGLEVEL Logger::emergency
+#define LOGLEVEL Logger::emergency
 #else
-	#define LOGLEVEL Logger::disabled
+#define LOGLEVEL Logger::disabled
 #endif
 
 #define _ac_LOGGER_ENABLED_LEVEL(level) (( (Logger::LogLevelType) LOGLEVEL) <= ( (Logger::LogLevelType) level))
 
-#define LOG(level, message) if (_ac_LOGGER_ENABLED_LEVEL(level)) { Logger::log(level, message); }
+#define LOG(level) \
+    if (_ac_LOGGER_ENABLED_LEVEL(level)) \
+        if (Logger::LogEntry entry(level); true) \
+            entry
 
-#define LOG_TRACE(message)     LOG(Logger::trace, message)
-#define LOG_DEBUG(message)     LOG(Logger::debug, message)
-#define LOG_INFO(message)      LOG(Logger::info, message)
-#define LOG_NOTICE(message)    LOG(Logger::notice, message)
-#define LOG_WARNING(message)   LOG(Logger::warning, message)
-#define LOG_ERROR(message)     LOG(Logger::error, message)
-#define LOG_EMERGENCY(message) LOG(Logger::emergency, message)
+#define LOG_TRACE     LOG(Logger::trace)
+#define LOG_DEBUG     LOG(Logger::debug)
+#define LOG_INFO      LOG(Logger::info)
+#define LOG_NOTICE    LOG(Logger::notice)
+#define LOG_WARNING   LOG(Logger::warning)
+#define LOG_ERROR     LOG(Logger::error)
+#define LOG_EMERGENCY LOG(Logger::emergency)
 
 /**
  * A logging class for ECSS Services that supports ETL's String and is lightweight enough to be used in embedded
@@ -73,9 +77,30 @@ public:
 	};
 
 	/**
+	 * A class that defines a log message.
+	 *
+	 * Instead of using this class, prefer one of the above macros
+	 */
+	struct LogEntry {
+		String<LOGGER_MAX_MESSAGE_SIZE> message = ""; ///< The current log message itself
+		etl::format_spec format; ///< ETL's string format specification
+		LogLevel level;
+
+		explicit LogEntry(LogLevel level); ///< Create a new LogEntry
+
+		/**
+		 * The LogEntry destructor gets called whenever a log message is finalized, and ready to be shown to the
+		 * user. This function is responsible for calling the Logger::log function.
+		 */
+		~LogEntry();
+
+		LogEntry(LogEntry const&) = delete; ///< Unimplemented copy constructor
+	};
+
+	/**
 	 * @brief Unimplemented copy constructor
 	 *
-	 * Does not allow Loggers should be copied. There should be only one instance for each Logger.
+	 * Does not allow Loggers to be copied. There should be only one instance for each Logger.
 	 */
 	Logger(Logger const&) = delete;
 
@@ -104,7 +129,15 @@ public:
 	/**
 	 * Store a new log message
 	 */
-	static void log(LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE> message);
+	static void log(LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE>& message);
 };
+
+template <class T>
+Logger::LogEntry& operator<<(Logger::LogEntry& entry, const T value) {
+	etl::to_string(value, entry.message, entry.format, true);
+
+	return entry;
+}
+
 
 #endif //ECSS_SERVICES_LOGGER_HPP

@@ -18,6 +18,7 @@ add_custom_target(check
 add_library(common OBJECT
         src/Service.cpp
         src/ErrorHandler.cpp
+        src/Logger.cpp
         src/Message.cpp
         src/MessageParser.cpp
         src/ServicePool.cpp
