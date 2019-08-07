@@ -71,7 +71,7 @@ int main() {
 	char pStr[4];
 	*pStr = 'T';
 	*(pStr + 1) = 'G';
-	*(pStr + 2) = '\0';
+	*(pStr + 2) = 0;
 
 	MemoryManagementService& memMangService = Services.memoryManagement;
 	Message rcvPack = Message(6, 5, Message::TC, 1);

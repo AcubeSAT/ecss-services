@@ -85,7 +85,7 @@ public:
 	// We allocate this data statically, in order to make sure there is predictability in the
 	// handling and storage of messages
 	// TODO: Is it a good idea to not initialise this to 0?
-	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = {'\0'};
+	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = { 0 };
 
 	// private:
 	uint8_t currentBit = 0;
