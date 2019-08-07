@@ -134,7 +134,7 @@ void Message::readString(char* string, uint8_t size) {
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
-	string[size] = '\0'; // todo: Use that for now to avoid problems. Later to be removed
+	string[size] = 0; // todo: Use that for now to avoid problems. Later to be removed
 
 	readPosition += size;
 }
@@ -144,7 +144,7 @@ void Message::readString(uint8_t* string, uint16_t size) {
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
-	string[size] = '\0'; // todo: Use that for now to avoid problems. Later to be removed
+	string[size] = 0; // todo: Use that for now to avoid problems. Later to be removed
 
 	readPosition += size;
 }
