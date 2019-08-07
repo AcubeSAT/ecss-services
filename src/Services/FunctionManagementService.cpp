@@ -7,8 +7,8 @@ void FunctionManagementService::call(Message& msg) {
 	ErrorHandler::assertRequest(msg.messageType == 1, msg, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(msg.serviceType == 8, msg, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint8_t funcName[FUNC_NAME_LENGTH]; // the function's name
-	uint8_t funcArgs[MAX_ARG_LENGTH]; // arguments for the function
+	uint8_t funcName[FUNC_NAME_LENGTH] = { 0 }; // the function's name
+	uint8_t funcArgs[MAX_ARG_LENGTH] = { 0 }; // arguments for the function
 
 	msg.readString(funcName, FUNC_NAME_LENGTH);
 	msg.readString(funcArgs, MAX_ARG_LENGTH);

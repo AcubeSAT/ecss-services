@@ -135,10 +135,29 @@ public:
 	 * need to use a function like Message::appendOctetString(), or have specified the size of the
 	 * string beforehand. Note that the standard does not support null-terminated strings.
 	 *
+	 * This does not append the full size of the string, just its current size. Use
+	 * Message::appendFixedString() to have a constant number of characters added.
+	 *
 	 * @param string The string to insert
 	 */
 	template <const size_t SIZE>
 	void appendString(const String<SIZE>& string);
+
+	/**
+	 * Appends a number of bytes to the message
+	 *
+	 * Note that this doesn't append the number of bytes that the string contains. For this, you
+	 * need to use a function like Message::appendOctetString(), or have specified the size of the
+	 * string beforehand. Note that the standard does not support null-terminated strings.
+	 *
+	 * The number of bytes appended is equal to \p SIZE. To append variable-sized parameters, use
+	 * Message::appendString() instead. Missing bytes are padded with zeros, until the length of SIZE
+	 * is reached.
+	 *
+	 * @param string The string to insert
+	 */
+	template <const size_t SIZE>
+	void appendFixedString(const String<SIZE>& string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -166,18 +185,27 @@ public:
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
-	 * ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string.
+	 * ECSS_MAX_STRING_SIZE. This function does NOT place a \0 at the end of the created string.
 	 */
-	void readString(char* string, uint8_t size);
+	void readString(char* string, uint16_t size);
 
 	/**
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
-	 * ECSS_MAX_STRING_SIZE. This function does placs a \0 at the end of the created string
+	 * ECSS_MAX_STRING_SIZE. This function does NOT place a \0 at the end of the created string
 	 * @todo Is uint16_t size too much or not enough? It has to be defined
 	 */
 	void readString(uint8_t* string, uint16_t size);
+
+	/**
+	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
+	 *
+	 * NOTE: We assume that \p string is already allocated, and its size is at least
+	 * ECSS_MAX_STRING_SIZE + 1. This function DOES place a \0 at the end of the created string,
+	 * meaning that \p string should contain 1 more byte than the string stored in the message.
+	 */
+	void readCString(char *string, uint16_t size);
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
@@ -452,8 +480,8 @@ public:
 	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
-	 * @details In the current implementation we assume that a preallocated array of
-	 * 			sufficient size is provided as the argument
+	 * In the current implementation we assume that a preallocated array of sufficient size
+	 * is provided as the argument. This does NOT append a trailing `\0` to \p byteString.
 	 * @todo Specify if the provided array size is too small or too large
 	 *
 	 * PTC = 7, PFC = 0
@@ -524,6 +552,16 @@ inline void Message::appendString(const String<SIZE>& string) {
 	memcpy(data + dataSize, string.data(), string.size());
 
 	dataSize += string.size();
+}
+
+template <const size_t SIZE>
+inline void Message::appendFixedString(const String<SIZE>& string) {
+	ASSERT_INTERNAL((dataSize + SIZE) < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+
+	memcpy(data + dataSize, string.data(), string.size()); // Append the bytes with content
+	(void) memset(data + dataSize + string.size(), 0, SIZE - string.size()); // The rest of the bytes is set to 0
+
+	dataSize += SIZE;
 }
 
 #endif // ECSS_SERVICES_PACKET_H

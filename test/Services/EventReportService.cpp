@@ -20,7 +20,7 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.readEnum16() == 0);
-	report.readString(checkString, 10);
+	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
 
@@ -38,7 +38,7 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.readEnum16() == 4);
-	report.readString(checkString, 10);
+	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
 
@@ -56,7 +56,7 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.readEnum16() == 5);
-	report.readString(checkString, 10);
+	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
 
@@ -74,7 +74,7 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.readEnum16() == 6);
-	report.readString(checkString, 10);
+	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
 

@@ -6,31 +6,58 @@
 
 FunctionManagementService& fms = Services.functionManagement;
 
+uint8_t globalVariable = 10;
+
 void test(String<MAX_ARG_LENGTH> a) {
-	std::cout << a.c_str() << std::endl;
+	globalVariable = a[0];
 }
 
 TEST_CASE("ST[08] - Call Tests") {
-	SECTION("Malformed name") {
+	SECTION("Function call") {
 		ServiceTests::reset();
+		globalVariable = 10;
+
 		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
-		msg.appendString(String<FUNC_NAME_LENGTH>("t3st"));
+
+		msg.appendFixedString(String<FUNC_NAME_LENGTH>("test"));
+		msg.appendByte(199);
 		MessageParser::execute(msg);
+
+		CHECK(ServiceTests::hasNoErrors());
+		CHECK(globalVariable == 199);
+	}
+
+	SECTION("Malformed name") {
+		ServiceTests::reset();
+		globalVariable = 10;
+
+		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
+		Message msg(8, 1, Message::TC, 1);
+		msg.appendFixedString(String<FUNC_NAME_LENGTH>("t3st"));
+		MessageParser::execute(msg);
+
 		CHECK(ServiceTests::get(0).messageType == 4);
 		CHECK(ServiceTests::get(0).serviceType == 1);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(globalVariable == 10);
 	}
 
 	SECTION("Too long message") {
 		ServiceTests::reset();
+		globalVariable = 10;
+
 		fms.include(String<FUNC_NAME_LENGTH>("test"), &test);
 		Message msg(8, 1, Message::TC, 1);
-		msg.appendString(String<FUNC_NAME_LENGTH>("test"));
+		msg.appendFixedString(String<FUNC_NAME_LENGTH>("test"));
 		msg.appendString(String<65>
 		    ("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
 		MessageParser::execute(msg);
+
 		CHECK(ServiceTests::get(0).messageType == 4);
 		CHECK(ServiceTests::get(0).serviceType == 1);
+		CHECK(ServiceTests::countErrors() == 2);
+		CHECK(globalVariable == 10);
 	}
 }
 
