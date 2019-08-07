@@ -34,5 +34,4 @@ python3 ci/summarizer.py --report ci/report.msr --suppress 3.1 5.1 5.2 5.3 12.3 
 # clean up old files
 echo -e "\u001b[34;1mRemoving dump files...\u001b[0m"
 echo > ci/report.msr # clear the report file
-find inc/ src/ -type f -name "*.dump" | xargs rm
-
+find inc/ src/ -type f -name "*.dump" | xargs rm -rf
