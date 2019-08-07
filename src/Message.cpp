@@ -129,12 +129,11 @@ uint32_t Message::readWord() {
 	return value;
 }
 
-void Message::readString(char* string, uint8_t size) {
+void Message::readString(char* string, uint16_t size) {
 	ASSERT_REQUEST((readPosition + size) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
-	string[size] = 0; // todo: Use that for now to avoid problems. Later to be removed
 
 	readPosition += size;
 }
@@ -144,9 +143,13 @@ void Message::readString(uint8_t* string, uint16_t size) {
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
 
 	memcpy(string, data + readPosition, size);
-	string[size] = 0; // todo: Use that for now to avoid problems. Later to be removed
 
 	readPosition += size;
+}
+
+void Message::readCString(char *string, uint16_t size) {
+	readString(string, size);
+	string[size] = 0;
 }
 
 void Message::resetRead() {

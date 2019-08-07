@@ -160,7 +160,7 @@ TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 	REQUIRE(message.dataSize == 4);
 
 	char string[5];
-	message.readString(string, 4);
+	message.readCString(string, 4);
 	CHECK_THAT(string, Catch::Matchers::Equals("test"));
 }
 

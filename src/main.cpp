@@ -32,7 +32,7 @@ int main() {
 	std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
 
 	char string[6];
-	packet.readString(string, 5);
+	packet.readCString(string, 5);
 	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 

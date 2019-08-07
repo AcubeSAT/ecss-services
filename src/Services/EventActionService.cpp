@@ -24,7 +24,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 	}
 	if (canBeAdded) {
-		char data[ECSS_TC_REQUEST_STRING_SIZE];
+		char data[ECSS_TC_REQUEST_STRING_SIZE] = { 0 };
 		message.readString(data, message.dataSize - 6);
 		EventActionDefinition temp;
 		temp.enabled = false;
