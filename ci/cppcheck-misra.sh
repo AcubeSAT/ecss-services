@@ -30,8 +30,13 @@ sed -i -r 's/(.*Script.*)|(.*Checking.*)|(.*MISRA.*)|(.*Undefined: .*)|(.* \(-\)
 # run the summarizer for a nice, clean summary of errors
 echo -e "\u001b[34;1mSummarizing results...\u001b[0m"
 python3 ci/summarizer.py --report ci/report.msr --suppress 3.1 5.1 5.2 5.3 12.3 13.4 14.4 15.5 16.3 18.4 18.8
+RETURN=$?
 
 # clean up old files
 echo -e "\u001b[34;1mRemoving dump files...\u001b[0m"
 echo > ci/report.msr # clear the report file
 find inc/ src/ -type f -name "*.dump" | xargs rm -rf
+
+# finally return the return value of the summarizer.py script
+exit $RETURN
+
