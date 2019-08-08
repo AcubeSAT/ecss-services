@@ -24,7 +24,6 @@ void Logger::log(Logger::LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE> & messa
 	} else if (level <= Logger::debug) {
 		name = "debug";
 		colour = "90"; // bright black
-		keepColour = true;
 	} else if (level <= Logger::info) {
 		name = "info";
 		colour = "32"; // green
@@ -58,4 +57,12 @@ void Logger::log(Logger::LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE> & messa
 
 	ss << "\n";
 	std::cerr << ss.str();
+}
+
+// Reimplementation of the log function for C++ strings
+// This is kept in the Platform files, since we don't want to mess with std::strings in the microcontroller
+Logger::LogEntry& operator<<(Logger::LogEntry& entry, const std::string & value) {
+	entry.message.append(value.c_str());
+
+	return entry;
 }

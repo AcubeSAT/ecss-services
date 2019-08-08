@@ -169,5 +169,6 @@ Logger::LogEntry& operator<<(Logger::LogEntry& entry, const T value) {
 	return entry;
 }
 
+Logger::LogEntry& operator<<(Logger::LogEntry& entry, const std::string & value);
 
 #endif //ECSS_SERVICES_LOGGER_HPP

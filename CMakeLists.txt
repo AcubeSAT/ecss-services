@@ -43,6 +43,8 @@ add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )
+set_target_properties(ecss_services
+        PROPERTIES COMPILE_DEFINITIONS LOGLEVEL_TRACE)
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests

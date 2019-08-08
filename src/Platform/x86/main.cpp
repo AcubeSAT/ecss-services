@@ -1,5 +1,3 @@
-#define LOGLEVEL_TRACE
-
 #include <iostream>
 #include <ServicePool.hpp>
 #include <Logger.hpp>

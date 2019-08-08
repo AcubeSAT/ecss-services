@@ -1,10 +1,16 @@
 #include <Logger.hpp>
 
+// Reimplementation of the function for variable C strings
+template <>
+Logger::LogEntry& operator<<(Logger::LogEntry& entry, char* value) {
+	entry.message.append(value);
+	return entry;
+}
+
 // Reimplementation of the function for C strings
 template <>
 Logger::LogEntry& operator<<(Logger::LogEntry& entry, const char* value) {
 	entry.message.append(value);
-
 	return entry;
 }
 
