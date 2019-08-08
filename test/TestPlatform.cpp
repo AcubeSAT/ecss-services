@@ -3,6 +3,7 @@
 #include <catch2/catch.hpp>
 #include <Message.hpp>
 #include <Service.hpp>
+#include <Logger.hpp>
 #include "Services/ServiceTests.hpp"
 
 // Explicit template specializations for the logError() function
@@ -32,6 +33,10 @@ void ErrorHandler::logError(const Message& message, ErrorType errorType) {
 template <typename ErrorType>
 void ErrorHandler::logError(ErrorType errorType) {
 	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
+}
+
+void Logger::log(Logger::LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE> & message) {
+	// Logs while testing are completely ignored
 }
 
 struct ServiceTestsListener : Catch::TestEventListenerBase {

@@ -1,3 +1,5 @@
+#define LOGLEVEL_TRACE
+
 #include <iostream>
 #include <ServicePool.hpp>
 #include <Logger.hpp>
@@ -21,7 +23,7 @@
 #include "etl/String.hpp"
 
 int main() {
-	LOG_NOTICE("ECSS Services test application");
+	LOG_NOTICE << "ECSS Services test application";
 
 	Message packet = Message(0, 0, Message::TC, 1);
 
@@ -338,5 +340,6 @@ int main() {
 	receivedMsg = Message(11, 12, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
+	LOG_NOTICE << "ECSS Services test complete";
 	return 0;
 }
