@@ -51,7 +51,7 @@ public:
 	                            const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
 
 	// The three uplink functions should handle a TC request to "upload" data. Since there is not
-	// a createECSSTC function ready, I just return the given string.
+	// a composeECSS function ready, I just return the given string.
 	// @TODO: Modify these functions properly
 	/**
 	 * Function that handles the first part of the uplink request

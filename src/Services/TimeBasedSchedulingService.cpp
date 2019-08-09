@@ -168,7 +168,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 		// todo: append sub-schedule and group ID if they are defined
 
 		report.appendUint32(activity.requestReleaseTime);
-		report.appendString(msgParser.createECSSTC(activity.request));
+		report.appendString(msgParser.composeECSS(activity.request));
 	}
 	storeMessage(report); // Save the report
 }
@@ -209,7 +209,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
 	for (auto& match : matchedActivities) {
 		report.appendUint32(match.requestReleaseTime); // todo: Replace with the time parser
-		report.appendString(msgParser.createECSSTC(match.request));
+		report.appendString(msgParser.composeECSS(match.request));
 	}
 	storeMessage(report); // Save the report
 }

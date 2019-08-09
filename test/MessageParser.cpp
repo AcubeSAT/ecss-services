@@ -21,7 +21,7 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 	CHECK(memcmp(message.data, "hello", 5) == 0);
 }
 
-TEST_CASE("TC data parsing into a message", "[MessageParser]") {}
+TEST_CASE("TC string parsing into a message", "[MessageParser]") {}
 
 TEST_CASE("TM message parsing", "[MessageParser]") {
 	MessageParser messageParser;
