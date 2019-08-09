@@ -5,9 +5,6 @@
 #include "ErrorHandler.hpp"
 #include "etl/map.h"
 
-// Number of stored parameters. MAX_PARAMS is just a dummy number for now.
-#define MAX_PARAMS 5
-
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C
@@ -39,11 +36,13 @@ struct Parameter {
  *
  * The parameter list is stored in a map with the parameter IDs as keys and values
  * corresponding Parameter structs containing the PTC, PFC and the parameter's value.
+ *
+ * @ingroup Services
  */
 
 class ParameterService : public Service {
 private:
-	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
+	etl::map<ParamId, Parameter, ECSS_MAX_PARAMETERS> paramsList;
 	uint16_t numOfValidIds(Message idMsg); // count the valid ids in a given TC[20, 1]
 
 public:

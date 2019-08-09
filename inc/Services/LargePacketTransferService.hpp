@@ -10,6 +10,8 @@
  * maximum data size
  *
  * Note: More information can be found in the standards' manual, in p. 526-528 and in p. 229-236
+ *
+ * @ingroup Services
  */
 
 class LargePacketTransferService : public Service {

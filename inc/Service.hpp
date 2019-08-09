@@ -7,6 +7,12 @@
 class ServicePool;
 
 /**
+ * @defgroup Services Services
+ * ECSS Services implementations, as defined in ECSS-E-ST-70-41C. These services receive TC Messages, and output TM
+ * Messages.
+ */
+
+/**
  * A spacecraft service, as defined in ECSS-E-ST-70-41C
  *
  * A member of the Service class should be used as a singleton, i.e. must be created only once in

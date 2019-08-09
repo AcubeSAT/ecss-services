@@ -2,11 +2,20 @@
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
 /**
- * @file
+ * @defgroup ECSSDefinitions ECSS Defined Constants
+ *
  * This file contains constant definitions that are used throughout the ECSS services. They often refer to maximum
  * values and upper limits for the storage of data in the services.
  *
  * @todo All these constants need to be redefined and revised after the design and the requirements are finalized.
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * This file contains constant definitions that are used throughout the ECSS services.
+ * @see ECSSDefinitions
  */
 
 /**
@@ -91,6 +100,29 @@
  */
 #define ECSS_MAX_DELTA_OF_RELEASE_TIME 60
 
+/**
+ * The maximum number of stored parameters in the \ref ParameterService
+ */
+#define ECSS_MAX_PARAMETERS 5
+
+/**
+ * The number of functions supported by the \ref FunctionManagementService
+ */
+#define ECSS_FUNCTION_MAP_SIZE 5
+
+/**
+ * The maximum length of a function name, in bytes
+ * @see FunctionManagementService
+ */
+#define ECSS_FUNCTION_NAME_LENGTH 32
+
+/**
+ * The maximum length of the argument of a function
+ * @see FunctionManagementService
+ */
+#define ECSS_FUNCTION_MAX_ARG_LENGTH 32
+
+/** @} */
 
 /**
  * @brief The maximum size of a log message

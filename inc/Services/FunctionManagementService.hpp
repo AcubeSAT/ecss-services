@@ -7,10 +7,6 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 
-#define FUNC_MAP_SIZE 5 // size of the function map (number of elements)
-#define FUNC_NAME_LENGTH 32 // max length of the function name
-#define MAX_ARG_LENGTH 32 // maximum argument byte string length
-
 /**
  * Implementation of the ST[08] function management service
  *
@@ -25,6 +21,7 @@
  *
  * You have been warned.
  *
+ * @ingroup Services
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
 
@@ -51,8 +48,8 @@
  * 	}
  */
 
-typedef String<FUNC_NAME_LENGTH> functionName;
-typedef etl::map<functionName, void (*)(String<MAX_ARG_LENGTH>), FUNC_MAP_SIZE> FunctionMap;
+typedef String<ECSS_FUNCTION_NAME_LENGTH> functionName;
+typedef etl::map<functionName, void (*)(String<ECSS_FUNCTION_MAX_ARG_LENGTH>), ECSS_FUNCTION_MAP_SIZE> FunctionMap;
 
 class FunctionManagementService : public Service {
 	/**
@@ -85,7 +82,7 @@ public:
 	 * @param ptr pointer to a function of void return type and a MAX_ARG_LENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
-	void include(String<FUNC_NAME_LENGTH> funcName, void (*ptr)(String<MAX_ARG_LENGTH>));
+	void include(String<ECSS_FUNCTION_NAME_LENGTH> funcName, void (*ptr)(String<ECSS_FUNCTION_MAX_ARG_LENGTH>));
 
 	int getMapSize() {
 		return funcPtrIndex.size();

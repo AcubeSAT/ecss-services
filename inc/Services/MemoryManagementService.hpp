@@ -8,6 +8,9 @@
 #include "ErrorHandler.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 
+/**
+ * @ingroup Services
+ */
 class MemoryManagementService : public Service {
 public:
 	// Memory type ID's

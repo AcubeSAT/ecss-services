@@ -41,6 +41,8 @@ struct Tester;
  * ground.
  * @todo Define whether the parsed absolute release time is saved in the scheduled activity as an
  * uint32_t or in the time format specified by the time management service.
+ *
+ * @ingroup Services
  */
 class TimeBasedSchedulingService : public Service {
 private:
