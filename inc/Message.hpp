@@ -71,8 +71,8 @@ public:
 	}
 
 	enum PacketType {
-		TM = 0, // Telemetry
-		TC = 1 // Telecommand
+		TM = 0, ///< Telemetry
+		TC = 1 ///< Telecommand
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)

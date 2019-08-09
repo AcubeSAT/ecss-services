@@ -1,24 +1,51 @@
 #ifndef ECSS_SERVICES_ECSS_DEFINITIONS_H
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
+/**
+ * @file
+ * This file contains constant definitions that are used throughout the ECSS services. They often refer to maximum
+ * values and upper limits for the storage of data in the services.
+ *
+ * @todo All these constants need to be redefined and revised after the design and the requirements are finalized.
+ */
+
+/**
+ * The maximum size of a regular ECSS message, in bytes
+ */
 #define ECSS_MAX_MESSAGE_SIZE 1024U
 
+/**
+ * The maximum size of a string to be read or appended to a Message, in bytes
+ *
+ * This is used by the Message::appendString() and Message::readString() functions
+ */
 #define ECSS_MAX_STRING_SIZE 256U
 
-#define ECSS_MAX_FIXED_OCTET_STRING_SIZE 256U // For the ST13 large packet transfer service
+/**
+ * The maximum size of a string to be used by ST[13] \ref LargePacketTransferService, in bytes
+ *
+ * This is used by the Message::appendString() and Message::readString() functions
+ */
+#define ECSS_MAX_FIXED_OCTET_STRING_SIZE 256U
 
 /**
  * The total number of different message types that can be handled by this project
  */
-#define ECSS_TOTAL_MESSAGE_TYPES (10 * 20)
+#define ECSS_TOTAL_MESSAGE_TYPES (10U * 20U)
 
-// 7.4.1
+/**
+ * The CCSDS packet version, as specified in section 7.4.1
+ */
 #define CCSDS_PACKET_VERSION 0
 
-// 7.4.4.1c
+/**
+ * The ECSS packet version, as specified in requirement 7.4.4.1c
+ */
 #define ECSS_PUS_VERSION 2U
 
-// 9.3.1a.1.e
+/**
+ * The CCSDS sequence flags have the constant value 0x3, as specified in section 7.4.1
+ */
 #define ECSS_SEQUENCE_FLAGS 0x3
 
 /**
@@ -29,7 +56,7 @@
  * their message request.
  * @attention This definition is probably dependent on the ECSS_TC_REQUEST_STRING_SIZE
  */
-#define ECSS_MAX_REQUEST_COUNT 20 // todo: Needs to be defined
+#define ECSS_MAX_REQUEST_COUNT 20
 
 /**
  * @brief Maximum length of a String converted TC packet message
@@ -38,25 +65,32 @@
  */
 #define ECSS_TC_REQUEST_STRING_SIZE 64
 
-// todo: Define the maximum number of activities
+/**
+ * The maximum number of activities that can be in the time-based schedule
+ * @see TimeBasedSchedulingService
+ */
 #define ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES 10
 
 /**
  * @brief Time margin used in the time based command scheduling service ST[11]
  * @details This defines the time margin in seconds, from the current rime, that an activity must
  * have in order
- * @todo Define the time margin for the command activation
+ * @see TimeBasedSchedulingService
  */
 #define ECSS_TIME_MARGIN_FOR_ACTIVATION 60
 
 /**
  * @brief Size of the multimap that holds every event-action definition
+ * @see EventActionService
  */
 #define ECSS_EVENT_ACTION_STRUCT_MAP_SIZE 256
 
-// todo: Define the maximum delta between the specified
+/**
+ * The maximum delta between the specified release time and the actual release time
+ * @see TimeBasedSchedulingService
+ */
 #define ECSS_MAX_DELTA_OF_RELEASE_TIME 60
-// release time and the actual release time
+
 
 /**
  * @brief The maximum size of a log message
