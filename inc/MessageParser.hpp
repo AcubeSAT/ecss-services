@@ -51,7 +51,7 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	Message parse(uint8_t* data, uint32_t length);
+	static Message parse(uint8_t* data, uint32_t length);
 
 	/**
 	 * Parse data that contains the ECSS packet header, without the CCSDS space packet header
@@ -60,23 +60,31 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	Message parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data);
+	static Message parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data);
 
 	/**
 	 * @brief Overloaded version of \ref MessageParser::parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data)
 	 * @param data A uint8_t array of the TC packet data
 	 * @return Parsed message
 	 */
-	Message parseECSSTC(uint8_t* data);
+	static Message parseECSSTC(uint8_t* data);
 
 	/**
-	 * @brief Converts a TC message to a string, appending just the ECSS header
+	 * @brief Converts a TC or TM message to a message string, appending just the ECSS header
+	 * @todo Add time reference, as soon as it is available and the format has been specified
 	 * @param message The Message object to be parsed to a String
-	 * @return A String class containing the parsed TC request
-	 * @attention The returned String has a fixed size, therefore the message size is considered
-	 * fixed and equal to the ECSS_TC_REQUEST_STRING_SIZE definition.
+	 * @param size The wanted size of the message (including the headers). Messages larger than \ref size display an
+	 * error. Messages smaller than \ref size are padded with zeros. When `size = 0`, there is no size limit.
+	 * @return A String class containing the parsed Message
 	 */
-	String<ECSS_TC_REQUEST_STRING_SIZE> createECSSTC(Message& message);
+	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSS(const Message& message, uint16_t size = 0u); // Ignore-MISRA
+
+	/**
+	 * @brief Converts a TC or TM message to a packet string, appending the ECSS and then the CCSDS header
+	 * @param message The Message object to be parsed to a String
+	 * @return A String class containing the parsed Message
+	 */
+	static String<CCSDS_MAX_MESSAGE_SIZE> compose(const Message& message);
 
 private:
 	/**
@@ -88,7 +96,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message);
+	static void parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -99,7 +107,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	void parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
+	static void parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
 };
 
 #endif // ECSS_SERVICES_MESSAGEPARSER_HPP

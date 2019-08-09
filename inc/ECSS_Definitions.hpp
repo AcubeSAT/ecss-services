@@ -23,6 +23,12 @@
  */
 #define ECSS_MAX_MESSAGE_SIZE 1024U
 
+
+/**
+ * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
+ */
+#define CCSDS_MAX_MESSAGE_SIZE (ECSS_MAX_MESSAGE_SIZE + 6u + 6u + 2u)
+
 /**
  * The maximum size of a string to be read or appended to a Message, in bytes
  *

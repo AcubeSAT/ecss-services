@@ -73,6 +73,10 @@ public:
 		 * Attempt to insert new function in a full function map (ST[08])
 		 */
 		FunctionMapFull = 10,
+		/**
+		 * A Message that is included within another message is too large
+		 */
+		NestedMessageTooLarge = 11,
 	};
 
 	/**
