@@ -181,7 +181,7 @@ void EventActionService::executeAction(uint16_t eventID) {
 		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.enabled) {
 				MessageParser messageParser;
-				Message message = messageParser.parseRequestTC(element->second.request);
+				Message message = messageParser.parseECSSTC(element->second.request);
 				MessageParser::execute(message);
 			}
 		}

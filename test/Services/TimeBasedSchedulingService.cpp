@@ -71,19 +71,19 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 
 	// Test activity 1
 	receivedMessage.appendUint32(currentTime + 1556435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage1));
+	receivedMessage.appendString(msgParser.createECSSTC(testMessage1));
 
 	// Test activity 2
 	receivedMessage.appendUint32(currentTime + 1957232);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage2));
+	receivedMessage.appendString(msgParser.createECSSTC(testMessage2));
 
 	// Test activity 3
 	receivedMessage.appendUint32(currentTime + 1726435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage3));
+	receivedMessage.appendString(msgParser.createECSSTC(testMessage3));
 
 	// Test activity 4
 	receivedMessage.appendUint32(currentTime + 17248435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage4));
+	receivedMessage.appendString(msgParser.createECSSTC(testMessage4));
 
 	// Insert activities in the schedule. They have to be inserted sorted
 	timeService.insertActivities(receivedMessage);
@@ -276,7 +276,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 			Message receivedTCPacket;
 			uint8_t receivedDataStr[ECSS_TC_REQUEST_STRING_SIZE];
 			response.readString(receivedDataStr, ECSS_TC_REQUEST_STRING_SIZE);
-			receivedTCPacket = msgParser.parseRequestTC(receivedDataStr);
+			receivedTCPacket = msgParser.parseECSSTC(receivedDataStr);
 
 			if (i == 0) {
 				REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
@@ -380,7 +380,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 		Message receivedTCPacket;
 		uint8_t receivedDataStr[ECSS_TC_REQUEST_STRING_SIZE];
 		response.readString(receivedDataStr, ECSS_TC_REQUEST_STRING_SIZE);
-		receivedTCPacket = msgParser.parseRequestTC(receivedDataStr);
+		receivedTCPacket = msgParser.parseECSSTC(receivedDataStr);
 
 		REQUIRE(receivedReleaseTime == scheduledActivities.at(i)->requestReleaseTime);
 		REQUIRE(receivedTCPacket.bytesEqualWith(scheduledActivities.at(i)->request));

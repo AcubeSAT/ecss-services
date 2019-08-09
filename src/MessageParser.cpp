@@ -60,15 +60,15 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	Message message(0, 0, packetType, APID);
 
 	if (packetType == Message::TC) {
-		parseTC(data + 6, packetDataLength, message);
+		parseECSSTCHeader(data + 6, packetDataLength, message);
 	} else {
-		parseTM(data + 6, packetDataLength, message);
+		parseECSSTMHeader(data + 6, packetDataLength, message);
 	}
 
 	return message;
 }
 
-void MessageParser::parseTC(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -91,22 +91,22 @@ void MessageParser::parseTC(const uint8_t* data, uint16_t length, Message& messa
 	message.dataSize = length;
 }
 
-Message MessageParser::parseRequestTC(String<ECSS_TC_REQUEST_STRING_SIZE> data) {
+Message MessageParser::parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data) {
 	Message message;
 	auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
 	message.packetType = Message::TC;
-	parseTC(dataInt, ECSS_TC_REQUEST_STRING_SIZE, message);
+	parseECSSTCHeader(dataInt, ECSS_TC_REQUEST_STRING_SIZE, message);
 	return message;
 }
 
-Message MessageParser::parseRequestTC(uint8_t* data) {
+Message MessageParser::parseECSSTC(uint8_t* data) {
 	Message message;
 	message.packetType = Message::TC;
-	parseTC(data, ECSS_TC_REQUEST_STRING_SIZE, message);
+	parseECSSTCHeader(data, ECSS_TC_REQUEST_STRING_SIZE, message);
 	return message;
 }
 
-String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::convertTCToStr(Message& message) {
+String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::createECSSTC(Message& message) {
 	uint8_t tempString[ECSS_TC_REQUEST_STRING_SIZE] = {0};
 
 	tempString[0] = ECSS_PUS_VERSION << 4; // Assign the pusVersion = 2
@@ -118,7 +118,7 @@ String<ECSS_TC_REQUEST_STRING_SIZE> MessageParser::convertTCToStr(Message& messa
 	return dataString;
 }
 
-void MessageParser::parseTM(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header

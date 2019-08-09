@@ -319,10 +319,10 @@ int main() {
 	receivedMsg.appendUint16(2); // Total number of requests
 
 	receivedMsg.appendUint32(currentTime + 1556435U);
-	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
+	receivedMsg.appendString(msgParser.createECSSTC(testMessage1));
 
 	receivedMsg.appendUint32(currentTime + 1957232U);
-	receivedMsg.appendString(msgParser.convertTCToStr(testMessage2));
+	receivedMsg.appendString(msgParser.createECSSTC(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
 	// Time shift activities
