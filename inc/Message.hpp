@@ -108,7 +108,7 @@ public:
 	 * multiple of the padding word size declared for the application process
 	 * @todo Confirm that the overall packet size is an integer multiple of the padding word size
 	 * declared for every application process
-	 * @todo check if wee need to define the spare field for the telemetry and telecommand
+	 * @todo check if we need to define the spare field for the telemetry and telecommand
 	 * secondary headers
 	 */
 	void finalize();

@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
 #include <Message.hpp>
+#include <ServicePool.hpp>
 
 TEST_CASE("Message is usable", "[message]") {
 	Message message(5, 17, Message::TC, 3);
@@ -288,5 +289,39 @@ TEST_CASE("Message type counter", "[message]") {
 		Message message2(0, 3, Message::TM, 0);
 		message2.finalize();
 		CHECK(message2.messageTypeCounter == 0);
+	}
+}
+
+TEST_CASE("Packet sequence counter", "[message]") {
+	SECTION("Packet counting") {
+		Message message1(0, 0, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.packetSequenceCount == 0);
+
+		Message message2(0, 0, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.packetSequenceCount == 1);
+
+		// Different message type check
+		Message message3(1, 2, Message::TM, 0);
+		message3.finalize();
+		CHECK(message3.packetSequenceCount == 2);
+	}
+
+	SECTION("Packet counter overflow") {
+		Services.reset();
+
+		for (int i = 0; i <= 16382; i++) {
+			Message message(0, 3, Message::TM, 0);
+			message.finalize();
+		}
+
+		Message message1(0, 3, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.packetSequenceCount == 16383);
+
+		Message message2(0, 3, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.packetSequenceCount == 0);
 	}
 }

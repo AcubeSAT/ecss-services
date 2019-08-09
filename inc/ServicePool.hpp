@@ -23,12 +23,16 @@ class ServicePool {
 	/**
 	 * A counter for messages
 	 *
-	 * Each key-value pair corresponds to one MessageType within a Service. The most significant 8 bits are the number
-	 * of the service, while the least significant 8 bits are the number of the Message.
-	 *
-	 * @todo Update this according to the final number of Services and Messages
+	 * Each key-value pair corresponds to one MessageType within a Service. For the key, the most significant 8 bits are
+     * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
+     * counter of each MessageType.
 	 */
-	etl::map<uint16_t, uint16_t, 10*20> messageTypeCounter;
+	etl::map<uint16_t, uint16_t, ECSS_TOTAL_MESSAGE_TYPES> messageTypeCounter;
+
+	/**
+	 * A counter for messages that corresponds to the total number of TM packets sent from an APID
+	 */
+	uint16_t packetSequenceCounter = 0;
 public:
 	RequestVerificationService requestVerification;
 	EventReportService eventReport;
@@ -64,7 +68,16 @@ public:
 	 * @param messageType The message type ID
 	 * @return The message type count
 	 */
-	uint16_t getMessageTypeCounter(uint8_t serviceType, uint8_t messageType);
+	uint16_t getAndUpdateMessageTypeCounter(uint8_t serviceType, uint8_t messageType);
+
+	/**
+	 * Get and increase the "packet sequence count" for the next message
+	 *
+	 * The packet sequence count is incremented each time a packet is released, with a maximum value of 2^14 - 1
+	 *
+	 * @return The packet sequence count
+	 */
+	uint16_t getAndUpdatePacketSequenceCounter();
 };
 
 /**
