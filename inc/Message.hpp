@@ -368,6 +368,17 @@ public:
 	}
 
 	/**
+	 * Adds a nested TC or TM Message within the current Message
+	 *
+	 * As a design decision, nested TC & TM Messages always have a fixed width, specified in \ref ECSSDefinitions. This
+	 * reduces the uncertainty and complexity of having to parse the nested Message itself to see how long it is, at
+	 * the cost of more data to be transmitted.
+	 * @param message The message to append
+	 * @param size The fixed number of bytes that the message will take up. The empty last bytes are padded with 0s.
+	 */
+	void appendMessage(const Message & message, uint16_t size);
+
+	/**
 	 * Fetches a single-byte boolean value from the current position in the message
 	 *
 	 * PTC = 1, PFC = 0

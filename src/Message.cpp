@@ -3,6 +3,7 @@
 #include <cstring>
 #include <ErrorHandler.hpp>
 #include <ServicePool.hpp>
+#include <MessageParser.hpp>
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
@@ -160,4 +161,8 @@ void Message::readCString(char *string, uint16_t size) {
 void Message::resetRead() {
 	readPosition = 0;
 	currentBit = 0;
+}
+
+void Message::appendMessage(const Message& message, uint16_t size) {
+	appendString(MessageParser::composeECSS(message, size));
 }
