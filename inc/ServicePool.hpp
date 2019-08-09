@@ -20,6 +20,15 @@
  * @todo Find a way to disable services which are not used
  */
 class ServicePool {
+	/**
+	 * A counter for messages
+	 *
+	 * Each key-value pair corresponds to one MessageType within a Service. The most significant 8 bits are the number
+	 * of the service, while the least significant 8 bits are the number of the Message.
+	 *
+	 * @todo Update this according to the final number of Services and Messages
+	 */
+	etl::map<uint16_t, uint16_t, 10*20> messageTypeCounter;
 public:
 	RequestVerificationService requestVerification;
 	EventReportService eventReport;
@@ -44,6 +53,18 @@ public:
 	 * Services already stored as values will point to the "new" Services after a reset.
 	 */
 	void reset();
+
+	/**
+	 * Get and increase the "message type counter" for the next message of a type
+	 *
+	 * The message type counter counts the type of generated messages per destination, according to requirement
+	 * 5.4.2.1j. If the value reaches its max, it is wrapped back to 0.
+	 *
+	 * @param serviceType The service type ID
+	 * @param messageType The message type ID
+	 * @return The message type count
+	 */
+	uint16_t getMessageTypeCounter(uint8_t serviceType, uint8_t messageType);
 };
 
 /**

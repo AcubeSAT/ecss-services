@@ -2,6 +2,7 @@
 #include "macros.hpp"
 #include <cstring>
 #include <ErrorHandler.hpp>
+#include <ServicePool.hpp>
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
@@ -36,10 +37,14 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 
 void Message::finalize() {
 	// Define the spare field in telemetry and telecommand user data field (7.4.3.2.c and 7.4.4.2.c)
-
 	if (currentBit != 0) {
 		currentBit = 0;
+		data[dataSize] = 0; // Make sure that the last bit is zero
 		dataSize++;
+	}
+
+	if (packetType == PacketType::TM) {
+		messageTypeCounter = Services.getMessageTypeCounter(serviceType, messageType);
 	}
 }
 

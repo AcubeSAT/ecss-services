@@ -253,3 +253,40 @@ TEST_CASE("Spare field", "[message]") {
 
 	CHECK(message9.dataSize == 3);
 }
+
+TEST_CASE("Message type counter", "[message]") {
+	SECTION("Message counting") {
+		Message message1(0, 0, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.messageTypeCounter == 0);
+
+		Message message2(0, 0, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.messageTypeCounter == 1);
+	}
+
+	SECTION("Different message types") {
+		Message message1(0, 1, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.messageTypeCounter == 0);
+
+		Message message2(0, 2, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.messageTypeCounter == 0);
+	}
+
+	SECTION("Message counter overflow") {
+		for (int i = 0; i <= 65534; i++) {
+			Message message(0, 3, Message::TM, 0);
+			message.finalize();
+		}
+
+		Message message1(0, 3, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.messageTypeCounter == 65535);
+
+		Message message2(0, 3, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.messageTypeCounter == 0);
+	}
+}
