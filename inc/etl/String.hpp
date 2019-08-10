@@ -60,7 +60,7 @@ public:
 	using etl::istring::append; // Use the append function from the parent
 
     /**
-     * Append a specified with of bytes from a uint8_t array to the String
+     * Append a specified number of bytes from a uint8_t array to the String
      * @details The array does NOT need to be null-terminated
      * @param data The characters to append
      * @param n The number of characters that \ref data contains

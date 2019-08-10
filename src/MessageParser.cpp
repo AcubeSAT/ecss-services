@@ -108,7 +108,9 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 
 String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message, uint16_t size) {
 	uint8_t header[5];
-
+	header[0] = ECSS_PUS_VERSION << 4u; // Assign the pusVersion = 2
+	header[1] = message.serviceType;
+	header[2] = message.messageType;
 	if (message.packetType == Message::TC) {
 		header[0] = ECSS_PUS_VERSION << 4U; // Assign the pusVersion = 2
 		header[1] = message.serviceType;
@@ -116,9 +118,6 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message
 		header[3] = 0;
 		header[4] = 0;
 	} else {
-		header[0] = ECSS_PUS_VERSION << 4U; // Assign the pusVersion = 2
-		header[1] = message.serviceType;
-		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
 	}
