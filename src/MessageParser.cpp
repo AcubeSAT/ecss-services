@@ -50,6 +50,7 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	uint8_t secondaryHeaderFlag = data[0] & static_cast<uint8_t>(0x08);
 	uint16_t APID = packetHeaderIdentification & static_cast<uint16_t>(0x07ff);
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
+	uint16_t packetSequenceCount = packetSequenceControl & (~ 0xc000u); // keep last 14 bits
 
 	// Returning an internal error, since the Message is not available yet
 	ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket);
@@ -58,6 +59,7 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(packetDataLength == (length - 6U), ErrorHandler::UnacceptablePacket);
 
 	Message message(0, 0, packetType, APID);
+	message.packetSequenceCount = packetSequenceCount;
 
 	if (packetType == Message::TC) {
 		parseECSSTCHeader(data + 6, packetDataLength, message);
@@ -150,10 +152,10 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
 	ASSERT_INTERNAL((ecssMessage.size() + 6U) <= CCSDS_MAX_MESSAGE_SIZE, ErrorHandler::StringTooLarge);
 
 	// Parts of the header
-	uint16_t packetId = 0; // TODO: Add the APID here
+	uint16_t packetId = message.applicationId;
 	packetId |= (1U << 11U); // Secondary header flag
 	packetId |= (message.packetType == Message::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
-	uint16_t packetSequenceControl = message.packetSequenceCount;
+	uint16_t packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size();
 
 	// Compile the header

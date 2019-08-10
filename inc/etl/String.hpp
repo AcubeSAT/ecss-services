@@ -70,11 +70,6 @@ public:
 		etl::string<MAX_SIZE>::append(reinterpret_cast<const char*>(data), n);
 		return *this;
 	}
-
-//	String& append(const String<MAX_SIZE> & str) {
-//		etl::string<MAX_SIZE>::append(str);
-//		return *this;
-//	}
 };
 
 #endif // ECSS_SERVICES_ETL_STRING_HPP
