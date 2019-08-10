@@ -25,7 +25,7 @@ int main() {
 
 	Message packet = Message(0, 0, Message::TC, 1);
 
-	packet.appendString<5>("hello");
+	packet.appendString(String<5>("hello"));
 	packet.appendBits(15, 0x28a8);
 	packet.appendBits(1, 1);
 	packet.appendFloat(5.7);

@@ -156,7 +156,7 @@ TEST_CASE("Requirement 7.3.6 (Real)", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.appendString<4>("test");
+	message.appendString(String<4>("test"));
 
 	REQUIRE(message.dataSize == 4);
 

@@ -159,8 +159,7 @@ public:
 	 *
 	 * @param string The string to insert
 	 */
-	template <const size_t SIZE>
-	void appendString(const String<SIZE>& string);
+	void appendString(const etl::istring& string);
 
 	/**
 	 * Appends a number of bytes to the message
@@ -175,8 +174,7 @@ public:
 	 *
 	 * @param string The string to insert
 	 */
-	template <const size_t SIZE>
-	void appendFixedString(const String<SIZE>& string);
+	void appendFixedString(const etl::istring& string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -358,14 +356,7 @@ public:
 	 *
 	 * PTC = 7, PFC = 0
 	 */
-	template <const size_t SIZE>
-	void appendOctetString(const String<SIZE>& string) {
-		// Make sure that the string is large enough to count
-		ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
-
-		appendUint16(string.size());
-		appendString(string);
-	}
+	void appendOctetString(const etl::istring& string);
 
 	/**
 	 * Adds a nested TC or TM Message within the current Message
@@ -572,26 +563,5 @@ public:
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
-
-template <const size_t SIZE>
-inline void Message::appendString(const String<SIZE>& string) {
-	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
-	// TODO: Do we need to keep this check? How does etl::string handle it?
-	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
-
-	memcpy(data + dataSize, string.data(), string.size());
-
-	dataSize += string.size();
-}
-
-template <const size_t SIZE>
-inline void Message::appendFixedString(const String<SIZE>& string) {
-	ASSERT_INTERNAL((dataSize + SIZE) < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
-
-	memcpy(data + dataSize, string.data(), string.size()); // Append the bytes with content
-	(void) memset(data + dataSize + string.size(), 0, SIZE - string.size()); // The rest of the bytes is set to 0
-
-	dataSize += SIZE;
-}
 
 #endif // ECSS_SERVICES_PACKET_H

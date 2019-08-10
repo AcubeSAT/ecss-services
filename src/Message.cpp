@@ -166,3 +166,32 @@ void Message::resetRead() {
 void Message::appendMessage(const Message& message, uint16_t size) {
 	appendString(MessageParser::composeECSS(message, size));
 }
+
+void Message::appendString(const etl::istring& string) {
+	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	// TODO: Do we need to keep this check? How does etl::string handle it?
+	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
+
+	memcpy(data + dataSize, string.data(), string.size());
+
+	dataSize += string.size();
+}
+
+void Message::appendFixedString(const etl::istring& string) {
+	ASSERT_INTERNAL((dataSize + string.max_size()) < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+
+	// Append the bytes with content
+	memcpy(data + dataSize, string.data(), string.size());
+	// The rest of the bytes is set to 0
+	(void) memset(data + dataSize + string.size(), 0, string.max_size() - string.size());
+
+	dataSize += string.max_size();
+}
+
+void Message::appendOctetString(const etl::istring& string) {
+	// Make sure that the string is large enough to count
+	ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
+
+	appendUint16(string.size());
+	appendString(string);
+}
