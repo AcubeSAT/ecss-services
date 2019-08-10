@@ -180,8 +180,7 @@ void EventActionService::executeAction(uint16_t eventID) {
 		auto range = eventActionDefinitionMap.equal_range(eventID);
 		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.enabled) {
-				MessageParser messageParser;
-				Message message = messageParser.parseECSSTC(element->second.request);
+				Message message = MessageParser::parseECSSTC(element->second.request);
 				MessageParser::execute(message);
 			}
 		}

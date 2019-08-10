@@ -54,8 +54,6 @@ private:
 	 */
 	bool executionFunctionStatus = false; // True indicates "enabled" and False "disabled" state
 
-	MessageParser msgParser; // Parse TC packets
-
 	/**
 	 * @brief Request identifier of the received packet
 	 *
