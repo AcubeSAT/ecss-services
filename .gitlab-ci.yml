@@ -14,6 +14,14 @@ stages:
   - test
   - deploy
 
+before_script:
+  - apt-get update -qq && apt-get -qq -y install python3-pip && python3 -m pip install --upgrade pip
+  - python3 -V
+  - python3 -m pip --version
+  - g++ --version
+  - cat /etc/*-release
+  - python3 -m pip install gcovr
+
 build:
   stage: build
   variables:
@@ -71,7 +79,8 @@ clang-tidy:
     GIT_SUBMODULE_STRATEGY: normal
     TERM: xterm-color
   script:
-     - ./ci/clang-tidy.sh
+    # Running with `script` to give clang a tty so that it outputs colours
+    - script -e -c "bash -x ci/clang-tidy.sh"
 
 pages:
   stage: deploy
