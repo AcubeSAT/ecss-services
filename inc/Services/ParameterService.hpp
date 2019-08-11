@@ -28,7 +28,7 @@
 
 class ParameterService : public Service {
 private:
-	static etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
+	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
 	uint16_t numOfValidIds(Message idMsg); // count the valid ids in a given TC[20, 1]
 
 public:
@@ -39,9 +39,9 @@ public:
 
 	/**
 	 * Adds a new parameter. If the parameter has not been added (either because the map is full or because it already
-	 * exists in it) then returns true.
+	 * exists in it) then returns false.
 	 */
-	static bool addParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue = 0, UpdatePtr ptr = nullptr);
+	bool addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initial_value = 0, UpdatePtr ptr = nullptr);
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

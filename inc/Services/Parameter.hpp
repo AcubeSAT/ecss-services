@@ -26,6 +26,9 @@ class Parameter {
 	// Various flags (TBD which. Ideas: update with priority, do not poll, etc.)
 
 	public:
+		ValueType currentValue = 0; // Last good value of the parameter. TODO: Find a way to store arbitrary types
+
+		Parameter() = default;
 		Parameter(uint8_t new_ptc, uint8_t new_pfc, uint32_t initialValue = 0, UpdatePtr new_ptr = nullptr) {
 			ptc = new_ptc;
 			pfc = new_pfc;
@@ -38,9 +41,6 @@ class Parameter {
 				currentValue = initialValue;
 			}
 		}
-
-		ValueType currentValue = 0; // Last good value of the parameter. TODO: Find a way to store arbitrary types (w/out
-		// templates preferred)
 };
 
 
