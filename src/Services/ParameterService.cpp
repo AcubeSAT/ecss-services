@@ -1,12 +1,7 @@
 #include "Services/ParameterService.hpp"
 
-//#define DEMOMODE
-
-//#include <ctime>
-//#include <cstdlib>
 
 ParameterService::ParameterService() {
-//#ifdef DEMOMODE
 //	// Test code, setting up some of the parameter fields
 //
 //	time_t currTime = time(nullptr);
@@ -33,6 +28,8 @@ ParameterService::ParameterService() {
 //
 //#endif
 }
+
+void
 
 void ParameterService::reportParameterIds(Message& paramIds) {
 	paramIds.assertTC(20, 1);
