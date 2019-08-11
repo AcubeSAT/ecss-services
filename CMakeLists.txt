@@ -26,6 +26,7 @@ add_library(common OBJECT
         src/Helpers/TimeHelper.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
+        src/Services/Parameter.cpp
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
