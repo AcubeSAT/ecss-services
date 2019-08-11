@@ -25,16 +25,23 @@
  * corresponding Parameter structs containing the PTC, PFC and the parameter's value.
  */
 
+
 class ParameterService : public Service {
 private:
-	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
+	static etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
 	uint16_t numOfValidIds(Message idMsg); // count the valid ids in a given TC[20, 1]
 
 public:
 	/**
-	 * Initializes the parameter list with some dummy values for now.
+	 * Initializes the parameter list.
 	 */
 	ParameterService();
+
+	/**
+	 * Adds a new parameter. If the parameter has not been added (either because the map is full or because it already
+	 * exists in it) then returns true.
+	 */
+	static bool addParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue = 0, UpdatePtr ptr = nullptr);
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

@@ -2,6 +2,10 @@
 
 
 ParameterService::ParameterService() {
+
+	addParameter(3, 14);
+	addParameter(3, 14);
+
 //	// Test code, setting up some of the parameter fields
 //
 //	time_t currTime = time(nullptr);
@@ -29,7 +33,11 @@ ParameterService::ParameterService() {
 //#endif
 }
 
-void
+bool ParameterService::addParameter(uint8_t ptc, uint8_t pfc, uint32_t initial_value, UpdatePtr ptr) {
+	Parameter param = Parameter(ptc, pfc, initial_value, ptr);
+	return paramsList.insert(std::make_pair(0, param)).second;
+	// second element of the returned std::pair is whether the given item was inserted or not
+}
 
 void ParameterService::reportParameterIds(Message& paramIds) {
 	paramIds.assertTC(20, 1);
@@ -84,7 +92,8 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 		uint16_t currId = newParamValues.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
-			paramsList[currId].currentValue = newParamValues.readUint32();
+			paramsList[currId].currentValue = newParamValues.readUint32(); // TODO: add a check here with the new
+			// flag functionality
 		} else {
 			ErrorHandler::reportError(newParamValues,
 			                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
