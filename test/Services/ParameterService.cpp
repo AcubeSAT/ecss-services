@@ -5,7 +5,26 @@
 
 ParameterService& pserv = Services.parameterManagement;
 
+void foo(ValueType* bar) {  // sample function
+	*bar = 0xDEADBEEF;
+}
+
 TEST_CASE("Parameter Report Subservice") {
+
+	SECTION("Insertion test") {
+		pserv.addNewParameter(3, 14);  // this one has ID 0
+		pserv.addNewParameter(1, 7, 12);  // this one has 1
+		pserv.addNewParameter(4, 12, 3, nullptr);  // this one has 2
+		pserv.addNewParameter(12, 3, 6, &foo); // this one has 3
+	}
+
+	SECTION("ID checking") {
+		Message request(20, 1, Message::TC, 1);
+		Message report(20, 2, Message::TM, 1);
+
+		request.appendUint16(2)
+	}
+
 	SECTION("Faulty Instruction Handling Test") {
 		Message request(20, 1, Message::TC, 1);
 		Message report(20, 2, Message::TM, 1);

@@ -3,8 +3,8 @@
 
 ParameterService::ParameterService() {
 	// test addings
-	addNewParameter(3, 14);
-	addNewParameter(3, 14);
+//	addNewParameter(3, 14);
+//	addNewParameter(3, 14);
 }
 
 bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue, UpdatePtr ptr) {
