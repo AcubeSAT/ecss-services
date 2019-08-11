@@ -22,7 +22,7 @@ TEST_CASE("Parameter Report Subservice") {
 		Message request(20, 1, Message::TC, 1);
 		Message report(20, 2, Message::TM, 1);
 
-		request.appendUint16(2)
+		request.appendUint16(2);
 	}
 
 	SECTION("Faulty Instruction Handling Test") {

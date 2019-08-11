@@ -33,4 +33,3 @@ uint8_t Parameter::getPTC() {
 uint8_t Parameter::getPFC() {
 	return pfc;
 }
-
