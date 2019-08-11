@@ -28,7 +28,11 @@ class Parameter {
 	public:
 		ValueType currentValue = 0; // Last good value of the parameter. TODO: Find a way to store arbitrary types
 
-		Parameter() = default;
+		Parameter() {
+			ptc = 0;
+			pfc = 0;
+			ptr = nullptr;
+		}
 		Parameter(uint8_t new_ptc, uint8_t new_pfc, uint32_t initialValue = 0, UpdatePtr new_ptr = nullptr) {
 			ptc = new_ptc;
 			pfc = new_pfc;
