@@ -1,35 +1,10 @@
 #include "Services/ParameterService.hpp"
 #include "Services/Parameter.hpp"
+
 ParameterService::ParameterService() {
-
+	// test addings
 	addNewParameter(3, 14);
 	addNewParameter(3, 14);
-
-//	// Test code, setting up some of the parameter fields
-//
-//	time_t currTime = time(nullptr);
-//	struct tm* today = localtime(&currTime);
-//
-//	Parameter test1, test2;
-//
-//	test1.currentValue = today->tm_hour; // the current hour
-//	test1.ptc = 3; // unsigned int
-//	test1.pfc = 14; // 32 bits
-//
-//	test2.currentValue = today->tm_min; // the current minute
-//	test2.ptc = 3; // unsigned int
-//	test2.pfc = 14; // 32 bits
-//
-//	// MAKE SURE THE IDS ARE UNIQUE WHEN INSERTING!
-//	/**
-//	 * @todo: Make a separate insert() function for parameter insertion to protect from blunders
-//	 * if needed to
-//	 */
-//
-//	paramsList.insert(std::make_pair(0, test1));
-//	paramsList.insert(std::make_pair(1, test2));
-//
-//#endif
 }
 
 bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue, UpdatePtr ptr) {

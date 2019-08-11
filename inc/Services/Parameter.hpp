@@ -67,6 +67,7 @@ class Parameter {
 
 		ValueType getCurrentValue();
 		uint8_t getPTC();
+
 		uint8_t getPFC();
 
 };

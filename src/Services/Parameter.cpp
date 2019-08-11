@@ -25,3 +25,12 @@ void Parameter::setCurrentValue(ValueType newVal) {
 ValueType Parameter::getCurrentValue() {
 	return currentValue;
 }
+
+uint8_t Parameter::getPTC() {
+	return ptc;
+}
+
+uint8_t Parameter::getPFC() {
+	return pfc;
+}
+
