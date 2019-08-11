@@ -1,37 +1,37 @@
 #include "Services/ParameterService.hpp"
 
-#define DEMOMODE
+//#define DEMOMODE
 
-#include <ctime>
-#include <cstdlib>
+//#include <ctime>
+//#include <cstdlib>
 
 ParameterService::ParameterService() {
-#ifdef DEMOMODE
-	// Test code, setting up some of the parameter fields
-
-	time_t currTime = time(nullptr);
-	struct tm* today = localtime(&currTime);
-
-	Parameter test1, test2;
-
-	test1.settingData = today->tm_hour; // the current hour
-	test1.ptc = 3; // unsigned int
-	test1.pfc = 14; // 32 bits
-
-	test2.settingData = today->tm_min; // the current minute
-	test2.ptc = 3; // unsigned int
-	test2.pfc = 14; // 32 bits
-
-	// MAKE SURE THE IDS ARE UNIQUE WHEN INSERTING!
-	/**
-	 * @todo: Make a separate insert() function for parameter insertion to protect from blunders
-	 * if needed to
-	 */
-
-	paramsList.insert(std::make_pair(0, test1));
-	paramsList.insert(std::make_pair(1, test2));
-
-#endif
+//#ifdef DEMOMODE
+//	// Test code, setting up some of the parameter fields
+//
+//	time_t currTime = time(nullptr);
+//	struct tm* today = localtime(&currTime);
+//
+//	Parameter test1, test2;
+//
+//	test1.currentValue = today->tm_hour; // the current hour
+//	test1.ptc = 3; // unsigned int
+//	test1.pfc = 14; // 32 bits
+//
+//	test2.currentValue = today->tm_min; // the current minute
+//	test2.ptc = 3; // unsigned int
+//	test2.pfc = 14; // 32 bits
+//
+//	// MAKE SURE THE IDS ARE UNIQUE WHEN INSERTING!
+//	/**
+//	 * @todo: Make a separate insert() function for parameter insertion to protect from blunders
+//	 * if needed to
+//	 */
+//
+//	paramsList.insert(std::make_pair(0, test1));
+//	paramsList.insert(std::make_pair(1, test2));
+//
+//#endif
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
@@ -58,7 +58,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 		if (paramsList.find(currId) != paramsList.end()) {
 			reqParam.appendUint16(currId);
-			reqParam.appendUint32(paramsList[currId].settingData);
+			reqParam.appendUint32(paramsList[currId].currentValue);
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
@@ -87,7 +87,7 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 		uint16_t currId = newParamValues.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
-			paramsList[currId].settingData = newParamValues.readUint32();
+			paramsList[currId].currentValue = newParamValues.readUint32();
 		} else {
 			ErrorHandler::reportError(newParamValues,
 			                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);

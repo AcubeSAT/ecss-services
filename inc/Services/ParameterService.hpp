@@ -4,10 +4,13 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/map.h"
+#include "etl/bitset.h"
 
 // Number of stored parameters. MAX_PARAMS is just a dummy number for now.
 #define MAX_PARAMS 5
 
+// Number of binary flags in every parameter.
+#define NUM_OF_FLAGS 5
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C
@@ -20,16 +23,14 @@
  * PTC and PFC for each parameter shall be specified as in
  * ECSS-E-ST-70-41C, chapter 7.3
  */
-
 typedef uint16_t ParamId; // parameter IDs are given sequentially
 struct Parameter {
-	uint8_t ptc; // Packet field type code (PTC)
-	uint8_t pfc; // Packet field format code (PFC)
-
-	uint32_t settingData;
-	// Actual data defining the operation of a peripheral or subsystem.
-	// Peripheral-dependent normally (void* maybe?) (it's a memory address according to spec).
-	// Dummy int for now.
+	uint8_t ptc;                       // Packet field type code (PTC)
+	uint8_t pfc;                       // Packet field format code (PFC)
+	void (*updatePtr)();               // Pointer to the function used to update the value
+	uint32_t currentValue;             // Last good value of the parameter
+	etl::bitset<NUM_OF_FLAGS> flags;   // Various flags (TBD which).
+	                                   // (Ideas: update with priority, do not poll, etc.)
 };
 
 /**
