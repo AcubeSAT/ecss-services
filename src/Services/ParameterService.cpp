@@ -1,6 +1,5 @@
 #include "Services/ParameterService.hpp"
-
-
+#include "Services/Parameter.hpp"
 ParameterService::ParameterService() {
 
 	addNewParameter(3, 14);
@@ -33,8 +32,8 @@ ParameterService::ParameterService() {
 //#endif
 }
 
-bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initial_value, UpdatePtr ptr) {
-	Parameter param = Parameter(ptc, pfc, initial_value, ptr);
+bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue, UpdatePtr ptr) {
+	Parameter param = Parameter(ptc, pfc, initialValue, ptr);
 	return paramsList.insert(std::make_pair(paramsList.size() + 1, param)).second;
 	// second element of the returned std::pair is whether the given item was inserted or not
 }
@@ -63,7 +62,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 		if (paramsList.find(currId) != paramsList.end()) {
 			reqParam.appendUint16(currId);
-			reqParam.appendUint32(paramsList[currId].currentValue);
+			reqParam.appendUint32(paramsList[currId].getCurrentValue());
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
@@ -92,7 +91,7 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 		uint16_t currId = newParamValues.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
-			paramsList[currId].currentValue = newParamValues.readUint32(); // TODO: add a check here with the new
+			paramsList[currId].setCurrentValue(newParamValues.readUint32()); // TODO: add a check here with the new
 			// flag functionality
 		} else {
 			ErrorHandler::reportError(newParamValues,
