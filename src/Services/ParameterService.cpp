@@ -3,8 +3,8 @@
 
 ParameterService::ParameterService() {
 
-	addParameter(3, 14);
-	addParameter(3, 14);
+	addNewParameter(3, 14);
+	addNewParameter(3, 14);
 
 //	// Test code, setting up some of the parameter fields
 //
@@ -33,9 +33,9 @@ ParameterService::ParameterService() {
 //#endif
 }
 
-bool ParameterService::addParameter(uint8_t ptc, uint8_t pfc, uint32_t initial_value, UpdatePtr ptr) {
+bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initial_value, UpdatePtr ptr) {
 	Parameter param = Parameter(ptc, pfc, initial_value, ptr);
-	return paramsList.insert(std::make_pair(0, param)).second;
+	return paramsList.insert(std::make_pair(paramsList.size() + 1, param)).second;
 	// second element of the returned std::pair is whether the given item was inserted or not
 }
 
