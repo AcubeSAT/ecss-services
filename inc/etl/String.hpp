@@ -63,7 +63,7 @@ public:
      * Append a specified number of bytes from a uint8_t array to the String
      * @details The array does NOT need to be null-terminated
      * @param data The characters to append
-     * @param n The number of characters that \ref data contains
+     * @param n The number of characters that \p data contains
      * @return This string
      */
 	String& append(const uint8_t* data, size_t n) {

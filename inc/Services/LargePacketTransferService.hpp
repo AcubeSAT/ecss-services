@@ -74,7 +74,7 @@ public:
 
 	/**
 	 * Function that splits large messages
-	 * @param Message that is exceeds the standards and has to be split down
+	 * @param message that is exceeds the standards and has to be split down
 	 * @param largeMessageTransactionIdentifier that is a value we assign to this splitting of the large message
 	 */
 	void split(Message& message, uint16_t largeMessageTransactionIdentifier);

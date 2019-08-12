@@ -36,9 +36,7 @@ public:
      * This function takes as input TC packets and calls the proper services' functions that have been
 	 * implemented to handle TC packets.
 	 *
-	 * @param Message Contains the necessary parameters to call the suitable subservice
- 	 * @todo Implement the execute() in the upcoming services or generally in the upcoming
- 	 * activities
+	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	static void execute(Message& message);
 
@@ -73,8 +71,8 @@ public:
 	 * @brief Converts a TC or TM message to a message string, appending just the ECSS header
 	 * @todo Add time reference, as soon as it is available and the format has been specified
 	 * @param message The Message object to be parsed to a String
-	 * @param size The wanted size of the message (including the headers). Messages larger than \ref size display an
-	 * error. Messages smaller than \ref size are padded with zeros. When `size = 0`, there is no size limit.
+	 * @param size The wanted size of the message (including the headers). Messages larger than \p size display an
+	 * error. Messages smaller than \p size are padded with zeros. When `size = 0`, there is no size limit.
 	 * @return A String class containing the parsed Message
 	 */
 	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSS(const Message& message, uint16_t size = 0u); // Ignore-MISRA

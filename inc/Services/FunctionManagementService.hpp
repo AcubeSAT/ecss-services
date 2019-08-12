@@ -46,6 +46,7 @@
  * 		include(String<FUNC_NAME_LENGTH>("bar"), &bar);
  * 		include(String<FUNC_NAME_LENGTH>("baz"), &baz);
  * 	}
+ * @endcode
  */
 
 typedef String<ECSS_FUNCTION_NAME_LENGTH> functionName;
@@ -61,8 +62,6 @@ public:
 	/**
 	 * Constructs the function pointer index with all the necessary functions at initialization time
 	 * These functions need to be in scope. Un-default when needed.
-	 *
-	 * @param None
 	 */
 	FunctionManagementService() = default;
 
@@ -93,7 +92,7 @@ public:
 	 * is the ground station.
 	 *
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
-	 * @param param Contains the necessary parameters to call the suitable subservice
+	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
 };
