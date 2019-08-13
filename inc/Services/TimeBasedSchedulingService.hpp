@@ -76,13 +76,14 @@ private:
 	 *
 	 * @details All scheduled activities must contain the request they exist for, their release
 	 * time and the corresponding request identifier.
+	 *
+	 * @todo If we decide to use sub-schedules, the ID of that has to be defined
+	 * @todo If groups are used, then the group ID has to be defined here
 	 */
 	struct ScheduledActivity {
 		Message request; ///< Hold the received command request
 		RequestID requestID; ///< Request ID, characteristic of the definition
 		uint32_t requestReleaseTime = 0; ///< Keep the command release time
-		// todo: If we decide to use sub-schedules, the ID of that has to be defined
-		// todo: If groups are used, then the group ID has to be defined here
 	};
 
 	/**
