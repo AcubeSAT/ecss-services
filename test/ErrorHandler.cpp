@@ -18,7 +18,7 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 47);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -41,7 +41,7 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -64,7 +64,7 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -88,7 +88,7 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -111,7 +111,7 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 71);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
