@@ -168,9 +168,9 @@ void Message::appendMessage(const Message& message, uint16_t size) {
 }
 
 void Message::appendString(const etl::istring& string) {
-	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	ASSERT_INTERNAL(dataSize + string.size() <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
-	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
+	ASSERT_INTERNAL(string.size() <= string.capacity(), ErrorHandler::StringTooLarge);
 
 	memcpy(data + dataSize, string.data(), string.size());
 

@@ -56,7 +56,7 @@ TEST_CASE("ST[08] - Call Tests") {
 
 		CHECK(ServiceTests::get(0).messageType == 4);
 		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::countErrors() == 2);
+		CHECK(ServiceTests::countErrors() == 1);
 		CHECK(globalVariable == 10);
 	}
 }
