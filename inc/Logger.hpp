@@ -107,7 +107,7 @@ public:
 	 *
 	 * Each severity is tied to a number. The higher the number, the higher the severity.
 	 */
-	enum LogLevel {
+	enum LogLevel : LogLevelType {
 		trace = 32, ///< Very detailed information, useful for tracking the individual steps of an operation
 		debug = 64, ///< General debugging information
 		info = 96, ///< Noteworthy or periodical events
@@ -121,9 +121,10 @@ public:
 	/**
 	 * A class that defines a log message.
 	 *
-	 * Instead of using this class, prefer one of the above macros
-	 */
-	struct LogEntry {
+   	 * Instead of using this class, prefer one of the above macros
+   	 * @internal
+   	 */
+   	struct LogEntry {
 		String<LOGGER_MAX_MESSAGE_SIZE> message = ""; ///< The current log message itself, starting from a blank slate
 		etl::format_spec format; ///< ETL's string format specification
 		LogLevel level; ///< The log level of this message

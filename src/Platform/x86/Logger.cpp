@@ -44,11 +44,11 @@ void Logger::log(Logger::LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE> & messa
 
 	std::ostringstream ss; // A string stream to create the log message
 	ss << "\033" "[0;90m" << std::put_time(&tm, "%FT%T%z") << "\033" "[0m "; // The date
-	ss << "[\033" "[1;" << colour << "m" << std::setfill(' ') << std::setw(7) << std::right
-		<< name << std::setw(0) << "\033" "[0m] "; // The log level
+	ss << "[\033" "[1;" << colour << "m" << std::setfill(' ') << std::setw(7) << std::right // Ignore-MISRA
+		<< name << std::setw(0) << "\033" "[0m] "; // The log level // Ignore-MISRA
 
 	if (keepColour) {
-		ss << "\033" "[0;" << colour << "m";
+		ss << "\033" "[0;" << colour << "m"; // Ignore-MISRA
 	}
 	ss << message.c_str(); // The message itself
 	if (keepColour) {

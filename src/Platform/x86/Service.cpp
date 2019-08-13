@@ -13,7 +13,8 @@ void Service::storeMessage(Message& message) {
 	// Just print it to the screen
 	ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
 	   << std::hex
-	   << static_cast<int>(message.serviceType) << "," << static_cast<int>(message.messageType)
+	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
+	   << static_cast<int>(message.messageType) // Ignore-MISRA
 	   << "] message! ";
 
 	for (unsigned int i = 0; i < message.dataSize; i++) {
