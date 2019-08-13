@@ -25,14 +25,6 @@
 #endif
 
 /**
- * Internal define to check if logging is enabled for a level
- * @param level A log level
- * @return bool
- */
-#define _ac_LOGGER_ENABLED_LEVEL(level) /* Ignore-MISRA */ \
-	(( (Logger::LogLevelType) LOGLEVEL) <= ( (Logger::LogLevelType) level))
-
-/**
  * Create a stream to log a Message
  *
  * This functions appends one line to the Logs (which could be printed to screen, transferred via UART or stored for
@@ -79,7 +71,7 @@
  * @param level The log level. A value of \ref Logger::LogEntry
  */
 #define LOG(level)  /* Ignore-MISRA */ \
-    if (_ac_LOGGER_ENABLED_LEVEL(level)) \
+    if (Logger::isLogged(level)) \
         if (Logger::LogEntry entry(level); true) \
             entry
 
@@ -146,6 +138,15 @@ public:
 
 		LogEntry(LogEntry const&) = delete; ///< Unimplemented copy constructor
 	};
+
+	/**
+	 * Returns whether a log entry of level \p level is logged, based on the compilation constants
+	 * @param level The level of the log entry
+	 * @return True if the logging is enabled for \p level, false if not
+	 */
+	static constexpr bool isLogged(LogLevelType level) {
+		return static_cast<LogLevelType>(LOGLEVEL) <= level;
+	}
 
 	/**
 	 * Store a new log message
