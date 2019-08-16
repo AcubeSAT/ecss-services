@@ -9,42 +9,48 @@ void foo(ValueType* bar) {  // sample function
 	*bar = 0xDEADBEEF;
 }
 
-TEST_CASE("Parameter Report Subservice") {
+/* test ideas:
+* parameter setting while flag is active
+*
+*
+*/
 
-	SECTION("Insertion test") {
+TEST_CASE("Parameter Service - General") {
+	SECTION("Parameter Setup") {
 		pserv.addNewParameter(3, 14);  // this one has ID 0
 		pserv.addNewParameter(1, 7, 12);  // this one has 1
 		pserv.addNewParameter(4, 12, 3, nullptr);  // this one has 2
 		pserv.addNewParameter(12, 3, 6, &foo); // this one has 3
+		pserv.addNewParameter(15, 7, 3, &foo); //and this one 4
 	}
 
-	SECTION("ID checking") {
-		Message request(20, 1, Message::TC, 1);
-		Message report(20, 2, Message::TM, 1);
-
-		request.appendUint16(2);
+	SECTION("Addition to full map") {
+		CHECK(pserv.addNewParameter(15, 5, 4));
 	}
+}
+
+TEST_CASE("Parameter Report Subservice") {
 
 	SECTION("Faulty Instruction Handling Test") {
 		Message request(20, 1, Message::TC, 1);
 		Message report(20, 2, Message::TM, 1);
 
 		request.appendUint16(2); // number of requested IDs
-		request.appendUint16(34672); // faulty ID in this context
+		request.appendUint16(65535); // faulty ID in this context
 		request.appendUint16(1); // valid
 
 		MessageParser::execute(request);
-		report = ServiceTests::get(0);
-		request.resetRead();
 
-		report.readUint16();
-		request.readUint16();
+		CHECK(((ServiceTests::get(0).messageType == 4) && (ServiceTests::get(0).serviceType == 1)));
+		// check for an ST[1,4] message caused by the faulty ID
+		CHECK((ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError)));
+		// check for the thrown UnknownExecutionStartError
+		CHECK(((ServiceTests::get(1).messageType == 2) && (ServiceTests::get(1).serviceType == 20)));
+		// check for an ST[20,2] message (the one that contains the settings)
 
-		while (report.readPosition <= report.dataSize) {
-			CHECK_FALSE(report.readUint16() == 34672); // fail if faulty ID is present in report
-			report.readUint32(); // ignore the carried settings
-		}
+		ServiceTests::reset();
 	}
+
 
 	// **WARNING**
 	// TODO: Update this test (and all tests in general) to use the error handler's output when
