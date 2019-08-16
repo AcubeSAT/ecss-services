@@ -29,20 +29,26 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	ErrorHandler::assertRequest(paramIds.serviceType == 20, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t ids = paramIds.readUint16();
-	reqParam.appendUint16(numOfValidIds(paramIds)); // include the number of valid IDs
+	uint16_t numOfIds = paramIds.readUint16();  // number of parameter IDs carried in the message
+	uint16_t numOfValidIds = 0; // number of IDs that are actually included in the list
+	reqParam.skipBytes(2); // skip the first 16 bits where the number of valid IDs will be included
+	//reqParam.appendUint16(numOfValidIds(paramIds)); // include the number of valid IDs
 
-	for (uint16_t i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16(); // current ID to be appended
 
 		if (paramsList.find(currId) != paramsList.end()) {
 			reqParam.appendUint16(currId);
 			reqParam.appendUint32(paramsList[currId].getCurrentValue());
+			numOfValidIds++;
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
 		}
 	}
+
+	reqParam.resetRead();  // reset the read/write position
+	reqParam.appendUint16(numOfValidIds);
 
 	storeMessage(reqParam);
 }
@@ -60,9 +66,9 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	ErrorHandler::assertRequest(newParamValues.serviceType == 20, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t ids = newParamValues.readUint16(); // get number of ID's
+	uint16_t numOfIds = newParamValues.readUint16(); // get number of ID's contained in the message
 
-	for (uint16_t i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
@@ -75,29 +81,29 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 		}
 	}
 }
-
-uint16_t ParameterService::numOfValidIds(Message idMsg) {
-	idMsg.resetRead();
-	// start reading from the beginning of the idMsg object
-	// (original obj. will not be influenced if this is called by value)
-
-	uint16_t ids = idMsg.readUint16(); // first 16bits of the packet are # of IDs
-	uint16_t validIds = 0;
-
-	for (uint16_t i = 0; i < ids; i++) {
-		uint16_t currId = idMsg.readUint16();
-
-		if (idMsg.messageType == 3) {
-			idMsg.readUint32(); // skip the 32bit settings blocks, we need only the IDs
-		}
-
-		if (paramsList.find(currId) != paramsList.end()) {
-			validIds++;
-		}
-	}
-
-	return validIds;
-}
+// possibly useless
+//uint16_t ParameterService::numOfValidIds(Message idMsg) {
+//	idMsg.resetRead();
+//	// start reading from the beginning of the idMsg object
+//	// (original obj. will not be influenced if this is called by value)
+//
+//	uint16_t ids = idMsg.readUint16(); // first 16bits of the packet are # of IDs
+//	uint16_t validIds = 0;
+//
+//	for (uint16_t i = 0; i < ids; i++) {
+//		uint16_t currId = idMsg.readUint16();
+//
+//		if (idMsg.messageType == 3) {
+//			idMsg.readUint32(); // skip the 32bit settings blocks, we need only the IDs
+//		}
+//
+//		if (paramsList.find(currId) != paramsList.end()) {
+//			validIds++;
+//		}
+//	}
+//
+//	return validIds;
+//}
 
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
