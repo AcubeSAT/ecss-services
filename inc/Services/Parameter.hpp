@@ -55,7 +55,7 @@ class Parameter {
 	uint8_t ptc;
 	uint8_t pfc;
 	UpdatePtr ptr;
-	etl::bitset<NUM_OF_FLAGS> flags = {false};
+	etl::bitset<NUM_OF_FLAGS> flags;
 	ValueType currentValue = 0;
 
 	public:
