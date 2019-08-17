@@ -59,7 +59,6 @@ class Parameter {
 	ValueType currentValue = 0;
 
 	public:
-		Parameter();
 		Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr);
 
 		void setCurrentValue(ValueType newVal);
