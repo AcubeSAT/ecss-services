@@ -30,6 +30,9 @@ TEST_CASE("Parameter Service - General") {
 //	SECTION("Addition of already existing parameter") {
 //
 //	}
+
+	//SECTION("Passing of null-pointer as update function on construction")
+
 }
 
 TEST_CASE("Parameter Report Subservice") {
@@ -81,7 +84,6 @@ TEST_CASE("Parameter Report Subservice") {
 }
 
 TEST_CASE("Parameter Setting Subservice") {
-	//SECTION("Passing of null-pointer as update function on construction")
 
 	SECTION("Faulty Instruction Handling Test") {
 		Message setRequest(20, 3, Message::TC, 1);
