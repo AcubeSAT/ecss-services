@@ -5,6 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
 #include "etl/map.h"
+#include "etl/vector.h"
 
 // Number of stored parameters. MAX_PARAMS is just a dummy number for now.
 #define MAX_PARAMS 5
