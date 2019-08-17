@@ -46,6 +46,7 @@ public:
 	/**
 	 * Adds a new parameter. If the parameter has not been added (either because the map is full or because it already
 	 * exists in it) then returns false.
+	 * The parameter IDs are given sequentially, starting from 0.
 	 */
 	bool addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue = 0, UpdatePtr ptr = nullptr);
 

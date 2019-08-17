@@ -11,7 +11,8 @@ bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initia
 	Parameter param = Parameter(ptc, pfc, initialValue, ptr);
 	try {
 		// second element of the returned std::pair is whether the given item was inserted or not
-		return paramsList.insert(std::make_pair(paramsList.size() + 1, param)).second;
+		paramsList.insert(std::make_pair(paramsList.size(), param));
+		return true;
 	}
 	catch(etl::map_full) {
 		return false;
@@ -19,11 +20,13 @@ bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initia
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
-	etl::vector<std::pair<uint16_t, ValueType>, MAX_PARAMS> validParamValues;
-	paramIds.assertTC(20, 1);
-	Message reqParam(20, 2, Message::TM, 1); // empty TM[20, 2] parameter report message
+	etl::vector<std::pair<uint16_t, ValueType>, MAX_PARAMS> validParams;
+//	paramIds.assertTC(20, 1);
+	Message reqParam(20, 2, Message::TM, 1);
+	// empty TM[20, 2] parameter report message
 
-	paramIds.resetRead(); // since we're passing a reference, the reading position shall be reset
+	paramIds.resetRead();
+	// since we're passing a reference, the reading position shall be reset
 	// to its default before any read operations (to ensure the correct data is being read)
 
 	// assertion: correct message, packet and service type (at failure throws an
@@ -41,8 +44,8 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
 		try {
-			std::pair<ValueType, uint16_t> p = std::make_pair(paramsList.at(currId).getCurrentValue(), i);
-			validParamValues.push_back(p);
+			std::pair<ValueType, uint16_t> p = std::make_pair(i, paramsList.at(currId).getCurrentValue());
+			validParams.push_back(p);
 			validIds++;
 		}
 		catch (etl::map_out_of_bounds) {
@@ -51,27 +54,12 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 		}
 	}
 
-	reqParam.appendUint16(validIds);
+	reqParam.appendUint16(validIds);  // append the number of valid IDs
 
-	for (auto i: validParamValues) {
-		reqParam.appendUint16(i.first);
-		reqParam.appendUint32(i.second);
+	for (auto i: validParams) {
+		reqParam.appendUint16(i.first);  // append the parameter ID
+		reqParam.appendUint32(i.second); // and its value
 	}
-
-//	reqParam.appendUint16(numOfValidIds(paramIds)); // include the number of valid IDs
-//
-//	for (uint16_t i = 0; i < numOfIds; i++) {
-//		uint16_t currId = paramIds.readUint16(); // current ID to be appended
-//		try {
-//			Parameter foundParam = paramsList.at(currId);
-//			reqParam.appendUint16(currId);
-//			uint32_t x = foundParam.getCurrentValue();
-//			reqParam.appendUint32(foundParam.getCurrentValue());
-//		}
-//		catch (etl::map_out_of_bounds) {
-//
-//		}
-//	}
 
 	storeMessage(reqParam);
 }
