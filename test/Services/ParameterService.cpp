@@ -11,7 +11,7 @@ void foo(ValueType* bar) {  // sample function
 
 /* test ideas:
 * parameter setting while flag is active
-*
+* requesting only invalid parameter IDs
 *
 */
 
