@@ -44,7 +44,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
 		try {
-			std::pair<ValueType, uint16_t> p = std::make_pair(i, paramsList.at(currId).getCurrentValue());
+			std::pair<uint16_t, ValueType> p = std::make_pair(currId, paramsList.at(currId).getCurrentValue());
 			// pair containing the parameter's ID as first element and its current value as second
 			validParams.push_back(p);
 			validIds++;
@@ -66,7 +66,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 }
 
 void ParameterService::setParameterIds(Message& newParamValues) {
-	newParamValues.assertTC(20, 3);
+	//newParamValues.assertTC(20, 3);
 
 	// assertion: correct message, packet and service type (at failure throws an
 	// InternalError::UnacceptablePacket which gets logged)
@@ -83,12 +83,13 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
 
-		if (paramsList.find(currId) != paramsList.end()) {
-			paramsList[currId].setCurrentValue(newParamValues.readUint32()); // TODO: add a check here with the new
-			// flag functionality
-		} else {
+		// TODO: add a check here with the new flag functionality
+		try {
+			paramsList.at(currId).setCurrentValue(newParamValues.readUint32());
+		}
+		catch (etl::map_out_of_bounds &mapOutOfBounds) {
 			ErrorHandler::reportError(newParamValues,
-			                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
+				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
 		}
 	}
