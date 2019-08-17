@@ -117,40 +117,5 @@ TEST_CASE("Parameter Setting Subservice") {
 
 		ServiceTests::reset();
 		Services.reset();
-//
-//		reportRequest.appendUint16(2);
-//		reportRequest.appendUint16(16742);
-//		reportRequest.appendUint16(1); // used to be 3, which pointed the bug with
-//		// numOfValidIds out, now is 1 in order to be a valid ID (a separate test for
-//		// numOfValidIds shall be introduced)
-//
-//		// Since every reporting and setting is called with the same (sometimes faulty) parameters,
-//		// and there are errors generated (as should be) it is important to catch and check for
-//		// them in order to preserve the integrity of the test.
-//		Message errorNotif1 = ServiceTests::get(0);
-//		CHECK(errorNotif1.messageType == 4);
-//		CHECK(errorNotif1.serviceType == 1);
-//
-//		Message before = ServiceTests::get(1);
-//
-//		MessageParser::execute(setRequest);
-//		Message errorNotif2 = ServiceTests::get(2);
-//		CHECK(errorNotif2.messageType == 4);
-//		CHECK(errorNotif2.serviceType == 1);
-//
-//		MessageParser::execute(reportRequest);
-//		Message errorNotif3 = ServiceTests::get(3);
-//		CHECK(errorNotif3.messageType == 4);
-//		CHECK(errorNotif3.serviceType == 1);
-//
-//		Message after = ServiceTests::get(4);
-//
-//		before.readUint16();
-//		after.readUint16(); // skip the number of IDs
-//
-//		while (after.readPosition <= after.dataSize) {
-//			CHECK(before.readUint16() == after.readUint16()); // check if all IDs are present
-//			CHECK_FALSE(after.readUint32() == 0xBAAAAAAD); // fail if any settings are BAAAAAAD :P
-//		}
 	}
 }
