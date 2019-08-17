@@ -14,7 +14,7 @@ bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initia
 		paramsList.insert(std::make_pair(paramsList.size(), param));
 		return true;
 	}
-	catch (etl::map_full) {
+	catch (etl::map_full &mapFull) {
 		return false;
 	}
 }
@@ -49,7 +49,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 			validParams.push_back(p);
 			validIds++;
 		}
-		catch (etl::map_out_of_bounds) {
+		catch (etl::map_out_of_bounds &mapOutOfBounds) {
 			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
 		}
