@@ -33,3 +33,7 @@ uint8_t Parameter::getPTC() {
 uint8_t Parameter::getPFC() {
 	return pfc;
 }
+
+void Parameter::setFlag(etl::bitset<NUM_OF_FLAGS> flags) {
+	this->flags |= flags;
+}
