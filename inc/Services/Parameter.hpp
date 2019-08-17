@@ -63,7 +63,7 @@ class Parameter {
 		Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr);
 
 		void setCurrentValue(ValueType newVal);
-		//void setFlag();
+		void setFlag(etl::bitset<NUM_OF_FLAGS> flags);
 
 		ValueType getCurrentValue();
 		uint8_t getPTC();
