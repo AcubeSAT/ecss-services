@@ -35,8 +35,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();  // number of parameter IDs carried in the message
-//	uint16_t numOfValidIds = 0; // number of IDs that are actually included in the list
-//	reqParam.skipBytes(2); // skip the first 16 bits where the number of valid IDs will be included
+
 	reqParam.appendUint16(numOfValidIds(paramIds)); // include the number of valid IDs
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
