@@ -14,7 +14,7 @@ bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initia
 		paramsList.insert(std::make_pair(paramsList.size(), param));
 		return true;
 	}
-	catch(etl::map_full) {
+	catch (etl::map_full) {
 		return false;
 	}
 }
@@ -38,13 +38,14 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	ErrorHandler::assertRequest(paramIds.serviceType == 20, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t numOfIds = paramIds.readUint16();  // number of parameter IDs carried in the message
-	uint16_t validIds = 0;
+	uint16_t numOfIds = paramIds.readUint16();  // total number of parameter IDs carried in the message
+	uint16_t validIds = 0;                      // number of valid IDs
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
 		try {
 			std::pair<ValueType, uint16_t> p = std::make_pair(i, paramsList.at(currId).getCurrentValue());
+			// pair containing the parameter's ID as first element and its current value as second
 			validParams.push_back(p);
 			validIds++;
 		}
@@ -61,7 +62,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 		reqParam.appendUint32(i.second); // and its value
 	}
 
-	storeMessage(reqParam);
+	storeMessage(reqParam);  // then store the message
 }
 
 void ParameterService::setParameterIds(Message& newParamValues) {
