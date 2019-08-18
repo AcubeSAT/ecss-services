@@ -17,7 +17,7 @@ Parameter::Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue, Upd
 
 void Parameter::setCurrentValue(ValueType newVal) {
 	// set the value only if the parameter can be updated manually
-	if (flags[2]) {
+	if (flags[1]) {
 		currentValue = newVal;
 	}
 }
