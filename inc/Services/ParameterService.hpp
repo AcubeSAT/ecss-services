@@ -9,10 +9,8 @@
 
 // Number of stored parameters. MAX_PARAMS is just a dummy number for now.
 #define MAX_PARAMS 5
-// TODO: 2) Implement flags and use them above
 // TODO: 3) Write more and better tests
 // TODO: 4) Make sure that docs are up to date
-// TODO: 5) Optimize stuff if possible
 
 /**
  * Implementation of the ST[20] parameter management service,
