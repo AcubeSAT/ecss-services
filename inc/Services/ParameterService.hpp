@@ -47,7 +47,7 @@ public:
 	 * exists in it) then returns false.
 	 * The parameter IDs are given sequentially, starting from 0.
 	 */
-	bool addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue = 0, UpdatePtr ptr = nullptr);
+	bool addNewParameter(uint8_t id, Parameter param, const char* flags = "110");
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

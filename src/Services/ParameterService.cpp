@@ -7,11 +7,11 @@ ParameterService::ParameterService() {
 //	addNewParameter(3, 14);
 }
 
-bool ParameterService::addNewParameter(uint8_t ptc, uint8_t pfc, uint32_t initialValue, UpdatePtr ptr) {
-	Parameter param = Parameter(ptc, pfc, initialValue, ptr);
+bool ParameterService::addNewParameter(uint8_t id, Parameter param, const char* flags) {
 	try {
 		// second element of the returned std::pair is whether the given item was inserted or not
-		paramsList.insert(std::make_pair(paramsList.size(), param));
+		param.setFlag(flags);
+		paramsList.insert(std::make_pair(id, param));
 		return true;
 	}
 	catch (etl::map_full &mapFull) {
@@ -82,8 +82,7 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-
-		// TODO: add a check here with the new flag functionality
+		// the parameter is checked for read-only status and manual update availability
 		try {
 			paramsList.at(currId).setCurrentValue(newParamValues.readUint32());
 		}
