@@ -9,7 +9,6 @@
 
 // Number of stored parameters. MAX_PARAMS is just a dummy number for now.
 #define MAX_PARAMS 5
-// TODO: 1) Rework the parameter setting and report functions
 // TODO: 2) Implement flags and use them above
 // TODO: 3) Write more and better tests
 // TODO: 4) Make sure that docs are up to date
@@ -28,7 +27,7 @@
  * for parameter reporting and modification.
  *
  * The parameter list is stored in a map with the parameter IDs as keys and values
- * corresponding Parameter structs containing the PTC, PFC and the parameter's value.
+ * corresponding Parameter classes containing the PTC, PFC and the parameter's value.
  */
 
 
@@ -38,16 +37,18 @@ private:
 
 public:
 	/**
-	 * Initializes the parameter list.
+	 * @brief Initializes the parameter list.
 	 */
 	ParameterService();
 
 	/**
-	 * Adds a new parameter. If the parameter has not been added (either because the map is full or because it already
-	 * exists in it) then returns false.
-	 * The parameter IDs are given sequentially, starting from 0.
+	 * @brief Adds a new parameter. Returns false if the parameter has not been added
+	 * (either because the map is full or because it already exists in it).
+	 * @param id: the desired ID for this parameter
+	 * @param param: the parameter field to be included
+	 * @param flags: the flags to be set for this field (see Parameter.hpp)
 	 */
-	bool addNewParameter(uint8_t id, Parameter param, const char* flags = "110");
+	bool addNewParameter(uint16_t id, Parameter param, const char* flags = "110");
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
@@ -70,7 +71,8 @@ public:
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
 	 * iterates over all contained parameter IDs and replaces the settings for each valid parameter,
-	 * while ignoring all invalid IDs.
+	 * while ignoring all invalid IDs. If the manual update flag is not set, the parameter's value should
+	 * not change.
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 * @return None
