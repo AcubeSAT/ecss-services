@@ -9,11 +9,6 @@ void foo(ValueType* bar) {  // sample function
 	*bar = 0xDEADBEEF;
 }
 
-/* test ideas:
-*
-*
-*/
-
 TEST_CASE("Parameter Service - General") {
 	SECTION("Addition to full map") {
 
