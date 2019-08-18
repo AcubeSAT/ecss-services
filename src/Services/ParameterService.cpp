@@ -7,21 +7,29 @@ ParameterService::ParameterService() {
 //	addNewParameter(3, 14);
 }
 
-bool ParameterService::addNewParameter(uint8_t id, Parameter param, const char* flags) {
+bool ParameterService::addNewParameter(uint16_t id, Parameter param, const char* flags) {
 	try {
-		// second element of the returned std::pair is whether the given item was inserted or not
-		param.setFlag(flags);
-		paramsList.insert(std::make_pair(id, param));
-		return true;
+		try {
+			paramsList.at(id);
+			return false;
+			// if it exists, an iterator will be returned with no exception thrown,
+			// so the function should return false
+			// todo: is it a better idea to use find() and if instead of an exception here?
+		}
+		catch (etl::map_out_of_bounds& mapOutOfBounds) {
+			param.setFlag(flags);
+			paramsList.insert(std::make_pair(id, param));
+			return true;
+		}
 	}
 	catch (etl::map_full &mapFull) {
 		return false;
+		// if the map is full, return false
 	}
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
 	etl::vector<std::pair<uint16_t, ValueType>, MAX_PARAMS> validParams;
-//	paramIds.assertTC(20, 1);
 	Message reqParam(20, 2, Message::TM, 1);
 	// empty TM[20, 2] parameter report message
 
@@ -66,8 +74,6 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 }
 
 void ParameterService::setParameterIds(Message& newParamValues) {
-	//newParamValues.assertTC(20, 3);
-
 	// assertion: correct message, packet and service type (at failure throws an
 	// InternalError::UnacceptablePacket which gets logged)
 

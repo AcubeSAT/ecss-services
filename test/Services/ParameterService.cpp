@@ -36,9 +36,13 @@ TEST_CASE("Parameter Service - General") {
 		Services.reset();  // reset all services
 	}
 
-//	SECTION("Addition of already existing parameter") {
-//
-//	}
+	SECTION("Addition of already existing parameter") {
+		Parameter param0 = Parameter(1, 3);
+		pserv.addNewParameter(0, param0);
+
+		CHECK_FALSE(pserv.addNewParameter(0, param0));
+		Services.reset();
+	}
 
 	//SECTION("Passing of null-pointer as update function on construction")
 
