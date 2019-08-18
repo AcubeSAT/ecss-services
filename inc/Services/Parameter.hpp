@@ -20,6 +20,7 @@
  * @typedef ParamId: the unique ID of a parameter, used for searching
  * @typedef ValueType: the type of the parameter's value (changing types is WIP)
  * @typedef UpdatePtr: pointer to a void function, with a single ValueType* argument (return address)
+ * @typedef Flags: container for the binary flags
  */
 typedef uint16_t ParamId;
 typedef uint32_t ValueType;
@@ -38,7 +39,7 @@ typedef etl::bitset<NUM_OF_FLAGS> Flags;
  *
  * Additional features (not included in standard):
  * @private flags: Various binary flags (number and meaning TBD).
- * Current flag meanings (starting from LSB, big-endian):
+ * @warning Current flag meanings (starting from LSB, big-endian):
  * Index 0: update with priority
  * Index 1: manual update available
  * Index 2: automatic update available
