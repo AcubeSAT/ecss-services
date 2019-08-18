@@ -17,13 +17,22 @@ void foo(ValueType* bar) {  // sample function
 
 TEST_CASE("Parameter Service - General") {
 	SECTION("Addition to full map") {
-		pserv.addNewParameter(3, 14);  // this one has ID 0
-		pserv.addNewParameter(1, 7, 12);  // this one has 1
-		pserv.addNewParameter(4, 12, 3, nullptr);  // this one has 2
-		pserv.addNewParameter(12, 3, 6, &foo); // this one has 3
-		pserv.addNewParameter(15, 7, 3, &foo); //and this one 4
 
-		REQUIRE_FALSE(pserv.addNewParameter(15, 5, 4));  // addNewParameter should return false
+		Parameter param0 = Parameter(3, 14);
+		Parameter param1 = Parameter(1, 7, 12);
+		Parameter param2 = Parameter(4, 12, 3, nullptr);
+		Parameter param3 = Parameter(12, 3, 6, &foo);
+		Parameter param4 = Parameter(15, 7, 3, &foo);
+
+		Parameter param5 = Parameter(15, 5, 4);
+
+		pserv.addNewParameter(0, param0);
+		pserv.addNewParameter(1, param1);
+		pserv.addNewParameter(2, param2);
+		pserv.addNewParameter(3, param3);
+		pserv.addNewParameter(4, param4);
+
+		REQUIRE_FALSE(pserv.addNewParameter(5, param5));  // addNewParameter should return false
 		Services.reset();  // reset all services
 	}
 
@@ -41,9 +50,12 @@ TEST_CASE("Parameter Report Subservice") {
 //	}
 
 	SECTION("Faulty instruction handling") {
-		pserv.addNewParameter(3, 14);  // ID 0
-		pserv.addNewParameter(1, 7, 12);  // ID 1
-		pserv.addNewParameter(4, 12, 3, nullptr);  // ID 2
+		Parameter param0 = Parameter(3, 14);
+		Parameter param1 = Parameter(1, 7, 12);
+		Parameter param2 = Parameter(4, 12, 3, nullptr);
+		pserv.addNewParameter(0, param0);
+		pserv.addNewParameter(1, param1);
+		pserv.addNewParameter(2, param2);
 
 		Message request(20, 1, Message::TC, 1);
 		request.appendUint16(2); // number of requested IDs
@@ -86,9 +98,12 @@ TEST_CASE("Parameter Report Subservice") {
 TEST_CASE("Parameter Setting Subservice") {
 
 	SECTION("Faulty Instruction Handling Test") {
-		pserv.addNewParameter(3, 14);  // ID 0
-		pserv.addNewParameter(1, 7, 12);  // ID 1
-		pserv.addNewParameter(4, 12, 3, nullptr);  // ID 2
+		Parameter param0 = Parameter(3, 14);
+		Parameter param1 = Parameter(1, 7, 12);
+		Parameter param2 = Parameter(4, 12, 3, nullptr);
+		pserv.addNewParameter(0, param0);
+		pserv.addNewParameter(1, param1);
+		pserv.addNewParameter(2, param2);
 
 		Message setRequest(20, 3, Message::TC, 1);
 		setRequest.appendUint16(2); // total number of IDs
