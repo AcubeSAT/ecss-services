@@ -10,8 +10,7 @@ void foo(ValueType* bar) {  // sample function
 }
 
 /* test ideas:
-* parameter setting while flag is active
-* requesting only invalid parameter IDs
+*
 *
 */
 
@@ -49,9 +48,29 @@ TEST_CASE("Parameter Service - General") {
 }
 
 TEST_CASE("Parameter Report Subservice") {
-//	SECTION("All requested parameters invalid") {
-//
-//	}
+	SECTION("All requested parameters invalid") {
+		Message request = Message(20, 1, Message::TC, 1);
+		request.appendUint16(3);
+		request.appendUint16(54432);
+		request.appendUint16(60000);
+		request.appendUint16(65535);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::get(0).serviceType == 1);
+		CHECK(ServiceTests::get(0).messageType == 4);
+		CHECK(ServiceTests::get(1).serviceType == 1);
+		CHECK(ServiceTests::get(1).messageType == 4);
+		CHECK(ServiceTests::get(2).serviceType == 1);
+		CHECK(ServiceTests::get(2).messageType == 4);
+
+		Message report = ServiceTests::get(3);
+		CHECK(report.serviceType == 20);
+		CHECK(report.messageType == 2);
+		CHECK(report.readUint16() == 0);  // the message shall be empty
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 
 	SECTION("Faulty instruction handling") {
 		Parameter param0 = Parameter(3, 14);
@@ -133,6 +152,33 @@ TEST_CASE("Parameter Setting Subservice") {
 		CHECK(report.readUint16() == 1);  // only 1 ID contained
 		CHECK(report.readUint16() == 1);  // contained ID should be ID 1
 		CHECK(report.readUint32() == 3735928559); // whose value is 0xDEADBEEF
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Attempt to set parameter with no manual update availability") {
+		Parameter param1 = Parameter(1, 7, 12);
+		pserv.addNewParameter(1, param1, "100");
+
+		Message setRequest = Message(20, 3, Message::TC, 1);
+		setRequest.appendUint16(1);
+		setRequest.appendUint16(1);
+		setRequest.appendUint32(0xBAAAAAAD);
+
+		MessageParser::execute(setRequest);
+
+		Message infoRequest = Message(20, 1, Message::TC, 1);
+		infoRequest.appendUint16(1);
+		infoRequest.appendUint16(1);
+
+		MessageParser::execute(infoRequest);
+
+		Message report = ServiceTests::get(0);
+
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readUint16() == 1);
+		CHECK_FALSE(report.readUint32() == 0xBAAAAAAD);
 
 		ServiceTests::reset();
 		Services.reset();
