@@ -15,7 +15,7 @@ stages:
   - deploy
 
 before_script:
-  - apt-get update -qq && apt-get -qq -y install python3-pip && python3 -m pip install --upgrade pip
+  - apt-get update -qq && apt-get -qq -y install libstdc++6 python3-pip && python3 -m pip install --upgrade pip
   - python3 -V
   - python3 -m pip --version
   - g++ --version
