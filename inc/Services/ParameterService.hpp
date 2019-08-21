@@ -10,6 +10,8 @@
 // Number of stored parameters. MAX_PARAMS is just a dummy number for now.
 #define MAX_PARAMS 5
 
+class HousekeepingService; // forward declaration
+
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C
@@ -30,6 +32,7 @@
 class ParameterService : public Service {
 private:
 	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
+	friend class HousekeepingService;
 
 public:
 	/**

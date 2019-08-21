@@ -11,6 +11,7 @@
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
+#include "Services/HousekeepingService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -31,6 +32,7 @@ public:
 	LargePacketTransferService largePacketTransferService;
 	FunctionManagementService functionManagement;
 	TimeBasedSchedulingService timeBasedScheduling;
+	HousekeepingService housekeeping;
 
 	/**
 	 * The default ServicePool constructor
