@@ -191,6 +191,8 @@ void Message::appendFixedString(const etl::istring& string) {
 void Message::appendOctetString(const etl::istring& string) {
 	// Make sure that the string is large enough to count
 	ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
+	// Redundant check to make sure we fail before appending string.size()
+	ASSERT_INTERNAL(dataSize + 2 + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 
 	appendUint16(string.size());
 	appendString(string);
