@@ -99,6 +99,11 @@ public:
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
 		UnacceptableMessage = 5,
+
+		/**
+		 * Number of parameters exceed the defined MAX_PARAM
+		 */
+		ExceedMaxNumParam = 6,
 	};
 
 	/**
@@ -131,6 +136,11 @@ public:
 		EventActionUnknownEventActionDefinitionIDError = 4,
 		SubServiceExecutionStartError = 5,
 		InstructionExecutionStartError = 6,
+
+		/**
+		 * Attempt to create an already assigned housekeeping report structure
+		 */
+		UsedHousekeepingStructureId = 7,
 
 	};
 

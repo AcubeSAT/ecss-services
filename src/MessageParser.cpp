@@ -5,9 +5,13 @@
 #include "macros.hpp"
 #include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
+#include "Services/HousekeepingService.hpp"
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
+		case 3:
+			Services.housekeeping.execute(message); // ST[03]
+			break;
 		case 5:
 			Services.eventReport.execute(message); // ST[05]
 			break;
