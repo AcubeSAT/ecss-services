@@ -11,9 +11,7 @@ struct Tester {
 HousekeepingService& housekeepingService = Services.housekeeping;
 ParameterService& paramService = Services.parameterManagement;
 
-// @todo specify time with collection interval. Time units? plus add notes for different situations
-
-TEST_CASE("Create housekeeping structures and generate periodic parameter reports","[service][st03]") {
+TEST_CASE("Create housekeeping structures and generate periodic parameter reports", "[service][st03]") {
 	// create a request TC[3,1]
 	Message request1(3, 1, Message::TC, 0);
 	request1.appendByte(0); // housekeeping ID = 0
@@ -35,7 +33,7 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	CHECK(it->second.paramId.size() == 2);
 	CHECK(it->second.paramId[0] == 1);
 	CHECK(it->second.paramId[1] == 2);
-	CHECK(!it->second.periodicStatus);
+	CHECK_FALSE(it->second.periodicStatus);
 
 	Message request2(3, 1, Message::TC, 0);
 	request2.appendByte(1); // housekeeping ID = 1
@@ -56,7 +54,7 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	CHECK(it->second.paramId.size() == 2);
 	CHECK(it->second.paramId[0] == 1);
 	CHECK(it->second.paramId[1] == 2);
-	CHECK(!it->second.periodicStatus);
+	CHECK_FALSE(it->second.periodicStatus);
 
 	it++;
 
@@ -66,7 +64,7 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	CHECK(it->second.paramId[0] == 3);
 	CHECK(it->second.paramId[1] == 4);
 	CHECK(it->second.paramId[2] == 5);
-	CHECK(!it->second.periodicStatus);
+	CHECK_FALSE(it->second.periodicStatus);
 
 	// now we have 2 housekeeping structures with IDs 0 and 1 and collection intervals 1 and 2 respectively
 
@@ -88,7 +86,7 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	// lets try to generate reports based on collection interval and current time
 
 	TimeAndDate timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 10);
-	uint32_t timeSeconds = TimeHelper::utcToSeconds(timeUtc); // for fun
+	//uint32_t timeSeconds = TimeHelper::utcToSeconds(timeUtc); // for fun
 	housekeepingService.paramReport(timeUtc); // should generate param report based on the structure with id 0
 
 
@@ -109,4 +107,16 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	CHECK(response.readUint32() == 9);
 	CHECK(response.readUint32() == 12);
 	CHECK(response.readUint32() == 15);
+}
+
+TEST_CASE("TC[3,1] housekeeping structures", "[service][st03]") {
+	SECTION("Trying to create a structure with the same id") {
+		// do stuff
+	}
+}
+
+TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
+	SECTION("") {
+		// do stuff
+	}
 }

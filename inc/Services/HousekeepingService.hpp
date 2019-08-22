@@ -8,10 +8,7 @@
 #include <etl/map.h>
 #include "Services/ParameterService.hpp"
 
-
-#define SAMPLE_INTERVAL 1u
 #define MAX_HOUSEKEEPING_STRUCTURES 256u
-
 
 struct Tester; // only for testing in order to access the private members of the class Housekeeping
 
@@ -38,12 +35,14 @@ private:
 	 * default value should be disabled
 	 * @var paramId A container to store the requested param IDs
 	 * @var timestamp the last time a structure is used for its paramIDs by the TM[3,25]. We use this timestamp to
-	 * define if the required time have passed to reuse it
-	 * @note We assume that the time unit for the Real Time Clock is seconds. So the collection intervals should be
+	 * define If the required time have passed to reuse it
+	 * @note We assume that the time unit for the Real Time Clock is seconds. So the \p collection intervals should be
 	 * integer multiple of seconds
+	 * @note The \p collection interval should be >= the sample interval. The sample interval is the time required to
+	 * update the values of the parameters
 	 */
 	struct HousekeepingReportStructure {
-		uint16_t collectInterval = SAMPLE_INTERVAL;
+		uint16_t collectInterval = 0;
 		bool periodicStatus = false; //
 		etl::vector<ParamId, MAX_PARAMS> paramId;
 		uint32_t timestamp = 0;
@@ -78,7 +77,6 @@ public:
 
 	/**
 	 * TC[3,5] enable the periodic generation of housekeeping parameter reports
-	 *
 	 */
 	void enablePeriodParamReports(Message& message);
 

@@ -142,6 +142,11 @@ public:
 		 */
 		UsedHousekeepingStructureId = 7,
 
+		/**
+		 * Unexpected packet due to unexpected service or message type
+		 */
+		 UnexpectedMessage = 8;
+
 	};
 
 	/**
