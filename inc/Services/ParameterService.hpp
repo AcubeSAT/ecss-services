@@ -36,13 +36,14 @@ public:
 	ParameterService();
 
 	/**
-	 * @brief Adds a new parameter. Returns false if the parameter has not been added
-	 * (either because the map is full or because it already exists in it).
+	 * @brief Adds a new parameter. Emits an InternalError::MapFull if an attempt is made to insert
+	 * parameters in a full map or an InternalError::ExistingParameterId if the given parameter ID
+	 * exists already.
 	 * @param id: the desired ID for this parameter
 	 * @param param: the parameter field to be included
 	 * @param flags: the flags to be set for this field (see Parameter.hpp)
 	 */
-	bool addNewParameter(uint16_t id, Parameter param, const char* flags = "110");
+	void addNewParameter(uint16_t id, Parameter param, const char* flags = "110");
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

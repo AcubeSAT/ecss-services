@@ -42,7 +42,7 @@ void FunctionManagementService::include(String<FUNC_NAME_LENGTH> funcName, void 
 		funcName.append(FUNC_NAME_LENGTH - funcName.length(), 0);
 		funcPtrIndex.insert(std::make_pair(funcName, ptr));
 	} else {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::FunctionMapFull);
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
 	}
 }
 

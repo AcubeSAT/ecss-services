@@ -34,6 +34,6 @@ uint8_t Parameter::getPFC() {
 	return pfc;
 }
 
-void Parameter::setFlag(const char* flags) {
+void Parameter::setFlags(const char* flags) {
 	this->flags = Flags(flags);
 }

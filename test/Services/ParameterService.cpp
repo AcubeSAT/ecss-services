@@ -26,7 +26,9 @@ TEST_CASE("Parameter Service - General") {
 		pserv.addNewParameter(3, param3);
 		pserv.addNewParameter(4, param4);
 
-		REQUIRE_FALSE(pserv.addNewParameter(5, param5));  // addNewParameter should return false
+		pserv.addNewParameter(5, param5);  // addNewParameter should return false
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
+		ServiceTests::reset();
 		Services.reset();  // reset all services
 	}
 
@@ -34,12 +36,11 @@ TEST_CASE("Parameter Service - General") {
 		Parameter param0 = Parameter(1, 3);
 		pserv.addNewParameter(0, param0);
 
-		CHECK_FALSE(pserv.addNewParameter(0, param0));
+		pserv.addNewParameter(0, param0);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::ExistingParameterId));
+		ServiceTests::reset();
 		Services.reset();
 	}
-
-	//SECTION("Passing of null-pointer as update function on construction")
-
 }
 
 TEST_CASE("Parameter Report Subservice") {

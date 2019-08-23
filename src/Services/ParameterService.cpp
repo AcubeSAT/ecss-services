@@ -7,24 +7,21 @@ ParameterService::ParameterService() {
 //	addNewParameter(3, 14);
 }
 
-bool ParameterService::addNewParameter(uint16_t id, Parameter param, const char* flags) {
-	try {
-		try {
-			paramsList.at(id);
-			return false;
-			// if it exists, an iterator will be returned with no exception thrown,
-			// so the function should return false
-			// todo: is it a better idea to use find() and if instead of an exception here?
-		}
-		catch (etl::map_out_of_bounds& mapOutOfBounds) {
-			param.setFlag(flags);
-			paramsList.insert(std::make_pair(id, param));
-			return true;
-		}
+void ParameterService::addNewParameter(uint16_t id, Parameter param, const char* flags) {
+	if (paramsList.full()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
+		return;
 	}
-	catch (etl::map_full &mapFull) {
-		return false;
-		// if the map is full, return false
+	else {
+		if (paramsList.find(id) == paramsList.end()) {
+			param.setFlags(flags);
+			paramsList.insert(std::make_pair(id, param));
+			return;
+		}
+		else {
+			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
+			return;
+		}
 	}
 }
 
@@ -51,13 +48,14 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		try {
+
+		if (paramsList.find(currId) != paramsList.end()) {
 			std::pair<uint16_t, ValueType> p = std::make_pair(currId, paramsList.at(currId).getCurrentValue());
 			// pair containing the parameter's ID as first element and its current value as second
 			validParams.push_back(p);
 			validIds++;
 		}
-		catch (etl::map_out_of_bounds &mapOutOfBounds) {
+		else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
 		}
@@ -89,10 +87,10 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
 		// the parameter is checked for read-only status and manual update availability
-		try {
+		if (paramsList.find(currId) != paramsList.end()) {
 			paramsList.at(currId).setCurrentValue(newParamValues.readUint32());
 		}
-		catch (etl::map_out_of_bounds &mapOutOfBounds) {
+		else {
 			ErrorHandler::reportError(newParamValues,
 				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore

@@ -70,9 +70,13 @@ public:
 		 */
 		OtherMessageType = 9,
 		/**
-		 * Attempt to insert new function in a full function map (ST[08])
+		 * Attempt to insert new element in a full map (ST[08], ST[20])
 		 */
-		FunctionMapFull = 10,
+		MapFull = 10,
+		/**
+		 * Attempt to overwrite an existing parameter (ST[20])
+		 */
+		ExistingParameterId = 11
 	};
 
 	/**
