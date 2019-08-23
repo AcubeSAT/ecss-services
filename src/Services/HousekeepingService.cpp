@@ -10,28 +10,34 @@ void HousekeepingService::createHousekeepingStructure(Message& message) {
 	ErrorHandler::assertRequest(message.packetType == Message::TC, message,
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
 	ErrorHandler::assertRequest(message.messageType == 1, message,
-		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage;
+		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
 	ErrorHandler::assertRequest(message.serviceType == 3, message,
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
 
-	HousekeepingId housekeepingId = message.readUint8(); // assign the housekeeping structure ID
-	ErrorHandler::assertRequest(housekeepingStructureList.find(housekeepingId) == housekeepingStructureList.end(),
-		message, ErrorHandler::ExecutionStartErrorType::UsedHousekeepingStructureId); //  reject request if id exists
+	HousekeepingId housekeepingId = message.readUint8(); // assign the housekeeping structure ID (key)
 
-	HousekeepingReportStructure reportStruct;
+	if (housekeepingStructureList.full()) {
+		// map is full
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::HousekeepingMapFull);
+	} else if (housekeepingStructureList.find(housekeepingId) != housekeepingStructureList.end()) {
+		// reject requests with IDs that are already assigned
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UsedHousekeepingStructureId);
+	} else {
 
-	reportStruct.collectInterval = message.readUint32(); // assign the collection interval
+		HousekeepingReportStructure reportStruct; // value of the map
+		reportStruct.collectInterval = message.readUint32(); // assign the collection interval
 
-	ParamId numParamIDs = message.readUint8();
-	ErrorHandler::assertRequest(numParamIDs < MAX_PARAMS, message,
-		ErrorHandler::AcceptanceErrorType::ExceedMaxNumParam);
-	for (int i = 0; i < numParamIDs; i++) {
-		reportStruct.paramId.push_back(message.readUint16()); // collect the param IDs
+		ParamId numParamIDs = message.readUint8();
+		if (numParamIDs > MAX_PARAMS) {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ExceedMaxNumParam);
+		} else {
+			for (int i = 0; i < numParamIDs; i++) {
+				reportStruct.paramId.push_back(message.readUint16()); // collect the param IDs
+			}
+
+			housekeepingStructureList.insert(std::make_pair(housekeepingId, reportStruct)); // insert the requested pair
+		}
 	}
-
-	ErrorHandler::assertInternal(not housekeepingStructureList.full(),
-		ErrorHandler::InternalErrorType::FunctionMapFull);
-	housekeepingStructureList.insert(std::make_pair(housekeepingId, reportStruct)); // insert the requested structure
 }
 
 void HousekeepingService::deleteHousekeepingStructure(Message& message) {
@@ -82,7 +88,7 @@ void HousekeepingService::paramReport(TimeAndDate time) {
 			for (auto i : it->second.paramId) {
 				auto itParam = Services.parameterManagement.paramsList.find(i); // find the requested paramID
 				report.appendWord(itParam->second.getCurrentValue()); // fetch the requested parameters that are
-				// already configured from the paramete service
+				// already configured from the parameter service
 			}
 			storeMessage(report);
 		}

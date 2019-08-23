@@ -8,19 +8,19 @@
 #include <etl/map.h>
 #include "Services/ParameterService.hpp"
 
-#define MAX_HOUSEKEEPING_STRUCTURES 256u
+#define MAX_HOUSEKEEPING_STRUCTURES 3u
 
 struct Tester; // only for testing in order to access the private members of the class Housekeeping
 
 /**
  * Implementation of ST[03] housekeeping
  *
- * @details The main purpose of this report is to create housekeeping structures, that will contain a group of some
- * parameter IDs and to report periodically the values of these requested params. How frequent these report will be
- * generated, depends on the 1)time required to call the function that is responsible to generate reports and the 2)
- * collection interval. The collection interval is the time interval for sampling parameters. The time required to
- * call the corresponding function to generate parameter reports (TM[3,25]) should be <= the minimum collection
- * interval
+ * @details The main purpose of this report is to create housekeeping structures, that each one of those will contain a
+ * group of some parameter IDs and to report periodically the values of these requested params. How frequent these
+ * report will be generated, depends on the 1)time required to call the function that is responsible to generate
+ * reports and the 2) collection interval. The collection interval is the time interval for sampling parameters. The
+ * time required to call the corresponding function to generate parameter reports (TM[3,25]) should be <= the minimum
+ * collection interval
  * @note The current implementation includes only the housekeeping subservice
  */
 class HousekeepingService : public Service {
@@ -64,9 +64,12 @@ public:
 	/**
 	 * TC[3,1] create a housekeeping report structure
 	 *
-	 * @note rejected requests due to existed housekeeping structure ID shall generate a failed start of execution
+	 * @note Rejected requests due to existed housekeeping structure ID shall generate a failed start of execution
+	 * @note The current implementation doesn't allow to override a structure with an already assigned housekeeping ID.
+	 * You need first to delete the structure and then create a new one
 	 * @note Housekeeping structures can be created either by telecommand (TC[3,1]) or can be predefined on-board
-	 * @note when creating a housekeeping structure the periodic generation should be disabled, as the standard claims
+	 * @note When creating a housekeeping structure the periodic generation should be disabled, as the standard claims
+	 * @todo Should we be able to update an already assigned housekeeping structure?
 	 */
 	void createHousekeepingStructure(Message& message);
 
@@ -91,12 +94,9 @@ public:
 	 * @details This function is the essence of the ST[03] service. It creates a telemetry message that contains the
 	 * values of the requested param IDs that are configured on the existing housekeeper structure IDs
 	 * @note In order to generate a TM, at least one structure should exist and at least one should be enabled
-	 * @note about structures with same collection interval
-	 * @note the selection of the housekeeping structures is based on the collection interval and the current time
-	 * (currTime % collection interval == 0). In the current implementation, in order to function properly, this
-	 * function should be called <= the time required to change the time unit. In other words, it should be less than 1
-	 * second. Otherwise we should track the last called of the function and the current time.
+	 * @note the values of the parameters that will be sent are ordered by its paramID
 	 * @param currTime A preliminary dummy value. It should be fetched from the Real Time Clock (UTC)
+	 * @todo Update parameterService in order to have access to parameter values without using friend class
 	 */
 	void paramReport(TimeAndDate time);
 

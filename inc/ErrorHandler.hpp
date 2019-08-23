@@ -99,11 +99,6 @@ public:
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
 		UnacceptableMessage = 5,
-
-		/**
-		 * Number of parameters exceed the defined MAX_PARAM
-		 */
-		ExceedMaxNumParam = 6,
 	};
 
 	/**
@@ -145,8 +140,17 @@ public:
 		/**
 		 * Unexpected packet due to unexpected service or message type
 		 */
-		 UnexpectedMessage = 8;
+		UnexpectedMessage = 8,
 
+		/**
+		 * Number of parameters exceed the defined MAX_PARAM
+		 */
+		ExceedMaxNumParam = 9,
+
+		/**
+		 * Attempt to insert a new housekeeping structure in a full map
+		 */
+		HousekeepingMapFull = 10,
 	};
 
 	/**
