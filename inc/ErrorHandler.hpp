@@ -151,6 +151,11 @@ public:
 		 * Attempt to insert a new housekeeping structure in a full map
 		 */
 		HousekeepingMapFull = 10,
+		
+		/**
+		 * The reqested key doesn't exist
+		 */
+		 Unknownkey = 11,
 	};
 
 	/**

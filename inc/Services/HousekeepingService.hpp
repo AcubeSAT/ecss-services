@@ -17,11 +17,11 @@ struct Tester; // only for testing in order to access the private members of the
  *
  * @details The main purpose of this report is to create housekeeping structures, that each one of those will contain a
  * group of some parameter IDs and to report periodically the values of these requested params. How frequent these
- * report will be generated, depends on the 1)time required to call the function that is responsible to generate
+ * reports will be generated, depends on the 1) time required to call the function that is responsible to generate
  * reports and the 2) collection interval. The collection interval is the time interval for sampling parameters. The
  * time required to call the corresponding function to generate parameter reports (TM[3,25]) should be <= the minimum
  * collection interval
- * @note The current implementation includes only the housekeeping subservice
+ * @note The current implementation includes a part of the housekeeping subservice
  */
 class HousekeepingService : public Service {
 private:
@@ -34,7 +34,7 @@ private:
 	 * @var periodicStatus Indicates if the periodic generation of parameter reports is enabled or disabled. The
 	 * default value should be disabled
 	 * @var paramId A container to store the requested param IDs
-	 * @var timestamp the last time a structure is used for its paramIDs by the TM[3,25]. We use this timestamp to
+	 * @var timestamp The last time a structure is used for its paramIDs by the TM[3,25]. We use this timestamp to
 	 * define If the required time have passed to reuse it
 	 * @note We assume that the time unit for the Real Time Clock is seconds. So the \p collection intervals should be
 	 * integer multiple of seconds
@@ -48,16 +48,12 @@ private:
 		uint32_t timestamp = 0;
 	};
 
-
-	 // Map is used as a container for the housekeeping structure to be more efficient the searching 1)when checking
-	 // if a structure with an existed ID is requested to be created and 2)for the deletion of a structure based on
-	 // its id
 	etl::map<HousekeepingId, HousekeepingReportStructure, MAX_HOUSEKEEPING_STRUCTURES> housekeepingStructureList;
 
 	friend struct Tester;
 public:
 	/**
-	 * Initialize the serviceType
+	 * Define the number of the service
 	 */
 	HousekeepingService();
 
@@ -68,23 +64,32 @@ public:
 	 * @note The current implementation doesn't allow to override a structure with an already assigned housekeeping ID.
 	 * You need first to delete the structure and then create a new one
 	 * @note Housekeeping structures can be created either by telecommand (TC[3,1]) or can be predefined on-board
+	 * @note The TC[3,1] request can contain only one housekeeping structure. Multiple structures need multiple requests
 	 * @note When creating a housekeeping structure the periodic generation should be disabled, as the standard claims
+	 * @param message The TC[3,1] request
 	 * @todo Should we be able to update an already assigned housekeeping structure?
+	 * @todo Should the requested paramIDs be ordered in a specific way?
 	 */
 	void createHousekeepingStructure(Message& message);
 
 	/**
 	 * TC[3,3] delete a housekeeping report structure
+	 *
+	 * @param message The TC[3,3] request
 	 */
 	void deleteHousekeepingStructure(Message& message);
 
 	/**
 	 * TC[3,5] enable the periodic generation of housekeeping parameter reports
+	 *
+	 * @param message The TC[3,5] request
 	 */
 	void enablePeriodParamReports(Message& message);
 
 	/**
 	 * TC[3,6] disable the periodic generation of housekeeping parameter reports
+	 *
+	 * @param message The TC[3,6] request
 	 */
 	void disablePeriodParamReports(Message& message);
 
@@ -92,10 +97,13 @@ public:
 	 * TM[3,25] housekeeping parameter report
 	 *
 	 * @details This function is the essence of the ST[03] service. It creates a telemetry message that contains the
-	 * values of the requested param IDs that are configured on the existing housekeeper structure IDs
-	 * @note In order to generate a TM, at least one structure should exist and at least one should be enabled
-	 * @note the values of the parameters that will be sent are ordered by its paramID
-	 * @param currTime A preliminary dummy value. It should be fetched from the Real Time Clock (UTC)
+	 * values of the requested param IDs that are configured on the existing enabled housekeeping structure IDs
+	 * @note In order to generate a TM, at least one structure should exist and at least one should be enabled. So,
+	 * the action order is 1) create structure, 2) enable some of them and 3) call this function to generate reports
+	 * based on the collection interval of the enabled structures and the current time
+	 * @note The values of the parameters that will be sent are ordered by the way that have been ordered in the
+	 * housekeeping structure when it was created.
+	 * @param time A preliminary dummy value. It should be fetched from the Real Time Clock (UTC)
 	 * @todo Update parameterService in order to have access to parameter values without using friend class
 	 */
 	void paramReport(TimeAndDate time);

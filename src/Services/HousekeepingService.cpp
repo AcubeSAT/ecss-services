@@ -31,7 +31,7 @@ void HousekeepingService::createHousekeepingStructure(Message& message) {
 		if (numParamIDs > MAX_PARAMS) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ExceedMaxNumParam);
 		} else {
-			for (int i = 0; i < numParamIDs; i++) {
+			for (uint16_t i = 0; i < numParamIDs; i++) {
 				reportStruct.paramId.push_back(message.readUint16()); // collect the param IDs
 			}
 
@@ -48,6 +48,16 @@ void HousekeepingService::deleteHousekeepingStructure(Message& message) {
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
 	ErrorHandler::assertRequest(message.serviceType == 3, message,
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
+
+	uint8_t numId = message.readUint8(); // find the number of the structures that will be deleted
+	for (uint8_t i = 0; i < numId; i++) {
+		auto it = housekeepingStructureList.find(message.readUint8()); // find the ID
+		if (it != housekeepingStructureList.end()) {
+			housekeepingStructureList.erase(it); // delete the housekeeping structure
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::Unknownkey);
+		}
+	}
 }
 
 void HousekeepingService::enablePeriodParamReports(Message& message) {
@@ -58,6 +68,16 @@ void HousekeepingService::enablePeriodParamReports(Message& message) {
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
 	ErrorHandler::assertRequest(message.serviceType == 3, message,
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
+
+	uint8_t numId = message.readUint8(); // find the number of the structures that will be enabled
+	for (uint8_t i = 0; i < numId; i++) {
+		auto it = housekeepingStructureList.find(message.readUint8()); // find the ID
+		if (it != housekeepingStructureList.end()) {
+			it->second.periodicStatus = true; // enable the periodic generation of param reports
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::Unknownkey);
+		}
+	}
 }
 
 void HousekeepingService::disablePeriodParamReports(Message& message) {
@@ -68,6 +88,16 @@ void HousekeepingService::disablePeriodParamReports(Message& message) {
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
 	ErrorHandler::assertRequest(message.serviceType == 3, message,
 		ErrorHandler::ExecutionStartErrorType::UnexpectedMessage);
+
+	uint8_t numId = message.readUint8(); // find the number of the structures that will be disabled
+	for (uint8_t i = 0; i < numId; i++) {
+		auto it = housekeepingStructureList.find(message.readUint8()); // find the ID
+		if (it != housekeepingStructureList.end()) {
+			it->second.periodicStatus = false; // disable the periodic generation of param reports
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::Unknownkey);
+		}
+	}
 }
 
 void HousekeepingService::paramReport(TimeAndDate time) {
@@ -76,13 +106,12 @@ void HousekeepingService::paramReport(TimeAndDate time) {
 
 	for (auto it = housekeepingStructureList.begin(); it != housekeepingStructureList.end(); it++) {
 		uint32_t diffTime = currSeconds - it->second.timestamp; // time diff between current and last time called
-		it->second.periodicStatus = true; // enable just for now
 		if ((diffTime >= it->second.collectInterval) && it->second.periodicStatus && oneMessage) { // find the
 			// structure with the appropriate interval
 			oneMessage = false;
 			it->second.timestamp = currSeconds; // update the timestamp
-			Message report = createTM(25); // create TM[3.25]
 
+			Message report = createTM(25); // create TM[3.25]
 			report.appendByte(it->first); // append housekeeping structure ID
 
 			for (auto i : it->second.paramId) {
