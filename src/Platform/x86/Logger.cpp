@@ -61,8 +61,8 @@ void Logger::log(Logger::LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE> & messa
 
 // Reimplementation of the log function for C++ strings
 // This is kept in the Platform files, since we don't want to mess with std::strings in the microcontroller
-Logger::LogEntry& operator<<(Logger::LogEntry& entry, const std::string & value) {
-	entry.message.append(value.c_str());
+Logger::LogEntry& Logger::LogEntry::operator<<(const std::string & value) {
+	message.append(value.c_str());
 
-	return entry;
+	return *this;
 }
