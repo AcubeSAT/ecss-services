@@ -29,7 +29,7 @@ bool ParameterService::addNewParameter(uint16_t id, Parameter param, const char*
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
-	etl::vector<std::pair<uint16_t, ValueType>, MAX_PARAMS> validParams;
+	etl::vector<std::pair<uint16_t, ValueType>, ECSS_ST_20_MAX_PARAMETERS> validParams;
 	Message reqParam(20, 2, Message::TM, 1);
 	// empty TM[20, 2] parameter report message
 

@@ -1,14 +1,12 @@
 #ifndef ECSS_SERVICES_PARAMETERSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
+#include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
 #include "etl/map.h"
 #include "etl/vector.h"
-
-// Number of stored parameters. MAX_PARAMS is just a dummy number for now.
-#define MAX_PARAMS 5
 
 /**
  * Implementation of the ST[20] parameter management service,
@@ -29,7 +27,7 @@
 
 class ParameterService : public Service {
 private:
-	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
+	etl::map<ParamId, Parameter, ECSS_ST_20_MAX_PARAMETERS> paramsList;
 
 public:
 	/**
