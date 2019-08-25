@@ -53,4 +53,6 @@
 #define ECSS_MAX_DELTA_OF_RELEASE_TIME 60
 // release time and the actual release time
 
+#define MAX_HOUSEKEEPING_STRUCTURES 64u
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

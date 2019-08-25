@@ -31,7 +31,7 @@ class HousekeepingService; // forward declaration
 
 class ParameterService : public Service {
 private:
-	etl::map<ParamId, Parameter, MAX_PARAMS> paramsList;
+	etl::map<ParamIdType, Parameter, MAX_PARAMS> paramsList;
 	friend class HousekeepingService;
 
 public:

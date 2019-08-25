@@ -22,7 +22,7 @@
  * @typedef UpdatePtr: pointer to a void function, with a single ValueType* argument (return address)
  * @typedef Flags: container for the binary flags
  */
-typedef uint16_t ParamId;
+typedef uint16_t ParamIdType;
 typedef uint32_t ValueType;
 typedef void(*UpdatePtr)(ValueType*);
 typedef etl::bitset<NUM_OF_FLAGS> Flags;

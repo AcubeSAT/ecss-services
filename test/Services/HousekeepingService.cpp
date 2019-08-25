@@ -28,11 +28,11 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	auto it = map.find(0);
 	CHECK(map.size() == 1);
 	CHECK(it->first == 0);
-	CHECK(it->second.collectInterval == 1);
+	CHECK(it->second.collectionInterval == 1);
 	CHECK(it->second.paramId.size() == 2);
 	CHECK(it->second.paramId[0] == 1);
 	CHECK(it->second.paramId[1] == 2);
-	CHECK_FALSE(it->second.periodicStatus);
+	CHECK_FALSE(it->second.isPeriodic);
 
 	Message request2(3, 1, Message::TC, 0);
 	request2.appendByte(1); // housekeeping ID = 1
@@ -49,19 +49,19 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	CHECK(map.find(1) != map.end());
 	CHECK(map.size() == 2);
 	CHECK(it->first == 0);
-	CHECK(it->second.collectInterval == 1);
+	CHECK(it->second.collectionInterval == 1);
 	CHECK(it->second.paramId.size() == 2);
 	CHECK(it->second.paramId[0] == 1);
 	CHECK(it->second.paramId[1] == 2);
-	CHECK_FALSE(it->second.periodicStatus);
+	CHECK_FALSE(it->second.isPeriodic);
 	it = map.find(1);
 	CHECK(it->first == 1);
-	CHECK(it->second.collectInterval == 2);
+	CHECK(it->second.collectionInterval == 2);
 	CHECK(it->second.paramId.size() == 3);
 	CHECK(it->second.paramId[0] == 3);
 	CHECK(it->second.paramId[1] == 4);
 	CHECK(it->second.paramId[2] == 5);
-	CHECK_FALSE(it->second.periodicStatus);
+	CHECK_FALSE(it->second.isPeriodic);
 
 	// now we have 2 housekeeping structures with IDs 0 and 1 and collection intervals 1 and 2 respectively
 
@@ -84,9 +84,9 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 
 	map = Tester::returnMap(housekeepingService);
 	it = map.find(1);
-	CHECK_FALSE(it->second.periodicStatus);
+	CHECK_FALSE(it->second.isPeriodic);
 	it = map.find(0);
-	CHECK_FALSE(it->second.periodicStatus);
+	CHECK_FALSE(it->second.isPeriodic);
 
 	// enable structures
 	Message enable = Message(3, 5, Message::TC, 0);
@@ -97,22 +97,21 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 
 	map = Tester::returnMap(housekeepingService);
 	it = map.find(1);
-	CHECK(it->second.periodicStatus);
+	CHECK(it->second.isPeriodic);
 	it = map.find(0);
-	CHECK(it->second.periodicStatus);
+	CHECK(it->second.isPeriodic);
 
 	TimeAndDate timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 10);
-	housekeepingService.paramReport(timeUtc); // should generate param report based on the structure with id 0
+	housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 
 	Message response = ServiceTests::get(0);
-	CHECK(ServiceTests::hasOneMessage());
 	CHECK(response.readUint8() == 0); // housekeeping ID
 	CHECK(response.readUint32() == 3); // value of paramID = 1
 	CHECK(response.readUint32() == 6); // value of paramID = 2
 
 	// same time
 
-	housekeepingService.paramReport(timeUtc); // should generate param report based on the structure with id 1
+	housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 
 	CHECK(ServiceTests::count() == 2);
 	response = ServiceTests::get(1);
@@ -130,20 +129,14 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 
 	map = Tester::returnMap(housekeepingService);
 	it = map.find(1);
-	CHECK_FALSE(it->second.periodicStatus);
+	CHECK_FALSE(it->second.isPeriodic);
 	it = map.find(0);
-	CHECK_FALSE(it->second.periodicStatus);
+	CHECK_FALSE(it->second.isPeriodic);
 
 	timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 20); // increment the time
-	housekeepingService.paramReport(timeUtc); // param reports should not be generated
-	housekeepingService.paramReport(timeUtc); // param reports should not be generated
+	housekeepingService.checkAndSendHousekeepingReports(timeUtc); // param reports should not be generated
 	CHECK(ServiceTests::count() == 2);
-
 	CHECK(map.size() == 2);
-	it = map.find(0);
-	CHECK(it->first == 0);
-	it = map.find(1);
-	CHECK(it->first == 1);
 
 	// enable structures
 	Message enableStruct = Message(3, 5, Message::TC, 0);
@@ -154,9 +147,9 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 
 	map = Tester::returnMap(housekeepingService);
 	it = map.find(1);
-	CHECK(it->second.periodicStatus);
+	CHECK(it->second.isPeriodic);
 	it = map.find(0);
-	CHECK(it->second.periodicStatus);
+	CHECK(it->second.isPeriodic);
 
 	// delete structure with id = 0
 	Message deleteStruct = Message(3, 3, Message::TC, 0);
@@ -165,8 +158,8 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	MessageParser::execute(deleteStruct);
 
 	timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 25);
-	housekeepingService.paramReport(timeUtc);
-	housekeepingService.paramReport(timeUtc);
+	housekeepingService.checkAndSendHousekeepingReports(timeUtc);
+	housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 
 	CHECK(ServiceTests::count() == 3);
 	response = ServiceTests::get(2);
@@ -211,7 +204,7 @@ TEST_CASE("TC[3,1] housekeeping structures", "[service][st03]") {
 		auto it = map.find(0);
 		CHECK(map.size() == 1);
 		CHECK(it->first == 0);
-		CHECK(it->second.collectInterval == 1);
+		CHECK(it->second.collectionInterval == 1);
 		CHECK(it->second.paramId.size() == 2);
 		CHECK(it->second.paramId[0] == 1);
 		CHECK(it->second.paramId[1] == 2);
@@ -221,7 +214,7 @@ TEST_CASE("TC[3,1] housekeeping structures", "[service][st03]") {
 		it = map.find(15);
 		CHECK(map.size() == 2);
 		CHECK(it->first == 15);
-		CHECK(it->second.collectInterval == 4);
+		CHECK(it->second.collectionInterval == 4);
 		CHECK(it->second.paramId.size() == 4);
 		CHECK(it->second.paramId[0] == 3);
 		CHECK(it->second.paramId[1] == 4);
@@ -233,7 +226,7 @@ TEST_CASE("TC[3,1] housekeeping structures", "[service][st03]") {
 		it = map.find(4);
 		CHECK(map.size() == 3);
 		CHECK(it->first == 4);
-		CHECK(it->second.collectInterval == 4);
+		CHECK(it->second.collectionInterval == 4);
 		CHECK(it->second.paramId.size() == 5);
 		CHECK(it->second.paramId[0] == 3);
 		CHECK(it->second.paramId[1] == 4);
@@ -267,51 +260,12 @@ TEST_CASE("TC[3,1] housekeeping structures", "[service][st03]") {
 		auto it = map.begin();
 		CHECK(map.size() == 1);
 		CHECK(it->first == 1);
-		CHECK(it->second.collectInterval == 1);
+		CHECK(it->second.collectionInterval == 1);
 		CHECK(it->second.paramId.size() == 2);
 		CHECK(it->second.paramId[0] == 1);
 		CHECK(it->second.paramId[1] == 2);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::thrownError(ErrorHandler::UsedHousekeepingStructureId));
-	}
-
-	SECTION("More param IDs than the defined maximum") {
-		Services.reset();
-
-		Message request1(3, 1, Message::TC, 0);
-		request1.appendByte(0); // housekeeping ID = 0
-		request1.appendWord(1); // collection interval = 1
-		request1.appendByte(6); // number of param IDs = 6
-
-		MessageParser::execute(request1);
-		auto map = Tester::returnMap(housekeepingService);
-		CHECK(map.size() == 0);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExceedMaxNumParam));
-	}
-
-
-	SECTION("Housekeeping structures map is full") {
-		Services.reset();
-
-		Message request1(3, 1, Message::TC, 0);
-		request1.appendByte(0); // housekeeping ID = 0
-
-		Message request2(3, 1, Message::TC, 0);
-		request2.appendByte(1); // housekeeping ID = 1
-
-		Message request3(3, 1, Message::TC, 0);
-		request3.appendByte(2); // housekeeping ID = 2
-
-		Message request4(3, 1, Message::TC, 0);
-		request4.appendByte(3); // housekeeping ID = 3
-
-		MessageParser::execute(request1);
-		MessageParser::execute(request2);
-		MessageParser::execute(request3);
-		MessageParser::execute(request4);
-		auto map = Tester::returnMap(housekeepingService);
-		CHECK(ServiceTests::thrownError(ErrorHandler::HousekeepingMapFull));
-		CHECK(map.size() == 3);
 	}
 }
 
@@ -352,7 +306,7 @@ TEST_CASE("TC[3,3] delete housekeeping structures", "[service][st03]") {
 		CHECK(map.size() == 0);
 	}
 
-	SECTION("Try to delete an unexisting structure") {
+	SECTION("Try to delete an non-existent structure") {
 		Services.reset();
 
 		// create a structure
@@ -414,14 +368,14 @@ TEST_CASE("TC[3, 5] enable periodic generation of housekeeping structures", "[se
 
 		auto map = Tester::returnMap(housekeepingService);
 		auto it = map.find(5);
-		CHECK(it->second.periodicStatus);
+		CHECK(it->second.isPeriodic);
 		it = map.find(2);
-		CHECK(it->second.periodicStatus);
+		CHECK(it->second.isPeriodic);
 		it = map.find(7);
-		CHECK(it->second.periodicStatus);
+		CHECK(it->second.isPeriodic);
 	}
 
-	SECTION("Enable unexisting housekeeping structures") {
+	SECTION("Enable non-existent housekeeping structures") {
 		Services.reset();
 
 		// create request to enable structure to an empty map
@@ -445,7 +399,7 @@ TEST_CASE("TC[3, 5] enable periodic generation of housekeeping structures", "[se
 		request1.appendHalfword(5); // paramID = 5
 		MessageParser::execute(request1);
 
-		// create request to enable structure with unexisting Id
+		// create request to enable structure with non-existent Id
 		Message request2 = Message(3, 5, Message::TC, 0);
 		request2.appendByte(1);
 		request2.appendByte(2);
@@ -495,11 +449,11 @@ TEST_CASE("TC[3, 6] disable periodic generation of housekeeping structures", "[s
 
 		auto map = Tester::returnMap(housekeepingService);
 		auto it = map.find(5);
-		CHECK(it->second.periodicStatus);
+		CHECK(it->second.isPeriodic);
 		it = map.find(2);
-		CHECK(it->second.periodicStatus);
+		CHECK(it->second.isPeriodic);
 		it = map.find(7);
-		CHECK(it->second.periodicStatus);
+		CHECK(it->second.isPeriodic);
 
 		// create request to disable structures
 		Message request4(3, 6, Message::TC, 0);
@@ -510,14 +464,14 @@ TEST_CASE("TC[3, 6] disable periodic generation of housekeeping structures", "[s
 
 		map = Tester::returnMap(housekeepingService);
 		it = map.find(5);
-		CHECK_FALSE(it->second.periodicStatus);
+		CHECK_FALSE(it->second.isPeriodic);
 		it = map.find(2);
-		CHECK_FALSE(it->second.periodicStatus);
+		CHECK_FALSE(it->second.isPeriodic);
 		it = map.find(7);
-		CHECK(it->second.periodicStatus);
+		CHECK(it->second.isPeriodic);
 	}
 
-	SECTION("Enable unexisting housekeeping structures") {
+	SECTION("Enable non-existent housekeeping structures") {
 		Services.reset();
 
 		// create request to enable structure to an empty map
@@ -541,7 +495,7 @@ TEST_CASE("TC[3, 6] disable periodic generation of housekeeping structures", "[s
 		request1.appendHalfword(5); // paramID = 5
 		MessageParser::execute(request1);
 
-		// create request to enable structure with unexisting Id
+		// create request to enable structure with non-existent Id
 		Message request2 = Message(3, 5, Message::TC, 0);
 		request2.appendByte(1);
 		request2.appendByte(2);
@@ -585,7 +539,7 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		MessageParser::execute(enable);
 
 		TimeAndDate timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 10);
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 
 		CHECK(ServiceTests::count() == 1);
 		Message response = ServiceTests::get(0);
@@ -598,11 +552,11 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 15);
 
 		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 12); // nothing should happen
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 1); // the count of messages should be the same
 
 		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 14);
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 2);
 
 		response = ServiceTests::get(1);
@@ -613,6 +567,49 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 9);
 		CHECK(response.readUint32() == 12);
 		CHECK(response.readUint32() == 15);
+	}
+
+	SECTION("Request to fetch the value of a parameter  that doesn't exist") {
+		Services.reset();
+		ServiceTests::reset();
+
+		// create structure
+		Message request(3, 1, Message::TC, 0);
+		request.appendByte(4); // housekeeping ID = 4
+		request.appendWord(4); // collection interval = 4
+		request.appendByte(2); // number of param IDs = 5
+		request.appendHalfword(3); // paramID = 3
+		request.appendHalfword(38); // paramID doesn't exist
+		MessageParser::execute(request);
+
+		// Add parameters
+		Parameter param0 = Parameter(1, 2, 3);
+		Parameter param1 = Parameter(4, 5, 6);
+		Parameter param2 = Parameter(7, 8, 9);
+		Parameter param3 = Parameter(10, 11, 12);
+		Parameter param4 = Parameter(13, 14, 15);
+
+		paramService.addNewParameter(3, param0); // paramID = 3, value = 3
+		paramService.addNewParameter(4, param1); // paramID = 4, value = 6
+		paramService.addNewParameter(5, param2); // paramID = 5, value = 9
+		paramService.addNewParameter(6, param3); // paramID = 6, value = 12
+		paramService.addNewParameter(7, param4); // paramID = 7, value = 15
+
+		// enable structures
+		Message enable = Message(3, 5, Message::TC, 0);
+		enable.appendByte(1);
+		enable.appendByte(4);
+		MessageParser::execute(enable);
+
+		TimeAndDate timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 10);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
+
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::Unknownkey));
+		Message response = ServiceTests::get(1);
+		CHECK(response.readUint8() == 4); // housekeeping ID
+		// check param values
+		CHECK(response.readUint32() == 3);
 	}
 
 	SECTION("Generation of param report using multiple housekeeping IDs") {
@@ -668,11 +665,12 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		MessageParser::execute(enable);
 
 		TimeAndDate timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 10);
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 
-		// keep time the same and call the paramReports. All structures IDs should be used because its their first time
+		// keep time the same and call the checkAndSendHousekeepingReports. All structures IDs should be used because
+		// its their first time
 
-		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::count() == 3);
 		Message response = ServiceTests::get(0);
 		CHECK(response.readUint8() == 4); // housekeeping ID
 		// check param values
@@ -682,8 +680,8 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 12);
 		CHECK(response.readUint32() == 15);
 
-		housekeepingService.paramReport(timeUtc);
-		CHECK(ServiceTests::count() == 2);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
+		CHECK(ServiceTests::count() == 3);
 		response = ServiceTests::get(1);
 		CHECK(response.readUint8() == 5); // housekeeping ID
 		// check param values
@@ -691,7 +689,7 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 6);
 		CHECK(response.readUint32() == 9);
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 3);
 		response = ServiceTests::get(2);
 		CHECK(response.readUint8() == 15); // housekeeping ID
@@ -700,14 +698,14 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 
 		// should do nothing because the time is the same
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 3);
 
-		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 11); // add 1 second
+		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 11); // add 1 second since the initial time
 
 		// only the param report of the housekeeping structure with collection interval 1 should be generated
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 4);
 		response = ServiceTests::get(3);
 		CHECK(response.readUint8() == 5); // housekeeping ID
@@ -716,14 +714,14 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 6);
 		CHECK(response.readUint32() == 9);
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 4);
 
-		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 13); // add 3 seconds from the first time the paramReport is called
+		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 13); // add 3 seconds since the initial time
 
 		// the param reports of the housekeeping structures with collection interval 1 and 3 should be generated
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		response = ServiceTests::get(4);
 		CHECK(response.readUint8() == 5); // housekeeping ID
 		// check param values
@@ -731,17 +729,17 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 6);
 		CHECK(response.readUint32() == 9);
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		response = ServiceTests::get(5);
 		CHECK(response.readUint8() == 15); // housekeeping ID
 		// check param values
 		CHECK(response.readUint32() == 3);
 
-		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 16); // add 6 seconds from the first time the paramReport is called
+		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 16); // add 6 seconds since the initial time
 
 		// the param reports of all the housekeeping structure should be generated
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		response = ServiceTests::get(6);
 		CHECK(response.readUint8() == 4); // housekeeping ID
 		// check param values
@@ -751,7 +749,7 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 12);
 		CHECK(response.readUint32() == 15);
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		response = ServiceTests::get(7);
 		CHECK(response.readUint8() == 5); // housekeeping ID
 		// check param values
@@ -759,7 +757,7 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		CHECK(response.readUint32() == 6);
 		CHECK(response.readUint32() == 9);
 
-		housekeepingService.paramReport(timeUtc);
+		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 9);
 		response = ServiceTests::get(8);
 		CHECK(response.readUint8() == 15); // housekeeping ID

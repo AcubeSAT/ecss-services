@@ -8,52 +8,55 @@
 #include <etl/map.h>
 #include "Services/ParameterService.hpp"
 
-#define MAX_HOUSEKEEPING_STRUCTURES 3u
-
-struct Tester; // only for testing in order to access the private members of the class Housekeeping
+/**
+ * A struct created only for testing in order to access the private members of the class Housekeeping
+ *
+ * @todo Remove it when the time comes
+ */
+struct Tester;
 
 /**
  * Implementation of ST[03] housekeeping
  *
- * @details The main purpose of this report is to create housekeeping structures, that each one of those will contain a
- * group of some parameter IDs and to report periodically the values of these requested params. How frequent these
- * reports will be generated, depends on the 1) time required to call the function that is responsible to generate
- * reports and the 2) collection interval. The collection interval is the time interval for sampling parameters. The
- * time required to call the corresponding function to generate parameter reports (TM[3,25]) should be <= the minimum
- * collection interval
+ * @details The main purpose of this service is to create housekeeping structures, each one of which contain a group
+ * of some parameter IDs. The values of these requested params will be reported periodically. The frequency of the
+ * generation of these reports depends on:
+ * 1. The time required to call the function that is responsible to generate reports
+ * 2  The collection interval, which is the time interval for sampling parameters. The time required to call the
+ * corresponding function to generate parameter reports (TM[3,25]) should be <= the minimum collection interval
  * @note The current implementation includes a part of the housekeeping subservice
+ * @todo Do we need more than 1 byte for the number of the housekeeping structures?
  */
 class HousekeepingService : public Service {
 private:
-	typedef uint8_t HousekeepingId; // @todo do we need more than 1 byte
+	typedef uint8_t HousekeepingIdType;
 
 	/**
 	 * A struct that resembles the housekeeping structures
 	 *
-	 * @var collectionInterval The time interval for sampling the parameters in seconds
-	 * @var periodicStatus Indicates if the periodic generation of parameter reports is enabled or disabled. The
+	 * @property collectionInterval The time interval for sampling the parameters
+	 * @property isPeriodic Indicates if the periodic generation of parameter reports is enabled or disabled. The
 	 * default value should be disabled
-	 * @var paramId A container to store the requested param IDs
-	 * @var timestamp The last time a structure is used for its paramIDs by the TM[3,25]. We use this timestamp to
-	 * define If the required time have passed to reuse it
-	 * @note We assume that the time unit for the Real Time Clock is seconds. So the \p collection intervals should be
-	 * integer multiple of seconds
-	 * @note The \p collection interval should be >= the sample interval. The sample interval is the time required to
-	 * update the values of the parameters
+	 * @property paramId A container to store the requested param IDs
+	 * @property timestamp The last time a structure is used for its paramIDs by the TM[3,25]. We use this timestamp to
+	 * define If the required time has passed to reuse it
+	 * @note The \p collectionInterval should be integer multiple of the time unit of the Real Time Clock
+	 * @note The \p collectionInterval should be expressed as units of the minimum sampling interval, refer to
+	 * requirement 5.4.3.2c.
 	 */
 	struct HousekeepingReportStructure {
-		uint16_t collectInterval = 0;
-		bool periodicStatus = false; //
-		etl::vector<ParamId, MAX_PARAMS> paramId;
+		uint16_t collectionInterval = 0;
+		bool isPeriodic = false;
+		etl::vector<ParamIdType, MAX_PARAMS> paramId;
 		uint32_t timestamp = 0;
 	};
 
-	etl::map<HousekeepingId, HousekeepingReportStructure, MAX_HOUSEKEEPING_STRUCTURES> housekeepingStructureList;
+	etl::map<HousekeepingIdType, HousekeepingReportStructure, MAX_HOUSEKEEPING_STRUCTURES> housekeepingStructureList;
 
 	friend struct Tester;
 public:
 	/**
-	 * Define the number of the service
+	 * Define the type of the service
 	 */
 	HousekeepingService();
 
@@ -68,7 +71,6 @@ public:
 	 * @note When creating a housekeeping structure the periodic generation should be disabled, as the standard claims
 	 * @param message The TC[3,1] request
 	 * @todo Should we be able to update an already assigned housekeeping structure?
-	 * @todo Should the requested paramIDs be ordered in a specific way?
 	 */
 	void createHousekeepingStructure(Message& message);
 
@@ -84,36 +86,38 @@ public:
 	 *
 	 * @param message The TC[3,5] request
 	 */
-	void enablePeriodParamReports(Message& message);
+	void enablePeriodicParamReports(Message& message);
 
 	/**
 	 * TC[3,6] disable the periodic generation of housekeeping parameter reports
 	 *
 	 * @param message The TC[3,6] request
 	 */
-	void disablePeriodParamReports(Message& message);
+	void disablePeriodicParamReports(Message& message);
 
 	/**
 	 * TM[3,25] housekeeping parameter report
 	 *
-	 * @details This function is the essence of the ST[03] service. It creates a telemetry message that contains the
-	 * values of the requested param IDs that are configured on the existing enabled housekeeping structure IDs
-	 * @note In order to generate a TM, at least one structure should exist and at least one should be enabled. So,
-	 * the action order is 1) create structure, 2) enable some of them and 3) call this function to generate reports
-	 * based on the collection interval of the enabled structures and the current time
+	 * @details This function is the essence of the ST[03] service. It creates multiple telemetry messages that contain
+	 * the values of the requested param IDs that are configured on the existing enabled housekeeping structure IDs.
+	 * Also, it is supposed to be called periodically to fetch the parameters values in different time moments
+	 * @note In order to generate a TM, at least one structure should be enabled. So, the action order is 1) create
+	 * structure, 2) enable some of them and 3) call this function to generate reports based on the collection
+	 * interval of the enabled structures and the current time
 	 * @note The values of the parameters that will be sent are ordered by the way that have been ordered in the
 	 * housekeeping structure when it was created.
 	 * @param time A preliminary dummy value. It should be fetched from the Real Time Clock (UTC)
 	 * @todo Update parameterService in order to have access to parameter values without using friend class
+	 * @todo Parameters values aren't a fixed size, so they should be handled accordingly
 	 */
-	void paramReport(TimeAndDate time);
+	void checkAndSendHousekeepingReports(TimeAndDate time);
 
 	/**
-	 * It is responsible to call the suitable function that execute the proper subservice. The
-	 * way that the subservices are selected is for the time being based on the messageType(class
-	 * member of class Message) of the param message
+	 * It is responsible to call the suitable function that executes a telecommand contained in a packet. The source of
+	 * that packet is the ground station.
 	 *
-	 * @todo Error handling for the switch() in the implementation of this execute function
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
 };
