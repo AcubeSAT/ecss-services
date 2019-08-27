@@ -120,7 +120,7 @@ void EventReportService::listOfDisabledEventsReport() {
 
 	uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
 	report.appendHalfword(numberOfDisabledEvents);
-	for (uint16_t i = 0; i < stateOfEvents.size(); i++) {
+	for (size_t i = 0; i < stateOfEvents.size(); i++) {
 		if (not stateOfEvents[i]) {
 			report.appendEnum16(i);
 		}

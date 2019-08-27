@@ -4,7 +4,7 @@ Checks:          >
   clang-analyzer-*,
   bugprone-*,
   cert-*,
-  cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-bounds-constant-array-index,
+  cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-avoid-c-arrays,
   misc-*,-misc-non-private-member-variables-in-classes,
   fuchsia-multiple-inheritance,
   google-*,-google-readability-todo,
@@ -17,7 +17,7 @@ Checks:          >
   misc-*,
   -misc-non-private-member-variables-in-classes,
   performance-*,
-  readability-*,
+  readability-*,-readability-magic-numbers,
   zircon-*
 WarningsAsErrors: '*,-misc-unused-parameters,-llvm-header-guard,-cppcoreguidelines-pro-type-member-init,-google-runtime-references,-clang-diagnostic-tautological-constant-out-of-range-compare,-readability-redundant-declaration,-modernize-use-equals-default,-fuchsia-statically-constructed-objects,-hicpp-signed-bitwise,-cert-err58-cpp,-clang-diagnostic-error,-misc-noexcept-move-constructor'
 HeaderFilterRegex: 'ecss-services\/((?!lib\/).)*$'
