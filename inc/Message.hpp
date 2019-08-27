@@ -34,23 +34,40 @@ public:
 	 * @brief Overload the equality operator to compare messages
 	 * @details Compare two @ref ::Message objects, based on their contents and type
 	 * @param The message content to compare against
-	 * @todo Activate the dataSize check when the Message object data field is defined with a
-	 * fixed size
 	 * @return The result of comparison
 	 */
 	bool operator==(const Message& msg) const {
-		// todo: Enable the following check when the message data field has a fixed size padded
-		//  with zeros. At the moment the data array is not padded with zeros to fulfil the
-		//  maximum set number of a TC request message.
-		// if (this->dataSize != msg.dataSize) return false;
-
-		for (uint16_t i = 0; i < ECSS_MAX_MESSAGE_SIZE; i++) {
-			if (this->data[i] != msg.data[i]) {
-				return false;
-			}
+		if (dataSize != msg.dataSize) {
+			return false;
 		}
-		return (this->packetType == msg.packetType) && (this->messageType == msg.messageType) &&
-		       (this->serviceType == msg.serviceType);
+
+		if (not isSameType(*this, msg)) {
+			return false;
+		}
+
+		return std::equal(data, data + dataSize, msg.data);
+	}
+
+	/**
+	 * Checks the first \ref Message::dataSize bytes of \p msg for equality
+	 *
+	 * This performs an equality check for the first `[0, this->dataSize)` bytes of two messages. Useful to compare
+	 * two messages that have the same content, but one of which does not know its length.
+	 *
+	 * @param msg The message to check. Its `dataSize` must be smaller than the object calling the function
+	 * @return False if the messages are not of the same type, if `msg.dataSize < this->dataSize`, or if the first
+	 * `this->dataSize` bytes are not equal between the two messages.
+	 */
+	bool bytesEqualWith(const Message& msg) const {
+		if (msg.dataSize < dataSize) {
+			return false;
+		}
+
+		if (not isSameType(*this, msg)) {
+			return false;
+		}
+
+		return std::equal(data, data + dataSize, msg.data);
 	}
 
 	enum PacketType {
@@ -84,7 +101,9 @@ public:
 	// Pointer to the contents of the message (excluding the PUS header)
 	// We allocate this data statically, in order to make sure there is predictability in the
 	// handling and storage of messages
-	// TODO: Is it a good idea to not initialise this to 0?
+	//
+	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
+	// Message::appendBits() relies on this in order to easily OR the requested bits.
 	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = { 0 };
 
 	// private:

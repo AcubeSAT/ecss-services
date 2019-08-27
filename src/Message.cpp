@@ -39,7 +39,6 @@ void Message::finalize() {
 	// Define the spare field in telemetry and telecommand user data field (7.4.3.2.c and 7.4.4.2.c)
 	if (currentBit != 0) {
 		currentBit = 0;
-		data[dataSize] = 0; // Make sure that the last byte is zero
 		dataSize++;
 	}
 

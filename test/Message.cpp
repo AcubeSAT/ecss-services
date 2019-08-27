@@ -178,17 +178,19 @@ TEST_CASE("Spare field", "[message]") {
 
 	message1.appendByte(1);
 	message1.appendHalfword(2);
-	message1.appendBits(1, 5);
+	message1.appendBits(1, 1);
 	message1.finalize();
 
+	CHECK(message1.data[3] == 0b10000000);
 	CHECK(message1.dataSize == 4);
 
 	Message message2(0, 0, Message::TM, 0);
 	message2.appendByte(1);
 	message2.appendHalfword(2);
-	message2.appendBits(2, 5);
+	message2.appendBits(2, 3);
 	message2.finalize();
 
+	CHECK(message2.data[3] == 0b11000000);
 	CHECK(message2.dataSize == 4);
 
 	Message message3(0, 0, Message::TM, 0);
@@ -198,6 +200,7 @@ TEST_CASE("Spare field", "[message]") {
 	message3.appendBits(3, 5);
 	message3.finalize();
 
+	CHECK(message3.data[3] == 0b10100000);
 	CHECK(message3.dataSize == 4);
 
 	Message message4(0, 0, Message::TM, 0);
@@ -207,6 +210,7 @@ TEST_CASE("Spare field", "[message]") {
 	message4.appendBits(4, 5);
 	message4.finalize();
 
+	CHECK(message4.data[3] == 0b01010000);
 	CHECK(message4.dataSize == 4);
 
 	Message message5(0, 0, Message::TM, 0);
@@ -216,6 +220,7 @@ TEST_CASE("Spare field", "[message]") {
 	message5.appendBits(5, 5);
 	message5.finalize();
 
+	CHECK(message5.data[3] == 0b00101000);
 	CHECK(message5.dataSize == 4);
 
 	Message message6(0, 0, Message::TM, 0);
@@ -225,6 +230,7 @@ TEST_CASE("Spare field", "[message]") {
 	message6.appendBits(6, 5);
 	message6.finalize();
 
+	CHECK(message6.data[3] == 0b00010100);
 	CHECK(message6.dataSize == 4);
 
 	Message message7(0, 0, Message::TM, 0);
@@ -234,6 +240,7 @@ TEST_CASE("Spare field", "[message]") {
 	message7.appendBits(7, 5);
 	message7.finalize();
 
+	CHECK(message7.data[3] == 0b00001010);
 	CHECK(message7.dataSize == 4);
 
 	Message message8(0, 0, Message::TM, 0);
@@ -243,6 +250,7 @@ TEST_CASE("Spare field", "[message]") {
 	message8.appendBits(8, 5);
 	message8.finalize();
 
+	CHECK(message8.data[3] == 0b00000101);
 	CHECK(message8.dataSize == 4);
 
 	Message message9(0, 0, Message::TM, 0);

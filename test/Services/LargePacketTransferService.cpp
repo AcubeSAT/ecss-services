@@ -86,5 +86,6 @@ TEST_CASE("Split function", "[no][service]") {
 			message5.appendUint8(ServiceTests::get(i).readUint8());
 		}
 	}
-	CHECK(message == message5);
+
+	CHECK(message.bytesEqualWith(message5));
 }
