@@ -58,6 +58,7 @@ public:
 	 * Each severity is tied to a number. The higher the number, the higher the severity.
 	 */
 	enum LogLevel : LogLevelType {
+		disabled = 0, ///< Use this log level to disable logging entirely. No message should be logged as disabled.
 		trace = 32, ///< Very detailed information, useful for tracking the individual steps of an operation
 		debug = 64, ///< General debugging information
 		info = 96, ///< Noteworthy or periodical events
@@ -65,7 +66,6 @@ public:
 		warning = 160, ///< Unexpected events that do not compromise the operability of a function
 		error = 192, ///< Unexpected failure of an operation
 		emergency = 254, ///< Unexpected failure that renders the entire system unusable
-		disabled = 255, ///< Use this log level to disable logging entirely. No message should be logged as disabled.
 	};
 
 	/**
@@ -110,13 +110,13 @@ public:
 		 * @return The current Logger::LogEntry where the value has been appended
 		 */
 		template <class T>
-		Logger::LogEntry& operator<<(const T value) {
+		Logger::LogEntry& operator<<(const T value) noexcept {
 			etl::to_string(value, message, format, true);
 
 			return *this;
 		}
 
-		Logger::LogEntry& operator<<(const std::string& value);
+		Logger::LogEntry& operator<<(const std::string& value) noexcept;
 	};
 
 	/**
