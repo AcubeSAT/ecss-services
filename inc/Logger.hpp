@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <etl/String.hpp>
 #include <etl/to_string.h>
-#include <ECSS_Definitions.hpp>
+#include "ECSS_Definitions.hpp"
 
 #if defined LOGLEVEL_TRACE
 #define LOGLEVEL Logger::trace // Ignore-MISRA
@@ -20,7 +20,7 @@
 #define LOGLEVEL Logger::error // Ignore-MISRA
 #elif defined LOGLEVEL_EMERGENCY
 #define LOGLEVEL Logger::emergency // Ignore-MISRA
-#else
+#elif !defined LOGLEVEL
 #define LOGLEVEL Logger::disabled // Ignore-MISRA
 #endif
 
@@ -52,13 +52,17 @@ public:
 	typedef uint8_t LogLevelType;
 
 	/**
+	 * ETL's string format specification, to be used for all logged messages
+	 */
+	static etl::format_spec format;
+
+	/**
 	 * Log levels supported by the logger. Each level represents a different severity of the logged Message,
 	 * and messages of lower severities can be filtered on top of more significant ones.
 	 *
 	 * Each severity is tied to a number. The higher the number, the higher the severity.
 	 */
 	enum LogLevel : LogLevelType {
-		disabled = 0, ///< Use this log level to disable logging entirely. No message should be logged as disabled.
 		trace = 32, ///< Very detailed information, useful for tracking the individual steps of an operation
 		debug = 64, ///< General debugging information
 		info = 96, ///< Noteworthy or periodical events
@@ -66,6 +70,7 @@ public:
 		warning = 160, ///< Unexpected events that do not compromise the operability of a function
 		error = 192, ///< Unexpected failure of an operation
 		emergency = 254, ///< Unexpected failure that renders the entire system unusable
+		disabled = 255, ///< Use this log level to disable logging entirely. No message should be logged as disabled.
 	};
 
 	/**
@@ -84,7 +89,6 @@ public:
 	 */
 	struct LogEntry {
 		String<LOGGER_MAX_MESSAGE_SIZE> message = ""; ///< The current log message itself, starting from a blank slate
-		etl::format_spec format; ///< ETL's string format specification
 		LogLevel level; ///< The log level of this message
 
 		explicit LogEntry(LogLevel level); ///< Create a new LogEntry
@@ -131,7 +135,7 @@ public:
 	/**
 	 * Store a new log message
 	 */
-	static void log(LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE>& message);
+	static void log(LogLevel level, etl::istring & message);
 };
 
 /**
@@ -190,7 +194,7 @@ public:
  * message will not be logged. This is determined at compile-time.
  */
 template <Logger::LogLevel level>
-constexpr inline auto LOG() {
+constexpr __attribute__((always_inline)) inline auto LOG() {
 	if constexpr (Logger::isLogged(level)) {
 		return Logger::LogEntry(level);
 	} else {

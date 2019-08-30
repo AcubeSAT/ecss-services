@@ -7,7 +7,7 @@
 #include <iomanip>
 
 // The implementation of this function appends ANSI codes that should add colours to a compatible terminal
-void Logger::log(Logger::LogLevel level, String<LOGGER_MAX_MESSAGE_SIZE> & message) {
+void Logger::log(Logger::LogLevel level, etl::istring & message) {
 	// Get the current time & date
 	std::time_t t = std::time(nullptr);
 	std::tm tm = *std::localtime(&t);
