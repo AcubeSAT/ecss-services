@@ -23,8 +23,7 @@
  * @typedef Flags: container for the binary flags
  */
 typedef uint16_t ParamId;
-typedef uint32_t ValueType;
-typedef void(*UpdatePtr)(ValueType*);
+//typedef etl::variant<bool, uint8_t, int32_t, float> ValueType;
 typedef etl::bitset<NUM_OF_FLAGS> Flags;
 
 /**
@@ -55,17 +54,17 @@ typedef etl::bitset<NUM_OF_FLAGS> Flags;
  * @public getCurrentValue(): Gets the current value of the parameter
  * @public getPTC(), getPFC(): Returns the PFC and PTC of the parameter
  */
-class Parameter {
+template <typename ValueType> class Parameter {
 	uint8_t ptc;
 	uint8_t pfc;
-	UpdatePtr ptr;
+	void(*ptr)(ValueType*);
 	Flags flags;
 	ValueType currentValue = 0;
 
 	public:
-		Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr);
+		Parameter<ValueType>(uint8_t newPtc, uint8_t newPfc, const ValueType& initialValue, void(*newPtr)(ValueType*));
 
-		void setCurrentValue(ValueType newVal);
+		void setCurrentValue(const ValueType& newVal);
 		void setFlags(const char* flags);
 
 		ValueType getCurrentValue();

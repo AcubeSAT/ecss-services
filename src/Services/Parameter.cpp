@@ -1,6 +1,7 @@
 #include "Services/Parameter.hpp"
 
-Parameter::Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue, UpdatePtr newPtr) {
+template <typename ValueType>
+Parameter<ValueType>::Parameter(uint8_t newPtc, uint8_t newPfc, const ValueType& initialValue, void(*newPtr)(ValueType*)) {
 	ptc = newPtc;
 	pfc = newPfc;
 	ptr = newPtr;
@@ -15,25 +16,30 @@ Parameter::Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue, Upd
 	}
 }
 
-void Parameter::setCurrentValue(ValueType newVal) {
+template <typename ValueType>
+void Parameter<ValueType>::setCurrentValue(const ValueType& newVal) {
 	// set the value only if the parameter can be updated manually
 	if (flags[1]) {
 		currentValue = newVal;
 	}
 }
 
-ValueType Parameter::getCurrentValue() {
+template <typename ValueType>
+ValueType Parameter<ValueType>::getCurrentValue() {
 	return currentValue;
 }
-
-uint8_t Parameter::getPTC() {
+template <typename ValueType>
+uint8_t Parameter<ValueType>::getPTC() {
 	return ptc;
 }
 
-uint8_t Parameter::getPFC() {
+template <typename ValueType>
+uint8_t Parameter<ValueType>::getPFC() {
 	return pfc;
 }
 
-void Parameter::setFlags(const char* flags) {
+template <typename ValueType>
+void Parameter<ValueType>::setFlags(const char* flags) {
 	this->flags = Flags(flags);
 }
+
