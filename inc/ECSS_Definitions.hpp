@@ -53,4 +53,8 @@
 #define ECSS_MAX_DELTA_OF_RELEASE_TIME 60
 // release time and the actual release time
 
+/**
+ * @brief Size of the map holding the Parameter objects for the ST[20] parameter service
+ */
+#define ECSS_ST_20_MAX_PARAMETERS 5
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

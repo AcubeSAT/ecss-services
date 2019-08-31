@@ -71,6 +71,6 @@ TEST_CASE("ST[08] - Insert Tests") {
 			name += std::to_string(i); // different names to fill up the map
 			fms.include(String<FUNC_NAME_LENGTH>(name.c_str()), &test);
 		}
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::FunctionMapFull));
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
 	}
 }
