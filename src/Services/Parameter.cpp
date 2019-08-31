@@ -1,10 +1,13 @@
 #include "Services/Parameter.hpp"
 
-Parameter::Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue, UpdatePtr newPtr) {
+template <typename ValueType>
+Parameter<ValueType>::Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue, void (*
+newPtr)(ValueType*)) {
 	ptc = newPtc;
 	pfc = newPfc;
 	ptr = newPtr;
-
+	sizeInBytes = sizeof(initialValue);
+	valuePtr = static_cast<void *>(&currentValue);
 	// see Parameter.hpp for explanation on flags
 	// by default: no update priority, manual and automatic update available
 
@@ -15,25 +18,28 @@ Parameter::Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue, Upd
 	}
 }
 
-void Parameter::setCurrentValue(ValueType newVal) {
+template <typename ValueType>
+void ParameterBase::setCurrentValue(ValueType newVal) {
 	// set the value only if the parameter can be updated manually
 	if (flags[1]) {
-		currentValue = newVal;
+		*reinterpret_cast<ValueType>(valuePtr) = newVal;
 	}
 }
 
-ValueType Parameter::getCurrentValue() {
-	return currentValue;
+template <typename ValueType>
+String<MAX_STRING_LENGTH> Parameter<ValueType>::getValueAsString() {
+	String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
+	return contents;
 }
 
-uint8_t Parameter::getPTC() {
+uint8_t ParameterBase::getPTC() {
 	return ptc;
 }
 
-uint8_t Parameter::getPFC() {
+uint8_t ParameterBase::getPFC() {
 	return pfc;
 }
 
-void Parameter::setFlags(const char* flags) {
+void ParameterBase::setFlags(const char* flags) {
 	this->flags = Flags(flags);
 }

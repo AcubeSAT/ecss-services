@@ -2,10 +2,12 @@
 #define ECSS_SERVICES_PARAMETER_HPP
 
 #include "etl/bitset.h"
+#include "etl/String.hpp"
 
 // Number of binary flags in every parameter. Final number TBD.
 #define NUM_OF_FLAGS 3
-
+// Maximum etl::string length in bytes
+#define MAX_STRING_LENGTH 5
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  * Fully compliant with the standards requirements, while adding some small,
@@ -23,8 +25,8 @@
  * @typedef Flags: container for the binary flags
  */
 typedef uint16_t ParamId;
-typedef uint32_t ValueType;
-typedef void(*UpdatePtr)(ValueType*);
+//typedef uint32_t ValueType;
+//#typedef ;
 typedef etl::bitset<NUM_OF_FLAGS> Flags;
 
 /**
@@ -55,24 +57,31 @@ typedef etl::bitset<NUM_OF_FLAGS> Flags;
  * @public getCurrentValue(): Gets the current value of the parameter
  * @public getPTC(), getPFC(): Returns the PFC and PTC of the parameter
  */
-class Parameter {
-	uint8_t ptc;
-	uint8_t pfc;
-	UpdatePtr ptr;
-	Flags flags;
-	ValueType currentValue = 0;
+
+class ParameterBase {
+	protected:
+		uint8_t ptc;
+		uint8_t pfc;
+		uint8_t sizeInBytes;
+		void* valuePtr;
+		Flags flags;
+	public:
+		uint8_t getPTC();
+		void setFlags(const char* flags);
+		uint8_t getPFC();
+		virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
+		template <typename ValueType> void setCurrentValue(ValueType newVal);
+};
+
+template <typename ValueType>
+class Parameter : public ParameterBase {
+	void(*ptr)(ValueType*);
+	ValueType currentValue;
 
 	public:
-		Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr);
-
-		void setCurrentValue(ValueType newVal);
-		void setFlags(const char* flags);
-
-		ValueType getCurrentValue();
-		uint8_t getPTC();
-
-		uint8_t getPFC();
-
+		Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0,  void(*newPtr)
+		(ValueType*) = nullptr);
+		String<MAX_STRING_LENGTH> getValueAsString() override;
 };
 
 
