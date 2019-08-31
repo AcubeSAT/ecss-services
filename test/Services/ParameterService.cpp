@@ -5,38 +5,34 @@
 
 ParameterService& pserv = Services.parameterManagement;
 
-void foo(ValueType* bar) {  // sample function
-	*bar = 0xDEADBEEF;
-}
-
 TEST_CASE("Parameter Service - General") {
 	SECTION("Addition to full map") {
 
-		Parameter param0 = Parameter(3, 14);
-		Parameter param1 = Parameter(1, 7, 12);
-		Parameter param2 = Parameter(4, 12, 3, nullptr);
-		Parameter param3 = Parameter(12, 3, 6, &foo);
-		Parameter param4 = Parameter(15, 7, 3, &foo);
+		Parameter<int> param0 = Parameter<int>(3, 14);
+		Parameter<int> param1 = Parameter<int>(1, 7, 12);
+		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
+		Parameter<int> param3 = Parameter<int>(12, 3, 6);
+		Parameter<int> param4 = Parameter<int>(15, 7, 3);
 
-		Parameter param5 = Parameter(15, 5, 4);
+		Parameter<int> param5 = Parameter<int>(15, 5, 4);
 
-		pserv.addNewParameter(0, param0);
-		pserv.addNewParameter(1, param1);
-		pserv.addNewParameter(2, param2);
-		pserv.addNewParameter(3, param3);
-		pserv.addNewParameter(4, param4);
+		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
+		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
+		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
+		pserv.addNewParameter(3, static_cast<ParameterBase*>(&param3));
+		pserv.addNewParameter(4, static_cast<ParameterBase*>(&param4));
 
-		pserv.addNewParameter(5, param5);  // addNewParameter should return false
+		pserv.addNewParameter(5, static_cast<ParameterBase*>(&param5));  // addNewParameter should return false
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
 		ServiceTests::reset();
 		Services.reset();  // reset all services
 	}
 
 	SECTION("Addition of already existing parameter") {
-		Parameter param0 = Parameter(1, 3);
-		pserv.addNewParameter(0, param0);
+		Parameter<int> param0 = Parameter<int>(1, 3);
+		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
 
-		pserv.addNewParameter(0, param0);
+		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::ExistingParameterId));
 		ServiceTests::reset();
 		Services.reset();
@@ -69,12 +65,12 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Faulty instruction handling") {
-		Parameter param0 = Parameter(3, 14);
-		Parameter param1 = Parameter(1, 7, 12);
-		Parameter param2 = Parameter(4, 12, 3, nullptr);
-		pserv.addNewParameter(0, param0);
-		pserv.addNewParameter(1, param1);
-		pserv.addNewParameter(2, param2);
+		Parameter<int> param0 = Parameter<int>(3, 14);
+		Parameter<int> param1 = Parameter<int>(1, 7, 12);
+		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
+		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
+		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
+		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
 
 		Message request(20, 1, Message::TC, 1);
 		request.appendUint16(2); // number of requested IDs
@@ -117,12 +113,12 @@ TEST_CASE("Parameter Report Subservice") {
 TEST_CASE("Parameter Setting Subservice") {
 
 	SECTION("Faulty Instruction Handling Test") {
-		Parameter param0 = Parameter(3, 14);
-		Parameter param1 = Parameter(1, 7, 12);
-		Parameter param2 = Parameter(4, 12, 3, nullptr);
-		pserv.addNewParameter(0, param0);
-		pserv.addNewParameter(1, param1);
-		pserv.addNewParameter(2, param2);
+		Parameter<int> param0 = Parameter<int>(3, 14);
+		Parameter<int> param1 = Parameter<int>(1, 7, 12);
+		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
+		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
+		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
+		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
 
 		Message setRequest(20, 3, Message::TC, 1);
 		setRequest.appendUint16(2); // total number of IDs
@@ -154,8 +150,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("Attempt to set parameter with no manual update availability") {
-		Parameter param1 = Parameter(1, 7, 12);
-		pserv.addNewParameter(1, param1, "100");
+		Parameter<int> param1 = Parameter<int>(1, 7, 12);
+		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1), "100");
 
 		Message setRequest = Message(20, 3, Message::TC, 1);
 		setRequest.appendUint16(1);

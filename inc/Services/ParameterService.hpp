@@ -27,7 +27,7 @@
 
 class ParameterService : public Service {
 private:
-	etl::map<ParamId, Parameter, ECSS_ST_20_MAX_PARAMETERS> paramsList;
+	etl::map<ParamId, ParameterBase*, ECSS_ST_20_MAX_PARAMETERS> paramsList;
 
 public:
 	/**
@@ -43,7 +43,7 @@ public:
 	 * @param param: the parameter field to be included
 	 * @param flags: the flags to be set for this field (see Parameter.hpp)
 	 */
-	void addNewParameter(uint16_t id, Parameter param, const char* flags = "110");
+	void addNewParameter(uint16_t id, ParameterBase* param, const char* flags = "110");
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
