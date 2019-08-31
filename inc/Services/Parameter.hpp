@@ -59,29 +59,57 @@ typedef etl::bitset<NUM_OF_FLAGS> Flags;
  */
 
 class ParameterBase {
-	protected:
-		uint8_t ptc;
-		uint8_t pfc;
-		uint8_t sizeInBytes;
-		void* valuePtr;
-		Flags flags;
-	public:
-		uint8_t getPTC();
-		void setFlags(const char* flags);
-		uint8_t getPFC();
-		virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
-		template <typename ValueType> void setCurrentValue(ValueType newVal);
+protected:
+	uint8_t ptc;
+	uint8_t pfc;
+	uint8_t sizeInBytes;
+	void* valuePtr;
+	Flags flags;
+public:
+	uint8_t getPTC();
+
+	void setFlags(const char* flags);
+
+	uint8_t getPFC();
+
+	virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
+
+	template <typename ValueType>
+	void setCurrentValue(ValueType newVal) {
+		// set the value only if the parameter can be updated manually
+		if (flags[1]) {
+			*reinterpret_cast<ValueType*>(valuePtr) = newVal;
+		}
+	}
 };
 
 template <typename ValueType>
 class Parameter : public ParameterBase {
-	void(*ptr)(ValueType*);
+	void (* ptr)(ValueType*);
+
 	ValueType currentValue;
 
-	public:
-		Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0,  void(*newPtr)
-		(ValueType*) = nullptr);
-		String<MAX_STRING_LENGTH> getValueAsString() override;
+public:
+	Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
+		ptc = newPtc;
+		pfc = newPfc;
+		ptr = newPtr;
+		sizeInBytes = sizeof(initialValue);
+		valuePtr = static_cast<void*>(&currentValue);
+		// see Parameter.hpp for explanation on flags
+		// by default: no update priority, manual and automatic update available
+
+		if (ptr != nullptr) {
+			(*ptr)(&currentValue);  // call the update function for the initial value
+		} else {
+			currentValue = initialValue;
+		}
+	}
+
+	String<MAX_STRING_LENGTH> getValueAsString() override {
+		String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
+		return contents;
+	}
 };
 
 
