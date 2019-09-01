@@ -49,8 +49,6 @@ typedef etl::bitset<NUM_OF_FLAGS> Flags;
  * as its update function pointer. Arguments initialValue and newPtr are optional, and have default values of
  * 0 and nullptr respectively.
  *
- * @todo Update documentation
- *
  * @public setCurrentValue(): Changes the current value of the parameter
  * @public getCurrentValue(): Gets the current value of the parameter
  * @public getPTC(), getPFC(): Returns the PFC and PTC of the parameter
