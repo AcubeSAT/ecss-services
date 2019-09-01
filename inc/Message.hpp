@@ -33,7 +33,7 @@ public:
 	/**
 	 * @brief Overload the equality operator to compare messages
 	 * @details Compare two @ref ::Message objects, based on their contents and type
-	 * @param The message content to compare against
+	 * @param msg The message content to compare against
 	 * @return The result of comparison
 	 */
 	bool operator==(const Message& msg) const {

@@ -47,14 +47,14 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	// Individual fields of the CCSDS Space Packet primary header
 	uint8_t versionNumber = data[0] >> 5;
 	Message::PacketType packetType = ((data[0] & 0x10) == 0) ? Message::TM : Message::TC;
-	uint8_t secondaryHeaderFlag = data[0] & static_cast<uint8_t>(0x08);
+	bool secondaryHeaderFlag = (data[0] & 0x08u) != 0U;
 	uint16_t APID = packetHeaderIdentification & static_cast<uint16_t>(0x07ff);
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
 	uint16_t packetSequenceCount = packetSequenceControl & (~ 0xc000u); // keep last 14 bits
 
 	// Returning an internal error, since the Message is not available yet
 	ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(secondaryHeaderFlag == 1U, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(secondaryHeaderFlag, ErrorHandler::UnacceptablePacket);
 	ASSERT_INTERNAL(sequenceFlags == 0x3U, ErrorHandler::UnacceptablePacket);
 	ASSERT_INTERNAL(packetDataLength == (length - 6U), ErrorHandler::UnacceptablePacket);
 
@@ -78,7 +78,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
 
-	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(pusVersion == 2u, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
 	length -= 5;
@@ -108,18 +108,19 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 
 String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message, uint16_t size) {
 	uint8_t header[5];
-	header[0] = ECSS_PUS_VERSION << 4u; // Assign the pusVersion = 2
-	header[1] = message.serviceType;
-	header[2] = message.messageType;
+
 	if (message.packetType == Message::TC) {
-		header[0] = ECSS_PUS_VERSION << 4U; // Assign the pusVersion = 2
+		header[0] = ECSS_PUS_VERSION << 4u; // Assign the pusVersion = 2
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = 0;
 		header[4] = 0;
 	} else {
-		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
-		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
+		header[0] = ECSS_PUS_VERSION << 4u; // Assign the pusVersion = 2
+		header[1] = message.serviceType;
+		header[2] = message.messageType;
+		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8u);
+		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffu);
 	}
 
 	String<CCSDS_MAX_MESSAGE_SIZE> dataString(header, 5);

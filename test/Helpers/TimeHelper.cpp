@@ -1,5 +1,6 @@
 #include "catch2/catch.hpp"
 #include "Helpers/TimeHelper.hpp"
+#include "../Services/ServiceTests.hpp"
 
 TEST_CASE("Time format implementation for CDS", "[CDS]") {
 	SECTION("Invalid date") {
@@ -16,7 +17,7 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid month
-		TimeInfo.year = 2018;
+		TimeInfo.year = 2019;
 		TimeInfo.month = 60;
 		TimeInfo.day = 10;
 		TimeInfo.hour = 10;
@@ -26,7 +27,7 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid day
-		TimeInfo.year = 2018;
+		TimeInfo.year = 2019;
 		TimeInfo.month = 4;
 		TimeInfo.day = 35;
 		TimeInfo.hour = 10;
@@ -36,7 +37,7 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid hour
-		TimeInfo.year = 2018;
+		TimeInfo.year = 2019;
 		TimeInfo.month = 4;
 		TimeInfo.day = 10;
 		TimeInfo.hour = 100;
@@ -46,7 +47,7 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid minute
-		TimeInfo.year = 2018;
+		TimeInfo.year = 2019;
 		TimeInfo.month = 4;
 		TimeInfo.day = 10;
 		TimeInfo.hour = 10;
@@ -56,7 +57,7 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		TimeHelper::utcToSeconds(TimeInfo);
 
 		// invalid second
-		TimeInfo.year = 2018;
+		TimeInfo.year = 2019;
 		TimeInfo.month = 4;
 		TimeInfo.day = 10;
 		TimeInfo.hour = 10;
@@ -64,6 +65,9 @@ TEST_CASE("Time format implementation for CDS", "[CDS]") {
 		TimeInfo.second = 122;
 
 		TimeHelper::utcToSeconds(TimeInfo);
+
+		CHECK(ServiceTests::countErrors() == 6);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InvalidDate));
 	}
 
 	SECTION("Convert UTC date to elapsed seconds since Unix epoch") {

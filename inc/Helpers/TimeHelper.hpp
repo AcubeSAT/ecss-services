@@ -33,7 +33,7 @@
  * decides what the time unit will be, so this is a subject for discussion. The recommended time unit from the
  * standard is the second and it is probably the best solution for accuracy.
  *
- * @notes
+ * @note
  * The defined epoch for both time formats is 1 January 1958 00:00:00
  *
  * Since CDS format is UTC-based, the leap second correction must be made. The leap seconds that
@@ -56,7 +56,7 @@ public:
 	/**
 	 * Convert UTC date to elapsed seconds since Unix epoch (1/1/1970 00:00:00).
 	 *
-	 * This is a reimplemented mktime() of <ctime> library in an embedded systems way
+	 * This is a reimplemented `mktime()` of the `<ctime>` library in an embedded compatible way
 	 *
 	 * @note
 	 * This function can convert UTC dates after 1 January 2019 to elapsed seconds since Unix epoch
@@ -71,7 +71,7 @@ public:
 	/**
 	 * Convert elapsed seconds since Unix epoch to UTC date.
 	 *
-	 * This is a reimplemented gmtime() of <ctime> library in an embedded systems way
+	 * This is a reimplemented `gmtime()` of the `<ctime>` library in an embedded compatible way
 	 *
 	 * @note
 	 * This function can convert elapsed seconds since Unix epoch to UTC dates after 1 January 2019
@@ -110,7 +110,7 @@ public:
 	 *
 	 * Converts a UTC date to CUC time format.
 	 *
-	 * @notes
+	 * @note
 	 * The T-field is specified for the seconds passed from the defined epoch 1 January 1958. We use 4 octets(32
 	 * bits) for the time unit (seconds) because 32 bits for the seconds are enough to count 136 years! But if we use 24
 	 * bits for the seconds then it will count 0,5 years and this isn't enough. Remember we can use only integers

@@ -36,7 +36,6 @@ protected:
 	 *                    the TC[17,3] message has `messageType = 3`.
 	 * @todo See if the Message must be returned by reference
 	 * @todo Set the application ID to the current application
-	 * @todo Use the messageTypeCounter
 	 */
 	Message createTM(uint8_t messageType) {
 		return Message(serviceType, messageType, Message::TM, 0);

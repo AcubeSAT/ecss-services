@@ -59,14 +59,11 @@ private:
 	 *
 	 * @details The request identifier consists of the application process ID, the packet
 	 * sequence count and the source ID, all defined in the ECSS standard.
-	 * @var applicationID Application process ID
-	 * @var sequenceCount Packet sequence count
-	 * @var sourceID Packet source ID
 	 */
 	struct RequestID {
-		uint16_t applicationID = 0;
-		uint16_t sequenceCount = 0;
-		uint8_t sourceID = 0;
+		uint16_t applicationID = 0; ///< Application process ID
+		uint16_t sequenceCount = 0; ///< Packet sequence count
+		uint8_t sourceID = 0; ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or
@@ -79,16 +76,14 @@ private:
 	 *
 	 * @details All scheduled activities must contain the request they exist for, their release
 	 * time and the corresponding request identifier.
-	 * @var request Contains the received TC request
-	 * @var requestID Contains the unique request identifier for that activity
-	 * @var requestReleaseTime The absolute time is seconds of the request release
+	 *
+	 * @todo If we decide to use sub-schedules, the ID of that has to be defined
+	 * @todo If groups are used, then the group ID has to be defined here
 	 */
 	struct ScheduledActivity {
-		Message request; // Hold the received command request
-		RequestID requestID; // Request ID, characteristic of the definition
-		uint32_t requestReleaseTime = 0; // Keep the command release time
-		// todo: If we decide to use sub-schedules, the ID of that has to be defined
-		// todo: If groups are used, then the group ID has to be defined here
+		Message request; ///< Hold the received command request
+		RequestID requestID; ///< Request ID, characteristic of the definition
+		uint32_t requestReleaseTime = 0; ///< Keep the command release time
 	};
 
 	/**
@@ -138,7 +133,7 @@ public:
 	void enableScheduleExecution(Message& request);
 
 	/**
-	 * @breif TC[11,2] disable the time-based schedule execution function
+	 * @brief TC[11,2] disable the time-based schedule execution function
 	 *
 	 * @details Disables the time-based command execution scheduling
 	 * @param request Provide the received message as a parameter

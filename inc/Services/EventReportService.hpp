@@ -102,9 +102,8 @@ public:
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
-	 * @param length the length of the data
 	 */
-	void informativeEventReport(Event eventID, const String<64>& data);
+	void informativeEventReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
@@ -114,9 +113,8 @@ public:
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
-	 * @param length the length of the data
 	 */
-	void lowSeverityAnomalyReport(Event eventID, const String<64>& data);
+	void lowSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
@@ -126,9 +124,8 @@ public:
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
-	 * @param length the length of the data
 	 */
-	void mediumSeverityAnomalyReport(Event eventID, const String<64>& data);
+	void mediumSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
 
 	/**
 	 * TM[5,4] high severity anomaly report
@@ -138,9 +135,8 @@ public:
 	 *
 	 * @param eventID event definition ID
 	 * @param data the data of the report
-	 * @param length the length of the data
 	 */
-	void highSeverityAnomalyReport(Event eventID, const String<64>& data);
+	void highSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
 
 	/**
 	 * TC[5,5] request to enable report generation
@@ -165,7 +161,6 @@ public:
 	/**
 	 * TM[5,8] disabled event definitions report
 	 * Telemetry package of a report of the disabled event definitions
-	 * @param message
 	 */
 	void listOfDisabledEventsReport();
 
@@ -182,7 +177,7 @@ public:
 	 * is the ground station.
 	 *
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
-	 * @param param Contains the necessary parameters to call the suitable subservice
+	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
 };

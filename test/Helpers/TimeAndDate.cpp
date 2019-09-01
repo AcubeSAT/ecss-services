@@ -1,5 +1,6 @@
 #include "catch2/catch.hpp"
 #include "Helpers/TimeAndDate.hpp"
+#include "../Services/ServiceTests.hpp"
 
 TEST_CASE("Date comparison", "[operands]") {
 	SECTION("Invalid date") {
@@ -9,6 +10,9 @@ TEST_CASE("Date comparison", "[operands]") {
 		TimeAndDate InvalidDate3(2030, 2, 2, 74, 5, 6); // error in hour
 		TimeAndDate InvalidDate4(2030, 2, 2, 4, 75, 6); // error in minute
 		TimeAndDate InvalidDate5(2030, 2, 2, 4, 5, 76); // error in seconds
+
+		CHECK(ServiceTests::countErrors() == 6);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InvalidDate));
 	}
 
 	SECTION("Different year") {

@@ -95,6 +95,12 @@
 #define ECSS_TIME_MARGIN_FOR_ACTIVATION 60
 
 /**
+ * @brief Maximum size of an event's auxiliary data
+ * @see EventReportService
+ */
+#define ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE 64
+
+/**
  * @brief Size of the multimap that holds every event-action definition
  * @see EventActionService
  */

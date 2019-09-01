@@ -48,8 +48,7 @@ struct ServiceTestsListener : Catch::TestEventListenerBase {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
 			// corresponding assertion function from ServiceTests to silence this message.
 
-			// TODO: Uncomment the following line as soon as Issue #19 is closed
-			// CHECK(ServiceTests::hasNoErrors());
+			CHECK(ServiceTests::hasNoErrors());
 		}
 	}
 
