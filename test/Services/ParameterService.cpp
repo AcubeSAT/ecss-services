@@ -93,7 +93,10 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(report.readUint16() == 1);  // only one parameter shall be contained
 
 		CHECK(report.readUint16() == 1);  // check for parameter ID
-		CHECK(report.readUint32() == 12); // check for value (defined when adding parameters)
+		uint8_t data[MAX_STRING_LENGTH];
+		report.readString(data, MAX_STRING_LENGTH);
+		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data);
+		CHECK(str.compare("12")); // check for value as string (defined when adding parameters)
 
 		ServiceTests::reset();  // clear all errors
 		Services.reset();  // reset the services
@@ -143,7 +146,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		CHECK(report.messageType == 2);
 		CHECK(report.readUint16() == 1);  // only 1 ID contained
 		CHECK(report.readUint16() == 1);  // contained ID should be ID 1
-		CHECK(report.readUint32() == 3735928559); // whose value is 0xDEADBEEF
+
+		char data[MAX_STRING_LENGTH];
+		report.readString(data, MAX_STRING_LENGTH);
+		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data);
+		CHECK(str.compare("3735928559")); // whose value is the string 0xDEADBEEF
 
 		ServiceTests::reset();
 		Services.reset();

@@ -6,7 +6,7 @@
 
 // Number of binary flags in every parameter. Final number TBD.
 #define NUM_OF_FLAGS 3
-// Maximum etl::string length in bytes
+// Maximum etl::string output length in bytes
 #define MAX_STRING_LENGTH 5
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
@@ -20,13 +20,9 @@
  * Useful type definitions
  *
  * @typedef ParamId: the unique ID of a parameter, used for searching
- * @typedef ValueType: the type of the parameter's value (changing types is WIP)
- * @typedef UpdatePtr: pointer to a void function, with a single ValueType* argument (return address)
  * @typedef Flags: container for the binary flags
  */
 typedef uint16_t ParamId;
-//typedef uint32_t ValueType;
-//#typedef ;
 typedef etl::bitset<NUM_OF_FLAGS> Flags;
 
 /**
@@ -52,6 +48,8 @@ typedef etl::bitset<NUM_OF_FLAGS> Flags;
  * Create a new Parameter object with newPtc PTC, newPfc PFC, initialValue as its starting value and newPtr
  * as its update function pointer. Arguments initialValue and newPtr are optional, and have default values of
  * 0 and nullptr respectively.
+ *
+ * @todo Update documentation
  *
  * @public setCurrentValue(): Changes the current value of the parameter
  * @public getCurrentValue(): Gets the current value of the parameter
@@ -86,7 +84,6 @@ public:
 template <typename ValueType>
 class Parameter : public ParameterBase {
 	void (* ptr)(ValueType*);
-
 	ValueType currentValue;
 
 public:
