@@ -4,14 +4,14 @@ etl::format_spec Logger::format;
 
 // Reimplementation of the function for variable C strings
 template <>
-Logger::LogEntry& Logger::LogEntry::operator<<(char* value) noexcept {
+Logger::LogEntry& Logger::LogEntry::operator<<(char* value) {
 	message.append(value);
 	return *this;
 }
 
 // Reimplementation of the function for C strings
 template <>
-Logger::LogEntry& Logger::LogEntry::operator<<(const char* value) noexcept {
+Logger::LogEntry& Logger::LogEntry::operator<<(const char* value) {
 	message.append(value);
 	return *this;
 }
