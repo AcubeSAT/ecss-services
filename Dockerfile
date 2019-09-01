@@ -16,6 +16,7 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" \
     >> /etc/apk/repositories && apk update && \
     apk add --no-cache --virtual git-deps git && \
     apk add --no-cache build-base cmake && \
+    apk add --no-cache python3 && \
     git clone --depth=1 https://github.com/llvm/llvm-project.git -b release/8.x && \
     cmake \
     -DLLVM_ENABLE_PROJECTS="clang-tools-extra;clang" \
@@ -27,7 +28,7 @@ RUN echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" \
 
 # Update package lists and install cmake, cppcheck, doxygen, vera++, 
 # gcc and lcov with their dependencies
-RUN apk add --no-cache findutils python3 python3-dev \
+RUN apk add --no-cache findutils python3-dev \
     cppcheck doxygen vera++@testing lcov@testing
 
 # Install gcovr
