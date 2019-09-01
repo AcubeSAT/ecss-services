@@ -7,6 +7,11 @@
 
 #define ECSS_MAX_FIXED_OCTET_STRING_SIZE 256U // For the ST13 large packet transfer service
 
+/**
+ * The total number of different message types that can be handled by this project
+ */
+#define ECSS_TOTAL_MESSAGE_TYPES (10 * 20)
+
 // 7.4.1
 #define CCSDS_PACKET_VERSION 0
 

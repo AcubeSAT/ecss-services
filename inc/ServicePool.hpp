@@ -20,6 +20,19 @@
  * @todo Find a way to disable services which are not used
  */
 class ServicePool {
+	/**
+	 * A counter for messages
+	 *
+	 * Each key-value pair corresponds to one MessageType within a Service. For the key, the most significant 8 bits are
+     * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
+     * counter of each MessageType.
+	 */
+	etl::map<uint16_t, uint16_t, ECSS_TOTAL_MESSAGE_TYPES> messageTypeCounter;
+
+	/**
+	 * A counter for messages that corresponds to the total number of TM packets sent from an APID
+	 */
+	uint16_t packetSequenceCounter = 0;
 public:
 	RequestVerificationService requestVerification;
 	EventReportService eventReport;
@@ -44,6 +57,27 @@ public:
 	 * Services already stored as values will point to the "new" Services after a reset.
 	 */
 	void reset();
+
+	/**
+	 * Get and increase the "message type counter" for the next message of a type
+	 *
+	 * The message type counter counts the type of generated messages per destination, according to requirement
+	 * 5.4.2.1j. If the value reaches its max, it is wrapped back to 0.
+	 *
+	 * @param serviceType The service type ID
+	 * @param messageType The message type ID
+	 * @return The message type count
+	 */
+	uint16_t getAndUpdateMessageTypeCounter(uint8_t serviceType, uint8_t messageType);
+
+	/**
+	 * Get and increase the "packet sequence count" for the next message
+	 *
+	 * The packet sequence count is incremented each time a packet is released, with a maximum value of 2^14 - 1
+	 *
+	 * @return The packet sequence count
+	 */
+	uint16_t getAndUpdatePacketSequenceCounter();
 };
 
 /**
