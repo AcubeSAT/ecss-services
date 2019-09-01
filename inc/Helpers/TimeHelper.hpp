@@ -5,9 +5,9 @@
 #include <Message.hpp>
 #include "TimeAndDate.hpp"
 
-#define SECONDS_PER_MINUTE 60u
-#define SECONDS_PER_HOUR 3600u
-#define SECONDS_PER_DAY 86400u
+#define SECONDS_PER_MINUTE 60U
+#define SECONDS_PER_HOUR 3600U
+#define SECONDS_PER_DAY 86400U
 
 /**
  * @todo If we use CUC time format then we should keep leap seconds up to date. Leap seconds are added in undefined

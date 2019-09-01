@@ -1,11 +1,11 @@
 #ifndef ECSS_SERVICES_ECSS_DEFINITIONS_H
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
-#define ECSS_MAX_MESSAGE_SIZE 1024u
+#define ECSS_MAX_MESSAGE_SIZE 1024U
 
-#define ECSS_MAX_STRING_SIZE 256u
+#define ECSS_MAX_STRING_SIZE 256U
 
-#define ECSS_MAX_FIXED_OCTET_STRING_SIZE 256u // For the ST13 large packet transfer service
+#define ECSS_MAX_FIXED_OCTET_STRING_SIZE 256U // For the ST13 large packet transfer service
 
 // 7.4.1
 #define CCSDS_PACKET_VERSION 0

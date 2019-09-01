@@ -84,7 +84,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 		if ((currentBit + numBits) >= 8) {
 			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
 
-			uint8_t mask = ((1u << bitsToAddNow) - 1u);
+			uint8_t mask = ((1U << bitsToAddNow) - 1U);
 			uint8_t maskedData = data[readPosition] & mask;
 			value |= maskedData << (numBits - bitsToAddNow);
 

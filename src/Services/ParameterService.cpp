@@ -12,12 +12,12 @@ ParameterService::ParameterService() {
 	time_t currTime = time(nullptr);
 	struct tm* today = localtime(&currTime);
 
-	Parameter test1, test2;
-
+	Parameter test1;
 	test1.settingData = today->tm_hour; // the current hour
 	test1.ptc = 3; // unsigned int
 	test1.pfc = 14; // 32 bits
 
+	Parameter test2;
 	test2.settingData = today->tm_min; // the current minute
 	test2.ptc = 3; // unsigned int
 	test2.pfc = 14; // 32 bits
