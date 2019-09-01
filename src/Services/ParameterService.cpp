@@ -7,14 +7,14 @@ ParameterService::ParameterService() {
 //	addNewParameter(3, 14);
 }
 
-void ParameterService::addNewParameter(uint16_t id, Parameter param, const char* flags) {
+void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const char* flags) {
 	if (paramsList.full()) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
 		return;
 	}
 	else {
 		if (paramsList.find(id) == paramsList.end()) {
-			param.setFlags(flags);
+			param->setFlags(flags);
 			paramsList.insert(std::make_pair(id, param));
 			return;
 		}
@@ -26,7 +26,7 @@ void ParameterService::addNewParameter(uint16_t id, Parameter param, const char*
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
-	etl::vector<std::pair<uint16_t, ValueType>, ECSS_ST_20_MAX_PARAMETERS> validParams;
+	etl::vector<std::pair<uint16_t, String<MAX_STRING_LENGTH>>, ECSS_ST_20_MAX_PARAMETERS> validParams;
 	Message reqParam(20, 2, Message::TM, 1);
 	// empty TM[20, 2] parameter report message
 
@@ -50,7 +50,8 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 		uint16_t currId = paramIds.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
-			std::pair<uint16_t, ValueType> p = std::make_pair(currId, paramsList.at(currId).getCurrentValue());
+			std::pair<uint16_t, String<MAX_STRING_LENGTH>> p = std::make_pair(currId, paramsList.at(currId)
+			->getValueAsString());
 			// pair containing the parameter's ID as first element and its current value as second
 			validParams.push_back(p);
 			validIds++;
@@ -65,7 +66,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 	for (auto i: validParams) {
 		reqParam.appendUint16(i.first);  // append the parameter ID
-		reqParam.appendUint32(i.second); // and its value
+		reqParam.appendString(i.second); // and its value
 	}
 
 	storeMessage(reqParam);  // then store the message
@@ -88,7 +89,7 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 		uint16_t currId = newParamValues.readUint16();
 		// the parameter is checked for read-only status and manual update availability
 		if (paramsList.find(currId) != paramsList.end()) {
-			paramsList.at(currId).setCurrentValue(newParamValues.readUint32());
+			paramsList.at(currId)->setCurrentValue(newParamValues.readUint32());
 		}
 		else {
 			ErrorHandler::reportError(newParamValues,
