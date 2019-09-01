@@ -10,4 +10,5 @@
 echo -e "\033[0;34mRunning vera++...\033[0m"
 
 cd "$(dirname "$0")/.."
-vera++ --error --parameter max-line-length=120 --profile custom `find src inc test -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'`
+vera++ --error --parameter max-line-length=120 --profile custom \
+    `find src inc test -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)' -not -wholename 'inc/Logger.hpp'`

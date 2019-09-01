@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include "Message.hpp"
-#include <iostream> // This file should be removed
 
 class ServicePool;
 
@@ -12,8 +11,6 @@ class ServicePool;
  *
  * A member of the Service class should be used as a singleton, i.e. must be created only once in
  * the code
- *
- * @todo Disable copy constructor
  */
 class Service {
 private:

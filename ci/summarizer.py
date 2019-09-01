@@ -58,7 +58,7 @@ class Summarizer(object):
                 with open(os.path.abspath(file_name)) as code_file:
                     code_lines = code_file.readlines()  # Read the source code file
                     line_of_interest = code_lines[int(violation[0]) - 1]  # Get the desired violation line
-                if line_of_interest.find("// Ignore-MISRA") >= 0:
+                if line_of_interest.find("// Ignore-MISRA") >= 0 or line_of_interest.find("/* Ignore-MISRA */") >= 0:
                     continue
 
                 if file_name not in self.violations_map.keys():
