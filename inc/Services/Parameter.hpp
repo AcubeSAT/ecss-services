@@ -24,6 +24,9 @@
  */
 typedef uint16_t ParamId;
 typedef etl::bitset<NUM_OF_FLAGS> Flags;
+typedef enum {STRING = 0,
+	INT32 = 1,
+	} TypesList;
 
 /**
  * Parameter class - Breakdown of fields
