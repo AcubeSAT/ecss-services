@@ -52,10 +52,10 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
 
 	// Returning an internal error, since the Message is not available yet
-	ASSERT_INTERNAL(versionNumber == 0u, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(secondaryHeaderFlag == 1u, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(sequenceFlags == 0x3u, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(packetDataLength == (length - 6u), ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(secondaryHeaderFlag == 1U, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(sequenceFlags == 0x3U, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(packetDataLength == (length - 6U), ErrorHandler::UnacceptablePacket);
 
 	Message message(0, 0, packetType, APID);
 
@@ -78,7 +78,7 @@ void MessageParser::parseTC(const uint8_t* data, uint16_t length, Message& messa
 
 	// todo: Fix this parsing function, because it assumes PUS header in data, which is not true
 	//  with the current implementation
-	ErrorHandler::assertRequest(pusVersion == 2u, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
 	length -= 5;
@@ -126,7 +126,7 @@ void MessageParser::parseTM(const uint8_t* data, uint16_t length, Message& messa
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
 
-	ErrorHandler::assertRequest(pusVersion == 2u, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
 	length -= 5;

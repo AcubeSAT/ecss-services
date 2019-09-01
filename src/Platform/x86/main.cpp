@@ -307,7 +307,8 @@ int main() {
 	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
 
 	Message receivedMsg = Message(11, 1, Message::TC, 1);
-	Message testMessage1(6, 5, Message::TC, 1), testMessage2(4, 5, Message::TC, 1);
+	Message testMessage1(6, 5, Message::TC, 1);
+	Message testMessage2(4, 5, Message::TC, 1);
 	testMessage1.appendUint16(4253); // Append dummy data
 	testMessage2.appendUint16(45667); // Append dummy data
 
@@ -317,10 +318,10 @@ int main() {
 	receivedMsg = Message(11, 4, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
-	receivedMsg.appendUint32(currentTime + 1556435u);
+	receivedMsg.appendUint32(currentTime + 1556435U);
 	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
 
-	receivedMsg.appendUint32(currentTime + 1957232u);
+	receivedMsg.appendUint32(currentTime + 1957232U);
 	receivedMsg.appendString(msgParser.convertTCToStr(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
