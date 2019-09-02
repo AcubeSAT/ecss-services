@@ -79,8 +79,7 @@ clang-tidy:
     GIT_SUBMODULE_STRATEGY: normal
     TERM: xterm-color
   script:
-    # Running with `script` to give clang a tty so that it outputs colours
-    - script -e -c "bash -x ci/clang-tidy.sh"
+    - ci/clang-tidy.sh
 
 pages:
   stage: deploy
