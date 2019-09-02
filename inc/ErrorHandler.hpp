@@ -73,6 +73,10 @@ public:
 		 * Attempt to insert new function in a full function map (ST[08])
 		 */
 		FunctionMapFull = 10,
+		/**
+		 * A Message that is included within another message is too large
+		 */
+		NestedMessageTooLarge = 11,
 	};
 
 	/**
@@ -225,11 +229,17 @@ public:
 	 * Reports a failure that occurred internally, not due to a failure of a received packet.
 	 *
 	 * Creates an error if \p condition is false. The created error is Internal.
+	 *
+	 * @param condition The condition to check. Throws an error if false.
+	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
+	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	static void assertInternal(bool condition, InternalErrorType errorCode) {
+	static bool assertInternal(bool condition, InternalErrorType errorCode) {
 		if (not condition) {
 			reportInternalError(errorCode);
 		}
+
+		return condition;
 	}
 
 	/**
@@ -238,12 +248,19 @@ public:
 	 * Reports a failure that occurred while processing a request, in any of the process phases.
 	 *
 	 * Creates an error if \p condition is false. The created error corresponds to a \p message.
+	 *
+	 * @param condition The condition to check. Throws an error if false.
+	 * @param message The message to associate with this error
+	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
+	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
 	template <typename ErrorType>
-	static void assertRequest(bool condition, const Message& message, ErrorType errorCode) {
+	static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
 		}
+
+		return condition;
 	}
 
 	/**

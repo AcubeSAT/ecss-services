@@ -33,7 +33,6 @@ namespace unit_test
 } // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
-MessageParser msgParser;
 auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
 bool messagesPopulated = false; // Indicate whether the test messages are initialized
 
@@ -71,19 +70,19 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 
 	// Test activity 1
 	receivedMessage.appendUint32(currentTime + 1556435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage1));
+	receivedMessage.appendMessage(testMessage1, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Test activity 2
 	receivedMessage.appendUint32(currentTime + 1957232);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage2));
+	receivedMessage.appendMessage(testMessage2, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Test activity 3
 	receivedMessage.appendUint32(currentTime + 1726435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage3));
+	receivedMessage.appendMessage(testMessage3, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Test activity 4
 	receivedMessage.appendUint32(currentTime + 17248435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage4));
+	receivedMessage.appendMessage(testMessage4, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Insert activities in the schedule. They have to be inserted sorted
 	timeService.insertActivities(receivedMessage);
@@ -276,7 +275,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 			Message receivedTCPacket;
 			uint8_t receivedDataStr[ECSS_TC_REQUEST_STRING_SIZE];
 			response.readString(receivedDataStr, ECSS_TC_REQUEST_STRING_SIZE);
-			receivedTCPacket = msgParser.parseRequestTC(receivedDataStr);
+			receivedTCPacket = MessageParser::parseECSSTC(receivedDataStr);
 
 			if (i == 0) {
 				REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
@@ -380,7 +379,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 		Message receivedTCPacket;
 		uint8_t receivedDataStr[ECSS_TC_REQUEST_STRING_SIZE];
 		response.readString(receivedDataStr, ECSS_TC_REQUEST_STRING_SIZE);
-		receivedTCPacket = msgParser.parseRequestTC(receivedDataStr);
+		receivedTCPacket = MessageParser::parseECSSTC(receivedDataStr);
 
 		REQUIRE(receivedReleaseTime == scheduledActivities.at(i)->requestReleaseTime);
 		REQUIRE(receivedTCPacket.bytesEqualWith(scheduledActivities.at(i)->request));

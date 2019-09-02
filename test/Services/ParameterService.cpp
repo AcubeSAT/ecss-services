@@ -25,6 +25,9 @@ TEST_CASE("Parameter Report Subservice") {
 			CHECK_FALSE(report.readUint16() == 34672); // fail if faulty ID is present in report
 			report.readUint32(); // ignore the carried settings
 		}
+
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnknownExecutionStartError));
 	}
 
 	// **WARNING**
@@ -93,5 +96,8 @@ TEST_CASE("Parameter Setting Subservice") {
 			CHECK(before.readUint16() == after.readUint16()); // check if all IDs are present
 			CHECK_FALSE(after.readUint32() == 0xBAAAAAAD); // fail if any settings are BAAAAAAD :P
 		}
+
+		CHECK(ServiceTests::countErrors() == 3);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnknownExecutionStartError));
 	}
 }

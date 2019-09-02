@@ -25,7 +25,7 @@ int main() {
 
 	Message packet = Message(0, 0, Message::TC, 1);
 
-	packet.appendString<5>("hello");
+	packet.appendString(String<5>("hello"));
 	packet.appendBits(15, 0x28a8);
 	packet.appendBits(1, 1);
 	packet.appendFloat(5.7);
@@ -301,7 +301,6 @@ int main() {
 
 	// ST[11] test
 	TimeBasedSchedulingService timeBasedSchedulingService;
-	MessageParser msgParser;
 	auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
 	std::cout << "\n\nST[11] service is running";
 	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
@@ -319,10 +318,10 @@ int main() {
 	receivedMsg.appendUint16(2); // Total number of requests
 
 	receivedMsg.appendUint32(currentTime + 1556435U);
-	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
+	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
 
 	receivedMsg.appendUint32(currentTime + 1957232U);
-	receivedMsg.appendString(msgParser.convertTCToStr(testMessage2));
+	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
 	// Time shift activities

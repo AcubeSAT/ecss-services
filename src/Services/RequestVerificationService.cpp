@@ -7,10 +7,10 @@ void RequestVerificationService::successAcceptanceVerification(const Message& re
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 
 	storeMessage(report);
 }
@@ -23,10 +23,10 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);
@@ -39,10 +39,10 @@ void RequestVerificationService::successStartExecutionVerification(const Message
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 
 	storeMessage(report);
 }
@@ -55,10 +55,10 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);
@@ -71,10 +71,10 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 	report.appendByte(stepID); // step ID
 
 	storeMessage(report);
@@ -89,10 +89,10 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 	report.appendByte(stepID); // step ID
 	report.appendEnum16(errorCode); // error code
 
@@ -106,10 +106,10 @@ void RequestVerificationService::successCompletionExecutionVerification(const Me
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 
 	storeMessage(report);
 }
@@ -122,10 +122,10 @@ void RequestVerificationService::failCompletionExecutionVerification(
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);
@@ -139,10 +139,10 @@ void RequestVerificationService::failRoutingVerification(const Message& request,
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
-	report.appendBits(1, 0); // secondary header flag(not implemented)
+	report.appendBits(1, 1); // secondary header flag
 	report.appendEnumerated(11, request.applicationId); // application process ID
 	report.appendEnumerated(2, ECSS_SEQUENCE_FLAGS); // sequence flags
-	report.appendBits(14, 0); // packet sequence count(not implemented)
+	report.appendBits(14, request.packetSequenceCount); // packet sequence count
 	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);
