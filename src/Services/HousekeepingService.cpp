@@ -40,7 +40,7 @@ void HousekeepingService::deleteHousekeepingStructure(Message& message) {
 		if (it != housekeepingStructureList.end()) {
 			housekeepingStructureList.erase(it); // delete the housekeeping structure
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::Unknownkey);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::KeyNotFound);
 		}
 	}
 }
@@ -55,7 +55,7 @@ void HousekeepingService::enablePeriodicParamReports(Message& message) {
 		if (it != housekeepingStructureList.end()) {
 			it->second.isPeriodic = true; // enable the periodic generation of param reports
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::Unknownkey);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::KeyNotFound);
 		}
 	}
 }
@@ -70,7 +70,7 @@ void HousekeepingService::disablePeriodicParamReports(Message& message) {
 		if (it != housekeepingStructureList.end()) {
 			it->second.isPeriodic = false; // disable the periodic generation of param reports
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::Unknownkey);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::KeyNotFound);
 		}
 	}
 }
@@ -89,11 +89,11 @@ void HousekeepingService::checkAndSendHousekeepingReports(TimeAndDate time) {
 			report.appendByte(it->first); // append housekeeping structure ID
 
 			for (auto i : it->second.paramId) {
-				auto itParam = Services.parameterManagement.paramsList.find(i); // find the requested paramID
-				if (itParam != Services.parameterManagement.paramsList.end()) {
-					report.appendWord(itParam->second.getCurrentValue()); // fetch the requested parameters values
+				if (Services.parameterManagement.isParamId(i)) {
+					// fetch the requested parameters values
+					report.appendString(Services.parameterManagement.returnParamValue(i));
 				} else {
-					ErrorHandler::reportError(report, ErrorHandler::ExecutionStartErrorType::Unknownkey);
+					ErrorHandler::reportError(report, ErrorHandler::ExecutionStartErrorType::KeyNotFound);
 				}
 			}
 			storeMessage(report);

@@ -1,14 +1,12 @@
 #ifndef ECSS_SERVICES_PARAMETERSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
+#include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
 #include "etl/map.h"
 #include "etl/vector.h"
-
-// Number of stored parameters. MAX_PARAMS is just a dummy number for now.
-#define MAX_PARAMS 5
 
 class HousekeepingService; // forward declaration
 
@@ -31,7 +29,7 @@ class HousekeepingService; // forward declaration
 
 class ParameterService : public Service {
 private:
-	etl::map<ParamIdType, Parameter, MAX_PARAMS> paramsList;
+	etl::map<ParamIdType, ParameterBase*, ECSS_ST_20_MAX_PARAMETERS> paramsList;
 	friend class HousekeepingService;
 
 public:
@@ -41,13 +39,14 @@ public:
 	ParameterService();
 
 	/**
-	 * @brief Adds a new parameter. Returns false if the parameter has not been added
-	 * (either because the map is full or because it already exists in it).
+	 * @brief Adds a new parameter. Emits an InternalError::MapFull if an attempt is made to insert
+	 * parameters in a full map or an InternalError::ExistingParameterId if the given parameter ID
+	 * exists already.
 	 * @param id: the desired ID for this parameter
 	 * @param param: the parameter field to be included
 	 * @param flags: the flags to be set for this field (see Parameter.hpp)
 	 */
-	bool addNewParameter(uint16_t id, Parameter param, const char* flags = "110");
+	void addNewParameter(uint16_t id, ParameterBase* param, const char* flags = "110");
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
@@ -79,6 +78,10 @@ public:
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
 	void setParameterIds(Message& newParamValues);
+
+	String<MAX_STRING_LENGTH> returnParamValue(ParamIdType id);
+
+	bool isParamId(ParamIdType id);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

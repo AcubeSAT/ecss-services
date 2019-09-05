@@ -70,9 +70,14 @@ public:
 		 */
 		OtherMessageType = 9,
 		/**
-		 * Attempt to insert new function in a full function map (ST[08])
+		 * Attempt to insert new element in a full map (ST[08], ST[20])
 		 */
-		FunctionMapFull = 10,
+		MapFull = 10,
+		/**
+		 * Attempt to overwrite an existing parameter (ST[20])
+		 */
+		ExistingParameterId = 11,
+		UnknownKey = 12,
 	};
 
 	/**
@@ -143,9 +148,11 @@ public:
 		HousekeepingMapFull = 8,
 		
 		/**
-		 * The reqested key doesn't exist
+		 * The reqested key doesn't exist (ST[03])
+		 * FIXME: KeyNotFound collides with the same error type in InternalErrorType, and as a workaround
+		 * InternalErrorType::UnknownKey is semantically the same error.
 		 */
-		 Unknownkey = 9,
+		KeyNotFound = 9
 	};
 
 	/**
