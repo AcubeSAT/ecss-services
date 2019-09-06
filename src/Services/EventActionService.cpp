@@ -77,7 +77,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	// TC[19,4]
 	message.assertTC(19, 4);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	if (numberOfEventActionDefinitions != 0u) {
+	if (numberOfEventActionDefinitions != 0U) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.skipBytes(2); // Skips reading the application ID
 			uint16_t eventDefinitionID = message.readEnum16();
@@ -110,7 +110,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	// TC[19,5]
 	message.assertTC(19, 5);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	if (numberOfEventActionDefinitions != 0u) {
+	if (numberOfEventActionDefinitions != 0U) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.skipBytes(2); // Skips reading applicationID
 			uint16_t eventDefinitionID = message.readEnum16();
@@ -180,8 +180,7 @@ void EventActionService::executeAction(uint16_t eventID) {
 		auto range = eventActionDefinitionMap.equal_range(eventID);
 		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.enabled) {
-				MessageParser messageParser;
-				Message message = messageParser.parseRequestTC(element->second.request);
+				Message message = MessageParser::parseECSSTC(element->second.request);
 				MessageParser::execute(message);
 			}
 		}

@@ -25,8 +25,8 @@ uint32_t TimeHelper::utcToSeconds(TimeAndDate& TimeInfo) {
 		secs += (IsLeapYear(y) ? 366 : 365) * SECONDS_PER_DAY;
 	}
 	for (uint16_t m = 1; m < TimeInfo.month; ++m) {
-		secs += DaysOfMonth[m - 1u] * SECONDS_PER_DAY;
-		if ((m == 2u) && IsLeapYear(TimeInfo.year)) {
+		secs += DaysOfMonth[m - 1U] * SECONDS_PER_DAY;
+		if ((m == 2U) && IsLeapYear(TimeInfo.year)) {
 			secs += SECONDS_PER_DAY;
 		}
 	}
@@ -62,7 +62,7 @@ struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
 		TimeInfo.month++;
 		seconds -= (DaysOfMonth[i] * SECONDS_PER_DAY);
 		i++;
-		if ((i == 1u) && IsLeapYear(TimeInfo.year)) {
+		if ((i == 1U) && IsLeapYear(TimeInfo.year)) {
 			if (seconds <= (28 * SECONDS_PER_DAY)) {
 				break;
 			}
@@ -121,7 +121,7 @@ TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t* data) {
 	uint32_t msOfDay = ((static_cast<uint32_t>(data[2])) << 24) | ((static_cast<uint32_t>(data[3]))) << 16 |
 	                   ((static_cast<uint32_t>(data[4]))) << 8 | (static_cast<uint32_t>(data[5]));
 
-	uint32_t seconds = (elapsedDays * SECONDS_PER_DAY) + (msOfDay / 1000u);
+	uint32_t seconds = (elapsedDays * SECONDS_PER_DAY) + (msOfDay / 1000U);
 
 	return secondsToUTC(seconds);
 }

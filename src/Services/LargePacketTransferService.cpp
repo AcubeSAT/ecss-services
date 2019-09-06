@@ -69,7 +69,7 @@ void LargePacketTransferService::split(Message& message, uint16_t largeMessageTr
 	stringPart = dataPart;
 	firstDownlinkPartReport(largeMessageTransactionIdentifier, 0, stringPart);
 
-	for (uint16_t part = 1; part < (parts - 1u); part++){
+	for (uint16_t part = 1; part < (parts - 1U); part++){
 		for (uint16_t i = 0; i < ECSS_MAX_FIXED_OCTET_STRING_SIZE; i++){
 			dataPart[i] = message.data[positionCounter];
 			positionCounter++;
@@ -86,5 +86,5 @@ void LargePacketTransferService::split(Message& message, uint16_t largeMessageTr
 		positionCounter++;
 	}
 	stringPart = dataPart;
-	lastDownlinkPartReport(largeMessageTransactionIdentifier, (parts - 1u), stringPart);
+	lastDownlinkPartReport(largeMessageTransactionIdentifier, (parts - 1U), stringPart);
 }

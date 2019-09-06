@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
 #include <Message.hpp>
+#include <ServicePool.hpp>
 
 TEST_CASE("Message is usable", "[message]") {
 	Message message(5, 17, Message::TC, 3);
@@ -155,7 +156,7 @@ TEST_CASE("Requirement 7.3.6 (Real)", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.appendString<4>("test");
+	message.appendString(String<4>("test"));
 
 	REQUIRE(message.dataSize == 4);
 
@@ -177,17 +178,19 @@ TEST_CASE("Spare field", "[message]") {
 
 	message1.appendByte(1);
 	message1.appendHalfword(2);
-	message1.appendBits(1, 5);
+	message1.appendBits(1, 1);
 	message1.finalize();
 
+	CHECK(message1.data[3] == 0b10000000);
 	CHECK(message1.dataSize == 4);
 
 	Message message2(0, 0, Message::TM, 0);
 	message2.appendByte(1);
 	message2.appendHalfword(2);
-	message2.appendBits(2, 5);
+	message2.appendBits(2, 3);
 	message2.finalize();
 
+	CHECK(message2.data[3] == 0b11000000);
 	CHECK(message2.dataSize == 4);
 
 	Message message3(0, 0, Message::TM, 0);
@@ -197,6 +200,7 @@ TEST_CASE("Spare field", "[message]") {
 	message3.appendBits(3, 5);
 	message3.finalize();
 
+	CHECK(message3.data[3] == 0b10100000);
 	CHECK(message3.dataSize == 4);
 
 	Message message4(0, 0, Message::TM, 0);
@@ -206,6 +210,7 @@ TEST_CASE("Spare field", "[message]") {
 	message4.appendBits(4, 5);
 	message4.finalize();
 
+	CHECK(message4.data[3] == 0b01010000);
 	CHECK(message4.dataSize == 4);
 
 	Message message5(0, 0, Message::TM, 0);
@@ -215,6 +220,7 @@ TEST_CASE("Spare field", "[message]") {
 	message5.appendBits(5, 5);
 	message5.finalize();
 
+	CHECK(message5.data[3] == 0b00101000);
 	CHECK(message5.dataSize == 4);
 
 	Message message6(0, 0, Message::TM, 0);
@@ -224,6 +230,7 @@ TEST_CASE("Spare field", "[message]") {
 	message6.appendBits(6, 5);
 	message6.finalize();
 
+	CHECK(message6.data[3] == 0b00010100);
 	CHECK(message6.dataSize == 4);
 
 	Message message7(0, 0, Message::TM, 0);
@@ -233,6 +240,7 @@ TEST_CASE("Spare field", "[message]") {
 	message7.appendBits(7, 5);
 	message7.finalize();
 
+	CHECK(message7.data[3] == 0b00001010);
 	CHECK(message7.dataSize == 4);
 
 	Message message8(0, 0, Message::TM, 0);
@@ -242,6 +250,7 @@ TEST_CASE("Spare field", "[message]") {
 	message8.appendBits(8, 5);
 	message8.finalize();
 
+	CHECK(message8.data[3] == 0b00000101);
 	CHECK(message8.dataSize == 4);
 
 	Message message9(0, 0, Message::TM, 0);
@@ -252,4 +261,75 @@ TEST_CASE("Spare field", "[message]") {
 	message9.finalize();
 
 	CHECK(message9.dataSize == 3);
+}
+
+TEST_CASE("Message type counter", "[message]") {
+	SECTION("Message counting") {
+		Message message1(0, 0, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.messageTypeCounter == 0);
+
+		Message message2(0, 0, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.messageTypeCounter == 1);
+	}
+
+	SECTION("Different message types") {
+		Message message1(0, 1, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.messageTypeCounter == 0);
+
+		Message message2(0, 2, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.messageTypeCounter == 0);
+	}
+
+	SECTION("Message counter overflow") {
+		for (int i = 0; i <= 65534; i++) {
+			Message message(0, 3, Message::TM, 0);
+			message.finalize();
+		}
+
+		Message message1(0, 3, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.messageTypeCounter == 65535);
+
+		Message message2(0, 3, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.messageTypeCounter == 0);
+	}
+}
+
+TEST_CASE("Packet sequence counter", "[message]") {
+	SECTION("Packet counting") {
+		Message message1(0, 0, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.packetSequenceCount == 0);
+
+		Message message2(0, 0, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.packetSequenceCount == 1);
+
+		// Different message type check
+		Message message3(1, 2, Message::TM, 0);
+		message3.finalize();
+		CHECK(message3.packetSequenceCount == 2);
+	}
+
+	SECTION("Packet counter overflow") {
+		Services.reset();
+
+		for (int i = 0; i <= 16382; i++) {
+			Message message(0, 3, Message::TM, 0);
+			message.finalize();
+		}
+
+		Message message1(0, 3, Message::TM, 0);
+		message1.finalize();
+		CHECK(message1.packetSequenceCount == 16383);
+
+		Message message2(0, 3, Message::TM, 0);
+		message2.finalize();
+		CHECK(message2.packetSequenceCount == 0);
+	}
 }

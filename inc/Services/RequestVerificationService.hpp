@@ -15,6 +15,8 @@
  *
  * @todo See if the deduced data defined from the standard should still be ignored. This deduced
  * data exists only in reports that send failure signs(for example the TM[1,2])
+ *
+ * @ingroup Services
  */
 class RequestVerificationService : public Service {
 public:
