@@ -7,15 +7,15 @@ ParameterService::ParameterService() {
 //	addNewParameter(3, 14);
 }
 
-void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const char* flags) {
+void ParameterService::addNewParameter(uint16_t id, ParameterBase & param, const char* flags) {
 	if (paramsList.full()) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ParameterListFull);
 		return;
 	}
 
     if (paramsList.find(id) == paramsList.end()) {
-        param->setFlags(flags);
-        paramsList.insert(std::make_pair(id, param));
+        param.setFlags(flags);
+        paramsList.insert(std::make_pair(id, &param));
     } else {
         ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
     }

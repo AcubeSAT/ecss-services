@@ -73,11 +73,11 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	Parameter<int> param3 = Parameter<int>(12, 3, 12);
 	Parameter<int> param4 = Parameter<int>(15, 7, 15);
 
-	paramService.addNewParameter(1, static_cast<ParameterBase*>(&param0));
-	paramService.addNewParameter(2, static_cast<ParameterBase*>(&param1));
-	paramService.addNewParameter(3, static_cast<ParameterBase*>(&param2));
-	paramService.addNewParameter(4, static_cast<ParameterBase*>(&param3));
-	paramService.addNewParameter(5, static_cast<ParameterBase*>(&param4));
+	paramService.addNewParameter(1, param0);
+	paramService.addNewParameter(2, param1);
+	paramService.addNewParameter(3, param2);
+	paramService.addNewParameter(4, param3);
+	paramService.addNewParameter(5, param4);
 
 	// now we have a full parameter's map with param IDs and values
 
@@ -541,11 +541,11 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		Parameter<int> param3 = Parameter<int>(12, 3, 12);
 		Parameter<int> param4 = Parameter<int>(15, 7, 15);
 
-		paramService.addNewParameter(3, static_cast<ParameterBase*>(&param0));
-		paramService.addNewParameter(4, static_cast<ParameterBase*>(&param1));
-		paramService.addNewParameter(5, static_cast<ParameterBase*>(&param2));
-		paramService.addNewParameter(6, static_cast<ParameterBase*>(&param3));
-		paramService.addNewParameter(7, static_cast<ParameterBase*>(&param4));
+		paramService.addNewParameter(3, param0);
+		paramService.addNewParameter(4, param1);
+		paramService.addNewParameter(5, param2);
+		paramService.addNewParameter(6, param3);
+		paramService.addNewParameter(7, param4);
 
 		// enable structures
 		Message enable = Message(3, 5, Message::TC, 0);
@@ -620,11 +620,11 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		Parameter<int> param3 = Parameter<int>(12, 3, 12);
 		Parameter<int> param4 = Parameter<int>(15, 7, 15);
 
-		paramService.addNewParameter(1, static_cast<ParameterBase*>(&param0));
-		paramService.addNewParameter(2, static_cast<ParameterBase*>(&param1));
-		paramService.addNewParameter(3, static_cast<ParameterBase*>(&param2));
-		paramService.addNewParameter(4, static_cast<ParameterBase*>(&param3));
-		paramService.addNewParameter(5, static_cast<ParameterBase*>(&param4));
+		paramService.addNewParameter(1, param0);
+		paramService.addNewParameter(2, param1);
+		paramService.addNewParameter(3, param2);
+		paramService.addNewParameter(4, param3);
+		paramService.addNewParameter(5, param4);
 
 		// enable structures
 		Message enable = Message(3, 5, Message::TC, 0);
@@ -684,11 +684,11 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		Parameter<int> param3 = Parameter<int>(12, 3, 12);
 		Parameter<int> param4 = Parameter<int>(15, 7, 15);
 
-		paramService.addNewParameter(3, static_cast<ParameterBase*>(&param0));
-		paramService.addNewParameter(4, static_cast<ParameterBase*>(&param1));
-		paramService.addNewParameter(5, static_cast<ParameterBase*>(&param2));
-		paramService.addNewParameter(6, static_cast<ParameterBase*>(&param3));
-		paramService.addNewParameter(7, static_cast<ParameterBase*>(&param4));
+		paramService.addNewParameter(3, param0);
+		paramService.addNewParameter(4, param1);
+		paramService.addNewParameter(5, param2);
+		paramService.addNewParameter(6, param3);
+		paramService.addNewParameter(7, param4);
 
 		// enable structures
 		Message enable = Message(3, 5, Message::TC, 0);

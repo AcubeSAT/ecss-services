@@ -79,6 +79,10 @@ public:
         return sizeInBytes;
     }
 
+    void setPtr(void *valuePtr) {
+        this->valuePtr = valuePtr;
+    }
+
     virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
 };
 
@@ -114,7 +118,7 @@ public:
 	 * @return The parameter
 	 */
 	ValueType getValue() const {
-        return currentValue;
+        return *static_cast<ValueType*>(valuePtr);
 	}
 
 	/**

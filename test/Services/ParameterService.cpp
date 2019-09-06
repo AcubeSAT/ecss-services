@@ -16,13 +16,13 @@ TEST_CASE("Parameter Service - General") {
 
 		Parameter<int> param5 = Parameter<int>(15, 5, 4);
 
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
-		pserv.addNewParameter(3, static_cast<ParameterBase*>(&param3));
-		pserv.addNewParameter(4, static_cast<ParameterBase*>(&param4));
+		pserv.addNewParameter(0, param0);
+		pserv.addNewParameter(1, param1);
+		pserv.addNewParameter(2, param2);
+		pserv.addNewParameter(3, param3);
+		pserv.addNewParameter(4, param4);
 
-		pserv.addNewParameter(5, static_cast<ParameterBase*>(&param5));  // addNewParameter should return false
+		pserv.addNewParameter(5, param5);  // addNewParameter should return false
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::ParameterListFull));
 		ServiceTests::reset();
 		Services.reset();  // reset all services
@@ -30,9 +30,9 @@ TEST_CASE("Parameter Service - General") {
 
 	SECTION("Addition of already existing parameter") {
 		Parameter<int> param0 = Parameter<int>(1, 3);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
+		pserv.addNewParameter(0, param0);
 
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
+		pserv.addNewParameter(0, param0);
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::ExistingParameterId));
 		ServiceTests::reset();
 		Services.reset();
@@ -68,9 +68,9 @@ TEST_CASE("Parameter Report Subservice") {
 		Parameter<int> param0 = Parameter<int>(3, 14);
 		Parameter<int> param1 = Parameter<int>(1, 7, 12);
 		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
+		pserv.addNewParameter(0, param0);
+		pserv.addNewParameter(1, param1);
+		pserv.addNewParameter(2, param2);
 
 		Message request(20, 1, Message::TC, 1);
 		request.appendUint16(2); // number of requested IDs
@@ -119,9 +119,9 @@ TEST_CASE("Parameter Setting Subservice") {
 		Parameter<int> param0 = Parameter<int>(3, 14);
 		Parameter<int> param1 = Parameter<int>(1, 7, 12);
 		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
+		pserv.addNewParameter(0, param0);
+		pserv.addNewParameter(1, param1);
+		pserv.addNewParameter(2, param2);
 
 		Message setRequest(20, 3, Message::TC, 1);
 		setRequest.appendUint16(2); // total number of IDs
@@ -159,7 +159,7 @@ TEST_CASE("Parameter Setting Subservice") {
 
 	SECTION("Attempt to set parameter with no manual update availability") {
 		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1), "100");
+		pserv.addNewParameter(1, param1, "100");
 
 		Message setRequest = Message(20, 3, Message::TC, 1);
 		setRequest.appendUint16(1);
