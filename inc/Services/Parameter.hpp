@@ -2,10 +2,12 @@
 #define ECSS_SERVICES_PARAMETER_HPP
 
 #include "etl/bitset.h"
+#include "etl/String.hpp"
 
 // Number of binary flags in every parameter. Final number TBD.
 #define NUM_OF_FLAGS 3
-
+// Maximum etl::string output length in bytes
+#define MAX_STRING_LENGTH 5
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  * Fully compliant with the standards requirements, while adding some small,
@@ -17,15 +19,14 @@
 /**
  * Useful type definitions
  *
- * @typedef ParamId: the unique ID of a parameter, used for searching
- * @typedef ValueType: the type of the parameter's value (changing types is WIP)
- * @typedef UpdatePtr: pointer to a void function, with a single ValueType* argument (return address)
+ * @typedef ParamIdType: the unique ID of a parameter, used for searching
  * @typedef Flags: container for the binary flags
  */
 typedef uint16_t ParamIdType;
-typedef uint32_t ValueType;
-typedef void(*UpdatePtr)(ValueType*);
 typedef etl::bitset<NUM_OF_FLAGS> Flags;
+typedef enum {STRING = 0,
+	INT32 = 1,
+	} TypesList;
 
 /**
  * Parameter class - Breakdown of fields
@@ -55,24 +56,58 @@ typedef etl::bitset<NUM_OF_FLAGS> Flags;
  * @public getCurrentValue(): Gets the current value of the parameter
  * @public getPTC(), getPFC(): Returns the PFC and PTC of the parameter
  */
-class Parameter {
+
+class ParameterBase {
+protected:
 	uint8_t ptc;
 	uint8_t pfc;
-	UpdatePtr ptr;
+	uint8_t sizeInBytes;
+	void* valuePtr;
 	Flags flags;
-	ValueType currentValue = 0;
+public:
+	uint8_t getPTC();
 
-	public:
-		Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr); // Ignore-MISRA
+	void setFlags(const char* flags);
 
-		void setCurrentValue(ValueType newVal);
-		void setFlag(const char* flags);
+	uint8_t getPFC();
 
-		ValueType getCurrentValue();
-		uint8_t getPTC();
+	virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
 
-		uint8_t getPFC();
+	template <typename ValueType>
+	void setCurrentValue(ValueType newVal) {
+		// set the value only if the parameter can be updated manually
+		if (flags[1]) {
+			*reinterpret_cast<ValueType*>(valuePtr) = newVal;
+		}
+	}
+};
 
+template <typename ValueType>
+class Parameter : public ParameterBase {
+	void (* ptr)(ValueType*);
+	ValueType currentValue;
+
+public:
+	Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
+		ptc = newPtc;
+		pfc = newPfc;
+		ptr = newPtr;
+		sizeInBytes = sizeof(initialValue);
+		valuePtr = static_cast<void*>(&currentValue);
+		// see Parameter.hpp for explanation on flags
+		// by default: no update priority, manual and automatic update available
+
+		if (ptr != nullptr) {
+			(*ptr)(&currentValue);  // call the update function for the initial value
+		} else {
+			currentValue = initialValue;
+		}
+	}
+
+	String<MAX_STRING_LENGTH> getValueAsString() override {
+		String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
+		return contents;
+	}
 };
 
 

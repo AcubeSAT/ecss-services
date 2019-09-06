@@ -74,9 +74,14 @@ public:
 		 */
 		FunctionMapFull = 10,
 		/**
+		 * Attempt to overwrite an existing parameter (ST[20])
+		 */
+		ExistingParameterId = 11,
+		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 11,
+		NestedMessageTooLarge = 12,
+		UnknownKey = 13,
 	};
 
 	/**
@@ -147,9 +152,11 @@ public:
 		HousekeepingMapFull = 8,
 		
 		/**
-		 * The reqested key doesn't exist
+		 * The reqested key doesn't exist (ST[03])
+		 * FIXME: KeyNotFound collides with the same error type in InternalErrorType, and as a workaround
+		 * InternalErrorType::UnknownKey is semantically the same error.
 		 */
-		 Unknownkey = 9,
+		KeyNotFound = 9
 	};
 
 	/**

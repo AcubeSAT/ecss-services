@@ -7,29 +7,26 @@ ParameterService::ParameterService() {
 //	addNewParameter(3, 14);
 }
 
-bool ParameterService::addNewParameter(uint16_t id, Parameter param, const char* flags) {
-	try {
-		try {
-			paramsList.at(id);
-			return false;
-			// if it exists, an iterator will be returned with no exception thrown,
-			// so the function should return false
-			// todo: is it a better idea to use find() and if instead of an exception here?
-		}
-		catch (etl::map_out_of_bounds& mapOutOfBounds) {
-			param.setFlag(flags);
-			paramsList.insert(std::make_pair(id, param));
-			return true;
-		}
+void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const char* flags) {
+	if (paramsList.full()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
+		return;
 	}
-	catch (etl::map_full &mapFull) {
-		return false;
-		// if the map is full, return false
+	else {
+		if (paramsList.find(id) == paramsList.end()) {
+			param->setFlags(flags);
+			paramsList.insert(std::make_pair(id, param));
+			return;
+		}
+		else {
+			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
+			return;
+		}
 	}
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
-	etl::vector<std::pair<uint16_t, ValueType>, MAX_PARAMS> validParams;
+	etl::vector<std::pair<uint16_t, String<MAX_STRING_LENGTH>>, ECSS_ST_20_MAX_PARAMETERS> validParams;
 	Message reqParam(20, 2, Message::TM, 1);
 	// empty TM[20, 2] parameter report message
 
@@ -51,13 +48,15 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		try {
-			std::pair<uint16_t, ValueType> p = std::make_pair(currId, paramsList.at(currId).getCurrentValue());
+
+		if (paramsList.find(currId) != paramsList.end()) {
+			std::pair<uint16_t, String<MAX_STRING_LENGTH>> p = std::make_pair(currId, paramsList.at(currId)
+			->getValueAsString());
 			// pair containing the parameter's ID as first element and its current value as second
 			validParams.push_back(p);
 			validIds++;
 		}
-		catch (etl::map_out_of_bounds &mapOutOfBounds) {
+		else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
 		}
@@ -67,7 +66,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 	for (auto i: validParams) {
 		reqParam.appendUint16(i.first);  // append the parameter ID
-		reqParam.appendUint32(i.second); // and its value
+		reqParam.appendString(i.second); // and its value
 	}
 
 	storeMessage(reqParam);  // then store the message
@@ -89,10 +88,13 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
 		// the parameter is checked for read-only status and manual update availability
-		try {
-			paramsList.at(currId).setCurrentValue(newParamValues.readUint32());
+		if (paramsList.find(currId) != paramsList.end()) {
+
+			// WARNING! SETTING WORKS ONLY WITH UINT32_T INPUT!
+			// I need a way to know the input's type!
+			paramsList.at(currId)->setCurrentValue(newParamValues.readUint32());
 		}
-		catch (etl::map_out_of_bounds &mapOutOfBounds) {
+		else {
 			ErrorHandler::reportError(newParamValues,
 				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
@@ -111,4 +113,17 @@ void ParameterService::execute(Message& message) {
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
+}
+
+String<MAX_STRING_LENGTH> ParameterService::returnParamValue(ParamIdType id) {
+	if (paramsList.find(id) != paramsList.end()) {
+		return paramsList.at(id)->getValueAsString();
+	}
+	else {
+		return "";
+	}
+}
+
+bool ParameterService::isParamId(ParamIdType id) {
+	return (paramsList.find(id) != paramsList.end());
 }

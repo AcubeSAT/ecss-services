@@ -47,11 +47,12 @@ private:
 	struct HousekeepingReportStructure {
 		uint16_t collectionInterval = 0;
 		bool isPeriodic = false;
-		etl::vector<ParamIdType, MAX_PARAMS> paramId;
+		etl::vector<ParamIdType, ECSS_ST_20_MAX_PARAMETERS> paramId;
 		uint32_t timestamp = 0;
 	};
 
-	etl::map<HousekeepingIdType, HousekeepingReportStructure, MAX_HOUSEKEEPING_STRUCTURES> housekeepingStructureList;
+	etl::map<HousekeepingIdType, HousekeepingReportStructure, ECSS_ST_03_MAX_HOUSEKEEPING_STRUCTURES>
+	housekeepingStructureList;
 
 	friend struct Tester;
 public:

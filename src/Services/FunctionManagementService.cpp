@@ -43,7 +43,7 @@ void FunctionManagementService::include(String<ECSS_FUNCTION_NAME_LENGTH> funcNa
 		funcName.append(ECSS_FUNCTION_NAME_LENGTH - funcName.length(), 0);
 		funcPtrIndex.insert(std::make_pair(funcName, ptr));
 	} else {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::FunctionMapFull);
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
 	}
 }
 

@@ -141,6 +141,13 @@
  */
 #define LOGGER_MAX_MESSAGE_SIZE 512
 
-#define MAX_HOUSEKEEPING_STRUCTURES 64u
+/**
+ * @brief Size of the map holding the Housekeeping structures for the ST[03] housekeeping service
+ */
+#define ECSS_ST_03_MAX_HOUSEKEEPING_STRUCTURES 5
 
+/**
+ * @brief Size of the map holding the Parameter objects for the ST[20] parameter service
+ */
+#define ECSS_ST_20_MAX_PARAMETERS 5
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
