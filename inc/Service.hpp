@@ -41,8 +41,6 @@ protected:
 		return Message(serviceType, messageType, Message::TM, 0);
 	}
 
-
-
 	/**
 	 * This function declared only to remind us that every service must have a function like
 	 * this, but this particular function does actually nothing.

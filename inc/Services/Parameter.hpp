@@ -72,14 +72,6 @@ public:
 	uint8_t getPFC();
 
 	virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
-
-	template <typename ValueType>
-	void setCurrentValue(ValueType newVal) {
-		// set the value only if the parameter can be updated manually
-		if (flags[1]) {
-			*reinterpret_cast<ValueType*>(valuePtr) = newVal;
-		}
-	}
 };
 
 template <typename ValueType>
@@ -108,6 +100,22 @@ public:
 		String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
 		return contents;
 	}
+
+	/**
+	 * Get the current value of this parameter
+	 * @return The parameter
+	 */
+	ValueType getValue() const {
+        return currentValue;
+	}
+
+	/**
+	 * Set the current value of this parameter
+	 * @param newVal
+	 */
+    void setCurrentValue(ValueType newVal) {
+        *reinterpret_cast<ValueType*>(valuePtr) = newVal;
+    }
 };
 
 

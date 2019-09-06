@@ -110,7 +110,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 			}
 		}
 
-		mainService.storeMessage(report); // Save the report message
+		storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
 	} else {
 		// todo: Send a failed start of execution
@@ -156,7 +156,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 			}
 		}
 
-		mainService.storeMessage(report); // Save the report message
+		storeMessage(report); // Save the report message
 		request.resetRead(); // Reset the reading count
 	} else {
 		// todo: Send a failed start of execution report
