@@ -2,6 +2,8 @@
 #include "ServicePool.hpp"
 #include "ServiceTests.hpp"
 
+#define NUM_PARAMS 5 // the number of the parameters that are gonna be used for testing
+
 struct Tester {
 	static auto returnMap(HousekeepingService& hsService) {
 		return hsService.housekeepingStructureList;
@@ -23,7 +25,6 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	MessageParser::execute(request1);
 
 	// check the map with the housekeeping id and the structure
-	//Tester test;
 	auto map = Tester::returnMap(housekeepingService);
 	auto it = map.find(0);
 	CHECK(map.size() == 1);
@@ -66,17 +67,17 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	// now we have 2 housekeeping structures with IDs 0 and 1 and collection intervals 1 and 2 respectively
 
 	// Add parameters
-	Parameter param0 = Parameter(1, 2, 3);
-	Parameter param1 = Parameter(4, 5, 6);
-	Parameter param2 = Parameter(7, 8, 9);
-	Parameter param3 = Parameter(10, 11, 12);
-	Parameter param4 = Parameter(13, 14, 15);
+	Parameter<int> param0 = Parameter<int>(3, 14, 3);
+	Parameter<int> param1 = Parameter<int>(1, 7, 6);
+	Parameter<int> param2 = Parameter<int>(4, 12, 9, nullptr);
+	Parameter<int> param3 = Parameter<int>(12, 3, 12);
+	Parameter<int> param4 = Parameter<int>(15, 7, 15);
 
-	paramService.addNewParameter(1, param0);
-	paramService.addNewParameter(2, param1);
-	paramService.addNewParameter(3, param2);
-	paramService.addNewParameter(4, param3);
-	paramService.addNewParameter(5, param4);
+	paramService.addNewParameter(1, static_cast<ParameterBase*>(&param0));
+	paramService.addNewParameter(2, static_cast<ParameterBase*>(&param1));
+	paramService.addNewParameter(3, static_cast<ParameterBase*>(&param2));
+	paramService.addNewParameter(4, static_cast<ParameterBase*>(&param3));
+	paramService.addNewParameter(5, static_cast<ParameterBase*>(&param4));
 
 	// now we have a full parameter's map with param IDs and values
 
@@ -106,8 +107,13 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 
 	Message response = ServiceTests::get(0);
 	CHECK(response.readUint8() == 0); // housekeeping ID
-	CHECK(response.readUint32() == 3); // value of paramID = 1
-	CHECK(response.readUint32() == 6); // value of paramID = 2
+	char data[NUM_PARAMS][MAX_STRING_LENGTH] = {0};
+	response.readString(data[0], MAX_STRING_LENGTH);
+	response.readString(data[1], MAX_STRING_LENGTH);
+	String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data[0]);
+	CHECK(str.compare("3"));
+	str = String<MAX_STRING_LENGTH>(data[1]);
+	CHECK(str.compare("6"));
 
 	// same time
 
@@ -116,9 +122,15 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	CHECK(ServiceTests::count() == 2);
 	response = ServiceTests::get(1);
 	CHECK(response.readUint8() == 1); // housekeeping ID
-	CHECK(response.readUint32() == 9); // value of paramID = 3
-	CHECK(response.readUint32() == 12); // value of paramID = 4
-	CHECK(response.readUint32() == 15); // value of paramID = 5
+	response.readString(data[2], 1);
+	response.readString(data[3], 1);
+	response.readString(data[4], 1);
+	str = String<MAX_STRING_LENGTH>(data[2]);
+	CHECK(str.compare("9")); // value of paramID = 3
+	str = String<MAX_STRING_LENGTH>(data[3]);
+	CHECK(str.compare("12")); // value of paramID = 4
+	str = String<MAX_STRING_LENGTH>(data[4]);
+	CHECK(str.compare("15")); // value of paramID = 5
 
 	// disable structures
 	Message disable = Message(3, 6, Message::TC, 0);
@@ -164,9 +176,12 @@ TEST_CASE("Create housekeeping structures and generate periodic parameter report
 	CHECK(ServiceTests::count() == 3);
 	response = ServiceTests::get(2);
 	CHECK(response.readUint8() == 1);
-	CHECK(response.readUint32() == 9); // value of paramID = 3
-	CHECK(response.readUint32() == 12); // value of paramID = 4
-	CHECK(response.readUint32() == 15); // value of paramID = 5
+	str = String<MAX_STRING_LENGTH>(data[2]);
+	CHECK(str.compare("9")); // value of paramID = 3
+	str = String<MAX_STRING_LENGTH>(data[3]);
+	CHECK(str.compare("12")); // value of paramID = 4
+	str = String<MAX_STRING_LENGTH>(data[4]);
+	CHECK(str.compare("15")); // value of paramID = 5*/
 }
 
 TEST_CASE("TC[3,1] housekeeping structures", "[service][st03]") {
@@ -324,7 +339,7 @@ TEST_CASE("TC[3,3] delete housekeeping structures", "[service][st03]") {
 
 		auto map = Tester::returnMap(housekeepingService);
 		CHECK(map.size() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::Unknownkey));
+		CHECK(ServiceTests::thrownError(ErrorHandler::KeyNotFound));
 	}
 }
 
@@ -386,7 +401,7 @@ TEST_CASE("TC[3, 5] enable periodic generation of housekeeping structures", "[se
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 2); // two report errors should be generated
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::Unknownkey));
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::KeyNotFound));
 		MessageParser::execute(request);
 
 		// create a structure
@@ -405,7 +420,7 @@ TEST_CASE("TC[3, 5] enable periodic generation of housekeeping structures", "[se
 		request2.appendByte(2);
 		MessageParser::execute(request2);
 
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::Unknownkey));
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::KeyNotFound));
 	}
 }
 
@@ -482,7 +497,7 @@ TEST_CASE("TC[3, 6] disable periodic generation of housekeeping structures", "[s
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 2); // two report errors should be generated
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::Unknownkey));
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::KeyNotFound));
 		MessageParser::execute(request);
 
 		// create a structure
@@ -501,7 +516,7 @@ TEST_CASE("TC[3, 6] disable periodic generation of housekeeping structures", "[s
 		request2.appendByte(2);
 		MessageParser::execute(request2);
 
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::Unknownkey));
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::KeyNotFound));
 	}
 }
 
@@ -520,17 +535,17 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		MessageParser::execute(request);
 
 		// Add parameters
-		Parameter param0 = Parameter(1, 2, 3);
-		Parameter param1 = Parameter(4, 5, 6);
-		Parameter param2 = Parameter(7, 8, 9);
-		Parameter param3 = Parameter(10, 11, 12);
-		Parameter param4 = Parameter(13, 14, 15);
+		Parameter<int> param0 = Parameter<int>(3, 14, 3);
+		Parameter<int> param1 = Parameter<int>(1, 7, 6);
+		Parameter<int> param2 = Parameter<int>(4, 12, 9, nullptr);
+		Parameter<int> param3 = Parameter<int>(12, 3, 12);
+		Parameter<int> param4 = Parameter<int>(15, 7, 15);
 
-		paramService.addNewParameter(3, param0); // paramID = 3, value = 3
-		paramService.addNewParameter(4, param1); // paramID = 4, value = 6
-		paramService.addNewParameter(5, param2); // paramID = 5, value = 9
-		paramService.addNewParameter(6, param3); // paramID = 6, value = 12
-		paramService.addNewParameter(7, param4); // paramID = 7, value = 15
+		paramService.addNewParameter(3, static_cast<ParameterBase*>(&param0));
+		paramService.addNewParameter(4, static_cast<ParameterBase*>(&param1));
+		paramService.addNewParameter(5, static_cast<ParameterBase*>(&param2));
+		paramService.addNewParameter(6, static_cast<ParameterBase*>(&param3));
+		paramService.addNewParameter(7, static_cast<ParameterBase*>(&param4));
 
 		// enable structures
 		Message enable = Message(3, 5, Message::TC, 0);
@@ -545,11 +560,22 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		Message response = ServiceTests::get(0);
 		CHECK(response.readUint8() == 4); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
-		CHECK(response.readUint32() == 12);
-		CHECK(response.readUint32() == 15);
+		char data[NUM_PARAMS][MAX_STRING_LENGTH] = {0};
+		response.readString(data[0], MAX_STRING_LENGTH);
+		response.readString(data[1], MAX_STRING_LENGTH);
+		response.readString(data[2], MAX_STRING_LENGTH);
+		response.readString(data[3], MAX_STRING_LENGTH);
+		response.readString(data[4], MAX_STRING_LENGTH);
+		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
+		str = String<MAX_STRING_LENGTH>(data[3]);
+		CHECK(str.compare("12"));
+		str = String<MAX_STRING_LENGTH>(data[4]);
+		CHECK(str.compare("15"));
 
 		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 12); // nothing should happen
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
@@ -562,11 +588,16 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		response = ServiceTests::get(1);
 		CHECK(response.readUint8() == 4); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
-		CHECK(response.readUint32() == 12);
-		CHECK(response.readUint32() == 15);
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
+		str = String<MAX_STRING_LENGTH>(data[3]);
+		CHECK(str.compare("12"));
+		str = String<MAX_STRING_LENGTH>(data[4]);
+		CHECK(str.compare("15"));
 	}
 
 	SECTION("Request to fetch the value of a parameter  that doesn't exist") {
@@ -583,17 +614,17 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		MessageParser::execute(request);
 
 		// Add parameters
-		Parameter param0 = Parameter(1, 2, 3);
-		Parameter param1 = Parameter(4, 5, 6);
-		Parameter param2 = Parameter(7, 8, 9);
-		Parameter param3 = Parameter(10, 11, 12);
-		Parameter param4 = Parameter(13, 14, 15);
+		Parameter<int> param0 = Parameter<int>(3, 14, 3);
+		Parameter<int> param1 = Parameter<int>(1, 7, 6);
+		Parameter<int> param2 = Parameter<int>(4, 12, 9, nullptr);
+		Parameter<int> param3 = Parameter<int>(12, 3, 12);
+		Parameter<int> param4 = Parameter<int>(15, 7, 15);
 
-		paramService.addNewParameter(3, param0); // paramID = 3, value = 3
-		paramService.addNewParameter(4, param1); // paramID = 4, value = 6
-		paramService.addNewParameter(5, param2); // paramID = 5, value = 9
-		paramService.addNewParameter(6, param3); // paramID = 6, value = 12
-		paramService.addNewParameter(7, param4); // paramID = 7, value = 15
+		paramService.addNewParameter(1, static_cast<ParameterBase*>(&param0));
+		paramService.addNewParameter(2, static_cast<ParameterBase*>(&param1));
+		paramService.addNewParameter(3, static_cast<ParameterBase*>(&param2));
+		paramService.addNewParameter(4, static_cast<ParameterBase*>(&param3));
+		paramService.addNewParameter(5, static_cast<ParameterBase*>(&param4));
 
 		// enable structures
 		Message enable = Message(3, 5, Message::TC, 0);
@@ -605,12 +636,14 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 
 		CHECK(ServiceTests::count() == 2);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::Unknownkey));
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::KeyNotFound));
 		Message response = ServiceTests::get(1);
 		CHECK(response.readUint8() == 4); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-	}
+		char data[NUM_PARAMS][MAX_STRING_LENGTH] = {0};
+		response.readString(data[0], MAX_STRING_LENGTH);
+		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3")); 	}
 
 	SECTION("Generation of param report using multiple housekeeping IDs") {
 		Services.reset();
@@ -644,17 +677,18 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		MessageParser::execute(request2);
 
 		// Add parameters
-		Parameter param0 = Parameter(1, 2, 3);
-		Parameter param1 = Parameter(4, 5, 6);
-		Parameter param2 = Parameter(7, 8, 9);
-		Parameter param3 = Parameter(10, 11, 12);
-		Parameter param4 = Parameter(13, 14, 15);
 
-		paramService.addNewParameter(3, param0); // paramID = 3, value = 3
-		paramService.addNewParameter(4, param1); // paramID = 4, value = 6
-		paramService.addNewParameter(5, param2); // paramID = 5, value = 9
-		paramService.addNewParameter(6, param3); // paramID = 6, value = 12
-		paramService.addNewParameter(7, param4); // paramID = 7, value = 15
+		Parameter<int> param0 = Parameter<int>(3, 14, 3);
+		Parameter<int> param1 = Parameter<int>(1, 7, 6);
+		Parameter<int> param2 = Parameter<int>(4, 12, 9, nullptr);
+		Parameter<int> param3 = Parameter<int>(12, 3, 12);
+		Parameter<int> param4 = Parameter<int>(15, 7, 15);
+
+		paramService.addNewParameter(3, static_cast<ParameterBase*>(&param0));
+		paramService.addNewParameter(4, static_cast<ParameterBase*>(&param1));
+		paramService.addNewParameter(5, static_cast<ParameterBase*>(&param2));
+		paramService.addNewParameter(6, static_cast<ParameterBase*>(&param3));
+		paramService.addNewParameter(7, static_cast<ParameterBase*>(&param4));
 
 		// enable structures
 		Message enable = Message(3, 5, Message::TC, 0);
@@ -674,28 +708,42 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		Message response = ServiceTests::get(0);
 		CHECK(response.readUint8() == 4); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
-		CHECK(response.readUint32() == 12);
-		CHECK(response.readUint32() == 15);
+		char data[NUM_PARAMS][MAX_STRING_LENGTH] = {0};
+		response.readString(data[0], MAX_STRING_LENGTH);
+		response.readString(data[1], MAX_STRING_LENGTH);
+		response.readString(data[2], MAX_STRING_LENGTH);
+		response.readString(data[3], MAX_STRING_LENGTH);
+		response.readString(data[4], MAX_STRING_LENGTH);
+		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
+		str = String<MAX_STRING_LENGTH>(data[3]);
+		CHECK(str.compare("12"));
+		str = String<MAX_STRING_LENGTH>(data[4]);
+		CHECK(str.compare("15"));
 
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 3);
 		response = ServiceTests::get(1);
 		CHECK(response.readUint8() == 5); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
 
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 3);
 		response = ServiceTests::get(2);
 		CHECK(response.readUint8() == 15); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
 		// should do nothing because the time is the same
 
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
@@ -710,9 +758,12 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		response = ServiceTests::get(3);
 		CHECK(response.readUint8() == 5); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
 
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 4);
@@ -725,15 +776,19 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		response = ServiceTests::get(4);
 		CHECK(response.readUint8() == 5); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
 
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		response = ServiceTests::get(5);
 		CHECK(response.readUint8() == 15); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
 
 		timeUtc = TimeAndDate(2020, 4, 10, 10, 45, 16); // add 6 seconds since the initial time
 
@@ -743,25 +798,33 @@ TEST_CASE("TM[3,25] housekeeping parameter report", "[service][st03]") {
 		response = ServiceTests::get(6);
 		CHECK(response.readUint8() == 4); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
-		CHECK(response.readUint32() == 12);
-		CHECK(response.readUint32() == 15);
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
+		str = String<MAX_STRING_LENGTH>(data[3]);
+		CHECK(str.compare("12"));
+		str = String<MAX_STRING_LENGTH>(data[4]);
+		CHECK(str.compare("15"));
 
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		response = ServiceTests::get(7);
 		CHECK(response.readUint8() == 5); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-		CHECK(response.readUint32() == 6);
-		CHECK(response.readUint32() == 9);
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3"));
+		str = String<MAX_STRING_LENGTH>(data[1]);
+		CHECK(str.compare("6"));
+		str = String<MAX_STRING_LENGTH>(data[2]);
+		CHECK(str.compare("9"));
 
 		housekeepingService.checkAndSendHousekeepingReports(timeUtc);
 		CHECK(ServiceTests::count() == 9);
 		response = ServiceTests::get(8);
 		CHECK(response.readUint8() == 15); // housekeeping ID
 		// check param values
-		CHECK(response.readUint32() == 3);
-	}
+		str = String<MAX_STRING_LENGTH>(data[0]);
+		CHECK(str.compare("3")); 	}
 }

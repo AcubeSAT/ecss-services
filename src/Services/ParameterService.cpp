@@ -119,6 +119,9 @@ String<MAX_STRING_LENGTH> ParameterService::returnParamValue(ParamIdType id) {
 	if (paramsList.find(id) != paramsList.end()) {
 		return paramsList.at(id)->getValueAsString();
 	}
+	else {
+		return "";
+	}
 }
 
 bool ParameterService::isParamId(ParamIdType id) {
