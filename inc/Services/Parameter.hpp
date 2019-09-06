@@ -63,7 +63,7 @@ class Parameter {
 	ValueType currentValue = 0;
 
 	public:
-		Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr);
+		Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr); // Ignore-MISRA
 
 		void setCurrentValue(ValueType newVal);
 		void setFlag(const char* flags);
