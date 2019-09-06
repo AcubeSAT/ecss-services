@@ -41,13 +41,7 @@ protected:
 		return Message(serviceType, messageType, Message::TM, 0);
 	}
 
-	/**
-	 * Stores a message so that it can be transmitted to the ground station
-	 *
-	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
-	 * we just print the message to the screen
-	 */
-	void storeMessage(Message& message);
+
 
 	/**
 	 * This function declared only to remind us that every service must have a function like
@@ -61,6 +55,14 @@ protected:
 	Service() = default;
 
 public:
+    /**
+	 * Stores a message so that it can be transmitted to the ground station
+	 *
+	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
+	 * we just print the message to the screen
+	 */
+    static void storeMessage(Message& message);
+
 	/**
 	 * @brief Unimplemented copy constructor
 	 *
