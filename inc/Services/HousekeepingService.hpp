@@ -6,6 +6,8 @@
 #include "Helpers/TimeHelper.hpp"
 #include <etl/vector.h>
 #include <etl/map.h>
+
+#include <utility>
 #include "Services/ParameterService.hpp"
 
 /**
@@ -46,9 +48,19 @@ private:
 	 */
 	struct HousekeepingReportStructure {
 		uint16_t collectionInterval = 0;
-		bool isPeriodic = false;
-		etl::vector<ParamIdType, ECSS_ST_20_MAX_PARAMETERS> paramId;
+        etl::vector<ParamIdType, ECSS_ST_20_MAX_PARAMETERS> paramId;
+        bool isPeriodic = true;
+
+        explicit HousekeepingReportStructure() = default;
+
+        HousekeepingReportStructure(uint16_t collectionInterval, etl::vector<ParamIdType, ECSS_ST_20_MAX_PARAMETERS> paramId,
+                                    bool isPeriodic = true) : collectionInterval(collectionInterval), paramId(std::move(paramId)),
+                                                       isPeriodic(isPeriodic) {}
+
+    private:
 		uint32_t timestamp = 0;
+
+		friend HousekeepingService;
 	};
 
 	etl::map<HousekeepingIdType, HousekeepingReportStructure, ECSS_ST_03_MAX_HOUSEKEEPING_STRUCTURES>
@@ -60,6 +72,8 @@ public:
 	 * Define the type of the service
 	 */
 	HousekeepingService();
+
+	void addHousekeepingStructure(HousekeepingIdType id, const HousekeepingReportStructure & structure);
 
 	/**
 	 * TC[3,1] create a housekeeping report structure

@@ -144,7 +144,7 @@
 /**
  * @brief Size of the map holding the Housekeeping structures for the ST[03] housekeeping service
  */
-#define ECSS_ST_03_MAX_HOUSEKEEPING_STRUCTURES 5
+#define ECSS_ST_03_MAX_HOUSEKEEPING_STRUCTURES 20
 
 /**
  * @brief Size of the map holding the Parameter objects for the ST[20] parameter service

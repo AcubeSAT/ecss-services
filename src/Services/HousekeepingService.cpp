@@ -114,3 +114,7 @@ void HousekeepingService::execute(Message& message) {
 		default: ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+void HousekeepingService::addHousekeepingStructure(HousekeepingIdType id, const HousekeepingService::HousekeepingReportStructure &structure) {
+    housekeepingStructureList.insert(std::make_pair(id, structure));
+}
