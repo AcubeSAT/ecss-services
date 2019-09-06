@@ -125,7 +125,7 @@ public:
 	 * @todo Update parameterService in order to have access to parameter values without using friend class
 	 * @todo Parameters values aren't a fixed size, so they should be handled accordingly
 	 */
-	void checkAndSendHousekeepingReports(TimeAndDate time);
+	void checkAndSendHousekeepingReports(uint32_t ticks);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand contained in a packet. The source of

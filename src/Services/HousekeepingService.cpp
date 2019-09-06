@@ -75,8 +75,8 @@ void HousekeepingService::disablePeriodicParamReports(Message& message) {
 	}
 }
 
-void HousekeepingService::checkAndSendHousekeepingReports(TimeAndDate time) {
-	uint32_t currSeconds = TimeHelper::utcToSeconds(time); // convert UTC date to seconds
+void HousekeepingService::checkAndSendHousekeepingReports(uint32_t ticks) {
+	uint32_t currSeconds = ticks;
 
 	for (auto it = housekeepingStructureList.begin(); it != housekeepingStructureList.end(); ++it) {
 		uint32_t diffTime = currSeconds - it->second.timestamp; // time diff between current and last time called

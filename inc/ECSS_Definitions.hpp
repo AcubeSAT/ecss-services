@@ -120,19 +120,19 @@
 /**
  * The number of functions supported by the \ref FunctionManagementService
  */
-#define ECSS_FUNCTION_MAP_SIZE 5
+#define ECSS_FUNCTION_MAP_SIZE 40
 
 /**
  * The maximum length of a function name, in bytes
  * @see FunctionManagementService
  */
-#define ECSS_FUNCTION_NAME_LENGTH 32
+#define ECSS_FUNCTION_NAME_LENGTH 20
 
 /**
  * The maximum length of the argument of a function
  * @see FunctionManagementService
  */
-#define ECSS_FUNCTION_MAX_ARG_LENGTH 32
+#define ECSS_FUNCTION_MAX_ARG_LENGTH 1
 
 /** @} */
 
@@ -149,5 +149,5 @@
 /**
  * @brief Size of the map holding the Parameter objects for the ST[20] parameter service
  */
-#define ECSS_ST_20_MAX_PARAMETERS 5
+#define ECSS_ST_20_MAX_PARAMETERS 40
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
