@@ -23,7 +23,7 @@ TEST_CASE("Parameter Service - General") {
 		pserv.addNewParameter(4, static_cast<ParameterBase*>(&param4));
 
 		pserv.addNewParameter(5, static_cast<ParameterBase*>(&param5));  // addNewParameter should return false
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::ParameterListFull));
 		ServiceTests::reset();
 		Services.reset();  // reset all services
 	}

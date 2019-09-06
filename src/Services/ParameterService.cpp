@@ -9,20 +9,16 @@ ParameterService::ParameterService() {
 
 void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const char* flags) {
 	if (paramsList.full()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ParameterListFull);
 		return;
 	}
-	else {
-		if (paramsList.find(id) == paramsList.end()) {
-			param->setFlags(flags);
-			paramsList.insert(std::make_pair(id, param));
-			return;
-		}
-		else {
-			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
-			return;
-		}
-	}
+
+    if (paramsList.find(id) == paramsList.end()) {
+        param->setFlags(flags);
+        paramsList.insert(std::make_pair(id, param));
+    } else {
+        ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
+    }
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
@@ -64,7 +60,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 	reqParam.appendUint16(validIds);  // append the number of valid IDs
 
-	for (auto i: validParams) {
+	for (const auto& i: validParams) {
 		reqParam.appendUint16(i.first);  // append the parameter ID
 		reqParam.appendString(i.second); // and its value
 	}
@@ -119,9 +115,9 @@ String<MAX_STRING_LENGTH> ParameterService::returnParamValue(ParamIdType id) {
 	if (paramsList.find(id) != paramsList.end()) {
 		return paramsList.at(id)->getValueAsString();
 	}
-	else {
-		return "";
-	}
+
+	// Parameter not found
+	return "";
 }
 
 bool ParameterService::isParamId(ParamIdType id) {

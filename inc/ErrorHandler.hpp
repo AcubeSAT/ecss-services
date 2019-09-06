@@ -74,14 +74,18 @@ public:
 		 */
 		FunctionMapFull = 10,
 		/**
+		 * Attempt to insert new parameter in a full parameter list (ST[20])
+		 */
+		ParameterListFull = 11,
+		/**
 		 * Attempt to overwrite an existing parameter (ST[20])
 		 */
-		ExistingParameterId = 11,
+		ExistingParameterId = 12,
 		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 12,
-		UnknownKey = 13,
+		NestedMessageTooLarge = 13,
+		UnknownKey = 14,
 	};
 
 	/**
