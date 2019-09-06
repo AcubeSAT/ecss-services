@@ -86,9 +86,9 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 		// the parameter is checked for read-only status and manual update availability
 		if (paramsList.find(currId) != paramsList.end()) {
 
-			// WARNING! SETTING WORKS ONLY WITH UINT32_T INPUT!
-			// I need a way to know the input's type!
-			paramsList.at(currId)->setCurrentValue(newParamValues.readUint32());
+			String<MAX_STRING_LENGTH> value = "";
+			newParamValues.readString(value.data(), paramsList.at(currId)->getSizeInBytes());
+			paramsList.at(currId)->setValueAsString(value);
 		}
 		else {
 			ErrorHandler::reportError(newParamValues,

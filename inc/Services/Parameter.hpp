@@ -71,7 +71,15 @@ public:
 
 	uint8_t getPFC();
 
-	virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
+    void setValueAsString(const String<MAX_STRING_LENGTH> & input) {
+        memcpy(valuePtr, input.c_str(), input.length());
+    }
+
+    uint8_t getSizeInBytes() const {
+        return sizeInBytes;
+    }
+
+    virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
 };
 
 template <typename ValueType>
