@@ -59,6 +59,10 @@ class FunctionManagementService : public Service {
 	FunctionMap funcPtrIndex;
 
 public:
+    FunctionMap & getFunctionMap() {
+        return funcPtrIndex;
+    }
+
 	/**
 	 * Constructs the function pointer index with all the necessary functions at initialization time
 	 * These functions need to be in scope. Un-default when needed.

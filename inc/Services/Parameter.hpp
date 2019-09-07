@@ -7,7 +7,7 @@
 // Number of binary flags in every parameter. Final number TBD.
 #define NUM_OF_FLAGS 3
 // Maximum etl::string output length in bytes
-#define MAX_STRING_LENGTH 5
+#define MAX_STRING_LENGTH 30
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  * Fully compliant with the standards requirements, while adding some small,
@@ -78,6 +78,8 @@ public:
     uint8_t getSizeInBytes() const {
         return sizeInBytes;
     }
+
+    void* ptr() { return valuePtr; }
 
     void setPtr(void *valuePtr) {
         this->valuePtr = valuePtr;
