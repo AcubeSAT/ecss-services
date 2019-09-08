@@ -83,7 +83,10 @@ public:
         this->valuePtr = valuePtr;
     }
 
-    virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
+    String<MAX_STRING_LENGTH> getValueAsString() {
+        String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(valuePtr), sizeInBytes);
+        return contents;
+    }
 };
 
 template <typename ValueType>
@@ -92,7 +95,7 @@ class Parameter : public ParameterBase {
 	ValueType currentValue;
 
 public:
-	Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
+	Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) noexcept {
 		ptc = newPtc;
 		pfc = newPfc;
 		ptr = newPtr;
@@ -106,11 +109,6 @@ public:
 		} else {
 			currentValue = initialValue;
 		}
-	}
-
-	String<MAX_STRING_LENGTH> getValueAsString() override {
-		String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
-		return contents;
 	}
 
 	/**
