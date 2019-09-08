@@ -1,3 +1,4 @@
+#include <ecss-services/inc/Logger.hpp>
 #include "Services/FunctionManagementService.hpp"
 
 void FunctionManagementService::call(Message& msg) {
@@ -13,12 +14,15 @@ void FunctionManagementService::call(Message& msg) {
 	msg.readString(funcName, ECSS_FUNCTION_NAME_LENGTH);
 	msg.readString(funcArgs, ECSS_FUNCTION_MAX_ARG_LENGTH);
 
-	if (msg.dataSize > (ECSS_FUNCTION_NAME_LENGTH + ECSS_FUNCTION_MAX_ARG_LENGTH)) {
-		ErrorHandler::reportError(msg,
-		                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError); // report failed
+	LOG_DEBUG << "Executing function " << funcName;
+
+	// We send ECSS messages for the mockup, so don't perfomr this check for now
+//	if (msg.dataSize > (ECSS_FUNCTION_NAME_LENGTH + ECSS_FUNCTION_MAX_ARG_LENGTH)) {
+//		ErrorHandler::reportError(msg,
+//		                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError); // report failed
 		// start of execution as requested by the standard
-		return;
-	}
+//		return;
+//	}
 
 	// locate the appropriate function pointer
 	String<ECSS_FUNCTION_NAME_LENGTH> name(funcName);
