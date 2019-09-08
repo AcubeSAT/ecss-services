@@ -38,6 +38,10 @@ public:
 	 */
 	ParameterService();
 
+	const etl::map<ParamIdType, ParameterBase*, ECSS_ST_20_MAX_PARAMETERS>& getParamsList() {
+	    return paramsList;
+	}
+
 	/**
 	 * @brief Adds a new parameter. Emits an InternalError::MapFull if an attempt is made to insert
 	 * parameters in a full map or an InternalError::ExistingParameterId if the given parameter ID
@@ -78,6 +82,10 @@ public:
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
 	void setParameterIds(Message& newParamValues);
+
+	ParameterBase & getParameterById(ParamIdType id) {
+	    return *(paramsList[id]);
+	}
 
 	String<MAX_STRING_LENGTH> returnParamValue(ParamIdType id);
 

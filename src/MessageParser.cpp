@@ -1,5 +1,6 @@
 #include <Services/EventActionService.hpp>
 #include <ServicePool.hpp>
+#include <ecss-services/inc/Logger.hpp>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "macros.hpp"
@@ -110,6 +111,13 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 	return message;
 }
 
+Message MessageParser::parseECSSTM(uint8_t* data) {
+    Message message;
+    message.packetType = Message::TM;
+    parseECSSTMHeader(data, ECSS_TC_REQUEST_STRING_SIZE, message);
+    return message;
+}
+
 String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message, uint16_t size) {
 	uint8_t header[5];
 
@@ -179,10 +187,10 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
 
 
 void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
-	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
+    ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
-	uint8_t pusVersion = data[0] >> 4;
+	uint8_t pusVersion = data[0] >> 4U;
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
 

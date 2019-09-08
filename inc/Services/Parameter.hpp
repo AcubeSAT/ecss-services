@@ -7,7 +7,7 @@
 // Number of binary flags in every parameter. Final number TBD.
 #define NUM_OF_FLAGS 3
 // Maximum etl::string output length in bytes
-#define MAX_STRING_LENGTH 5
+#define MAX_STRING_LENGTH 30
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  * Fully compliant with the standards requirements, while adding some small,
@@ -71,21 +71,30 @@ public:
 
 	uint8_t getPFC();
 
-    void setValueAsString(const String<MAX_STRING_LENGTH> & input) {
-        memcpy(valuePtr, input.c_str(), input.length());
-    }
+    void setValueAsString(const String<MAX_STRING_LENGTH> & input);
 
     uint8_t getSizeInBytes() const {
         return sizeInBytes;
     }
+
+    void* ptr() { return valuePtr; }
 
     void setPtr(void *valuePtr) {
         this->valuePtr = valuePtr;
     }
 
     String<MAX_STRING_LENGTH> getValueAsString() {
-        String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(valuePtr), sizeInBytes);
+        String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t *>(valuePtr), sizeInBytes);
         return contents;
+    }
+
+    template <class T>
+    static T change_endian_double(T in)
+    {
+        char* const p = reinterpret_cast<char*>(&in);
+        for (size_t i = 0; i < sizeof(T) / 2; ++i)
+            std::swap(p[i], p[sizeof(T) - i - 1]);
+        return in;
     }
 };
 
@@ -99,7 +108,7 @@ public:
 		ptc = newPtc;
 		pfc = newPfc;
 		ptr = newPtr;
-		sizeInBytes = sizeof(initialValue);
+		sizeInBytes = sizeof(ValueType);
 		valuePtr = static_cast<void*>(&currentValue);
 		// see Parameter.hpp for explanation on flags
 		// by default: no update priority, manual and automatic update available

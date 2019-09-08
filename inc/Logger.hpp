@@ -24,13 +24,13 @@
 #define LOGLEVEL Logger::disabled // Ignore-MISRA
 #endif
 
-#define LOG_TRACE     (LOG<Logger::trace>())     ///< @see LOG @relates Logger
-#define LOG_DEBUG     (LOG<Logger::debug>())     ///< @see LOG @relates Logger
-#define LOG_INFO      (LOG<Logger::info>())      ///< @see LOG @relates Logger
-#define LOG_NOTICE    (LOG<Logger::notice>())    ///< @see LOG @relates Logger
-#define LOG_WARNING   (LOG<Logger::warning>())   ///< @see LOG @relates Logger
-#define LOG_ERROR     (LOG<Logger::error>())     ///< @see LOG @relates Logger
-#define LOG_EMERGENCY (LOG<Logger::emergency>()) ///< @see LOG @relates Logger
+#define LOG_TRACE     (LOG<Logger::LogLevel::trace>())     ///< @see LOG @relates Logger
+#define LOG_DEBUG     (LOG<Logger::LogLevel::debug>())     ///< @see LOG @relates Logger
+#define LOG_INFO      (LOG<Logger::LogLevel::info>())      ///< @see LOG @relates Logger
+#define LOG_NOTICE    (LOG<Logger::LogLevel::notice>())    ///< @see LOG @relates Logger
+#define LOG_WARNING   (LOG<Logger::LogLevel::warning>())   ///< @see LOG @relates Logger
+#define LOG_ERROR     (LOG<Logger::LogLevel::error>())     ///< @see LOG @relates Logger
+#define LOG_EMERGENCY (LOG<Logger::LogLevel::emergency>()) ///< @see LOG @relates Logger
 
 /**
  * A logging class for ECSS Services that supports ETL's String and is lightweight enough to be used in embedded

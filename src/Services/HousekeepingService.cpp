@@ -1,3 +1,4 @@
+#include <ecss-services/inc/Logger.hpp>
 #include "Services/HousekeepingService.hpp"
 #include "ServicePool.hpp"
 
@@ -117,4 +118,19 @@ void HousekeepingService::execute(Message& message) {
 
 void HousekeepingService::addHousekeepingStructure(HousekeepingIdType id, const HousekeepingService::HousekeepingReportStructure &structure) {
     housekeepingStructureList.insert(std::make_pair(id, structure));
+}
+
+void HousekeepingService::applyHousekeeping(Message &message) {
+    message.assertTM(3, 25);
+
+    HousekeepingIdType id = message.readByte();
+
+    auto & structure = housekeepingStructureList[id];
+    for (auto &it : structure.paramId) {
+        ParameterBase & param = Services.parameterManagement.getParameterById(it);
+
+        uint8_t string[50];
+        message.readString(string, param.getSizeInBytes());
+        param.setValueAsString(string);
+    }
 }
