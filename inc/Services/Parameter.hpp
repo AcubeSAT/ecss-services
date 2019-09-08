@@ -96,6 +96,8 @@ public:
             std::swap(p[i], p[sizeof(T) - i - 1]);
         return in;
     }
+
+    virtual ~ParameterBase() = default;
 };
 
 template <typename ValueType>
