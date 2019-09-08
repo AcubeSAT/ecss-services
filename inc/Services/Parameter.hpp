@@ -71,9 +71,7 @@ public:
 
 	uint8_t getPFC();
 
-    void setValueAsString(const String<MAX_STRING_LENGTH> & input) {
-        memcpy(valuePtr, input.c_str(), input.length());
-    }
+    void setValueAsString(const String<MAX_STRING_LENGTH> & input);
 
     uint8_t getSizeInBytes() const {
         return sizeInBytes;
@@ -86,6 +84,15 @@ public:
     }
 
     virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
+
+    template <class T>
+    static T change_endian_double(T in)
+    {
+        char* const p = reinterpret_cast<char*>(&in);
+        for (size_t i = 0; i < sizeof(T) / 2; ++i)
+            std::swap(p[i], p[sizeof(T) - i - 1]);
+        return in;
+    }
 };
 
 template <typename ValueType>
@@ -98,7 +105,7 @@ public:
 		ptc = newPtc;
 		pfc = newPfc;
 		ptr = newPtr;
-		sizeInBytes = sizeof(initialValue);
+		sizeInBytes = sizeof(ValueType);
 		valuePtr = static_cast<void*>(&currentValue);
 		// see Parameter.hpp for explanation on flags
 		// by default: no update priority, manual and automatic update available

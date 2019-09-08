@@ -1,3 +1,4 @@
+#include <ecss-services/inc/Logger.hpp>
 #include "Services/Parameter.hpp"
 
 uint8_t ParameterBase::getPTC() {
@@ -10,4 +11,12 @@ uint8_t ParameterBase::getPFC() {
 
 void ParameterBase::setFlags(const char* flags) {
 	this->flags = Flags(flags);
+}
+
+void ParameterBase::setValueAsString(const String<MAX_STRING_LENGTH> &input) {
+    memcpy(valuePtr, input.c_str(), sizeInBytes);
+
+    if (dynamic_cast<Parameter<double>*>(this) != nullptr) {
+        *((double*)valuePtr) = change_endian_double(*((double*)valuePtr));
+    }
 }

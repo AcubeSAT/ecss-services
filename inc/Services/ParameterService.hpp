@@ -83,6 +83,10 @@ public:
 	 */
 	void setParameterIds(Message& newParamValues);
 
+	ParameterBase & getParameterById(ParamIdType id) {
+	    return *(paramsList[id]);
+	}
+
 	String<MAX_STRING_LENGTH> returnParamValue(ParamIdType id);
 
 	bool isParamId(ParamIdType id);

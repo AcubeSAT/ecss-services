@@ -127,6 +127,8 @@ public:
 	 */
 	void checkAndSendHousekeepingReports(uint32_t ticks);
 
+	void applyHousekeeping(Message& message);
+
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand contained in a packet. The source of
 	 * that packet is the ground station.
