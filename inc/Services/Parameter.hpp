@@ -71,7 +71,7 @@ public:
 
 	uint8_t getPFC();
 
-    void setValueAsString(const String<MAX_STRING_LENGTH> & input);
+    virtual void setValueAsString(const String<MAX_STRING_LENGTH> & input);
 
     uint8_t getSizeInBytes() const {
         return sizeInBytes;
@@ -103,8 +103,12 @@ public:
 class StringParameter : public ParameterBase {
     String<10> value;
 public:
-    StringParameter() : value("bla") {
+    StringParameter() : value("") {
         sizeInBytes = 10;
+    }
+
+    String<10> getValue() const {
+        return value;
     }
 
     String<MAX_STRING_LENGTH> getValueAsString() override {
@@ -113,6 +117,10 @@ public:
             value[i] = '\0';
         }
         return String<MAX_STRING_LENGTH>(reinterpret_cast<const unsigned char*>(value.c_str()), sizeInBytes);
+    }
+
+    void setValueAsString(const String<MAX_STRING_LENGTH> & input) override {
+        value.assign(input);
     }
 
     void setCurrentValue(String<10> newValue) {

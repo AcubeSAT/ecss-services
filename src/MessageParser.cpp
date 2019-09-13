@@ -66,7 +66,7 @@ std::optional<Message> MessageParser::parse(uint8_t* data, uint32_t length) {
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
-	if (packetDataLength <= length - 6U) {
+	if (packetDataLength <= length - 6U && packetDataLength >= 6U) {
         if (packetType == Message::TC) {
             parseECSSTCHeader(data + 6, packetDataLength, message);
         } else {
