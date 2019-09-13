@@ -49,7 +49,7 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	static Message parse(uint8_t* data, uint32_t length);
+	static std::optional<Message> parse(uint8_t* data, uint32_t length);
 
 	/**
 	 * Parse data that contains the ECSS packet header, without the CCSDS space packet header

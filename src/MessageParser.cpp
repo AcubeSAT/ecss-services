@@ -42,7 +42,7 @@ void MessageParser::execute(Message& message) {
 	}
 }
 
-Message MessageParser::parse(uint8_t* data, uint32_t length) {
+std::optional<Message> MessageParser::parse(uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(length >= 6, ErrorHandler::UnacceptablePacket);
 
 	uint16_t packetHeaderIdentification = (data[0] << 8) | data[1];
@@ -61,18 +61,35 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket);
 	ASSERT_INTERNAL(secondaryHeaderFlag, ErrorHandler::UnacceptablePacket);
 	ASSERT_INTERNAL(sequenceFlags == 0x3U, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(packetDataLength == (length - 6U), ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(packetDataLength <= (length - 6U), ErrorHandler::UnacceptablePacket);
 
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
-	if (packetType == Message::TC) {
-		parseECSSTCHeader(data + 6, packetDataLength, message);
-	} else {
-		parseECSSTMHeader(data + 6, packetDataLength, message);
-	}
+	if (packetDataLength <= length - 6U) {
+        if (packetType == Message::TC) {
+            parseECSSTCHeader(data + 6, packetDataLength, message);
+        } else {
+            parseECSSTMHeader(data + 6, packetDataLength, message);
+        }
 
-	return message;
+        // Get the CRC at the end of the message
+        uint16_t crc = *reinterpret_cast<uint16_t*>(message.data + message.dataSize - 2);
+        uint16_t corcrc = CRCHelper::calculateCRC(message.data, message.dataSize - 2);
+
+        // Reverse endianness
+        crc = ((crc >> 8U) & 0xffU) | ((crc & 0xffU) << 8U);
+
+        if (crc == corcrc) {
+            return message;
+        } else {
+            LOG_ERROR << "Failed CRC check";
+        }
+
+        return std::optional<Message>();
+    }
+
+    return std::optional<Message>();
 }
 
 void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
