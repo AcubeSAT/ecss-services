@@ -43,6 +43,9 @@ void Message::finalize() {
 		dataSize++;
 	}
 
+    // Append the CRC of the message to the end
+    appendUint16(CRCHelper::calculateCRC(data, dataSize));
+
 	if (packetType == PacketType::TM) {
 		messageTypeCounter = Services.getAndUpdateMessageTypeCounter(serviceType, messageType);
 		packetSequenceCount = Services.getAndUpdatePacketSequenceCounter();
