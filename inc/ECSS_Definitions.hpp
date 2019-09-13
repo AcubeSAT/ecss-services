@@ -149,5 +149,5 @@
 /**
  * @brief Size of the map holding the Parameter objects for the ST[20] parameter service
  */
-#define ECSS_ST_20_MAX_PARAMETERS 40
+#define ECSS_ST_20_MAX_PARAMETERS 100
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
