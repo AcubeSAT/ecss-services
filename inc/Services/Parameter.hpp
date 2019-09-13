@@ -83,7 +83,7 @@ public:
         this->valuePtr = valuePtr;
     }
 
-    String<MAX_STRING_LENGTH> getValueAsString() {
+    virtual String<MAX_STRING_LENGTH> getValueAsString() {
         String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t *>(valuePtr), sizeInBytes);
         return contents;
     }
@@ -100,12 +100,37 @@ public:
     virtual ~ParameterBase() = default;
 };
 
+class StringParameter : public ParameterBase {
+    String<10> value;
+public:
+    StringParameter() : value("bla") {
+        sizeInBytes = 10;
+    }
+
+    String<MAX_STRING_LENGTH> getValueAsString() override {
+        for (int i = value.size(); i < 10; i++) {
+            // Null bytes for the data
+            value[i] = '\0';
+        }
+        return String<MAX_STRING_LENGTH>(reinterpret_cast<const unsigned char*>(value.c_str()), sizeInBytes);
+    }
+
+    void setCurrentValue(String<10> newValue) {
+        value = newValue;
+    }
+};
+
 template <typename ValueType>
 class Parameter : public ParameterBase {
 	void (* ptr)(ValueType*);
 	ValueType currentValue;
 
 public:
+    Parameter() noexcept {
+        sizeInBytes = sizeof(ValueType);
+        valuePtr = static_cast<void*>(&currentValue);
+    }
+
 	Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) noexcept {
 		ptc = newPtc;
 		pfc = newPfc;

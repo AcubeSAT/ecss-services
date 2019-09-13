@@ -25,6 +25,11 @@
 template <const size_t MAX_SIZE>
 class String : public etl::string<MAX_SIZE> {
 public:
+    /**
+     * Constructor for an empty string
+     */
+    String() : etl::string<MAX_SIZE>("", 0) {};
+
 	/**
 	 * String constructor from a uint8_t array, with a length equal to \p MAX_SIZE
 	 *
