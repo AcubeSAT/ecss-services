@@ -13,7 +13,7 @@ cd "$(dirname "$0")"
 GCCVERSION=`g++ -dumpversion`
 
 clang-tidy `find ../src/ -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` \
-    -extra-arg=-fcolor-diagnostics -- -std=c++17 -I../inc -I../lib/etl/include \
+    -extra-arg=-fcolor-diagnostics -- -std=c++17 -I../inc -I../lib/etl/include -I../inc/Platform/x86 \
     -I/usr/include/c++/$GCCVERSION -I/usr/include/x86_64-linux-gnu/c++/$GCCVERSION \
     -I/usr/include/c++/$GCCVERSION/$MACHTYPE
 

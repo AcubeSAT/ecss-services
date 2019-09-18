@@ -14,6 +14,12 @@ add_custom_target(check
         COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
+# Allow the user to set the ECSS Configuration directory using the -DECSS_CONFIGURATION=... command line argument
+set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
+        "The include directory for the platform-specific ECSS configuration headers"
+        )
+include_directories(${ECSS_CONFIGURATION})
+
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
         src/Service.cpp
@@ -43,8 +49,6 @@ add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )
-set_target_properties(ecss_services
-        PROPERTIES COMPILE_DEFINITIONS LOGLEVEL_TRACE)
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
