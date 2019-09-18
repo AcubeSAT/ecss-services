@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_LARGEPACKET
+
 #include <Services/LargePacketTransferService.hpp>
 #include "Message.hpp"
 #include <etl/String.hpp>
@@ -88,3 +91,5 @@ void LargePacketTransferService::split(Message& message, uint16_t largeMessageTr
 	stringPart = dataPart;
 	lastDownlinkPartReport(largeMessageTransactionIdentifier, (parts - 1U), stringPart);
 }
+
+#endif

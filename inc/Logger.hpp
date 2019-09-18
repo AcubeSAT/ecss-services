@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <etl/String.hpp>
 #include <etl/to_string.h>
+#include "ECSS_Configuration.hpp"
 #include "ECSS_Definitions.hpp"
 
 #if defined LOGLEVEL_TRACE

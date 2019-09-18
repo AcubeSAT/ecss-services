@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_EVENTACTION
+
 #include "Services/EventActionService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
@@ -217,3 +220,5 @@ void EventActionService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif

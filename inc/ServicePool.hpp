@@ -1,7 +1,8 @@
 #ifndef ECSS_SERVICES_SERVICEPOOL_HPP
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
-#include <Services/TimeBasedSchedulingService.hpp>
+#include "ECSS_Configuration.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/TimeManagementService.hpp"
@@ -16,8 +17,6 @@
  * Defines a class that contains instances of all Services.
  *
  * All Services should be stored here and should not be instantiated in a different way.
- *
- * @todo Find a way to disable services which are not used
  */
 class ServicePool {
 	/**
@@ -34,16 +33,45 @@ class ServicePool {
 	 */
 	uint16_t packetSequenceCounter = 0;
 public:
-	RequestVerificationService requestVerification;
-	EventReportService eventReport;
-	MemoryManagementService memoryManagement;
-	TimeManagementService timeManagement;
+#ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
-	TestService testService;
-	ParameterService parameterManagement;
-	LargePacketTransferService largePacketTransferService;
+#endif
+
+#ifdef SERVICE_EVENTREPORT
+	EventReportService eventReport;
+#endif
+
+#ifdef SERVICE_FUNCTION
 	FunctionManagementService functionManagement;
+#endif
+
+#ifdef SERVICE_LARGEPACKET
+	LargePacketTransferService largePacketTransferService;
+#endif
+
+#ifdef SERVICE_MEMORY
+	MemoryManagementService memoryManagement;
+#endif
+
+#ifdef SERVICE_PARAMETER
+	ParameterService parameterManagement;
+#endif
+
+#ifdef SERVICE_REQUESTVERIFICATION
+	RequestVerificationService requestVerification;
+#endif
+
+#ifdef SERVICE_TEST
+	TestService testService;
+#endif
+
+#ifdef SERVICE_TIME
+	TimeManagementService timeManagement;
+#endif
+
+#ifdef SERVICE_TIMESCHEDULING
 	TimeBasedSchedulingService timeBasedScheduling;
+#endif
 
 	/**
 	 * The default ServicePool constructor

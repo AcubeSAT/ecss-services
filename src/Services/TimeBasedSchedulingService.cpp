@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_TIMESCHEDULING
+
 #include "Services/TimeBasedSchedulingService.hpp"
 
 TimeBasedSchedulingService::TimeBasedSchedulingService() {
@@ -293,3 +296,5 @@ void TimeBasedSchedulingService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif

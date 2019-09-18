@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_TIME
+
 #include "Services/TimeManagementService.hpp"
 
 void TimeManagementService::cdsTimeReport(TimeAndDate& TimeInfo) {
@@ -35,3 +38,5 @@ void TimeManagementService::execute(Message& message) {
 			break;
 	}
 }
+
+#endif

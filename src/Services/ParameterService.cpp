@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_PARAMETER
+
 #include "Services/ParameterService.hpp"
 
 #define DEMOMODE
@@ -131,3 +134,5 @@ void ParameterService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif
