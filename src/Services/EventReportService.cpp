@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_EVENTREPORT
+
 #include <Services/EventReportService.hpp>
 #include <Services/EventActionService.hpp>
 #include "Message.hpp"
@@ -144,3 +147,5 @@ void EventReportService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif

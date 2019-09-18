@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_REQUESTVERIFICATION
+
 #include "Services/RequestVerificationService.hpp"
 
 void RequestVerificationService::successAcceptanceVerification(const Message& request) {
@@ -147,3 +150,5 @@ void RequestVerificationService::failRoutingVerification(const Message& request,
 
 	storeMessage(report);
 }
+
+#endif

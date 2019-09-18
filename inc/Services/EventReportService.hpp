@@ -13,8 +13,6 @@
  * Note: enum IDs are these just for test purposes
  *
  */
-#define CSS_EVENTS_MAX_COUNT 16
-#define ECSS_EVENTS_BITS 16
 
 class EventReportService : public Service {
 private:

@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_FUNCTION
+
 #include "Services/FunctionManagementService.hpp"
 
 void FunctionManagementService::call(Message& msg) {
@@ -57,3 +60,5 @@ void FunctionManagementService::execute(Message& message) {
 			break;
 	}
 }
+
+#endif

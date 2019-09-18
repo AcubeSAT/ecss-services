@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_TEST
+
 #include "Services/TestService.hpp"
 
 void TestService::areYouAlive(Message& request) {
@@ -30,3 +33,5 @@ void TestService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif
