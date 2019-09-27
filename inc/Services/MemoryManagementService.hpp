@@ -2,7 +2,6 @@
 #define ECSS_SERVICES_MEMMANGSERVICE_HPP
 
 #include <memory>
-#include <iostream>
 #include "Service.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
