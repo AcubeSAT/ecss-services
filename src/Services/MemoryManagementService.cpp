@@ -2,7 +2,6 @@
 #ifdef SERVICE_MEMORY
 
 #include "Services/MemoryManagementService.hpp"
-#include <iostream>
 #include <cerrno>
 #include <etl/String.hpp>
 

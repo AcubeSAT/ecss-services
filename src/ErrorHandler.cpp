@@ -1,5 +1,4 @@
-#include <iostream>
-#include <cxxabi.h>
+#include "ECSS_Configuration.hpp"
 #include <ErrorHandler.hpp>
 #include <ServicePool.hpp>
 #include "Services/RequestVerificationService.hpp"
