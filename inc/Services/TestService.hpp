@@ -5,6 +5,8 @@
 
 /**
  * Implementation of the ST[17] test service
+ *
+ * @ingroup Services
  */
 class TestService : public Service {
 public:

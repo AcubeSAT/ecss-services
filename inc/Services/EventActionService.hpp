@@ -11,6 +11,7 @@
  *
  * ECSS 8.19 && 6.19
  *
+ * @ingroup Services
  * @note: Make sure to check the note in the addEventActionDefinition()
  * @note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
  * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions

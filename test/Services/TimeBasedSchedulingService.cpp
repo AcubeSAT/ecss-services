@@ -33,7 +33,6 @@ namespace unit_test
 } // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
-MessageParser msgParser;
 auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
 bool messagesPopulated = false; // Indicate whether the test messages are initialized
 
@@ -71,19 +70,19 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 
 	// Test activity 1
 	receivedMessage.appendUint32(currentTime + 1556435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage1));
+	receivedMessage.appendMessage(testMessage1, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Test activity 2
 	receivedMessage.appendUint32(currentTime + 1957232);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage2));
+	receivedMessage.appendMessage(testMessage2, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Test activity 3
 	receivedMessage.appendUint32(currentTime + 1726435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage3));
+	receivedMessage.appendMessage(testMessage3, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Test activity 4
 	receivedMessage.appendUint32(currentTime + 17248435);
-	receivedMessage.appendString(msgParser.convertTCToStr(testMessage4));
+	receivedMessage.appendMessage(testMessage4, ECSS_TC_REQUEST_STRING_SIZE);
 
 	// Insert activities in the schedule. They have to be inserted sorted
 	timeService.insertActivities(receivedMessage);
@@ -115,14 +114,15 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
 	REQUIRE(scheduledActivities.size() == 4);
+
 	REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435);
 	REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435);
 	REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232);
 	REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435);
-	REQUIRE(scheduledActivities.at(0)->request == testMessage1);
-	REQUIRE(scheduledActivities.at(1)->request == testMessage3);
-	REQUIRE(scheduledActivities.at(2)->request == testMessage2);
-	REQUIRE(scheduledActivities.at(3)->request == testMessage4);
+	REQUIRE(testMessage1.bytesEqualWith(scheduledActivities.at(0)->request));
+	REQUIRE(testMessage3.bytesEqualWith(scheduledActivities.at(1)->request));
+	REQUIRE(testMessage2.bytesEqualWith(scheduledActivities.at(2)->request));
+	REQUIRE(testMessage4.bytesEqualWith(scheduledActivities.at(3)->request));
 
 	SECTION("Error throw test") {
 		Message receivedMessage(11, 4, Message::TC, 1);
@@ -198,7 +198,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 
 		// Make sure the new value is inserted sorted
 		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 1957232 + timeShift);
-		REQUIRE(scheduledActivities.at(3)->request == testMessage2);
+		REQUIRE(testMessage2.bytesEqualWith(scheduledActivities.at(3)->request));
 	}
 
 	SECTION("Negative Shift") {
@@ -213,7 +213,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 
 		// Output should be sorted
 		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1957232 - 250000);
-		REQUIRE(scheduledActivities.at(1)->request == testMessage2);
+		REQUIRE(testMessage2.bytesEqualWith(scheduledActivities.at(1)->request));
 	}
 
 	SECTION("Error throw on wrong request ID") {
@@ -275,7 +275,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 			Message receivedTCPacket;
 			uint8_t receivedDataStr[ECSS_TC_REQUEST_STRING_SIZE];
 			response.readString(receivedDataStr, ECSS_TC_REQUEST_STRING_SIZE);
-			receivedTCPacket = msgParser.parseRequestTC(receivedDataStr);
+			receivedTCPacket = MessageParser::parseECSSTC(receivedDataStr);
 
 			if (i == 0) {
 				REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
@@ -379,10 +379,10 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 		Message receivedTCPacket;
 		uint8_t receivedDataStr[ECSS_TC_REQUEST_STRING_SIZE];
 		response.readString(receivedDataStr, ECSS_TC_REQUEST_STRING_SIZE);
-		receivedTCPacket = msgParser.parseRequestTC(receivedDataStr);
+		receivedTCPacket = MessageParser::parseECSSTC(receivedDataStr);
 
 		REQUIRE(receivedReleaseTime == scheduledActivities.at(i)->requestReleaseTime);
-		REQUIRE(scheduledActivities.at(i)->request == receivedTCPacket);
+		REQUIRE(receivedTCPacket.bytesEqualWith(scheduledActivities.at(i)->request));
 	}
 }
 
@@ -408,7 +408,7 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 
 		REQUIRE(scheduledActivities.size() == 3);
 		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 17248435);
-		REQUIRE(scheduledActivities.at(2)->request == testMessage4);
+		REQUIRE(testMessage4.bytesEqualWith(scheduledActivities.at(2)->request));
 	}
 
 	SECTION("Error throw on wrong request ID") {

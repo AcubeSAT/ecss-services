@@ -1,4 +1,4 @@
-image: lycantropos/cmake
+image: lightspot21/acubesat-ci:latest
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -15,7 +15,7 @@ stages:
   - deploy
 
 before_script:
-  - apt-get update -qq && apt-get -qq -y install python3-pip && python3 -m pip install --upgrade pip
+  - apt-get update -qq && apt-get -qq -y install libstdc++6 python3-pip && python3 -m pip install --upgrade pip
   - python3 -V
   - python3 -m pip --version
   - g++ --version
@@ -54,8 +54,6 @@ tests:
 cppcheck:
   stage: build
   before_script:
-    - echo deb http://deb.debian.org/debian testing main > /etc/apt/sources.list
-    - apt-get update -qq && apt-get -t testing install -y cppcheck
     - cppcheck --version
   script:
     - ci/cppcheck.sh
@@ -63,9 +61,6 @@ cppcheck:
 cppcheck-misra:
   stage: build
   before_script:
-  # install cppcheck from the testing repos in order to get the latest version
-    - echo deb http://deb.debian.org/debian testing main > /etc/apt/sources.list
-    - apt-get update -qq && apt-get -t testing install -y cppcheck && apt-get -t testing install -y python3
     - cppcheck --version
   script:
     - ci/cppcheck-misra.sh
@@ -73,7 +68,6 @@ cppcheck-misra:
 vera:
   stage: build
   before_script:
-    - apt-get update -qq && apt-get install -y -qq vera++
     - vera++ --version
     - cp ci/vera.profile /usr/lib/vera++/profiles/custom
   script:
@@ -84,14 +78,8 @@ clang-tidy:
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     TERM: xterm-color
-  before_script:
-    # Installing the `sid` repository to get the latest version of clang
-    - echo deb http://deb.debian.org/debian sid main > /etc/apt/sources.list
-    - apt-get update -qq && apt-get -t sid install -y -qq clang-tidy-7
-    - clang-tidy-7 --version
   script:
-    # Running with `script` to give clang a tty so that it outputs colours
-    - script -c "bash -x ci/clang-tidy.sh"
+    - ci/clang-tidy.sh
 
 pages:
   stage: deploy
@@ -103,8 +91,6 @@ pages:
   variables:
     GIT_SUBMODULE_STRATEGY: normal
   script:
-    - apt-get install -qq -y doxygen graphviz lcov
-  after_script:
     - ./ci/pages_deploy.sh
     - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage  # Print directory contents for debugging
   artifacts:

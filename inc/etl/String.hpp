@@ -56,6 +56,20 @@ public:
 	 */
 	String(const char* text) // NOLINTNEXTLINE(google-explicit-constructor)
 	    : etl::string<MAX_SIZE>(text) {}
+
+	using etl::istring::append; // Use the append function from the parent
+
+    /**
+     * Append a specified number of bytes from a uint8_t array to the String
+     * @details The array does NOT need to be null-terminated
+     * @param data The characters to append
+     * @param n The number of characters that \p data contains
+     * @return This string
+     */
+	String& append(const uint8_t* data, size_t n) {
+		etl::string<MAX_SIZE>::append(reinterpret_cast<const char*>(data), n);
+		return *this;
+	}
 };
 
 #endif // ECSS_SERVICES_ETL_STRING_HPP

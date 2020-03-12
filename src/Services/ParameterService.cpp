@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_PARAMETER
+
 #include "Services/ParameterService.hpp"
 #include "Services/Parameter.hpp"
 
@@ -114,3 +117,5 @@ void ParameterService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif

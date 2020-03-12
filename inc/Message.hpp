@@ -33,29 +33,46 @@ public:
 	/**
 	 * @brief Overload the equality operator to compare messages
 	 * @details Compare two @ref ::Message objects, based on their contents and type
-	 * @param The message content to compare against
-	 * @todo Activate the dataSize check when the Message object data field is defined with a
-	 * fixed size
+	 * @param msg The message content to compare against
 	 * @return The result of comparison
 	 */
 	bool operator==(const Message& msg) const {
-		// todo: Enable the following check when the message data field has a fixed size padded
-		//  with zeros. At the moment the data array is not padded with zeros to fulfil the
-		//  maximum set number of a TC request message.
-		// if (this->dataSize != msg.dataSize) return false;
-
-		for (uint16_t i = 0; i < ECSS_MAX_MESSAGE_SIZE; i++) {
-			if (this->data[i] != msg.data[i]) {
-				return false;
-			}
+		if (dataSize != msg.dataSize) {
+			return false;
 		}
-		return (this->packetType == msg.packetType) && (this->messageType == msg.messageType) &&
-		       (this->serviceType == msg.serviceType);
+
+		if (not isSameType(*this, msg)) {
+			return false;
+		}
+
+		return std::equal(data, data + dataSize, msg.data);
+	}
+
+	/**
+	 * Checks the first \ref Message::dataSize bytes of \p msg for equality
+	 *
+	 * This performs an equality check for the first `[0, this->dataSize)` bytes of two messages. Useful to compare
+	 * two messages that have the same content, but one of which does not know its length.
+	 *
+	 * @param msg The message to check. Its `dataSize` must be smaller than the object calling the function
+	 * @return False if the messages are not of the same type, if `msg.dataSize < this->dataSize`, or if the first
+	 * `this->dataSize` bytes are not equal between the two messages.
+	 */
+	bool bytesEqualWith(const Message& msg) const {
+		if (msg.dataSize < dataSize) {
+			return false;
+		}
+
+		if (not isSameType(*this, msg)) {
+			return false;
+		}
+
+		return std::equal(data, data + dataSize, msg.data);
 	}
 
 	enum PacketType {
-		TM = 0, // Telemetry
-		TC = 1 // Telecommand
+		TM = 0, ///< Telemetry
+		TC = 1 ///< Telecommand
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
@@ -84,7 +101,9 @@ public:
 	// Pointer to the contents of the message (excluding the PUS header)
 	// We allocate this data statically, in order to make sure there is predictability in the
 	// handling and storage of messages
-	// TODO: Is it a good idea to not initialise this to 0?
+	//
+	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
+	// Message::appendBits() relies on this in order to easily OR the requested bits.
 	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = { 0 };
 
 	// private:
@@ -108,7 +127,7 @@ public:
 	 * multiple of the padding word size declared for the application process
 	 * @todo Confirm that the overall packet size is an integer multiple of the padding word size
 	 * declared for every application process
-	 * @todo check if wee need to define the spare field for the telemetry and telecommand
+	 * @todo check if we need to define the spare field for the telemetry and telecommand
 	 * secondary headers
 	 */
 	void finalize();
@@ -140,8 +159,7 @@ public:
 	 *
 	 * @param string The string to insert
 	 */
-	template <const size_t SIZE>
-	void appendString(const String<SIZE>& string);
+	void appendString(const etl::istring& string);
 
 	/**
 	 * Appends a number of bytes to the message
@@ -156,8 +174,7 @@ public:
 	 *
 	 * @param string The string to insert
 	 */
-	template <const size_t SIZE>
-	void appendFixedString(const String<SIZE>& string);
+	void appendFixedString(const etl::istring& string);
 
 	/**
 	 * Reads the next \p numBits bits from the the message in a big-endian format
@@ -339,14 +356,18 @@ public:
 	 *
 	 * PTC = 7, PFC = 0
 	 */
-	template <const size_t SIZE>
-	void appendOctetString(const String<SIZE>& string) {
-		// Make sure that the string is large enough to count
-		ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
+	void appendOctetString(const etl::istring& string);
 
-		appendUint16(string.size());
-		appendString(string);
-	}
+	/**
+	 * Adds a nested TC or TM Message within the current Message
+	 *
+	 * As a design decision, nested TC & TM Messages always have a fixed width, specified in \ref ECSSDefinitions. This
+	 * reduces the uncertainty and complexity of having to parse the nested Message itself to see how long it is, at
+	 * the cost of more data to be transmitted.
+	 * @param message The message to append
+	 * @param size The fixed number of bytes that the message will take up. The empty last bytes are padded with 0s.
+	 */
+	void appendMessage(const Message & message, uint16_t size);
 
 	/**
 	 * Fetches a single-byte boolean value from the current position in the message
@@ -542,26 +563,5 @@ public:
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
-
-template <const size_t SIZE>
-inline void Message::appendString(const String<SIZE>& string) {
-	ASSERT_INTERNAL(dataSize + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
-	// TODO: Do we need to keep this check? How does etl::string handle it?
-	ASSERT_INTERNAL(string.size() < string.capacity(), ErrorHandler::StringTooLarge);
-
-	memcpy(data + dataSize, string.data(), string.size());
-
-	dataSize += string.size();
-}
-
-template <const size_t SIZE>
-inline void Message::appendFixedString(const String<SIZE>& string) {
-	ASSERT_INTERNAL((dataSize + SIZE) < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
-
-	memcpy(data + dataSize, string.data(), string.size()); // Append the bytes with content
-	(void) memset(data + dataSize + string.size(), 0, SIZE - string.size()); // The rest of the bytes is set to 0
-
-	dataSize += SIZE;
-}
 
 #endif // ECSS_SERVICES_PACKET_H

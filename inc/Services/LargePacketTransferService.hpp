@@ -10,6 +10,8 @@
  * maximum data size
  *
  * Note: More information can be found in the standards' manual, in p. 526-528 and in p. 229-236
+ *
+ * @ingroup Services
  */
 
 class LargePacketTransferService : public Service {
@@ -49,7 +51,7 @@ public:
 	                            const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
 
 	// The three uplink functions should handle a TC request to "upload" data. Since there is not
-	// a createTC function ready, I just return the given string.
+	// a composeECSS function ready, I just return the given string.
 	// @TODO: Modify these functions properly
 	/**
 	 * Function that handles the first part of the uplink request
@@ -72,7 +74,7 @@ public:
 
 	/**
 	 * Function that splits large messages
-	 * @param Message that is exceeds the standards and has to be split down
+	 * @param message that is exceeds the standards and has to be split down
 	 * @param largeMessageTransactionIdentifier that is a value we assign to this splitting of the large message
 	 */
 	void split(Message& message, uint16_t largeMessageTransactionIdentifier);

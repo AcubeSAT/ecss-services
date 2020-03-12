@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ServicePool.hpp>
+#include <Logger.hpp>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
@@ -20,9 +21,11 @@
 #include "etl/String.hpp"
 
 int main() {
+	LOG_NOTICE << "ECSS Services test application";
+
 	Message packet = Message(0, 0, Message::TC, 1);
 
-	packet.appendString<5>("hello");
+	packet.appendString(String<5>("hello"));
 	packet.appendBits(15, 0x28a8);
 	packet.appendBits(1, 1);
 	packet.appendFloat(5.7);
@@ -298,13 +301,13 @@ int main() {
 
 	// ST[11] test
 	TimeBasedSchedulingService timeBasedSchedulingService;
-	MessageParser msgParser;
 	auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
 	std::cout << "\n\nST[11] service is running";
 	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
 
 	Message receivedMsg = Message(11, 1, Message::TC, 1);
-	Message testMessage1(6, 5, Message::TC, 1), testMessage2(4, 5, Message::TC, 1);
+	Message testMessage1(6, 5, Message::TC, 1);
+	Message testMessage2(4, 5, Message::TC, 1);
 	testMessage1.appendUint16(4253); // Append dummy data
 	testMessage2.appendUint16(45667); // Append dummy data
 
@@ -314,11 +317,11 @@ int main() {
 	receivedMsg = Message(11, 4, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
-	receivedMsg.appendUint32(currentTime + 1556435u);
-	receivedMsg.appendString(msgParser.convertTCToStr(testMessage1));
+	receivedMsg.appendUint32(currentTime + 1556435U);
+	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
 
-	receivedMsg.appendUint32(currentTime + 1957232u);
-	receivedMsg.appendString(msgParser.convertTCToStr(testMessage2));
+	receivedMsg.appendUint32(currentTime + 1957232U);
+	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
 	// Time shift activities
@@ -335,5 +338,6 @@ int main() {
 	receivedMsg = Message(11, 12, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
+	LOG_NOTICE << "ECSS Services test complete";
 	return 0;
 }
