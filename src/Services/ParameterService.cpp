@@ -13,17 +13,14 @@ ParameterService::ParameterService() {
 void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const char* flags) {
 	if (paramsList.full()) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
-		return;
 	}
 	else {
 		if (paramsList.find(id) == paramsList.end()) {
 			param->setFlags(flags);
 			paramsList.insert(std::make_pair(id, param));
-			return;
 		}
 		else {
 			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
-			return;
 		}
 	}
 }
@@ -67,7 +64,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 	reqParam.appendUint16(validIds);  // append the number of valid IDs
 
-	for (auto i: validParams) {
+	for (auto const& i: validParams) {
 		reqParam.appendUint16(i.first);  // append the parameter ID
 		reqParam.appendString(i.second); // and its value
 	}
