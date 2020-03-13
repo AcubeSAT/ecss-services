@@ -21,7 +21,7 @@
  * for parameter reporting and modification.
  *
  * The parameter list is stored in a map with the parameter IDs as keys and values
- * corresponding Parameter classes containing the PTC, PFC and the parameter's value.
+ * corresponding Parameter classes containing the parameter's value.
  */
 
 

@@ -21,15 +21,10 @@
  */
 typedef uint16_t ParamId;
 typedef etl::bitset<ECSS_ST_20_NUMBER_OF_FLAGS> Flags;
-typedef enum {STRING = 0,
-	INT32 = 1,
-	} TypesList;
 
 /**
  * Parameter class - Breakdown of fields
  *
- * @private ptc: The Packet field type code (PTC) as defined in ECSS-E-ST-70-41C, chapter 7.3.
- * @private pfc: The Packet field format code (PfC) as defined in the same standard
  * @private ptr: Pointer of the function that will update the parameter
  * @private currentValue: The current (as in last good) value of the parameter
  *
@@ -44,29 +39,22 @@ typedef enum {STRING = 0,
  *
  *
  * Methods:
- * @public Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr):
- * Create a new Parameter object with newPtc PTC, newPfc PFC, initialValue as its starting value and newPtr
+ * @public Parameter(uint32_t initialValue = 0, UpdatePtr newPtr = nullptr):
+ * Create a new Parameter object with initialValue as its starting value and newPtr
  * as its update function pointer. Arguments initialValue and newPtr are optional, and have default values of
  * 0 and nullptr respectively.
  *
  * @public setCurrentValue(): Changes the current value of the parameter
  * @public getCurrentValue(): Gets the current value of the parameter
- * @public getPTC(), getPFC(): Returns the PFC and PTC of the parameter
  */
 
 class ParameterBase {
 protected:
-	uint8_t ptc;
-	uint8_t pfc;
 	uint8_t sizeInBytes;
 	void* valuePtr;
 	Flags flags;
 public:
-	uint8_t getPTC();
-
 	void setFlags(const char* flags);
-
-	uint8_t getPFC();
 
 	virtual String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() = 0;
 
@@ -85,9 +73,7 @@ class Parameter : public ParameterBase {
 	ValueType currentValue;
 
 public:
-	Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
-		ptc = newPtc;
-		pfc = newPfc;
+	Parameter(ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
 		ptr = newPtr;
 		sizeInBytes = sizeof(initialValue);
 		valuePtr = static_cast<void*>(&currentValue);

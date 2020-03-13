@@ -8,13 +8,13 @@ ParameterService& pserv = Services.parameterManagement;
 TEST_CASE("Parameter Service - General") {
 	SECTION("Addition to full map") {
 
-		Parameter<int> param0 = Parameter<int>(3, 14);
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
-		Parameter<int> param3 = Parameter<int>(12, 3, 6);
-		Parameter<int> param4 = Parameter<int>(15, 7, 3);
+		Parameter<int> param0 = Parameter<int>();
+		Parameter<int> param1 = Parameter<int>(12);
+		Parameter<int> param2 = Parameter<int>(3, nullptr);
+		Parameter<int> param3 = Parameter<int>(6);
+		Parameter<int> param4 = Parameter<int>(3);
 
-		Parameter<int> param5 = Parameter<int>(15, 5, 4);
+		Parameter<int> param5 = Parameter<int>(4);
 
 		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
 		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
@@ -29,7 +29,7 @@ TEST_CASE("Parameter Service - General") {
 	}
 
 	SECTION("Addition of already existing parameter") {
-		Parameter<int> param0 = Parameter<int>(1, 3);
+		Parameter<int> param0 = Parameter<int>();
 		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
 
 		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
@@ -65,9 +65,9 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Faulty instruction handling") {
-		Parameter<int> param0 = Parameter<int>(3, 14);
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
+		Parameter<int> param0 = Parameter<int>();
+		Parameter<int> param1 = Parameter<int>(12);
+		Parameter<int> param2 = Parameter<int>(3, nullptr);
 		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
 		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
 		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
@@ -116,9 +116,9 @@ TEST_CASE("Parameter Report Subservice") {
 TEST_CASE("Parameter Setting Subservice") {
 
 	SECTION("Faulty Instruction Handling Test") {
-		Parameter<int> param0 = Parameter<int>(3, 14);
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
+		Parameter<int> param0 = Parameter<int>();
+		Parameter<int> param1 = Parameter<int>(12);
+		Parameter<int> param2 = Parameter<int>(3, nullptr);
 		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
 		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
 		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
@@ -157,7 +157,7 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("Attempt to set parameter with no manual update availability") {
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
+		Parameter<int> param1 = Parameter<int>(12);
 		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1), "100");
 
 		Message setRequest = Message(20, 3, Message::TC, 1);
