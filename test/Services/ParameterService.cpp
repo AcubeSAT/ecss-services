@@ -158,7 +158,7 @@ TEST_CASE("Parameter Setting Subservice") {
 
 	SECTION("Attempt to set parameter with no manual update availability") {
 		Parameter<int> param1 = Parameter<int>(12);
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1), "100");
+		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
 
 		Message setRequest = Message(20, 3, Message::TC, 1);
 		setRequest.appendUint16(1);

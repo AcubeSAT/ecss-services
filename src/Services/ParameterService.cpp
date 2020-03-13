@@ -10,13 +10,12 @@ ParameterService::ParameterService() {
 //	addNewParameter(3, 14);
 }
 
-void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const char* flags) {
+void ParameterService::addNewParameter(uint16_t id, ParameterBase* param) {
 	if (paramsList.full()) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
 	}
 	else {
 		if (paramsList.find(id) == paramsList.end()) {
-			param->setFlags(flags);
 			paramsList.insert(std::make_pair(id, param));
 		}
 		else {

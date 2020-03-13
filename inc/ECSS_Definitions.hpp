@@ -147,11 +147,6 @@
 #define ECSS_ST_20_MAX_PARAMETERS 5
 
 /**
- * @brief (TEMPORARY) Length of the flags bitset for each \ref Parameter of ST[20]
- */
-#define ECSS_ST_20_NUMBER_OF_FLAGS 3
-
-/**
  * @brief Maximum etl::string output length in bytes for each \ref Parameter of ST[20]
  */
 

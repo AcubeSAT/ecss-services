@@ -41,9 +41,8 @@ public:
 	 * exists already.
 	 * @param id: the desired ID for this parameter
 	 * @param param: the parameter field to be included
-	 * @param flags: the flags to be set for this field (see Parameter.hpp)
 	 */
-	void addNewParameter(uint16_t id, ParameterBase* param, const char* flags = "110");
+	void addNewParameter(uint16_t id, ParameterBase* param);
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

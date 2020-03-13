@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_PARAMETER_HPP
 #define ECSS_SERVICES_PARAMETER_HPP
 
-#include "etl/bitset.h"
 #include "etl/String.hpp"
 #include "ECSS_Definitions.hpp"
 
@@ -17,10 +16,8 @@
  * Useful type definitions
  *
  * @typedef ParamId: the unique ID of a parameter, used for searching
- * @typedef Flags: container for the binary flags
  */
 typedef uint16_t ParamId;
-typedef etl::bitset<ECSS_ST_20_NUMBER_OF_FLAGS> Flags;
 
 /**
  * Parameter class - Breakdown of fields
@@ -29,13 +26,6 @@ typedef etl::bitset<ECSS_ST_20_NUMBER_OF_FLAGS> Flags;
  * @private currentValue: The current (as in last good) value of the parameter
  *
  * @todo: Find a way to store arbitrary types in currentValue
- *
- * Additional features (not included in standard):
- * @private flags: Various binary flags (number and meaning TBD).
- * @warning Current flag meanings (starting from LSB, big-endian):
- * Index 0: update with priority
- * Index 1: manual update available
- * Index 2: automatic update available
  *
  *
  * Methods:
@@ -52,18 +42,14 @@ class ParameterBase {
 protected:
 	uint8_t sizeInBytes;
 	void* valuePtr;
-	Flags flags;
 public:
-	void setFlags(const char* flags);
 
 	virtual String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() = 0;
 
 	template <typename ValueType>
 	void setCurrentValue(ValueType newVal) {
 		// set the value only if the parameter can be updated manually
-		if (flags[1]) {
-			*reinterpret_cast<ValueType*>(valuePtr) = newVal;
-		}
+		*reinterpret_cast<ValueType*>(valuePtr) = newVal;
 	}
 };
 
@@ -77,8 +63,6 @@ public:
 		ptr = newPtr;
 		sizeInBytes = sizeof(initialValue);
 		valuePtr = static_cast<void*>(&currentValue);
-		// see Parameter.hpp for explanation on flags
-		// by default: no update priority, manual and automatic update available
 
 		if (ptr != nullptr) {
 			(*ptr)(&currentValue);  // call the update function for the initial value
