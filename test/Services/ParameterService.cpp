@@ -93,9 +93,9 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(report.readUint16() == 1);  // only one parameter shall be contained
 
 		CHECK(report.readUint16() == 1);  // check for parameter ID
-		uint8_t data[MAX_STRING_LENGTH];
-		report.readString(data, MAX_STRING_LENGTH);
-		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data);
+		uint8_t data[ECSS_ST_20_MAX_STRING_LENGTH];
+		report.readString(data, ECSS_ST_20_MAX_STRING_LENGTH);
+		String<ECSS_ST_20_MAX_STRING_LENGTH> str = String<ECSS_ST_20_MAX_STRING_LENGTH>(data);
 		CHECK(str.compare("12")); // check for value as string (defined when adding parameters)
 
 		ServiceTests::reset();  // clear all errors
@@ -147,9 +147,9 @@ TEST_CASE("Parameter Setting Subservice") {
 		CHECK(report.readUint16() == 1);  // only 1 ID contained
 		CHECK(report.readUint16() == 1);  // contained ID should be ID 1
 
-		char data[MAX_STRING_LENGTH];
-		report.readString(data, MAX_STRING_LENGTH);
-		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data);
+		char data[ECSS_ST_20_MAX_STRING_LENGTH];
+		report.readString(data, ECSS_ST_20_MAX_STRING_LENGTH);
+		String<ECSS_ST_20_MAX_STRING_LENGTH> str = String<ECSS_ST_20_MAX_STRING_LENGTH>(data);
 		CHECK(str.compare("3735928559")); // whose value is the string 0xDEADBEEF
 
 		ServiceTests::reset();

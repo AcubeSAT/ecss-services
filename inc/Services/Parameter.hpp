@@ -3,11 +3,8 @@
 
 #include "etl/bitset.h"
 #include "etl/String.hpp"
+#include "ECSS_Definitions.hpp"
 
-// Number of binary flags in every parameter. Final number TBD.
-#define NUM_OF_FLAGS 3
-// Maximum etl::string output length in bytes
-#define MAX_STRING_LENGTH 5
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  * Fully compliant with the standards requirements, while adding some small,
@@ -23,7 +20,7 @@
  * @typedef Flags: container for the binary flags
  */
 typedef uint16_t ParamId;
-typedef etl::bitset<NUM_OF_FLAGS> Flags;
+typedef etl::bitset<ECSS_ST_20_NUMBER_OF_FLAGS> Flags;
 typedef enum {STRING = 0,
 	INT32 = 1,
 	} TypesList;
@@ -71,7 +68,7 @@ public:
 
 	uint8_t getPFC();
 
-	virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
+	virtual String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() = 0;
 
 	template <typename ValueType>
 	void setCurrentValue(ValueType newVal) {
@@ -104,8 +101,8 @@ public:
 		}
 	}
 
-	String<MAX_STRING_LENGTH> getValueAsString() override {
-		String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
+	String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() override {
+		String<ECSS_ST_20_MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
 		return contents;
 	}
 };

@@ -26,7 +26,7 @@ void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const 
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
-	etl::vector<std::pair<uint16_t, String<MAX_STRING_LENGTH>>, ECSS_ST_20_MAX_PARAMETERS> validParams;
+	etl::vector<std::pair<uint16_t, String<ECSS_ST_20_MAX_STRING_LENGTH>>, ECSS_ST_20_MAX_PARAMETERS> validParams;
 	Message reqParam(20, 2, Message::TM, 1);
 	// empty TM[20, 2] parameter report message
 
@@ -50,7 +50,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 		uint16_t currId = paramIds.readUint16();
 
 		if (paramsList.find(currId) != paramsList.end()) {
-			std::pair<uint16_t, String<MAX_STRING_LENGTH>> p = std::make_pair(currId, paramsList.at(currId)
+			std::pair<uint16_t, String<ECSS_ST_20_MAX_STRING_LENGTH>> p = std::make_pair(currId, paramsList.at(currId)
 			->getValueAsString());
 			// pair containing the parameter's ID as first element and its current value as second
 			validParams.push_back(p);
