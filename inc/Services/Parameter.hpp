@@ -9,76 +9,61 @@
  * Fully compliant with the standard's requirements.
  *
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
+ * @author Athanasios Theocharis <athatheo@csd.auth.gr>
+ * 
+ * 
+ * The Parameter class implements a way of storing and updating system parameters
+ * of arbitrary size and type, while avoiding std::any and dynamic memory allocation.
+ * 
+ * It is split in two parts: an abstract ParameterBase class which contains the setter,
+ * and a 
  */
 
 /**
  * Useful type definitions
- *
+ * (DEPRECATED - MARK FOR REMOVAL)
  * @typedef ParamId: the unique ID of a parameter, used for searching
  */
 typedef uint16_t ParamId;
 
-/**
- * Parameter class - Breakdown of fields
+/*
+ * MILLION DOLLAR QUESTIONS:
+ * setCurrentValue is templated. Since Parameter (a template class) inherits ParameterBase
+ * (a class containing a template member), does a specialization of Parameter also specialize
+ * setCurrentValue? If not, we have a problem, since Parameter won't necessarily specialize
+ * setCurrentValue with the correct type => our setter is *not* typesafe.
  *
- * @private ptr: Pointer of the function that will update the parameter
- * @private currentValue: The current (as in last good) value of the parameter
+ * Answer: NO! After a discussion on ##C++-general@Freenode, it turns out that this specialization
+ * does not happen! What this means is that, while a Parameter can be specialized as e.g. int, there
+ * is no way to prevent the setter from being called with a non-int (e.g. string or float) argument,
+ * resulting in an attempt to write data inside the Parameter that have a different type from what the
+ * template is carrying.
+ *
+ * Proof of concept:
+ *      Parameter<int> ircTest = Parameter<int>(1337);
+ *		ircTest.setCurrentValue("Hello this is a problem speaking");
+ *		auto s = ircTest.getValueAsString();
+ *
+ * This snippet will overwrite the 4 bytes of the Parameter field with garbage and most importantly,
+ * it will do so silently.
  *
  *
- *
- * Methods:
- * @public Parameter(uint32_t initialValue = 0, UpdatePtr newPtr = nullptr):
- * Create a new Parameter object with initialValue as its starting value and newPtr
- * as its update function pointer. Arguments initialValue and newPtr are optional, and have default values of
- * 0 and nullptr respectively.
- *
- * @public setCurrentValue(): Changes the current value of the parameter
- * @public getCurrentValue(): Gets the current value of the parameter
  */
-
-// class DataField {
-// protected:
-// 	uint8_t sizeInBytes;
-// 	void* dataFieldAddress;
-// 	// possible race: setCurrentValue may be ran when dataFieldAddress is uninitialized
-// public:
-// 	template <typename DataType>
-// 	void setCurrentValue(DataType newValue) {
-// 		DataType* typedDataFieldAddress = reinterpret_cast<DataType*>(dataFieldAddress);
-// 		*typedDataFieldAddress = newValue;
-// 	}
-// };
-
-/**
- * Highly likely that valuePtr is redundant! Then, ParameterBase could only contain
- * virtual methods and act as a mere interface, moving all specific functionality to
- * the Parameter class and ensuring type safety.
- */ 
 
 class ParameterBase {
 protected:
 	uint8_t sizeInBytes;
-	void* valuePtr = nullptr;
+	void* valuePtr;
 public:
 
 	virtual String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() = 0;
 
 	template <typename ValueType>
 	void setCurrentValue(ValueType newVal) {
-		if (valuePtr == nullptr) {
-			std::cout << "THIS IS NULL!" << std::endl;
-		}
 		*reinterpret_cast<ValueType*>(valuePtr) = newVal;
 	}
 };
 
-/**
- * MILLION DOLLAR QUESTIONS:
- * setCurrentValue is templated. Since Parameter (a template class) inherits ParameterBase
- * (a class containing a template member), does a specialization of Parameter also specialize
- * setCurrentValue? If not, we have a problem, since Parameter won't necessarily specialize
- * setCurrentValue with the correct type => our setter is *not* typesafe.
- */
 
 template <typename ValueType>
 class Parameter : public ParameterBase {
