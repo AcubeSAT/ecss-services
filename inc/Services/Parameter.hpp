@@ -3,11 +3,10 @@
 
 #include "etl/String.hpp"
 #include "ECSS_Definitions.hpp"
-
+#include <iostream>
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
- * Fully compliant with the standards requirements, while adding some small,
- * but useful extensions to its contents.
+ * Fully compliant with the standard's requirements.
  *
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
@@ -25,7 +24,6 @@ typedef uint16_t ParamId;
  * @private ptr: Pointer of the function that will update the parameter
  * @private currentValue: The current (as in last good) value of the parameter
  *
- * @todo: Find a way to store arbitrary types in currentValue
  *
  *
  * Methods:
@@ -38,20 +36,49 @@ typedef uint16_t ParamId;
  * @public getCurrentValue(): Gets the current value of the parameter
  */
 
+// class DataField {
+// protected:
+// 	uint8_t sizeInBytes;
+// 	void* dataFieldAddress;
+// 	// possible race: setCurrentValue may be ran when dataFieldAddress is uninitialized
+// public:
+// 	template <typename DataType>
+// 	void setCurrentValue(DataType newValue) {
+// 		DataType* typedDataFieldAddress = reinterpret_cast<DataType*>(dataFieldAddress);
+// 		*typedDataFieldAddress = newValue;
+// 	}
+// };
+
+/**
+ * Highly likely that valuePtr is redundant! Then, ParameterBase could only contain
+ * virtual methods and act as a mere interface, moving all specific functionality to
+ * the Parameter class and ensuring type safety.
+ */ 
+
 class ParameterBase {
 protected:
 	uint8_t sizeInBytes;
-	void* valuePtr;
+	void* valuePtr = nullptr;
 public:
 
 	virtual String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() = 0;
 
 	template <typename ValueType>
 	void setCurrentValue(ValueType newVal) {
-		// set the value only if the parameter can be updated manually
+		if (valuePtr == nullptr) {
+			std::cout << "THIS IS NULL!" << std::endl;
+		}
 		*reinterpret_cast<ValueType*>(valuePtr) = newVal;
 	}
 };
+
+/**
+ * MILLION DOLLAR QUESTIONS:
+ * setCurrentValue is templated. Since Parameter (a template class) inherits ParameterBase
+ * (a class containing a template member), does a specialization of Parameter also specialize
+ * setCurrentValue? If not, we have a problem, since Parameter won't necessarily specialize
+ * setCurrentValue with the correct type => our setter is *not* typesafe.
+ */
 
 template <typename ValueType>
 class Parameter : public ParameterBase {
@@ -62,6 +89,7 @@ public:
 	Parameter(ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
 		ptr = newPtr;
 		sizeInBytes = sizeof(initialValue);
+		// previously null valuePtr now points to the currentValue field	
 		valuePtr = static_cast<void*>(&currentValue);
 
 		if (ptr != nullptr) {
