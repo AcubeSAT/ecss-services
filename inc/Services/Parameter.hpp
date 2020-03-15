@@ -2,7 +2,9 @@
 #define ECSS_SERVICES_PARAMETER_HPP
 
 #include "etl/String.hpp"
+#include "Message.hpp"
 #include "ECSS_Definitions.hpp"
+
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  * Fully compliant with the standard's requirements.
@@ -11,11 +13,37 @@
  * @author Athanasios Theocharis <athatheo@csd.auth.gr>
  * 
  * 
+ * @section Introduction
  * The Parameter class implements a way of storing and updating system parameters
  * of arbitrary size and type, while avoiding std::any and dynamic memory allocation.
  * 
- * It is split in two parts: an abstract ParameterBase class which contains the setter,
- * and a 
+ * It is split in two distinct parts: 
+ * 
+ * 1) an abstract \ref ParameterBase class which provides a 
+ * common data type used to create any pointers to \ref Parameter objects, as well as 
+ * virtual functions for accessing the parameter's data part, and
+ * 
+ * 2) a template \ref Parameter used to store any type-specific parameter information,
+ * such as the actual data field where the parameter's value will be stored and any pointers
+ * to suitable functions that will be responsible for updating the parameter's value.
+ * 
+ * 
+ * @section Architecture Rationale
+ * The ST[20] Parameter service is implemented with the need of arbitrary type storage
+ * in mind, while avoiding any use of dynamic memory allocation, a requirement for use
+ * in embedded systems. Since lack of DMA precludes usage of stl::any and the need for
+ * truly arbitrary (even for template-based objects like etl::string) type storage
+ * would exclude from consideration constructs like etl::variant due to limitations on
+ * the number of supported distinct types, a custom solution was needed.
+ * 
+ * Furthermore, the \ref ParameterService should provide both ID-based access to parameters,
+ * 
+ * 
+ * @section Methods
+ * @public getValueAsString() - returns a \ref ECSS_ST_20_MAX_STRING_LENGTH-lengthed
+ * \ref String containing the value of the Parameter
+ * @public 
+ * 
  */
 
 /**
@@ -26,7 +54,7 @@
 typedef uint16_t ParamId;
 
 /*
- * MILLION DOLLAR QUESTIONS:
+ * MILLION DOLLAR QUESTIONS - OLD IMPLEMENTATION:
  * setCurrentValue is templated. Since Parameter (a template class) inherits ParameterBase
  * (a class containing a template member), does a specialization of Parameter also specialize
  * setCurrentValue? If not, we have a problem, since Parameter won't necessarily specialize
