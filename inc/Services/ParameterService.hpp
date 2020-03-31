@@ -5,7 +5,6 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
-#include "etl/map.h"
 #include "etl/vector.h"
 
 /**
@@ -26,14 +25,11 @@
 
 
 class ParameterService : public Service {
-private:
-	etl::map<ParamId, ParameterBase*, ECSS_ST_20_MAX_PARAMETERS> paramsList;
-
 public:
 	/**
 	 * @brief Initializes the parameter list.
 	 */
-	ParameterService();
+	ParameterService() = default;
 
 	/**
 	 * @brief Adds a new parameter. Emits an InternalError::MapFull if an attempt is made to insert

@@ -4,24 +4,11 @@
 #include "Services/ParameterService.hpp"
 #include "Services/Parameter.hpp"
 
-ParameterService::ParameterService() {
-	// test addings
-//	addNewParameter(3, 14);
-//	addNewParameter(3, 14);
-}
-
 void ParameterService::addNewParameter(uint16_t id, ParameterBase* param) {
-	if (paramsList.full()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
-	}
-	else {
-		if (paramsList.find(id) == paramsList.end()) {
-			paramsList.insert(std::make_pair(id, param));
-		}
-		else {
-			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
-		}
-	}
+	ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
+	ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
+	etl::vector<ParameterBase*, ECSS_ST_20_MAX_PARAMETERS> arr;
+
 }
 
 void ParameterService::reportParameterIds(Message& paramIds) {
@@ -47,7 +34,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-
+/**
 		if (paramsList.find(currId) != paramsList.end()) {
 			std::pair<uint16_t, String<ECSS_ST_20_MAX_STRING_LENGTH>> p = std::make_pair(currId, paramsList.at(currId)
 			->getValueAsString());
@@ -58,7 +45,7 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 		else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
-		}
+		}**/
 	}
 
 	reqParam.appendUint16(validIds);  // append the number of valid IDs
@@ -87,7 +74,7 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
 		// the parameter is checked for read-only status and manual update availability
-		if (paramsList.find(currId) != paramsList.end()) {
+/**		if (paramsList.find(currId) != paramsList.end()) {
 
 			// WARNING! SETTING WORKS ONLY WITH UINT32_T INPUT!
 			// I need a way to know the input's type!
@@ -97,7 +84,7 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 			ErrorHandler::reportError(newParamValues,
 				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 			continue; // generate failed start of execution notification & ignore
-		}
+		}**/
 	}
 }
 

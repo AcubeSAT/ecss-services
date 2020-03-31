@@ -86,14 +86,15 @@ public:
 
 template <typename DataType>
 class Parameter : public ParameterBase {
+private:
 	DataType currentValue;
 	void (* updateFunction)(DataType*);
 
 public:
 	Parameter(DataType initialValue, void (* updateFunction)(DataType*) = nullptr) {
-		this.updateFunction = updateFunction;
+		this->updateFunction = updateFunction;
 
-		if (this.updateFunction != nullptr) {
+		if (this->updateFunction != nullptr) {
 			(*updateFunction)(&currentValue);
 		}
 		else {
