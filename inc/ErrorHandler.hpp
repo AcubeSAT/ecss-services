@@ -70,7 +70,7 @@ public:
 		 */
 		OtherMessageType = 9,
 		/**
-		 * Attempt to insert new element in a full map (ST[08], ST[20])
+		 * Attempt to insert new element in a full map ST[08]
 		 */
 		MapFull = 10,
 		/**

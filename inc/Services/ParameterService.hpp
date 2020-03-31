@@ -5,14 +5,15 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
-#include "etl/map.h"
 #include "etl/vector.h"
+#include "Parameters/Parameters.hpp"
 
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C
  *
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
+ * @author Athanasios Theocharis <athatheoc@gmail.com>
  */
 
 /**
@@ -23,17 +24,18 @@
  * The parameter list is stored in a map with the parameter IDs as keys and values
  * corresponding Parameter classes containing the parameter's value.
  */
-
-
 class ParameterService : public Service {
-private:
-	etl::map<ParamId, ParameterBase*, ECSS_ST_20_MAX_PARAMETERS> paramsList;
-
 public:
 	/**
 	 * @brief Initializes the parameter list.
 	 */
-	ParameterService();
+	ParameterService() {
+		addToParameterArray(1, systemParameters.parameter1);
+		addToParameterArray(2, systemParameters.parameter2);
+		addToParameterArray(3, systemParameters.parameter3);
+		addToParameterArray(4, systemParameters.parameter4);
+		addToParameterArray(5, systemParameters.parameter5);
+	}
 
 	/**
 	 * @brief Adds a new parameter. Emits an InternalError::MapFull if an attempt is made to insert
@@ -42,7 +44,7 @@ public:
 	 * @param id: the desired ID for this parameter
 	 * @param param: the parameter field to be included
 	 */
-	void addNewParameter(uint16_t id, ParameterBase* param);
+	void addToParameterArray(uint16_t id, ParameterBase& param);
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
@@ -60,7 +62,7 @@ public:
 	 *
 	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
-	void reportParameterIds(Message& paramIds);
+	void reportParameters(Message& paramIds);
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
@@ -73,7 +75,7 @@ public:
 	 *
 	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
-	void setParameterIds(Message& newParamValues);
+	void setParameters(Message& newParamValues);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

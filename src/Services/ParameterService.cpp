@@ -4,37 +4,15 @@
 #include "Services/ParameterService.hpp"
 #include "Services/Parameter.hpp"
 
-ParameterService::ParameterService() {
-	// test addings
-//	addNewParameter(3, 14);
-//	addNewParameter(3, 14);
+void ParameterService::addToParameterArray(uint16_t id, ParameterBase& param) {
+	systemParameters.parametersArray[id] = param;
 }
 
-void ParameterService::addNewParameter(uint16_t id, ParameterBase* param) {
-	if (paramsList.full()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
-	}
-	else {
-		if (paramsList.find(id) == paramsList.end()) {
-			paramsList.insert(std::make_pair(id, param));
-		}
-		else {
-			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
-		}
-	}
-}
-
-void ParameterService::reportParameterIds(Message& paramIds) {
-	etl::vector<std::pair<uint16_t, String<ECSS_ST_20_MAX_STRING_LENGTH>>, ECSS_ST_20_MAX_PARAMETERS> validParams;
+void ParameterService::reportParameters(Message& paramIds) {
+	// TM[20,2]
 	Message reqParam(20, 2, Message::TM, 1);
-	// empty TM[20, 2] parameter report message
 
 	paramIds.resetRead();
-	// since we're passing a reference, the reading position shall be reset
-	// to its default before any read operations (to ensure the correct data is being read)
-
-	// assertion: correct message, packet and service type (at failure throws an
-	// InternalError::UnacceptableMessage)
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == 1, paramIds,
@@ -42,38 +20,23 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	ErrorHandler::assertRequest(paramIds.serviceType == 20, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t numOfIds = paramIds.readUint16();  // total number of parameter IDs carried in the message
-	uint16_t validIds = 0;                      // number of valid IDs
+	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t validIds = 0;
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-
-		if (paramsList.find(currId) != paramsList.end()) {
-			std::pair<uint16_t, String<ECSS_ST_20_MAX_STRING_LENGTH>> p = std::make_pair(currId, paramsList.at(currId)
-			->getValueAsString());
-			// pair containing the parameter's ID as first element and its current value as second
-			validParams.push_back(p);
+		if (currId < ECSS_ST_20_MAX_PARAMETERS) {
+			reqParam.appendUint16(currId);
+			reqParam.appendString(systemParameters.parametersArray[currId].get().getValueAsString());
 			validIds++;
 		}
-		else {
-			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue; // generate failed start of execution notification & ignore
-		}
 	}
+	reqParam.appendUint16(validIds);
 
-	reqParam.appendUint16(validIds);  // append the number of valid IDs
-
-	for (auto const& i: validParams) {
-		reqParam.appendUint16(i.first);  // append the parameter ID
-		reqParam.appendString(i.second); // and its value
-	}
-
-	storeMessage(reqParam);  // then store the message
+	storeMessage(reqParam);
 }
 
-void ParameterService::setParameterIds(Message& newParamValues) {
-	// assertion: correct message, packet and service type (at failure throws an
-	// InternalError::UnacceptablePacket which gets logged)
+void ParameterService::setParameters(Message& newParamValues) {
 
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -82,21 +45,12 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	ErrorHandler::assertRequest(newParamValues.serviceType == 20, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t numOfIds = newParamValues.readUint16(); // get number of ID's contained in the message
+	uint16_t numOfIds = newParamValues.readUint16();
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		// the parameter is checked for read-only status and manual update availability
-		if (paramsList.find(currId) != paramsList.end()) {
-
-			// WARNING! SETTING WORKS ONLY WITH UINT32_T INPUT!
-			// I need a way to know the input's type!
-			paramsList.at(currId)->setCurrentValue(newParamValues.readUint32());
-		}
-		else {
-			ErrorHandler::reportError(newParamValues,
-				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue; // generate failed start of execution notification & ignore
+		if (currId < ECSS_ST_20_MAX_PARAMETERS) {
+			systemParameters.parametersArray[currId].get().setValueFromMessage(newParamValues);
 		}
 	}
 }
@@ -104,10 +58,10 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
-			reportParameterIds(message); // TC[20,1]
+			reportParameters(message); // TC[20,1]
 			break;
 		case 3:
-			setParameterIds(message); // TC[20,3]
+			setParameters(message); // TC[20,3]
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

@@ -55,7 +55,7 @@ int main() {
 	sentPacket.appendUint16(2); // number of contained IDs
 	sentPacket.appendUint16(0); // first ID
 	sentPacket.appendUint16(1); // second ID
-	paramService.reportParameterIds(sentPacket);
+	paramService.reportParameters(sentPacket);
 
 	// Test code for setParameter
 	Message sentPacket2 = Message(20, 3, Message::TC, 1); // application id is a dummy number (1)
@@ -65,8 +65,8 @@ int main() {
 	sentPacket2.appendUint16(1); // 2nd parameter ID
 	sentPacket2.appendUint32(45823); // settings for 2nd parameter
 
-	paramService.setParameterIds(sentPacket2);
-	paramService.reportParameterIds(sentPacket);
+	paramService.setParameters(sentPacket2);
+	paramService.reportParameters(sentPacket);
 
 	// ST[06] testing
 	char anotherStr[8] = "Fgthred";

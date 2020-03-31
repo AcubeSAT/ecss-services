@@ -8,7 +8,7 @@ ParameterService& pserv = Services.parameterManagement;
 TEST_CASE("Parameter Service - General") {
 	SECTION("Addition to full map") {
 
-		Parameter<int> param0 = Parameter<int>();
+		Parameter<int> param0 = Parameter<int>(1);
 		Parameter<int> param1 = Parameter<int>(12);
 		Parameter<int> param2 = Parameter<int>(3, nullptr);
 		Parameter<int> param3 = Parameter<int>(6);
@@ -29,7 +29,7 @@ TEST_CASE("Parameter Service - General") {
 	}
 
 	SECTION("Addition of already existing parameter") {
-		Parameter<int> param0 = Parameter<int>();
+		Parameter<int> param0 = Parameter<int>(1);
 		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
 
 		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));

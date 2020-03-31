@@ -46,13 +46,6 @@
  * 
  */
 
-/**
- * Useful type definitions
- * (DEPRECATED - MARK FOR REMOVAL)
- * @typedef ParamId: the unique ID of a parameter, used for searching
- */
-typedef uint16_t ParamId;
-
 /*
  * MILLION DOLLAR QUESTIONS - OLD IMPLEMENTATION:
  * setCurrentValue is templated. Since Parameter (a template class) inherits ParameterBase
@@ -86,14 +79,15 @@ public:
 
 template <typename DataType>
 class Parameter : public ParameterBase {
+private:
 	DataType currentValue;
 	void (* updateFunction)(DataType*);
 
 public:
 	Parameter(DataType initialValue, void (* updateFunction)(DataType*) = nullptr) {
-		this.updateFunction = updateFunction;
+		this->updateFunction = updateFunction;
 
-		if (this.updateFunction != nullptr) {
+		if (this->updateFunction != nullptr) {
 			(*updateFunction)(&currentValue);
 		}
 		else {
@@ -110,43 +104,4 @@ public:
 		return String<ECSS_ST_20_MAX_STRING_LENGTH>("DUMMY STRING");
 	}
 };
-
-// class ParameterBase {
-// public:
-
-// 	virtual String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() = 0;
-// 	virtual void setValueFromMessage(Message message) = 0;
-
-// 	template <typename ValueType>
-// 	void setCurrentValue(ValueType newVal) {
-// 		*reinterpret_cast<ValueType*>(valuePtr) = newVal;
-// 	}
-// };
-
-// template <typename ValueType>
-// class Parameter : public ParameterBase {
-// 	void (* ptr)(ValueType*);
-// 	ValueType currentValue;
-
-// public:
-// 	Parameter(ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
-// 		ptr = newPtr;
-// 		sizeInBytes = sizeof(initialValue);
-// 		// previously null valuePtr now points to the currentValue field	
-// 		valuePtr = static_cast<void*>(&currentValue);
-
-// 		if (ptr != nullptr) {
-// 			(*ptr)(&currentValue);  // call the update function for the initial value
-// 		} else {
-// 			currentValue = initialValue;
-// 		}
-// 	}
-
-// 	String<ECSS_ST_20_MAX_STRING_LENGTH> getValueAsString() override {
-// 		String<ECSS_ST_20_MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
-// 		return contents;
-// 	}
-// };
-
-
 #endif //ECSS_SERVICES_PARAMETER_HPP
