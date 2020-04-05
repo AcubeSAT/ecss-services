@@ -74,13 +74,17 @@ public:
 		 */
 		MapFull = 10,
 		/**
-		 * Attempt to overwrite an existing parameter (ST[20])
+		 * Attempt to access a non existing parameter (ST[20])
 		 */
-		ExistingParameterId = 11,
+		GetNonExistingParameter = 11,
+		/**
+		 * Attempt to change the value of a non existing parameter (ST[20])
+		 */
+		SetNonExistingParameter = 12,
 		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 12
+		NestedMessageTooLarge = 13
 	};
 
 	/**

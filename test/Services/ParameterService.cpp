@@ -5,40 +5,6 @@
 
 ParameterService& pserv = Services.parameterManagement;
 
-TEST_CASE("Parameter Service - General") {
-	SECTION("Addition to full map") {
-
-		Parameter<int> param0 = Parameter<int>(1);
-		Parameter<int> param1 = Parameter<int>(12);
-		Parameter<int> param2 = Parameter<int>(3, nullptr);
-		Parameter<int> param3 = Parameter<int>(6);
-		Parameter<int> param4 = Parameter<int>(3);
-
-		Parameter<int> param5 = Parameter<int>(4);
-
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
-		pserv.addNewParameter(3, static_cast<ParameterBase*>(&param3));
-		pserv.addNewParameter(4, static_cast<ParameterBase*>(&param4));
-
-		pserv.addNewParameter(5, static_cast<ParameterBase*>(&param5));  // addNewParameter should return false
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
-		ServiceTests::reset();
-		Services.reset();  // reset all services
-	}
-
-	SECTION("Addition of already existing parameter") {
-		Parameter<int> param0 = Parameter<int>(1);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::ExistingParameterId));
-		ServiceTests::reset();
-		Services.reset();
-	}
-}
-
 TEST_CASE("Parameter Report Subservice") {
 	SECTION("All requested parameters invalid") {
 		Message request = Message(20, 1, Message::TC, 1);
@@ -65,12 +31,12 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Faulty instruction handling") {
-		Parameter<int> param0 = Parameter<int>();
-		Parameter<int> param1 = Parameter<int>(12);
-		Parameter<int> param2 = Parameter<int>(3, nullptr);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
+		auto param0 = Parameter<uint16_t>(1);
+		auto param1 = Parameter<uint16_t>(12);
+		auto param2 = Parameter<uint16_t>(3);
+		systemParameters.parametersArray.push_back(param0);
+		systemParameters.parametersArray.push_back(param1);
+		systemParameters.parametersArray.push_back(param2);
 
 		Message request(20, 1, Message::TC, 1);
 		request.appendUint16(2); // number of requested IDs
@@ -114,14 +80,13 @@ TEST_CASE("Parameter Report Subservice") {
 }
 
 TEST_CASE("Parameter Setting Subservice") {
-
 	SECTION("Faulty Instruction Handling Test") {
-		Parameter<int> param0 = Parameter<int>();
-		Parameter<int> param1 = Parameter<int>(12);
-		Parameter<int> param2 = Parameter<int>(3, nullptr);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
+		auto param0 = Parameter<uint16_t>(1);
+		auto param1 = Parameter<uint16_t>(12);
+		auto param2 = Parameter<uint16_t>(3);
+		systemParameters.parametersArray.push_back(param0);
+		systemParameters.parametersArray.push_back(param1);
+		systemParameters.parametersArray.push_back(param2);
 
 		Message setRequest(20, 3, Message::TC, 1);
 		setRequest.appendUint16(2); // total number of IDs
@@ -131,7 +96,6 @@ TEST_CASE("Parameter Setting Subservice") {
 		setRequest.appendUint32(3131746989); // 0xBAAAAAAD (this shouldn't be found in the report)
 
 		MessageParser::execute(setRequest);
-
 
 		CHECK(ServiceTests::get(0).serviceType == 1);
 		CHECK(ServiceTests::get(0).messageType == 4);
@@ -157,8 +121,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("Attempt to set parameter with no manual update availability") {
-		Parameter<int> param1 = Parameter<int>(12);
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
+		auto param1 = Parameter<uint16_t>(12);
+		systemParameters.parametersArray.push_back(param1);
 
 		Message setRequest = Message(20, 3, Message::TC, 1);
 		setRequest.appendUint16(1);

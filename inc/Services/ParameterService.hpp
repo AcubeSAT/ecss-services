@@ -27,24 +27,9 @@
 class ParameterService : public Service {
 public:
 	/**
-	 * @brief Initializes the parameter list.
+	 * @brief Fills the parameter map.
 	 */
-	ParameterService() {
-		addToParameterArray(1, systemParameters.parameter1);
-		addToParameterArray(2, systemParameters.parameter2);
-		addToParameterArray(3, systemParameters.parameter3);
-		addToParameterArray(4, systemParameters.parameter4);
-		addToParameterArray(5, systemParameters.parameter5);
-	}
-
-	/**
-	 * @brief Adds a new parameter. Emits an InternalError::MapFull if an attempt is made to insert
-	 * parameters in a full map or an InternalError::ExistingParameterId if the given parameter ID
-	 * exists already.
-	 * @param id: the desired ID for this parameter
-	 * @param param: the parameter field to be included
-	 */
-	void addToParameterArray(uint16_t id, ParameterBase& param);
+	ParameterService() = default;
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

@@ -4,10 +4,6 @@
 #include "Services/ParameterService.hpp"
 #include "Services/Parameter.hpp"
 
-void ParameterService::addToParameterArray(uint16_t id, ParameterBase& param) {
-	systemParameters.parametersArray[id] = param;
-}
-
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
 	Message reqParam(20, 2, Message::TM, 1);
@@ -22,16 +18,18 @@ void ParameterService::reportParameters(Message& paramIds) {
 
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t validIds = 0;
+	reqParam.appendUint16(validIds); // Shouldn't you count first the actually fucking valid ids?
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		if (currId < ECSS_ST_20_MAX_PARAMETERS) {
+		if (currId < systemParameters.parametersArray.size()) {
 			reqParam.appendUint16(currId);
-			reqParam.appendString(systemParameters.parametersArray[currId].get().getValueAsString());
+			systemParameters.parametersArray[currId].get().appendValueToMessage(reqParam);
 			validIds++;
+		} else {
+			ErrorHandler::reportInternalError(ErrorHandler::GetNonExistingParameter);
 		}
 	}
-	reqParam.appendUint16(validIds);
 
 	storeMessage(reqParam);
 }
@@ -49,8 +47,10 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		if (currId < ECSS_ST_20_MAX_PARAMETERS) {
+		if (currId < systemParameters.parametersArray.size()) {
 			systemParameters.parametersArray[currId].get().setValueFromMessage(newParamValues);
+		} else {
+			ErrorHandler::reportInternalError(ErrorHandler::SetNonExistingParameter);
 		}
 	}
 }
