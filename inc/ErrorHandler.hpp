@@ -74,17 +74,9 @@ public:
 		 */
 		MapFull = 10,
 		/**
-		 * Attempt to access a non existing parameter (ST[20])
-		 */
-		GetNonExistingParameter = 11,
-		/**
-		 * Attempt to change the value of a non existing parameter (ST[20])
-		 */
-		SetNonExistingParameter = 12,
-		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 13
+		NestedMessageTooLarge = 11
 	};
 
 	/**
@@ -111,6 +103,14 @@ public:
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
 		UnacceptableMessage = 5,
+		/**
+		 * Attempt to change the value of a non existing parameter (ST[20])
+		 */
+		InvalidParameterId = 6,
+		/**
+		 * Attempt to access a non existing parameter (ST[20])
+		 */
+		GetNonExistingParameter = 7,
 	};
 
 	/**

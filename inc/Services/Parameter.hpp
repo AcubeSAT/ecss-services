@@ -30,16 +30,17 @@
  * would exclude from consideration constructs like etl::variant due to limitations on
  * the number of supported distinct types, a custom solution was needed.
  * Furthermore, the \ref ParameterService should provide ID-based access to parameters.
- *
  */
-
 class ParameterBase {
 public:
 	virtual void appendValueToMessage(Message& message) = 0;
 	virtual void setValueFromMessage(Message& message) = 0;
 };
 
-
+/**
+ * Implementation of a parameter containing its value. See \ref ParameterBase for more information.
+ * @tparam DataType
+ */
 template <typename DataType>
 class Parameter : public ParameterBase {
 private:
@@ -54,7 +55,7 @@ public:
 		currentValue = value;
 	}
 
-	inline DataType getValue() {
+	DataType getValue() {
 		return currentValue;
 	}
 

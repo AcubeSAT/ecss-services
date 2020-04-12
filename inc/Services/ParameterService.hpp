@@ -6,7 +6,7 @@
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
 #include "etl/vector.h"
-#include "Parameters/Parameters.hpp"
+#include "Parameters/SystemParameters.hpp"
 
 /**
  * Implementation of the ST[20] parameter management service,
@@ -18,17 +18,13 @@
 
 /**
  * Parameter manager - ST[20]
- * Holds the list with the parameters and provides functions
- * for parameter reporting and modification.
  *
- * The parameter list is stored in a map with the parameter IDs as keys and values
- * corresponding Parameter classes containing the parameter's value.
+ * The purpose of this class is to handle functions regarding the access and modification
+ * of the various parameters of the CubeSat.
+ * The parameters to be managed are initialized and kept in \ref SystemParameters.
  */
 class ParameterService : public Service {
 public:
-	/**
-	 * @brief Fills the parameter map.
-	 */
 	ParameterService() = default;
 
 	/**
@@ -36,29 +32,17 @@ public:
 	 * containing the current configuration
 	 * **for the parameters specified in the carried valid IDs**.
 	 *
-	 * The packet is checked for errors in service and message type, as well as for the
-	 * validity of the IDs contained. For every invalid ID an ExecutionStartErrorType::UnknownExecutionStartError
-	 * is raised.
-	 * If the packet has an incorrect header and service type, an InternalError::UnacceptableMessage is raised.
-	 * If no IDs are correct, the returned message shall be empty.
-	 *
 	 * @param paramId: a TC[20, 1] packet carrying the requested parameter IDs
 	 * @return None (messages are stored using storeMessage())
-	 *
-	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
 	void reportParameters(Message& paramIds);
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
 	 * iterates over all contained parameter IDs and replaces the settings for each valid parameter,
-	 * while ignoring all invalid IDs. If the manual update flag is not set, the parameter's value should
-	 * not change.
+	 * while ignoring all invalid IDs.
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
-	 * @return None
-	 *
-	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
 	void setParameters(Message& newParamValues);
 

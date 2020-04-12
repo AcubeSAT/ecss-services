@@ -6,9 +6,8 @@
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
-	Message reqParam(20, 2, Message::TM, 1);
+	Message parameterReport(20, 2, Message::TM, 1);
 
-	paramIds.resetRead();
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == 1, paramIds,
@@ -17,21 +16,26 @@ void ParameterService::reportParameters(Message& paramIds) {
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
-	uint16_t validIds = 0;
-	reqParam.appendUint16(validIds); // Shouldn't you count first the actually fucking valid ids?
-
+	uint16_t numberOfValidIds = 0;
+	for (uint16_t counter = 0; counter < numOfIds; counter++) {
+		if (paramIds.readUint16() < systemParameters.parametersArray.size()) {
+			numberOfValidIds++;
+		}
+	}
+	parameterReport.appendUint16(numberOfValidIds);
+	paramIds.resetRead();
+	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
 		if (currId < systemParameters.parametersArray.size()) {
-			reqParam.appendUint16(currId);
-			systemParameters.parametersArray[currId].get().appendValueToMessage(reqParam);
-			validIds++;
+			parameterReport.appendUint16(currId);
+			systemParameters.parametersArray[currId].get().appendValueToMessage(parameterReport);
 		} else {
-			ErrorHandler::reportInternalError(ErrorHandler::GetNonExistingParameter);
+			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
 	}
 
-	storeMessage(reqParam);
+	storeMessage(parameterReport);
 }
 
 void ParameterService::setParameters(Message& newParamValues) {
@@ -50,7 +54,8 @@ void ParameterService::setParameters(Message& newParamValues) {
 		if (currId < systemParameters.parametersArray.size()) {
 			systemParameters.parametersArray[currId].get().setValueFromMessage(newParamValues);
 		} else {
-			ErrorHandler::reportInternalError(ErrorHandler::SetNonExistingParameter);
+			ErrorHandler::reportError(newParamValues, ErrorHandler::InvalidParameterId);
+			break;
 		}
 	}
 }
