@@ -102,15 +102,7 @@ public:
 		/**
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
-		UnacceptableMessage = 5,
-		/**
-		 * Attempt to change the value of a non existing parameter (ST[20])
-		 */
-		InvalidParameterId = 6,
-		/**
-		 * Attempt to access a non existing parameter (ST[20])
-		 */
-		GetNonExistingParameter = 7,
+		UnacceptableMessage = 5
 	};
 
 	/**
@@ -143,7 +135,14 @@ public:
 		EventActionUnknownEventActionDefinitionIDError = 4,
 		SubServiceExecutionStartError = 5,
 		InstructionExecutionStartError = 6,
-
+		/**
+		 * Attempt to change the value of a non existing parameter (ST[20])
+		 */
+		SetNonExistingParameter = 7,
+		/**
+		 * Attempt to access a non existing parameter (ST[20])
+		 */
+		GetNonExistingParameter = 8
 	};
 
 	/**

@@ -5,7 +5,6 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
-#include "etl/vector.h"
 #include "Parameters/SystemParameters.hpp"
 
 /**

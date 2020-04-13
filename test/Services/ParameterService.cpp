@@ -2,6 +2,12 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 
+static void resetParameterValues() {
+	systemParameters.parameter1.setValue(3);
+	systemParameters.parameter2.setValue(7);
+	systemParameters.parameter3.setValue(10);
+};
+
 TEST_CASE("Parameter Report Subservice") {
 	SECTION("All requested parameters invalid") {
 		Message request = Message(20, 1, Message::TC, 1);
@@ -11,12 +17,8 @@ TEST_CASE("Parameter Report Subservice") {
 		request.appendUint16(65535);
 
 		MessageParser::execute(request);
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::get(0).messageType == 2);
-		CHECK(ServiceTests::get(1).serviceType == 1);
-		CHECK(ServiceTests::get(1).messageType == 2);
-		CHECK(ServiceTests::get(2).serviceType == 1);
-		CHECK(ServiceTests::get(2).messageType == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 3);
+		CHECK(ServiceTests::count() == 4);
 
 		Message report = ServiceTests::get(3);
 		CHECK(report.serviceType == 20);
@@ -31,12 +33,12 @@ TEST_CASE("Parameter Report Subservice") {
 		Message request = Message(20, 1, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(1);
-		request.appendUint16(2);
 		request.appendUint16(10000);
+		request.appendUint16(2);
 
 		MessageParser::execute(request);
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::get(0).messageType == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 2);
 
 		Message report = ServiceTests::get(1);
 		CHECK(report.serviceType == 20);
@@ -74,20 +76,10 @@ TEST_CASE("Parameter Report Subservice") {
 		ServiceTests::reset();
 		Services.reset();
 	}
-
-	SECTION("Wrong Message Type Handling Test") {
-		Message falseRequest(62, 3, Message::TM, 1); // a totally wrong message
-
-		MessageParser::execute(falseRequest);
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
-
-		ServiceTests::reset();
-		Services.reset();
-	}
 }
 
 TEST_CASE("Parameter Setting Subservice") {
-	SECTION("All parameter ids are invalid") {
+	SECTION("All parameter IDs are invalid") {
 		Message request = Message(20, 3, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(54432);
@@ -98,8 +90,8 @@ TEST_CASE("Parameter Setting Subservice") {
 		request.appendUint16(1);
 
 		MessageParser::execute(request);
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::get(0).messageType == 2); // Just one error, because it should break after on invalid param
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 1);
 
 		CHECK(systemParameters.parameter1.getValue() == 3);
 		CHECK(systemParameters.parameter2.getValue() == 7);
@@ -109,7 +101,7 @@ TEST_CASE("Parameter Setting Subservice") {
 		Services.reset();
 	}
 
-	SECTION("The last parameter ids are invalid") {
+	SECTION("The last parameter ID is invalid") {
 		Message request = Message(20, 3, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
@@ -120,22 +112,20 @@ TEST_CASE("Parameter Setting Subservice") {
 		request.appendUint16(1);
 
 		MessageParser::execute(request);
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::get(0).messageType == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 1);
 
 		CHECK(systemParameters.parameter1.getValue() == 1);
 		CHECK(systemParameters.parameter2.getValue() == 2);
 		CHECK(systemParameters.parameter3.getValue() == 10);
 
-		systemParameters.parameter1.setValue(3);
-		systemParameters.parameter2.setValue(7);
-		systemParameters.parameter3.setValue(10);
+		resetParameterValues();
 
 		ServiceTests::reset();
 		Services.reset();
 	}
 
-	SECTION("The last parameter ids are invalid") {
+	SECTION("The middle parameter ID is invalid") {
 		Message request = Message(20, 3, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
@@ -146,22 +136,20 @@ TEST_CASE("Parameter Setting Subservice") {
 		request.appendUint16(3);
 
 		MessageParser::execute(request);
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::get(0).messageType == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 1);
 
 		CHECK(systemParameters.parameter1.getValue() == 1);
 		CHECK(systemParameters.parameter2.getValue() == 7);
 		CHECK(systemParameters.parameter3.getValue() == 10);
 
-		systemParameters.parameter1.setValue(3);
-		systemParameters.parameter2.setValue(7);
-		systemParameters.parameter3.setValue(10);
+		resetParameterValues();
 
 		ServiceTests::reset();
 		Services.reset();
 	}
 
-	SECTION("All ids are valid") {
+	SECTION("All IDs are valid") {
 		Message request = Message(20, 3, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
@@ -177,16 +165,37 @@ TEST_CASE("Parameter Setting Subservice") {
 		CHECK(systemParameters.parameter2.getValue() == 2);
 		CHECK(systemParameters.parameter3.getValue() == 3);
 
-		systemParameters.parameter1.setValue(3);
-		systemParameters.parameter2.setValue(7);
-		systemParameters.parameter3.setValue(10);
+		resetParameterValues();
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Wrong Messages") {
+
+	SECTION("Wrong Service Type Handling Test for Report") {
+		Message falseRequest(62, 1, Message::TM, 1);
+
+		MessageParser::execute(falseRequest);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
 
 		ServiceTests::reset();
 		Services.reset();
 	}
 
-	SECTION("Wrong Message Type Handling Test") {
-		Message falseRequest(62, 3, Message::TM, 1); // a totally wrong message
+	SECTION("Wrong Service Type Handling Test for Set") {
+		Message falseRequest(62, 3, Message::TM, 1);
+
+		MessageParser::execute(falseRequest);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Wrong Message Type") {
+		Message falseRequest(20, 127, Message::TM, 1);
 
 		MessageParser::execute(falseRequest);
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));

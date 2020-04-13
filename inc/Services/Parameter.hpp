@@ -19,8 +19,7 @@
  * common data type used to create any pointers to \ref Parameter objects, as well as
  * virtual functions for accessing the parameter's data part, and
  * 2) a templated \ref Parameter used to store any type-specific parameter information,
- * such as the actual data field where the parameter's value will be stored and any pointers
- * to suitable functions that will be responsible for updating the parameter's value.
+ * such as the actual data field where the parameter's value will be stored.
  *
  * @section Architecture Rationale
  * The ST[20] Parameter service is implemented with the need of arbitrary type storage
@@ -39,7 +38,8 @@ public:
 
 /**
  * Implementation of a parameter containing its value. See \ref ParameterBase for more information.
- * @tparam DataType
+ * @tparam DataType The type of the Parameter value. This is the type used for transmission and reception
+ * as per the PUS.
  */
 template <typename DataType>
 class Parameter : public ParameterBase {
@@ -65,14 +65,14 @@ public:
 };
 
 template<> inline void Parameter<uint8_t>::setValueFromMessage(Message& message) {
-	this->currentValue = message.readUint8();
+	currentValue = message.readUint8();
 }
 template<> inline void Parameter<uint16_t>::setValueFromMessage(Message& message) {
-	this->currentValue = message.readUint16();
+	currentValue = message.readUint16();
 }
 
 template<> inline void Parameter<uint32_t>::setValueFromMessage(Message& message) {
-	this->currentValue = message.readUint32();
+	currentValue = message.readUint32();
 }
 
 template<> inline void Parameter<uint8_t>::appendValueToMessage(Message& message) {

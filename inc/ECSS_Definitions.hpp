@@ -142,7 +142,7 @@
 #define LOGGER_MAX_MESSAGE_SIZE 512
 
 /**
- * @brief Size of the map holding the Parameter objects for the ST[20] parameter service
+ * @brief Size of the array holding the Parameter objects for the ST[20] parameter service
  */
 #define ECSS_PARAMETER_COUNT 3
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
