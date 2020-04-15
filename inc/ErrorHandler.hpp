@@ -70,13 +70,13 @@ public:
 		 */
 		OtherMessageType = 9,
 		/**
-		 * Attempt to insert new function in a full function map (ST[08])
+		 * Attempt to insert new element in a full map ST[08]
 		 */
-		FunctionMapFull = 10,
+		MapFull = 10,
 		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 11,
+		NestedMessageTooLarge = 11
 	};
 
 	/**
@@ -102,7 +102,7 @@ public:
 		/**
 		 * Cannot parse a Message, because there is an error in its secondary header
 		 */
-		UnacceptableMessage = 5,
+		UnacceptableMessage = 5
 	};
 
 	/**
@@ -135,7 +135,14 @@ public:
 		EventActionUnknownEventActionDefinitionIDError = 4,
 		SubServiceExecutionStartError = 5,
 		InstructionExecutionStartError = 6,
-
+		/**
+		 * Attempt to change the value of a non existing parameter (ST[20])
+		 */
+		SetNonExistingParameter = 7,
+		/**
+		 * Attempt to access a non existing parameter (ST[20])
+		 */
+		GetNonExistingParameter = 8
 	};
 
 	/**

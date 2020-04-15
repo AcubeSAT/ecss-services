@@ -65,14 +65,6 @@ cppcheck-misra:
   script:
     - ci/cppcheck-misra.sh
 
-vera:
-  stage: build
-  before_script:
-    - vera++ --version
-    - cp ci/vera.profile /usr/lib/vera++/profiles/custom
-  script:
-    - ci/vera.sh
-
 clang-tidy:
   stage: build
   variables:

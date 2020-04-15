@@ -2,50 +2,12 @@
 #ifdef SERVICE_PARAMETER
 
 #include "Services/ParameterService.hpp"
+#include "Services/Parameter.hpp"
 
-#define DEMOMODE
+void ParameterService::reportParameters(Message& paramIds) {
+	// TM[20,2]
+	Message parameterReport(20, 2, Message::TM, 1);
 
-#include <ctime>
-#include <cstdlib>
-
-ParameterService::ParameterService() {
-#ifdef DEMOMODE
-	// Test code, setting up some of the parameter fields
-
-	time_t currTime = time(nullptr);
-	struct tm* today = localtime(&currTime);
-
-	Parameter test1;
-	test1.settingData = today->tm_hour; // the current hour
-	test1.ptc = 3; // unsigned int
-	test1.pfc = 14; // 32 bits
-
-	Parameter test2;
-	test2.settingData = today->tm_min; // the current minute
-	test2.ptc = 3; // unsigned int
-	test2.pfc = 14; // 32 bits
-
-	// MAKE SURE THE IDS ARE UNIQUE WHEN INSERTING!
-	/**
-	 * @todo: Make a separate insert() function for parameter insertion to protect from blunders
-	 * if needed to
-	 */
-
-	paramsList.insert(std::make_pair(0, test1));
-	paramsList.insert(std::make_pair(1, test2));
-
-#endif
-}
-
-void ParameterService::reportParameterIds(Message& paramIds) {
-	paramIds.assertTC(20, 1);
-	Message reqParam(20, 2, Message::TM, 1); // empty TM[20, 2] parameter report message
-
-	paramIds.resetRead(); // since we're passing a reference, the reading position shall be reset
-	// to its default before any read operations (to ensure the correct data is being read)
-
-	// assertion: correct message, packet and service type (at failure throws an
-	// InternalError::UnacceptablePacket)
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == 1, paramIds,
@@ -53,29 +15,31 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	ErrorHandler::assertRequest(paramIds.serviceType == 20, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t ids = paramIds.readUint16();
-	reqParam.appendUint16(numOfValidIds(paramIds)); // include the number of valid IDs
+	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t numberOfValidIds = 0;
+	for (uint16_t i = 0; i < numOfIds; i++) {
+		if (paramIds.readUint16() < systemParameters.parametersArray.size()) {
+			numberOfValidIds++;
+		}
+	}
+	parameterReport.appendUint16(numberOfValidIds);
+	paramIds.resetRead();
 
-	for (uint16_t i = 0; i < ids; i++) {
-		uint16_t currId = paramIds.readUint16(); // current ID to be appended
-
-		if (paramsList.find(currId) != paramsList.end()) {
-			reqParam.appendUint16(currId);
-			reqParam.appendUint32(paramsList[currId].settingData);
+	numOfIds = paramIds.readUint16();
+	for (uint16_t i = 0; i < numOfIds; i++) {
+		uint16_t currId = paramIds.readUint16();
+		if (currId < systemParameters.parametersArray.size()) {
+			parameterReport.appendUint16(currId);
+			systemParameters.parametersArray[currId].get().appendValueToMessage(parameterReport);
 		} else {
-			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue; // generate failed start of execution notification & ignore
+			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
 	}
 
-	storeMessage(reqParam);
+	storeMessage(parameterReport);
 }
 
-void ParameterService::setParameterIds(Message& newParamValues) {
-	newParamValues.assertTC(20, 3);
-
-	// assertion: correct message, packet and service type (at failure throws an
-	// InternalError::UnacceptablePacket which gets logged)
+void ParameterService::setParameters(Message& newParamValues) {
 
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -84,51 +48,26 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	ErrorHandler::assertRequest(newParamValues.serviceType == 20, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t ids = newParamValues.readUint16(); // get number of ID's
+	uint16_t numOfIds = newParamValues.readUint16();
 
-	for (uint16_t i = 0; i < ids; i++) {
+	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-
-		if (paramsList.find(currId) != paramsList.end()) {
-			paramsList[currId].settingData = newParamValues.readUint32();
+		if (currId < systemParameters.parametersArray.size()) {
+			systemParameters.parametersArray[currId].get().setValueFromMessage(newParamValues);
 		} else {
-			ErrorHandler::reportError(newParamValues,
-			                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue; // generate failed start of execution notification & ignore
+			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);
+			break; // Setting next parameters is impossible, since the size of value to be read is unknown
 		}
 	}
-}
-
-uint16_t ParameterService::numOfValidIds(Message idMsg) {
-	idMsg.resetRead();
-	// start reading from the beginning of the idMsg object
-	// (original obj. will not be influenced if this is called by value)
-
-	uint16_t ids = idMsg.readUint16(); // first 16bits of the packet are # of IDs
-	uint16_t validIds = 0;
-
-	for (uint16_t i = 0; i < ids; i++) {
-		uint16_t currId = idMsg.readUint16();
-
-		if (idMsg.messageType == 3) {
-			idMsg.readUint32(); // skip the 32bit settings blocks, we need only the IDs
-		}
-
-		if (paramsList.find(currId) != paramsList.end()) {
-			validIds++;
-		}
-	}
-
-	return validIds;
 }
 
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
-			reportParameterIds(message); // TC[20,1]
+			reportParameters(message); // TC[20,1]
 			break;
 		case 3:
-			setParameterIds(message); // TC[20,3]
+			setParameters(message); // TC[20,3]
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

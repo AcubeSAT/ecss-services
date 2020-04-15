@@ -1,77 +1,40 @@
 #ifndef ECSS_SERVICES_PARAMETERSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
+#include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "etl/map.h"
+#include "Parameter.hpp"
+#include "Parameters/SystemParameters.hpp"
 
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C
  *
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
+ * @author Athanasios Theocharis <athatheoc@gmail.com>
  */
-
-/**
- * Generic parameter structure
- * PTC and PFC for each parameter shall be specified as in
- * ECSS-E-ST-70-41C, chapter 7.3
- */
-
-typedef uint16_t ParamId; // parameter IDs are given sequentially
-struct Parameter {
-	uint8_t ptc; // Packet field type code (PTC)
-	uint8_t pfc; // Packet field format code (PFC)
-
-	uint32_t settingData;
-	// Actual data defining the operation of a peripheral or subsystem.
-	// Peripheral-dependent normally (void* maybe?) (it's a memory address according to spec).
-	// Dummy int for now.
-};
 
 /**
  * Parameter manager - ST[20]
- * Holds the list with the parameters and provides functions
- * for parameter reporting and modification.
  *
- * The parameter list is stored in a map with the parameter IDs as keys and values
- * corresponding Parameter structs containing the PTC, PFC and the parameter's value.
- *
- * @ingroup Services
+ * The purpose of this class is to handle functions regarding the access and modification
+ * of the various parameters of the CubeSat.
+ * The parameters to be managed are initialized and kept in \ref SystemParameters.
  */
-
 class ParameterService : public Service {
-private:
-	etl::map<ParamId, Parameter, ECSS_MAX_PARAMETERS> paramsList;
-	uint16_t numOfValidIds(Message idMsg); // count the valid ids in a given TC[20, 1]
-
 public:
-	/**
-	 * Initializes the parameter list with some dummy values for now.
-	 */
-	ParameterService();
+	ParameterService() = default;
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
 	 * containing the current configuration
 	 * **for the parameters specified in the carried valid IDs**.
 	 *
-	 * No sophisticated error checking for now, just whether the packet is of the correct type
-	 * and whether the requested IDs are valid, ignoring the invalid ones.
-	 * If the packet has an incorrect header, an InternalError::UnacceptablePacket is raised.
-	 * If no IDs are correct, the returned message shall be empty.
-	 *
-	 * @param paramId: a valid TC[20, 1] packet carrying the requested parameter IDs
+	 * @param paramId: a TC[20, 1] packet carrying the requested parameter IDs
 	 * @return None (messages are stored using storeMessage())
-	 *
-	 *
-	 * NOTES:
-	 * Method for valid ID counting is a hack (clones the message and figures out the number
-	 * separately, due to message access being non-random). Should be enough for now.
-	 *
-	 * Everything apart from the setting data is uint16 (setting data are uint32 for now)
 	 */
-	void reportParameterIds(Message& paramIds);
+	void reportParameters(Message& paramIds);
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
@@ -79,11 +42,8 @@ public:
 	 * while ignoring all invalid IDs.
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
-	 * @return None
-	 *
-	 * @todo Use pointers for changing and storing addresses to comply with the standard
 	 */
-	void setParameterIds(Message& newParamValues);
+	void setParameters(Message& newParamValues);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

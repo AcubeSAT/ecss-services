@@ -66,7 +66,7 @@ public:
 	 * @todo check if we need to change the epoch to the recommended one from the standard, 1
 	 * January 1958
 	 */
-	static uint32_t utcToSeconds(TimeAndDate& TimeInfo);
+	static uint32_t utcToSeconds(const TimeAndDate& TimeInfo);
 
 	/**
 	 * Convert elapsed seconds since Unix epoch to UTC date.
@@ -94,7 +94,7 @@ public:
 	 * @todo time security for critical time operations
 	 * @todo declare the implicit P-field
 	 */
-	static uint64_t generateCDSTimeFormat(struct TimeAndDate& TimeInfo);
+	static uint64_t generateCDSTimeFormat(const struct TimeAndDate& TimeInfo);
 
 	/**
 	 * Parse the CDS time format (3.3 in CCSDS 301.0-B-4 standard)
@@ -124,7 +124,7 @@ public:
 	 * @todo time security for critical time operations
 	 * @todo declare the implicit P-field
 	 */
-	static uint32_t generateCUCTimeFormat(struct TimeAndDate& TimeInfo);
+	static uint32_t generateCUCTimeFormat(const struct TimeAndDate& TimeInfo);
 
 	/**
 	 * Parse the CUC time format (3.3 in CCSDS 301.0-B-4 standard)
