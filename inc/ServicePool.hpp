@@ -12,6 +12,7 @@
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
+#include "Services/HousekeepingService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -71,6 +72,10 @@ public:
 
 #ifdef SERVICE_TIMESCHEDULING
 	TimeBasedSchedulingService timeBasedScheduling;
+#endif
+
+#ifdef SERVICE_HOUSEKEEPING
+	HousekeepingService housekeeping;
 #endif
 
 	/**

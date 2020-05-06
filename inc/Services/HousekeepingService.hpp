@@ -59,7 +59,9 @@ public:
 	/**
 	 * Define the type of the service
 	 */
-	HousekeepingService();
+	HousekeepingService() {
+		serviceType = 3;
+	}
 
 	/**
 	 * TC[3,1] create a housekeeping report structure

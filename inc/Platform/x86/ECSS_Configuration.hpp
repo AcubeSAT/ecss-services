@@ -34,6 +34,7 @@
 #define SERVICE_TEST                ///<  Compile ST[17] test
 #define SERVICE_TIME                ///<  Compile ST[09] time management
 #define SERVICE_TIMESCHEDULING      ///<  Compile ST[11] time-based scheduling
+#define SERVICE_HOUSEKEEPING        ///<  Compile ST[03] housekeeping
 #endif
 /** @} */
 

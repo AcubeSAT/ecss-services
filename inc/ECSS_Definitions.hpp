@@ -146,4 +146,10 @@
  * @brief Size of the array holding the Parameter objects for the ST[20] parameter service
  */
 #define ECSS_PARAMETER_COUNT 3
+
+/**
+ * @brief Size of the map holding the Housekeeping structures for the ST[03] housekeeping service
+ */
+#define ECSS_ST_03_MAX_HOUSEKEEPING_STRUCTURES 5
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
