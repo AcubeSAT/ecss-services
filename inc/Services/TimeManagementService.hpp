@@ -7,7 +7,8 @@
 /**
  * Implementation of the ST[09] time management.
  *
- * @notes
+ * @ingroup Services
+ * @note
  * There is a noticeable difference between setting the time using GPS and setting the time
  * using space packets from the ground segment. The GPS module sends the actual time of UTC (123519
  * is 12:35:19 UTC), while space packets, for time configuration, sends the elapsed time units

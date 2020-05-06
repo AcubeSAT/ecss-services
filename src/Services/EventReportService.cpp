@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_EVENTREPORT
+
 #include <Services/EventReportService.hpp>
 #include <Services/EventActionService.hpp>
 #include "Message.hpp"
@@ -6,7 +9,7 @@
  * @todo: Add message type in TCs
  * @todo: this code is error prone, depending on parameters given, add fail safes (probably?)
  */
-void EventReportService::informativeEventReport(Event eventID, const String<64>& data) {
+void EventReportService::informativeEventReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
 	// TM[5,1]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
 		Message report = createTM(1);
@@ -19,7 +22,8 @@ void EventReportService::informativeEventReport(Event eventID, const String<64>&
 	}
 }
 
-void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<64>& data) {
+void
+EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
 	lowSeverityEventCount++;
 	// TM[5,2]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -35,7 +39,8 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<64
 	}
 }
 
-void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<64>& data) {
+void
+EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
 	mediumSeverityEventCount++;
 	// TM[5,3]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -51,7 +56,8 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 	}
 }
 
-void EventReportService::highSeverityAnomalyReport(Event eventID, const String<64>& data) {
+void
+EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
 	highSeverityEventCount++;
 	// TM[5,4]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -120,7 +126,7 @@ void EventReportService::listOfDisabledEventsReport() {
 
 	uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
 	report.appendHalfword(numberOfDisabledEvents);
-	for (uint16_t i = 0; i < stateOfEvents.size(); i++) {
+	for (size_t i = 0; i < stateOfEvents.size(); i++) {
 		if (not stateOfEvents[i]) {
 			report.appendEnum16(i);
 		}
@@ -141,3 +147,5 @@ void EventReportService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif

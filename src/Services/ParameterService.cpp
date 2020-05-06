@@ -1,41 +1,13 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_PARAMETER
+
 #include "Services/ParameterService.hpp"
 #include "Services/Parameter.hpp"
 
-ParameterService::ParameterService() {
-	// test addings
-//	addNewParameter(3, 14);
-//	addNewParameter(3, 14);
-}
+void ParameterService::reportParameters(Message& paramIds) {
+	// TM[20,2]
+	Message parameterReport(20, 2, Message::TM, 1);
 
-void ParameterService::addNewParameter(uint16_t id, ParameterBase* param, const char* flags) {
-	if (paramsList.full()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);
-		return;
-	}
-	else {
-		if (paramsList.find(id) == paramsList.end()) {
-			param->setFlags(flags);
-			paramsList.insert(std::make_pair(id, param));
-			return;
-		}
-		else {
-			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ExistingParameterId);
-			return;
-		}
-	}
-}
-
-void ParameterService::reportParameterIds(Message& paramIds) {
-	etl::vector<std::pair<uint16_t, String<MAX_STRING_LENGTH>>, ECSS_ST_20_MAX_PARAMETERS> validParams;
-	Message reqParam(20, 2, Message::TM, 1);
-	// empty TM[20, 2] parameter report message
-
-	paramIds.resetRead();
-	// since we're passing a reference, the reading position shall be reset
-	// to its default before any read operations (to ensure the correct data is being read)
-
-	// assertion: correct message, packet and service type (at failure throws an
-	// InternalError::UnacceptableMessage)
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == 1, paramIds,
@@ -43,38 +15,31 @@ void ParameterService::reportParameterIds(Message& paramIds) {
 	ErrorHandler::assertRequest(paramIds.serviceType == 20, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t numOfIds = paramIds.readUint16();  // total number of parameter IDs carried in the message
-	uint16_t validIds = 0;                      // number of valid IDs
+	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t numberOfValidIds = 0;
+	for (uint16_t i = 0; i < numOfIds; i++) {
+		if (paramIds.readUint16() < systemParameters.parametersArray.size()) {
+			numberOfValidIds++;
+		}
+	}
+	parameterReport.appendUint16(numberOfValidIds);
+	paramIds.resetRead();
 
+	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-
-		if (paramsList.find(currId) != paramsList.end()) {
-			std::pair<uint16_t, String<MAX_STRING_LENGTH>> p = std::make_pair(currId, paramsList.at(currId)
-			->getValueAsString());
-			// pair containing the parameter's ID as first element and its current value as second
-			validParams.push_back(p);
-			validIds++;
-		}
-		else {
-			ErrorHandler::reportError(paramIds, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue; // generate failed start of execution notification & ignore
+		if (currId < systemParameters.parametersArray.size()) {
+			parameterReport.appendUint16(currId);
+			systemParameters.parametersArray[currId].get().appendValueToMessage(parameterReport);
+		} else {
+			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
 	}
 
-	reqParam.appendUint16(validIds);  // append the number of valid IDs
-
-	for (auto i: validParams) {
-		reqParam.appendUint16(i.first);  // append the parameter ID
-		reqParam.appendString(i.second); // and its value
-	}
-
-	storeMessage(reqParam);  // then store the message
+	storeMessage(parameterReport);
 }
 
-void ParameterService::setParameterIds(Message& newParamValues) {
-	// assertion: correct message, packet and service type (at failure throws an
-	// InternalError::UnacceptablePacket which gets logged)
+void ParameterService::setParameters(Message& newParamValues) {
 
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -83,21 +48,15 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 	ErrorHandler::assertRequest(newParamValues.serviceType == 20, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t numOfIds = newParamValues.readUint16(); // get number of ID's contained in the message
+	uint16_t numOfIds = newParamValues.readUint16();
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		// the parameter is checked for read-only status and manual update availability
-		if (paramsList.find(currId) != paramsList.end()) {
-
-			// WARNING! SETTING WORKS ONLY WITH UINT32_T INPUT!
-			// I need a way to know the input's type!
-			paramsList.at(currId)->setCurrentValue(newParamValues.readUint32());
-		}
-		else {
-			ErrorHandler::reportError(newParamValues,
-				ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-			continue; // generate failed start of execution notification & ignore
+		if (currId < systemParameters.parametersArray.size()) {
+			systemParameters.parametersArray[currId].get().setValueFromMessage(newParamValues);
+		} else {
+			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);
+			break; // Setting next parameters is impossible, since the size of value to be read is unknown
 		}
 	}
 }
@@ -105,25 +64,14 @@ void ParameterService::setParameterIds(Message& newParamValues) {
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
-			reportParameterIds(message); // TC[20,1]
+			reportParameters(message); // TC[20,1]
 			break;
 		case 3:
-			setParameterIds(message); // TC[20,3]
+			setParameters(message); // TC[20,3]
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
 
-String<MAX_STRING_LENGTH> ParameterService::returnParamValue(ParamIdType id) {
-	if (paramsList.find(id) != paramsList.end()) {
-		return paramsList.at(id)->getValueAsString();
-	}
-	else {
-		return "";
-	}
-}
-
-bool ParameterService::isParamId(ParamIdType id) {
-	return (paramsList.find(id) != paramsList.end());
-}
+#endif

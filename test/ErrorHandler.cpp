@@ -7,6 +7,7 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	ErrorHandler::reportError(failedMessage, ErrorHandler::MessageTooShort);
 
 	REQUIRE(ServiceTests::hasOneMessage());
+	CHECK(ServiceTests::thrownError(ErrorHandler::MessageTooShort));
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,2] message was returned
@@ -17,7 +18,7 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 47);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -29,6 +30,7 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownExecutionStartError);
 
 	REQUIRE(ServiceTests::hasOneMessage());
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownExecutionStartError));
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,3] message was returned
@@ -39,7 +41,7 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -51,6 +53,7 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	ErrorHandler::reportProgressError(failedMessage, ErrorHandler::UnknownExecutionProgressError, 0);
 
 	REQUIRE(ServiceTests::hasOneMessage());
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownExecutionProgressError));
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,6] message was returned
@@ -61,7 +64,7 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -74,6 +77,7 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownExecutionCompletionError);
 
 	REQUIRE(ServiceTests::hasOneMessage());
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownExecutionCompletionError));
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,8] message was returned
@@ -84,7 +88,7 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
@@ -96,6 +100,7 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	ErrorHandler::reportError(failedMessage, ErrorHandler::UnknownRoutingError);
 
 	REQUIRE(ServiceTests::hasOneMessage());
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownRoutingError));
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,8] message was returned
@@ -106,7 +111,7 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 
 	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 0);
+	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 71);
 	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);

@@ -3,6 +3,7 @@
 #include <catch2/catch.hpp>
 #include <Message.hpp>
 #include <Service.hpp>
+#include <Logger.hpp>
 #include "Services/ServiceTests.hpp"
 
 // Explicit template specializations for the logError() function
@@ -34,6 +35,10 @@ void ErrorHandler::logError(ErrorType errorType) {
 	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
 }
 
+void Logger::log(Logger::LogLevel level, etl::istring & message) {
+	// Logs while testing are completely ignored
+}
+
 struct ServiceTestsListener : Catch::TestEventListenerBase {
 	using TestEventListenerBase::TestEventListenerBase; // inherit constructor
 
@@ -43,8 +48,7 @@ struct ServiceTestsListener : Catch::TestEventListenerBase {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
 			// corresponding assertion function from ServiceTests to silence this message.
 
-			// TODO: Uncomment the following line as soon as Issue #19 is closed
-			// CHECK(ServiceTests::hasNoErrors());
+			CHECK(ServiceTests::hasNoErrors());
 		}
 	}
 

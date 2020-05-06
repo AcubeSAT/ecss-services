@@ -2,6 +2,8 @@
 #include "macros.hpp"
 #include <cstring>
 #include <ErrorHandler.hpp>
+#include <ServicePool.hpp>
+#include <MessageParser.hpp>
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
@@ -36,10 +38,14 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 
 void Message::finalize() {
 	// Define the spare field in telemetry and telecommand user data field (7.4.3.2.c and 7.4.4.2.c)
-
 	if (currentBit != 0) {
 		currentBit = 0;
 		dataSize++;
+	}
+
+	if (packetType == PacketType::TM) {
+		messageTypeCounter = Services.getAndUpdateMessageTypeCounter(serviceType, messageType);
+		packetSequenceCount = Services.getAndUpdatePacketSequenceCounter();
 	}
 }
 
@@ -84,7 +90,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 		if ((currentBit + numBits) >= 8) {
 			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit);
 
-			uint8_t mask = ((1u << bitsToAddNow) - 1u);
+			uint8_t mask = ((1U << bitsToAddNow) - 1U);
 			uint8_t maskedData = data[readPosition] & mask;
 			value |= maskedData << (numBits - bitsToAddNow);
 
@@ -155,4 +161,39 @@ void Message::readCString(char *string, uint16_t size) {
 void Message::resetRead() {
 	readPosition = 0;
 	currentBit = 0;
+}
+
+void Message::appendMessage(const Message& message, uint16_t size) {
+	appendString(MessageParser::composeECSS(message, size));
+}
+
+void Message::appendString(const etl::istring& string) {
+	ASSERT_INTERNAL(dataSize + string.size() <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+	// TODO: Do we need to keep this check? How does etl::string handle it?
+	ASSERT_INTERNAL(string.size() <= string.capacity(), ErrorHandler::StringTooLarge);
+
+	memcpy(data + dataSize, string.data(), string.size());
+
+	dataSize += string.size();
+}
+
+void Message::appendFixedString(const etl::istring& string) {
+	ASSERT_INTERNAL((dataSize + string.max_size()) < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+
+	// Append the bytes with content
+	memcpy(data + dataSize, string.data(), string.size());
+	// The rest of the bytes is set to 0
+	(void) memset(data + dataSize + string.size(), 0, string.max_size() - string.size());
+
+	dataSize += string.max_size();
+}
+
+void Message::appendOctetString(const etl::istring& string) {
+	// Make sure that the string is large enough to count
+	ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
+	// Redundant check to make sure we fail before appending string.size()
+	ASSERT_INTERNAL(dataSize + 2 + string.size() < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
+
+	appendUint16(string.size());
+	appendString(string);
 }

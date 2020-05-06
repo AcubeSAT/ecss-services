@@ -3,9 +3,7 @@
 #include <Message.hpp>
 #include "ServiceTests.hpp"
 #include <etl/String.hpp>
-#include <etl/map.h>
 #include <cstring>
-#include <iostream>
 #include <ServicePool.hpp>
 
 EventActionService& eventActionService = Services.eventAction;

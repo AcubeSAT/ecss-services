@@ -2,12 +2,14 @@
 #define ECSS_SERVICES_MEMMANGSERVICE_HPP
 
 #include <memory>
-#include <iostream>
 #include "Service.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 
+/**
+ * @ingroup Services
+ */
 class MemoryManagementService : public Service {
 public:
 	// Memory type ID's
@@ -77,7 +79,7 @@ public:
 	 * is the ground station.
 	 *
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
-	 * @param param Contains the necessary parameters to call the suitable subservice
+	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
 

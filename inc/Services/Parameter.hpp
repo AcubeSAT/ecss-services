@@ -1,114 +1,89 @@
 #ifndef ECSS_SERVICES_PARAMETER_HPP
 #define ECSS_SERVICES_PARAMETER_HPP
 
-#include "etl/bitset.h"
 #include "etl/String.hpp"
+#include "Message.hpp"
+#include "ECSS_Definitions.hpp"
 
-// Number of binary flags in every parameter. Final number TBD.
-#define NUM_OF_FLAGS 3
-// Maximum etl::string output length in bytes
-#define MAX_STRING_LENGTH 5
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
- * Fully compliant with the standards requirements, while adding some small,
- * but useful extensions to its contents.
  *
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
+ * @author Athanasios Theocharis <athatheoc@gmail.com>
+ *
+ * @section Introduction
+ * The Parameter class implements a way of storing and updating system parameters
+ * of arbitrary size and type, while avoiding std::any and dynamic memory allocation.
+ * It is split in two distinct parts:
+ * 1) an abstract \ref ParameterBase class which provides a
+ * common data type used to create any pointers to \ref Parameter objects, as well as
+ * virtual functions for accessing the parameter's data part, and
+ * 2) a templated \ref Parameter used to store any type-specific parameter information,
+ * such as the actual data field where the parameter's value will be stored.
+ *
+ * @section Architecture Rationale
+ * The ST[20] Parameter service is implemented with the need of arbitrary type storage
+ * in mind, while avoiding any use of dynamic memory allocation, a requirement for use
+ * in embedded systems. Since lack of Dynamic Memory Access precludes usage of stl::any
+ * and the need for truly arbitrary (even for template-based objects like etl::string) type storage
+ * would exclude from consideration constructs like etl::variant due to limitations on
+ * the number of supported distinct types, a custom solution was needed.
+ * Furthermore, the \ref ParameterService should provide ID-based access to parameters.
  */
-
-/**
- * Useful type definitions
- *
- * @typedef ParamIdType: the unique ID of a parameter, used for searching
- * @typedef Flags: container for the binary flags
- */
-typedef uint16_t ParamIdType;
-typedef etl::bitset<NUM_OF_FLAGS> Flags;
-typedef enum {STRING = 0,
-	INT32 = 1,
-	} TypesList;
-
-/**
- * Parameter class - Breakdown of fields
- *
- * @private ptc: The Packet field type code (PTC) as defined in ECSS-E-ST-70-41C, chapter 7.3.
- * @private pfc: The Packet field format code (PfC) as defined in the same standard
- * @private ptr: Pointer of the function that will update the parameter
- * @private currentValue: The current (as in last good) value of the parameter
- *
- * @todo: Find a way to store arbitrary types in currentValue
- *
- * Additional features (not included in standard):
- * @private flags: Various binary flags (number and meaning TBD).
- * @warning Current flag meanings (starting from LSB, big-endian):
- * Index 0: update with priority
- * Index 1: manual update available
- * Index 2: automatic update available
- *
- *
- * Methods:
- * @public Parameter(uint8_t newPtc, uint8_t newPfc, uint32_t initialValue = 0, UpdatePtr newPtr = nullptr):
- * Create a new Parameter object with newPtc PTC, newPfc PFC, initialValue as its starting value and newPtr
- * as its update function pointer. Arguments initialValue and newPtr are optional, and have default values of
- * 0 and nullptr respectively.
- *
- * @public setCurrentValue(): Changes the current value of the parameter
- * @public getCurrentValue(): Gets the current value of the parameter
- * @public getPTC(), getPFC(): Returns the PFC and PTC of the parameter
- */
-
 class ParameterBase {
-protected:
-	uint8_t ptc;
-	uint8_t pfc;
-	uint8_t sizeInBytes;
-	void* valuePtr;
-	Flags flags;
 public:
-	uint8_t getPTC();
-
-	void setFlags(const char* flags);
-
-	uint8_t getPFC();
-
-	virtual String<MAX_STRING_LENGTH> getValueAsString() = 0;
-
-	template <typename ValueType>
-	void setCurrentValue(ValueType newVal) {
-		// set the value only if the parameter can be updated manually
-		if (flags[1]) {
-			*reinterpret_cast<ValueType*>(valuePtr) = newVal;
-		}
-	}
+	virtual void appendValueToMessage(Message& message) = 0;
+	virtual void setValueFromMessage(Message& message) = 0;
 };
 
-template <typename ValueType>
+/**
+ * Implementation of a parameter containing its value. See \ref ParameterBase for more information.
+ * @tparam DataType The type of the Parameter value. This is the type used for transmission and reception
+ * as per the PUS.
+ */
+template <typename DataType>
 class Parameter : public ParameterBase {
-	void (* ptr)(ValueType*);
-	ValueType currentValue;
+private:
+	DataType currentValue;
 
 public:
-	Parameter(uint8_t newPtc, uint8_t newPfc, ValueType initialValue = 0, void(* newPtr)(ValueType*) = nullptr) {
-		ptc = newPtc;
-		pfc = newPfc;
-		ptr = newPtr;
-		sizeInBytes = sizeof(initialValue);
-		valuePtr = static_cast<void*>(&currentValue);
-		// see Parameter.hpp for explanation on flags
-		// by default: no update priority, manual and automatic update available
-
-		if (ptr != nullptr) {
-			(*ptr)(&currentValue);  // call the update function for the initial value
-		} else {
-			currentValue = initialValue;
-		}
+	Parameter(DataType initialValue) {
+		currentValue = initialValue;
 	}
 
-	String<MAX_STRING_LENGTH> getValueAsString() override {
-		String<MAX_STRING_LENGTH> contents(reinterpret_cast<uint8_t*>(&currentValue), sizeInBytes);
-		return contents;
+	inline void setValue(DataType value) {
+		currentValue = value;
 	}
+
+	DataType getValue() {
+		return currentValue;
+	}
+
+	inline void setValueFromMessage(Message& message) override;
+
+	inline void appendValueToMessage(Message& message) override;
 };
 
+template<> inline void Parameter<uint8_t>::setValueFromMessage(Message& message) {
+	currentValue = message.readUint8();
+}
+template<> inline void Parameter<uint16_t>::setValueFromMessage(Message& message) {
+	currentValue = message.readUint16();
+}
 
+template<> inline void Parameter<uint32_t>::setValueFromMessage(Message& message) {
+	currentValue = message.readUint32();
+}
+
+template<> inline void Parameter<uint8_t>::appendValueToMessage(Message& message) {
+	message.appendUint8(this->currentValue);
+}
+
+template<> inline void Parameter<uint16_t>::appendValueToMessage(Message& message) {
+	message.appendUint16(this->currentValue);
+}
+
+template<> inline void Parameter<uint32_t>::appendValueToMessage(Message& message) {
+	message.appendUint32(this->currentValue);
+}
 #endif //ECSS_SERVICES_PARAMETER_HPP

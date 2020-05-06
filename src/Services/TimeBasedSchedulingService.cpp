@@ -1,3 +1,6 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_TIMESCHEDULING
+
 #include "Services/TimeBasedSchedulingService.hpp"
 
 TimeBasedSchedulingService::TimeBasedSchedulingService() {
@@ -49,7 +52,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			// Get the TC packet request
 			uint8_t requestData[ECSS_TC_REQUEST_STRING_SIZE] = {0};
 			request.readString(requestData, ECSS_TC_REQUEST_STRING_SIZE);
-			Message receivedTCPacket = msgParser.parseRequestTC(requestData);
+			Message receivedTCPacket = MessageParser::parseECSSTC(requestData);
 			ScheduledActivity newActivity; // Create the new activity
 
 			// Assign the attributes to the newly created activity
@@ -168,7 +171,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 		// todo: append sub-schedule and group ID if they are defined
 
 		report.appendUint32(activity.requestReleaseTime);
-		report.appendString(msgParser.convertTCToStr(activity.request));
+		report.appendString(MessageParser::composeECSS(activity.request));
 	}
 	storeMessage(report); // Save the report
 }
@@ -209,7 +212,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
 	for (auto& match : matchedActivities) {
 		report.appendUint32(match.requestReleaseTime); // todo: Replace with the time parser
-		report.appendString(msgParser.convertTCToStr(match.request));
+		report.appendString(MessageParser::composeECSS(match.request));
 	}
 	storeMessage(report); // Save the report
 }
@@ -293,3 +296,5 @@ void TimeBasedSchedulingService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif

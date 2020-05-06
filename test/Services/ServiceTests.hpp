@@ -123,7 +123,7 @@ public:
 	}
 
 	/**
-	 * Find if an error
+	 * Find if an error exists
 	 * @tparam ErrorType An enumeration of ErrorHandler
 	 * @param errorType The error code of the Error, corresponding to the correct type as
 	 * specified in ErrorHandler
@@ -135,6 +135,20 @@ public:
 		expectingErrors = true;
 
 		return thrownErrors.find(std::make_pair(errorSource, errorType)) != thrownErrors.end();
+	}
+	/**
+ 	 * Find the number of times that an error exists
+ 	 * @tparam ErrorType An enumeration of ErrorHandler
+ 	 * @param errorType The error code of the Error, corresponding to the correct type as
+ 	 * specified in ErrorHandler
+ 	 */
+	template <typename ErrorType>
+	static int countThrownErrors(ErrorType errorType) {
+		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource(errorType);
+
+		expectingErrors = true;
+
+		return thrownErrors.count(std::make_pair(errorSource, errorType));
 	}
 };
 

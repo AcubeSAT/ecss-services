@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_TIMEGETTER_HPP
 #define ECSS_SERVICES_TIMEGETTER_HPP
 
-#include <iostream>
 #include <cstdint>
 #include <ctime>
 

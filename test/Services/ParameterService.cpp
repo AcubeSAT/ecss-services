@@ -1,43 +1,12 @@
 #include "catch2/catch.hpp"
-#include "Services/ParameterService.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 
-ParameterService& pserv = Services.parameterManagement;
-
-TEST_CASE("Parameter Service - General") {
-	SECTION("Addition to full map") {
-
-		Parameter<int> param0 = Parameter<int>(3, 14);
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
-		Parameter<int> param3 = Parameter<int>(12, 3, 6);
-		Parameter<int> param4 = Parameter<int>(15, 7, 3);
-
-		Parameter<int> param5 = Parameter<int>(15, 5, 4);
-
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
-		pserv.addNewParameter(3, static_cast<ParameterBase*>(&param3));
-		pserv.addNewParameter(4, static_cast<ParameterBase*>(&param4));
-
-		pserv.addNewParameter(5, static_cast<ParameterBase*>(&param5));  // addNewParameter should return false
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
-		ServiceTests::reset();
-		Services.reset();  // reset all services
-	}
-
-	SECTION("Addition of already existing parameter") {
-		Parameter<int> param0 = Parameter<int>(1, 3);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::ExistingParameterId));
-		ServiceTests::reset();
-		Services.reset();
-	}
-}
+static void resetParameterValues() {
+	systemParameters.parameter1.setValue(3);
+	systemParameters.parameter2.setValue(7);
+	systemParameters.parameter3.setValue(10);
+};
 
 TEST_CASE("Parameter Report Subservice") {
 	SECTION("All requested parameters invalid") {
@@ -48,12 +17,8 @@ TEST_CASE("Parameter Report Subservice") {
 		request.appendUint16(65535);
 
 		MessageParser::execute(request);
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::get(0).messageType == 4);
-		CHECK(ServiceTests::get(1).serviceType == 1);
-		CHECK(ServiceTests::get(1).messageType == 4);
-		CHECK(ServiceTests::get(2).serviceType == 1);
-		CHECK(ServiceTests::get(2).messageType == 4);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 3);
+		CHECK(ServiceTests::count() == 4);
 
 		Message report = ServiceTests::get(3);
 		CHECK(report.serviceType == 20);
@@ -64,49 +29,49 @@ TEST_CASE("Parameter Report Subservice") {
 		Services.reset();
 	}
 
-	SECTION("Faulty instruction handling") {
-		Parameter<int> param0 = Parameter<int>(3, 14);
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
-
-		Message request(20, 1, Message::TC, 1);
-		request.appendUint16(2); // number of requested IDs
-		request.appendUint16(65535); // invalid ID in this context
-		request.appendUint16(1); // valid
+	SECTION("Some requested parameters invalid") {
+		Message request = Message(20, 1, Message::TC, 1);
+		request.appendUint16(3);
+		request.appendUint16(1);
+		request.appendUint16(10000);
+		request.appendUint16(2);
 
 		MessageParser::execute(request);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 2);
+
 		Message report = ServiceTests::get(1);
-
-		CHECK(ServiceTests::get(0).messageType == 4);
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		// check for an ST[1,4] message caused by the faulty ID
-		CHECK((ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError)));
-		// check for the thrown UnknownExecutionStartError
-
-		CHECK(report.messageType == 2);
 		CHECK(report.serviceType == 20);
-		// check for an ST[20,2] message (the one that contains the settings)
+		CHECK(report.messageType == 2);
+		CHECK(report.readUint16() == 2);
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readUint16() == 7);
+		CHECK(report.readUint16() == 2);
+		CHECK(report.readUint32() == 10);
 
-		CHECK(report.readUint16() == 1);  // only one parameter shall be contained
-
-		CHECK(report.readUint16() == 1);  // check for parameter ID
-		uint8_t data[MAX_STRING_LENGTH];
-		report.readString(data, MAX_STRING_LENGTH);
-		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data);
-		CHECK(str.compare("12")); // check for value as string (defined when adding parameters)
-
-		ServiceTests::reset();  // clear all errors
-		Services.reset();  // reset the services
+		ServiceTests::reset();
+		Services.reset();
 	}
 
-	SECTION("Wrong Message Type Handling Test") {
-		Message falseRequest(62, 3, Message::TM, 1); // a totally wrong message
+	SECTION("Parameters are of different types") {
+		Message request = Message(20, 1, Message::TC, 1);
+		request.appendUint16(3);
+		request.appendUint16(0);
+		request.appendUint16(1);
+		request.appendUint16(2);
 
-		MessageParser::execute(falseRequest);
-		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
+		MessageParser::execute(request);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == 20);
+		CHECK(report.messageType == 2);
+		CHECK(report.readUint16() == 3);
+		CHECK(report.readUint16() == 0);
+		CHECK(report.readUint8() == 3);
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readUint16() == 7);
+		CHECK(report.readUint16() == 2);
+		CHECK(report.readUint32() == 10);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -114,71 +79,126 @@ TEST_CASE("Parameter Report Subservice") {
 }
 
 TEST_CASE("Parameter Setting Subservice") {
+	SECTION("All parameter IDs are invalid") {
+		Message request = Message(20, 3, Message::TC, 1);
+		request.appendUint16(3);
+		request.appendUint16(54432);
+		request.appendUint16(1);
+		request.appendUint16(60000);
+		request.appendUint16(1);
+		request.appendUint16(65534);
+		request.appendUint16(1);
 
-	SECTION("Faulty Instruction Handling Test") {
-		Parameter<int> param0 = Parameter<int>(3, 14);
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		Parameter<int> param2 = Parameter<int>(4, 12, 3, nullptr);
-		pserv.addNewParameter(0, static_cast<ParameterBase*>(&param0));
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1));
-		pserv.addNewParameter(2, static_cast<ParameterBase*>(&param2));
+		MessageParser::execute(request);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 1);
 
-		Message setRequest(20, 3, Message::TC, 1);
-		setRequest.appendUint16(2); // total number of IDs
-		setRequest.appendUint16(1); // correct ID in this context
-		setRequest.appendUint32(3735928559); // 0xDEADBEEF in hex (new setting)
-		setRequest.appendUint16(65535); // faulty ID
-		setRequest.appendUint32(3131746989); // 0xBAAAAAAD (this shouldn't be found in the report)
-
-		MessageParser::execute(setRequest);
-
-
-		CHECK(ServiceTests::get(0).serviceType == 1);
-		CHECK(ServiceTests::get(0).messageType == 4);
-
-		Message reportRequest(20, 1, Message::TC, 1);
-		reportRequest.appendUint16(1);
-		reportRequest.appendUint16(1);  // the changed parameter has ID 1
-
-		MessageParser::execute(reportRequest);
-		Message report = ServiceTests::get(1);
-		CHECK(report.serviceType == 20);
-		CHECK(report.messageType == 2);
-		CHECK(report.readUint16() == 1);  // only 1 ID contained
-		CHECK(report.readUint16() == 1);  // contained ID should be ID 1
-
-
-		char data[MAX_STRING_LENGTH];
-		report.readString(data, MAX_STRING_LENGTH);
-		String<MAX_STRING_LENGTH> str = String<MAX_STRING_LENGTH>(data);
-		CHECK(str.compare("3735928559")); // whose value is the string 0xDEADBEEF
+		CHECK(systemParameters.parameter1.getValue() == 3);
+		CHECK(systemParameters.parameter2.getValue() == 7);
+		CHECK(systemParameters.parameter3.getValue() == 10);
 
 		ServiceTests::reset();
 		Services.reset();
 	}
 
-	SECTION("Attempt to set parameter with no manual update availability") {
-		Parameter<int> param1 = Parameter<int>(1, 7, 12);
-		pserv.addNewParameter(1, static_cast<ParameterBase*>(&param1), "100");
+	SECTION("The last parameter ID is invalid") {
+		Message request = Message(20, 3, Message::TC, 1);
+		request.appendUint16(3);
+		request.appendUint16(0);
+		request.appendUint8(1);
+		request.appendUint16(1);
+		request.appendUint16(2);
+		request.appendUint16(65534);
+		request.appendUint16(1);
 
-		Message setRequest = Message(20, 3, Message::TC, 1);
-		setRequest.appendUint16(1);
-		setRequest.appendUint16(1);
-		setRequest.appendUint32(0xBAAAAAAD);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 1);
 
-		MessageParser::execute(setRequest);
+		CHECK(systemParameters.parameter1.getValue() == 1);
+		CHECK(systemParameters.parameter2.getValue() == 2);
+		CHECK(systemParameters.parameter3.getValue() == 10);
 
-		Message infoRequest = Message(20, 1, Message::TC, 1);
-		infoRequest.appendUint16(1);
-		infoRequest.appendUint16(1);
+		resetParameterValues();
 
-		MessageParser::execute(infoRequest);
+		ServiceTests::reset();
+		Services.reset();
+	}
 
-		Message report = ServiceTests::get(0);
+	SECTION("The middle parameter ID is invalid") {
+		Message request = Message(20, 3, Message::TC, 1);
+		request.appendUint16(3);
+		request.appendUint16(0);
+		request.appendUint8(1);
+		request.appendUint16(65534);
+		request.appendUint16(1);
+		request.appendUint16(2);
+		request.appendUint16(3);
 
-		CHECK(report.readUint16() == 1);
-		CHECK(report.readUint16() == 1);
-		CHECK_FALSE(report.readUint32() == 0xBAAAAAAD);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
+		CHECK(ServiceTests::count() == 1);
+
+		CHECK(systemParameters.parameter1.getValue() == 1);
+		CHECK(systemParameters.parameter2.getValue() == 7);
+		CHECK(systemParameters.parameter3.getValue() == 10);
+
+		resetParameterValues();
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("All IDs are valid") {
+		Message request = Message(20, 3, Message::TC, 1);
+		request.appendUint16(3);
+		request.appendUint16(0);
+		request.appendUint8(1);
+		request.appendUint16(1);
+		request.appendUint16(2);
+		request.appendUint16(2);
+		request.appendUint32(3);
+
+		MessageParser::execute(request);
+
+		CHECK(systemParameters.parameter1.getValue() == 1);
+		CHECK(systemParameters.parameter2.getValue() == 2);
+		CHECK(systemParameters.parameter3.getValue() == 3);
+
+		resetParameterValues();
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Wrong Messages") {
+
+	SECTION("Wrong Service Type Handling Test for Report") {
+		Message falseRequest(62, 1, Message::TM, 1);
+
+		MessageParser::execute(falseRequest);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Wrong Service Type Handling Test for Set") {
+		Message falseRequest(62, 3, Message::TM, 1);
+
+		MessageParser::execute(falseRequest);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Wrong Message Type") {
+		Message falseRequest(20, 127, Message::TM, 1);
+
+		MessageParser::execute(falseRequest);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
 
 		ServiceTests::reset();
 		Services.reset();

@@ -14,19 +14,26 @@ add_custom_target(check
         COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
+# Allow the user to set the ECSS Configuration directory using the -DECSS_CONFIGURATION=... command line argument
+set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
+        "The include directory for the platform-specific ECSS configuration headers"
+        )
+include_directories(${ECSS_CONFIGURATION})
+
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
         src/Service.cpp
         src/ErrorHandler.cpp
+        src/Logger.cpp
         src/Message.cpp
         src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
         src/Helpers/TimeAndDate.cpp
         src/Helpers/TimeHelper.cpp
+        src/Platform/x86/Parameters/SystemParameters.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
-        src/Services/Parameter.cpp
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
@@ -41,7 +48,6 @@ add_library(common OBJECT
 # Specify the .cpp files for the executables
 file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
 add_executable(ecss_services
-        src/main.cpp
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )

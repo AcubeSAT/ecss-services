@@ -1,5 +1,7 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_MEMORY
+
 #include "Services/MemoryManagementService.hpp"
-#include <iostream>
 #include <cerrno>
 #include <etl/String.hpp>
 
@@ -236,3 +238,5 @@ void MemoryManagementService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif
