@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD 17)
 # Specify the directories for #includes
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include")
 
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/docs/cmake" ${CMAKE_MODULE_PATH})
+add_subdirectory(docs)
+
 add_custom_target(check
         COMMAND ./cppcheck.sh
         COMMAND ./vera.sh
@@ -64,3 +67,4 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             )
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()
+
