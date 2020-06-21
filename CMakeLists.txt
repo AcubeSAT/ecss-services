@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(ecss_services)
+project(ecss_services VERSION 0.1.0)
 
 # Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
@@ -42,7 +42,7 @@ add_library(common OBJECT
         src/Services/TestService.cpp
         src/Services/TimeManagementService.cpp
         src/Services/LargePacketTransferService.cpp
-    	src/Services/EventActionService.cpp
+        src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
         )

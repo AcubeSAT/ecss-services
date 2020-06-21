@@ -1,5 +1,5 @@
-# Minimal makefile for Sphinx documentation
-#
+# Makefile for Sphinx documentation
+# Run make clean inside the docs directory to clean the docs
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
@@ -15,8 +15,8 @@ help:
 .PHONY: help Makefile clean
 
 clean:
-    rm -rf ./output/doxygen ./exhale ./output/sphinx
-    @$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	rm -rf ./output ./.exhaleTmp ./conf.py ./Doxyfile
+	@$(SPHINXBUILD) -M clean "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
