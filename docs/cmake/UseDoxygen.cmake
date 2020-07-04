@@ -1,5 +1,6 @@
 find_package(Doxygen REQUIRED)
 
+#Creates Doxygen documentation with the settings described in doxygen.conf files.
 function(create_doxygen_doc)
     set(options)
     set(oneValueArgs
@@ -8,7 +9,7 @@ function(create_doxygen_doc)
             TARGET_NAME
             COMMENT)
     set(multiValueArgs)
-
+    #Build Fails if Doxygen package is not found
     if (NOT DOXYGEN_FOUND)
         message(FATAL_ERROR "Doxygen is needed to build the documentation.")
     else ()
@@ -21,7 +22,8 @@ function(create_doxygen_doc)
         #Doxygen won't create this directory for us
         file(MAKE_DIRECTORY ${DOXY_BUILD_DIR})
 
-        #Replace variables inside @@ with the current values
+        #Replace variables inside @@ with the current values (Dynamic strings).
+        #And output to a new file (Doxyfile)
         configure_file(${DOXY_CONF_FILE} ${DOCS_DIR}/Doxyfile @ONLY)
 
         #Starting from cmake 3.9 the usage of DOXYGEN_EXECUTABLE is deprecated

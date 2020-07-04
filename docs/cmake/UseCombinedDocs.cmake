@@ -8,6 +8,8 @@ find_package(Sphinx REQUIRED)
 find_python_module(breathe REQUIRED)
 find_python_module(exhale REQUIRED)
 
+#Creates sphinx Documentation using Doxygen and Custom docs (docs/src). outputs Doxygen documentation parsed with
+#breathe and exhale to make it Sphinx compatible.
 function(create_combined_doc)
     set(options)
     set(oneValueArgs
@@ -40,7 +42,7 @@ function(create_combined_doc)
             "Doxygen documentation"
     )
 
-    #Parse the sphinx config file, replace with cmake args
+    #Parse the sphinx config file, replace dynamic strings with cmake args
     #and create a proper conf.py file for sphinx
     set(PARSED_SPHINX_CONF_FILE ${DOC_SOURCE_DIR}/conf.py)
     configure_file(${DOC_SPHINX_CONF_FILE} ${PARSED_SPHINX_CONF_FILE} @ONLY)

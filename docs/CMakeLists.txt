@@ -1,9 +1,9 @@
 include(UseCombinedDocs)
 
-# Set the documentation directory
+# Set the documentation root directory
 set(DOCS_DIR ${PROJECT_SOURCE_DIR}/docs)
 
-# Create Build Configurations for Doxygen and Sphinx with specified paths
+# Create Build Configurations for Doxygen and Sphinx with the specified directories
 create_combined_doc(
         SOURCE_DIR
         ${DOCS_DIR}

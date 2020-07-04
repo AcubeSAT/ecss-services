@@ -1,4 +1,4 @@
-#Look for an executable called sphinx-build
+#Look for an executable called sphinx-build in the OS
 find_program(SPHINX_EXECUTABLE
         NAMES sphinx-build
         HINTS $ENV{SPHINX_DIR}

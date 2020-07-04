@@ -1,6 +1,7 @@
 
 # Pulmonary Docs
- Easy API and Code Documentation Toolchain For C++ Projects. This documentation solution uses Doxygen +Shpinx + Breathe + Exhale to create user generated docs and auto code docs.
+ Easy API and Code Documentation Toolchain For C++ Projects. This documentation solution uses Doxygen +Sphinx + Breathe
+ + Exhale to create user generated docs and auto code docs.
  You need to write the doxygen documentation in your code, and you can create your own documentation for Tutorials, Instructions etc. This toolchain will produce a well structures cross-linked website (html) for your documentation
 
  ## Installation Instructions
@@ -46,7 +47,7 @@ I recommend installing with pyenv for better version management.
  - Right click at your CmakeList.txt and select **Reload CMake Project**
 
 
-You should now be able to see the new **Generate_Docs** and Doxygen configurations in your build confugurations list.
+You should now be able to see the new **Generate_Docs** and Doxygen configurations in your Build Configuration list.
 If you dont see these configurations select *Edit Configurations* click the *Add new configuration*  and select Doxygen or Generate_Docs for the target.
 
 Build the generate docs Configuration
@@ -58,9 +59,14 @@ Doxygen will automatically document your code based on your doxygen comments
 You can create API docs/Tutorials/ Instructions and Examples by creating new rst files inside docs/src
 Changing the Name of the site
 
+## WARNING (Cleaning)
+The IDE clean command will not  clean the Documentation folder properly. If you want to clean the docs folder please go
+to the docs directory and run:
+`$make clean`
+
 ## How to Document your project
  To learn how to **write doxygen** comments in your code please read [Here](https://www.doxygen.nl/manual/docblocks.html)
- For intruction on how to write **restructured Text** read [Here](https://docutils.readthedocs.io/en/sphinx-docs/user/rst/cheatsheet.html)
+ For instruction on how to write **restructured Text** read [Here](https://docutils.readthedocs.io/en/sphinx-docs/user/rst/cheatsheet.html)
 If you  to **cross-link your code** inside your user documentation read [Here](#TODO)
 ## Future Plans
 
@@ -71,4 +77,4 @@ If you  to **cross-link your code** inside your user documentation read [Here](#
 	 - Theme selection
 
  - [ ] 2. Set build arguments for creating html/xml/latex output
- - [ ] 3. Create a version controled output so we can see documentation for every major code version
+ - [ ] 3. Create a version controlled output so we can see documentation for every major code version

@@ -1,4 +1,6 @@
 include(FindPackageHandleStandardArgs)
+
+#Searches the OS for a  specified python module
 function(find_python_module module)
     # Build Fail if Python interpreter was not found
     if (NOT PYTHON_EXECUTABLE)

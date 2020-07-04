@@ -1,9 +1,9 @@
 .. Documentation master file, created by Sphinx
 You can adapt this file completely to your liking, but it should at least
 contain the root `toctree` directive. In this file you can include your User Docs
-and structure the Webpage Menu
+and structure the Webpage Menu. Doxygen docs are included through exhale (.exhaleTmp/library_root)
 
-Welcome to ECSS's documentation!
+ECSS Servies documentation
 ================================
 
 .. toctree::
