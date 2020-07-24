@@ -1,8 +1,6 @@
 ASAT CubeSat ECSS Services Library
 ==================================
-
-|Subreddit subscribers|\ |Twitter Follow|
-
+|GitlabIssues|
    **Doc Note** This documentation is JUST a baseline example. Actual
    Information in this version WILL be wrong or nonsensical sometimes,
    in order to fill space or provide guidelines
@@ -21,7 +19,7 @@ in this library as a "menu" from which you can pick the ones that fit
 your needs The two main components of the library are:
 
 -  `Telecommand packets (TC)`_ and `Telemetry packets ( TM)`_ for remote
-   monitoring and control of the cubesat subsystems and payloads.
+   monitoring and control of the ACubesat subsystems and payloads.
 -  `Services`_ that satisfy all the fundamental operational requirements
    for spacecraft monitoring and control during spacecraft integration,
    testing and flight operations.
@@ -29,9 +27,8 @@ your needs The two main components of the library are:
 To start using ECSS Services Library, see the `User Guide`_ and `Getting
 Started`_ documents.
 
-   **Doc Note** If we can implement user control. CubeSat Members will
-   be alble to see the following links to the ecss standar but public
-   user won't
+   **Doc Note** If the provided links have user control. CubeSat Members will
+   be alble to see the ecss standar but public user won't.
 
 \*This standard is `provided in detail by ESA`_. The ECSS Services
 library is the utilization of this standar in C++.
@@ -55,6 +52,9 @@ content is licensed under the |GitHub license| .
 
 .. |GitHub license| image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://github.com/facebook/react/blob/master/LICENSE
+.. |GitlabIssues| image:: https://helit.org/ecss-docs/docs/html/badge_is.svg
+    :target: https://gitlab.com/acubesat/obc/ecss-services/issues/
+    :alt: coverage report
 
 .. _Telecommand packets (TC): #linkneeded
 .. _Telemetry packets ( TM): #linkneeded
