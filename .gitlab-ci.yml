@@ -24,7 +24,7 @@ before_script:
 
 build:
   stage: build
-  when: never
+  when: manual
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
@@ -38,7 +38,7 @@ build:
 
 tests:
   stage: test
-  when: never
+  when: manual
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
   variables:
     GIT_SUBMODULE_STRATEGY: normal
@@ -56,12 +56,14 @@ tests:
 tests-hil:
   stage: test
   when: always
+  tags:
+    - hardware
   script:
     - echo success
 
 cppcheck:
   stage: build
-  when: never
+  when: manual
   before_script:
     - cppcheck --version
   script:
@@ -69,7 +71,7 @@ cppcheck:
 
 cppcheck-misra:
   stage: build
-  when: never
+  when: manual
   before_script:
     - cppcheck --version
   script:
@@ -77,7 +79,7 @@ cppcheck-misra:
 
 clang-tidy:
   stage: build
-  when: never
+  when: manual
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     TERM: xterm-color
