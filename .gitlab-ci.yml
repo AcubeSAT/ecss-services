@@ -60,7 +60,7 @@ tests-hil:
     - hardware
   before_script:
     - apk add libffi-dev curl
-    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
     - ls
     - git clone https://gitlab.com/acubesat/obc/hil-tests
