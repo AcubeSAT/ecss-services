@@ -65,6 +65,9 @@ tests-hil:
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
     - source $HOME/.poetry/env
+    - curl -O http://mbed-os.s3-eu-west-1.amazonaws.com/builds/cmsis-pack-manager/dist/cmsis_pack_manager-0.2.9-py2.py3-none-manylinux1_x86_64.whl
+    - python3 -m pip install wheel
+    - python3 -m pip install cmsis_pack_manager-0.2.9-py2.py3-none-manylinux1_x86_64.whl
     - poetry install
     # - python3 -m pip install -r requirements.txt
   script:
