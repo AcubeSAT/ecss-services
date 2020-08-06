@@ -65,6 +65,7 @@ tests-hil:
     - ls
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
+    - source $HOME/.cargo/env
     - source $HOME/.poetry/env
     - poetry install
     # - python3 -m pip install -r requirements.txt
