@@ -59,11 +59,13 @@ tests-hil:
   tags:
     - hardware
   before_script:
-    - apk add libffi-dev cargo
+    - apk add libffi-dev
+    - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
     - ls
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
-    - python3 -m pip install -r requirements.txt
+    - poetry add pyocd pyserial
+    # - python3 -m pip install -r requirements.txt
   script:
     - echo success
     - python3 test.py
