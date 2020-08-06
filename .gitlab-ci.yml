@@ -70,11 +70,10 @@ tests-hil:
     - source $HOME/.cargo/env
     - source $HOME/.poetry/env
     - poetry install
-    - poetry shell
     # - python3 -m pip install -r requirements.txt
   script:
     - echo success
-    - python3 test.py
+    - poetry run python3 test.py
 
 cppcheck:
   stage: build
