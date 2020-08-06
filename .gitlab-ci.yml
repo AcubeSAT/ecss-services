@@ -59,6 +59,7 @@ tests-hil:
   tags:
     - hardware
   before_script:
+    - apk add libffi-dev
     - ls
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
