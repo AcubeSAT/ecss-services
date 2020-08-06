@@ -65,7 +65,7 @@ tests-hil:
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
     - source $HOME/.poetry/env
-    - poetry add pyocd pyserial
+    - poetry install
     # - python3 -m pip install -r requirements.txt
   script:
     - echo success
