@@ -58,8 +58,14 @@ tests-hil:
   when: always
   tags:
     - hardware
+  before_script:
+    - ls
+    - git clone https://gitlab.com/acubesat/obc/hil-tests
+    - cd hil-tests
+    - python3 -m pip install -r requirements.txt
   script:
     - echo success
+    - python3 test.py
 
 cppcheck:
   stage: build
