@@ -62,13 +62,15 @@ tests-hil:
     RUSTFLAGS: "-C target-feature=-crt-static"
   before_script:
     - apk add libffi-dev curl
-    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
     - ls
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
     - source $HOME/.cargo/env
     - source $HOME/.poetry/env
+    - curl -O https://ioun.asat.gr/cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
+    - poetry add cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
     - poetry install
     # - python3 -m pip install -r requirements.txt
   script:
