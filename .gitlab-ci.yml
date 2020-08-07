@@ -68,6 +68,7 @@ tests-hil:
     # - source /root/virtualenv/bin/activate
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
+    - poetry
     # - source $HOME/.cargo/env
     # - source $HOME/.poetry/env
     # - curl -O https://ioun.asat.gr/cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
