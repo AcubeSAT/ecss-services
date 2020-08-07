@@ -71,7 +71,7 @@ tests-hil:
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - mv /root/*.pack hil-tests
     - cd hil-tests
-    - mv /builds/acubesat/obc/ecss-services ./stm32l4r5/
+    - ln -s /builds/acubesat/obc/ecss-services ./stm32l4r5/ecss-services
     - cd stm32l4r5
     - cmake .
   script:
