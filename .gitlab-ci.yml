@@ -77,7 +77,7 @@ tests-hil:
   script:
     - make -j4
     - cd ..
-    - python test.py
+    - python test.py -b ./stm32l4r5/ecss-services/hil-ecss.elf -s /dev/ttyACM0
 
 cppcheck:
   stage: build
