@@ -66,6 +66,7 @@ tests-hil:
     #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - ls
     - ls /root
+    - pwd
     # - source /root/virtualenv/bin/activate
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - mv /root/*.pack hil-tests
