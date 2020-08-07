@@ -63,7 +63,6 @@ tests-hil:
     TERM: xterm-color
     CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
   before_script:
-    - python test.py
     - python -c 'print("\033[94mHello!")'
     - return 1
     - apk add make --no-cache
@@ -74,6 +73,7 @@ tests-hil:
     - pwd
     # - source /root/virtualenv/bin/activate
     - git clone https://gitlab.com/acubesat/obc/hil-tests
+    - python test.py
     - mv /root/*.pack hil-tests
     - cd hil-tests
     - ln -s /builds/acubesat/obc/ecss-services ./stm32l4r5/ecss-services
