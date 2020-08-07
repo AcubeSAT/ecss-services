@@ -60,6 +60,7 @@ tests-hil:
     - hardware
   variables:
     GIT_SUBMODULE_STRATEGY: normal
+    TERM: xterm-color
   before_script:
     - apk add make --no-cache
     # - apk add newlib-arm-none-eabi --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
