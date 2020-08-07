@@ -35,7 +35,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 		uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
-		if (memoryID == MemoryManagementService::MemoryID::FLASH) {
+		if (memoryID == MemoryManagementService::MemoryID::FLASH_MEM) {
 			// todo: Define FLASH specific access code when we transfer to embedded
 		} else {
 			for (std::size_t j = 0; j < iterationCount; j++) {
@@ -195,7 +195,7 @@ bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID
 				validIndicator = true;
 			}
 			break;
-		case MemoryManagementService::MemoryID::FLASH:
+		case MemoryManagementService::MemoryID::FLASH_MEM:
 			if ((address >= FLASH_LOWER_LIM) && (address <= FLASH_UPPER_LIM)) {
 				validIndicator = true;
 			}
@@ -215,7 +215,7 @@ inline bool MemoryManagementService::memoryIdValidator(MemoryManagementService::
 	       (memId == MemoryManagementService::MemoryID::RAM_D3) ||
 	       (memId == MemoryManagementService::MemoryID::DTCMRAM) ||
 	       (memId == MemoryManagementService::MemoryID::ITCMRAM) ||
-	       (memId == MemoryManagementService::MemoryID::FLASH) ||
+	       (memId == MemoryManagementService::MemoryID::FLASH_MEM) ||
 	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
 }
 

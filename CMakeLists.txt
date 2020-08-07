@@ -5,7 +5,8 @@ project(ecss_services)
 set(CMAKE_CXX_STANDARD 17)
 
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include")
+include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include"
+        "${PROJECT_SOURCE_DIR}/lib/Catch2/single_include")
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -62,5 +63,6 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             ${test_main_SRC}
             ${test_SRC}
             )
+    add_library(test_common OBJECT ${test_main_SRC} ${test_SRC})
     target_link_libraries(tests Catch2::Catch2)
 ENDIF ()

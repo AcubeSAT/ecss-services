@@ -19,7 +19,7 @@ public:
 		RAM_D2,
 		RAM_D3,
 		ITCMRAM,
-		FLASH,
+		FLASH_MEM,
 		EXTERNAL,
 	};
 
