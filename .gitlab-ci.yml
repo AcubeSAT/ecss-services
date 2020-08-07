@@ -61,7 +61,10 @@ tests-hil:
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     TERM: xterm-color
+    CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
   before_script:
+    - python -c 'print("\033[94mHello!")'
+    - return 1
     - apk add make --no-cache
     # - apk add newlib-arm-none-eabi --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
     #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
