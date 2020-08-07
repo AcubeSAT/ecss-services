@@ -1,4 +1,4 @@
-image: lightspot21/acubesat-ci:latest
+image: kongr45gpen/acubesat-ci:latest
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -61,18 +61,15 @@ tests-hil:
   variables:
     RUSTFLAGS: "-C target-feature=-crt-static"
   before_script:
-    - apk add libffi-dev curl libusb
     #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python3
-    - ls
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
     # - source $HOME/.cargo/env
-    - source $HOME/.poetry/env
-    - curl -O https://ioun.asat.gr/cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
-    - poetry add ./cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
+    # - source $HOME/.poetry/env
+    # - curl -O https://ioun.asat.gr/cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
+    # - poetry add ./cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
     - poetry install
-    - curl -O https://keilpack.azureedge.net/pack/Keil.STM32L4xx_DFP.2.4.0.pack
+    # - curl -O https://keilpack.azureedge.net/pack/Keil.STM32L4xx_DFP.2.4.0.pack
     # - python3 -m pip install -r requirements.txt
   script:
     - echo success
