@@ -63,6 +63,7 @@ tests-hil:
     TERM: xterm-color
     CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
   before_script:
+    - python test.py
     - python -c 'print("\033[94mHello!")'
     - return 1
     - apk add make --no-cache
