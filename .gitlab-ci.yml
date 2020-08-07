@@ -61,7 +61,7 @@ tests-hil:
   variables:
     GIT_SUBMODULE_STRATEGY: normal
   before_script:
-    - apk add cmake --no-cache
+    - apk add cmake make --no-cache
     - apk add newlib-arm-none-eabi --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
     #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - ls
