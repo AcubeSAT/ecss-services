@@ -61,11 +61,11 @@ tests-hil:
   variables:
     RUSTFLAGS: "-C target-feature=-crt-static"
   before_script:
-    - apk add git python3
+    # - apk add git python3
     #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - ls
     - ls /root
-    - source /root/virtualenv/bin/activate
+    # - source /root/virtualenv/bin/activate
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
     # - source $HOME/.cargo/env
