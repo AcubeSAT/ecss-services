@@ -67,7 +67,7 @@ tests-hil:
     - ls /root
     # - source /root/virtualenv/bin/activate
     - git clone https://gitlab.com/acubesat/obc/hil-tests
-    - mv *.pack hil-tests
+    - mv Keil.STM32L4xx_DFP.2.4.0.pack hil-tests
     - cd hil-tests
     # - poetry
     # - source $HOME/.cargo/env
