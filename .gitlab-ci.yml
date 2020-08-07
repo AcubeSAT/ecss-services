@@ -69,12 +69,12 @@ tests-hil:
     - source $HOME/.poetry/env
     # - curl -O https://ioun.asat.gr/cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
     # - poetry add ./cmsis_pack_manager-0.2.11.dev18-py2.py3-none-linux_x86_64.whl
-    - poetry install
+    # - poetry install
     # - curl -O https://keilpack.azureedge.net/pack/Keil.STM32L4xx_DFP.2.4.0.pack
     # - python3 -m pip install -r requirements.txt
   script:
     - echo success
-    - poetry run python3 test.py
+    - python3 test.py
 
 cppcheck:
   stage: build
