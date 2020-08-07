@@ -78,7 +78,7 @@ tests-hil:
     - python test.py
     - ln -s /builds/acubesat/obc/ecss-services ./stm32l4r5/ecss-services
     - cd stm32l4r5
-    - return 1
+    # - return 1
     - cmake .
   script:
     - make -j4
