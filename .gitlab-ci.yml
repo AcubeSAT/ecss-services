@@ -64,6 +64,8 @@ tests-hil:
     - apk add git python3
     #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - ls
+    - ls /root
+    - source /root/virtualenv/bin/activate
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
     # - source $HOME/.cargo/env
