@@ -61,6 +61,7 @@ tests-hil:
   variables:
     RUSTFLAGS: "-C target-feature=-crt-static"
   before_script:
+    - apk add git
     #- curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - cd hil-tests
