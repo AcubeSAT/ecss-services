@@ -109,7 +109,7 @@ TEST_CASE("TC[11,2] Disable Schedule Execution", "[service][st11]") {
 	CHECK(not unit_test::Tester::executionFunctionStatus(timeBasedService));
 }
 
-TEST_CASE("TC[11,4] Activity Insertion", "[service][st11][!mayfail]") {
+TEST_CASE("TC[11,4] Activity Insertion", "[service][st11][!hide]") {
 	Services.reset();
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
@@ -135,7 +135,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11][!mayfail]") {
 	}
 }
 
-TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11][!mayfail]") {
+TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11][!hide]") {
 	Services.reset();
 	Message receivedMessage(11, 15, Message::TC, 1);
 
