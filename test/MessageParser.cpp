@@ -47,7 +47,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 
 	Message message = MessageParser::parse(packet, 18);
 	CHECK(message.packetType == Message::TM);
-	CHECK(message.applicationId == 1);
+	CHECK(message.applicationId == 2);
 	CHECK(message.packetSequenceCount == 77);
 	CHECK(message.dataSize == 7);
 	CHECK(message.serviceType == 22);
