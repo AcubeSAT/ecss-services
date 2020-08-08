@@ -62,6 +62,7 @@ tests-hil:
     GIT_SUBMODULE_STRATEGY: normal
     TERM: xterm-color
     CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
+    PYTHONIOENCODING: utf-8
   before_script:
     - python -c 'print("\033[94mHello!")'
     # - return 1
@@ -75,7 +76,7 @@ tests-hil:
     - git clone https://gitlab.com/acubesat/obc/hil-tests
     - mv /root/*.pack hil-tests
     - cd hil-tests
-    - ./test.py
+    - python -u -d ./test.py
     - ln -s /builds/acubesat/obc/ecss-services ./stm32l4r5/ecss-services
     - cd stm32l4r5
     - return 1
