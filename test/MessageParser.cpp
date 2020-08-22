@@ -36,7 +36,7 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.dataSize = 5;
 
 	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
-#if ECSS_CRC_INCLUDE
+#if ECSS_CRC_INCLUDED
 	CHECK(createdPacket.size() == 18);
 	CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
 
@@ -78,7 +78,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.dataSize = 7;
 	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
 
-#if ECSS_CRC_INCLUDE
+#if ECSS_CRC_INCLUDED
 	CHECK(createdPacket.size() == 20);
 	CHECK(memcmp(createdPacket.data(), wantedPacket, 18) == 0);
 

@@ -149,6 +149,6 @@
 /**
  * @brief Defines whether the optional CRC field is included
  */
-#define ECSS_CRC_INCLUDE true
+#define ECSS_CRC_INCLUDED true
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
