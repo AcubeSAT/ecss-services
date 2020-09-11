@@ -40,9 +40,10 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	CHECK(createdPacket.size() == 18);
 	CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
 
-	uint16_t crcField = CRCHelper::calculateCRC(wantedPacket, 16);
-	uint16_t calculatedCRC = (static_cast<uint16_t>(createdPacket.data()[16]) << 0x8U) | (static_cast<uint16_t>(createdPacket.data()[17]) & 0xFF);
-	CHECK(calculatedCRC == crcField);
+	createdPacket.data();
+	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+	uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
+	CHECK(crc_verification == 0);
 #else
 	CHECK(createdPacket.size() == 16);
 	// The two parentheses are necessary so that Catch2 doesn't try to parse the strings here
@@ -82,10 +83,9 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	CHECK(createdPacket.size() == 20);
 	CHECK(memcmp(createdPacket.data(), wantedPacket, 18) == 0);
 
-	uint16_t crcField = CRCHelper::calculateCRC(wantedPacket, 18);
-	uint16_t calculatedCRC = (static_cast<uint16_t>(createdPacket.data()[18]) << 0x8U) | (static_cast<uint16_t>
-		(createdPacket.data()[19]) & 0xFFU);
-	CHECK(calculatedCRC == crcField);
+	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+	uint8_t crc_verification = CRCHelper::validateCRC(packet, 20);
+	CHECK(crc_verification == 0);
 #else
 	CHECK(createdPacket.size() == 18);
 	// The two parentheses are necessary so that Catch2 doesn't try to parse the strings here
