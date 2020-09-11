@@ -5,6 +5,7 @@
 #include "macros.hpp"
 #include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
+#include "Helpers/CRCHelper.hpp"
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
@@ -193,6 +194,14 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
 	// Compile the final message by appending the header
 	String<CCSDS_MAX_MESSAGE_SIZE> ccsdsMessage(header, 6);
 	ccsdsMessage.append(ecssMessage);
+
+#if ECSS_CRC_INCLUDED
+	// Append CRC field
+	uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 +
+	packetDataLength);
+	ccsdsMessage.push_back(static_cast<uint8_t>(crcField >> 8U));
+	ccsdsMessage.push_back(static_cast<uint8_t>(crcField & 0xFF));
+#endif
 
 	return ccsdsMessage;
 }

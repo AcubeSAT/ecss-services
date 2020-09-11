@@ -145,4 +145,10 @@
  * @brief Size of the array holding the Parameter objects for the ST[20] parameter service
  */
 #define ECSS_PARAMETER_COUNT 3
+
+/**
+ * @brief Defines whether the optional CRC field is included
+ */
+#define ECSS_CRC_INCLUDED true
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

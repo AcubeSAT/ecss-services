@@ -3,6 +3,7 @@
 #include <Services/RequestVerificationService.hpp>
 #include <Message.hpp>
 #include <cstring>
+#include "Helpers/CRCHelper.hpp"
 #include "MessageParser.hpp"
 #include "Services/ServiceTests.hpp"
 #include "ServicePool.hpp"
@@ -35,10 +36,17 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.dataSize = 5;
 
 	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
+#if ECSS_CRC_INCLUDED
+	CHECK(createdPacket.size() == 18);
+	CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
 
+	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+	uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
+	CHECK(crc_verification == 0);
+#else
 	CHECK(createdPacket.size() == 16);
-	// The two parentheses are necessary so that Catch2 doesn't try to parse the strings here
 	CHECK((createdPacket == String<16>(wantedPacket)));
+#endif
 }
 
 TEST_CASE("TM message parsing", "[MessageParser]") {
@@ -67,10 +75,17 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.messageType = 17;
 	memcpy(message.data, "hellohi", 7);
 	message.dataSize = 7;
-
 	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
 
+#if ECSS_CRC_INCLUDED
+	CHECK(createdPacket.size() == 20);
+	CHECK(memcmp(createdPacket.data(), wantedPacket, 18) == 0);
+
+	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+	uint8_t crc_verification = CRCHelper::validateCRC(packet, 20);
+	CHECK(crc_verification == 0);
+#else
 	CHECK(createdPacket.size() == 18);
-	// The two parentheses are necessary so that Catch2 doesn't try to parse the strings here
 	CHECK((createdPacket == String<18>(wantedPacket)));
+#endif
 }
