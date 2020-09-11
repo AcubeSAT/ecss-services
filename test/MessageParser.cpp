@@ -40,13 +40,11 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	CHECK(createdPacket.size() == 18);
 	CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
 
-	createdPacket.data();
 	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
 	uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
 	CHECK(crc_verification == 0);
 #else
 	CHECK(createdPacket.size() == 16);
-	// The two parentheses are necessary so that Catch2 doesn't try to parse the strings here
 	CHECK((createdPacket == String<16>(wantedPacket)));
 #endif
 }
@@ -88,7 +86,6 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	CHECK(crc_verification == 0);
 #else
 	CHECK(createdPacket.size() == 18);
-	// The two parentheses are necessary so that Catch2 doesn't try to parse the strings here
 	CHECK((createdPacket == String<18>(wantedPacket)));
 #endif
 }
