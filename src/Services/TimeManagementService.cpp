@@ -2,11 +2,12 @@
 #ifdef SERVICE_TIME
 
 #include "Services/TimeManagementService.hpp"
+#include "ECSS_ST_Definitions.hpp"
 
 void TimeManagementService::cdsTimeReport(TimeAndDate& TimeInfo) {
 	// TM[9,3] CDS time report
 
-	Message timeReport = createTM(3);
+	Message timeReport = createTM(CDSTimeReport);
 
 	uint64_t timeFormat = TimeHelper::generateCDSTimeFormat(TimeInfo);
 
@@ -18,7 +19,7 @@ void TimeManagementService::cdsTimeReport(TimeAndDate& TimeInfo) {
 
 TimeAndDate TimeManagementService::cdsTimeRequest(Message& message) {
 	// TC[9,128] CDS time request
-	message.assertTC(9, 128);
+	message.assertTC(TimeManagement, 128);
 
 	// check if we have the correct size of the data. The size should be 6 (48 bits)
 	ErrorHandler::assertRequest(message.dataSize == 6, message, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);

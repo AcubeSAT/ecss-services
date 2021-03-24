@@ -42,7 +42,7 @@ add_library(common OBJECT
     	src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
-        )
+        inc/ECSS_ST_Definitions.hpp)
 
 # Specify the .cpp files for the executables
 file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")

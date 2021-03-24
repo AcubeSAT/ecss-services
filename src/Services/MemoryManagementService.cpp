@@ -4,10 +4,11 @@
 #include "Services/MemoryManagementService.hpp"
 #include <cerrno>
 #include <etl/String.hpp>
+#include "ECSS_ST_Definitions.hpp"
 
 // Define the constructors for the classes
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
-	serviceType = 6;
+	serviceType = MemoryManagement;
 }
 
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
@@ -24,7 +25,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 	 * @todo Add failure reporting
 	 */
 	// Check if we have the correct packet
-	request.assertTC(6, 2);
+	request.assertTC(MemoryManagement, LoadRawMemoryDataAreas);
 
 	// Read the memory ID from the request
 	auto memoryID = MemoryManagementService::MemoryID(request.readEnum8());
@@ -74,10 +75,10 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
 	// Check if we have the correct packet
-	request.assertTC(6, 5);
+	request.assertTC(MemoryManagement, DumpRawMemoryData);
 
 	// Create the report message object of telemetry message subtype 6
-	Message report = mainService.createTM(6);
+	Message report = mainService.createTM(DumpedRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	// Check for a valid memory ID first
@@ -121,10 +122,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
 	// Check if we have the correct packet
-	request.assertTC(6, 9);
+	request.assertTC(MemoryManagement, CheckRawMemoryData);
 
 	// Create the report message object of telemetry message subtype 10
-	Message report = mainService.createTM(10);
+	Message report = mainService.createTM(CheckedRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {

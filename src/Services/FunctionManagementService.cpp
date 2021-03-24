@@ -2,13 +2,15 @@
 #ifdef SERVICE_FUNCTION
 
 #include "Services/FunctionManagementService.hpp"
+#include "ECSS_ST_Definitions.hpp"
 
 void FunctionManagementService::call(Message& msg) {
 	msg.resetRead();
 	ErrorHandler::assertRequest(msg.packetType == Message::TC, msg,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.messageType == 1, msg, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.serviceType == 8, msg, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(msg.messageType == PerformFunction, msg, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(msg.serviceType == FunctionManagement, msg,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint8_t funcName[ECSS_FUNCTION_NAME_LENGTH] = { 0 }; // the function's name
 	uint8_t funcArgs[ECSS_FUNCTION_MAX_ARG_LENGTH] = { 0 }; // arguments for the function
