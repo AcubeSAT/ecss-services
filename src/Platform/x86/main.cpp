@@ -19,7 +19,6 @@
 #include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
-#include "ECSS_ST_Definitions.hpp"
 
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
@@ -42,24 +41,24 @@ int main() {
 
 	// ST[17] test
 	TestService& testService = Services.testService;
-	Message receivedPacket = Message(Test, AreYouAliveTest, Message::TC, 1);
+	Message receivedPacket = Message(TEST, ARE_YOU_ALIVE_TEST, Message::TC, 1);
 	testService.areYouAlive(receivedPacket);
-	receivedPacket = Message(Test, OnBoardConnectionTest, Message::TC, 1);
+	receivedPacket = Message(TEST, ON_BOARD_CONNECTION_TEST, Message::TC, 1);
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
 	// ST[20] test
 	ParameterService& paramService = Services.parameterManagement;
 
-	// Test code for reportParameter
-	Message sentPacket = Message(ParameterManagement, ReportParameterValues, Message::TC, 1); // application id is a dummy number (1)
+	// TEST code for reportParameter
+	Message sentPacket = Message(PARAMETER_MANAGEMENT, REPORT_PARAMETER_VALUES, Message::TC, 1); // application id is a dummy number (1)
 	sentPacket.appendUint16(2); // number of contained IDs
 	sentPacket.appendUint16(0); // first ID
 	sentPacket.appendUint16(1); // second ID
 	paramService.reportParameters(sentPacket);
 
-	// Test code for setParameter
-	Message sentPacket2 = Message(ParameterManagement, SetParameterValues, Message::TC, 1); // application id is a dummy number (1)
+	// TEST code for setParameter
+	Message sentPacket2 = Message(PARAMETER_MANAGEMENT, SET_PARAMETER_VALUES, Message::TC, 1); // application id is a dummy number (1)
 	sentPacket2.appendUint16(2); // number of contained IDs
 	sentPacket2.appendUint16(0); // first parameter ID
 	sentPacket2.appendUint32(63238); // settings for first parameter
@@ -78,7 +77,7 @@ int main() {
 	*(pStr + 2) = 0;
 
 	MemoryManagementService& memMangService = Services.memoryManagement;
-	Message rcvPack = Message(MemoryManagement, DumpRawMemoryData, Message::TC, 1);
+	Message rcvPack = Message(MEMORY_MANAGEMENT, DUMP_RAW_MEMORY_DATA, Message::TC, 1);
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t>(string)); // Start address
@@ -91,7 +90,7 @@ int main() {
 	rcvPack.appendUint16(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
-	rcvPack = Message(MemoryManagement, LoadRawMemoryDataAreas, Message::TC, 1);
+	rcvPack = Message(MEMORY_MANAGEMENT, LOAD_RAW_MEMORY_DATA_AREAS, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
@@ -104,7 +103,7 @@ int main() {
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
 
-	rcvPack = Message(MemoryManagement, CheckRawMemoryData, Message::TC, 1);
+	rcvPack = Message(MEMORY_MANAGEMENT, CHECK_RAW_MEMORY_DATA, Message::TC, 1);
 
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
@@ -118,31 +117,31 @@ int main() {
 
 	RequestVerificationService& reqVerifService = Services.requestVerification;
 
-	Message receivedMessage = Message(RequestVerification, SuccessfulAcceptanceReport, Message::TC, 3);
+	Message receivedMessage = Message(REQUEST_VERIFICATION, SUCCESSFUL_ACCEPTANCE_REPORT, Message::TC, 3);
 	reqVerifService.successAcceptanceVerification(receivedMessage);
 
-	receivedMessage = Message(RequestVerification, FailedAcceptanceReport, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, FAILED_ACCEPTANCE_REPORT, Message::TC, 3);
 	reqVerifService.failAcceptanceVerification(receivedMessage, ErrorHandler::UnknownAcceptanceError);
 
-	receivedMessage = Message(RequestVerification, SuccessfulStartOfExecution, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, SUCCESSFUL_START_OF_EXECUTION, Message::TC, 3);
 	reqVerifService.successStartExecutionVerification(receivedMessage);
 
-	receivedMessage = Message(RequestVerification, FailedStartOfExecution, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, FAILED_START_OF_EXECUTION, Message::TC, 3);
 	reqVerifService.failStartExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionStartError);
 
-	receivedMessage = Message(RequestVerification, SuccessfulProgressOfExecution, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, SUCCESSFUL_PROGRESS_OF_EXECUTION, Message::TC, 3);
 	reqVerifService.successProgressExecutionVerification(receivedMessage, 0);
 
-	receivedMessage = Message(RequestVerification, FailedProgressOfExecution, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, FAILED_PROGRESS_OF_EXECUTION, Message::TC, 3);
 	reqVerifService.failProgressExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionProgressError, 0);
 
-	receivedMessage = Message(RequestVerification, SuccessfulCompletionOfExecution, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, SUCCESSFUL_COMPLETION_OF_EXECUTION, Message::TC, 3);
 	reqVerifService.successCompletionExecutionVerification(receivedMessage);
 
-	receivedMessage = Message(RequestVerification, FailedCompletionOfExecution, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, FAILED_COMPLETION_OF_EXECUTION, Message::TC, 3);
 	reqVerifService.failCompletionExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionCompletionError);
 
-	receivedMessage = Message(RequestVerification, FailedRoutingReport, Message::TC, 3);
+	receivedMessage = Message(REQUEST_VERIFICATION, FAILED_ROUTING_REPORT, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
 
 	// ST[05] (5,1 to 5,4) test [works]
@@ -181,16 +180,16 @@ int main() {
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
 	                                        EventReportService::MediumSeverityUnknownEvent};
 	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
-	Message eventMessage(EventReport, DisableReportGenerationOfEvents, Message::TC, 1);
+	Message eventMessage(EVENT_REPORT, DISABLE_REPORT_GENERATION_OF_EVENTS, Message::TC, 1);
 	eventMessage.appendUint16(2);
 	eventMessage.appendEnum16(eventIDs[0]);
 	eventMessage.appendEnum16(eventIDs[1]);
 
-	Message eventMessage2(EventReport, EnableReportGenerationOfEvents, Message::TC, 1);
+	Message eventMessage2(EVENT_REPORT, ENABLE_REPORT_GENERATION_OF_EVENTS, Message::TC, 1);
 	eventMessage2.appendUint16(1);
 	eventMessage2.appendEnum16(eventIDs2[0]);
 
-	Message eventMessage3(EventReport, ReportListOfDisabledEvent, Message::TC, 1);
+	Message eventMessage3(EVENT_REPORT, REPORT_LIST_OF_DISABLED_EVENT, Message::TC, 1);
 	eventReportService.disableReportGeneration(eventMessage);
 	eventReportService.listOfDisabledEventsReport();
 	eventReportService.enableReportGeneration(eventMessage2);
@@ -200,7 +199,7 @@ int main() {
 
 	EventActionService & eventActionService = Services.eventAction;
 
-	Message eventActionDefinition(EventAction, AddEventAction, Message::TC, 1);
+	Message eventActionDefinition(EVENT_ACTION, ADD_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition.appendEnum16(0);
 	eventActionDefinition.appendEnum16(2);
 	eventActionDefinition.appendEnum16(1);
@@ -208,7 +207,7 @@ int main() {
 	eventActionDefinition.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition);
 
-	Message eventActionDefinition1(EventAction, AddEventAction, Message::TC, 1);
+	Message eventActionDefinition1(EVENT_ACTION, ADD_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition1.appendEnum16(0);
 	eventActionDefinition1.appendEnum16(2);
 	eventActionDefinition1.appendEnum16(1);
@@ -217,7 +216,7 @@ int main() {
 	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.addEventActionDefinitions(eventActionDefinition1);
 
-	Message eventActionDefinition2(EventAction, AddEventAction, Message::TC, 1);
+	Message eventActionDefinition2(EVENT_ACTION, ADD_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition2.appendEnum16(0);
 	eventActionDefinition2.appendEnum16(4);
 	eventActionDefinition2.appendEnum16(2);
@@ -225,7 +224,7 @@ int main() {
 	eventActionDefinition2.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition2);
 
-	Message eventActionDefinition7(EventAction, AddEventAction, Message::TC, 1);
+	Message eventActionDefinition7(EVENT_ACTION, ADD_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition7.appendEnum16(0);
 	eventActionDefinition7.appendEnum16(4);
 	eventActionDefinition7.appendEnum16(4);
@@ -238,7 +237,7 @@ int main() {
 		std::cout << element.second.enabled;
 	}
 
-	Message eventActionDefinition5(EventAction, EnableEventAction, Message::TC, 1);
+	Message eventActionDefinition5(EVENT_ACTION, ENABLE_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition5.appendUint16(3);
 	eventActionDefinition5.appendUint16(0);
 	eventActionDefinition5.appendUint16(2);
@@ -256,7 +255,7 @@ int main() {
 		std::cout << element.second.enabled;
 	}
 
-	Message eventActionDefinition3(EventAction, DisableEventAction, Message::TC, 1);
+	Message eventActionDefinition3(EVENT_ACTION, DISABLE_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition3.appendUint16(3);
 	eventActionDefinition3.appendUint16(0);
 	eventActionDefinition3.appendUint16(2);
@@ -275,7 +274,7 @@ int main() {
 
 	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
 
-	Message eventActionDefinition4(EventAction, DeleteEventAction, Message::TC, 1);
+	Message eventActionDefinition4(EVENT_ACTION, DELETE_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition4.appendUint16(1);
 	eventActionDefinition4.appendUint16(0);
 	eventActionDefinition4.appendUint16(2);
@@ -284,7 +283,7 @@ int main() {
 	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
 
-	Message eventActionDefinition6(EventAction, DisableEventAction, Message::TC, 1);
+	Message eventActionDefinition6(EVENT_ACTION, DISABLE_EVENT_ACTION, Message::TC, 1);
 	eventActionDefinition6.appendUint16(1);
 	eventActionDefinition6.appendUint16(0);
 	eventActionDefinition6.appendUint16(2);
@@ -306,16 +305,16 @@ int main() {
 	std::cout << "\n\nST[11] service is running";
 	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
 
-	Message receivedMsg = Message(TimeBasedScheduling, EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
-	Message testMessage1(MemoryManagement, DumpRawMemoryData, Message::TC, 1);
-	Message testMessage2(4, 5, Message::TC, 1);
+	Message receivedMsg = Message(TIMEBASED_SCHEDULING, ENABLE_TIMEBASED_SCHEDULE_EXECUTION_FUNCTION, Message::TC, 1);
+	Message testMessage1(MEMORY_MANAGEMENT, DUMP_RAW_MEMORY_DATA, Message::TC, 1);
+	Message testMessage2(PARAMETER_STATISTICS_REPORTING, DISABLE_PERIODIC_PARAMETER_STATISTICS_REPORTING, Message::TC, 1);
 	testMessage1.appendUint16(4253); // Append dummy data
 	testMessage2.appendUint16(45667); // Append dummy data
 
 	timeBasedSchedulingService.enableScheduleExecution(receivedMsg); // Enable the schedule
 
 	// Insert activities in the schedule
-	receivedMsg = Message(TimeBasedScheduling, InsertActivities, Message::TC, 1);
+	receivedMsg = Message(TIMEBASED_SCHEDULING, INSERT_ACTIVITIES, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
 	receivedMsg.appendUint32(currentTime + 1556435U);
@@ -326,17 +325,17 @@ int main() {
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
 	// Time shift activities
-	receivedMsg = Message(TimeBasedScheduling, TimeShiftAllScheduledActivities, Message::TC, 1);
+	receivedMsg = Message(TIMEBASED_SCHEDULING, TIME_SHIFT_ALL_SCHEDULED_ACTIVITIES, Message::TC, 1);
 	receivedMsg.appendSint32(-6789);
 	timeBasedSchedulingService.timeShiftAllActivities(receivedMsg);
 	std::cout << "Activities should be time shifted by: " << -6789 << " seconds." << std::endl;
 
 	// Report the activities
-	receivedMsg = Message(TimeBasedScheduling, DetailReportAllScheduledActivities, Message::TC, 1);
+	receivedMsg = Message(TIMEBASED_SCHEDULING, DETAIL_REPORT_ALL_SCHEDULED_ACTIVITIES, Message::TC, 1);
 	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);
 
 	// Report the activities by ID
-	receivedMsg = Message(TimeBasedScheduling, ActivitiesSummaryReportByIdentifier, Message::TC, 1);
+	receivedMsg = Message(TIMEBASED_SCHEDULING, ACTIVITIES_SUMMARY_REPORT_BY_ID, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 	LOG_NOTICE << "ECSS Services test complete";

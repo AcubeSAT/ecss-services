@@ -7,6 +7,18 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 
+/*
+ * ST[8] Function Management Service
+ */
+
+const uint8_t FUNCTION_MANAGEMENT = 8;
+
+/*
+ * ST[8] Function Management Sub-Services
+ */
+
+const uint8_t PERFORM_FUNCTION = 1;
+
 /**
  * Implementation of the ST[08] function management service
  *

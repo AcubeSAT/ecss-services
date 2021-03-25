@@ -4,6 +4,18 @@
 #include <Service.hpp>
 #include "Helpers/TimeHelper.hpp"
 
+/*
+ * ST[9] Time Management Service
+ */
+
+const uint8_t TIME_MANAGEMENT = 9;
+
+/*
+ * ST[9] Time Management Sub-Services
+ */
+
+const uint8_t CDS_TIME_REPORT = 3;
+
 /**
  * Implementation of the ST[09] time management.
  *

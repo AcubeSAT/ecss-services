@@ -11,6 +11,29 @@
 // Include platform specific files
 #include "Platform/x86/TimeGetter.hpp"
 
+/*
+ * ST[11] TimeBased Scheduling Service
+ */
+
+const uint8_t TIMEBASED_SCHEDULING = 11;
+
+/*
+ * ST[11] TimeBased Scheduling Sub-Services
+ */
+
+const uint8_t ENABLE_TIMEBASED_SCHEDULE_EXECUTION_FUNCTION = 1;
+const uint8_t DISABLE_TIMEBASED_SCHEDULE_EXECUTION_FUNCTION = 2;
+const uint8_t RESET_TIMEBASED_SCHEDULE = 3;
+const uint8_t INSERT_ACTIVITIES = 4;
+const uint8_t DELETE_ACTIVITIES_BY_ID = 5;
+const uint8_t TIME_SHIFT_ACTIVITIES_BY_ID = 7;
+const uint8_t DETAIL_REPORT_ACTIVITIES_BY_ID = 9;
+const uint8_t TIME_BASED_SCHEDULE_DETAIL_REPORT = 10;
+const uint8_t ACTIVITIES_SUMMARY_REPORT_BY_ID = 12;
+const uint8_t TIMEBASED_SCHEDULE_SUMMARY_REPORT = 13;
+const uint8_t TIME_SHIFT_ALL_SCHEDULED_ACTIVITIES = 15;
+const uint8_t DETAIL_REPORT_ALL_SCHEDULED_ACTIVITIES = 16;
+
 /**
  * @def SUB_SCHEDULES_ENABLED
  * @brief Indicates whether sub-schedules are supported

@@ -2,20 +2,20 @@
 #ifdef SERVICE_TEST
 
 #include "Services/TestService.hpp"
-#include "ECSS_ST_Definitions.hpp"
+
 
 void TestService::areYouAlive(Message& request) {
-	request.assertTC(Test, AreYouAliveTest);
+	request.assertTC(TEST, ARE_YOU_ALIVE_TEST);
 	// TM[17,2] are-you-alive connection test report
-	Message report = createTM(AreYouALiveTestReport);
+	Message report = createTM(ARE_YOU_ALIVE_TEST_REPORT);
 
 	storeMessage(report);
 }
 
 void TestService::onBoardConnection(Message& request) {
-	request.assertTC(Test, OnBoardConnectionTest);
+	request.assertTC(TEST, ON_BOARD_CONNECTION_TEST);
 	// TM[17,4] on-board connection test report
-	Message report = createTM(OnBoardConnectionTestReport);
+	Message report = createTM(ON_BOARD_CONNECTION_TEST_REPORT);
 
 	report.appendUint16(request.readUint16());
 	// just print it on the screen

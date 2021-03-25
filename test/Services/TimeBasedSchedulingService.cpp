@@ -68,19 +68,19 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	Message receivedMessage(11, 4, Message::TC, 1);
 	receivedMessage.appendUint16(4); // Total number of requests
 
-	// Test activity 1
+	// TEST activity 1
 	receivedMessage.appendUint32(currentTime + 1556435);
 	receivedMessage.appendMessage(testMessage1, ECSS_TC_REQUEST_STRING_SIZE);
 
-	// Test activity 2
+	// TEST activity 2
 	receivedMessage.appendUint32(currentTime + 1957232);
 	receivedMessage.appendMessage(testMessage2, ECSS_TC_REQUEST_STRING_SIZE);
 
-	// Test activity 3
+	// TEST activity 3
 	receivedMessage.appendUint32(currentTime + 1726435);
 	receivedMessage.appendMessage(testMessage3, ECSS_TC_REQUEST_STRING_SIZE);
 
-	// Test activity 4
+	// TEST activity 4
 	receivedMessage.appendUint32(currentTime + 17248435);
 	receivedMessage.appendMessage(testMessage4, ECSS_TC_REQUEST_STRING_SIZE);
 

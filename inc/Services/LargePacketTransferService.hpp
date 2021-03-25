@@ -4,6 +4,20 @@
 #include "Service.hpp"
 #include <etl/String.hpp>
 
+/*
+ * ST[13] Large-Packet-Transfer Service
+ */
+
+const uint8_t LARGE_PACKET_TRANSFER = 13;
+
+/*
+ * ST[13] Large-Packet-Transfer Sub-Service
+ */
+
+const uint8_t FIRST_DOWNLINK_PART_REPORT = 1;
+const uint8_t INTERNAL_DOWNLINK_PART_REPORT = 2;
+const uint8_t LAST_DOWNLINK_PART_REPORT = 3;
+
 /**
  * Implementation of the ST[13] large packet transfer service
  * The goal of this service is to help in splitting data packages that exceed the standard's

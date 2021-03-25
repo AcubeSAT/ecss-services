@@ -5,6 +5,18 @@
 #include "Message.hpp"
 #include "ECSS_Definitions.hpp"
 
+/*
+ * ST[04] Parameter Statistics Reporting Service
+ */
+
+const uint8_t PARAMETER_STATISTICS_REPORTING = 4;
+
+/*
+ * ST[04] Parameter Statistics Reporting Sub-Service
+ */
+
+const uint8_t DISABLE_PERIODIC_PARAMETER_STATISTICS_REPORTING = 5;
+
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  *

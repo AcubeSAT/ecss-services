@@ -129,7 +129,7 @@ public:
 		 */
 		EventActionUnknownEventDefinitionError = 3,
 		/**
-		 * EventAction refers to the service, EventActionIDefinitionID refers to the variable
+		 * EVENT_ACTION refers to the service, EventActionIDefinitionID refers to the variable
 		 * In the Event Action Service, an access attempt was made to an unknown eventActionDefinitionID
 		 */
 		EventActionUnknownEventActionDefinitionIDError = 4,

@@ -4,11 +4,10 @@
 #include "Services/MemoryManagementService.hpp"
 #include <cerrno>
 #include <etl/String.hpp>
-#include "ECSS_ST_Definitions.hpp"
 
 // Define the constructors for the classes
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
-	serviceType = MemoryManagement;
+	serviceType = MEMORY_MANAGEMENT;
 }
 
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
@@ -25,7 +24,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 	 * @todo Add failure reporting
 	 */
 	// Check if we have the correct packet
-	request.assertTC(MemoryManagement, LoadRawMemoryDataAreas);
+	request.assertTC(MEMORY_MANAGEMENT, LOAD_RAW_MEMORY_DATA_AREAS);
 
 	// Read the memory ID from the request
 	auto memoryID = MemoryManagementService::MemoryID(request.readEnum8());
@@ -75,10 +74,10 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
 	// Check if we have the correct packet
-	request.assertTC(MemoryManagement, DumpRawMemoryData);
+	request.assertTC(MEMORY_MANAGEMENT, DUMP_RAW_MEMORY_DATA);
 
 	// Create the report message object of telemetry message subtype 6
-	Message report = mainService.createTM(DumpedRawMemoryDataReport);
+	Message report = mainService.createTM(DUMP_RAW_MEMORY_DATA_REPORT);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	// Check for a valid memory ID first
@@ -122,10 +121,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
 	// Check if we have the correct packet
-	request.assertTC(MemoryManagement, CheckRawMemoryData);
+	request.assertTC(MEMORY_MANAGEMENT, CHECK_RAW_MEMORY_DATA);
 
 	// Create the report message object of telemetry message subtype 10
-	Message report = mainService.createTM(CheckedRawMemoryDataReport);
+	Message report = mainService.createTM(CHECK_RAW_MEMORY_DATA_REPORT);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {

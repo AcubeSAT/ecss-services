@@ -2,12 +2,11 @@
 #ifdef SERVICE_REQUESTVERIFICATION
 
 #include "Services/RequestVerificationService.hpp"
-#include "ECSS_ST_Definitions.hpp"
 
 void RequestVerificationService::successAcceptanceVerification(const Message& request) {
 	// TM[1,1] successful acceptance verification report
 
-	Message report = createTM(SuccessfulAcceptanceReport);
+	Message report = createTM(SUCCESSFUL_ACCEPTANCE_REPORT);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -23,7 +22,7 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
                                                             ErrorHandler::AcceptanceErrorType errorCode) {
 	// TM[1,2] failed acceptance verification report
 
-	Message report = createTM(FailedAcceptanceReport);
+	Message report = createTM(FAILED_ACCEPTANCE_REPORT);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -39,7 +38,7 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
 void RequestVerificationService::successStartExecutionVerification(const Message& request) {
 	// TM[1,3] successful start of execution verification report
 
-	Message report = createTM(SuccessfulStartOfExecution);
+	Message report = createTM(SUCCESSFUL_START_OF_EXECUTION);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -55,7 +54,7 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
                                                                 ErrorHandler::ExecutionStartErrorType errorCode) {
 	// TM[1,4] failed start of execution verification report
 
-	Message report = createTM(FailedStartOfExecution);
+	Message report = createTM(FAILED_START_OF_EXECUTION);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -71,7 +70,7 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 void RequestVerificationService::successProgressExecutionVerification(const Message& request, uint8_t stepID) {
 	// TM[1,5] successful progress of execution verification report
 
-	Message report = createTM(SuccessfulProgressOfExecution);
+	Message report = createTM(SUCCESSFUL_PROGRESS_OF_EXECUTION);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -89,7 +88,7 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
                                                                    uint8_t stepID) {
 	// TM[1,6] failed progress of execution verification report
 
-	Message report = createTM(FailedProgressOfExecution);
+	Message report = createTM(FAILED_PROGRESS_OF_EXECUTION);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -106,7 +105,7 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 void RequestVerificationService::successCompletionExecutionVerification(const Message& request) {
 	// TM[1,7] successful completion of execution verification report
 
-	Message report = createTM(SuccessfulCompletionOfExecution);
+	Message report = createTM(SUCCESSFUL_COMPLETION_OF_EXECUTION);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -122,7 +121,7 @@ void RequestVerificationService::failCompletionExecutionVerification(
     const Message& request, ErrorHandler::ExecutionCompletionErrorType errorCode) {
 	// TM[1,8] failed completion of execution verification report
 
-	Message report = createTM(FailedCompletionOfExecution);
+	Message report = createTM(FAILED_COMPLETION_OF_EXECUTION);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -139,7 +138,7 @@ void RequestVerificationService::failRoutingVerification(const Message& request,
                                                          ErrorHandler::RoutingErrorType errorCode) {
 	// TM[1,10] failed routing verification report
 
-	Message report = createTM(FailedRoutingReport);
+	Message report = createTM(FAILED_ROUTING_REPORT);
 
 	report.appendEnumerated(3, CCSDS_PACKET_VERSION); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type

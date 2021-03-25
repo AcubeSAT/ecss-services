@@ -6,6 +6,26 @@
 #include "ErrorHandler.hpp"
 #include "ECSS_Definitions.hpp"
 
+/*
+ * ST[1] Request Verification Service
+ */
+
+const uint8_t REQUEST_VERIFICATION = 1;
+
+/*
+ * ST[1] Request Verification Sub-Services
+ */
+
+const uint8_t SUCCESSFUL_ACCEPTANCE_REPORT = 1;
+const uint8_t FAILED_ACCEPTANCE_REPORT = 2;
+const uint8_t SUCCESSFUL_START_OF_EXECUTION = 3;
+const uint8_t FAILED_START_OF_EXECUTION = 4;
+const uint8_t SUCCESSFUL_PROGRESS_OF_EXECUTION = 5;
+const uint8_t FAILED_PROGRESS_OF_EXECUTION = 6;
+const uint8_t SUCCESSFUL_COMPLETION_OF_EXECUTION = 7;
+const uint8_t FAILED_COMPLETION_OF_EXECUTION = 8;
+const uint8_t FAILED_ROUTING_REPORT = 10;
+
 /**
  * Implementation of the ST[01] request verification service
  *

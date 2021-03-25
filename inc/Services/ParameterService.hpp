@@ -7,6 +7,20 @@
 #include "Parameter.hpp"
 #include "Parameters/SystemParameters.hpp"
 
+/*
+ * ST[20] Parameter Management Service
+ */
+
+const uint8_t PARAMETER_MANAGEMENT = 20;
+
+/*
+ * ST[20] Parameter Management Sub-Services
+ */
+
+const uint8_t REPORT_PARAMETER_VALUES = 1;
+const uint8_t PARAMETER_VALUES_REPORT = 2;
+const uint8_t SET_PARAMETER_VALUES = 3;
+
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C

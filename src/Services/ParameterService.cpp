@@ -3,17 +3,16 @@
 
 #include "Services/ParameterService.hpp"
 #include "Services/Parameter.hpp"
-#include "ECSS_ST_Definitions.hpp"
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
-	Message parameterReport(ParameterManagement, ParameterValueReport, Message::TM, 1);
+	Message parameterReport(PARAMETER_MANAGEMENT, PARAMETER_VALUES_REPORT, Message::TM, 1);
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.messageType == ReportParameterValues, paramIds,
+	ErrorHandler::assertRequest(paramIds.messageType == REPORT_PARAMETER_VALUES, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.serviceType == ParameterManagement, paramIds,
+	ErrorHandler::assertRequest(paramIds.serviceType == PARAMETER_MANAGEMENT, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
@@ -44,9 +43,9 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.messageType == SetParameterValues, newParamValues,
+	ErrorHandler::assertRequest(newParamValues.messageType == SET_PARAMETER_VALUES, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.serviceType == ParameterManagement, newParamValues,
+	ErrorHandler::assertRequest(newParamValues.serviceType == PARAMETER_MANAGEMENT, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = newParamValues.readUint16();

@@ -174,7 +174,7 @@ TEST_CASE("Parameter Setting Subservice") {
 
 TEST_CASE("Wrong Messages") {
 
-	SECTION("Wrong Service Type Handling Test for Report") {
+	SECTION("Wrong Service Type Handling TEST for Report") {
 		Message falseRequest(62, 1, Message::TM, 1);
 
 		MessageParser::execute(falseRequest);
@@ -184,7 +184,7 @@ TEST_CASE("Wrong Messages") {
 		Services.reset();
 	}
 
-	SECTION("Wrong Service Type Handling Test for Set") {
+	SECTION("Wrong Service Type Handling TEST for Set") {
 		Message falseRequest(62, 3, Message::TM, 1);
 
 		MessageParser::execute(falseRequest);

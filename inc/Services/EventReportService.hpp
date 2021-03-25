@@ -4,6 +4,25 @@
 #include "Service.hpp"
 #include <etl/bitset.h>
 
+/*
+ * ST[5] Event Report Service
+ */
+
+const uint8_t EVENT_REPORT = 5;
+
+/*
+ * ST[5] Event Report Sub-Services
+ */
+
+const uint8_t INFORMATIVE_EVENT_REPORT = 1;
+const uint8_t LOW_SEVERITY_ANOMALY_REPORT = 2;
+const uint8_t MEDIUM_SEVERITY_ANOMALY_REPORT = 3;
+const uint8_t HIGH_SEVERITY_ANOMALY_REPORT = 4;
+const uint8_t ENABLE_REPORT_GENERATION_OF_EVENTS = 5;
+const uint8_t DISABLE_REPORT_GENERATION_OF_EVENTS = 6;
+const uint8_t REPORT_LIST_OF_DISABLED_EVENT = 7;
+const uint8_t DISABLED_LIST_EVENT_REPORT = 8;
+
 /**
  * Implementation of ST[05] event reporting service
  *
