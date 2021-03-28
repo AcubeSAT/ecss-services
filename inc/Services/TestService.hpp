@@ -3,20 +3,7 @@
 
 #include "Service.hpp"
 
-/*
- * ST[17] TEST Service
- */
 
-const uint8_t TEST = 17;
-
-/*
- * ST[17] TEST Sub-Services
- */
-
-const uint8_t ARE_YOU_ALIVE_TEST = 1;
-const uint8_t ARE_YOU_ALIVE_TEST_REPORT = 2;
-const uint8_t ON_BOARD_CONNECTION_TEST = 3;
-const uint8_t ON_BOARD_CONNECTION_TEST_REPORT = 4;
 
 /**
  * Implementation of the ST[17] test service
@@ -25,6 +12,19 @@ const uint8_t ON_BOARD_CONNECTION_TEST_REPORT = 4;
  */
 class TestService : public Service {
 public:
+
+	/*
+ * ST[17] TEST Service and Sub-Service Macros, for readability purpose
+ */
+
+	static const uint8_t ServiceType = 17;
+
+	enum MessageType : uint8_t {
+		AreYouAliveTest = 1,
+		AreYouAliveTestReport = 2,
+		OnBoardConnectionTest = 3,
+		OnBoardConnectionTestReport = 4,
+	};
 	TestService() {
 		serviceType = 17;
 	}

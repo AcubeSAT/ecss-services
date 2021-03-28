@@ -7,17 +7,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 
-/*
- * ST[8] Function Management Service
- */
 
-const uint8_t FUNCTION_MANAGEMENT = 8;
-
-/*
- * ST[8] Function Management Sub-Services
- */
-
-const uint8_t PERFORM_FUNCTION = 1;
 
 /**
  * Implementation of the ST[08] function management service
@@ -71,6 +61,16 @@ class FunctionManagementService : public Service {
 	FunctionMap funcPtrIndex;
 
 public:
+
+	/*
+ * ST[8] Function Management Service and Sub-Service Macros, for readability purpose
+ */
+
+	const uint8_t ServiceType = 8;
+
+	enum MessageType : uint8_t {
+		PerformFunction = 1,
+	};
 	/**
 	 * Constructs the function pointer index with all the necessary functions at initialization time
 	 * These functions need to be in scope. Un-default when needed.

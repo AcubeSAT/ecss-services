@@ -8,7 +8,7 @@
 
 void EventActionService::addEventActionDefinitions(Message& message) {
 	// TC[19,1]
-	message.assertTC(EVENT_ACTION, ADD_EVENT_ACTION);
+	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction);
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
 	uint16_t eventActionDefinitionID = message.readEnum16();
@@ -41,7 +41,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 
 void EventActionService::deleteEventActionDefinitions(Message& message) {
 	// TC[19,2]
-	message.assertTC(EVENT_ACTION, DELETE_EVENT_ACTION);
+	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	bool definitionIDexists = false;
 	for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
@@ -71,7 +71,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 
 void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 	// TC[19,3]
-	message.assertTC(EVENT_ACTION, DELETE_ALL_EVENT_ACTION);
+	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction);
 
 	setEventActionFunctionStatus(false);
 	eventActionDefinitionMap.clear();
@@ -79,7 +79,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 
 void EventActionService::enableEventActionDefinitions(Message& message) {
 	// TC[19,4]
-	message.assertTC(EVENT_ACTION, ENABLE_EVENT_ACTION);
+	message.assertTC(EventActionService::serviceType, EventActionService::MessageType::EnableEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0U) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
@@ -112,7 +112,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 
 void EventActionService::disableEventActionDefinitions(Message& message) {
 	// TC[19,5]
-	message.assertTC(EVENT_ACTION, DISABLE_EVENT_ACTION);
+	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0U) {
 		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
@@ -144,14 +144,14 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 
 void EventActionService::requestEventActionDefinitionStatus(Message& message) {
 	// TC[19,6]
-	message.assertTC(EVENT_ACTION, REPORT_STATUS_OF_EACH_EVENT_ACTION);
+	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::ReportStatusOfEachEventAction);
 
 	eventActionStatusReport();
 }
 
 void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
-	Message report = createTM(EVENT_ACTION_STATUS_REPORT);
+	Message report = createTM(EventActionStatusReport);
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
 	for (const auto& element : eventActionDefinitionMap) {
@@ -165,14 +165,14 @@ void EventActionService::eventActionStatusReport() {
 
 void EventActionService::enableEventActionFunction(Message& message) {
 	// TC[19,8]
-	message.assertTC(EVENT_ACTION, ENABLE_EVENT_ACTION_FUNCTION);
+	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventActionFunction);
 
 	setEventActionFunctionStatus(true);
 }
 
 void EventActionService::disableEventActionFunction(Message& message) {
 	// TC[19,9]
-	message.assertTC(EVENT_ACTION, DISABLE_EVENT_ACTION_FUNCTION);
+	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventActionFunction);
 
 	setEventActionFunctionStatus(false);
 }

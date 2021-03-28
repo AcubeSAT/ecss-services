@@ -4,19 +4,7 @@
 #include "Service.hpp"
 #include <etl/String.hpp>
 
-/*
- * ST[13] Large-Packet-Transfer Service
- */
 
-const uint8_t LARGE_PACKET_TRANSFER = 13;
-
-/*
- * ST[13] Large-Packet-Transfer Sub-Service
- */
-
-const uint8_t FIRST_DOWNLINK_PART_REPORT = 1;
-const uint8_t INTERNAL_DOWNLINK_PART_REPORT = 2;
-const uint8_t LAST_DOWNLINK_PART_REPORT = 3;
 
 /**
  * Implementation of the ST[13] large packet transfer service
@@ -30,6 +18,19 @@ const uint8_t LAST_DOWNLINK_PART_REPORT = 3;
 
 class LargePacketTransferService : public Service {
 public:
+
+	/*
+ * ST[13] Large-Packet-Transfer Service and Sub-Service Macros, for readability purpose
+ */
+
+	static const uint8_t ServiceType = 13;
+
+
+	enum MessageType : uint8_t {
+		FirstDownlinkPartReport = 1,
+		InternalDownlinkPartReport = 2,
+		LastDownlinkPartReport = 3,
+	};
 	/**
 	 * Default constructor since only functions will be used.
 	 */

@@ -6,25 +6,7 @@
 #include "Services/EventReportService.hpp"
 #include "etl/multimap.h"
 
-/*
- * ST[19] Event Action Service
- */
 
-const uint8_t EVENT_ACTION = 19;
-
-/*
- * ST[19] Event Action Sub-Services
- */
-
-const uint8_t ADD_EVENT_ACTION = 1;
-const uint8_t DELETE_EVENT_ACTION = 2;
-const uint8_t DELETE_ALL_EVENT_ACTION = 3;
-const uint8_t ENABLE_EVENT_ACTION = 4;
-const uint8_t DISABLE_EVENT_ACTION = 5;
-const uint8_t REPORT_STATUS_OF_EACH_EVENT_ACTION = 6;
-const uint8_t EVENT_ACTION_STATUS_REPORT = 7;
-const uint8_t ENABLE_EVENT_ACTION_FUNCTION = 8;
-const uint8_t DISABLE_EVENT_ACTION_FUNCTION = 9;
 
 /**
  * Implementation of ST[19] event-action Service
@@ -59,6 +41,25 @@ private:
 	void executeAction(uint16_t eventID);
 
 public:
+
+	/*
+ * ST[19] EventAction Service and Sub-Service Macros, for readability purpose
+ */
+
+	static const uint8_t ServiceType = 19;
+
+	enum MessageType : uint8_t {
+		AddEventAction = 1,
+		DeleteEventAction = 2,
+		DeleteAllEventAction = 3,
+		EnableEventAction = 4,
+		DisableEventAction = 5,
+		ReportStatusOfEachEventAction = 6,
+		EventActionStatusReport = 7,
+		EnableEventActionFunction = 8,
+		DisableEventActionFunction = 9
+	};
+
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationId = 0;

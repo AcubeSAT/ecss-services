@@ -7,27 +7,28 @@
 #include "ErrorHandler.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 
-/*
- * ST[6] Memory Management Service
- */
 
-const uint8_t MEMORY_MANAGEMENT = 6;
-
-/*
- * ST[6] Memory Management Sub-Services
- */
-
-const uint8_t LOAD_RAW_MEMORY_DATA_AREAS = 2;
-const uint8_t DUMP_RAW_MEMORY_DATA = 5;
-const uint8_t DUMP_RAW_MEMORY_DATA_REPORT = 6;
-const uint8_t CHECK_RAW_MEMORY_DATA = 9;
-const uint8_t CHECK_RAW_MEMORY_DATA_REPORT = 10;
 
 /**
  * @ingroup Services
  */
 class MemoryManagementService : public Service {
 public:
+
+	/*
+ * ST[6] Memory Management Service and Sub-Service Macros, for readability purpose
+ */
+
+	static const uint8_t ServiceType = 6;
+
+	enum MessageType : uint8_t {
+		LoadRawMemoryDataAreas = 2,
+		DumpRawMemoryData = 5,
+		DumpRawMemoryDataReport = 6,
+		CheckRawMemoryData = 9,
+		CheckRawMemoryDataReport = 10,
+	};
+
 	// Memory type ID's
 	enum MemoryID {
 		DTCMRAM = 0,

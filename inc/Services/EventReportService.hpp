@@ -4,25 +4,6 @@
 #include "Service.hpp"
 #include <etl/bitset.h>
 
-/*
- * ST[5] Event Report Service
- */
-
-const uint8_t EVENT_REPORT = 5;
-
-/*
- * ST[5] Event Report Sub-Services
- */
-
-const uint8_t INFORMATIVE_EVENT_REPORT = 1;
-const uint8_t LOW_SEVERITY_ANOMALY_REPORT = 2;
-const uint8_t MEDIUM_SEVERITY_ANOMALY_REPORT = 3;
-const uint8_t HIGH_SEVERITY_ANOMALY_REPORT = 4;
-const uint8_t ENABLE_REPORT_GENERATION_OF_EVENTS = 5;
-const uint8_t DISABLE_REPORT_GENERATION_OF_EVENTS = 6;
-const uint8_t REPORT_LIST_OF_DISABLED_EVENT = 7;
-const uint8_t DISABLED_LIST_EVENT_REPORT = 8;
-
 /**
  * Implementation of ST[05] event reporting service
  *
@@ -39,6 +20,24 @@ private:
 	etl::bitset<numberOfEvents> stateOfEvents;
 
 public:
+
+	/*
+ * ST[5] Event Report Service and Sub-Service Macros, for readability purpose
+ */
+
+	static const uint8_t ServiceType = 5;
+
+	enum MessageType : uint8_t {
+		InformativeEventReport = 1,
+		LowSeverityAnomalyReport = 2,
+		MediumSeverityAnomalyReport = 3,
+		HighSeverityAnomalyReport = 4,
+		EnableReportGenerationOfEvents = 5,
+		DisableReportGenerationOfEvents = 6,
+		ReportListOfDisabledEvent = 7,
+		DisabledListEventReport = 8,
+	};
+
 	// Variables that count the event reports per severity level
 	uint16_t lowSeverityReportCount;
 	uint16_t mediumSeverityReportCount;

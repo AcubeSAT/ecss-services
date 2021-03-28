@@ -8,8 +8,9 @@ void FunctionManagementService::call(Message& msg) {
 	msg.resetRead();
 	ErrorHandler::assertRequest(msg.packetType == Message::TC, msg,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.messageType == PERFORM_FUNCTION, msg, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.serviceType == FUNCTION_MANAGEMENT, msg,
+	ErrorHandler::assertRequest(msg.messageType == FunctionManagementService::MessageType::PerformFunction, msg,
+		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(msg.serviceType == FunctionManagementService::ServiceType, msg,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint8_t funcName[ECSS_FUNCTION_NAME_LENGTH] = { 0 }; // the function's name

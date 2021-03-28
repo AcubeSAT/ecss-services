@@ -5,17 +5,17 @@
 
 
 void TestService::areYouAlive(Message& request) {
-	request.assertTC(TEST, ARE_YOU_ALIVE_TEST);
+	request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest);
 	// TM[17,2] are-you-alive connection test report
-	Message report = createTM(ARE_YOU_ALIVE_TEST_REPORT);
+	Message report = createTM(TestService::MessageType::AreYouAliveTestReport);
 
 	storeMessage(report);
 }
 
 void TestService::onBoardConnection(Message& request) {
-	request.assertTC(TEST, ON_BOARD_CONNECTION_TEST);
+	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
 	// TM[17,4] on-board connection test report
-	Message report = createTM(ON_BOARD_CONNECTION_TEST_REPORT);
+	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
 
 	report.appendUint16(request.readUint16());
 	// just print it on the screen

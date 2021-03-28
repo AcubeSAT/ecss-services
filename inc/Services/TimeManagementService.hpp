@@ -4,17 +4,6 @@
 #include <Service.hpp>
 #include "Helpers/TimeHelper.hpp"
 
-/*
- * ST[9] Time Management Service
- */
-
-const uint8_t TIME_MANAGEMENT = 9;
-
-/*
- * ST[9] Time Management Sub-Services
- */
-
-const uint8_t CDS_TIME_REPORT = 3;
 
 /**
  * Implementation of the ST[09] time management.
@@ -42,6 +31,17 @@ const uint8_t CDS_TIME_REPORT = 3;
 
 class TimeManagementService : public Service {
 public:
+
+	/*
+ * ST[9] Time Management Service and Sub-Service Macros, for readability purpose
+ */
+
+	static const uint8_t ServiceType = 9;
+
+	enum MessageType : uint8_t {
+		CdsTimeReport = 3,
+	};
+
 	TimeManagementService() {
 		serviceType = 9;
 	}

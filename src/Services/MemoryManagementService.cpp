@@ -7,7 +7,7 @@
 
 // Define the constructors for the classes
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
-	serviceType = MEMORY_MANAGEMENT;
+	serviceType = MemoryManagementService::ServiceType;
 }
 
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
@@ -24,7 +24,8 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 	 * @todo Add failure reporting
 	 */
 	// Check if we have the correct packet
-	request.assertTC(MEMORY_MANAGEMENT, LOAD_RAW_MEMORY_DATA_AREAS);
+	request.assertTC(MemoryManagementService::ServiceType,
+		MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
 
 	// Read the memory ID from the request
 	auto memoryID = MemoryManagementService::MemoryID(request.readEnum8());
@@ -74,10 +75,10 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
 	// Check if we have the correct packet
-	request.assertTC(MEMORY_MANAGEMENT, DUMP_RAW_MEMORY_DATA);
+	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData);
 
 	// Create the report message object of telemetry message subtype 6
-	Message report = mainService.createTM(DUMP_RAW_MEMORY_DATA_REPORT);
+	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	// Check for a valid memory ID first
@@ -121,10 +122,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
 	// Check if we have the correct packet
-	request.assertTC(MEMORY_MANAGEMENT, CHECK_RAW_MEMORY_DATA);
+	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData);
 
 	// Create the report message object of telemetry message subtype 10
-	Message report = mainService.createTM(CHECK_RAW_MEMORY_DATA_REPORT);
+	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
