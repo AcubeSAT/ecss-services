@@ -5,7 +5,6 @@
 #include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
-#include "Services/Parameter.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
