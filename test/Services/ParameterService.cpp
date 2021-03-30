@@ -10,7 +10,7 @@ static void resetParameterValues() {
 
 TEST_CASE("Parameter Report Subservice") {
 	SECTION("All requested parameters invalid") {
-		Message request = Message(20, 1, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(54432);
 		request.appendUint16(60000);
@@ -21,8 +21,8 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(ServiceTests::count() == 4);
 
 		Message report = ServiceTests::get(3);
-		CHECK(report.serviceType == 20);
-		CHECK(report.messageType == 2);
+		CHECK(report.serviceType == ParameterService::ServiceType);
+		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 0);  // the message shall be empty
 
 		ServiceTests::reset();
@@ -30,7 +30,7 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Some requested parameters invalid") {
-		Message request = Message(20, 1, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(1);
 		request.appendUint16(10000);
@@ -41,8 +41,8 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(ServiceTests::count() == 2);
 
 		Message report = ServiceTests::get(1);
-		CHECK(report.serviceType == 20);
-		CHECK(report.messageType == 2);
+		CHECK(report.serviceType == ParameterService::ServiceType);
+		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 2);
 		CHECK(report.readUint16() == 1);
 		CHECK(report.readUint16() == 7);
@@ -54,7 +54,7 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Parameters are of different types") {
-		Message request = Message(20, 1, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint16(1);
@@ -63,8 +63,8 @@ TEST_CASE("Parameter Report Subservice") {
 		MessageParser::execute(request);
 
 		Message report = ServiceTests::get(0);
-		CHECK(report.serviceType == 20);
-		CHECK(report.messageType == 2);
+		CHECK(report.serviceType == ParameterService::ServiceType);
+		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 3);
 		CHECK(report.readUint16() == 0);
 		CHECK(report.readUint8() == 3);
@@ -80,7 +80,7 @@ TEST_CASE("Parameter Report Subservice") {
 
 TEST_CASE("Parameter Setting Subservice") {
 	SECTION("All parameter IDs are invalid") {
-		Message request = Message(20, 3, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(54432);
 		request.appendUint16(1);
@@ -102,7 +102,7 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("The last parameter ID is invalid") {
-		Message request = Message(20, 3, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -126,7 +126,7 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("The middle parameter ID is invalid") {
-		Message request = Message(20, 3, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -150,7 +150,7 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("All IDs are valid") {
-		Message request = Message(20, 3, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);

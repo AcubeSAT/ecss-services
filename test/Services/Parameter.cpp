@@ -1,10 +1,11 @@
 #include "catch2/catch.hpp"
 #include "Services/Parameter.hpp"
+#include "Services/ParameterService.hpp"
 #include "Message.hpp"
 
 TEST_CASE("Parameter Append") {
 	SECTION("Check correct appending") {
-		Message request = Message(20, 1, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
 		Parameter<uint8_t> parameter1 = Parameter<uint8_t>(1);
 		Parameter<uint16_t> parameter2 = Parameter<uint16_t>(500);
 		Parameter<uint32_t> parameter3 = Parameter<uint32_t>(70000);
@@ -21,7 +22,7 @@ TEST_CASE("Parameter Append") {
 
 TEST_CASE("Parameter Set") {
 	SECTION("Check correct setting") {
-		Message request = Message(20, 1, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
 		Parameter<uint8_t> parameter1 = Parameter<uint8_t>(1);
 		Parameter<uint16_t> parameter2 = Parameter<uint16_t>(500);
 		Parameter<uint32_t> parameter3 = Parameter<uint32_t>(70000);
