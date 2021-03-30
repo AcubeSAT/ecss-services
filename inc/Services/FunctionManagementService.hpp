@@ -64,7 +64,7 @@ public:
 * ST[8] Function Management Service and Sub-Service Macros, for readability purpose
 */
 
-	const uint8_t ServiceType = 8;
+	static const uint8_t ServiceType = 8;
 
 	enum MessageType : uint8_t {
 		PerformFunction = 1,
