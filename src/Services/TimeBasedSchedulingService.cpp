@@ -4,29 +4,29 @@
 #include "Services/TimeBasedSchedulingService.hpp"
 
 TimeBasedSchedulingService::TimeBasedSchedulingService() {
-	serviceType = 11;
+	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
 void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 1);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
 
 	executionFunctionStatus = true; // Enable the service
 }
 
 void TimeBasedSchedulingService::disableScheduleExecution(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 2);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction);
 
 	executionFunctionStatus = false; // Disable the service
 }
 
 void TimeBasedSchedulingService::resetSchedule(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 3);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule);
 
 	executionFunctionStatus = false; // Disable the service
 	scheduledActivities.clear(); // Delete all scheduled activities
@@ -35,8 +35,8 @@ void TimeBasedSchedulingService::resetSchedule(Message& request) {
 
 void TimeBasedSchedulingService::insertActivities(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 4);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::InsertActivities);
 
 	// todo: Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
@@ -71,8 +71,8 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 15);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
 
 	uint32_t current_time = TimeGetter::getSeconds(); // Get the current system time
 
@@ -96,8 +96,8 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 
 void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 7);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
 
 	uint32_t current_time = TimeGetter::getSeconds(); // Get the current system time
 
@@ -133,8 +133,8 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 5);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::DeleteActivitiesById);
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	while (iterationCount-- != 0) {
@@ -160,11 +160,11 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 16);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
 
 	// Create the report message object of telemetry message subtype 10 for each activity
-	Message report = createTM(10);
+	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(scheduledActivities.size()));
 
 	for (auto& activity : scheduledActivities) {
@@ -178,11 +178,11 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 9);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
 
 	// Create the report message object of telemetry message subtype 10 for each activity
-	Message report = createTM(10);
+	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
@@ -219,11 +219,11 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	// Check if the correct packet is being processed
-	assert(request.serviceType == 11);
-	assert(request.messageType == 12);
+	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
+	assert(request.messageType == TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
 
 	// Create the report message object of telemetry message subtype 13 for each activity
-	Message report = createTM(13);
+	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)

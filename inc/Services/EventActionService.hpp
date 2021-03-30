@@ -39,6 +39,25 @@ private:
 	void executeAction(uint16_t eventID);
 
 public:
+
+	/*
+* ST[19] EventAction Service and Sub-Service Macros, for readability purpose
+*/
+
+	static const uint8_t ServiceType = 19;
+
+	enum MessageType : uint8_t {
+		AddEventAction = 1,
+		DeleteEventAction = 2,
+		DeleteAllEventAction = 3,
+		EnableEventAction = 4,
+		DisableEventAction = 5,
+		ReportStatusOfEachEventAction = 6,
+		EventActionStatusReport = 7,
+		EnableEventActionFunction = 8,
+		DisableEventActionFunction = 9
+	};
+
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationId = 0;

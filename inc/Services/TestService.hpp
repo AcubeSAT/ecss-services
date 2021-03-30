@@ -10,6 +10,20 @@
  */
 class TestService : public Service {
 public:
+
+	/*
+* ST[17] TEST Service and Sub-Service Macros, for readability purpose
+*/
+
+	static const uint8_t ServiceType = 17;
+
+	enum MessageType : uint8_t {
+		AreYouAliveTest = 1,
+		AreYouAliveTestReport = 2,
+		OnBoardConnectionTest = 3,
+		OnBoardConnectionTestReport = 4,
+	};
+
 	TestService() {
 		serviceType = 17;
 	}

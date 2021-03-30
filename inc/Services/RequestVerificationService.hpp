@@ -20,6 +20,25 @@
  */
 class RequestVerificationService : public Service {
 public:
+
+	/*
+* ST[1] Request Verification Service and Sub-Service Macros, for readability purpose
+*/
+
+	static const uint8_t ServiceType = 1;
+
+	enum MessageType : uint8_t {
+		SuccessfulAcceptanceReport = 1,
+		FailedAcceptanceReport = 2,
+		SuccessfulStartOfExecution = 3,
+		FailedStartOfExecution = 4,
+		SuccessfulProgressOfExecution = 5,
+		FailedProgressOfExecution = 6,
+		SuccessfulCompletionOfExecution = 7,
+		FailedCompletionOfExecution = 8,
+		FailedRoutingReport = 10,
+	};
+
 	RequestVerificationService() {
 		serviceType = 1;
 	}

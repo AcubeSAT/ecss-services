@@ -12,6 +12,21 @@
  */
 class MemoryManagementService : public Service {
 public:
+
+	/*
+* ST[6] Memory Management Service and Sub-Service Macros, for readability purpose
+*/
+
+	static const uint8_t ServiceType = 6;
+
+	enum MessageType : uint8_t {
+		LoadRawMemoryDataAreas = 2,
+		DumpRawMemoryData = 5,
+		DumpRawMemoryDataReport = 6,
+		CheckRawMemoryData = 9,
+		CheckRawMemoryDataReport = 10,
+	};
+
 	// Memory type ID's
 	enum MemoryID {
 		DTCMRAM = 0,

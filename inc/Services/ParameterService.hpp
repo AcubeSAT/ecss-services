@@ -24,6 +24,19 @@
  */
 class ParameterService : public Service {
 public:
+
+	/*
+* ST[20] Parameter Management Service and Sub-Service Macros, for readability purpose
+*/
+
+	static const uint8_t ServiceType = 20;
+
+	enum MessageType : uint8_t {
+		ReportParameterValues = 1,
+		ParameterValuesReport = 2,
+		SetParameterValues = 3,
+	};
+
 	ParameterService() = default;
 
 	/**

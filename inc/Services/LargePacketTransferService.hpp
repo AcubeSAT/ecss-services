@@ -16,6 +16,20 @@
 
 class LargePacketTransferService : public Service {
 public:
+
+	/*
+* ST[13] Large-Packet-Transfer Service and Sub-Service Macros, for readability purpose
+*/
+
+	static const uint8_t ServiceType = 13;
+
+
+	enum MessageType : uint8_t {
+		FirstDownlinkPartReport = 1,
+		InternalDownlinkPartReport = 2,
+		LastDownlinkPartReport = 3,
+	};
+
 	/**
 	 * Default constructor since only functions will be used.
 	 */
