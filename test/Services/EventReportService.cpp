@@ -15,7 +15,7 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
 	CHECK(report.serviceType == EventReportService::ServiceType);
-	CHECK(report.serviceType == EventReportService::MessageType::InformativeEventReport);
+	CHECK(report.messageType == EventReportService::MessageType::InformativeEventReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -33,7 +33,7 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
 	CHECK(report.serviceType == EventReportService::ServiceType);
-	CHECK(report.serviceType == EventReportService::MessageType::LowSeverityAnomalyReport);
+	CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -51,7 +51,7 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
 	CHECK(report.serviceType == EventReportService::ServiceType);
-	CHECK(report.serviceType == EventReportService::MessageType::MediumSeverityAnomalyReport);
+	CHECK(report.messageType == EventReportService::MessageType::MediumSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -69,7 +69,7 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
 	CHECK(report.serviceType == EventReportService::ServiceType);
-	CHECK(report.serviceType == EventReportService::MessageType::HighSeverityAnomalyReport);
+	CHECK(report.messageType == EventReportService::MessageType::HighSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -131,7 +131,7 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	Message report = ServiceTests::get(0);
 	// Check for the data-members of the report Message created
 	CHECK(report.serviceType == EventReportService::ServiceType);
-	CHECK(report.serviceType == EventReportService::MessageType::DisabledListEventReport);
+	CHECK(report.messageType == EventReportService::MessageType::DisabledListEventReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 6);
 	// Check for the information stored in report

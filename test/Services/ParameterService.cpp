@@ -1,6 +1,7 @@
 #include "catch2/catch.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
+#include "Services/ParameterService.hpp"
 
 static void resetParameterValues() {
 	systemParameters.parameter1.setValue(3);

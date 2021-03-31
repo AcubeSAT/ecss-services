@@ -19,7 +19,8 @@ TEST_CASE("ST[08] - Call Tests") {
 		globalVariable = 10;
 
 		fms.include(String<ECSS_FUNCTION_NAME_LENGTH>("test"), &test);
-		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, Message::TC, 1);
+		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
+			Message::TC, 1);
 
 		msg.appendFixedString(String<ECSS_FUNCTION_NAME_LENGTH>("test"));
 		msg.appendByte(199);
