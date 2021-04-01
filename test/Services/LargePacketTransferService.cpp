@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <Services/LargePacketTransferService.hpp>
 #include <Message.hpp>
 #include "ServiceTests.hpp"
