@@ -114,7 +114,7 @@ TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
 
 	Message report = ServiceTests::get(0);
 	// Check if there is message of type 8 created
-	CHECK(report.serviceType == EventReportService::MessageType::DisabledListEventReport);
+	CHECK(report.messageType == EventReportService::MessageType::DisabledListEventReport);
 }
 
 TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
