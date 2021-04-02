@@ -1,11 +1,12 @@
 #include <catch2/catch.hpp>
 #include <Message.hpp>
 #include <ServicePool.hpp>
+#include "Services/EventReportService.hpp"
 
 TEST_CASE("Message is usable", "[message]") {
-	Message message(5, 17, Message::TC, 3);
+	Message message(EventReportService::ServiceType, 17, Message::TC, 3);
 
-	REQUIRE(message.serviceType == 5);
+	REQUIRE(message.serviceType == EventReportService::ServiceType);
 	REQUIRE(message.messageType == 17);
 	REQUIRE(message.packetType == Message::TC);
 	REQUIRE(message.applicationId == 3);
