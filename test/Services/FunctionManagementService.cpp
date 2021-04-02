@@ -1,4 +1,4 @@
-#include "catch2/catch_all.hpp"
+#include "catch2/catch.hpp"
 #include "Services/FunctionManagementService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "ServicePool.hpp"

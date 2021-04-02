@@ -25,7 +25,7 @@ public:
 * ST[5] Event Report Service and Sub-Service Macros, for readability purpose
 */
 
-	static const uint8_t ServiceType = 5;
+	inline static const uint8_t ServiceType = 5;
 
 	enum MessageType : uint8_t {
 		InformativeEventReport = 1,

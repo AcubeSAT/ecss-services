@@ -1,4 +1,4 @@
-#include <catch2/catch_all.hpp>
+#include <catch2/catch.hpp>
 #include <Services/EventActionService.hpp>
 #include <Message.hpp>
 #include "ServiceTests.hpp"

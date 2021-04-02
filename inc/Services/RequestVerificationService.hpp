@@ -25,7 +25,7 @@ public:
 * ST[1] Request Verification Service and Sub-Service Macros, for readability purpose
 */
 
-	static const uint8_t ServiceType = 1;
+	inline static const uint8_t ServiceType = 1;
 
 	enum MessageType : uint8_t {
 		SuccessfulAcceptanceReport = 1,
