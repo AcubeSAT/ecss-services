@@ -31,10 +31,6 @@
 class TimeManagementService : public Service {
 public:
 
-	/*
-* ST[9] Time Management Service and Sub-Service Macros, for readability purpose
-*/
-
 	inline static const uint8_t ServiceType = 9;
 
 	enum MessageType : uint8_t {

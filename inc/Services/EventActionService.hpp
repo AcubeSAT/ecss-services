@@ -40,11 +40,7 @@ private:
 
 public:
 
-	/*
-* ST[19] EventAction Service and Sub-Service Macros, for readability purpose
-*/
-
-	static const uint8_t ServiceType = 19;
+	inline static const uint8_t ServiceType = 19;
 
 	enum MessageType : uint8_t {
 		AddEventAction = 1,

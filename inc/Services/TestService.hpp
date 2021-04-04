@@ -11,9 +11,6 @@
 class TestService : public Service {
 public:
 
-	/*
-* ST[17] TEST Service and Sub-Service Macros, for readability purpose
-*/
 
 	inline static const uint8_t ServiceType = 17;
 

@@ -21,10 +21,6 @@
 class RequestVerificationService : public Service {
 public:
 
-	/*
-* ST[1] Request Verification Service and Sub-Service Macros, for readability purpose
-*/
-
 	inline static const uint8_t ServiceType = 1;
 
 	enum MessageType : uint8_t {

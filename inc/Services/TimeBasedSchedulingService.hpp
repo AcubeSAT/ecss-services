@@ -123,7 +123,7 @@ public:
 * ST[11] TimeBased Scheduling Service and Sub-Service Macros, for readability purpose
 */
 
-	static const uint8_t ServiceType = 11;
+	inline static const uint8_t ServiceType = 11;
 
 	enum MessageType : uint8_t {
 		EnableTimeBasedScheduleExecutionFunction = 1,

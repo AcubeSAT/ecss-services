@@ -13,10 +13,6 @@
 class MemoryManagementService : public Service {
 public:
 
-	/*
-* ST[6] Memory Management Service and Sub-Service Macros, for readability purpose
-*/
-
 	inline static const uint8_t ServiceType = 6;
 
 	enum MessageType : uint8_t {

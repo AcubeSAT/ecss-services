@@ -25,10 +25,6 @@
 class ParameterService : public Service {
 public:
 
-	/*
-* ST[20] Parameter Management Service and Sub-Service Macros, for readability purpose
-*/
-
 	inline static const uint8_t ServiceType = 20;
 
 	enum MessageType : uint8_t {
