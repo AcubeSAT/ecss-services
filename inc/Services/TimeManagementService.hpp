@@ -30,6 +30,13 @@
 
 class TimeManagementService : public Service {
 public:
+
+	inline static const uint8_t ServiceType = 9;
+
+	enum MessageType : uint8_t {
+		CdsTimeReport = 3,
+	};
+
 	TimeManagementService() {
 		serviceType = 9;
 	}

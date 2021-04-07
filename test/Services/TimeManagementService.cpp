@@ -23,13 +23,13 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 
 	timeService.cdsTimeReport(TimeInfo);
 	Message response = ServiceTests::get(0);
-	CHECK(response.serviceType == 9);
-	CHECK(response.messageType == 3);
+	CHECK(response.serviceType == TimeManagementService::ServiceType);
+	CHECK(response.messageType == TimeManagementService::MessageType::CdsTimeReport);
 	CHECK(response.packetType == Message::TM);
 	CHECK(response.readHalfword() == static_cast<uint16_t>(timeFormat >> 32));
 	CHECK(response.readWord() == static_cast<uint32_t>(timeFormat));
 
-	Message message = Message(9, 128, Message::TC, 3);
+	Message message = Message(TimeManagementService::ServiceType, 128, Message::TC, 3);
 	message.appendHalfword(static_cast<uint16_t>(timeFormat >> 32));
 	message.appendWord(static_cast<uint32_t>(timeFormat));
 
@@ -58,13 +58,13 @@ TEST_CASE("TM[9,3]", "[service][st09]") {
 
 	timeService.cdsTimeReport(TimeInfo);
 	response = ServiceTests::get(1);
-	CHECK(response.serviceType == 9);
-	CHECK(response.messageType == 3);
+	CHECK(response.serviceType == TimeManagementService::ServiceType);
+	CHECK(response.messageType == TimeManagementService::MessageType::CdsTimeReport);
 	CHECK(response.packetType == Message::TM);
 	CHECK(response.readHalfword() == static_cast<uint16_t>(timeFormat >> 32));
 	CHECK(response.readWord() == static_cast<uint32_t>(timeFormat));
 
-	message = Message(9, 128, Message::TC, 3);
+	message = Message(TimeManagementService::ServiceType, 128, Message::TC, 3);
 	message.appendHalfword(static_cast<uint16_t>(timeFormat >> 32));
 	message.appendWord(static_cast<uint32_t>(timeFormat));
 

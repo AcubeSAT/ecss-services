@@ -14,8 +14,8 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
-	CHECK(report.serviceType == 5);
-	CHECK(report.messageType == 1);
+	CHECK(report.serviceType == EventReportService::ServiceType);
+	CHECK(report.messageType == EventReportService::MessageType::InformativeEventReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -32,8 +32,8 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
-	CHECK(report.serviceType == 5);
-	CHECK(report.messageType == 2);
+	CHECK(report.serviceType == EventReportService::ServiceType);
+	CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -50,8 +50,8 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
-	CHECK(report.serviceType == 5);
-	CHECK(report.messageType == 3);
+	CHECK(report.serviceType == EventReportService::ServiceType);
+	CHECK(report.messageType == EventReportService::MessageType::MediumSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -68,8 +68,8 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 
 	Message report = ServiceTests::get(0);
 	// Checks for the data-members of the report Message created
-	CHECK(report.serviceType == 5);
-	CHECK(report.messageType == 4);
+	CHECK(report.serviceType == EventReportService::ServiceType);
+	CHECK(report.messageType == EventReportService::MessageType::HighSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
@@ -82,7 +82,7 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	eventReportService.getStateOfEvents().reset();
 	EventReportService::Event eventID[] = {EventReportService::AssertionFail,
 	                                       EventReportService::LowSeverityUnknownEvent};
-	Message message(5, 5, Message::TC, 1);
+	Message message(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
 	message.appendEnum16(eventID[0]);
 	message.appendEnum16(eventID[1]);
@@ -94,7 +94,7 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::InformativeUnknownEvent,
 	                                       EventReportService::MediumSeverityUnknownEvent};
-	Message message(5, 6, Message::TC, 1);
+	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
 	message.appendEnum16(eventID[0]);
 	message.appendEnum16(eventID[1]);
@@ -108,18 +108,18 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 }
 
 TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
-	Message message(5, 7, Message::TC, 1);
+	Message message(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvent, Message::TC, 1);
 	MessageParser::execute(message);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
 	// Check if there is message of type 8 created
-	CHECK(report.messageType == 8);
+	CHECK(report.messageType == EventReportService::MessageType::DisabledListEventReport);
 }
 
 TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::MCUStart, EventReportService::HighSeverityUnknownEvent};
-	Message message(5, 6, Message::TC, 1);
+	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
 	message.appendEnum16(eventID[0]);
 	message.appendEnum16(eventID[1]);
@@ -130,8 +130,8 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 
 	Message report = ServiceTests::get(0);
 	// Check for the data-members of the report Message created
-	CHECK(report.serviceType == 5);
-	CHECK(report.messageType == 8);
+	CHECK(report.serviceType == EventReportService::ServiceType);
+	CHECK(report.messageType == EventReportService::MessageType::DisabledListEventReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 6);
 	// Check for the information stored in report
@@ -142,7 +142,7 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 
 TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
-	Message message(5, 6, Message::TC, 1);
+	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(1);
 	message.appendEnum16(eventID[0]);
 	MessageParser::execute(message);

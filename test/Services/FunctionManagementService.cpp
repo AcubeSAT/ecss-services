@@ -1,5 +1,6 @@
 #include "catch2/catch.hpp"
 #include "Services/FunctionManagementService.hpp"
+#include "Services/RequestVerificationService.hpp"
 #include "ServicePool.hpp"
 #include "ServiceTests.hpp"
 #include <iostream>
@@ -18,7 +19,8 @@ TEST_CASE("ST[08] - Call Tests") {
 		globalVariable = 10;
 
 		fms.include(String<ECSS_FUNCTION_NAME_LENGTH>("test"), &test);
-		Message msg(8, 1, Message::TC, 1);
+		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
+			Message::TC, 1);
 
 		msg.appendFixedString(String<ECSS_FUNCTION_NAME_LENGTH>("test"));
 		msg.appendByte(199);
@@ -33,12 +35,12 @@ TEST_CASE("ST[08] - Call Tests") {
 		globalVariable = 10;
 
 		fms.include(String<ECSS_FUNCTION_NAME_LENGTH>("test"), &test);
-		Message msg(8, 1, Message::TC, 1);
+		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, Message::TC, 1);
 		msg.appendFixedString(String<ECSS_FUNCTION_NAME_LENGTH>("t3st"));
 		MessageParser::execute(msg);
 
-		CHECK(ServiceTests::get(0).messageType == 4);
-		CHECK(ServiceTests::get(0).serviceType == 1);
+		CHECK(ServiceTests::get(0).messageType == RequestVerificationService::MessageType::FailedStartOfExecution);
+		CHECK(ServiceTests::get(0).serviceType == RequestVerificationService::ServiceType);
 		CHECK(ServiceTests::countErrors() == 1);
 		CHECK(globalVariable == 10);
 	}
@@ -48,14 +50,14 @@ TEST_CASE("ST[08] - Call Tests") {
 		globalVariable = 10;
 
 		fms.include(String<ECSS_FUNCTION_NAME_LENGTH>("test"), &test);
-		Message msg(8, 1, Message::TC, 1);
+		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, Message::TC, 1);
 		msg.appendFixedString(String<ECSS_FUNCTION_NAME_LENGTH>("test"));
 		msg.appendString(String<65>
 		    ("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
 		MessageParser::execute(msg);
 
-		CHECK(ServiceTests::get(0).messageType == 4);
-		CHECK(ServiceTests::get(0).serviceType == 1);
+		CHECK(ServiceTests::get(0).messageType == RequestVerificationService::MessageType::FailedStartOfExecution);
+		CHECK(ServiceTests::get(0).serviceType == RequestVerificationService::ServiceType);
 		CHECK(ServiceTests::countErrors() == 1);
 		CHECK(globalVariable == 10);
 	}

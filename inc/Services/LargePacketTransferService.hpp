@@ -16,6 +16,16 @@
 
 class LargePacketTransferService : public Service {
 public:
+
+	inline static const uint8_t ServiceType = 13;
+
+
+	enum MessageType : uint8_t {
+		FirstDownlinkPartReport = 1,
+		InternalDownlinkPartReport = 2,
+		LastDownlinkPartReport = 3,
+	};
+
 	/**
 	 * Default constructor since only functions will be used.
 	 */

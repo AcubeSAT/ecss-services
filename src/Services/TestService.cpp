@@ -4,17 +4,17 @@
 #include "Services/TestService.hpp"
 
 void TestService::areYouAlive(Message& request) {
-	request.assertTC(17, 1);
+	request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest);
 	// TM[17,2] are-you-alive connection test report
-	Message report = createTM(2);
+	Message report = createTM(TestService::MessageType::AreYouAliveTestReport);
 
 	storeMessage(report);
 }
 
 void TestService::onBoardConnection(Message& request) {
-	request.assertTC(17, 3);
+	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
 	// TM[17,4] on-board connection test report
-	Message report = createTM(4);
+	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
 
 	report.appendUint16(request.readUint16());
 	// just print it on the screen
