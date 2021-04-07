@@ -13,8 +13,8 @@ TEST_CASE("First Downlink Part Report TM[13,1]", "[service][st13]") {
 	lPT.firstDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
-	CHECK(report.messageType == 1);
-	CHECK(report.serviceType == 13);
+	CHECK(report.messageType == LargePacketTransferService::MessageType::FirstDownlinkPartReport);
+	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
 	CHECK(report.readUint16() == 1);
 	CHECK(report.readUint16() == 1);
 	uint8_t string2[ECSS_MAX_FIXED_OCTET_STRING_SIZE];
@@ -28,8 +28,8 @@ TEST_CASE("Intermediate Downlink Part Report TM[13,2]", "[service][st13]") {
 	lPT.intermediateDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
-	CHECK(report.messageType == 2);
-	CHECK(report.serviceType == 13);
+	CHECK(report.messageType == LargePacketTransferService::MessageType::InternalDownlinkPartReport);
+	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
 	CHECK(report.readUint16() == 1);
 	CHECK(report.readUint16() == 1);
 	uint8_t string2[ECSS_MAX_FIXED_OCTET_STRING_SIZE];
@@ -43,8 +43,8 @@ TEST_CASE("Last Downlink Part Report TM[13,3]", "[service][st13]") {
 	lPT.lastDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
-	CHECK(report.messageType == 3);
-	CHECK(report.serviceType == 13);
+	CHECK(report.messageType == LargePacketTransferService::MessageType::LastDownlinkPartReport);
+	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
 	CHECK(report.readUint16() == 1);
 	CHECK(report.readUint16() == 1);
 	uint8_t string2[ECSS_MAX_FIXED_OCTET_STRING_SIZE];

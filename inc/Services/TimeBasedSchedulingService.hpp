@@ -118,6 +118,28 @@ private:
 	friend struct ::unit_test::Tester;
 
 public:
+
+	/*
+* ST[11] TimeBased Scheduling Service and Sub-Service Macros, for readability purpose
+*/
+
+	inline static const uint8_t ServiceType = 11;
+
+	enum MessageType : uint8_t {
+		EnableTimeBasedScheduleExecutionFunction = 1,
+		DisableTimeBasedScheduleExecutionFunction = 2,
+		ResetTimeBasedSchedule = 3,
+		InsertActivities = 4,
+		DeleteActivitiesById = 5,
+		TimeShiftActivitiesById = 7,
+		DetailReportActivitiesById = 9,
+		TimeBasedScheduleReportById = 10,
+		ActivitiesSummaryReportById = 12,
+		TimeBasedScheduledSummaryReport = 13,
+		TimeShiftALlScheduledActivities = 15,
+		DetailReportAllScheduledActivities = 16,
+	};
+
 	/**
 	 * @brief Class constructor
 	 * @details Initializes the serviceType

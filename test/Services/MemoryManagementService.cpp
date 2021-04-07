@@ -14,7 +14,7 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	*(pStr + 2) = '\0';
 	uint8_t data[2] = {'h', 'R'};
 
-	Message receivedPacket = Message(6, 2, Message::TC, 1);
+	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(2); // Iteration count
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(pStr)); // Start address
@@ -38,7 +38,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint8_t checkString[ECSS_MAX_STRING_SIZE];
 	uint16_t readSize = 0, checksum = 0;
 
-	Message receivedPacket = Message(6, 5, Message::TC, 1);
+	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(3); // Iteration count (Equal to 3 test strings)
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1)); // Start address
@@ -53,8 +53,8 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	CHECK(response.serviceType == 6);
-	CHECK(response.messageType == 6);
+	CHECK(response.serviceType == MemoryManagementService::ServiceType);
+	CHECK(response.messageType == MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 	REQUIRE(response.dataSize == 55);
 
 	CHECK(response.readEnum8() == MemoryManagementService::MemoryID::EXTERNAL);
@@ -99,7 +99,7 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	uint8_t testString_2[8] = "SecStrT";
 	uint16_t readSize = 0, checksum = 0;
 
-	Message receivedPacket = Message(6, 9, Message::TC, 1);
+	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(2); // Iteration count
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1)); // Start address
@@ -111,8 +111,8 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	CHECK(response.serviceType == 6);
-	CHECK(response.messageType == 10);
+	CHECK(response.serviceType == MemoryManagementService::ServiceType);
+	CHECK(response.messageType == MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	REQUIRE(response.dataSize == 27);
 
 	CHECK(response.readEnum8() == MemoryManagementService::MemoryID::EXTERNAL);

@@ -59,6 +59,13 @@ class FunctionManagementService : public Service {
 	FunctionMap funcPtrIndex;
 
 public:
+
+	inline static const uint8_t ServiceType = 8;
+
+	enum MessageType : uint8_t {
+		PerformFunction = 1,
+	};
+
 	/**
 	 * Constructs the function pointer index with all the necessary functions at initialization time
 	 * These functions need to be in scope. Un-default when needed.

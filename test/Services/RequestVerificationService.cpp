@@ -6,14 +6,14 @@
 RequestVerificationService& reqVerifService = Services.requestVerification;
 
 TEST_CASE("TM[1,1]", "[service][st01]") {
-	Message receivedMessage = Message(1, 1, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulAcceptanceReport, Message::TC, 3);
 	reqVerifService.successAcceptanceVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 1);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::SuccessfulAcceptanceReport);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
@@ -27,14 +27,14 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,2]", "[service][st01]") {
-	Message receivedMessage = Message(1, 2, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedAcceptanceReport, Message::TC, 3);
 	reqVerifService.failAcceptanceVerification(receivedMessage, ErrorHandler::UnknownAcceptanceError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 2);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::FailedAcceptanceReport);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
@@ -49,14 +49,14 @@ TEST_CASE("TM[1,2]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,3]", "[service][st01]") {
-	Message receivedMessage = Message(1, 3, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulStartOfExecution, Message::TC, 3);
 	reqVerifService.successStartExecutionVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 3);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::SuccessfulStartOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
@@ -70,14 +70,14 @@ TEST_CASE("TM[1,3]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,4]", "[service][st01]") {
-	Message receivedMessage = Message(1, 2, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedAcceptanceReport, Message::TC, 3);
 	reqVerifService.failStartExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionStartError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 4);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::FailedStartOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
@@ -92,14 +92,14 @@ TEST_CASE("TM[1,4]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,5]", "[service][st01]") {
-	Message receivedMessage = Message(1, 5, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulProgressOfExecution, Message::TC, 3);
 	reqVerifService.successProgressExecutionVerification(receivedMessage, 0);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 5);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 5); // dataSize is the number of bytes of data array
@@ -114,14 +114,14 @@ TEST_CASE("TM[1,5]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,6]", "[service][st01]") {
-	Message receivedMessage = Message(1, 5, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulProgressOfExecution, Message::TC, 3);
 	reqVerifService.failProgressExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionProgressError, 0);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 6);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::FailedProgressOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 7); // dataSize is the number of bytes of data array
@@ -137,14 +137,14 @@ TEST_CASE("TM[1,6]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,7]", "[service][st01]") {
-	Message receivedMessage = Message(1, 7, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulCompletionOfExecution, Message::TC, 3);
 	reqVerifService.successCompletionExecutionVerification(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 7);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::SuccessfulCompletionOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
@@ -158,13 +158,13 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,8]", "[service][st01]") {
-	Message receivedMessage = Message(1, 8, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedCompletionOfExecution, Message::TC, 3);
 	reqVerifService.failCompletionExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionCompletionError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 8);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::FailedCompletionOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
@@ -179,14 +179,14 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 }
 
 TEST_CASE("TM[1,10]", "[service][st01]") {
-	Message receivedMessage = Message(1, 10, Message::TC, 3);
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message response = ServiceTests::get(0);
 	// Checks for the data-members of the object response
-	CHECK(response.serviceType == 1);
-	CHECK(response.messageType == 10);
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType ==  RequestVerificationService::MessageType::FailedRoutingReport);
 	CHECK(response.packetType == Message::TM); // packet type
 	CHECK(response.applicationId == 0);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array

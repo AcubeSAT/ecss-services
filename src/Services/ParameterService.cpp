@@ -6,13 +6,13 @@
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
-	Message parameterReport(20, 2, Message::TM, 1);
+	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport, Message::TM, 1);
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.messageType == 1, paramIds,
+	ErrorHandler::assertRequest(paramIds.messageType == ParameterService::MessageType::ReportParameterValues, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.serviceType == 20, paramIds,
+	ErrorHandler::assertRequest(paramIds.serviceType == ParameterService::ServiceType, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
@@ -43,9 +43,9 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.messageType == 3, newParamValues,
+	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.serviceType == 20, newParamValues,
+	ErrorHandler::assertRequest(newParamValues.serviceType == ParameterService::ServiceType, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = newParamValues.readUint16();

@@ -20,6 +20,20 @@ private:
 	etl::bitset<numberOfEvents> stateOfEvents;
 
 public:
+
+	inline static const uint8_t ServiceType = 5;
+
+	enum MessageType : uint8_t {
+		InformativeEventReport = 1,
+		LowSeverityAnomalyReport = 2,
+		MediumSeverityAnomalyReport = 3,
+		HighSeverityAnomalyReport = 4,
+		EnableReportGenerationOfEvents = 5,
+		DisableReportGenerationOfEvents = 6,
+		ReportListOfDisabledEvent = 7,
+		DisabledListEventReport = 8,
+	};
+
 	// Variables that count the event reports per severity level
 	uint16_t lowSeverityReportCount;
 	uint16_t mediumSeverityReportCount;

@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 #include <ErrorHandler.hpp>
 #include "Services/ServiceTests.hpp"
+#include "Services/RequestVerificationService.hpp"
 
 TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 47);
@@ -11,8 +12,8 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,2] message was returned
-	CHECK(report.serviceType == 1);
-	CHECK(report.messageType == 2);
+	CHECK(report.serviceType == RequestVerificationService::ServiceType);
+	CHECK(report.messageType == RequestVerificationService::MessageType::FailedAcceptanceReport);
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
@@ -34,8 +35,8 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,3] message was returned
-	CHECK(report.serviceType == 1);
-	CHECK(report.messageType == 4);
+	CHECK(report.serviceType == RequestVerificationService::ServiceType);
+	CHECK(report.messageType == RequestVerificationService::MessageType::FailedStartOfExecution);
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
@@ -57,8 +58,8 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,6] message was returned
-	CHECK(report.serviceType == 1);
-	CHECK(report.messageType == 6);
+	CHECK(report.serviceType == RequestVerificationService::ServiceType);
+	CHECK(report.messageType == RequestVerificationService::MessageType::FailedProgressOfExecution);
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 7);
 
@@ -81,8 +82,8 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,8] message was returned
-	CHECK(report.serviceType == 1);
-	CHECK(report.messageType == 8);
+	CHECK(report.serviceType == RequestVerificationService::ServiceType);
+	CHECK(report.messageType == RequestVerificationService::MessageType::FailedCompletionOfExecution);
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
@@ -104,8 +105,8 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	Message report = ServiceTests::get(0);
 
 	// Check that a TM[1,8] message was returned
-	CHECK(report.serviceType == 1);
-	CHECK(report.messageType == 10);
+	CHECK(report.serviceType == RequestVerificationService::ServiceType);
+	CHECK(report.messageType == RequestVerificationService::MessageType::FailedRoutingReport);
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
