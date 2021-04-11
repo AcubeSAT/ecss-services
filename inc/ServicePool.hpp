@@ -5,7 +5,6 @@
 #include "Services/TimeBasedSchedulingService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/RequestVerificationService.hpp"
-#include "Services/TimeManagementService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Services/EventActionService.hpp"
 #include "Services/ParameterService.hpp"
@@ -63,10 +62,6 @@ public:
 
 #ifdef SERVICE_TEST
 	TestService testService;
-#endif
-
-#ifdef SERVICE_TIME
-	TimeManagementService timeManagement;
 #endif
 
 #ifdef SERVICE_TIMESCHEDULING

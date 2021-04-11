@@ -37,7 +37,6 @@ add_library(common OBJECT
         src/Services/ParameterService.cpp
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
-        src/Services/TimeManagementService.cpp
         src/Services/LargePacketTransferService.cpp
     	src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp

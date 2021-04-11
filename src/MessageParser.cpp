@@ -27,12 +27,6 @@ void MessageParser::execute(Message& message) {
 			break;
 #endif
 
-#ifdef SERVICE_TIME
-		case 9:
-			Services.timeManagement.execute(message); // ST[09]
-			break;
-#endif
-
 #ifdef SERVICE_TIMESCHEDULING
 		case 11:
 			Services.timeBasedScheduling.execute(message); // ST[11]
