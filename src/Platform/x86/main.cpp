@@ -9,7 +9,6 @@
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Services/FunctionManagementService.hpp"
-#include "Services/TimeManagementService.hpp"
 #include "Services/EventActionService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
@@ -165,18 +164,6 @@ int main() {
 	Message errorMessage(0, 0, Message::TC, 1);
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
-
-	// ST[09] test
-	TimeManagementService& timeReport = Services.timeManagement;
-	TimeAndDate timeInfo;
-	// 10/04/1998 10:15:00
-	timeInfo.year = 1998;
-	timeInfo.month = 4;
-	timeInfo.day = 10;
-	timeInfo.hour = 10;
-	timeInfo.minute = 15;
-	timeInfo.second = 0;
-	timeReport.cdsTimeReport(timeInfo);
 
 	// ST[05] (5,5 to 5,8) test [works]
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
