@@ -1,8 +1,5 @@
 image: lightspot21/acubesat-ci:latest
 
-tags:
- - local
-
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
@@ -27,6 +24,8 @@ before_script:
 
 build:
   stage: build
+  tags:
+    - local
   variables:
     GIT_SUBMODULE_STRATEGY: normal
     GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
