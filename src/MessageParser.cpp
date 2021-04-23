@@ -126,20 +126,15 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 }
 
 String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message, uint16_t size) {
-	uint8_t header[5];
+	uint8_t header[3];
 
 	if (message.packetType == Message::TC) {
-		header[0] = ECSS_PUS_VERSION << 4U; // Assign the pusVersion = 2
-		header[1] = message.serviceType;
-		header[2] = message.messageType;
-		header[3] = 0;
-		header[4] = 0;
+		header[0] = message.serviceType;
+		header[1] = message.messageType;
 	} else {
-		header[0] = ECSS_PUS_VERSION << 4U; // Assign the pusVersion = 2
-		header[1] = message.serviceType;
-		header[2] = message.messageType;
-		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
-		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
+		header[0] = message.serviceType;
+		header[1] = message.messageType;
+		header[2] = static_cast<uint8_t>(message.messageTypeCounter);
 	}
 
 	String<CCSDS_MAX_MESSAGE_SIZE> dataString(header, 5);
@@ -202,17 +197,14 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
 
 
 void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
-	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(length >= ECSS_SECONDARY_TM_HEADER_LENGTH, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
-	uint8_t pusVersion = data[0] >> 4;
-	uint8_t serviceType = data[1];
-	uint8_t messageType = data[2];
-
-	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
+	uint8_t serviceType = data[0];
+	uint8_t messageType = data[1];
 
 	// Remove the length of the header
-	length -= 5;
+	length -= ECSS_SECONDARY_TM_HEADER_LENGTH;
 
 	// Copy the data to the message
 	// TODO: See if memcpy is needed for this

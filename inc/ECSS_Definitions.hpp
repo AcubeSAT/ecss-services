@@ -23,6 +23,10 @@
  */
 #define ECSS_MAX_MESSAGE_SIZE 1024U
 
+/**
+ * ECSS TM secondary packet header length in bytes
+ */
+#define ECSS_SECONDARY_TM_HEADER_LENGTH
 
 /**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
