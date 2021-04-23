@@ -26,7 +26,12 @@
 /**
  * ECSS TM secondary packet header length in bytes
  */
-#define ECSS_SECONDARY_TM_HEADER_LENGTH
+#define ECSS_SECONDARY_TM_HEADER_LENGTH 3
+
+/**
+ * ECSS TC secondary packet header length in bytes
+ */
+#define ECSS_SECONDARY_TC_HEADER_LENGTH 3
 
 /**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes

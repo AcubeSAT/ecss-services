@@ -90,23 +90,22 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 }
 
 void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
-	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(length >= ECSS_SECONDARY_TC_HEADER_LENGTH, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
-	uint8_t pusVersion = data[0] >> 4;
+	uint8_t response_band = (data[0] & 00010000) >> 4;
+	uint8_t acknowledgement_flags = data[0] & 00001111;
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
 
-	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
-
 	// Remove the length of the header
-	length -= 5;
+	length -= ECSS_SECONDARY_TC_HEADER_LENGTH;
 
 	// Copy the data to the message
 	// TODO: See if memcpy is needed for this
 	message.serviceType = serviceType;
 	message.messageType = messageType;
-	memcpy(message.data, data + 5, length);
+	memcpy(message.data, data + ECSS_SECONDARY_TC_HEADER_LENGTH, length);
 	message.dataSize = length;
 }
 
@@ -126,7 +125,7 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 }
 
 String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message, uint16_t size) {
-	uint8_t header[3];
+	uint8_t header[ECSS_SECONDARY_TM_HEADER_LENGTH];
 
 	if (message.packetType == Message::TC) {
 		header[0] = message.serviceType;
@@ -210,6 +209,6 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	// TODO: See if memcpy is needed for this
 	message.serviceType = serviceType;
 	message.messageType = messageType;
-	memcpy(message.data, data + 5, length);
+	memcpy(message.data, data + ECSS_SECONDARY_TM_HEADER_LENGTH, length);
 	message.dataSize = length;
 }
