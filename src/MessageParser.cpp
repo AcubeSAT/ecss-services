@@ -1,58 +1,48 @@
-#include <Services/EventActionService.hpp>
 #include <ServicePool.hpp>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "macros.hpp"
-#include "Services/TestService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
 #ifdef SERVICE_EVENTREPORT
-		case 5:
-			Services.eventReport.execute(message); // ST[05]
+		case 5: Services.eventReport.execute(message); // ST[05]
 			break;
 #endif
 
 #ifdef SERVICE_MEMORY
-		case 6:
-			Services.memoryManagement.execute(message); // ST[06]
+		case 6: Services.memoryManagement.execute(message); // ST[06]
 			break;
 #endif
 
 #ifdef SERVICE_FUNCTION
-		case 8:
-			Services.functionManagement.execute(message); // ST[08]
+		case 8: Services.functionManagement.execute(message); // ST[08]
 			break;
 #endif
 
 #ifdef SERVICE_TIMESCHEDULING
-		case 11:
-			Services.timeBasedScheduling.execute(message); // ST[11]
+		case 11: Services.timeBasedScheduling.execute(message); // ST[11]
 			break;
 #endif
 
 #ifdef SERVICE_TEST
-		case 17:
-			Services.testService.execute(message); // ST[17]
+		case 17: Services.testService.execute(message); // ST[17]
 			break;
 #endif
 
 #ifdef SERVICE_EVENTACTION
-		case 19:
-			Services.eventAction.execute(message); // ST[19]
+		case 19: Services.eventAction.execute(message); // ST[19]
 			break;
 #endif
 
 #ifdef SERVICE_PARAMETER
-		case 20:
-			Services.parameterManagement.execute(message); // ST[20]
+		case 20: Services.parameterManagement.execute(message); // ST[20]
 			break;
 #endif
 
-		default:
-			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+		default: ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
 
@@ -69,7 +59,7 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	bool secondaryHeaderFlag = (data[0] & 0x08U) != 0U;
 	uint16_t APID = packetHeaderIdentification & static_cast<uint16_t>(0x07ff);
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
-	uint16_t packetSequenceCount = packetSequenceControl & (~ 0xc000U); // keep last 14 bits
+	uint16_t packetSequenceCount = packetSequenceControl & (~0xc000U); // keep last 14 bits
 
 	// Returning an internal error, since the Message is not available yet
 	ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket);
@@ -103,10 +93,9 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	length -= 5;
 
 	// Copy the data to the message
-	// TODO: See if memcpy is needed for this
 	message.serviceType = serviceType;
 	message.messageType = messageType;
-	memcpy(message.data, data + 5, length);
+	std::copy(data + 5, data + 5 + length, message.data);
 	message.dataSize = length;
 }
 
@@ -192,7 +181,7 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
 #if ECSS_CRC_INCLUDED
 	// Append CRC field
 	uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 +
-	packetDataLength);
+	                                                                                             packetDataLength);
 	ccsdsMessage.push_back(static_cast<uint8_t>(crcField >> 8U));
 	ccsdsMessage.push_back(static_cast<uint8_t>(crcField & 0xFF));
 #endif
@@ -215,9 +204,8 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	length -= 5;
 
 	// Copy the data to the message
-	// TODO: See if memcpy is needed for this
 	message.serviceType = serviceType;
 	message.messageType = messageType;
-	memcpy(message.data, data + 5, length);
+	std::copy(data + 5, data + 5 + length, message.data);
 	message.dataSize = length;
 }

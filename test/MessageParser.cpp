@@ -1,12 +1,8 @@
 #include <catch2/catch.hpp>
-#include <Services/TestService.hpp>
-#include <Services/RequestVerificationService.hpp>
 #include <Message.hpp>
 #include <cstring>
 #include "Helpers/CRCHelper.hpp"
 #include "MessageParser.hpp"
-#include "Services/ServiceTests.hpp"
-#include "ServicePool.hpp"
 
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
@@ -32,7 +28,8 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.serviceType = 129;
 	message.messageType = 31;
 	message.packetSequenceCount = 8199;
-	memcpy(message.data, "hello", 5);
+	String<5> sourceString = "hello";
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
 	message.dataSize = 5;
 
 	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
@@ -73,7 +70,8 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 77;
 	message.serviceType = 22;
 	message.messageType = 17;
-	memcpy(message.data, "hellohi", 7);
+	String<7> sourceString = "hellohi";
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
 	message.dataSize = 7;
 	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
 

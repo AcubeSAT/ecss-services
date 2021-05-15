@@ -6,7 +6,7 @@
 #include <MessageParser.hpp>
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
-    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
+	: serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
 	// TODO: Add assertion that data does not contain 1s outside of numBits bits
@@ -138,22 +138,18 @@ uint32_t Message::readWord() {
 void Message::readString(char* string, uint16_t size) {
 	ASSERT_REQUEST((readPosition + size) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
-
-	memcpy(string, data + readPosition, size);
-
+	std::copy(data + readPosition, data + readPosition + size, string);
 	readPosition += size;
 }
 
 void Message::readString(uint8_t* string, uint16_t size) {
 	ASSERT_REQUEST((readPosition + size) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSS_MAX_STRING_SIZE, ErrorHandler::StringTooShort);
-
-	memcpy(string, data + readPosition, size);
-
+	std::copy(data + readPosition, data + readPosition + size, string);
 	readPosition += size;
 }
 
-void Message::readCString(char *string, uint16_t size) {
+void Message::readCString(char* string, uint16_t size) {
 	readString(string, size);
 	string[size] = 0;
 }
@@ -171,20 +167,14 @@ void Message::appendString(const etl::istring& string) {
 	ASSERT_INTERNAL(dataSize + string.size() <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	// TODO: Do we need to keep this check? How does etl::string handle it?
 	ASSERT_INTERNAL(string.size() <= string.capacity(), ErrorHandler::StringTooLarge);
-
-	memcpy(data + dataSize, string.data(), string.size());
-
+	std::copy(string.data(), string.data() + string.size(), data + dataSize);
 	dataSize += string.size();
 }
 
 void Message::appendFixedString(const etl::istring& string) {
 	ASSERT_INTERNAL((dataSize + string.max_size()) < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
-
-	// Append the bytes with content
-	memcpy(data + dataSize, string.data(), string.size());
-	// The rest of the bytes is set to 0
+	std::copy(string.data(), string.data() + string.size(), data + dataSize);
 	(void) memset(data + dataSize + string.size(), 0, string.max_size() - string.size());
-
 	dataSize += string.max_size();
 }
 
