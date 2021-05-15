@@ -104,7 +104,7 @@ public:
 	//
 	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	// Message::appendBits() relies on this in order to easily OR the requested bits.
-	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = { 0 };
+	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = {0};
 
 	// private:
 	uint8_t currentBit = 0;
@@ -222,7 +222,7 @@ public:
 	 * ECSS_MAX_STRING_SIZE + 1. This function DOES place a \0 at the end of the created string,
 	 * meaning that \p string should contain 1 more byte than the string stored in the message.
 	 */
-	void readCString(char *string, uint16_t size);
+	void readCString(char* string, uint16_t size);
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
@@ -367,7 +367,7 @@ public:
 	 * @param message The message to append
 	 * @param size The fixed number of bytes that the message will take up. The empty last bytes are padded with 0s.
 	 */
-	void appendMessage(const Message & message, uint16_t size);
+	void appendMessage(const Message& message, uint16_t size);
 
 	/**
 	 * Fetches a single-byte boolean value from the current position in the message
