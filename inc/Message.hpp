@@ -359,6 +359,20 @@ public:
 	void appendOctetString(const etl::istring& string);
 
 	/**
+	 * Generic function to append any type of data to the message. The amount of bytes appended is equal to the size of
+	 * the @ref T value.
+	 *
+	 * The data is appended on the current write position (deduced by @ref dataSize)
+	 *
+	 * Calling this or any of the other `append...` functions for equivalent types is exactly the same.
+	 *
+	 * @tparam T The type of the value to be appended
+	 * @return The value to append
+	 */
+	template <typename T>
+	void append(const T& value);
+
+	/**
 	 * Adds a nested TC or TM Message within the current Message
 	 *
 	 * As a design decision, nested TC & TM Messages always have a fixed width, specified in \ref ECSSDefinitions. This
@@ -515,6 +529,42 @@ public:
 	}
 
 	/**
+	 * Fetches an N-byte string from the current position in the message. The string can be at most MAX_SIZE long.
+	 *
+	 * @note This function was not implemented as Message::read() due to an inherent C++ limitation, see
+	 * https://www.fluentcpp.com/2017/08/15/function-templates-partial-specialization-cpp/
+	 * @tparam MAX_SIZE The memory size of the string in bytes, which corresponds to the max string size
+	 */
+	template<const size_t MAX_SIZE>
+	String<MAX_SIZE> readOctetString() {
+		String<MAX_SIZE> string("");
+
+		uint16_t length = readUint16();
+		ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort);
+		ASSERT_REQUEST((readPosition + length) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+
+		string.append(data + readPosition, length);
+		readPosition += length;
+
+		return std::move(string);
+	}
+
+	/**
+	 * Generic function to read any type of data from the message. The amount of bytes read is equal to the size of
+	 * the @ref T value.
+	 *
+	 * After the data is read, the message pointer @ref readPosition moves forward so that the next amount of data
+	 * can be read.
+	 *
+	 * Calling this or any of the other `read...` functions for equivalent types is exactly the same.
+	 *
+	 * @tparam T The type to be read
+	 * @return The value that has been read from the string
+	 */
+	template <typename T>
+	T read();
+
+	/**
 	 * @brief Skip read bytes in the read string
 	 * @details Skips the provided number of bytes, by incrementing the readPosition and this is
 	 * done to avoid accessing the `readPosition` variable directly
@@ -563,5 +613,38 @@ public:
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
+
+template<> inline void Message::append(const uint8_t& value) { appendUint8(value); }
+template<> inline void Message::append(const uint16_t& value) { appendUint16(value); }
+template<> inline void Message::append(const uint32_t& value) { appendUint32(value); }
+template<> inline void Message::append(const uint64_t& value) { appendUint64(value); }
+
+template<> inline void Message::append(const int8_t& value) { appendSint8(value); }
+template<> inline void Message::append(const int16_t& value) { appendSint16(value); }
+template<> inline void Message::append(const int32_t& value) { appendSint32(value); }
+
+template<> inline void Message::append(const bool& value) { appendBoolean(value); }
+template<> inline void Message::append(const char& value) { appendByte(value); }
+template<> inline void Message::append(const float& value) { appendFloat(value); }
+
+/**
+ * Appends an ETL string to the message. ETL strings are handled as ECSS octet strings, meaning that the string size
+ * is appended as a byte before the string itself. To append other string sequences, see the Message::appendString()
+ * functions
+ */
+template<> inline void Message::append(const etl::istring& value) { appendOctetString(value); }
+
+template<> inline uint8_t Message::read() { return readUint8(); }
+template<> inline uint16_t Message::read() { return readUint16(); }
+template<> inline uint32_t Message::read() { return readUint32(); }
+template<> inline uint64_t Message::read() { return readUint64(); }
+
+template<> inline int8_t Message::read() { return readSint8(); }
+template<> inline int16_t Message::read() { return readSint16(); }
+template<> inline int32_t Message::read() { return readSint32(); }
+
+template<> inline bool Message::read<bool>() { return readBoolean(); }
+template<> inline char Message::read() { return readByte(); }
+template<> inline float Message::read() { return readFloat(); }
 
 #endif // ECSS_SERVICES_PACKET_H

@@ -9,7 +9,6 @@ include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/i
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
-        COMMAND ./vera.sh
         COMMAND ./clang-tidy.sh
         COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")

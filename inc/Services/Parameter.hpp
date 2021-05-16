@@ -47,9 +47,7 @@ private:
 	DataType currentValue;
 
 public:
-	Parameter(DataType initialValue) {
-		currentValue = initialValue;
-	}
+	explicit Parameter(DataType initialValue) : currentValue(initialValue) {}
 
 	inline void setValue(DataType value) {
 		currentValue = value;
@@ -59,31 +57,19 @@ public:
 		return currentValue;
 	}
 
-	inline void setValueFromMessage(Message& message) override;
+	/**
+	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that paremeter
+	 */
+	inline void setValueFromMessage(Message& message) override {
+		currentValue = message.read<DataType>();
+	};
 
-	inline void appendValueToMessage(Message& message) override;
+	/**
+	 * Appends the parameter as an ECSS value to an ECSS Message
+	 */
+	inline void appendValueToMessage(Message& message) override {
+		message.append<DataType>(currentValue);
+	};
 };
 
-template<> inline void Parameter<uint8_t>::setValueFromMessage(Message& message) {
-	currentValue = message.readUint8();
-}
-template<> inline void Parameter<uint16_t>::setValueFromMessage(Message& message) {
-	currentValue = message.readUint16();
-}
-
-template<> inline void Parameter<uint32_t>::setValueFromMessage(Message& message) {
-	currentValue = message.readUint32();
-}
-
-template<> inline void Parameter<uint8_t>::appendValueToMessage(Message& message) {
-	message.appendUint8(this->currentValue);
-}
-
-template<> inline void Parameter<uint16_t>::appendValueToMessage(Message& message) {
-	message.appendUint16(this->currentValue);
-}
-
-template<> inline void Parameter<uint32_t>::appendValueToMessage(Message& message) {
-	message.appendUint32(this->currentValue);
-}
 #endif //ECSS_SERVICES_PARAMETER_HPP
