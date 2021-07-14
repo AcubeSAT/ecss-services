@@ -26,7 +26,7 @@
 /**
  * ECSS TM secondary packet header length in bytes
  */
-#define ECSS_SECONDARY_TM_HEADER_LENGTH 3
+#define ECSS_SECONDARY_TM_HEADER_LENGTH 7
 
 /**
  * ECSS TC secondary packet header length in bytes

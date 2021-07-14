@@ -75,6 +75,16 @@ public:
 		TC = 1 ///< Telecommand
 	};
 
+	enum ResponseBand {
+		UHFBand = 0,
+		SBand = 1
+	};
+
+	ResponseBand responseBand = ResponseBand(0);
+
+	uint8_t acknowledgementFlags = 0;
+
+	uint32_t timeAtCreation = 0;
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
 	uint8_t serviceType;
 	uint8_t messageType;

@@ -106,6 +106,12 @@ private:
 	 * @param message The Message to modify based on the header
 	 */
 	static void parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
+
+	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSSTC(const Message& message, uint16_t size);
+
+	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSSTM(const Message& message, uint16_t size);
+
+	static String<CCSDS_MAX_MESSAGE_SIZE> reachRequestedSize(String<CCSDS_MAX_MESSAGE_SIZE> dataString, uint16_t size, const Message& message);
 };
 
 #endif // ECSS_SERVICES_MESSAGEPARSER_HPP

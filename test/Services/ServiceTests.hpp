@@ -110,6 +110,7 @@ public:
 	 * @todo Implement a way to run this assertion at the end of every test
 	 */
 	static bool hasNoErrors() {
+
 		return thrownErrors.empty();
 	}
 
