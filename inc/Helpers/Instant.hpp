@@ -65,14 +65,14 @@ public:
 	 * Initialize the instant as seconds from epoch in TAI
 	 *
 	 */
-  int from_TAI_seconds(int seconds);
+  void from_TAI_seconds(int seconds);
 
   /**
   * Get the representation as seconds from epoch in TAI
   *
   * @return the seconds elapsed in TAI since 1 Jan 1958, cut to the integer part
   */
-  void as_TAI_seconds();
+  int as_TAI_seconds();
 
     /**
     * Get the representation as CUC formatted bytes
