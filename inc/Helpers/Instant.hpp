@@ -71,7 +71,7 @@ public:
   *
   * @return the seconds elapsed in TAI since 1 Jan 1958, cut to the integer part
   */
-  int as_TAI_seconds();
+  void as_TAI_seconds();
 
   /**
 	 * Compare two instants.
