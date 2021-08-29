@@ -57,8 +57,9 @@ template<uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 class Instant{
 private:
   static constexpr uint64_t seconds_mask = fractional_mask_from_bytes(fractional_counter_bytes);
+  static constexpr uint8_t CUC_header = build_CUC_header(seconds_counter_bytes, fractional_counter_bytes);
   static constexpr uint64_t fractional_mask = fractional_mask_from_bytes(fractional_counter_bytes);
-  uint64_t tai_counter;
+  uint64_t tai_counter = 0;
 public:
   /**
 	 * Initialize the instant as seconds from epoch in TAI
@@ -72,6 +73,13 @@ public:
   * @return the seconds elapsed in TAI since 1 Jan 1958, cut to the integer part
   */
   void as_TAI_seconds();
+
+    /**
+    * Get the representation as CUC formatted bytes
+    *
+    * @return the instant, represented in the CCSDS CUC format
+    */
+    void as_CUC_timestamp();
 
   /**
 	 * Compare two instants.
