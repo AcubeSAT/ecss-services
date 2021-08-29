@@ -55,6 +55,7 @@ inline constexpr uint64_t fractional_mask_from_bytes(uint8_t fractional_counter_
  */
 template<uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 class Instant{
+  static_assert((seconds_counter_bytes + fractional_counter_bytes) <= 8);
 private:
   static constexpr uint64_t seconds_mask = fractional_mask_from_bytes(fractional_counter_bytes);
   static constexpr uint8_t CUC_header = build_CUC_header(seconds_counter_bytes, fractional_counter_bytes);
