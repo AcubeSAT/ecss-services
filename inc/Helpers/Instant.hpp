@@ -2,6 +2,10 @@
 #define ECSS_SERVICES_TIME_HPP
 
 #include <cstdint>
+#include <algorithm>
+#include <type_traits>
+#include <array>
+#include <typeinfo>
 #include <stdexcept>
 #include "macros.hpp"
 
@@ -13,7 +17,8 @@ inline constexpr uint8_t CUC_fractional_counter_bytes = 2; // 2 byte of fraction
 ////////////////////////////////////////////////
 
 //////// HELPER CONSTEXPR DO NOT TOUCH ////////
-inline constexpr uint8_t build_short_CUC_header(uint8_t CUC_seconds_counter_bytes, uint8_t CUC_fractional_counter_bytes) {
+template <int CUC_seconds_counter_bytes, int CUC_fractional_counter_bytes>
+inline constexpr uint8_t build_short_CUC_header() {
 	static_assert( CUC_seconds_counter_bytes <= 4, "Use build_long_CUC_header instead");
 	static_assert( CUC_fractional_counter_bytes <= 3, "Use build_long_CUC_header instead");
 
@@ -38,17 +43,18 @@ inline constexpr uint8_t build_short_CUC_header(uint8_t CUC_seconds_counter_byte
 	return header;
 }
 
-inline constexpr uint16_t build_long_CUC_header(uint8_t CUC_seconds_counter_bytes, uint8_t CUC_fractional_counter_bytes) {
-	static_assert( CUC_seconds_counter_bytes > 4 | CUC_fractional_counter_bytes > 3, "Use build_short_CUC_header instead");
+template <int CUC_seconds_counter_bytes, int CUC_fractional_counter_bytes>
+inline constexpr uint16_t build_long_CUC_header() {
+	static_assert( CUC_seconds_counter_bytes > 4 || CUC_fractional_counter_bytes > 3, "Use build_short_CUC_header instead");
 	static_assert( CUC_seconds_counter_bytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
 	static_assert( CUC_fractional_counter_bytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
 
 	uint16_t header = 0;
 
-	uint8_t first_octet_number_of_seconds_bytes = max(4, CUC_seconds_counter_bytes);
+	uint8_t first_octet_number_of_seconds_bytes = std::max(4, CUC_seconds_counter_bytes);
 	uint8_t second_octet_number_of_seconds_bytes = CUC_seconds_counter_bytes - first_octet_number_of_seconds_bytes;
 
-	uint8_t first_octet_number_of_fractional_bytes = max(3, CUC_fractional_counter_bytes);
+	uint8_t first_octet_number_of_fractional_bytes = std::max(3, CUC_fractional_counter_bytes);
 	uint8_t second_octet_number_of_fractional_bytes = CUC_fractional_counter_bytes - first_octet_number_of_fractional_bytes;
 
   // P-Field extension is 1, CUC header is extended
@@ -86,7 +92,13 @@ inline constexpr uint16_t build_long_CUC_header(uint8_t CUC_seconds_counter_byte
 	return header;
 }
 
-
+template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
+inline constexpr T build_CUC_header() {
+	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3)
+		return build_short_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
+	else
+		return build_long_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
+}
 ////////////////////////////////////////////////
 
 ///////////// CLASS DECLARATION ////////////////
@@ -100,13 +112,14 @@ inline constexpr uint16_t build_long_CUC_header(uint8_t CUC_seconds_counter_byte
  */
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 class Instant {
-	static_assert((seconds_counter_bytes + fractional_counter_bytes) <= 8);
 
 private:
-	static constexpr uint8_t CUC_header = build_CUC_header(seconds_counter_bytes, fractional_counter_bytes);
 	uint64_t tai_counter = 0;
+	typedef typename std::conditional<seconds_counter_bytes < 4 && fractional_counter_bytes < 3, uint8_t, uint16_t>::type CUC_header_t;
+	CUC_header_t CUC_header = build_CUC_header<CUC_header_t, seconds_counter_bytes,fractional_counter_bytes>();
 
 public:
+
 	/**
 	 * Initialize the instant as seconds from epoch in TAI
 	 *
@@ -166,6 +179,14 @@ public:
 	 * @return true if the pointer `this` is greater than or equal to \p Instant
 	 */
 	bool operator>=(const Instant& Instant);
+
+	/**
+	 * Check internal variables have right sizes from template, use for debug
+	 *
+	 *
+	 * @return [size_of CUC_header, size_of tai_counter]
+	 */
+	const std::type_info& check_header_type();
 };
 ////////////////////////////////////////////////
 

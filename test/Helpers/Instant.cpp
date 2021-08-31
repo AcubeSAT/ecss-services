@@ -1,13 +1,19 @@
 #include "catch2/catch.hpp"
 #include "Helpers/Instant.hpp"
 #include "../Services/ServiceTests.hpp"
+#include <typeinfo>
 
 TEST_CASE("Instant class construction"){
   SECTION("Valid initialization"){
     Instant<1, 2> Epoch1;
-    Instant<4, 4> Epoch2;
+    Instant<4, 6> Epoch2;
     REQUIRE(Epoch1.as_TAI_seconds() == 0);
     REQUIRE(Epoch2.as_TAI_seconds() == 0);
+    const std::type_info& expected_type1 = typeid(uint8_t);
+    const std::type_info& expected_type2 = typeid(uint16_t);
+    CHECK(Epoch1.check_header_type() == expected_type1);
+    CHECK(Epoch1.check_header_type() != expected_type2);
+    CHECK(Epoch2.check_header_type() == expected_type2);
   }
 
   // SECTION("Initialize with excessive precision, breaks at compile time"){
