@@ -15,6 +15,7 @@ inline constexpr uint8_t CUC_fractional_counter_bytes = 2; // 2 byte of fraction
 //////// HELPER CONSTEXPR DO NOT TOUCH ////////
 inline constexpr uint8_t build_CUC_header(uint8_t CUC_seconds_counter_bytes, uint8_t CUC_fractional_counter_bytes) {
 	uint8_t header = 0;
+
   // P-Field extension is 0, CUC is not extended
 	header += 0;
 	header << 1;
@@ -30,7 +31,7 @@ inline constexpr uint8_t build_CUC_header(uint8_t CUC_seconds_counter_bytes, uin
   // CUC_fractional_counter_bytes in the fractional unit
 	header += CUC_fractional_counter_bytes;
   //header << 0;
-  
+
 	return header;
 }
 
