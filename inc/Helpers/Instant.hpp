@@ -94,7 +94,8 @@ inline constexpr uint16_t build_long_CUC_header() {
 
 template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr T build_CUC_header() {
-	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3)
+	//cppcheck-suppress syntaxError 
+	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3) //if constexpr not supported yet in cppcheck
 		return build_short_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
 	else
 		return build_long_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
@@ -114,8 +115,9 @@ template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 class Instant {
 
 private:
-	uint64_t tai_counter = 0;
 	typedef typename std::conditional<seconds_counter_bytes < 4 && fractional_counter_bytes < 3, uint8_t, uint16_t>::type CUC_header_t;
+	typedef typename std::conditional<(seconds_counter_bytes + fractional_counter_bytes) < 4, uint32_t, uint64_t>::type tai_counter_t;
+	tai_counter_t tai_counter = 0;
 	CUC_header_t CUC_header = build_CUC_header<CUC_header_t, seconds_counter_bytes,fractional_counter_bytes>();
 
 public:
