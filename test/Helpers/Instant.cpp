@@ -34,6 +34,6 @@ TEST_CASE("Instant class construction"){
     int input_time = 1000;
     Instant<CUC_seconds_counter_bytes, CUC_fractional_counter_bytes> Epoch;
     Epoch.update_from_TAI_seconds(input_time);
-    REQUIRE(sizeof(Epoch) < 16);
+    REQUIRE(sizeof(Epoch) < 32);
   }
 }
