@@ -13,27 +13,79 @@ inline constexpr uint8_t CUC_fractional_counter_bytes = 2; // 2 byte of fraction
 ////////////////////////////////////////////////
 
 //////// HELPER CONSTEXPR DO NOT TOUCH ////////
-inline constexpr uint8_t build_CUC_header(uint8_t CUC_seconds_counter_bytes, uint8_t CUC_fractional_counter_bytes) {
+inline constexpr uint8_t build_short_CUC_header(uint8_t CUC_seconds_counter_bytes, uint8_t CUC_fractional_counter_bytes) {
+	static_assert( CUC_seconds_counter_bytes <= 4, "Use build_long_CUC_header instead");
+	static_assert( CUC_fractional_counter_bytes <= 3, "Use build_long_CUC_header instead");
+
 	uint8_t header = 0;
 
-  // P-Field extension is 0, CUC is not extended
+  // P-Field extension is 0, CUC header is not extended
 	header += 0;
 	header << 1;
 
-  // Acubesat is using recommended TAI epoch
-	header += 0b001;
+  // Acubesat is using custom TAI epoch at 01 Jan 2020
+	header += 0b010;
 	header << 3;
 
-  // CUC_seconds_counter_bytes in the basic time unit
+  // Number of bytes in the basic time unit
 	header += CUC_seconds_counter_bytes - 1;
 	header << 2;
 
-  // CUC_fractional_counter_bytes in the fractional unit
+  // Number of bytes in the fractional unit
 	header += CUC_fractional_counter_bytes;
   //header << 0;
 
 	return header;
 }
+
+inline constexpr uint16_t build_long_CUC_header(uint8_t CUC_seconds_counter_bytes, uint8_t CUC_fractional_counter_bytes) {
+	static_assert( CUC_seconds_counter_bytes > 4 | CUC_fractional_counter_bytes > 3, "Use build_short_CUC_header instead");
+	static_assert( CUC_seconds_counter_bytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
+	static_assert( CUC_fractional_counter_bytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
+
+	uint16_t header = 0;
+
+	uint8_t first_octet_number_of_seconds_bytes = max(4, CUC_seconds_counter_bytes);
+	uint8_t second_octet_number_of_seconds_bytes = CUC_seconds_counter_bytes - first_octet_number_of_seconds_bytes;
+
+	uint8_t first_octet_number_of_fractional_bytes = max(3, CUC_fractional_counter_bytes);
+	uint8_t second_octet_number_of_fractional_bytes = CUC_fractional_counter_bytes - first_octet_number_of_fractional_bytes;
+
+  // P-Field extension is 1, CUC header is extended
+	header += 1;
+	header << 1;
+
+	// Acubesat is using custom TAI epoch at 01 Jan 2020
+	header += 0b010;
+	header << 3;
+
+  // Number of bytes in the basic time unit
+	header += first_octet_number_of_seconds_bytes - 1;
+	header << 2;
+
+  // Number of bytes in the fractional unit
+	header += first_octet_number_of_fractional_bytes;
+  header << 2;
+
+	// P-Field extension is 1, CUC header was extended
+	header += 1;
+	header << 1;
+
+	// Number of bytes in the extended basic time unit
+	header += second_octet_number_of_seconds_bytes;
+	header << 2;
+
+  // Number of bytes in the extended fractional unit
+	header += second_octet_number_of_fractional_bytes;
+  header << 2;
+
+	// Last 3 LSB are reserved for custom mission use
+	//header += 0;
+  //header << 3;
+
+	return header;
+}
+
 
 ////////////////////////////////////////////////
 
