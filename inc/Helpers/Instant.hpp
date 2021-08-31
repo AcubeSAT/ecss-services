@@ -35,29 +35,6 @@ inline constexpr uint8_t build_CUC_header(uint8_t CUC_seconds_counter_bytes, uin
 	return header;
 }
 
-inline constexpr uint64_t seconds_mask_from_bytes(uint8_t seconds_counter_bytes) {
-	if (seconds_counter_bytes > 4) {
-		throw std::invalid_argument("Seconds counter is too big for the internal representation of time");
-	}
-	uint64_t mask = 0;
-	for (int i = 0; i < seconds_counter_bytes; i++) {
-		mask >> 8;
-		mask += 0xFF000000;
-	}
-	return mask;
-}
-
-inline constexpr uint64_t fractional_mask_from_bytes(uint8_t fractional_counter_bytes) {
-	if (fractional_counter_bytes > 4) {
-		throw std::invalid_argument("Seconds counter is too big for the internal representation of time");
-	}
-	uint64_t mask = 0;
-	for (int i = 0; i < fractional_counter_bytes; i++) {
-		mask << 8;
-		mask += 0x000000FF;
-	}
-	return mask;
-}
 ////////////////////////////////////////////////
 
 ///////////// CLASS DECLARATION ////////////////
@@ -74,9 +51,7 @@ class Instant {
 	static_assert((seconds_counter_bytes + fractional_counter_bytes) <= 8);
 
 private:
-	static constexpr uint64_t seconds_mask = fractional_mask_from_bytes(fractional_counter_bytes);
 	static constexpr uint8_t CUC_header = build_CUC_header(seconds_counter_bytes, fractional_counter_bytes);
-	static constexpr uint64_t fractional_mask = fractional_mask_from_bytes(fractional_counter_bytes);
 	uint64_t tai_counter = 0;
 
 public:
