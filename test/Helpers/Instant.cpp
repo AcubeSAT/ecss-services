@@ -6,7 +6,7 @@
 TEST_CASE("Instant class construction"){
   SECTION("Valid initialization"){
     Instant<1, 2> Epoch1;
-    Instant<4, 6> Epoch2;
+    Instant<4, 4> Epoch2;
     REQUIRE(Epoch1.as_TAI_seconds() == 0);
     REQUIRE(Epoch2.as_TAI_seconds() == 0);
     const std::type_info& expected_type1 = typeid(uint8_t);

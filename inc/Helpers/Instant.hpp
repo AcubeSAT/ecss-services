@@ -94,7 +94,8 @@ inline constexpr uint16_t build_long_CUC_header() {
 
 template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr T build_CUC_header() {
-	//cppcheck-suppress syntaxError 
+	static_assert((seconds_counter_bytes + fractional_counter_bytes ) <= 8, "Complete arbitrary precision not yet supported"); //TODO improve and get rid of this
+	//cppcheck-suppress syntaxError
 	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3) //if constexpr not supported yet in cppcheck
 		return build_short_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
 	else
