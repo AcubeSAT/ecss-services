@@ -127,4 +127,108 @@ void ParameterStatisticsService :: disablePeriodicStatisticsReporting(Message& r
 	ParameterStatisticsService :: periodicStatisticsReportingInterval = 0;
 }
 
+void ParameterStatisticsService ::addOrUpdateStatisticsDefinitions(Message& paramIds) {
+
+	uint16_t SAMPLING_RATE; // the sampling rate for every parameter. Has to be defined.
+
+	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
+	                            paramIds, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(paramIds.serviceType == ParameterStatisticsService::ServiceType, paramIds,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t currentId, interval;
+
+	uint16_t step;
+	(paramIds.hasTimeIntervals) ? (step = 2) : (step = 1);  //if there are intervals we have to iterate with step 2.
+
+	for (uint16_t i = 0; i < numOfIds; i+=step) {
+
+		currentId = paramIds.readUint16();
+
+		if (currentId < systemParameters.parametersArray.size()) {
+			ErrorHandler::assertRequest(ParameterStatisticsService::numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, paramIds,
+			                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+			// If there are intervals, get the value and check if it exceeds the sampling rate of the parameter.
+			if (paramIds.hasTimeIntervals) {
+				interval = paramIds.readUint16();
+				ErrorHandler::assertRequest(interval >= SAMPLING_RATE, paramIds,
+				                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+				/*
+				 * TODO:
+				 *      1. If no definition exists for that parameter:
+				 *          a. add the parameter statistics definition to the list of evaluated parameters
+				 *          b. start the evaluation of the statistics for that parameter
+				 *      2. if a parameter statistics definition exists for that parameter:
+				 *          a. update  the  sampling  interval  of  that  parameter  statistics definition
+				 *          b. restart the evaluation of the statistics for that parameter
+				 */
+			}
+		} else {
+			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+		}
+	}
+}
+
+void ParameterStatisticsService ::deleteStatisticsDefinitions(Message& paramIds) {
+
+	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions,
+	                            paramIds, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(paramIds.serviceType == ParameterStatisticsService::ServiceType, paramIds,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t currentId;
+
+	for (uint16_t i = 0; i < numOfIds; i++) {
+
+		currentId = paramIds.readUint16();
+		if (currentId < systemParameters.parametersArray.size()) {
+
+			/*
+			 * TODO:
+			 *      1. remove that parameter statistics definition from the list of evaluated parameters
+			 */
+
+		} else {
+			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+		}
+	}
+
+	// TODO: "ParameterStatisticsService::periodicStatisticsReportingStatus = 0" if the list of evaluated parameters
+	//       is empty after execution of all instructions.
+}
+
+void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request) {
+
+	Message definitionsReport(ParameterStatisticsService::ServiceType,
+	                        ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport, Message::TM, 1);
+
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType ==ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ParameterStatisticsService::ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t reportingInterval = 0;
+	if (ParameterStatisticsService :: periodicStatisticsReportingStatus)
+		reportingInterval = ParameterStatisticsService :: periodicStatisticsReportingInterval;
+
+	uint16_t numOfParameters = systemParameters.parametersArray.size();
+	definitionsReport.appendUint16(reportingInterval);  // Append interval
+	definitionsReport.appendUint16(numOfParameters);    // Append N
+
+	uint16_t samplingInterval;  // Needs to get this for every parameter.
+
+	for (int i = 0; i < numOfParameters; i++) {
+		definitionsReport.appendUint16(i);  // Append parameter ID
+		definitionsReport.appendUint16(samplingInterval);   // Append sampling interval
+	}
+
+	storeMessage(definitionsReport);
+
+}
+
 #endif

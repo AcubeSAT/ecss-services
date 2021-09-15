@@ -70,6 +70,7 @@ public:
 	inline void appendValueToMessage(Message& message) override {
 		message.append<DataType>(currentValue);
 	};
+
 };
 
 #endif //ECSS_SERVICES_PARAMETER_HPP

@@ -1,6 +1,8 @@
 #ifndef ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 
+#define MAX_NUM_OF_DEFINITIONS 10
+
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
@@ -32,13 +34,14 @@ public:
 
 	bool periodicStatisticsReportingStatus = 0;     // 1 means that periodic reporting is enabled
 	uint16_t periodicStatisticsReportingInterval;
+	uint16_t numOfStatisticsDefinitions = 0;
 
 	/**
 	 * This function receives a TM[4,1] packet and
 	 * returns a TM[4,2] packet containing the parameter
 	 * statistics report.
 	 *
-	 * @param resetFlag: a TC[20, 1] packet carrying a boolean value
+	 * @param resetFlag: a TC[4, 1] packet carrying a boolean value
 	 */
 	void reportParameterStatistics(Message& resetFlag);
 
@@ -53,44 +56,39 @@ public:
 	/**
 	 * TC[4,4] enable periodic parameter reporting
 	 *
-	 * @param
+	 * @param request: contains a boolean value
 	 */
 	void enablePeriodicStatisticsReporting(Message& request);
 
 	/**
 	 * TM[4,5] disable periodic parameter reporting
 	 *
-	 * @param
+	 * @param request: contains a boolean value
 	 */
 	void disablePeriodicStatisticsReporting(Message& request);
 
 	/**
 	 * TM[4,6] add or update parameter statistics definitions
 	 *
-	 * @param
+	 * @param paramIds: Ids of the parameters. Could be followed by intervals.
 	 */
-
+	void addOrUpdateStatisticsDefinitions(Message& paramIds);
 
 	/**
 	 * TM[4,7] delete parameter statistics definitions
 	 *
-	 * @param
+	 * @param paramIds: Ids of the parameters
 	 */
-
+	void deleteStatisticsDefinitions(Message& paramIds);
 
 	/**
-	 * TM[4,8] report parameter statistics definitions
+	 * This function receives a TM[4,8] packet and
+	 * returns a TM[4,9] packet containing the parameter
+	 * statistics definitions report.
 	 *
 	 * @param
 	 */
-
-
-	/**
-	 * TM[4,9] parameter statistics definitions report
-	 *
-	 * @param
-	 */
-
+	void reportStatisticsDefinitions(Message& request);
 };
 
 #endif
