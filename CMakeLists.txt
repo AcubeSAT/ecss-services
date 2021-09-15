@@ -40,6 +40,7 @@ add_library(common OBJECT
     	src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
+        src/Services/ParameterStatisticsService.cpp
         )
 
 # Specify the .cpp files for the executables

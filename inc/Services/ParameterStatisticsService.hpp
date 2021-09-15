@@ -1,0 +1,96 @@
+#ifndef ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
+#define ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
+
+#include "ECSS_Definitions.hpp"
+#include "Service.hpp"
+#include "ErrorHandler.hpp"
+#include "Parameter.hpp"
+#include "Parameters/SystemParameters.hpp"
+
+/**
+ * Implementation of the ST[04] parameter management service,
+ * as defined in ECSS-E-ST-70-41C
+ *
+ * @author Konstantinos Petridis <petridkon@gmail.com>
+ */
+
+class ParameterStatisticsService : public Service {
+public:
+	inline static const uint8_t ServiceType = 4;
+
+	enum MessageType : uint8_t {
+		ReportParameterStatistics = 1,
+		ParameterStatisticsReport = 2,
+		ResetParameterStatistics = 3,
+		EnablePeriodicParameterReporting = 4,
+		DisablePeriodicParameterReporting = 5,
+		AddOrUpdateParameterStatisticsDefinitions = 6,
+		DeleteParameterStatisticsDefinitions = 7,
+		ReportParameterStatisticsDefinitions = 8,
+		ParameterStatisticsDefinitionsReport = 9,
+	};
+
+	bool periodicStatisticsReportingStatus = 0;     // 1 means that periodic reporting is enabled
+	uint16_t periodicStatisticsReportingInterval;
+
+	/**
+	 * This function receives a TM[4,1] packet and
+	 * returns a TM[4,2] packet containing the parameter
+	 * statistics report.
+	 *
+	 * @param resetFlag: a TC[20, 1] packet carrying a boolean value
+	 */
+	void reportParameterStatistics(Message& resetFlag);
+
+	/**
+	 * TC[4,3] reset parameter statistics
+	 *
+	 * @param reset: boolean value. Was not actually specified in the
+	 * datasheet, will have to be discussed.
+	 */
+	void resetParameterStatistics(Message& reset);
+
+	/**
+	 * TC[4,4] enable periodic parameter reporting
+	 *
+	 * @param
+	 */
+	void enablePeriodicStatisticsReporting(Message& request);
+
+	/**
+	 * TM[4,5] disable periodic parameter reporting
+	 *
+	 * @param
+	 */
+	void disablePeriodicStatisticsReporting(Message& request);
+
+	/**
+	 * TM[4,6] add or update parameter statistics definitions
+	 *
+	 * @param
+	 */
+
+
+	/**
+	 * TM[4,7] delete parameter statistics definitions
+	 *
+	 * @param
+	 */
+
+
+	/**
+	 * TM[4,8] report parameter statistics definitions
+	 *
+	 * @param
+	 */
+
+
+	/**
+	 * TM[4,9] parameter statistics definitions report
+	 *
+	 * @param
+	 */
+
+};
+
+#endif
