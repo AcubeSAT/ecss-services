@@ -4,10 +4,10 @@
 #include <cstdint>
 #include <algorithm>
 #include <type_traits>
-#include <array>
 #include <typeinfo>
 #include <stdexcept>
 #include "macros.hpp"
+#include <etl/array.h>
 #include "Helpers/TimeFormats.hpp"
 
 // SEE CCSDS 301.0-B-4
@@ -34,24 +34,45 @@ private:
 public:
 
 	/**
-	 * Initialize the instant as seconds from epoch in TAI
+	 * Initialize the instant at epoch
 	 *
 	 */
-	void update_from_TAI_seconds(int seconds);
+	Instant();
+
+	/**
+	 * Initialize the instant from a duration from epoch in TAI
+	 *
+	 * @param seconds an integer number of seconds from Acubesat custom epoch
+	 */
+	Instant(int seconds);
+
+	/**
+	 * Initialize the instant from the bytes of a CUC time stamp
+	 *
+	 * @param timestamp a complete CUC time stamp including header, of the maximum possible size, zero padded to the right
+	 */
+	Instant(etl::array<uint8_t, 9> timestamp);
+
+	/**
+	 * Initialize the instant from a UTC timestamp struct
+	 *
+	 * @param timestamp a UTC timestamp, from Unix Epoch
+	 */
+	Instant(UTC_Timestamp timestamp);
 
 	/**
 	 * Get the representation as seconds from epoch in TAI
 	 *
 	 * @return the seconds elapsed in TAI since 1 Jan 1958, cut to the integer part
 	 */
-	int as_TAI_seconds();
+	const int as_TAI_seconds();
 
 	/**
 	 * Get the representation as CUC formatted bytes
 	 *
 	 * @return the instant, represented in the CCSDS CUC format
 	 */
-	void as_CUC_timestamp();
+	const void as_CUC_timestamp();
 
 	/**
 	 * Compare two instants.

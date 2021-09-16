@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <Message.hpp>
 #include "macros.hpp"
+#include "etl/String.hpp"
 
 // SEE CCSDS 301.0-B-4
 
@@ -172,5 +173,5 @@ public:
 	/**
 	 * @param text_timestamp the timestamp to parse into a UTC date
 	 */
-	UTC_Timestamp(string text_timestamp); // TODO change to ETL string type
+	UTC_Timestamp(String<32> text_timestamp); // TODO change to ETL string type
 };

@@ -4,7 +4,7 @@
 #include <typeinfo>
 
 TEST_CASE("Instant class construction"){
-  SECTION("Valid initialization"){
+  SECTION("Valid initialization at epoch"){
     Instant<1, 2> Epoch1;
     Instant<4, 4> Epoch2;
     REQUIRE(Epoch1.as_TAI_seconds() == 0);
@@ -23,17 +23,26 @@ TEST_CASE("Instant class construction"){
 
   SECTION("Check TAI idempotence"){
     int input_time = 1000;
-    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch;
-    Epoch.update_from_TAI_seconds(input_time);
+    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
     REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
-    Epoch.update_from_TAI_seconds(input_time);
-    REQUIRE(Epoch.as_TAI_seconds() == input_time); //check re-update changes nothing
+  }
+
+  SECTION("Check CUC idempotence"){
+    etl::array<uint8_t, 9> input_time = {10, 0, 1, 1, 3, 1, 2};
+    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
+    //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
+  }
+
+  SECTION("Check UTC idempotence"){
+    // TODO
+    //etl::array<uint8_t, 9> input_time = {10, 0, 1, 1, 3, 1, 2};
+    //Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
+    //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
   }
 
   SECTION("Check runtime class size"){
     int input_time = 1000;
-    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch;
-    Epoch.update_from_TAI_seconds(input_time);
+    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
     REQUIRE(sizeof(Epoch) < 32);
   }
 }
