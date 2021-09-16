@@ -23,7 +23,7 @@ TEST_CASE("Instant class construction"){
 
   SECTION("Check TAI idempotence"){
     int input_time = 1000;
-    Instant<CUC_seconds_counter_bytes, CUC_fractional_counter_bytes> Epoch;
+    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch;
     Epoch.update_from_TAI_seconds(input_time);
     REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
     Epoch.update_from_TAI_seconds(input_time);
@@ -32,7 +32,7 @@ TEST_CASE("Instant class construction"){
 
   SECTION("Check runtime class size"){
     int input_time = 1000;
-    Instant<CUC_seconds_counter_bytes, CUC_fractional_counter_bytes> Epoch;
+    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch;
     Epoch.update_from_TAI_seconds(input_time);
     REQUIRE(sizeof(Epoch) < 32);
   }
