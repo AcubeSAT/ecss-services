@@ -136,11 +136,6 @@ inline constexpr uint8_t build_Acubesat_CDS_header() {
 }
 ////////////////////////////////////////////////
 
-//////////////// CONSTANTS ////////////////////
-inline constexpr uint8_t Acubesat_CUC_seconds_counter_bytes = 2; // PER DDJF_TTC
-inline constexpr uint8_t Acubesat_CUC_fractional_counter_bytes = 2; // PER DDJF_TTC
-//////////////////////////////////////////////
-
 ////////// CONVENIENCE FUNCTIONS ////////////
 bool is_leap_year(uint16_t year);
 
