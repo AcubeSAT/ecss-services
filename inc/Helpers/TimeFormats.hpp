@@ -6,7 +6,7 @@
 
 bool is_leap_year(uint16_t year);
 
-inline constexpr uint8_t build_Acubesat_CUC_header() {
+inline constexpr uint8_t build_Acubesat_CDS_header() {
 	uint8_t header = 0;
 
   // bit 0 is at 0
@@ -35,7 +35,7 @@ inline constexpr uint8_t build_Acubesat_CUC_header() {
 // CUSTOM EPOCH FOR ALL ACUBESAT TIMESTAMPS IS 01 JAN 2020, EXCEPT UTC (UNIX)
 class Acubesat_CDS_timestamp{
 public:
-  static constexpr uint8_t P_FIELD = build_Acubesat_CUC_header();
+  static constexpr uint8_t P_FIELD = build_Acubesat_CDS_header();
   uint16_t day;
   uint16_t ms_of_day;
   uint32_t submilliseconds;
