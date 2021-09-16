@@ -87,7 +87,7 @@ public:
 	 * @param Instant the date that will be compared with the pointer `this`
 	 * @return true if the pointer `this` is smaller than \p Instant
 	 */
-	bool operator<(const Instant& Instant);
+	bool operator<(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 
 	/**
 	 * Compare two instants.
@@ -95,7 +95,7 @@ public:
 	 * @param Instant the date that will be compared with the pointer `this`
 	 * @return true if the pointer `this` is greater than \p Instant
 	 */
-	bool operator>(const Instant& Instant);
+	bool operator>(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 
 	/**
 	 * Compare two instants.
@@ -103,7 +103,15 @@ public:
 	 * @param Instant the date that will be compared with the pointer `this`
 	 * @return true if the pointer `this` is equal to \p Instant
 	 */
-	bool operator==(const Instant& Instant);
+	bool operator==(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
+
+	/**
+	 * Compare two instants.
+	 *
+	 * @param Instant the date that will be compared with the pointer `this`
+	 * @return true if the pointer `this` is different from \p Instant
+	 */
+	bool operator!=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 
 	/**
 	 * Compare two instants.
@@ -111,7 +119,7 @@ public:
 	 * @param Instant the date that will be compared with the pointer `this`
 	 * @return true if the pointer `this` is smaller than or equal to \p Instant
 	 */
-	bool operator<=(const Instant& Instant);
+	bool operator<=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 
 	/**
 	 * Compare two instants.
@@ -119,7 +127,7 @@ public:
 	 * @param Instant the date that will be compared with the pointer `this`
 	 * @return true if the pointer `this` is greater than or equal to \p Instant
 	 */
-	bool operator>=(const Instant& Instant);
+	bool operator>=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 
 	/**
 	 * Check internal variables have right sizes from template, use for debug

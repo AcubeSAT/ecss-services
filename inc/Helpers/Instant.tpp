@@ -48,9 +48,35 @@ const int Instant<seconds_counter_bytes, fractional_counter_bytes>::as_TAI_secon
 
 ////////////// OPERATORS ///////////
 /// COMPARISON
-// TODO
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator==(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const{
+  return tai_counter == Instant.tai_counter;
+}
 
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator!=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const{
+  return tai_counter != Instant.tai_counter;
+}
 
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator<(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const{
+  return tai_counter < Instant.tai_counter;
+}
+
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator>(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const{
+  return tai_counter > Instant.tai_counter;
+}
+
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator<=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const{
+  return tai_counter <= Instant.tai_counter;
+}
+
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator>=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const{
+  return tai_counter >= Instant.tai_counter;
+}
 /// ARITHMETIC
 // TODO
 

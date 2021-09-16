@@ -47,6 +47,31 @@ TEST_CASE("Instant class construction"){
     //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
   }
 
+  // SECTION("Check different templates, should break at compile"){
+  //   Instant<1, 2> Epoch1;
+  //   Instant<4, 4> Epoch2;
+  //   REQUIRE(Epoch1==Epoch2);
+  // }
+
+  SECTION("Check operators"){
+    Instant<1, 2> Epoch1;
+    Instant<1, 2> Epoch2;
+    Instant<1, 2> Epoch3(10);//todo introduce variety in the initialization
+    Instant<1, 2> Epoch4(15);
+    Instant<1, 2> Epoch5(12);
+    Instant<1, 2> Epoch6(10);
+    Instant<2, 2> Epoch7;
+    REQUIRE(Epoch1==Epoch2);
+    REQUIRE(Epoch2==Epoch1); //check symmetry
+    REQUIRE(Epoch3==Epoch6);
+    REQUIRE(Epoch1!=Epoch3);
+    REQUIRE(Epoch3!=Epoch5);
+    REQUIRE(Epoch3<=Epoch5);
+    REQUIRE(Epoch3<Epoch5);
+
+    //REQUIRE(Epoch1==Epoch7); //should fail at compile, different templates
+  }
+
   SECTION("Check runtime class size"){
     int input_time = 1000;
     Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
