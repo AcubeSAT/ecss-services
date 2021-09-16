@@ -40,6 +40,13 @@ TEST_CASE("Instant class construction"){
     //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
   }
 
+  SECTION("Check CDS idempotence"){
+    // TODO
+    //etl::array<uint8_t, 9> input_time = {10, 0, 1, 1, 3, 1, 2};
+    //Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
+    //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
+  }
+
   SECTION("Check runtime class size"){
     int input_time = 1000;
     Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);

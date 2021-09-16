@@ -5,6 +5,24 @@
 
 // SEE CCSDS 301.0-B-4
 
+//////////////// CONSTANTS ////////////////////
+inline constexpr uint8_t SECONDS_PER_MINUTE = 60;
+inline constexpr uint16_t SECONDS_PER_HOUR = 3600;
+inline constexpr uint32_t SECONDS_PER_DAY = 86400;
+static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+inline constexpr uint8_t Acubesat_CUC_seconds_counter_bytes = 2; // PER DDJF_TTC
+inline constexpr uint8_t Acubesat_CUC_fractional_counter_bytes = 2; // PER DDJF_TTC
+inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800; //TODO correct for 2020.01.01
+inline constexpr uint16_t ACUBESAT_EPOCH_YEAR = 2019;
+inline constexpr uint8_t ACUBESAT_EPOCH_MONTH = 1 - 1;
+inline constexpr uint8_t ACUBESAT_EPOCH_DAY = 1;
+
+static_assert(ACUBESAT_EPOCH_YEAR >= 2019);
+static_assert(ACUBESAT_EPOCH_MONTH < 11 && ACUBESAT_EPOCH_MONTH >= 0);
+static_assert(ACUBESAT_EPOCH_DAY < DaysOfMonth[ACUBESAT_EPOCH_MONTH]);
+//////////////////////////////////////////////
+
 //////// HELPER CONSTEXPR DO NOT TOUCH ////////
 template <int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr uint8_t build_short_CUC_header() {
