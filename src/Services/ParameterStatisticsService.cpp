@@ -69,7 +69,8 @@ void ParameterStatisticsService :: resetParameterStatistics(Message& reset) {
 
 void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& request) {
 
-	uint16_t SAMPLING_PARAMETER_INTERVAL = 0; //The sampling interval of each parameter, "timeInterval" requested should
+	// Dummy value
+	uint16_t SAMPLING_PARAMETER_INTERVAL = 5; //The sampling interval of each parameter, "timeInterval" requested should
 	                                          //not exceed it. It has to be defined as a constant.
 
 	uint16_t timeInterval = request.readUint16();
@@ -133,7 +134,8 @@ void ParameterStatisticsService :: disablePeriodicStatisticsReporting(Message& r
 
 void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& paramIds) {
 
-	uint16_t SAMPLING_RATE = 0; // the sampling rate for every parameter. Has to be defined.
+	// Dummy value
+	uint16_t SAMPLING_RATE = 4; // the sampling rate for every parameter. Has to be defined.
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
@@ -142,22 +144,20 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
-	uint16_t currentId = -1;
-	uint16_t interval = -1;
 
 	uint16_t step = -1;
 	(paramIds.hasTimeIntervals) ? (step = 2) : (step = 1);  //if there are intervals we have to iterate with step 2.
 
 	for (uint16_t i = 0; i < numOfIds; i+=step) {
 
-		currentId = paramIds.readUint16();
+		uint16_t currentId = paramIds.readUint16();
 
 		if (currentId < systemParameters.parametersArray.size()) {
 			ErrorHandler::assertRequest(ParameterStatisticsService::numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, paramIds,
 			                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 			// If there are intervals, get the value and check if it exceeds the sampling rate of the parameter.
 			if (paramIds.hasTimeIntervals) {
-				interval = paramIds.readUint16();
+				uint16_t interval = paramIds.readUint16();
 				ErrorHandler::assertRequest(interval >= SAMPLING_RATE, paramIds,
 				                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 				/*
@@ -185,11 +185,10 @@ void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
-	uint16_t currentId = -1;
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 
-		currentId = paramIds.readUint16();
+		uint16_t currentId = paramIds.readUint16();
 		if (currentId < systemParameters.parametersArray.size()) {
 
 			/*
