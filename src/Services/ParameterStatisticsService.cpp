@@ -68,8 +68,8 @@ void ParameterStatisticsService :: resetParameterStatistics(Message& reset) {
 
 void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& request) {
 
-	uint16_t SAMPLING_PARAMETER_INTERVAL; // The sampling interval of each parameter, "timeInterval" requested should
-	                                      // not exceed it. It has to be defined as a constant.
+	uint16_t SAMPLING_PARAMETER_INTERVAL = 0; //The sampling interval of each parameter, "timeInterval" requested should
+	                                          //not exceed it. It has to be defined as a constant.
 
 	uint16_t timeInterval = request.readUint16();
 
@@ -129,7 +129,7 @@ void ParameterStatisticsService :: disablePeriodicStatisticsReporting(Message& r
 
 void ParameterStatisticsService ::addOrUpdateStatisticsDefinitions(Message& paramIds) {
 
-	uint16_t SAMPLING_RATE; // the sampling rate for every parameter. Has to be defined.
+	uint16_t SAMPLING_RATE = 0; // the sampling rate for every parameter. Has to be defined.
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
@@ -138,9 +138,9 @@ void ParameterStatisticsService ::addOrUpdateStatisticsDefinitions(Message& para
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
-	uint16_t currentId, interval;
+	uint16_t currentId = -1, interval = -1;
 
-	uint16_t step;
+	uint16_t step = -1;
 	(paramIds.hasTimeIntervals) ? (step = 2) : (step = 1);  //if there are intervals we have to iterate with step 2.
 
 	for (uint16_t i = 0; i < numOfIds; i+=step) {
@@ -171,7 +171,7 @@ void ParameterStatisticsService ::addOrUpdateStatisticsDefinitions(Message& para
 	}
 }
 
-void ParameterStatisticsService ::deleteStatisticsDefinitions(Message& paramIds) {
+void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds) {
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions,
@@ -180,7 +180,7 @@ void ParameterStatisticsService ::deleteStatisticsDefinitions(Message& paramIds)
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
-	uint16_t currentId;
+	uint16_t currentId = -1;
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 
@@ -220,7 +220,7 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 	definitionsReport.appendUint16(reportingInterval);  // Append interval
 	definitionsReport.appendUint16(numOfParameters);    // Append N
 
-	uint16_t samplingInterval;  // Needs to get this for every parameter.
+	uint16_t samplingInterval;  // Need to get this for every parameter.
 
 	for (int i = 0; i < numOfParameters; i++) {
 		definitionsReport.appendUint16(i);  // Append parameter ID
