@@ -83,7 +83,7 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 	ErrorHandler::assertRequest(timeInterval >= SAMPLING_PARAMETER_INTERVAL, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	ParameterStatisticsService :: periodicStatisticsReportingStatus = 1;    //Periodic reporting status changes to enabled
+	ParameterStatisticsService :: periodicStatisticsReportingStatus = true; //Periodic reporting status changes to enabled
 	ParameterStatisticsService :: periodicStatisticsReportingInterval = timeInterval;
 
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
@@ -98,7 +98,10 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 		 *      1. append start time to parameterReport
 		 *      2. append end time
 		 *      3. append numOfParameters (N = 1)
-		 *      4. append 1 time:
+		 */
+				parameterReport.appendUint16(numOfParameters);  // step 3
+
+		/*      4. append 1 time:
 		 *          a. ID of parameter
 		 *          b. number of samples
 		 *          c. max value
@@ -123,11 +126,11 @@ void ParameterStatisticsService :: disablePeriodicStatisticsReporting(Message& r
 	ErrorHandler::assertRequest(request.serviceType == ParameterStatisticsService::ServiceType, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	ParameterStatisticsService :: periodicStatisticsReportingStatus = 0;
+	ParameterStatisticsService :: periodicStatisticsReportingStatus = false;
 	ParameterStatisticsService :: periodicStatisticsReportingInterval = 0;
 }
 
-void ParameterStatisticsService ::addOrUpdateStatisticsDefinitions(Message& paramIds) {
+void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& paramIds) {
 
 	uint16_t SAMPLING_RATE = 0; // the sampling rate for every parameter. Has to be defined.
 
@@ -213,14 +216,15 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t reportingInterval = 0;
-	if (ParameterStatisticsService :: periodicStatisticsReportingStatus)
-		reportingInterval = ParameterStatisticsService :: periodicStatisticsReportingInterval;
+	if (ParameterStatisticsService :: periodicStatisticsReportingStatus) {
+		reportingInterval = ParameterStatisticsService ::periodicStatisticsReportingInterval;
+	}
 
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	definitionsReport.appendUint16(reportingInterval);  // Append interval
 	definitionsReport.appendUint16(numOfParameters);    // Append N
 
-	uint16_t samplingInterval;  // Need to get this for every parameter.
+	uint16_t samplingInterval = 0;  // Need to get this for every parameter.
 
 	for (int i = 0; i < numOfParameters; i++) {
 		definitionsReport.appendUint16(i);  // Append parameter ID
