@@ -16,13 +16,14 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	bool resetFlagValue = resetFlag.readBoolean();
-	int numOfParameters = systemParameters.parametersArray.size();
+	uint16_t numOfParameters = systemParameters.parametersArray.size();
 
 	if (resetFlagValue) {
 
 		for (uint16_t i = 0; i < numOfParameters; i++) {
 
-			uint16_t currId = i;
+			// uint16_t currId = i;
+
 			/*
 			 * TODO:
 			 *      1. append start time to parameterReport
@@ -141,7 +142,8 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = paramIds.readUint16();
-	uint16_t currentId = -1, interval = -1;
+	uint16_t currentId = -1;
+	uint16_t interval = -1;
 
 	uint16_t step = -1;
 	(paramIds.hasTimeIntervals) ? (step = 2) : (step = 1);  //if there are intervals we have to iterate with step 2.
