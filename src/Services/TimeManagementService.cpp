@@ -5,7 +5,9 @@
 void TimeManagementService :: decimal2binary(uint16_t n, uint8_t *arr, int numOctets) {
 
 	uint8_t binaryNum[8 * numOctets];
-	for (int i = 0; i < 8 * numOctets; i++) binaryNum[i] = 0;
+	for (int i = 0; i < 8 * numOctets; i++) {
+		binaryNum[i] = 0;
+	}
 
 	uint16_t i = 0;
 	uint16_t k = 0;
@@ -27,8 +29,8 @@ void TimeManagementService :: convert2cuc(uint16_t timestampMs, int numOfBasicOc
 	//TODO: take epoch into consideration.
 
 	uint16_t timestampSec = timestampMs / 1000;
-	int fractionalTimeCountMax = (int) pow(2, 8 * numOfFractionalOctets);
-	long basicTimeCountMax = pow(2, 8 * numOfBasicOctets);
+	int fractionalTimeCountMax = static_cast <int> (pow(2, 8 * numOfFractionalOctets));
+	int64_t basicTimeCountMax = pow(2, 8 * numOfBasicOctets);
 
 	int pField[8] = {0, 0, 0, 1, (numOfBasicOctets - 1) / 10, (numOfBasicOctets - 1) % 10, numOfFractionalOctets /
 	        10, numOfFractionalOctets % 10};
@@ -50,7 +52,9 @@ void TimeManagementService :: convert2cuc(uint16_t timestampMs, int numOfBasicOc
 		uint16_t basicTimeCount = timestampSec / fractionalTimeCountMax;
 		uint16_t fractionalTimeCount = timestampSec % fractionalTimeCountMax;
 
-		//TODO: check if basicTimeCount exceeds basicTimeCountMax and log the error.
+		if (basicTimeCount > basicTimeCountMax) {
+			//TODO: log an error.
+		}
 
 		decimal2binary(basicTimeCount, tField, numOfBasicOctets);
 		decimal2binary(fractionalTimeCount, tField + fractionalTimeOffset, numOfFractionalOctets);
@@ -58,29 +62,29 @@ void TimeManagementService :: convert2cuc(uint16_t timestampMs, int numOfBasicOc
 
 	//Append pField and tField to the report, thus form the CUC format.
 	for (int i : pField) {
-		cucReport.appendUint8((uint8_t) i);
+		cucReport.appendUint8(static_cast <uint8_t> (i));
 	}
 	for(int i : tField) {
-		cucReport.appendUint8((uint8_t) i);
+		cucReport.appendUint8(static_cast <uint8_t> (i));
 	}
 }
 
 void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDaySegment, uint8_t subMsCodeBit1,
                                         uint8_t subMsCodeBit2, Message& cdsReport) {
 
-	long msOfDayCountMax = pow(2, 32);
+	int64_t msOfDayCountMax = pow(2, 32);
 	bool isAbsent = false;
 	bool isReserved = false;
-	bool daySegmentCode = 0;
+	bool daySegmentCode = false;
 	uint8_t subMsSegmentLength = 0;
-	daySegmentCode = (is16BitDaySegment == true) ? 0 : 1;
+	(is16BitDaySegment) ? daySegmentCode = false : daySegmentCode = true;
 
 	uint8_t pField[8] = {0, 1, 0, 0, 0, daySegmentCode, subMsCodeBit1, subMsCodeBit2};
 
 	if (subMsCodeBit1 == 0) {
 
 		if (subMsCodeBit2 == 0) {
-			isAbsent = true;
+			//isAbsent = true;
 		}
 		else {
 			subMsSegmentLength = 16;
@@ -92,11 +96,12 @@ void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDayS
 			subMsSegmentLength = 32;
 		}
 		else {
-			isReserved = true;
+			//isReserved = true;
 		}
 	}
 
-	uint8_t daySegmentOffset = (daySegmentCode == true) ? 24 : 16;
+	uint8_t daySegmentOffset = false;
+	(daySegmentCode) ? daySegmentOffset = 24 : daySegmentOffset = 16;
 	uint8_t tField[daySegmentOffset + subMsSegmentLength + 32];
 
 	int dayCountMax = pow(2, daySegmentOffset);
@@ -110,7 +115,9 @@ void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDayS
 		uint8_t dayCount = timestampMs / msOfDayCountMax;
 		uint8_t msOfDayCount = timestampMs % msOfDayCountMax;
 
-		//TODO: check if dayCount exceeds dayCountMax and log the error.
+		if (dayCount > dayCountMax) {
+			//TODO: log an error.
+		}
 
 		decimal2binary(dayCount, tField, daySegmentOffset / 8);
 		decimal2binary(msOfDayCount, tField + daySegmentOffset, 4);
@@ -143,7 +150,7 @@ void TimeManagementService :: setTimerReportGenerationRate(Message& rateExponent
 	ErrorHandler::assertRequest(newRate <= 8, rateExponentialValue,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	newRate = (uint16_t) pow(2, newRate);
+	newRate = static_cast <uint16_t> (pow(2, newRate));
 
 	TimeManagementService :: timeReportGenerationRate = newRate;
 }
@@ -164,7 +171,7 @@ void TimeManagementService :: cucTimeReport(Message& timestampMs) {
 	ErrorHandler::assertRequest(timestampMs.serviceType == TimeManagementService::ServiceType, timestampMs,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	cucReport.appendUint16((uint16_t) log2(TimeManagementService::timeReportGenerationRate));
+	cucReport.appendUint16(static_cast <uint16_t> (log2(TimeManagementService::timeReportGenerationRate)));
 
 	// Do the conversion and store it into the report message.
 	uint16_t timestampToConvert = timestampMs.readUint16();
@@ -193,7 +200,7 @@ void TimeManagementService :: cdsTimeReport(Message& timestampMs) {
 	ErrorHandler::assertRequest(timestampMs.serviceType == TimeManagementService::ServiceType, timestampMs,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	cdsReport.appendUint16((uint16_t) log2(TimeManagementService::timeReportGenerationRate));
+	cdsReport.appendUint16(static_cast <uint16_t> (log2(TimeManagementService::timeReportGenerationRate)));
 
 	uint16_t timestampToConvert = timestampMs.readUint16();
 	bool is16BitDaySegment = true;
