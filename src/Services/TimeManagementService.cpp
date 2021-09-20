@@ -73,8 +73,8 @@ void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDayS
                                         uint8_t subMsCodeBit2, Message& cdsReport) {
 
 	int64_t msOfDayCountMax = pow(2, 32);
-	bool isAbsent = false;
-	bool isReserved = false;
+	//bool isAbsent = false;
+	//bool isReserved = false;
 	bool daySegmentCode = false;
 	uint8_t subMsSegmentLength = 0;
 	(is16BitDaySegment) ? daySegmentCode = false : daySegmentCode = true;
