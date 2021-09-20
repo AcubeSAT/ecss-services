@@ -1,5 +1,5 @@
 #include "ECSS_Configuration.hpp"
-#include "Services/TimeManagement.hpp"
+#include "Services/TimeManagementService.hpp"
 #include <cmath>
 
 void TimeManagementService :: decimal2binary(uint16_t n, uint8_t *arr, int numOctets) {
@@ -16,7 +16,7 @@ void TimeManagementService :: decimal2binary(uint16_t n, uint8_t *arr, int numOc
 		i++;
 	}
 
-	for (uint16_t j = 8 * numOctets - 1; j >= 0; j--, k++) {
+	for (int j = 8 * numOctets - 1; j >= 0; j--, k++) {
 		arr[k] = binaryNum[j];
 	}
 }
@@ -71,7 +71,7 @@ void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDayS
 	long msOfDayCountMax = pow(2, 32);
 	bool isAbsent = false;
 	bool isReserved = false;
-	uint8_t daySegmentCode = 0;
+	bool daySegmentCode = 0;
 	uint8_t subMsSegmentLength = 0;
 	daySegmentCode = (is16BitDaySegment == true) ? 0 : 1;
 
