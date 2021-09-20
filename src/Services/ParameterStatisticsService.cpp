@@ -44,6 +44,12 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 
 	storeMessage(parameterReport);
 
+	if (ParameterStatisticsService :: hasAutomaticStatisticsReset) {
+		Message resetParams(ParameterStatisticsService::ServiceType,
+		                    ParameterStatisticsService::MessageType::ResetParameterStatistics,Message::TC,1);
+		resetParameterStatistics(resetParams);
+	}
+
 }
 
 void ParameterStatisticsService :: resetParameterStatistics(Message& reset) {
@@ -83,7 +89,7 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 
 	// Added error handler to check if the time interval asked is not a valid number.
 	ErrorHandler::assertRequest(timeInterval >= SAMPLING_PARAMETER_INTERVAL, request,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	                            ErrorHandler::ExecutionStartErrorType::InvalidReportingRateError);
 
 	ParameterStatisticsService :: periodicStatisticsReportingStatus = true; //Periodic reporting status changes to enabled
 	ParameterStatisticsService :: periodicStatisticsReportingInterval = timeInterval;

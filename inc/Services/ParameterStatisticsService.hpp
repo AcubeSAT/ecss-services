@@ -33,6 +33,7 @@ public:
 	};
 
 	bool periodicStatisticsReportingStatus = 0;     // 1 means that periodic reporting is enabled
+	bool hasAutomaticStatisticsReset = false;
 	uint16_t periodicStatisticsReportingInterval;
 	uint16_t numOfStatisticsDefinitions = 0;
 

@@ -142,7 +142,12 @@ public:
 		/**
 		 * Attempt to access a non existing parameter (ST[20])
 		 */
-		GetNonExistingParameter = 8
+		GetNonExistingParameter = 8,
+		/**
+		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
+		 * ST[04]
+		 */
+		InvalidReportingRateError = 9
 	};
 
 	/**
