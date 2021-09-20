@@ -79,7 +79,7 @@ void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDayS
 	uint8_t subMsSegmentLength = 0;
 	(is16BitDaySegment) ? daySegmentCode = false : daySegmentCode = true;
 
-	uint8_t pField[8] = {0, 1, 0, 0, 0, daySegmentCode, subMsCodeBit1, subMsCodeBit2};
+	uint8_t pField[8] = {0, 1, 0, 0, 0, static_cast <uint8_t> (daySegmentCode), subMsCodeBit1, subMsCodeBit2};
 
 	if (subMsCodeBit1 == 0) {
 
@@ -100,11 +100,11 @@ void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDayS
 		}
 	}
 
-	uint8_t daySegmentOffset = false;
+	uint8_t daySegmentOffset = 0;
 	(daySegmentCode) ? daySegmentOffset = 24 : daySegmentOffset = 16;
 	uint8_t tField[daySegmentOffset + subMsSegmentLength + 32];
 
-	int dayCountMax = pow(2, daySegmentOffset);
+	int64_t dayCountMax = pow(2, daySegmentOffset);
 
 	if (timestampMs < msOfDayCountMax) {
 
