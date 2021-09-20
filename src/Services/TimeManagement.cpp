@@ -122,6 +122,9 @@ void TimeManagementService :: convert2cds(uint16_t timestampMs, bool is16BitDayS
 	for (int i : tField) {
 		cdsReport.appendUint8(i);
 	}
+
+	//TODO: if subMs segment is not absent, add sub-milliseconds at the end of the report.
+
 }
 
 void TimeManagementService :: setTimerReportGenerationRate(Message& rateExponentialValue) {
