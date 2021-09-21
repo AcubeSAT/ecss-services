@@ -18,9 +18,6 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 	bool resetFlagValue = resetFlag.readBoolean();
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 
-	ErrorHandler::assertRequest(resetFlagValue, resetFlag,
-	                            ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
-
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 
 		// uint16_t currId = i;
@@ -46,11 +43,17 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 
 	storeMessage(parameterReport);
 
-	if (ParameterStatisticsService :: hasAutomaticStatisticsReset) {
+	if (resetFlagValue) {
 		Message resetParams(ParameterStatisticsService::ServiceType,
 		                    ParameterStatisticsService::MessageType::ResetParameterStatistics,Message::TC,1);
 		resetParameterStatistics(resetParams);
 	}
+
+//	if (ParameterStatisticsService :: hasAutomaticStatisticsReset) {
+//		Message resetParams(ParameterStatisticsService::ServiceType,
+//		                    ParameterStatisticsService::MessageType::ResetParameterStatistics,Message::TC,1);
+//		resetParameterStatistics(resetParams);
+//	}
 
 }
 
