@@ -30,7 +30,7 @@ void TimeManagementService :: convert2cuc(T timestampMs, int numOfBasicOctets, i
 	//TODO: take epoch into consideration.
 
 	T timestampSec = timestampMs / 1000;
-	int64_t fractionalTimeCountMax = static_cast <int64_t> (pow(2, 8 * numOfFractionalOctets));
+	auto fractionalTimeCountMax = static_cast <int64_t> (pow(2, 8 * numOfFractionalOctets));
 	int64_t basicTimeCountMax = pow(2, 8 * numOfBasicOctets);
 
 	int pField[8] = {0, 0, 0, 1, (numOfBasicOctets - 1) / 10, (numOfBasicOctets - 1) % 10, numOfFractionalOctets /
