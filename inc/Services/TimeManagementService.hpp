@@ -9,11 +9,11 @@
 class TimeManagementService : public Service {
 public:
 
-	inline static const uint8_t ServiceType = 9;
+	inline static const int ServiceType = 9;
 
 	TimeManagementService() = default;
 
-	enum MessageType : uint8_t {
+	enum MessageType : int {
 		SetTimeReportGenerationRate = 1,
 		CucTimeReport = 2,
 		CdsTimeReport = 3,
@@ -21,7 +21,7 @@ public:
 
 
 	// Should be 2,4,8,16,32,64,128 or 256
-	uint16_t timeReportGenerationRate = 8;
+	int timeReportGenerationRate = 8;
 	bool containsPfield = true;
 
 	/**
@@ -31,7 +31,7 @@ public:
 	 * @param arr: array to store the binary result.
 	 * @param numOctets: number of octets. Needed for array size.
 	 */
-	void decimal2binary(uint16_t n, uint8_t *arr, int numOctets);
+	void decimal2binary(int n, int *arr, int numOctets);
 
 	/**
 	 * This function takes a timestamp (ms) as argument
@@ -42,7 +42,8 @@ public:
 	 * @param numOfFractionalOctets: the number of fractional time octets
 	 * @param cucReport: the report of type message that contains the CUC format.
 	 */
-	void convert2cuc(uint16_t timestampMs, int numOfBasicOctets, int numOfFractionalOctets, Message& cucReport);
+	template <typename T>
+	void convert2cuc(T timestampMs, int numOfBasicOctets, int numOfFractionalOctets, Message& cucReport);
 
 	/**
 	 * This function takes a timestamp (ms) as argument
@@ -54,7 +55,8 @@ public:
 	 * @param subMsCodebit2:
 	 * @param cdsReport: the report of type message that contains the CDS format.
 	 */
-	void convert2cds(uint16_t timestampMs, bool is16BitDaySegment, uint8_t subMsCodeBit1, uint8_t subMsCodeBit2,
+	template <typename T>
+	void convert2cds(T timestampMs, bool is16BitDaySegment, int subMsCodeBit1, int subMsCodeBit2,
 	                 Message& cdsReport);
 
 	/**
