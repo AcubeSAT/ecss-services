@@ -22,7 +22,7 @@ public:
 	/**
 	 * The key of the array is the ID of the parameter as specified in PUS
 	 */
-	etl::array<std::reference_wrapper<ParameterBase>, ECSS_PARAMETER_COUNT> parametersArray = {
+	etl::array<std::reference_wrapper <ParameterBase>, ECSS_PARAMETER_COUNT> parametersArray = {
 		parameter1, parameter2, parameter3
 	};
 

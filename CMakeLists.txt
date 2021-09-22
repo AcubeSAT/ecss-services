@@ -41,6 +41,7 @@ add_library(common OBJECT
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
         src/Services/ParameterStatisticsService.cpp
+        src/Services/Statistic.cpp
         )
 
 # Specify the .cpp files for the executables

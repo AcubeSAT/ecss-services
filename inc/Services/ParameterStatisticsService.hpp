@@ -8,6 +8,8 @@
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
 #include "Parameters/SystemParameters.hpp"
+#include "Statistic.hpp"
+#include "etl/deque.h"
 
 /**
  * Implementation of the ST[04] parameter management service,
@@ -18,6 +20,10 @@
 
 class ParameterStatisticsService : public Service {
 public:
+
+	//TODO: implement the statistic parsing from the dequeue and the resetting of each parameter's vector after
+	//      resetFlag or periodic reset.
+
 	inline static const uint8_t ServiceType = 4;
 
 	enum MessageType : uint8_t {
@@ -32,10 +38,12 @@ public:
 		ParameterStatisticsDefinitionsReport = 9,
 	};
 
-	bool periodicStatisticsReportingStatus = 0;     // 1 means that periodic reporting is enabled
+	bool periodicStatisticsReportingStatus = false;     // 1 means that periodic reporting is enabled
 	bool hasAutomaticStatisticsReset = false;
 	uint16_t periodicStatisticsReportingInterval;
 	uint16_t numOfStatisticsDefinitions = 0;
+
+	etl::deque <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsQueue;
 
 	/**
 	 * This function receives a TM[4,1] packet and

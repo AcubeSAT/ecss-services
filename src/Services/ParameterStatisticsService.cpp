@@ -18,6 +18,8 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 	bool resetFlagValue = resetFlag.readBoolean();
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 
+	// Here is the end time
+
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 
 		// uint16_t currId = i;
@@ -43,17 +45,13 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 
 	storeMessage(parameterReport);
 
-	if (resetFlagValue) {
+	if (resetFlagValue or ParameterStatisticsService :: hasAutomaticStatisticsReset) {
 		Message resetParams(ParameterStatisticsService::ServiceType,
 		                    ParameterStatisticsService::MessageType::ResetParameterStatistics,Message::TC,1);
 		resetParameterStatistics(resetParams);
 	}
 
-//	if (ParameterStatisticsService :: hasAutomaticStatisticsReset) {
-//		Message resetParams(ParameterStatisticsService::ServiceType,
-//		                    ParameterStatisticsService::MessageType::ResetParameterStatistics,Message::TC,1);
-//		resetParameterStatistics(resetParams);
-//	}
+	// Here add start time
 
 }
 
