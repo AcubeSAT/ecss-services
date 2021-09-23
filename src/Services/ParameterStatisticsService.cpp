@@ -19,25 +19,9 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 
 	// Here is the end time
-
-	/*
-		 * TODO:
-		 *      1. append start time to parameterReport
-		 *      2. append end time
-		 *      3. append numOfParameters (N)
-		 *      4. append N times:
-		 *          a. ID of parameter
-		 *          b. number of samples
-		 *          c. max value
-		 *          d. max time             <--- The samples will be given by another task, which takes them from
-		 *          e. min value                                                                      the sensors
-		 *          f. min time
-		 *          g. mean value
-		 *          h. standard deviation (optional)
-	 */
-
 	// append start time
 	// append end time
+
 	statisticsReport.appendUint16(numOfParameters);
 
 	for (uint16_t i = 0; i < numOfParameters; i++) {

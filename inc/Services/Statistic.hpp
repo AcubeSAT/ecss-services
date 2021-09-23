@@ -23,9 +23,6 @@ class Statistic : public StatisticBase {
 public:
 
 	explicit Statistic(const StatisticBase& base) {}
-	uint16_t parameterId = 0;
-	uint16_t type = 0;
-	uint16_t numOfSamplesCounter = 0;
 	DataType max = 0;
 	DataType min = 0;
 	uint16_t maxTime = 0;   //what time??
@@ -33,8 +30,8 @@ public:
 	float mean = 0;
 	float standardDeviation = 0;
 
-	explicit Statistic(uint16_t paramId, uint16_t samplesCounter, uint16_t typeId) : parameterId(paramId) ,
-	      numOfSamplesCounter(samplesCounter) , type(typeId) {}
+//	explicit Statistic(uint16_t paramId, uint16_t samplesCounter, uint16_t typeId) : parameterId(paramId) ,
+//	      numOfSamplesCounter(samplesCounter) , type(typeId) {}
 
 	etl::vector <DataType, SAMPLES_MAX_VECTOR_SIZE> samplesVector;
 
