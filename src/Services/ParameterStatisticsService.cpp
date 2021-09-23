@@ -265,6 +265,9 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 					break;
 			}
 
+			statisticsReport.appendFloat(meanVal);
+			statisticsReport.appendFloat(sdVal);
+
 			/*
 			 * TODO: put the message into a queue and continue constructing the next report, and when
 			 *      it's ready put that in the queue as well, another FreeRTOS task will be accountable of
