@@ -13,7 +13,9 @@
 
 /**
  * Implementation of the ST[04] parameter management service,
- * as defined in ECSS-E-ST-70-41C
+ * as defined in ECSS-E-ST-70-41C. Regarding the variable types
+ * 0 means uint8, 1 means uint16 and 2 means uint32 (watch the implementation
+ * of TC[02]).
  *
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
@@ -43,7 +45,7 @@ public:
 	uint16_t periodicStatisticsReportingInterval;
 	uint16_t numOfStatisticsDefinitions = 0;
 
-	etl::deque <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsQueue;
+	etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsVector;
 
 	/**
 	 * This function receives a TM[4,1] packet and

@@ -6,7 +6,7 @@
 
 void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag) {
 
-	Message parameterReport(ParameterStatisticsService::ServiceType,
+	Message statisticsReport(ParameterStatisticsService::ServiceType,
 	                        ParameterStatisticsService::MessageType::ParameterStatisticsReport, Message::TM, 1);
 
 	ErrorHandler::assertRequest(resetFlag.packetType == Message::TC, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -20,13 +20,7 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 
 	// Here is the end time
 
-	for (uint16_t i = 0; i < numOfParameters; i++) {
-
-		// uint16_t currId = i;
-
-		// TODO: first check if the current parameter has been sampled at least once since last reset
-
-		/*
+	/*
 		 * TODO:
 		 *      1. append start time to parameterReport
 		 *      2. append end time
@@ -40,10 +34,101 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 		 *          f. min time
 		 *          g. mean value
 		 *          h. standard deviation (optional)
-		 */
+	 */
+
+	// append start time
+	// append end time
+	statisticsReport.appendUint16(numOfParameters);
+
+	for (uint16_t i = 0; i < numOfParameters; i++) {
+
+		 uint16_t currId = i;
+		 float meanVal = 0;
+		 float sdVal = 0;
+
+		uint16_t numOfSamples = ParameterStatisticsService::parameterStatisticsVector.at(currId).get().numOfSamplesCounter;
+		if (numOfSamples == 0) {
+			continue;
+		}
+		statisticsReport.appendUint16(currId);
+		statisticsReport.appendUint16(numOfSamples);
+
+		uint16_t type = ParameterStatisticsService::parameterStatisticsVector.at(i).get().type;
+		switch (type) {
+			case 0: {
+				static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				    .calculateStatistics();
+				uint8_t maxVal =
+				    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .max;
+				uint8_t minVal =
+				    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .min;
+				meanVal =
+				    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .mean;
+				sdVal =
+				    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .standardDeviation;
+				statisticsReport.appendUint8(maxVal);
+//				statisticsReport.appendUint16(maxTime);
+				statisticsReport.appendUint8(minVal);
+//				statisticsReport.appendUint16(minTime);
+				break;
+			}
+			case 1: {
+				static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				    .calculateStatistics();
+				uint16_t maxVal =
+				    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .max;
+				uint16_t minVal =
+				    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .min;
+				meanVal =
+				    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .mean;
+				sdVal =
+				    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .standardDeviation;
+				statisticsReport.appendUint16(maxVal);
+//				statisticsReport.appendUint16(maxTime);
+				statisticsReport.appendUint16(minVal);
+//				statisticsReport.appendUint16(minTime);
+				break;
+			}
+			case 2: {
+				static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				    .calculateStatistics();
+				uint32_t maxVal =
+				    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .max;
+				uint32_t minVal =
+				    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .min;
+				meanVal =
+				    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .mean;
+				sdVal =
+				    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+				        .standardDeviation;
+				statisticsReport.appendUint32(maxVal);
+//				statisticsReport.appendUint16(maxTime);
+				statisticsReport.appendUint32(minVal);
+//				statisticsReport.appendUint16(minTime);
+				break;
+			}
+			default:
+				//TODO: add error, might not even needed.
+				break;
+		}
+
+		statisticsReport.appendFloat(meanVal);
+		statisticsReport.appendFloat(sdVal);
+
 	}
 
-	storeMessage(parameterReport);
+	storeMessage(statisticsReport);
 
 	if (resetFlagValue or ParameterStatisticsService :: hasAutomaticStatisticsReset) {
 		Message resetParams(ParameterStatisticsService::ServiceType,
