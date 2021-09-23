@@ -135,12 +135,16 @@ void ParameterStatisticsService :: resetParameterStatistics(Message& reset) {
 	bool resetSignal = reset.readBoolean();
 
 	if (resetSignal) {
-		/*
-		 * TODO:
-		 *      1. Stop the evaluation of parameter statistics
-		 *      2. Clear all accumulated results
-		 *      3. Restart the evaluation process
-		 */
+
+		//TODO: Stop the evaluation of parameter statistics
+		uint16_t numOfParameters = systemParameters.parametersArray.size();
+		for(int i = 0; i < numOfParameters; i++) {
+			//Will this clear the right Statistic's samples? Because its StatisticBase but vector contains
+			// Statistic
+			ParameterStatisticsService::parameterStatisticsVector.at(i).get().clearStatisticSamples();
+
+		}
+		//TODO: Restart the evaluation of parameter statistics
 	}
 
 }
@@ -171,30 +175,106 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 	//Only generate ONE parameter statistics report after every interval passes.
 	while (ParameterStatisticsService :: periodicStatisticsReportingStatus) {
 
-		Message parameterReport(ParameterStatisticsService::ServiceType,
-		                        ParameterStatisticsService::MessageType::ParameterStatisticsReport, Message::TM, 1);
-		/*
-		 * TODO:
-		 *      1. append start time to parameterReport
-		 *      2. append end time
-		 *      3. append numOfParameters (N = 1)
-		 */
-				parameterReport.appendUint16(numOfParameters);  // step 3
+		for (int i = 0; i < numOfParameters; i++) {
 
-		/*      4. append 1 time:
-		 *          a. ID of parameter
-		 *          b. number of samples
-		 *          c. max value
-		 *          d. max time
-		 *          e. min value
-		 *          f. min time
-		 *          g. mean value
-		 *          h. standard deviation (optional)
-	     */
+			Message statisticsReport(ParameterStatisticsService::ServiceType,
+			                        ParameterStatisticsService::MessageType::ParameterStatisticsReport, Message::TM, 1);
+			/*
+			 * TODO:
+			 *      1. append start time to parameterReport
+			 *      2. append end time
+			 */
+			uint16_t numOfSamples = ParameterStatisticsService::parameterStatisticsVector.at(i).get()
+			                            .numOfSamplesCounter;
+			if(numOfSamples == 0) {
+				continue;
+			}
+			statisticsReport.appendUint16(numOfParameters);  // step 3
+			statisticsReport.appendUint16(i);
+
+			float sdVal = 0;
+			float meanVal = 0;
+
+			uint16_t type = ParameterStatisticsService::parameterStatisticsVector.at(i).get().type;
+			switch (type) {
+				case 0: {
+					static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					    .calculateStatistics();
+					uint8_t maxVal =
+					    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .max;
+					uint8_t minVal =
+					    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .min;
+					meanVal =
+					    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .mean;
+					sdVal =
+					    static_cast<Statistic<uint8_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .standardDeviation;
+					statisticsReport.appendUint8(maxVal);
+					//				statisticsReport.appendUint16(maxTime);
+					statisticsReport.appendUint8(minVal);
+					//				statisticsReport.appendUint16(minTime);
+					break;
+				}
+				case 1: {
+					static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					    .calculateStatistics();
+					uint16_t maxVal =
+					    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .max;
+					uint16_t minVal =
+					    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .min;
+					meanVal =
+					    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .mean;
+					sdVal =
+					    static_cast<Statistic<uint16_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .standardDeviation;
+					statisticsReport.appendUint16(maxVal);
+					//				statisticsReport.appendUint16(maxTime);
+					statisticsReport.appendUint16(minVal);
+					//				statisticsReport.appendUint16(minTime);
+					break;
+				}
+				case 2: {
+					static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					    .calculateStatistics();
+					uint32_t maxVal =
+					    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .max;
+					uint32_t minVal =
+					    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .min;
+					meanVal =
+					    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .mean;
+					sdVal =
+					    static_cast<Statistic<uint32_t>>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+					        .standardDeviation;
+					statisticsReport.appendUint32(maxVal);
+					//				statisticsReport.appendUint16(maxTime);
+					statisticsReport.appendUint32(minVal);
+					//				statisticsReport.appendUint16(minTime);
+					break;
+				}
+				default:
+					//TODO: add error, might not even needed.
+					break;
+			}
+
+			/*
+			 * TODO: put the message into a queue and continue constructing the next report, and when
+			 *      it's ready put that in the queue as well, another FreeRTOS task will be accountable of
+			 *      keeping track of time, and when the interval passes, it's gonna pop the next
+			 *      reportMessage from the queue and report it.
+			 */
+		}
 
 		//TODO: systematically reset the parameters' statistics.
 
-		storeMessage(parameterReport);
 	}
 }
 

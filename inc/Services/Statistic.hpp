@@ -14,8 +14,9 @@ public:
 	uint16_t parameterId = 0;
 	uint16_t numOfSamplesCounter = 0;
 	uint16_t type = 0;
-	virtual void storeStatistic() = 0;  //Maybe take message type argument from another task, containing the statistic.
+	virtual void storeSamples() = 0;  //Maybe take message type argument from another task, containing the statistic.
 	virtual void calculateStatistics() = 0;
+	virtual void clearStatisticSamples() = 0;
 };
 
 template <typename DataType>
@@ -35,7 +36,7 @@ public:
 
 	etl::vector <DataType, SAMPLES_MAX_VECTOR_SIZE> samplesVector;
 
-	inline void storeStatistic() override {
+	inline void storeSamples() override {
 		DataType newSample = 1; //Dummy value, in reality it has to take a real sample at this point.
 		Statistic::samplesVector.push_back(newSample);
 		numOfSamplesCounter++;
@@ -64,6 +65,18 @@ public:
 			standardDeviation += pow(samplesVector.at(i) - mean, 2);
 		}
 		standardDeviation = sqrt(standardDeviation / samplesVector.size());
+	}
+
+	inline void clearStatisticSamples() override {
+
+		samplesVector.clear();
+		max = 0;
+		min = 0;
+		mean = 0;
+		standardDeviation = 0;
+		numOfSamplesCounter = 0;
+		maxTime = 0;
+		minTime = 0;
 	}
 
 };
