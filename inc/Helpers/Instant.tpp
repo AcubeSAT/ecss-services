@@ -22,15 +22,15 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
   int header_size = bool(timestamp[0] >> 7) ? 2 : 1;
   int timestamp_fractional_bytes = 0;
   int timestamp_seconds_bytes = 1;
-  int epoch_param = 0;
+  //int epoch_param = 0;
 
   if (header_size == 2){
-    epoch_param = (timestamp[0] & 0b01110000) >> 4;
+    //epoch_param = (timestamp[0] & 0b01110000) >> 4;
     timestamp_seconds_bytes += ((timestamp[0] & 0b00001100) >> 2) + (timestamp[1] & 0b01100000) >> 5;
     timestamp_fractional_bytes = ((timestamp[0] & 0b00000011) >> 0) + ((timestamp[1] & 0b00011000) >> 3);
   }
   else if(header_size==1){
-    epoch_param = (timestamp[0] & 0b01110000) >> 4;
+    //epoch_param = (timestamp[0] & 0b01110000) >> 4;
     timestamp_seconds_bytes += (timestamp[0] & 0b00001100) >> 2;
     timestamp_fractional_bytes = (timestamp[0] & 0b00000011) >> 0;
   }
