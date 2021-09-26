@@ -52,7 +52,7 @@ TEST_CASE("Instant class construction"){
   }
 
   SECTION("Check CUC idempotence"){
-    etl::array<uint8_t, 9> input_time = {10, 0, 1, 1, 3, 1, 2};
+    etl::array<uint8_t, 9> input_time = {0b00100110, 0, 1, 1, 3, 0, 0, 0, 0};
     Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
     //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
   }

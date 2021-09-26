@@ -18,7 +18,53 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(Acubesat_CDS_t
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uint8_t, 9> timestamp){
-  tai_counter = 0; //TODO
+  //process header
+  int header_size = bool(timestamp[0] >> 7) ? 2 : 1;
+  int timestamp_fractional_bytes = 0;
+  int timestamp_seconds_bytes = 1;
+  int epoch_param = 0;
+
+  if (header_size == 2){
+    epoch_param = (timestamp[0] & 0b01110000) >> 4;
+    timestamp_seconds_bytes += ((timestamp[0] & 0b00001100) >> 2) + (timestamp[1] & 0b01100000) >> 5;
+    timestamp_fractional_bytes = ((timestamp[0] & 0b00000011) >> 0) + ((timestamp[1] & 0b00011000) >> 3);
+  }
+  else if(header_size==1){
+    epoch_param = (timestamp[0] & 0b01110000) >> 4;
+    timestamp_seconds_bytes += (timestamp[0] & 0b00001100) >> 2;
+    timestamp_fractional_bytes = (timestamp[0] & 0b00000011) >> 0;
+  }
+  else{
+    ASSERT_INTERNAL(true, ErrorHandler::InternalErrorType::InvalidDate);
+  }
+
+  //check input validity (useless bytes set to 0)
+  int err = 0;
+  for (int i=header_size+timestamp_seconds_bytes+timestamp_fractional_bytes; i<9; i++){
+    if (timestamp[i] != 0) {
+      err += 1;
+    }
+  }
+  ASSERT_INTERNAL(err == 0, ErrorHandler::InternalErrorType::InvalidDate);
+
+  //do checks wrt template precision parameters
+  ASSERT_INTERNAL(timestamp_seconds_bytes <= seconds_counter_bytes, ErrorHandler::InternalErrorType::InvalidDate);
+  ASSERT_INTERNAL(timestamp_fractional_bytes <= fractional_counter_bytes, ErrorHandler::InternalErrorType::InvalidDate);
+
+  //put timestamp into internal counter
+  tai_counter = 0;
+  //add seconds until run out of bytes on input array
+  for(auto i = 0; i < timestamp_seconds_bytes; i++){
+    tai_counter = tai_counter << 8;
+    tai_counter += timestamp[header_size + i];
+  }
+  //add fractional until run out of bytes on input array
+  for(auto i = 0; i < timestamp_fractional_bytes; i++){
+    tai_counter = tai_counter << 8;
+    tai_counter += timestamp[header_size + timestamp_seconds_bytes + i];
+  }
+  //pad rightmost bytes to full length
+  tai_counter = tai_counter << 8*(fractional_counter_bytes - timestamp_fractional_bytes);
 }
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
