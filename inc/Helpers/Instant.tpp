@@ -8,7 +8,7 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(){
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(int seconds){
-  tai_counter = (tai_counter_t)seconds << 8*fractional_counter_bytes;
+  tai_counter = static_cast<tai_counter_t>(seconds) << 8*fractional_counter_bytes;
 }
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
