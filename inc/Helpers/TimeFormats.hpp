@@ -33,19 +33,18 @@ inline constexpr uint8_t build_short_CUC_header() {
 
   // P-Field extension is 0, CUC header is not extended
 	header += 0;
-	header << 1;
 
   // Acubesat is using custom TAI epoch at 01 Jan 2020
+	header = header << 3;
 	header += 0b010;
-	header << 3;
 
-  // Number of bytes in the basic time unit
+  // // Number of bytes in the basic time unit
+	header = header << 2;
 	header += seconds_counter_bytes - 1;
-	header << 2;
 
   // Number of bytes in the fractional unit
+	header = header << 2;
 	header += fractional_counter_bytes;
-  //header << 0;
 
 	return header;
 }
@@ -58,43 +57,42 @@ inline constexpr uint16_t build_long_CUC_header() {
 
 	uint16_t header = 0;
 
-	uint8_t first_octet_number_of_seconds_bytes = std::max(4, seconds_counter_bytes);
+	uint8_t first_octet_number_of_seconds_bytes = std::min(4, seconds_counter_bytes);
 	uint8_t second_octet_number_of_seconds_bytes = seconds_counter_bytes - first_octet_number_of_seconds_bytes;
 
-	uint8_t first_octet_number_of_fractional_bytes = std::max(3, fractional_counter_bytes);
+	uint8_t first_octet_number_of_fractional_bytes = std::min(3, fractional_counter_bytes);
 	uint8_t second_octet_number_of_fractional_bytes = fractional_counter_bytes - first_octet_number_of_fractional_bytes;
 
   // P-Field extension is 1, CUC header is extended
 	header += 1;
-	header << 1;
 
 	// Acubesat is using custom TAI epoch at 01 Jan 2020
+	header = header << 3;
 	header += 0b010;
-	header << 3;
 
-  // Number of bytes in the basic time unit
+  // // Number of bytes in the basic time unit
+	header = header << 2;
 	header += first_octet_number_of_seconds_bytes - 1;
-	header << 2;
-
+	
   // Number of bytes in the fractional unit
+	header = header << 2;
 	header += first_octet_number_of_fractional_bytes;
-  header << 2;
 
 	// P-Field extension is 1, CUC header was extended
+	header = header << 1;
 	header += 1;
-	header << 1;
 
 	// Number of bytes in the extended basic time unit
+	header = header << 2;
 	header += second_octet_number_of_seconds_bytes;
-	header << 2;
 
   // Number of bytes in the extended fractional unit
+	header = header << 2;
 	header += second_octet_number_of_fractional_bytes;
-  header << 2;
 
 	// Last 3 LSB are reserved for custom mission use
-	//header += 0;
-  //header << 3;
+	header = header << 3;
+	header += 0;
 
 	return header;
 }

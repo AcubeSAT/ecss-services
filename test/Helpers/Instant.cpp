@@ -2,6 +2,7 @@
 #include "Helpers/Instant.hpp"
 #include "../Services/ServiceTests.hpp"
 #include <typeinfo>
+#include <iostream>
 
 TEST_CASE("Instant class construction"){
   SECTION("Valid initialization at epoch"){
@@ -20,6 +21,29 @@ TEST_CASE("Instant class construction"){
   //   Instant<5, 10> Epoch3;
   //   Instant<4, 4> Epoch4;
   // }
+
+  SECTION("Test CUC headers generation"){
+    uint8_t cuc_header1 = build_CUC_header<uint8_t, 2, 2>();
+    CHECK(cuc_header1 == 0b00100110);
+
+    uint8_t cuc_header2 = build_CUC_header<uint8_t, 4, 1>();
+    CHECK(cuc_header2 == 0b00101101);
+
+    uint8_t cuc_header3 = build_CUC_header<uint8_t, 1, 1>();
+    CHECK(cuc_header3 == 0b00100001);
+
+    uint16_t cuc_header4 = build_CUC_header<uint16_t, 5, 1>();
+    CHECK(cuc_header4 == 0b1010110110100000);
+
+    uint16_t cuc_header5 = build_CUC_header<uint16_t, 1, 6>();
+    CHECK(cuc_header5 == 0b1010001110011000);
+
+    uint16_t cuc_header6 = build_CUC_header<uint16_t, 7, 1>();
+    CHECK(cuc_header6 == 0b1010110111100000);
+
+    //TODO ADD MORE TESTS HERE ONCE FULL PRECISION RANGE IS SUPPORTED IN INTERNAL REPRESENTATION
+
+  }
 
   SECTION("Check TAI idempotence"){
     int input_time = 1000;
