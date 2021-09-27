@@ -45,11 +45,14 @@ int main() {
 	std::cout << "SD value: " << stat2.standardDeviation << std::endl;
 
 	// Store statistics into vector of type StatisticBase
-	ParameterStatisticsService::parameterStatisticsVector.push_back(stat1);
-	ParameterStatisticsService::parameterStatisticsVector.push_back(stat2);
-	stat1 = static_cast <Statistic <int>> (ParameterStatisticsService::parameterStatisticsVector.at(0));
-	std::cout << "Max value: " << stat1.max << std::endl;
-	std::cout << "Number of samples: " <<stat1.numOfSamplesCounter << std::endl;
+	ParameterStatisticsService obj;
+	int max = obj.test(stat1);
+	std::cout << "max = " << max << std::endl;
+//	ParameterStatisticsService::parameterStatisticsVector.push_back(stat1);
+//	ParameterStatisticsService::parameterStatisticsVector.push_back(stat2);
+//	stat1 = static_cast <Statistic <int>> (ParameterStatisticsService::parameterStatisticsVector.at(0));
+//	std::cout << "Max value: " << stat1.max << std::endl;
+//	std::cout << "Number of samples: " <<stat1.numOfSamplesCounter << std::endl;
 }
 /*
 int main() {

@@ -45,8 +45,9 @@ public:
 	uint16_t numOfStatisticsDefinitions = 0;
 	uint16_t nonDefinedStatistics = 0;
 
-	static etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsVector;
+	etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsVector;
 
+	ParameterStatisticsService() = default;
 	/**
 	 * This function receives a TM[4,1] packet and
 	 * returns a TM[4,2] packet containing the parameter
@@ -100,6 +101,7 @@ public:
 	 * @param
 	 */
 	void reportStatisticsDefinitions(Message& request);
+	int test(Statistic <int> stat);
 };
 
 #endif

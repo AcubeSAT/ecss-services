@@ -4,7 +4,7 @@
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/Parameter.hpp"
 
-etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> ParameterStatisticsService::parameterStatisticsVector;
+//etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> ParameterStatisticsService::parameterStatisticsVector;
 
 void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag) {
 
@@ -423,6 +423,14 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 
 	storeMessage(definitionsReport);
 
+}
+
+int ParameterStatisticsService::test(Statistic<int> stat) {
+	stat.max = 6;
+	ParameterStatisticsService::parameterStatisticsVector.push_back(stat);
+	Statistic s = static_cast <Statistic <int>> (ParameterStatisticsService::parameterStatisticsVector.at(0));
+	int maxVal = s.max;
+	return maxVal;
 }
 
 #endif
