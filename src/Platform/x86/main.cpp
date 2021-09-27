@@ -1,5 +1,4 @@
 #include <iostream>
-#include <ServicePool.hpp>
 #include <Logger.hpp>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeHelper.hpp"
@@ -12,13 +11,47 @@
 #include "Services/EventActionService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
-#include "ServicePool.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+#include "Services/Statistic.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
-#include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
+#include <ctime>
 
+int main() {
+
+	srand(time(NULL));
+	std::cout << "Statistic-1\n";
+	Statistic <int> stat1;
+	stat1.storeSamples(5);
+	std::cout << "Number of samples: " << stat1.numOfSamplesCounter << std::endl;
+
+	stat1.calculateStatistics();
+	std::cout << "Max value: " << stat1.max << std::endl;
+	std::cout << "Min value: " << stat1.min << std::endl;
+	std::cout << "Mean value: " << stat1.mean << std::endl;
+	std::cout << "SD value: " << stat1.standardDeviation << std::endl;
+
+	std::cout << "\nStatistic-2\n";
+	Statistic <float> stat2;
+	stat2.storeSamples(3);
+	std::cout << "Number of samples: " << stat2.numOfSamplesCounter << std::endl;
+
+	stat2.calculateStatistics();
+	std::cout << "Max value: " << stat2.max << std::endl;
+	std::cout << "Min value: " << stat2.min << std::endl;
+	std::cout << "Mean value: " << stat2.mean << std::endl;
+	std::cout << "SD value: " << stat2.standardDeviation << std::endl;
+
+	// Store statistics into vector of type StatisticBase
+	ParameterStatisticsService::parameterStatisticsVector.push_back(stat1);
+	ParameterStatisticsService::parameterStatisticsVector.push_back(stat2);
+	stat1 = static_cast <Statistic <int>> (ParameterStatisticsService::parameterStatisticsVector.at(0));
+	std::cout << "Max value: " << stat1.max << std::endl;
+	std::cout << "Number of samples: " <<stat1.numOfSamplesCounter << std::endl;
+}
+/*
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
@@ -331,3 +364,4 @@ int main() {
 	LOG_NOTICE << "ECSS Services test complete";
 	return 0;
 }
+*/

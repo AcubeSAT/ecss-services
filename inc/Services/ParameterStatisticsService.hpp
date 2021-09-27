@@ -7,7 +7,6 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
-#include "Parameters/SystemParameters.hpp"
 #include "Statistic.hpp"
 #include "etl/deque.h"
 
@@ -46,7 +45,7 @@ public:
 	uint16_t numOfStatisticsDefinitions = 0;
 	uint16_t nonDefinedStatistics = 0;
 
-	etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsVector;
+	static etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsVector;
 
 	/**
 	 * This function receives a TM[4,1] packet and

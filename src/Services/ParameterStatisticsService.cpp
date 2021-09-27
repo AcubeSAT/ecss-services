@@ -4,6 +4,8 @@
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/Parameter.hpp"
 
+etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> ParameterStatisticsService::parameterStatisticsVector;
+
 void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag) {
 
 	Message statisticsReport(ParameterStatisticsService::ServiceType,
