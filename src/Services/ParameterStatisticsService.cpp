@@ -295,9 +295,6 @@ void ParameterStatisticsService :: disablePeriodicStatisticsReporting(Message& r
 
 void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& paramIds) {
 
-	// Dummy value
-	uint16_t SAMPLING_RATE = 4; // the sampling rate for every parameter. Has to be defined.
-
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
 	                            paramIds, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
