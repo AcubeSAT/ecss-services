@@ -48,12 +48,10 @@ int main() {
 	ParameterStatisticsService obj;
 	int max = obj.test(stat1);
 	std::cout << "max = " << max << std::endl;
-//	ParameterStatisticsService::parameterStatisticsVector.push_back(stat1);
-//	ParameterStatisticsService::parameterStatisticsVector.push_back(stat2);
-//	stat1 = static_cast <Statistic <int>> (ParameterStatisticsService::parameterStatisticsVector.at(0));
-//	std::cout << "Max value: " << stat1.max << std::endl;
-//	std::cout << "Number of samples: " <<stat1.numOfSamplesCounter << std::endl;
+
 }
+
+
 /*
 int main() {
 	LOG_NOTICE << "ECSS Services test application";

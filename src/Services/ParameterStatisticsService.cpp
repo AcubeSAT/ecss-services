@@ -426,10 +426,10 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 }
 
 int ParameterStatisticsService::test(Statistic<int> stat) {
-	stat.max = 6;
+
 	ParameterStatisticsService::parameterStatisticsVector.push_back(stat);
-	Statistic s = static_cast <Statistic <int>> (ParameterStatisticsService::parameterStatisticsVector.at(0));
-	int maxVal = s.max;
+	Statistic <int> s = (static_cast <Statistic<int>&> (ParameterStatisticsService::parameterStatisticsVector.at(0).get()));
+	int &maxVal = s.max;
 	return maxVal;
 }
 

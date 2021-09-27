@@ -16,10 +16,10 @@ public:
 	uint16_t selfSamplingInterval = 0;
 	uint16_t numOfSamplesCounter = 0;
 	uint16_t type = 0;
-	virtual void storeSamples(int n) = 0;  //Maybe take message type argument from another task, containing the
+	[[maybe_unused]] virtual void storeSamples(int n) = 0;  //Maybe take message type argument from another task, containing the
 	// statistic.
-	virtual void calculateStatistics() = 0;
-	virtual void clearStatisticSamples() = 0;
+	[[maybe_unused]] virtual void calculateStatistics() = 0;
+	[[maybe_unused]] virtual void clearStatisticSamples() = 0;
 };
 
 template <typename DataType>

@@ -101,6 +101,7 @@ public:
 	 * @param
 	 */
 	void reportStatisticsDefinitions(Message& request);
+
 	int test(Statistic <int> stat);
 };
 
