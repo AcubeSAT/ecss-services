@@ -309,27 +309,34 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 	uint16_t step = -1;
 	(paramIds.hasTimeIntervals) ? (step = 2) : (step = 1);  //if there are intervals we have to iterate with step 2.
 
-	for (uint16_t i = 0; i < numOfIds; i+=step) {
+	for (uint16_t i = 0; i < numOfIds; i += step) {
 
 		uint16_t currentId = paramIds.readUint16();
 
 		if (currentId < systemParameters.parametersArray.size()) {
 			ErrorHandler::assertRequest(ParameterStatisticsService::numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, paramIds,
 			                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
 			// If there are intervals, get the value and check if it exceeds the sampling rate of the parameter.
 			if (paramIds.hasTimeIntervals) {
+
 				uint16_t interval = paramIds.readUint16();
-				ErrorHandler::assertRequest(interval >= SAMPLING_RATE, paramIds,
-				                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-				/*
-				 * TODO:
-				 *      1. If no definition exists for that parameter:
-				 *          a. add the parameter statistics definition to the list of evaluated parameters
-				 *          b. start the evaluation of the statistics for that parameter
-				 *      2. if a parameter statistics definition exists for that parameter:
-				 *          a. update  the  sampling  interval  of  that  parameter  statistics definition
-				 *          b. restart the evaluation of the statistics for that parameter
-				 */
+				ErrorHandler::assertRequest(interval <=ParameterStatisticsService::periodicStatisticsReportingInterval, paramIds,
+				                            ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
+				// Get the sampling interval of the current parameter from the statistics vector
+				uint16_t paramSamplingInterval = ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval;
+				if (paramSamplingInterval == 0) {
+					ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval =
+					    interval;
+					ParameterStatisticsService::nonDefinedStatistics--;
+					//TODO: start the evaluation of statistics for this parameter.
+				}
+				else {
+					ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval =
+					    interval;
+					// Statistics evaluation reset
+					ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().clearStatisticSamples();
+				}
 			}
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
@@ -347,23 +354,31 @@ void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds
 
 	uint16_t numOfIds = paramIds.readUint16();
 
-	for (uint16_t i = 0; i < numOfIds; i++) {
+	// In case that not all parameter definitions have to be deleted
+	if (numOfIds < systemParameters.parametersArray.size()) {
+		for (uint16_t i = 0; i < numOfIds; i++) {
 
-		uint16_t currentId = paramIds.readUint16();
-		if (currentId < systemParameters.parametersArray.size()) {
-
-			/*
-			 * TODO:
-			 *      1. remove that parameter statistics definition from the list of evaluated parameters
-			 */
-
-		} else {
-			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+			uint16_t currentId = paramIds.readUint16();
+			if (currentId < systemParameters.parametersArray.size()) {
+				// Removing the parameter definitions
+				ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval = 0;
+				ParameterStatisticsService::nonDefinedStatistics++;
+			} else {
+				ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+			}
 		}
+	}// In case that we request to delete every parameter definition
+	else if (numOfIds == systemParameters.parametersArray.size()) {
+		for (uint16_t i = 0; i < numOfIds; i++) {
+			ParameterStatisticsService::parameterStatisticsVector.at(i).get().selfSamplingInterval = 0;
+		}
+		ParameterStatisticsService::nonDefinedStatistics = systemParameters.parametersArray.size();
 	}
 
-	// TODO: "ParameterStatisticsService::periodicStatisticsReportingStatus = 0" if the list of evaluated parameters
-	//       is empty after execution of all instructions.
+	// If list of definitions is empty, stop the periodic reporting.
+	if (ParameterStatisticsService::nonDefinedStatistics == systemParameters.parametersArray.size()) {
+		ParameterStatisticsService::periodicStatisticsReportingStatus = false;
+	}
 }
 
 void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request) {
@@ -379,18 +394,32 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 
 	uint16_t reportingInterval = 0;
 	if (ParameterStatisticsService :: periodicStatisticsReportingStatus) {
-		reportingInterval = ParameterStatisticsService ::periodicStatisticsReportingInterval;
+		reportingInterval = ParameterStatisticsService :: periodicStatisticsReportingInterval;
 	}
 
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	definitionsReport.appendUint16(reportingInterval);  // Append interval
-	definitionsReport.appendUint16(numOfParameters);    // Append N
 
-	uint16_t samplingInterval = 0;  // Need to get this for every parameter.
+	uint16_t numOfDefinedParameters = 0;
+	for (int i = 0; i < numOfParameters; i++) {
+		uint16_t currentId = i;
+		uint16_t currentSamplingInterval = ParameterStatisticsService::parameterStatisticsVector.at(currentId).get()
+		                                .selfSamplingInterval;
+		if (currentSamplingInterval != 0) {
+			numOfDefinedParameters++;
+		}
+	}
+
+	definitionsReport.appendUint16(numOfDefinedParameters);
 
 	for (int i = 0; i < numOfParameters; i++) {
-		definitionsReport.appendUint16(i);  // Append parameter ID
-		definitionsReport.appendUint16(samplingInterval);   // Append sampling interval
+		uint16_t currentId = i;
+		uint16_t samplingInterval = ParameterStatisticsService::parameterStatisticsVector.at(currentId).get()
+		                                       .selfSamplingInterval;
+		if (samplingInterval != 0) {
+			definitionsReport.appendUint16(currentId);
+			definitionsReport.appendUint16(samplingInterval);
+		}
 	}
 
 	storeMessage(definitionsReport);

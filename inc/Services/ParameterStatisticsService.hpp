@@ -44,6 +44,7 @@ public:
 	bool hasAutomaticStatisticsReset = false;
 	uint16_t periodicStatisticsReportingInterval;
 	uint16_t numOfStatisticsDefinitions = 0;
+	uint16_t nonDefinedStatistics = 0;
 
 	etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsVector;
 

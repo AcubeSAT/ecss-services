@@ -12,6 +12,7 @@
 class StatisticBase {
 public:
 	uint16_t parameterId = 0;
+	uint16_t selfSamplingInterval = 0;
 	uint16_t numOfSamplesCounter = 0;
 	uint16_t type = 0;
 	virtual void storeSamples() = 0;  //Maybe take message type argument from another task, containing the statistic.
