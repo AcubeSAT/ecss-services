@@ -16,10 +16,10 @@ public:
 	uint16_t selfSamplingInterval = 0;
 	uint16_t numOfSamplesCounter = 0;
 	uint16_t type = 0;
-	[[maybe_unused]] virtual void storeSamples(int n) = 0;  //Maybe take message type argument from another task, containing the
+	virtual void storeSamples(int n) = 0;  //Maybe take message type argument from another task, containing the
 	// statistic.
-	[[maybe_unused]] virtual void calculateStatistics() = 0;
-	[[maybe_unused]] virtual void clearStatisticSamples() = 0;
+	virtual void calculateStatistics() = 0;
+	virtual void clearStatisticSamples() = 0;
 };
 
 template <typename DataType>
@@ -27,6 +27,7 @@ class Statistic : public StatisticBase {
 public:
 
 	explicit Statistic(const StatisticBase& base) {}
+//	explicit Statistic(DataType initialValue) : currentValue(initialValue) {}
 	DataType max = 0;
 	DataType min = 0;
 	uint16_t maxTime = 0;   //what time??
@@ -41,6 +42,7 @@ public:
 	etl::vector <DataType, SAMPLES_MAX_VECTOR_SIZE> samplesVector;
 
 	inline void storeSamples(int n) override {
+		// save timestamp. if periodic, store first and calculate.
 		for (int i = 0; i < n; i++) {
 			DataType newSample = static_cast <DataType> (rand()) / static_cast <DataType> (10000000); //Dummy value, in reality it
 			// has to take a real sample at this point.

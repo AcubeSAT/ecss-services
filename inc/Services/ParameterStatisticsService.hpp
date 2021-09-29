@@ -9,6 +9,7 @@
 #include "Parameter.hpp"
 #include "Statistic.hpp"
 #include "etl/deque.h"
+#include "Statistics/SystemStatistics.hpp"
 
 /**
  * Implementation of the ST[04] parameter management service,
