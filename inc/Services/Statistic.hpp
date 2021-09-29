@@ -101,8 +101,8 @@ public:
 		newStat.calculateStatistics();
 		DataType &maxValue = newStat.max;
 		DataType &minValue = newStat.min;
-		float meanValue = newStat.mean;
-		float sdValue = newStat.standardDeviation;
+		float &meanValue = newStat.mean;
+		float &sdValue = newStat.standardDeviation;
 
 		// Append everything to the report message in the correct order
 		report.append <DataType> (maxValue);
