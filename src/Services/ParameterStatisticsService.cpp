@@ -3,8 +3,6 @@
 
 #include "Services/ParameterStatisticsService.hpp"
 
-//etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> ParameterStatisticsService::parameterStatisticsVector;
-
 void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag) {
 
 	Message statisticsReport(ParameterStatisticsService::ServiceType,
@@ -27,91 +25,17 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 
-		 uint16_t currId = i;
-		 float meanVal = 0;
-		 float sdVal = 0;
+	    uint16_t currId = i;
+		std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[currId].get();
+	    uint16_t numOfSamples = currentStatistic.get().numOfSamplesCounter;
 
-		uint16_t numOfSamples = ParameterStatisticsService::parameterStatisticsVector.at(currId).get().numOfSamplesCounter;
 		if (numOfSamples == 0) {
 			continue;
 		}
 		statisticsReport.appendUint16(currId);
 		statisticsReport.appendUint16(numOfSamples);
 
-		uint16_t type = ParameterStatisticsService::parameterStatisticsVector.at(i).get().type;
-//		SystemStatistics::statisticsArray
-		switch (type) {
-			case 0: {
-				static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				    .calculateStatistics();
-				uint8_t maxVal =
-				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .max;
-				uint8_t minVal =
-				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .min;
-				meanVal =
-				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .mean;
-				sdVal =
-				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .standardDeviation;
-				statisticsReport.appendUint8(maxVal);
-//				statisticsReport.appendUint16(maxTime);
-				statisticsReport.appendUint8(minVal);
-//				statisticsReport.appendUint16(minTime);
-				break;
-			}
-			case 1: {
-				static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				    .calculateStatistics();
-				uint16_t maxVal =
-				    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .max;
-				uint16_t minVal =
-				    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .min;
-				meanVal =
-				    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .mean;
-				sdVal =
-				    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .standardDeviation;
-				statisticsReport.appendUint16(maxVal);
-//				statisticsReport.appendUint16(maxTime);
-				statisticsReport.appendUint16(minVal);
-//				statisticsReport.appendUint16(minTime);
-				break;
-			}
-			case 2: {
-				static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				    .calculateStatistics();
-				uint32_t maxVal =
-				    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .max;
-				uint32_t minVal =
-				    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .min;
-				meanVal =
-				    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .mean;
-				sdVal =
-				    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-				        .standardDeviation;
-				statisticsReport.appendUint32(maxVal);
-//				statisticsReport.appendUint16(maxTime);
-				statisticsReport.appendUint32(minVal);
-//				statisticsReport.appendUint16(minTime);
-				break;
-			}
-			default:
-				//TODO: add error, might not even needed.
-				break;
-		}
-
-		statisticsReport.appendFloat(meanVal);
-		statisticsReport.appendFloat(sdVal);
-
+		currentStatistic.get().appendStatisticsToMessage(currentStatistic, statisticsReport); // WORKS! MAGIC!
 	}
 
 	storeMessage(statisticsReport);
@@ -141,10 +65,9 @@ void ParameterStatisticsService :: resetParameterStatistics(Message& reset) {
 		//TODO: Stop the evaluation of parameter statistics
 		uint16_t numOfParameters = systemParameters.parametersArray.size();
 		for(int i = 0; i < numOfParameters; i++) {
-			//Will this clear the right Statistic's samples? Because its StatisticBase but vector contains
-			// Statistic
-			ParameterStatisticsService::parameterStatisticsVector.at(i).get().clearStatisticSamples();
 
+			std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[i].get();
+			currentStatistic.get().clearStatisticSamples();
 		}
 		//TODO: Restart the evaluation of parameter statistics
 	}
@@ -186,89 +109,17 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 			 *      1. append start time to parameterReport
 			 *      2. append end time
 			 */
-			uint16_t numOfSamples = ParameterStatisticsService::parameterStatisticsVector.at(i).get()
-			                            .numOfSamplesCounter;
+
+			std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[i].get();
+			uint16_t numOfSamples = currentStatistic.get().numOfSamplesCounter;
+
 			if(numOfSamples == 0) {
 				continue;
 			}
 			statisticsReport.appendUint16(numOfParameters);  // step 3
 			statisticsReport.appendUint16(i);
 
-			float sdVal = 0;
-			float meanVal = 0;
-
-			uint16_t type = ParameterStatisticsService::parameterStatisticsVector.at(i).get().type;
-			switch (type) {
-				case 0: {
-					static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					    .calculateStatistics();
-					uint8_t maxVal =
-					    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .max;
-					uint8_t minVal =
-					    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .min;
-					meanVal =
-					    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .mean;
-					sdVal =
-					    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .standardDeviation;
-					statisticsReport.appendUint8(maxVal);
-					//				statisticsReport.appendUint16(maxTime);
-					statisticsReport.appendUint8(minVal);
-					//				statisticsReport.appendUint16(minTime);
-					break;
-				}
-				case 1: {
-					static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					    .calculateStatistics();
-					uint16_t maxVal =
-					    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .max;
-					uint16_t minVal =
-					    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .min;
-					meanVal =
-					    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .mean;
-					sdVal =
-					    static_cast<Statistic<uint16_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .standardDeviation;
-					statisticsReport.appendUint16(maxVal);
-					//				statisticsReport.appendUint16(maxTime);
-					statisticsReport.appendUint16(minVal);
-					//				statisticsReport.appendUint16(minTime);
-					break;
-				}
-				case 2: {
-					static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					    .calculateStatistics();
-					uint32_t maxVal =
-					    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .max;
-					uint32_t minVal =
-					    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .min;
-					meanVal =
-					    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .mean;
-					sdVal =
-					    static_cast<Statistic<uint32_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-					        .standardDeviation;
-					statisticsReport.appendUint32(maxVal);
-					//				statisticsReport.appendUint16(maxTime);
-					statisticsReport.appendUint32(minVal);
-					//				statisticsReport.appendUint16(minTime);
-					break;
-				}
-				default:
-					//TODO: add error, might not even needed.
-					break;
-			}
-
-			statisticsReport.appendFloat(meanVal);
-			statisticsReport.appendFloat(sdVal);
+			currentStatistic.get().appendStatisticsToMessage(currentStatistic, statisticsReport);
 
 			/*
 			 * TODO: put the message into a queue and continue constructing the next report, and when
@@ -323,18 +174,20 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 				ErrorHandler::assertRequest(interval <=ParameterStatisticsService::periodicStatisticsReportingInterval, paramIds,
 				                            ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 				// Get the sampling interval of the current parameter from the statistics vector
-				uint16_t paramSamplingInterval = ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval;
+				std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[currentId].get();
+				uint16_t paramSamplingInterval = currentStatistic.get().selfSamplingInterval;
+
 				if (paramSamplingInterval == 0) {
-					ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval =
-					    interval;
+
+					systemStatistics.statisticsArray[currentId].get().selfSamplingInterval = interval;
 					ParameterStatisticsService::nonDefinedStatistics--;
-					//TODO: start the evaluation of statistics for this parameter.
+					//TODO: start the evaluation of statistics for this parameter. //add boolean value on statistic
+					// that says if evaluation is enabled
 				}
 				else {
-					ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval =
-					    interval;
+					systemStatistics.statisticsArray[currentId].get().selfSamplingInterval = interval;
 					// Statistics evaluation reset
-					ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().clearStatisticSamples();
+					systemStatistics.statisticsArray[currentId].get().clearStatisticSamples();
 				}
 			}
 		} else {
@@ -359,8 +212,8 @@ void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds
 
 			uint16_t currentId = paramIds.readUint16();
 			if (currentId < systemParameters.parametersArray.size()) {
-				// Removing the parameter definitions
-				ParameterStatisticsService::parameterStatisticsVector.at(currentId).get().selfSamplingInterval = 0;
+
+				systemStatistics.statisticsArray.at(currentId).get().selfSamplingInterval = 0;
 				ParameterStatisticsService::nonDefinedStatistics++;
 			} else {
 				ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
@@ -369,7 +222,7 @@ void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds
 	}// In case that we request to delete every parameter definition
 	else if (numOfIds == systemParameters.parametersArray.size()) {
 		for (uint16_t i = 0; i < numOfIds; i++) {
-			ParameterStatisticsService::parameterStatisticsVector.at(i).get().selfSamplingInterval = 0;
+			systemStatistics.statisticsArray.at(i).get().selfSamplingInterval = 0;
 		}
 		ParameterStatisticsService::nonDefinedStatistics = systemParameters.parametersArray.size();
 	}
@@ -402,8 +255,8 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 	uint16_t numOfDefinedParameters = 0;
 	for (int i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = i;
-		uint16_t currentSamplingInterval = ParameterStatisticsService::parameterStatisticsVector.at(currentId).get()
-		                                .selfSamplingInterval;
+		uint16_t currentSamplingInterval = systemStatistics.statisticsArray.at(currentId).get().selfSamplingInterval;
+
 		if (currentSamplingInterval != 0) {
 			numOfDefinedParameters++;
 		}
@@ -413,8 +266,8 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 
 	for (int i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = i;
-		uint16_t samplingInterval = ParameterStatisticsService::parameterStatisticsVector.at(currentId).get()
-		                                       .selfSamplingInterval;
+		uint16_t samplingInterval = systemStatistics.statisticsArray.at(currentId).get().selfSamplingInterval;
+
 		if (samplingInterval != 0) {
 			definitionsReport.appendUint16(currentId);
 			definitionsReport.appendUint16(samplingInterval);
@@ -425,12 +278,33 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 
 }
 
-int ParameterStatisticsService::test(Statistic<int> stat) {
+//int ParameterStatisticsService::test(Statistic<int> stat) {
+//
+//	ParameterStatisticsService::parameterStatisticsVector.push_back(stat);
+//	Statistic <int> s = (static_cast <Statistic<int>&> (ParameterStatisticsService::parameterStatisticsVector.at(0).get()));
+//	int &maxVal = s.max;
+//	return maxVal;
+//}
 
-	ParameterStatisticsService::parameterStatisticsVector.push_back(stat);
-	Statistic <int> s = (static_cast <Statistic<int>&> (ParameterStatisticsService::parameterStatisticsVector.at(0).get()));
-	int &maxVal = s.max;
-	return maxVal;
-}
 
 #endif
+
+
+////		switch (type) {
+////			case 0: {
+////				static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+////				    .calculateStatistics();
+////				uint8_t maxVal =
+////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+////				        .max;
+////				uint8_t minVal =
+////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+////				        .min;
+////				meanVal =
+////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+////				        .mean;
+////				sdVal =
+////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
+////				        .standardDeviation;
+////				break;
+////			}

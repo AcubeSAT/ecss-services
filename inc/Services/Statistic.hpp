@@ -6,7 +6,12 @@
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
 #include "cmath"
-#include "ServicePool.hpp"
+//#include "Parameters/SystemParameters.hpp"
+//#include "Statistics/SystemStatistics.hpp"
+//#include "ServicePool.hpp"
+//#include "Statistics/SystemStatistics.hpp"
+
+//#include "Services/ParameterStatisticsService.hpp"
 
 #define SAMPLES_MAX_VECTOR_SIZE 10
 
@@ -16,10 +21,10 @@ public:
 	uint16_t selfSamplingInterval = 0;
 	uint16_t numOfSamplesCounter = 0;
 	uint16_t type = 0;
-	virtual void storeSamples(int n) = 0;  //Maybe take message type argument from another task, containing the
-	// statistic.
+	virtual void storeSamples(int n) = 0;//Maybe take message type argument from another task, containing the statistic.
 	virtual void calculateStatistics() = 0;
 	virtual void clearStatisticSamples() = 0;
+	virtual void appendStatisticsToMessage(StatisticBase& stat, Message& report) = 0;
 };
 
 template <typename DataType>
@@ -42,6 +47,7 @@ public:
 	etl::vector <DataType, SAMPLES_MAX_VECTOR_SIZE> samplesVector;
 
 	inline void storeSamples(int n) override {
+		// uint32_t t = as_CUC_timestamp(); it will get the CUC format timestamp and store it into the report packet
 		// save timestamp. if periodic, store first and calculate.
 		for (int i = 0; i < n; i++) {
 			DataType newSample = static_cast <DataType> (rand()) / static_cast <DataType> (10000000); //Dummy value, in reality it
@@ -86,6 +92,25 @@ public:
 		numOfSamplesCounter = 0;
 		maxTime = 0;
 		minTime = 0;
+	}
+
+	inline void appendStatisticsToMessage(StatisticBase& stat, Message& report) override {
+
+		Statistic <DataType> newStat = static_cast <Statistic <DataType>&> (stat);
+		// Calculate all the statistics
+		newStat.calculateStatistics();
+		DataType &maxValue = newStat.max;
+		DataType &minValue = newStat.min;
+		float meanValue = newStat.mean;
+		float sdValue = newStat.standardDeviation;
+
+		// Append everything to the report message in the correct order
+		report.append <DataType> (maxValue);
+		// append maxTime here (returned from storeSamples)
+		report.append <DataType> (minValue);
+		// append minTime here (returned from storeSamples)
+		report.appendFloat(meanValue);
+		report.appendFloat(sdValue);
 	}
 
 };

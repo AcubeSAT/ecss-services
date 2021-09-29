@@ -5,6 +5,7 @@
 #include "Message.hpp"
 #include "ECSS_Definitions.hpp"
 
+
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  *

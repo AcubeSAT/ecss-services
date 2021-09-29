@@ -5,7 +5,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameter.hpp"
-#include "Parameters/SystemParameters.hpp"
+//#include "Parameters/SystemParameters.hpp"
 
 /**
  * Implementation of the ST[20] parameter management service,

@@ -33,22 +33,14 @@ int main() {
 	std::cout << "Mean value: " << stat1.mean << std::endl;
 	std::cout << "SD value: " << stat1.standardDeviation << std::endl;
 
-	std::cout << "\nStatistic-2\n";
-	Statistic <float> stat2;
-	stat2.storeSamples(3);
-	std::cout << "Number of samples: " << stat2.numOfSamplesCounter << std::endl;
+	systemStatistics.statisticsArray[0] = stat1;
 
-	stat2.calculateStatistics();
-	std::cout << "Max value: " << stat2.max << std::endl;
-	std::cout << "Min value: " << stat2.min << std::endl;
-	std::cout << "Mean value: " << stat2.mean << std::endl;
-	std::cout << "SD value: " << stat2.standardDeviation << std::endl;
+	Message reportExample(ParameterStatisticsService::ServiceType,
+	                      ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport,
+	                      Message::TM,1);
 
-	// Store statistics into vector of type StatisticBase
-	ParameterStatisticsService obj;
-	int max = obj.test(stat1);
-	std::cout << "max = " << max << std::endl;
-
+	std::reference_wrapper <StatisticBase> stat = systemStatistics.statisticsArray[0].get();
+	stat.get().appendStatisticsToMessage(stat, reportExample);
 }
 
 

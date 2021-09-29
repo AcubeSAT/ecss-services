@@ -6,8 +6,9 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "Parameter.hpp"
+//#include "Parameter.hpp"
 #include "Statistic.hpp"
+#include "Parameters/SystemParameters.hpp"
 #include "etl/deque.h"
 #include "Statistics/SystemStatistics.hpp"
 
@@ -45,8 +46,6 @@ public:
 	uint16_t periodicStatisticsReportingInterval;
 	uint16_t numOfStatisticsDefinitions = 0;
 	uint16_t nonDefinedStatistics = 0;
-
-	etl::vector <std::reference_wrapper <StatisticBase>, ECSS_MAX_PARAMETERS> parameterStatisticsVector;
 
 	ParameterStatisticsService() = default;
 	/**
@@ -103,7 +102,8 @@ public:
 	 */
 	void reportStatisticsDefinitions(Message& request);
 
-	int test(Statistic <int> stat);
+//	int test(Statistic <int> stat);
+	void test(Message& report);
 };
 
 #endif
