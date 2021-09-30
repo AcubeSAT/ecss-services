@@ -7,7 +7,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 //#include "Parameter.hpp"
-#include "Statistic.hpp"
+//#include "Statistic.hpp"
 #include "Parameters/SystemParameters.hpp"
 #include "etl/deque.h"
 #include "Statistics/SystemStatistics.hpp"
@@ -43,7 +43,7 @@ public:
 
 	bool periodicStatisticsReportingStatus = false;     // 1 means that periodic reporting is enabled
 	bool hasAutomaticStatisticsReset = false;
-	uint16_t periodicStatisticsReportingInterval;
+	uint16_t periodicStatisticsReportingInterval = 0;
 	uint16_t numOfStatisticsDefinitions = 0;
 	uint16_t nonDefinedStatistics = 0;
 
@@ -58,12 +58,9 @@ public:
 	void reportParameterStatistics(Message& resetFlag);
 
 	/**
-	 * TC[4,3] reset parameter statistics
-	 *
-	 * @param reset: boolean value. Was not actually specified in the
-	 * datasheet, will have to be discussed.
+	 * TC[4,3] reset parameter statistics thus clear all samples and values.
 	 */
-	void resetParameterStatistics(Message& reset);
+	void resetParameterStatistics();
 
 	/**
 	 * TC[4,4] enable periodic parameter reporting
@@ -88,10 +85,15 @@ public:
 
 	/**
 	 * TM[4,7] delete parameter statistics definitions
+	 * 		   One version specifies the IDs of the
+	 * 		   parameters whose definitions are to
+	 * 		   be deleted.The second version deletes
+	 * 		   all definitions
 	 *
 	 * @param paramIds: Ids of the parameters
 	 */
 	void deleteStatisticsDefinitions(Message& paramIds);
+	void deleteAllStatisticsDefinitions();
 
 	/**
 	 * This function receives a TM[4,8] packet and
@@ -105,5 +107,6 @@ public:
 //	int test(Statistic <int> stat);
 	void test(Message& report);
 };
+
 
 #endif

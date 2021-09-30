@@ -6,12 +6,6 @@
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
 #include "cmath"
-//#include "Parameters/SystemParameters.hpp"
-//#include "Statistics/SystemStatistics.hpp"
-//#include "ServicePool.hpp"
-//#include "Statistics/SystemStatistics.hpp"
-
-//#include "Services/ParameterStatisticsService.hpp"
 
 #define SAMPLES_MAX_VECTOR_SIZE 10
 
@@ -20,11 +14,16 @@ public:
 	uint16_t parameterId = 0;
 	uint16_t selfSamplingInterval = 0;
 	uint16_t numOfSamplesCounter = 0;
-	uint16_t type = 0;
-	virtual void storeSamples(int n) = 0;//Maybe take message type argument from another task, containing the statistic.
+	bool supportsStandardDeviation = true;
+
+	virtual void storeSamples(int n) = 0;
 	virtual void calculateStatistics() = 0;
 	virtual void clearStatisticSamples() = 0;
-	virtual void appendStatisticsToMessage(StatisticBase& stat, Message& report) = 0;
+	virtual int appendStatisticsToMessage(StatisticBase& stat, Message& report) = 0;
+
+	void setSelfTimeInterval(uint16_t timeInterval) {
+		this -> selfSamplingInterval = timeInterval;
+	}
 };
 
 template <typename DataType>
@@ -32,23 +31,30 @@ class Statistic : public StatisticBase {
 public:
 
 	explicit Statistic(const StatisticBase& base) {}
-//	explicit Statistic(DataType initialValue) : currentValue(initialValue) {}
 	DataType max = 0;
 	DataType min = 0;
-	uint16_t maxTime = 0;   //what time??
+	uint16_t maxTime = 0;
 	uint16_t minTime = 0;
 	float mean = 0;
 	float standardDeviation = 0;
 
 	Statistic() = default;
-//	explicit Statistic(uint16_t paramId, uint16_t samplesCounter, uint16_t typeId) : parameterId(paramId) ,
-//	      numOfSamplesCounter(samplesCounter) , type(typeId) {}
 
 	etl::vector <DataType, SAMPLES_MAX_VECTOR_SIZE> samplesVector;
+//	etl::vector <uint32_t, SAMPLES_MAX_VECTOR_SIZE> sampleTimestampsVector; <-this will be used when CUC is ready!!
 
 	inline void storeSamples(int n) override {
-		// uint32_t t = as_CUC_timestamp(); it will get the CUC format timestamp and store it into the report packet
-		// save timestamp. if periodic, store first and calculate.
+		/*
+		 * TODO:
+		 *      uint32_t currentSampleTime = as_CUC_timestamp();
+		 *      sampleTimestampsVector.push_back(currentSampleTime);
+		 *
+		 *      if periodic, just calculate next time without the CUC
+		 *      function. Very easy, but we cannot include the
+		 *      ParameterStatisticsService.hpp because that includes
+		 *      the Statistic.hpp file, not the other way around.
+		 *      There are plenty of ways to do that though!!
+		 * */
 		for (int i = 0; i < n; i++) {
 			DataType newSample = static_cast <DataType> (rand()) / static_cast <DataType> (10000000); //Dummy value, in reality it
 			// has to take a real sample at this point.
@@ -60,7 +66,9 @@ public:
 	inline void calculateStatistics() override {
 
 		max = samplesVector.at(0);
+		// maxTime = sampleTimestampsVector.at(0);
 		min = max;
+		// minTime = maxTime;
 		uint16_t sum = samplesVector.at(0);
 
 		for (int i = 1; i < samplesVector.size(); i++) {
@@ -68,18 +76,22 @@ public:
 			DataType currentValue = samplesVector.at(i);
 			if (currentValue > max) {
 				max = currentValue;
+				// maxTime = sampleTimestampsVector.at(i);
 			}
 			if (currentValue < min) {
 				min = currentValue;
+				// minTime = sampleTimestampsVector.at(i);
 			}
 			sum += currentValue;
 		}
 
 		mean = sum / samplesVector.size();
-		for (int i = 0; i < samplesVector.size(); i++) {
-			standardDeviation += pow(samplesVector.at(i) - mean, 2);
+		if (supportsStandardDeviation) {
+			for (int i = 0; i < samplesVector.size(); i++) {
+				standardDeviation += pow(samplesVector.at(i) - mean, 2);
+			}
+			standardDeviation = sqrt(standardDeviation / samplesVector.size());
 		}
-		standardDeviation = sqrt(standardDeviation / samplesVector.size());
 	}
 
 	inline void clearStatisticSamples() override {
@@ -94,7 +106,7 @@ public:
 		minTime = 0;
 	}
 
-	inline void appendStatisticsToMessage(StatisticBase& stat, Message& report) override {
+	inline int appendStatisticsToMessage(StatisticBase& stat, Message& report) override {
 
 		Statistic <DataType> newStat = static_cast <Statistic <DataType>&> (stat);
 		// Calculate all the statistics
@@ -102,7 +114,6 @@ public:
 		DataType &maxValue = newStat.max;
 		DataType &minValue = newStat.min;
 		float &meanValue = newStat.mean;
-		float &sdValue = newStat.standardDeviation;
 
 		// Append everything to the report message in the correct order
 		report.append <DataType> (maxValue);
@@ -110,7 +121,12 @@ public:
 		report.append <DataType> (minValue);
 		// append minTime here (returned from storeSamples)
 		report.appendFloat(meanValue);
-		report.appendFloat(sdValue);
+
+		if (supportsStandardDeviation) {
+			float &sdValue = newStat.standardDeviation;
+			report.appendFloat(sdValue);
+		}
+		return maxValue;
 	}
 
 };

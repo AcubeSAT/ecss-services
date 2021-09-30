@@ -41,37 +41,22 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 	storeMessage(statisticsReport);
 
 	if (resetFlagValue or ParameterStatisticsService :: hasAutomaticStatisticsReset) {
-		Message resetParams(ParameterStatisticsService::ServiceType,
-		                    ParameterStatisticsService::MessageType::ResetParameterStatistics,Message::TC,1);
-		resetParameterStatistics(resetParams);
+		resetParameterStatistics();
 	}
-
 	// Here add start time
 
 }
 
-void ParameterStatisticsService :: resetParameterStatistics(Message& reset) {
+void ParameterStatisticsService :: resetParameterStatistics() {
 
-	ErrorHandler::assertRequest(reset.packetType == Message::TC, reset,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(reset.messageType == ParameterStatisticsService::MessageType::ResetParameterStatistics,
-	                            reset, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(reset.serviceType == ParameterStatisticsService::ServiceType, reset,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	//TODO: Stop the evaluation of parameter statistics
+	uint16_t numOfParameters = systemParameters.parametersArray.size();
+	for(int i = 0; i < numOfParameters; i++) {
 
-	bool resetSignal = reset.readBoolean();
-
-	if (resetSignal) {
-
-		//TODO: Stop the evaluation of parameter statistics
-		uint16_t numOfParameters = systemParameters.parametersArray.size();
-		for(int i = 0; i < numOfParameters; i++) {
-
-			std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[i].get();
-			currentStatistic.get().clearStatisticSamples();
-		}
-		//TODO: Restart the evaluation of parameter statistics
+		std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[i].get();
+		currentStatistic.get().clearStatisticSamples();
 	}
-
+	//TODO: Restart the evaluation of parameter statistics
 }
 
 void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& request) {
@@ -179,13 +164,13 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 
 				if (paramSamplingInterval == 0) {
 
-					systemStatistics.statisticsArray[currentId].get().selfSamplingInterval = interval;
+					systemStatistics.statisticsArray[currentId].get().setSelfTimeInterval(interval) ;
 					ParameterStatisticsService::nonDefinedStatistics--;
 					//TODO: start the evaluation of statistics for this parameter. //add boolean value on statistic
 					// that says if evaluation is enabled
 				}
 				else {
-					systemStatistics.statisticsArray[currentId].get().selfSamplingInterval = interval;
+					systemStatistics.statisticsArray[currentId].get().setSelfTimeInterval(interval);
 					// Statistics evaluation reset
 					systemStatistics.statisticsArray[currentId].get().clearStatisticSamples();
 				}
@@ -206,31 +191,32 @@ void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds
 
 	uint16_t numOfIds = paramIds.readUint16();
 
-	// In case that not all parameter definitions have to be deleted
-	if (numOfIds < systemParameters.parametersArray.size()) {
-		for (uint16_t i = 0; i < numOfIds; i++) {
+	for (uint16_t i = 0; i < numOfIds; i++) {
 
-			uint16_t currentId = paramIds.readUint16();
-			if (currentId < systemParameters.parametersArray.size()) {
+		uint16_t currentId = paramIds.readUint16();
+		if (currentId < systemParameters.parametersArray.size()) {
 
-				systemStatistics.statisticsArray.at(currentId).get().selfSamplingInterval = 0;
-				ParameterStatisticsService::nonDefinedStatistics++;
-			} else {
-				ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
-			}
+			systemStatistics.statisticsArray.at(currentId).get().setSelfTimeInterval(0);
+			ParameterStatisticsService::nonDefinedStatistics++;
+		} else {
+			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
-	}// In case that we request to delete every parameter definition
-	else if (numOfIds == systemParameters.parametersArray.size()) {
-		for (uint16_t i = 0; i < numOfIds; i++) {
-			systemStatistics.statisticsArray.at(i).get().selfSamplingInterval = 0;
-		}
-		ParameterStatisticsService::nonDefinedStatistics = systemParameters.parametersArray.size();
 	}
-
 	// If list of definitions is empty, stop the periodic reporting.
 	if (ParameterStatisticsService::nonDefinedStatistics == systemParameters.parametersArray.size()) {
 		ParameterStatisticsService::periodicStatisticsReportingStatus = false;
 	}
+}
+
+void ParameterStatisticsService :: deleteAllStatisticsDefinitions() {
+
+	uint16_t numOfIds = systemParameters.parametersArray.size();
+	for (uint16_t i = 0; i < numOfIds; i++) {
+		systemStatistics.statisticsArray.at(i).get().setSelfTimeInterval(0);
+	}
+	ParameterStatisticsService::nonDefinedStatistics = systemParameters.parametersArray.size();
+	// Stop the periodic reporting because there are no defined parameters.
+	ParameterStatisticsService::periodicStatisticsReportingStatus = false;
 }
 
 void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request) {
@@ -275,36 +261,7 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 	}
 
 	storeMessage(definitionsReport);
-
 }
-
-//int ParameterStatisticsService::test(Statistic<int> stat) {
-//
-//	ParameterStatisticsService::parameterStatisticsVector.push_back(stat);
-//	Statistic <int> s = (static_cast <Statistic<int>&> (ParameterStatisticsService::parameterStatisticsVector.at(0).get()));
-//	int &maxVal = s.max;
-//	return maxVal;
-//}
 
 
 #endif
-
-
-////		switch (type) {
-////			case 0: {
-////				static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-////				    .calculateStatistics();
-////				uint8_t maxVal =
-////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-////				        .max;
-////				uint8_t minVal =
-////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-////				        .min;
-////				meanVal =
-////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-////				        .mean;
-////				sdVal =
-////				    static_cast<Statistic<uint8_t>&>(ParameterStatisticsService::parameterStatisticsVector.at(i).get())
-////				        .standardDeviation;
-////				break;
-////			}
