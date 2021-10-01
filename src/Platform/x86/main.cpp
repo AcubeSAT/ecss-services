@@ -20,7 +20,7 @@
 #include "ServicePool.hpp"
 #include <ctime>
 
-
+/*
 int main() {
 
 	srand(time(NULL));
@@ -57,8 +57,8 @@ int main() {
 	    std::endl;
 	return 0;
 }
+*/
 
-/*
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
@@ -371,4 +371,3 @@ int main() {
 	LOG_NOTICE << "ECSS Services test complete";
 	return 0;
 }
-*/
