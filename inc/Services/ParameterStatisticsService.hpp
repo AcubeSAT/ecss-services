@@ -6,12 +6,11 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-//#include "Parameter.hpp"
-//#include "Statistic.hpp"
 #include "Parameters/SystemParameters.hpp"
 #include "etl/deque.h"
 #include "Statistics/SystemStatistics.hpp"
 
+extern bool supportsStandardDeviation;
 /**
  * Implementation of the ST[04] parameter management service,
  * as defined in ECSS-E-ST-70-41C. Regarding the variable types
@@ -20,6 +19,8 @@
  *
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
+
+//extern bool supportsStandardDeviation = true;
 
 class ParameterStatisticsService : public Service {
 public:
@@ -43,6 +44,7 @@ public:
 
 	bool periodicStatisticsReportingStatus = false;     // 1 means that periodic reporting is enabled
 	bool hasAutomaticStatisticsReset = false;
+	bool supportsStandardDeviation = true;
 	uint16_t periodicStatisticsReportingInterval = 0;
 	uint16_t numOfStatisticsDefinitions = 0;
 	uint16_t nonDefinedStatistics = 0;
@@ -106,7 +108,9 @@ public:
 
 //	int test(Statistic <int> stat);
 	void test(Message& report);
+
 };
 
+extern ParameterStatisticsService parameterStatisticsService;
 
 #endif

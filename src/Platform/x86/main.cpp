@@ -20,7 +20,6 @@
 #include "ServicePool.hpp"
 #include <ctime>
 
-/*
 int main() {
 
 	srand(time(NULL));
@@ -48,11 +47,11 @@ int main() {
 	systemStatistics.statisticsArray[0].get().setSelfTimeInterval(12345);
 	std::cout << "Interval after change: " << systemStatistics.statisticsArray[0].get().selfSamplingInterval <<
 	    std::endl;
-
+	std::cout << "Supports SD: " << stat.get().supportsStandardDeviation << std::endl;
 	return 0;
 }
-*/
 
+/*
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
@@ -365,3 +364,4 @@ int main() {
 	LOG_NOTICE << "ECSS Services test complete";
 	return 0;
 }
+*/

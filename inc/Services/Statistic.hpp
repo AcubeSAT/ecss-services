@@ -6,7 +6,9 @@
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
 #include "cmath"
+//#include "ParameterStatisticsService.hpp"
 
+extern bool supportsStandardDeviation;
 #define SAMPLES_MAX_VECTOR_SIZE 10
 
 class StatisticBase {

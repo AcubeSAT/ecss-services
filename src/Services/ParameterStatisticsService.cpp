@@ -1,7 +1,9 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
-
+//#include "Statistics/SystemStatistics.hpp"
 #include "Services/ParameterStatisticsService.hpp"
+
+extern bool supportsStandardDeviation = true;
 
 void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag) {
 
@@ -220,23 +222,25 @@ void ParameterStatisticsService :: deleteAllStatisticsDefinitions() {
 }
 
 void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request) {
-
 	Message definitionsReport(ParameterStatisticsService::ServiceType,
-	                        ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport, Message::TM, 1);
+	                          ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport,
+	                          Message::TM, 1);
 
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType ==ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions,
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType ==
+	                                ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ParameterStatisticsService::ServiceType, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t reportingInterval = 0;
-	if (ParameterStatisticsService :: periodicStatisticsReportingStatus) {
-		reportingInterval = ParameterStatisticsService :: periodicStatisticsReportingInterval;
+	if (ParameterStatisticsService ::periodicStatisticsReportingStatus) {
+		reportingInterval = ParameterStatisticsService ::periodicStatisticsReportingInterval;
 	}
 
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
-	definitionsReport.appendUint16(reportingInterval);  // Append interval
+	definitionsReport.appendUint16(reportingInterval); // Append interval
 
 	uint16_t numOfDefinedParameters = 0;
 	for (int i = 0; i < numOfParameters; i++) {
@@ -261,7 +265,7 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 	}
 
 	storeMessage(definitionsReport);
-}
 
+}
 
 #endif
