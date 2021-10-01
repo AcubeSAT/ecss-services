@@ -10,7 +10,7 @@
 #include "etl/deque.h"
 #include "Statistics/SystemStatistics.hpp"
 
-extern bool supportsStandardDeviation;
+//extern bool supportsStandardDeviation;
 /**
  * Implementation of the ST[04] parameter management service,
  * as defined in ECSS-E-ST-70-41C. Regarding the variable types
@@ -105,9 +105,6 @@ public:
 	 * @param
 	 */
 	void reportStatisticsDefinitions(Message& request);
-
-//	int test(Statistic <int> stat);
-	void test(Message& report);
 
 };
 

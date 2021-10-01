@@ -6,7 +6,6 @@
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
 #include "cmath"
-//#include "ParameterStatisticsService.hpp"
 
 extern bool supportsStandardDeviation;
 #define SAMPLES_MAX_VECTOR_SIZE 10
@@ -16,7 +15,7 @@ public:
 	uint16_t parameterId = 0;
 	uint16_t selfSamplingInterval = 0;
 	uint16_t numOfSamplesCounter = 0;
-	bool supportsStandardDeviation = true;
+//	bool supportsStandardDeviation = 0;
 
 	virtual void storeSamples(int n) = 0;
 	virtual void calculateStatistics() = 0;
@@ -127,6 +126,7 @@ public:
 		if (supportsStandardDeviation) {
 			float &sdValue = newStat.standardDeviation;
 			report.appendFloat(sdValue);
+			return 0;
 		}
 		return maxValue;
 	}

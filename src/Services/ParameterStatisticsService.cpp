@@ -3,7 +3,7 @@
 //#include "Statistics/SystemStatistics.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
-extern bool supportsStandardDeviation = true;
+bool supportsStandardDeviation = false;
 
 void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag) {
 

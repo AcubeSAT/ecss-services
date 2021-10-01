@@ -20,6 +20,7 @@
 #include "ServicePool.hpp"
 #include <ctime>
 
+
 int main() {
 
 	srand(time(NULL));
@@ -42,12 +43,18 @@ int main() {
 	                      Message::TM,1);
 
 	std::reference_wrapper <StatisticBase> stat = systemStatistics.statisticsArray[0].get();
+
 	int max = stat.get().appendStatisticsToMessage(stat, reportExample);
 	std::cout << "Max after: " << max << std::endl;
+
+//	supportsStandardDeviation = true;
+
+	max = stat.get().appendStatisticsToMessage(stat, reportExample);
+	std::cout << "Max after 2: " << max << std::endl;
+
 	systemStatistics.statisticsArray[0].get().setSelfTimeInterval(12345);
 	std::cout << "Interval after change: " << systemStatistics.statisticsArray[0].get().selfSamplingInterval <<
 	    std::endl;
-	std::cout << "Supports SD: " << stat.get().supportsStandardDeviation << std::endl;
 	return 0;
 }
 
