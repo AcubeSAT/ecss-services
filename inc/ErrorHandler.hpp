@@ -152,7 +152,11 @@ public:
 		 * Attempt to set a sampling rate which is greater than the parameter reporting rate.
 		 * ST[04]
 		 */
-		InvalidSamplingRateError = 10
+		InvalidSamplingRateError = 10,
+		/**
+		 * Attempt to add definition to the struct map but its already full. (ST[19])
+		 */
+		EventActionDefinitionsMapIsFull = 11
 	};
 
 	/**
