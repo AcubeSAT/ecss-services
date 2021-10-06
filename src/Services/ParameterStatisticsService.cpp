@@ -143,10 +143,7 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 
 	uint16_t numOfIds = paramIds.readUint16();
 
-	uint16_t step = -1;
-	(paramIds.hasTimeIntervals) ? (step = 2) : (step = 1);  //if there are intervals we have to iterate with step 2.
-
-	for (uint16_t i = 0; i < numOfIds; i += step) {
+	for (uint16_t i = 0; i < numOfIds; i++) {
 
 		uint16_t currentId = paramIds.readUint16();
 
@@ -167,6 +164,7 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 				if (paramSamplingInterval == 0) {
 
 					systemStatistics.statisticsArray[currentId].get().setSelfTimeInterval(interval) ;
+					systemParameters.parametersArray.at(currentId).get().setParameterIsActive(true);
 					ParameterStatisticsService::nonDefinedStatistics--;
 					//TODO: start the evaluation of statistics for this parameter. //add boolean value on statistic
 					// that says if evaluation is enabled
@@ -199,7 +197,9 @@ void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds
 		if (currentId < systemParameters.parametersArray.size()) {
 
 			systemStatistics.statisticsArray.at(currentId).get().setSelfTimeInterval(0);
+			systemParameters.parametersArray.at(currentId).get().setParameterIsActive(false);
 			ParameterStatisticsService::nonDefinedStatistics++;
+
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
@@ -215,6 +215,7 @@ void ParameterStatisticsService :: deleteAllStatisticsDefinitions() {
 	uint16_t numOfIds = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		systemStatistics.statisticsArray.at(i).get().setSelfTimeInterval(0);
+		systemParameters.parametersArray.at(i).get().setParameterIsActive(false);
 	}
 	ParameterStatisticsService::nonDefinedStatistics = systemParameters.parametersArray.size();
 	// Stop the periodic reporting because there are no defined parameters.

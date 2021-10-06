@@ -33,8 +33,14 @@
  */
 class ParameterBase {
 public:
+	bool parameterIsActive = true;
+
 	virtual void appendValueToMessage(Message& message) = 0;
 	virtual void setValueFromMessage(Message& message) = 0;
+
+	void setParameterIsActive(bool paramIsActive) {
+		this -> parameterIsActive = paramIsActive;
+	}
 };
 
 /**

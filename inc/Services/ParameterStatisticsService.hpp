@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 
+// TODO: actually define this
 #define MAX_NUM_OF_DEFINITIONS 10
 
 #include "ECSS_Definitions.hpp"
@@ -10,7 +11,6 @@
 #include "etl/deque.h"
 #include "Statistics/SystemStatistics.hpp"
 
-//extern bool supportsStandardDeviation;
 /**
  * Implementation of the ST[04] parameter management service,
  * as defined in ECSS-E-ST-70-41C. Regarding the variable types
