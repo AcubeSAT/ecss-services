@@ -15,9 +15,11 @@ public:
 	uint16_t parameterId = 0;
 	uint16_t selfSamplingInterval = 0;
 	uint16_t numOfSamplesCounter = 0;
-//	bool supportsStandardDeviation = 0;
 
-	virtual void storeSamples(int n) = 0;
+	virtual void storeSamples(uint8_t value) = 0;
+	virtual void storeSamples(uint16_t value) = 0;
+	virtual void storeSamples(uint32_t value) = 0;
+	virtual void storeSamples(float value) = 0;
 	virtual void calculateStatistics() = 0;
 	virtual void clearStatisticSamples() = 0;
 	virtual int appendStatisticsToMessage(StatisticBase& stat, Message& report) = 0;
@@ -44,7 +46,7 @@ public:
 	etl::vector <DataType, SAMPLES_MAX_VECTOR_SIZE> samplesVector;
 //	etl::vector <uint32_t, SAMPLES_MAX_VECTOR_SIZE> sampleTimestampsVector; <-this will be used when CUC is ready!!
 
-	inline void storeSamples(int n) override {
+	inline void storeSamples(uint8_t value) override {
 		/*
 		 * TODO:
 		 *      uint32_t currentSampleTime = as_CUC_timestamp();
@@ -56,12 +58,58 @@ public:
 		 *      the Statistic.hpp file, not the other way around.
 		 *      There are plenty of ways to do that though!!
 		 * */
-		for (int i = 0; i < n; i++) {
-			DataType newSample = static_cast <DataType> (rand()) / static_cast <DataType> (10000000); //Dummy value, in reality it
-			// has to take a real sample at this point.
-			Statistic::samplesVector.push_back(newSample);
-			numOfSamplesCounter++;
-		}
+		Statistic::samplesVector.push_back(value);
+		numOfSamplesCounter++;
+
+	}
+
+	inline void storeSamples(uint16_t value) override {
+		/*
+		 * TODO:
+		 *      uint32_t currentSampleTime = as_CUC_timestamp();
+		 *      sampleTimestampsVector.push_back(currentSampleTime);
+		 *
+		 *      if periodic, just calculate next time without the CUC
+		 *      function. Very easy, but we cannot include the
+		 *      ParameterStatisticsService.hpp because that includes
+		 *      the Statistic.hpp file, not the other way around.
+		 *      There are plenty of ways to do that though!!
+		 * */
+		Statistic::samplesVector.push_back(value);
+		numOfSamplesCounter++;
+	}
+
+	inline void storeSamples(uint32_t value) override {
+		/*
+		 * TODO:
+		 *      uint32_t currentSampleTime = as_CUC_timestamp();
+		 *      sampleTimestampsVector.push_back(currentSampleTime);
+		 *
+		 *      if periodic, just calculate next time without the CUC
+		 *      function. Very easy, but we cannot include the
+		 *      ParameterStatisticsService.hpp because that includes
+		 *      the Statistic.hpp file, not the other way around.
+		 *      There are plenty of ways to do that though!!
+		 * */
+		Statistic::samplesVector.push_back(value);
+		numOfSamplesCounter++;
+	}
+
+	inline void storeSamples(float value) override {
+		/*
+		 * TODO:
+		 *      uint32_t currentSampleTime = as_CUC_timestamp();
+		 *      sampleTimestampsVector.push_back(currentSampleTime);
+		 *
+		 *      if periodic, just calculate next time without the CUC
+		 *      function. Very easy, but we cannot include the
+		 *      ParameterStatisticsService.hpp because that includes
+		 *      the Statistic.hpp file, not the other way around.
+		 *      There are plenty of ways to do that though!!
+		 * */
+		Statistic::samplesVector.push_back(value);
+		numOfSamplesCounter++;
+
 	}
 
 	inline void calculateStatistics() override {
