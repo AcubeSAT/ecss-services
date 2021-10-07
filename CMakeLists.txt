@@ -43,6 +43,8 @@ add_library(common OBJECT
         src/Services/ParameterStatisticsService.cpp
         src/Services/Statistic.cpp
         src/Platform/x86/Statistics/SystemStatistics.cpp
+        src/Services/HousekeepingService.cpp
+        src/Services/HousekeepingStructure.cpp
         )
 
 # Specify the .cpp files for the executables

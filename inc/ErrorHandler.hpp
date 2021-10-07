@@ -156,7 +156,11 @@ public:
 		/**
 		 * Attempt to add definition to the struct map but its already full. (ST[19])
 		 */
-		EventActionDefinitionsMapIsFull = 11
+		EventActionDefinitionsMapIsFull = 11,
+		/**
+		 * Attempt to report non existing housekeeping structure (St[03])
+		 */
+		RequestedNonExistingStructure = 12
 	};
 
 	/**
