@@ -80,8 +80,6 @@ public:
 
 	/**
 	 * TM[4,6] add or update parameter statistics definitions
-	 *
-	 * @param paramIds: Ids of the parameters. Could be followed by intervals.
 	 */
 	void addOrUpdateStatisticsDefinitions(Message& paramIds);
 
