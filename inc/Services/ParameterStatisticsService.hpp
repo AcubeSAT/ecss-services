@@ -57,7 +57,8 @@ public:
 	 *
 	 * @param resetFlag: a TC[4, 1] packet carrying a boolean value
 	 */
-	void reportParameterStatistics(Message& resetFlag);
+	 */
+	void reportParameterStatistics(Message& request);
 
 	/**
 	 * TC[4,3] reset parameter statistics, clearing all samples and values.
