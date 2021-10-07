@@ -60,7 +60,7 @@ public:
 	void reportParameterStatistics(Message& resetFlag);
 
 	/**
-	 * TC[4,3] reset parameter statistics thus clear all samples and values.
+	 * TC[4,3] reset parameter statistics, clearing all samples and values.
 	 */
 	void resetParameterStatistics();
 
