@@ -52,6 +52,7 @@ tests:
       junit: junit.xml
 
 cppcheck:
+  image: spacedot/cppcheck:2.5
   stage: build
   before_script:
     - cppcheck --version
