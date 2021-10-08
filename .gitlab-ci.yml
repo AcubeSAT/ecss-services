@@ -1,5 +1,3 @@
-image: lightspot21/acubesat-ci:latest
-
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
@@ -52,18 +50,16 @@ tests:
       junit: junit.xml
 
 cppcheck:
+  image: spacedot/cppcheck:2.5
   stage: build
   before_script:
     - cppcheck --version
   script:
-    - ci/cppcheck.sh
-
-cppcheck-misra:
-  stage: build
-  before_script:
-    - cppcheck --version
-  script:
-    - ci/cppcheck-misra.sh
+    - cppcheck --enable=all --suppress=unusedFunction --suppress=noExplicitConstructor --force \
+     --inline-suppr --error-exitcode=1 -I inc src test
+    - cppcheck --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
+     --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
+     --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 -I inc src test
 
 clang-tidy:
   stage: build
