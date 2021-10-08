@@ -21,6 +21,7 @@ before_script:
   - python3 -m pip install gcovr
 
 build:
+  image: spacedot/cppcheck:2.5
   stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: normal
@@ -34,6 +35,7 @@ build:
     - make -j4
 
 tests:
+  image: lightspot21/acubesat-ci:latest
   stage: test
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
   variables:
@@ -50,13 +52,16 @@ tests:
       junit: junit.xml
 
 cppcheck:
-  image: spacedot/cppcheck:2.5
   stage: build
   before_script:
     - cppcheck --version
   script:
+    - echo -e "\u001b[34;1mStarting cppcheck...\u001b[0m"
+    - echo -e "\u001b[34;1mRunning cppcheck with default checklist...\u001b[0m"
+    - cd "$(dirname "$0")/.."
     - cppcheck --enable=all --suppress=unusedFunction --suppress=noExplicitConstructor --force \
      --inline-suppr --error-exitcode=1 -I inc src test
+    - echo -e "\u001b[34;1mRunning cppcheck with misra addon...\u001b[0m"
     - cppcheck --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
      --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
      --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 -I inc src test
@@ -70,6 +75,7 @@ clang-tidy:
     - ci/clang-tidy.sh
 
 pages:
+  image: lightspot21/acubesat-ci:latest
   stage: deploy
   when: always  # Deploy always and on build or test failure, generate just the documentation
   cache:
