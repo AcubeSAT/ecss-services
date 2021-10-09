@@ -1,35 +1,31 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
-//#include "Statistics/SystemStatistics.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
 bool supportsStandardDeviation = false;
 
 void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag) {
 
-	Message statisticsReport(ParameterStatisticsService::ServiceType,
-	                        ParameterStatisticsService::MessageType::ParameterStatisticsReport, Message::TM, 1);
-
 	ErrorHandler::assertRequest(resetFlag.packetType == Message::TC, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(resetFlag.messageType ==ParameterStatisticsService::MessageType::ReportParameterStatistics,
+	ErrorHandler::assertRequest(resetFlag.messageType == MessageType::ReportParameterStatistics,
 	                            resetFlag, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(resetFlag.serviceType == ParameterStatisticsService::ServiceType, resetFlag,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(resetFlag.serviceType == ServiceType, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
 
 	bool resetFlagValue = resetFlag.readBoolean();
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
+	uint16_t numOfValidParameters = 0;
 
-	// Here is the end time
-	// append start time
-	// append end time
-
-	statisticsReport.appendUint16(numOfParameters);
+	// TODO: Here is the end time
+	//       append start time
+	//       append end time
 
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 
 	    uint16_t currId = i;
 		std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[currId].get();
-	    uint16_t numOfSamples = currentStatistic.get().numOfSamplesCounter;
+	    uint16_t numOfSamples = currentStatistic.get().sampleCounter;
 
 		if (numOfSamples == 0) {
 			continue;
@@ -38,8 +34,11 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 		statisticsReport.appendUint16(numOfSamples);
 
 		currentStatistic.get().appendStatisticsToMessage(currentStatistic, statisticsReport); // WORKS! MAGIC!
+		numOfValidParameters++;
 	}
 
+	statisticsReport.resetRead();
+	statisticsReport.appendUint16(numOfValidParameters);
 	storeMessage(statisticsReport);
 
 	if (resetFlagValue or ParameterStatisticsService :: hasAutomaticStatisticsReset) {
@@ -53,10 +52,9 @@ void ParameterStatisticsService :: resetParameterStatistics() {
 
 	//TODO: Stop the evaluation of parameter statistics
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
-	for(int i = 0; i < numOfParameters; i++) {
+	for(auto &it: systemStatistics.statisticsArray) {
 
-		std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[i].get();
-		currentStatistic.get().clearStatisticSamples();
+		it.get().clearStatisticSamples();
 	}
 	//TODO: Restart the evaluation of parameter statistics
 }
@@ -64,33 +62,30 @@ void ParameterStatisticsService :: resetParameterStatistics() {
 void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& request) {
 
 	// Dummy value
-	uint16_t SAMPLING_PARAMETER_INTERVAL = 5; //The sampling interval of each parameter, "timeInterval" requested should
-	                                          //not exceed it. It has to be defined as a constant.
+	uint16_t SAMPLING_PARAMETER_INTERVAL = 5; //TODO: The sampling interval of each parameter, "timeInterval" requested
+	                                          //      should not exceed it. It has to be defined as a constant.
+
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::EnablePeriodicParameterReporting,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t timeInterval = request.readUint16();
 
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ParameterStatisticsService::ServiceType, request,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-
-	// Added error handler to check if the time interval asked is not a valid number.
 	ErrorHandler::assertRequest(timeInterval >= SAMPLING_PARAMETER_INTERVAL, request,
 	                            ErrorHandler::ExecutionStartErrorType::InvalidReportingRateError);
 
-	ParameterStatisticsService :: periodicStatisticsReportingStatus = true; //Periodic reporting status changes to enabled
-	ParameterStatisticsService :: periodicStatisticsReportingInterval = timeInterval;
+	periodicStatisticsReportingStatus = true;
+	reportingInterval = timeInterval;
 
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 
 	//Only generate ONE parameter statistics report after every interval passes.
-	while (ParameterStatisticsService :: periodicStatisticsReportingStatus) {
+	while (periodicStatisticsReportingStatus) {
 
 		for (int i = 0; i < numOfParameters; i++) {
 
-			Message statisticsReport(ParameterStatisticsService::ServiceType,
-			                        ParameterStatisticsService::MessageType::ParameterStatisticsReport, Message::TM, 1);
+			Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
 			/*
 			 * TODO:
 			 *      1. append start time to parameterReport
@@ -98,12 +93,12 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 			 */
 
 			std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[i].get();
-			uint16_t numOfSamples = currentStatistic.get().numOfSamplesCounter;
+			uint16_t numOfSamples = currentStatistic.get().sampleCounter;
 
 			if(numOfSamples == 0) {
 				continue;
 			}
-			statisticsReport.appendUint16(numOfParameters);  // step 3
+			statisticsReport.appendUint16(numOfParameters);
 			statisticsReport.appendUint16(i);
 
 			currentStatistic.get().appendStatisticsToMessage(currentStatistic, statisticsReport);
@@ -124,38 +119,36 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 void ParameterStatisticsService :: disablePeriodicStatisticsReporting(Message& request) {
 
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == ParameterStatisticsService::MessageType::DisablePeriodicParameterReporting,
+	ErrorHandler::assertRequest(request.messageType == MessageType::DisablePeriodicParameterReporting,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ParameterStatisticsService::ServiceType, request,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	ParameterStatisticsService :: periodicStatisticsReportingStatus = false;
-	ParameterStatisticsService :: periodicStatisticsReportingInterval = 0;
+	ParameterStatisticsService :: reportingInterval = 0;
 }
 
-void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& paramIds) {
+void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& request) {
 
-	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
-	                            paramIds, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.serviceType == ParameterStatisticsService::ServiceType, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::AddOrUpdateParameterStatisticsDefinitions,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t numOfIds = request.readUint16();
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 
-		uint16_t currentId = paramIds.readUint16();
+		uint16_t currentId = request.readUint16();
 
 		if (currentId < systemParameters.parametersArray.size()) {
-			ErrorHandler::assertRequest(ParameterStatisticsService::numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, paramIds,
+			ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
 			                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 			// If there are intervals, get the value and check if it exceeds the sampling rate of the parameter.
-			if (paramIds.hasTimeIntervals) {
+			if (request.hasTimeIntervals) {
 
-				uint16_t interval = paramIds.readUint16();
-				ErrorHandler::assertRequest(interval <=ParameterStatisticsService::periodicStatisticsReportingInterval, paramIds,
+				uint16_t interval = request.readUint16();
+				ErrorHandler::assertRequest(interval <= reportingInterval, request,
 				                            ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 				// Get the sampling interval of the current parameter from the statistics vector
 				std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[currentId].get();
@@ -163,50 +156,49 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& par
 
 				if (paramSamplingInterval == 0) {
 
-					systemStatistics.statisticsArray[currentId].get().setSelfTimeInterval(interval) ;
+					systemStatistics.statisticsArray[currentId].get().setSelfSamplingInterval(interval) ;
 					systemParameters.parametersArray.at(currentId).get().setParameterIsActive(true);
 					ParameterStatisticsService::nonDefinedStatistics--;
 					//TODO: start the evaluation of statistics for this parameter. //add boolean value on statistic
 					// that says if evaluation is enabled
 				}
 				else {
-					systemStatistics.statisticsArray[currentId].get().setSelfTimeInterval(interval);
+					systemStatistics.statisticsArray[currentId].get().setSelfSamplingInterval(interval);
 					// Statistics evaluation reset
 					systemStatistics.statisticsArray[currentId].get().clearStatisticSamples();
 				}
 			}
 		} else {
-			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 		}
 	}
 }
 
-void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& paramIds) {
+void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& request) {
 
-	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.messageType == ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions,
-	                            paramIds, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.serviceType == ParameterStatisticsService::ServiceType, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::DeleteParameterStatisticsDefinitions,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t numOfIds = request.readUint16();
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 
-		uint16_t currentId = paramIds.readUint16();
+		uint16_t currentId = request.readUint16();
 		if (currentId < systemParameters.parametersArray.size()) {
 
-			systemStatistics.statisticsArray.at(currentId).get().setSelfTimeInterval(0);
+			systemStatistics.statisticsArray.at(currentId).get().setSelfSamplingInterval(0);
 			systemParameters.parametersArray.at(currentId).get().setParameterIsActive(false);
 			ParameterStatisticsService::nonDefinedStatistics++;
 
 		} else {
-			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 		}
 	}
 	// If list of definitions is empty, stop the periodic reporting.
-	if (ParameterStatisticsService::nonDefinedStatistics == systemParameters.parametersArray.size()) {
-		ParameterStatisticsService::periodicStatisticsReportingStatus = false;
+	if (nonDefinedStatistics == systemParameters.parametersArray.size()) {
+		periodicStatisticsReportingStatus = false;
 	}
 }
 
@@ -214,40 +206,35 @@ void ParameterStatisticsService :: deleteAllStatisticsDefinitions() {
 
 	uint16_t numOfIds = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		systemStatistics.statisticsArray.at(i).get().setSelfTimeInterval(0);
+		systemStatistics.statisticsArray.at(i).get().setSelfSamplingInterval(0);
 		systemParameters.parametersArray.at(i).get().setParameterIsActive(false);
 	}
-	ParameterStatisticsService::nonDefinedStatistics = systemParameters.parametersArray.size();
+	nonDefinedStatistics = systemParameters.parametersArray.size();
 	// Stop the periodic reporting because there are no defined parameters.
-	ParameterStatisticsService::periodicStatisticsReportingStatus = false;
+	periodicStatisticsReportingStatus = false;
 }
 
 void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request) {
-	Message definitionsReport(ParameterStatisticsService::ServiceType,
-	                          ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport,
-	                          Message::TM, 1);
 
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType ==
-	                                ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions,
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportParameterStatisticsDefinitions,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ParameterStatisticsService::ServiceType, request,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t reportingInterval = 0;
-	if (ParameterStatisticsService ::periodicStatisticsReportingStatus) {
-		reportingInterval = ParameterStatisticsService ::periodicStatisticsReportingInterval;
+	Message definitionsReport(ServiceType,MessageType::ParameterStatisticsDefinitionsReport,Message::TM, 1);
+
+	uint16_t currReportingInterval = 0;
+	if (periodicStatisticsReportingStatus) {
+		currReportingInterval = reportingInterval;
 	}
 
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
-	definitionsReport.appendUint16(reportingInterval); // Append interval
+	definitionsReport.appendUint16(currReportingInterval); // Append interval
 
 	uint16_t numOfDefinedParameters = 0;
-	for (int i = 0; i < numOfParameters; i++) {
-		uint16_t currentId = i;
-		uint16_t currentSamplingInterval = systemStatistics.statisticsArray.at(currentId).get().selfSamplingInterval;
-
+	for (auto &it : systemStatistics.statisticsArray) {
+		uint16_t currentSamplingInterval = it.get().selfSamplingInterval;
 		if (currentSamplingInterval != 0) {
 			numOfDefinedParameters++;
 		}
@@ -259,7 +246,7 @@ void ParameterStatisticsService :: reportStatisticsDefinitions(Message& request)
 		uint16_t currentId = i;
 		uint16_t samplingInterval = systemStatistics.statisticsArray.at(currentId).get().selfSamplingInterval;
 
-		if (samplingInterval != 0) {
+		if (samplingInterval != 0 and supportsSamplingInterval) {
 			definitionsReport.appendUint16(currentId);
 			definitionsReport.appendUint16(samplingInterval);
 		}

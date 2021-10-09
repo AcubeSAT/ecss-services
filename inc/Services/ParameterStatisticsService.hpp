@@ -1,9 +1,6 @@
 #ifndef ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 
-// TODO: actually define this
-#define MAX_NUM_OF_DEFINITIONS 10
-
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
@@ -12,21 +9,12 @@
 #include "Statistics/SystemStatistics.hpp"
 
 /**
- * Implementation of the ST[04] parameter management service,
- * as defined in ECSS-E-ST-70-41C. Regarding the variable types
- * 0 means uint8, 1 means uint16 and 2 means uint32 (watch the implementation
- * of TC[02]).
- *
+ * Implementation of the ST[04] parameter management service, as defined in ECSS-E-ST-70-41C.
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 
-//extern bool supportsStandardDeviation = true;
-
 class ParameterStatisticsService : public Service {
 public:
-
-	//TODO: implement the statistic parsing from the dequeue and the resetting of each parameter's vector after
-	//      resetFlag or periodic reset.
 
 	inline static const uint8_t ServiceType = 4;
 
@@ -42,18 +30,25 @@ public:
 		ParameterStatisticsDefinitionsReport = 9,
 	};
 
-	bool periodicStatisticsReportingStatus = false;     // 1 means that periodic reporting is enabled
-	bool hasAutomaticStatisticsReset = false;
-	bool supportsStandardDeviation = true;
-	uint16_t periodicStatisticsReportingInterval = 0;
-	uint16_t numOfStatisticsDefinitions = 0;
+	/**
+	 * true means that the periodic statistics reporting is enabled
+	 */
+	bool periodicStatisticsReportingStatus = false;
+	/**
+	 * If true, after every report reset the parameter statistics.
+	 */
+	const bool hasAutomaticStatisticsReset = false;
+	/**
+	 * Whether the statistics report messages include the standard deviation or not
+	 */
+	const bool supportsStandardDeviation = true;
+	const bool supportsSamplingInterval = true;
+	uint16_t reportingInterval = 0;   // Must define units. Same as parameter sampling rates
+	const uint16_t numOfStatisticsDefinitions = 0;
 	uint16_t nonDefinedStatistics = 0;
 
-	ParameterStatisticsService() = default;
 	/**
-	 * This function receives a TM[4,1] packet and
-	 * returns a TM[4,2] packet containing the parameter
-	 * statistics report.
+	 * This function receives a TM[4,1] packet and returns a TM[4,2] packet containing the parameter statistics report.
 	 *
 	 * @param resetFlag: a TC[4, 1] packet carrying a boolean value
 	 */
@@ -66,43 +61,32 @@ public:
 
 	/**
 	 * TC[4,4] enable periodic parameter reporting
-	 *
-	 * @param request: contains a boolean value
 	 */
 	void enablePeriodicStatisticsReporting(Message& request);
 
 	/**
 	 * TM[4,5] disable periodic parameter reporting
-	 *
-	 * @param request: contains a boolean value
 	 */
 	void disablePeriodicStatisticsReporting(Message& request);
 
 	/**
 	 * TM[4,6] add or update parameter statistics definitions
-	 *
-	 * @param paramIds: Ids of the parameters. Could be followed by intervals.
 	 */
-	void addOrUpdateStatisticsDefinitions(Message& paramIds);
+	void addOrUpdateStatisticsDefinitions(Message& request);
 
 	/**
-	 * TM[4,7] delete parameter statistics definitions
-	 * 		   One version specifies the IDs of the
-	 * 		   parameters whose definitions are to
-	 * 		   be deleted.The second version deletes
-	 * 		   all definitions
-	 *
-	 * @param paramIds: Ids of the parameters
+	 * TM[4,7] delete parameter statistics definitions. This version specifies the IDs of the parameters whose
+	 * definitions are to be deleted.
 	 */
-	void deleteStatisticsDefinitions(Message& paramIds);
+	void deleteStatisticsDefinitions(Message& request);
+	/**
+	 * TM[4,7] This version deletes all definitions
+	 */
 	void deleteAllStatisticsDefinitions();
 
 	/**
-	 * This function receives a TM[4,8] packet and
-	 * returns a TM[4,9] packet containing the parameter
-	 * statistics definitions report.
-	 *
-	 * @param
+	 * This function receives a TM[4,8] packet and returns a TM[4,9] packet containing the parameter statistics
+	 * definitions report.
 	 */
 	void reportStatisticsDefinitions(Message& request);
 

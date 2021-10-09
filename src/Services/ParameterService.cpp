@@ -65,8 +65,6 @@ void ParameterService::setParameters(Message& newParamValues) {
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
-//	int m = stat.get().f(stat);
-//	std::cout << "max = " << m << std::endl;
 			reportParameters(message); // TC[20,1]
 			break;
 		case 3:
