@@ -52,7 +52,6 @@ public:
 	 *
 	 * @param resetFlag: a TC[4, 1] packet carrying a boolean value
 	 */
-	 */
 	void reportParameterStatistics(Message& request);
 
 	/**
