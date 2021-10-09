@@ -10,7 +10,11 @@
 class HousekeepingStructure {
 public:
 
-	uint8_t structureId;
+	uint8_t structureId = -1;
+	uint16_t collectionInterval = 0;    // As units of minimum sampling interval
+	uint16_t numOfSimplyCommutatedParams = 0;
+	uint16_t numOfSuperCommutatedParameterSets = 0;
+	bool periodicGenerationActionStatus = false;
 
 	// vector storing the id's of the parameters contained in this structure, maybe needs to be a map for lookup
 	etl::vector <uint16_t, ECSS_MAX_PARAMETERS> containedParametersIdVec;
