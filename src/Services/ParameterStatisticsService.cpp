@@ -51,9 +51,7 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 void ParameterStatisticsService :: resetParameterStatistics() {
 
 	//TODO: Stop the evaluation of parameter statistics
-	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for(auto &it: systemStatistics.statisticsArray) {
-
 		it.get().clearStatisticSamples();
 	}
 	//TODO: Restart the evaluation of parameter statistics
