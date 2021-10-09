@@ -121,7 +121,6 @@ public:
 		 * */
 		Statistic::samplesVector.push_back(value);
 		sampleCounter++;
-
 	}
 
 	/**

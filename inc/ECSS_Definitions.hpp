@@ -160,4 +160,9 @@
  */
 #define SAMPLES_MAX_VECTOR_SIZE 10
 
+/**
+ * @brief Defines the max number of housekeeping structs that a housekeeping service can contain
+ */
+#define ECSS_MAX_HOUSEKEEPING_STRUCTS 10
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
