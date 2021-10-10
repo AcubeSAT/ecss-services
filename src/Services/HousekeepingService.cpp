@@ -314,3 +314,22 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 	}
 
 }
+
+void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request) {
+
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ModifyCollectionIntervalOfStructures,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfTargetStructs = request.readUint16();
+	for (int i = 0; i < numOfTargetStructs; i++) {
+		uint16_t targetStructId = request.readUint16();
+		if (existingStructIds.find(targetStructId) != existingStructIds.end()) {
+			uint16_t newCollectionInterval = request.readUint16();
+			housekeepingStructuresArray[targetStructId].collectionInterval = newCollectionInterval;
+		} else {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		}
+	}
+}

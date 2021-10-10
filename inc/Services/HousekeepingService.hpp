@@ -30,6 +30,8 @@ public:
 		ReportHousekeepingStructures = 7,
 		HousekeepingStructuresReport = 8,
 		AppendParametersToHousekeepingStructure = 9,
+		ModifyCollectionIntervalOfStructures = 10,
+
 	};
 
 	/**
@@ -86,6 +88,11 @@ public:
 	 * This function appends new parameters to an already existing housekeeping structure (TC[3,29]).
 	 */
 	void appendParametersToHousekeepingStructure(Message& newParams);
+
+	/**
+	 * This function modifies the collection interval of specified structures (TC[3,31]).
+	 */
+	void modifyCollectionIntervalOfStructures(Message& request);
 
 };
 
