@@ -15,7 +15,7 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 		housekeepingReport.appendUint16(requestedId);
 
 		// Append data from simply commutated parameters
-		for (int i = 0; i < housekeepingStructuresArray[requestedId].simplyCommutatedIdsVec.size(); i++) {
+		for (auto i = 0; i < housekeepingStructuresArray[requestedId].simplyCommutatedIdsVec.size(); i++) {
 
 			uint16_t currentParameterId = housekeepingStructuresArray[requestedId].simplyCommutatedIdsVec.at(i);
 			std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[currentParameterId].get();
@@ -23,7 +23,7 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 		}
 
 		// Append data from super commutated parameters (OH MY FREAKING GOD !!!)
-		for (int i = 0; i < housekeepingStructuresArray[requestedId].superCommutatedIdsVec.size(); i++) {
+		for (auto i = 0; i < housekeepingStructuresArray[requestedId].superCommutatedIdsVec.size(); i++) {
 
 			uint16_t currentParameterChunkSampleCounter = housekeepingStructuresArray[requestedId]
 			                                                  .superCommutatedIdsVec.at(i).first;
@@ -47,9 +47,9 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 
 void HousekeepingService::periodicHousekeepingParameterReport() {
 
-	while (1) {
+	while (true) {
 
-		for (int i = 0; i < housekeepingStructuresArray.size(); i++) {
+		for (auto i = 0; i < housekeepingStructuresArray.size(); i++) {
 			uint16_t currStructureId = i;
 			if (housekeepingStructuresArray[currStructureId].periodicGenerationActionStatus) {
 
