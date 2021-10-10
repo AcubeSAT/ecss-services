@@ -66,11 +66,21 @@ public:
 	void deleteHousekeepingReportStructure(Message& request);
 
 	/**
-	 * This function takes as argument a message type TC[3,9] and responds with a TM[3,10].
+	 * This function takes a structure ID as argument and constructs a TM[3,10]-formatted report.
+	 */
+	void housekeepingStructureReport(Message& request);
+
+	/**
+	 * This function takes as argument a message type TC[3,9] and for every struct ID in it, calls the
+	 * "housekeepingStructureReport" function.
 	 */
 	void reportHousekeepingStructures(Message& request);
 
-	void housekeepingStructureReport(Message& request);
+	/**
+	 * This function takes as argument a message type TC[3,27] and responds with a TM[3,25].
+	 */
+	void generateOneShotHousekeepingReport(Message& request);
+
 };
 
 #endif

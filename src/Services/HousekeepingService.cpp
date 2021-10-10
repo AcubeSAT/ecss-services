@@ -224,4 +224,22 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 	}
 }
 
+void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportHousekeepingStructures,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfStructsToReport = request.readUint16();
+	for (int i = 0; i < numOfStructsToReport; i++) {
+		uint16_t currStructId = request.readUint16();
+		if (existingStructIds.find(currStructId) != existingStructIds.end()) {
+			Message structIdToReport(ServiceType,MessageType::ReportHousekeepingParameters,Message::TC,1);
+			structIdToReport.appendUint16(currStructId);
+			housekeepingParametersReport(structIdToReport);
+		} else {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		}
+	}
+}
