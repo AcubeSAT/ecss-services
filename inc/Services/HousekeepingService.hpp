@@ -31,7 +31,8 @@ public:
 		HousekeepingStructuresReport = 8,
 		AppendParametersToHousekeepingStructure = 9,
 		ModifyCollectionIntervalOfStructures = 10,
-
+		ReportHousekeepingPeriodicProperties = 11,
+		HousekeepingPeriodicPropertiesReport = 12,
 	};
 
 	/**
@@ -93,6 +94,12 @@ public:
 	 * This function modifies the collection interval of specified structures (TC[3,31]).
 	 */
 	void modifyCollectionIntervalOfStructures(Message& request);
+
+	/**
+	 * This function takes as argument a message type TC[3,33] and responds with a TM[3,35]. What it does is, report
+	 * the periodic properties of each requested structure.
+ 	 */
+	void housekeepingPeriodicPropertiesReport(Message& request);
 
 };
 

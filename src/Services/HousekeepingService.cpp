@@ -333,3 +333,35 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 		}
 	}
 }
+
+void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request) {
+
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportHousekeepingPeriodicProperties,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message periodicPropertiesReport(ServiceType,MessageType::HousekeepingPeriodicPropertiesReport, Message::TM, 1);
+
+	uint16_t numOfValidIds = 0;
+	uint16_t numOfStructIds = request.readUint16();
+	periodicPropertiesReport.appendUint16(numOfStructIds);
+
+	for (int i = 0; i < numOfStructIds; i++) {
+		uint16_t structIdToReport = request.readUint16();
+		if (existingStructIds.find(structIdToReport) != existingStructIds.end()) {
+			periodicPropertiesReport.appendUint16(structIdToReport);
+			periodicPropertiesReport.appendBoolean(housekeepingStructuresArray[structIdToReport]
+			                                           .periodicGenerationActionStatus);
+			periodicPropertiesReport.appendUint16(housekeepingStructuresArray[structIdToReport].collectionInterval);
+			numOfValidIds++;
+		} else {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		}
+	}
+
+	periodicPropertiesReport.resetRead();
+	periodicPropertiesReport.appendUint16(numOfValidIds);
+	storeMessage(periodicPropertiesReport);
+
+}
