@@ -169,6 +169,10 @@ public:
 		 * Attempt to delete structure which has the periodic reporting status enabled (St[03]) as per 6.3.3.5.2(d-2)
 		 */
 		RequestedDeletionOfPeriodicStructure = 14,
+		/**
+		 * Attempt to append a new parameter id to a housekeeping structure, but the id already exists (ST[03])
+		 */
+		AlreadyExistingParameter = 15,
 	};
 
 	/**

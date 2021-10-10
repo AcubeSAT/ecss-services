@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
+#include "etl/unordered_set.h"
 
 #define ECSS_MAX_SUPER_COMMUTATED_SETS_PER_HOUSEKEEPING_STRUCT 10
 
@@ -17,7 +18,7 @@ public:
 	bool periodicGenerationActionStatus = false;
 
 	// vector storing the id's of the parameters contained in this structure, maybe needs to be a map for lookup
-	etl::vector <uint16_t, ECSS_MAX_PARAMETERS> containedParametersIdVec;
+	etl::unordered_set <uint16_t, ECSS_MAX_PARAMETERS> containedParameterIds;
 
 	// vector containing Ids of parameters with a single value sampled
 	etl::vector <uint16_t, ECSS_MAX_PARAMETERS> simplyCommutatedIdsVec;

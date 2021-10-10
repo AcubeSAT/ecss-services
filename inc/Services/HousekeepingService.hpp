@@ -28,7 +28,8 @@ public:
 		CreateHousekeepingReportStructure = 5,
 		DeleteHousekeepingReportStructure = 6,
 		ReportHousekeepingStructures = 7,
-		HousekeepingStructuresReport = 8
+		HousekeepingStructuresReport = 8,
+		AppendParametersToHousekeepingStructure = 9,
 	};
 
 	/**
@@ -80,6 +81,11 @@ public:
 	 * This function takes as argument a message type TC[3,27] and responds with a TM[3,25].
 	 */
 	void generateOneShotHousekeepingReport(Message& request);
+
+	/**
+	 * This function appends new parameters to an already existing housekeeping structure (TC[3,29]).
+	 */
+	void appendParametersToHousekeepingStructure(Message& newParams);
 
 };
 

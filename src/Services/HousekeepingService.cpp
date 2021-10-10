@@ -122,7 +122,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	for (int i = 0; i < numOfSimplyCommutatedParams; i++) {
 		uint16_t newParamId = request.readUint16();
 		newStructure.simplyCommutatedIdsVec.push_back(newParamId);
-		newStructure.containedParametersIdVec.push_back(newParamId);
+		newStructure.containedParameterIds.insert(newParamId);
 	}
 
 	int numOfSets = request.readUint16();
@@ -136,7 +136,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 		for (int j = 0; j < numOfCurrentSetIds; j++) {
 			uint16_t newParamId = request.readUint16();
 			newStructure.superCommutatedIdsVec[i].second.push_back(newParamId);
-			newStructure.containedParametersIdVec.push_back(newParamId);
+			newStructure.containedParameterIds.insert(newParamId);
 		}
 	}
 
@@ -168,7 +168,7 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 void HousekeepingService::housekeepingStructureReport(Message& request) {
 
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::ReportHousekeepingParameters,
+	ErrorHandler::assertRequest(request.messageType == MessageType::HousekeepingStructuresReport,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
@@ -215,7 +215,7 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 	for (int i = 0; i < numOfStructsToReport; i++) {
 		uint16_t currStructId = request.readUint16();
 		if (existingStructIds.find(currStructId) != existingStructIds.end()) {
-			Message structIdToReport(ServiceType,MessageType::ReportHousekeepingParameters,Message::TC,1);
+			Message structIdToReport(ServiceType,MessageType::HousekeepingStructuresReport,Message::TC,1);
 			structIdToReport.appendUint16(currStructId);
 			housekeepingStructureReport(structIdToReport);
 		} else {
@@ -242,4 +242,75 @@ void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		}
 	}
+}
+
+void HousekeepingService::appendParametersToHousekeepingStructure(Message& newParams) {
+
+	ErrorHandler::assertRequest(newParams.packetType == Message::TC, newParams,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(newParams.messageType == MessageType::AppendParametersToHousekeepingStructure,
+	                            newParams, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(newParams.serviceType == ServiceType, newParams,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t targetStructId = newParams.readUint16();
+	if (existingStructIds.find(targetStructId) != existingStructIds.end()) {
+		if (not housekeepingStructuresArray[targetStructId].periodicGenerationActionStatus) {
+
+			/**
+			 * @todo: check if resources allocated by the host are exceeded.
+			 */
+
+			// Append simply commutated parameters
+			uint16_t numOfSimplyCommParams = newParams.readUint16();
+			for (int i = 0; i < numOfSimplyCommParams; i++) {
+				uint16_t newParamId = newParams.readUint16();
+				if (newParamId < systemParameters.parametersArray.size()) {
+					if (housekeepingStructuresArray[targetStructId].containedParameterIds.find(newParamId) !=
+					    housekeepingStructuresArray[targetStructId].containedParameterIds.end()) {
+						housekeepingStructuresArray[targetStructId].numOfSimplyCommutatedParams++;
+						housekeepingStructuresArray[targetStructId].containedParameterIds.insert(newParamId);
+						housekeepingStructuresArray[targetStructId].simplyCommutatedIdsVec.push_back(newParamId);
+					} else {
+						ErrorHandler::reportError(newParams,
+						                          ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+					}
+				} else {
+					ErrorHandler::reportError(newParams,
+					                          ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+				}
+			}
+
+			// Append super commutated parameters
+			uint16_t numOfNewSets = newParams.readUint16();
+			for (int i = 0; i < numOfNewSets; i++) {
+				uint16_t numOfCurrSetSamples = newParams.readUint16();
+				uint16_t numOfCurrSetIds = newParams.readUint16();
+				housekeepingStructuresArray[targetStructId].numOfSuperCommutatedParameterSets++;
+				etl::vector<uint16_t, ECSS_MAX_PARAMETERS> currSetIdsVec;
+
+				for (int j = 0; j < numOfCurrSetIds; j++) {
+					uint16_t newParamId = newParams.readUint16();
+					if (newParamId < systemParameters.parametersArray.size()) {
+						if (housekeepingStructuresArray[targetStructId].containedParameterIds.find(newParamId) !=
+						    housekeepingStructuresArray[targetStructId].containedParameterIds.end()) {
+							housekeepingStructuresArray[targetStructId].containedParameterIds.insert(newParamId);
+							currSetIdsVec.push_back(newParamId);
+						} else {
+							ErrorHandler::reportError(newParams,
+							                          ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+						}
+					} else {
+						ErrorHandler::reportError(newParams,
+						                          ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+					}
+				}
+				housekeepingStructuresArray[targetStructId].superCommutatedIdsVec.push_back(
+				    std::make_pair(numOfCurrSetSamples, currSetIdsVec));
+			}
+		} else {
+			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
+		}
+	} else {
+		ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+	}
+
 }
