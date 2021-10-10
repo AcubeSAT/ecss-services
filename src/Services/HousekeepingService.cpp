@@ -102,9 +102,20 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	HousekeepingStructure newStructure;
 
 	uint16_t idToCreate = request.readUint16();
+	if (alreadyUsedStructIds.find(idToCreate) != alreadyUsedStructIds.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
+	} else {
+		alreadyUsedStructIds.insert(idToCreate);
+	}
+
+	/**
+	 * @todo: Check if the new struct creation exceeds the resources allocated by the host.
+	 */
+
 	newStructure.structureId = idToCreate;
 	uint16_t requestedInterval = request.readUint16();
 	newStructure.collectionInterval = requestedInterval;
+	newStructure.periodicGenerationActionStatus = false;
 
 	uint16_t numOfSimplyCommutatedParams = request.readUint16();
 	newStructure.numOfSimplyCommutatedParams = numOfSimplyCommutatedParams;
@@ -131,4 +142,26 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	}
 
 	housekeepingStructuresArray[idToCreate] = newStructure;
+}
+
+void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
+
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::DeleteHousekeepingReportStructure,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfStructuresToDelete = request.readUint16();
+	for (int i = 0; i < numOfStructuresToDelete; i++) {
+		uint16_t currStructureId = request.readUint16();
+		if (alreadyUsedStructIds.find(currStructureId) != alreadyUsedStructIds.end()) {
+			if (not housekeepingStructuresArray[currStructureId].periodicGenerationActionStatus) {
+				alreadyUsedStructIds.erase(currStructureId);
+			} else {
+				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
+			}
+		} else {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		}
+	}
 }

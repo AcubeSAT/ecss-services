@@ -158,9 +158,17 @@ public:
 		 */
 		EventActionDefinitionsMapIsFull = 11,
 		/**
-		 * Attempt to report non existing housekeeping structure (St[03])
+		 * Attempt to report/delete non existing housekeeping structure (St[03])
 		 */
-		RequestedNonExistingStructure = 12
+		RequestedNonExistingStructure = 12,
+		/**
+		 * Attempt to create already created structure (St[03])
+		 */
+		RequestedAlreadyExistingStructure = 13,
+		/**
+		 * Attempt to delete structure which has the periodic reporting status enabled (St[03]) as per 6.3.3.5.2(d-2)
+		 */
+		RequestedDeletionOfPeriodicStructure = 14,
 	};
 
 	/**

@@ -7,6 +7,7 @@
 #include "Parameters/SystemParameters.hpp"
 #include "Statistics/SystemStatistics.hpp"
 #include "Services/HousekeepingStructure.hpp"
+#include "etl/unordered_set.h"
 
 class HousekeepingService : Service {
 public:
@@ -17,6 +18,7 @@ public:
 
 	// Here we save the housekeeping structs after the corresponding TC
 	etl::array <HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructuresArray;
+	etl::unordered_set <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS> alreadyUsedStructIds;
 
 	enum MessageType : uint8_t {
 		ReportHousekeepingParameters = 1,
@@ -24,6 +26,8 @@ public:
 		EnableHousekeepingParametersReport = 3,
 		DisableHousekeepingParametersReport = 4,
 		CreateHousekeepingReportStructure = 5,
+		DeleteHousekeepingReportStructure = 6,
+
 	};
 
 	/**
@@ -54,6 +58,11 @@ public:
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
 	 */
 	void createHousekeepingReportStructure(Message& request);
+
+	/**
+	 * Implementation of TC[3,3]. Request to delete a housekeeping parameters report structure.
+	 */
+	void deleteHousekeepingReportStructure(Message& request);
 };
 
 #endif
