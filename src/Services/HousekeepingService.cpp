@@ -7,11 +7,10 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 	                            structId, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(structId.serviceType == ServiceType, structId,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	Message housekeepingReport(HousekeepingService::ServiceType,
-	                         HousekeepingService::MessageType::HousekeepingParametersReport, Message::TM, 1);
+	Message housekeepingReport(ServiceType,MessageType::HousekeepingParametersReport, Message::TM, 1);
 
 	uint16_t requestedId = structId.readUint16();
-	if (requestedId <= structureIdCounter) {    //Check if structure with requested ID exists
+	if (existingStructIds.find(requestedId) != existingStructIds.end()) {
 
 		housekeepingReport.appendUint16(requestedId);
 
@@ -70,7 +69,7 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t structIdToEnable = request.readUint16();
-	if (structIdToEnable <= structureIdCounter) {
+	if (existingStructIds.find(structIdToEnable) != existingStructIds.end()) {
 		housekeepingStructuresArray[structIdToEnable].periodicGenerationActionStatus = true;
 	} else {
 		ErrorHandler::reportError(request,ErrorHandler::RequestedNonExistingStructure);
@@ -84,9 +83,9 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t structIdToEnable = request.readUint16();
-	if (structIdToEnable <= structureIdCounter) {
-		housekeepingStructuresArray[structIdToEnable].periodicGenerationActionStatus = false;
+	uint16_t structIdToDisable = request.readUint16();
+	if (existingStructIds.find(structIdToDisable) != existingStructIds.end()) {
+		housekeepingStructuresArray[structIdToDisable].periodicGenerationActionStatus = false;
 	} else {
 		ErrorHandler::reportError(request,ErrorHandler::RequestedNonExistingStructure);
 	}
@@ -102,10 +101,10 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	HousekeepingStructure newStructure;
 
 	uint16_t idToCreate = request.readUint16();
-	if (alreadyUsedStructIds.find(idToCreate) != alreadyUsedStructIds.end()) {
+	if (existingStructIds.find(idToCreate) != existingStructIds.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
 	} else {
-		alreadyUsedStructIds.insert(idToCreate);
+		existingStructIds.insert(idToCreate);
 	}
 
 	/**
@@ -154,12 +153,32 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	uint16_t numOfStructuresToDelete = request.readUint16();
 	for (int i = 0; i < numOfStructuresToDelete; i++) {
 		uint16_t currStructureId = request.readUint16();
-		if (alreadyUsedStructIds.find(currStructureId) != alreadyUsedStructIds.end()) {
+		if (existingStructIds.find(currStructureId) != existingStructIds.end()) {
 			if (not housekeepingStructuresArray[currStructureId].periodicGenerationActionStatus) {
-				alreadyUsedStructIds.erase(currStructureId);
+				existingStructIds.erase(currStructureId);
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
 			}
+		} else {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		}
+	}
+}
+
+void HousekeepingService::reportHousekeepingStructures(Message& request) {
+
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportHousekeepingStructures,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfStructsToReport = request.readUint16();
+	for (int i = 0; i < numOfStructsToReport; i++) {
+		uint16_t currStructId = request.readUint16();
+		if (existingStructIds.find(currStructId) != existingStructIds.end()) {
+			Message structIdToReport(ServiceType,MessageType::ReportHousekeepingParameters,Message::TC,1);
+			structIdToReport.appendUint16(currStructId);
+			housekeepingParametersReport(structIdToReport);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		}

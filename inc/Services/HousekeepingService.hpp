@@ -18,7 +18,7 @@ public:
 
 	// Here we save the housekeeping structs after the corresponding TC
 	etl::array <HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructuresArray;
-	etl::unordered_set <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS> alreadyUsedStructIds;
+	etl::unordered_set <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS> existingStructIds;
 
 	enum MessageType : uint8_t {
 		ReportHousekeepingParameters = 1,
@@ -27,7 +27,8 @@ public:
 		DisableHousekeepingParametersReport = 4,
 		CreateHousekeepingReportStructure = 5,
 		DeleteHousekeepingReportStructure = 6,
-
+		ReportHousekeepingStructures = 7,
+		HousekeepingStructuresReport = 8
 	};
 
 	/**
@@ -63,6 +64,11 @@ public:
 	 * Implementation of TC[3,3]. Request to delete a housekeeping parameters report structure.
 	 */
 	void deleteHousekeepingReportStructure(Message& request);
+
+	/**
+	 * This function takes as argument a message type TC[3,9] and responds with a TM[3,10].
+	 */
+	void reportHousekeepingStructures(Message& request);
 };
 
 #endif
