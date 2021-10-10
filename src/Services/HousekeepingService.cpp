@@ -165,6 +165,45 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	}
 }
 
+void HousekeepingService::housekeepingStructureReport(Message& request) {
+
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportHousekeepingParameters,
+	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message structReport(ServiceType,MessageType::HousekeepingParametersReport, Message::TM, 1);
+	uint16_t structIdToReport = request.readUint16();
+
+	if (existingStructIds.find(structIdToReport) != existingStructIds.end()) {
+
+		structReport.appendUint16(structIdToReport);
+		if (supportsPeriodicGeneration) {
+			structReport.appendBoolean(housekeepingStructuresArray[structIdToReport].periodicGenerationActionStatus);
+		}
+		structReport.appendUint16(housekeepingStructuresArray[structIdToReport].collectionInterval);
+		structReport.appendUint16(housekeepingStructuresArray[structIdToReport].numOfSimplyCommutatedParams);
+
+		for (auto &currParamId : housekeepingStructuresArray[structIdToReport].simplyCommutatedIdsVec) {
+			structReport.appendUint16(currParamId);
+		}
+		structReport.appendUint16(housekeepingStructuresArray[structIdToReport].numOfSuperCommutatedParameterSets);
+
+		for (auto &currSet : housekeepingStructuresArray[structIdToReport].superCommutatedIdsVec) {
+			structReport.appendUint16(currSet.first);
+			structReport.appendUint16(currSet.second.size());
+
+			for (auto &currParamId : currSet.second) {
+				structReport.appendUint16(currParamId);
+			}
+		}
+	} else {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+	}
+
+	storeMessage(structReport);
+}
+
 void HousekeepingService::reportHousekeepingStructures(Message& request) {
 
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -178,9 +217,11 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 		if (existingStructIds.find(currStructId) != existingStructIds.end()) {
 			Message structIdToReport(ServiceType,MessageType::ReportHousekeepingParameters,Message::TC,1);
 			structIdToReport.appendUint16(currStructId);
-			housekeepingParametersReport(structIdToReport);
+			housekeepingStructureReport(structIdToReport);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		}
 	}
 }
+
+

@@ -14,11 +14,11 @@ public:
 
 	inline static const uint8_t ServiceType = 3;
 
-	uint16_t structureIdCounter = -1;    // Helps track if a structure already exists or not
-
 	// Here we save the housekeeping structs after the corresponding TC
 	etl::array <HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructuresArray;
 	etl::unordered_set <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS> existingStructIds;
+
+	const bool supportsPeriodicGeneration = true;
 
 	enum MessageType : uint8_t {
 		ReportHousekeepingParameters = 1,
@@ -69,6 +69,8 @@ public:
 	 * This function takes as argument a message type TC[3,9] and responds with a TM[3,10].
 	 */
 	void reportHousekeepingStructures(Message& request);
+
+	void housekeepingStructureReport(Message& request);
 };
 
 #endif
