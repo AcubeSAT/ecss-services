@@ -351,8 +351,7 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 		uint16_t structIdToReport = request.readUint16();
 		if (existingStructIds.find(structIdToReport) != existingStructIds.end()) {
 			periodicPropertiesReport.appendUint16(structIdToReport);
-			periodicPropertiesReport.appendBoolean(housekeepingStructuresArray[structIdToReport]
-			                                           .periodicGenerationActionStatus);
+			periodicPropertiesReport.appendBoolean(housekeepingStructuresArray[structIdToReport].periodicGenerationActionStatus);
 			periodicPropertiesReport.appendUint16(housekeepingStructuresArray[structIdToReport].collectionInterval);
 			numOfValidIds++;
 		} else {

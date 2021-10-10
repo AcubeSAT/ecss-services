@@ -14,8 +14,10 @@ public:
 
 	inline static const uint8_t ServiceType = 3;
 
-	// Here we save the housekeeping structs after the corresponding TC
 	etl::array <HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructuresArray;
+	/**
+	 * For quick look-up at the existing structures in the service.
+	 */
 	etl::unordered_set <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS> existingStructIds;
 
 	const bool supportsPeriodicGeneration = true;

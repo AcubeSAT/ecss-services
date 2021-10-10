@@ -156,4 +156,9 @@
  */
 #define ECSS_MAX_HOUSEKEEPING_STRUCTS 10
 
+/**
+ * @brief Max super commutated sets per housekeeping struct
+ */
+#define ECSS_MAX_SUPER_COMMUTATED_SETS_PER_HOUSEKEEPING_STRUCT 10
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
