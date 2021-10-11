@@ -225,65 +225,54 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 	ErrorHandler::assertRequest(newParams.serviceType == ServiceType, newParams,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t targetStructId = newParams.readUint16();
-	if (housekeepingStructures.find(targetStructId) != housekeepingStructures.end()) {
-		if (not housekeepingStructures[targetStructId].periodicGenerationActionStatus) {
-
-			/**
-			 * @todo: check if resources allocated by the host are exceeded.
-			 */
-
-			// Append simply commutated parameters
-			uint16_t numOfSimplyCommParams = newParams.readUint16();
-			for (int i = 0; i < numOfSimplyCommParams; i++) {
-				uint16_t newParamId = newParams.readUint16();
-				if (newParamId < systemParameters.parametersArray.size()) {
-					if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
-						housekeepingStructures[targetStructId].numOfSimplyCommutatedParams++;
-						housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
-						housekeepingStructures[targetStructId].simplyCommutatedIds.push_back(newParamId);
-					} else {
-						ErrorHandler::reportError(newParams,
-						                          ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
-					}
-				} else {
-					ErrorHandler::reportError(newParams,
-					                          ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-				}
-			}
-
-			// Append super commutated parameters
-			uint16_t numOfNewSets = newParams.readUint16();
-			for (int i = 0; i < numOfNewSets; i++) {
-				uint16_t numOfCurrSetSamples = newParams.readUint16();
-				uint16_t numOfCurrSetIds = newParams.readUint16();
-				housekeepingStructures[targetStructId].numOfSuperCommutatedParameterSets++;
-				etl::vector<uint16_t, ECSS_MAX_PARAMETERS> currSetIdsVec;
-
-				for (int j = 0; j < numOfCurrSetIds; j++) {
-					uint16_t newParamId = newParams.readUint16();
-					if (newParamId < systemParameters.parametersArray.size()) {
-						if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
-							housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
-							currSetIdsVec.push_back(newParamId);
-						} else {
-							ErrorHandler::reportError(newParams,
-							                          ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
-						}
-					} else {
-						ErrorHandler::reportError(newParams,
-						                          ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-					}
-				}
-				housekeepingStructures[targetStructId].superCommutatedIds.push_back(
-				    std::make_pair(numOfCurrSetSamples, currSetIdsVec));
-			}
-		} else {
-			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
-		}
-	} else {
+	if (housekeepingStructures.find(targetStructId) == housekeepingStructures.end()) {
 		ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 	}
+	if (housekeepingStructures[targetStructId].periodicGenerationActionStatus) {
+	    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
+    }
 
+	/**
+	 * @todo: check if resources allocated by the host are exceeded.
+	 */
+
+	// Append simply commutated parameters
+	uint16_t numOfSimplyCommParams = newParams.readUint16();
+	for (int i = 0; i < numOfSimplyCommParams; i++) {
+		uint16_t newParamId = newParams.readUint16();
+
+		if (newParamId >= systemParameters.parametersArray.size()) {
+			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+		}
+		if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
+		    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+	    }
+		housekeepingStructures[targetStructId].numOfSimplyCommutatedParams++;
+		housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
+		housekeepingStructures[targetStructId].simplyCommutatedIds.push_back(newParamId);
+	}
+
+	// Append super commutated parameters
+	uint16_t numOfNewSets = newParams.readUint16();
+	for (int i = 0; i < numOfNewSets; i++) {
+		uint16_t numOfCurrSetSamples = newParams.readUint16();
+		uint16_t numOfCurrSetIds = newParams.readUint16();
+		housekeepingStructures[targetStructId].numOfSuperCommutatedParameterSets++;
+		etl::vector<uint16_t, ECSS_MAX_PARAMETERS> currSetIdsVec;
+
+		for (int j = 0; j < numOfCurrSetIds; j++) {
+			uint16_t newParamId = newParams.readUint16();
+			if (newParamId >= systemParameters.parametersArray.size()) {
+				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			}
+			if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
+				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+			}
+			housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
+			currSetIdsVec.push_back(newParamId);
+		}
+		housekeepingStructures[targetStructId].superCommutatedIds.push_back(std::make_pair(numOfCurrSetSamples, currSetIdsVec));
+	}
 }
 
 void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request) {
