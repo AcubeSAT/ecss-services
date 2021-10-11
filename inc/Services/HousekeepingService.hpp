@@ -31,10 +31,11 @@ public:
 		DeleteHousekeepingReportStructure = 6,
 		ReportHousekeepingStructures = 7,
 		HousekeepingStructuresReport = 8,
-		AppendParametersToHousekeepingStructure = 9,
-		ModifyCollectionIntervalOfStructures = 10,
-		ReportHousekeepingPeriodicProperties = 11,
-		HousekeepingPeriodicPropertiesReport = 12,
+		GenerateOneShotHousekeepingReport = 9,
+		AppendParametersToHousekeepingStructure = 10,
+		ModifyCollectionIntervalOfStructures = 11,
+		ReportHousekeepingPeriodicProperties = 12,
+		HousekeepingPeriodicPropertiesReport = 13,
 	};
 
 	/**
@@ -42,12 +43,6 @@ public:
 	 * appropriate notification.
 	 */
 	void housekeepingParametersReport(Message& structId);
-
-	/**
-	 * This func should be called by a FreeRTOS task and periodically report the housekeeping structures for which the
-	 * periodic reporting is enabled as per 6.3.3.3(d).
-	 */
-	void periodicHousekeepingParameterReport();
 
 	/**
 	 * Implementation of TM[3,5]. Request to enable the periodic housekeeping parameters reporting for a specific

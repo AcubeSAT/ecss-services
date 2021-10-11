@@ -15,27 +15,22 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 		housekeepingReport.appendUint16(requestedId);
 
 		// Append data from simply commutated parameters
-		for (auto i = 0; i < housekeepingStructuresArray[requestedId].simplyCommutatedIdsVec.size(); i++) {
-
+		for (int i = 0; i < housekeepingStructuresArray[requestedId].numOfSimplyCommutatedParams; i++) {
 			uint16_t currentParameterId = housekeepingStructuresArray[requestedId].simplyCommutatedIdsVec.at(i);
-			std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[currentParameterId].get();
-			currentStatistic.get().getSample(housekeepingReport, 0);
+			systemStatistics.statisticsArray[currentParameterId].get().getSample(housekeepingReport, 0);
 		}
 
-		// Append data from super commutated parameters (OH MY FREAKING GOD !!!)
-		for (auto i = 0; i < housekeepingStructuresArray[requestedId].superCommutatedIdsVec.size(); i++) {
+		// Append data from super commutated parameters
+		for (int i = 0; i < housekeepingStructuresArray[requestedId].numOfSuperCommutatedParameterSets; i++) {
+			uint16_t numOfCurrSetSamples = housekeepingStructuresArray[requestedId].superCommutatedIdsVec.at(i).first;
+			uint16_t numOfParamsInCurrSet = housekeepingStructuresArray[requestedId].superCommutatedIdsVec.at(i).second.size();
 
-			uint16_t currentParameterChunkSampleCounter = housekeepingStructuresArray[requestedId]
-			                                                  .superCommutatedIdsVec.at(i).first;
-			uint16_t numOfParametersInChunk = housekeepingStructuresArray[requestedId].superCommutatedIdsVec.at(i)
-			                                      .second.size();
-			for (int j = 0; j < currentParameterChunkSampleCounter; j++) {  // As per note-2 page 81
-				for (int k = 0; k < numOfParametersInChunk; k++) {
+			for (int j = 0; j < numOfCurrSetSamples; j++) {  // As per note-2 page 81
+				for (int k = 0; k < numOfParamsInCurrSet; k++) {
 
 					uint16_t currentParameterId = housekeepingStructuresArray[requestedId].superCommutatedIdsVec.at
 					                              (i).second.at(k);
-					std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsArray[currentParameterId].get();
-					currentStatistic.get().getSample(housekeepingReport, j);
+					systemStatistics.statisticsArray[currentParameterId].get().getSample(housekeepingReport, j);
 				}
 			}
 		}
@@ -43,22 +38,6 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 		ErrorHandler::reportError(structId, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 	}
 	storeMessage(housekeepingReport);
-}
-
-void HousekeepingService::periodicHousekeepingParameterReport() {
-
-	while (true) {
-
-		for (auto i = 0; i < housekeepingStructuresArray.size(); i++) {
-			uint16_t currStructureId = i;
-			if (housekeepingStructuresArray[currStructureId].periodicGenerationActionStatus) {
-
-				Message structId(ServiceType,MessageType::ReportHousekeepingParameters,Message::TC,1);
-				housekeepingParametersReport(structId);
-			}
-		}
-		//TODO: here suspend the task for time = collectionInterval. This could be done outside of the function as well.
-	}
 }
 
 void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& request) {
@@ -227,7 +206,7 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::ReportHousekeepingStructures,
+	ErrorHandler::assertRequest(request.messageType == MessageType::GenerateOneShotHousekeepingReport,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
@@ -264,7 +243,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 			for (int i = 0; i < numOfSimplyCommParams; i++) {
 				uint16_t newParamId = newParams.readUint16();
 				if (newParamId < systemParameters.parametersArray.size()) {
-					if (housekeepingStructuresArray[targetStructId].containedParameterIds.find(newParamId) !=
+					if (housekeepingStructuresArray[targetStructId].containedParameterIds.find(newParamId) ==
 					    housekeepingStructuresArray[targetStructId].containedParameterIds.end()) {
 						housekeepingStructuresArray[targetStructId].numOfSimplyCommutatedParams++;
 						housekeepingStructuresArray[targetStructId].containedParameterIds.insert(newParamId);
@@ -290,7 +269,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 				for (int j = 0; j < numOfCurrSetIds; j++) {
 					uint16_t newParamId = newParams.readUint16();
 					if (newParamId < systemParameters.parametersArray.size()) {
-						if (housekeepingStructuresArray[targetStructId].containedParameterIds.find(newParamId) !=
+						if (housekeepingStructuresArray[targetStructId].containedParameterIds.find(newParamId) ==
 						    housekeepingStructuresArray[targetStructId].containedParameterIds.end()) {
 							housekeepingStructuresArray[targetStructId].containedParameterIds.insert(newParamId);
 							currSetIdsVec.push_back(newParamId);
@@ -307,7 +286,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 				    std::make_pair(numOfCurrSetSamples, currSetIdsVec));
 			}
 		} else {
-			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
+			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
 		}
 	} else {
 		ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
