@@ -27,7 +27,7 @@ public:
 	virtual void calculateStatistics() = 0;
 	virtual void clearStatisticSamples() = 0;
 	virtual int appendStatisticsToMessage(StatisticBase& stat, Message& report) = 0;
-	virtual void getSample(Message& report, int index) = 0;
+	virtual void appendSampleToMessage(Message& report, uint16_t index) = 0;
 
 	void setSelfTimeInterval(uint16_t timeInterval) {
 		this -> selfSamplingInterval = timeInterval;
@@ -183,7 +183,7 @@ public:
 		return maxValue;
 	}
 
-	inline void getSample(Message& report, int index) override {
+	inline void appendSampleToMessage(Message& report, uint16_t index) override {
 
 		DataType sampleValue = samplesVector[index];
 		report.append(sampleValue);

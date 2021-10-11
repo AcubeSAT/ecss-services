@@ -1,46 +1,42 @@
 #ifndef ECSS_SERVICES_HOUSEKEEPINGSERVICE_HPP
 #define ECSS_SERVICES_HOUSEKEEPINGSERVICE_HPP
 
+#include "etl/map.h"
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameters/SystemParameters.hpp"
 #include "Statistics/SystemStatistics.hpp"
 #include "Services/HousekeepingStructure.hpp"
-#include "etl/unordered_set.h"
 
 /**
  * Implementation of the ST[03] Housekeeping Reporting Subservice
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
-
 class HousekeepingService : Service {
 public:
 
 	inline static const uint8_t ServiceType = 3;
 
-	etl::array <HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructuresArray;
 	/**
-	 * For quick look-up at the existing structures in the service.
+	 * Map containing the housekeeping structures. Map[i] contains structure with ID = i.
 	 */
-	etl::unordered_set <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS> existingStructIds;
-
-	const bool supportsPeriodicGeneration = true;
+	etl::map <uint16_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
 
 	enum MessageType : uint8_t {
-		ReportHousekeepingParameters = 1,
-		HousekeepingParametersReport = 2,
-		EnableHousekeepingParametersReport = 3,
-		DisableHousekeepingParametersReport = 4,
-		CreateHousekeepingReportStructure = 5,
-		DeleteHousekeepingReportStructure = 6,
-		ReportHousekeepingStructures = 7,
-		HousekeepingStructuresReport = 8,
-		GenerateOneShotHousekeepingReport = 9,
-		AppendParametersToHousekeepingStructure = 10,
-		ModifyCollectionIntervalOfStructures = 11,
-		ReportHousekeepingPeriodicProperties = 12,
-		HousekeepingPeriodicPropertiesReport = 13,
+		ReportHousekeepingParameters = 0,
+		CreateHousekeepingReportStructure = 1,
+		DeleteHousekeepingReportStructure = 3,
+		EnablePeriodicHousekeepingParametersReport = 5,
+		DisablePeriodicHousekeepingParametersReport = 6,
+		ReportHousekeepingStructures = 9,
+		HousekeepingStructuresReport = 10,
+		HousekeepingParametersReport = 25,
+		GenerateOneShotHousekeepingReport = 27,
+		AppendParametersToHousekeepingStructure = 29,
+		ModifyCollectionIntervalOfStructures = 31,
+		ReportHousekeepingPeriodicProperties = 33,
+		HousekeepingPeriodicPropertiesReport = 35,
 	};
 
 	/**
@@ -74,9 +70,9 @@ public:
 	/**
 	 * This function takes a structure ID as argument and constructs a TM[3,10]-formatted report.
 	 */
-	void housekeepingStructureReport(Message& request);
+	void housekeepingStructureReport(uint16_t structIdToReport);
 
-	/**
+	    /**
 	 * This function takes as argument a message type TC[3,9] and for every struct ID in it, calls the
 	 * "housekeepingStructureReport" function.
 	 */
@@ -103,6 +99,10 @@ public:
  	 */
 	void housekeepingPeriodicPropertiesReport(Message& request);
 
+	/**
+	 * Returns true if the targetId exists in the vector.
+	 */
+	bool existsInVector(uint16_t targetId, etl::vector <uint16_t, ECSS_MAX_PARAMETERS> vec);
 };
 
 #endif
