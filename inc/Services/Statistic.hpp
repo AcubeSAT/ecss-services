@@ -7,6 +7,10 @@
 #include "etl/vector.h"
 #include "cmath"
 
+/**
+ * @author Petridis Konstantinos <petridkon@gmail.com>
+ */
+
 extern bool supportsStandardDeviation;
 #define SAMPLES_MAX_VECTOR_SIZE 10
 

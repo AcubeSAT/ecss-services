@@ -9,6 +9,11 @@
 #include "Services/HousekeepingStructure.hpp"
 #include "etl/unordered_set.h"
 
+/**
+ * Implementation of the ST[03] Housekeeping Reporting Subservice
+ * @author Petridis Konstantinos <petridkon@gmail.com>
+ */
+
 class HousekeepingService : Service {
 public:
 
