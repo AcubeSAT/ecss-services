@@ -29,7 +29,8 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
 
   if (header_size == 2){
     //epoch_param = (timestamp[0] & 0b01110000) >> 4;
-    timestamp_seconds_bytes += ((timestamp[0] & 0b00001100) >> 2) + (timestamp[1] & 0b01100000) >> 5;
+    timestamp_seconds_bytes += (timestamp[0] & 0b00001100) >> 2;
+    timestamp_seconds_bytes += (timestamp[1] & 0b01100000) >> 5;
     timestamp_fractional_bytes = ((timestamp[0] & 0b00000011) >> 0) + ((timestamp[1] & 0b00011000) >> 3);
   }
   else if(header_size==1){
@@ -68,6 +69,7 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
   }
   //pad rightmost bytes to full length
   tai_counter = tai_counter << 8*(fractional_counter_bytes - timestamp_fractional_bytes);
+  //printf("created timestamp from %d seconds bytes, %d fractional bytes, leading to an internal value of %lu\n", timestamp_seconds_bytes, timestamp_fractional_bytes, tai_counter);
 }
 
 //// FROM UTC TIMESTAMP
@@ -111,8 +113,13 @@ const etl::array<uint8_t, 9> Instant<seconds_counter_bytes, fractional_counter_b
     i0 = 2;
   }
 
+  //printf("tai_counter of size %lu\n", sizeof(tai_counter_t));
+  //printf("total bytes size %d\n", seconds_counter_bytes + fractional_counter_bytes);
   for(auto i = 0; i < seconds_counter_bytes + fractional_counter_bytes; i++){
-    r[i0 + i] = tai_counter >> (8*(seconds_counter_bytes + fractional_counter_bytes - i - 1));
+    int j = 8*(seconds_counter_bytes + fractional_counter_bytes - i - 1);
+    //printf("shift %d bits\n", j);
+    //printf("writing %d at index %d \n", (uint8_t)(tai_counter >> j), i0 + i);
+    r[i0 + i] = tai_counter >> j;
   }
 
   return r;

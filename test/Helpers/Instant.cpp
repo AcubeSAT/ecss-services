@@ -58,7 +58,7 @@ TEST_CASE("Instant class construction"){
 
     for (auto i = 0; i < 9; i++){
       bool test = input_time1[i] == test_return1[i];
-      //printf("%d // %d\n", input_time1[i], test_return1[i]);
+      //printf("comparison1 %d // %d\n", input_time1[i], test_return1[i]);
       REQUIRE(test);
     }
 
@@ -68,12 +68,19 @@ TEST_CASE("Instant class construction"){
 
     for (auto i = 0; i < 9; i++){
       bool test = input_time2[i] == test_return2[i];
-      printf("%d // %d\n", input_time2[i], test_return2[i]);
-      //REQUIRE(test);
+      //printf("comparison2 %d // %d\n", input_time2[i], test_return2[i]);
+      REQUIRE(test);
     }
 
-    // TODO test with 2 byte header
-    //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
+    etl::array<uint8_t, 9> input_time3 = {0b10100011, 0b10011000, 218, 103, 11, 0, 3, 23, 2};
+    Instant<1, 6> Epoch3(input_time3);
+    etl::array<uint8_t, 9> test_return3 = Epoch3.as_CUC_timestamp();
+
+    for (auto i = 0; i < 9; i++){
+      bool test = input_time3[i] == test_return3[i];
+      //printf("comparison3 %d // %d\n", input_time3[i], test_return3[i]);
+      REQUIRE(test);
+    }
   }
 
   SECTION("Check UTC idempotence"){
