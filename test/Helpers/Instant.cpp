@@ -52,14 +52,24 @@ TEST_CASE("Instant class construction"){
   }
 
   SECTION("Check CUC idempotence"){
-    etl::array<uint8_t, 9> input_time = {0b00100110, 0, 1, 1, 3, 0, 0, 0, 0};
-    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
-    etl::array<uint8_t, 9> test_return = Epoch.as_CUC_timestamp();
+    etl::array<uint8_t, 9> input_time1 = {0b00100110, 0, 1, 1, 3, 0, 0, 0, 0};
+    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch1(input_time1);
+    etl::array<uint8_t, 9> test_return1 = Epoch1.as_CUC_timestamp();
 
     for (auto i = 0; i < 9; i++){
-      bool test = input_time[i] == test_return[i];
-      //printf("%d // %d\n", input_time[i], test_return[i]);
+      bool test = input_time1[i] == test_return1[i];
+      //printf("%d // %d\n", input_time1[i], test_return1[i]);
       REQUIRE(test);
+    }
+
+    etl::array<uint8_t, 9> input_time2 = {0b10101101, 0b10100000, 218, 103, 11, 0, 3, 23, 0};
+    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch2(input_time2);
+    etl::array<uint8_t, 9> test_return2 = Epoch2.as_CUC_timestamp();
+
+    for (auto i = 0; i < 9; i++){
+      bool test = input_time2[i] == test_return2[i];
+      printf("%d // %d\n", input_time2[i], test_return2[i]);
+      //REQUIRE(test);
     }
 
     // TODO test with 2 byte header
