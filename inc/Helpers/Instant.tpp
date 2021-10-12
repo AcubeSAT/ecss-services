@@ -100,7 +100,7 @@ template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 const etl::array<uint8_t, 9> Instant<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp(){
   etl::array<uint8_t, 9> r = {0};
   int i0;
-  if (CUC_header < 255){ //one-byte CUC header
+  if (typeid(CUC_header_t).name() == typeid(uint8_t).name()){ //one-byte CUC header
     r[0] = static_cast<uint8_t>(CUC_header);
     i0 = 1;
   }
