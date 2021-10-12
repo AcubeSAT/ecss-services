@@ -57,35 +57,37 @@ cppcheck:
   before_script:
     - cppcheck --version
   script:
-    - echo -e "\u001b[34;1mStarting cppcheck...\u001b[0m"
-    - echo -e "\u001b[34;1mRunning cppcheck with default checklist...\u001b[0m"
-    - cd "$(dirname "$0")/.."
-    - echo -e "\u001b[34;1mRunning cppcheck with misra addon...\u001b[0m"
+    - cd $CI_PROJECT_DIR
     - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
-     --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
-     --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
-     --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
-      --xml --xml-version=2 2>report.xml -I inc src test
-    - mkdir html-report
-    - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=html-report
+      --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
+      --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
+      --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
+      --xml --xml-version=2 2>report.xml -I ./inc ./src
+  after_script:
+    - mkdir cppcheck-html-report
+    - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
   artifacts:
+    when: on_failure
     paths:
-      - ./html-report
+      - ./cppcheck-html-report
+
 clang-tidy:
+  image: spacedot/clang-tools:12.0.0
   stage: build
   variables:
     GIT_SUBMODULE_STRATEGY: normal
-    TERM: xterm-color
   script:
-    - ci/clang-tidy.sh
-
-# clang-tidy:
-#   stage: build
-#   variables:
-#     GIT_SUBMODULE_STRATEGY: normal
-#     TERM: xterm-color
-#   script:
-#     - ci/clang-tidy.sh
+    - cd $CI_PROJECT_DIR
+    - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    - clang-tidy -p ./build/compile_commands.json --checks=* `find ./src -type f -regextype posix-egrep -regex \
+      '.*\.(cpp|hpp|c|h)'` >> clang-tidy-output.log
+  after_script:
+    - mkdir clang-tidy-html-report
+    - clang-tidy-html clang-tidy-output.log
+    - mv clang.html clang-tidy-html-report
+  artifacts:
+    paths:
+      - ./clang-tidy-html-report
 
 # pages:
 #   image: lightspot21/acubesat-ci:latest
