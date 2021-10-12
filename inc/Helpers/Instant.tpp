@@ -1,21 +1,10 @@
 bool is_leap_year(uint16_t year);
 
 ////////////: CONSTRUCTORS ////////////
-//// DEFAULT CONSTRUCTOR
-template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(){
-  tai_counter = 0;
-}
-//// FROM TAI SECONDS
-template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(int seconds){
-  tai_counter = static_cast<tai_counter_t>(seconds) << 8*fractional_counter_bytes;
-}
-
 //// FROM CDS TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(Acubesat_CDS_timestamp timestamp){
-  tai_counter = 0; //TODO
+  //tai_counter = 0; //TODO
 }
 
 //// FROM CUC TIMESTAMP

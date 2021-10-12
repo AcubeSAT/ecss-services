@@ -37,14 +37,14 @@ public:
 	 * Initialize the instant at epoch
 	 *
 	 */
-	Instant();
+	Instant() : tai_counter(0){};
 
 	/**
 	 * Initialize the instant from a duration from epoch in TAI
 	 *
 	 * @param seconds an integer number of seconds from Acubesat custom epoch
 	 */
-	Instant(int seconds);
+	Instant(int seconds) : tai_counter(static_cast<tai_counter_t>(seconds) << 8*fractional_counter_bytes){};
 
 	/**
 	 * Initialize the instant from the bytes of a CUC time stamp
