@@ -60,13 +60,17 @@ cppcheck:
     - echo -e "\u001b[34;1mStarting cppcheck...\u001b[0m"
     - echo -e "\u001b[34;1mRunning cppcheck with default checklist...\u001b[0m"
     - cd "$(dirname "$0")/.."
-    - cppcheck --enable=all --suppress=unusedFunction --suppress=noExplicitConstructor --force \
-     --inline-suppr --error-exitcode=1 -I inc src test
     - echo -e "\u001b[34;1mRunning cppcheck with misra addon...\u001b[0m"
-    - cppcheck --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
+    - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
      --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
-     --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 -I inc src test
-
+     --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
+     --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
+      --xml --xml-version=2 2>report.xml -I inc src test
+    - mkdir html-report
+    - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=html-report
+  artifacts:
+    paths:
+      - ./html-report
 clang-tidy:
   stage: build
   variables:
