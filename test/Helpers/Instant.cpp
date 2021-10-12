@@ -57,7 +57,8 @@ TEST_CASE("Instant class construction"){
     etl::array<uint8_t, 9> test_return = Epoch.as_CUC_timestamp();
 
     for (auto i = 0; i < 9; i++){
-      bool test = input_time[0] == test_return[0];
+      bool test = input_time[i] == test_return[i];
+      //printf("%d // %d\n", input_time[i], test_return[i]);
       REQUIRE(test);
     }
 
