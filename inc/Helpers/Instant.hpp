@@ -79,7 +79,7 @@ public:
 	 *
 	 * @return the instant, represented in the CCSDS CUC format
 	 */
-	const void as_CUC_timestamp();
+	const etl::array<uint8_t, 9> as_CUC_timestamp();
 
 	/**
 	 * Compare two instants.
