@@ -197,7 +197,8 @@ public:
  */
 template <Logger::LogLevel level>
 constexpr __attribute__((always_inline)) inline auto LOG() {
-	if constexpr (Logger::isLogged(level)) {
+	//cppcheck-suppress syntaxError
+	if constexpr (Logger::isLogged(level)) { //cppcheck cant deal with constexpr
 		return Logger::LogEntry(level);
 	} else {
 		return Logger::NoLogEntry();

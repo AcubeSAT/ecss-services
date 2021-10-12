@@ -51,6 +51,7 @@ inline constexpr uint8_t build_short_CUC_header() {
 
 template <int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr uint16_t build_long_CUC_header() {
+	//cppcheck-suppress style
 	static_assert( seconds_counter_bytes > 4 || fractional_counter_bytes > 3, "Use build_short_CUC_header instead");
 	static_assert( seconds_counter_bytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
 	static_assert( fractional_counter_bytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
@@ -73,7 +74,7 @@ inline constexpr uint16_t build_long_CUC_header() {
   // // Number of bytes in the basic time unit
 	header = header << 2;
 	header += first_octet_number_of_seconds_bytes - 1;
-	
+
   // Number of bytes in the fractional unit
 	header = header << 2;
 	header += first_octet_number_of_fractional_bytes;
@@ -101,6 +102,7 @@ template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr T build_CUC_header() {
 	static_assert((seconds_counter_bytes + fractional_counter_bytes ) <= 8, "Complete arbitrary precision not yet supported"); //TODO improve and get rid of this
 	//cppcheck-suppress syntaxError
+	//cppcheck-suppress style
 	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3) //if constexpr not supported yet in cppcheck
 		return build_short_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
 	else
