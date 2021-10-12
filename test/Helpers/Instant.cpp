@@ -63,7 +63,7 @@ TEST_CASE("Instant class construction"){
     }
 
     etl::array<uint8_t, 9> input_time2 = {0b10101101, 0b10100000, 218, 103, 11, 0, 3, 23, 0};
-    Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch2(input_time2);
+    Instant<5, 1> Epoch2(input_time2);
     etl::array<uint8_t, 9> test_return2 = Epoch2.as_CUC_timestamp();
 
     for (auto i = 0; i < 9; i++){
