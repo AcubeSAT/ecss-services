@@ -152,7 +152,6 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& req
 				Statistic newStat;
 				systemStatistics.statisticsMap.insert({currentId, newStat});
 				systemStatistics.statisticsMap.at(currentId).get().setSelfSamplingInterval(interval);
-				ParameterStatisticsService::nonDefinedStatistics--;
 				// TODO: start the evaluation of statistics for this parameter. //add boolean value on statistic
 				//       that says if evaluation is enabled
 			} else {
@@ -177,28 +176,21 @@ void ParameterStatisticsService :: deleteStatisticsDefinitions(Message& request)
 		uint16_t currentId = request.readUint16();
 		if (currentId < systemParameters.parametersArray.size()) {
 
-			systemStatistics.statisticsMap.at(currentId).get().setSelfSamplingInterval(0);
-			systemParameters.parametersArray.at(currentId).get().setParameterIsActive(false);
-			ParameterStatisticsService::nonDefinedStatistics++;
+			systemStatistics.statisticsMap.erase(currentId);
 
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 		}
 	}
 	// If list of definitions is empty, stop the periodic reporting.
-	if (nonDefinedStatistics == systemParameters.parametersArray.size()) {
+	if (systemStatistics.statisticsMap.empty()) {
 		periodicStatisticsReportingStatus = false;
 	}
 }
 
 void ParameterStatisticsService :: deleteAllStatisticsDefinitions() {
 
-	uint16_t numOfIds = systemParameters.parametersArray.size();
-	for (uint16_t i = 0; i < numOfIds; i++) {
-		systemStatistics.statisticsMap.at(i).get().setSelfSamplingInterval(0);
-		systemParameters.parametersArray.at(i).get().setParameterIsActive(false);
-	}
-	nonDefinedStatistics = systemParameters.parametersArray.size();
+	systemStatistics.statisticsMap.clear();
 	// Stop the periodic reporting because there are no defined parameters.
 	periodicStatisticsReportingStatus = false;
 }

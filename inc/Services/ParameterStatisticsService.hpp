@@ -45,7 +45,6 @@ public:
 	const bool supportsSamplingInterval = true;
 	uint16_t reportingInterval = 0;   // Must define units. Same as parameter sampling rates
 	const uint16_t numOfStatisticsDefinitions = 0;
-	uint16_t nonDefinedStatistics = 0;
 
 	/**
 	 * This function receives a TM[4,1] packet and returns a TM[4,2] packet containing the parameter statistics report.
