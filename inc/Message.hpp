@@ -353,6 +353,15 @@ public:
 	}
 
 	/**
+	 * Adds a double to the end of the message
+	 */
+	void appendDouble(double value) {
+		static_assert(sizeof(uint64_t) == sizeof(value), "Double numbers must be 64 bits long");
+
+		return appendWord(reinterpret_cast<uint64_t&>(value));
+	}
+
+	/**
 	 * Adds a N-byte string to the end of the message
 	 *
 	 *
