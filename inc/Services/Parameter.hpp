@@ -64,6 +64,10 @@ public:
 		return currentValue;
 	}
 
+	double getValueAsDouble() {
+		return (static_cast <double> (currentValue));
+	}
+
 	/**
 	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that paremeter
 	 */

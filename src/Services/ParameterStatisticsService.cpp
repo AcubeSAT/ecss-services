@@ -24,8 +24,8 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 
 	    uint16_t currId = i;
-		std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsMap.at(currId).get();
-	    uint16_t numOfSamples = currentStatistic.get().sampleCounter;
+		Statistic currentStatistic = systemStatistics.statisticsMap.at(currId).get();
+	    uint16_t numOfSamples = currentStatistic.sampleCounter;
 
 		if (numOfSamples == 0) {
 			continue;
@@ -33,7 +33,7 @@ void ParameterStatisticsService :: reportParameterStatistics(Message& resetFlag)
 		statisticsReport.appendUint16(currId);
 		statisticsReport.appendUint16(numOfSamples);
 
-		currentStatistic.get().appendStatisticsToMessage(currentStatistic, statisticsReport); // WORKS! MAGIC!
+		currentStatistic.appendStatisticsToMessage(statisticsReport); // WORKS! MAGIC!
 		numOfValidParameters++;
 	}
 
@@ -52,7 +52,7 @@ void ParameterStatisticsService :: resetParameterStatistics() {
 
 	//TODO: Stop the evaluation of parameter statistics
 	for(auto &it: systemStatistics.statisticsMap) {
-		it.second.get().clearStatisticSamples();
+		it.second.get().resetStatistics();
 	}
 	//TODO: Restart the evaluation of parameter statistics
 }
@@ -90,8 +90,8 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 			 *      2. append end time
 			 */
 
-			std::reference_wrapper <StatisticBase> currentStatistic = systemStatistics.statisticsMap.at(i).get();
-			uint16_t numOfSamples = currentStatistic.get().sampleCounter;
+			Statistic currentStatistic = systemStatistics.statisticsMap.at(i).get();
+			uint16_t numOfSamples = currentStatistic.sampleCounter;
 
 			if(numOfSamples == 0) {
 				continue;
@@ -99,7 +99,7 @@ void ParameterStatisticsService :: enablePeriodicStatisticsReporting(Message& re
 			statisticsReport.appendUint16(numOfParameters);
 			statisticsReport.appendUint16(i);
 
-			currentStatistic.get().appendStatisticsToMessage(currentStatistic, statisticsReport);
+			currentStatistic.appendStatisticsToMessage(statisticsReport);
 
 			/*
 			 * TODO: put the message into a queue and continue constructing the next report, and when
@@ -137,36 +137,28 @@ void ParameterStatisticsService :: addOrUpdateStatisticsDefinitions(Message& req
 	for (uint16_t i = 0; i < numOfIds; i++) {
 
 		uint16_t currentId = request.readUint16();
+		if (currentId >= systemParameters.parametersArray.size()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
+		}
+		bool exists = systemStatistics.statisticsMap.find(currentId) != systemStatistics.statisticsMap.end();
+		ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
+		                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-		if (currentId < systemParameters.parametersArray.size() and systemStatistics.statisticsMap.find(currentId) !=
-		                                                                systemStatistics.statisticsMap.end()) {
-
-			ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
-			                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-
-			// If there are intervals, get the value and check if it exceeds the sampling rate of the parameter.
-			if (request.hasTimeIntervals) {
-				uint16_t interval = request.readUint16();
-				ErrorHandler::assertRequest(interval <= reportingInterval, request,
-				                            ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
-
-				uint16_t paramSamplingInterval =
-				    systemStatistics.statisticsMap.at(currentId).get().selfSamplingInterval;
-
-				if (paramSamplingInterval == 0) {
-					systemStatistics.statisticsMap.at(currentId).get().setSelfSamplingInterval(interval);
-					systemParameters.parametersArray.at(currentId).get().setParameterIsActive(true);
-					ParameterStatisticsService::nonDefinedStatistics--;
-					// TODO: start the evaluation of statistics for this parameter. //add boolean value on statistic
-					//  that says if evaluation is enabled
-				} else {
-					systemStatistics.statisticsMap.at(currentId).get().setSelfSamplingInterval(interval);
-					// Statistics evaluation reset
-					systemStatistics.statisticsMap.at(currentId).get().clearStatisticSamples();
-				}
+		if (request.hasTimeIntervals) {
+			uint16_t interval = request.readUint16();
+			ErrorHandler::assertRequest(interval <= reportingInterval, request,
+			                            ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
+			if (not exists) {
+				Statistic newStat;
+				systemStatistics.statisticsMap.insert({currentId, newStat});
+				systemStatistics.statisticsMap.at(currentId).get().setSelfSamplingInterval(interval);
+				ParameterStatisticsService::nonDefinedStatistics--;
+				// TODO: start the evaluation of statistics for this parameter. //add boolean value on statistic
+				//       that says if evaluation is enabled
+			} else {
+				systemStatistics.statisticsMap.at(currentId).get().setSelfSamplingInterval(interval);
+				systemStatistics.statisticsMap.at(currentId).get().resetStatistics();
 			}
-		} else {
-			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 		}
 	}
 }
