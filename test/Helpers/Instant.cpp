@@ -84,11 +84,33 @@ TEST_CASE("Instant class construction"){
   }
 
   SECTION("Check UTC idempotence"){
-    UTC_Timestamp timestamp1(2020,4,10,10,15,0); //10 Apr 2020, 10:15:00;
-    Instant<3,3> Epoch(timestamp1);
-    UTC_Timestamp timestamp2 = Epoch.as_UTC_timestamp();
-    bool cond = (timestamp2 == timestamp1);
-    REQUIRE(cond);
+    {
+      UTC_Timestamp timestamp1(2020,4,10,10,15,0); //10 Apr 2020, 10:15:00;
+      Instant<Acubesat_CUC_seconds_counter_bytes,Acubesat_CUC_fractional_counter_bytes> Epoch(timestamp1);
+      UTC_Timestamp timestamp2 = Epoch.as_UTC_timestamp();
+      bool cond = (timestamp2 == timestamp1);
+      REQUIRE(cond);
+    }
+    {
+      UTC_Timestamp timestamp1(2035,1,1,0,0,1); //1 Jan 2035 midnight passed;
+      Instant<Acubesat_CUC_seconds_counter_bytes,Acubesat_CUC_fractional_counter_bytes> Epoch(timestamp1);
+      UTC_Timestamp timestamp2 = Epoch.as_UTC_timestamp();
+      bool cond = (timestamp2 == timestamp1);
+      REQUIRE(cond);
+    }
+  }
+
+  SECTION("UTC conversion to and from seconds timestamps") {
+    {
+      UTC_Timestamp timestamp1(2020,12,5, 0,0,0); //5 Dec 2020, midnight;
+      Instant<Acubesat_CUC_seconds_counter_bytes,Acubesat_CUC_fractional_counter_bytes> Epoch(timestamp1);
+      REQUIRE(Epoch.as_TAI_seconds()  == 1607126400 );
+    }
+    {
+      UTC_Timestamp timestamp1(2020,2,29, 0,0,0); //5 Dec 2020, midnight;
+      Instant<Acubesat_CUC_seconds_counter_bytes,Acubesat_CUC_fractional_counter_bytes> Epoch(timestamp1);
+      REQUIRE(Epoch.as_TAI_seconds()  == 1582934400 );
+    }
   }
 
   // SECTION("UTC conversion to and from CUC") {

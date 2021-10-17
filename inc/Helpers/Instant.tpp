@@ -116,7 +116,58 @@ const etl::array<uint8_t, 9> Instant<seconds_counter_bytes, fractional_counter_b
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 const UTC_Timestamp Instant<seconds_counter_bytes, fractional_counter_bytes>::as_UTC_timestamp(){
-  return UTC_Timestamp();
+  int seconds = as_TAI_seconds();
+
+  // elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
+	ASSERT_INTERNAL(seconds >= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS, ErrorHandler::InternalErrorType::InvalidDate);
+
+	seconds -= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
+	int year = 2019;
+	int month = 1;
+	int day = 0;
+	int hour = 0;
+	int minute = 0;
+	int second = 0;
+
+	// calculate years
+	while (seconds >= (is_leap_year(year) ? 366 : 365) * SECONDS_PER_DAY) {
+		seconds -= (is_leap_year(year) ? 366 : 365) * SECONDS_PER_DAY;
+		year++;
+	}
+
+	// calculate months
+	int i = 0;
+	while (seconds >= (DaysOfMonth[i] * SECONDS_PER_DAY)) {
+		month++;
+		seconds -= (DaysOfMonth[i] * SECONDS_PER_DAY);
+		i++;
+		if ((i == 1U) && is_leap_year(year)) {
+			if (seconds <= (28 * SECONDS_PER_DAY)) {
+				break;
+			}
+			month++;
+			seconds -= 29 * SECONDS_PER_DAY;
+			i++;
+		}
+	}
+
+	// calculate days
+	day = seconds / SECONDS_PER_DAY;
+	seconds -= day * SECONDS_PER_DAY;
+	day++; // add 1 day because we start count from 1 January (and not 0 January!)
+
+	// calculate hours
+	hour = seconds / SECONDS_PER_HOUR;
+	seconds -= hour * SECONDS_PER_HOUR;
+
+	// calculate minutes
+	minute = seconds / SECONDS_PER_MINUTE;
+	seconds -= minute * SECONDS_PER_MINUTE;
+
+	// calculate seconds
+	second = seconds;
+
+  return UTC_Timestamp(year, month, day, hour, minute, second);
 }
 
 ////////////// OPERATORS ///////////
