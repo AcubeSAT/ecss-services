@@ -228,4 +228,10 @@ public:
 	 */
 	bool operator>=(const UTC_Timestamp& Date);
 
+	/**
+	 * Pretty-print timestamp.
+	 *
+	 * @param Date the date that will be output
+	 */
+	 friend std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date);
 };
