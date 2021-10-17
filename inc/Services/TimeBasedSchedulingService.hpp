@@ -6,7 +6,6 @@
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "Helpers/CRCHelper.hpp"
-#include "Helpers/TimeHelper.hpp"
 
 // Include platform specific files
 #include "Platform/x86/TimeGetter.hpp"
