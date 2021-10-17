@@ -82,6 +82,13 @@ public:
 	const etl::array<uint8_t, 9> as_CUC_timestamp();
 
 	/**
+	 * Get the representation as a UTC timestamp
+	 *
+	 * @return the instant, represented in the structure that holds UTC timestamps
+	 */
+	const UTC_Timestamp as_UTC_timestamp();
+
+	/**
 	 * Compare two instants.
 	 *
 	 * @param Instant the date that will be compared with the pointer `this`

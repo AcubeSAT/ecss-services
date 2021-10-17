@@ -15,7 +15,7 @@ inline constexpr uint8_t Acubesat_CUC_seconds_counter_bytes = 2; // PER DDJF_TTC
 inline constexpr uint8_t Acubesat_CUC_fractional_counter_bytes = 2; // PER DDJF_TTC
 inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800; //TODO correct for 2020.01.01
 inline constexpr uint16_t ACUBESAT_EPOCH_YEAR = 2019;
-inline constexpr uint8_t ACUBESAT_EPOCH_MONTH = 1 - 1;
+inline constexpr uint8_t ACUBESAT_EPOCH_MONTH = 1;
 inline constexpr uint8_t ACUBESAT_EPOCH_DAY = 1;
 
 static_assert(ACUBESAT_EPOCH_YEAR >= 2019);
@@ -187,4 +187,45 @@ public:
 	 * @param text_timestamp the timestamp to parse into a UTC date
 	 */
 	UTC_Timestamp(String<32> text_timestamp); // TODO change to ETL string type
+
+		/**
+	 * Compare two timestamps.
+	 *
+	 * @param Date the date that will be compared with the pointer `this`
+	 * @return true if the pointer `this` is smaller than \p Date
+	 */
+	bool operator<(const UTC_Timestamp& Date);
+
+	/**
+	 * Compare two timestamps.
+	 *
+	 * @param Date the date that will be compared with the pointer `this`
+	 * @return true if the pointer `this` is greater than \p Date
+	 */
+	bool operator>(const UTC_Timestamp& Date);
+
+	/**
+	 * Compare two timestamps.
+	 *
+	 * @param Date the date that will be compared with the pointer `this`
+	 * @return true if the pointer `this` is equal to \p Date
+	 */
+	bool operator==(const UTC_Timestamp& Date);
+
+	/**
+	 * Compare two timestamps.
+	 *
+	 * @param Date the date that will be compared with the pointer `this`
+	 * @return true if the pointer `this` is smaller than or equal to \p Date
+	 */
+	bool operator<=(const UTC_Timestamp& Date);
+
+	/**
+	 * Compare two timestamps.
+	 *
+	 * @param Date the date that will be compared with the pointer `this`
+	 * @return true if the pointer `this` is greater than or equal to \p Date
+	 */
+	bool operator>=(const UTC_Timestamp& Date);
+
 };

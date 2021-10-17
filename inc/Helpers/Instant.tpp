@@ -69,7 +69,7 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(UTC_Timestamp 
     secs += (is_leap_year(y) ? 366 : 365) * SECONDS_PER_DAY;
   }
   for (int m = ACUBESAT_EPOCH_MONTH; m < timestamp.month; ++m) {
-    secs += DaysOfMonth[m - 1U] * SECONDS_PER_DAY;
+    secs += DaysOfMonth[m - 1] * SECONDS_PER_DAY;
     if ((m == 2U) && is_leap_year(timestamp.year)) {
       secs += SECONDS_PER_DAY;
     }
@@ -78,7 +78,7 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(UTC_Timestamp 
   secs += timestamp.hour * SECONDS_PER_HOUR;
   secs += timestamp.minute * SECONDS_PER_MINUTE;
   secs += timestamp.second;
-  this.Instant(secs);
+  tai_counter = static_cast<tai_counter_t>(secs) << 8*fractional_counter_bytes;
 }
 
 ////////////// GETTER ///////////////
@@ -112,6 +112,11 @@ const etl::array<uint8_t, 9> Instant<seconds_counter_bytes, fractional_counter_b
   }
 
   return r;
+}
+
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+const UTC_Timestamp Instant<seconds_counter_bytes, fractional_counter_bytes>::as_UTC_timestamp(){
+  return UTC_Timestamp();
 }
 
 ////////////// OPERATORS ///////////

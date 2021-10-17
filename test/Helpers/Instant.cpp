@@ -84,11 +84,20 @@ TEST_CASE("Instant class construction"){
   }
 
   SECTION("Check UTC idempotence"){
-    // TODO
-    //etl::array<uint8_t, 9> input_time = {10, 0, 1, 1, 3, 1, 2};
-    //Instant<Acubesat_CUC_seconds_counter_bytes, Acubesat_CUC_fractional_counter_bytes> Epoch(input_time);
-    //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
+    UTC_Timestamp timestamp1(2020,4,10,10,15,0); //10 Apr 2020, 10:15:00;
+    Instant<3,3> Epoch(timestamp1);
+    UTC_Timestamp timestamp2 = Epoch.as_UTC_timestamp();
+    bool cond = (timestamp2 == timestamp1);
+    REQUIRE(cond);
   }
+
+  // SECTION("UTC conversion to and from CUC") {
+  // 	//TODO
+  // }
+  //
+  // SECTION("UTC conversion to and from CDS") {
+  // 	//TODO
+  // }
 
   SECTION("Check CDS idempotence"){
     // TODO

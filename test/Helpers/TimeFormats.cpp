@@ -24,11 +24,3 @@ TEST_CASE("UTC timestamps") {
 		CHECK(ServiceTests::countErrors() == 6);
 		CHECK(ServiceTests::thrownError(ErrorHandler::InvalidDate));
 }
-
-TEST_CASE("UTC conversion to and from CUC") {
-	//TODO
-}
-
-TEST_CASE("UTC conversion to and from CDS") {
-	//TODO
-}
