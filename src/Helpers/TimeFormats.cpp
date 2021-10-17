@@ -179,7 +179,7 @@ bool UTC_Timestamp::operator>=(const UTC_Timestamp& Date) {
 	return ((*this > Date) || (*this == Date));
 }
 
-std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date){
+std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date){// NOLINT because clang tidy is shitting itself
 	// YYYY-MM-DDTHH:mm:ss.sssZ
 	o.fill('0');
 	o << static_cast<int>(Date.year) << "-"
@@ -189,4 +189,5 @@ std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date){
 	<< std::setw(2) << static_cast<int>(Date.minute) << ":"
 	<< std::setw(2) << static_cast<int>(Date.second) << ":000Z"
 	<< std::endl;
+	return o;
 }
