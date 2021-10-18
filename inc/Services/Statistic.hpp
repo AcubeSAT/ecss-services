@@ -26,6 +26,7 @@ public:
 	double mean = 0;
 	double meanOfSquares = 0;
 	double standardDeviation = 0;
+	bool evaluationIsEnabled = false;
 
 	Statistic() = default;
 

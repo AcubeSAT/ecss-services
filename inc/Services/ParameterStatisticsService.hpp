@@ -48,8 +48,6 @@ public:
 
 	/**
 	 * This function receives a TM[4,1] packet and returns a TM[4,2] packet containing the parameter statistics report.
-	 *
-	 * @param resetFlag: a TC[4, 1] packet carrying a boolean value
 	 */
 	void reportParameterStatistics(Message& request);
 
