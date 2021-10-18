@@ -96,7 +96,7 @@ scan-build:
     - mkdir scan-build-html-report
   script:
     - cd $CI_PROJECT_DIR
-    - scan-build cmake ./
+    - scan-build cmake ./ -DCMAKE_C_COMPILER clang -DCMAKE_CXX_COMPILER clang++
     - scan-build -o ./scan-build-html-report make
   artifacts:
     paths:
