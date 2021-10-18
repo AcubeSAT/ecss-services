@@ -4,13 +4,11 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
-#include "etl/unordered_set.h"
 
 /**
  * Implementation of the Housekeeping report structure used by the Housekeeping Reporting Subservice (ST[03])
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
-
 class HousekeepingStructure {
 public:
 

@@ -1,5 +1,15 @@
 #include "Services/HousekeepingService.hpp"
 
+/**
+ * TODO:
+ * 		for (every minimum sampling_interval):
+ * 			for (every Parameter ID):
+ * 				ecss.st20.getValueAsDouble();
+ * 				ecss.st04.storeStatistics();
+ * 				if (ID is a housekeeping parameter):	<--- Should we do it this way?
+ * 					ecss.st03.storeValueInSystemHousekeeping();
+ */
+
 void HousekeepingService::housekeepingParametersReport(Message& structId) {
 
 	ErrorHandler::assertRequest(structId.packetType == Message::TC, structId,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -16,7 +26,7 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 
 		// Append data from simply commutated parameters
 		for (auto &currentParameterId : housekeepingStructures[requestedId].simplyCommutatedIds) {
-			systemStatistics.statisticsArray[currentParameterId].get().appendSampleToMessage(housekeepingReport, 0);
+			systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage(housekeepingReport,0);
 		}
 
 		// Append data from super commutated parameters
@@ -28,7 +38,7 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 				for (int k = 0; k < numOfParamsInCurrSet; k++) {
 
 					uint16_t currentParameterId = currentSet.second.at(k);
-					systemStatistics.statisticsArray[currentParameterId].get().appendSampleToMessage(housekeepingReport, j);
+					systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage(housekeepingReport, j);
 				}
 			}
 		}
@@ -84,6 +94,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	uint16_t idToCreate = request.readUint16();
 	if (housekeepingStructures.find(idToCreate) != housekeepingStructures.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
+		return;
 	}
 
 	HousekeepingStructure newStructure;
@@ -149,31 +160,23 @@ void HousekeepingService::housekeepingStructureReport(uint16_t structIdToReport)
 
 	Message structReport(ServiceType,MessageType::HousekeepingParametersReport, Message::TM, 1);
 
-	if (housekeepingStructures.find(structIdToReport) != housekeepingStructures.end()) {
+	structReport.appendUint16(structIdToReport);
+	structReport.appendBoolean(housekeepingStructures[structIdToReport].periodicGenerationActionStatus);
+	structReport.appendUint16(housekeepingStructures[structIdToReport].collectionInterval);
+	structReport.appendUint16(housekeepingStructures[structIdToReport].numOfSimplyCommutatedParams);
 
-		structReport.appendUint16(structIdToReport);
-		structReport.appendBoolean(housekeepingStructures[structIdToReport].periodicGenerationActionStatus);
+	for (auto currParamId : housekeepingStructures[structIdToReport].simplyCommutatedIds) {
+		structReport.appendUint16(currParamId);
+	}
+	structReport.appendUint16(housekeepingStructures[structIdToReport].numOfSuperCommutatedParameterSets);
 
-		structReport.appendUint16(housekeepingStructures[structIdToReport].collectionInterval);
-		structReport.appendUint16(housekeepingStructures[structIdToReport].numOfSimplyCommutatedParams);
+	for (auto &currSet : housekeepingStructures[structIdToReport].superCommutatedIds) {
+		structReport.appendUint16(currSet.first);
+		structReport.appendUint16(currSet.second.size());
 
-		for (auto currParamId : housekeepingStructures[structIdToReport].simplyCommutatedIds) {
+		for (auto &currParamId : currSet.second) {
 			structReport.appendUint16(currParamId);
 		}
-		structReport.appendUint16(housekeepingStructures[structIdToReport].numOfSuperCommutatedParameterSets);
-
-		for (auto &currSet : housekeepingStructures[structIdToReport].superCommutatedIds) {
-			structReport.appendUint16(currSet.first);
-			structReport.appendUint16(currSet.second.size());
-
-			for (auto &currParamId : currSet.second) {
-				structReport.appendUint16(currParamId);
-			}
-		}
-	} else {
-		/**
-		 * @todo: Raise an error (RequestedNonExistingParameter)
-		 */
 	}
 
 	storeMessage(structReport);
@@ -227,9 +230,11 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 	uint16_t targetStructId = newParams.readUint16();
 	if (housekeepingStructures.find(targetStructId) == housekeepingStructures.end()) {
 		ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		return;
 	}
 	if (housekeepingStructures[targetStructId].periodicGenerationActionStatus) {
 	    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
+		return;
     }
 
 	/**
@@ -243,9 +248,11 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 
 		if (newParamId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			return;
 		}
 		if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
 		    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+			return;
 	    }
 		housekeepingStructures[targetStructId].numOfSimplyCommutatedParams++;
 		housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
@@ -259,19 +266,25 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 		uint16_t numOfCurrSetIds = newParams.readUint16();
 		housekeepingStructures[targetStructId].numOfSuperCommutatedParameterSets++;
 		etl::vector<uint16_t, ECSS_MAX_PARAMETERS> currSetIdsVec;
+		uint16_t validIdsCounter = 0;
 
 		for (int j = 0; j < numOfCurrSetIds; j++) {
 			uint16_t newParamId = newParams.readUint16();
 			if (newParamId >= systemParameters.parametersArray.size()) {
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+				return;
 			}
 			if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+				return;
 			}
 			housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
 			currSetIdsVec.push_back(newParamId);
+			validIdsCounter++;
 		}
-		housekeepingStructures[targetStructId].superCommutatedIds.push_back(std::make_pair(numOfCurrSetSamples, currSetIdsVec));
+		if (validIdsCounter > 0) {  // There must be at least one new added ID in order to insert new set.
+			housekeepingStructures[targetStructId].superCommutatedIds.push_back(std::make_pair(numOfCurrSetSamples, currSetIdsVec));
+		}
 	}
 }
 
@@ -311,8 +324,7 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 		uint16_t structIdToReport = request.readUint16();
 		if (housekeepingStructures.find(structIdToReport) != housekeepingStructures.end()) {
 			periodicPropertiesReport.appendUint16(structIdToReport);
-			periodicPropertiesReport.appendBoolean(housekeepingStructures[structIdToReport]
-			                                           .periodicGenerationActionStatus);
+			periodicPropertiesReport.appendBoolean(housekeepingStructures[structIdToReport].periodicGenerationActionStatus);
 			periodicPropertiesReport.appendUint16(housekeepingStructures[structIdToReport].collectionInterval);
 			numOfValidIds++;
 		} else {
@@ -323,7 +335,6 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 	periodicPropertiesReport.resetRead();
 	periodicPropertiesReport.appendUint16(numOfValidIds);
 	storeMessage(periodicPropertiesReport);
-
 }
 
 bool HousekeepingService::existsInVector(uint16_t targetId, etl::vector <uint16_t, 5> vec) {

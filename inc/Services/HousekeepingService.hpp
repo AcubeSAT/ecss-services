@@ -7,6 +7,7 @@
 #include "ErrorHandler.hpp"
 #include "Parameters/SystemParameters.hpp"
 #include "Statistics/SystemStatistics.hpp"
+#include "Housekeeping/SystemHousekeeping.hpp"
 #include "Services/HousekeepingStructure.hpp"
 
 /**
