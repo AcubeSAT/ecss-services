@@ -106,6 +106,7 @@ doxygen:
   stage: build
   script:
     - cd $CI_PROJECT_DIR
+    - ls
     - doxygen doxygen.conf
   artifacts:
     paths:
