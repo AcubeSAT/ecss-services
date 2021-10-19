@@ -107,6 +107,7 @@ doxygen:
   script:
     - cd $CI_PROJECT_DIR
     - ls
+    - pwd
     - doxygen doxygen.conf
   artifacts:
     paths:
