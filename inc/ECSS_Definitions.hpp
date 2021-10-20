@@ -165,4 +165,9 @@
  */
 #define ECSS_MAX_HOUSEKEEPING_STRUCTS 10
 
+/**
+ * Number of parameters whose statistics we need and are going to be stored into the statisticsMap
+ */
+#define ECSS_MAX_STATISTIC_PARAMETERS 10
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

@@ -146,18 +146,22 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 	for (uint16_t i = 0; i < numOfIds; i++) {
 
 		uint16_t currentId = request.readUint16();
+		// TODO: actually define what does it mean to have an invalid parameter ID, what is the max ID??
+		//       Maybe not parametersArray.size
 		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
 			return;
 		}
 		bool exists = systemStatistics.statisticsMap.find(currentId) != systemStatistics.statisticsMap.end();
-		ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
-		                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+//		ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
+//		                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 		if (request.hasTimeIntervals) {
 			uint16_t interval = request.readUint16();
-			ErrorHandler::assertRequest(interval <= reportingInterval, request,
-			                            ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
+			if (interval <= reportingInterval) {
+				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
+				return;
+			}
 			if (not exists) {
 				Statistic newStat;
 				systemStatistics.statisticsMap.insert({currentId, newStat});

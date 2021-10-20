@@ -113,7 +113,7 @@ public:
 	uint16_t readPosition = 0;
 
 	// TC[4,6] needs to know if there are intervals in the message
-	bool hasTimeIntervals = false;
+	bool hasTimeIntervals = true;
 	/**
 	 * Appends the least significant \p numBits from \p data to the message
 	 *

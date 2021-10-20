@@ -1,3 +1,4 @@
+#include <iostream>
 #include "catch2/catch.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
@@ -29,7 +30,6 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		initializeStatistics();
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                            ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
-
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 
@@ -66,12 +66,37 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		initializeStatistics();
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-
 		request.appendUint16(3);
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 10);
 	}
 
+	/**
+	 * @todo: In order to test every case for this function, we need to specify what is the MAX_PARAMETERS
+	 */
+	SECTION("Add and Update statistics definitions") {
+		initializeStatistics();
+		Message request = Message(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
+		                          Message::TC, 1);
+		uint16_t numOfIds = 2;
+		uint16_t paramId1 = 0;
+		uint16_t paramId2 = 1;
+		uint16_t interval1 = 14;
+		uint16_t interval2 = 32;
+		request.appendUint16(numOfIds);
+		request.appendUint16(paramId1);
+		request.appendUint16(interval1);
+		request.appendUint16(paramId2);
+		request.appendUint16(interval2);
 
+		CHECK(systemStatistics.statisticsMap[0].selfSamplingInterval == 0);
+		CHECK(systemStatistics.statisticsMap[1].selfSamplingInterval == 0);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 10);
+		CHECK(systemStatistics.statisticsMap[0].selfSamplingInterval == 14);
+		CHECK(systemStatistics.statisticsMap[1].selfSamplingInterval == 32);
+	}
 
 }
