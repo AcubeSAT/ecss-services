@@ -27,8 +27,6 @@ void Statistic::updateStatistics(double value) {
 }
 
 void Statistic::appendStatisticsToMessage(Message& report) {
-	// Calculate all the statistics
-	std::cout<<"stddev="<<standardDeviation<<std::endl;
 	report.appendFloat(static_cast <float> (max));
 	report.appendUint32(maxTime);
 	report.appendFloat(static_cast <float> (min));

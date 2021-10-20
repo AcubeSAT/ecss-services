@@ -50,7 +50,6 @@ void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
 	if (resetFlagValue or hasAutomaticStatisticsReset) {
 		resetParameterStatistics();
 	}
-
 	// Here add start time
 }
 
@@ -77,19 +76,23 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t timeInterval = request.readUint16();
-
-	ErrorHandler::assertRequest(timeInterval >= SAMPLING_PARAMETER_INTERVAL, request,
-	                            ErrorHandler::ExecutionStartErrorType::InvalidReportingRateError);
+	if (timeInterval >= SAMPLING_PARAMETER_INTERVAL) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
+		return;
+	}
 
 	periodicStatisticsReportingStatus = true;
 	reportingInterval = timeInterval;
 
 	uint16_t numOfParameters = systemStatistics.statisticsMap.size();
-
+	uint16_t count = 0;
 	//Only generate ONE parameter statistics report after every interval passes.
-	while (periodicStatisticsReportingStatus) {
+	while (count < 10) {    //TODO: while(periodicStatisticsReportingStatus)
 
-		for (int i = 0; i < numOfParameters; i++) {
+		Message message = Message(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		reportParameterStatistics(message);
+		for (auto &currentStatistic : systemStatistics.statisticsMap) {
 
 			Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
 			/*
@@ -98,16 +101,14 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 			 *      2. append end time
 			 */
 
-			Statistic currentStatistic = systemStatistics.statisticsMap.at(i);
-			uint16_t numOfSamples = currentStatistic.sampleCounter;
-
+			uint16_t currId = currentStatistic.first;
+			uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 			if(numOfSamples == 0) {
 				continue;
 			}
 			statisticsReport.appendUint16(numOfParameters);
-			statisticsReport.appendUint16(i);
-
-			currentStatistic.appendStatisticsToMessage(statisticsReport);
+			statisticsReport.appendUint16(currId);
+			currentStatistic.second.appendStatisticsToMessage(statisticsReport);
 
 			/*
 			 * TODO: put the message into a queue and continue constructing the next report, and when
@@ -117,9 +118,8 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 			 *      Or maybe use just one FreeRTOS task that will run this function per interval.
 			 */
 		}
-
+		count++; //TODO: Delete
 		//TODO: systematically reset the parameters' statistics.
-
 	}
 }
 
@@ -130,8 +130,8 @@ void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& req
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	ParameterStatisticsService :: periodicStatisticsReportingStatus = false;
-	ParameterStatisticsService :: reportingInterval = 0;
+	periodicStatisticsReportingStatus = false;
+	reportingInterval = 0;
 }
 
 void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& request) {

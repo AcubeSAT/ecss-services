@@ -3,28 +3,30 @@
 #include "ServiceTests.hpp"
 #include "Services/ParameterService.hpp"
 
+/**
+		 * System-statistics initialization, so there are actual statistics in the map to work with.
+ */
+void initializeStatistics() {
+	Statistic stat1;
+	Statistic stat2;
+	uint16_t id1 = 7;
+	uint16_t id2 = 5;
+
+	int numOfSamples = 3;
+	for (int i = 0; i < numOfSamples; i++) {    // Values of stat-1: [ 1, 3, 5 ]
+		stat1.updateStatistics(i * 2 + 1);
+	}
+	numOfSamples = 6;
+	for (int i = 0; i < numOfSamples; i++) {    // Values of stat-2: [ 3, 5, 7, 9, 11, 13 ]
+		stat2.updateStatistics(i * 2 + 3);
+	}
+	systemStatistics.statisticsMap.insert({id1, stat1});
+	systemStatistics.statisticsMap.insert({id2, stat2});
+}
+
 TEST_CASE("Parameter Statistics Reporting Sub-service") {
 	SECTION("Reporting of valid statistics") {
-
-		/**
-		 * System-statistics initialization, so there are actual statistics in the map to work with.
-		 */
-		Statistic stat1;
-		Statistic stat2;
-		uint16_t id1 = 7;
-		uint16_t id2 = 5;
-
-		int numOfSamples = 3;
-		for (int i = 0; i < numOfSamples; i++) {    // Values of stat-1: [ 1, 3, 5 ]
-			stat1.updateStatistics(i * 2 + 1);
-		}
-		numOfSamples = 6;
-		for (int i = 0; i < numOfSamples; i++) {    // Values of stat-2: [ 3, 5, 7, 9, 11, 13 ]
-			stat2.updateStatistics(i * 2 + 3);
-		}
-		systemStatistics.statisticsMap.insert({id1, stat1});
-		systemStatistics.statisticsMap.insert({id2, stat2});
-
+		initializeStatistics();
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                            ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 
@@ -59,4 +61,17 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+
+	SECTION("Periodic reporting of valid statistics") {
+		initializeStatistics();
+		Message request = Message(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
+
+		request.appendUint16(3);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 10);
+	}
+
+
+
 }
