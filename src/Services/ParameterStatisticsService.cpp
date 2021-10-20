@@ -1,8 +1,9 @@
+#include <iostream>
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
 #include "Services/ParameterStatisticsService.hpp"
 
-bool supportsStandardDeviation = false;
+bool supportsStandardDeviation = true;
 
 void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
 
@@ -15,38 +16,42 @@ void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
 
 	bool resetFlagValue = resetFlag.readBoolean();
 	uint16_t numOfParameters = systemStatistics.statisticsMap.size();
+	statisticsReport.appendUint16(1);  //Dummy value for start and min time, will change in the end
+	statisticsReport.appendUint16(1);
 	uint16_t numOfValidParameters = 0;
 
 	// TODO: Here is the end time
 	//       append start time
 	//       append end time
 
-	for (uint16_t i = 0; i < numOfParameters; i++) {
+	for (auto &currentStatistic : systemStatistics.statisticsMap) {
+		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
+		if (numOfSamples == 0) {
+			continue;
+		}
+		numOfValidParameters++;
+	}
+	statisticsReport.appendUint16(numOfValidParameters);
 
-	    uint16_t currId = i;
-		Statistic currentStatistic = systemStatistics.statisticsMap.at(currId);
-	    uint16_t numOfSamples = currentStatistic.sampleCounter;
-
+	for (auto &currentStatistic : systemStatistics.statisticsMap) {
+	    uint16_t currId = currentStatistic.first;
+	    uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
 		}
 		statisticsReport.appendUint16(currId);
 		statisticsReport.appendUint16(numOfSamples);
-
-		currentStatistic.appendStatisticsToMessage(statisticsReport); // WORKS! MAGIC!
-		numOfValidParameters++;
+		currentStatistic.second.appendStatisticsToMessage(statisticsReport); // WORKS! MAGIC!
 	}
 
-	statisticsReport.resetRead();
 	// TODO: First add start time and end time
-	statisticsReport.appendUint16(numOfValidParameters);
 	storeMessage(statisticsReport);
 
 	if (resetFlagValue or hasAutomaticStatisticsReset) {
 		resetParameterStatistics();
 	}
-	// Here add start time
 
+	// Here add start time
 }
 
 void ParameterStatisticsService::resetParameterStatistics() {

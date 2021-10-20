@@ -6,6 +6,7 @@
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
 #include <cmath>
+#include <cfloat>
 
 extern bool supportsStandardDeviation;
 
@@ -21,12 +22,12 @@ public:
 	uint32_t maxTime = 0;
 	uint32_t minTime = 0;   //TODO: CUC Format timestamp
 	double max = 0;
-	double min = 0;
+	double min = 99;
 	double sumOfSquares = 0;
 	double mean = 0;
 	double meanOfSquares = 0;
 	double standardDeviation = 0;
-	bool evaluationIsEnabled = false;
+//	bool evaluationIsEnabled = false;
 
 	Statistic() = default;
 

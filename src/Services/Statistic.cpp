@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Services/Statistic.hpp"
 
 void Statistic::updateStatistics(double value) {
@@ -27,13 +28,14 @@ void Statistic::updateStatistics(double value) {
 
 void Statistic::appendStatisticsToMessage(Message& report) {
 	// Calculate all the statistics
-	report.appendDouble(max);
+	std::cout<<"stddev="<<standardDeviation<<std::endl;
+	report.appendFloat(static_cast <float> (max));
 	report.appendUint32(maxTime);
-	report.appendDouble(min);
+	report.appendFloat(static_cast <float> (min));
 	report.appendUint32(minTime);
-	report.appendDouble(mean);
+	report.appendFloat(static_cast <float> (mean));
 	if (supportsStandardDeviation) {
-		report.appendDouble(standardDeviation);
+		report.appendFloat(static_cast <float> (standardDeviation));
 	}
 }
 
