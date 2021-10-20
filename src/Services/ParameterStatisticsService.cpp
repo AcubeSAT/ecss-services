@@ -234,4 +234,29 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 	storeMessage(definitionsReport);
 }
 
+void ParameterStatisticsService::execute(Message& message) {
+	switch (message.messageType) {
+		case 1:
+			reportParameterStatistics(message);
+			break;
+		case 4:
+			enablePeriodicStatisticsReporting(message);
+			break;
+		case 5:
+			disablePeriodicStatisticsReporting(message);
+			break;
+		case 6:
+			addOrUpdateStatisticsDefinitions(message);
+			break;
+		case 7:
+			deleteStatisticsDefinitions(message);
+			break;
+		case 8:
+			reportStatisticsDefinitions(message);
+			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+	}
+}
+
 #endif

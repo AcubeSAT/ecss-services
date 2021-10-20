@@ -24,6 +24,7 @@
 #define SERVICE_ALL ///< Enables compilation of all the ECSS services
 
 #ifdef SERVICE_ALL
+#define SERVICE_PARAMETERSTATISTICS ///< Compile ST[04] parameter statistics
 #define SERVICE_EVENTACTION         ///<  Compile ST[19] event-action
 #define SERVICE_EVENTREPORT         ///<  Compile ST[05] event reporting
 #define SERVICE_FUNCTION            ///<  Compile ST[08] function management

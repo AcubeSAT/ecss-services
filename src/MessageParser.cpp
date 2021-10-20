@@ -7,6 +7,11 @@
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
+#ifdef SERVICE_PARAMETERSTATISTICS
+		case 4: Services.parameterStatistics.execute(message);
+			break;
+#endif
+
 #ifdef SERVICE_EVENTREPORT
 		case 5: Services.eventReport.execute(message); // ST[05]
 			break;

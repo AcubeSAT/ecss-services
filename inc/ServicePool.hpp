@@ -11,6 +11,7 @@
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
+#include "Services/ParameterStatisticsService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -25,13 +26,17 @@ class ServicePool {
      * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
      * counter of each MessageType.
 	 */
-	etl::map<uint16_t, uint16_t, ECSS_TOTAL_MESSAGE_TYPES> messageTypeCounter;
+	etl::map <uint16_t, uint16_t, ECSS_TOTAL_MESSAGE_TYPES> messageTypeCounter;
 
 	/**
 	 * A counter for messages that corresponds to the total number of TM packets sent from an APID
 	 */
 	uint16_t packetSequenceCounter = 0;
 public:
+#ifdef SERVICE_PARAMETERSTATISTICS
+	ParameterStatisticsService parameterStatistics;
+#endif
+
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
