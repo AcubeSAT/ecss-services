@@ -49,7 +49,7 @@ public:
 	/**
 	 * This function receives a TM[4,1] packet and returns a TM[4,2] packet containing the parameter statistics report.
 	 */
-	void reportParameterStatistics(Message& request);
+	void reportParameterStatistics(Message& resetFlag);
 
 	/**
 	 * TC[4,3] reset parameter statistics, clearing all samples and values.
