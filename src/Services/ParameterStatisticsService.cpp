@@ -15,7 +15,6 @@ void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
 	Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
 
 	bool resetFlagValue = resetFlag.readBoolean();
-	uint16_t numOfParameters = systemStatistics.statisticsMap.size();
 	statisticsReport.appendUint16(1);  //Dummy value for start and min time, will change in the end
 	statisticsReport.appendUint16(1);
 	uint16_t numOfValidParameters = 0;
@@ -89,8 +88,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	//Only generate ONE parameter statistics report after every interval passes.
 	while (count < 10) {    //TODO: while(periodicStatisticsReportingStatus)
 
-		Message message = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		Message message = Message(ServiceType,MessageType::ReportParameterStatistics, Message::TC, 1);
 		reportParameterStatistics(message);
 		for (auto &currentStatistic : systemStatistics.statisticsMap) {
 
