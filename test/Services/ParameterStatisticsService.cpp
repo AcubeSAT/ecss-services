@@ -7,9 +7,11 @@
 /**
 		 * System-statistics initialization, so there are actual statistics in the map to work with.
  */
-void initializeStatistics() {
+void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	Statistic stat1;
 	Statistic stat2;
+	stat1.selfSamplingInterval = interval1;
+	stat2.selfSamplingInterval = interval2;
 	uint16_t id1 = 7;
 	uint16_t id2 = 5;
 
@@ -31,7 +33,7 @@ void resetSystem() {
 
 TEST_CASE("Parameter Statistics Reporting Sub-service") {
 	SECTION("Reporting of valid statistics") {
-		initializeStatistics();
+		initializeStatistics(6, 7);
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                            ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 		MessageParser::execute(request);
@@ -68,7 +70,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 	}
 
 	SECTION("Periodic reporting of valid statistics") {
-		initializeStatistics();
+		initializeStatistics(6, 7);
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request.appendUint16(3);
@@ -83,8 +85,8 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 	/**
 	 * @todo: In order to test every case for this function, we need to specify what is the MAX_PARAMETERS
 	 */
-	SECTION("Add and Update statistics definitions") {
-		initializeStatistics();
+	SECTION("Add/Update statistics definitions") {
+		initializeStatistics(7, 6);
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
 		                          Message::TC, 1);
@@ -123,9 +125,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		systemStatistics.statisticsMap.insert({0, stat1});
 		systemStatistics.statisticsMap.insert({1, stat2});
 
-		CHECK(systemStatistics.statisticsMap.size() == 2);
-		CHECK(systemStatistics.statisticsMap.find(0) != systemStatistics.statisticsMap.end());
-		CHECK(systemStatistics.statisticsMap.find(1) != systemStatistics.statisticsMap.end());
+		REQUIRE(systemStatistics.statisticsMap.size() == 2);
+		REQUIRE(systemStatistics.statisticsMap.find(0) != systemStatistics.statisticsMap.end());
+		REQUIRE(systemStatistics.statisticsMap.find(1) != systemStatistics.statisticsMap.end());
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions,
 		                          Message::TC, 1);
@@ -141,6 +143,28 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		CHECK(systemStatistics.statisticsMap.empty());
+
+		resetSystem();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Parameter statistics definition report") {
+		initializeStatistics(0, 12);
+		REQUIRE(systemStatistics.statisticsMap.size() == 2);
+		REQUIRE(systemStatistics.statisticsMap.find(7) != systemStatistics.statisticsMap.end());
+		REQUIRE(systemStatistics.statisticsMap.find(5) != systemStatistics.statisticsMap.end());
+
+		Message request = Message(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions,
+		                          Message::TC, 1);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		CHECK(report.readUint16() == 0);    //Reporting interval
+		CHECK(report.readUint16() == 1);    //Num of valid Ids
+		CHECK(report.readUint16() == 5);    //Valid parameter ID
+		CHECK(report.readUint16() == 12);   //Sampling interval
 
 		resetSystem();
 		ServiceTests::reset();

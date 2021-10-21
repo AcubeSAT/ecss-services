@@ -220,7 +220,6 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 		currReportingInterval = reportingInterval;
 	}
 	definitionsReport.appendUint16(currReportingInterval);
-	uint16_t numOfParameters = systemStatistics.statisticsMap.size();
 
 	uint16_t numOfDefinedParameters = 0;
 	for (auto &it : systemStatistics.statisticsMap) {
@@ -231,9 +230,9 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 	}
 	definitionsReport.appendUint16(numOfDefinedParameters);
 
-	for (int i = 0; i < numOfParameters; i++) {
-		uint16_t currentId = i;
-		uint16_t samplingInterval = systemStatistics.statisticsMap.at(currentId).selfSamplingInterval;
+	for (auto &currentParam : systemStatistics.statisticsMap) {
+		uint16_t currentId = currentParam.first;
+		uint16_t samplingInterval = currentParam.second.selfSamplingInterval;
 
 		if (samplingInterval != 0 and supportsSamplingInterval) {
 			definitionsReport.appendUint16(currentId);
