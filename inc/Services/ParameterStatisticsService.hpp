@@ -43,7 +43,7 @@ public:
 	 */
 	const bool supportsStandardDeviation = true;
 	const bool supportsSamplingInterval = true;
-	uint16_t reportingInterval = 0;   // Must define units. Same as parameter sampling rates
+	uint16_t reportingInterval = 5;   // Must define units. Same as parameter sampling rates
 	const uint16_t numOfStatisticsDefinitions = 0;
 
 	/**

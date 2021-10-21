@@ -25,6 +25,10 @@ void initializeStatistics() {
 	systemStatistics.statisticsMap.insert({id2, stat2});
 }
 
+void resetSystem() {
+	systemStatistics.statisticsMap.clear();
+}
+
 TEST_CASE("Parameter Statistics Reporting Sub-service") {
 	SECTION("Reporting of valid statistics") {
 		initializeStatistics();
@@ -58,6 +62,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(report.readFloat() == 3);     // mean
 		CHECK(static_cast <int> (report.readFloat()) == 1);  // stddev
 
+		resetSystem();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -68,7 +73,11 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request.appendUint16(3);
 		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 10);
+		CHECK(ServiceTests::count() == 10);     // 10 reports generated (check function implementation)
+
+		resetSystem();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	/**
@@ -79,24 +88,63 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
 		                          Message::TC, 1);
-		uint16_t numOfIds = 2;
+		uint16_t numOfIds = 3;
 		uint16_t paramId1 = 0;
 		uint16_t paramId2 = 1;
+		uint16_t paramId3 = 2;
 		uint16_t interval1 = 14;
 		uint16_t interval2 = 32;
+		uint16_t interval3 = 2;
 		request.appendUint16(numOfIds);
 		request.appendUint16(paramId1);
 		request.appendUint16(interval1);
 		request.appendUint16(paramId2);
 		request.appendUint16(interval2);
+		request.appendUint16(interval3);
 
 		CHECK(systemStatistics.statisticsMap[0].selfSamplingInterval == 0);
 		CHECK(systemStatistics.statisticsMap[1].selfSamplingInterval == 0);
+		CHECK(systemStatistics.statisticsMap[2].selfSamplingInterval == 0);
 
 		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 10);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidSamplingRateError) == 1);
+		CHECK(ServiceTests::count() == 1);
 		CHECK(systemStatistics.statisticsMap[0].selfSamplingInterval == 14);
 		CHECK(systemStatistics.statisticsMap[1].selfSamplingInterval == 32);
+
+		resetSystem();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Delete statistics definitions") {
+		Statistic stat1;
+		Statistic stat2;
+		systemStatistics.statisticsMap.insert({0, stat1});
+		systemStatistics.statisticsMap.insert({1, stat2});
+
+		CHECK(systemStatistics.statisticsMap.size() == 2);
+		CHECK(systemStatistics.statisticsMap.find(0) != systemStatistics.statisticsMap.end());
+		CHECK(systemStatistics.statisticsMap.find(1) != systemStatistics.statisticsMap.end());
+		Message request = Message(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions,
+		                          Message::TC, 1);
+		uint16_t numIds = 3;
+		uint16_t id1 = 0;
+		uint16_t id2 = 1;
+		uint16_t id3 = 255;  // Invalid ID
+		request.appendUint16(numIds);
+		request.appendUint16(id1);
+		request.appendUint16(id2);
+		request.appendUint16(id3);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
+		CHECK(systemStatistics.statisticsMap.empty());
+
+		resetSystem();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 }
