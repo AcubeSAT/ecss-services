@@ -87,7 +87,7 @@ clang-tidy:
     - ls
     - pwd
     - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    - clang-tidy -p ./build/compile_commands.json --checks=* `find ./src -type f -regextype posix-egrep -regex \
+    - clang-tidy -p /root/build/compile_commands.json --checks=* `find /root/src -type f -regextype posix-egrep -regex \
       '.*\.(cpp|hpp|c|h)'` >> clang-tidy-output.log
   after_script:
     - mkdir clang-tidy-html-report
