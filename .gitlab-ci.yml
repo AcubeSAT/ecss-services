@@ -27,6 +27,8 @@ build:
     GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
     CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
   script:
+    - ls
+    - pwd
     - cmake . -DCMAKE_CXX_FLAGS="-Werror -fdiagnostics-color=always"
     - make -j4
     - make clean
@@ -40,6 +42,8 @@ tests:
   variables:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
+    - ls
+    - pwd
     - cmake .
     - make tests -j4
     - ./tests --use-colour yes  # Run the tests
@@ -57,6 +61,8 @@ cppcheck:
     - cppcheck --version
   script:
     - cd $CI_PROJECT_DIR
+    - ls
+    - pwd
     - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
       --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
       --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
@@ -77,6 +83,8 @@ clang-tidy:
     GIT_SUBMODULE_STRATEGY: normal
   script:
     - cd $CI_PROJECT_DIR
+    - ls
+    - pwd
     - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     - clang-tidy -p ./build/compile_commands.json --checks=* `find ./src -type f -regextype posix-egrep -regex \
       '.*\.(cpp|hpp|c|h)'` >> clang-tidy-output.log
@@ -95,6 +103,8 @@ scan-build:
     - mkdir scan-build-html-report
   script:
     - cd $CI_PROJECT_DIR
+    - ls
+    - pwd
     - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
     - scan-build -o ./scan-build-html-report make
   artifacts:
@@ -105,6 +115,8 @@ doxygen:
   stage: build
   script:
     - cd $CI_PROJECT_DIR
+    - ls
+    - pwd
     - doxygen doxygen.conf
   artifacts:
     paths:
