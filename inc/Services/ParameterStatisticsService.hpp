@@ -12,7 +12,6 @@
  * Implementation of the ST[04] parameter management service, as defined in ECSS-E-ST-70-41C.
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
-
 class ParameterStatisticsService : public Service {
 public:
 
@@ -47,7 +46,7 @@ public:
 	const uint16_t numOfStatisticsDefinitions = 0;
 
 	/**
-	 * This function receives a TM[4,1] packet and returns a TM[4,2] packet containing the parameter statistics report.
+	 * This function receives a TC[4,1] packet and returns a TM[4,2] packet containing the parameter statistics report.
 	 */
 	void reportParameterStatistics(Message& resetFlag);
 

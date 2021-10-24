@@ -16,7 +16,6 @@ extern bool supportsStandardDeviation;
  */
 class Statistic {
 public:
-
 	uint16_t selfSamplingInterval = 0;
 	uint16_t sampleCounter = 0;
 	uint32_t maxTime = 0;
