@@ -1,4 +1,5 @@
 #include <ServicePool.hpp>
+#include <iostream>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "macros.hpp"
@@ -7,6 +8,11 @@
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
+#ifdef SERVICE_HOUSEKEEPING
+		case 3: Services.housekeeping.execute(message); // ST[03]
+			break;
+#endif
+
 #ifdef SERVICE_EVENTREPORT
 		case 5: Services.eventReport.execute(message); // ST[05]
 			break;

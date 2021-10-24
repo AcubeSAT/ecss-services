@@ -22,7 +22,8 @@ public:
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains structure with ID = i.
 	 */
-	etl::map <uint16_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
+	etl::map <uint16_t, std::reference_wrapper <HousekeepingStructure>, ECSS_MAX_HOUSEKEEPING_STRUCTS>
+	                         housekeepingStructures;
 
 	enum MessageType : uint8_t {
 		ReportHousekeepingParameters = 0,
@@ -104,6 +105,17 @@ public:
 	 * Returns true if the targetId exists in the vector.
 	 */
 	bool existsInVector(uint16_t targetId, etl::vector <uint16_t, ECSS_MAX_PARAMETERS> vec);
+
+	/**
+	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param message Contains the necessary parameters to call the suitable subservice
+	 */
+	void execute(Message& message);
 };
+
+extern HousekeepingService housekeepingService;
 
 #endif

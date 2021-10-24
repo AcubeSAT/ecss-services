@@ -115,7 +115,7 @@
 /**
  * The maximum number of stored parameters in the \ref ParameterService
  */
-#define ECSS_MAX_PARAMETERS 5
+#define ECSS_MAX_PARAMETERS 50
 
 /**
  * The number of functions supported by the \ref FunctionManagementService
@@ -159,6 +159,6 @@
 /**
  * @brief Max super commutated sets per housekeeping struct
  */
-#define ECSS_MAX_SUPER_COMMUTATED_SETS_PER_HOUSEKEEPING_STRUCT 10
+#define ECSS_MAX_SUPER_COMMUTATED_SETS_PER_HOUSEKEEPING_STRUCT 50
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Services/HousekeepingService.hpp"
 
 /**
@@ -25,12 +26,13 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 		housekeepingReport.appendUint16(requestedId);
 
 		// Append data from simply commutated parameters
-		for (auto &currentParameterId : housekeepingStructures[requestedId].simplyCommutatedIds) {
-			systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage(housekeepingReport,0);
+		for (auto &currentParameterId : housekeepingStructures.at(requestedId).get().simplyCommutatedIds) {
+			systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage
+			    (housekeepingReport,0);
 		}
 
 		// Append data from super commutated parameters
-		for (auto &currentSet : housekeepingStructures[requestedId].superCommutatedIds) {
+		for (auto &currentSet : housekeepingStructures.at(requestedId).get().superCommutatedIds) {
 			uint16_t numOfCurrSetSamples = currentSet.first;
 			uint16_t numOfParamsInCurrSet = currentSet.second.size();
 
@@ -38,7 +40,8 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 				for (int k = 0; k < numOfParamsInCurrSet; k++) {
 
 					uint16_t currentParameterId = currentSet.second.at(k);
-					systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage(housekeepingReport, j);
+					systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage
+					    (housekeepingReport, j);
 				}
 			}
 		}
@@ -59,7 +62,7 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 	for (int i = 0; i < numOfStructIds; i++) {
 		uint16_t structIdToEnable = request.readUint16();
 		if (housekeepingStructures.find(structIdToEnable) != housekeepingStructures.end()) {
-			housekeepingStructures[structIdToEnable].periodicGenerationActionStatus = true;
+			housekeepingStructures.at(structIdToEnable).get().periodicGenerationActionStatus = true;
 		} else {
 			ErrorHandler::reportError(request,ErrorHandler::RequestedNonExistingStructure);
 		}
@@ -77,7 +80,7 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 	for (int i = 0; i < numOfStructIds; i++) {
 		uint16_t structIdToDisable = request.readUint16();
 		if (housekeepingStructures.find(structIdToDisable) != housekeepingStructures.end()) {
-			housekeepingStructures[structIdToDisable].periodicGenerationActionStatus = false;
+			housekeepingStructures.at(structIdToDisable).get().periodicGenerationActionStatus = false;
 		} else {
 			ErrorHandler::reportError(request,ErrorHandler::RequestedNonExistingStructure);
 		}
@@ -126,11 +129,12 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 
 		for (int j = 0; j < numOfCurrentSetIds; j++) {
 			uint16_t newParamId = request.readUint16();
+			etl::vector <uint16_t, ECSS_MAX_PARAMETERS> ids;
+			newStructure.superCommutatedIds.push_back(std::make_pair(i, ids));
 			newStructure.superCommutatedIds[i].second.push_back(newParamId);
 			newStructure.containedParameterIds.push_back(newParamId);
 		}
 	}
-
 	housekeepingStructures.insert({idToCreate, newStructure});
 }
 
@@ -145,7 +149,7 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	for (int i = 0; i < numOfStructuresToDelete; i++) {
 		uint16_t currStructureId = request.readUint16();
 		if (housekeepingStructures.find(currStructureId) != housekeepingStructures.end()) {
-			if (not housekeepingStructures[currStructureId].periodicGenerationActionStatus) {
+			if (not housekeepingStructures.at(currStructureId).get().periodicGenerationActionStatus) {
 				housekeepingStructures.erase(currStructureId);
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
@@ -161,16 +165,16 @@ void HousekeepingService::housekeepingStructureReport(uint16_t structIdToReport)
 	Message structReport(ServiceType,MessageType::HousekeepingParametersReport, Message::TM, 1);
 
 	structReport.appendUint16(structIdToReport);
-	structReport.appendBoolean(housekeepingStructures[structIdToReport].periodicGenerationActionStatus);
-	structReport.appendUint16(housekeepingStructures[structIdToReport].collectionInterval);
-	structReport.appendUint16(housekeepingStructures[structIdToReport].numOfSimplyCommutatedParams);
+	structReport.appendBoolean(housekeepingStructures.at(structIdToReport).get().periodicGenerationActionStatus);
+	structReport.appendUint16(housekeepingStructures.at(structIdToReport).get().collectionInterval);
+	structReport.appendUint16(housekeepingStructures.at(structIdToReport).get().numOfSimplyCommutatedParams);
 
-	for (auto currParamId : housekeepingStructures[structIdToReport].simplyCommutatedIds) {
+	for (auto currParamId : housekeepingStructures.at(structIdToReport).get().simplyCommutatedIds) {
 		structReport.appendUint16(currParamId);
 	}
-	structReport.appendUint16(housekeepingStructures[structIdToReport].numOfSuperCommutatedParameterSets);
+	structReport.appendUint16(housekeepingStructures.at(structIdToReport).get().numOfSuperCommutatedParameterSets);
 
-	for (auto &currSet : housekeepingStructures[structIdToReport].superCommutatedIds) {
+	for (auto &currSet : housekeepingStructures.at(structIdToReport).get().superCommutatedIds) {
 		structReport.appendUint16(currSet.first);
 		structReport.appendUint16(currSet.second.size());
 
@@ -232,7 +236,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 		ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		return;
 	}
-	if (housekeepingStructures[targetStructId].periodicGenerationActionStatus) {
+	if (housekeepingStructures.at(targetStructId).get().periodicGenerationActionStatus) {
 	    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
 		return;
     }
@@ -250,13 +254,13 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			return;
 		}
-		if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
+		if (existsInVector(newParamId, housekeepingStructures.at(targetStructId).get().containedParameterIds)) {
 		    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			return;
 	    }
-		housekeepingStructures[targetStructId].numOfSimplyCommutatedParams++;
-		housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
-		housekeepingStructures[targetStructId].simplyCommutatedIds.push_back(newParamId);
+		housekeepingStructures.at(targetStructId).get().numOfSimplyCommutatedParams++;
+		housekeepingStructures.at(targetStructId).get().containedParameterIds.push_back(newParamId);
+		housekeepingStructures.at(targetStructId).get().simplyCommutatedIds.push_back(newParamId);
 	}
 
 	// Append super commutated parameters
@@ -264,7 +268,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 	for (int i = 0; i < numOfNewSets; i++) {
 		uint16_t numOfCurrSetSamples = newParams.readUint16();
 		uint16_t numOfCurrSetIds = newParams.readUint16();
-		housekeepingStructures[targetStructId].numOfSuperCommutatedParameterSets++;
+		housekeepingStructures.at(targetStructId).get().numOfSuperCommutatedParameterSets++;
 		etl::vector<uint16_t, ECSS_MAX_PARAMETERS> currSetIdsVec;
 		uint16_t validIdsCounter = 0;
 
@@ -274,16 +278,18 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 				return;
 			}
-			if (existsInVector(newParamId, housekeepingStructures[targetStructId].containedParameterIds)) {
+			if (existsInVector(newParamId, housekeepingStructures.at(targetStructId).get().containedParameterIds)) {
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 				return;
 			}
-			housekeepingStructures[targetStructId].containedParameterIds.push_back(newParamId);
+			housekeepingStructures.at(targetStructId).get().containedParameterIds.push_back(newParamId);
 			currSetIdsVec.push_back(newParamId);
 			validIdsCounter++;
 		}
 		if (validIdsCounter > 0) {  // There must be at least one new added ID in order to insert new set.
-			housekeepingStructures[targetStructId].superCommutatedIds.push_back(std::make_pair(numOfCurrSetSamples, currSetIdsVec));
+			housekeepingStructures.at(targetStructId).get().superCommutatedIds.push_back(std::make_pair
+			                                                                             (numOfCurrSetSamples,
+			                                                                         currSetIdsVec));
 		}
 	}
 }
@@ -300,7 +306,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 		uint16_t targetStructId = request.readUint16();
 		if (housekeepingStructures.find(targetStructId) != housekeepingStructures.end()) {
 			uint16_t newCollectionInterval = request.readUint16();
-			housekeepingStructures[targetStructId].collectionInterval = newCollectionInterval;
+			housekeepingStructures.at(targetStructId).get().collectionInterval = newCollectionInterval;
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		}
@@ -324,8 +330,8 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 		uint16_t structIdToReport = request.readUint16();
 		if (housekeepingStructures.find(structIdToReport) != housekeepingStructures.end()) {
 			periodicPropertiesReport.appendUint16(structIdToReport);
-			periodicPropertiesReport.appendBoolean(housekeepingStructures[structIdToReport].periodicGenerationActionStatus);
-			periodicPropertiesReport.appendUint16(housekeepingStructures[structIdToReport].collectionInterval);
+			periodicPropertiesReport.appendBoolean(housekeepingStructures.at(structIdToReport).get().periodicGenerationActionStatus);
+			periodicPropertiesReport.appendUint16(housekeepingStructures.at(structIdToReport).get().collectionInterval);
 			numOfValidIds++;
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
@@ -337,7 +343,7 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 	storeMessage(periodicPropertiesReport);
 }
 
-bool HousekeepingService::existsInVector(uint16_t targetId, etl::vector <uint16_t, 5> vec) {
+bool HousekeepingService::existsInVector(uint16_t targetId, etl::vector <uint16_t, 50> vec) {
 
 	for (auto &it : vec) {
 		if (it == targetId) {
@@ -346,3 +352,43 @@ bool HousekeepingService::existsInVector(uint16_t targetId, etl::vector <uint16_
 	}
 	return false;
 }
+
+void HousekeepingService::execute(Message& message) {
+	switch (message.messageType) {
+		case 0:
+			housekeepingParametersReport(message);
+			break;
+		case 1:
+			createHousekeepingReportStructure(message);
+			break;
+		case 3:
+			deleteHousekeepingReportStructure(message);
+			break;
+		case 5:
+			enablePeriodicHousekeepingParametersReport(message);
+			break;
+		case 6:
+			disablePeriodicHousekeepingParametersReport(message);
+			break;
+		case 9:
+			reportHousekeepingStructures(message);
+			break;
+		case 25:
+			housekeepingParametersReport(message);
+			break;
+		case 27:
+			generateOneShotHousekeepingReport(message);
+			break;
+		case 29:
+			appendParametersToHousekeepingStructure(message);
+			break;
+		case 31:
+			modifyCollectionIntervalOfStructures(message);
+			break;
+		case 33:
+			housekeepingPeriodicPropertiesReport(message);
+			break;
+	}
+}
+
+HousekeepingService housekeepingService;

@@ -12,7 +12,7 @@
 class HousekeepingStructure {
 public:
 
-	uint8_t structureId;
+	uint16_t structureId;
 	/**
 	 * Defined as units of minimum sampling interval.
 	 */
@@ -36,6 +36,8 @@ public:
 
 	etl::vector <std::pair <uint16_t, etl::vector <uint16_t, ECSS_MAX_PARAMETERS>>, ECSS_MAX_SUPER_COMMUTATED_SETS_PER_HOUSEKEEPING_STRUCT>
 	    superCommutatedIds;
+
+	HousekeepingStructure() = default;
 };
 
 #endif
