@@ -128,7 +128,7 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure,Message::TC,1);
 		uint16_t ids[3] = {0, 4, 6};
-		for (auto &id : ids) {              //Create 3 structures first
+		for (auto &id : ids) {              //Create 3 structures first, these will be used by next test cases as well.
 			buildRequest(request, id);
 			MessageParser::execute(request);
 		}
@@ -164,17 +164,46 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 			request.appendUint16(id);
 		}
 		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 4);  //3 previous + 1 new
-		//3 previous + 1 new
+		CHECK(ServiceTests::count() == 4);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 4);
 		CHECK(not housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus);
 		CHECK(not housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus);
 		CHECK(not housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus);
 	}
 
-//	SECTION("Housekeeping parameter reporting") {
-//		Message request(HousekeepingService::ServiceType,
-//		                HousekeepingService::MessageType::ReportHousekeepingParameters,Message::TC,1);
-//
-//	}
+	SECTION("Reporting of housekeeping structures") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::ReportHousekeepingStructures,Message::TC,1);
+		uint16_t numOfStructs = 3;
+		uint16_t idsToReport[3] = {9, 4, 2};
+		request.appendUint16(numOfStructs);
+		for (auto &id : idsToReport) {
+			request.appendUint16(id);
+		}
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 7);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 6);
+
+		Message report = ServiceTests::get(5); //Both 4 and 6 are the error messages because only id=4 was valid.
+		uint16_t validId = 4;
+		CHECK(report.readUint16() == validId);
+		CHECK(not report.readBoolean());    //periodic status
+		CHECK(report.readUint16() == 7);    //interval
+		CHECK(report.readUint16() == 3);    //number of simply commutated ids
+		CHECK(report.readUint16() == 1);    //ids
+		CHECK(report.readUint16() == 4);
+		CHECK(report.readUint16() == 5);
+		CHECK(report.readUint16() == 2);    //number of super sets
+		//Set-1
+		CHECK(report.readUint16() == 4);    //number of samples
+		CHECK(report.readUint16() == 2);    //number of ids
+		CHECK(report.readUint16() == 2);    //ids
+		CHECK(report.readUint16() == 3);
+		//Set-2
+		CHECK(report.readUint16() == 9);    //number of samples
+		CHECK(report.readUint16() == 3);    //number of ids
+		CHECK(report.readUint16() == 6);    //ids
+		CHECK(report.readUint16() == 7);
+		CHECK(report.readUint16() == 8);
+	}
 }
