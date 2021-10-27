@@ -2,8 +2,7 @@
 #include "etl/vector.h"
 #include "Message.hpp"
 #include <cmath>
-
-#define SIZE2 5
+#include <iostream>
 
 /**
  * Mother class, exists only to offer its functions to its child class, so that we utilize polymorphism to our
@@ -36,7 +35,7 @@ template <typename DataType>
 class HousekeepingParameter : public HousekeepingParameterBase {
 public:
 
-	etl::vector <DataType, SIZE2> housekeepingParameterSamples;
+	etl::vector <DataType, ECSS_MAX_HOUSEKEEPING_PARAMETER_SAMPLES> housekeepingParameterSamples;
 
 	explicit HousekeepingParameter(int base) {}
 	HousekeepingParameter() = default;
@@ -113,6 +112,7 @@ public:
 	inline void appendSampleToMessage(Message& report, uint16_t index) override {
 
 		DataType sampleValue = housekeepingParameterSamples[index];
+//		std::cout<<sampleValue<<std::endl;
 		report.append(sampleValue);
 	}
 

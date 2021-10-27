@@ -24,13 +24,11 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 	if (housekeepingStructures.find(requestedId) != housekeepingStructures.end()) {
 
 		housekeepingReport.appendUint16(requestedId);
-
 		// Append data from simply commutated parameters
-		for (auto &currentParameterId : housekeepingStructures.at(requestedId).simplyCommutatedIds) {
+		for (auto &currentParameterId : housekeepingStructures.at(requestedId).simplyCommutatedIds){
 			systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage
 			    (housekeepingReport,0);
 		}
-
 		// Append data from super commutated parameters
 		for (auto &currentSet : housekeepingStructures.at(requestedId).superCommutatedIds) {
 			uint16_t numOfCurrSetSamples = currentSet.first;
@@ -38,7 +36,6 @@ void HousekeepingService::housekeepingParametersReport(Message& structId) {
 
 			for (int j = 0; j < numOfCurrSetSamples; j++) {  // As per 6.3.3.3(c) from the ECSS standard
 				for (int k = 0; k < numOfParamsInCurrSet; k++) {
-
 					uint16_t currentParameterId = currentSet.second.at(k);
 					systemHousekeeping.housekeepingParameters.at(currentParameterId).get().appendSampleToMessage
 					    (housekeepingReport, j);

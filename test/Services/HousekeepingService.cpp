@@ -206,4 +206,64 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		CHECK(report.readUint16() == 7);
 		CHECK(report.readUint16() == 8);
 	}
+
+	SECTION("Reporting of housekeeping parameters") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::ReportHousekeepingParameters,Message::TC,1);
+		uint16_t structId = 6;
+		request.appendUint16(structId);
+
+		for (auto &paramId : housekeepingService.housekeepingStructures[structId].containedParameterIds) {
+			CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(paramId).get().sampleCounter == 0);
+		}
+
+		//Store samples for parameter with ID=4
+		uint16_t sample1 = 45;
+		housekeepingService.systemHousekeeping.housekeepingParameters.at(4).get().storeSamples(sample1);
+		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(4).get().sampleCounter == 1);
+
+		//Store samples for parameter with ID=5
+		uint8_t sample2 = 21;
+		housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().storeSamples(sample2);
+		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().sampleCounter == 1);
+
+		//Store samples for parameter with ID=7
+		uint32_t samples3[9] = {12, 34, 21, 31, 54, 95, 67, 24, 55};
+		for (auto &value : samples3) {
+			housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().storeSamples(value);
+		}
+		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().sampleCounter == 9);
+
+		//Store samples for parameter with ID=8
+		uint8_t samples4[9] = {11, 22, 33, 77, 88, 55, 99, 33, 44};
+		for (auto &value : samples4) {
+			housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().storeSamples(value);
+		}
+		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().sampleCounter == 9);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 8);
+		Message report = ServiceTests::get(7);
+		CHECK(report.readUint16() == structId);
+
+		//Simply commutated parameter samples
+		CHECK(report.readUint16() == 0);
+		CHECK(report.readUint16() == 45);
+		CHECK(report.readUint8() == static_cast <uint8_t> (21));
+		//Super commutated parameter samples
+		for (int i = 0; i < 4; i++) {       //Ids={2,3} are in the same set, with no samples. 4 is the sample-counter
+											//of the current group, as created by the "buildRequest" function above.
+			CHECK(report.readUint32() == 0);
+			CHECK(report.readUint32() == 0);
+		}
+		for (int i = 0; i < 9; i++) {		//Ids={6,7,8} are in the same set, 7 and 8 have samples. 9 is the
+											//sample-counter of the current group, as created by the "buildRequest" function above.
+			CHECK(report.readUint16() == 0);
+			CHECK(report.readUint32() == samples3[i]);
+			CHECK(report.readUint8() == static_cast <uint8_t> (samples4[i]));
+		}
+		/**
+		 * @note: this is the order that the parameter samples should be reported as per 6.3.3.3(c) from the standard.
+		 */
+	}
 }

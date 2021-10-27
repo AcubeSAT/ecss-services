@@ -18,7 +18,7 @@ class HousekeepingService : Service {
 public:
 
 	inline static const uint8_t ServiceType = 3;
-
+	SystemHousekeeping systemHousekeeping;
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains structure with ID = i.
 	 */
