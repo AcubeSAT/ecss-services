@@ -149,15 +149,15 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	uint16_t numOfStructuresToDelete = request.readUint16();
 	for (int i = 0; i < numOfStructuresToDelete; i++) {
 		uint16_t currStructureId = request.readUint16();
-		if (housekeepingStructures.find(currStructureId) != housekeepingStructures.end()) {
-			if (not housekeepingStructures.at(currStructureId).periodicGenerationActionStatus) {
-				housekeepingStructures.erase(currStructureId);
-			} else {
-				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
-			}
-		} else {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		if (housekeepingStructures.find(currStructureId) == housekeepingStructures.end()) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+			continue;
 		}
+		if (housekeepingStructures.at(currStructureId).periodicGenerationActionStatus) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
+			continue;
+		}
+		housekeepingStructures.erase(currStructureId);
 	}
 }
 

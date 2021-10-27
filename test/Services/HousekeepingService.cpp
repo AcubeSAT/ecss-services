@@ -58,7 +58,6 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 				CHECK(newStruct.superCommutatedIds[set].second[id] == superCommutatedIds[set].second[id]);
 			}
 		}
-
 		// Invalid structure creation request
 		Message request2(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure,Message::TC,1);
@@ -66,13 +65,38 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		request2.appendUint16(idToCreate2);
 		MessageParser::execute(request2);
 		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors
-		      (ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 1);
 	}
 
-//	SECTION("Housekeeping parameter reporting") {
-//		Message request(HousekeepingService::ServiceType,
-//		                HousekeepingService::MessageType::ReportHousekeepingParameters,Message::TC,1);
-//
-//	}
+	SECTION("Delete housekeeping structure") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure,Message::TC,1);
+		uint16_t numOfStructs = 5;
+		uint16_t ids[5] = {2, 3, 4, 7, 8};
+		request.appendUint16(numOfStructs);
+		for (auto &id : ids) {
+			request.appendUint16(id);
+		}
+		//Add periodic structure
+		HousekeepingStructure periodicStruct;
+		periodicStruct.structureId = 4;
+		periodicStruct.periodicGenerationActionStatus = true;
+		housekeepingService.housekeepingStructures.insert({4, periodicStruct});
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 5);  //4 + 1 from previous test which did not reset the system.
+		CHECK(ServiceTests::countThrownErrors
+		      (ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) == 3);
+		CHECK(ServiceTests::countThrownErrors
+		      (ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Housekeeping parameter reporting") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::ReportHousekeepingParameters,Message::TC,1);
+
+	}
 }
