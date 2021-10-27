@@ -6,6 +6,36 @@
 
 HousekeepingService& housekeepingService = Services.housekeeping;
 
+/**
+ * Helper function that forms the message that's going to be sent as request to create a new housekeeping structure.
+ */
+void buildRequest(Message& request, uint16_t idToCreate) {
+	uint16_t interval = 7;
+	uint16_t numOfSimplyCommutatedParams = 3;
+	etl::vector <uint16_t, 50> simplyCommutatedIds = {1, 4, 5};
+	uint16_t numOfSets = 2;
+	etl::vector <std::pair<uint16_t, etl::vector <uint16_t, 5>>, 2> superCommutatedIds;
+	etl::vector <uint16_t, 5> temp1 = {2, 3};
+	etl::vector <uint16_t, 5> temp2 = {6, 7, 8};
+	superCommutatedIds.push_back(std::make_pair(4, temp1));     //Num of samples followed by the list of IDs
+	superCommutatedIds.push_back(std::make_pair(9, temp2));
+
+	request.appendUint16(idToCreate);
+	request.appendUint16(interval);
+	request.appendUint16(numOfSimplyCommutatedParams);
+	for (auto &id : simplyCommutatedIds) {
+		request.appendUint16(id);
+	}
+	request.appendUint16(numOfSets);
+	for (auto &set : superCommutatedIds) {
+		request.appendUint16(set.first);
+		request.appendUint16(set.second.size());
+		for (auto &id : set.second) {
+			request.appendUint16(id);
+		}
+	}
+}
+
 TEST_CASE("Housekeeping Reporting Sub-service") {
 	SECTION("Create housekeeping structure") {
 		// Valid structure creation request
@@ -94,9 +124,40 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		Services.reset();
 	}
 
-	SECTION("Housekeeping parameter reporting") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::ReportHousekeepingParameters,Message::TC,1);
+	SECTION("Enable periodic generation of housekeeping parameters report") {
 
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure,Message::TC,1);
+		uint16_t ids[3] = {0, 4, 6};
+		for (auto &id : ids) {              //Create 3 structures first
+			buildRequest(request, id);
+			MessageParser::execute(request);
+		}
+		CHECK(housekeepingService.housekeepingStructures.size() == 3);
+		Message request2(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport,Message::TC,1);
+		uint16_t numOfStructs = 5;
+		uint16_t idsToEnable[5] = {1, 3, 4, 6, 7};
+		request2.appendUint16(numOfStructs);
+		for (auto &id : idsToEnable) {
+			request2.appendUint16(id);
+		}
+		CHECK(not housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus);
+		CHECK(not housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus);
+		CHECK(not housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus);
+
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) == 3);
+
+		CHECK(not housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus);
+		CHECK(housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus);
+		CHECK(housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus);
 	}
+
+//	SECTION("Housekeeping parameter reporting") {
+//		Message request(HousekeepingService::ServiceType,
+//		                HousekeepingService::MessageType::ReportHousekeepingParameters,Message::TC,1);
+//
+//	}
 }
