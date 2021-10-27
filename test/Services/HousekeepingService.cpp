@@ -36,6 +36,13 @@ void buildRequest(Message& request, uint16_t idToCreate) {
 	}
 }
 
+uint32_t samples3[9] = {12, 34, 21, 31, 54, 95, 67, 24, 55};
+uint8_t samples4[9] = {11, 22, 33, 77, 88, 55, 99, 33, 44};
+
+/**
+ * Helper function that stores samples into parameters, which are passed as arguments.
+ * @note: 2 parameters are simply-commutated and 2 are super-commutated
+ */
 void storeSamplesOfParameters( uint16_t simplyCommId1,
                                uint16_t simplyCommId2,
                                uint16_t superCommId1,
@@ -47,15 +54,9 @@ void storeSamplesOfParameters( uint16_t simplyCommId1,
 	//Store samples for parameter with ID=simplyCommId2
 	uint8_t sample2 = 21;
 	housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().storeSamples(sample2);
-
-	//Store samples for parameter with ID=superCommId1
-	uint32_t samples3[9] = {12, 34, 21, 31, 54, 95, 67, 24, 55};
 	for (auto &value : samples3) {
 		housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().storeSamples(value);
 	}
-
-	//Store samples for parameter with ID=superCommId2
-	uint8_t samples4[9] = {11, 22, 33, 77, 88, 55, 99, 33, 44};
 	for (auto &value : samples4) {
 		housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().storeSamples(value);
 	}
@@ -247,15 +248,12 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().sampleCounter == 1);
 		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().sampleCounter == 9);
 		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().sampleCounter == 9);
-		//Same samples used by the "storeSamplesOfParameters" function
-		uint32_t samples3[9] = {12, 34, 21, 31, 54, 95, 67, 24, 55};
-		uint8_t samples4[9] = {11, 22, 33, 77, 88, 55, 99, 33, 44};
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 8);
 		Message report = ServiceTests::get(7);
-		CHECK(report.readUint16() == structId);
 
+		CHECK(report.readUint16() == structId);
 		//Simply commutated parameter samples
 		CHECK(report.readUint16() == 0);
 		CHECK(report.readUint16() == 45);
@@ -276,4 +274,37 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		 * @note: this is the order that the parameter samples should be reported as per 6.3.3.3(c) from the standard.
 		 */
 	}
+
+	SECTION("Generation of one-shot housekeeping parameter report") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::GenerateOneShotHousekeepingReport,Message::TC,1);
+		uint16_t numOfStructs = 5;
+		uint16_t structIds[5] = {0, 4, 7, 8, 11};
+		request.appendUint16(numOfStructs);
+		for (auto &id : structIds) {
+			request.appendUint16(id);
+		}
+		storeSamplesOfParameters(4, 5, 7, 8);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 13);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 9);
+		Message report = ServiceTests::get(9);
+
+		CHECK(report.readUint16() == 4);
+		//Simply commutated parameter samples
+		CHECK(report.readUint16() == 0);
+		CHECK(report.readUint16() == 45);
+		CHECK(report.readUint8() == static_cast <uint8_t> (21));
+		//Super commutated parameter samples
+		for (int i = 0; i < 4; i++) {
+			CHECK(report.readUint32() == 0);
+			CHECK(report.readUint32() == 0);
+		}
+		for (int i = 0; i < 9; i++) {
+			CHECK(report.readUint16() == 0);
+			CHECK(report.readUint32() == samples3[i]);
+			CHECK(report.readUint8() == static_cast <uint8_t> (samples4[i]));
+		}
+    }
 }
