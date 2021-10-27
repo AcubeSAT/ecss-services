@@ -22,7 +22,7 @@ public:
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains structure with ID = i.
 	 */
-	etl::map <uint16_t, std::reference_wrapper <HousekeepingStructure>, ECSS_MAX_HOUSEKEEPING_STRUCTS>
+	etl::map <uint16_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS>
 	                         housekeepingStructures;
 
 	enum MessageType : uint8_t {
@@ -40,6 +40,8 @@ public:
 		ReportHousekeepingPeriodicProperties = 33,
 		HousekeepingPeriodicPropertiesReport = 35,
 	};
+
+	HousekeepingService() = default;
 
 	/**
 	 * This function is the implementation of TM[3,25]. It generates a housekeeping parameters report with an
@@ -116,6 +118,6 @@ public:
 	void execute(Message& message);
 };
 
-extern HousekeepingService housekeepingService;
+//extern HousekeepingService housekeepingService;
 
 #endif

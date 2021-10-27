@@ -4,18 +4,23 @@
 #include "ServiceTests.hpp"
 #include "Services/HousekeepingService.hpp"
 
+HousekeepingService& housekeepingService = Services.housekeeping;
+
 TEST_CASE("Housekeeping Reporting Sub-service") {
 	SECTION("Create housekeeping structure") {
+		// Valid structure creation request
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure,Message::TC,1);
 		uint16_t idToCreate = 2;
 		uint16_t interval = 7;
 		uint16_t numOfSimplyCommutatedParams = 3;
-		uint16_t simplyCommutatedIds[3] = {1, 4, 5};
+		etl::vector <uint16_t, 50> simplyCommutatedIds = {1, 4, 5};
 		uint16_t numOfSets = 2;
-		etl::map <uint16_t, etl::vector <uint16_t, 5>, 2> superCommutatedIds;
-		superCommutatedIds.insert({4, {2, 3}});     //Num of samples followed by the list of IDs
-		superCommutatedIds.insert({9, {6, 7, 8}});
+		etl::vector <std::pair<uint16_t, etl::vector <uint16_t, 5>>, 2> superCommutatedIds;
+		etl::vector <uint16_t, 5> temp1 = {2, 3};
+		etl::vector <uint16_t, 5> temp2 = {6, 7, 8};
+		superCommutatedIds.push_back(std::make_pair(4, temp1));     //Num of samples followed by the list of IDs
+		superCommutatedIds.push_back(std::make_pair(9, temp2));
 
 		request.appendUint16(idToCreate);
 		request.appendUint16(interval);
@@ -31,21 +36,38 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 				request.appendUint16(id);
 			}
 		}
-		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 0);
-//		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
-		std::cout<<housekeepingService.housekeepingStructures.size()<<std::endl;
-//		for(auto &i : housekeepingService.housekeepingStructures){
-//			std::cout<<i.second.get().structureId<<std::endl;
-//		}
 
-//		CHECK(housekeepingService.housekeepingStructures[idToCreate].structureId == idToCreate);
-//		CHECK(newStruct.numOfSimplyCommutatedParams == numOfSimplyCommutatedParams);
-//		CHECK(newStruct.numOfSuperCommutatedParameterSets == numOfSets);
+		MessageParser::execute(request);
+		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
 		uint16_t allIds[8] = {1, 2, 3, 4, 5, 6, 7, 8};
-//		for (auto &id : allIds) {
-//			CHECK(housekeepingService.existsInVector(id, newStruct.containedParameterIds));
-//		}
+
+		CHECK(ServiceTests::count() == 0);
+		CHECK(newStruct.structureId == idToCreate);
+		CHECK(newStruct.numOfSimplyCommutatedParams == numOfSimplyCommutatedParams);
+		CHECK(newStruct.numOfSuperCommutatedParameterSets == numOfSets);
+		CHECK(newStruct.collectionInterval == interval);
+		for (auto &id : allIds) {
+			CHECK(housekeepingService.existsInVector(id, newStruct.containedParameterIds));
+		}
+		for (auto &id : newStruct.simplyCommutatedIds) {
+			CHECK(housekeepingService.existsInVector(id, simplyCommutatedIds));
+		}
+		for (int set = 0; set < newStruct.numOfSuperCommutatedParameterSets; set++) {
+			CHECK(newStruct.superCommutatedIds[set].first == superCommutatedIds[set].first);
+			for(int id = 0; id < newStruct.superCommutatedIds[set].second.size(); id++) {
+				CHECK(newStruct.superCommutatedIds[set].second[id] == superCommutatedIds[set].second[id]);
+			}
+		}
+
+		// Invalid structure creation request
+		Message request2(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure,Message::TC,1);
+		uint16_t idToCreate2 = 2;
+		request2.appendUint16(idToCreate2);
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors
+		      (ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 1);
 	}
 
 //	SECTION("Housekeeping parameter reporting") {
