@@ -124,8 +124,7 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		Services.reset();
 	}
 
-	SECTION("Enable periodic generation of housekeeping parameters report") {
-
+	SECTION("Enable periodic generation of housekeeping structures") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure,Message::TC,1);
 		uint16_t ids[3] = {0, 4, 6};
@@ -153,6 +152,24 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		CHECK(not housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus);
 		CHECK(housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus);
 		CHECK(housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus);
+	}
+
+	SECTION("Disable periodic generation of housekeeping structures") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport,Message::TC,1);
+		uint16_t numOfStructs = 4;
+		uint16_t idsToDisable[4] = {0, 1, 4, 6};
+		request.appendUint16(numOfStructs);
+		for (auto &id : idsToDisable) {
+			request.appendUint16(id);
+		}
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 4);  //3 previous + 1 new
+		//3 previous + 1 new
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 4);
+		CHECK(not housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus);
+		CHECK(not housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus);
+		CHECK(not housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus);
 	}
 
 //	SECTION("Housekeeping parameter reporting") {
