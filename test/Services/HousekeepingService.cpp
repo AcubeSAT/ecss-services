@@ -36,6 +36,31 @@ void buildRequest(Message& request, uint16_t idToCreate) {
 	}
 }
 
+void storeSamplesOfParameters( uint16_t simplyCommId1,
+                               uint16_t simplyCommId2,
+                               uint16_t superCommId1,
+                               uint16_t superCommId2 ) {
+	//Store samples for parameter with ID=simplyCommId1
+	uint16_t sample1 = 45;
+	housekeepingService.systemHousekeeping.housekeepingParameters.at(4).get().storeSamples(sample1);
+
+	//Store samples for parameter with ID=simplyCommId2
+	uint8_t sample2 = 21;
+	housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().storeSamples(sample2);
+
+	//Store samples for parameter with ID=superCommId1
+	uint32_t samples3[9] = {12, 34, 21, 31, 54, 95, 67, 24, 55};
+	for (auto &value : samples3) {
+		housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().storeSamples(value);
+	}
+
+	//Store samples for parameter with ID=superCommId2
+	uint8_t samples4[9] = {11, 22, 33, 77, 88, 55, 99, 33, 44};
+	for (auto &value : samples4) {
+		housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().storeSamples(value);
+	}
+}
+
 TEST_CASE("Housekeeping Reporting Sub-service") {
 	SECTION("Create housekeeping structure") {
 		// Valid structure creation request
@@ -217,29 +242,14 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 			CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(paramId).get().sampleCounter == 0);
 		}
 
-		//Store samples for parameter with ID=4
-		uint16_t sample1 = 45;
-		housekeepingService.systemHousekeeping.housekeepingParameters.at(4).get().storeSamples(sample1);
+		storeSamplesOfParameters(4, 5, 7, 8);
 		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(4).get().sampleCounter == 1);
-
-		//Store samples for parameter with ID=5
-		uint8_t sample2 = 21;
-		housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().storeSamples(sample2);
 		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().sampleCounter == 1);
-
-		//Store samples for parameter with ID=7
-		uint32_t samples3[9] = {12, 34, 21, 31, 54, 95, 67, 24, 55};
-		for (auto &value : samples3) {
-			housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().storeSamples(value);
-		}
 		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().sampleCounter == 9);
-
-		//Store samples for parameter with ID=8
-		uint8_t samples4[9] = {11, 22, 33, 77, 88, 55, 99, 33, 44};
-		for (auto &value : samples4) {
-			housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().storeSamples(value);
-		}
 		CHECK(housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().sampleCounter == 9);
+		//Same samples used by the "storeSamplesOfParameters" function
+		uint32_t samples3[9] = {12, 34, 21, 31, 54, 95, 67, 24, 55};
+		uint8_t samples4[9] = {11, 22, 33, 77, 88, 55, 99, 33, 44};
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 8);
