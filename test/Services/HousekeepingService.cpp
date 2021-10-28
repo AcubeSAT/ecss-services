@@ -414,12 +414,40 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 			request.appendUint16(id);
 			request.appendUint16(intervals[i++]);
 		}
-
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 26);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 12);
 		CHECK(housekeepingService.housekeepingStructures[0].collectionInterval == 12);
 		CHECK(housekeepingService.housekeepingStructures[4].collectionInterval == 21);
+	}
+
+	SECTION("Reporting of housekeeping structure periodic properties") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties,Message::TC,1);
+		uint16_t numOfStructs = 6;
+		uint16_t structIds[6] = {0, 4, 1, 6, 9, 10};
+		request.appendUint16(numOfStructs);
+		for (auto &id : structIds) {
+			request.appendUint16(id);
+		}
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 30);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 15);
+
+		Message report = ServiceTests::get(29);
+		CHECK(report.readUint16() == 3);        //Number of valid ids
+		CHECK(report.readUint16() == 0);        //Id
+		CHECK(report.readBoolean() == true);    //Periodic status
+		CHECK(report.readUint16() == 12);       //Interval
+		CHECK(report.readUint16() == 4);        //Id
+		CHECK(report.readBoolean() == false);   //Periodic status
+		CHECK(report.readUint16() == 21);       //Interval
+		CHECK(report.readUint16() == 6);        //Id
+		CHECK(report.readBoolean() == false);   //Periodic status
+		CHECK(report.readUint16() == 7);        //Interval
+
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 }
