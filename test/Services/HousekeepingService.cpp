@@ -370,6 +370,7 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		newParamsToAppend(request3, structId);
 
 		MessageParser::execute(request3);
+		CHECK(ServiceTests::count() == 24);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter)== 7);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter)== 2);
 
@@ -399,6 +400,26 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 				CHECK(id == newSuperCommutatedIds[j++]);
 			}
 		}
+	}
+
+	SECTION("Modification of housekeeping structures' interval") {
+		Message request(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::ModifyCollectionIntervalOfStructures,Message::TC,1);
+		uint16_t numOfStructs = 4;
+		uint16_t structIds[4] = {0, 4, 9, 10};
+		uint16_t intervals[4] = {12, 21, 32, 17};
+		request.appendUint16(numOfStructs);
+		int i = 0;
+		for (auto &id : structIds) {
+			request.appendUint16(id);
+			request.appendUint16(intervals[i++]);
+		}
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 26);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 12);
+		CHECK(housekeepingService.housekeepingStructures[0].collectionInterval == 12);
+		CHECK(housekeepingService.housekeepingStructures[4].collectionInterval == 21);
 	}
 
 }

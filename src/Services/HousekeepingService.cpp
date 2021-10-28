@@ -299,8 +299,8 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 	uint16_t numOfTargetStructs = request.readUint16();
 	for (int i = 0; i < numOfTargetStructs; i++) {
 		uint16_t targetStructId = request.readUint16();
+		uint16_t newCollectionInterval = request.readUint16();
 		if (housekeepingStructures.find(targetStructId) != housekeepingStructures.end()) {
-			uint16_t newCollectionInterval = request.readUint16();
 			housekeepingStructures.at(targetStructId).collectionInterval = newCollectionInterval;
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
