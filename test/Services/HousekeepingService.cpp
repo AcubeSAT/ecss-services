@@ -49,16 +49,46 @@ void storeSamplesOfParameters( uint16_t simplyCommId1,
                                uint16_t superCommId2 ) {
 	//Store samples for parameter with ID=simplyCommId1
 	uint16_t sample1 = 45;
-	housekeepingService.systemHousekeeping.housekeepingParameters.at(4).get().storeSamples(sample1);
+	housekeepingService.systemHousekeeping.housekeepingParameters.at(simplyCommId1).get().storeSamples(sample1);
 
 	//Store samples for parameter with ID=simplyCommId2
 	uint8_t sample2 = 21;
-	housekeepingService.systemHousekeeping.housekeepingParameters.at(5).get().storeSamples(sample2);
+	housekeepingService.systemHousekeeping.housekeepingParameters.at(simplyCommId2).get().storeSamples(sample2);
 	for (auto &value : samples3) {
-		housekeepingService.systemHousekeeping.housekeepingParameters.at(7).get().storeSamples(value);
+		housekeepingService.systemHousekeeping.housekeepingParameters.at(superCommId1).get().storeSamples(value);
 	}
 	for (auto &value : samples4) {
-		housekeepingService.systemHousekeeping.housekeepingParameters.at(8).get().storeSamples(value);
+		housekeepingService.systemHousekeeping.housekeepingParameters.at(superCommId2).get().storeSamples(value);
+	}
+}
+
+void newParamsToAppend(Message& request, uint16_t idToAppend) {
+	uint16_t numOfSimplyCommutatedParams = 7;
+	etl::vector <uint16_t, 50> simplyCommutatedIds = {1, 4, 5, 9, 11, 10, 220};
+	uint16_t numOfSets = 3;
+	etl::vector <std::pair<uint16_t, etl::vector <uint16_t, 5>>, 3> superCommutatedIds;
+	//Already existing
+	etl::vector <uint16_t, 5> temp1 = {2, 3, 160};
+	//2 already existing, 2 new
+	etl::vector <uint16_t, 5> temp2 = {6, 7, 12, 13};
+	//New set
+	etl::vector <uint16_t, 5> temp3 = {14, 15, 16};
+	superCommutatedIds.push_back(std::make_pair(4, temp1));     //Num of samples followed by the list of IDs
+	superCommutatedIds.push_back(std::make_pair(11, temp2));
+	superCommutatedIds.push_back(std::make_pair(7, temp3));
+
+	request.appendUint16(idToAppend);
+	request.appendUint16(numOfSimplyCommutatedParams);
+	for (auto &id : simplyCommutatedIds) {
+		request.appendUint16(id);
+	}
+	request.appendUint16(numOfSets);
+	for (auto &set : superCommutatedIds) {
+		request.appendUint16(set.first);
+		request.appendUint16(set.second.size());
+		for (auto &id : set.second) {
+			request.appendUint16(id);
+		}
 	}
 }
 
@@ -307,4 +337,68 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 			CHECK(report.readUint8() == static_cast <uint8_t> (samples4[i]));
 		}
     }
+
+	SECTION("Append parameters in housekeeping report structure") {
+		//Non existing structure
+		Message request1(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure,Message::TC,1);
+		uint16_t structId = 2;
+		request1.appendUint16(structId);
+		MessageParser::execute(request1);
+		CHECK(ServiceTests::count() == 14);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure)== 10);
+
+		//Periodic structure
+		Message request(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport,Message::TC,1);
+		request.appendUint16(1);    //Enable 1 periodic struct with id=0
+		request.appendUint16(0);
+		MessageParser::execute(request);
+		CHECK(housekeepingService.housekeepingStructures.at(0).periodicGenerationActionStatus);
+		Message request2(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure,Message::TC,1);
+		structId = 0;
+		request2.appendUint16(structId);
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 15);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure)== 1);
+
+		//Valid request including both valid and invalid parameters
+		Message request3(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure,Message::TC,1);
+		structId = 6;
+		newParamsToAppend(request3, structId);
+
+		MessageParser::execute(request3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter)== 7);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter)== 2);
+
+		uint16_t allNewIds[8] = {9, 11, 10, 12, 13, 14, 15, 16};
+		uint16_t newSimplyCommutatedIds[6] = {1, 4, 5, 9, 11, 10};
+		uint16_t newSuperCommutatedIds[10] = {2, 3, 6, 7, 8, 12, 13, 14, 15, 16};
+		uint16_t newSampleCounters[4] = {4, 9, 11, 7};
+
+		HousekeepingStructure structToCheck = housekeepingService.housekeepingStructures[structId];
+		CHECK(structToCheck.containedParameterIds.size() == 16);
+		for (auto &newId : allNewIds) {
+			CHECK(housekeepingService.existsInVector(newId, structToCheck.containedParameterIds));
+		}
+		CHECK(structToCheck.numOfSimplyCommutatedParams == 6);
+		CHECK(structToCheck.numOfSimplyCommutatedParams == structToCheck.simplyCommutatedIds.size());
+		int i = 0;
+		for (auto &id : structToCheck.simplyCommutatedIds) {
+			CHECK(id == newSimplyCommutatedIds[i++]);
+		}
+		CHECK(structToCheck.numOfSuperCommutatedParameterSets == 4);    //2 added, 1 whole was rejected (2,3,160)
+		CHECK(structToCheck.numOfSuperCommutatedParameterSets == structToCheck.superCommutatedIds.size());
+		int j = 0;
+		i = 0;
+		for (auto &set : structToCheck.superCommutatedIds) {
+			CHECK(set.first == newSampleCounters[i++]);
+			for (auto &id : set.second) {
+				CHECK(id == newSuperCommutatedIds[j++]);
+			}
+		}
+	}
+
 }

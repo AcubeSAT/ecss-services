@@ -34,7 +34,7 @@ public:
 
 	etl::vector <uint16_t, ECSS_MAX_PARAMETERS> simplyCommutatedIds;
 
-	etl::vector <std::pair <uint16_t, etl::vector <uint16_t, ECSS_MAX_PARAMETERS>>, ECSS_MAX_SUPER_COMMUTATED_SETS_PER_HOUSEKEEPING_STRUCT>
+	etl::vector <std::pair <uint16_t, etl::vector <uint16_t, ECSS_MAX_PARAMETERS>>, ECSS_MAX_SUPER_COMMUTATED_SETS>
 	    superCommutatedIds;
 
 	HousekeepingStructure() = default;

@@ -159,7 +159,7 @@
 /**
  * @brief Max super commutated sets per housekeeping struct
  */
-#define ECSS_MAX_SUPER_COMMUTATED_SETS_PER_HOUSEKEEPING_STRUCT 50
+#define ECSS_MAX_SUPER_COMMUTATED_SETS 50
 
 /**
  * @brief The number of housekeeping parameters
@@ -167,8 +167,13 @@
 #define ECSS_HOUSEKEEPING_PARAMETERS 10
 
 /**
- * The max number of samples that each housekeeping parameter should store
+ * @brief The max number of samples that each housekeeping parameter should store
  */
 #define ECSS_MAX_HOUSEKEEPING_PARAMETER_SAMPLES 30
+
+/**
+ * @brief The max parameter Id, anything beyond that is a nonexisting parameter
+ */
+#define ECSS_MAX_PARAMETER_ID 150
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

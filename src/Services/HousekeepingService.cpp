@@ -247,13 +247,13 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 	for (int i = 0; i < numOfSimplyCommParams; i++) {
 		uint16_t newParamId = newParams.readUint16();
 
-		if (newParamId >= systemParameters.parametersArray.size()) {
+		if (newParamId >= ECSS_MAX_PARAMETER_ID) {
 			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-			return;
+			continue;
 		}
 		if (existsInVector(newParamId, housekeepingStructures.at(targetStructId).containedParameterIds)) {
 		    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
-			return;
+			continue;
 	    }
 		housekeepingStructures.at(targetStructId).numOfSimplyCommutatedParams++;
 		housekeepingStructures.at(targetStructId).containedParameterIds.push_back(newParamId);
@@ -265,28 +265,26 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 	for (int i = 0; i < numOfNewSets; i++) {
 		uint16_t numOfCurrSetSamples = newParams.readUint16();
 		uint16_t numOfCurrSetIds = newParams.readUint16();
-		housekeepingStructures.at(targetStructId).numOfSuperCommutatedParameterSets++;
-		etl::vector<uint16_t, ECSS_MAX_PARAMETERS> currSetIdsVec;
+		etl::vector <uint16_t, ECSS_MAX_PARAMETERS> currSetIdsVec;
 		uint16_t validIdsCounter = 0;
 
 		for (int j = 0; j < numOfCurrSetIds; j++) {
 			uint16_t newParamId = newParams.readUint16();
-			if (newParamId >= systemParameters.parametersArray.size()) {
+			if (newParamId >= ECSS_MAX_PARAMETER_ID) {
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-				return;
+				continue;
 			}
 			if (existsInVector(newParamId, housekeepingStructures.at(targetStructId).containedParameterIds)) {
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
-				return;
+				continue;
 			}
 			housekeepingStructures.at(targetStructId).containedParameterIds.push_back(newParamId);
 			currSetIdsVec.push_back(newParamId);
 			validIdsCounter++;
 		}
 		if (validIdsCounter > 0) {  // There must be at least one new added ID in order to insert new set.
-			housekeepingStructures.at(targetStructId).superCommutatedIds.push_back(std::make_pair
-			                                                                             (numOfCurrSetSamples,
-			                                                                         currSetIdsVec));
+			housekeepingStructures.at(targetStructId).superCommutatedIds.push_back(std::make_pair(numOfCurrSetSamples,currSetIdsVec));
+			housekeepingStructures.at(targetStructId).numOfSuperCommutatedParameterSets++;
 		}
 	}
 }
