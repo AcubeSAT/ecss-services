@@ -1,3 +1,6 @@
+#ifndef ECSS_SERVICES_SYSTEMPARAMETERS_HPP
+#define ECSS_SERVICES_SYSTEMPARAMETERS_HPP
+
 #include "Services/Parameter.hpp"
 #include "etl/vector.h"
 /**
@@ -30,3 +33,5 @@ public:
 };
 
 extern SystemParameters systemParameters;
+
+#endif
