@@ -11,7 +11,7 @@
 #include "Services/EventActionService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
-#include "Services/ParameterStatisticsService.hpp"
+//#include "Services/ParameterStatisticsService.hpp"
 #include "Services/Statistic.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"

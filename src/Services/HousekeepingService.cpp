@@ -251,7 +251,9 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 			ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}
-		if (existsInVector(newParamId, housekeepingStructures.at(targetStructId).containedParameterIds)) {
+		if (std::find(housekeepingStructures.at(targetStructId).containedParameterIds.begin(),
+		              housekeepingStructures.at(targetStructId).containedParameterIds.end(),
+		              newParamId) != housekeepingStructures.at(targetStructId).containedParameterIds.end()) {
 		    ErrorHandler::reportError(newParams,ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			continue;
 	    }
@@ -274,7 +276,9 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 				continue;
 			}
-			if (existsInVector(newParamId, housekeepingStructures.at(targetStructId).containedParameterIds)) {
+			if (std::find(housekeepingStructures.at(targetStructId).containedParameterIds.begin(),
+			              housekeepingStructures.at(targetStructId).containedParameterIds.end(),
+			              newParamId) != housekeepingStructures.at(targetStructId).containedParameterIds.end()) {
 				ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 				continue;
 			}
@@ -343,16 +347,6 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 		}
 	}
 	storeMessage(periodicPropertiesReport);
-}
-
-bool HousekeepingService::existsInVector(uint16_t targetId, etl::vector <uint16_t, 50> vec) {
-
-	for (auto &it : vec) {
-		if (it == targetId) {
-			return true;
-		}
-	}
-	return false;
 }
 
 void HousekeepingService::execute(Message& message) {

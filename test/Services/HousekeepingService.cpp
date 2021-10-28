@@ -3,6 +3,7 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/HousekeepingService.hpp"
+#include "etl/algorithm.h"
 
 HousekeepingService& housekeepingService = Services.housekeeping;
 
@@ -133,10 +134,11 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		CHECK(newStruct.numOfSuperCommutatedParameterSets == numOfSets);
 		CHECK(newStruct.collectionInterval == interval);
 		for (auto &id : allIds) {
-			CHECK(housekeepingService.existsInVector(id, newStruct.containedParameterIds));
+			CHECK(std::find(newStruct.containedParameterIds.begin(), newStruct.containedParameterIds.end(),
+			                id) != newStruct.containedParameterIds.end());
 		}
 		for (auto &id : newStruct.simplyCommutatedIds) {
-			CHECK(housekeepingService.existsInVector(id, simplyCommutatedIds));
+			CHECK(std::find(simplyCommutatedIds.begin(), simplyCommutatedIds.end(), id) != simplyCommutatedIds.end());
 		}
 		for (int set = 0; set < newStruct.numOfSuperCommutatedParameterSets; set++) {
 			CHECK(newStruct.superCommutatedIds[set].first == superCommutatedIds[set].first);
@@ -382,7 +384,8 @@ TEST_CASE("Housekeeping Reporting Sub-service") {
 		HousekeepingStructure structToCheck = housekeepingService.housekeepingStructures[structId];
 		CHECK(structToCheck.containedParameterIds.size() == 16);
 		for (auto &newId : allNewIds) {
-			CHECK(housekeepingService.existsInVector(newId, structToCheck.containedParameterIds));
+			CHECK(std::find(structToCheck.containedParameterIds.begin(), structToCheck.containedParameterIds.end(),
+			                newId) != structToCheck.containedParameterIds.end());
 		}
 		CHECK(structToCheck.numOfSimplyCommutatedParams == 6);
 		CHECK(structToCheck.numOfSimplyCommutatedParams == structToCheck.simplyCommutatedIds.size());

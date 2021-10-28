@@ -5,8 +5,8 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "Parameters/SystemParameters.hpp"
-#include "Statistics/SystemStatistics.hpp"
+//#include "Parameters/SystemParameters.hpp"
+//#include "Statistics/SystemStatistics.hpp"
 #include "Housekeeping/SystemHousekeeping.hpp"
 #include "Services/HousekeepingStructure.hpp"
 
@@ -102,11 +102,6 @@ public:
 	 * the periodic properties of each requested structure.
  	 */
 	void housekeepingPeriodicPropertiesReport(Message& request);
-
-	/**
-	 * Returns true if the targetId exists in the vector.
-	 */
-	bool existsInVector(uint16_t targetId, etl::vector <uint16_t, ECSS_MAX_PARAMETERS> vec);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
