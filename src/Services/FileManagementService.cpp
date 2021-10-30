@@ -23,6 +23,7 @@ uint8_t FileManagementService::getStringUntilZeroTerminator(Message &message)
 
         currentChar = message.readByte();
     }
+    return charCounter;
 }
 
 void FileManagementService::createFile(Message &message)
@@ -91,7 +92,6 @@ void FileManagementService::deleteFile(Message &message)
             ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
         }
     }
-
 }
 
 
