@@ -142,7 +142,19 @@ public:
 		/**
 		 * Attempt to access a non existing parameter (ST[20])
 		 */
-		GetNonExistingParameter = 8
+		GetNonExistingParameter = 8,
+		/**
+		 * Size of file is bigger than allowed
+		 */
+		SizeOfFileIsOutOfBounds = 9,
+		/**
+		 * Object path is invalid
+		 */
+		ObjectPathIsInvalid = 10,
+		/**
+		 * Size of string is bigger than allowed
+		 */
+		SizeOfStringIsOutOfBounds = 11
 	};
 
 	/**
