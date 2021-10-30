@@ -21,6 +21,7 @@ uint8_t FileManagementService::getStringUntilZeroTerminator(Message &message)
             ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
         }
 
+        //Read next byte
         currentChar = message.readByte();
     }
     return charCounter;
@@ -47,11 +48,13 @@ void FileManagementService::createFile(Message &message)
     //Check the validity of the request at service level
     if(fileSizeBytes > MAX_FILE_SIZE_BYTES)
     {
+        //Size of file out of bounds
         ErrorHandler::reportError(message,ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
     }
     // TODO implement pathIsValid (lfs_stat)
     else if(pathIsValidForCreation(repositoryPathString, fileNameString) == 1)
     {
+        //Invalid path
         ErrorHandler::reportError(message,ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
     }
     else
@@ -59,8 +62,13 @@ void FileManagementService::createFile(Message &message)
         // TODO implement littleFsCreateFile using littleFs
         if(littleFsCreateFile(repositoryPathString, fileNameString, fileSizeBytes) != 1)
         {
+            //LittleFs generated error
             //TODO The error codes that littlefs will produce are documented, so we could integrate them but later
             ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+        }
+        else
+        {
+            //Successful creation
         }
     }
 }
@@ -82,14 +90,21 @@ void FileManagementService::deleteFile(Message &message)
     //Check the validity of the request at service level
     if(pathIsValidForDeletion(repositoryPathString, fileNameString) == 1)
     {
+        //Invalid path
         ErrorHandler::reportError(message,ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
     }
     else
     {
+        //Valid path
         // TODO implement littleFsCreateFile using littleFs
         if(littleFsCreateFile(repositoryPathString, fileNameString, fileSizeBytes) != 1)
         {
+            //LittleFs generated error
             ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+        }
+        else
+        {
+            //Successful Deletion
         }
     }
 }
