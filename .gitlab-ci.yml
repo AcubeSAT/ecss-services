@@ -58,6 +58,8 @@ before_script:
 #cppcheck:
 #  image: spacedot/cppcheck:2.5
 #  stage: build
+#  variables:
+#    GIT_SUBMODULE_STRATEGY: Recursive
 #  before_script:
 #    - cppcheck --version
 #  script:
@@ -81,7 +83,7 @@ clang-tidy:
   image: spacedot/clang-tools:13.0.0-html-1.3.7
   stage: build
   variables:
-    GIT_SUBMODULE_STRATEGY: normal
+    GIT_SUBMODULE_STRATEGY: Recursive
   script:
     - cd $CI_PROJECT_DIR
     - ls
@@ -100,6 +102,8 @@ clang-tidy:
 #scan-build:
 #  image: spacedot/clang-tools:13.0.0-html-1.3.7
 #  stage: build
+#  variables:
+#    GIT_SUBMODULE_STRATEGY: Recursive
 #  before_script:
 #    - mkdir scan-build-html-report
 #  script:
@@ -115,6 +119,8 @@ clang-tidy:
 #doxygen:
 #  image: spacedot/doxygen:1.9.2-awesomecss-1.6.0
 #  stage: build
+#  variables:
+#    GIT_SUBMODULE_STRATEGY: Recursive
 #  script:
 #    - cd $CI_PROJECT_DIR
 #    - ls
@@ -141,3 +147,5 @@ clang-tidy:
 #        - public # Upload the resulting website
 #    only:
 #      - branches # Deploy on all branches
+
+
