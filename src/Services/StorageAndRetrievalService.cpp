@@ -11,13 +11,13 @@ void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
 		for (auto &packetStore : packetStores) {
-			packetStore.selfStorageStatus = true;
+			packetStore.second.selfStorageStatus = true;
 		}
 		return;
 	}
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint16_t currPacketStoreId = request.readUint16();
-		if (currPacketStoreId >= packetStores.size()) {
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 			continue;
 		}
@@ -36,13 +36,13 @@ void StorageAndRetrievalService::disableStorageFunction(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
 		for (auto &packetStore : packetStores) {
-			packetStore.selfStorageStatus = false;
+			packetStore.second.selfStorageStatus = false;
 		}
 		return;
 	}
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint16_t currPacketStoreId = request.readUint16();
-		if (currPacketStoreId >= packetStores.size()) {
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 			continue;
 		}
@@ -62,8 +62,8 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
 		for (auto &packetStore : packetStores) {
-			if (packetStore.selfOpenRetrievalStatus == PacketStore::Suspended) {
-				packetStore.openRetrievalStartTimeTag = newStartTimeTag;
+			if (packetStore.second.selfOpenRetrievalStatus == PacketStore::Suspended) {
+				packetStore.second.openRetrievalStartTimeTag = newStartTimeTag;
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
 			}
@@ -72,7 +72,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 	}
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint16_t currPacketStoreId = request.readUint16();
-		if (currPacketStoreId >= packetStores.size()) {
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 			continue;
 		}
@@ -95,21 +95,21 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
 		for (auto &packetStore : packetStores) {
-			if ((not supportsConcurrentRetrievalRequests) and packetStore.selfByTimeRangeRetrievalStatus) {
+			if ((not supportsConcurrentRetrievalRequests) and packetStore.second.selfByTimeRangeRetrievalStatus) {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
 				continue;
 			}
-			packetStore.selfOpenRetrievalStatus = PacketStore::InProgress;
+			packetStore.second.selfOpenRetrievalStatus = PacketStore::InProgress;
 			if (supportsPrioritizingRetrievals) {
 				uint16_t newRetrievalPriority = request.readUint16();
-				packetStore.retrievalPriority = newRetrievalPriority;
+				packetStore.second.retrievalPriority = newRetrievalPriority;
 			}
 		}
 		return;
 	}
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint16_t currPacketStoreId = request.readUint16();
-		if (currPacketStoreId >= packetStores.size()) {
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 			continue;
 		}
@@ -136,13 +136,13 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
 		for (auto &packetStore : packetStores) {
-			packetStore.selfOpenRetrievalStatus = PacketStore::Suspended;
+			packetStore.second.selfOpenRetrievalStatus = PacketStore::Suspended;
 		}
 		return;
 	}
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint16_t currPacketStoreId = request.readUint16();
-		if (currPacketStoreId >= packetStores.size()) {
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 			continue;
 		}
@@ -161,7 +161,7 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint16_t currPacketStoreId = request.readUint16();
-		if (currPacketStoreId >= packetStores.size()) {
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 			continue;
 		}
@@ -207,13 +207,13 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
 		for (auto &packetStore : packetStores) {
-			packetStore.selfByTimeRangeRetrievalStatus = false;
+			packetStore.second.selfByTimeRangeRetrievalStatus = false;
 		}
 		return;
 	}
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint16_t currPacketStoreId = request.readUint16();
-		if (currPacketStoreId >= packetStores.size()) {
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 			continue;
 		}

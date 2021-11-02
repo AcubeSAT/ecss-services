@@ -3,6 +3,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
+#include "etl/String.hpp"
 
 class PacketStore {
 public:
@@ -15,8 +16,8 @@ public:
 	etl::string<8> managementType;      //circular or bounded
 
 	enum PacketStoreOpenRetrievalStatus {
-		InProgress,
-		Suspended
+		InProgress = 0,
+		Suspended = 1
 	};
 	bool selfStorageStatus;
 	bool selfByTimeRangeRetrievalStatus;
