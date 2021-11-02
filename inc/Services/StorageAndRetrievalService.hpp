@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
+#include "PacketStore.hpp"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -20,6 +21,13 @@ public:
 	inline static const uint8_t ServiceType = 15;
 
 	enum MessageType : uint8_t {
+		EnableStorageFunction = 1,
+		DisableStorageFunction = 2,
+		ChangeOpenRetrievalStartTimeTag = 14,
+		ResumeOpenRetrievalOfPacketStores = 15,
+		SuspendOpenRetrievalOfPacketStores = 16,
+		StartByTimeRangeRetrieval = 9,
+		AbortByTimeRangeRetrieval = 17,
 
 	};
 
@@ -32,22 +40,63 @@ public:
 		PacketBased
 	};
 
-	const uint16_t maxPacketStores = 20;
+	static const uint16_t maxPacketStores = 20;
+
+	etl::array <PacketStore, maxPacketStores> packetStores;
+
 	const bool supportsCircularType = true;
 	const bool supportsBoundedType = true;
+
 	/**
-	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
-	 */
+	* @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
+ 	*/
 	const bool supportsConcurrentRetrievalRequests = false;
+
 	/**
-	 * @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
-	 */
+	* @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
+	*/
 	const bool supportsQueuingRetrievalRequests = true;
+
 	/**
-	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
-	 */
+	* @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
+	*/
 	const bool supportsPrioritizingRetrievals = true;
 	const TimeStamping timeStamping = PacketBased;
+
+	/**
+	* TC[15,1] request to enable the packet stores' storage function
+	*/
+	void enableStorageFunction(Message& request);
+
+	/**
+	* TC[15,2] request to disable the packet stores' storage function
+	*/
+	void disableStorageFunction(Message& request);
+
+	/**
+	* TC[15,14] change the open retrieval start time tag
+	*/
+	void changeOpenRetrievalStartTimeTag(Message& request);
+
+	/**
+	* TC[15,15] resume the open retrieval of packet stores
+	*/
+    void resumeOpenRetrievalOfPacketStores(Message& request);
+
+  	/**
+	* TC[15,16] suspend the open retrieval of packet stores
+	*/
+    void suspendOpenRetrievalOfPacketStores(Message& request);
+
+	/**
+	* TC[15,9] start the by-time-range retrieval of packet stores
+	*/
+	void startByTimeRangeRetrieval(Message& request);
+
+	/**
+	* TC[15,17] abort the by-time-range retrieval of packet stores
+	*/
+	void abortByTimeRangeRetrieval(Message& request);
 };
 
 #endif
