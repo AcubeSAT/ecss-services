@@ -221,3 +221,22 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 	}
 }
 
+void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportStatusOfPacketStores, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message report(ServiceType,MessageType::PacketStoresStatusReport,Message::TM,1);
+	report.appendUint16(packetStores.size());
+	for (auto &packetStore : packetStores) {
+		report.appendUint16(packetStore.first);
+		report.appendBoolean(packetStore.second.selfStorageStatus);
+		uint16_t statusCode = (packetStore.second.selfOpenRetrievalStatus == PacketStore::InProgress) ? 0 : 1;
+		report.appendUint16(statusCode);
+		report.appendBoolean(packetStore.second.selfByTimeRangeRetrievalStatus);
+	}
+	storeMessage(report);
+}

@@ -5,6 +5,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "PacketStore.hpp"
+#include "etl/map.h"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -28,7 +29,8 @@ public:
 		SuspendOpenRetrievalOfPacketStores = 16,
 		StartByTimeRangeRetrieval = 9,
 		AbortByTimeRangeRetrieval = 17,
-
+		ReportStatusOfPacketStores = 18,
+		PacketStoresStatusReport = 19,
 	};
 
 	enum VirtualChannel : uint8_t {
@@ -42,7 +44,7 @@ public:
 
 	static const uint16_t maxPacketStores = 20;
 
-	etl::array <PacketStore, maxPacketStores> packetStores;
+	etl::map <uint16_t, PacketStore, maxPacketStores> packetStores;
 
 	const bool supportsCircularType = true;
 	const bool supportsBoundedType = true;
@@ -97,6 +99,12 @@ public:
 	* TC[15,17] abort the by-time-range retrieval of packet stores
 	*/
 	void abortByTimeRangeRetrieval(Message& request);
+
+	/**
+	 * This function takes a TC[15,18] 'report the status of packet stores' request as argument and responds with a
+	 * TM[15,19] 'packet stores status' report message.
+	 */
+	 void packetStoresStatusReport(Message& request);
 };
 
 #endif
