@@ -142,7 +142,31 @@ public:
 		/**
 		 * Attempt to access a non existing parameter (ST[20])
 		 */
-		GetNonExistingParameter = 8
+		GetNonExistingParameter = 8,
+		/**
+		 * Attempt to change a non-existent packet store (ST[15])
+		 */
+		SetNonExistingPacketStore = 9,
+		/**
+		 * Attempt to change the start time tag of a packet store, whose open retrieval status is in progress (ST[15])
+		 */
+		SetPacketStoreWithOpenRetrievalInProgress = 10,
+		/**
+		 * Attempt to resume open retrieval of a packet store, whose by-time-range retrieval is enabled (ST[15])
+		 */
+		SetPacketStoreWithByTimeRangeRetrieval = 11,
+		/**
+		 * Attempt to start the by-time-range retrieval of packet store, whose open retrieval is in progress (ST[15])
+		 */
+		GetPacketStoreWithOpenRetrievalInProgress = 12,
+		/**
+		 * Start time of retrieval is later than the end time (ST[15])
+		 */
+		InvalidRetrievalTimesRelation = 13,
+		/**
+		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
+		 */
+		ByTimeRangeRetrievalAlreadyEnabled = 14,
 	};
 
 	/**
