@@ -24,10 +24,11 @@ public:
 	enum MessageType : uint8_t {
 		EnableStorageFunction = 1,
 		DisableStorageFunction = 2,
+		StartByTimeRangeRetrieval = 9,
+		DeletePacketStoreContent = 11,
 		ChangeOpenRetrievalStartTimeTag = 14,
 		ResumeOpenRetrievalOfPacketStores = 15,
 		SuspendOpenRetrievalOfPacketStores = 16,
-		StartByTimeRangeRetrieval = 9,
 		AbortByTimeRangeRetrieval = 17,
 		ReportStatusOfPacketStores = 18,
 		PacketStoresStatusReport = 19,
@@ -105,6 +106,11 @@ public:
 	 * TM[15,19] 'packet stores status' report message.
 	 */
 	 void packetStoresStatusReport(Message& request);
+
+	 /**
+	  * TC[15,11] delete the packet store content up to the specified time
+	  */
+	  void deletePacketStoreContent(Message& request);
 };
 
 #endif

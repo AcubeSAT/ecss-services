@@ -240,3 +240,57 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 	}
 	storeMessage(report);
 }
+
+void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::DeletePacketStoreContent, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint32_t timeLimit = request.readUint32();
+	uint16_t numOfPacketStores = request.readUint16();
+	if (!numOfPacketStores) {
+		for (auto &packetStore : packetStores) {
+			for (auto &tmPacket : packetStore.second.storedTmPackets) {
+				if (tmPacket.first <= timeLimit) {
+					packetStore.second.storedTmPackets.pop_front();
+				} else {
+					break;
+				}
+			}
+		}
+		return;
+	}
+	for (int i = 0; i < numOfPacketStores; i++) {
+		uint16_t currPacketStoreId = request.readUint16();
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
+			continue;
+		}
+		if (packetStores[currPacketStoreId].selfByTimeRangeRetrievalStatus) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
+			continue;
+		}
+		if (packetStores[currPacketStoreId].selfOpenRetrievalStatus == PacketStore::InProgress) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
+			continue;
+		}
+		for (int j = 0; j < packetStores[currPacketStoreId].storedTmPackets.size(); j++) {
+			/**
+			 * @todo: actually compare the real time structures.
+			 */
+			if (packetStores[currPacketStoreId].storedTmPackets[j].first <= timeLimit) {
+				packetStores[currPacketStoreId].storedTmPackets.pop_front();
+			} else {
+				break;
+			}
+		}
+//		for (auto &tmPacket : packetStores[currPacketStoreId].storedTmPackets) {    <--- Will this work???
+//			if (tmPacket.first <= timeLimit) {
+//				packetStores[currPacketStoreId].storedTmPackets.pop_front();
+//			}
+//		}
+	}
+}
