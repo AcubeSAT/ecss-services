@@ -529,3 +529,31 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 	packetStores[idToChange].packetStoreType = PacketStore::Bounded;
 }
 
+void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ChangeVirtualChannel, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t idToChange = request.readUint16();
+	/**
+	 * @todo: read the requested virtual channel and check if its valid
+	 */
+	if (packetStores.find(idToChange) == packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (packetStores[idToChange].selfByTimeRangeRetrievalStatus) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
+		return;
+	}
+	if (packetStores[idToChange].selfOpenRetrievalStatus == PacketStore::InProgress) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
+		return;
+	}
+	/**
+	 * @todo: actually change the virtual channel utilized by the packet store
+	 */
+}

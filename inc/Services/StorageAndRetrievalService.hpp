@@ -40,6 +40,7 @@ public:
 		ResizePacketStores = 25,
 		ChangeTypeToCircular = 26,
 		ChangeTypeToBounded = 27,
+		ChangeVirtualChannel = 28,
 
 	};
 
@@ -156,6 +157,11 @@ public:
 	 * TC[15,27] change the packet store type to bounded
 	 */
 	void changeTypeToBounded(Message& request);
+
+	/**
+	 * TC[15,28] change the virtual channel used by a packet store
+	 */
+	void changeVirtualChannel(Message& request);
 };
 
 #endif
