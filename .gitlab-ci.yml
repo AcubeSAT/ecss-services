@@ -58,8 +58,6 @@ build:
 cppcheck:
  image: spacedot/cppcheck:2.5
  stage: build
- variables:
-   GIT_SUBMODULE_STRATEGY: Recursive
  before_script:
    - cppcheck --version
  script:
@@ -82,8 +80,6 @@ cppcheck:
 clang-tidy:
  image: spacedot/clang-tools:13.0.0-html-1.3.7
  stage: build
- variables:
-   GIT_SUBMODULE_STRATEGY: Recursive
  script:
    - cd $CI_PROJECT_DIR
    - ls
@@ -102,8 +98,6 @@ clang-tidy:
 scan-build:
  image: spacedot/clang-tools:13.0.0-html-1.3.7
  stage: build
- variables:
-   GIT_SUBMODULE_STRATEGY: Recursive
  before_script:
    - mkdir scan-build-html-report
  script:
