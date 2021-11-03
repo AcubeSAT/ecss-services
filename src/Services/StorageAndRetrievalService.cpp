@@ -500,3 +500,32 @@ void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
 	}
 	packetStores[idToChange].packetStoreType = PacketStore::Circular;
 }
+
+void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ChangeTypeToBounded, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t idToChange = request.readUint16();
+	if (packetStores.find(idToChange) == packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (packetStores[idToChange].selfStorageStatus) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
+		return;
+	}
+	if (packetStores[idToChange].selfByTimeRangeRetrievalStatus) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
+		return;
+	}
+	if (packetStores[idToChange].selfOpenRetrievalStatus == PacketStore::InProgress) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
+		return;
+	}
+	packetStores[idToChange].packetStoreType = PacketStore::Bounded;
+}
+
