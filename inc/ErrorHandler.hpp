@@ -148,33 +148,49 @@ public:
 		 */
 		SetNonExistingPacketStore = 9,
 		/**
+		 * Attempt to access a packet store that does not exist (ST[15])
+		 */
+		GetNonExistingPacketStore = 10,
+		/**
 		 * Attempt to change the start time tag of a packet store, whose open retrieval status is in progress (ST[15])
 		 */
-		SetPacketStoreWithOpenRetrievalInProgress = 10,
+		SetPacketStoreWithOpenRetrievalInProgress = 11,
 		/**
 		 * Attempt to resume open retrieval of a packet store, whose by-time-range retrieval is enabled (ST[15])
 		 */
-		SetPacketStoreWithByTimeRangeRetrieval = 11,
+		SetPacketStoreWithByTimeRangeRetrieval = 12,
 		/**
 		 * Attempt to start the by-time-range retrieval of packet store, whose open retrieval is in progress (ST[15])
 		 */
-		GetPacketStoreWithOpenRetrievalInProgress = 12,
+		GetPacketStoreWithOpenRetrievalInProgress = 13,
 		/**
 		 * Start time of retrieval is later than the end time (ST[15])
 		 */
-		InvalidRetrievalTimesRelation = 13,
+		InvalidRetrievalTimesRelation = 14,
 		/**
 		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
 		 */
-		ByTimeRangeRetrievalAlreadyEnabled = 14,
+		ByTimeRangeRetrievalAlreadyEnabled = 15,
 		/**
 		 * Attempt to create packet store, whose ID already exists (ST[15])
 		 */
-		AlreadyExistingPacketStore = 15,
+		AlreadyExistingPacketStore = 16,
 		/**
 		 * Attempt to create packet store, when the max number of packet stores is already reached (ST[15])
 		 */
-		MaxNumberOfPacketStoresReached = 16
+		MaxNumberOfPacketStoresReached = 17,
+		/**
+		 * Attempt to delete a packet store with the storage status enabled (ST[15])
+		 */
+		DeletionOfPacketStoreWithStorageStatusEnabled = 18,
+		/**
+		 * Attempt to delete a packet whose by time range retrieval status is enabled (ST[15])
+		 */
+		DeletionOfPacketWithByTimeRangeRetrieval = 19,
+		/**
+		 * Attempt to delete a packet whose open retrieval status is in progress (ST[15])
+		 */
+		DeletionOfPacketWithOpenRetrievalInProgress = 20,
 	};
 
 	/**

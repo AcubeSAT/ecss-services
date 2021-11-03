@@ -33,6 +33,7 @@ public:
 		ReportStatusOfPacketStores = 18,
 		PacketStoresStatusReport = 19,
 		CreatePacketStores = 20,
+		DeletePacketStores = 21,
 
 	};
 
@@ -118,6 +119,11 @@ public:
 	* TC[15,20] create packet stores
 	*/
 	void createPacketStores(Message& request);
+
+	/**
+	 * TC[15,21] delete packet stores
+	 */
+	void deletePacketStores(Message& request);
 };
 
 #endif

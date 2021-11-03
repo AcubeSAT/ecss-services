@@ -287,11 +287,6 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 				break;
 			}
 		}
-//		for (auto &tmPacket : packetStores[currPacketStoreId].storedTmPackets) {    <--- Will this work???
-//			if (tmPacket.first <= timeLimit) {
-//				packetStores[currPacketStoreId].storedTmPackets.pop_front();
-//			}
-//		}
 	}
 }
 
@@ -332,5 +327,54 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 		newPacketStore.selfByTimeRangeRetrievalStatus = false;
 		newPacketStore.selfOpenRetrievalStatus = PacketStore::Suspended;
 		packetStores.insert({idToCreate, newPacketStore});
+	}
+}
+
+void StorageAndRetrievalService::deletePacketStores(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::DeletePacketStores, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfPacketStores = request.readUint16();
+	if (!numOfPacketStores) {
+		for (int i = 0; i < packetStores.size(); i++) {
+			if (packetStores[i].selfStorageStatus) {
+				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
+				continue;
+			}
+			if (packetStores[i].selfByTimeRangeRetrievalStatus) {
+				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketWithByTimeRangeRetrieval);
+				continue;
+			}
+			if(packetStores[i].selfOpenRetrievalStatus == PacketStore::InProgress) {
+				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::DeletionOfPacketWithOpenRetrievalInProgress);
+				continue;
+			}
+			packetStores.erase(i);
+		}
+		return;
+	}
+	for (int i = 0; i < numOfPacketStores; i++) {
+		uint16_t idToDelete = request.readUint16();
+		if (packetStores.find(idToDelete) == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+			continue;
+		}
+		if (packetStores[idToDelete].selfStorageStatus) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
+			continue;
+		}
+		if (packetStores[idToDelete].selfByTimeRangeRetrievalStatus) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketWithByTimeRangeRetrieval);
+			continue;
+		}
+		if(packetStores[idToDelete].selfOpenRetrievalStatus == PacketStore::InProgress) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::DeletionOfPacketWithOpenRetrievalInProgress);
+			continue;
+		}
+		packetStores.erase(idToDelete);
 	}
 }
