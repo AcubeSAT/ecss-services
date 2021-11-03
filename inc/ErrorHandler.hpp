@@ -167,6 +167,14 @@ public:
 		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
 		 */
 		ByTimeRangeRetrievalAlreadyEnabled = 14,
+		/**
+		 * Attempt to create packet store, whose ID already exists (ST[15])
+		 */
+		AlreadyExistingPacketStore = 15,
+		/**
+		 * Attempt to create packet store, when the max number of packet stores is already reached (ST[15])
+		 */
+		MaxNumberOfPacketStoresReached = 16
 	};
 
 	/**

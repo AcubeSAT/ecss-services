@@ -14,9 +14,9 @@ public:
 	uint32_t retrievalStartTime;
 	uint32_t retrievalEndTime;
 
-	enum ManagementType {
-		Circular,
-		Bounded
+	enum PacketStoreType {
+		Circular = 0,
+		Bounded = 1
 	};
 
 	enum PacketStoreOpenRetrievalStatus {
@@ -27,7 +27,7 @@ public:
 	bool selfStorageStatus;
 	bool selfByTimeRangeRetrievalStatus;
 	PacketStoreOpenRetrievalStatus selfOpenRetrievalStatus;
-	ManagementType managementType;
+	PacketStoreType packetStoreType;
 
 	/**
 	 * A queue containing the TM messages stored by the packet store. Every TM is followed by its timestamp.

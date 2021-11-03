@@ -294,3 +294,43 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 //		}
 	}
 }
+
+void StorageAndRetrievalService::createPacketStores(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::CreatePacketStores, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfPacketStores = request.readUint16();
+	for (int i = 0; i < numOfPacketStores; i++) {
+		if (packetStores.size() >= maxPacketStores) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxNumberOfPacketStoresReached);
+			return;
+		}
+		uint16_t idToCreate = request.readUint16();
+//		uint16_t packetStoreSize = request.readUint16();
+		uint16_t typeCode = request.readUint16();
+		PacketStore::PacketStoreType packetStoreType = (!typeCode) ? PacketStore::Circular : PacketStore::Bounded;
+
+		/**
+		 * @todo: actually check if the available memory can handle the new creation
+		 *
+		 * @todo: read the virtual channel. Don't know the data-type yet
+		 *
+		 * @todo: check if the virtual channel is valid
+		 */
+
+		 if (packetStores.find(idToCreate) != packetStores.end()) {
+			 ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingPacketStore);
+			 continue;
+		 }
+		PacketStore newPacketStore;
+		newPacketStore.packetStoreType = packetStoreType;
+		newPacketStore.selfStorageStatus = false;
+		newPacketStore.selfByTimeRangeRetrievalStatus = false;
+		newPacketStore.selfOpenRetrievalStatus = PacketStore::Suspended;
+		packetStores.insert({idToCreate, newPacketStore});
+	}
+}

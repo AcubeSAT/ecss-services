@@ -32,6 +32,8 @@ public:
 		AbortByTimeRangeRetrieval = 17,
 		ReportStatusOfPacketStores = 18,
 		PacketStoresStatusReport = 19,
+		CreatePacketStores = 20,
+
 	};
 
 	enum VirtualChannel : uint8_t {
@@ -102,15 +104,20 @@ public:
 	void abortByTimeRangeRetrieval(Message& request);
 
 	/**
-	 * This function takes a TC[15,18] 'report the status of packet stores' request as argument and responds with a
-	 * TM[15,19] 'packet stores status' report message.
-	 */
-	 void packetStoresStatusReport(Message& request);
+	* This function takes a TC[15,18] 'report the status of packet stores' request as argument and responds with a
+	* TM[15,19] 'packet stores status' report message.
+	*/
+	void packetStoresStatusReport(Message& request);
 
-	 /**
-	  * TC[15,11] delete the packet store content up to the specified time
-	  */
-	  void deletePacketStoreContent(Message& request);
+	/**
+	* TC[15,11] delete the packet store content up to the specified time
+	*/
+	void deletePacketStoreContent(Message& request);
+
+	/**
+	* TC[15,20] create packet stores
+	*/
+	void createPacketStores(Message& request);
 };
 
 #endif
