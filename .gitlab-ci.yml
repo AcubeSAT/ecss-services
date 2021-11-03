@@ -159,8 +159,12 @@ ikos:
     - cd $CI_PROJECT_DIR
     - pwd
     - ls
-    - ikos-scan ./src
+    - ikos-scan cmake .
     - ikos-scan make
+    - ikos tests.bc
+    - ikos ecss_services.bc
+    - ikos-report -f=text output.db
+    - ls
   artifacts:
     paths:
       - ./ikos-report
