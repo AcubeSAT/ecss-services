@@ -151,4 +151,9 @@
  */
 #define ECSS_CRC_INCLUDED true
 
+/**
+ * @brief the max number of TM packets that a packet store in ST[15] can store
+ */
+#define ECSS_MAX_PACKETS_IN_PACKET_STORE 20
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
