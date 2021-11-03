@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
+#include "Message.hpp"
 
 /**
  * @todo: add a way of measuring each packets store's size in bytes
@@ -45,6 +46,12 @@ public:
 	 */
 	etl::deque <std::pair <uint32_t, Message>, ECSS_MAX_PACKETS_IN_PACKET_STORE> storedTmPackets;
 
+	/**
+	 * This function copies all the packets within the start-time -> end-time window to the destination packet store.
+	 *
+	 * @note may needs to be template, depending on the timestamping type.
+	 */
+	void copyPacketsTo(PacketStore &target, uint32_t startTime, uint32_t endTime);
 };
 
 #endif
