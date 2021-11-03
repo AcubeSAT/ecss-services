@@ -134,8 +134,6 @@ scan-build:
 doxygen:
  image: spacedot/doxygen:1.9.2-awesomecss-1.6.0
  stage: build
- variables:
-   GIT_SUBMODULE_STRATEGY: Recursive
  script:
    - cd $CI_PROJECT_DIR
    - ls
