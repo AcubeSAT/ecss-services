@@ -458,8 +458,7 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 		 * @todo: check if the current memory availability can handle the new size requested
 		 */
 		if (packetStores[currPacketStoreId].selfStorageStatus) {
-			ErrorHandler::reportError(request,
-			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 			continue;
 		}
 		if (packetStores[currPacketStoreId].selfOpenRetrievalStatus == PacketStore::InProgress) {
@@ -472,4 +471,32 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 		}
 		packetStores[currPacketStoreId].sizeInBytes = currPacketStoreSize;
 	}
+}
+
+void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ChangeTypeToCircular, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t idToChange = request.readUint16();
+	if (packetStores.find(idToChange) == packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (packetStores[idToChange].selfStorageStatus) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
+		return;
+	}
+	if (packetStores[idToChange].selfByTimeRangeRetrievalStatus) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
+		return;
+	}
+	if (packetStores[idToChange].selfOpenRetrievalStatus == PacketStore::InProgress) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
+		return;
+	}
+	packetStores[idToChange].packetStoreType = PacketStore::Circular;
 }

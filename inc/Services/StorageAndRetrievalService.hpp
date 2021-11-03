@@ -38,6 +38,8 @@ public:
 		PacketStoreConfigurationReport = 23,
 		CopyPacketsInTimeWindow = 24,
 		ResizePacketStores = 25,
+		ChangeTypeToCircular = 26,
+		ChangeTypeToBounded = 27,
 
 	};
 
@@ -144,6 +146,16 @@ public:
 	 * TC[15,25] resize packet stores
 	 */
 	void resizePacketStores(Message& request);
+
+	/**
+	 * TC[15,26] change the packet store type to circular
+	 */
+	void changeTypeToCircular(Message& request);
+
+	/**
+	 * TC[15,27] change the packet store type to bounded
+	 */
+	void changeTypeToBounded(Message& request);
 };
 
 #endif
