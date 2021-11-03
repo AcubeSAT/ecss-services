@@ -191,6 +191,14 @@ public:
 		 * Attempt to delete a packet whose open retrieval status is in progress (ST[15])
 		 */
 		DeletionOfPacketWithOpenRetrievalInProgress = 20,
+		/**
+		 * Requested a time window where the start time is larger than the end time (ST[15])
+		 */
+		InvalidTimeWindow = 21,
+		/**
+		 * Attempt to copy a packet store to a destination packet store that is not empty (ST[15])
+		 */
+		DestinationPacketStoreNotEmtpy = 22,
 	};
 
 	/**

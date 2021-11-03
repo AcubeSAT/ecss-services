@@ -36,6 +36,7 @@ public:
 		DeletePacketStores = 21,
 		ReportConfigurationOfPacketStores = 22,
 		PacketStoreConfigurationReport = 23,
+		CopyPacketsInTimeWindow = 24,
 	};
 
 	enum VirtualChannels : uint8_t {
@@ -43,8 +44,8 @@ public:
 	};
 
 	enum TimeStamping {
-	    StorageBased,
-		PacketBased
+	    StorageBased = 0,
+		PacketBased = 1
 	};
 
 	static const uint16_t maxPacketStores = 20;
@@ -131,6 +132,11 @@ public:
 	 * 23] 'packet store configuration report' report message.
 	 */
 	void packetStoreConfigurationReport(Message& request);
+
+	/**
+	 * TC[15,24] copy the packets contained into a packet store, selected by the time window
+	 */
+	void copyPacketsInTimeWindow(Message& request);
 };
 
 #endif

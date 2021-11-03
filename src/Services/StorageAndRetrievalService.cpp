@@ -404,3 +404,36 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 	}
 	storeMessage(report);
 }
+
+void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::CopyPacketsInTimeWindow, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t timeTagsTypeCode = request.readUint16();
+//	TimeStamping timeTagsType = (!timeTagsTypeCode) ? StorageBased : PacketBased; // How do I use that??
+	uint32_t timeTag1 = request.readUint32();
+	uint32_t timeTag2 = request.readUint32();
+	uint16_t fromPacketStoreId = request.readUint16();
+	uint16_t toPacketStoreId = request.readUint16();
+	if (fromPacketStoreId >= maxPacketStores or fromPacketStoreId < 0) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (toPacketStoreId >= maxPacketStores or fromPacketStoreId < 0) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (timeTag1 >= timeTag2) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
+		return;
+	}
+	if (!packetStores[toPacketStoreId].storedTmPackets.empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+		return;
+	}
+	packetStores[fromPacketStoreId].copyPacketsTo(packetStores[toPacketStoreId], timeTag1, timeTag2);
+}
