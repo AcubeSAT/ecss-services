@@ -151,8 +151,8 @@ before_script:
 ikos:
   image: spacedot/ikos:3.0
   stage: build
-  variables:
-    GIT_SUBMODULE_STRATEGY: Recursive
+  # variables:
+  #   GIT_SUBMODULE_STRATEGY: Recursive
   before_script:
     - mkdir ikos-report
   script:
