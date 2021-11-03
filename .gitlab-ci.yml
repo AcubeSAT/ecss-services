@@ -151,8 +151,6 @@ before_script:
 ikos:
   image: spacedot/ikos:3.0
   stage: build
-  # variables:
-  #   GIT_SUBMODULE_STRATEGY: Recursive
   before_script:
     - mkdir ikos-report
   script:
@@ -163,8 +161,10 @@ ikos:
     - ikos-scan make
     - ikos tests.bc
     - ikos ecss_services.bc
-    - ikos-report -f=text output.db
+    - ikos-report -o=ikos-report.txt output.db
     - ls
+  after_script:
+    - mv ikos-report.txt ikos-report
   artifacts:
     paths:
       - ./ikos-report
