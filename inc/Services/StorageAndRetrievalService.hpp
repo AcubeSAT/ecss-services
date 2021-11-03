@@ -26,6 +26,8 @@ public:
 		DisableStorageFunction = 2,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
+		ReportContentSummaryOfPacketStores = 12,
+		PacketStoreContentSummaryReport = 13,
 		ChangeOpenRetrievalStartTimeTag = 14,
 		ResumeOpenRetrievalOfPacketStores = 15,
 		SuspendOpenRetrievalOfPacketStores = 16,
@@ -162,6 +164,12 @@ public:
 	 * TC[15,28] change the virtual channel used by a packet store
 	 */
 	void changeVirtualChannel(Message& request);
+
+	/**
+	 * This function takes a TC[15,12] 'report the packet store content summary' as argument and responds with a TM[15,
+	 * 13] 'packet store content summary report' report message.
+	 */
+	void packetStoreContentSummaryReport(Message& request);
 };
 
 #endif

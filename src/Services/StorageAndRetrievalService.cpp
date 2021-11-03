@@ -557,3 +557,74 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 	 * @todo: actually change the virtual channel utilized by the packet store
 	 */
 }
+
+void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportContentSummaryOfPacketStores, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message report(ServiceType,MessageType::PacketStoreContentSummaryReport,Message::TM,1);
+	uint16_t numOfPacketStores = request.readUint16();
+	//For all packet stores
+	if (!numOfPacketStores) {
+		report.appendUint16(packetStores.size());
+		for (auto &packetStore : packetStores) {
+			report.appendUint16(packetStore.first);
+			uint32_t oldestStoredPacketTime = packetStore.second.storedTmPackets.front().first;
+			report.appendUint32(oldestStoredPacketTime);
+			uint32_t newestStoredPacketTime = packetStore.second.storedTmPackets.back().first;
+			report.appendUint32(newestStoredPacketTime);
+			auto fillingPercentage = static_cast <uint16_t> (packetStore.second.storedTmPackets.size() * 100
+			                                               / ECSS_MAX_PACKETS_IN_PACKET_STORE);
+			report.appendUint16(fillingPercentage);
+			uint16_t packetCounter = 0;
+			for (auto &packet : packetStore.second.storedTmPackets) {
+				if (packetStore.second.openRetrievalStartTimeTag <= packet.first) {
+					packetCounter++;
+				}
+			}
+			fillingPercentage = static_cast <uint16_t> (packetCounter * 100 / ECSS_MAX_PACKETS_IN_PACKET_STORE);
+			report.appendUint16(fillingPercentage);
+		}
+		return;
+	}
+	//For specified packet stores
+	uint16_t numOfValidPacketStores = 0;
+	for (int i = 0; i < numOfPacketStores; i++) {
+		uint16_t currPacketStoreId = request.readUint16();
+		if (packetStores.find(currPacketStoreId) != packetStores.end()) {
+			numOfValidPacketStores++;;
+		}
+	}
+	report.appendUint16(numOfValidPacketStores);
+	request.resetRead();
+	numOfPacketStores = request.readUint16();
+	for (int i = 0; i < numOfPacketStores; i++) {
+		uint16_t currPacketStoreId = request.readUint16();
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+			continue;
+		}
+		report.appendUint16(currPacketStoreId);
+		uint32_t oldestStoredPacketTime = packetStores[currPacketStoreId].storedTmPackets.front().first;
+		report.appendUint32(oldestStoredPacketTime);
+		uint32_t newestStoredPacketTime = packetStores[currPacketStoreId].storedTmPackets.back().first;
+		report.appendUint32(newestStoredPacketTime);
+		report.appendUint32(packetStores[currPacketStoreId].openRetrievalStartTimeTag);
+		auto fillingPercentage = static_cast <uint16_t> (packetStores[currPacketStoreId].storedTmPackets.size() * 100
+		                                               / ECSS_MAX_PACKETS_IN_PACKET_STORE);
+		report.appendUint16(fillingPercentage);
+		uint16_t packetCounter = 0;
+		for (auto &packet : packetStores[currPacketStoreId].storedTmPackets) {
+			if (packetStores[currPacketStoreId].openRetrievalStartTimeTag <= packet.first) {
+				packetCounter++;
+			}
+		}
+		fillingPercentage = static_cast <uint16_t> (packetCounter * 100 / ECSS_MAX_PACKETS_IN_PACKET_STORE);
+		report.appendUint16(fillingPercentage);
+	}
+
+}
