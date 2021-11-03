@@ -78,22 +78,22 @@ cppcheck:
      - ./cppcheck-html-report
 
 clang-tidy:
- image: spacedot/clang-tools:13.0.0-html-1.3.7
- stage: build
- script:
-   - cd $CI_PROJECT_DIR
-   - ls
-   - pwd
-   - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-   - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --checks=* && find $CI_PROJECT_DIR/src -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)' >> clang-tidy-output.log
+  image: spacedot/clang-tools:13.0.0-html-1.3.7
+  stage: build
+  script:
+    - cd $CI_PROJECT_DIR
+    - ls
+    - pwd
+    - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --checks=* && find $CI_PROJECT_DIR/src -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)' >> clang-tidy-output.log
+  after_script:
+    - mkdir clang-tidy-html-report
+    - clang-tidy-html clang-tidy-output.log
+    - mv clang.html clang-tidy-html-report
+  artifacts:
+    paths:
+      - ./clang-tidy-html-report
 
- after_script:
-   - mkdir clang-tidy-html-report
-   - clang-tidy-html clang-tidy-output.log
-   - mv clang.html clang-tidy-html-report
- artifacts:
-   paths:
-     - ./clang-tidy-html-report
 
 scan-build:
  image: spacedot/clang-tools:13.0.0-html-1.3.7
@@ -130,6 +130,21 @@ scan-build:
 #        - public # Upload the resulting website
 #    only:
 #      - branches # Deploy on all branches
+
+doxygen:
+ image: spacedot/doxygen:1.9.2-awesomecss-1.6.0
+ stage: build
+ variables:
+   GIT_SUBMODULE_STRATEGY: Recursive
+ script:
+   - cd $CI_PROJECT_DIR
+   - ls
+   - pwd
+   - doxygen doxygen.conf
+ artifacts:
+   paths:
+     - ./doxygen-output
+
 
 ikos:
   image: spacedot/ikos:3.0
