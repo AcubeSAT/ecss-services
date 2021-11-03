@@ -160,45 +160,49 @@ public:
 		 */
 		SetPacketStoreWithByTimeRangeRetrieval = 12,
 		/**
+		 * Attempt to access a packet with by-time range retrieval enabled (ST[15])
+		 */
+		GetPacketStoreWithByTimeRangeRetrieval = 13,
+		/**
 		 * Attempt to start the by-time-range retrieval of packet store, whose open retrieval is in progress (ST[15])
 		 */
-		GetPacketStoreWithOpenRetrievalInProgress = 13,
+		GetPacketStoreWithOpenRetrievalInProgress = 14,
 		/**
 		 * Start time of retrieval is later than the end time (ST[15])
 		 */
-		InvalidRetrievalTimesRelation = 14,
+		InvalidRetrievalTimesRelation = 15,
 		/**
 		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
 		 */
-		ByTimeRangeRetrievalAlreadyEnabled = 15,
+		ByTimeRangeRetrievalAlreadyEnabled = 16,
 		/**
 		 * Attempt to create packet store, whose ID already exists (ST[15])
 		 */
-		AlreadyExistingPacketStore = 16,
+		AlreadyExistingPacketStore = 17,
 		/**
 		 * Attempt to create packet store, when the max number of packet stores is already reached (ST[15])
 		 */
-		MaxNumberOfPacketStoresReached = 17,
+		MaxNumberOfPacketStoresReached = 18,
 		/**
-		 * Attempt to delete a packet store with the storage status enabled (ST[15])
+		 * Attempt to access a packet store with the storage status enabled (ST[15])
 		 */
-		DeletionOfPacketStoreWithStorageStatusEnabled = 18,
+		GetPacketStoreWithStorageStatusEnabled = 19,
 		/**
 		 * Attempt to delete a packet whose by time range retrieval status is enabled (ST[15])
 		 */
-		DeletionOfPacketWithByTimeRangeRetrieval = 19,
+		DeletionOfPacketWithByTimeRangeRetrieval = 20,
 		/**
 		 * Attempt to delete a packet whose open retrieval status is in progress (ST[15])
 		 */
-		DeletionOfPacketWithOpenRetrievalInProgress = 20,
+		DeletionOfPacketWithOpenRetrievalInProgress = 21,
 		/**
 		 * Requested a time window where the start time is larger than the end time (ST[15])
 		 */
-		InvalidTimeWindow = 21,
+		InvalidTimeWindow = 22,
 		/**
 		 * Attempt to copy a packet store to a destination packet store that is not empty (ST[15])
 		 */
-		DestinationPacketStoreNotEmtpy = 22,
+		DestinationPacketStoreNotEmtpy = 23,
 	};
 
 	/**

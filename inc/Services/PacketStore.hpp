@@ -22,6 +22,7 @@ public:
 	uint32_t openRetrievalStartTimeTag; //What type is it?? (absolute time)
 	uint32_t retrievalStartTime;
 	uint32_t retrievalEndTime;
+	uint64_t sizeInBytes;
 
 	enum PacketStoreType {
 		Circular = 0,

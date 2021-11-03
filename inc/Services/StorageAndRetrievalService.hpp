@@ -37,6 +37,8 @@ public:
 		ReportConfigurationOfPacketStores = 22,
 		PacketStoreConfigurationReport = 23,
 		CopyPacketsInTimeWindow = 24,
+		ResizePacketStores = 25,
+
 	};
 
 	enum VirtualChannels : uint8_t {
@@ -137,6 +139,11 @@ public:
 	 * TC[15,24] copy the packets contained into a packet store, selected by the time window
 	 */
 	void copyPacketsInTimeWindow(Message& request);
+
+	/**
+	 * TC[15,25] resize packet stores
+	 */
+	void resizePacketStores(Message& request);
 };
 
 #endif

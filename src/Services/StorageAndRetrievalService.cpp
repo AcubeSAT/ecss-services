@@ -342,7 +342,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	if (!numOfPacketStores) {
 		for (int i = 0; i < packetStores.size(); i++) {
 			if (packetStores[i].selfStorageStatus) {
-				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
+				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 				continue;
 			}
 			if (packetStores[i].selfByTimeRangeRetrievalStatus) {
@@ -364,7 +364,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			continue;
 		}
 		if (packetStores[idToDelete].selfStorageStatus) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 			continue;
 		}
 		if (packetStores[idToDelete].selfByTimeRangeRetrievalStatus) {
@@ -436,4 +436,40 @@ void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
 		return;
 	}
 	packetStores[fromPacketStoreId].copyPacketsTo(packetStores[toPacketStoreId], timeTag1, timeTag2);
+}
+
+void StorageAndRetrievalService::resizePacketStores(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ResizePacketStores, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t numOfPacketStores = request.readUint16();
+	for (int i = 0; i < numOfPacketStores; i++) {
+		uint16_t currPacketStoreId = request.readUint16();
+		uint16_t currPacketStoreSize = request.readUint16();    //In bytes
+		if (packetStores.find(currPacketStoreId) == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+			continue;
+		}
+		/**
+		 * @todo: check if the current memory availability can handle the new size requested
+		 */
+		if (packetStores[currPacketStoreId].selfStorageStatus) {
+			ErrorHandler::reportError(request,
+			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
+			continue;
+		}
+		if (packetStores[currPacketStoreId].selfOpenRetrievalStatus == PacketStore::InProgress) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
+			continue;
+		}
+		if (packetStores[currPacketStoreId].selfByTimeRangeRetrievalStatus) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
+			continue;
+		}
+		packetStores[currPacketStoreId].sizeInBytes = currPacketStoreSize;
+	}
 }
