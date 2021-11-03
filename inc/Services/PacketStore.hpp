@@ -5,6 +5,14 @@
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
 
+/**
+ * @todo: add a way of measuring each packets store's size in bytes
+ */
+
+/**
+ * This is the Packet Store class, needed for the Storage-Retrieval Service. The purpose of the packet-store is to
+ * store all the TM packets transmitted by the other Services.
+ */
 class PacketStore {
 public:
 	uint8_t id;

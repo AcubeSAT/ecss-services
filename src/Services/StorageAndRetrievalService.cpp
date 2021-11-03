@@ -378,3 +378,29 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 		packetStores.erase(idToDelete);
 	}
 }
+
+void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportConfigurationOfPacketStores, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message report(ServiceType,MessageType::PacketStoreConfigurationReport,Message::TM,1);
+	report.appendUint16(packetStores.size());
+	for (auto &packetStore : packetStores) {
+		uint16_t currPacketStoreId = packetStore.first;
+		request.appendUint16(currPacketStoreId);
+		/**
+		 * @todo: append packet store size in bytes
+		 */
+		PacketStore::PacketStoreType currPacketStoreType = packetStore.second.packetStoreType;
+		uint16_t typeCode = (currPacketStoreType == PacketStore::Circular) ? 0 : 1;
+		request.appendUint16(typeCode);
+		/**
+		 * @todo: append virtual channel. Don't know the data-type yet.
+		 */
+	}
+	storeMessage(report);
+}

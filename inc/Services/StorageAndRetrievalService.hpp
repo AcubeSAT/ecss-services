@@ -34,10 +34,11 @@ public:
 		PacketStoresStatusReport = 19,
 		CreatePacketStores = 20,
 		DeletePacketStores = 21,
-
+		ReportConfigurationOfPacketStores = 22,
+		PacketStoreConfigurationReport = 23,
 	};
 
-	enum VirtualChannel : uint8_t {
+	enum VirtualChannels : uint8_t {
 
 	};
 
@@ -124,6 +125,12 @@ public:
 	 * TC[15,21] delete packet stores
 	 */
 	void deletePacketStores(Message& request);
+
+	/**
+	 * This function takes a TC[15,22] 'report the packet store configuration' as argument and responds with a TM[15,
+	 * 23] 'packet store configuration report' report message.
+	 */
+	void packetStoreConfigurationReport(Message& request);
 };
 
 #endif
