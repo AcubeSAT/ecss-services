@@ -5,17 +5,17 @@
 #include <iostream>
 
 TEST_CASE("Instant class construction"){
-  SECTION("Valid initialization at epoch"){
-    Instant<1, 2> Epoch1;
-    Instant<4, 4> Epoch2;
-    REQUIRE(Epoch1.as_TAI_seconds() == 0);
-    REQUIRE(Epoch2.as_TAI_seconds() == 0);
-    const std::type_info& expected_type1 = typeid(uint8_t);
-    const std::type_info& expected_type2 = typeid(uint16_t);
-    CHECK(Epoch1.check_header_type() == expected_type1);
-    CHECK(Epoch1.check_header_type() != expected_type2);
-    CHECK(Epoch2.check_header_type() == expected_type2);
-  }
+  // SECTION("Valid initialization at epoch"){
+  //   Instant<1, 2> Epoch1;
+  //   Instant<4, 4> Epoch2;
+  //   REQUIRE(Epoch1.as_TAI_seconds() == 0);
+  //   REQUIRE(Epoch2.as_TAI_seconds() == 0);
+  //   const std::type_info& expected_type1 = typeid(uint8_t);
+  //   const std::type_info& expected_type2 = typeid(uint16_t);
+  //   CHECK(Epoch1.check_header_type() == expected_type1);
+  //   CHECK(Epoch1.check_header_type() != expected_type2);
+  //   CHECK(Epoch2.check_header_type() == expected_type2);
+  // }
 
   // SECTION("Initialize with excessive precision, breaks at compile time"){
   //   Instant<5, 10> Epoch3;

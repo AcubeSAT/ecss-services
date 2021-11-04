@@ -206,7 +206,7 @@ bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator>=(const 
 
 
 ////////////// TESTS ///////////////
-template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-const std::type_info& Instant<seconds_counter_bytes, fractional_counter_bytes>::check_header_type(){
-  return typeid(CUC_header);
-}
+// template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+// const std::type_info& Instant<seconds_counter_bytes, fractional_counter_bytes>::check_header_type(){
+//   return typeid(CUC_header);
+// }
