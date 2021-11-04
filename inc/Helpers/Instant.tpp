@@ -23,7 +23,7 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
   if(timestamp[0] & 0b10000000){
     header_size = 2;
   };
-  
+
   int timestamp_fractional_bytes_count = 0;
   int timestamp_seconds_bytes_count = 1;
   //int epoch_param = 0;
@@ -102,16 +102,16 @@ const int Instant<seconds_counter_bytes, fractional_counter_bytes>::as_TAI_secon
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 const etl::array<uint8_t, 9> Instant<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp(){
   etl::array<uint8_t, 9> r = {0};
-  int i0;
+  int index_first_non_header_byte;
   if (typeid(CUC_header_t).name() == typeid(uint8_t).name()){ //one-byte CUC header
     r[0] = static_cast<uint8_t>(CUC_header);
-    i0 = 1;
+    index_first_non_header_byte = 1;
   }
 
   else{ //two-bytes CUC header
     r[1] = static_cast<uint8_t>(CUC_header);
     r[0] = static_cast<uint8_t>(CUC_header >> 8);
-    i0 = 2;
+    index_first_non_header_byte = 2;
   }
 
   //printf("tai_counter of size %lu\n", sizeof(tai_counter_t));
@@ -119,8 +119,8 @@ const etl::array<uint8_t, 9> Instant<seconds_counter_bytes, fractional_counter_b
   for(auto i = 0; i < seconds_counter_bytes + fractional_counter_bytes; i++){
     int j = 8*(seconds_counter_bytes + fractional_counter_bytes - i - 1);
     //printf("shift %d bits\n", j);
-    //printf("writing %d at index %d \n", (uint8_t)(tai_counter >> j), i0 + i);
-    r[i0 + i] = tai_counter >> j;
+    //printf("writing %d at index %d \n", (uint8_t)(tai_counter >> j), index_first_non_header_byte + i);
+    r[index_first_non_header_byte + i] = tai_counter >> j;
   }
 
   return r;
