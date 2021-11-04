@@ -1,3 +1,11 @@
+#define SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00001100
+#define SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2 0b01100000
+#define FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00000011
+#define FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2 0b00011000
+
+#define SECONDS_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00001100
+#define FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00000011
+
 bool is_leap_year(uint16_t year);
 
 ////////////: CONSTRUCTORS ////////////
@@ -18,14 +26,14 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
 
   if (header_size == 2){
     //epoch_param = (timestamp[0] & 0b01110000) >> 4;
-    timestamp_seconds_bytes += (timestamp[0] & 0b00001100) >> 2;
-    timestamp_seconds_bytes += (timestamp[1] & 0b01100000) >> 5;
-    timestamp_fractional_bytes = ((timestamp[0] & 0b00000011) >> 0) + ((timestamp[1] & 0b00011000) >> 3);
+    timestamp_seconds_bytes += (timestamp[0] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
+    timestamp_seconds_bytes += (timestamp[1] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 5;
+    timestamp_fractional_bytes = ((timestamp[0] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0) + ((timestamp[1] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 3);
   }
   else if(header_size==1){
     //epoch_param = (timestamp[0] & 0b01110000) >> 4;
-    timestamp_seconds_bytes += (timestamp[0] & 0b00001100) >> 2;
-    timestamp_fractional_bytes = (timestamp[0] & 0b00000011) >> 0;
+    timestamp_seconds_bytes += (timestamp[0] & SECONDS_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
+    timestamp_fractional_bytes = (timestamp[0] & FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0;
   }
   else{
     ASSERT_INTERNAL(true, ErrorHandler::InternalErrorType::InvalidDate);
