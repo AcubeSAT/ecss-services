@@ -20,20 +20,20 @@ template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uint8_t, 9> timestamp){
   //process header
   int header_size = bool(timestamp[0] >> 7) ? 2 : 1;
-  int timestamp_fractional_bytes = 0;
-  int timestamp_seconds_bytes = 1;
+  int timestamp_fractional_bytes_count = 0;
+  int timestamp_seconds_bytes_count = 1;
   //int epoch_param = 0;
 
   if (header_size == 2){
     //epoch_param = (timestamp[0] & 0b01110000) >> 4;
-    timestamp_seconds_bytes += (timestamp[0] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
-    timestamp_seconds_bytes += (timestamp[1] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 5;
-    timestamp_fractional_bytes = ((timestamp[0] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0) + ((timestamp[1] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 3);
+    timestamp_seconds_bytes_count += (timestamp[0] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
+    timestamp_seconds_bytes_count += (timestamp[1] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 5;
+    timestamp_fractional_bytes_count = ((timestamp[0] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0) + ((timestamp[1] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 3);
   }
   else if(header_size==1){
     //epoch_param = (timestamp[0] & 0b01110000) >> 4;
-    timestamp_seconds_bytes += (timestamp[0] & SECONDS_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
-    timestamp_fractional_bytes = (timestamp[0] & FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0;
+    timestamp_seconds_bytes_count += (timestamp[0] & SECONDS_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
+    timestamp_fractional_bytes_count = (timestamp[0] & FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0;
   }
   else{
     ASSERT_INTERNAL(true, ErrorHandler::InternalErrorType::InvalidDate);
@@ -41,7 +41,7 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
 
   //check input validity (useless bytes set to 0)
   int err = 0;
-  for (int i=header_size+timestamp_seconds_bytes+timestamp_fractional_bytes; i<9; i++){
+  for (int i=header_size+timestamp_seconds_bytes_count+timestamp_fractional_bytes_count; i<9; i++){
     if (timestamp[i] != 0) {
       err += 1;
     }
@@ -49,24 +49,24 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
   ASSERT_INTERNAL(err == 0, ErrorHandler::InternalErrorType::InvalidDate);
 
   //do checks wrt template precision parameters
-  ASSERT_INTERNAL(timestamp_seconds_bytes <= seconds_counter_bytes, ErrorHandler::InternalErrorType::InvalidDate);
-  ASSERT_INTERNAL(timestamp_fractional_bytes <= fractional_counter_bytes, ErrorHandler::InternalErrorType::InvalidDate);
+  ASSERT_INTERNAL(timestamp_seconds_bytes_count <= seconds_counter_bytes, ErrorHandler::InternalErrorType::InvalidDate);
+  ASSERT_INTERNAL(timestamp_fractional_bytes_count <= fractional_counter_bytes, ErrorHandler::InternalErrorType::InvalidDate);
 
   //put timestamp into internal counter
   tai_counter = 0;
   //add seconds until run out of bytes on input array
-  for(auto i = 0; i < timestamp_seconds_bytes; i++){
+  for(auto i = 0; i < timestamp_seconds_bytes_count; i++){
     tai_counter = tai_counter << 8;
     tai_counter += timestamp[header_size + i];
   }
   //add fractional until run out of bytes on input array
-  for(auto i = 0; i < timestamp_fractional_bytes; i++){
+  for(auto i = 0; i < timestamp_fractional_bytes_count; i++){
     tai_counter = tai_counter << 8;
-    tai_counter += timestamp[header_size + timestamp_seconds_bytes + i];
+    tai_counter += timestamp[header_size + timestamp_seconds_bytes_count + i];
   }
   //pad rightmost bytes to full length
-  tai_counter = tai_counter << 8*(fractional_counter_bytes - timestamp_fractional_bytes);
-  //printf("created timestamp from %d seconds bytes, %d fractional bytes, leading to an internal value of %lu\n", timestamp_seconds_bytes, timestamp_fractional_bytes, tai_counter);
+  tai_counter = tai_counter << 8*(fractional_counter_bytes - timestamp_fractional_bytes_count);
+  //printf("created timestamp from %d seconds bytes, %d fractional bytes, leading to an internal value of %lu\n", timestamp_seconds_bytes_count, timestamp_fractional_bytes_count, tai_counter);
 }
 
 //// FROM UTC TIMESTAMP
