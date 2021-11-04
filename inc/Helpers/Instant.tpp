@@ -19,7 +19,11 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(Acubesat_CDS_t
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uint8_t, 9> timestamp){
   //process header
-  int header_size = bool(timestamp[0] >> 7) ? 2 : 1;
+  int header_size = 1;
+  if(timestamp[0] & 0b10000000){
+    header_size = 2;
+  };
+  
   int timestamp_fractional_bytes_count = 0;
   int timestamp_seconds_bytes_count = 1;
   //int epoch_param = 0;
