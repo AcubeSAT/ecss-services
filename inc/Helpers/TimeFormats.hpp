@@ -192,40 +192,12 @@ public:
 	 * Compare two timestamps.
 	 *
 	 * @param Date the date that will be compared with the pointer `this`
-	 * @return true if the pointer `this` is smaller than \p Date
+	 * @return true if the condition is satisfied
 	 */
 	bool operator<(const UTC_Timestamp& Date);
-
-	/**
-	 * Compare two timestamps.
-	 *
-	 * @param Date the date that will be compared with the pointer `this`
-	 * @return true if the pointer `this` is greater than \p Date
-	 */
 	bool operator>(const UTC_Timestamp& Date);
-
-	/**
-	 * Compare two timestamps.
-	 *
-	 * @param Date the date that will be compared with the pointer `this`
-	 * @return true if the pointer `this` is equal to \p Date
-	 */
 	bool operator==(const UTC_Timestamp& Date);
-
-	/**
-	 * Compare two timestamps.
-	 *
-	 * @param Date the date that will be compared with the pointer `this`
-	 * @return true if the pointer `this` is smaller than or equal to \p Date
-	 */
 	bool operator<=(const UTC_Timestamp& Date);
-
-	/**
-	 * Compare two timestamps.
-	 *
-	 * @param Date the date that will be compared with the pointer `this`
-	 * @return true if the pointer `this` is greater than or equal to \p Date
-	 */
 	bool operator>=(const UTC_Timestamp& Date);
 
 	/**
