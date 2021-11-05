@@ -1,5 +1,8 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
+StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice(StorageAndRetrievalService& parent)
+    : mainService(parent) {}
+
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -626,5 +629,6 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 		fillingPercentage = static_cast <uint16_t> (packetCounter * 100 / ECSS_MAX_PACKETS_IN_PACKET_STORE);
 		report.appendUint16(fillingPercentage);
 	}
-
 }
+
+
