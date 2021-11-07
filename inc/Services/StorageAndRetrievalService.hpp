@@ -186,6 +186,15 @@ public:
 		const bool supportsStorageControlOfHousekeepingReports = true;
 		const bool supportsStorageControlOfEventReports = true;
 
+		enum ControlledAppProcesses {
+
+		};
+
+		const uint16_t maxServiceTypeDefinitions;     //Per Application Process Definition
+		const uint16_t maxReportTypeDefinitions;      //This is per Service Type Definition
+		const uint16_t maxHousekeepingStructureIds;   //Per Housekeeping storage-control definition
+		const uint16_t maxEventDefinitionIds;         //Per Event-Report storage-control definition
+
 	} packetSelectionSubservice;
 
 };

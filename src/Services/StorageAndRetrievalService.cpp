@@ -630,5 +630,3 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 		report.appendUint16(fillingPercentage);
 	}
 }
-
-
