@@ -85,7 +85,7 @@ clang-tidy:
     - ls
     - pwd
     - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --checks=* && find $CI_PROJECT_DIR/src -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)' >> clang-tidy-output.log
+    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --checks=* find $CI_PROJECT_DIR/src -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)' >> clang-tidy-output.log
   after_script:
     - mkdir clang-tidy-html-report
     - clang-tidy-html clang-tidy-output.log
@@ -107,8 +107,10 @@ scan-build:
    - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
    - scan-build -o ./scan-build-html-report make
  artifacts:
+   when: on_failure
    paths:
      - ./scan-build-html-report
+     - ./CMakeFiles
 
 
 
