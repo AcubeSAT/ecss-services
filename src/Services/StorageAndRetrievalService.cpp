@@ -415,17 +415,17 @@ void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint16_t timeTagsTypeCode = request.readUint16();
+//	uint16_t timeTagsTypeCode = request.readUint16();
 //	TimeStamping timeTagsType = (!timeTagsTypeCode) ? StorageBased : PacketBased; // How do I use that??
 	uint32_t timeTag1 = request.readUint32();
 	uint32_t timeTag2 = request.readUint32();
 	uint16_t fromPacketStoreId = request.readUint16();
 	uint16_t toPacketStoreId = request.readUint16();
-	if (fromPacketStoreId >= maxPacketStores or fromPacketStoreId < 0) {
+	if (fromPacketStoreId >= maxPacketStores) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	if (toPacketStoreId >= maxPacketStores or fromPacketStoreId < 0) {
+	if (toPacketStoreId >= maxPacketStores) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
