@@ -181,7 +181,11 @@ public:
 	private:
 		StorageAndRetrievalService& mainService;
 	public:
-		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent);
+		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent,
+		                                   uint16_t maxEventDefIds,
+		                                   uint16_t maxHousekeepingStructIds,
+		                                   uint16_t maxReportTypeDefs,
+		                                   uint16_t maxServiceTypeDefs);
 
 		const bool supportsStorageControlOfHousekeepingReports = true;
 		const bool supportsStorageControlOfEventReports = true;

@@ -1,7 +1,12 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
-StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice(StorageAndRetrievalService& parent)
-    : mainService(parent) {}
+StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice(StorageAndRetrievalService& parent,
+                                                                                 uint16_t maxEventDefIds,
+                                                                                 uint16_t maxHousekeepingStructIds,
+                                                                                 uint16_t maxReportTypeDefs,
+                                                                                 uint16_t maxServiceTypeDefs)
+    : mainService(parent), maxEventDefinitionIds(maxEventDefIds), maxHousekeepingStructureIds
+      (maxHousekeepingStructIds), maxReportTypeDefinitions(maxReportTypeDefs), maxServiceTypeDefinitions(maxServiceTypeDefs) {}
 
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
