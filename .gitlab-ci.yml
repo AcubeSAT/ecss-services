@@ -156,7 +156,7 @@ ikos:
     - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
     - ls
-  after_script:d
+  after_script:
     - mv ikos-report.txt ikos-report
   artifacts:
     paths:
