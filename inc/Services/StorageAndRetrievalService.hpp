@@ -5,6 +5,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "PacketStore.hpp"
+#include "StorageAndRetrievalConfigurations/ApplicationProcessConfiguration.hpp"
 #include "etl/map.h"
 
 /**
@@ -182,6 +183,7 @@ public:
 		StorageAndRetrievalService& mainService;
 	public:
 		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent,
+		                                   uint16_t numOfControlledAppProcs,
 		                                   uint16_t maxEventDefIds,
 		                                   uint16_t maxHousekeepingStructIds,
 		                                   uint16_t maxReportTypeDefs,
@@ -194,10 +196,13 @@ public:
 
 		};
 
+		const uint16_t numOfControlledAppProcesses;
 		const uint16_t maxServiceTypeDefinitions;     //Per Application Process Definition
 		const uint16_t maxReportTypeDefinitions;      //This is per Service Type Definition
 		const uint16_t maxHousekeepingStructureIds;   //Per Housekeeping storage-control definition
 		const uint16_t maxEventDefinitionIds;         //Per Event-Report storage-control definition
+
+		ApplicationProcessConfiguration applicationProcessConfiguration;
 
 	} packetSelectionSubservice;
 

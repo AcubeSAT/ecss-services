@@ -156,4 +156,21 @@
  */
 #define ECSS_MAX_PACKETS_IN_PACKET_STORE 20
 
+/**
+ * @brief the max number of application processes that an app process storage control configuration can store in ST[15]
+ */
+#define ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS 5
+
+/**
+ * @brief the max number of service type definitions that an app process storage control configuration can store in
+ * ST[15]
+ */
+#define ECSS_MAX_SERVICE_TYPE_DEFINITIONS 20
+
+/**
+ * @brief the max number of message type definitions that an app process storage control configuration can store in
+ * ST[15]
+ */
+#define ECSS_MAX_MESSAGE_TYPE_DEFINITIONS 30
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
