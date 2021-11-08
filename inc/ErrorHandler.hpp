@@ -203,6 +203,26 @@ public:
 		 * Attempt to copy a packet store to a destination packet store that is not empty (ST[15])
 		 */
 		DestinationPacketStoreNotEmtpy = 23,
+		/**
+		 * Request to change the storage control configuration of an application ID that's not controlled by the packet
+		 * selection subservice (ST[15])
+		 */
+		UnControlledApplicationProcessId = 24,
+		/**
+		 * Attempt to add a new service type definition, after the max number of service type definitions has already
+		 * been reached (ST[15])
+		 */
+		MaxServiceTypeDefinitionsReached = 25,
+		/**
+		 * Attempt to add a new report type definition, after the max number of report type definitions has already
+		 * been reached (ST[15])
+		 */
+		MaxReportTypeDefinitionsReached = 26,
+		/**
+		 * Attempt to add a new report type definition in a service type with no report type definitions (ST[15])
+		 */
+		NoExistingReportTypeDefinitionInService = 27,
+
 	};
 
 	/**
