@@ -173,4 +173,10 @@
  */
 #define ECSS_MAX_MESSAGE_TYPE_DEFINITIONS 30
 
+/**
+ * @brief the max number of housekeeping struct ids that can be contained in a housekeeping storage control
+ * configuration in ST[15]
+ */
+#define ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL 20
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

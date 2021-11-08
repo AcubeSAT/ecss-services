@@ -6,6 +6,8 @@
 #include "ErrorHandler.hpp"
 #include "PacketStore.hpp"
 #include "StorageAndRetrievalConfigurations/ApplicationProcessConfiguration.hpp"
+#include "StorageAndRetrievalConfigurations/HousekeepingReportConfiguration.hpp"
+#include "StorageAndRetrievalConfigurations/EventReportBlockingConfiguration.hpp"
 #include "etl/map.h"
 
 /**
@@ -203,6 +205,7 @@ public:
 		const uint16_t maxEventDefinitionIds;         //Per Event-Report storage-control definition
 
 		ApplicationProcessConfiguration applicationProcessConfiguration;
+		HousekeepingReportConfiguration housekeepingReportConfiguration;
 
 	} packetSelectionSubservice;
 
