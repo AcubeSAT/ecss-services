@@ -122,7 +122,7 @@ unit-tests:
   script:
     - cmake .
     - make tests -j4
-    - ./tests --use-colour yes  # Run the tests
+    - ./tests --use-colour yes # Run the tests
   after_script:
     - ./tests -r junit -o junit.xml
   artifacts:
@@ -133,7 +133,7 @@ unit-tests:
 pages:
   image: spacedot/build-base:latest # LATEST TAG IS TEMPORARY
   stage: deploy
-  when: always  # Deploy always and on build or test failure, generate just the documentation
+  when: always # Deploy always and on build or test failure, generate just the documentation
   cache:
     key: "$CI_JOB_NAME"
     paths:
@@ -142,7 +142,7 @@ pages:
     GIT_SUBMODULE_STRATEGY: normal
   script:
     - ./ci/pages_deploy.sh
-    - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage  # Print directory contents for debugging
+    - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage # Print directory contents for debugging
   artifacts:
     paths:
       - public # Upload the resulting website
