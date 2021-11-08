@@ -1,5 +1,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
+/********************************    Storage And Retrieval Subservice    *********************************/
+
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -628,6 +630,8 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	}
 }
 
+/********************************    Packet Selection Subservice    *********************************/
+
 StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice(StorageAndRetrievalService& parent,
                                                                                  uint16_t numOfControlledAppProcs,
                                                                                  uint16_t maxEventDefIds,
@@ -637,3 +641,183 @@ StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice
     : mainService(parent), numOfControlledAppProcesses(numOfControlledAppProcs), maxEventDefinitionIds(maxEventDefIds),
       maxHousekeepingStructureIds(maxHousekeepingStructIds), maxReportTypeDefinitions(maxReportTypeDefs),
       maxServiceTypeDefinitions(maxServiceTypeDefs) {}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::appIsControlled(uint16_t applicationId, Message& request) {
+	if (std::find(controlledAppProcesses.begin(), controlledAppProcesses.end(), applicationId) ==
+	    controlledAppProcesses.end()) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::UnControlledApplicationProcessId);
+		return false;
+	}
+	return true;
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefinitions(uint16_t applicationId,
+                                                                                        uint16_t serviceId,
+                                                                                        Message& request) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].size() >=
+	    maxReportTypeDefinitions) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypeDefinitionsReached);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDefinitions(uint16_t applicationId,Message& request) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].size() >=maxServiceTypeDefinitions) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::MaxServiceTypeDefinitionsReached);
+		return true;
+	}
+	return false;
+
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::noReportDefinitionInService(uint16_t applicationId,
+                                                                                        uint16_t serviceId,
+                                                                                        Message& request) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NoExistingReportTypeDefinitionInService);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::noServiceDefinitionInApplication(uint16_t applicationId,
+                                                                                             Message& request) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NoExistingReportTypeDefinitionInService);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInDefinition(uint16_t applicationId) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions.find(applicationId) !=
+	    applicationProcessConfiguration.applicationProcessDefinitions.end()) {
+		return true;
+	}
+	return false;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::createAppDefinition(uint16_t applicationId){
+	typedef etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> vecType;
+	etl::map <uint16_t, vecType, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> tempMap;
+	applicationProcessConfiguration.applicationProcessDefinitions.insert({applicationId, tempMap});
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(uint16_t applicationId,
+                                                                               uint16_t serviceId) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].find(serviceId) !=
+	    applicationProcessConfiguration.applicationProcessDefinitions[applicationId].end()) {
+		return true;
+	}
+	return false;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::createServiceDefinition(uint16_t applicationId,uint16_t serviceId){
+	etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> tempVec;
+	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].insert({serviceId, tempVec});
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInService(uint16_t applicationId,
+                                                                                  uint16_t serviceId,
+                                                                                  uint16_t reportId) {
+	if (std::find(applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].begin(),
+	              applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].end(),
+	              reportId) != applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].end()) {
+		return true;
+	}
+	return false;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::createReportDefinition(uint16_t applicationId,
+                                                                                   uint16_t serviceId,
+                                                                                   uint16_t reportId) {
+	applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].push_back(reportId);
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::serviceHasReportDefinitions(uint16_t applicationId,
+                                                                                        uint16_t serviceId) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].empty()) {
+		return false;
+	}
+	return true;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportDefinitionsOfService(uint16_t applicationId,
+                                                                                             uint16_t serviceId) {
+	applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].clear();
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::appHasServiceDefinitions(uint16_t applicationId) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].empty()) {
+		return false;
+	}
+	return true;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinitionsOfApp(uint16_t applicationId) {
+	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].clear();
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::AddReportTypesToAppProcessConfiguration, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t packetStoreId = request.readUint16();
+	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	uint16_t numOfApplicationIds = request.readUint16();
+	//Per application process
+	for (int i = 0; i < numOfApplicationIds; i++) {
+		uint16_t currentAppId = request.readUint16();
+		if (not appIsControlled(currentAppId, request)) {
+			continue;
+		}
+		if (not appExistsInDefinition(currentAppId)) {
+			createAppDefinition(currentAppId);
+		}
+//		if (noServiceDefinitionInApplication(currentAppId, request)) {
+//			continue;
+//		}
+		uint16_t numOfCurrAppServices = request.readUint16();
+		if (!numOfCurrAppServices and (appHasServiceDefinitions(currentAppId))) {
+			deleteServiceDefinitionsOfApp(currentAppId);
+			continue;
+		}
+		if (exceedsMaxServiceDefinitions(currentAppId, request)) {
+			continue;
+		}
+		//Per service type in application process
+		for (int j = 0; j < numOfCurrAppServices; j++) {
+			uint16_t currentServiceId = request.readUint16();
+			if (exceedsMaxReportDefinitions(currentAppId, currentServiceId, request)) {
+				continue;
+			}
+//			if (noReportDefinitionInService(currentAppId, currentServiceId, request)) {
+//				continue;
+//			}
+			if (not serviceExistsInApp(currentAppId, currentServiceId)) {
+				createServiceDefinition(currentAppId, currentServiceId);
+			}
+			uint16_t numOfCurrServiceMessageTypes = request.readUint16();
+			if ((!numOfCurrServiceMessageTypes) and (serviceHasReportDefinitions(currentAppId, currentServiceId))) {
+				deleteReportDefinitionsOfService(currentAppId, currentServiceId);
+				continue;
+			}
+			//Per message type per service type
+			for (int k = 0; k < numOfCurrServiceMessageTypes; k++) {
+				uint16_t currentMessageType = request.readUint16();
+				if (not reportExistsInService(currentAppId, currentServiceId, currentMessageType)) {
+					createReportDefinition(currentAppId, currentServiceId, currentMessageType);
+				}
+
+			}
+		}
+	}
+}

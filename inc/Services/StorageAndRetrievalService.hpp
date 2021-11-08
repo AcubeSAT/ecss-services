@@ -27,6 +27,7 @@ public:
 	enum MessageType : uint8_t {
 		EnableStorageFunction = 1,
 		DisableStorageFunction = 2,
+		AddReportTypesToAppProcessConfiguration = 3,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
 		ReportContentSummaryOfPacketStores = 12,
@@ -194,9 +195,7 @@ public:
 		const bool supportsStorageControlOfHousekeepingReports = true;
 		const bool supportsStorageControlOfEventReports = true;
 
-		enum ControlledAppProcesses {
-
-		};
+		etl::vector <uint16_t, ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES> controlledAppProcesses;
 
 		const uint16_t numOfControlledAppProcesses;
 		const uint16_t maxServiceTypeDefinitions;     //Per Application Process Definition
@@ -206,6 +205,102 @@ public:
 
 		ApplicationProcessConfiguration applicationProcessConfiguration;
 		HousekeepingReportConfiguration housekeepingReportConfiguration;
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if the requested application process id is controlled by the packet selection subservice.
+		 */
+		bool appIsControlled(uint16_t applicationId, Message& request);
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if the maximum number of report type definitions are reached, in order to decide whether to put a new
+		 * report type definition.
+		 */
+		bool exceedsMaxReportDefinitions(uint16_t applicationId, uint16_t serviceId, Message& request);
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if the maximum number of service type definitions are reached, in order to decide whether to put a
+		 * new service type definition.
+		 */
+		bool exceedsMaxServiceDefinitions(uint16_t applicationId, Message& request);
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if there are no report definitions inside a service type definition, so it decides whether to put a
+		 * new report type definition.
+		 */
+		bool noReportDefinitionInService(uint16_t applicationId, uint16_t serviceId, Message& request);
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if there are no service type definitions inside an application definition, so it decides whether to
+		 * put a new report type definition.
+		 */
+		bool noServiceDefinitionInApplication(uint16_t applicationId, Message& request);
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if the requested application ID already exists in the definition, to decide whether to add it or not.
+		 */
+		bool appExistsInDefinition(uint16_t applicationId);
+
+		/**
+		 *
+		 * Creates an application definition and adds it to the application process storage control configuration.
+		 * Only use if the specified App Id does not exist already.
+		 */
+		void createAppDefinition(uint16_t applicationId);
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if the requested service type already exists in the application, to decide whether to add it or not.
+		 */
+		bool serviceExistsInApp(uint16_t applicationId, uint16_t serviceId);
+
+		/**
+		 * Creates a service type definition and adds it to the specified application definition. Only use if the
+		 * specified service type definition does not exist already.
+		 */
+		void createServiceDefinition(uint16_t applicationId, uint16_t serviceId);
+
+		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
+		 */
+		bool reportExistsInService(uint16_t applicationId, uint16_t serviceId, uint16_t reportId);
+
+		/**
+		 * Creates a report type definition and adds it to the specified service definition. Only use if the
+		 * specified report type definition does not exist already.
+		 */
+		void createReportDefinition(uint16_t applicationId, uint16_t serviceId, uint16_t reportId);
+
+		/**
+		 * Deletes all report type definitions of a specified service type definition.
+		 */
+		void deleteReportDefinitionsOfService(uint16_t applicationId, uint16_t serviceId);
+
+		/**
+		 * Checks if there are any report definitions in the specified service type and application process.
+		 */
+		bool serviceHasReportDefinitions(uint16_t applicationId, uint16_t serviceId);
+
+		/**
+		 * Checks if there are any service definitions in the specified application process
+		 */
+		bool appHasServiceDefinitions(uint16_t applicationId);
+
+		/**
+		 * Deletes all service type definitions of a specified application process
+		 */
+		void deleteServiceDefinitionsOfApp(uint16_t applicationId);
+
+		/**
+		 * TC[15,3] add report types to an application process storage control configuration
+		 */
+		void addReportTypesToAppProcessConfiguration(Message& request);
 
 	} packetSelectionSubservice;
 
