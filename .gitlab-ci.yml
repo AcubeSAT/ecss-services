@@ -2,6 +2,8 @@ variables:
   # PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   GIT_SUBMODULE_STRATEGY: recursive
 
+
+
 # # Global caching directive for pip
 # cache:
 #   key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
@@ -130,6 +132,25 @@ unit-tests:
     reports:
       junit: junit.xml
 
+coverage:
+  image: spacedot/coverage:gcovr-5.0-lcov-1.15
+  stage: test
+  before_script:
+    - mkdir gcovr
+  script:
+    - cd $CI_PROJECT_DIR
+    - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" && make all -j4
+    - lcov -q --capture --initial --directory . -o coverage_base
+    - ./tests --use-colour yes
+    - lcov -q --capture --directory . -o coverage_tests
+    - lcov -q -a coverage_base -a coverage_tests -o coverage_total_unfiltered
+    - lcov -q --remove coverage_total_unfiltered "${PWD}/lib/*" "${PWD}/CMakeFiles/*" "${PWD}/test/*" "${PWD}/src/main.cpp" -o coverage_total_filtered
+    - gcovr -s -p -e "^.*(test|lib|main.cpp|CMakeFiles)" --html --html-details --html-title "Code coverage ${CI_PROJECT_NAME}/${CI_COMMIT_REF_NAME}" -o ./gcovr/gcovr.html
+    - gcovr -e "^.*(test|lib|main.cpp|CMakeFiles)"  # Not sure if this is needed
+    - genhtml --demangle-cpp -t "${PAGE_TITLE}" --html-epilog ci/page_style/epilog.html -o ./gcovr coverage_total_filtered
+  artifacts:
+    paths:
+      - ./gcovr
 pages:
   image: spacedot/build-base:latest # LATEST TAG IS TEMPORARY
   stage: deploy
