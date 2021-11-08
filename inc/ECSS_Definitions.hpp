@@ -179,4 +179,9 @@
  */
 #define ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL 20
 
+/**
+ * @brief the max number of application processes that can be controlled by the packet selection subservice in ST[15]
+ */
+#define ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES 10
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
