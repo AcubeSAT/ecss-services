@@ -37,7 +37,7 @@ check-build:
 
 cppcheck:
   image: spacedot/cppcheck:2.5
-  stage: analysis
+  stage: analyze
   before_script:
     - cppcheck --version
   script:
@@ -57,7 +57,7 @@ cppcheck:
 
 clang-tidy:
   image: spacedot/clang-tools:13.0.0-html-1.3.7
-  stage: analysis
+  stage: analyze
   script:
     - cd $CI_PROJECT_DIR
     - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -72,7 +72,7 @@ clang-tidy:
 
 clang-analyzer:
   image: spacedot/clang-tools:13.0.0-html-1.3.7
-  stage: analysis
+  stage: analyze
   before_script:
     - mkdir scan-build-html-report
   script:
@@ -87,7 +87,7 @@ clang-analyzer:
 
 doxygen:
   image: spacedot/doxygen:1.9.2-awesomecss-1.6.0
-  stage: analysis
+  stage: analyze
   script:
     - cd $CI_PROJECT_DIR
     - doxygen doxygen.conf
@@ -97,7 +97,7 @@ doxygen:
 
 ikos:
   image: spacedot/ikos:3.0
-  stage: build
+  stage: analyze
   before_script:
     - mkdir ikos-report
   script:
