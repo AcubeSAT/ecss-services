@@ -18,11 +18,11 @@
  */
 class ApplicationProcessConfiguration {
 public:
-	etl::map <uint16_t, ApplicationProcessDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationProcessDefinitions;
+	typedef etl::map <uint16_t, ApplicationProcessDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS>
+	    applicationProcessDefinitions;
 
-	/**
-	 * @todo: actually know which packet store each definition is responsible for.
-	 */
+	//First is the packet store ID
+	etl::map <uint16_t, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
 };
 
 #endif

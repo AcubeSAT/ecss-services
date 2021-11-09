@@ -8,7 +8,6 @@
 
 class ApplicationProcessDefinition {
 public:
-	uint16_t packetStoreId;
 	typedef etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypeDefinitions;
 	etl::map <uint16_t, reportTypeDefinitions, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypeDefinitions;
 };

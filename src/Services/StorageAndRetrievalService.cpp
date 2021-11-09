@@ -651,10 +651,11 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::appIsControlled(uint
 	return true;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefinitions(uint16_t applicationId,
+bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefinitions(uint16_t packetStoreId,
+                                                                                        uint16_t applicationId,
                                                                                         uint16_t serviceId,
                                                                                         Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].size() >=
+	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].size() >=
 	    maxReportTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypeDefinitionsReached);
 		return true;
@@ -662,8 +663,10 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefi
 	return false;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDefinitions(uint16_t applicationId,Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.size()
+bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDefinitions(uint16_t packetStoreId,
+                                                                                         uint16_t applicationId,
+                                                                                         Message& request) {
+	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.size()
 	    >= maxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::MaxServiceTypeDefinitionsReached);
 		return true;
@@ -672,62 +675,71 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDef
 
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::noReportDefinitionInService(uint16_t applicationId,
+bool StorageAndRetrievalService::PacketSelectionSubservice::noReportDefinitionInService(uint16_t packetStoreId,
+                                                                                        uint16_t applicationId,
                                                                                         uint16_t serviceId,
                                                                                         Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].empty()) {
+	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].empty()) {
 		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinitionInService);
 		return true;
 	}
 	return false;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::noServiceDefinitionInApplication(uint16_t applicationId,
+bool StorageAndRetrievalService::PacketSelectionSubservice::noServiceDefinitionInApplication(uint16_t packetStoreId,
+                                                                                             uint16_t applicationId,
                                                                                              Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
+	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.empty()) {
 		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinitionInService);
 		return true;
 	}
 	return false;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInDefinition(uint16_t applicationId) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions.find(applicationId) !=
-	    applicationProcessConfiguration.applicationProcessDefinitions.end()) {
+bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInDefinition(uint16_t packetStoreId,
+                                                                                  uint16_t applicationId) {
+	if (applicationProcessConfiguration.definitions[packetStoreId].find(applicationId) !=
+	    applicationProcessConfiguration.definitions[packetStoreId].end()) {
 		return true;
 	}
 	return false;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::createAppDefinition(uint16_t applicationId) {
+void StorageAndRetrievalService::PacketSelectionSubservice::createAppDefinition(uint16_t packetStoreId,
+                                                                                uint16_t applicationId) {
 	typedef etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> vecType;
 	etl::map <uint16_t, vecType, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> tempMap;
 	ApplicationProcessDefinition newAppDefinition;
 	newAppDefinition.serviceTypeDefinitions = tempMap;
-	applicationProcessConfiguration.applicationProcessDefinitions.insert({applicationId, newAppDefinition});
+	applicationProcessConfiguration.definitions[packetStoreId].insert({applicationId, newAppDefinition});
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(uint16_t applicationId,uint16_t serviceId) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.find
-	        (serviceId) != applicationProcessConfiguration.applicationProcessDefinitions[applicationId]
+bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(uint16_t packetStoreId,
+                                                                               uint16_t applicationId,
+                                                                               uint16_t serviceId) {
+	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.find
+	        (serviceId) != applicationProcessConfiguration.definitions[packetStoreId][applicationId]
 	                       .serviceTypeDefinitions.end()) {
 		return true;
 	}
 	return false;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::createServiceDefinition(uint16_t applicationId,uint16_t serviceId){
+void StorageAndRetrievalService::PacketSelectionSubservice::createServiceDefinition(uint16_t packetStoreId,
+                                                                                    uint16_t applicationId,
+                                                                                    uint16_t serviceId){
 	etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> tempVec;
-	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.insert
+	applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.insert
 	    ({serviceId, tempVec});
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInService(uint16_t applicationId,
+bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInService(uint16_t packetStoreId,
+                                                                                  uint16_t applicationId,
                                                                                   uint16_t serviceId,
                                                                                   uint16_t reportId,
                                                                                   uint16_t &index) {
 	uint16_t position = 0;
-	for (auto &id : applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId]) {
+	for (auto &id : applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId]) {
 		if (id == reportId) {
 			index = position;
 			return true;
@@ -737,55 +749,62 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInServic
 	return false;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::createReportDefinition(uint16_t applicationId,
+void StorageAndRetrievalService::PacketSelectionSubservice::createReportDefinition(uint16_t packetStoreId,
+                                                                                   uint16_t applicationId,
                                                                                    uint16_t serviceId,
                                                                                    uint16_t reportId) {
-	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].push_back(reportId);
+	applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].push_back
+	    (reportId);
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::serviceHasReportDefinitions(uint16_t applicationId,
+bool StorageAndRetrievalService::PacketSelectionSubservice::serviceHasReportDefinitions(uint16_t packetStoreId,
+                                                                                        uint16_t applicationId,
                                                                                         uint16_t serviceId) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].empty()) {
+	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].empty()) {
 		return false;
 	}
 	return true;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportDefinitionsOfService(uint16_t applicationId,
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportDefinitionsOfService(uint16_t packetStoreId,
+                                                                                             uint16_t applicationId,
                                                                                              uint16_t serviceId,
                                                                                              bool deleteAll,
                                                                                              uint16_t index) {
 	if (deleteAll) {
-		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].clear();
+		applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].clear();
 	} else {
-		auto iterator = applicationProcessConfiguration.applicationProcessDefinitions[applicationId]
+		auto iterator = applicationProcessConfiguration.definitions[packetStoreId][applicationId]
 		                    .serviceTypeDefinitions[serviceId].begin() + index;
-		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].erase(iterator);
-		if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].empty()) {
-			deleteServiceDefinitionsOfApp(applicationId, false, serviceId);
-			if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
-				applicationProcessConfiguration.applicationProcessDefinitions.erase(applicationId);
+		applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].erase
+		    (iterator);
+		if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].empty()) {
+			deleteServiceDefinitionsOfApp(packetStoreId, applicationId, false, serviceId);
+			if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.empty()) {
+				applicationProcessConfiguration.definitions[packetStoreId].erase(applicationId);
 			}
 		}
 	}
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::appHasServiceDefinitions(uint16_t applicationId) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
+bool StorageAndRetrievalService::PacketSelectionSubservice::appHasServiceDefinitions(uint16_t packetStoreId,
+                                                                                     uint16_t applicationId) {
+	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.empty()) {
 		return false;
 	}
 	return true;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinitionsOfApp(uint16_t applicationId,
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinitionsOfApp(uint16_t packetStoreId,
+                                                                                          uint16_t applicationId,
                                                                                           bool deleteAll,
                                                                                           uint16_t serviceId) {
 	if (deleteAll) {
-		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.clear();
+		applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.clear();
 	} else {
-		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.erase(serviceId);
-		if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
-			applicationProcessConfiguration.applicationProcessDefinitions.erase(applicationId);
+		applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.erase(serviceId);
+		if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.empty()) {
+			applicationProcessConfiguration.definitions[packetStoreId].erase(applicationId);
 		}
 	}
 }
@@ -810,58 +829,58 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 		if (not appIsControlled(currentAppId, request)) {
 			continue;
 		}
-		if (noServiceDefinitionInApplication(currentAppId, request)) {
+		if (noServiceDefinitionInApplication(packetStoreId, currentAppId, request)) {
 			continue;
 		}
 		uint16_t numOfCurrAppServices = request.readUint16();
 		//Add all reports in application
 		if (!numOfCurrAppServices) {
-			if (not appExistsInDefinition(currentAppId)) {
-				createAppDefinition(currentAppId);
+			if (not appExistsInDefinition(packetStoreId, currentAppId)) {
+				createAppDefinition(packetStoreId, currentAppId);
 			}
-			if (appHasServiceDefinitions(currentAppId)) {
-				deleteServiceDefinitionsOfApp(currentAppId, true, 0);
+			if (appHasServiceDefinitions(packetStoreId, currentAppId)) {
+				deleteServiceDefinitionsOfApp(packetStoreId, currentAppId, true, 0);
 			}
 			continue;
 		}
-		if (exceedsMaxServiceDefinitions(currentAppId, request)) {
+		if (exceedsMaxServiceDefinitions(packetStoreId, currentAppId, request)) {
 			continue;
 		}
 		//Per service type in application process
 		for (int j = 0; j < numOfCurrAppServices; j++) {
 			uint16_t currentServiceId = request.readUint16();
-			if (noReportDefinitionInService(currentAppId, currentServiceId, request)) {
+			if (noReportDefinitionInService(packetStoreId, currentAppId, currentServiceId, request)) {
 				continue;
 			}
 			uint16_t numOfCurrServiceMessageTypes = request.readUint16();
 			//Add all reports of Service
 			if ((!numOfCurrServiceMessageTypes)) {
-				if (not appExistsInDefinition(currentAppId)) {
-					createAppDefinition(currentAppId);
+				if (not appExistsInDefinition(packetStoreId, currentAppId)) {
+					createAppDefinition(packetStoreId, currentAppId);
 				}
-				if (not serviceExistsInApp(currentAppId, currentServiceId)) {
-					createServiceDefinition(currentAppId, currentServiceId);
+				if (not serviceExistsInApp(packetStoreId, currentAppId, currentServiceId)) {
+					createServiceDefinition(packetStoreId, currentAppId, currentServiceId);
 				}
-				if (serviceHasReportDefinitions(currentAppId, currentServiceId)) {
-					deleteReportDefinitionsOfService(currentAppId, currentServiceId, true, 0);
+				if (serviceHasReportDefinitions(packetStoreId, currentAppId, currentServiceId)) {
+					deleteReportDefinitionsOfService(packetStoreId, currentAppId, currentServiceId, true, 0);
 				}
 				continue;
 			}
-			if (exceedsMaxReportDefinitions(currentAppId, currentServiceId, request)) {
+			if (exceedsMaxReportDefinitions(packetStoreId, currentAppId, currentServiceId, request)) {
 				continue;
 			}
 			//Per report type
 			for (int k = 0; k < numOfCurrServiceMessageTypes; k++) {
 				uint16_t currentReportType = request.readUint16();
-				if (not appExistsInDefinition(currentAppId)) {
-					createAppDefinition(currentAppId);
+				if (not appExistsInDefinition(packetStoreId, currentAppId)) {
+					createAppDefinition(packetStoreId, currentAppId);
 				}
-				if (not serviceExistsInApp(currentAppId, currentServiceId)) {
-					createServiceDefinition(currentAppId, currentServiceId);
+				if (not serviceExistsInApp(packetStoreId, currentAppId, currentServiceId)) {
+					createServiceDefinition(packetStoreId, currentAppId, currentServiceId);
 				}
 				uint16_t garbage = 0;
-				if (not reportExistsInService(currentAppId, currentServiceId, currentReportType, garbage)) {
-					createReportDefinition(currentAppId, currentServiceId, currentReportType);
+				if (not reportExistsInService(packetStoreId, currentAppId, currentServiceId, currentReportType, garbage)) {
+					createReportDefinition(packetStoreId, currentAppId, currentServiceId, currentReportType);
 				}
 
 			}
@@ -884,44 +903,76 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 	}
 	uint16_t numOfApplicationIds = request.readUint16();
 	if (!numOfApplicationIds) {
-		applicationProcessConfiguration.applicationProcessDefinitions.clear();
+		applicationProcessConfiguration.definitions[packetStoreId].clear();
 		return;
 	}
 	//Per application process
 	for (int i = 0; i < numOfApplicationIds; i++) {
 		uint16_t currentAppId = request.readUint16();
-		if (not appExistsInDefinition(currentAppId)) {
+		if (not appExistsInDefinition(packetStoreId, currentAppId)) {
 			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
 			continue;
 		}
 		uint16_t numOfCurrAppServices = request.readUint16();
 		//Add all reports in application
 		if (!numOfCurrAppServices) {
-			applicationProcessConfiguration.applicationProcessDefinitions.erase(currentAppId);
+			applicationProcessConfiguration.definitions[packetStoreId].erase(currentAppId);
 			continue;
 		}
 		//Per service type in application process
 		for (int j = 0; j < numOfCurrAppServices; j++) {
 			uint16_t currentServiceId = request.readUint16();
-			if (not serviceExistsInApp(currentAppId, currentServiceId)) {
+			if (not serviceExistsInApp(packetStoreId, currentAppId, currentServiceId)) {
 				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinitionInApp);
 				continue;
 			}
 			uint16_t numOfCurrServiceReportTypes = request.readUint16();
 			//Delete whole service definition
 			if ((!numOfCurrServiceReportTypes)) {
-				deleteServiceDefinitionsOfApp(currentAppId, false, currentServiceId);
+				deleteServiceDefinitionsOfApp(packetStoreId, currentAppId, false, currentServiceId);
 				continue;
 			}
 			//Per report type
 			for (int k = 0; k < numOfCurrServiceReportTypes; k++) {
 				uint16_t currentReportType = request.readUint16();
 				uint16_t index = 0;
-				if (not reportExistsInService(currentAppId, currentServiceId, currentReportType, index)) {
+				if (not reportExistsInService(packetStoreId, currentAppId, currentServiceId, currentReportType, index)) {
 					ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinitionInService);
 					continue;
 				}
-				deleteReportDefinitionsOfService(currentAppId, currentServiceId, false, index);
+				deleteReportDefinitionsOfService(packetStoreId, currentAppId, currentServiceId, false, index);
+			}
+		}
+	}
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationContentReport(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportAppConfigurationContent, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message contentReport(ServiceType,MessageType::AppConfigurationContentReport,Message::TM,1);
+	uint16_t packetStoreId = request.readUint16();
+	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	contentReport.appendUint16(packetStoreId);
+	uint16_t numOfApplications = applicationProcessConfiguration.definitions[packetStoreId].size();
+	contentReport.appendUint16(numOfApplications);
+	for (auto &app : applicationProcessConfiguration.definitions[packetStoreId]) {
+		contentReport.appendUint16(app.first);
+		uint16_t numOfAppServices = app.second.serviceTypeDefinitions.size();
+		contentReport.appendUint16(numOfAppServices);
+		for (auto &service : app.second.serviceTypeDefinitions) {
+			contentReport.appendUint16(service.first);
+			uint16_t numOfServiceReports = service.second.size();
+			contentReport.appendUint16(numOfServiceReports);
+			for (auto &report: service.second) {
+				contentReport.appendUint16(report);
 			}
 		}
 	}

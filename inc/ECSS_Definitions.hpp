@@ -184,4 +184,9 @@
  */
 #define ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES 10
 
+/**
+ * @brief the max number of packet stores that a packet selection subservice can handle in ST[15]
+ */
+#define ECSS_MAX_PACKET_STORES 20
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
