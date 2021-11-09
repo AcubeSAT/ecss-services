@@ -3,6 +3,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
+#include "PacketSelectionDefinitions.hpp"
 #include "etl/map.h"
 #include "etl/vector.h"
 
@@ -17,23 +18,7 @@
  */
 class ApplicationProcessConfiguration {
 public:
-	typedef etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> messageTypeDefinitions;
-	typedef etl::map <uint16_t, messageTypeDefinitions, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypeDefinitions;
-
-	/**
-	 * This map contains the necessary definitions' hierarchy (application process -> service -> message). It stores
-	 * the definitions in 3 layers.
-	 *
-	 * Layer-1:
-	 * Map containing the application process ID, each being a key to the second map.
-	 *
-	 * Layer-2:
-	 * Map containing the service type ID as key, pointing to a vector.
-	 *
-	 * Layer-3:
-	 * Vector containing the message type definitions (message type ids).
-	 */
-	etl::map <uint16_t, serviceTypeDefinitions, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationProcessDefinitions;
+	etl::map <uint16_t, ApplicationProcessDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationProcessDefinitions;
 
 	/**
 	 * @todo: actually know which packet store each definition is responsible for.
