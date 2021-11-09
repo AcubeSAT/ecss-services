@@ -17,21 +17,10 @@
  */
 class HousekeepingReportConfiguration {
 public:
-	typedef std::pair <uint16_t, etl::vector <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL>>
-	                        housekeepingStructIds;
+	typedef etl::map <uint16_t, HousekeepingDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS>
+	    applicationProcessDefinitions;
 
-	/**
-	 * This map contains the necessary definitions' hierarchy (application process -> housekeeping struct ids). It
-	 * stores the definitions in 2 layers.
-	 *
-	 * Layer-1:
-	 * Map containing pairs (first = AppProcessId, second = packetStoreId), each as a key to a vector. Every pair
-	 * contains the application process type definitions.
-	 *
-	 * Layer-2:
-	 * Vector containing the housekeeping structure IDs.
-	 */
-	etl::map <uint16_t, housekeepingStructIds, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> housekeepingReportDefinitions;
+	etl::map <uint16_t, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
 };
 
 #endif

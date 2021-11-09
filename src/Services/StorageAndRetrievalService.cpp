@@ -640,7 +640,7 @@ StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice
                                                                                  uint16_t maxServiceTypeDefs)
     : mainService(parent), numOfControlledAppProcesses(numOfControlledAppProcs), maxEventDefinitionIds(maxEventDefIds),
       maxHousekeepingStructureIds(maxHousekeepingStructIds), maxReportTypeDefinitions(maxReportTypeDefs),
-      maxServiceTypeDefinitions(maxServiceTypeDefs) {}
+      maxServiceTypeDefinitions(maxServiceTypeDefs), supportsSubsamplingRate(true) {}
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::appIsControlled(uint16_t applicationId, Message& request) {
 	if (std::find(controlledAppProcesses.begin(), controlledAppProcesses.end(), applicationId) ==
@@ -809,6 +809,68 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinit
 	}
 }
 
+bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxStructureIds(uint16_t packetStoreId,
+                                                                                   uint16_t applicationId,
+                                                                                   Message& request) {
+	if (housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.size() >=
+	    maxHousekeepingStructureIds) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::MaxHousekeepingStructureIdsReached);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::noStructureInDefinition(uint16_t packetStoreId,
+                                                                                    uint16_t applicationId,
+                                                                                    Message& request) {
+	if (housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.empty()) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingHousekeepingStructureIdInDefinition);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::housekeepingDefinitionExists(uint16_t packetStoreId,
+                                                                                         uint16_t applicationId) {
+	if (housekeepingReportConfiguration.definitions[packetStoreId].find(applicationId) !=
+	    housekeepingReportConfiguration.definitions[packetStoreId].end()) {
+		return true;
+	}
+	return false;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::createHousekeepingDefinition(uint16_t packetStoreId,
+                                                                                         uint16_t applicationId) {
+	etl::vector <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
+	HousekeepingDefinition newDefinition;
+	newDefinition.housekeepingStructIds = housekeepingStructIds;
+	housekeepingReportConfiguration.definitions[packetStoreId].insert({applicationId, newDefinition});
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::structureExists(uint16_t packetStoreId,
+                                                                            uint16_t applicationId,
+                                                                            uint16_t structureId) {
+	if (std::find(housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.begin(),
+	              housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.end(),
+	              structureId) != housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.end()) {
+		return true;
+	}
+	return false;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructureIds(uint16_t packetStoreId,
+                                                                               uint16_t applicationId,
+                                                                               bool deleteAll,
+                                                                               uint16_t index){
+	if (deleteAll and (not housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.empty())) {
+		housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.clear();
+	} else {
+		auto iterator = housekeepingReportConfiguration.definitions[packetStoreId][applicationId]
+		                    .housekeepingStructIds.begin() + index;
+		housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.erase(iterator);
+	}
+}
+
 void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -882,7 +944,6 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 				if (not reportExistsInService(packetStoreId, currentAppId, currentServiceId, currentReportType, garbage)) {
 					createReportDefinition(packetStoreId, currentAppId, currentServiceId, currentReportType);
 				}
-
 			}
 		}
 	}
@@ -977,3 +1038,58 @@ void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationCont
 		}
 	}
 }
+
+void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHousekeepingConfiguration(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::AddStructuresToHousekeepingConfiguration, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t packetStoreId = request.readUint16();
+	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	uint16_t numOfApplicationIds = request.readUint16();
+	for (int i = 0; i < numOfApplicationIds; i++) {
+		uint16_t currentAppId = request.readUint16();
+		if (not appIsControlled(currentAppId, request)) {
+			continue;
+		}
+		if (noStructureInDefinition(packetStoreId, currentAppId, request)) {
+			continue;
+		}
+		uint16_t numOfHousekeepingStructs = request.readUint16();
+
+		if (!numOfHousekeepingStructs) {
+			if (not housekeepingDefinitionExists(packetStoreId, currentAppId)) {
+				createHousekeepingDefinition(packetStoreId, currentAppId);
+			}
+			deleteStructureIds(packetStoreId, currentAppId, false, 0);
+			continue;
+		}
+
+		for (int j = 0; j < numOfHousekeepingStructs; j++) {
+			uint16_t currentStructId = request.readUint16();
+			if (supportsSubsamplingRate) {
+				uint16_t subsamplingRate = request.readUint16();
+			}
+			if (exceedsMaxStructureIds(packetStoreId, currentAppId, request)) {
+				continue;
+			}
+			if (not housekeepingDefinitionExists(packetStoreId, currentAppId)) {
+				createHousekeepingDefinition(packetStoreId, currentAppId);
+			}
+			if (not structureExists(packetStoreId, currentAppId, currentStructId)) {
+				housekeepingReportConfiguration.definitions[packetStoreId][currentAppId].housekeepingStructIds
+				    .push_back(currentAppId);
+			}
+			/**
+			 * @todo: set the subsampling rate (pg.303)
+			 */
+		}
+	}
+}
+

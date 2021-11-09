@@ -50,7 +50,7 @@ public:
 		ChangeTypeToCircular = 26,
 		ChangeTypeToBounded = 27,
 		ChangeVirtualChannel = 28,
-
+		AddStructuresToHousekeepingConfiguration = 29,
 	};
 
 	enum VirtualChannels : uint8_t {
@@ -200,6 +200,7 @@ public:
 
 		etl::vector <uint16_t, ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES> controlledAppProcesses;
 
+		const bool supportsSubsamplingRate;
 		const uint16_t numOfControlledAppProcesses;
 		const uint16_t maxServiceTypeDefinitions;     //Per Application Process Definition
 		const uint16_t maxReportTypeDefinitions;      //This is per Service Type Definition
@@ -208,6 +209,8 @@ public:
 
 		ApplicationProcessConfiguration applicationProcessConfiguration;
 		HousekeepingReportConfiguration housekeepingReportConfiguration;
+
+		/**************************************** Helper Functions *************************************/
 
 		/**
 		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
@@ -321,6 +324,43 @@ public:
 		                                   uint16_t serviceId);
 
 		/**
+		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
+		 * checks if the maximum number of housekeeping structures are reached, in order to decide whether to add a new
+		 * structure.
+		 */
+		bool exceedsMaxStructureIds(uint16_t packetStoreId, uint16_t applicationId, Message&request);
+
+		/**
+		 * Checks if there are no structure Ids in the definition
+		 */
+		bool noStructureInDefinition(uint16_t packetStoreId, uint16_t applicationId, Message& request);
+
+		/**
+		 * Creates new Housekeeping definition
+		 */
+		void createHousekeepingDefinition(uint16_t packetStoreId, uint16_t applicationId);
+
+		/**
+		 * Checks if the Housekeeping Definition already exists
+		 */
+		bool housekeepingDefinitionExists(uint16_t packetStoreId, uint16_t applicationId);
+
+		/**
+		 * Checks if the requested structure already exists in a housekeeping definition
+		 */
+		bool structureExists(uint16_t packetStoreId, uint16_t applicationId, uint16_t structureId);
+
+		/**
+		 *
+		 */
+		void deleteStructureIds(uint16_t packetStoreId,
+		                   uint16_t applicationId,
+		                   bool deleteAll,
+		                   uint16_t index);
+
+		/************************************* TC/TM Implementations *************************************/
+
+		/**
 		 * TC[15,3] add report types to an application process storage control configuration
 		 */
 		void addReportTypesToAppProcessConfiguration(Message& request);
@@ -336,6 +376,11 @@ public:
 		 * message.
 		 */
 		void appConfigurationContentReport(Message& request);
+
+		/**
+		 * TC[15,29] add structure identifiers to the housekeeping parameter report storage control configuration
+		 */
+		void addStructuresToHousekeepingConfiguration(Message& request);
 
 	} packetSelectionSubservice;
 

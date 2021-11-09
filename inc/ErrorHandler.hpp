@@ -230,7 +230,14 @@ public:
 		 * Attempt to access a non existing application process in the definition (ST[15])
 		 */
 		NonExistingApplicationInDefinition = 29,
-
+		/**
+		 * Attempt to add new housekeeping structure id, when the max number of structures is already reached (ST[15])
+		 */
+		MaxHousekeepingStructureIdsReached = 30,
+		/**
+		 * Attempt to add new housekeeping structure id, when there is no structures in the definition already (ST[15])
+		 */
+		NonExistingHousekeepingStructureIdInDefinition = 31,
 	};
 
 	/**

@@ -12,4 +12,9 @@ public:
 	etl::map <uint16_t, reportTypeDefinitions, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypeDefinitions;
 };
 
+class HousekeepingDefinition {
+public:
+	etl::vector <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
+};
+
 #endif
