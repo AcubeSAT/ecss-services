@@ -82,10 +82,8 @@ clang-analyzer:
     - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
     - scan-build -o ./scan-build-html-report make
   artifacts:
-    when: on_failure
     paths:
       - ./scan-build-html-report
-      - ./CMakeFiles
 
 doxygen:
   image: spacedot/doxygen:1.9.2-awesomecss-1.6.0
@@ -164,6 +162,7 @@ pages:
   script:
     - pwd
     - ls
+    - cp ./doxygen-output ./public
     - ./ci/pages_deploy.sh
     - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage # Print directory contents for debugging
   artifacts:
