@@ -213,13 +213,11 @@ public:
 		/**************************************** Helper Functions *************************************/
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the requested application process id is controlled by the packet selection subservice.
 		 */
 		bool appIsControlled(uint16_t applicationId, Message& request);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the maximum number of report type definitions are reached, in order to decide whether to put a new
 		 * report type definition.
 		 */
@@ -229,14 +227,12 @@ public:
 		                                 Message&request);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the maximum number of service type definitions are reached, in order to decide whether to put a
 		 * new service type definition.
 		 */
 		bool exceedsMaxServiceDefinitions(uint16_t packetStoreId, uint16_t applicationId, Message& request);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if there are no report definitions inside a service type definition, so it decides whether to put a
 		 * new report type definition.
 		 */
@@ -246,27 +242,23 @@ public:
 		                                 Message& request);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if there are no service type definitions inside an application definition, so it decides whether to
 		 * put a new report type definition.
 		 */
 		bool noServiceDefinitionInApplication(uint16_t packetStoreId, uint16_t applicationId, Message& request);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the requested application ID already exists in the definition, to decide whether to add it or not.
 		 */
 		bool appExistsInDefinition(uint16_t packetStoreId, uint16_t applicationId);
 
 		/**
-		 *
 		 * Creates an application definition and adds it to the application process storage control configuration.
 		 * Only use if the specified App Id does not exist already.
 		 */
 		void createAppDefinition(uint16_t packetStoreId, uint16_t applicationId);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the requested service type already exists in the application, to decide whether to add it or not.
 		 */
 		bool serviceExistsInApp(uint16_t packetStoreId, uint16_t applicationId, uint16_t serviceId);
@@ -278,7 +270,6 @@ public:
 		void createServiceDefinition(uint16_t packetStoreId, uint16_t applicationId, uint16_t serviceId);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
 		 */
 		bool reportExistsInService(uint16_t packetStoreId,
@@ -324,7 +315,6 @@ public:
 		                                   uint16_t serviceId);
 
 		/**
-		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the maximum number of housekeeping structures are reached, in order to decide whether to add a new
 		 * structure.
 		 */
@@ -351,12 +341,9 @@ public:
 		bool structureExists(uint16_t packetStoreId, uint16_t applicationId, uint16_t structureId);
 
 		/**
-		 *
+		 * Deletes either all or specified housekeeping structure ids
 		 */
-		void deleteStructureIds(uint16_t packetStoreId,
-		                   uint16_t applicationId,
-		                   bool deleteAll,
-		                   uint16_t index);
+		void deleteStructureIds(uint16_t packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
 
 		/************************************* TC/TM Implementations *************************************/
 
