@@ -28,6 +28,7 @@ public:
 		EnableStorageFunction = 1,
 		DisableStorageFunction = 2,
 		AddReportTypesToAppProcessConfiguration = 3,
+		DeleteReportTypesFromAppProcessConfiguration = 4,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
 		ReportContentSummaryOfPacketStores = 12,
@@ -269,7 +270,7 @@ public:
 		 * Helper function to make multiple checking inside other functions more clear and easy to read. It basically
 		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
 		 */
-		bool reportExistsInService(uint16_t applicationId, uint16_t serviceId, uint16_t reportId);
+		bool reportExistsInService(uint16_t applicationId, uint16_t serviceId, uint16_t reportId, uint16_t &index);
 
 		/**
 		 * Creates a report type definition and adds it to the specified service definition. Only use if the
@@ -280,7 +281,7 @@ public:
 		/**
 		 * Deletes all report type definitions of a specified service type definition.
 		 */
-		void deleteReportDefinitionsOfService(uint16_t applicationId, uint16_t serviceId);
+		void deleteReportDefinitionsOfService(uint16_t applicationId, uint16_t serviceId,bool deleteAll,uint16_t index);
 
 		/**
 		 * Checks if there are any report definitions in the specified service type and application process.
@@ -295,12 +296,17 @@ public:
 		/**
 		 * Deletes all service type definitions of a specified application process
 		 */
-		void deleteServiceDefinitionsOfApp(uint16_t applicationId);
+		void deleteServiceDefinitionsOfApp(uint16_t applicationId, bool deleteAll, uint16_t serviceId);
 
 		/**
 		 * TC[15,3] add report types to an application process storage control configuration
 		 */
 		void addReportTypesToAppProcessConfiguration(Message& request);
+
+		/**
+		 * TC[15,4] delete report types from an application process storage control configuration
+		 */
+		void deleteReportTypesFromAppProcessConfiguration(Message& request);
 
 	} packetSelectionSubservice;
 

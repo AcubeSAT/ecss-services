@@ -221,7 +221,15 @@ public:
 		/**
 		 * Attempt to add a new report type definition in a service type with no report type definitions (ST[15])
 		 */
-		NoExistingReportTypeDefinitionInService = 27,
+		NonExistingReportTypeDefinitionInService = 27,
+		/**
+		 * Attempt to access a non existing service type in an application storage control configuration (ST[15])
+		 */
+		NonExistingServiceTypeDefinitionInApp = 28,
+		/**
+		 * Attempt to access a non existing application process in the definition (ST[15])
+		 */
+		NonExistingApplicationInDefinition = 29,
 
 	};
 

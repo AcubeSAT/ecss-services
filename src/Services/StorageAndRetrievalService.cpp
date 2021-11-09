@@ -654,7 +654,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::appIsControlled(uint
 bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefinitions(uint16_t applicationId,
                                                                                         uint16_t serviceId,
                                                                                         Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].size() >=
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].size() >=
 	    maxReportTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypeDefinitionsReached);
 		return true;
@@ -663,7 +663,8 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefi
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDefinitions(uint16_t applicationId,Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].size() >=maxServiceTypeDefinitions) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.size()
+	    >= maxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::MaxServiceTypeDefinitionsReached);
 		return true;
 	}
@@ -674,8 +675,8 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDef
 bool StorageAndRetrievalService::PacketSelectionSubservice::noReportDefinitionInService(uint16_t applicationId,
                                                                                         uint16_t serviceId,
                                                                                         Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].empty()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NoExistingReportTypeDefinitionInService);
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].empty()) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinitionInService);
 		return true;
 	}
 	return false;
@@ -683,8 +684,8 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::noReportDefinitionIn
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::noServiceDefinitionInApplication(uint16_t applicationId,
                                                                                              Message& request) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].empty()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NoExistingReportTypeDefinitionInService);
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
+		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinitionInService);
 		return true;
 	}
 	return false;
@@ -698,16 +699,18 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInDefinitio
 	return false;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::createAppDefinition(uint16_t applicationId){
+void StorageAndRetrievalService::PacketSelectionSubservice::createAppDefinition(uint16_t applicationId) {
 	typedef etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> vecType;
 	etl::map <uint16_t, vecType, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> tempMap;
-	applicationProcessConfiguration.applicationProcessDefinitions.insert({applicationId, tempMap});
+	ApplicationProcessDefinition newAppDefinition;
+	newAppDefinition.serviceTypeDefinitions = tempMap;
+	applicationProcessConfiguration.applicationProcessDefinitions.insert({applicationId, newAppDefinition});
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(uint16_t applicationId,
-                                                                               uint16_t serviceId) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].find(serviceId) !=
-	    applicationProcessConfiguration.applicationProcessDefinitions[applicationId].end()) {
+bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(uint16_t applicationId,uint16_t serviceId) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.find
+	        (serviceId) != applicationProcessConfiguration.applicationProcessDefinitions[applicationId]
+	                       .serviceTypeDefinitions.end()) {
 		return true;
 	}
 	return false;
@@ -715,16 +718,21 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(u
 
 void StorageAndRetrievalService::PacketSelectionSubservice::createServiceDefinition(uint16_t applicationId,uint16_t serviceId){
 	etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> tempVec;
-	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].insert({serviceId, tempVec});
+	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.insert
+	    ({serviceId, tempVec});
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInService(uint16_t applicationId,
                                                                                   uint16_t serviceId,
-                                                                                  uint16_t reportId) {
-	if (std::find(applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].begin(),
-	              applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].end(),
-	              reportId) != applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].end()) {
-		return true;
+                                                                                  uint16_t reportId,
+                                                                                  uint16_t &index) {
+	uint16_t position = 0;
+	for (auto &id : applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId]) {
+		if (id == reportId) {
+			index = position;
+			return true;
+		}
+		position++;
 	}
 	return false;
 }
@@ -732,31 +740,54 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInServic
 void StorageAndRetrievalService::PacketSelectionSubservice::createReportDefinition(uint16_t applicationId,
                                                                                    uint16_t serviceId,
                                                                                    uint16_t reportId) {
-	applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].push_back(reportId);
+	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].push_back(reportId);
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::serviceHasReportDefinitions(uint16_t applicationId,
                                                                                         uint16_t serviceId) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].empty()) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].empty()) {
 		return false;
 	}
 	return true;
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportDefinitionsOfService(uint16_t applicationId,
-                                                                                             uint16_t serviceId) {
-	applicationProcessConfiguration.applicationProcessDefinitions[applicationId][serviceId].clear();
+                                                                                             uint16_t serviceId,
+                                                                                             bool deleteAll,
+                                                                                             uint16_t index) {
+	if (deleteAll) {
+		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].clear();
+	} else {
+		auto iterator = applicationProcessConfiguration.applicationProcessDefinitions[applicationId]
+		                    .serviceTypeDefinitions[serviceId].begin() + index;
+		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].erase(iterator);
+		if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions[serviceId].empty()) {
+			deleteServiceDefinitionsOfApp(applicationId, false, serviceId);
+			if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
+				applicationProcessConfiguration.applicationProcessDefinitions.erase(applicationId);
+			}
+		}
+	}
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::appHasServiceDefinitions(uint16_t applicationId) {
-	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].empty()) {
+	if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
 		return false;
 	}
 	return true;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinitionsOfApp(uint16_t applicationId) {
-	applicationProcessConfiguration.applicationProcessDefinitions[applicationId].clear();
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinitionsOfApp(uint16_t applicationId,
+                                                                                          bool deleteAll,
+                                                                                          uint16_t serviceId) {
+	if (deleteAll) {
+		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.clear();
+	} else {
+		applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.erase(serviceId);
+		if (applicationProcessConfiguration.applicationProcessDefinitions[applicationId].serviceTypeDefinitions.empty()) {
+			applicationProcessConfiguration.applicationProcessDefinitions.erase(applicationId);
+		}
+	}
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
@@ -779,15 +810,18 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 		if (not appIsControlled(currentAppId, request)) {
 			continue;
 		}
-		if (not appExistsInDefinition(currentAppId)) {
-			createAppDefinition(currentAppId);
+		if (noServiceDefinitionInApplication(currentAppId, request)) {
+			continue;
 		}
-//		if (noServiceDefinitionInApplication(currentAppId, request)) {
-//			continue;
-//		}
 		uint16_t numOfCurrAppServices = request.readUint16();
-		if (!numOfCurrAppServices and (appHasServiceDefinitions(currentAppId))) {
-			deleteServiceDefinitionsOfApp(currentAppId);
+		//Add all reports in application
+		if (!numOfCurrAppServices) {
+			if (not appExistsInDefinition(currentAppId)) {
+				createAppDefinition(currentAppId);
+			}
+			if (appHasServiceDefinitions(currentAppId)) {
+				deleteServiceDefinitionsOfApp(currentAppId, true, 0);
+			}
 			continue;
 		}
 		if (exceedsMaxServiceDefinitions(currentAppId, request)) {
@@ -796,27 +830,98 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 		//Per service type in application process
 		for (int j = 0; j < numOfCurrAppServices; j++) {
 			uint16_t currentServiceId = request.readUint16();
+			if (noReportDefinitionInService(currentAppId, currentServiceId, request)) {
+				continue;
+			}
+			uint16_t numOfCurrServiceMessageTypes = request.readUint16();
+			//Add all reports of Service
+			if ((!numOfCurrServiceMessageTypes)) {
+				if (not appExistsInDefinition(currentAppId)) {
+					createAppDefinition(currentAppId);
+				}
+				if (not serviceExistsInApp(currentAppId, currentServiceId)) {
+					createServiceDefinition(currentAppId, currentServiceId);
+				}
+				if (serviceHasReportDefinitions(currentAppId, currentServiceId)) {
+					deleteReportDefinitionsOfService(currentAppId, currentServiceId, true, 0);
+				}
+				continue;
+			}
 			if (exceedsMaxReportDefinitions(currentAppId, currentServiceId, request)) {
 				continue;
 			}
-//			if (noReportDefinitionInService(currentAppId, currentServiceId, request)) {
-//				continue;
-//			}
-			if (not serviceExistsInApp(currentAppId, currentServiceId)) {
-				createServiceDefinition(currentAppId, currentServiceId);
-			}
-			uint16_t numOfCurrServiceMessageTypes = request.readUint16();
-			if ((!numOfCurrServiceMessageTypes) and (serviceHasReportDefinitions(currentAppId, currentServiceId))) {
-				deleteReportDefinitionsOfService(currentAppId, currentServiceId);
-				continue;
-			}
-			//Per message type per service type
+			//Per report type
 			for (int k = 0; k < numOfCurrServiceMessageTypes; k++) {
-				uint16_t currentMessageType = request.readUint16();
-				if (not reportExistsInService(currentAppId, currentServiceId, currentMessageType)) {
-					createReportDefinition(currentAppId, currentServiceId, currentMessageType);
+				uint16_t currentReportType = request.readUint16();
+				if (not appExistsInDefinition(currentAppId)) {
+					createAppDefinition(currentAppId);
+				}
+				if (not serviceExistsInApp(currentAppId, currentServiceId)) {
+					createServiceDefinition(currentAppId, currentServiceId);
+				}
+				uint16_t garbage = 0;
+				if (not reportExistsInService(currentAppId, currentServiceId, currentReportType, garbage)) {
+					createReportDefinition(currentAppId, currentServiceId, currentReportType);
 				}
 
+			}
+		}
+	}
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::DeleteReportTypesFromAppProcessConfiguration, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t packetStoreId = request.readUint16();
+	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	uint16_t numOfApplicationIds = request.readUint16();
+	if (!numOfApplicationIds) {
+		applicationProcessConfiguration.applicationProcessDefinitions.clear();
+		return;
+	}
+	//Per application process
+	for (int i = 0; i < numOfApplicationIds; i++) {
+		uint16_t currentAppId = request.readUint16();
+		if (not appExistsInDefinition(currentAppId)) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
+			continue;
+		}
+		uint16_t numOfCurrAppServices = request.readUint16();
+		//Add all reports in application
+		if (!numOfCurrAppServices) {
+			applicationProcessConfiguration.applicationProcessDefinitions.erase(currentAppId);
+			continue;
+		}
+		//Per service type in application process
+		for (int j = 0; j < numOfCurrAppServices; j++) {
+			uint16_t currentServiceId = request.readUint16();
+			if (not serviceExistsInApp(currentAppId, currentServiceId)) {
+				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinitionInApp);
+				continue;
+			}
+			uint16_t numOfCurrServiceReportTypes = request.readUint16();
+			//Delete whole service definition
+			if ((!numOfCurrServiceReportTypes)) {
+				deleteServiceDefinitionsOfApp(currentAppId, false, currentServiceId);
+				continue;
+			}
+			//Per report type
+			for (int k = 0; k < numOfCurrServiceReportTypes; k++) {
+				uint16_t currentReportType = request.readUint16();
+				uint16_t index = 0;
+				if (not reportExistsInService(currentAppId, currentServiceId, currentReportType, index)) {
+					ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinitionInService);
+					continue;
+				}
+				deleteReportDefinitionsOfService(currentAppId, currentServiceId, false, index);
 			}
 		}
 	}
