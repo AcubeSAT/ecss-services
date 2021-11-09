@@ -37,25 +37,25 @@ check-build:
     # - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -fdiagnostics-color=always" # Build again, but with more warnings
     # - make -j4
 
-cppcheck:
-  image: spacedot/cppcheck:2.5
-  stage: analyze
-  before_script:
-    - cppcheck --version
-  script:
-    - cd $CI_PROJECT_DIR
-    - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
-      --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
-      --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
-      --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
-      --xml --xml-version=2 2>report.xml -I ./inc ./src
-  after_script:
-    - mkdir cppcheck-html-report
-    - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
-  artifacts:
-    when: on_failure
-    paths:
-      - ./cppcheck-html-report
+# cppcheck:
+#   image: spacedot/cppcheck:2.5
+#   stage: analyze
+#   before_script:
+#     - cppcheck --version
+#   script:
+#     - cd $CI_PROJECT_DIR
+#     - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
+#       --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
+#       --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
+#       --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
+#       --xml --xml-version=2 2>report.xml -I ./inc ./src
+#   after_script:
+#     - mkdir cppcheck-html-report
+#     - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
+#   artifacts:
+#     when: on_failure
+#     paths:
+#       - ./cppcheck-html-report
 
 clang-tidy:
   image: spacedot/clang-tools:13.0.0-html-1.3.7
