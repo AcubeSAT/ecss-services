@@ -189,4 +189,9 @@
  */
 #define ECSS_MAX_PACKET_STORES 20
 
+/**
+ * @brief the max number of event definition Ids that can be contained inside an event report definition in ST[15]
+ */
+#define ECSS_MAX_EVENT_DEFINITION_IDS 30
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

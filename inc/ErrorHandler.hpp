@@ -238,6 +238,15 @@ public:
 		 * The requested structure id does not exist in the requested housekeeping parameter report definition (ST[15])
 		 */
 		NonExistingHousekeepingStructureIdInDefinition = 31,
+		/**
+		 * Attempt to add new event report definition id, when the max number of event definitions for the specified
+		 * packet store and the specified event report blocking definition is already reached (ST[15])
+		 */
+		MaxEventDefinitionIdsReached = 32,
+		/**
+		 * Attempt to add new event definition in a event report blocking definition with no event definitions (ST[15])
+		 */
+		NoEventDefinitionExistsInApp = 33
 	};
 
 	/**

@@ -52,6 +52,7 @@ public:
 		ChangeVirtualChannel = 28,
 		AddStructuresToHousekeepingConfiguration = 29,
 		DeleteStructuresFromHousekeepingConfiguration = 30,
+		AddEventDefinitionsToEventReportConfiguration = 34,
 		ReportHousekeepingConfigurationContent = 35,
 		HousekeepingConfigurationContentReport = 36,
 	};
@@ -212,6 +213,7 @@ public:
 
 		ApplicationProcessConfiguration applicationProcessConfiguration;
 		HousekeepingReportConfiguration housekeepingReportConfiguration;
+		EventReportBlockingConfiguration eventReportConfiguration;
 
 		/**************************************** Helper Functions *************************************/
 
@@ -348,7 +350,48 @@ public:
 		 */
 		void deleteStructureIds(uint16_t packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
 
-		/************************************* TC/TM Implementations *************************************/
+		/**
+		 * Checks if the maximum number of event definitions are reached, in order to decide whether to add a new
+		 * definition.
+		 */
+		bool exceedsMaxEventDefinitionIds(uint16_t packetStoreId, uint16_t applicationId, Message& request);
+
+		/**
+		 * Checks if a event report blocking definition contains no event report definition IDs, to know whether to
+		 * abort the request to add new ones.
+		 */
+		bool noEventInDefinition(uint16_t packetStoreId, uint16_t applicationId, Message& request);
+
+		/**
+		 * Checks if a event blocking storage control definition exists for the requested packet store.
+		 */
+		bool eventBlockingDefinitionExists(uint16_t packetStoreId, uint16_t applicationId);
+
+		/**
+		 * Creates a new event blocking storage control definition for a given packet store id
+		 */
+		void createEventReportBlockingDefinition(uint16_t packetStoreId, uint16_t applicationId);
+
+		/**
+		 * Checks if an event definition identifier exists for a specified packet store and a specified event report
+		 * blocking storage control definition.
+		 */
+		bool eventDefinitionIdExists(uint16_t packetStoreId, uint16_t applicationId, uint16_t eventId, uint16_t &index);
+
+		/**
+		 * Adds a new event definition identifier in a specified packet store and a specified event report
+		 * blocking storage control definition.
+		 */
+		void createEventDefinitionId(uint16_t packetStoreId, uint16_t applicationId, uint16_t eventId);
+
+		/**
+		 * Deletes wither all or the specified event definition IDs from a  specified packet store and a specified
+		 * event report blocking storage control definition.
+		 */
+		void deleteEventDefinitionIds(uint16_t packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
+
+
+		/*************************************** TC/TM Implementations *************************************/
 
 		/**
 		 * TC[15,3] add report types to an application process storage control configuration
@@ -383,6 +426,11 @@ public:
 		 * configuration content report' message.
 		 */
 		void housekeepingConfigurationContentReport(Message& request);
+
+		/**
+		 * TC[15,34] add event definition identifiers to the event report blocking storage-control configuration
+		 */
+		void addEventDefinitionsToEventReportConfiguration(Message& request);
 
 	} packetSelectionSubservice;
 
