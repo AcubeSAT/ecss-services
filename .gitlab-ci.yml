@@ -163,7 +163,7 @@ pages:
   script:
     - pwd
     - ls
-    - cp -r ./{doxygen-output,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report} ./public
+    - cp -r ./{doxygen-output,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./public
     # - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage # Print directory contents for debugging
   artifacts:
     paths:
