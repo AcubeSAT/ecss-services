@@ -7,7 +7,7 @@
 #include "etl/vector.h"
 
 /**
- * This is the housekeeping parameter report configuration as defined in ST[15] of the standard.
+ * This is the Housekeeping Parameter Report configuration as defined in ST[15] of the standard.
  *
  * @brief it contains all the necessary housekeeping parameter report definitions, which contain the application
  * process ID, each followed by a list of the housekeeping structure IDs. These IDs define which housekeeping TM

@@ -8,7 +8,7 @@
 #include "etl/vector.h"
 
 /**
- * This is the application process configuration as defined in ST[15] of the standard.
+ * This is the Application Process configuration as defined in ST[15] of the standard.
  *
  * @brief it contains all the necessary application process definitions, followed by the service type definitions,
  * and finally the message type definitions. This configuration is meant to decide which packets are going to be
