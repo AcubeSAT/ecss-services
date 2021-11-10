@@ -51,6 +51,7 @@ public:
 		ChangeTypeToBounded = 27,
 		ChangeVirtualChannel = 28,
 		AddStructuresToHousekeepingConfiguration = 29,
+		DeleteStructuresFromHousekeepingConfiguration = 30,
 	};
 
 	enum VirtualChannels : uint8_t {
@@ -338,7 +339,7 @@ public:
 		/**
 		 * Checks if the requested structure already exists in a housekeeping definition
 		 */
-		bool structureExists(uint16_t packetStoreId, uint16_t applicationId, uint16_t structureId);
+		bool structureExists(uint16_t packetStoreId, uint16_t applicationId, uint16_t structureId, uint16_t &index);
 
 		/**
 		 * Deletes either all or specified housekeeping structure ids
@@ -368,6 +369,11 @@ public:
 		 * TC[15,29] add structure identifiers to the housekeeping parameter report storage control configuration
 		 */
 		void addStructuresToHousekeepingConfiguration(Message& request);
+
+		/**
+		 * TC[15,30] delete structure identifiers from the housekeeping parameter report storage control configuration
+		 */
+		void deleteStructuresFromHousekeepingConfiguration(Message& request);
 
 	} packetSelectionSubservice;
 

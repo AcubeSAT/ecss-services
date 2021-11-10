@@ -849,11 +849,15 @@ void StorageAndRetrievalService::PacketSelectionSubservice::createHousekeepingDe
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::structureExists(uint16_t packetStoreId,
                                                                             uint16_t applicationId,
-                                                                            uint16_t structureId) {
-	if (std::find(housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.begin(),
-	              housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.end(),
-	              structureId) != housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.end()) {
-		return true;
+                                                                            uint16_t structureId,
+                                                                            uint16_t &index) {
+	uint16_t position = 0;
+	for (auto &id : housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds) {
+		if (id == structureId) {
+			index = position;
+			return true;
+		}
+		position++;
 	}
 	return false;
 }
@@ -868,6 +872,9 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructureIds(u
 		auto iterator = housekeepingReportConfiguration.definitions[packetStoreId][applicationId]
 		                    .housekeepingStructIds.begin() + index;
 		housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.erase(iterator);
+		if (housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.empty()) {
+			housekeepingReportConfiguration.definitions[packetStoreId].erase(applicationId);
+		}
 	}
 }
 
@@ -1082,7 +1089,8 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHouse
 			if (not housekeepingDefinitionExists(packetStoreId, currentAppId)) {
 				createHousekeepingDefinition(packetStoreId, currentAppId);
 			}
-			if (not structureExists(packetStoreId, currentAppId, currentStructId)) {
+			uint16_t garbage = 0;
+			if (not structureExists(packetStoreId, currentAppId, currentStructId, garbage)) {
 				housekeepingReportConfiguration.definitions[packetStoreId][currentAppId].housekeepingStructIds
 				    .push_back(currentAppId);
 			}
@@ -1093,3 +1101,43 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHouse
 	}
 }
 
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructuresFromHousekeepingConfiguration(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::DeleteStructuresFromHousekeepingConfiguration, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t packetStoreId = request.readUint16();
+	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	uint16_t numOfApplicationIds = request.readUint16();
+	if (!numOfApplicationIds) {
+		housekeepingReportConfiguration.definitions[packetStoreId].clear();
+		return;
+	}
+	for (int i = 0; i < numOfApplicationIds; i++) {
+		uint16_t currentAppId = request.readUint16();
+		if (not housekeepingDefinitionExists(packetStoreId, currentAppId)) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
+			continue;
+		}
+		uint16_t numOfHousekeepingStructs = request.readUint16();
+		if (!numOfHousekeepingStructs) {
+			housekeepingReportConfiguration.definitions[packetStoreId].erase(currentAppId);
+			continue;
+		}
+		for (int j = 0; j < numOfHousekeepingStructs; j++) {
+			uint16_t currentStructId = request.readUint16();
+			uint16_t index = 0;
+			if (not structureExists(packetStoreId, currentAppId, currentStructId, index)) {
+				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::NonExistingHousekeepingStructureIdInDefinition);
+				continue;
+			}
+			deleteStructureIds(packetStoreId, currentAppId, false, index);
+		}
+	}
+}

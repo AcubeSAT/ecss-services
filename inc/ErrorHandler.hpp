@@ -235,7 +235,7 @@ public:
 		 */
 		MaxHousekeepingStructureIdsReached = 30,
 		/**
-		 * Attempt to add new housekeeping structure id, when there is no structures in the definition already (ST[15])
+		 * The requested structure id does not exist in the requested housekeeping parameter report definition (ST[15])
 		 */
 		NonExistingHousekeepingStructureIdInDefinition = 31,
 	};
