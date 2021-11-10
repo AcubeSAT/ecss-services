@@ -9,7 +9,7 @@
 #include "Statistics/SystemStatistics.hpp"
 
 /**
- * Implementation of the ST[04] parameter management service, as defined in ECSS-E-ST-70-41C.
+ * Implementation of the ST[04] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class ParameterStatisticsService : public Service {
@@ -40,13 +40,14 @@ public:
 	/**
 	 * Whether the statistics report messages include the standard deviation or not
 	 */
-	const bool supportsStandardDeviation = true;
+	bool hasTimeIntervals = true;
 	const bool supportsSamplingInterval = true;
 	uint16_t reportingInterval = 5;   // Must define units. Same as parameter sampling rates
 	const uint16_t numOfStatisticsDefinitions = 0;
 
 	/**
-	 * This function receives a TC[4,1] packet and returns a TM[4,2] packet containing the parameter statistics report.
+	 * This function receives a TC[4,1] packet and responds with a TM[4,2] packet containing the parameter statistics
+	 * report.
 	 */
 	void reportParameterStatistics(Message& resetFlag);
 
@@ -81,7 +82,7 @@ public:
 	void deleteAllStatisticsDefinitions();
 
 	/**
-	 * This function receives a TM[4,8] packet and returns a TM[4,9] packet containing the parameter statistics
+	 * This function receives a TM[4,8] packet and responds with a TM[4,9] packet containing the parameter statistics
 	 * definitions report.
 	 */
 	void reportStatisticsDefinitions(Message& request);
@@ -94,9 +95,6 @@ public:
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
-
 };
-
-extern ParameterStatisticsService parameterStatisticsService;
 
 #endif

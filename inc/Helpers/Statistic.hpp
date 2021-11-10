@@ -8,8 +8,6 @@
 #include <cmath>
 #include <cfloat>
 
-extern bool supportsStandardDeviation;
-
 /**
  * Class containing all the statistics for every parameter. Includes functions that calculate and append the
  * statistics to messages
@@ -26,7 +24,6 @@ public:
 	double mean = 0;
 	double meanOfSquares = 0;
 	double standardDeviation = 0;
-//	bool evaluationIsEnabled = false;
 
 	Statistic() = default;
 

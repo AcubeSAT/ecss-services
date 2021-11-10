@@ -170,4 +170,9 @@
  */
 #define ECSS_MAX_STATISTIC_PARAMETERS 10
 
+/**
+ * Whether the ST[04] statistics calculation supports the reporting of stddev
+ */
+#define SUPPORTS_STANDARD_DEVIATION true
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

@@ -41,7 +41,7 @@ add_library(common OBJECT
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
         src/Services/ParameterStatisticsService.cpp
-        src/Services/Statistic.cpp
+        src/Helpers/Statistic.cpp
         src/Platform/x86/Statistics/SystemStatistics.cpp
         )
 

@@ -2,7 +2,7 @@
 #ifdef SERVICE_PARAMETER
 
 #include "Services/ParameterService.hpp"
-#include "Services/Parameter.hpp"
+#include "Helpers/Parameter.hpp"
 #include "Parameters/SystemParameters.hpp"
 
 void ParameterService::reportParameters(Message& paramIds) {

@@ -5,7 +5,7 @@
 #include "Services/ParameterService.hpp"
 
 /**
-		 * System-statistics initialization, so there are actual statistics in the map to work with.
+ * System-statistics initialization, so there are actual statistics in the map to work with.
  */
 void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	Statistic stat1;

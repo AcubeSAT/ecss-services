@@ -1,5 +1,5 @@
 #include "catch2/catch.hpp"
-#include "Services/Parameter.hpp"
+#include "Helpers/Parameter.hpp"
 #include "Services/ParameterService.hpp"
 #include "Message.hpp"
 

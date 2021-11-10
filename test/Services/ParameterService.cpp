@@ -2,7 +2,6 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/ParameterService.hpp"
-//#include "Parameters/SystemParameters.hpp"
 
 static void resetParameterValues() {
 	systemParameters.parameter1.setValue(3);

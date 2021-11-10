@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Services/Statistic.hpp"
+#include "Helpers/Statistic.hpp"
 
 void Statistic::updateStatistics(double value) {
 	/*
@@ -32,7 +32,8 @@ void Statistic::appendStatisticsToMessage(Message& report) {
 	report.appendFloat(static_cast <float> (min));
 	report.appendUint32(minTime);
 	report.appendFloat(static_cast <float> (mean));
-	if (supportsStandardDeviation) {
+
+	if (SUPPORTS_STANDARD_DEVIATION) {
 		report.appendFloat(static_cast <float> (standardDeviation));
 	}
 }

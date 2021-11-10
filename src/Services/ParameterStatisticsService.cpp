@@ -3,8 +3,6 @@
 #ifdef SERVICE_PARAMETER
 #include "Services/ParameterStatisticsService.hpp"
 
-bool supportsStandardDeviation = true;
-
 void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
 
 	ErrorHandler::assertRequest(resetFlag.packetType == Message::TC, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -154,7 +152,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 //		ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
 //		                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-		if (request.hasTimeIntervals) {
+		if (hasTimeIntervals) {
 			uint16_t interval = request.readUint16();
 			if (interval <= reportingInterval) {
 				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
@@ -185,13 +183,13 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currentId = request.readUint16();
 
-		if (currentId < systemParameters.parametersArray.size()) {
-			systemStatistics.statisticsMap.erase(currentId);
-		} else {
+		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
+			continue;
+
 		}
+		systemStatistics.statisticsMap.erase(currentId);
 	}
-	// If list of definitions is empty, stop the periodic reporting.
 	if (systemStatistics.statisticsMap.empty()) {
 		periodicStatisticsReportingStatus = false;
 	}
@@ -200,7 +198,6 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 void ParameterStatisticsService::deleteAllStatisticsDefinitions() {
 
 	systemStatistics.statisticsMap.clear();
-	// Stop the periodic reporting because there are no defined parameters.
 	periodicStatisticsReportingStatus = false;
 }
 
@@ -213,11 +210,11 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 
 	Message definitionsReport(ServiceType,MessageType::ParameterStatisticsDefinitionsReport,Message::TM, 1);
 
-	uint16_t currReportingInterval = 0;
+	uint16_t currentReportingInterval = 0;
 	if (periodicStatisticsReportingStatus) {
-		currReportingInterval = reportingInterval;
+		currentReportingInterval = reportingInterval;
 	}
-	definitionsReport.appendUint16(currReportingInterval);
+	definitionsReport.appendUint16(currentReportingInterval);
 
 	uint16_t numOfDefinedParameters = 0;
 	for (auto &it : systemStatistics.statisticsMap) {
