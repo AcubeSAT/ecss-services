@@ -1,6 +1,8 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
-/********************************    Storage And Retrieval Subservice    *********************************/
+/******************************************************************************
+ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 	  Storage and Retrieval     ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+ ******************************************************************************/
 
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
@@ -630,7 +632,9 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	}
 }
 
-/********************************    Packet Selection Subservice    *********************************/
+/******************************************************************************
+ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~	 Packet Selection     ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+ ******************************************************************************/
 
 StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice(StorageAndRetrievalService& parent,
                                                                                  uint16_t numOfControlledAppProcs,

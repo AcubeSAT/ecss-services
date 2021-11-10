@@ -71,6 +71,9 @@ public:
 
 	static const uint16_t maxPacketStores = 20;
 
+	/**
+	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
+	 */
 	etl::map <uint16_t, PacketStore, maxPacketStores> packetStores;
 
 	const bool supportsCircularType = true;
@@ -214,11 +217,25 @@ public:
 		const uint16_t maxHousekeepingStructureIds;   //Per Housekeeping storage-control definition
 		const uint16_t maxEventDefinitionIds;         //Per Event-Report storage-control definition
 
+		/**
+		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
+		 * application processes.
+		 */
 		ApplicationProcessConfiguration applicationProcessConfiguration;
+		/**
+		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
+		 * housekeeping reports.
+		 */
 		HousekeepingReportConfiguration housekeepingReportConfiguration;
+		/**
+		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
+		 * events.
+		 */
 		EventReportBlockingConfiguration eventReportConfiguration;
 
-		/**************************************** Helper Functions *************************************/
+		/*******************************************************************************
+		 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 	Helper Functions     ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+		 *******************************************************************************/
 
 		/**
 		 * checks if the requested application process id is controlled by the packet selection subservice.
@@ -394,7 +411,9 @@ public:
 		void deleteEventDefinitionIds(uint16_t packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
 
 
-		/*************************************** TC/TM Implementations *************************************/
+		/*******************************************************************************
+		 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 	  TC/TM Implementations      ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+		 *******************************************************************************/
 
 		/**
 		 * TC[15,3] add report types to an application process storage control configuration
@@ -448,7 +467,6 @@ public:
 		void eventConfigurationContentReport(Message& request);
 
 	} packetSelectionSubservice;
-
 };
 
 #endif
