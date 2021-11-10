@@ -133,6 +133,7 @@ unit-tests:
 coverage:
   image: spacedot/coverage:gcovr-5.0-lcov-1.15
   stage: test
+  when: always
   before_script:
     - mkdir gcovr
   script:
