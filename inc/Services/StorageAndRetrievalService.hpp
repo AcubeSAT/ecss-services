@@ -52,6 +52,7 @@ public:
 		ChangeVirtualChannel = 28,
 		AddStructuresToHousekeepingConfiguration = 29,
 		DeleteStructuresFromHousekeepingConfiguration = 30,
+		DeleteEventDefinitionsFromEventReportConfiguration = 33,
 		AddEventDefinitionsToEventReportConfiguration = 34,
 		ReportHousekeepingConfigurationContent = 35,
 		HousekeepingConfigurationContentReport = 36,
@@ -431,6 +432,12 @@ public:
 		 * TC[15,34] add event definition identifiers to the event report blocking storage-control configuration
 		 */
 		void addEventDefinitionsToEventReportConfiguration(Message& request);
+
+		/**
+		 * TC[15,33] delete event definition identifiers from the event report blocking storage-control configuration
+		 */
+		void deleteEventDefinitionsFromEventReportConfiguration(Message& request);
+
 
 	} packetSelectionSubservice;
 

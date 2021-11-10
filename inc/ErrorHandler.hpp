@@ -246,7 +246,15 @@ public:
 		/**
 		 * Attempt to add new event definition in a event report blocking definition with no event definitions (ST[15])
 		 */
-		NoEventDefinitionExistsInApp = 33
+		NoEventDefinitionExistsInApp = 33,
+		/**
+		 * Attempt to access a non existing event report blocking definition (ST[15])
+		 */
+		NonExistingEventReportBlockingDefinition = 34,
+		/**
+		 * Attempt to access a non existing event definition id (ST[15])
+		 */
+		NonExistingEventDefinitionId = 35,
 	};
 
 	/**
