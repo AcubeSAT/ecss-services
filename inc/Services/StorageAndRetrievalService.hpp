@@ -52,6 +52,8 @@ public:
 		ChangeVirtualChannel = 28,
 		AddStructuresToHousekeepingConfiguration = 29,
 		DeleteStructuresFromHousekeepingConfiguration = 30,
+		ReportHousekeepingConfigurationContent = 35,
+		HousekeepingConfigurationContentReport = 36,
 	};
 
 	enum VirtualChannels : uint8_t {
@@ -359,7 +361,7 @@ public:
 		void deleteReportTypesFromAppProcessConfiguration(Message& request);
 
 		/**
-		 * This message takes a TC[15,5] 'report the application process storage control configuration content' request
+		 * This function takes a TC[15,5] 'report the application process storage control configuration content' request
 		 * as argument, and responds with a TM[15,6] 'application process storage control configuration content report'
 		 * message.
 		 */
@@ -374,6 +376,13 @@ public:
 		 * TC[15,30] delete structure identifiers from the housekeeping parameter report storage control configuration
 		 */
 		void deleteStructuresFromHousekeepingConfiguration(Message& request);
+
+		/**
+		 * This function takes a TC[15,35] 'report the housekeeping parameter report storage control configuration
+		 * content' request as argument, and responds with a TM[15,36] 'housekeeping parameter report storage control
+		 * configuration content report' message.
+		 */
+		void housekeepingConfigurationContentReport(Message& request);
 
 	} packetSelectionSubservice;
 

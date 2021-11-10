@@ -14,7 +14,7 @@ public:
 
 class HousekeepingDefinition {
 public:
-	etl::vector <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
+	etl::vector <std::pair <uint16_t, uint16_t>, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
 };
 
 #endif

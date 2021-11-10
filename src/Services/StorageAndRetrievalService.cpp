@@ -841,7 +841,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::housekeepingDefiniti
 
 void StorageAndRetrievalService::PacketSelectionSubservice::createHousekeepingDefinition(uint16_t packetStoreId,
                                                                                          uint16_t applicationId) {
-	etl::vector <uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
+	etl::vector<std::pair<uint16_t, uint16_t>, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
 	HousekeepingDefinition newDefinition;
 	newDefinition.housekeepingStructIds = housekeepingStructIds;
 	housekeepingReportConfiguration.definitions[packetStoreId].insert({applicationId, newDefinition});
@@ -853,7 +853,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::structureExists(uint
                                                                             uint16_t &index) {
 	uint16_t position = 0;
 	for (auto &id : housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds) {
-		if (id == structureId) {
+		if (id.first == structureId) {
 			index = position;
 			return true;
 		}
@@ -1080,8 +1080,9 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHouse
 
 		for (int j = 0; j < numOfHousekeepingStructs; j++) {
 			uint16_t currentStructId = request.readUint16();
+			uint16_t subsamplingRate = 0;
 			if (supportsSubsamplingRate) {
-				uint16_t subsamplingRate = request.readUint16();
+				subsamplingRate = request.readUint16();
 			}
 			if (exceedsMaxStructureIds(packetStoreId, currentAppId, request)) {
 				continue;
@@ -1092,7 +1093,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHouse
 			uint16_t garbage = 0;
 			if (not structureExists(packetStoreId, currentAppId, currentStructId, garbage)) {
 				housekeepingReportConfiguration.definitions[packetStoreId][currentAppId].housekeepingStructIds
-				    .push_back(currentAppId);
+				    .push_back(std::make_pair(currentStructId, subsamplingRate));
 			}
 			/**
 			 * @todo: set the subsampling rate (pg.303)
@@ -1138,6 +1139,34 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructuresFrom
 				continue;
 			}
 			deleteStructureIds(packetStoreId, currentAppId, false, index);
+		}
+	}
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigurationContentReport(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportHousekeepingConfigurationContent, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	Message contentReport(ServiceType,MessageType::HousekeepingConfigurationContentReport,Message::TM,1);
+	uint16_t packetStoreId = request.readUint16();
+	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	contentReport.appendUint16(packetStoreId);
+	contentReport.appendUint16(housekeepingReportConfiguration.definitions[packetStoreId].size());
+	for (auto &app : housekeepingReportConfiguration.definitions[packetStoreId]) {
+		contentReport.appendUint16(app.first);
+		contentReport.appendUint16(app.second.housekeepingStructIds.size());
+		for (auto &structId : app.second.housekeepingStructIds) {
+			contentReport.appendUint16(structId.first);
+			if (supportsSubsamplingRate) {
+				contentReport.appendUint16(structId.second);
+			}
 		}
 	}
 }
