@@ -1119,6 +1119,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationCont
 			}
 		}
 	}
+	mainService.storeMessage(contentReport);
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHousekeepingConfiguration(Message& request) {
@@ -1247,6 +1248,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigur
 			}
 		}
 	}
+	mainService.storeMessage(contentReport);
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionsToEventReportConfiguration(Message& request) {
@@ -1333,4 +1335,31 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitio
 			deleteEventDefinitionIds(packetStoreId, applicationId, false, index);
 		}
 	}
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::eventConfigurationContentReport(Message& request) {
+	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.messageType == MessageType::ReportEventConfigurationContent, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
+	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	uint16_t packetStoreId = request.readUint16();
+	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	Message contentReport(ServiceType,MessageType::EventConfigurationContentReport,Message::TM,1);
+	contentReport.appendUint16(packetStoreId);
+	uint16_t numOfApplications = eventReportConfiguration.definitions[packetStoreId].size();
+	contentReport.appendUint16(numOfApplications);
+	for (auto &app : eventReportConfiguration.definitions[packetStoreId]) {
+		contentReport.appendUint16(app.first);
+		contentReport.appendUint16(app.second.eventDefinitionIds.size());
+		for (auto &id : app.second.eventDefinitionIds) {
+			contentReport.appendUint16(id);
+		}
+	}
+	mainService.storeMessage(contentReport);
 }

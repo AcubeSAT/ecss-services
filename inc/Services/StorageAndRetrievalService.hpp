@@ -56,6 +56,8 @@ public:
 		AddEventDefinitionsToEventReportConfiguration = 34,
 		ReportHousekeepingConfigurationContent = 35,
 		HousekeepingConfigurationContentReport = 36,
+		ReportEventConfigurationContent = 39,
+		EventConfigurationContentReport = 40
 	};
 
 	enum VirtualChannels : uint8_t {
@@ -438,6 +440,12 @@ public:
 		 */
 		void deleteEventDefinitionsFromEventReportConfiguration(Message& request);
 
+		/**
+		 * This function takes a TC[15,39] 'report the event report blocking storage control configuration
+		 * content' request as argument, and responds with a TM[15,40] 'event report blocking configuration content
+		 * report' message.
+		 */
+		void eventConfigurationContentReport(Message& request);
 
 	} packetSelectionSubservice;
 
