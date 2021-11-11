@@ -153,20 +153,20 @@ coverage:
 pages:
   image: spacedot/build-base:latest # LATEST TAG IS TEMPORARY
   stage: deploy
-  when: always # Deploy always and on build or test failure, generate just the documentation
-  cache:
-    key: "$CI_JOB_NAME"
-    paths:
-      - public
-  variables:
-    GIT_SUBMODULE_STRATEGY: normal
+  #  when: always # Deploy always and on build or test failure, generate just the documentation
+  #  cache:
+  #    key: "$CI_JOB_NAME"
+    #    paths:
+      #      - public
+        #  variables:
+    #    GIT_SUBMODULE_STRATEGY: normal
   script:
-    - pwd
-    - ls
     - cp -r ./{doxygen-output,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./public
+    - ls ./public
+    - find ./public
     # - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage # Print directory contents for debugging
   artifacts:
     paths:
       - public # Upload the resulting website
-  only:
-    - branches # Deploy on all branches
+        #  only:
+        #    - branches # Deploy on all branches
