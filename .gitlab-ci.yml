@@ -42,6 +42,7 @@ cppcheck:
   stage: analyze
   before_script:
     - cppcheck --version
+  allow_failure: true
   script:
     - cd $CI_PROJECT_DIR
     - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
