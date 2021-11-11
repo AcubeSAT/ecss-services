@@ -162,9 +162,11 @@ pages:
         #  variables:
     #    GIT_SUBMODULE_STRATEGY: normal
   script:
-    - cp -r ./{doxygen-output,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./public
-    - ls ./public
-    - find ./public
+    - mkdir .public
+    - cp -r ./{doxygen-output,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
+    - ls ./.public
+    - find ./.public
+    - mv .public public
     # - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage # Print directory contents for debugging
   artifacts:
     paths:
