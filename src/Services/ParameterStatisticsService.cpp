@@ -186,7 +186,6 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 			continue;
-
 		}
 		systemStatistics.statisticsMap.erase(currentId);
 	}
@@ -217,8 +216,8 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 	definitionsReport.appendUint16(currentReportingInterval);
 
 	uint16_t numOfDefinedParameters = 0;
-	for (auto &it : systemStatistics.statisticsMap) {
-		uint16_t currentSamplingInterval = it.second.selfSamplingInterval;
+	for (auto &statistic : systemStatistics.statisticsMap) {
+		uint16_t currentSamplingInterval = statistic.second.selfSamplingInterval;
 		if (currentSamplingInterval != 0) {
 			numOfDefinedParameters++;
 		}
