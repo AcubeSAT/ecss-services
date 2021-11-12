@@ -16,7 +16,6 @@
  */
 class PacketStore {
 public:
-	uint8_t id;
 	uint8_t virtualChannel;
 	uint16_t retrievalPriority;
 	uint32_t openRetrievalStartTimeTag; //What type is it?? (absolute time)
@@ -24,20 +23,23 @@ public:
 	uint32_t retrievalEndTime;
 	uint64_t sizeInBytes;
 
-	enum PacketStoreType {
+	enum PacketStoreType : uint8_t {
 		Circular = 0,
 		Bounded = 1
 	};
 
-	enum PacketStoreOpenRetrievalStatus {
+	enum PacketStoreOpenRetrievalStatus : uint8_t {
 		InProgress = 0,
 		Suspended = 1
 	};
 
-	bool selfStorageStatus;
-	bool selfByTimeRangeRetrievalStatus;
-	PacketStoreOpenRetrievalStatus selfOpenRetrievalStatus;
+	/**
+	 * @brief defines whether the storage of TM packets is enabled for this packet store
+	 */
+	bool storageStatus;
 	PacketStoreType packetStoreType;
+	PacketStoreOpenRetrievalStatus openRetrievalStatus;
+	bool byTimeRangeRetrievalStatus;
 
 	/**
 	 * A queue containing the TM messages stored by the packet store. Every TM is followed by its timestamp.
