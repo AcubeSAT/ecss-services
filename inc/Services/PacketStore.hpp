@@ -46,6 +46,9 @@ public:
 	 *
 	 * @note I made a convention that this should be filled out using 'push_back' and NOT 'push_front', dictating that
 	 * earlier packets are placed in the front position. So popping the earlier packets is done with 'pop_front'.
+	 *
+	 * 				old packets  <---------->  new packets
+	 * 				[][][][][][][][][][][][][][][][][][][]	<--- deque
 	 */
 	etl::deque <std::pair <uint32_t, Message>, ECSS_MAX_PACKETS_IN_PACKET_STORE> storedTmPackets;
 
@@ -54,7 +57,12 @@ public:
 	 *
 	 * @note may needs to be template, depending on the timestamping type.
 	 */
-	void copyPacketsTo(PacketStore &target, uint32_t startTime, uint32_t endTime);
+	bool copyPacketsTo(PacketStore &target,
+	                   uint32_t startTime,
+	                   uint32_t endTime,
+	                   bool beforeTimeTag,
+	                   bool afterTimeTag,
+	                   bool fromTagToTag);
 };
 
 #endif

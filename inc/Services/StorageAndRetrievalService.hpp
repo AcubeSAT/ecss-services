@@ -11,6 +11,10 @@
 #include "etl/map.h"
 
 /**
+ * @TODO: make function that skips the invalid messages as a whole, iterating over every invalid element.
+ */
+
+/**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
  *
  * @brief This Service:
@@ -61,20 +65,19 @@ public:
 	};
 
 	enum VirtualChannels : uint8_t {
-
+		MIN = 0,
+		MAX = 10
 	};
 
-	enum TimeStamping {
+	enum TimeStamping : uint8_t {
 	    StorageBased = 0,
 		PacketBased = 1
 	};
 
-	static const uint16_t maxPacketStores = 20;
-
 	/**
 	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	etl::map <uint16_t, PacketStore, maxPacketStores> packetStores;
+	etl::map <uint16_t, PacketStore, ECSS_MAX_PACKET_STORES> packetStores;
 
 	const bool supportsCircularType = true;
 	const bool supportsBoundedType = true;
@@ -82,7 +85,8 @@ public:
 	/**
 	* @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
  	*/
-	const bool supportsConcurrentRetrievalRequests = false;
+	const bool supportsConcurrentRetrievalRequests = true;
+	const uint16_t maxConcurrentRetrievalRequests = 5;
 
 	/**
 	* @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
@@ -93,6 +97,14 @@ public:
 	* @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
 	*/
 	const bool supportsPrioritizingRetrievals = true;
+
+	/**
+	 * @brief Support for the by-time-range retrieval of packets.
+	 */
+	const bool supportsByTimeRangeRetrieval = true;
+	/**
+	 * @todo: add prioritization policy for retrievals if prioritization is supported
+	 */
 	const TimeStamping timeStamping = PacketBased;
 
 	/**

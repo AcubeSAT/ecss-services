@@ -255,6 +255,15 @@ public:
 		 * Attempt to access a non existing event definition id (ST[15])
 		 */
 		NonExistingEventDefinitionId = 35,
+		/**
+		 * Attempt to set the virtual channel of a packet store to a invalid value (ST[15])
+		 */
+		InvalidVirtualChannel = 36,
+		/**
+		 * Attempt to delete a packet store, whose storage status is enabled (ST[15])
+		 */
+		DeletionOfPacketStoreWithStorageStatusEnabled = 37,
+
 	};
 
 	/**
