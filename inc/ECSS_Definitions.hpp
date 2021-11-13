@@ -194,4 +194,9 @@
  */
 #define ECSS_MAX_EVENT_DEFINITION_IDS 30
 
+/**
+ * @brief each packet store's id is an etl::string. So this defines the max size of a packet store ID in ST[15]
+ */
+#define ECSS_MAX_PACKET_STORE_ID_SIZE 20
+
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

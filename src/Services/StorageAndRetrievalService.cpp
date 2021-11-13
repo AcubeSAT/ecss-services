@@ -630,6 +630,53 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	}
 }
 
+void StorageAndRetrievalService::execute(Message& request) {
+	switch (request.messageType) {
+		case 1: enableStorageFunction(request);
+			break;
+		case 2: disableStorageFunction(request);
+			break;
+		case 9: startByTimeRangeRetrieval(request);
+			break;
+		case 11: deletePacketStoreContent(request);
+			break;
+		case 12: packetStoreContentSummaryReport(request);
+			break;
+		case 14: changeOpenRetrievalStartTimeTag(request);
+			break;
+		case 15: resumeOpenRetrievalOfPacketStores(request);
+			break;
+		case 16: suspendOpenRetrievalOfPacketStores(request);
+			break;
+		case 17: abortByTimeRangeRetrieval(request);
+			break;
+		case 18: packetStoresStatusReport(request);
+			break;
+		case 20: createPacketStores(request);
+			break;
+		case 21: deletePacketStores(request);
+			break;
+		case 22: packetStoreConfigurationReport(request);
+			break;
+		case 24: copyPacketsInTimeWindow(request);
+			break;
+		case 25: resizePacketStores(request);
+			break;
+		case 26: changeTypeToCircular(request);
+			break;
+		case 27: changeTypeToBounded(request);
+			break;
+		case 28: changeVirtualChannel(request);
+			break;
+	}
+}
+
+StorageAndRetrievalService::StorageAndRetrievalService() : packetSelectionSubservice(*this,5,
+                                ECSS_MAX_EVENT_DEFINITION_IDS,ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL,
+                                ECSS_MAX_MESSAGE_TYPE_DEFINITIONS,ECSS_MAX_SERVICE_TYPE_DEFINITIONS) {
+	serviceType = StorageAndRetrievalService::ServiceType;
+}
+
 /******************************************************************************
  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~	 Packet Selection     ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
  ******************************************************************************/

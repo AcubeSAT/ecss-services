@@ -27,6 +27,11 @@ void MessageParser::execute(Message& message) {
 			break;
 #endif
 
+#ifdef SERVICE_STORAGEANDRETRIEVAL
+		case 15: Services.storageAndRetrieval.execute(message); // ST[15]
+			break;
+#endif
+
 #ifdef SERVICE_TEST
 		case 17: Services.testService.execute(message); // ST[17]
 			break;

@@ -64,6 +64,8 @@ public:
 		EventConfigurationContentReport = 40
 	};
 
+	StorageAndRetrievalService();
+
 	enum VirtualChannels : uint8_t {
 		MIN = 0,
 		MAX = 10
@@ -77,6 +79,7 @@ public:
 	/**
 	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
+//	typedef etl::string <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreKey;
 	etl::map <uint16_t, PacketStore, ECSS_MAX_PACKET_STORES> packetStores;
 
 	const bool supportsCircularType = true;
@@ -479,6 +482,15 @@ public:
 		void eventConfigurationContentReport(Message& request);
 
 	} packetSelectionSubservice;
+
+	/**
+	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param param Contains the necessary parameters to call the suitable subservice
+	 */
+	void execute(Message& request);
 };
 
 #endif

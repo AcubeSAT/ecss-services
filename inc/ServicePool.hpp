@@ -11,6 +11,7 @@
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
+#include "Services/StorageAndRetrievalService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -32,6 +33,10 @@ class ServicePool {
 	 */
 	uint16_t packetSequenceCounter = 0;
 public:
+#ifdef SERVICE_STORAGEANDRETRIEVAL
+	StorageAndRetrievalService storageAndRetrieval;
+#endif
+
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
