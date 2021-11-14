@@ -369,7 +369,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
-		int index = 0;
+		int size = 0;
 		etl::string <ECSS_MAX_STRING_SIZE> keysToDelete[packetStores.size()];
 		for (auto &packetStore : packetStores) {
 			if (packetStore.second.storageStatus) {
@@ -384,12 +384,13 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::DeletionOfPacketWithOpenRetrievalInProgress);
 				continue;
 			}
-			keysToDelete[index++] = packetStore.first;
+			keysToDelete[size++] = packetStore.first;
 		}
-		for (auto &keyToDelete : keysToDelete) {
+		for (int l = 0; l < size; l++) {
 			uint8_t data[ECSS_MAX_STRING_SIZE];
+			etl::string <ECSS_MAX_STRING_SIZE> keyToDelete = keysToDelete[l];
 			std::copy(keyToDelete.begin(), keyToDelete.end(), data);
-			String<ECSS_MAX_STRING_SIZE> key(data);
+			String <ECSS_MAX_STRING_SIZE> key(data);
 			packetStores.erase(key);
 		}
 		return;
