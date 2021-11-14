@@ -20,7 +20,7 @@ public:
 	typedef etl::map <uint16_t, HousekeepingDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS>
 	    applicationProcessDefinitions;
 
-	etl::map <String <ECSS_MAX_STRING_SIZE>, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
+	etl::map <String <ECSS_MAX_PACKET_STORE_ID_SIZE>, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
 };
 
 #endif

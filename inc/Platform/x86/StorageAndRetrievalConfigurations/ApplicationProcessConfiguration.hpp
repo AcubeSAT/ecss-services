@@ -22,7 +22,7 @@ public:
 	    applicationProcessDefinitions;
 
 	//First is the packet store ID
-	etl::map <String <ECSS_MAX_STRING_SIZE>, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
+	etl::map <String <ECSS_MAX_PACKET_STORE_ID_SIZE>, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
 };
 
 #endif

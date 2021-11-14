@@ -67,7 +67,7 @@ public:
 	StorageAndRetrievalService();
 
 	enum VirtualChannels : uint8_t {
-		MIN = 0,
+		MIN = 1,
 		MAX = 10
 	};
 
@@ -79,7 +79,7 @@ public:
 	/**
 	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	typedef String <ECSS_MAX_STRING_SIZE> packetStoreKey;
+	typedef String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreKey;
 	etl::map <packetStoreKey, PacketStore, ECSS_MAX_PACKET_STORES> packetStores;
 
 	const bool supportsCircularType = true;
@@ -261,7 +261,7 @@ public:
 		 * checks if the maximum number of report type definitions are reached, in order to decide whether to put a new
 		 * report type definition.
 		 */
-		bool exceedsMaxReportDefinitions(String <ECSS_MAX_STRING_SIZE> packetStoreId,
+		bool exceedsMaxReportDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
 		                                 uint16_t applicationId,
 		                                 uint16_t serviceId,
 		                                 Message&request);
@@ -270,13 +270,13 @@ public:
 		 * checks if the maximum number of service type definitions are reached, in order to decide whether to put a
 		 * new service type definition.
 		 */
-		bool exceedsMaxServiceDefinitions(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, Message& request);
+		bool exceedsMaxServiceDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
 
 		/**
 		 * checks if there are no report definitions inside a service type definition, so it decides whether to put a
 		 * new report type definition.
 		 */
-		bool noReportDefinitionInService(String <ECSS_MAX_STRING_SIZE> packetStoreId,
+		bool noReportDefinitionInService(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
 		                                 uint16_t applicationId,
 		                                 uint16_t serviceId,
 		                                 Message& request);
@@ -285,34 +285,34 @@ public:
 		 * checks if there are no service type definitions inside an application definition, so it decides whether to
 		 * put a new report type definition.
 		 */
-		bool noServiceDefinitionInApplication(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, Message& request);
+		bool noServiceDefinitionInApplication(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
 
 		/**
 		 * checks if the requested application ID already exists in the definition, to decide whether to add it or not.
 		 */
-		bool appExistsInDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId);
+		bool appExistsInDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
 
 		/**
 		 * Creates an application definition and adds it to the application process storage control configuration.
 		 * Only use if the specified App Id does not exist already.
 		 */
-		void createAppDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId);
+		void createAppDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
 
 		/**
 		 * checks if the requested service type already exists in the application, to decide whether to add it or not.
 		 */
-		bool serviceExistsInApp(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
+		bool serviceExistsInApp(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
 
 		/**
 		 * Creates a service type definition and adds it to the specified application definition. Only use if the
 		 * specified service type definition does not exist already.
 		 */
-		void createServiceDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
+		void createServiceDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
 
 		/**
 		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
 		 */
-		bool reportExistsInService(String <ECSS_MAX_STRING_SIZE> packetStoreId,
+		bool reportExistsInService(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
 		                           uint16_t applicationId,
 		                           uint16_t serviceId,
 		                           uint16_t reportId,
@@ -322,7 +322,7 @@ public:
 		 * Creates a report type definition and adds it to the specified service definition. Only use if the
 		 * specified report type definition does not exist already.
 		 */
-		void createReportDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId,
+		void createReportDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
 		                            uint16_t applicationId,
 		                            uint16_t serviceId,
 		                            uint16_t reportId);
@@ -330,7 +330,7 @@ public:
 		/**
 		 * Deletes all report type definitions of a specified service type definition.
 		 */
-		void deleteReportDefinitionsOfService(String <ECSS_MAX_STRING_SIZE> packetStoreId,
+		void deleteReportDefinitionsOfService(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
 		                                      uint16_t applicationId,
 		                                      uint16_t serviceId,
 		                                      bool deleteAll,
@@ -339,17 +339,17 @@ public:
 		/**
 		 * Checks if there are any report definitions in the specified service type and application process.
 		 */
-		bool serviceHasReportDefinitions(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
+		bool serviceHasReportDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
 
 		/**
 		 * Checks if there are any service definitions in the specified application process
 		 */
-		bool appHasServiceDefinitions(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId);
+		bool appHasServiceDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
 
 		/**
 		 * Deletes all service type definitions of a specified application process
 		 */
-		void deleteServiceDefinitionsOfApp(String <ECSS_MAX_STRING_SIZE> packetStoreId,
+		void deleteServiceDefinitionsOfApp(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
 		                                   uint16_t applicationId,
 		                                   bool deleteAll,
 		                                   uint16_t serviceId);
@@ -358,72 +358,72 @@ public:
 		 * checks if the maximum number of housekeeping structures are reached, in order to decide whether to add a new
 		 * structure.
 		 */
-		bool exceedsMaxStructureIds(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, Message&request);
+		bool exceedsMaxStructureIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message&request);
 
 		/**
 		 * Checks if there are no structure Ids in the definition
 		 */
-		bool noStructureInDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, Message& request);
+		bool noStructureInDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
 
 		/**
 		 * Creates new Housekeeping definition
 		 */
-		void createHousekeepingDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId);
+		void createHousekeepingDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
 
 		/**
 		 * Checks if the Housekeeping Definition already exists
 		 */
-		bool housekeepingDefinitionExists(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId);
+		bool housekeepingDefinitionExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
 
 		/**
 		 * Checks if the requested structure already exists in a housekeeping definition
 		 */
-		bool structureExists(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, uint16_t structureId, uint16_t &index);
+		bool structureExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t structureId, uint16_t &index);
 
 		/**
 		 * Deletes either all or specified housekeeping structure ids
 		 */
-		void deleteStructureIds(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
+		void deleteStructureIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
 
 		/**
 		 * Checks if the maximum number of event definitions are reached, in order to decide whether to add a new
 		 * definition.
 		 */
-		bool exceedsMaxEventDefinitionIds(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, Message& request);
+		bool exceedsMaxEventDefinitionIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
 
 		/**
 		 * Checks if a event report blocking definition contains no event report definition IDs, to know whether to
 		 * abort the request to add new ones.
 		 */
-		bool noEventInDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, Message& request);
+		bool noEventInDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
 
 		/**
 		 * Checks if a event blocking storage control definition exists for the requested packet store.
 		 */
-		bool eventBlockingDefinitionExists(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId);
+		bool eventBlockingDefinitionExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
 
 		/**
 		 * Creates a new event blocking storage control definition for a given packet store id
 		 */
-		void createEventReportBlockingDefinition(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId);
+		void createEventReportBlockingDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
 
 		/**
 		 * Checks if an event definition identifier exists for a specified packet store and a specified event report
 		 * blocking storage control definition.
 		 */
-		bool eventDefinitionIdExists(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId, uint16_t &index);
+		bool eventDefinitionIdExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId, uint16_t &index);
 
 		/**
 		 * Adds a new event definition identifier in a specified packet store and a specified event report
 		 * blocking storage control definition.
 		 */
-		void createEventDefinitionId(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId);
+		void createEventDefinitionId(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId);
 
 		/**
 		 * Deletes wither all or the specified event definition IDs from a  specified packet store and a specified
 		 * event report blocking storage control definition.
 		 */
-		void deleteEventDefinitionIds(String <ECSS_MAX_STRING_SIZE> packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
+		void deleteEventDefinitionIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
 
 
 		/*******************************************************************************

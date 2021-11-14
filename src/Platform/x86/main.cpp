@@ -20,16 +20,6 @@
 #include "etl/String.hpp"
 
 int main() {
-
-	etl::string <10> str = "HelloWorld";
-	uint8_t data[10];
-	std::copy(str.begin(),str.end(),data);
-	for (int i = 0; i < 10; i++) {
-		if (data[i] != str[i]) {
-			std::cout << "Fuck!!!" << std::endl;
-		}
-	}
-
 //	String <10> str(data);
 //
 //	Message mes(ParameterService::ServiceType,ParameterService::MessageType::ParameterValuesReport,Message::TC,1);

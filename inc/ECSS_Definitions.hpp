@@ -187,7 +187,7 @@
 /**
  * @brief the max number of packet stores that a packet selection subservice can handle in ST[15]
  */
-#define ECSS_MAX_PACKET_STORES 20
+#define ECSS_MAX_PACKET_STORES 4
 
 /**
  * @brief the max number of event definition Ids that can be contained inside an event report definition in ST[15]
@@ -197,6 +197,6 @@
 /**
  * @brief each packet store's id is an etl::string. So this defines the max size of a packet store ID in ST[15]
  */
-#define ECSS_MAX_PACKET_STORE_ID_SIZE 20
+#define ECSS_MAX_PACKET_STORE_ID_SIZE 10
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
