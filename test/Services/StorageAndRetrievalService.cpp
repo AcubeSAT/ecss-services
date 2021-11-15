@@ -134,6 +134,62 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == true);
 	}
 
+	SECTION("Storage function disabling") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DisableStorageFunction,Message::TC,1);
+		uint16_t numOfPacketStores = 4;
+		request.appendUint16(numOfPacketStores);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps33";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+
+		request.appendOctetString(id);
+		request.appendOctetString(id2);
+		request.appendOctetString(id3);
+		request.appendOctetString(id4);
+
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData7[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id7(packetStoreData7);
+
+		CHECK(Services.storageAndRetrieval.packetStores[id2].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id7].storageStatus == true);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 9);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 5);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id7].storageStatus == true);
+
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::DisableStorageFunction,Message::TC,1);
+		numOfPacketStores = 0;
+		request2.appendUint16(numOfPacketStores);
+
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 9);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id7].storageStatus == false);
+	}
+
 //	SECTION("Packet store deletion") {
 //		Message request(StorageAndRetrievalService::ServiceType,
 //		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
