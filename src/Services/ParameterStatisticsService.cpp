@@ -159,7 +159,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 				return;
 			}
 			if (not exists) {
-				Statistic newStat;
+				Statistic newStatistic;
 				systemStatistics.statisticsMap.insert({currentId, newStatistic});
 				systemStatistics.statisticsMap.at(currentId).setSelfSamplingInterval(interval);
 				// TODO: start the evaluation of statistics for this parameter.
