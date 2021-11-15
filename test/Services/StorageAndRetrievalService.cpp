@@ -509,6 +509,63 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus == false);
 	}
 
+	SECTION("Reporting the packet store status") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ReportStatusOfPacketStores,Message::TC,1);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		Services.storageAndRetrieval.packetStores[id].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus = true;
+		Services.storageAndRetrieval.packetStores[id2].storageStatus = true;
+		Services.storageAndRetrieval.packetStores[id3].openRetrievalStatus = PacketStore::InProgress;
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 29);
+		Message report = ServiceTests::get(28);
+		CHECK(report.readUint16() == 4);
+		//Packet store 1
+		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
+		report.readOctetString(data);
+		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+			CHECK(data[i] == packetStoreData[i]);
+		}
+		CHECK(report.readBoolean() == false);
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readBoolean() == true);
+		//Packet store 2
+		report.readOctetString(data);
+		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+			CHECK(data[i] == packetStoreData2[i]);
+		}
+		CHECK(report.readBoolean() == true);
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readBoolean() == false);
+		//Packet store 3
+		report.readOctetString(data);
+		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+			CHECK(data[i] == packetStoreData4[i]);
+		}
+		CHECK(report.readBoolean() == false);
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readBoolean() == false);
+		//Packet store 4
+		report.readOctetString(data);
+		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+			CHECK(data[i] == packetStoreData3[i]);
+		}
+		CHECK(report.readBoolean() == false);
+		CHECK(report.readUint16() == 0);
+		CHECK(report.readBoolean() == false);
+	}
+
 //	SECTION("Packet store deletion") {
 //		Message request(StorageAndRetrievalService::ServiceType,
 //		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);

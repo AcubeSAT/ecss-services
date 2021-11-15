@@ -258,9 +258,11 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 	Message report(ServiceType,MessageType::PacketStoresStatusReport,Message::TM,1);
 	report.appendUint16(packetStores.size());
 	for (auto &packetStore : packetStores) {
-		report.appendString(packetStore.first);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId = packetStore.first;
+		report.appendOctetString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageStatus);
-		report.appendEnum8(packetStore.second.openRetrievalStatus);
+		uint16_t code = (packetStore.second.openRetrievalStatus == PacketStore::InProgress) ? 0 : 1;
+		report.appendUint16(code);
 		if (supportsByTimeRangeRetrieval) {
 			report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
 		}
