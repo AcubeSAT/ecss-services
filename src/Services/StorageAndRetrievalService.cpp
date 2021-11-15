@@ -307,11 +307,11 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
 			continue;
 		}
-		for (int j = 0; j < packetStores[packetStoreId].storedTmPackets.size(); j++) {
+		for (auto &tmPacket : packetStores[packetStoreId].storedTmPackets) {
 			/**
 			 * @todo: actually compare the real time formats.
 			 */
-			if (packetStores[packetStoreId].storedTmPackets[j].first > timeLimit) {
+			if (tmPacket.first > timeLimit) {
 				break;
 			}
 			packetStores[packetStoreId].storedTmPackets.pop_front();
