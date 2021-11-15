@@ -31,6 +31,13 @@ void buildPacketCreationRequest(Message& request) {
 	}
 }
 
+void buildPacketDeletionRequest(Message& request) {
+	uint16_t numOfPacketStores = 6;
+	request.appendUint16(numOfPacketStores);
+	uint8_t concatenatedPacketStoreNames[] = "ps1ps2ps27ps799ps5555ps1111";
+	uint16_t offsets[7] = {0, 3, 6, 10, 15, 21, 27};
+}
+
 TEST_CASE("Storage And Retrieval Service") {
 	SECTION("Packet store creation") {
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -68,11 +75,71 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id2].packetStoreType == PacketStore::PacketStoreType::Bounded);
 		CHECK(Services.storageAndRetrieval.packetStores[id3].packetStoreType == PacketStore::PacketStoreType::Circular);
 		CHECK(Services.storageAndRetrieval.packetStores[id4].packetStoreType == PacketStore::PacketStoreType::Circular);
-
+		/**
+		 * @note so currently there are 4 packet stores, named "ps2", "ps25", "ps799", "ps5555"
+		 */
 	}
-//	SECTION("Storage function enabling") {
+
+	SECTION("Storage function enabling") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::EnableStorageFunction,Message::TC,1);
+		uint16_t numOfPacketStores = 4;
+		request.appendUint16(numOfPacketStores);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps33";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+
+		request.appendOctetString(id);
+		request.appendOctetString(id2);
+		request.appendOctetString(id3);
+		request.appendOctetString(id4);
+
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		CHECK(Services.storageAndRetrieval.packetStores[id].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id3].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == false);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 6);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 2);
+		CHECK(Services.storageAndRetrieval.packetStores[id].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id3].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == false);
+
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::EnableStorageFunction,Message::TC,1);
+		numOfPacketStores = 0;
+		request2.appendUint16(numOfPacketStores);
+
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 6);
+		CHECK(Services.storageAndRetrieval.packetStores[id].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id3].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == true);
+	}
+
+//	SECTION("Packet store deletion") {
 //		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::EnableStorageFunction,Message::TC,1);
-//
+//		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
+//		buildPacketDeletionRequest(request);
+//		MessageParser::execute(request);
 //	}
+
+
 }
