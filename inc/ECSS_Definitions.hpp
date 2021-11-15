@@ -150,6 +150,7 @@
  * @brief Defines whether the optional CRC field is included
  */
 #define ECSS_CRC_INCLUDED true
+
 /**
  * @brief Defines the max number of statistic definitions
  */
