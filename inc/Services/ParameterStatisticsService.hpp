@@ -50,6 +50,7 @@ public:
 	 * report.
 	 */
 	void reportParameterStatistics(Message& resetFlag);
+	void createParameterStatisticsReport(Message& report);
 
 	/**
 	 * TC[4,3] reset parameter statistics, clearing all samples and values.

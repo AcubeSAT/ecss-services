@@ -11,10 +11,22 @@ void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
 	ErrorHandler::assertRequest(resetFlag.serviceType == ServiceType, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
-
 	bool resetFlagValue = resetFlag.readBoolean();
-	statisticsReport.appendUint16(1);  //Dummy value for start and min time, will change in the end
-	statisticsReport.appendUint16(1);
+
+	createParameterStatisticsReport(statisticsReport);
+
+	// TODO: First add start time and end time
+	storeMessage(statisticsReport);
+
+	if (resetFlagValue or hasAutomaticStatisticsReset) {
+		resetParameterStatistics();
+	}
+	// Here add start time
+}
+
+void ParameterStatisticsService::createParameterStatisticsReport(Message& report) {
+	report.appendUint16(1);  //Dummy value for start and min time, will change in the end
+	report.appendUint16(1);
 	uint16_t numOfValidParameters = 0;
 
 	// TODO: Here is the end time
@@ -28,26 +40,18 @@ void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
 		}
 		numOfValidParameters++;
 	}
-	statisticsReport.appendUint16(numOfValidParameters);
+	report.appendUint16(numOfValidParameters);
 
 	for (auto &currentStatistic : systemStatistics.statisticsMap) {
-	    uint16_t currId = currentStatistic.first;
-	    uint16_t numOfSamples = currentStatistic.second.sampleCounter;
+		uint16_t currId = currentStatistic.first;
+		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
 		}
-		statisticsReport.appendUint16(currId);
-		statisticsReport.appendUint16(numOfSamples);
-		currentStatistic.second.appendStatisticsToMessage(statisticsReport); // WORKS! MAGIC!
+		report.appendUint16(currId);
+		report.appendUint16(numOfSamples);
+		currentStatistic.second.appendStatisticsToMessage(report);
 	}
-
-	// TODO: First add start time and end time
-	storeMessage(statisticsReport);
-
-	if (resetFlagValue or hasAutomaticStatisticsReset) {
-		resetParameterStatistics();
-	}
-	// Here add start time
 }
 
 void ParameterStatisticsService::resetParameterStatistics() {
