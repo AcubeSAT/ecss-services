@@ -76,6 +76,7 @@ public:
 	 * definitions are to be deleted.
 	 */
 	void deleteStatisticsDefinitions(Message& request);
+
 	/**
 	 * TM[4,7] This version deletes all definitions
 	 */
