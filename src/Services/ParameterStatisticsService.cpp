@@ -176,7 +176,7 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.messageType == MessageType::DeleteParameterStatisticsDefinitions,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(request.serviceType == ServiceType, request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	uint16_t numOfIds = request.readUint16();
 
