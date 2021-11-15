@@ -319,6 +319,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id2].openRetrievalStatus == PacketStore::InProgress);
 		CHECK(Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus == PacketStore::Suspended);
 		CHECK(Services.storageAndRetrieval.packetStores[id6].openRetrievalStatus == PacketStore::InProgress);
+		Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus = false;
 	}
 
 	SECTION("Open retrieval suspension") {
@@ -326,6 +327,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		                StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores,Message::TC,1);
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
+
 		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
 		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
 		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
@@ -376,6 +378,79 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id2].openRetrievalStatus == PacketStore::Suspended);
 		CHECK(Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus == PacketStore::Suspended);
 		CHECK(Services.storageAndRetrieval.packetStores[id6].openRetrievalStatus == PacketStore::Suspended);
+	}
+
+	SECTION("Starting the by-time-range retrieval of packet stores") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval,Message::TC,1);
+		uint16_t numOfPacketStores = 6;
+		request.appendUint16(numOfPacketStores);
+		uint32_t fromTime = 4;
+		uint32_t toTime = 18;
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		/**
+		 * @todo: actually skip the rest of the invalid message before reading the next id
+		 */
+		request.appendOctetString(id);
+//		request.appendUint32(fromTime);
+//		request.appendUint32(toTime);
+		request.appendOctetString(id2);
+		request.appendUint32(fromTime);
+		request.appendUint32(toTime);
+		request.appendOctetString(id3);
+//		request.appendUint32(fromTime);
+//		request.appendUint32(toTime);
+		request.appendOctetString(id4);
+//		request.appendUint32(fromTime);
+//		request.appendUint32(toTime);
+		request.appendOctetString(id5);
+		request.appendUint32(6);
+		request.appendUint32(4);
+		request.appendOctetString(id6);
+//		request.appendUint32(fromTime);
+//		request.appendUint32(toTime);
+
+		Services.storageAndRetrieval.packetStores[id].openRetrievalStatus = PacketStore::InProgress;
+		Services.storageAndRetrieval.packetStores[id6].byTimeRangeRetrievalStatus = true;
+
+		CHECK(Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].byTimeRangeRetrievalStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus == false);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 26);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 13);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithOpenRetrievalInProgress) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ByTimeRangeRetrievalAlreadyEnabled) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidTimeWindow) == 1);
+
+		CHECK(Services.storageAndRetrieval.packetStores[id2].byTimeRangeRetrievalStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].retrievalStartTime == 4);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].retrievalEndTime == 18);
+		CHECK(Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id].retrievalStartTime == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id].retrievalEndTime == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus == false);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].retrievalStartTime == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].retrievalEndTime == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].byTimeRangeRetrievalStatus == true);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].retrievalStartTime == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].retrievalEndTime == 0);
 	}
 
 //	SECTION("Packet store deletion") {

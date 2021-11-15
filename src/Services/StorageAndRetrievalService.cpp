@@ -201,7 +201,7 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		uint32_t retrievalStartTime = request.readUint32();
 		uint32_t retrievalEndTime = request.readUint32();
 		if (retrievalStartTime >= retrievalEndTime) {
-			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::InvalidRetrievalTimesRelation);
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 			continue;
 		}
 //		if (retrievalEndTime <= packetStores[packetStoreId].storedTmPackets.end()->first and retrievalEndTime <=
