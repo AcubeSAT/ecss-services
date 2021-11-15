@@ -190,6 +190,75 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id7].storageStatus == false);
 	}
 
+	SECTION("Open retrieval start time tag changing") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartTimeTag,Message::TC,1);
+		uint32_t startTimeTag = 200;
+		/**
+		 * todo: use function (CUC) to get the timestamp
+		 */
+		uint16_t numOfPacketStores = 6;
+		request.appendUint32(startTimeTag);
+		request.appendUint16(numOfPacketStores);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		request.appendOctetString(id);
+		request.appendOctetString(id2);
+		request.appendOctetString(id3);
+		request.appendOctetString(id4);
+		request.appendOctetString(id5);
+		request.appendOctetString(id6);
+
+		Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus = PacketStore::InProgress;
+		Services.storageAndRetrieval.packetStores[id6].openRetrievalStatus = PacketStore::InProgress;
+
+		CHECK(Services.storageAndRetrieval.packetStores[id].openRetrievalStartTimeTag == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].openRetrievalStartTimeTag == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].openRetrievalStartTimeTag == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].openRetrievalStartTimeTag == 0);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 13);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 7);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 2);
+		CHECK(Services.storageAndRetrieval.packetStores[id].openRetrievalStartTimeTag == 200);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].openRetrievalStartTimeTag == 200);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].openRetrievalStartTimeTag == 0);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].openRetrievalStartTimeTag == 0);
+
+		Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus = PacketStore::Suspended;
+
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartTimeTag,Message::TC,1);
+		startTimeTag = 15;
+		numOfPacketStores = 0;
+		request2.appendUint32(startTimeTag);
+		request2.appendUint16(numOfPacketStores);
+
+		MessageParser::execute(request2);
+
+		CHECK(ServiceTests::count() == 14);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 3);
+		CHECK(Services.storageAndRetrieval.packetStores[id].openRetrievalStartTimeTag == 15);
+		CHECK(Services.storageAndRetrieval.packetStores[id2].openRetrievalStartTimeTag == 15);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].openRetrievalStartTimeTag == 15);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].openRetrievalStartTimeTag == 0);
+	}
+
 //	SECTION("Packet store deletion") {
 //		Message request(StorageAndRetrievalService::ServiceType,
 //		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
