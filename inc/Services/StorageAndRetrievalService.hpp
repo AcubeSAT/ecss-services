@@ -88,7 +88,7 @@ public:
 	/**
 	* @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
  	*/
-	const bool supportsConcurrentRetrievalRequests = true;
+	const bool supportsConcurrentRetrievalRequests = false;
 	const uint16_t maxConcurrentRetrievalRequests = 5;
 
 	/**
@@ -99,7 +99,7 @@ public:
 	/**
 	* @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
 	*/
-	const bool supportsPrioritizingRetrievals = true;
+	const bool supportsPrioritizingRetrievals = false;
 
 	/**
 	 * @brief Support for the by-time-range retrieval of packets.
