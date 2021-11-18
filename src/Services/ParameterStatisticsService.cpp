@@ -4,24 +4,29 @@
 #include "Services/ParameterStatisticsService.hpp"
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
-
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.messageType == MessageType::ReportParameterStatistics,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
-	bool resetFlagValue = request.readBoolean();
 
 	createParameterStatisticsReport(statisticsReport);
 
 	// TODO: First add start time and end time
 	storeMessage(statisticsReport);
 
-	if (resetFlagValue or hasAutomaticStatisticsReset) {
+	if (hasAutomaticStatisticsReset) {
 		Message reset(ServiceType,MessageType::ResetParameterStatistics,Message::TC,1);
 		resetParameterStatistics(reset);
+	} else {
+		Message reset(ServiceType,MessageType::ResetParameterStatistics,Message::TC,1);
+		bool resetFlagValue = request.readBoolean();
+		if (resetFlagValue) {
+			resetParameterStatistics(reset);
+		}
 	}
+
 	// Here add start time
 }
 

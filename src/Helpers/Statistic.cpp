@@ -17,11 +17,7 @@ void Statistic::updateStatistics(double value) {
 		// TODO: minTime = as_CUC_timestamp();
 	}
 	mean = (mean * sampleCounter + value) / (sampleCounter + 1);
-	meanOfSquares = (meanOfSquares * sampleCounter + pow(value, 2)) / (sampleCounter + 1);
 	sumOfSquares += pow(value, 2);
-	if (SUPPORTS_STANDARD_DEVIATION) {
-		standardDeviation = sqrt(meanOfSquares - pow(mean, 2));
-	}
 	sampleCounter++;
 }
 
@@ -33,6 +29,8 @@ void Statistic::appendStatisticsToMessage(Message& report) {
 	report.appendFloat(static_cast <float> (mean));
 
 	if (SUPPORTS_STANDARD_DEVIATION) {
+		meanOfSquares = sumOfSquares / sampleCounter;
+		standardDeviation = sqrt(meanOfSquares - pow(mean, 2));
 		report.appendFloat(static_cast <float> (standardDeviation));
 	}
 }
