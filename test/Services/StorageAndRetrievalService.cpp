@@ -941,6 +941,57 @@ TEST_CASE("Storage And Retrieval Service") {
 		 */
 	}
 
+	SECTION("Resizing the packet stores") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
+		uint16_t numOfPacketStores = 6;
+		request.appendUint16(numOfPacketStores);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		request.appendOctetString(id);
+		request.appendUint16(444);
+		request.appendOctetString(id2);
+		request.appendUint16(555);
+		request.appendOctetString(id3);
+		request.appendUint16(666);
+		request.appendOctetString(id4);
+		request.appendUint16(777);
+		request.appendOctetString(id5);
+		request.appendUint16(888);
+		request.appendOctetString(id6);
+		request.appendUint16(999);
+
+		CHECK(Services.storageAndRetrieval.packetStores[id5].sizeInBytes == 400);
+		CHECK(Services.storageAndRetrieval.packetStores[id].sizeInBytes == 200);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].sizeInBytes == 340);
+		CHECK(Services.storageAndRetrieval.packetStores[id4].sizeInBytes == 292);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 44);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithStorageStatusEnabled) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithByTimeRangeRetrieval) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithOpenRetrievalInProgress) == 2);
+
+		CHECK(Services.storageAndRetrieval.packetStores[id5].sizeInBytes == 888);
+		CHECK(Services.storageAndRetrieval.packetStores[id].sizeInBytes == 200);
+		CHECK(Services.storageAndRetrieval.packetStores[id6].sizeInBytes == 340);
+		CHECK(Services.storageAndRetrieval.packetStores[id4].sizeInBytes == 292);
+	}
+
 	//	SECTION("Packet store deletion") {
 	//		Message request(StorageAndRetrievalService::ServiceType,
 	//		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
