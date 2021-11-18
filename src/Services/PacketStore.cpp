@@ -9,6 +9,9 @@ bool PacketStore::copyPacketsTo(PacketStore &target,
 	if ((beforeTimeTag and afterTimeTag) or (beforeTimeTag and fromTagToTag) or (afterTimeTag and fromTagToTag)) {
 		return false;
 	}
+	if (fromTagToTag and endTime < storedTmPackets.front().first) {
+		return false;
+	}
 	if (fromTagToTag) {
 		for (auto &packet : storedTmPackets) {
 			if (packet.first < startTime) {

@@ -41,6 +41,8 @@ public:
 	PacketStoreOpenRetrievalStatus openRetrievalStatus;
 	bool byTimeRangeRetrievalStatus;
 
+	PacketStore() = default;
+
 	/**
 	 * A queue containing the TM messages stored by the packet store. Every TM is followed by its timestamp.
 	 *

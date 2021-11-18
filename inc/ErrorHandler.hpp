@@ -263,6 +263,12 @@ public:
 		 * Attempt to delete a packet store, whose storage status is enabled (ST[15])
 		 */
 		DeletionOfPacketStoreWithStorageStatusEnabled = 37,
+		/**
+		 * Attempt to copy packets from a packet store to another, but either no packet timestamp falls inside the
+		 * specified timestamp, or more than one boolean argument were given as true in the 'copyPacketsTo' function
+		 * (ST[15])
+		 */
+		CopyOfPacketsFailed = 38,
 
 	};
 

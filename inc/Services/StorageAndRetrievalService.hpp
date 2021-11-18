@@ -110,6 +110,10 @@ public:
 	 */
 	const TimeStamping timeStamping = PacketBased;
 
+	const bool fromTagToTag = true;
+	const bool afterTimeTag = false;
+	const bool beforeTimeTag = false;
+
 	/**
 	* TC[15,1] request to enable the packet stores' storage function
 	*/
@@ -175,7 +179,10 @@ public:
 	/**
 	 * TC[15,24] copy the packets contained into a packet store, selected by the time window
 	 */
-	void copyPacketsInTimeWindow(Message& request);
+	void copyPacketsInTimeWindow(Message& request,
+	                             bool beforeTimeTag,
+	                             bool afterTimeTag,
+	                             bool fromTagToTag);
 
 	/**
 	 * TC[15,25] resize packet stores

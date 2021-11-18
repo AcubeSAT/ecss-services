@@ -73,6 +73,11 @@ void addTelemetryPacketsInPacketStores() {
 	}
 }
 
+void createEmptyPacketStore(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId) {
+	PacketStore emptyPacketStore;
+	Services.storageAndRetrieval.packetStores.insert({packetStoreId, emptyPacketStore});
+}
+
 TEST_CASE("Storage And Retrieval Service") {
 	SECTION("Packet store creation") {
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -669,10 +674,12 @@ TEST_CASE("Storage And Retrieval Service") {
 
 		MessageParser::execute(request);
 
-		CHECK(Services.storageAndRetrieval.packetStores[id].storedTmPackets.empty()); // all remaining deleted
-		CHECK(Services.storageAndRetrieval.packetStores[id4].storedTmPackets.empty()); // all remaining deleted
-		CHECK(Services.storageAndRetrieval.packetStores[id5].storedTmPackets.size() == 1); // 1 remained
-		CHECK(Services.storageAndRetrieval.packetStores[id6].storedTmPackets.empty()); // all remaining deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id].storedTmPackets.empty());       // all remaining deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id4].storedTmPackets.empty());      // all remaining deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storedTmPackets.size() == 1);  // 1 remained
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storedTmPackets.empty());      // all remaining deleted
+		Services.storageAndRetrieval.packetStores[id5].storedTmPackets.pop_front();         // delete all to fill later
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storedTmPackets.empty());
 	}
 
 	SECTION("Reporting the packet store configuration") {
@@ -737,6 +744,201 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.readUint16() == 292);
 		CHECK(report.readUint16() == 0);
 		CHECK(report.readUint16() == 3);
+	}
+
+	SECTION("Copying packets in time window") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		addTelemetryPacketsInPacketStores();
+
+		/**
+		 * CASE 1:
+		 *
+		 * 	(tag1)--------(earlier packet timestamp)-----(..more packets)-----(tag2)--------(latest packet timestamp)
+		 * 				left-most packet in deque				tag2 somewehere inside		right-most packet in deque
+		 */
+		request.appendUint16(0);
+		uint32_t timeTag1 = 0;
+		uint32_t timeTag2 = 4;
+		uint8_t fromPacketStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId(fromPacketStoreData);
+		uint8_t toPacketStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> toPacketStoreId(toPacketStoreData);
+		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.clear(); //empty ps799
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.empty());
+
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 34);
+
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.size() == 2);
+		int index = 0;
+		for (auto &tmPacket : Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets) {
+			CHECK(tmPacket.first == timestamps1[index++]);
+		}
+
+		/**
+		 * CASE 2:
+		 *
+		 * 	(earlier packet timestamp)-------(tag1)-----(..more packets)-----(tag2)--------(latest packet timestamp)
+		 * 	left-most packet in deque						both tag1 and tag2 inside 		right-most packet in deque
+		 */
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		request2.appendUint16(0);
+		timeTag1 = 35;
+		timeTag2 = 52;
+		uint8_t fromPacketStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId2(fromPacketStoreData2);
+		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.clear(); //empty ps799
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.empty());
+
+		request2.appendUint32(timeTag1);
+		request2.appendUint32(timeTag2);
+		request2.appendOctetString(fromPacketStoreId2);
+		request2.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 34);
+
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.size() == 4);
+		index = 3;
+		for (auto &tmPacket : Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets) {
+			CHECK(tmPacket.first == timestamps4[index++]);
+		}
+
+		/**
+		 * CASE 3:
+		 *
+		 * 	(earlier packet timestamp)-------(tag1)-----(..more packets)-----(latest packet timestamp)--------(tag2)
+		 * 	left-most packet in deque		tag1 inside						right-most packet in deque
+		 */
+		Message request3(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		request3.appendUint16(0);
+		timeTag1 = 3;
+		timeTag2 = 27;
+		uint8_t fromPacketStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId3(fromPacketStoreData3);
+		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.clear(); //empty ps799
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.empty());
+
+		request3.appendUint32(timeTag1);
+		request3.appendUint32(timeTag2);
+		request3.appendOctetString(fromPacketStoreId3);
+		request3.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request3);
+		CHECK(ServiceTests::count() == 34);
+
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.size() == 3);
+		index = 2;
+		for (auto &tmPacket : Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets) {
+			CHECK(tmPacket.first == timestamps2[index++]);
+		}
+
+		/**
+		 * CASE 4: Invalid packet store
+		 */
+		 //Invalid fromPacket
+		Message request4(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		request4.appendUint16(0);
+		uint8_t fromPacketStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps21";
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId4(fromPacketStoreData4);
+
+		request4.appendUint32(timeTag1);
+		request4.appendUint32(timeTag2);
+		request4.appendOctetString(fromPacketStoreId4);
+		request4.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request4);
+		CHECK(ServiceTests::count() == 35);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 1);
+
+		//Invalid toPacket
+		Message request44(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		request44.appendUint16(0);
+
+		request44.appendUint32(timeTag1);
+		request44.appendUint32(timeTag2);
+		request44.appendOctetString(fromPacketStoreId3);
+		request44.appendOctetString(fromPacketStoreId4);
+
+		MessageParser::execute(request44);
+		CHECK(ServiceTests::count() == 36);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 2);
+
+		/**
+		 * CASE 5: Invalid time window
+		 */
+		Message request5(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		request5.appendUint16(0);
+		timeTag1 = 5;
+		timeTag2 = 3;
+		uint8_t fromPacketStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId5(fromPacketStoreData5);
+
+		request5.appendUint32(timeTag1);
+		request5.appendUint32(timeTag2);
+		request5.appendOctetString(fromPacketStoreId5);
+		request5.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request5);
+		CHECK(ServiceTests::count() == 37);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidTimeWindow) == 2);
+
+		/**
+		 * CASE 6: Destination packet NOT empty
+		 */
+		Message request6(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		request6.appendUint16(0);
+		timeTag1 = 3;
+		timeTag2 = 7;
+
+		request6.appendUint32(timeTag1);
+		request6.appendUint32(timeTag2);
+		request6.appendOctetString(fromPacketStoreId5);
+		request6.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request6);
+		CHECK(ServiceTests::count() == 38);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DestinationPacketStoreNotEmtpy) == 1);
+
+		/**
+		 * CASE 7: No packets inside the requested time window in the source packet
+		 */
+		Message request7(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+		request7.appendUint16(0);
+		uint8_t fromPacketStoreData7[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId7(fromPacketStoreData7);
+
+		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.clear(); //empty ps799
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.empty());
+		timeTag1 = 0;
+		timeTag2 = 3;
+
+		request7.appendUint32(timeTag1);
+		request7.appendUint32(timeTag2);
+		request7.appendOctetString(fromPacketStoreId7);
+		request7.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request7);
+		CHECK(ServiceTests::count() == 39);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::CopyOfPacketsFailed) == 1);
+		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTmPackets.empty());
+
+		/**
+		 * todo: test the 'afterTimeTag' and 'beforeTimeTag' as well
+		 */
 	}
 
 	//	SECTION("Packet store deletion") {
