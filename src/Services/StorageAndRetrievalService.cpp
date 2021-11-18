@@ -578,7 +578,7 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 
 	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
 	request.readOctetString(packetStoreData);
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> idToChange(packetStoreData);
+	String <ECSS_MAX_PACKET_STORE_ID_SIZE> idToChange(packetStoreData);
 	if (packetStores.find(idToChange) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
@@ -611,7 +611,7 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 
 	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
 	request.readOctetString(packetStoreData);
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> idToChange(packetStoreData);
+	String <ECSS_MAX_PACKET_STORE_ID_SIZE> idToChange(packetStoreData);
 	uint8_t virtualChannel = request.readUint8();
 	if (packetStores.find(idToChange) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);

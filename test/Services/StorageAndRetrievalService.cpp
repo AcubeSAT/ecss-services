@@ -1116,6 +1116,75 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id5].packetStoreType == PacketStore::Bounded);
 	}
 
+	SECTION("Changing the virtual channel of packet stores") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		uint8_t virtualChannel = 5;
+
+		request.appendOctetString(id2);
+		request.appendUint8(virtualChannel);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 53);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 7);
+
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
+		request2.appendOctetString(id4);
+		request2.appendUint8(virtualChannel);
+		Services.storageAndRetrieval.packetStores[id4].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id4].openRetrievalStatus = PacketStore::InProgress;
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 54);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithOpenRetrievalInProgress) == 5);
+
+		Message request3(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
+		Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id].openRetrievalStatus = PacketStore::Suspended;
+		request3.appendOctetString(id);
+		virtualChannel = 12;
+		request3.appendUint8(virtualChannel);
+		MessageParser::execute(request3);
+		CHECK(ServiceTests::count() == 55);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidVirtualChannel) == 3);
+
+		Message request4(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
+		Services.storageAndRetrieval.packetStores[id6].byTimeRangeRetrievalStatus = true;
+		request4.appendOctetString(id6);
+		request4.appendUint8(virtualChannel);
+		MessageParser::execute(request4);
+		CHECK(ServiceTests::count() == 56);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithByTimeRangeRetrieval) == 4);
+
+		Message request5(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
+		Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus = PacketStore::Suspended;
+		request5.appendOctetString(id5);
+		virtualChannel = 7;
+		request5.appendUint8(virtualChannel);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].virtualChannel == static_cast <uint8_t> (5));
+		MessageParser::execute(request5);
+		CHECK(ServiceTests::count() == 56);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].virtualChannel == static_cast <uint8_t> (7));
+	}
+
 	//	SECTION("Packet store deletion") {
 	//		Message request(StorageAndRetrievalService::ServiceType,
 	//		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
