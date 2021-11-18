@@ -435,11 +435,11 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 	report.appendUint16(packetStores.size());
 	for (auto &packetStore : packetStores) {
 		String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId = packetStore.first;
-		request.appendString(packetStoreId);
-		request.appendUint16(packetStore.second.sizeInBytes);
+		report.appendOctetString(packetStoreId);
+		report.appendUint16(packetStore.second.sizeInBytes);
 		uint16_t typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
-		request.appendUint16(typeCode);
-		request.appendUint16(packetStore.second.virtualChannel);
+		report.appendUint16(typeCode);
+		report.appendUint16(packetStore.second.virtualChannel);
 	}
 	storeMessage(report);
 }

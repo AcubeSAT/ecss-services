@@ -20,11 +20,12 @@ void buildPacketCreationRequest(Message& request) {
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
-		for (auto &x : packetStoreData) {
+		for (auto& x : packetStoreData) {
 			x = 0;
 		}
-		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1], packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
+		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
+		          packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
 		request.appendOctetString(packetStoreId);
 		request.appendUint16(sizes[i]);
 		if (!(i % 2)) {
@@ -36,12 +37,12 @@ void buildPacketCreationRequest(Message& request) {
 	}
 }
 
-//void buildPacketDeletionRequest(Message& request) {
+// void buildPacketDeletionRequest(Message& request) {
 //	uint16_t numOfPacketStores = 6;
 //	request.appendUint16(numOfPacketStores);
 //	uint8_t concatenatedPacketStoreNames[] = "ps1ps2ps27ps799ps5555ps1111";
 //	uint16_t offsets[7] = {0, 3, 6, 10, 15, 21, 27};
-//}
+// }
 
 void addTelemetryPacketsInPacketStores() {
 	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
@@ -49,24 +50,24 @@ void addTelemetryPacketsInPacketStores() {
 	uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 	uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-	String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-	String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-	String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-	String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
 
-	for (auto &timestamp : timestamps1) {
+	for (auto& timestamp : timestamps1) {
 		Message tmPacket;
 		Services.storageAndRetrieval.packetStores[id].storedTmPackets.push_back({timestamp, tmPacket});
 	}
-	for (auto &timestamp : timestamps2) {
+	for (auto& timestamp : timestamps2) {
 		Message tmPacket;
 		Services.storageAndRetrieval.packetStores[id2].storedTmPackets.push_back({timestamp, tmPacket});
 	}
-	for (auto &timestamp : timestamps3) {
+	for (auto& timestamp : timestamps3) {
 		Message tmPacket;
 		Services.storageAndRetrieval.packetStores[id3].storedTmPackets.push_back({timestamp, tmPacket});
 	}
-	for (auto &timestamp : timestamps4) {
+	for (auto& timestamp : timestamps4) {
 		Message tmPacket;
 		Services.storageAndRetrieval.packetStores[id4].storedTmPackets.push_back({timestamp, tmPacket});
 	}
@@ -75,7 +76,7 @@ void addTelemetryPacketsInPacketStores() {
 TEST_CASE("Storage And Retrieval Service") {
 	SECTION("Packet store creation") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::CreatePacketStores,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::CreatePacketStores, Message::TC, 1);
 		buildPacketCreationRequest(request);
 		MessageParser::execute(request);
 
@@ -90,10 +91,10 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
 
 		CHECK(Services.storageAndRetrieval.packetStores[id].sizeInBytes == 200);
 		CHECK(Services.storageAndRetrieval.packetStores[id2].sizeInBytes == 340);
@@ -116,7 +117,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Storage function enabling") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::EnableStorageFunction,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::EnableStorageFunction, Message::TC, 1);
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
@@ -125,10 +126,10 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -138,8 +139,8 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
 
 		CHECK(Services.storageAndRetrieval.packetStores[id].storageStatus == false);
 		CHECK(Services.storageAndRetrieval.packetStores[id3].storageStatus == false);
@@ -156,7 +157,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id6].storageStatus == false);
 
 		Message request2(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::EnableStorageFunction,Message::TC,1);
+		                 StorageAndRetrievalService::MessageType::EnableStorageFunction, Message::TC, 1);
 		numOfPacketStores = 0;
 		request2.appendUint16(numOfPacketStores);
 
@@ -170,7 +171,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Storage function disabling") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::DisableStorageFunction,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::DisableStorageFunction, Message::TC, 1);
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
@@ -179,10 +180,10 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
 		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -193,9 +194,9 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData7[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id7(packetStoreData7);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id7(packetStoreData7);
 
 		CHECK(Services.storageAndRetrieval.packetStores[id2].storageStatus == true);
 		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == true);
@@ -212,7 +213,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id7].storageStatus == true);
 
 		Message request2(StorageAndRetrievalService::ServiceType,
-		                 StorageAndRetrievalService::MessageType::DisableStorageFunction,Message::TC,1);
+		                 StorageAndRetrievalService::MessageType::DisableStorageFunction, Message::TC, 1);
 		numOfPacketStores = 0;
 		request2.appendUint16(numOfPacketStores);
 
@@ -226,7 +227,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Open retrieval start time tag changing") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartTimeTag,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartTimeTag, Message::TC, 1);
 		uint32_t startTimeTag = 200;
 		/**
 		 * todo: use function (CUC) to get the timestamp
@@ -242,12 +243,12 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -277,7 +278,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus = PacketStore::Suspended;
 
 		Message request2(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartTimeTag,Message::TC,1);
+		                 StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartTimeTag, Message::TC, 1);
 		startTimeTag = 15;
 		numOfPacketStores = 0;
 		request2.appendUint32(startTimeTag);
@@ -295,7 +296,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Open retrieval resuming") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores, Message::TC, 1);
 		uint16_t numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 
@@ -306,12 +307,12 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -341,7 +342,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		Services.storageAndRetrieval.packetStores[id6].byTimeRangeRetrievalStatus = false;
 
 		Message request2(StorageAndRetrievalService::ServiceType,
-		                 StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores,Message::TC,1);
+		                 StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores, Message::TC, 1);
 		numOfPacketStores = 0;
 		request2.appendUint16(numOfPacketStores);
 
@@ -358,7 +359,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Open retrieval suspension") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores, Message::TC, 1);
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
@@ -369,12 +370,12 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -401,7 +402,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		Services.storageAndRetrieval.packetStores[id6].openRetrievalStatus = PacketStore::InProgress;
 
 		Message request2(StorageAndRetrievalService::ServiceType,
-		                 StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores,Message::TC,1);
+		                 StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores, Message::TC, 1);
 		numOfPacketStores = 0;
 		request2.appendUint16(numOfPacketStores);
 
@@ -416,7 +417,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Starting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
 		uint16_t numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 		uint32_t fromTime = 4;
@@ -429,34 +430,34 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
 
 		/**
 		 * @todo: actually skip the rest of the invalid message before reading the next id
 		 */
 		request.appendOctetString(id);
-//		request.appendUint32(fromTime);
-//		request.appendUint32(toTime);
+		//		request.appendUint32(fromTime);
+		//		request.appendUint32(toTime);
 		request.appendOctetString(id2);
 		request.appendUint32(fromTime);
 		request.appendUint32(toTime);
 		request.appendOctetString(id3);
-//		request.appendUint32(fromTime);
-//		request.appendUint32(toTime);
+		//		request.appendUint32(fromTime);
+		//		request.appendUint32(toTime);
 		request.appendOctetString(id4);
-//		request.appendUint32(fromTime);
-//		request.appendUint32(toTime);
+		//		request.appendUint32(fromTime);
+		//		request.appendUint32(toTime);
 		request.appendOctetString(id5);
 		request.appendUint32(6);
 		request.appendUint32(4);
 		request.appendOctetString(id6);
-//		request.appendUint32(fromTime);
-//		request.appendUint32(toTime);
+		//		request.appendUint32(fromTime);
+		//		request.appendUint32(toTime);
 
 		Services.storageAndRetrieval.packetStores[id].openRetrievalStatus = PacketStore::InProgress;
 		Services.storageAndRetrieval.packetStores[id6].byTimeRangeRetrievalStatus = true;
@@ -493,7 +494,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Aborting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::AbortByTimeRangeRetrieval,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::AbortByTimeRangeRetrieval, Message::TC, 1);
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
@@ -504,12 +505,12 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -530,7 +531,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus == true);
 
 		Message request2(StorageAndRetrievalService::ServiceType,
-		                 StorageAndRetrievalService::MessageType::AbortByTimeRangeRetrieval,Message::TC,1);
+		                 StorageAndRetrievalService::MessageType::AbortByTimeRangeRetrieval, Message::TC, 1);
 		numOfPacketStores = 0;
 		request2.appendUint16(numOfPacketStores);
 
@@ -545,16 +546,16 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Reporting the packet store status") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::ReportStatusOfPacketStores,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::ReportStatusOfPacketStores, Message::TC, 1);
 
 		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
 		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
 		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
 		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
 		Services.storageAndRetrieval.packetStores[id].storageStatus = false;
 		Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus = true;
 		Services.storageAndRetrieval.packetStores[id2].storageStatus = true;
@@ -566,7 +567,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message report = ServiceTests::get(28);
 		CHECK(report.readUint16() == 4);
 		CHECK(report.messageType == StorageAndRetrievalService::MessageType::PacketStoresStatusReport);
-		//Packet store 1
+		// Packet store 1
 		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
 		report.readOctetString(data);
 		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
@@ -575,7 +576,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.readBoolean() == false);
 		CHECK(report.readUint16() == 1);
 		CHECK(report.readBoolean() == true);
-		//Packet store 2
+		// Packet store 2
 		report.readOctetString(data);
 		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
 			CHECK(data[i] == packetStoreData2[i]);
@@ -583,7 +584,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.readBoolean() == true);
 		CHECK(report.readUint16() == 1);
 		CHECK(report.readBoolean() == false);
-		//Packet store 3
+		// Packet store 3
 		report.readOctetString(data);
 		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
 			CHECK(data[i] == packetStoreData4[i]);
@@ -591,7 +592,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.readBoolean() == false);
 		CHECK(report.readUint16() == 1);
 		CHECK(report.readBoolean() == false);
-		//Packet store 4
+		// Packet store 4
 		report.readOctetString(data);
 		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
 			CHECK(data[i] == packetStoreData3[i]);
@@ -603,7 +604,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 	SECTION("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent,Message::TC,1);
+		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 		addTelemetryPacketsInPacketStores();
 		uint32_t timeLimit = 7;
 		uint16_t numOfPacketStores = 6;
@@ -617,12 +618,12 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
 		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
 
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String <ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -634,29 +635,30 @@ TEST_CASE("Storage And Retrieval Service") {
 		Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus = true;
 		MessageParser::execute(request);
 
+		CHECK(ServiceTests::count() == 33);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 17);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithByTimeRangeRetrieval) == 4);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 4);
 
-		CHECK(Services.storageAndRetrieval.packetStores[id].storedTmPackets.size() == 6);   //none deleted
-		CHECK(Services.storageAndRetrieval.packetStores[id4].storedTmPackets.size() == 4);  //none deleted
-		CHECK(Services.storageAndRetrieval.packetStores[id5].storedTmPackets.size() == 6);  //1 deleted
-		CHECK(Services.storageAndRetrieval.packetStores[id6].storedTmPackets.size() == 2);  //3 deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id].storedTmPackets.size() == 6); // none deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id4].storedTmPackets.size() == 4); // none deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storedTmPackets.size() == 6); // 1 deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storedTmPackets.size() == 2); // 3 deleted
 
 		int index = 0;
-		for (auto &timestamp : Services.storageAndRetrieval.packetStores[id].storedTmPackets) {
+		for (auto& timestamp : Services.storageAndRetrieval.packetStores[id].storedTmPackets) {
 			CHECK(timestamp.first == timestamps1[index++]);
 		}
 		index = 0;
-		for (auto &timestamp : Services.storageAndRetrieval.packetStores[id4].storedTmPackets) {
+		for (auto& timestamp : Services.storageAndRetrieval.packetStores[id4].storedTmPackets) {
 			CHECK(timestamp.first == timestamps3[index++]);
 		}
 		index = 2;
-		for (auto &timestamp : Services.storageAndRetrieval.packetStores[id5].storedTmPackets) {
+		for (auto& timestamp : Services.storageAndRetrieval.packetStores[id5].storedTmPackets) {
 			CHECK(timestamp.first == timestamps4[index++]);
 		}
 		index = 3;
-		for (auto &timestamp : Services.storageAndRetrieval.packetStores[id6].storedTmPackets) {
+		for (auto& timestamp : Services.storageAndRetrieval.packetStores[id6].storedTmPackets) {
 			CHECK(timestamp.first == timestamps2[index++]);
 		}
 
@@ -667,18 +669,80 @@ TEST_CASE("Storage And Retrieval Service") {
 
 		MessageParser::execute(request);
 
-		CHECK(Services.storageAndRetrieval.packetStores[id].storedTmPackets.empty());       //all remaining deleted
-		CHECK(Services.storageAndRetrieval.packetStores[id4].storedTmPackets.empty());      //all remaining deleted
-		CHECK(Services.storageAndRetrieval.packetStores[id5].storedTmPackets.size() == 1);  //1 remained
-		CHECK(Services.storageAndRetrieval.packetStores[id6].storedTmPackets.empty());      //all remaining deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id].storedTmPackets.empty()); // all remaining deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id4].storedTmPackets.empty()); // all remaining deleted
+		CHECK(Services.storageAndRetrieval.packetStores[id5].storedTmPackets.size() == 1); // 1 remained
+		CHECK(Services.storageAndRetrieval.packetStores[id6].storedTmPackets.empty()); // all remaining deleted
 	}
 
-//	SECTION("Packet store deletion") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
-//		buildPacketDeletionRequest(request);
-//		MessageParser::execute(request);
-//	}
+	SECTION("Reporting the packet store configuration") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ReportConfigurationOfPacketStores, Message::TC, 1);
 
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
 
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 34);
+		Message report = ServiceTests::get(33);
+		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
+		CHECK(report.readUint16() == 4);
+
+		/**
+		 * @note:
+		 * I don't know if there is a possibility that the map inserts the elements in an order, different than the
+		 * expected one. In that case this will be an issue here, but in all of my testing it remained
+		 * consistently correct.
+		 */
+
+		// packet store ps2
+		report.readOctetString(data);
+		int index = 0;
+		for (auto& x : data) {
+			CHECK(x == packetStoreData[index++]);
+		}
+		CHECK(report.readUint16() == 200);
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readUint16() == 6);
+
+		// packet store ps25
+		report.readOctetString(data);
+		index = 0;
+		for (auto& x : data) {
+			CHECK(x == packetStoreData4[index++]);
+		}
+		CHECK(report.readUint16() == 340);
+		CHECK(report.readUint16() == 1);
+		CHECK(report.readUint16() == 2);
+
+		// packet store ps5555
+		report.readOctetString(data);
+		index = 0;
+		for (auto& x : data) {
+			CHECK(x == packetStoreData3[index++]);
+		}
+		CHECK(report.readUint16() == 400);
+		CHECK(report.readUint16() == 0);
+		CHECK(report.readUint16() == 5);
+
+		// packet store ps799
+		report.readOctetString(data);
+		index = 0;
+		for (auto& x : data) {
+			CHECK(x == packetStoreData2[index++]);
+		}
+		CHECK(report.readUint16() == 292);
+		CHECK(report.readUint16() == 0);
+		CHECK(report.readUint16() == 3);
+	}
+
+	//	SECTION("Packet store deletion") {
+	//		Message request(StorageAndRetrievalService::ServiceType,
+	//		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
+	//		buildPacketDeletionRequest(request);
+	//		MessageParser::execute(request);
+	//	}
 }
