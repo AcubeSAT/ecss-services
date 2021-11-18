@@ -152,21 +152,6 @@
 #define ECSS_CRC_INCLUDED true
 
 /**
- * @brief Defines the max number of statistic definitions
- */
-// TODO: actually define this
-#define MAX_NUM_OF_DEFINITIONS 10
-/**
- * Defines the max number of samples per statistic in ST[04]
- */
-#define SAMPLES_MAX_VECTOR_SIZE 10
-
-/**
- * @brief Defines the max number of housekeeping structs that a housekeeping service can contain
- */
-#define ECSS_MAX_HOUSEKEEPING_STRUCTS 10
-
-/**
  * Number of parameters whose statistics we need and are going to be stored into the statisticsMap
  */
 #define ECSS_MAX_STATISTIC_PARAMETERS 10

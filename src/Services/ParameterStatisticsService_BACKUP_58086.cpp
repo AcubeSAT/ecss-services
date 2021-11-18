@@ -3,12 +3,20 @@
 #ifdef SERVICE_PARAMETER
 #include "Services/ParameterStatisticsService.hpp"
 
+<<<<<<< Updated upstream
+void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
+	ErrorHandler::assertRequest(resetFlag.packetType == Message::TC, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(resetFlag.messageType == MessageType::ReportParameterStatistics,
+	                            resetFlag, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(resetFlag.serviceType == ServiceType, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+=======
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 
 	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.messageType == MessageType::ReportParameterStatistics,
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+>>>>>>> Stashed changes
 
 	Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
 	bool resetFlagValue = request.readBoolean();

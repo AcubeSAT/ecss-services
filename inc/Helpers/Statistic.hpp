@@ -18,7 +18,6 @@ public:
 	uint16_t sampleCounter = 0;
 	uint32_t maxTime = 0;
 	uint32_t minTime = 0;   //TODO: CUC Format timestamp
-	double max = 0;
 	double max = -std::numeric_limits<double>::infinity();
 	double min = std::numeric_limits<double>::infinity();
 	double sumOfSquares = 0;

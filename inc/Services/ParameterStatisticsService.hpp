@@ -40,19 +40,18 @@ public:
 	bool hasTimeIntervals = true;
 	const bool supportsSamplingInterval = true;
 	uint16_t reportingInterval = 5;   // Must define units. Same as parameter sampling rates
-	const uint16_t numOfStatisticsDefinitions = 0;
 
 	/**
 	 * This function receives a TC[4,1] packet and responds with a TM[4,2] packet containing the parameter statistics
 	 * report.
 	 */
-	void reportParameterStatistics(Message& resetFlag);
+	void reportParameterStatistics(Message& request);
 	void createParameterStatisticsReport(Message& report);
 
 	/**
 	 * TC[4,3] reset parameter statistics, clearing all samples and values.
 	 */
-	void resetParameterStatistics();
+	void resetParameterStatistics(Message& request);
 
 	/**
 	 * TC[4,4] enable periodic parameter reporting
@@ -85,6 +84,7 @@ public:
 	 * definitions report.
 	 */
 	void reportStatisticsDefinitions(Message& request);
+	void statisticsDefinitionsReport();
 
 	/**
 	 * Calls the suitable function that executes a telecommand packet. The source of that packet

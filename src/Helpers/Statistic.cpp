@@ -19,7 +19,9 @@ void Statistic::updateStatistics(double value) {
 	mean = (mean * sampleCounter + value) / (sampleCounter + 1);
 	meanOfSquares = (meanOfSquares * sampleCounter + pow(value, 2)) / (sampleCounter + 1);
 	sumOfSquares += pow(value, 2);
-	standardDeviation = sqrt(meanOfSquares - pow(mean,2));
+	if (SUPPORTS_STANDARD_DEVIATION) {
+		standardDeviation = sqrt(meanOfSquares - pow(mean, 2));
+	}
 	sampleCounter++;
 }
 

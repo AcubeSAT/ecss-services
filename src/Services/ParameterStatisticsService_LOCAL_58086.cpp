@@ -3,15 +3,14 @@
 #ifdef SERVICE_PARAMETER
 #include "Services/ParameterStatisticsService.hpp"
 
-void ParameterStatisticsService::reportParameterStatistics(Message& request) {
-
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::ReportParameterStatistics,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
+	ErrorHandler::assertRequest(resetFlag.packetType == Message::TC, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(resetFlag.messageType == MessageType::ReportParameterStatistics,
+	                            resetFlag, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(resetFlag.serviceType == ServiceType, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
 	Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
-	bool resetFlagValue = request.readBoolean();
+	bool resetFlagValue = resetFlag.readBoolean();
 
 	createParameterStatisticsReport(statisticsReport);
 
@@ -19,8 +18,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	storeMessage(statisticsReport);
 
 	if (resetFlagValue or hasAutomaticStatisticsReset) {
-		Message reset(ServiceType,MessageType::ResetParameterStatistics,Message::TC,1);
-		resetParameterStatistics(reset);
+		resetParameterStatistics();
 	}
 	// Here add start time
 }
@@ -55,11 +53,8 @@ void ParameterStatisticsService::createParameterStatisticsReport(Message& report
 	}
 }
 
-void ParameterStatisticsService::resetParameterStatistics(Message& request) {
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::ResetParameterStatistics,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+void ParameterStatisticsService::resetParameterStatistics() {
+
 	// TODO: Stop the evaluation of parameter statistics
 	for (auto &it: systemStatistics.statisticsMap) {
 		it.second.resetStatistics();
@@ -215,10 +210,6 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	statisticsDefinitionsReport();
-}
-
-void ParameterStatisticsService::statisticsDefinitionsReport() {
 	Message definitionsReport(ServiceType,MessageType::ParameterStatisticsDefinitionsReport,Message::TM, 1);
 
 	uint16_t currentReportingInterval = 0;
