@@ -87,7 +87,7 @@ public:
 	void reportStatisticsDefinitions(Message& request);
 
 	/**
-	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * Calls the suitable function that executes a telecommand packet. The source of that packet
 	 * is the ground station.
 	 *
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
