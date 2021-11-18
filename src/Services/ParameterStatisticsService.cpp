@@ -4,7 +4,6 @@
 #include "Services/ParameterStatisticsService.hpp"
 
 void ParameterStatisticsService::reportParameterStatistics(Message& resetFlag) {
-
 	ErrorHandler::assertRequest(resetFlag.packetType == Message::TC, resetFlag,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(resetFlag.messageType == MessageType::ReportParameterStatistics,
 	                            resetFlag, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
