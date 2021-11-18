@@ -695,6 +695,7 @@ TEST_CASE("Storage And Retrieval Service") {
 
 		CHECK(ServiceTests::count() == 34);
 		Message report = ServiceTests::get(33);
+		CHECK(report.messageType == StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport);
 		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
 		CHECK(report.readUint16() == 4);
 
@@ -1054,6 +1055,65 @@ TEST_CASE("Storage And Retrieval Service") {
 		MessageParser::execute(request5);
 		CHECK(ServiceTests::count() == 48);
 		CHECK(Services.storageAndRetrieval.packetStores[id5].packetStoreType == PacketStore::Circular);
+	}
+
+	SECTION("Changing the packet store type to Bounded") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		request.appendOctetString(id2);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 49);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 6);
+
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
+		request2.appendOctetString(id4);
+		MessageParser::execute(request2);
+		CHECK(ServiceTests::count() == 50);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithOpenRetrievalInProgress) == 4);
+
+		Message request3(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
+		Services.storageAndRetrieval.packetStores[id].storageStatus = true;
+		request3.appendOctetString(id);
+		MessageParser::execute(request3);
+		CHECK(ServiceTests::count() == 51);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithStorageStatusEnabled) == 3);
+
+		Message request4(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
+		Services.storageAndRetrieval.packetStores[id6].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id6].byTimeRangeRetrievalStatus = true;
+		request4.appendOctetString(id6);
+		MessageParser::execute(request4);
+		CHECK(ServiceTests::count() == 52);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithByTimeRangeRetrieval) == 3);
+
+		Message request5(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
+		Services.storageAndRetrieval.packetStores[id5].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus = PacketStore::Suspended;
+		request5.appendOctetString(id5);
+		Services.storageAndRetrieval.packetStores[id5].packetStoreType = PacketStore::Circular;
+		MessageParser::execute(request5);
+		CHECK(ServiceTests::count() == 52);
+		CHECK(Services.storageAndRetrieval.packetStores[id5].packetStoreType == PacketStore::Bounded);
 	}
 
 	//	SECTION("Packet store deletion") {
