@@ -65,7 +65,7 @@ public:
 	void disablePeriodicStatisticsReporting(Message& request);
 
 	/**
-	 * TM[4,6] add or update parameter statistics definitions
+	 * TC[4,6] add or update parameter statistics definitions
 	 */
 	void addOrUpdateStatisticsDefinitions(Message& request);
 
