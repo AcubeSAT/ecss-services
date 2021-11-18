@@ -70,7 +70,7 @@ public:
 	void addOrUpdateStatisticsDefinitions(Message& request);
 
 	/**
-	 * TM[4,7] delete parameter statistics definitions. This version specifies the IDs of the parameters whose
+	 * TC[4,7] delete parameter statistics definitions. This version specifies the IDs of the parameters whose
 	 * definitions are to be deleted.
 	 */
 	void deleteStatisticsDefinitions(Message& request);
