@@ -162,7 +162,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
 		CHECK(report.readUint16() == 0);    //Reporting interval
-		CHECK(report.readUint16() == 1);    //Num of valid Ids
+		CHECK(report.readUint16() == 2);    //Num of valid Ids
 		CHECK(report.readUint16() == 5);    //Valid parameter ID
 		CHECK(report.readUint16() == 12);   //Sampling interval
 

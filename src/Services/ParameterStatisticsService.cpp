@@ -103,9 +103,6 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 			continue;
 		}
 		bool exists = systemStatistics.statisticsMap.find(currentId) != systemStatistics.statisticsMap.end();
-//		ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
-//		                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-
 		uint16_t interval = 0;
 		if (hasTimeIntervals) {
 			interval = request.readUint16();
@@ -115,6 +112,10 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 			}
 		}
 		if (not exists) {
+			if (systemStatistics.statisticsMap.size() >= ECSS_MAX_STATISTIC_PARAMETERS) {
+				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::MaxStatisticDefinitionsReached);
+				return;
+			}
 			Statistic newStatistic;
 			if (hasTimeIntervals) {
 				newStatistic.setSelfSamplingInterval(interval);
@@ -134,7 +135,7 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions);
 
 	uint16_t numOfIds = request.readUint16();
-	if (!numOfIds) {
+	if (numOfIds == 0) {
 		systemStatistics.statisticsMap.clear();
 		periodicStatisticsReportingStatus = false;
 		return;

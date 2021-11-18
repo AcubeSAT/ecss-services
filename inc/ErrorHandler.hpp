@@ -156,7 +156,11 @@ public:
 		/**
 		 * Attempt to add definition to the struct map but its already full. (ST[19])
 		 */
-		EventActionDefinitionsMapIsFull = 11
+		EventActionDefinitionsMapIsFull = 11,
+		/**
+		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
+		 */
+		MaxStatisticDefinitionsReached = 12,
 	};
 
 	/**
