@@ -12,7 +12,7 @@
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
-#include "Helpers//Statistic.hpp"
+#include "Helpers/Statistic.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "ErrorHandler.hpp"
