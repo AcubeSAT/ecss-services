@@ -40,8 +40,8 @@ void Statistic::setSelfSamplingInterval(uint16_t samplingInterval)  {
 }
 
 void Statistic::resetStatistics() {
-	max = 0;
-	min = 0;
+	max = -std::numeric_limits<double>::infinity();
+	min = std::numeric_limits<double>::infinity();
 	maxTime = 0;
 	minTime = 0;
 	mean = 0;
