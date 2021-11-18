@@ -40,7 +40,7 @@ public:
 	void resetStatistics();
 
 	/**
-	 * Gets a StatisticBase object, casts it into type Statistic, calculates its statistics and appends them to the
+	 * Appends itself to the received Message
 	 * message.
 	 */
 	void appendStatisticsToMessage(Message& report);
