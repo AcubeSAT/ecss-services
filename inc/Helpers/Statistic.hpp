@@ -30,7 +30,7 @@ public:
 
 	/**
 	 * Gets the value from the sensor as argument and updates the statistics without storing it
-	 * @param value: returned value from "getValue()" of Parameter.hpp, i.e the last sampled value from a parameter
+	 * @param value returned value from "getValue()" of Parameter.hpp, i.e. the last sampled value from a parameter
 	 */
 	void updateStatistics(double value);
 
