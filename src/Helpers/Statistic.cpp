@@ -5,10 +5,7 @@ void Statistic::updateStatistics(double value) {
 	/*
 	* TODO:
 	*      if periodic, just calculate next time without the CUC
-	*      function. Very easy, but we cannot include the
-	*      ParameterStatisticsService.hpp because that includes
-	*      the Statistic.hpp file, not the other way around.
-	*      There are plenty of ways to do that though!!
+	*      function. 
 	* */
 
 	if (value > max) {
