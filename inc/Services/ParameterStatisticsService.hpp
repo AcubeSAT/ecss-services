@@ -37,9 +37,6 @@ public:
 	 * If true, after every report reset the parameter statistics.
 	 */
 	const bool hasAutomaticStatisticsReset = false;
-	/**
-	 * Whether the statistics report messages include the standard deviation or not
-	 */
 	bool hasTimeIntervals = true;
 	const bool supportsSamplingInterval = true;
 	uint16_t reportingInterval = 5;   // Must define units. Same as parameter sampling rates
