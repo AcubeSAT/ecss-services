@@ -42,11 +42,14 @@ public:
 	uint16_t reportingInterval = 5;   // Must define units. Same as parameter sampling rates
 
 	/**
-	 * This function receives a TC[4,1] packet and responds with a TM[4,2] packet containing the parameter statistics
-	 * report.
+	 * This function receives a TC[4,1] packet and calls the necessary function to construct the corresponding
+	 * report
 	 */
 	void reportParameterStatistics(Message& request);
-	void createParameterStatisticsReport(Message& report);
+	/**
+	 * Constructs and stores a TM[4,2] packet containing the parameter statistics report.
+	 */
+	void parameterStatisticsReport();
 
 	/**
 	 * TC[4,3] reset parameter statistics, clearing all samples and values.
@@ -75,15 +78,12 @@ public:
 	void deleteStatisticsDefinitions(Message& request);
 
 	/**
-	 * TM[4,7] This version deletes all definitions
-	 */
-	void deleteAllStatisticsDefinitions();
-
-	/**
-	 * This function receives a TM[4,8] packet and responds with a TM[4,9] packet containing the parameter statistics
-	 * definitions report.
+	 * This function receives a TM[4,8] packet and calls the necessary function to create a report
 	 */
 	void reportStatisticsDefinitions(Message& request);
+	/**
+	* Constructs and stores a TM[4,9] packet containing the parameter statistics definitions report.
+	 */
 	void statisticsDefinitionsReport();
 
 	/**

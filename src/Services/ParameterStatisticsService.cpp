@@ -4,17 +4,10 @@
 #include "Services/ParameterStatisticsService.hpp"
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::ReportParameterStatistics,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-
-	Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
-
-	createParameterStatisticsReport(statisticsReport);
+	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
+	parameterStatisticsReport();
 
 	// TODO: First add start time and end time
-	storeMessage(statisticsReport);
 
 	if (hasAutomaticStatisticsReset) {
 		Message reset(ServiceType,MessageType::ResetParameterStatistics,Message::TC,1);
@@ -30,7 +23,8 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	// Here add start time
 }
 
-void ParameterStatisticsService::createParameterStatisticsReport(Message& report) {
+void ParameterStatisticsService::parameterStatisticsReport() {
+	Message report(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
 	report.appendUint16(1);  //Dummy value for start and min time, will change in the end
 	report.appendUint16(1);
 	uint16_t numOfValidParameters = 0;
@@ -58,13 +52,11 @@ void ParameterStatisticsService::createParameterStatisticsReport(Message& report
 		report.appendUint16(numOfSamples);
 		currentStatistic.second.appendStatisticsToMessage(report);
 	}
+	storeMessage(report);
 }
 
 void ParameterStatisticsService::resetParameterStatistics(Message& request) {
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::ResetParameterStatistics,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	request.assertTC(ServiceType, MessageType::ResetParameterStatistics);
 	// TODO: Stop the evaluation of parameter statistics
 	for (auto &it: systemStatistics.statisticsMap) {
 		it.second.resetStatistics();
@@ -80,10 +72,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	 */
 	uint16_t SAMPLING_PARAMETER_INTERVAL = 5;
 
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::EnablePeriodicParameterReporting,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting);
 
 	uint16_t timeInterval = request.readUint16();
 	if (timeInterval >= SAMPLING_PARAMETER_INTERVAL) {
@@ -93,106 +82,63 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 
 	periodicStatisticsReportingStatus = true;
 	reportingInterval = timeInterval;
-
-	uint16_t numOfParameters = systemStatistics.statisticsMap.size();
-	uint16_t count = 0;
-	//Only generate ONE parameter statistics report after every interval passes.
-	while (count < 10) {    //TODO: while(periodicStatisticsReportingStatus)
-
-		Message message = Message(ServiceType,MessageType::ReportParameterStatistics, Message::TC, 1);
-		reportParameterStatistics(message);
-		for (auto &currentStatistic : systemStatistics.statisticsMap) {
-
-			Message statisticsReport(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
-			/*
-			 * TODO:
-			 *      1. append start time to parameterReport
-			 *      2. append end time
-			 */
-
-			uint16_t currId = currentStatistic.first;
-			uint16_t numOfSamples = currentStatistic.second.sampleCounter;
-			if(numOfSamples == 0) {
-				continue;
-			}
-			statisticsReport.appendUint16(numOfParameters);
-			statisticsReport.appendUint16(currId);
-			currentStatistic.second.appendStatisticsToMessage(statisticsReport);
-
-			/*
-			 * TODO: put the message into a queue and continue constructing the next report, and when
-			 *      it's ready put that in the queue as well, another FreeRTOS task will be accountable of
-			 *      keeping track of time, and when the interval passes, it's gonna pop the next
-			 *      reportMessage from the queue and report it.
-			 *      Or maybe use just one FreeRTOS task that will run this function per interval.
-			 */
-		}
-		count++; //TODO: Delete
-		//TODO: systematically reset the parameters' statistics.
-	}
 }
 
 void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& request) {
-
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::DisablePeriodicParameterReporting,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting);
 
 	periodicStatisticsReportingStatus = false;
 	reportingInterval = 0;
 }
 
 void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& request) {
-
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::AddOrUpdateParameterStatisticsDefinitions,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions);
 
 	uint16_t numOfIds = request.readUint16();
-
 	for (uint16_t i = 0; i < numOfIds; i++) {
 
 		uint16_t currentId = request.readUint16();
-		// TODO: actually define what does it mean to have an invalid parameter ID, what is the max ID??
-		//       Maybe not parametersArray.size
 		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
-			return;
+			continue;
 		}
 		bool exists = systemStatistics.statisticsMap.find(currentId) != systemStatistics.statisticsMap.end();
 //		ErrorHandler::assertRequest(numOfStatisticsDefinitions < MAX_NUM_OF_DEFINITIONS, request,
 //		                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
+		uint16_t interval = 0;
 		if (hasTimeIntervals) {
-			uint16_t interval = request.readUint16();
+			interval = request.readUint16();
 			if (interval <= reportingInterval) {
-				ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
-				return;
+				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
+				continue;
 			}
-			if (not exists) {
-				Statistic newStatistic;
-				systemStatistics.statisticsMap.insert({currentId, newStatistic});
-				systemStatistics.statisticsMap.at(currentId).setSelfSamplingInterval(interval);
-				// TODO: start the evaluation of statistics for this parameter.
-			} else {
-				systemStatistics.statisticsMap.at(currentId).setSelfSamplingInterval(interval);
-				systemStatistics.statisticsMap.at(currentId).resetStatistics();
+		}
+		if (not exists) {
+			Statistic newStatistic;
+			if (hasTimeIntervals) {
+				newStatistic.setSelfSamplingInterval(interval);
 			}
+			systemStatistics.statisticsMap.insert({currentId, newStatistic});
+			// TODO: start the evaluation of statistics for this parameter.
+		} else {
+			if (hasTimeIntervals) {
+				systemStatistics.statisticsMap.at(currentId).setSelfSamplingInterval(interval);
+			}
+			systemStatistics.statisticsMap.at(currentId).resetStatistics();
 		}
 	}
 }
 
 void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
-
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::DeleteParameterStatisticsDefinitions,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions);
 
 	uint16_t numOfIds = request.readUint16();
-
+	if (!numOfIds) {
+		systemStatistics.statisticsMap.clear();
+		periodicStatisticsReportingStatus = false;
+		return;
+	}
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currentId = request.readUint16();
 
@@ -207,19 +153,8 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	}
 }
 
-void ParameterStatisticsService::deleteAllStatisticsDefinitions() {
-
-	systemStatistics.statisticsMap.clear();
-	periodicStatisticsReportingStatus = false;
-}
-
 void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
-
-	ErrorHandler::assertRequest(request.packetType == Message::TC, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.messageType == MessageType::ReportParameterStatisticsDefinitions,
-	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-
+	request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions);
 	statisticsDefinitionsReport();
 }
 
@@ -232,21 +167,14 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 	}
 	definitionsReport.appendUint16(currentReportingInterval);
 
-	uint16_t numOfDefinedParameters = 0;
-	for (auto &statistic : systemStatistics.statisticsMap) {
-		uint16_t currentSamplingInterval = statistic.second.selfSamplingInterval;
-		if (currentSamplingInterval != 0) {
-			numOfDefinedParameters++;
-		}
-	}
-	definitionsReport.appendUint16(numOfDefinedParameters);
+	definitionsReport.appendUint16(systemStatistics.statisticsMap.size());
 
 	for (auto &currentParam : systemStatistics.statisticsMap) {
 		uint16_t currentId = currentParam.first;
 		uint16_t samplingInterval = currentParam.second.selfSamplingInterval;
+		definitionsReport.appendUint16(currentId);
 
 		if (samplingInterval != 0 and supportsSamplingInterval) {
-			definitionsReport.appendUint16(currentId);
 			definitionsReport.appendUint16(samplingInterval);
 		}
 	}

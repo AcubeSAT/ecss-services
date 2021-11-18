@@ -69,18 +69,18 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		Services.reset();
 	}
 
-	SECTION("Periodic reporting of valid statistics") {
-		initializeStatistics(6, 7);
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-		request.appendUint16(3);
-		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 10);     // 10 reports generated (check function implementation)
-
-		resetSystem();
-		ServiceTests::reset();
-		Services.reset();
-	}
+//	SECTION("Periodic reporting of valid statistics") {
+//		initializeStatistics(6, 7);
+//		Message request = Message(ParameterStatisticsService::ServiceType,
+//		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
+//		request.appendUint16(3);
+//		MessageParser::execute(request);
+//		CHECK(ServiceTests::count() == 10);     // 10 reports generated (check function implementation)
+//
+//		resetSystem();
+//		ServiceTests::reset();
+//		Services.reset();
+//	}
 
 	/**
 	 * @todo: In order to test every case for this function, we need to specify what is the MAX_PARAMETERS
