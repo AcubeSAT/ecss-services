@@ -1185,6 +1185,103 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(Services.storageAndRetrieval.packetStores[id5].virtualChannel == static_cast <uint8_t> (7));
 	}
 
+	SECTION("Reporting the packet store content summary") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
+		uint16_t numOfPacketStores = 3;
+		request.appendUint16(numOfPacketStores);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		request.appendOctetString(id);
+		request.appendOctetString(id2);
+		request.appendOctetString(id3);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 59);
+		Message report = ServiceTests::get(58);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 9);
+
+		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
+		CHECK(report.readUint16() == 1);
+		report.readOctetString(data);
+		int index = 0;
+		for (auto &x : data){
+			CHECK(x == packetStoreData[index++]);
+		}
+		CHECK(report.readUint32() == timestamps1[0]);
+		CHECK(report.readUint32() == timestamps1[5]);
+		CHECK(report.readUint32() == 15);
+		CHECK(report.readUint16() == 30);
+		CHECK(report.readUint16() == 0);
+
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
+		numOfPacketStores = 0;
+		request2.appendUint16(numOfPacketStores);
+		Services.storageAndRetrieval.packetStores[id5].openRetrievalStartTimeTag = 20;
+		Services.storageAndRetrieval.packetStores[id4].storedTmPackets.clear();
+
+		MessageParser::execute(request2);
+
+		CHECK(ServiceTests::count() == 60);
+		report = ServiceTests::get(59);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 9);
+		CHECK(report.readUint16() == 4);
+		//For ps2
+		report.readOctetString(data);
+		index = 0;
+		for (auto &x : data){
+			CHECK(x == packetStoreData[index++]);
+		}
+		CHECK(report.readUint32() == timestamps1[0]);
+		CHECK(report.readUint32() == timestamps1[5]);
+		CHECK(report.readUint32() == 15);
+		CHECK(report.readUint16() == 30);
+		CHECK(report.readUint16() == 0);
+		//For ps25
+		report.readOctetString(data);
+		index = 0;
+		for (auto &x : data){
+			CHECK(x == packetStoreData6[index++]);
+		}
+		CHECK(report.readUint32() == timestamps2[0]);
+		CHECK(report.readUint32() == timestamps2[4]);
+		CHECK(report.readUint32() == 15);
+		CHECK(report.readUint16() == 25);
+		CHECK(report.readUint16() == 10);
+		//For ps5555
+		report.readOctetString(data);
+		index = 0;
+		for (auto &x : data){
+			CHECK(x == packetStoreData5[index++]);
+		}
+		CHECK(report.readUint32() == timestamps4[0]);
+		CHECK(report.readUint32() == timestamps4[7]);
+		CHECK(report.readUint32() == 20);
+		CHECK(report.readUint16() == 40);
+		CHECK(report.readUint16() == 30);
+		//For ps7999
+		report.readOctetString(data);
+		index = 0;
+		for (auto &x : data){
+			CHECK(x == packetStoreData4[index++]);
+		}
+		//Skip the rest because it was previously used to copy other packets into it.
+	}
 	//	SECTION("Packet store deletion") {
 	//		Message request(StorageAndRetrievalService::ServiceType,
 	//		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
