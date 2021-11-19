@@ -382,7 +382,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (!numOfPacketStores) {
 		int size = 0;
-		etl::string<ECSS_MAX_PACKET_STORE_ID_SIZE> keysToDelete[packetStores.size()];
+		etl::string <ECSS_MAX_PACKET_STORE_ID_SIZE> keysToDelete[packetStores.size()];
 		for (auto& packetStore : packetStores) {
 			if (packetStore.second.storageStatus) {
 				ErrorHandler::reportError(
@@ -413,9 +413,9 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
 		request.readOctetString(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> idToDelete(packetStoreData);
+		String <ECSS_MAX_PACKET_STORE_ID_SIZE> idToDelete(packetStoreData);
 		if (packetStores.find(idToDelete) == packetStores.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 			continue;
 		}
 		if (packetStores[idToDelete].storageStatus) {

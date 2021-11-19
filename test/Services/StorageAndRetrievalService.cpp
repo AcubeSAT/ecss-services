@@ -1282,6 +1282,79 @@ TEST_CASE("Storage And Retrieval Service") {
 		}
 		//Skip the rest because it was previously used to copy other packets into it.
 	}
+
+	SECTION("Deleting packet stores") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                 StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
+		uint16_t numOfPacketStores = 6;
+		request.appendUint16(numOfPacketStores);
+
+		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
+		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
+		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
+		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
+		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+
+		request.appendOctetString(id);
+		request.appendOctetString(id2);
+		request.appendOctetString(id3);
+		request.appendOctetString(id4);
+		request.appendOctetString(id5);
+		request.appendOctetString(id6);
+
+		Services.storageAndRetrieval.packetStores[id].storageStatus = true;
+		Services.storageAndRetrieval.packetStores[id4].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id4].byTimeRangeRetrievalStatus = true;
+		Services.storageAndRetrieval.packetStores[id5].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus = PacketStore::InProgress;
+		Services.storageAndRetrieval.packetStores[id6].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id6].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id6].openRetrievalStatus = PacketStore::Suspended;
+
+		CHECK(Services.storageAndRetrieval.packetStores.size() == 4);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 65);
+		CHECK(Services.storageAndRetrieval.packetStores.size() == 3);
+		CHECK(Services.storageAndRetrieval.packetStores.find(id6) == Services.storageAndRetrieval.packetStores.end());
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 11);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DeletionOfPacketStoreWithStorageStatusEnabled) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DeletionOfPacketWithByTimeRangeRetrieval) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DeletionOfPacketWithOpenRetrievalInProgress) == 1);
+
+		Message request2(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
+		numOfPacketStores = 0;
+		request2.appendUint16(numOfPacketStores);
+
+		Services.storageAndRetrieval.packetStores[id].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id].openRetrievalStatus = PacketStore::Suspended;
+		Services.storageAndRetrieval.packetStores[id4].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id4].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id4].openRetrievalStatus = PacketStore::Suspended;
+		Services.storageAndRetrieval.packetStores[id5].storageStatus = false;
+		Services.storageAndRetrieval.packetStores[id5].byTimeRangeRetrievalStatus = false;
+		Services.storageAndRetrieval.packetStores[id5].openRetrievalStatus = PacketStore::InProgress;
+
+		MessageParser::execute(request2);
+
+		CHECK(Services.storageAndRetrieval.packetStores.size() == 1);
+		CHECK(Services.storageAndRetrieval.packetStores.find(id) == Services.storageAndRetrieval.packetStores.end());
+		CHECK(Services.storageAndRetrieval.packetStores.find(id4) == Services.storageAndRetrieval.packetStores.end());
+		CHECK(Services.storageAndRetrieval.packetStores.find(id5) != Services.storageAndRetrieval.packetStores.end());
+	}
+
 	//	SECTION("Packet store deletion") {
 	//		Message request(StorageAndRetrievalService::ServiceType,
 	//		                StorageAndRetrievalService::MessageType::DeletePacketStores,Message::TC,1);
