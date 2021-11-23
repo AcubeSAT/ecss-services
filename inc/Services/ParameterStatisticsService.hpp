@@ -36,7 +36,7 @@ public:
 	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
-	const bool hasAutomaticStatisticsReset = false;
+	bool hasAutomaticStatisticsReset = false;   //todo: do const
 	bool hasTimeIntervals = true;
 	const bool supportsSamplingInterval = true;
 	uint16_t reportingInterval = 5;   // TODO: Must define units. Same as parameter sampling rates

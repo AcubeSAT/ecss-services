@@ -19,13 +19,12 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 			resetParameterStatistics(reset);
 		}
 	}
-
 	// Here add start time
 }
 
 void ParameterStatisticsService::parameterStatisticsReport() {
 	Message report(ServiceType,MessageType::ParameterStatisticsReport, Message::TM, 1);
-	report.appendUint16(1);  //Dummy value for start and min time, will change in the end
+	report.appendUint16(1);  //Dummy value for start and end time, will change in the end
 	report.appendUint16(1);
 	uint16_t numOfValidParameters = 0;
 
@@ -43,12 +42,12 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	report.appendUint16(numOfValidParameters);
 
 	for (auto &currentStatistic : systemStatistics.statisticsMap) {
-		uint16_t currId = currentStatistic.first;
+		uint16_t currentId = currentStatistic.first;
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
 		}
-		report.appendUint16(currId);
+		report.appendUint16(currentId);
 		report.appendUint16(numOfSamples);
 		currentStatistic.second.appendStatisticsToMessage(report);
 	}
@@ -65,7 +64,6 @@ void ParameterStatisticsService::resetParameterStatistics(Message& request) {
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
-
 	/**
 	 * @todo: The sampling interval of each parameter. the "timeInterval" requested should not exceed it.
 	 * 		  It has to be defined as a constant.
@@ -79,7 +77,6 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 		ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 		return;
 	}
-
 	periodicStatisticsReportingStatus = true;
 	reportingInterval = timeInterval;
 }
@@ -96,10 +93,12 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 
 	uint16_t numOfIds = request.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
-
 		uint16_t currentId = request.readUint16();
 		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
+			if (hasTimeIntervals) {
+				request.skipBytes(2);
+			}
 			continue;
 		}
 		bool exists = systemStatistics.statisticsMap.find(currentId) != systemStatistics.statisticsMap.end();
@@ -142,7 +141,6 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	}
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currentId = request.readUint16();
-
 		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 			continue;
@@ -167,14 +165,12 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 		currentReportingInterval = reportingInterval;
 	}
 	definitionsReport.appendUint16(currentReportingInterval);
-
 	definitionsReport.appendUint16(systemStatistics.statisticsMap.size());
 
 	for (auto &currentParam : systemStatistics.statisticsMap) {
 		uint16_t currentId = currentParam.first;
 		uint16_t samplingInterval = currentParam.second.selfSamplingInterval;
 		definitionsReport.appendUint16(currentId);
-
 		if (samplingInterval != 0 and supportsSamplingInterval) {
 			definitionsReport.appendUint16(samplingInterval);
 		}
@@ -189,6 +185,9 @@ void ParameterStatisticsService::execute(Message& message) {
 			break;
 		case 4:
 			enablePeriodicStatisticsReporting(message);
+			break;
+		case 3:
+			resetParameterStatistics(message);
 			break;
 		case 5:
 			disablePeriodicStatisticsReporting(message);

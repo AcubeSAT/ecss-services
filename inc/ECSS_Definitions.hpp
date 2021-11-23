@@ -144,7 +144,7 @@
 /**
  * @brief Size of the array holding the Parameter objects for the ST[20] parameter service
  */
-#define ECSS_PARAMETER_COUNT 3
+#define ECSS_PARAMETER_COUNT 4
 
 /**
  * @brief Defines whether the optional CRC field is included
@@ -154,7 +154,7 @@
 /**
  * Number of parameters whose statistics we need and are going to be stored into the statisticsMap
  */
-#define ECSS_MAX_STATISTIC_PARAMETERS 25
+#define ECSS_MAX_STATISTIC_PARAMETERS 4
 
 /**
  * Whether the ST[04] statistics calculation supports the reporting of stddev
