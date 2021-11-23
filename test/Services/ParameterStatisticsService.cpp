@@ -67,7 +67,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(report.readFloat() == 3);     // min value
 		CHECK(report.readUint32() == 0);    // min time
 		CHECK(report.readFloat() == 8);     // mean
-		CHECK(static_cast <int> (report.readFloat()) == 3);  // stddev
+    CHECK(report.readFloat() == Approx(3.41565).epsilon(0.01));
 		// Parameter A
 		CHECK(report.readUint16() == 7);    // ID-1
 		CHECK(report.readUint16() == 3);    // number of samples
