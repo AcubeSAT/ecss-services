@@ -1102,7 +1102,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 
 	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
 	request.readOctetString(packetStoreData);
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
+	String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
 	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
