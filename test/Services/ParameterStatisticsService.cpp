@@ -213,7 +213,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 4);
+		REQUIRE(ServiceTests::count() == 4);
 		CHECK(systemStatistics.statisticsMap.size() == 4);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidSamplingRateError) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 2);
