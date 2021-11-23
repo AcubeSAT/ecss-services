@@ -16,11 +16,11 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	uint16_t id2 = 5;
 
 	int numOfSamples = 3;
-	for (int i = 0; i < numOfSamples; i++) {    // Values of stat-1: [ 1, 3, 5 ]
+	for (int i = 0; i < numOfSamples; i++) { // Values of stat-1: [ 1, 3, 5 ]
 		stat1.updateStatistics(i * 2 + 1);
 	}
 	numOfSamples = 6;
-	for (int i = 0; i < numOfSamples; i++) {    // Values of stat-2: [ 3, 5, 7, 9, 11, 13 ]
+	for (int i = 0; i < numOfSamples; i++) { // Values of stat-2: [ 3, 5, 7, 9, 11, 13 ]
 		stat2.updateStatistics(i * 2 + 3);
 	}
 	systemStatistics.statisticsMap.insert({id1, stat1});
@@ -31,14 +31,9 @@ void resetSystem() {
 	systemStatistics.statisticsMap.clear();
 }
 
-bool statisticsAreInitialized(Statistic &stat) {
-	return (stat.sampleCounter == 0 and
-	        stat.mean == 0 and
-	        stat.sumOfSquares == 0 and
-	        stat.meanOfSquares == 0 and
-	        stat.maxTime == 0 and
-	        stat.minTime == 0 and
-	        stat.standardDeviation == 0 and
+bool statisticsAreInitialized(Statistic& stat) {
+	return (stat.sampleCounter == 0 and stat.mean == 0 and stat.sumOfSquares == 0 and stat.meanOfSquares == 0 and
+	        stat.maxTime == 0 and stat.minTime == 0 and stat.standardDeviation == 0 and
 	        stat.max == -std::numeric_limits<double>::infinity() and
 	        stat.min == std::numeric_limits<double>::infinity());
 }
@@ -47,7 +42,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 	SECTION("Reporting of valid statistics") {
 		initializeStatistics(6, 7);
 		Message request = Message(ParameterStatisticsService::ServiceType,
-		                            ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
 		MessageParser::execute(request);
@@ -56,27 +51,27 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.readUint16() == 1);    // start time
-		CHECK(report.readUint16() == 1);    // end time
-		CHECK(report.readUint16() == 2);    // number of parameters reported
+		CHECK(report.readUint16() == 1); // start time
+		CHECK(report.readUint16() == 1); // end time
+		CHECK(report.readUint16() == 2); // number of parameters reported
 		// Parameter B
-		CHECK(report.readUint16() == 5);    // ID-2
-		CHECK(report.readUint16() == 6);    // number of samples
-		CHECK(report.readFloat() == 13);    // max value
-		CHECK(report.readUint32() == 0);    // max time
-		CHECK(report.readFloat() == 3);     // min value
-		CHECK(report.readUint32() == 0);    // min time
-		CHECK(report.readFloat() == 8);     // mean
-    CHECK(report.readFloat() == Approx(3.41565).epsilon(0.01));
+		CHECK(report.readUint16() == 5); // ID-2
+		CHECK(report.readUint16() == 6); // number of samples
+		CHECK(report.readFloat() == 13); // max value
+		CHECK(report.readUint32() == 0); // max time
+		CHECK(report.readFloat() == 3); // min value
+		CHECK(report.readUint32() == 0); // min time
+		CHECK(report.readFloat() == 8); // mean
+		CHECK(report.readFloat() == Approx(3.41565).epsilon(0.01));
 		// Parameter A
-		CHECK(report.readUint16() == 7);    // ID-1
-		CHECK(report.readUint16() == 3);    // number of samples
-		CHECK(report.readFloat() == 5);    // max value
-		CHECK(report.readUint32() == 0);    // max time
-		CHECK(report.readFloat() == 1);    // min value
-		CHECK(report.readUint32() == 0);    // min time
-		CHECK(report.readFloat() == 3);     // mean
-		CHECK(static_cast <int> (report.readFloat()) == 1);  // stddev
+		CHECK(report.readUint16() == 7); // ID-1
+		CHECK(report.readUint16() == 3); // number of samples
+		CHECK(report.readFloat() == 5); // max value
+		CHECK(report.readUint32() == 0); // max time
+		CHECK(report.readFloat() == 1); // min value
+		CHECK(report.readUint32() == 0); // min time
+		CHECK(report.readFloat() == 3); // mean
+		CHECK(static_cast<int>(report.readFloat()) == 1); // stddev
 
 		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[5]));
 		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[7]));
@@ -88,7 +83,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(statisticsAreInitialized(systemStatistics.statisticsMap[7]));
 
 		Message request2 = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		                           ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 		request2.appendBoolean(true);
 		systemStatistics.statisticsMap[5].mean = 5;
 		systemStatistics.statisticsMap[7].mean = 3;
@@ -110,7 +105,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 	SECTION("Resetting the parameter statistics") {
 		initializeStatistics(6, 7);
 		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ResetParameterStatistics,Message::TC,1);
+		                          ParameterStatisticsService::MessageType::ResetParameterStatistics, Message::TC, 1);
 
 		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[5]));
 		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[7]));
@@ -127,8 +122,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 	SECTION("Enable the periodic reporting of statistics") {
 		initializeStatistics(6, 7);
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
+		Message request =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request.appendUint16(3);
 		Services.parameterStatistics.periodicStatisticsReportingStatus = false;
 		CHECK(Services.parameterStatistics.reportingInterval == 5);
@@ -139,8 +135,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == true);
 		CHECK(Services.parameterStatistics.reportingInterval == 3);
 
-		Message request2 = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
+		Message request2 =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request2.appendUint16(7);
 		Services.parameterStatistics.periodicStatisticsReportingStatus = false;
 		CHECK(Services.parameterStatistics.reportingInterval == 3);
@@ -158,8 +155,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 	SECTION("Disabling the periodic reporting of statistics") {
 		initializeStatistics(6, 7);
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::DisablePeriodicParameterReporting, Message::TC, 1);
+		Message request =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::DisablePeriodicParameterReporting, Message::TC, 1);
 		Services.parameterStatistics.periodicStatisticsReportingStatus = true;
 
 		MessageParser::execute(request);
@@ -172,9 +170,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 	SECTION("Add/Update statistics definitions") {
 		initializeStatistics(7, 6);
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions,
-		                          Message::TC, 1);
+		Message request =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
 		uint16_t numOfIds = 6;
 		request.appendUint16(numOfIds);
 
@@ -239,12 +237,12 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		REQUIRE(systemStatistics.statisticsMap.find(1) != systemStatistics.statisticsMap.end());
 		REQUIRE(systemStatistics.statisticsMap.find(2) != systemStatistics.statisticsMap.end());
 
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions,
-		                          Message::TC, 1);
+		Message request =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, Message::TC, 1);
 		uint16_t numIds = 2;
 		uint16_t id1 = 0;
-		uint16_t id2 = 255;  // Invalid ID
+		uint16_t id2 = 255; // Invalid ID
 		request.appendUint16(numIds);
 		request.appendUint16(id1);
 		request.appendUint16(id2);
@@ -256,9 +254,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		CHECK(systemStatistics.statisticsMap.size() == 2);
 
-		Message request2 = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions,
-		                          Message::TC, 1);
+		Message request2 =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, Message::TC, 1);
 		numIds = 0;
 		request2.appendUint16(numIds);
 
@@ -279,18 +277,18 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		REQUIRE(systemStatistics.statisticsMap.find(7) != systemStatistics.statisticsMap.end());
 		REQUIRE(systemStatistics.statisticsMap.find(5) != systemStatistics.statisticsMap.end());
 
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions,
-		                          Message::TC, 1);
+		Message request =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions, Message::TC, 1);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
-		CHECK(report.readUint16() == 0);    //Reporting interval
-		CHECK(report.readUint16() == 2);    //Num of valid Ids
-		CHECK(report.readUint16() == 5);    //Valid parameter ID
-		CHECK(report.readUint16() == 12);   //Sampling interval
+		CHECK(report.readUint16() == 0); // Reporting interval
+		CHECK(report.readUint16() == 2); // Num of valid Ids
+		CHECK(report.readUint16() == 5); // Valid parameter ID
+		CHECK(report.readUint16() == 12); // Sampling interval
 		CHECK(report.readUint16() == 7);
 		CHECK(report.readUint16() == 0);
 
@@ -298,5 +296,4 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		ServiceTests::reset();
 		Services.reset();
 	}
-
 }

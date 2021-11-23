@@ -17,7 +17,7 @@ public:
 	uint16_t selfSamplingInterval = 0;
 	uint16_t sampleCounter = 0;
 	uint32_t maxTime = 0;
-	uint32_t minTime = 0;   //TODO: CUC Format timestamp
+	uint32_t minTime = 0; // TODO: CUC Format timestamp
 	double max = -std::numeric_limits<double>::infinity();
 	double min = std::numeric_limits<double>::infinity();
 	double sumOfSquares = 0;
@@ -48,7 +48,6 @@ public:
 	 * Setter function
 	 */
 	void setSelfSamplingInterval(uint16_t samplingInterval);
-
 };
 
 #endif

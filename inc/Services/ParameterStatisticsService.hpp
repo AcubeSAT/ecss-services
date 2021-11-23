@@ -14,7 +14,6 @@
  */
 class ParameterStatisticsService : public Service {
 public:
-
 	inline static const uint8_t ServiceType = 4;
 
 	enum MessageType : uint8_t {
@@ -36,10 +35,10 @@ public:
 	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
-	bool hasAutomaticStatisticsReset = false;   //todo: do const
+	bool hasAutomaticStatisticsReset = false; // todo: do const
 	bool hasTimeIntervals = true;
 	const bool supportsSamplingInterval = true;
-	uint16_t reportingInterval = 5;   // TODO: Must define units. Same as parameter sampling rates
+	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
 
 	/**
 	 * This function receives a TC[4,1] packet and calls the necessary function to construct the corresponding
@@ -82,7 +81,7 @@ public:
 	 */
 	void reportStatisticsDefinitions(Message& request);
 	/**
-	* Constructs and stores a TM[4,9] packet containing the parameter statistics definitions report.
+	 * Constructs and stores a TM[4,9] packet containing the parameter statistics definitions report.
 	 */
 	void statisticsDefinitionsReport();
 
