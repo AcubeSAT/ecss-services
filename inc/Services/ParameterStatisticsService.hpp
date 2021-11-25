@@ -41,8 +41,7 @@ public:
 	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
 
 	/**
-	 * This function receives a TC[4,1] packet and calls the necessary function to construct the corresponding
-	 * report
+	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
 	 */
 	void reportParameterStatistics(Message& request);
 	/**
