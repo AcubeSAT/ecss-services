@@ -76,7 +76,7 @@ public:
 	void deleteStatisticsDefinitions(Message& request);
 
 	/**
-	 * This function receives a TM[4,8] packet and calls the necessary function to create a report
+	 * TC[4,8] report the parameter statistics definitions, by calling statisticsDefinitionsReport()
 	 */
 	void reportStatisticsDefinitions(Message& request);
 	/**
