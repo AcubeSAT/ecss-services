@@ -73,7 +73,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting);
 
 	uint16_t timeInterval = request.readUint16();
-	if (timeInterval >= SAMPLING_PARAMETER_INTERVAL) {
+	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 		return;
 	}
@@ -172,7 +172,7 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 		uint16_t currentId = currentParam.first;
 		uint16_t samplingInterval = currentParam.second.selfSamplingInterval;
 		definitionsReport.appendUint16(currentId);
-		if (samplingInterval != 0 and supportsSamplingInterval) {
+		if (supportsSamplingInterval) {
 			definitionsReport.appendUint16(samplingInterval);
 		}
 	}

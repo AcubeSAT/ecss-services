@@ -125,7 +125,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-		request.appendUint16(3);
+		request.appendUint16(6);
 		Services.parameterStatistics.periodicStatisticsReportingStatus = false;
 		CHECK(Services.parameterStatistics.reportingInterval == 5);
 
@@ -133,20 +133,20 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(ServiceTests::count() == 0);
 
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == true);
-		CHECK(Services.parameterStatistics.reportingInterval == 3);
+		CHECK(Services.parameterStatistics.reportingInterval == 6);
 
 		Message request2 =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-		request2.appendUint16(7);
+		request2.appendUint16(3);
 		Services.parameterStatistics.periodicStatisticsReportingStatus = false;
-		CHECK(Services.parameterStatistics.reportingInterval == 3);
+		CHECK(Services.parameterStatistics.reportingInterval == 6);
 
 		MessageParser::execute(request2);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidSamplingRateError) == 1);
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == false);
-		CHECK(Services.parameterStatistics.reportingInterval == 3);
+		CHECK(Services.parameterStatistics.reportingInterval == 6);
 
 		resetSystem();
 		ServiceTests::reset();
