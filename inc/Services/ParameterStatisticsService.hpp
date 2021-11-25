@@ -71,8 +71,7 @@ public:
 	void addOrUpdateStatisticsDefinitions(Message& request);
 
 	/**
-	 * TC[4,7] delete parameter statistics definitions. This version specifies the IDs of the parameters whose
-	 * definitions are to be deleted.
+	 * TC[4,7] delete parameter statistics definitions.
 	 */
 	void deleteStatisticsDefinitions(Message& request);
 
