@@ -22,7 +22,6 @@ public:
 	double min = std::numeric_limits<double>::infinity();
 	double sumOfSquares = 0;
 	double mean = 0;
-	double standardDeviation = 0;
 
 	Statistic() = default;
 

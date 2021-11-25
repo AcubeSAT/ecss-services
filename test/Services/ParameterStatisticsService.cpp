@@ -33,7 +33,7 @@ void resetSystem() {
 
 bool statisticsAreInitialized(Statistic& stat) {
 	return (stat.sampleCounter == 0 and stat.mean == 0 and stat.sumOfSquares == 0 and
-	        stat.maxTime == 0 and stat.minTime == 0 and stat.standardDeviation == 0 and
+	        stat.maxTime == 0 and stat.minTime == 0 and
 	        stat.max == -std::numeric_limits<double>::infinity() and
 	        stat.min == std::numeric_limits<double>::infinity());
 }
@@ -170,6 +170,11 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 	SECTION("Add/Update statistics definitions") {
 		initializeStatistics(7, 6);
+
+		Statistic newStatistic;
+		newStatistic.setSelfSamplingInterval(0);
+		systemStatistics.statisticsMap.insert({0, newStatistic});
+
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
@@ -202,10 +207,6 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		request.appendUint16(interval5);
 		request.appendUint16(paramId6);
 		request.appendUint16(interval6);
-
-		Statistic newStatistic;
-		newStatistic.setSelfSamplingInterval(0);
-		systemStatistics.statisticsMap.insert({0, newStatistic});
 
 		CHECK(systemStatistics.statisticsMap.size() == 3);
 

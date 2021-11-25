@@ -184,11 +184,11 @@ void ParameterStatisticsService::execute(Message& message) {
 		case 1:
 			reportParameterStatistics(message);
 			break;
-		case 4:
-			enablePeriodicStatisticsReporting(message);
-			break;
 		case 3:
 			resetParameterStatistics(message);
+			break;
+		case 4:
+			enablePeriodicStatisticsReporting(message);
 			break;
 		case 5:
 			disablePeriodicStatisticsReporting(message);
