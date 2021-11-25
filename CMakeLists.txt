@@ -42,7 +42,6 @@ add_library(common OBJECT
         src/Services/FunctionManagementService.cpp
         src/Services/ParameterStatisticsService.cpp
         src/Helpers/Statistic.cpp
-        src/Platform/x86/Statistics/SystemStatistics.cpp
         )
 
 # Specify the .cpp files for the executables

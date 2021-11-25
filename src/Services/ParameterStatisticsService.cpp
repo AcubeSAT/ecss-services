@@ -10,13 +10,11 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	// TODO: First add start time and end time
 
 	if (hasAutomaticStatisticsReset) {
-		Message reset(ServiceType, MessageType::ResetParameterStatistics, Message::TC, 1);
-		resetParameterStatistics(reset);
+		resetParameterStatistics();
 	} else {
-		Message reset(ServiceType, MessageType::ResetParameterStatistics, Message::TC, 1);
 		bool resetFlagValue = request.readBoolean();
 		if (resetFlagValue) {
-			resetParameterStatistics(reset);
+			resetParameterStatistics();
 		}
 	}
 	// Here add start time
@@ -32,7 +30,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	//       append start time
 	//       append end time
 
-	for (auto& currentStatistic : systemStatistics.statisticsMap) {
+	for (auto& currentStatistic : statisticsMap) {
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
@@ -41,7 +39,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	}
 	report.appendUint16(numOfValidParameters);
 
-	for (auto& currentStatistic : systemStatistics.statisticsMap) {
+	for (auto& currentStatistic : statisticsMap) {
 		uint16_t currentId = currentStatistic.first;
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
@@ -56,8 +54,12 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 
 void ParameterStatisticsService::resetParameterStatistics(Message& request) {
 	request.assertTC(ServiceType, MessageType::ResetParameterStatistics);
+	resetParameterStatistics();
+}
+
+void ParameterStatisticsService::resetParameterStatistics() {
 	// TODO: Stop the evaluation of parameter statistics
-	for (auto& it : systemStatistics.statisticsMap) {
+	for (auto& it : statisticsMap) {
 		it.second.resetStatistics();
 	}
 	// TODO: Restart the evaluation of parameter statistics
@@ -96,14 +98,14 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 		uint16_t currentId = request.readUint16();
 		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
-			if (hasTimeIntervals) {
+			if (supportsSamplingInterval) {
 				request.skipBytes(2);
 			}
 			continue;
 		}
-		bool exists = systemStatistics.statisticsMap.find(currentId) != systemStatistics.statisticsMap.end();
+		bool exists = statisticsMap.find(currentId) != statisticsMap.end();
 		uint16_t interval = 0;
-		if (hasTimeIntervals) {
+		if (supportsSamplingInterval) {
 			interval = request.readUint16();
 			if (interval < reportingInterval) {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
@@ -111,22 +113,22 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 			}
 		}
 		if (not exists) {
-			if (systemStatistics.statisticsMap.size() >= ECSS_MAX_STATISTIC_PARAMETERS) {
+			if (statisticsMap.size() >= ECSS_MAX_STATISTIC_PARAMETERS) {
 				ErrorHandler::reportError(request,
 				                          ErrorHandler::ExecutionStartErrorType::MaxStatisticDefinitionsReached);
 				return;
 			}
 			Statistic newStatistic;
-			if (hasTimeIntervals) {
+			if (supportsSamplingInterval) {
 				newStatistic.setSelfSamplingInterval(interval);
 			}
-			systemStatistics.statisticsMap.insert({currentId, newStatistic});
+			statisticsMap.insert({currentId, newStatistic});
 			// TODO: start the evaluation of statistics for this parameter.
 		} else {
-			if (hasTimeIntervals) {
-				systemStatistics.statisticsMap.at(currentId).setSelfSamplingInterval(interval);
+			if (supportsSamplingInterval) {
+				statisticsMap.at(currentId).setSelfSamplingInterval(interval);
 			}
-			systemStatistics.statisticsMap.at(currentId).resetStatistics();
+			statisticsMap.at(currentId).resetStatistics();
 		}
 	}
 }
@@ -136,7 +138,7 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 
 	uint16_t numOfIds = request.readUint16();
 	if (numOfIds == 0) {
-		systemStatistics.statisticsMap.clear();
+		statisticsMap.clear();
 		periodicStatisticsReportingStatus = false;
 		return;
 	}
@@ -146,9 +148,9 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 			continue;
 		}
-		systemStatistics.statisticsMap.erase(currentId);
+		statisticsMap.erase(currentId);
 	}
-	if (systemStatistics.statisticsMap.empty()) {
+	if (statisticsMap.empty()) {
 		periodicStatisticsReportingStatus = false;
 	}
 }
@@ -166,9 +168,9 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 		currentReportingInterval = reportingInterval;
 	}
 	definitionsReport.appendUint16(currentReportingInterval);
-	definitionsReport.appendUint16(systemStatistics.statisticsMap.size());
+	definitionsReport.appendUint16(statisticsMap.size());
 
-	for (auto& currentParam : systemStatistics.statisticsMap) {
+	for (auto& currentParam : statisticsMap) {
 		uint16_t currentId = currentParam.first;
 		uint16_t samplingInterval = currentParam.second.selfSamplingInterval;
 		definitionsReport.appendUint16(currentId);

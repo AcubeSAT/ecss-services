@@ -199,6 +199,11 @@ public:
 	uint32_t readWord();
 
 	/**
+	 * Reads the next 8 bytes from the message
+	 */
+	uint64_t read2Words();
+
+	/**
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
@@ -521,6 +526,13 @@ public:
 		return reinterpret_cast<float&>(value);
 	}
 
+	float readDouble() {
+		static_assert(sizeof(uint64_t) == sizeof(double), "Double numbers must be 64 bits long");
+
+		uint64_t value = readUint64();
+		return reinterpret_cast<double&>(value);
+	}
+
 	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
@@ -635,6 +647,7 @@ template<> inline void Message::append(const int32_t& value) { appendSint32(valu
 template<> inline void Message::append(const bool& value) { appendBoolean(value); }
 template<> inline void Message::append(const char& value) { appendByte(value); }
 template<> inline void Message::append(const float& value) { appendFloat(value); }
+template<> inline void Message::append(const double& value) { appendDouble(value); }
 
 /**
  * Appends an ETL string to the message. ETL strings are handled as ECSS octet strings, meaning that the string size
@@ -655,5 +668,6 @@ template<> inline int32_t Message::read() { return readSint32(); }
 template<> inline bool Message::read<bool>() { return readBoolean(); }
 template<> inline char Message::read() { return readByte(); }
 template<> inline float Message::read() { return readFloat(); }
+template<> inline double Message::read() { return readDouble(); }
 
 #endif // ECSS_SERVICES_PACKET_H

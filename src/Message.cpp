@@ -187,3 +187,4 @@ void Message::appendOctetString(const etl::istring& string) {
 	appendUint16(string.size());
 	appendString(string);
 }
+

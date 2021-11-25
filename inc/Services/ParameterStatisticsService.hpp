@@ -5,8 +5,9 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameters/SystemParameters.hpp"
+#include "Helpers/Statistic.hpp"
 #include "etl/deque.h"
-#include "Statistics/SystemStatistics.hpp"
+#include "etl/map.h"
 
 /**
  * Implementation of the ST[04] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
@@ -29,6 +30,11 @@ public:
 	};
 
 	/**
+	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
+	 */
+	etl::map <uint16_t, Statistic, ECSS_MAX_STATISTIC_PARAMETERS> statisticsMap;
+
+	/**
 	 * true means that the periodic statistics reporting is enabled
 	 */
 	bool periodicStatisticsReportingStatus = false;
@@ -36,7 +42,6 @@ public:
 	 * If true, after every report reset the parameter statistics.
 	 */
 	bool hasAutomaticStatisticsReset = false; // todo: do const
-	bool hasTimeIntervals = true;
 	const bool supportsSamplingInterval = true;
 	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
 
@@ -51,9 +56,15 @@ public:
 	void parameterStatisticsReport();
 
 	/**
-	 * TC[4,3] reset parameter statistics, clearing all samples and values.
+	 * TC[4,3] reset parameter statistics, clearing all samples and values. This is the function called by TC from
+	 * the GS.
 	 */
 	void resetParameterStatistics(Message& request);
+
+	/**
+	 * This function clears all the samples.
+	 */
+	void resetParameterStatistics();
 
 	/**
 	 * TC[4,4] enable periodic parameter statistics reporting

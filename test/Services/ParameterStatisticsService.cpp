@@ -23,12 +23,12 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	for (int i = 0; i < numOfSamples; i++) { // Values of stat-2: [ 3, 5, 7, 9, 11, 13 ]
 		stat2.updateStatistics(i * 2 + 3);
 	}
-	systemStatistics.statisticsMap.insert({id1, stat1});
-	systemStatistics.statisticsMap.insert({id2, stat2});
+	Services.parameterStatistics.statisticsMap.insert({id1, stat1});
+	Services.parameterStatistics.statisticsMap.insert({id2, stat2});
 }
 
 void resetSystem() {
-	systemStatistics.statisticsMap.clear();
+	Services.parameterStatistics.statisticsMap.clear();
 }
 
 bool statisticsAreInitialized(Statistic& stat) {
@@ -73,29 +73,29 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(report.readFloat() == 3); // mean
 		CHECK(static_cast<int>(report.readFloat()) == 1); // stddev
 
-		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[5]));
-		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[7]));
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
 
 		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
 		MessageParser::execute(request);
 
-		CHECK(statisticsAreInitialized(systemStatistics.statisticsMap[5]));
-		CHECK(statisticsAreInitialized(systemStatistics.statisticsMap[7]));
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
 
 		Message request2 = Message(ParameterStatisticsService::ServiceType,
 		                           ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 		request2.appendBoolean(true);
-		systemStatistics.statisticsMap[5].mean = 5;
-		systemStatistics.statisticsMap[7].mean = 3;
+		Services.parameterStatistics.statisticsMap[5].mean = 5;
+		Services.parameterStatistics.statisticsMap[7].mean = 3;
 		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
-		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[5]));
-		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[7]));
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
 
 		MessageParser::execute(request2);
 
-		CHECK(statisticsAreInitialized(systemStatistics.statisticsMap[5]));
-		CHECK(statisticsAreInitialized(systemStatistics.statisticsMap[7]));
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
 
 		resetSystem();
 		ServiceTests::reset();
@@ -107,13 +107,13 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::ResetParameterStatistics, Message::TC, 1);
 
-		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[5]));
-		CHECK(not statisticsAreInitialized(systemStatistics.statisticsMap[7]));
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
 
 		MessageParser::execute(request);
 
-		CHECK(statisticsAreInitialized(systemStatistics.statisticsMap[5]));
-		CHECK(statisticsAreInitialized(systemStatistics.statisticsMap[7]));
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
 
 		resetSystem();
 		ServiceTests::reset();
@@ -173,7 +173,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 		Statistic newStatistic;
 		newStatistic.setSelfSamplingInterval(0);
-		systemStatistics.statisticsMap.insert({0, newStatistic});
+		Services.parameterStatistics.statisticsMap.insert({0, newStatistic});
 
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
@@ -208,17 +208,17 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		request.appendUint16(paramId6);
 		request.appendUint16(interval6);
 
-		CHECK(systemStatistics.statisticsMap.size() == 3);
+		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
 
 		MessageParser::execute(request);
 
 		REQUIRE(ServiceTests::count() == 4);
-		CHECK(systemStatistics.statisticsMap.size() == 4);
+		CHECK(Services.parameterStatistics.statisticsMap.size() == 4);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidSamplingRateError) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::MaxStatisticDefinitionsReached) == 1);
-		CHECK(systemStatistics.statisticsMap[0].selfSamplingInterval == 14);
-		CHECK(systemStatistics.statisticsMap[1].selfSamplingInterval == 32);
+		CHECK(Services.parameterStatistics.statisticsMap[0].selfSamplingInterval == 14);
+		CHECK(Services.parameterStatistics.statisticsMap[1].selfSamplingInterval == 32);
 
 		resetSystem();
 		ServiceTests::reset();
@@ -229,14 +229,14 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		Statistic stat1;
 		Statistic stat2;
 		Statistic stat3;
-		systemStatistics.statisticsMap.insert({0, stat1});
-		systemStatistics.statisticsMap.insert({1, stat2});
-		systemStatistics.statisticsMap.insert({2, stat3});
+		Services.parameterStatistics.statisticsMap.insert({0, stat1});
+		Services.parameterStatistics.statisticsMap.insert({1, stat2});
+		Services.parameterStatistics.statisticsMap.insert({2, stat3});
 
-		REQUIRE(systemStatistics.statisticsMap.size() == 3);
-		REQUIRE(systemStatistics.statisticsMap.find(0) != systemStatistics.statisticsMap.end());
-		REQUIRE(systemStatistics.statisticsMap.find(1) != systemStatistics.statisticsMap.end());
-		REQUIRE(systemStatistics.statisticsMap.find(2) != systemStatistics.statisticsMap.end());
+		REQUIRE(Services.parameterStatistics.statisticsMap.size() == 3);
+		REQUIRE(Services.parameterStatistics.statisticsMap.find(0) != Services.parameterStatistics.statisticsMap.end());
+		REQUIRE(Services.parameterStatistics.statisticsMap.find(1) != Services.parameterStatistics.statisticsMap.end());
+		REQUIRE(Services.parameterStatistics.statisticsMap.find(2) != Services.parameterStatistics.statisticsMap.end());
 
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
@@ -253,7 +253,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == true);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
-		CHECK(systemStatistics.statisticsMap.size() == 2);
+		CHECK(Services.parameterStatistics.statisticsMap.size() == 2);
 
 		Message request2 =
 		    Message(ParameterStatisticsService::ServiceType,
@@ -265,7 +265,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == false);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
-		CHECK(systemStatistics.statisticsMap.empty());
+		CHECK(Services.parameterStatistics.statisticsMap.empty());
 
 		resetSystem();
 		ServiceTests::reset();
@@ -274,9 +274,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 	SECTION("Parameter statistics definition report") {
 		initializeStatistics(0, 12);
-		REQUIRE(systemStatistics.statisticsMap.size() == 2);
-		REQUIRE(systemStatistics.statisticsMap.find(7) != systemStatistics.statisticsMap.end());
-		REQUIRE(systemStatistics.statisticsMap.find(5) != systemStatistics.statisticsMap.end());
+		REQUIRE(Services.parameterStatistics.statisticsMap.size() == 2);
+		REQUIRE(Services.parameterStatistics.statisticsMap.find(7) != Services.parameterStatistics.statisticsMap.end());
+		REQUIRE(Services.parameterStatistics.statisticsMap.find(5) != Services.parameterStatistics.statisticsMap.end());
 
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
