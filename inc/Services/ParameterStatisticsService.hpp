@@ -56,7 +56,7 @@ public:
 	void resetParameterStatistics(Message& request);
 
 	/**
-	 * TC[4,4] enable periodic parameter reporting
+	 * TC[4,4] enable periodic parameter statistics reporting
 	 */
 	void enablePeriodicStatisticsReporting(Message& request);
 
