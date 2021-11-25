@@ -61,7 +61,7 @@ public:
 	void enablePeriodicStatisticsReporting(Message& request);
 
 	/**
-	 * TC[4,5] disable periodic parameter reporting
+	 * TC[4,5] disable periodic parameter statistics reporting
 	 */
 	void disablePeriodicStatisticsReporting(Message& request);
 
