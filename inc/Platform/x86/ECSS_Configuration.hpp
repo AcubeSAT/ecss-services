@@ -24,13 +24,13 @@
 #define SERVICE_ALL ///< Enables compilation of all the ECSS services
 
 #ifdef SERVICE_ALL
-#define SERVICE_PARAMETERSTATISTICS ///< Compile ST[04] parameter statistics
 #define SERVICE_EVENTACTION         ///<  Compile ST[19] event-action
 #define SERVICE_EVENTREPORT         ///<  Compile ST[05] event reporting
 #define SERVICE_FUNCTION            ///<  Compile ST[08] function management
 #define SERVICE_LARGEPACKET         ///<  Compile ST[13] large packet transfer
 #define SERVICE_MEMORY              ///<  Compile ST[06] memory management
 #define SERVICE_PARAMETER           ///<  Compile ST[20] parameter management
+#define SERVICE_PARAMETERSTATISTICS ///<  Compile ST[04] parameter statistics
 #define SERVICE_REQUESTVERIFICATION ///<  Compile ST[01] request verification
 #define SERVICE_TEST                ///<  Compile ST[17] test
 #define SERVICE_TIME                ///<  Compile ST[09] time management

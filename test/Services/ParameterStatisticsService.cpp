@@ -32,7 +32,7 @@ void resetSystem() {
 }
 
 bool statisticsAreInitialized(Statistic& stat) {
-	return (stat.sampleCounter == 0 and stat.mean == 0 and stat.sumOfSquares == 0 and stat.meanOfSquares == 0 and
+	return (stat.sampleCounter == 0 and stat.mean == 0 and stat.sumOfSquares == 0 and
 	        stat.maxTime == 0 and stat.minTime == 0 and stat.standardDeviation == 0 and
 	        stat.max == -std::numeric_limits<double>::infinity() and
 	        stat.min == std::numeric_limits<double>::infinity());

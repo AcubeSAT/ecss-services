@@ -29,7 +29,7 @@ void Statistic::appendStatisticsToMessage(Message& report) {
 	report.appendFloat(static_cast<float>(mean));
 
 	if (SUPPORTS_STANDARD_DEVIATION) {
-		meanOfSquares = sumOfSquares / sampleCounter;
+		auto meanOfSquares = sumOfSquares / sampleCounter;
 		standardDeviation = sqrt(meanOfSquares - pow(mean, 2));
 		report.appendFloat(static_cast<float>(standardDeviation));
 	}
@@ -45,7 +45,6 @@ void Statistic::resetStatistics() {
 	maxTime = 0;
 	minTime = 0;
 	mean = 0;
-	meanOfSquares = 0;
 	sumOfSquares = 0;
 	standardDeviation = 0;
 	sampleCounter = 0;
