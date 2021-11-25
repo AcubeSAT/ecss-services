@@ -105,7 +105,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 		uint16_t interval = 0;
 		if (hasTimeIntervals) {
 			interval = request.readUint16();
-			if (interval <= reportingInterval) {
+			if (interval < reportingInterval) {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 				continue;
 			}
