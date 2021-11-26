@@ -6,7 +6,8 @@
 
 TEST_CASE("Parameter Append") {
 	SECTION("Check correct appending") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                          Message::TC, 1);
 		auto parameter1 = Parameter<uint8_t>(1);
 		auto parameter2 = Parameter<uint16_t>(500);
 		auto parameter3 = Parameter<uint32_t>(70000);
@@ -23,7 +24,8 @@ TEST_CASE("Parameter Append") {
 
 TEST_CASE("Parameter Set") {
 	SECTION("Check correct setting") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                          Message::TC, 1);
 		auto parameter1 = Parameter<uint8_t>(1);
 		auto parameter2 = Parameter<uint16_t>(500);
 		auto parameter3 = Parameter<uint32_t>(70000);

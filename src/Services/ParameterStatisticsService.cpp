@@ -7,7 +7,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
 	parameterStatisticsReport();
 
-	// TODO: First add start time and end time
+	// TODO: append start time and end time to the report
 
 	if (hasAutomaticStatisticsReset) {
 		resetParameterStatistics();
@@ -17,7 +17,6 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 			resetParameterStatistics();
 		}
 	}
-	// Here add start time
 }
 
 void ParameterStatisticsService::parameterStatisticsReport() {
@@ -25,10 +24,6 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	report.appendUint16(1); // Dummy value for start and end time, will change in the end
 	report.appendUint16(1);
 	uint16_t numOfValidParameters = 0;
-
-	// TODO: Here is the end time
-	//       append start time
-	//       append end time
 
 	for (auto& currentStatistic : statisticsMap) {
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;

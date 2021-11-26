@@ -32,7 +32,7 @@ public:
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
-	etl::map <uint16_t, Statistic, ECSS_MAX_STATISTIC_PARAMETERS> statisticsMap;
+	etl::map<uint16_t, Statistic, ECSS_MAX_STATISTIC_PARAMETERS> statisticsMap;
 
 	/**
 	 * true means that the periodic statistics reporting is enabled
@@ -42,15 +42,21 @@ public:
 	 * If true, after every report reset the parameter statistics.
 	 */
 	bool hasAutomaticStatisticsReset = false; // todo: do const
+	/**
+	 * Indicates whether to append/read the sampling interval to/from message
+	 */
 	const bool supportsSamplingInterval = true;
+	/**
+	 * The parameter statistics reporting interval
+	 */
 	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
 
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
 	 */
 	void reportParameterStatistics(Message& request);
-	
-        /**
+
+	/**
 	 * Constructs and stores a TM[4,2] packet containing the parameter statistics report.
 	 */
 	void parameterStatisticsReport();

@@ -23,7 +23,6 @@
  */
 #define ECSS_MAX_MESSAGE_SIZE 1024U
 
-
 /**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
  */

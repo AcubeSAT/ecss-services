@@ -6,7 +6,7 @@
 #include <MessageParser.hpp>
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
-	: serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
+    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
 	// TODO: Add assertion that data does not contain 1s outside of numBits bits
@@ -174,7 +174,7 @@ void Message::appendString(const etl::istring& string) {
 void Message::appendFixedString(const etl::istring& string) {
 	ASSERT_INTERNAL((dataSize + string.max_size()) < ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooLarge);
 	std::copy(string.data(), string.data() + string.size(), data + dataSize);
-	(void) memset(data + dataSize + string.size(), 0, string.max_size() - string.size());
+	(void)memset(data + dataSize + string.size(), 0, string.max_size() - string.size());
 	dataSize += string.max_size();
 }
 
@@ -187,4 +187,3 @@ void Message::appendOctetString(const etl::istring& string) {
 	appendUint16(string.size());
 	appendString(string);
 }
-

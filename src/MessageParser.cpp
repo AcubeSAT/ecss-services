@@ -8,46 +8,55 @@
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
 #ifdef SERVICE_PARAMETERSTATISTICS
-		case 4: Services.parameterStatistics.execute(message);
+		case 4:
+			Services.parameterStatistics.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_EVENTREPORT
-		case 5: Services.eventReport.execute(message); // ST[05]
+		case 5:
+			Services.eventReport.execute(message); // ST[05]
 			break;
 #endif
 
 #ifdef SERVICE_MEMORY
-		case 6: Services.memoryManagement.execute(message); // ST[06]
+		case 6:
+			Services.memoryManagement.execute(message); // ST[06]
 			break;
 #endif
 
 #ifdef SERVICE_FUNCTION
-		case 8: Services.functionManagement.execute(message); // ST[08]
+		case 8:
+			Services.functionManagement.execute(message); // ST[08]
 			break;
 #endif
 
 #ifdef SERVICE_TIMESCHEDULING
-		case 11: Services.timeBasedScheduling.execute(message); // ST[11]
+		case 11:
+			Services.timeBasedScheduling.execute(message); // ST[11]
 			break;
 #endif
 
 #ifdef SERVICE_TEST
-		case 17: Services.testService.execute(message); // ST[17]
+		case 17:
+			Services.testService.execute(message); // ST[17]
 			break;
 #endif
 
 #ifdef SERVICE_EVENTACTION
-		case 19: Services.eventAction.execute(message); // ST[19]
+		case 19:
+			Services.eventAction.execute(message); // ST[19]
 			break;
 #endif
 
 #ifdef SERVICE_PARAMETER
-		case 20: Services.parameterManagement.execute(message); // ST[20]
+		case 20:
+			Services.parameterManagement.execute(message); // ST[20]
 			break;
 #endif
 
-		default: ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
 
@@ -185,15 +194,13 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
 
 #if ECSS_CRC_INCLUDED
 	// Append CRC field
-	uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 +
-	                                                                                             packetDataLength);
+	uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 + packetDataLength);
 	ccsdsMessage.push_back(static_cast<uint8_t>(crcField >> 8U));
 	ccsdsMessage.push_back(static_cast<uint8_t>(crcField & 0xFF));
 #endif
 
 	return ccsdsMessage;
 }
-
 
 void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);

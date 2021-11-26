@@ -2,7 +2,6 @@
 #include "catch2/catch.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "Services/ParameterService.hpp"
 
 /**
  * System-statistics initialization, so there are actual statistics in the map to work with.
@@ -32,9 +31,8 @@ void resetSystem() {
 }
 
 bool statisticsAreInitialized(Statistic& stat) {
-	return (stat.sampleCounter == 0 and stat.mean == 0 and stat.sumOfSquares == 0 and
-	        stat.maxTime == 0 and stat.minTime == 0 and
-	        stat.max == -std::numeric_limits<double>::infinity() and
+	return (stat.sampleCounter == 0 and stat.mean == 0 and stat.sumOfSquares == 0 and stat.maxTime == 0 and
+	        stat.minTime == 0 and stat.max == -std::numeric_limits<double>::infinity() and
 	        stat.min == std::numeric_limits<double>::infinity());
 }
 
