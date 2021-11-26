@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <algorithm>
-#include <type_traits>
 #include "macros.hpp"
 #include <etl/array.h>
 #include "Helpers/TimeFormats.hpp"
