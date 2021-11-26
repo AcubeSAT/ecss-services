@@ -36,8 +36,8 @@ bool statisticsAreInitialized(Statistic& stat) {
 	        stat.min == std::numeric_limits<double>::infinity());
 }
 
-TEST_CASE("Parameter Statistics Reporting Sub-service") {
-	SECTION("Reporting of valid statistics") {
+TEST_CASE("Reporting of statistics") {
+	SECTION("Report statistics, with auto statistic reset disabled") {
 		initializeStatistics(6, 7);
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
@@ -73,16 +73,22 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
 		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+	}
 
+	SECTION("Report statistics, with auto statistics reset enabled") {
+		Message request = Message(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
 		MessageParser::execute(request);
 
 		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
 		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+	}
 
-		Message request2 = Message(ParameterStatisticsService::ServiceType,
-		                           ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
-		request2.appendBoolean(true);
+	SECTION("Report statistics, with auto statistics reset disabled, but reset is given by TC") {
+		Message request = Message(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		request.appendBoolean(true);
 		Services.parameterStatistics.statisticsMap[5].mean = 5;
 		Services.parameterStatistics.statisticsMap[7].mean = 3;
 		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
@@ -90,7 +96,7 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
 		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
 
-		MessageParser::execute(request2);
+		MessageParser::execute(request);
 
 		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
 		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
@@ -99,8 +105,10 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+}
 
-	SECTION("Resetting the parameter statistics") {
+TEST_CASE("Resetting the parameter statistics") {
+	SECTION("Reset via TC") {
 		initializeStatistics(6, 7);
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::ResetParameterStatistics, Message::TC, 1);
@@ -118,7 +126,25 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		Services.reset();
 	}
 
-	SECTION("Enable the periodic reporting of statistics") {
+	SECTION("Reset without TC") {
+		initializeStatistics(6, 7);
+
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+
+		Services.parameterStatistics.resetParameterStatistics();
+
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
+		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+
+		resetSystem();
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Enable the periodic reporting of statistics") {
+	SECTION("Valid reporting interval requested") {
 		initializeStatistics(6, 7);
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
@@ -132,7 +158,9 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == true);
 		CHECK(Services.parameterStatistics.reportingInterval == 6);
+	}
 
+	SECTION("Invalid reporting interval requested") {
 		Message request2 =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
@@ -150,8 +178,10 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+}
 
-	SECTION("Disabling the periodic reporting of statistics") {
+TEST_CASE("Disabling the periodic reporting of statistics") {
+	SECTION("Successfully disable the periodic reporting") {
 		initializeStatistics(6, 7);
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
@@ -165,10 +195,67 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+}
 
-	SECTION("Add/Update statistics definitions") {
+TEST_CASE("Add/Update statistics definitions") {
+	SECTION("Update existing parameter statistic definition") {
 		initializeStatistics(7, 6);
+		Statistic newStatistic;
+		newStatistic.setSelfSamplingInterval(0);
+		Services.parameterStatistics.statisticsMap.insert({0, newStatistic});
 
+		Message request =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
+		uint16_t numOfIds = 1;
+		request.appendUint16(numOfIds);
+
+		uint16_t paramId1 = 0;
+		uint16_t interval1 = 14;
+		request.appendUint16(paramId1);
+		request.appendUint16(interval1);
+
+		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
+
+		MessageParser::execute(request);
+
+		REQUIRE(ServiceTests::count() == 0);
+		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
+		CHECK(Services.parameterStatistics.statisticsMap[0].selfSamplingInterval == 14);
+
+		resetSystem();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Add new statistic definition") {
+		initializeStatistics(7, 6);
+		Message request =
+		    Message(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
+		uint16_t numOfIds = 1;
+		request.appendUint16(numOfIds);
+
+		uint16_t paramId1 = 1;
+		uint16_t interval1 = 32;
+		request.appendUint16(paramId1);
+		request.appendUint16(interval1);
+
+		CHECK(Services.parameterStatistics.statisticsMap.size() == 2);
+
+		MessageParser::execute(request);
+
+		REQUIRE(ServiceTests::count() == 0);
+		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
+		CHECK(Services.parameterStatistics.statisticsMap[1].selfSamplingInterval == 32);
+
+		resetSystem();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("All possible invalid requests combined with add/update") {
+		initializeStatistics(7, 6);
 		Statistic newStatistic;
 		newStatistic.setSelfSamplingInterval(0);
 		Services.parameterStatistics.statisticsMap.insert({0, newStatistic});
@@ -222,8 +309,10 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+}
 
-	SECTION("Delete statistics definitions") {
+TEST_CASE("Delete statistics definitions") {
+	SECTION("Delete specified definitions") {
 		Statistic stat1;
 		Statistic stat2;
 		Statistic stat3;
@@ -252,14 +341,16 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == true);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 2);
+	}
 
-		Message request2 =
+	SECTION("Delete all definitions") {
+		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, Message::TC, 1);
-		numIds = 0;
-		request2.appendUint16(numIds);
+		uint16_t numIds = 0;
+		request.appendUint16(numIds);
 
-		MessageParser::execute(request2);
+		MessageParser::execute(request);
 
 		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == false);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
@@ -269,8 +360,10 @@ TEST_CASE("Parameter Statistics Reporting Sub-service") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+}
 
-	SECTION("Parameter statistics definition report") {
+TEST_CASE("Parameter statistics definition report") {
+	SECTION("Check if the stored report is valid") {
 		initializeStatistics(0, 12);
 		REQUIRE(Services.parameterStatistics.statisticsMap.size() == 2);
 		REQUIRE(Services.parameterStatistics.statisticsMap.find(7) != Services.parameterStatistics.statisticsMap.end());
