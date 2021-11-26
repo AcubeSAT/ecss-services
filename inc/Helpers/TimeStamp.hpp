@@ -20,7 +20,7 @@
  * from UTC time system.
  */
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-class Instant {
+class TimeStamp {
 private:
 	static_assert(seconds_counter_bytes + fractional_counter_bytes <= 8,
 	              "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
@@ -36,14 +36,14 @@ public:
 	 * Initialize the instant at epoch
 	 *
 	 */
-	Instant() : tai_counter(0){};
+	TimeStamp() : tai_counter(0){};
 
 	/**
 	 * Initialize the instant from a duration from epoch in TAI
 	 *
 	 * @param seconds an integer number of seconds from AcubeSAT custom epoch
 	 */
-	Instant(int tai_seconds_from_AcubeSAT_epoch)
+	TimeStamp(int tai_seconds_from_AcubeSAT_epoch)
 	    : tai_counter(static_cast<tai_counter_t>(tai_seconds_from_AcubeSAT_epoch) << 8 * fractional_counter_bytes){};
 
 	/**
@@ -52,21 +52,21 @@ public:
 	 * @param timestamp a complete CUC time stamp including header, of the maximum possible size, zero padded to the
 	 * right
 	 */
-	Instant(etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp);
+	TimeStamp(etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp);
 
 	/**
 	 * Initialize the instant from a UTC timestamp struct
 	 *
 	 * @param timestamp a UTC timestamp, from Unix Epoch
 	 */
-	Instant(UTC_Timestamp timestamp);
+	TimeStamp(UTC_Timestamp timestamp);
 
 	/**
 	 * Initialize the instant from an AcubeSAT CDS timestamp
 	 *
 	 * @param timestamp a CDS timestamp, in the format from DDJF_TTC, from epoch 2020.01.01
 	 */
-	Instant(AcubeSAT_CDS_timestamp timestamp);
+	TimeStamp(AcubeSAT_CDS_timestamp timestamp);
 
 	/**
 	 * Get the representation as seconds from epoch in TAI
@@ -92,20 +92,20 @@ public:
 	/**
 	 * Compare two instants.
 	 *
-	 * @param Instant the date that will be compared with the pointer `this`
+	 * @param TimeStamp the date that will be compared with the pointer `this`
 	 * @return true if the condition is satisfied
 	 */
-	bool operator<(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
-	bool operator>(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
-	bool operator==(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
-	bool operator!=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
-	bool operator<=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
-	bool operator>=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
+	bool operator<(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
+	bool operator>(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
+	bool operator==(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
+	bool operator!=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
+	bool operator<=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
+	bool operator>=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
 };
 ////////////////////////////////////////////////
 
 ////// TEMPLATED METHODS INSTANTIATION /////////
-#include "Instant.tpp"
+#include "TimeStamp.tpp"
 ////////////////////////////////////////////////
 
 #endif
