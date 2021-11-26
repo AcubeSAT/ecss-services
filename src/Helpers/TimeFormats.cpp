@@ -89,47 +89,36 @@ bool UTC_Timestamp::operator<(const UTC_Timestamp& Date) {
 }
 
 bool UTC_Timestamp::operator>(const UTC_Timestamp& Date) {
-	// compare years
 	if (this->year > Date.year) {
 		return true;
 	}
 	if (this->year < Date.year) {
 		return false;
 	}
-
-	// compare months
 	if (this->month > Date.month) {
 		return true;
 	}
 	if (this->month < Date.month) {
 		return false;
 	}
-
-	// compare days
 	if (this->day > Date.day) {
 		return true;
 	}
 	if (this->day < Date.day) {
 		return false;
 	}
-
-	// compare hours
 	if (this->hour > Date.hour) {
 		return true;
 	}
 	if (this->hour < Date.hour) {
 		return false;
 	}
-
-	// compare minutes
 	if (this->minute > Date.minute) {
 		return true;
 	}
 	if (this->minute < Date.minute) {
 		return false;
 	}
-
-	// compare seconds
 	if (this->second > Date.second) {
 		return true;
 	}
@@ -138,36 +127,24 @@ bool UTC_Timestamp::operator>(const UTC_Timestamp& Date) {
 }
 
 bool UTC_Timestamp::operator==(const UTC_Timestamp& Date) {
-	// compare years
 	if (this->year != Date.year) {
 		return false;
 	}
-
-	// compare months
 	if (this->month != Date.month) {
 		return false;
 	}
-
-	// compare days
 	if (this->day != Date.day) {
 		return false;
 	}
-
-	// compare hours
 	if (this->hour != Date.hour) {
 		return false;
 	}
-
-	// compare minutes
 	if (this->minute != Date.minute) {
 		return false;
 	}
-
-	// compare seconds
 	if (this->second != Date.second) {
 		return false;
 	}
-
 	return true;
 }
 
@@ -179,7 +156,7 @@ bool UTC_Timestamp::operator>=(const UTC_Timestamp& Date) {
 	return ((*this > Date) || (*this == Date));
 }
 
-std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date){// NOLINT because clang tidy is shitting itself
+std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date){// NOLINT
 	// YYYY-MM-DDTHH:mm:ss.sssZ
 	o.fill('0');
 	o << static_cast<int>(Date.year) << "-"

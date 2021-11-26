@@ -11,13 +11,13 @@ bool is_leap_year(uint16_t year);
 ////////////: CONSTRUCTORS ////////////
 //// FROM CDS TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(Acubesat_CDS_timestamp timestamp){
+Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(AcubeSAT_CDS_timestamp timestamp){
   //tai_counter = 0; //TODO
 }
 
 //// FROM CUC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uint8_t, 9> timestamp){
+Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp){
   //process header
   int header_size = 1;
   if(timestamp[0] & 0b10000000){
@@ -76,21 +76,21 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
 //// FROM UTC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(UTC_Timestamp timestamp){
-  int secs = UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS;
-  for (int y = ACUBESAT_EPOCH_YEAR; y < timestamp.year; ++y) {
-    secs += (is_leap_year(y) ? 366 : 365) * SECONDS_PER_DAY;
+  int seconds = UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS;
+  for (int year = ACUBESAT_EPOCH_YEAR; year < timestamp.year; ++year) {
+    seconds += (is_leap_year(year) ? 366 : 365) * SECONDS_PER_DAY;
   }
-  for (int m = ACUBESAT_EPOCH_MONTH; m < timestamp.month; ++m) {
-    secs += DaysOfMonth[m - 1] * SECONDS_PER_DAY;
-    if ((m == 2U) && is_leap_year(timestamp.year)) {
-      secs += SECONDS_PER_DAY;
+  for (int month = ACUBESAT_EPOCH_MONTH; month < timestamp.month; ++month) {
+    seconds += DAYSOFMONTH[month - 1] * SECONDS_PER_DAY;
+    if ((month == 2U) && is_leap_year(timestamp.year)) {
+      seconds += SECONDS_PER_DAY;
     }
   }
-  secs += (timestamp.day - ACUBESAT_EPOCH_DAY) * SECONDS_PER_DAY;
-  secs += timestamp.hour * SECONDS_PER_HOUR;
-  secs += timestamp.minute * SECONDS_PER_MINUTE;
-  secs += timestamp.second;
-  tai_counter = static_cast<tai_counter_t>(secs) << 8*fractional_counter_bytes;
+  seconds += (timestamp.day - ACUBESAT_EPOCH_DAY) * SECONDS_PER_DAY;
+  seconds += timestamp.hour * SECONDS_PER_HOUR;
+  seconds += timestamp.minute * SECONDS_PER_MINUTE;
+  seconds += timestamp.second;
+  tai_counter = static_cast<tai_counter_t>(seconds) << 8*fractional_counter_bytes;
 }
 
 ////////////// GETTER ///////////////
@@ -100,8 +100,8 @@ const int Instant<seconds_counter_bytes, fractional_counter_bytes>::as_TAI_secon
 }
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-const etl::array<uint8_t, 9> Instant<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp(){
-  etl::array<uint8_t, 9> r = {0};
+const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> Instant<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp(){
+  etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> r = {0};
   int index_first_non_header_byte;
   if (typeid(CUC_header_t).name() == typeid(uint8_t).name()){ //one-byte CUC header
     r[0] = static_cast<uint8_t>(CUC_header);
@@ -149,9 +149,9 @@ const UTC_Timestamp Instant<seconds_counter_bytes, fractional_counter_bytes>::as
 
 	// calculate months
 	int i = 0;
-	while (seconds >= (DaysOfMonth[i] * SECONDS_PER_DAY)) {
+	while (seconds >= (DAYSOFMONTH[i] * SECONDS_PER_DAY)) {
 		month++;
-		seconds -= (DaysOfMonth[i] * SECONDS_PER_DAY);
+		seconds -= (DAYSOFMONTH[i] * SECONDS_PER_DAY);
 		i++;
 		if ((i == 1U) && is_leap_year(year)) {
 			if (seconds <= (28 * SECONDS_PER_DAY)) {

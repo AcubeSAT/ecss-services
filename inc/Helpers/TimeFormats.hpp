@@ -9,21 +9,23 @@
 inline constexpr uint8_t SECONDS_PER_MINUTE = 60;
 inline constexpr uint16_t SECONDS_PER_HOUR = 3600;
 inline constexpr uint32_t SECONDS_PER_DAY = 86400;
-static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+static constexpr uint8_t DAYSOFMONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-inline constexpr uint8_t Acubesat_CUC_seconds_counter_bytes = 2; // PER DDJF_TTC
-inline constexpr uint8_t Acubesat_CUC_fractional_counter_bytes = 2; // PER DDJF_TTC
+inline constexpr uint8_t ACUBESAT_CUC_SECONDS_COUNTER_BYTES = 2; // PER DDJF_TTC
+inline constexpr uint8_t ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES = 2; // PER DDJF_TTC
 inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800; //TODO correct for 2020.01.01
 inline constexpr uint16_t ACUBESAT_EPOCH_YEAR = 2019;
 inline constexpr uint8_t ACUBESAT_EPOCH_MONTH = 1;
 inline constexpr uint8_t ACUBESAT_EPOCH_DAY = 1;
 
+inline constexpr uint8_t MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP = 9;
+
 static_assert(ACUBESAT_EPOCH_YEAR >= 2019);
 static_assert(ACUBESAT_EPOCH_MONTH < 11 && ACUBESAT_EPOCH_MONTH >= 0);
-static_assert(ACUBESAT_EPOCH_DAY < DaysOfMonth[ACUBESAT_EPOCH_MONTH]);
+static_assert(ACUBESAT_EPOCH_DAY < DAYSOFMONTH[ACUBESAT_EPOCH_MONTH]);
 //////////////////////////////////////////////
 
-//////// HELPER CONSTEXPR DO NOT TOUCH ////////
+//////// HELPER CONSTEXPR ////////
 template <int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr uint8_t build_short_CUC_header() {
 	static_assert( seconds_counter_bytes <= 4, "Use build_long_CUC_header instead");
@@ -34,7 +36,7 @@ inline constexpr uint8_t build_short_CUC_header() {
   // P-Field extension is 0, CUC header is not extended
 	header += 0;
 
-  // Acubesat is using custom TAI epoch at 01 Jan 2020
+  // AcubeSAT is using custom TAI epoch at 01 Jan 2020
 	header = header << 3;
 	header += 0b010;
 
@@ -67,7 +69,7 @@ inline constexpr uint16_t build_long_CUC_header() {
   // P-Field extension is 1, CUC header is extended
 	header += 1;
 
-	// Acubesat is using custom TAI epoch at 01 Jan 2020
+	// AcubeSAT is using custom TAI epoch at 01 Jan 2020
 	header = header << 3;
 	header += 0b010;
 
@@ -109,7 +111,7 @@ inline constexpr T build_CUC_header() {
 		return build_long_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
 }
 
-inline constexpr uint8_t build_Acubesat_CDS_header() {
+inline constexpr uint8_t build_AcubeSAT_CDS_header() {
 	uint8_t header = 0;
 
   // bit 0 is at 0
@@ -120,15 +122,15 @@ inline constexpr uint8_t build_Acubesat_CDS_header() {
   header += 0b100;
   header << 3;
 
-  // Acubesat is using custom TAI epoch at 01 Jan 2020
+  // AcubeSAT is using custom TAI epoch at 01 Jan 2020
 	header += 1;
 	header << 1;
 
-  // Acubesat is using 16 bits day count segment
+  // AcubeSAT is using 16 bits day count segment
   header += 0;
   header << 1;
 
-  // Acubesat is using picosecond resolution
+  // AcubeSAT is using picosecond resolution
 	header += 0b10;
 	//header << 2;
 
@@ -141,9 +143,9 @@ bool is_leap_year(uint16_t year);
 
 ////////// Transitory timestamps ////////////
 // CUSTOM EPOCH FOR ALL ACUBESAT TIMESTAMPS IS 01 JAN 2020, EXCEPT UTC (UNIX)
-class Acubesat_CDS_timestamp{
+class AcubeSAT_CDS_timestamp{
 public:
-  static constexpr uint8_t P_FIELD = build_Acubesat_CDS_header();
+  static constexpr uint8_t P_FIELD = build_AcubeSAT_CDS_header();
   uint16_t day;
   uint16_t ms_of_day;
   uint32_t submilliseconds;

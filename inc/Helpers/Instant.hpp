@@ -41,16 +41,16 @@ public:
 	/**
 	 * Initialize the instant from a duration from epoch in TAI
 	 *
-	 * @param seconds an integer number of seconds from Acubesat custom epoch
+	 * @param seconds an integer number of seconds from AcubeSAT custom epoch
 	 */
-	Instant(int seconds) : tai_counter(static_cast<tai_counter_t>(seconds) << 8*fractional_counter_bytes){};
+	Instant(int tai_seconds_from_AcubeSAT_epoch) : tai_counter(static_cast<tai_counter_t>(tai_seconds_from_AcubeSAT_epoch) << 8*fractional_counter_bytes){};
 
 	/**
 	 * Initialize the instant from the bytes of a CUC time stamp
 	 *
 	 * @param timestamp a complete CUC time stamp including header, of the maximum possible size, zero padded to the right
 	 */
-	Instant(etl::array<uint8_t, 9> timestamp);
+	Instant(etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp);
 
 	/**
 	 * Initialize the instant from a UTC timestamp struct
@@ -60,11 +60,11 @@ public:
 	Instant(UTC_Timestamp timestamp);
 
 	/**
-	 * Initialize the instant from an Acubesat CDS timestamp
+	 * Initialize the instant from an AcubeSAT CDS timestamp
 	 *
 	 * @param timestamp a CDS timestamp, in the format from DDJF_TTC, from epoch 2020.01.01
 	 */
-	Instant(Acubesat_CDS_timestamp timestamp);
+	Instant(AcubeSAT_CDS_timestamp timestamp);
 
 	/**
 	 * Get the representation as seconds from epoch in TAI
@@ -78,7 +78,7 @@ public:
 	 *
 	 * @return the instant, represented in the CCSDS CUC format
 	 */
-	const etl::array<uint8_t, 9> as_CUC_timestamp();
+	const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> as_CUC_timestamp();
 
 	/**
 	 * Get the representation as a UTC timestamp
@@ -110,7 +110,7 @@ public:
 };
 ////////////////////////////////////////////////
 
-////// TEMPLATED METHODS INSTANCIATION /////////
+////// TEMPLATED METHODS INSTANTIATION /////////
 #include "Instant.tpp"
 ////////////////////////////////////////////////
 
