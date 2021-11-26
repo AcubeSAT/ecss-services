@@ -48,6 +48,7 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
   for (int i=header_size+timestamp_seconds_bytes_count+timestamp_fractional_bytes_count; i<9; i++){
     if (timestamp[i] != 0) {
       err += 1;
+      break;
     }
   }
   ASSERT_INTERNAL(err == 0, ErrorHandler::InternalErrorType::InvalidDate);
@@ -100,28 +101,28 @@ const int Instant<seconds_counter_bytes, fractional_counter_bytes>::as_TAI_secon
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> Instant<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp(){
-  etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> r = {0};
+  etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> return_array = {0};
   int index_first_non_header_byte;
 
   static constexpr uint8_t header_size = seconds_counter_bytes < 4 && fractional_counter_bytes < 3 ? 1 : 2; //number of bytes in CUC header
 
   if (header_size == 1){
-    r[0] = static_cast<uint8_t>(CUC_header);
+    return_array[0] = static_cast<uint8_t>(CUC_header);
     index_first_non_header_byte = 1;
   }
 
   else{ //two-bytes CUC header
-    r[1] = static_cast<uint8_t>(CUC_header);
-    r[0] = static_cast<uint8_t>(CUC_header >> 8);
+    return_array[1] = static_cast<uint8_t>(CUC_header);
+    return_array[0] = static_cast<uint8_t>(CUC_header >> 8);
     index_first_non_header_byte = 2;
   }
 
-  for(auto i = 0; i < seconds_counter_bytes + fractional_counter_bytes; i++){
-    int j = 8*(seconds_counter_bytes + fractional_counter_bytes - i - 1);
-    r[index_first_non_header_byte + i] = tai_counter >> j;
+  for(auto byte_being_filled_in_return = 0; byte_being_filled_in_return < seconds_counter_bytes + fractional_counter_bytes; byte_being_filled_in_return++){
+    int index_of_interesting_byte_in_tai_counter = 8*(seconds_counter_bytes + fractional_counter_bytes - byte_being_filled_in_return - 1);
+    return_array[index_first_non_header_byte + byte_being_filled_in_return] = tai_counter >> index_of_interesting_byte_in_tai_counter;
   }
 
-  return r;
+  return return_array;
 }
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
