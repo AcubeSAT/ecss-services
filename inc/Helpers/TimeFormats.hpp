@@ -102,7 +102,7 @@ inline constexpr uint16_t build_long_CUC_header() {
 
 template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr T build_CUC_header() {
-	static_assert((seconds_counter_bytes + fractional_counter_bytes ) <= 8, "Complete arbitrary precision not yet supported"); //TODO improve and get rid of this
+	static_assert((seconds_counter_bytes + fractional_counter_bytes ) <= 8, "Complete arbitrary precision not yet supported"); //See Issue #106 on Gitlab
 	// cppcheck-suppress syntaxError
 	// cppcheck-suppress redundantCondition
 	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3) //if constexpr not supported yet in cppcheck
@@ -188,7 +188,7 @@ public:
 	/**
 	 * @param text_timestamp the timestamp to parse into a UTC date
 	 */
-	UTC_Timestamp(String<32> text_timestamp); // TODO change to ETL string type
+	UTC_Timestamp(etl::string<32> text_timestamp);
 
 		/**
 	 * Compare two timestamps.

@@ -100,13 +100,6 @@ public:
 	bool operator<=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 	bool operator>=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 
-	// /**
-	//  * Check internal variables have right sizes from template, use for debug
-	//  *
-	//  *
-	//  * @return [size_of CUC_header, size_of tai_counter]
-	//  */
-	// const std::type_info& check_header_type();
 };
 ////////////////////////////////////////////////
 

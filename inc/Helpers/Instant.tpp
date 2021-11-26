@@ -12,7 +12,7 @@ bool is_leap_year(uint16_t year);
 //// FROM CDS TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(AcubeSAT_CDS_timestamp timestamp){
-  //tai_counter = 0; //TODO
+  //tai_counter = 0; //See Issue #105 on Gitlab
 }
 
 //// FROM CUC TIMESTAMP
@@ -70,7 +70,6 @@ Instant<seconds_counter_bytes, fractional_counter_bytes>::Instant(etl::array<uin
   }
   //pad rightmost bytes to full length
   tai_counter = tai_counter << 8*(fractional_counter_bytes - timestamp_fractional_bytes_count);
-  //printf("created timestamp from %d seconds bytes, %d fractional bytes, leading to an internal value of %lu\n", timestamp_seconds_bytes_count, timestamp_fractional_bytes_count, tai_counter);
 }
 
 //// FROM UTC TIMESTAMP
@@ -114,12 +113,8 @@ const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> Instant<seco
     index_first_non_header_byte = 2;
   }
 
-  //printf("tai_counter of size %lu\n", sizeof(tai_counter_t));
-  //printf("total bytes size %d\n", seconds_counter_bytes + fractional_counter_bytes);
   for(auto i = 0; i < seconds_counter_bytes + fractional_counter_bytes; i++){
     int j = 8*(seconds_counter_bytes + fractional_counter_bytes - i - 1);
-    //printf("shift %d bits\n", j);
-    //printf("writing %d at index %d \n", (uint8_t)(tai_counter >> j), index_first_non_header_byte + i);
     r[index_first_non_header_byte + i] = tai_counter >> j;
   }
 
@@ -214,11 +209,4 @@ bool Instant<seconds_counter_bytes, fractional_counter_bytes>::operator>=(const 
   return tai_counter >= Instant.tai_counter;
 }
 /// ARITHMETIC
-// TODO
-
-
-////////////// TESTS ///////////////
-// template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-// const std::type_info& Instant<seconds_counter_bytes, fractional_counter_bytes>::check_header_type(){
-//   return typeid(CUC_header);
-// }
+// See Issue #104 on Gitlab repository

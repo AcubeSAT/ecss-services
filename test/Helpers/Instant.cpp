@@ -5,18 +5,6 @@
 #include <iostream>
 
 TEST_CASE("Instant class construction"){
-  // SECTION("Valid initialization at epoch"){
-  //   Instant<1, 2> Epoch1;
-  //   Instant<4, 4> Epoch2;
-  //   REQUIRE(Epoch1.as_TAI_seconds() == 0);
-  //   REQUIRE(Epoch2.as_TAI_seconds() == 0);
-  //   const std::type_info& expected_type1 = typeid(uint8_t);
-  //   const std::type_info& expected_type2 = typeid(uint16_t);
-  //   CHECK(Epoch1.check_header_type() == expected_type1);
-  //   CHECK(Epoch1.check_header_type() != expected_type2);
-  //   CHECK(Epoch2.check_header_type() == expected_type2);
-  // }
-
   // SECTION("Initialize with excessive precision, breaks at compile time"){
   //   Instant<5, 10> Epoch3;
   //   Instant<4, 4> Epoch4;
@@ -40,9 +28,6 @@ TEST_CASE("Instant class construction"){
 
     uint16_t cuc_header6 = build_CUC_header<uint16_t, 7, 1>();
     CHECK(cuc_header6 == 0b1010110111100000);
-
-    //TODO ADD MORE TESTS HERE ONCE FULL PRECISION RANGE IS SUPPORTED IN INTERNAL REPRESENTATION
-
   }
 
   SECTION("Check TAI idempotence"){
@@ -58,7 +43,6 @@ TEST_CASE("Instant class construction"){
 
     for (auto i = 0; i < 9; i++){
       bool test = input_time1[i] == test_return1[i];
-      //printf("comparison1 %d // %d\n", input_time1[i], test_return1[i]);
       REQUIRE(test);
     }
 
@@ -68,7 +52,6 @@ TEST_CASE("Instant class construction"){
 
     for (auto i = 0; i < 9; i++){
       bool test = input_time2[i] == test_return2[i];
-      //printf("comparison2 %d // %d\n", input_time2[i], test_return2[i]);
       REQUIRE(test);
     }
 
@@ -78,7 +61,6 @@ TEST_CASE("Instant class construction"){
 
     for (auto i = 0; i < 9; i++){
       bool test = input_time3[i] == test_return3[i];
-      //printf("comparison3 %d // %d\n", input_time3[i], test_return3[i]);
       REQUIRE(test);
     }
   }
@@ -113,21 +95,6 @@ TEST_CASE("Instant class construction"){
     }
   }
 
-  // SECTION("UTC conversion to and from CUC") {
-  // 	//TODO
-  // }
-  //
-  // SECTION("UTC conversion to and from CDS") {
-  // 	//TODO
-  // }
-
-  SECTION("Check CDS idempotence"){
-    // TODO
-    //etl::array<uint8_t, 9> input_time = {10, 0, 1, 1, 3, 1, 2};
-    //Instant<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(input_time);
-    //REQUIRE(Epoch.as_TAI_seconds() == input_time); //check initialization has intended effect
-  }
-
   // SECTION("Check different templates, should break at compile"){
   //   Instant<1, 2> Epoch1;
   //   Instant<4, 4> Epoch2;
@@ -137,13 +104,13 @@ TEST_CASE("Instant class construction"){
   SECTION("Check operators"){
     Instant<1, 2> Epoch1;
     Instant<1, 2> Epoch2;
-    Instant<1, 2> Epoch3(10);//todo introduce variety in the initialization
+    Instant<1, 2> Epoch3(10);
     Instant<1, 2> Epoch4(15);
     Instant<1, 2> Epoch5(12);
     Instant<1, 2> Epoch6(10);
     Instant<2, 2> Epoch7;
     REQUIRE(Epoch1==Epoch2);
-    REQUIRE(Epoch2==Epoch1); //check symmetry
+    REQUIRE(Epoch2==Epoch1);
     REQUIRE(Epoch3==Epoch6);
     REQUIRE(Epoch1!=Epoch3);
     REQUIRE(Epoch3!=Epoch5);
