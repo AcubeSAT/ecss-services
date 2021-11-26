@@ -108,7 +108,8 @@ const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp() {
 	etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> return_array = {0};
 	int index_first_non_header_byte;
-
+  
+  // cppcheck-suppress redundantCondition
 	static constexpr uint8_t header_size =
 	    seconds_counter_bytes < 4 && fractional_counter_bytes < 3 ? 1 : 2; // number of bytes in CUC header
 
