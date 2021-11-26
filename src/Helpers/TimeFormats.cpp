@@ -156,15 +156,11 @@ bool UTC_Timestamp::operator>=(const UTC_Timestamp& Date) {
 	return ((*this > Date) || (*this == Date));
 }
 
-std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date){// NOLINT
+std::ostream& operator<<(std::ostream& o, UTC_Timestamp const& Date) { // NOLINT
 	// YYYY-MM-DDTHH:mm:ss.sssZ
 	o.fill('0');
-	o << static_cast<int>(Date.year) << "-"
-	<< std::setw(2) << static_cast<int>(Date.month) << "-"
-	<< std::setw(2) << static_cast<int>(Date.day) << "T"
-	<< std::setw(2) << static_cast<int>(Date.hour) << ":"
-	<< std::setw(2) << static_cast<int>(Date.minute) << ":"
-	<< std::setw(2) << static_cast<int>(Date.second) << ":000Z"
-	<< std::endl;
+	o << static_cast<int>(Date.year) << "-" << std::setw(2) << static_cast<int>(Date.month) << "-" << std::setw(2)
+	  << static_cast<int>(Date.day) << "T" << std::setw(2) << static_cast<int>(Date.hour) << ":" << std::setw(2)
+	  << static_cast<int>(Date.minute) << ":" << std::setw(2) << static_cast<int>(Date.second) << ":000Z" << std::endl;
 	return o;
 }

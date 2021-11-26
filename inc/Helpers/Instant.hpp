@@ -21,16 +21,17 @@
  */
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 class Instant {
-
 private:
-	static_assert( seconds_counter_bytes + fractional_counter_bytes <= 8, "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
-	typedef typename std::conditional<seconds_counter_bytes < 4 && fractional_counter_bytes < 3, uint8_t, uint16_t>::type CUC_header_t;
-	typedef typename std::conditional<(seconds_counter_bytes + fractional_counter_bytes) < 4, uint32_t, uint64_t>::type tai_counter_t;
+	static_assert(seconds_counter_bytes + fractional_counter_bytes <= 8,
+	              "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
+	typedef typename std::conditional < seconds_counter_bytes < 4 &&
+	    fractional_counter_bytes<3, uint8_t, uint16_t>::type CUC_header_t;
+	typedef typename std::conditional<(seconds_counter_bytes + fractional_counter_bytes) < 4, uint32_t, uint64_t>::type
+	    tai_counter_t;
 	tai_counter_t tai_counter;
-	CUC_header_t CUC_header = build_CUC_header<CUC_header_t, seconds_counter_bytes,fractional_counter_bytes>();
+	CUC_header_t CUC_header = build_CUC_header<CUC_header_t, seconds_counter_bytes, fractional_counter_bytes>();
 
 public:
-
 	/**
 	 * Initialize the instant at epoch
 	 *
@@ -42,12 +43,14 @@ public:
 	 *
 	 * @param seconds an integer number of seconds from AcubeSAT custom epoch
 	 */
-	Instant(int tai_seconds_from_AcubeSAT_epoch) : tai_counter(static_cast<tai_counter_t>(tai_seconds_from_AcubeSAT_epoch) << 8*fractional_counter_bytes){};
+	Instant(int tai_seconds_from_AcubeSAT_epoch)
+	    : tai_counter(static_cast<tai_counter_t>(tai_seconds_from_AcubeSAT_epoch) << 8 * fractional_counter_bytes){};
 
 	/**
 	 * Initialize the instant from the bytes of a CUC time stamp
 	 *
-	 * @param timestamp a complete CUC time stamp including header, of the maximum possible size, zero padded to the right
+	 * @param timestamp a complete CUC time stamp including header, of the maximum possible size, zero padded to the
+	 * right
 	 */
 	Instant(etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp);
 
@@ -98,7 +101,6 @@ public:
 	bool operator!=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 	bool operator<=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
 	bool operator>=(const Instant<seconds_counter_bytes, fractional_counter_bytes>& Instant) const;
-
 };
 ////////////////////////////////////////////////
 

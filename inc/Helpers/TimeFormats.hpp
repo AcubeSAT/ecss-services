@@ -13,7 +13,7 @@ static constexpr uint8_t DAYSOFMONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 
 
 inline constexpr uint8_t ACUBESAT_CUC_SECONDS_COUNTER_BYTES = 2; // PER DDJF_TTC
 inline constexpr uint8_t ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES = 2; // PER DDJF_TTC
-inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800; //TODO correct for 2020.01.01
+inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800; // TODO correct for 2020.01.01
 inline constexpr uint16_t ACUBESAT_EPOCH_YEAR = 2019;
 inline constexpr uint8_t ACUBESAT_EPOCH_MONTH = 1;
 inline constexpr uint8_t ACUBESAT_EPOCH_DAY = 1;
@@ -28,23 +28,23 @@ static_assert(ACUBESAT_EPOCH_DAY < DAYSOFMONTH[ACUBESAT_EPOCH_MONTH]);
 //////// HELPER CONSTEXPR ////////
 template <int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr uint8_t build_short_CUC_header() {
-	static_assert( seconds_counter_bytes <= 4, "Use build_long_CUC_header instead");
-	static_assert( fractional_counter_bytes <= 3, "Use build_long_CUC_header instead");
+	static_assert(seconds_counter_bytes <= 4, "Use build_long_CUC_header instead");
+	static_assert(fractional_counter_bytes <= 3, "Use build_long_CUC_header instead");
 
 	uint8_t header = 0;
 
-  // P-Field extension is 0, CUC header is not extended
+	// P-Field extension is 0, CUC header is not extended
 	header += 0;
 
-  // AcubeSAT is using custom TAI epoch at 01 Jan 2020
+	// AcubeSAT is using custom TAI epoch at 01 Jan 2020
 	header = header << 3;
 	header += 0b010;
 
-  // // Number of bytes in the basic time unit
+	// // Number of bytes in the basic time unit
 	header = header << 2;
 	header += seconds_counter_bytes - 1;
 
-  // Number of bytes in the fractional unit
+	// Number of bytes in the fractional unit
 	header = header << 2;
 	header += fractional_counter_bytes;
 
@@ -54,9 +54,11 @@ inline constexpr uint8_t build_short_CUC_header() {
 template <int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr uint16_t build_long_CUC_header() {
 	// cppcheck-suppress redundantCondition
-	static_assert( seconds_counter_bytes > 4 || fractional_counter_bytes > 3, "Use build_short_CUC_header instead");
-	static_assert( seconds_counter_bytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
-	static_assert( fractional_counter_bytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
+	static_assert(seconds_counter_bytes > 4 || fractional_counter_bytes > 3, "Use build_short_CUC_header instead");
+	static_assert(seconds_counter_bytes <= 7,
+	              "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
+	static_assert(fractional_counter_bytes <= 6,
+	              "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
 
 	uint16_t header = 0;
 
@@ -66,18 +68,18 @@ inline constexpr uint16_t build_long_CUC_header() {
 	uint8_t first_octet_number_of_fractional_bytes = std::min(3, fractional_counter_bytes);
 	uint8_t second_octet_number_of_fractional_bytes = fractional_counter_bytes - first_octet_number_of_fractional_bytes;
 
-  // P-Field extension is 1, CUC header is extended
+	// P-Field extension is 1, CUC header is extended
 	header += 1;
 
 	// AcubeSAT is using custom TAI epoch at 01 Jan 2020
 	header = header << 3;
 	header += 0b010;
 
-  // // Number of bytes in the basic time unit
+	// // Number of bytes in the basic time unit
 	header = header << 2;
 	header += first_octet_number_of_seconds_bytes - 1;
 
-  // Number of bytes in the fractional unit
+	// Number of bytes in the fractional unit
 	header = header << 2;
 	header += first_octet_number_of_fractional_bytes;
 
@@ -89,7 +91,7 @@ inline constexpr uint16_t build_long_CUC_header() {
 	header = header << 2;
 	header += second_octet_number_of_seconds_bytes;
 
-  // Number of bytes in the extended fractional unit
+	// Number of bytes in the extended fractional unit
 	header = header << 2;
 	header += second_octet_number_of_fractional_bytes;
 
@@ -102,37 +104,39 @@ inline constexpr uint16_t build_long_CUC_header() {
 
 template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr T build_CUC_header() {
-	static_assert((seconds_counter_bytes + fractional_counter_bytes ) <= 8, "Complete arbitrary precision not yet supported"); //See Issue #106 on Gitlab
+	static_assert((seconds_counter_bytes + fractional_counter_bytes) <= 8,
+	              "Complete arbitrary precision not yet supported"); // See Issue #106 on Gitlab
 	// cppcheck-suppress syntaxError
 	// cppcheck-suppress redundantCondition
-	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3) //if constexpr not supported yet in cppcheck
-		return build_short_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
+	if constexpr (seconds_counter_bytes <= 4 &&
+	              fractional_counter_bytes <= 3) // if constexpr not supported yet in cppcheck
+		return build_short_CUC_header<seconds_counter_bytes, fractional_counter_bytes>();
 	else
-		return build_long_CUC_header<seconds_counter_bytes,fractional_counter_bytes>();
+		return build_long_CUC_header<seconds_counter_bytes, fractional_counter_bytes>();
 }
 
 inline constexpr uint8_t build_AcubeSAT_CDS_header() {
 	uint8_t header = 0;
 
-  // bit 0 is at 0
+	// bit 0 is at 0
 	header += 0;
 	header << 1;
 
-  // timecode identification
-  header += 0b100;
-  header << 3;
+	// timecode identification
+	header += 0b100;
+	header << 3;
 
-  // AcubeSAT is using custom TAI epoch at 01 Jan 2020
+	// AcubeSAT is using custom TAI epoch at 01 Jan 2020
 	header += 1;
 	header << 1;
 
-  // AcubeSAT is using 16 bits day count segment
-  header += 0;
-  header << 1;
+	// AcubeSAT is using 16 bits day count segment
+	header += 0;
+	header << 1;
 
-  // AcubeSAT is using picosecond resolution
+	// AcubeSAT is using picosecond resolution
 	header += 0b10;
-	//header << 2;
+	// header << 2;
 
 	return header;
 }
@@ -143,15 +147,15 @@ bool is_leap_year(uint16_t year);
 
 ////////// Transitory timestamps ////////////
 // CUSTOM EPOCH FOR ALL ACUBESAT TIMESTAMPS IS 01 JAN 2020, EXCEPT UTC (UNIX)
-class AcubeSAT_CDS_timestamp{
+class AcubeSAT_CDS_timestamp {
 public:
-  static constexpr uint8_t P_FIELD = build_AcubeSAT_CDS_header();
-  uint16_t day;
-  uint16_t ms_of_day;
-  uint32_t submilliseconds;
+	static constexpr uint8_t P_FIELD = build_AcubeSAT_CDS_header();
+	uint16_t day;
+	uint16_t ms_of_day;
+	uint32_t submilliseconds;
 
-  uint64_t to_CDS_timestamp();
-  void from_CDS_timestamp(uint64_t);
+	uint64_t to_CDS_timestamp();
+	void from_CDS_timestamp(uint64_t);
 };
 
 // CUSTOM EPOCH FOR ALL ACUBESAT TIMESTAMPS IS 01 JAN 2020, EXCEPT UTC (UNIX)
@@ -190,7 +194,7 @@ public:
 	 */
 	UTC_Timestamp(etl::string<32> text_timestamp);
 
-		/**
+	/**
 	 * Compare two timestamps.
 	 *
 	 * @param Date the date that will be compared with the pointer `this`
@@ -207,5 +211,5 @@ public:
 	 *
 	 * @param Date the date that will be output
 	 */
-	 friend std::ostream& operator<< (std::ostream& o, UTC_Timestamp const& Date);
+	friend std::ostream& operator<<(std::ostream& o, UTC_Timestamp const& Date);
 };
