@@ -389,3 +389,40 @@ TEST_CASE("Parameter statistics definition report") {
 		Services.reset();
 	}
 }
+
+TEST_CASE("Statistics updating function") {
+	SECTION("values in one by one") {
+		Statistic stat1;
+		CHECK(statisticsAreInitialized(stat1));
+
+		double value = 3.24;
+		stat1.updateStatistics(value);
+		CHECK(stat1.max == 3.24);
+		CHECK(stat1.min == 3.24);
+		CHECK(stat1.mean == 3.24);
+
+		value = 1.3;
+		stat1.updateStatistics(value);
+		CHECK(stat1.max == 3.24);
+		CHECK(stat1.min == 1.3);
+		CHECK(stat1.mean == Approx(2.27).epsilon(0.01));
+
+		value = 5.8;
+		stat1.updateStatistics(value);
+		CHECK(stat1.max == 5.8);
+		CHECK(stat1.min == 1.3);
+		CHECK(stat1.mean == Approx(3.446).epsilon(0.001));
+	}
+
+	SECTION("Multiple consecutive values") {
+		double values[10] = {8.3001, 2.3, 6.4, 1.1, 8.35, 3.4, 6, 8.31, 4.7, 1.09};
+		Statistic stat;
+		CHECK(statisticsAreInitialized(stat));
+		for (auto &value : values) {
+			stat.updateStatistics(value);
+		}
+		CHECK(stat.max == 8.35);
+		CHECK(stat.min == 1.09);
+		CHECK(stat.mean == Approx(4.99501).epsilon(0.00001));
+	}
+}
