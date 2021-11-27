@@ -30,12 +30,6 @@ void resetSystem() {
 	Services.parameterStatistics.statisticsMap.clear();
 }
 
-bool statisticsAreInitialized(Statistic& stat) {
-	return (stat.sampleCounter == 0 and stat.mean == 0 and stat.sumOfSquares == 0 and stat.maxTime == 0 and
-	        stat.minTime == 0 and stat.max == -std::numeric_limits<double>::infinity() and
-	        stat.min == std::numeric_limits<double>::infinity());
-}
-
 TEST_CASE("Reporting of statistics") {
 	SECTION("Report statistics, with auto statistic reset disabled") {
 		initializeStatistics(6, 7);
@@ -71,8 +65,8 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readFloat() == 3); // mean
 		CHECK(static_cast<int>(report.readFloat()) == 1); // stddev
 
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 	}
 
 	SECTION("Report statistics, with auto statistics reset enabled") {
@@ -81,8 +75,8 @@ TEST_CASE("Reporting of statistics") {
 		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
 		MessageParser::execute(request);
 
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 	}
 
 	SECTION("Report statistics, with auto statistics reset disabled, but reset is given by TC") {
@@ -93,13 +87,13 @@ TEST_CASE("Reporting of statistics") {
 		Services.parameterStatistics.statisticsMap[7].mean = 3;
 		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
 		MessageParser::execute(request);
 
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
 		resetSystem();
 		ServiceTests::reset();
@@ -113,13 +107,13 @@ TEST_CASE("Resetting the parameter statistics") {
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::ResetParameterStatistics, Message::TC, 1);
 
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
 		MessageParser::execute(request);
 
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
 		resetSystem();
 		ServiceTests::reset();
@@ -129,13 +123,13 @@ TEST_CASE("Resetting the parameter statistics") {
 	SECTION("Reset without TC") {
 		initializeStatistics(6, 7);
 
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(not statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
 		Services.parameterStatistics.resetParameterStatistics();
 
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[5]));
-		CHECK(statisticsAreInitialized(Services.parameterStatistics.statisticsMap[7]));
+		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
 		resetSystem();
 		ServiceTests::reset();
