@@ -108,7 +108,7 @@ const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp() {
 	etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> return_array = {0};
 	int index_first_non_header_byte;
-  
+
   // cppcheck-suppress redundantCondition
 	static constexpr uint8_t header_size =
 	    seconds_counter_bytes < 4 && fractional_counter_bytes < 3 ? 1 : 2; // number of bytes in CUC header
@@ -143,40 +143,40 @@ const UTC_Timestamp TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::
 	// elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
 	ASSERT_INTERNAL(seconds >= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS, ErrorHandler::InternalErrorType::InvalidDate);
 
-	seconds -= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
-	int year = 2019;
-	int month = 1;
-	int day = 0;
+	seconds -= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS; // elapsed seconds from Unix epoch until AcubeSAT custom epoch 00:00:00 (UTC)
+	int year_utc = ACUBESAT_EPOCH_YEAR;
+	int month_utc = ACUBESAT_EPOCH_MONTH;
+	int day_utc = ACUBESAT_EPOCH_DAY;
 	int hour = 0;
 	int minute = 0;
 	int second = 0;
 
 	// calculate years
-	while (seconds >= (is_leap_year(year) ? 366 : 365) * SECONDS_PER_DAY) {
-		seconds -= (is_leap_year(year) ? 366 : 365) * SECONDS_PER_DAY;
-		year++;
+	while (seconds >= (is_leap_year(year_utc) ? 366 : 365) * SECONDS_PER_DAY) {
+		seconds -= (is_leap_year(year_utc) ? 366 : 365) * SECONDS_PER_DAY;
+		year_utc++;
 	}
 
 	// calculate months
-	int i = 0;
-	while (seconds >= (DAYSOFMONTH[i] * SECONDS_PER_DAY)) {
-		month++;
-		seconds -= (DAYSOFMONTH[i] * SECONDS_PER_DAY);
-		i++;
-		if ((i == 1U) && is_leap_year(year)) {
+	int current_month = 0;
+	while (seconds >= (DAYSOFMONTH[current_month] * SECONDS_PER_DAY)) {
+		month_utc++;
+		seconds -= (DAYSOFMONTH[current_month] * SECONDS_PER_DAY);
+		current_month++;
+		if ((current_month == 1U) && is_leap_year(year_utc)) {
 			if (seconds <= (28 * SECONDS_PER_DAY)) {
 				break;
 			}
-			month++;
+			month_utc++;
 			seconds -= 29 * SECONDS_PER_DAY;
-			i++;
+			current_month++;
 		}
 	}
 
 	// calculate days
-	day = seconds / SECONDS_PER_DAY;
-	seconds -= day * SECONDS_PER_DAY;
-	day++; // add 1 day because we start count from 1 January (and not 0 January!)
+	day_utc = seconds / SECONDS_PER_DAY;
+	seconds -= day_utc * SECONDS_PER_DAY;
+	day_utc++; // add 1 day because we start count from 1 January (and not 0 January!)
 
 	// calculate hours
 	hour = seconds / SECONDS_PER_HOUR;
@@ -189,7 +189,7 @@ const UTC_Timestamp TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::
 	// calculate seconds
 	second = seconds;
 
-	return UTC_Timestamp(year, month, day, hour, minute, second);
+	return UTC_Timestamp(year_utc, month_utc, day_utc, hour, minute, second);
 }
 
 ////////////// OPERATORS ///////////
