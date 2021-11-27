@@ -110,8 +110,7 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp() {
 	int index_first_non_header_byte;
 
   // cppcheck-suppress redundantCondition
-	static constexpr uint8_t header_size =
-	    seconds_counter_bytes < 4 && fractional_counter_bytes < 3 ? 1 : 2; // number of bytes in CUC header
+	static constexpr uint8_t header_size = seconds_counter_bytes < 4 && fractional_counter_bytes < 3 ? 1 : 2; // number of bytes in CUC header
 
 	if (header_size == 1) {
 		return_array[0] = static_cast<uint8_t>(CUC_header);
