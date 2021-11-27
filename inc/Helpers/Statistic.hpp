@@ -46,6 +46,11 @@ public:
 	 * Setter function
 	 */
 	void setSelfSamplingInterval(uint16_t samplingInterval);
+
+	/**
+	 * Check if all the statistics are initialized
+	 */
+	bool statisticsAreInitialized();
 };
 
 #endif

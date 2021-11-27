@@ -55,3 +55,8 @@ void Statistic::resetStatistics() {
 	sumOfSquares = 0;
 	sampleCounter = 0;
 }
+
+bool Statistic::statisticsAreInitialized() {
+	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and maxTime == 0 and minTime == 0 and
+	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
+}
