@@ -33,7 +33,7 @@
 class MessageParser {
 public:
 	/**
-     * This function takes as input TC packets and calls the proper services' functions that have been
+	 * This function takes as input TC packets and calls the proper services' functions that have been
 	 * implemented to handle TC packets.
 	 *
 	 * @param message Contains the necessary parameters to call the suitable subservice
