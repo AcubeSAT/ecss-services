@@ -5,7 +5,6 @@
 #include "Message.hpp"
 #include "ECSS_Definitions.hpp"
 
-
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
  *
@@ -60,7 +59,7 @@ public:
 	}
 
 	inline double getValueAsDouble() override {
-		return static_cast <double> (currentValue);
+		return static_cast<double>(currentValue);
 	}
 
 	/**
@@ -78,4 +77,4 @@ public:
 	};
 };
 
-#endif //ECSS_SERVICES_PARAMETER_HPP
+#endif // ECSS_SERVICES_PARAMETER_HPP
