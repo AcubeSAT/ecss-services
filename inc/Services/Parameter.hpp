@@ -34,16 +34,8 @@
  */
 class ParameterBase {
 public:
-	bool parameterIsActive = false;
-	uint16_t sampleCounter = 0;
-
 	virtual void appendValueToMessage(Message& message) = 0;
 	virtual void setValueFromMessage(Message& message) = 0;
-	virtual void appendSampleToMessage(Message& report, uint16_t index) = 0;
-
-	void setParameterIsActive(bool paramIsActive) {
-		this->parameterIsActive = paramIsActive;
-	}
 };
 
 /**
@@ -61,22 +53,6 @@ public:
 
 	inline void setValue(DataType value) {
 		currentValue = value;
-	}
-
-	/**
-	 * Vector containing all the samples gathered for this specific parameter.
-	 */
-	etl::vector<DataType, ECSS_MAX_HOUSEKEEPING_PARAMETER_SAMPLES> samples;
-
-	/**
-	 * Helper function that appends parameter samples to a report message.
-	 *
-	 * @param report Target report message to append the sampled value
-	 * @param index Position of the sampled value in the samples-vector.
-	 */
-	inline void appendSampleToMessage(Message& report, uint16_t index) override {
-		DataType sampleValue = samples[index];
-		report.append(sampleValue);
 	}
 
 	DataType getValue() {
