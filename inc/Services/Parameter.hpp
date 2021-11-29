@@ -2,9 +2,10 @@
 #define ECSS_SERVICES_PARAMETER_HPP
 
 #include "etl/String.hpp"
+#include "etl/vector.h"
+#include "etl/map.h"
 #include "Message.hpp"
 #include "ECSS_Definitions.hpp"
-
 
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
@@ -34,12 +35,14 @@
 class ParameterBase {
 public:
 	bool parameterIsActive = false;
+	uint16_t sampleCounter = 0;
 
 	virtual void appendValueToMessage(Message& message) = 0;
 	virtual void setValueFromMessage(Message& message) = 0;
+	virtual void appendSampleToMessage(Message& report, uint16_t index) = 0;
 
 	void setParameterIsActive(bool paramIsActive) {
-		this -> parameterIsActive = paramIsActive;
+		this->parameterIsActive = paramIsActive;
 	}
 };
 
@@ -60,6 +63,22 @@ public:
 		currentValue = value;
 	}
 
+	/**
+	 * Vector containing all the samples gathered for this specific parameter.
+	 */
+	etl::vector<DataType, ECSS_MAX_HOUSEKEEPING_PARAMETER_SAMPLES> samples;
+
+	/**
+	 * Helper function that appends parameter samples to a report message.
+	 *
+	 * @param report Target report message to append the sampled value
+	 * @param index Position of the sampled value in the samples-vector.
+	 */
+	inline void appendSampleToMessage(Message& report, uint16_t index) override {
+		DataType sampleValue = samples[index];
+		report.append(sampleValue);
+	}
+
 	DataType getValue() {
 		return currentValue;
 	}
@@ -77,7 +96,6 @@ public:
 	inline void appendValueToMessage(Message& message) override {
 		message.append<DataType>(currentValue);
 	};
-
 };
 
-#endif //ECSS_SERVICES_PARAMETER_HPP
+#endif // ECSS_SERVICES_PARAMETER_HPP

@@ -16,14 +16,12 @@
  */
 class HousekeepingService : Service {
 public:
-
 	inline static const uint8_t ServiceType = 3;
-	SystemHousekeeping systemHousekeeping;
+
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains structure with ID = i.
 	 */
-	etl::map <uint16_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS>
-	                         housekeepingStructures;
+	etl::map<uint16_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
 
 	enum MessageType : uint8_t {
 		ReportHousekeepingParameters = 0,
@@ -76,7 +74,7 @@ public:
 	 */
 	void housekeepingStructureReport(uint16_t structIdToReport);
 
-	    /**
+	/**
 	 * This function takes as argument a message type TC[3,9] and for every struct ID in it, calls the
 	 * "housekeepingStructureReport" function.
 	 */
@@ -100,7 +98,7 @@ public:
 	/**
 	 * This function takes as argument a message type TC[3,33] and responds with a TM[3,35]. What it does is, report
 	 * the periodic properties of each requested structure.
- 	 */
+	 */
 	void housekeepingPeriodicPropertiesReport(Message& request);
 
 	/**
@@ -112,7 +110,5 @@ public:
 	 */
 	void execute(Message& message);
 };
-
-//extern HousekeepingService housekeepingService;
 
 #endif

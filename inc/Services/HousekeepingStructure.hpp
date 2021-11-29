@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
+#include "Parameter.hpp"
 
 /**
  * Implementation of the Housekeeping report structure used by the Housekeeping Reporting Subservice (ST[03])
@@ -11,7 +12,6 @@
  */
 class HousekeepingStructure {
 public:
-
 	uint16_t structureId;
 	/**
 	 * Defined as units of minimum sampling interval.
@@ -30,12 +30,13 @@ public:
 	/**
 	 * All the parameter Ids contained in the structure
 	 */
-	etl::vector <uint16_t, ECSS_MAX_PARAMETERS> containedParameterIds;
+	etl::vector<uint16_t, ECSS_MAX_PARAMETERS> containedParameterIds;
 
-	etl::vector <uint16_t, ECSS_MAX_PARAMETERS> simplyCommutatedIds;
-
-	etl::vector <std::pair <uint16_t, etl::vector <uint16_t, ECSS_MAX_PARAMETERS>>, ECSS_MAX_SUPER_COMMUTATED_SETS>
-	    superCommutatedIds;
+	etl::vector<uint16_t, ECSS_MAX_PARAMETERS> simplyCommutatedIds;
+	/**
+	 * Map containing references to housekeeping parameters. The ID of each parameter is used as a key.
+	 */
+	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSS_MAX_PARAMETERS> housekeepingParameters;
 
 	HousekeepingStructure() = default;
 };
