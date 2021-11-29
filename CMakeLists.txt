@@ -43,10 +43,10 @@ add_library(common OBJECT
         )
 
 # Specify the .cpp files for the executables
-file(GLOB ATSAM_main_SRC "src/Platform/ATSAMV71Q21/ECSS_Configuration.hpp")
+file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
 add_executable(ecss_services
         $<TARGET_OBJECTS:common>
-        ${ATSAM_main_SRC}
+        ${x86_main_SRC}
         )
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
