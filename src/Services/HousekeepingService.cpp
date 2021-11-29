@@ -82,6 +82,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 		uint16_t newParamId = request.readUint16();
 		newStructure.simplyCommutatedIds.push_back(newParamId);
 		newStructure.containedParameterIds.push_back(newParamId);
+		newStructure.housekeepingParameters.insert({newParamId, systemParameters.getParameter(newParamId)});
 	}
 	housekeepingStructures.insert({idToCreate, newStructure});
 }
@@ -111,9 +112,8 @@ void HousekeepingService::housekeepingStructureReport(uint16_t structIdToReport)
 	structReport.appendBoolean(housekeepingStructures.at(structIdToReport).periodicGenerationActionStatus);
 	structReport.appendUint16(housekeepingStructures.at(structIdToReport).collectionInterval);
 	structReport.appendUint16(housekeepingStructures.at(structIdToReport).numOfSimplyCommutatedParams);
-
-	for (auto currParamId : housekeepingStructures.at(structIdToReport).simplyCommutatedIds) {
-		structReport.appendUint16(currParamId);
+	for (auto parameterId : housekeepingStructures.at(structIdToReport).simplyCommutatedIds) {
+		structReport.appendUint16(parameterId);
 	}
 	storeMessage(structReport);
 }
@@ -183,6 +183,8 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 		housekeepingStructures.at(targetStructId).numOfSimplyCommutatedParams++;
 		housekeepingStructures.at(targetStructId).containedParameterIds.push_back(newParamId);
 		housekeepingStructures.at(targetStructId).simplyCommutatedIds.push_back(newParamId);
+		housekeepingStructures.at(targetStructId)
+		    .housekeepingParameters.insert({newParamId, systemParameters.getParameter(newParamId)});
 	}
 }
 

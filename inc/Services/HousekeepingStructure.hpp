@@ -18,21 +18,24 @@ public:
 	 */
 	uint16_t collectionInterval = 0;
 	/**
-	 * Num of parameters with a single sample collected.
+	 * Number of parameters with a single sample collected.
 	 */
 	uint16_t numOfSimplyCommutatedParams = 0;
 	/**
-	 * Num of sets of super commutated parameters (with more than one samples collected).
+	 * Indicates whether the periodic generation of housekeeping reports is enabled.
 	 */
-	uint16_t numOfSuperCommutatedParameterSets = 0;
 	bool periodicGenerationActionStatus = false;
 
 	/**
-	 * All the parameter Ids contained in the structure
+	 * All the parameter Ids contained in the structure.
 	 */
 	etl::vector<uint16_t, ECSS_MAX_PARAMETERS> containedParameterIds;
 
+	/**
+	 * The IDs of the simply commutated parameters.
+	 */
 	etl::vector<uint16_t, ECSS_MAX_PARAMETERS> simplyCommutatedIds;
+
 	/**
 	 * Map containing references to housekeeping parameters. The ID of each parameter is used as a key.
 	 */

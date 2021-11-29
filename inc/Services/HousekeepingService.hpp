@@ -5,8 +5,7 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-//#include "Parameters/SystemParameters.hpp"
-//#include "Statistics/SystemStatistics.hpp"
+#include "Parameters/SystemParameters.hpp"
 #include "Housekeeping/SystemHousekeeping.hpp"
 #include "Services/HousekeepingStructure.hpp"
 

@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PARAMETER_HPP
 #define ECSS_SERVICES_PARAMETER_HPP
 
+#include <iostream>
 #include "etl/String.hpp"
 #include "etl/vector.h"
 #include "etl/map.h"

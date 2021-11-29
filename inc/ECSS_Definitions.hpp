@@ -144,7 +144,7 @@
 /**
  * @brief Size of the array holding the Parameter objects for the ST[20] parameter service
  */
-#define ECSS_PARAMETER_COUNT 3
+#define ECSS_PARAMETER_COUNT 11
 
 /**
  * @brief Defines whether the optional CRC field is included
