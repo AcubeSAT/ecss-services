@@ -27,7 +27,7 @@ public:
 	Parameter<uint32_t> parameter6 = Parameter<uint32_t>(23);
 	Parameter<uint32_t> parameter7 = Parameter<uint32_t>(53);
 	Parameter<uint8_t> parameter8 = Parameter<uint8_t>(55);
-	Parameter<uint32_t> parameter9 = Parameter<uint32_t>(132);
+	Parameter<uint16_t> parameter9 = Parameter<uint16_t>(32);
 	Parameter<uint32_t> parameter10 = Parameter<uint32_t>(43);
 	Parameter<uint32_t> parameter11 = Parameter<uint32_t>(91);
 	Parameter<uint8_t> parameter12 = Parameter<uint8_t>(1);
