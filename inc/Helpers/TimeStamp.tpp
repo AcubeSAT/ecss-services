@@ -42,7 +42,7 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
 		timestamp_fractional_bytes_count =
 		    (timestamp[0] & FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0;
 	} else {
-		ASSERT_INTERNAL(true, ErrorHandler::InternalErrorType::InvalidDate);
+		ASSERT_INTERNAL(true, ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 	}
 
 	// check input validity (useless bytes set to 0)
@@ -53,13 +53,13 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
 			break;
 		}
 	}
-	ASSERT_INTERNAL(err == 0, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(err == 0, ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 
 	// do checks wrt template precision parameters
 	ASSERT_INTERNAL(timestamp_seconds_bytes_count <= seconds_counter_bytes,
-	                ErrorHandler::InternalErrorType::InvalidDate);
+	                ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 	ASSERT_INTERNAL(timestamp_fractional_bytes_count <= fractional_counter_bytes,
-	                ErrorHandler::InternalErrorType::InvalidDate);
+	                ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 
 	// put timestamp into internal counter
 	tai_counter = 0;

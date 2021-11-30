@@ -76,7 +76,11 @@ public:
 		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 11
+		NestedMessageTooLarge = 11,
+		/**
+		 * Invalid TimeStamp parameters at creation
+		 */
+		InvalidTimeStampInput = 12
 	};
 
 	/**
