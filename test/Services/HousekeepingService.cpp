@@ -13,7 +13,7 @@ HousekeepingService& housekeepingService = Services.housekeeping;
 void buildRequest(Message& request, uint16_t idToCreate) {
 	uint16_t interval = 7;
 	uint16_t numOfSimplyCommutatedParams = 3;
-	etl::vector<uint16_t, 50> simplyCommutatedIds = {8, 4, 5};
+	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
 
 	request.appendUint16(idToCreate);
 	request.appendUint16(interval);
@@ -62,7 +62,7 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
  */
 void appendNewParameters(Message& request, uint16_t idToAppend) {
 	uint16_t numOfSimplyCommutatedParams = 7;
-	etl::vector<uint16_t, 50> simplyCommutatedIds = {8, 4, 5, 9, 11, 10, 220};
+	etl::vector<uint16_t, 7> simplyCommutatedIds = {8, 4, 5, 9, 11, 10, 220};
 
 	request.appendUint16(idToAppend);
 	request.appendUint16(numOfSimplyCommutatedParams);
@@ -270,7 +270,7 @@ TEST_CASE("Reporting of housekeeping structures without a TC message as argument
 
 TEST_CASE("Reporting of housekeeping parameters") {
 	SECTION("Valid structure request") {
-		storeSamplesToParameters(1, 4, 5);
+		storeSamplesToParameters(8, 4, 5);
 		initializeHousekeepingStructures();
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::ReportHousekeepingParameters, Message::TC, 1);
