@@ -145,31 +145,31 @@ void HousekeepingService::oneShotHousekeepingReport(Message& request) {
 	}
 }
 
-void HousekeepingService::appendParametersToHousekeepingStructure(Message& newParams) {
-	newParams.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure);
+void HousekeepingService::appendParametersToHousekeepingStructure(Message& request) {
+	request.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure);
 
-	uint16_t targetStructId = newParams.readUint16();
+	uint16_t targetStructId = request.readUint16();
 	if (housekeepingStructures.find(targetStructId) == housekeepingStructures.end()) {
-		ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		return;
 	}
 	if (housekeepingStructures.at(targetStructId).periodicGenerationActionStatus) {
-		ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
 		return;
 	}
 	/**
 	 * @todo: check if resources allocated by the host are exceeded.
 	 */
-	uint16_t numOfSimplyCommParams = newParams.readUint16();
+	uint16_t numOfSimplyCommParams = request.readUint16();
 	for (int i = 0; i < numOfSimplyCommParams; i++) {
-		uint16_t newParamId = newParams.readUint16();
+		uint16_t newParamId = request.readUint16();
 		if (newParamId >= systemParameters.parametersArray.size()) {
-			ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}
 		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameters.find(newParamId) !=
 		    housekeepingStructures.at(targetStructId).simplyCommutatedParameters.end()) {
-			ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			continue;
 		}
 		housekeepingStructures.at(targetStructId)

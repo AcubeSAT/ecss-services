@@ -98,7 +98,7 @@ public:
 	/**
 	 * This function appends new parameters to an already existing housekeeping structure (TC[3,29]).
 	 */
-	void appendParametersToHousekeepingStructure(Message& newParams);
+	void appendParametersToHousekeepingStructure(Message& request);
 
 	/**
 	 * This function modifies the collection interval of specified structures (TC[3,31]).
