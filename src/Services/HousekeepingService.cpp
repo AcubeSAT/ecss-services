@@ -11,22 +11,21 @@
  * 					ecss.st03.storeValueInSystemHousekeeping();
  */
 
-void HousekeepingService::housekeepingParametersReport(Message& structId) {
-	structId.assertTC(ServiceType, MessageType::ReportHousekeepingParameters);
-
-	uint16_t structureId = structId.readUint16();
+void HousekeepingService::reportHousekeepingParameters(Message& request) {
+	request.assertTC(ServiceType, MessageType::ReportHousekeepingParameters);
+	uint16_t structureId = request.readUint16();
 	if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
-		ErrorHandler::reportError(structId, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		return;
 	}
+	housekeepingParametersReport(structureId);
+}
+
+void HousekeepingService::housekeepingParametersReport(uint16_t structureId) {
 	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
 	housekeepingReport.appendUint16(structureId);
-	// simply commutated params
-	for (auto& parameterId : housekeepingStructures.at(structureId).simplyCommutatedIds) {
-		housekeepingStructures.at(structureId)
-		    .housekeepingParameters.at(parameterId)
-		    .get()
-		    .appendValueToMessage(housekeepingReport);
+	for (auto& parameter : housekeepingStructures.at(structureId).simplyCommutatedParameters) {
+		parameter.second.get().appendValueToMessage(housekeepingReport);
 	}
 	storeMessage(housekeepingReport);
 }
@@ -67,7 +66,6 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 		return;
 	}
 	HousekeepingStructure newStructure;
-	newStructure.simplyCommutatedIds = {};
 	/**
 	 * @todo: Check if the new struct creation exceeds the resources allocated by the host.
 	 */
@@ -76,13 +74,10 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	newStructure.periodicGenerationActionStatus = false;
 
 	uint16_t numOfSimplyCommutatedParams = request.readUint16();
-	newStructure.numOfSimplyCommutatedParams = numOfSimplyCommutatedParams;
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		uint16_t newParamId = request.readUint16();
-		newStructure.simplyCommutatedIds.push_back(newParamId);
-		newStructure.containedParameterIds.push_back(newParamId);
-		newStructure.housekeepingParameters.insert({newParamId, systemParameters.getParameter(newParamId)});
+		newStructure.simplyCommutatedParameters.insert({newParamId, systemParameters.getParameter(newParamId)});
 	}
 	housekeepingStructures.insert({idToCreate, newStructure});
 }
@@ -106,13 +101,14 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 }
 
 void HousekeepingService::housekeepingStructureReport(uint16_t structIdToReport) {
-	Message structReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
+	Message structReport(ServiceType, MessageType::HousekeepingStructuresReport, Message::TM, 1);
 
 	structReport.appendUint16(structIdToReport);
 	structReport.appendBoolean(housekeepingStructures.at(structIdToReport).periodicGenerationActionStatus);
 	structReport.appendUint16(housekeepingStructures.at(structIdToReport).collectionInterval);
-	structReport.appendUint16(housekeepingStructures.at(structIdToReport).numOfSimplyCommutatedParams);
-	for (auto parameterId : housekeepingStructures.at(structIdToReport).simplyCommutatedIds) {
+	structReport.appendUint16(housekeepingStructures.at(structIdToReport).simplyCommutatedParameters.size());
+	for (auto& parameter : housekeepingStructures.at(structIdToReport).simplyCommutatedParameters) {
+		uint16_t parameterId = parameter.first;
 		structReport.appendUint16(parameterId);
 	}
 	storeMessage(structReport);
@@ -134,7 +130,10 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 
 void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 	request.assertTC(ServiceType, MessageType::GenerateOneShotHousekeepingReport);
+	oneShotHousekeepingReport(request);
+}
 
+void HousekeepingService::oneShotHousekeepingReport(Message& request) {
 	uint16_t numOfStructsToReport = request.readUint16();
 	for (int i = 0; i < numOfStructsToReport; i++) {
 		uint16_t structureId = request.readUint16();
@@ -142,9 +141,7 @@ void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 			continue;
 		}
-		Message structIdToReport(ServiceType, MessageType::ReportHousekeepingParameters, Message::TC, 1);
-		structIdToReport.appendUint16(structureId);
-		housekeepingParametersReport(structIdToReport);
+		housekeepingParametersReport(structureId);
 	}
 }
 
@@ -160,31 +157,23 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& newPa
 		ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::RequestedAppendToPeriodicStructure);
 		return;
 	}
-
 	/**
 	 * @todo: check if resources allocated by the host are exceeded.
 	 */
-
-	// Append simply commutated parameters
 	uint16_t numOfSimplyCommParams = newParams.readUint16();
 	for (int i = 0; i < numOfSimplyCommParams; i++) {
 		uint16_t newParamId = newParams.readUint16();
-
-		if (newParamId >= ECSS_MAX_PARAMETER_ID) {
+		if (newParamId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}
-		if (std::find(housekeepingStructures.at(targetStructId).containedParameterIds.begin(),
-		              housekeepingStructures.at(targetStructId).containedParameterIds.end(),
-		              newParamId) != housekeepingStructures.at(targetStructId).containedParameterIds.end()) {
+		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameters.find(newParamId) !=
+		    housekeepingStructures.at(targetStructId).simplyCommutatedParameters.end()) {
 			ErrorHandler::reportError(newParams, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			continue;
 		}
-		housekeepingStructures.at(targetStructId).numOfSimplyCommutatedParams++;
-		housekeepingStructures.at(targetStructId).containedParameterIds.push_back(newParamId);
-		housekeepingStructures.at(targetStructId).simplyCommutatedIds.push_back(newParamId);
 		housekeepingStructures.at(targetStructId)
-		    .housekeepingParameters.insert({newParamId, systemParameters.getParameter(newParamId)});
+		    .simplyCommutatedParameters.insert({newParamId, systemParameters.getParameter(newParamId)});
 	}
 }
 
@@ -202,9 +191,12 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 	}
 }
 
-void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request) {
+void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties);
+	housekeepingPeriodicPropertiesReport(request);
+}
 
+void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request) {
 	Message periodicPropertiesReport(ServiceType, MessageType::HousekeepingPeriodicPropertiesReport, Message::TM, 1);
 	uint16_t numOfValidIds = 0;
 	uint16_t numOfStructIds = request.readUint16();
@@ -235,7 +227,7 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 void HousekeepingService::execute(Message& message) {
 	switch (message.messageType) {
 		case 0:
-			housekeepingParametersReport(message);
+			reportHousekeepingParameters(message);
 			break;
 		case 1:
 			createHousekeepingReportStructure(message);
@@ -252,9 +244,6 @@ void HousekeepingService::execute(Message& message) {
 		case 9:
 			reportHousekeepingStructures(message);
 			break;
-		case 25:
-			housekeepingParametersReport(message);
-			break;
 		case 27:
 			generateOneShotHousekeepingReport(message);
 			break;
@@ -265,7 +254,7 @@ void HousekeepingService::execute(Message& message) {
 			modifyCollectionIntervalOfStructures(message);
 			break;
 		case 33:
-			housekeepingPeriodicPropertiesReport(message);
+			reportHousekeepingPeriodicProperties(message);
 			break;
 	}
 }

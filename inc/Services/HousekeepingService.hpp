@@ -6,11 +6,12 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameters/SystemParameters.hpp"
-#include "Housekeeping/SystemHousekeeping.hpp"
 #include "Services/HousekeepingStructure.hpp"
 
 /**
- * Implementation of the ST[03] Housekeeping Reporting Subservice
+ * Implementation of the ST[03] Housekeeping Reporting Service. The job of the Housekeeping Service is to store
+ * parameters in the housekeeping structures so that it can generate housekeeping reports periodically.
+ *
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
 class HousekeepingService : Service {
@@ -18,7 +19,7 @@ public:
 	inline static const uint8_t ServiceType = 3;
 
 	/**
-	 * Map containing the housekeeping structures. Map[i] contains structure with ID = i.
+	 * Map containing the housekeeping structures. Map[i] contains the housekeeping structure with ID = i.
 	 */
 	etl::map<uint16_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
 
@@ -41,10 +42,16 @@ public:
 	HousekeepingService() = default;
 
 	/**
-	 * This function is the implementation of TM[3,25]. It generates a housekeeping parameters report with an
-	 * appropriate notification.
+	 * This function gets a request to report the housekeeping parameters and checks whether its valid or not
 	 */
-	void housekeepingParametersReport(Message& structId);
+	void reportHousekeepingParameters(Message& request);
+
+	/**
+	 * This function creates and stores the housekeeping parameters report message. The purpose for this
+	 * functionality, not existing in the previous function is so that, we don't have to create new request messages
+	 * when generating one-shot housekeeping parameter reports, but rather just call a function using the structure id.
+	 */
+	void housekeepingParametersReport(uint16_t structureId);
 
 	/**
 	 * Implementation of TM[3,5]. Request to enable the periodic housekeeping parameters reporting for a specific
@@ -69,20 +76,24 @@ public:
 	void deleteHousekeepingReportStructure(Message& request);
 
 	/**
-	 * This function takes a structure ID as argument and constructs a TM[3,10]-formatted report.
+	 * This function takes a structure ID as argument and constructs/stores a TM[3,10] housekeeping structure report.
 	 */
 	void housekeepingStructureReport(uint16_t structIdToReport);
 
 	/**
-	 * This function takes as argument a message type TC[3,9] and for every struct ID in it, calls the
-	 * "housekeepingStructureReport" function.
+	 * This function gets a message type TC[3,9] request.
 	 */
 	void reportHousekeepingStructures(Message& request);
 
 	/**
-	 * This function takes as argument a message type TC[3,27] and responds with a TM[3,25].
+	 * This function takes as argument a message type TC[3,27].
 	 */
 	void generateOneShotHousekeepingReport(Message& request);
+
+	/**
+	 * This function creates and stores a TM[3,25] one shot housekeeping report message.
+	 */
+	void oneShotHousekeepingReport(Message& request);
 
 	/**
 	 * This function appends new parameters to an already existing housekeeping structure (TC[3,29]).
@@ -95,8 +106,12 @@ public:
 	void modifyCollectionIntervalOfStructures(Message& request);
 
 	/**
-	 * This function takes as argument a message type TC[3,33] and responds with a TM[3,35]. What it does is, report
-	 * the periodic properties of each requested structure.
+	 * This function takes as argument, a message type TC[3,33].
+	 */
+	void reportHousekeepingPeriodicProperties(Message& request);
+
+	/**
+	 * Creates and stores a TM[3,35] housekeeping periodic properties report, for each requested housekeeping structure.
 	 */
 	void housekeepingPeriodicPropertiesReport(Message& request);
 

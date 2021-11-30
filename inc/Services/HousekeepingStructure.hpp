@@ -7,7 +7,9 @@
 #include "Parameter.hpp"
 
 /**
- * Implementation of the Housekeeping report structure used by the Housekeeping Reporting Subservice (ST[03])
+ * Implementation of the Housekeeping report structure used by the Housekeeping Reporting Subservice (ST[03]). The
+ * current version includes only simply commutated parameters, i.e parameters that only contain a single sampled value.
+ *
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
 class HousekeepingStructure {
@@ -18,28 +20,15 @@ public:
 	 */
 	uint16_t collectionInterval = 0;
 	/**
-	 * Number of parameters with a single sample collected.
-	 */
-	uint16_t numOfSimplyCommutatedParams = 0;
-	/**
 	 * Indicates whether the periodic generation of housekeeping reports is enabled.
 	 */
 	bool periodicGenerationActionStatus = false;
 
 	/**
-	 * All the parameter Ids contained in the structure.
+	 * Map containing references to simply commutated housekeeping parameters. The ID of each parameter is used as a
+	 * key.
 	 */
-	etl::vector<uint16_t, ECSS_MAX_PARAMETERS> containedParameterIds;
-
-	/**
-	 * The IDs of the simply commutated parameters.
-	 */
-	etl::vector<uint16_t, ECSS_MAX_PARAMETERS> simplyCommutatedIds;
-
-	/**
-	 * Map containing references to housekeeping parameters. The ID of each parameter is used as a key.
-	 */
-	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSS_MAX_PARAMETERS> housekeepingParameters;
+	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSS_MAX_PARAMETERS> simplyCommutatedParameters;
 
 	HousekeepingStructure() = default;
 };

@@ -92,13 +92,13 @@ TEST_CASE("Create housekeeping structure") {
 
 		CHECK(ServiceTests::count() == 0);
 		CHECK(newStruct.structureId == idToCreate);
-		CHECK(newStruct.numOfSimplyCommutatedParams == numOfSimplyCommutatedParams);
+		CHECK(newStruct.simplyCommutatedParameters.size() == numOfSimplyCommutatedParams);
 		CHECK(newStruct.collectionInterval == interval);
 		for (auto& id : simplyCommutatedIds) {
-			CHECK(std::find(newStruct.containedParameterIds.begin(), newStruct.containedParameterIds.end(), id) !=
-			      newStruct.containedParameterIds.end());
+			CHECK(newStruct.simplyCommutatedParameters.find(id) != newStruct.simplyCommutatedParameters.end());
 		}
-		for (auto& id : newStruct.simplyCommutatedIds) {
+		for (auto& parameter : newStruct.simplyCommutatedParameters) {
+			uint16_t id = parameter.first;
 			CHECK(std::find(simplyCommutatedIds.begin(), simplyCommutatedIds.end(), id) != simplyCommutatedIds.end());
 		}
 	}
@@ -367,7 +367,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
 		uint16_t structId = 6;
 		appendNewParameters(request3, structId);
-		REQUIRE(housekeepingService.housekeepingStructures[structId].housekeepingParameters.size() == 3);
+		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameters.size() == 3);
 
 		MessageParser::execute(request3);
 		CHECK(ServiceTests::count() == 6);
@@ -376,10 +376,10 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 
 		uint16_t currentlyExistingParameters[] = {1, 4, 5, 9, 10, 11};
 		HousekeepingStructure structToCheck = housekeepingService.housekeepingStructures[structId];
-		REQUIRE(structToCheck.housekeepingParameters.size() == 6);
+		REQUIRE(structToCheck.simplyCommutatedParameters.size() == 6);
 		for (auto& existingParameter : currentlyExistingParameters) {
-			CHECK(structToCheck.housekeepingParameters.find(existingParameter) !=
-			      structToCheck.housekeepingParameters.end());
+			CHECK(structToCheck.simplyCommutatedParameters.find(existingParameter) !=
+			      structToCheck.simplyCommutatedParameters.end());
 		}
 		ServiceTests::reset();
 		Services.reset();

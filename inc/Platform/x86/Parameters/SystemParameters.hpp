@@ -30,12 +30,14 @@ public:
 	Parameter<uint32_t> parameter9 = Parameter<uint32_t>(132);
 	Parameter<uint32_t> parameter10 = Parameter<uint32_t>(43);
 	Parameter<uint32_t> parameter11 = Parameter<uint32_t>(91);
+	Parameter<uint8_t> parameter12 = Parameter<uint8_t>(1);
+
 	/**
 	 * The key of the array is the ID of the parameter as specified in PUS
 	 */
 	etl::array<std::reference_wrapper<ParameterBase>, ECSS_PARAMETER_COUNT> parametersArray = {
-	    parameter1, parameter2, parameter3, parameter4,  parameter5, parameter6,
-	    parameter7, parameter8, parameter9, parameter10, parameter11};
+	    parameter1, parameter2, parameter3, parameter4,  parameter5,  parameter6,
+	    parameter7, parameter8, parameter9, parameter10, parameter11, parameter12};
 
 	SystemParameters() = default;
 
