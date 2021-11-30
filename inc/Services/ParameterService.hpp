@@ -4,7 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "Parameter.hpp"
+#include "Helpers/Parameter.hpp"
 #include "Parameters/SystemParameters.hpp"
 
 /**
@@ -24,7 +24,6 @@
  */
 class ParameterService : public Service {
 public:
-
 	inline static const uint8_t ServiceType = 20;
 
 	enum MessageType : uint8_t {

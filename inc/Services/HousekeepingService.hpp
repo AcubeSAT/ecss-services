@@ -6,7 +6,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameters/SystemParameters.hpp"
-#include "Services/HousekeepingStructure.hpp"
+#include "Helpers/HousekeepingStructure.hpp"
 
 /**
  * Implementation of the ST[03] Housekeeping Reporting Service. The job of the Housekeeping Service is to store

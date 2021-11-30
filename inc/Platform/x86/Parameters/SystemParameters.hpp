@@ -1,7 +1,7 @@
 #ifndef ECSS_SERVICES_SYSTEMPARAMETERS_HPP
 #define ECSS_SERVICES_SYSTEMPARAMETERS_HPP
 
-#include "Services/Parameter.hpp"
+#include "Helpers/Parameter.hpp"
 #include "etl/vector.h"
 /**
  * @author Athanasios Theocharis <athatheoc@gmail.com>

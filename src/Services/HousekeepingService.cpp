@@ -1,16 +1,6 @@
 #include <iostream>
 #include "Services/HousekeepingService.hpp"
 
-/**
- * TODO:
- * 		for (every minimum sampling_interval):
- * 			for (every Parameter ID):
- * 				ecss.st20.getValueAsDouble();
- * 				ecss.st04.storeStatistics();
- * 				if (ID is a housekeeping parameter):	<--- Should we do it this way?
- * 					ecss.st03.storeValueInSystemHousekeeping();
- */
-
 void HousekeepingService::reportHousekeepingParameters(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportHousekeepingParameters);
 	uint16_t structureId = request.readUint16();

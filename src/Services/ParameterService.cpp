@@ -2,12 +2,12 @@
 #ifdef SERVICE_PARAMETER
 
 #include "Services/ParameterService.hpp"
-#include "Services/Parameter.hpp"
-//#include "Parameters/SystemParameters.hpp"
+#include "Helpers/Parameter.hpp"
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
-	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport, Message::TM, 1);
+	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport,
+	                        Message::TM, 1);
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -41,11 +41,10 @@ void ParameterService::reportParameters(Message& paramIds) {
 }
 
 void ParameterService::setParameters(Message& newParamValues) {
-
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues, newParamValues,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues,
+	                            newParamValues, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(newParamValues.serviceType == ParameterService::ServiceType, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
@@ -65,8 +64,8 @@ void ParameterService::setParameters(Message& newParamValues) {
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
 		case 1:
-//	int m = stat.get().f(stat);
-//	std::cout << "max = " << m << std::endl;
+			//	int m = stat.get().f(stat);
+			//	std::cout << "max = " << m << std::endl;
 			reportParameters(message); // TC[20,1]
 			break;
 		case 3:

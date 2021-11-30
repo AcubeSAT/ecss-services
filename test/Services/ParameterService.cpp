@@ -11,7 +11,8 @@ static void resetParameterValues() {
 
 TEST_CASE("Parameter Report Subservice") {
 	SECTION("All requested parameters invalid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                          Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(54432);
 		request.appendUint16(60000);
@@ -24,14 +25,15 @@ TEST_CASE("Parameter Report Subservice") {
 		Message report = ServiceTests::get(3);
 		CHECK(report.serviceType == ParameterService::ServiceType);
 		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
-		CHECK(report.readUint16() == 0);  // the message shall be empty
+		CHECK(report.readUint16() == 0); // the message shall be empty
 
 		ServiceTests::reset();
 		Services.reset();
 	}
 
 	SECTION("Some requested parameters invalid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                          Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(1);
 		request.appendUint16(10000);
@@ -55,7 +57,8 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Parameters are of different types") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1);
+		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                          Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint16(1);
@@ -81,7 +84,8 @@ TEST_CASE("Parameter Report Subservice") {
 
 TEST_CASE("Parameter Setting Subservice") {
 	SECTION("All parameter IDs are invalid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		Message request =
+		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(54432);
 		request.appendUint16(1);
@@ -103,7 +107,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("The last parameter ID is invalid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		Message request =
+		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -127,7 +132,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("The middle parameter ID is invalid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		Message request =
+		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -151,7 +157,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("All IDs are valid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		Message request =
+		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -174,7 +181,6 @@ TEST_CASE("Parameter Setting Subservice") {
 }
 
 TEST_CASE("Wrong Messages") {
-
 	SECTION("Wrong Service Type Handling Test for Report") {
 		Message falseRequest(62, 1, Message::TM, 1);
 

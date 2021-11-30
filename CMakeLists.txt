@@ -40,7 +40,7 @@ add_library(common OBJECT
     	src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
-        src/Services/HousekeepingStructure.cpp
+        src/Helpers/HousekeepingStructure.cpp
         src/Services/HousekeepingService.cpp
         )
 
