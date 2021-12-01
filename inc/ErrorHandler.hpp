@@ -160,7 +160,7 @@ public:
 		 */
 		RequestedDeletionOfPeriodicStructure = 14,
 		/**
-		 * Attempt to append a new parameter id to a housekeeping structure, but the id already exists (ST[03])
+		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure (ST[03])
 		 */
 		AlreadyExistingParameter = 15,
 		/**
