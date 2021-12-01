@@ -54,7 +54,7 @@ public:
 	void housekeepingParametersReport(uint16_t structureId);
 
 	/**
-	 * Implementation of TM[3,5]. Request to enable the periodic housekeeping parameters reporting for a specific
+	 * Implementation of TC[3,5]. Request to enable the periodic housekeeping parameters reporting for a specific
 	 * housekeeping structure.
 	 */
 	void enablePeriodicHousekeepingParametersReport(Message& request);
