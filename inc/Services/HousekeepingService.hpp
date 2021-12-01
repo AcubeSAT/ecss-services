@@ -86,14 +86,10 @@ public:
 	void reportHousekeepingStructures(Message& request);
 
 	/**
-	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report'.
+	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report' and stores a
+	 * TM[3,25] report messages.
 	 */
 	void generateOneShotHousekeepingReport(Message& request);
-
-	/**
-	 * This function creates and stores a TM[3,25] one shot housekeeping report message.
-	 */
-	void oneShotHousekeepingReport(Message& request);
 
 	/**
 	 * This function receives a message type TC[3,29] 'append new parameters to an already existing housekeeping
@@ -107,14 +103,15 @@ public:
 	void modifyCollectionIntervalOfStructures(Message& request);
 
 	/**
-	 * This function takes as argument, a message type TC[3,33] 'report housekeeping periodic properties'.
+	 * This function takes as argument, a message type TC[3,33] 'report housekeeping periodic properties' and
+	 * responds with a TM[3,35] 'housekeeping periodic properties report'.
 	 */
 	void reportHousekeepingPeriodicProperties(Message& request);
 
 	/**
 	 * Creates and stores a TM[3,35] housekeeping periodic properties report, for each requested housekeeping structure.
 	 */
-	void housekeepingPeriodicPropertiesReport(Message& request);
+	void appendPeriodicPropertiesToMessage(Message& request, uint8_t structureId);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

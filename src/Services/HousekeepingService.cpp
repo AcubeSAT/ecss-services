@@ -49,6 +49,7 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure);
+
 	uint8_t idToCreate = request.readUint8();
 	if (housekeepingStructures.find(idToCreate) != housekeepingStructures.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
@@ -119,10 +120,6 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 
 void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 	request.assertTC(ServiceType, MessageType::GenerateOneShotHousekeepingReport);
-	oneShotHousekeepingReport(request);
-}
-
-void HousekeepingService::oneShotHousekeepingReport(Message& request) {
 	uint16_t numOfStructsToReport = request.readUint16();
 	for (int i = 0; i < numOfStructsToReport; i++) {
 		uint8_t structureId = request.readUint8();
@@ -182,10 +179,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 
 void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties);
-	housekeepingPeriodicPropertiesReport(request);
-}
 
-void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request) {
 	Message periodicPropertiesReport(ServiceType, MessageType::HousekeepingPeriodicPropertiesReport, Message::TM, 1);
 	uint16_t numOfValidIds = 0;
 	uint16_t numOfStructIds = request.readUint16();
@@ -205,12 +199,16 @@ void HousekeepingService::housekeepingPeriodicPropertiesReport(Message& request)
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 			continue;
 		}
-		periodicPropertiesReport.appendUint8(structIdToReport);
-		periodicPropertiesReport.appendBoolean(
-		    housekeepingStructures.at(structIdToReport).periodicGenerationActionStatus);
-		periodicPropertiesReport.appendUint16(housekeepingStructures.at(structIdToReport).collectionInterval);
+		appendPeriodicPropertiesToMessage(periodicPropertiesReport, structIdToReport);
 	}
 	storeMessage(periodicPropertiesReport);
+}
+
+void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId) {
+	report.appendUint8(structureId);
+	report.appendBoolean(
+	    housekeepingStructures.at(structureId).periodicGenerationActionStatus);
+	report.appendUint16(housekeepingStructures.at(structureId).collectionInterval);
 }
 
 void HousekeepingService::execute(Message& message) {
