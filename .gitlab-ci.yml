@@ -4,25 +4,12 @@ variables:
 
 
 
-# # Global caching directive for pip
-# cache:
-#   key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
-#   paths:
-#     - .cache/pip
-
 stages:
   - build
   - analyze
   - test
   - deploy
 
-# before_script:
-#   - apt-get update -qq && apt-get -qq -y install libstdc++6 python3-pip && python3 -m pip install --upgrade pip
-#   - python3 -V
-#   - python3 -m pip --version
-#   - g++ --version
-#   - cat /etc/*-release
-#   - python3 -m pip install gcovr
 
 check-build:
   image: spacedot/build-base # temporary till I figure out how to push build-base
@@ -33,10 +20,7 @@ check-build:
   script:
     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always"
     - make -j$(nproc)
-    # - make clean
-    # - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -fdiagnostics-color=always" # Build again, but with more warnings
-    # - make -j4
-
+    
 cppcheck:
   image: spacedot/cppcheck:2.5
   stage: analyze
@@ -118,8 +102,6 @@ unit-tests:
   image: spacedot/build-base:latest # LATEST TAG IS TEMPORARY
   stage: test
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
-  # variables:
-  #   GIT_SUBMODULE_STRATEGY: recursive
   script:
     - cmake .
     - make tests -j4
@@ -154,20 +136,12 @@ coverage:
 pages:
   image: spacedot/build-base:latest # LATEST TAG IS TEMPORARY
   stage: deploy
-  #  when: always # Deploy always and on build or test failure, generate just the documentation
-  #  cache:
-  #    key: "$CI_JOB_NAME"
-    #    paths:
-      #      - public
-        #  variables:
-    #    GIT_SUBMODULE_STRATEGY: normal
   script:
     - mkdir .public
     - cp -r ./{doxygen-output,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
     - ls ./.public
     - find ./.public
     - mv .public public
-    # - echo -e "\e[1;36mPublic directory contents\e[0m" && ls -l public/coverage # Print directory contents for debugging
   artifacts:
     paths:
       - public # Upload the resulting website
