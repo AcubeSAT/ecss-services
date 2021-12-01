@@ -60,7 +60,7 @@ public:
 	void enablePeriodicHousekeepingParametersReport(Message& request);
 
 	/**
-	 * Implementation of TM[3,6]. Request to disable the periodic housekeeping parameters reporting for a specific
+	 * Implementation of TC[3,6]. Request to disable the periodic housekeeping parameters reporting for a specific
 	 * housekeeping structure.
 	 */
 	void disablePeriodicHousekeepingParametersReport(Message& request);
