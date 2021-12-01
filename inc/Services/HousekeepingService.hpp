@@ -21,7 +21,7 @@ public:
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains the housekeeping structure with ID = i.
 	 */
-	etl::map<uint16_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
+	etl::map<uint8_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
 
 	enum MessageType : uint8_t {
 		ReportHousekeepingParameters = 0,
@@ -51,7 +51,7 @@ public:
 	 * functionality, not existing in the previous function is to create new request messages when generating
 	 * one-shot housekeeping parameter reports, but rather just call a function using the structure id.
 	 */
-	void housekeepingParametersReport(uint16_t structureId);
+	void housekeepingParametersReport(uint8_t structureId);
 
 	/**
 	 * Implementation of TC[3,5]. Request to enable the periodic housekeeping parameters reporting for a specific
@@ -78,7 +78,7 @@ public:
 	/**
 	 * This function takes a structure ID as argument and constructs/stores a TM[3,10] housekeeping structure report.
 	 */
-	void housekeepingStructureReport(uint16_t structIdToReport);
+	void housekeepingStructureReport(uint8_t structIdToReport);
 
 	/**
 	 * This function gets a message type TC[3,9] 'report housekeeping structures'.
