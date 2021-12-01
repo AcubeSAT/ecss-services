@@ -16,7 +16,7 @@ class HousekeepingStructure {
 public:
 	uint8_t structureId;
 	/**
-	 * Defined as units of minimum sampling interval.
+	 * Defined as integer multiples of the minimum sampling interval. (see XXX)
 	 */
 	uint32_t collectionInterval = 0;
 	/**
