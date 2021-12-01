@@ -13,7 +13,7 @@ void HousekeepingService::reportHousekeepingParameters(Message& request) {
 void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
 	housekeepingReport.appendUint8(structureId);
-	for (auto& parameter : housekeepingStructures.at(structureId).simplyCommutatedParameters) {
+	for (const auto& parameter : housekeepingStructures.at(structureId).simplyCommutatedParameters) {
 		parameter.second.get().appendValueToMessage(housekeepingReport);
 	}
 	storeMessage(housekeepingReport);
