@@ -8,7 +8,7 @@
 
 /**
  * Implementation of the Housekeeping report structure used by the Housekeeping Reporting Subservice (ST[03]). The
- * current version includes only simply commutated parameters, i.e parameters that contain a single sampled value.
+ * current version includes only simply commutated parameters, i.e. parameters that contain a single sampled value.
  *
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
