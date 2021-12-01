@@ -21,8 +21,8 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 
 void ParameterStatisticsService::parameterStatisticsReport() {
 	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
-	report.appendUint16(1); // Dummy value for start and end time, will change in the end IS THIS A MAGIC NUMBER?
-	report.appendUint16(1); // POSSIBLE MAGIC NUMBER
+	report.appendUint16(1); // Dummy value for start and end time, will change in the end
+	report.appendUint16(1);
 	uint16_t numOfValidParameters = 0;
 
 	for (auto& currentStatistic : statisticsMap) {
