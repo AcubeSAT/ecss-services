@@ -41,7 +41,7 @@ public:
 
 	SystemParameters() = default;
 
-	std::reference_wrapper<ParameterBase> getParameter(uint16_t parameterId);
+	ParameterBase& getParameter(uint16_t parameterId);
 };
 
 extern SystemParameters systemParameters;
