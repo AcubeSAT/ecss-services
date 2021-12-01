@@ -41,6 +41,11 @@ public:
 
 	SystemParameters() = default;
 
+	/**
+	 * This is a simple getter function, which returns a reference to a specified parameter, from the parametersArray.
+	 *
+	 * @param parameterId the id of the parameter, whose reference is to be returned.
+	 */
 	ParameterBase& getParameter(uint16_t parameterId);
 };
 
