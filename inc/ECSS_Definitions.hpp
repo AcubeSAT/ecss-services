@@ -22,12 +22,12 @@
 /**
  * The maximum size of a regular ECSS message, in bytes
  */
-inline const uint32_t ECSSMaxMessageSize = 1024U;
+inline const uint16_t ECSSMaxMessageSize = 1024U;
 
 /**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
  */
-inline const uint32_t CCSDSMaxMessageSize = (ECSSMaxMessageSize + 6u + 6u + 2u);
+inline const uint32_t CCSDSMaxMessageSize = ECSSMaxMessageSize + 6u + 6u + 2u;
 
 /**
  * The maximum size of a string to be read or appended to a Message, in bytes
@@ -46,7 +46,7 @@ inline const uint32_t ECSSMaxFixedOctetStringSize = 256U;
 /**
  * The total number of different message types that can be handled by this project
  */
-inline const uint8_t ECSSTotalMessageTypes = (10U * 20U);
+inline const uint8_t ECSSTotalMessageTypes = 10U * 20U;
 
 /**
  * The CCSDS packet version, as specified in section 7.4.1

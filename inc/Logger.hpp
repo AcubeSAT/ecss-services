@@ -182,7 +182,7 @@ public:
  * will not be shown.
  *
  * The global log level can be set by defining one of the following constants:
- * - `.LOGLEVEL_TRACE`
+ * - `LOGLEVEL_TRACE`
  * - `LOGLEVEL_DEBUG`
  * - `LOGLEVEL_INFO`
  * - `LOGLEVEL_NOTICE`
