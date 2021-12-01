@@ -156,18 +156,20 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}
-		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameters.find(newParamId) !=
-		    housekeepingStructures.at(targetStructId).simplyCommutatedParameters.end()) {
+		auto& housekeepingStructure = housekeepingStructures.at(targetStructId);
+		if (housekeepingStructure.simplyCommutatedParameters.find(newParamId) !=
+		    housekeepingStructure.simplyCommutatedParameters.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			continue;
 		}
-		housekeepingStructures.at(targetStructId)
-		    .simplyCommutatedParameters.insert({newParamId, systemParameters.getParameter(newParamId)});
+		housekeepingStructure.simplyCommutatedParameters.insert(
+		    {newParamId, systemParameters.getParameter(newParamId)});
 	}
 }
 
 void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request) {
 	request.assertTC(ServiceType, MessageType::ModifyCollectionIntervalOfStructures);
+
 	uint16_t numOfTargetStructs = request.readUint16();
 	for (int i = 0; i < numOfTargetStructs; i++) {
 		uint8_t targetStructId = request.readUint8();
@@ -209,8 +211,7 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 
 void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId) {
 	report.appendUint8(structureId);
-	report.appendBoolean(
-	    housekeepingStructures.at(structureId).periodicGenerationActionStatus);
+	report.appendBoolean(housekeepingStructures.at(structureId).periodicGenerationActionStatus);
 	report.appendUint32(housekeepingStructures.at(structureId).collectionInterval);
 }
 

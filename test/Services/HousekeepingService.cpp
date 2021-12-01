@@ -136,17 +136,30 @@ TEST_CASE("Delete housekeeping structure") {
 		for (auto& id : ids) {
 			request.appendUint8(id);
 		}
-		// Add periodic housekeeping structure to check
-		HousekeepingStructure periodicStruct;
-		periodicStruct.structureId = 4;
-		periodicStruct.periodicGenerationActionStatus = true;
-		housekeepingService.housekeepingStructures.insert({4, periodicStruct});
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 4);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) ==
-		      3);
+		      4);
+	}
+
+	SECTION("Invalid request of periodic structure") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure, Message::TC, 1);
+		HousekeepingStructure periodicStruct;
+		periodicStruct.structureId = 4;
+		periodicStruct.periodicGenerationActionStatus = true;
+		housekeepingService.housekeepingStructures.insert({4, periodicStruct});
+
+		uint16_t numOfStructs = 1;
+		uint8_t structureId = 4;
+		request.appendUint16(numOfStructs);
+		request.appendUint8(structureId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 5);
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure) == 1);
 

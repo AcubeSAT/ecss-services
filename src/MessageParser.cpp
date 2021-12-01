@@ -1,5 +1,4 @@
 #include <ServicePool.hpp>
-#include <iostream>
 #include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
 #include "macros.hpp"
