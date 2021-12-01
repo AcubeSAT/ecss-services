@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Services/HousekeepingService.hpp"
 
 void HousekeepingService::reportHousekeepingParameters(Message& request) {
