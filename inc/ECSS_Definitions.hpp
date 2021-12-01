@@ -27,21 +27,21 @@ inline const uint16_t ECSSMaxMessageSize = 1024U;
 /**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
  */
-inline const uint32_t CCSDSMaxMessageSize = ECSSMaxMessageSize + 6u + 6u + 2u;
+inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + 6u + 6u + 2u;
 
 /**
  * The maximum size of a string to be read or appended to a Message, in bytes
  *
  * This is used by the Message::appendString() and Message::readString() functions
  */
-inline const uint32_t ECSSMaxStringSize = 256U;
+inline const uint16_t ECSSMaxStringSize = 256U;
 
 /**
  * The maximum size of a string to be used by ST[13] \ref LargePacketTransferService, in bytes
  *
  * This is used by the Message::appendString() and Message::readString() functions
  */
-inline const uint32_t ECSSMaxFixedOctetStringSize = 256U;
+inline const uint16_t ECSSMaxFixedOctetStringSize = 256U;
 
 /**
  * The total number of different message types that can be handled by this project
@@ -104,7 +104,7 @@ inline const uint8_t ECSSEventDataAuxiliaryMaxSize = 64;
  * @brief Size of the multimap that holds every event-action definition
  * @see EventActionService
  */
-inline const uint32_t ECSSEventActionStructMapSize = 256;
+inline const uint16_t ECSSEventActionStructMapSize = 256;
 
 /**
  * The maximum delta between the specified release time and the actual release time
@@ -139,7 +139,7 @@ inline const uint8_t ECSSFunctionMaxArgLength = 32;
 /**
  * @brief The maximum size of a log message
  */
-inline const uint32_t LoggerMaxMessageSize = 512;
+inline const uint16_t LoggerMaxMessageSize = 512;
 
 /**
  * @brief Size of the array holding the Parameter objects for the ST[20] parameter service

@@ -6,7 +6,7 @@
 #include "TimeAndDate.hpp"
 
 inline const uint8_t SecondsPerMinute = 60U;
-inline const uint32_t SecondsPerHour = 3600U;
+inline const uint16_t SecondsPerHour = 3600U;
 inline const uint32_t SecondsPerDay = 86400U;
 
 /**
