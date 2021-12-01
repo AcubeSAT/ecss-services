@@ -156,7 +156,7 @@ public:
 		 */
 		RequestedAlreadyExistingStructure = 13,
 		/**
-		 * Attempt to delete structure which has the periodic reporting status enabled (St[03]) as per 6.3.3.5.2(d-2)
+		 * Attempt to delete structure which has the periodic reporting status enabled (ST[03]) as per 6.3.3.5.2(d-2)
 		 */
 		RequestedDeletionOfPeriodicStructure = 14,
 		/**
