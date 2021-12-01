@@ -47,7 +47,7 @@ public:
 	void reportHousekeepingParameters(Message& request);
 
 	/**
-	 * This function creates and stores the housekeeping parameters report message. The purpose for this
+	 * This function creates and stores the housekeeping parameter value report. The purpose for this
 	 * functionality, not existing in the previous function is so that, we don't have to create new request messages
 	 * when generating one-shot housekeeping parameter reports, but rather just call a function using the structure id.
 	 */
