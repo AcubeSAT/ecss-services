@@ -35,11 +35,6 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		temp.eventDefinitionID = eventDefinitionID;
 		temp.eventActionDefinitionID = eventActionDefinitionID;
 		temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
-		if (eventActionDefinitionMap.size() == ECSS_EVENT_ACTION_STRUCT_MAP_SIZE) {
-			ErrorHandler::reportError(message,ErrorHandler::EventActionDefinitionsMapIsFull);
-		} else {
-			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
-		}
 	}
 }
 
