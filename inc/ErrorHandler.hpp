@@ -167,7 +167,7 @@ public:
 		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
 		 * enabled (ST[03])
 		 */
-		RequestedAppendToPeriodicStructure = 16
+		RequestedAppendToEnabledHousekeeping = 16
 	};
 
 	/**
