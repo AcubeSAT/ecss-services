@@ -94,10 +94,13 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 	Message structReport(ServiceType, MessageType::HousekeepingStructuresReport, Message::TM, 1);
 
 	structReport.appendUint8(structIdToReport);
-	structReport.appendBoolean(housekeepingStructures.at(structIdToReport).periodicGenerationActionStatus);
-	structReport.appendUint32(housekeepingStructures.at(structIdToReport).collectionInterval);
-	structReport.appendUint16(housekeepingStructures.at(structIdToReport).simplyCommutatedParameters.size());
-	for (auto& parameter : housekeepingStructures.at(structIdToReport).simplyCommutatedParameters) {
+	auto housekeepingStructure = housekeepingStructures.find(structIdToReport);
+	assert(housekeepingStructure != housekeepingStructures.end());
+
+	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
+	structReport.appendUint32(housekeepingStructure->second.collectionInterval);
+	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameters.size());
+	for (auto& parameter : housekeepingStructure->second.simplyCommutatedParameters) {
 		uint16_t parameterId = parameter.first;
 		structReport.appendUint16(parameterId);
 	}
