@@ -46,7 +46,9 @@ public:
 	 *
 	 * @param parameterId the id of the parameter, whose reference is to be returned.
 	 */
-	ParameterBase& getParameter(uint16_t parameterId);
+	inline ParameterBase& getParameter(uint16_t parameterId) {
+		return parametersArray[parameterId];
+	}
 };
 
 extern SystemParameters systemParameters;
