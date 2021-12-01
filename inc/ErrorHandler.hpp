@@ -152,7 +152,7 @@ public:
 		 */
 		RequestedNonExistingStructure = 12,
 		/**
-		 * Attempt to create already created structure (St[03])
+		 * Attempt to create already created structure (ST[03])
 		 */
 		RequestedAlreadyExistingStructure = 13,
 		/**
