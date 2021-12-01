@@ -6,6 +6,7 @@
 #define MAX_FILE_SIZE_BYTES 4096
 #define MAX_FILE_COPY_OPERATIONS 10
 #define MAX_FILE_NAME_SIZE 256
+#define MAX_OPERATION_IDENTIFIERS 256
 
 /**
  * Implementation of ST[23] file management service
@@ -29,10 +30,13 @@
  *
  */
 
+
+// Global lfs struct
+lfs_t fs1;
+
 class FileManagementService : public Service {
 private:
 
-    char wildcard = '?';
     bool lockFileSupport = false;
     bool searchFileSupport = false;
     bool createDirectorySupport = true;
@@ -59,7 +63,13 @@ private:
         uint8_t operationStatus = 0;
     };
 
-    enum operationStatusType : uint8_t {
+    struct RepositorySummaryReportStruct{
+        char repositoryPath[ECSS_MAX_STRING_SIZE];
+        uint8_t objectType;
+        char objectName[ECSS_MAX_STRING_SIZE];
+    };
+
+    enum operationStatusType : uint8_t{
         inProgress = 1,
         waitingResources = 2,
         onHold = 3
@@ -68,6 +78,12 @@ private:
 public:
 
     inline static const uint8_t ServiceType = 23;
+    static const char wildcard = '?';
+
+    /*
+     * @todo must be initialized with void fill(0).
+     */
+    etl::array<uint8_t,MAX_OPERATION_IDENTIFIERS> operationIdArray;
 
     enum MessageType : uint8_t {
         CreateFile = 1,
@@ -144,7 +160,7 @@ public:
     /*
      * TM[23,4] Create a report with the attributes of a file
      */
-    void fileAttributeReport();
+    void fileAttributeReport(char* repositoryPathString, uint16_t repositoryPathLength, lfs_info info_struct);
 
     /*
      * TC[23,5] Lock a file, makes it read only. This function should work if and only if locking functionality
@@ -168,7 +184,7 @@ public:
     /*
      * TM[23,8] Found file report, generated after the arrival of a TC[23,7]
      */
-    void foundFileReport();
+    void foundFileReport(char repositoryPath[ECSS_MAX_STRING_SIZE], uint8_t repositoryPathSize, char fileName[ECSS_MAX_STRING_SIZE], uint8_t fileNameSize);
 
     /*
      * TC[23,9] Create a directory
@@ -193,7 +209,7 @@ public:
     /*
      * TM[23,13] Report containing summary of a directory
      */
-    void summaryDirectoryReport();
+    void summaryDirectoryReport(char repositoryPath[ECSS_MAX_STRING_SIZE], RepositorySummaryReportStruct &summaryStruct);
 
     /*
      * TC[23,14] Copy a file
@@ -253,14 +269,59 @@ public:
     //------------------------------------------------------------------------
 
     /**
-     * The purpose of this function is code reuse of the extraction process for object path variable
-     * Parses the message until a '\0' is found. Then returns the actual number of bytes that needs to be extracted, excluding the '\0' char
-     * @param message
-     * @return the number of bytes before '\0' in the message
+     * The purpose of this function is to take care of the extraction process for the object path variable
+     * Parses the message until a '\0' is found. Then returns the actual string, excluding the '\0' char
+     * @param message : The message that we want to parse
+     * @param extractedString : pointer to a char buffer that will house the extracted string
+     * @return status of execution (0: Successful completion, 1: Error occurred)
      */
-    uint8_t getStringUntilZeroTerminator(Message& message);
+    uint8_t getStringUntilZeroTerminator(Message& message, char extractedString[ECSS_MAX_STRING_SIZE], uint8_t &stringSize);
 
+    /**
+     * The purpose of this function is to check if the object path is valid for creation
+     * Checks if there is an object at this path AND if it is a file, not a directory
+     * @param repositoryString : Pointer to the repository
+     * @param repositoryStringSize : The actual size of the repositoryString
+     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     */
+    int32_t pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize);
 
+    /**
+     * The purpose of this function is to initiate a creation of a file using littleFs
+     * Checks if there is already a file with this name
+     * @param fs : Pointer to the file system struct
+     * @param file : Pointer to the file struct
+     * @param repositoryPath : The repository path
+     * @param repositoryPathSize : The actual size of the repositoryPath
+     * @param fileName : The file name
+     * @param fileNameSize : The actual size of the fileName
+     * @param flags : Input flags that determines the creation status
+     */
+    int32_t littleFsCreateFile(lfs_t &fs, lfs_file_t &file, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
+                               String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize, int flags);
+
+    /**
+     * The purpose of this function is to check if the object path is valid for deletion
+     * Checks if there is an object at this path, if it is a file and does not contain any wildcards
+     * @param repositoryString : String with the repository name
+     * @param repositoryStringSize : The actual size of the repositoryString
+     * @param fileNameString : String with the file name
+     * @param fileNameStringSize : The actual size of the fileName
+     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     */
+    int32_t pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize, String<ECSS_MAX_STRING_SIZE> fileNameString, uint8_t fileNameStringSize);
+
+    /**
+     * The purpose of this function is to initiate the deletion of a file using littleFs
+     * Checks if there is already a file with this name and if there is a wildcard in the object path
+     * @param fs : Pointer to the file system struct
+     * @param repositoryPath : The repository path
+     * @param repositoryPathSize : The actual size of the repositoryPath
+     * @param fileName : The file name
+     * @param fileNameSize : The actual size of the fileName
+     */
+    int32_t littleFsDeleteFile(lfs_t &fs, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
+                               String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize);
 
 
 };
