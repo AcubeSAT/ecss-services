@@ -18,7 +18,7 @@ public:
 	/**
 	 * Defined as units of minimum sampling interval.
 	 */
-	uint16_t collectionInterval = 0;
+	uint32_t collectionInterval = 0;
 	/**
 	 * Indicates whether the periodic generation of housekeeping reports is enabled.
 	 */

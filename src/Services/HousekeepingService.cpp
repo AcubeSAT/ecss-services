@@ -60,7 +60,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	 * @todo: Check if the new struct creation exceeds the resources allocated by the host.
 	 */
 	newStructure.structureId = idToCreate;
-	newStructure.collectionInterval = request.readUint16();
+	newStructure.collectionInterval = request.readUint32();
 	newStructure.periodicGenerationActionStatus = false;
 
 	uint16_t numOfSimplyCommutatedParams = request.readUint16();
@@ -95,7 +95,7 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 
 	structReport.appendUint8(structIdToReport);
 	structReport.appendBoolean(housekeepingStructures.at(structIdToReport).periodicGenerationActionStatus);
-	structReport.appendUint16(housekeepingStructures.at(structIdToReport).collectionInterval);
+	structReport.appendUint32(housekeepingStructures.at(structIdToReport).collectionInterval);
 	structReport.appendUint16(housekeepingStructures.at(structIdToReport).simplyCommutatedParameters.size());
 	for (auto& parameter : housekeepingStructures.at(structIdToReport).simplyCommutatedParameters) {
 		uint16_t parameterId = parameter.first;
@@ -168,7 +168,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 	uint16_t numOfTargetStructs = request.readUint16();
 	for (int i = 0; i < numOfTargetStructs; i++) {
 		uint8_t targetStructId = request.readUint8();
-		uint16_t newCollectionInterval = request.readUint16();
+		uint32_t newCollectionInterval = request.readUint32();
 		if (housekeepingStructures.find(targetStructId) == housekeepingStructures.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 			continue;
@@ -208,7 +208,7 @@ void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uin
 	report.appendUint8(structureId);
 	report.appendBoolean(
 	    housekeepingStructures.at(structureId).periodicGenerationActionStatus);
-	report.appendUint16(housekeepingStructures.at(structureId).collectionInterval);
+	report.appendUint32(housekeepingStructures.at(structureId).collectionInterval);
 }
 
 void HousekeepingService::execute(Message& message) {

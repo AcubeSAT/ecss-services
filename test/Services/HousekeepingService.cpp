@@ -11,12 +11,12 @@ HousekeepingService& housekeepingService = Services.housekeeping;
  * Helper function that forms the message that's going to be sent as request to create a new housekeeping structure.
  */
 void buildRequest(Message& request, uint8_t idToCreate) {
-	uint16_t interval = 7;
+	uint32_t interval = 7;
 	uint16_t numOfSimplyCommutatedParams = 3;
 	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
 
 	request.appendUint8(idToCreate);
-	request.appendUint16(interval);
+	request.appendUint32(interval);
 	request.appendUint16(numOfSimplyCommutatedParams);
 	for (auto& id : simplyCommutatedIds) {
 		request.appendUint16(id);
@@ -76,12 +76,12 @@ TEST_CASE("Create housekeeping structure") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
 		uint8_t idToCreate = 2;
-		uint16_t interval = 7;
+		uint32_t interval = 7;
 		uint16_t numOfSimplyCommutatedParams = 3;
 		etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
 
 		request.appendUint8(idToCreate);
-		request.appendUint16(interval);
+		request.appendUint32(interval);
 		request.appendUint16(numOfSimplyCommutatedParams);
 		for (auto& id : simplyCommutatedIds) {
 			request.appendUint16(id);
@@ -234,7 +234,7 @@ TEST_CASE("Reporting of housekeeping structures") {
 		uint8_t validId = 4;
 		CHECK(report.readUint8() == validId);
 		CHECK(not report.readBoolean()); // periodic status
-		CHECK(report.readUint16() == 7); // interval
+		CHECK(report.readUint32() == 7); // interval
 		CHECK(report.readUint16() == 3); // number of simply commutated ids
 		CHECK(report.readUint16() == 4); // ids
 		CHECK(report.readUint16() == 5);
@@ -257,7 +257,7 @@ TEST_CASE("Reporting of housekeeping structures without a TC message as argument
 		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingStructuresReport);
 		CHECK(report.readUint8() == structureId);
 		CHECK(not report.readBoolean());
-		CHECK(report.readUint16() == 7);
+		CHECK(report.readUint32() == 7);
 		CHECK(report.readUint16() == 3);
 		CHECK(report.readUint16() == 4);
 		CHECK(report.readUint16() == 5);
@@ -437,12 +437,12 @@ TEST_CASE("Modification of housekeeping structures' interval") {
 		                HousekeepingService::MessageType::ModifyCollectionIntervalOfStructures, Message::TC, 1);
 		uint16_t numOfStructs = 4;
 		uint8_t structIds[4] = {0, 4, 9, 10};
-		uint16_t intervals[4] = {12, 21, 32, 17};
+		uint32_t intervals[4] = {12, 21, 32, 17};
 		request.appendUint16(numOfStructs);
 		int i = 0;
 		for (auto& id : structIds) {
 			request.appendUint8(id);
-			request.appendUint16(intervals[i++]);
+			request.appendUint32(intervals[i++]);
 		}
 		MessageParser::execute(request);
 
@@ -482,13 +482,13 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		CHECK(report.readUint16() == 3); // Number of valid ids
 		CHECK(report.readUint8() == 0); // Id
 		CHECK(report.readBoolean() == true); // Periodic status
-		CHECK(report.readUint16() == 7); // Interval
+		CHECK(report.readUint32() == 7); // Interval
 		CHECK(report.readUint8() == 4); // Id
 		CHECK(report.readBoolean() == false); // Periodic status
-		CHECK(report.readUint16() == 24); // Interval
+		CHECK(report.readUint32() == 24); // Interval
 		CHECK(report.readUint8() == 6); // Id
 		CHECK(report.readBoolean() == false); // Periodic status
-		CHECK(report.readUint16() == 13); // Interval
+		CHECK(report.readUint32() == 13); // Interval
 
 		ServiceTests::reset();
 		Services.reset();
