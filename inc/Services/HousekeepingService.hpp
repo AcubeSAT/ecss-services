@@ -81,12 +81,12 @@ public:
 	void housekeepingStructureReport(uint16_t structIdToReport);
 
 	/**
-	 * This function gets a message type TC[3,9] request.
+	 * This function gets a message type TC[3,9] 'report housekeeping structures'.
 	 */
 	void reportHousekeepingStructures(Message& request);
 
 	/**
-	 * This function takes as argument a message type TC[3,27].
+	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report'.
 	 */
 	void generateOneShotHousekeepingReport(Message& request);
 
@@ -96,17 +96,18 @@ public:
 	void oneShotHousekeepingReport(Message& request);
 
 	/**
-	 * This function appends new parameters to an already existing housekeeping structure (TC[3,29]).
+	 * This function receives a message type TC[3,29] 'append new parameters to an already existing housekeeping
+	 * structure'
 	 */
 	void appendParametersToHousekeepingStructure(Message& request);
 
 	/**
-	 * This function modifies the collection interval of specified structures (TC[3,31]).
+	 * This function receives a message type TC[3,31] 'modify' the collection interval of specified structures'.
 	 */
 	void modifyCollectionIntervalOfStructures(Message& request);
 
 	/**
-	 * This function takes as argument, a message type TC[3,33].
+	 * This function takes as argument, a message type TC[3,33] 'report housekeeping periodic properties'.
 	 */
 	void reportHousekeepingPeriodicProperties(Message& request);
 
