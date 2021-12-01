@@ -5,16 +5,16 @@
 #include <Message.hpp>
 #include "TimeAndDate.hpp"
 
-#define SECONDS_PER_MINUTE 60U
-#define SECONDS_PER_HOUR 3600U
-#define SECONDS_PER_DAY 86400U
+inline const uint8_t SecondsPerMinute = 60U;
+inline const uint32_t SecondsPerHour = 3600U;
+inline const uint32_t SecondsPerDay = 86400U;
 
 /**
  * @todo If we use CUC time format then we should keep leap seconds up to date. Leap seconds are added in undefined
  * periods of time, so we should find a way to adjust to these changes either in runtime using GPS or sending a new
  * compiled code (changing the defined leap seconds) from the ground segment
  */
-#define LEAP_SECONDS 27
+inline const uint8_t LeapSeconds = 27;
 
 
 /**

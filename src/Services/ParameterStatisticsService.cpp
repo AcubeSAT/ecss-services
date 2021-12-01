@@ -108,7 +108,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 			}
 		}
 		if (not exists) {
-			if (statisticsMap.size() >= ECSS_MAX_STATISTIC_PARAMETERS) {
+			if (statisticsMap.size() >= ECSSMaxStatisticParameters) {
 				ErrorHandler::reportError(request,
 				                          ErrorHandler::ExecutionStartErrorType::MaxStatisticDefinitionsReached);
 				return;
