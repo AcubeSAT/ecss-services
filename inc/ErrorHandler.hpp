@@ -148,7 +148,7 @@ public:
 		 */
 		EventActionDefinitionsMapIsFull = 11,
 		/**
-		 * Attempt to report/delete non existing housekeeping structure (St[03])
+		 * Attempt to report/delete non existing housekeeping structure (ST[03])
 		 */
 		RequestedNonExistingStructure = 12,
 		/**
