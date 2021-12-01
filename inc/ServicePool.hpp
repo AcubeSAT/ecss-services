@@ -26,6 +26,7 @@ class ServicePool {
 	 * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
 	 * counter of each MessageType.
 	 */
+
 	etl::map<uint16_t, uint16_t, ECSS_TOTAL_MESSAGE_TYPES> messageTypeCounter;
 
 	/**
@@ -34,6 +35,19 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
+
+	enum ServiceType {
+
+
+		ParameterStatisticsType = 4,
+		EventReportType = 5,
+		MemoryManagementType = 6,
+		FunctionManagementType = 8,
+		TimeBasedSchedulingType = 11,
+		TestServiceType = 17,
+		EventActionType = 19,
+		ParameterManagementType = 20
+	};
 #ifdef SERVICE_PARAMETERSTATISTICS
 	ParameterStatisticsService parameterStatistics;
 #endif

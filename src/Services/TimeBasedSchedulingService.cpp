@@ -262,34 +262,34 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 
 void TimeBasedSchedulingService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case EnableTimeBasedScheduleExecutionFunction:
 			enableScheduleExecution(message); // TC[11,1]
 			break;
-		case 2:
+		case DisableTimeBasedScheduleExecutionFunction:
 			disableScheduleExecution(message); // TC[11,2]
 			break;
-		case 3:
+		case ResetTimeBasedSchedule:
 			resetSchedule(message); // TC[11,3]
 			break;
-		case 4:
+		case InsertActivities:
 			insertActivities(message); // TC[11,4]
 			break;
-		case 5:
+		case DeleteActivitiesById:
 			deleteActivitiesByID(message); // TC[11,5]
 			break;
-		case 7:
+		case TimeShiftActivitiesById:
 			timeShiftActivitiesByID(message); // TC[11,7]
 			break;
-		case 9:
+		case DetailReportActivitiesById:
 			detailReportActivitiesByID(message); // TC[11,9]
 			break;
-		case 12:
+		case ActivitiesSummaryReportById:
 			summaryReportActivitiesByID(message); // TC[11,12]
 			break;
-		case 15:
+		case TimeShiftALlScheduledActivities:
 			timeShiftAllActivities(message); // TC[11,15]
 			break;
-		case 16:
+		case DetailReportAllScheduledActivities:
 			detailReportAllActivities(message); // TC[11,16]
 			break;
 		default:

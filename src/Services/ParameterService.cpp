@@ -64,10 +64,10 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case ReportParameterValues:
 			reportParameters(message); // TC[20,1]
 			break;
-		case 3:
+		case SetParameterValues:
 			setParameters(message); // TC[20,3]
 			break;
 		default:

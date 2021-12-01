@@ -54,7 +54,7 @@ void FunctionManagementService::include(String<ECSS_FUNCTION_NAME_LENGTH> funcNa
 
 void FunctionManagementService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case PerformFunction:
 			call(message); // TC[8,1]
 			break;
 		default:

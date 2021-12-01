@@ -22,7 +22,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 			}
 		}
 	}
-	if ((message.dataSize - 6) > ECSS_TC_REQUEST_STRING_SIZE) {
+	if ((message.dataSize - 6) > ECSS_TC_REQUEST_STRING_SIZE) { //IS THIS A MAGIC NUMBER?
 		canBeAdded = false;
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 	}
@@ -196,28 +196,28 @@ void EventActionService::executeAction(uint16_t eventID) {
 
 void EventActionService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case AddEventAction:
 			addEventActionDefinitions(message); // TC[19,1]
 			break;
-		case 2:
+		case DeleteEventAction:
 			deleteEventActionDefinitions(message); // TC[19,2]
 			break;
-		case 3:
+		case DeleteAllEventAction:
 			deleteAllEventActionDefinitions(message); // TC[19,3]
 			break;
-		case 4:
+		case EnableEventAction:
 			enableEventActionDefinitions(message); // TC[19,4]
 			break;
-		case 5:
+		case DisableEventAction:
 			disableEventActionDefinitions(message); // TC[19,5]
 			break;
-		case 6:
+		case ReportStatusOfEachEventAction:
 			requestEventActionDefinitionStatus(message); // TC[19,6]
 			break;
-		case 8:
+		case EnableEventActionFunction :
 			enableEventActionFunction(message); // TC[19,8]
 			break;
-		case 9:
+		case DisableEventActionFunction:
 			disableEventActionFunction(message); // TC[19,9]
 			break;
 		default:
