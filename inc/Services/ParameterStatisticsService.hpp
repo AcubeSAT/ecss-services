@@ -32,7 +32,7 @@ public:
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
-	etl::map<uint16_t, Statistic, ECSS_MAX_STATISTIC_PARAMETERS> statisticsMap;
+	etl::map<uint16_t, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
 	 * true means that the periodic statistics reporting is enabled

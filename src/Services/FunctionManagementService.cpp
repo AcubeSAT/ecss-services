@@ -12,13 +12,13 @@ void FunctionManagementService::call(Message& msg) {
 	ErrorHandler::assertRequest(msg.serviceType == FunctionManagementService::ServiceType, msg,
 		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint8_t funcName[ECSS_FUNCTION_NAME_LENGTH] = { 0 }; // the function's name
-	uint8_t funcArgs[ECSS_FUNCTION_MAX_ARG_LENGTH] = { 0 }; // arguments for the function
+	uint8_t funcName[ECSSFunctionNameLength] = { 0 }; // the function's name
+	uint8_t funcArgs[ECSSFunctionMaxArgLength] = { 0 }; // arguments for the function
 
-	msg.readString(funcName, ECSS_FUNCTION_NAME_LENGTH);
-	msg.readString(funcArgs, ECSS_FUNCTION_MAX_ARG_LENGTH);
+	msg.readString(funcName, ECSSFunctionNameLength);
+	msg.readString(funcArgs, ECSSFunctionMaxArgLength);
 
-	if (msg.dataSize > (ECSS_FUNCTION_NAME_LENGTH + ECSS_FUNCTION_MAX_ARG_LENGTH)) {
+	if (msg.dataSize > (ECSSFunctionNameLength + ECSSFunctionMaxArgLength)) {
 		ErrorHandler::reportError(msg,
 		                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError); // report failed
 		// start of execution as requested by the standard
@@ -26,9 +26,9 @@ void FunctionManagementService::call(Message& msg) {
 	}
 
 	// locate the appropriate function pointer
-	String<ECSS_FUNCTION_NAME_LENGTH> name(funcName);
+	String<ECSSFunctionNameLength> name(funcName);
 	FunctionMap::iterator iter = funcPtrIndex.find(name);
-	void (*selected)(String<ECSS_FUNCTION_MAX_ARG_LENGTH>);
+	void (*selected)(String<ECSSFunctionMaxArgLength>);
 
 	if (iter != funcPtrIndex.end()) {
 		selected = *iter->second;
@@ -41,11 +41,11 @@ void FunctionManagementService::call(Message& msg) {
 	selected(funcArgs);
 }
 
-void FunctionManagementService::include(String<ECSS_FUNCTION_NAME_LENGTH> funcName,
-	void (* ptr)(String<ECSS_FUNCTION_MAX_ARG_LENGTH>)) {
+void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,
+	void (* ptr)(String<ECSSFunctionMaxArgLength>)) {
 	if (not funcPtrIndex.full()) { // CAUTION: etl::map won't check by itself if it's full
 		// before attempting to insert a key-value pair, causing segmentation faults. Check first!
-		funcName.append(ECSS_FUNCTION_NAME_LENGTH - funcName.length(), 0);
+		funcName.append(ECSSFunctionNameLength - funcName.length(), 0);
 		funcPtrIndex.insert(std::make_pair(funcName, ptr));
 	} else {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MapFull);

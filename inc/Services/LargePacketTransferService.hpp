@@ -40,7 +40,7 @@ public:
 	 * @param string The data contained in this part of the large packet
 	 */
 	void firstDownlinkPartReport(uint16_t largeMessageTransactionIdentifier, uint16_t partSequenceNumber,
-	                             const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
+	                             const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * Function that handles the n-2 parts of tbe n-part download report
@@ -49,7 +49,7 @@ public:
 	 * @param string The data contained in this part of the large packet
 	 */
 	void intermediateDownlinkPartReport(uint16_t largeMessageTransactionIdentifier, uint16_t partSequenceNumber,
-	                                    const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
+	                                    const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * Function that handles the last part of the download report
@@ -58,7 +58,7 @@ public:
 	 * @param string The data contained in this part of the large packet
 	 */
 	void lastDownlinkPartReport(uint16_t largeMessageTransactionIdentifier, uint16_t partSequenceNumber,
-	                            const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
+	                            const String<ECSSMaxFixedOctetStringSize>& string);
 
 	// The three uplink functions should handle a TC request to "upload" data. Since there is not
 	// a composeECSS function ready, I just return the given string.
@@ -67,20 +67,20 @@ public:
 	 * Function that handles the first part of the uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> firstUplinkPart(const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
+	String<ECSSMaxFixedOctetStringSize> firstUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * Function that handles the n-2 parts of tbe n-part uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>
-	intermediateUplinkPart(const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
+	String<ECSSMaxFixedOctetStringSize>
+	intermediateUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * Function that handles the last part of the uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> lastUplinkPart(const String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>& string);
+	String<ECSSMaxFixedOctetStringSize> lastUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * Function that splits large messages

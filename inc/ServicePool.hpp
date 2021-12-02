@@ -26,8 +26,12 @@ class ServicePool {
 	 * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
 	 * counter of each MessageType.
 	 */
+<<<<<<< HEAD
 
 	etl::map<uint16_t, uint16_t, ECSS_TOTAL_MESSAGE_TYPES> messageTypeCounter;
+=======
+	etl::map<uint16_t, uint16_t, ECSSTotalMessageTypes> messageTypeCounter;
+>>>>>>> origin/master
 
 	/**
 	 * A counter for messages that corresponds to the total number of TM packets sent from an APID

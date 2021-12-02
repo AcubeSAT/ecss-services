@@ -242,7 +242,7 @@ TEST_CASE("Time format implementation for CUC", "[CUC]") {
 
 	uint32_t currTime = TimeHelper::utcToSeconds(TimeInfo);
 
-	uint32_t timeFormat = currTime + LEAP_SECONDS;
+	uint32_t timeFormat = currTime + LeapSeconds;
 	CHECK(TimeHelper::generateCUCTimeFormat(TimeInfo) == timeFormat);
 
 	Message message = Message(9, 128, Message::TC, 3);
@@ -259,7 +259,7 @@ TEST_CASE("Time format implementation for CUC", "[CUC]") {
 
 	currTime = TimeHelper::utcToSeconds(TimeInfo);
 
-	timeFormat = currTime + LEAP_SECONDS; // TAI format
+	timeFormat = currTime + LeapSeconds; // TAI format
 	CHECK(TimeHelper::generateCUCTimeFormat(TimeInfo) == timeFormat);
 
 	message = Message(9, 128, Message::TC, 3);

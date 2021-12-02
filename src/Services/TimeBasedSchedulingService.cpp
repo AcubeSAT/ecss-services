@@ -45,13 +45,13 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		uint32_t currentTime = TimeGetter::getSeconds(); // Get the current system time
 
 		uint32_t releaseTime = request.readUint32(); // Get the specified release time
-		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSS_TIME_MARGIN_FOR_ACTIVATION))) {
+		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
-			request.skipBytes(ECSS_TC_REQUEST_STRING_SIZE);
+			request.skipBytes(ECSSTCRequestStringSize);
 		} else {
 			// Get the TC packet request
-			uint8_t requestData[ECSS_TC_REQUEST_STRING_SIZE] = {0};
-			request.readString(requestData, ECSS_TC_REQUEST_STRING_SIZE);
+			uint8_t requestData[ECSSTCRequestStringSize] = {0};
+			request.readString(requestData, ECSSTCRequestStringSize);
 			Message receivedTCPacket = MessageParser::parseECSSTC(requestData);
 			ScheduledActivity newActivity; // Create the new activity
 
@@ -84,7 +84,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	                        });
 	// todo: Define what the time format is going to be
 	int32_t relativeOffset = request.readSint32(); // Get the relative offset
-	if ((releaseTimes.first->requestReleaseTime + relativeOffset) < (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
+	if ((releaseTimes.first->requestReleaseTime + relativeOffset) < (current_time + ECSSTimeMarginForActivation)) {
 		// Report the error
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	} else {
@@ -119,7 +119,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 		if (requestIDMatch != scheduledActivities.end()) {
 			// If the relative offset does not meet the restrictions issue an error
 			if ((requestIDMatch->requestReleaseTime + relativeOffset) <
-			    (current_time + ECSS_TIME_MARGIN_FOR_ACTIVATION)) {
+			    (current_time + ECSSTimeMarginForActivation)) {
 				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			} else {
 				requestIDMatch->requestReleaseTime += relativeOffset; // Add the time offset
@@ -183,7 +183,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 
 	// Create the report message object of telemetry message subtype 10 for each activity
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
-	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
+	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	while (iterationCount-- != 0) {
@@ -224,7 +224,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 
 	// Create the report message object of telemetry message subtype 13 for each activity
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
-	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> matchedActivities;
+	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	while (iterationCount-- != 0) {
