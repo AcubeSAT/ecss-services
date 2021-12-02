@@ -30,7 +30,7 @@ void Statistic::appendStatisticsToMessage(Message& report) {
 	report.appendUint32(minTime);
 	report.appendFloat(static_cast<float>(mean));
 
-	if (SUPPORTS_STANDARD_DEVIATION) {
+	if (SupportsStandardDeviation) {
 		double standardDeviation = 0;
 		if (sampleCounter == 0) {
 			standardDeviation = 0;
