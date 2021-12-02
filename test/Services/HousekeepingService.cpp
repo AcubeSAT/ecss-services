@@ -30,10 +30,22 @@ void initializeHousekeepingStructures() {
 	Message request(HousekeepingService::ServiceType,
 	                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
 	uint8_t ids[3] = {0, 4, 6};
-	for (auto& id : ids) {
-		buildRequest(request, id);
-		MessageParser::execute(request);
+	uint32_t interval = 7;
+	uint16_t numOfSimplyCommutatedParams = 3;
+	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+
+	HousekeepingStructure structures[3];
+	int i = 0;
+	for (auto& newStructure : structures) {
+		newStructure.structureId = ids[i];
+		newStructure.collectionInterval = interval;
+		newStructure.periodicGenerationActionStatus = false;
+		for (uint16_t parameterId : simplyCommutatedIds) {
+			newStructure.simplyCommutatedParameters.insert({parameterId, systemParameters.getParameter(parameterId)});
+		}
+		housekeepingService.housekeepingStructures.insert({ids[i++], newStructure});
 	}
+
 	REQUIRE(housekeepingService.housekeepingStructures.size() == 3);
 	REQUIRE(housekeepingService.housekeepingStructures.find(0) != housekeepingService.housekeepingStructures.end());
 	REQUIRE(housekeepingService.housekeepingStructures.find(4) != housekeepingService.housekeepingStructures.end());
