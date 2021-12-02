@@ -41,7 +41,11 @@ void initializeHousekeepingStructures() {
 		newStructure.collectionInterval = interval;
 		newStructure.periodicGenerationActionStatus = false;
 		for (uint16_t parameterId : simplyCommutatedIds) {
-			newStructure.simplyCommutatedParameters.insert({parameterId, systemParameters.getParameter(parameterId)});
+			newStructure.simplyCommutatedParameters.push_back(systemParameters.getParameter(parameterId));
+			newStructure.parameterPositions.push_back(parameterId);
+//			std::pair<uint16_t, std::reference_wrapper<ParameterBase>> newPair = {
+//			    parameterId, systemParameters.getParameter(parameterId)};
+//			newStructure.simplyCommutatedParameters.push_back(newPair);
 		}
 		housekeepingService.housekeepingStructures.insert({ids[i++], newStructure});
 	}
@@ -107,12 +111,19 @@ TEST_CASE("Create housekeeping structure") {
 		CHECK(newStruct.simplyCommutatedParameters.size() == numOfSimplyCommutatedParams);
 		CHECK(newStruct.collectionInterval == interval);
 		for (auto& id : simplyCommutatedIds) {
-			CHECK(newStruct.simplyCommutatedParameters.find(id) != newStruct.simplyCommutatedParameters.end());
+			CHECK(std::find(std::begin(newStruct.parameterPositions), std::end(newStruct.parameterPositions),
+			                id) != std::end(newStruct.parameterPositions));
 		}
-		for (auto& parameter : newStruct.simplyCommutatedParameters) {
-			uint16_t id = parameter.first;
-			CHECK(std::find(simplyCommutatedIds.begin(), simplyCommutatedIds.end(), id) != simplyCommutatedIds.end());
-		}
+//		for (auto& id : simplyCommutatedIds) {
+//			CHECK(newStruct.simplyCommutatedParameters.find(id) != newStruct.simplyCommutatedParameters.end());
+//		}
+//		for (auto& parameterId : newStruct.parameterPositions) {
+//			CHECK(std::find(simplyCommutatedIds.begin(), simplyCommutatedIds.end(), parameterId) != simplyCommutatedIds.end());
+//		}
+//		for (auto& parameter: newStruct.simplyCommutatedParameters) {
+//			uint16_t id = parameter.first;
+//			CHECK(std::find(simplyCommutatedIds.begin(), simplyCommutatedIds.end(), id) != simplyCommutatedIds.end());
+//		}
 	}
 
 	SECTION("Invalid structure creation request") {
@@ -299,9 +310,9 @@ TEST_CASE("Reporting of housekeeping structures") {
 		CHECK(not report.readBoolean()); // periodic status
 		CHECK(report.readUint32() == 7); // interval
 		CHECK(report.readUint16() == 3); // number of simply commutated ids
+		CHECK(report.readUint16() == 8);
 		CHECK(report.readUint16() == 4); // ids
 		CHECK(report.readUint16() == 5);
-		CHECK(report.readUint16() == 8);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -322,9 +333,9 @@ TEST_CASE("Reporting of housekeeping structures without a TC message as argument
 		CHECK(not report.readBoolean());
 		CHECK(report.readUint32() == 7);
 		CHECK(report.readUint16() == 3);
+		CHECK(report.readUint16() == 8);
 		CHECK(report.readUint16() == 4);
 		CHECK(report.readUint16() == 5);
-		CHECK(report.readUint16() == 8);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -343,9 +354,9 @@ TEST_CASE("Reporting of housekeeping parameters") {
 		Message report = ServiceTests::get(0);
 		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
 		REQUIRE(report.readUint8() == structId);
+		CHECK(report.readUint16() == 33);
 		CHECK(report.readUint8() == 77);
 		CHECK(report.readUint32() == 99);
-		CHECK(report.readUint16() == 33);
 	}
 
 	SECTION("Invalid structure request") {
@@ -376,9 +387,9 @@ TEST_CASE("Reporting of housekeeping parameters without a TC request") {
 
 		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
 		REQUIRE(report.readUint8() == structureId);
+		CHECK(report.readUint16() == 33);
 		CHECK(report.readUint8() == 77);
 		CHECK(report.readUint32() == 99);
-		CHECK(report.readUint16() == 33);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -409,14 +420,14 @@ TEST_CASE("One-shot housekeeping parameter report generation") {
 		REQUIRE(report2.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
 
 		REQUIRE(report1.readUint8() == 0);
+		CHECK(report1.readUint16() == 33);
 		CHECK(report1.readUint8() == 77);
 		CHECK(report1.readUint32() == 99);
-		CHECK(report1.readUint16() == 33);
 
 		REQUIRE(report2.readUint8() == 4);
+		CHECK(report2.readUint16() == 33);
 		CHECK(report2.readUint8() == 77);
 		CHECK(report2.readUint32() == 99);
-		CHECK(report2.readUint16() == 33);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -472,8 +483,10 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		HousekeepingStructure structToCheck = housekeepingService.housekeepingStructures[structId];
 		REQUIRE(structToCheck.simplyCommutatedParameters.size() == 6);
 		for (auto& existingParameter : currentlyExistingParameters) {
-			CHECK(structToCheck.simplyCommutatedParameters.find(existingParameter) !=
-			      structToCheck.simplyCommutatedParameters.end());
+			CHECK(std::find(std::begin(structToCheck.parameterPositions), std::end(structToCheck.parameterPositions),
+			                existingParameter) != std::end(structToCheck.parameterPositions));
+//			CHECK(structToCheck.simplyCommutatedParameters.find(existingParameter) !=
+//			      structToCheck.simplyCommutatedParameters.end());
 		}
 	}
 

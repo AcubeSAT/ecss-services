@@ -25,11 +25,15 @@ public:
 	bool periodicGenerationActionStatus = false;
 
 	/**
-	 * Map containing references to simply commutated housekeeping parameters. The ID of each parameter is used as a
+	 * Vector containing references to simply commutated housekeeping parameters. The ID of each parameter is used as a
 	 * key.
 	 */
-	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS>
+	etl::vector<uint16_t, ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS> parameterPositions;
+	etl::vector<std::reference_wrapper<ParameterBase>, ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS>
 	    simplyCommutatedParameters;
+
+	//	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS>
+	//	    simplyCommutatedParameters;
 
 	HousekeepingStructure() = default;
 };
