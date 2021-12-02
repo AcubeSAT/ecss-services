@@ -12,8 +12,8 @@ void HousekeepingService::reportHousekeepingParameters(uint8_t structureId) {
 void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
 	housekeepingReport.appendUint8(structureId);
-	for (auto& parameter : housekeepingStructures.at(structureId).simplyCommutatedParameters) {
-		parameter.get().appendValueToMessage(housekeepingReport);
+	for (auto& id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
+		systemParameters.getParameter(id).appendValueToMessage(housekeepingReport);
 	}
 	storeMessage(housekeepingReport);
 }
@@ -68,8 +68,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		uint16_t newParamId = request.readUint16();
-		newStructure.simplyCommutatedParameters.push_back(systemParameters.getParameter(newParamId));
-		newStructure.parameterPositions.push_back(newParamId);
+		newStructure.simplyCommutatedParameterIds.push_back(newParamId);
 	}
 	housekeepingStructures.insert({idToCreate, newStructure});
 }
@@ -103,15 +102,11 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 	}
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
 	structReport.appendUint32(housekeepingStructure->second.collectionInterval);
-	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameters.size());
-	int i = 0;
-	for (auto& parameterId : housekeepingStructure->second.parameterPositions) {
+	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameterIds.size());
+
+	for (auto& parameterId : housekeepingStructure->second.simplyCommutatedParameterIds) {
 		structReport.appendUint16(parameterId);
 	}
-//	for (auto& parameter : housekeepingStructure->second.simplyCommutatedParameters) {
-//		uint16_t parameterId = parameter.first;
-//		structReport.appendUint16(parameterId);
-//	}
 	storeMessage(structReport);
 }
 
@@ -157,7 +152,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 
 	uint16_t numOfSimplyCommParams = request.readUint16();
 	for (int i = 0; i < numOfSimplyCommParams; i++) {
-		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameters.size() >=
+		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameterIds.size() >=
 		    ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
 			ErrorHandler::reportError(
 			    request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
@@ -169,21 +164,13 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 			continue;
 		}
 		auto& housekeepingStructure = housekeepingStructures.at(targetStructId);
-		if (std::find(std::begin(housekeepingStructure.parameterPositions), std::end(housekeepingStructure
-		                                                                                 .parameterPositions), newParamId)
-		    != std::end(housekeepingStructure.parameterPositions)) {
+		if (std::find(std::begin(housekeepingStructure.simplyCommutatedParameterIds),
+		              std::end(housekeepingStructure.simplyCommutatedParameterIds),
+		              newParamId) != std::end(housekeepingStructure.simplyCommutatedParameterIds)) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			continue;
 		}
-//		if (housekeepingStructure.simplyCommutatedParameters.find(newParamId) !=
-//		    housekeepingStructure.simplyCommutatedParameters.end()) {
-//			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
-//			continue;
-//		}
-		housekeepingStructure.simplyCommutatedParameters.push_back(systemParameters.getParameter(newParamId));
-		housekeepingStructure.parameterPositions.push_back(newParamId);
-//		housekeepingStructure.simplyCommutatedParameters.insert(
-//		    {newParamId, systemParameters.getParameter(newParamId)});
+		housekeepingStructure.simplyCommutatedParameterIds.push_back(newParamId);
 	}
 }
 
