@@ -22,11 +22,8 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 			}
 		}
 	}
-<<<<<<< HEAD
-	if ((message.dataSize - 6) > ECSS_TC_REQUEST_STRING_SIZE) { //IS THIS A MAGIC NUMBER?
-=======
+
 	if ((message.dataSize - 6) > ECSSTCRequestStringSize) {
->>>>>>> origin/master
 		canBeAdded = false;
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 	}
