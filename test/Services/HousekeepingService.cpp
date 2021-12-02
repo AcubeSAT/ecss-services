@@ -57,13 +57,14 @@ void initializeHousekeepingStructures() {
 void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 	Message samples(HousekeepingService::ServiceType,
 	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
-	samples.appendUint16(static_cast<uint16_t>(33));
-	samples.appendUint8(static_cast<uint8_t>(77));
-	samples.appendUint32(static_cast<uint32_t>(99));
 
-	systemParameters.parametersArray[id1].get().setValueFromMessage(samples);
-	systemParameters.parametersArray[id2].get().setValueFromMessage(samples);
-	systemParameters.parametersArray[id3].get().setValueFromMessage(samples);
+	static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id1].get()).setValue(33);
+	static_cast<Parameter<uint8_t>&>(systemParameters.parametersArray[id2].get()).setValue(77);
+	static_cast<Parameter<uint32_t>&>(systemParameters.parametersArray[id3].get()).setValue(99);
+
+	REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id1].get()).getValue() == 33);
+	REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id2].get()).getValue() == 77);
+	REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id3].get()).getValue() == 99);
 }
 
 /**
