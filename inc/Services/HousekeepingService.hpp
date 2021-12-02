@@ -110,7 +110,7 @@ public:
 	/**
 	 * Creates and stores a TM[3,35] housekeeping periodic properties report, for each requested housekeeping structure.
 	 */
-	void appendPeriodicPropertiesToMessage(Message& request, uint8_t structureId);
+	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

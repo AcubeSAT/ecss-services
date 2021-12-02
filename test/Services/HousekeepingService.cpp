@@ -31,7 +31,6 @@ void initializeHousekeepingStructures() {
 	                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
 	uint8_t ids[3] = {0, 4, 6};
 	uint32_t interval = 7;
-	uint16_t numOfSimplyCommutatedParams = 3;
 	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
 
 	HousekeepingStructure structures[3];
