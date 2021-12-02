@@ -35,7 +35,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint8_t testString_2[8] = "SecStrT";
 	uint8_t testString_3[2] = {5, 8};
 
-	uint8_t checkString[ECSS_MAX_STRING_SIZE];
+	uint8_t checkString[ECSSMaxStringSize];
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
