@@ -58,7 +58,7 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	static Message parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data);
+	static Message parseECSSTC(String<ECSSTCRequestStringSize> data);
 
 	/**
 	 * @brief Overloaded version of \ref MessageParser::parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data)
@@ -75,14 +75,14 @@ public:
 	 * error. Messages smaller than \p size are padded with zeros. When `size = 0`, there is no size limit.
 	 * @return A String class containing the parsed Message
 	 */
-	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSS(const Message& message, uint16_t size = 0u); // Ignore-MISRA
+	static String<CCSDSMaxMessageSize> composeECSS(const Message& message, uint16_t size = 0u); // Ignore-MISRA
 
 	/**
 	 * @brief Converts a TC or TM message to a packet string, appending the ECSS and then the CCSDS header
 	 * @param message The Message object to be parsed to a String
 	 * @return A String class containing the parsed Message
 	 */
-	static String<CCSDS_MAX_MESSAGE_SIZE> compose(const Message& message);
+	static String<CCSDSMaxMessageSize> compose(const Message& message);
 
 private:
 	/**

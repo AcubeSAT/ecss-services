@@ -113,39 +113,39 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	message.dataSize = length;
 }
 
-Message MessageParser::parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data) {
+Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
 	Message message;
 	auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
 	message.packetType = Message::TC;
-	parseECSSTCHeader(dataInt, ECSS_TC_REQUEST_STRING_SIZE, message);
+	parseECSSTCHeader(dataInt, ECSSTCRequestStringSize, message);
 	return message;
 }
 
 Message MessageParser::parseECSSTC(uint8_t* data) {
 	Message message;
 	message.packetType = Message::TC;
-	parseECSSTCHeader(data, ECSS_TC_REQUEST_STRING_SIZE, message);
+	parseECSSTCHeader(data, ECSSTCRequestStringSize, message);
 	return message;
 }
 
-String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message, uint16_t size) {
+String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
 	uint8_t header[5];
 
 	if (message.packetType == Message::TC) {
-		header[0] = ECSS_PUS_VERSION << 4U; // Assign the pusVersion = 2
+		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = 0;
 		header[4] = 0;
 	} else {
-		header[0] = ECSS_PUS_VERSION << 4U; // Assign the pusVersion = 2
+		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
 	}
 
-	String<CCSDS_MAX_MESSAGE_SIZE> dataString(header, 5);
+	String<CCSDSMaxMessageSize> dataString(header, 5);
 	dataString.append(message.data, message.dataSize);
 
 	// Make sure to reach the requested size
@@ -164,14 +164,14 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::composeECSS(const Message& message
 	return dataString;
 }
 
-String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
+String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	uint8_t header[6];
 
 	// First, compose the ECSS part
-	String<CCSDS_MAX_MESSAGE_SIZE> ecssMessage = MessageParser::composeECSS(message);
+	String<CCSDSMaxMessageSize> ecssMessage = MessageParser::composeECSS(message);
 
 	// Sanity check that there is enough space for the string
-	ASSERT_INTERNAL((ecssMessage.size() + 6U) <= CCSDS_MAX_MESSAGE_SIZE, ErrorHandler::StringTooLarge);
+	ASSERT_INTERNAL((ecssMessage.size() + 6U) <= CCSDSMaxMessageSize, ErrorHandler::StringTooLarge);
 
 	// Parts of the header
 	uint16_t packetId = message.applicationId;
@@ -189,7 +189,7 @@ String<CCSDS_MAX_MESSAGE_SIZE> MessageParser::compose(const Message& message) {
 	header[5] = packetDataLength & 0xffU;
 
 	// Compile the final message by appending the header
-	String<CCSDS_MAX_MESSAGE_SIZE> ccsdsMessage(header, 6);
+	String<CCSDSMaxMessageSize> ccsdsMessage(header, 6);
 	ccsdsMessage.append(ecssMessage);
 
 #if ECSS_CRC_INCLUDED

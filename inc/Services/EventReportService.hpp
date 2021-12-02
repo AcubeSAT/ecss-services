@@ -115,7 +115,7 @@ public:
 	 * @param eventID event definition ID
 	 * @param data the data of the report
 	 */
-	void informativeEventReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
+	void informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data);
 
 	/**
 	 * TM[5,2] low severiity anomaly report
@@ -126,7 +126,7 @@ public:
 	 * @param eventID event definition ID
 	 * @param data the data of the report
 	 */
-	void lowSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
+	void lowSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data);
 
 	/**
 	 * TM[5,3] medium severity anomaly report
@@ -137,7 +137,7 @@ public:
 	 * @param eventID event definition ID
 	 * @param data the data of the report
 	 */
-	void mediumSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
+	void mediumSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data);
 
 	/**
 	 * TM[5,4] high severity anomaly report
@@ -148,7 +148,7 @@ public:
 	 * @param eventID event definition ID
 	 * @param data the data of the report
 	 */
-	void highSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data);
+	void highSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data);
 
 	/**
 	 * TC[5,5] request to enable report generation

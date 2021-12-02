@@ -92,7 +92,7 @@ private:
 	 * @details The scheduled activities in this list are ordered by their release time, as the
 	 * standard requests.
 	 */
-	etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES> scheduledActivities;
+	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> scheduledActivities;
 
 	/**
 	 * @brief Sort the activities by their release time
@@ -101,7 +101,7 @@ private:
 	 * response. Also it is better to have the activities sorted.
 	 */
 	inline void
-	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSS_MAX_NUMBER_OF_TIME_SCHED_ACTIVITIES>& schedActivities) {
+	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& schedActivities) {
 		schedActivities.sort([](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 			// cppcheck-suppress
 			return leftSide.requestReleaseTime < rightSide.requestReleaseTime;

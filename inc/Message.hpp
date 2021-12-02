@@ -104,7 +104,7 @@ public:
 	//
 	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	// Message::appendBits() relies on this in order to easily OR the requested bits.
-	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = {0};
+	uint8_t data[ECSSMaxMessageSize] = {0};
 
 	// private:
 	uint8_t currentBit = 0;
@@ -557,7 +557,7 @@ public:
 
 		uint16_t length = readUint16();
 		ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort);
-		ASSERT_REQUEST((readPosition + length) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+		ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
 		string.append(data + readPosition, length);
 		readPosition += length;

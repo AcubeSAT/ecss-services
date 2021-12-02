@@ -22,20 +22,20 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 			}
 		}
 	}
-	if ((message.dataSize - 6) > ECSS_TC_REQUEST_STRING_SIZE) {
+	if ((message.dataSize - 6) > ECSSTCRequestStringSize) {
 		canBeAdded = false;
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 	}
 	if (canBeAdded) {
-		char data[ECSS_TC_REQUEST_STRING_SIZE] = { 0 };
+		char data[ECSSTCRequestStringSize] = { 0 };
 		message.readString(data, message.dataSize - 6);
 		EventActionDefinition temp;
 		temp.enabled = false;
 		temp.applicationId = applicationID;
 		temp.eventDefinitionID = eventDefinitionID;
 		temp.eventActionDefinitionID = eventActionDefinitionID;
-		temp.request = String<ECSS_TC_REQUEST_STRING_SIZE>(data);
-		if (eventActionDefinitionMap.size() == ECSS_EVENT_ACTION_STRUCT_MAP_SIZE) {
+		temp.request = String<ECSSTCRequestStringSize>(data);
+		if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 			ErrorHandler::reportError(message,ErrorHandler::EventActionDefinitionsMapIsFull);
 		} else {
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
