@@ -118,12 +118,20 @@ TEST_CASE("Create housekeeping structure") {
 	SECTION("Invalid structure creation request") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t idToCreate2 = 2;
-		request.appendUint8(idToCreate2);
+		uint8_t structureId = 9;
+		HousekeepingStructure structure1;
+		structure1.structureId = structureId;
+		housekeepingService.housekeepingStructures.insert({structureId, structure1});
+
+		uint8_t idToCreate = 9;
+		request.appendUint8(idToCreate);
+
 		MessageParser::execute(request);
+
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 1);
+		housekeepingService.housekeepingStructures.erase(structureId);
 	}
 
 	SECTION("Exceeding max number of housekeeping structures") {

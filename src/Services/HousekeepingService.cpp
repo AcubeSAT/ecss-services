@@ -96,8 +96,10 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 
 	structReport.appendUint8(structIdToReport);
 	auto housekeepingStructure = housekeepingStructures.find(structIdToReport);
-	assert(housekeepingStructure != housekeepingStructures.end());
-
+	if (housekeepingStructure == housekeepingStructures.end()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistingStructure);
+		return;
+	}
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
 	structReport.appendUint32(housekeepingStructure->second.collectionInterval);
 	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameters.size());
