@@ -1,10 +1,9 @@
+#include <iostream>
 #include "Services/HousekeepingService.hpp"
 
-void HousekeepingService::reportHousekeepingParameters(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportHousekeepingParameters);
-	uint8_t structureId = request.readUint8();
+void HousekeepingService::reportHousekeepingParameters(uint8_t structureId) {
 	if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistingStructure);
 		return;
 	}
 	housekeepingParametersReport(structureId);
@@ -55,10 +54,12 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
 		return;
 	}
+	if (housekeepingStructures.size() >= ECSS_MAX_HOUSEKEEPING_STRUCTS) {
+		ErrorHandler::reportError(request,
+		                          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfHousekeepingStructures);
+		return;
+	}
 	HousekeepingStructure newStructure;
-	/**
-	 * @todo: Check if the new struct creation exceeds the resources allocated by the host.
-	 */
 	newStructure.structureId = idToCreate;
 	newStructure.collectionInterval = request.readUint32();
 	newStructure.periodicGenerationActionStatus = false;
@@ -146,11 +147,15 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
 		return;
 	}
-	/**
-	 * @todo: check if resources allocated by the host are exceeded.
-	 */
+
 	uint16_t numOfSimplyCommParams = request.readUint16();
 	for (int i = 0; i < numOfSimplyCommParams; i++) {
+		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameters.size() >=
+		    ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
+			ErrorHandler::reportError(request,
+			                          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
+			return;
+		}
 		uint16_t newParamId = request.readUint16();
 		if (newParamId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
@@ -217,9 +222,6 @@ void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uin
 
 void HousekeepingService::execute(Message& message) {
 	switch (message.messageType) {
-		case 0:
-			reportHousekeepingParameters(message);
-			break;
 		case 1:
 			createHousekeepingReportStructure(message);
 			break;

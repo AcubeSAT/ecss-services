@@ -28,7 +28,8 @@ public:
 	 * Map containing references to simply commutated housekeeping parameters. The ID of each parameter is used as a
 	 * key.
 	 */
-	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSS_MAX_PARAMETERS> simplyCommutatedParameters;
+	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS>
+	    simplyCommutatedParameters;
 
 	HousekeepingStructure() = default;
 };

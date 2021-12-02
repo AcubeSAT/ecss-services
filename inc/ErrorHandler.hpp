@@ -76,7 +76,11 @@ public:
 		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 11
+		NestedMessageTooLarge = 11,
+		/**
+		 * A request to access a non existing housekeeping structure in ST[03]
+		 */
+		NonExistingStructure = 12
 	};
 
 	/**
@@ -167,7 +171,18 @@ public:
 		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
 		 * enabled (ST[03])
 		 */
-		RequestedAppendToEnabledHousekeeping = 16
+		RequestedAppendToEnabledHousekeeping = 16,
+		/**
+		 * Attempt to create a new housekeeping structure in Housekeeping Service, when the maximum number of
+		 * housekeeping structures is already reached (ST[03])
+		 */
+		ExceededMaxNumberOfHousekeepingStructures = 17,
+		/**
+		 * Attempt to add a new simply commutated parameter in a specific housekeeping structure, but the maximum
+		 * number of simply commutated parameters for this structure is already reached (ST[03])
+		 */
+		ExceededMaxNumberOfSimplyCommutatedParameters = 18,
+
 	};
 
 	/**

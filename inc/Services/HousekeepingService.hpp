@@ -24,14 +24,13 @@ public:
 	etl::map<uint8_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
 
 	enum MessageType : uint8_t {
-		ReportHousekeepingParameters = 0,
-		CreateHousekeepingReportStructure = 1,
-		DeleteHousekeepingReportStructure = 3,
+		HousekeepingParametersReport = 25,
 		EnablePeriodicHousekeepingParametersReport = 5,
 		DisablePeriodicHousekeepingParametersReport = 6,
+		CreateHousekeepingReportStructure = 1,
+		DeleteHousekeepingReportStructure = 3,
 		ReportHousekeepingStructures = 9,
 		HousekeepingStructuresReport = 10,
-		HousekeepingParametersReport = 25,
 		GenerateOneShotHousekeepingReport = 27,
 		AppendParametersToHousekeepingStructure = 29,
 		ModifyCollectionIntervalOfStructures = 31,
@@ -44,7 +43,7 @@ public:
 	/**
 	 * This function gets a request to report the housekeeping parameters and checks whether its valid or not
 	 */
-	void reportHousekeepingParameters(Message& request);
+	void reportHousekeepingParameters(uint8_t structureId);
 
 	/**
 	 * This function creates and stores the housekeeping parameter value report. The purpose for this

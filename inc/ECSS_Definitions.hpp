@@ -115,7 +115,7 @@
 /**
  * The maximum number of stored parameters in the \ref ParameterService
  */
-#define ECSS_MAX_PARAMETERS 50
+#define ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS 10
 
 /**
  * The number of functions supported by the \ref FunctionManagementService

@@ -44,8 +44,8 @@ void initializeHousekeepingStructures() {
  * Helper function that stores samples into simply commutated parameters of different data type each.
  */
 void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
-	Message samples(HousekeepingService::ServiceType, HousekeepingService::MessageType::ReportHousekeepingParameters,
-	                Message::TM, 1);
+	Message samples(HousekeepingService::ServiceType,
+	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
 	samples.appendUint16(static_cast<uint16_t>(33));
 	samples.appendUint8(static_cast<uint8_t>(77));
 	samples.appendUint32(static_cast<uint32_t>(99));
@@ -112,6 +112,36 @@ TEST_CASE("Create housekeeping structure") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 1);
+	}
+
+	SECTION("Exceeding max number of housekeeping structures") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+
+		uint8_t idsToCreate[15] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18};
+		uint16_t numOfSimplyCommutatedParams = 3;
+		etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+		uint32_t interval = 12;
+
+		REQUIRE(housekeepingService.housekeepingStructures.size() == 1);
+
+		for (auto& structId : idsToCreate) {
+			request.appendUint8(structId);
+			request.appendUint32(interval);
+			request.appendUint16(numOfSimplyCommutatedParams);
+			for (auto& parameterId : simplyCommutatedIds) {
+				request.appendUint16(parameterId);
+			}
+			MessageParser::execute(request);
+		}
+
+		REQUIRE(housekeepingService.housekeepingStructures.size() == 10);
+		CHECK(ServiceTests::count() == 7);
+		CHECK(ServiceTests::countThrownErrors(
+		          ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 2);
+		CHECK(ServiceTests::countThrownErrors(
+		          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfHousekeepingStructures) == 5);
+
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -285,12 +315,9 @@ TEST_CASE("Reporting of housekeeping parameters") {
 	SECTION("Valid structure request") {
 		storeSamplesToParameters(8, 4, 5);
 		initializeHousekeepingStructures();
-		Message request2(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::ReportHousekeepingParameters, Message::TC, 1);
 		uint8_t structId = 6;
-		request2.appendUint8(structId);
 
-		MessageParser::execute(request2);
+		housekeepingService.reportHousekeepingParameters(structId);
 
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
@@ -302,25 +329,15 @@ TEST_CASE("Reporting of housekeeping parameters") {
 	}
 
 	SECTION("Invalid structure request") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::ReportHousekeepingParameters, Message::TC, 1);
 		uint8_t structId = 8;
-		request.appendUint8(structId);
-		MessageParser::execute(request);
+		housekeepingService.reportHousekeepingParameters(structId);
 
-		CHECK(ServiceTests::count() == 2);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) ==
-		      1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistingStructure) == 1);
 
-		Message request2(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::ReportHousekeepingParameters, Message::TC, 1);
 		structId = 12;
-		request2.appendUint8(structId);
-		MessageParser::execute(request2);
+		housekeepingService.reportHousekeepingParameters(structId);
 
-		CHECK(ServiceTests::count() == 3);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) ==
-		      2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistingStructure) == 2);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -438,6 +455,56 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 			CHECK(structToCheck.simplyCommutatedParameters.find(existingParameter) !=
 			      structToCheck.simplyCommutatedParameters.end());
 		}
+	}
+
+	SECTION("Exceeding the maximum number of simply commutated parameters for the specified structure") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
+		uint8_t structId = 6;
+		uint16_t numOfSimplyCommutatedParams = 12;
+		etl::vector<uint16_t, 12> simplyCommutatedIds = {0, 1, 2, 3, 6, 7, 8, 12, 13, 14, 15, 16};
+
+		request.appendUint8(structId);
+		request.appendUint16(numOfSimplyCommutatedParams);
+		for (auto& id : simplyCommutatedIds) {
+			request.appendUint16(id);
+		}
+		HousekeepingStructure& structToCheck = housekeepingService.housekeepingStructures[structId];
+		REQUIRE(housekeepingService.housekeepingStructures.find(structId) !=
+		        housekeepingService.housekeepingStructures.end());
+		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameters.size() == 6);
+
+		MessageParser::execute(request);
+
+		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameters.size() == 10);
+		CHECK(ServiceTests::count() == 7);
+		CHECK(ServiceTests::countThrownErrors(
+		          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters) == 1);
+	}
+
+	SECTION("Continue exceeding the maximum number of parameters just to be sure") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
+		uint8_t structId = 6;
+		uint16_t numOfSimplyCommutatedParams = 3;
+		etl::vector<uint16_t, 3> simplyCommutatedIds = {17, 18, 21};
+
+		request.appendUint8(structId);
+		request.appendUint16(numOfSimplyCommutatedParams);
+		for (auto& id : simplyCommutatedIds) {
+			request.appendUint16(id);
+		}
+		HousekeepingStructure& structToCheck = housekeepingService.housekeepingStructures[structId];
+		REQUIRE(housekeepingService.housekeepingStructures.find(structId) !=
+		        housekeepingService.housekeepingStructures.end());
+		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameters.size() == 10);
+
+		MessageParser::execute(request);
+
+		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameters.size() == 10);
+		CHECK(ServiceTests::count() == 8);
+		CHECK(ServiceTests::countThrownErrors(
+		          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters) == 2);
 		ServiceTests::reset();
 		Services.reset();
 	}
