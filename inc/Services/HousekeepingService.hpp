@@ -108,7 +108,7 @@ public:
 	void reportHousekeepingPeriodicProperties(Message& request);
 
 	/**
-	 * Creates and stores a TM[3,35] housekeeping periodic properties report, for each requested housekeeping structure.
+	 * Appends periodic properties of housekeeping structure to message.
 	 */
 	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
 
