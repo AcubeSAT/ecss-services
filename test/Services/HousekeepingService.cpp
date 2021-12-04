@@ -182,9 +182,9 @@ TEST_CASE("Delete housekeeping structure") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure, Message::TC, 1);
 
-		uint16_t numOfStructs = 5;
+		uint8_t numOfStructs = 5;
 		uint8_t ids[5] = {2, 3, 4, 7, 8};
-		request.appendUint16(numOfStructs);
+		request.appendUint8(numOfStructs);
 		for (auto& id : ids) {
 			request.appendUint8(id);
 		}
@@ -204,9 +204,9 @@ TEST_CASE("Delete housekeeping structure") {
 		periodicStruct.periodicGenerationActionStatus = true;
 		housekeepingService.housekeepingStructures.insert({4, periodicStruct});
 
-		uint16_t numOfStructs = 1;
+		uint8_t numOfStructs = 1;
 		uint8_t structureId = 4;
-		request.appendUint16(numOfStructs);
+		request.appendUint8(numOfStructs);
 		request.appendUint8(structureId);
 
 		MessageParser::execute(request);
@@ -225,9 +225,9 @@ TEST_CASE("Enable the periodic generation of housekeeping structures") {
 		initializeHousekeepingStructures();
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, Message::TC, 1);
-		uint16_t numOfStructs = 5;
+		uint8_t numOfStructs = 5;
 		uint8_t idsToEnable[5] = {1, 3, 4, 6, 7};
-		request2.appendUint16(numOfStructs);
+		request2.appendUint8(numOfStructs);
 		for (auto& id : idsToEnable) {
 			request2.appendUint8(id);
 		}
@@ -253,9 +253,9 @@ TEST_CASE("Disable the periodic generation of housekeeping structures") {
 		initializeHousekeepingStructures();
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport, Message::TC, 1);
-		uint16_t numOfStructs = 4;
+		uint8_t numOfStructs = 4;
 		uint8_t idsToDisable[4] = {0, 1, 4, 6};
-		request2.appendUint16(numOfStructs);
+		request2.appendUint8(numOfStructs);
 		for (auto& id : idsToDisable) {
 			request2.appendUint8(id);
 		}
@@ -282,9 +282,9 @@ TEST_CASE("Reporting of housekeeping structures") {
 		initializeHousekeepingStructures();
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::ReportHousekeepingStructures, Message::TC, 1);
-		uint16_t numOfStructs = 3;
+		uint8_t numOfStructs = 3;
 		uint8_t idsToReport[3] = {9, 4, 2};
-		request2.appendUint16(numOfStructs);
+		request2.appendUint8(numOfStructs);
 		for (auto& id : idsToReport) {
 			request2.appendUint8(id);
 		}
@@ -393,9 +393,9 @@ TEST_CASE("One-shot housekeeping parameter report generation") {
 		initializeHousekeepingStructures();
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::GenerateOneShotHousekeepingReport, Message::TC, 1);
-		uint16_t numOfStructs = 5;
+		uint8_t numOfStructs = 5;
 		uint8_t structIds[5] = {0, 4, 7, 8, 11};
-		request2.appendUint16(numOfStructs);
+		request2.appendUint8(numOfStructs);
 		for (auto& id : structIds) {
 			request2.appendUint8(id);
 		}
@@ -442,7 +442,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, Message::TC, 1);
 		// Enable 1 periodic struct with id=0
-		request.appendUint16(1);
+		request.appendUint8(1);
 		request.appendUint8(0);
 		MessageParser::execute(request);
 
@@ -538,10 +538,10 @@ TEST_CASE("Modification of housekeeping structures' interval") {
 		initializeHousekeepingStructures();
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::ModifyCollectionIntervalOfStructures, Message::TC, 1);
-		uint16_t numOfStructs = 4;
+		uint8_t numOfStructs = 4;
 		uint8_t structIds[4] = {0, 4, 9, 10};
 		uint32_t intervals[4] = {12, 21, 32, 17};
-		request.appendUint16(numOfStructs);
+		request.appendUint8(numOfStructs);
 		int i = 0;
 		for (auto& id : structIds) {
 			request.appendUint8(id);
@@ -565,9 +565,9 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		initializeHousekeepingStructures();
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TC, 1);
-		uint16_t numOfStructs = 6;
+		uint8_t numOfStructs = 6;
 		uint8_t structIds[6] = {0, 4, 1, 6, 9, 10};
-		request.appendUint16(numOfStructs);
+		request.appendUint8(numOfStructs);
 		for (auto& id : structIds) {
 			request.appendUint8(id);
 		}
@@ -582,7 +582,7 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		      3);
 
 		Message report = ServiceTests::get(3);
-		CHECK(report.readUint16() == 3); // Number of valid ids
+		CHECK(report.readUint8() == 3); // Number of valid ids
 		CHECK(report.readUint8() == 0); // Id
 		CHECK(report.readBoolean() == true); // Periodic status
 		CHECK(report.readUint32() == 7); // Interval
