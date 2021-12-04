@@ -112,15 +112,11 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 	storeMessage(structReport);
 }
 
-void HousekeepingService::reportHousekeepingParameters(uint8_t structureId) {
+void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistingStructure);
 		return;
 	}
-	housekeepingParametersReport(structureId);
-}
-
-void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
 
 	housekeepingReport.appendUint8(structureId);

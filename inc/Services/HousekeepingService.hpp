@@ -15,6 +15,12 @@
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
 class HousekeepingService : Service {
+private:
+	/**
+	 * Appends periodic properties of housekeeping structure to message.
+	 */
+	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
+
 public:
 	inline static const uint8_t ServiceType = 3;
 
@@ -73,14 +79,8 @@ public:
 	void housekeepingStructureReport(uint8_t structIdToReport);
 
 	/**
-	 * This function gets a request to report the housekeeping parameters and checks whether it is valid or not
-	 */
-	void reportHousekeepingParameters(uint8_t structureId);
-
-	/**
-	 * This function creates and stores the housekeeping parameter value report. The purpose for this
-	 * functionality, not existing in the previous function is to create new request messages when generating
-	 * one-shot housekeeping parameter reports, but rather just call a function using the structure id.
+	 * This function gets a request to report the housekeeping parameters and creates stores the housekeeping parameter
+	 * value report
 	 */
 	void housekeepingParametersReport(uint8_t structureId);
 
@@ -106,11 +106,6 @@ public:
 	 * responds with a TM[3,35] 'housekeeping periodic properties report'.
 	 */
 	void reportHousekeepingPeriodicProperties(Message& request);
-
-	/**
-	 * Appends periodic properties of housekeeping structure to message.
-	 */
-	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
