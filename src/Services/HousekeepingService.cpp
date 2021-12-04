@@ -155,7 +155,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	}
 	uint16_t numOfSimplyCommutatedParameters = request.readUint16();
 
-	for (uint16_t i = 0; i < numOfSimplyCommParams; i++) {
+	for (uint16_t i = 0; i < numOfSimplyCommutatedParameters; i++) {
 		if (housekeepingStructure.simplyCommutatedParameterIds.size() >=
 		    ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
 			ErrorHandler::reportError(
