@@ -41,7 +41,7 @@ public:
 	HousekeepingService() = default;
 
 	/**
-	 * This function gets a request to report the housekeeping parameters and checks whether its valid or not
+	 * This function gets a request to report the housekeeping parameters and checks whether it is valid or not
 	 */
 	void reportHousekeepingParameters(uint8_t structureId);
 
