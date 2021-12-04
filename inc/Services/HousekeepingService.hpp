@@ -21,6 +21,11 @@ private:
 	 */
 	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
 
+	/**
+	 * Returns true if the given parameter ID exists in the parameters contained in the housekeeping structure.
+	 */
+	bool existsInVector(etl::vector<uint16_t, ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS> ids, uint16_t parameterId);
+
 public:
 	inline static const uint8_t ServiceType = 3;
 

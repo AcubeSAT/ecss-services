@@ -23,9 +23,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		uint16_t newParamId = request.readUint16();
-		if (std::find(std::begin(newStructure.simplyCommutatedParameterIds),
-		              std::end(newStructure.simplyCommutatedParameterIds),
-		              newParamId) != std::end(newStructure.simplyCommutatedParameterIds)) {
+		if (existsInVector(newStructure.simplyCommutatedParameterIds, newParamId)) {
 			continue;
 		}
 		newStructure.simplyCommutatedParameterIds.push_back(newParamId);
@@ -156,8 +154,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	uint16_t numOfSimplyCommutatedParameters = request.readUint16();
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParameters; i++) {
-		if (housekeepingStructure.simplyCommutatedParameterIds.size() >=
-		    ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
+		if (housekeepingStructure.simplyCommutatedParameterIds.size() >= ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
 			ErrorHandler::reportError(
 			    request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
 			return;
@@ -167,9 +164,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}
-		if (std::find(std::begin(housekeepingStructure.simplyCommutatedParameterIds),
-		              std::end(housekeepingStructure.simplyCommutatedParameterIds),
-		              newParamId) != std::end(housekeepingStructure.simplyCommutatedParameterIds)) {
+		if (existsInVector(housekeepingStructure.simplyCommutatedParameterIds, newParamId)) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			continue;
 		}
@@ -195,7 +190,6 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties);
 
-	Message periodicPropertiesReport(ServiceType, MessageType::HousekeepingPeriodicPropertiesReport, Message::TM, 1);
 	uint8_t numOfValidIds = 0;
 	uint8_t numOfStructIds = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructIds; i++) {
@@ -204,6 +198,7 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 			numOfValidIds++;
 		}
 	}
+	Message periodicPropertiesReport(ServiceType, MessageType::HousekeepingPeriodicPropertiesReport, Message::TM, 1);
 	periodicPropertiesReport.appendUint8(numOfValidIds);
 	request.resetRead();
 	request.readUint8();
@@ -255,4 +250,8 @@ void HousekeepingService::execute(Message& message) {
 			reportHousekeepingPeriodicProperties(message);
 			break;
 	}
+}
+
+bool HousekeepingService::existsInVector(etl::vector<uint16_t, 10> ids, uint16_t parameterId) {
+	return std::find(std::begin(ids), std::end(ids), parameterId) != std::end(ids);
 }
