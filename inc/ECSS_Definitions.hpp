@@ -156,14 +156,4 @@
  */
 #define ECSS_MAX_HOUSEKEEPING_STRUCTS 10
 
-/**
- * @brief The maximum number of simply commutated parameters in a housekeeping structure
- */
-#define ECSS_HOUSEKEEPING_PARAMETERS 10
-
-/**
- * @brief The max number of samples that each housekeeping parameter should store
- */
-#define ECSS_MAX_HOUSEKEEPING_PARAMETER_SAMPLES 30
-
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
