@@ -18,45 +18,6 @@
 #include "etl/String.hpp"
 #include <ctime>
 
-/*
-int main() {
-
-	srand(time(NULL));
-	std::cout << "Statistic\n";
-	Statistic <int> stat1;
-	stat1.storeSamples(5);
-	std::cout << "Number of samples: " << stat1.numOfSamplesCounter << std::endl;
-
-	stat1.calculateStatistics();
-	std::cout << "Max before: " << stat1.max << std::endl;
-	std::cout << "Min value: " << stat1.min << std::endl;
-	std::cout << "Mean value: " << stat1.mean << std::endl;
-	std::cout << "SD value: " << stat1.standardDeviation << std::endl;
-	std::cout << "Interval before change: " << stat1.selfSamplingInterval << std::endl;
-
-	systemStatistics.statisticsArray[0] = stat1;
-
-	Message reportExample(ParameterStatisticsService::ServiceType,
-	                      ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport,
-	                      Message::TM,1);
-
-	std::reference_wrapper <StatisticBase> stat = systemStatistics.statisticsArray[0].get();
-
-	int max = stat.get().appendStatisticsToMessage(stat, reportExample);
-	std::cout << "Max after: " << max << std::endl;
-
-//	supportsStandardDeviation = true;
-
-	max = stat.get().appendStatisticsToMessage(stat, reportExample);
-	std::cout << "Max after 2: " << max << std::endl;
-
-	systemStatistics.statisticsArray[0].get().setSelfTimeInterval(12345);
-	std::cout << "Interval after change: " << systemStatistics.statisticsArray[0].get().selfSamplingInterval <<
-	    std::endl;
-	return 0;
-}
-*/
-
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
