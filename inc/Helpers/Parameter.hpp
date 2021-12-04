@@ -72,8 +72,6 @@ public:
 	inline void appendValueToMessage(Message& message) override {
 		message.append<DataType>(currentValue);
 	};
-
-	explicit Parameter(std::reference_wrapper<ParameterBase> wrapper) {}
 };
 
 #endif // ECSS_SERVICES_PARAMETER_HPP
