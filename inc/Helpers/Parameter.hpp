@@ -2,8 +2,6 @@
 #define ECSS_SERVICES_PARAMETER_HPP
 
 #include "etl/String.hpp"
-#include "etl/vector.h"
-#include "etl/map.h"
 #include "Message.hpp"
 #include "ECSS_Definitions.hpp"
 
