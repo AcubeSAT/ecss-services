@@ -168,6 +168,35 @@ TEST_CASE("Create housekeeping structure") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+
+	SECTION("Same simply commutated parameter twice in the request") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		uint8_t idToCreate = 2;
+		uint32_t interval = 7;
+		uint16_t numOfSimplyCommutatedParams = 9;
+		etl::vector<uint16_t, 9> simplyCommutatedIds = {8, 4, 5, 4, 8, 8, 5, 4, 11};
+
+		request.appendUint8(idToCreate);
+		request.appendUint32(interval);
+		request.appendUint16(numOfSimplyCommutatedParams);
+		for (auto& id : simplyCommutatedIds) {
+			request.appendUint16(id);
+		}
+
+		MessageParser::execute(request);
+		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
+
+		REQUIRE(newStruct.simplyCommutatedParameterIds.size() == 4);
+		uint16_t existingParameterIds[4] = {8, 4, 5, 11};
+		for (auto parameterId : newStruct.simplyCommutatedParameterIds) {
+			CHECK(std::find(std::begin(existingParameterIds), std::end(existingParameterIds), parameterId) !=
+			      std::end(existingParameterIds));
+		}
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
 
 TEST_CASE("Delete housekeeping structure") {
