@@ -79,8 +79,8 @@ public:
 	void housekeepingStructureReport(uint8_t structIdToReport);
 
 	/**
-	 * This function gets a request to report the housekeeping parameters and creates stores the housekeeping parameter
-	 * value report
+	 * This function gets a request to report the housekeeping parameters and creates stores a TM[3,25] 'housekeeping
+	 * parameter report' message.
 	 */
 	void housekeepingParametersReport(uint8_t structureId);
 

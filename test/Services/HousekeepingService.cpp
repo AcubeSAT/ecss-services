@@ -354,12 +354,12 @@ TEST_CASE("Reporting of housekeeping parameters") {
 		uint8_t structId = 8;
 		housekeepingService.housekeepingParametersReport(structId);
 
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistingStructure) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
 
 		structId = 12;
 		housekeepingService.housekeepingParametersReport(structId);
 
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistingStructure) == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 2);
 
 		ServiceTests::reset();
 		Services.reset();

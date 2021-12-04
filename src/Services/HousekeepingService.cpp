@@ -99,7 +99,7 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 	structReport.appendUint8(structIdToReport);
 	auto housekeepingStructure = housekeepingStructures.find(structIdToReport);
 	if (housekeepingStructure == housekeepingStructures.end()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistingStructure);
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
@@ -114,7 +114,7 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 
 void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistingStructure);
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
 	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
@@ -154,7 +154,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	}
 
 	uint16_t numOfSimplyCommParams = request.readUint16();
-	for (int i = 0; i < numOfSimplyCommParams; i++) {
+	for (uint16_t i = 0; i < numOfSimplyCommParams; i++) {
 		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameterIds.size() >=
 		    ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
 			ErrorHandler::reportError(
