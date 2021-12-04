@@ -153,7 +153,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
 		return;
 	}
-	uint16_t numOfSimplyCommParams = request.readUint16();
+	uint16_t numOfSimplyCommutatedParameters = request.readUint16();
 
 	for (uint16_t i = 0; i < numOfSimplyCommParams; i++) {
 		if (housekeepingStructure.simplyCommutatedParameterIds.size() >=
