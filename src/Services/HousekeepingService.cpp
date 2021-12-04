@@ -106,7 +106,7 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 	structReport.appendUint32(housekeepingStructure->second.collectionInterval);
 	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameterIds.size());
 
-	for (auto& parameterId : housekeepingStructure->second.simplyCommutatedParameterIds) {
+	for (auto parameterId : housekeepingStructure->second.simplyCommutatedParameterIds) {
 		structReport.appendUint16(parameterId);
 	}
 	storeMessage(structReport);
