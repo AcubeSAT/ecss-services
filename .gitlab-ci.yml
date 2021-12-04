@@ -98,7 +98,7 @@ ikos:
       - ./ikos-report
 
 unit-tests:
-  image: spacedot/build-base:latest # LATEST TAG IS TEMPORARY
+  image: spacedot/build-base:latest # TODO: Latest tag is temporary
   stage: test
   coverage: '/^TOTAL.*\s+(\d+\%)$/'
   script:
