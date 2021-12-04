@@ -279,7 +279,7 @@ TEST_CASE("Enable the periodic generation of housekeeping structures") {
 }
 
 TEST_CASE("Disable the periodic generation of housekeeping structures") {
-	SECTION("Both valid and invalid structure Ids in request") {
+	SECTION("Both valid and invalid structure IDs in request") {
 		initializeHousekeepingStructures();
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport, Message::TC, 1);
