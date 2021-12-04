@@ -42,7 +42,8 @@ void initializeHousekeepingStructures() {
 		for (uint16_t parameterId : simplyCommutatedIds) {
 			newStructure.simplyCommutatedParameterIds.push_back(parameterId);
 		}
-		housekeepingService.housekeepingStructures.insert({ids[i++], newStructure});
+		housekeepingService.housekeepingStructures.insert({ids[i], newStructure});
+		i++;
 	}
 
 	REQUIRE(housekeepingService.housekeepingStructures.size() == 3);
