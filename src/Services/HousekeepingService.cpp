@@ -94,14 +94,14 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 }
 
 void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) {
-	Message structReport(ServiceType, MessageType::HousekeepingStructuresReport, Message::TM, 1);
-
-	structReport.appendUint8(structIdToReport);
 	auto housekeepingStructure = housekeepingStructures.find(structIdToReport);
 	if (housekeepingStructure == housekeepingStructures.end()) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
+	Message structReport(ServiceType, MessageType::HousekeepingStructuresReport, Message::TM, 1);
+	structReport.appendUint8(structIdToReport);
+
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
 	structReport.appendUint32(housekeepingStructure->second.collectionInterval);
 	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameterIds.size());
@@ -148,14 +148,15 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		return;
 	}
+	auto& housekeepingStructure = housekeepingStructures.at(targetStructId);
 	if (housekeepingStructures.at(targetStructId).periodicGenerationActionStatus) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
 		return;
 	}
-
 	uint16_t numOfSimplyCommParams = request.readUint16();
+
 	for (uint16_t i = 0; i < numOfSimplyCommParams; i++) {
-		if (housekeepingStructures.at(targetStructId).simplyCommutatedParameterIds.size() >=
+		if (housekeepingStructure.simplyCommutatedParameterIds.size() >=
 		    ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
 			ErrorHandler::reportError(
 			    request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
@@ -166,7 +167,6 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}
-		auto& housekeepingStructure = housekeepingStructures.at(targetStructId);
 		if (std::find(std::begin(housekeepingStructure.simplyCommutatedParameterIds),
 		              std::end(housekeepingStructure.simplyCommutatedParameterIds),
 		              newParamId) != std::end(housekeepingStructure.simplyCommutatedParameterIds)) {
