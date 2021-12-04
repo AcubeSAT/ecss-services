@@ -85,7 +85,7 @@ public:
 	void housekeepingParametersReport(uint8_t structureId);
 
 	/**
-	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report' and stores a
+	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report' and stores
 	 * TM[3,25] report messages.
 	 */
 	void generateOneShotHousekeepingReport(Message& request);
