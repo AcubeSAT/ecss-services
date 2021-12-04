@@ -226,13 +226,13 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, uint16_t
 void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case LoadRawMemoryDataAreas:
-			rawDataMemorySubservice.loadRawData(message); // TC[6,2]
+			rawDataMemorySubservice.loadRawData(message);
 			break;
 		case DumpRawMemoryData:
-			rawDataMemorySubservice.dumpRawData(message); // TC[6,5]
+			rawDataMemorySubservice.dumpRawData(message);
 			break;
 		case CheckRawMemoryData:
-			rawDataMemorySubservice.checkRawData(message); // TC[6,9]
+			rawDataMemorySubservice.checkRawData(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

@@ -137,11 +137,14 @@ void EventReportService::listOfDisabledEventsReport() {
 
 void EventReportService::execute(Message& message) {
 	switch (message.messageType) {
-		case EnableReportGenerationOfEvents: enableReportGeneration(message); // TC[5,5]
+		case EnableReportGenerationOfEvents:
+			enableReportGeneration(message);
 			break;
-		case DisableReportGenerationOfEvents: disableReportGeneration(message); // TC[5,6]
+		case DisableReportGenerationOfEvents:
+			disableReportGeneration(message);
 			break;
-		case ReportListOfDisabledEvent: requestListOfDisabledEvents(message); // TC[5,7]
+		case ReportListOfDisabledEvent:
+			requestListOfDisabledEvents(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

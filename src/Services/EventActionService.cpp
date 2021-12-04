@@ -198,28 +198,28 @@ void EventActionService::executeAction(uint16_t eventID) {
 void EventActionService::execute(Message& message) {
 	switch (message.messageType) {
 		case AddEventAction:
-			addEventActionDefinitions(message); // TC[19,1]
+			addEventActionDefinitions(message);
 			break;
 		case DeleteEventAction:
-			deleteEventActionDefinitions(message); // TC[19,2]
+			deleteEventActionDefinitions(message);
 			break;
 		case DeleteAllEventAction:
-			deleteAllEventActionDefinitions(message); // TC[19,3]
+			deleteAllEventActionDefinitions(message);
 			break;
 		case EnableEventAction:
-			enableEventActionDefinitions(message); // TC[19,4]
+			enableEventActionDefinitions(message);
 			break;
 		case DisableEventAction:
-			disableEventActionDefinitions(message); // TC[19,5]
+			disableEventActionDefinitions(message);
 			break;
 		case ReportStatusOfEachEventAction:
-			requestEventActionDefinitionStatus(message); // TC[19,6]
+			requestEventActionDefinitionStatus(message);
 			break;
 		case EnableEventActionFunction :
-			enableEventActionFunction(message); // TC[19,8]
+			enableEventActionFunction(message);
 			break;
 		case DisableEventActionFunction:
-			disableEventActionFunction(message); // TC[19,9]
+			disableEventActionFunction(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

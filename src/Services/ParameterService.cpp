@@ -65,10 +65,10 @@ void ParameterService::setParameters(Message& newParamValues) {
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
 		case ReportParameterValues:
-			reportParameters(message); // TC[20,1]
+			reportParameters(message);
 			break;
 		case SetParameterValues:
-			setParameters(message); // TC[20,3]
+			setParameters(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

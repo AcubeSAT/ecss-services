@@ -29,17 +29,16 @@ class ServicePool {
 
 	etl::map<uint16_t, uint16_t, ECSSTotalMessageTypes> messageTypeCounter;
 
-
 	/**
 	 * A counter for messages that corresponds to the total number of TM packets sent from an APID
 	 */
 	uint16_t packetSequenceCounter = 0;
 
 public:
-
-	enum ServiceType {
-
-
+	/**
+	 * enums defining the service types per the ECSS-E-ST-70-41C standard.
+	 */
+	enum ServiceType : uint8_t {
 		ParameterStatisticsType = 4,
 		EventReportType = 5,
 		MemoryManagementType = 6,
