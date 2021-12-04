@@ -133,7 +133,7 @@ coverage:
     paths:
       - ./gcovr
 pages:
-  image: spacedot/build-base:latest # LATEST TAG IS TEMPORARY
+  image: spacedot/build-base:latest # TODO: Latest tag is temporary
   stage: deploy
   script:
     - mkdir .public
