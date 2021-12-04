@@ -24,13 +24,13 @@ public:
 	etl::map<uint8_t, HousekeepingStructure, ECSS_MAX_HOUSEKEEPING_STRUCTS> housekeepingStructures;
 
 	enum MessageType : uint8_t {
-		HousekeepingParametersReport = 25,
-		EnablePeriodicHousekeepingParametersReport = 5,
-		DisablePeriodicHousekeepingParametersReport = 6,
 		CreateHousekeepingReportStructure = 1,
 		DeleteHousekeepingReportStructure = 3,
+		EnablePeriodicHousekeepingParametersReport = 5,
+		DisablePeriodicHousekeepingParametersReport = 6,
 		ReportHousekeepingStructures = 9,
 		HousekeepingStructuresReport = 10,
+		HousekeepingParametersReport = 25,
 		GenerateOneShotHousekeepingReport = 27,
 		AppendParametersToHousekeepingStructure = 29,
 		ModifyCollectionIntervalOfStructures = 31,
@@ -41,16 +41,14 @@ public:
 	HousekeepingService() = default;
 
 	/**
-	 * This function gets a request to report the housekeeping parameters and checks whether it is valid or not
+	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
 	 */
-	void reportHousekeepingParameters(uint8_t structureId);
+	void createHousekeepingReportStructure(Message& request);
 
 	/**
-	 * This function creates and stores the housekeeping parameter value report. The purpose for this
-	 * functionality, not existing in the previous function is to create new request messages when generating
-	 * one-shot housekeeping parameter reports, but rather just call a function using the structure id.
+	 * Implementation of TC[3,3]. Request to delete a housekeeping parameters report structure.
 	 */
-	void housekeepingParametersReport(uint8_t structureId);
+	void deleteHousekeepingReportStructure(Message& request);
 
 	/**
 	 * Implementation of TC[3,5]. Request to enable the periodic housekeeping parameters reporting for a specific
@@ -65,14 +63,9 @@ public:
 	void disablePeriodicHousekeepingParametersReport(Message& request);
 
 	/**
-	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
+	 * This function gets a message type TC[3,9] 'report housekeeping structures'.
 	 */
-	void createHousekeepingReportStructure(Message& request);
-
-	/**
-	 * Implementation of TC[3,3]. Request to delete a housekeeping parameters report structure.
-	 */
-	void deleteHousekeepingReportStructure(Message& request);
+	void reportHousekeepingStructures(Message& request);
 
 	/**
 	 * This function takes a structure ID as argument and constructs/stores a TM[3,10] housekeeping structure report.
@@ -80,9 +73,16 @@ public:
 	void housekeepingStructureReport(uint8_t structIdToReport);
 
 	/**
-	 * This function gets a message type TC[3,9] 'report housekeeping structures'.
+	 * This function gets a request to report the housekeeping parameters and checks whether it is valid or not
 	 */
-	void reportHousekeepingStructures(Message& request);
+	void reportHousekeepingParameters(uint8_t structureId);
+
+	/**
+	 * This function creates and stores the housekeeping parameter value report. The purpose for this
+	 * functionality, not existing in the previous function is to create new request messages when generating
+	 * one-shot housekeeping parameter reports, but rather just call a function using the structure id.
+	 */
+	void housekeepingParametersReport(uint8_t structureId);
 
 	/**
 	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report' and stores a

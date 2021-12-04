@@ -1,51 +1,6 @@
 #include <iostream>
 #include "Services/HousekeepingService.hpp"
 
-void HousekeepingService::reportHousekeepingParameters(uint8_t structureId) {
-	if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistingStructure);
-		return;
-	}
-	housekeepingParametersReport(structureId);
-}
-
-void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
-	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
-	housekeepingReport.appendUint8(structureId);
-	for (auto& id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
-		systemParameters.getParameter(id).appendValueToMessage(housekeepingReport);
-	}
-	storeMessage(housekeepingReport);
-}
-
-void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport);
-
-	uint16_t numOfStructIds = request.readUint16();
-	for (int i = 0; i < numOfStructIds; i++) {
-		uint8_t structIdToEnable = request.readUint8();
-		if (housekeepingStructures.find(structIdToEnable) == housekeepingStructures.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
-			continue;
-		}
-		housekeepingStructures.at(structIdToEnable).periodicGenerationActionStatus = true;
-	}
-}
-
-void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::DisablePeriodicHousekeepingParametersReport);
-
-	uint16_t numOfStructIds = request.readUint16();
-	for (int i = 0; i < numOfStructIds; i++) {
-		uint8_t structIdToDisable = request.readUint8();
-		if (housekeepingStructures.find(structIdToDisable) == housekeepingStructures.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
-			continue;
-		}
-		housekeepingStructures.at(structIdToDisable).periodicGenerationActionStatus = false;
-	}
-}
-
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure);
 
@@ -91,6 +46,48 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	}
 }
 
+void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& request) {
+	request.assertTC(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport);
+
+	uint16_t numOfStructIds = request.readUint16();
+	for (int i = 0; i < numOfStructIds; i++) {
+		uint8_t structIdToEnable = request.readUint8();
+		if (housekeepingStructures.find(structIdToEnable) == housekeepingStructures.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
+			continue;
+		}
+		housekeepingStructures.at(structIdToEnable).periodicGenerationActionStatus = true;
+	}
+}
+
+void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& request) {
+	request.assertTC(ServiceType, MessageType::DisablePeriodicHousekeepingParametersReport);
+
+	uint16_t numOfStructIds = request.readUint16();
+	for (int i = 0; i < numOfStructIds; i++) {
+		uint8_t structIdToDisable = request.readUint8();
+		if (housekeepingStructures.find(structIdToDisable) == housekeepingStructures.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
+			continue;
+		}
+		housekeepingStructures.at(structIdToDisable).periodicGenerationActionStatus = false;
+	}
+}
+
+void HousekeepingService::reportHousekeepingStructures(Message& request) {
+	request.assertTC(ServiceType, MessageType::ReportHousekeepingStructures);
+
+	uint16_t numOfStructsToReport = request.readUint16();
+	for (int i = 0; i < numOfStructsToReport; i++) {
+		uint8_t structureId = request.readUint8();
+		if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+			continue;
+		}
+		housekeepingStructureReport(structureId);
+	}
+}
+
 void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) {
 	Message structReport(ServiceType, MessageType::HousekeepingStructuresReport, Message::TM, 1);
 
@@ -110,18 +107,21 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 	storeMessage(structReport);
 }
 
-void HousekeepingService::reportHousekeepingStructures(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportHousekeepingStructures);
-
-	uint16_t numOfStructsToReport = request.readUint16();
-	for (int i = 0; i < numOfStructsToReport; i++) {
-		uint8_t structureId = request.readUint8();
-		if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
-			continue;
-		}
-		housekeepingStructureReport(structureId);
+void HousekeepingService::reportHousekeepingParameters(uint8_t structureId) {
+	if (housekeepingStructures.find(structureId) == housekeepingStructures.end()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistingStructure);
+		return;
 	}
+	housekeepingParametersReport(structureId);
+}
+
+void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
+	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
+	housekeepingReport.appendUint8(structureId);
+	for (auto& id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
+		systemParameters.getParameter(id).appendValueToMessage(housekeepingReport);
+	}
+	storeMessage(housekeepingReport);
 }
 
 void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
