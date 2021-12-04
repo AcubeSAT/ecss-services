@@ -80,7 +80,7 @@ public:
 		/**
 		 * A request to access a non existing housekeeping structure in ST[03]
 		 */
-		NonExistingStructure = 12
+		NonExistentHousekeeping = 12
 	};
 
 	/**
