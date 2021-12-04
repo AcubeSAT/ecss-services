@@ -213,7 +213,7 @@ TEST_CASE("Delete housekeeping structure") {
 
 		CHECK(ServiceTests::count() == 5);
 		CHECK(ServiceTests::countThrownErrors(
-		          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure) == 1);
+		          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfEnabledHousekeeping) == 1);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -339,7 +339,7 @@ TEST_CASE("Reporting of housekeeping parameters") {
 		initializeHousekeepingStructures();
 		uint8_t structId = 6;
 
-		housekeepingService.reportHousekeepingParameters(structId);
+		housekeepingService.housekeepingParametersReport(structId);
 
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
@@ -352,12 +352,12 @@ TEST_CASE("Reporting of housekeeping parameters") {
 
 	SECTION("Invalid structure request") {
 		uint8_t structId = 8;
-		housekeepingService.reportHousekeepingParameters(structId);
+		housekeepingService.housekeepingParametersReport(structId);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistingStructure) == 1);
 
 		structId = 12;
-		housekeepingService.reportHousekeepingParameters(structId);
+		housekeepingService.housekeepingParametersReport(structId);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistingStructure) == 2);
 

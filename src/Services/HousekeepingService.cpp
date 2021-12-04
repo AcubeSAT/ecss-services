@@ -44,7 +44,7 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 		}
 		if (housekeepingStructures.at(structureId).periodicGenerationActionStatus) {
 			ErrorHandler::reportError(request,
-			                          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfPeriodicStructure);
+			                          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfEnabledHousekeeping);
 			continue;
 		}
 		housekeepingStructures.erase(structureId);
