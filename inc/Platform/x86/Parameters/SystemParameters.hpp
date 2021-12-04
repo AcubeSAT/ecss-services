@@ -49,9 +49,8 @@ public:
 	inline ParameterBase& getParameter(uint16_t parameterId) {
 		if (parameterId >= parametersArray.size()) {
 			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
-		} else {
-			return parametersArray[parameterId];
 		}
+		return parametersArray[parameterId];
 	}
 };
 
