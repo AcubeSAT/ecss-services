@@ -8,49 +8,49 @@
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
 #ifdef SERVICE_PARAMETERSTATISTICS
-		case ServicePool::ParameterStatisticsType:
+		case ParameterStatisticsService::ServiceType:
 			Services.parameterStatistics.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_EVENTREPORT
-		case ServicePool::EventReportType:
+		case EventReportService::ServiceType:
 			Services.eventReport.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_MEMORY
-		case ServicePool::MemoryManagementType:
+		case MemoryManagementService::ServiceType:
 			Services.memoryManagement.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_FUNCTION
-		case ServicePool::FunctionManagementType:
+		case FunctionManagementService::ServiceType:
 			Services.functionManagement.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_TIMESCHEDULING
-		case ServicePool::TimeBasedSchedulingType:
+		case TimeBasedSchedulingService::ServiceType:
 			Services.timeBasedScheduling.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_TEST
-		case ServicePool::TestServiceType:
+		case TestService::ServiceType:
 			Services.testService.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_EVENTACTION
-		case ServicePool::EventActionType:
+		case EventActionService::ServiceType:
 			Services.eventAction.execute(message);
 			break;
 #endif
 
 #ifdef SERVICE_PARAMETER
-		case ServicePool::ParameterManagementType:
+		case ParameterService::ServiceType:
 			Services.parameterManagement.execute(message);
 			break;
 #endif

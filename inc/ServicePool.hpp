@@ -35,19 +35,6 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
-	/**
-	 * enums defining the service types per the ECSS-E-ST-70-41C standard.
-	 */
-	enum ServiceType : uint8_t {
-		ParameterStatisticsType = 4,
-		EventReportType = 5,
-		MemoryManagementType = 6,
-		FunctionManagementType = 8,
-		TimeBasedSchedulingType = 11,
-		TestServiceType = 17,
-		EventActionType = 19,
-		ParameterManagementType = 20
-	};
 #ifdef SERVICE_PARAMETERSTATISTICS
 	ParameterStatisticsService parameterStatistics;
 #endif
