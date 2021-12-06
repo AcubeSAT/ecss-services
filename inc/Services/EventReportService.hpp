@@ -30,7 +30,7 @@ public:
 		HighSeverityAnomalyReport = 4,
 		EnableReportGenerationOfEvents = 5,
 		DisableReportGenerationOfEvents = 6,
-		ReportListOfDisabledEvent = 7,
+		ReportListOfDisabledEvents = 7,
 		DisabledListEventReport = 8,
 	};
 
