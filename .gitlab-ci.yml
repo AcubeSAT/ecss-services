@@ -77,7 +77,7 @@ doxygen:
     - doxygen doxygen.conf
   artifacts:
     paths:
-      - ./doxygen-output
+      - ./docs
 
 ikos:
   image: spacedot/ikos:3.0
