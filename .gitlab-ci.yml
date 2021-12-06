@@ -99,21 +99,6 @@ ikos:
       - ./ikos-report
       - output.db
 
-unit-tests:
-  image: spacedot/build-base:latest # TODO: Latest tag is temporary
-  stage: test
-  coverage: '/^TOTAL.*\s+(\d+\%)$/'
-  script:
-    - cmake .
-    - make tests -j4
-    - ./tests --use-colour yes # Run the tests
-  after_script:
-    - ./tests -r junit -o junit.xml
-  artifacts:
-    expire_in: 1 week
-    reports:
-      junit: junit.xml
-
 coverage:
   image: spacedot/coverage:gcovr-5.0-lcov-1.15
   stage: test
