@@ -137,7 +137,7 @@ pages:
   stage: deploy
   script:
     - mkdir .public
-    - cp -r ./{doxygen-output,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
+    - cp -r ./{docs,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
     - ls ./.public
     - find ./.public
     - mv .public public
