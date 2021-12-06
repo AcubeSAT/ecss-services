@@ -115,7 +115,7 @@ void EventReportService::disableReportGeneration(Message message) {
 
 void EventReportService::requestListOfDisabledEvents(Message message) {
 	// TC[5,7]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvent);
+	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents);
 
 	listOfDisabledEventsReport();
 }
