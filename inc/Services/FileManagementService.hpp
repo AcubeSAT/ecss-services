@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 
 #include <Service.hpp>
+#include "../../lib/littlefs/lfs.h"
 
 #define MAX_FILE_SIZE_BYTES 4096
 #define MAX_FILE_COPY_OPERATIONS 10
@@ -119,7 +120,7 @@ public:
 
     FileManagementService()
     {
-        wildcard = '?';
+        const char wildcard = '?';
         lockFileSupport = false;
         searchFileSupport = false;
         createDirectorySupport = true;
@@ -160,7 +161,10 @@ public:
     /*
      * TM[23,4] Create a report with the attributes of a file
      */
-    void fileAttributeReport(char* repositoryPathString, uint16_t repositoryPathLength, lfs_info info_struct);
+    void fileAttributeReport(String<ECSS_MAX_STRING_SIZE> repositoryString,
+                                                    uint8_t repositoryStringSize,
+                                                    String<ECSS_MAX_STRING_SIZE> fileNameString,
+                                                    uint8_t fileNameStringSize, lfs_info infoStruct);
 
     /*
      * TC[23,5] Lock a file, makes it read only. This function should work if and only if locking functionality
@@ -269,6 +273,14 @@ public:
     //------------------------------------------------------------------------
 
     /**
+     * The purpose of this function is to check if there is a wildcard in a given string
+     * @param messageString : The message passed as a String
+     * @param messageStringSize : The actual size of the message
+     * @return status of execution (1: Message does not contain any wildcards, -1: Message contains at least one wildcard)
+     */
+    int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString, uint8_t messageStringSize);
+
+    /**
      * The purpose of this function is to take care of the extraction process for the object path variable
      * Parses the message until a '\0' is found. Then returns the actual string, excluding the '\0' char
      * @param message : The message that we want to parse
@@ -323,7 +335,28 @@ public:
     int32_t littleFsDeleteFile(lfs_t &fs, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
                                String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize);
 
+    /**
+     * The purpose of this function is to check if the file is valid for a repo
+     * Checks if there is an object at this path, if it is a repo and does not contain any wildcards
+     * @param repositoryString : String with the repository name
+     * @param repositoryStringSize : The actual size of the repositoryString
+     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     */
+    int32_t pathIsValidForARepository(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize);
 
+
+    /**
+     * The purpose of this function is to initiate the lfs_stat function, which will fill the info struct with all
+     * the necessary information about a files report.
+     * Checks if there is an object at this path, if it is a file and does not contain any wildcards,
+     * @param repositoryString : String with the repository name
+     * @param repositoryStringSize : The actual size of the repositoryString
+     * @param fileNameString : String with the file name
+     * @param fileNameStringSize : The actual size of the fileName
+     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     */
+    int32_t littleFsReportFile(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize,
+                               String<ECSS_MAX_STRING_SIZE> fileNameString, uint8_t fileNameStringSize, lfs_info *infoStruct);
 };
 
 #endif //ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
