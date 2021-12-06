@@ -54,7 +54,7 @@ void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,
 
 void FunctionManagementService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case PerformFunction:
 			call(message); // TC[8,1]
 			break;
 		default:

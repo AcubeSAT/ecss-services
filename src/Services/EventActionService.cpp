@@ -22,6 +22,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 			}
 		}
 	}
+
 	if ((message.dataSize - 6) > ECSSTCRequestStringSize) {
 		canBeAdded = false;
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
@@ -196,29 +197,29 @@ void EventActionService::executeAction(uint16_t eventID) {
 
 void EventActionService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
-			addEventActionDefinitions(message); // TC[19,1]
+		case AddEventAction:
+			addEventActionDefinitions(message);
 			break;
-		case 2:
-			deleteEventActionDefinitions(message); // TC[19,2]
+		case DeleteEventAction:
+			deleteEventActionDefinitions(message);
 			break;
-		case 3:
-			deleteAllEventActionDefinitions(message); // TC[19,3]
+		case DeleteAllEventAction:
+			deleteAllEventActionDefinitions(message);
 			break;
-		case 4:
-			enableEventActionDefinitions(message); // TC[19,4]
+		case EnableEventAction:
+			enableEventActionDefinitions(message);
 			break;
-		case 5:
-			disableEventActionDefinitions(message); // TC[19,5]
+		case DisableEventAction:
+			disableEventActionDefinitions(message);
 			break;
-		case 6:
-			requestEventActionDefinitionStatus(message); // TC[19,6]
+		case ReportStatusOfEachEventAction:
+			requestEventActionDefinitionStatus(message);
 			break;
-		case 8:
-			enableEventActionFunction(message); // TC[19,8]
+		case EnableEventActionFunction :
+			enableEventActionFunction(message);
 			break;
-		case 9:
-			disableEventActionFunction(message); // TC[19,9]
+		case DisableEventActionFunction:
+			disableEventActionFunction(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

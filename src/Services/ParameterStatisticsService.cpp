@@ -178,25 +178,25 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 
 void ParameterStatisticsService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case ReportParameterStatistics:
 			reportParameterStatistics(message);
 			break;
-		case 3:
+		case ResetParameterStatistics:
 			resetParameterStatistics(message);
 			break;
-		case 4:
+		case EnablePeriodicParameterReporting:
 			enablePeriodicStatisticsReporting(message);
 			break;
-		case 5:
+		case DisablePeriodicParameterReporting:
 			disablePeriodicStatisticsReporting(message);
 			break;
-		case 6:
+		case AddOrUpdateParameterStatisticsDefinitions:
 			addOrUpdateStatisticsDefinitions(message);
 			break;
-		case 7:
+		case DeleteParameterStatisticsDefinitions:
 			deleteStatisticsDefinitions(message);
 			break;
-		case 8:
+		case ReportParameterStatisticsDefinitions:
 			reportStatisticsDefinitions(message);
 			break;
 		default:

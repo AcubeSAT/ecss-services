@@ -26,6 +26,7 @@ class ServicePool {
 	 * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
 	 * counter of each MessageType.
 	 */
+
 	etl::map<uint16_t, uint16_t, ECSSTotalMessageTypes> messageTypeCounter;
 
 	/**

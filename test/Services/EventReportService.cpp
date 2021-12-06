@@ -108,7 +108,8 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 }
 
 TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
-	Message message(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvent, Message::TC, 1);
+	Message message(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents,
+	                Message::TC, 1);
 	MessageParser::execute(message);
 	REQUIRE(ServiceTests::hasOneMessage());
 

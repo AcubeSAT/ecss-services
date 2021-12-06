@@ -262,35 +262,35 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 
 void TimeBasedSchedulingService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
-			enableScheduleExecution(message); // TC[11,1]
+		case EnableTimeBasedScheduleExecutionFunction:
+			enableScheduleExecution(message);
 			break;
-		case 2:
-			disableScheduleExecution(message); // TC[11,2]
+		case DisableTimeBasedScheduleExecutionFunction:
+			disableScheduleExecution(message);
 			break;
-		case 3:
-			resetSchedule(message); // TC[11,3]
+		case ResetTimeBasedSchedule:
+			resetSchedule(message);
 			break;
-		case 4:
-			insertActivities(message); // TC[11,4]
+		case InsertActivities:
+			insertActivities(message);
 			break;
-		case 5:
-			deleteActivitiesByID(message); // TC[11,5]
+		case DeleteActivitiesById:
+			deleteActivitiesByID(message);
 			break;
-		case 7:
-			timeShiftActivitiesByID(message); // TC[11,7]
+		case TimeShiftActivitiesById:
+			timeShiftActivitiesByID(message);
 			break;
-		case 9:
-			detailReportActivitiesByID(message); // TC[11,9]
+		case DetailReportActivitiesById:
+			detailReportActivitiesByID(message);
 			break;
-		case 12:
-			summaryReportActivitiesByID(message); // TC[11,12]
+		case ActivitiesSummaryReportById:
+			summaryReportActivitiesByID(message);
 			break;
-		case 15:
-			timeShiftAllActivities(message); // TC[11,15]
+		case TimeShiftALlScheduledActivities:
+			timeShiftAllActivities(message);
 			break;
-		case 16:
-			detailReportAllActivities(message); // TC[11,16]
+		case DetailReportAllScheduledActivities:
+			detailReportAllActivities(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
