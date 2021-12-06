@@ -143,7 +143,7 @@ void EventReportService::execute(Message& message) {
 		case DisableReportGenerationOfEvents:
 			disableReportGeneration(message);
 			break;
-		case ReportListOfDisabledEvent:
+		case ReportListOfDisabledEvents:
 			requestListOfDisabledEvents(message);
 			break;
 		default:
