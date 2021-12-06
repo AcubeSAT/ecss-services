@@ -115,7 +115,7 @@ void EventReportService::disableReportGeneration(Message message) {
 
 void EventReportService::requestListOfDisabledEvents(Message message) {
 	// TC[5,7]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvent);
+	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents);
 
 	listOfDisabledEventsReport();
 }
@@ -137,11 +137,14 @@ void EventReportService::listOfDisabledEventsReport() {
 
 void EventReportService::execute(Message& message) {
 	switch (message.messageType) {
-		case 5: enableReportGeneration(message); // TC[5,5]
+		case EnableReportGenerationOfEvents:
+			enableReportGeneration(message);
 			break;
-		case 6: disableReportGeneration(message); // TC[5,6]
+		case DisableReportGenerationOfEvents:
+			disableReportGeneration(message);
 			break;
-		case 7: requestListOfDisabledEvents(message); // TC[5,7]
+		case ReportListOfDisabledEvents:
+			requestListOfDisabledEvents(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

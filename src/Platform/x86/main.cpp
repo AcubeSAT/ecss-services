@@ -195,7 +195,7 @@ int main() {
 	eventMessage2.appendUint16(1);
 	eventMessage2.appendEnum16(eventIDs2[0]);
 
-	Message eventMessage3(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvent,
+	Message eventMessage3(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents,
 	                      Message::TC, 1);
 	eventReportService.disableReportGeneration(eventMessage);
 	eventReportService.listOfDisabledEventsReport();
