@@ -92,6 +92,7 @@ ikos:
     - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
   after_script:
+    - cat ikos-report.txt
     - mv ikos-report.txt ikos-report
   artifacts:
     paths:
