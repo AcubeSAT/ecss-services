@@ -96,6 +96,7 @@ ikos:
   artifacts:
     paths:
       - ./ikos-report
+      - output.db
 
 unit-tests:
   image: spacedot/build-base:latest # TODO: Latest tag is temporary
