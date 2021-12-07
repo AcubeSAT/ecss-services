@@ -22,17 +22,17 @@ uint32_t TimeHelper::utcToSeconds(const TimeAndDate& TimeInfo) {
 
 	uint32_t secs = 1546300800; // elapsed seconds from Unix epoch until 1/1/2019 00:00:00 (UTC)
 	for (uint16_t y = 2019; y < TimeInfo.year; ++y) {
-		secs += (IsLeapYear(y) ? 366 : 365) * SECONDS_PER_DAY;
+		secs += (IsLeapYear(y) ? 366 : 365) * SecondsPerDay;
 	}
 	for (uint16_t m = 1; m < TimeInfo.month; ++m) {
-		secs += DaysOfMonth[m - 1U] * SECONDS_PER_DAY;
+		secs += DaysOfMonth[m - 1U] * SecondsPerDay;
 		if ((m == 2U) && IsLeapYear(TimeInfo.year)) {
-			secs += SECONDS_PER_DAY;
+			secs += SecondsPerDay;
 		}
 	}
-	secs += (TimeInfo.day - 1) * SECONDS_PER_DAY;
-	secs += TimeInfo.hour * SECONDS_PER_HOUR;
-	secs += TimeInfo.minute * SECONDS_PER_MINUTE;
+	secs += (TimeInfo.day - 1) * SecondsPerDay;
+	secs += TimeInfo.hour * SecondsPerHour;
+	secs += TimeInfo.minute * SecondsPerMinute;
 	secs += TimeInfo.second;
 	return secs;
 }
@@ -51,39 +51,39 @@ struct TimeAndDate TimeHelper::secondsToUTC(uint32_t seconds) {
 	TimeInfo.second = 0;
 
 	// calculate years
-	while (seconds >= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SECONDS_PER_DAY) {
-		seconds -= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SECONDS_PER_DAY;
+	while (seconds >= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay) {
+		seconds -= (IsLeapYear(TimeInfo.year) ? 366 : 365) * SecondsPerDay;
 		TimeInfo.year++;
 	}
 
 	// calculate months
 	uint8_t i = 0;
-	while (seconds >= (DaysOfMonth[i] * SECONDS_PER_DAY)) {
+	while (seconds >= (DaysOfMonth[i] * SecondsPerDay)) {
 		TimeInfo.month++;
-		seconds -= (DaysOfMonth[i] * SECONDS_PER_DAY);
+		seconds -= (DaysOfMonth[i] * SecondsPerDay);
 		i++;
 		if ((i == 1U) && IsLeapYear(TimeInfo.year)) {
-			if (seconds <= (28 * SECONDS_PER_DAY)) {
+			if (seconds <= (28 * SecondsPerDay)) {
 				break;
 			}
 			TimeInfo.month++;
-			seconds -= 29 * SECONDS_PER_DAY;
+			seconds -= 29 * SecondsPerDay;
 			i++;
 		}
 	}
 
 	// calculate days
-	TimeInfo.day = seconds / SECONDS_PER_DAY;
-	seconds -= TimeInfo.day * SECONDS_PER_DAY;
+	TimeInfo.day = seconds / SecondsPerDay;
+	seconds -= TimeInfo.day * SecondsPerDay;
 	TimeInfo.day++; // add 1 day because we start count from 1 January (and not 0 January!)
 
 	// calculate hours
-	TimeInfo.hour = seconds / SECONDS_PER_HOUR;
-	seconds -= TimeInfo.hour * SECONDS_PER_HOUR;
+	TimeInfo.hour = seconds / SecondsPerHour;
+	seconds -= TimeInfo.hour * SecondsPerHour;
 
 	// calculate minutes
-	TimeInfo.minute = seconds / SECONDS_PER_MINUTE;
-	seconds -= TimeInfo.minute * SECONDS_PER_MINUTE;
+	TimeInfo.minute = seconds / SecondsPerMinute;
+	seconds -= TimeInfo.minute * SecondsPerMinute;
 
 	// calculate seconds
 	TimeInfo.second = seconds;
@@ -103,13 +103,13 @@ uint64_t TimeHelper::generateCDSTimeFormat(const TimeAndDate& TimeInfo) {
 	 * The `DAY` segment, 16 bits as defined from standard. Actually the days passed since Unix
 	 * epoch
 	 */
-	auto elapsedDays = static_cast<uint16_t>(seconds / SECONDS_PER_DAY);
+	auto elapsedDays = static_cast<uint16_t>(seconds / SecondsPerDay);
 
 	/**
 	 * The `ms of day` segment, 32 bits as defined in standard. The `ms of the day` and DAY`
 	 * should give the time passed since Unix epoch
 	 */
-	auto msOfDay = static_cast<uint32_t>((seconds % SECONDS_PER_DAY) * 1000);
+	auto msOfDay = static_cast<uint32_t>((seconds % SecondsPerDay) * 1000);
 
 	uint64_t timeFormat = (static_cast<uint64_t>(elapsedDays) << 32) | msOfDay;
 
@@ -121,19 +121,19 @@ TimeAndDate TimeHelper::parseCDStimeFormat(const uint8_t* data) {
 	uint32_t msOfDay = ((static_cast<uint32_t>(data[2])) << 24) | ((static_cast<uint32_t>(data[3]))) << 16 |
 	                   ((static_cast<uint32_t>(data[4]))) << 8 | (static_cast<uint32_t>(data[5]));
 
-	uint32_t seconds = (elapsedDays * SECONDS_PER_DAY) + (msOfDay / 1000U);
+	uint32_t seconds = (elapsedDays * SecondsPerDay) + (msOfDay / 1000U);
 
 	return secondsToUTC(seconds);
 }
 
 uint32_t TimeHelper::generateCUCTimeFormat(const struct TimeAndDate& TimeInfo) {
-	return (utcToSeconds(TimeInfo) + LEAP_SECONDS);
+	return (utcToSeconds(TimeInfo) + LeapSeconds);
 }
 
 TimeAndDate TimeHelper::parseCUCTimeFormat(const uint8_t* data) {
 	uint32_t seconds = ((static_cast<uint32_t>(data[0])) << 24) | ((static_cast<uint32_t>(data[1]))) << 16 |
 	                   ((static_cast<uint32_t>(data[2]))) << 8 | (static_cast<uint32_t>(data[3]));
-	seconds -= LEAP_SECONDS;
+	seconds -= LeapSeconds;
 
 	return secondsToUTC(seconds);
 }

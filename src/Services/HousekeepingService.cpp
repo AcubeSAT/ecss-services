@@ -9,7 +9,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
 		return;
 	}
-	if (housekeepingStructures.size() >= ECSS_MAX_HOUSEKEEPING_STRUCTS) {
+	if (housekeepingStructures.size() >= ECSSMaxHousekeepingStructures) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfHousekeepingStructures);
 		return;
@@ -154,7 +154,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	uint16_t numOfSimplyCommutatedParameters = request.readUint16();
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParameters; i++) {
-		if (housekeepingStructure.simplyCommutatedParameterIds.size() >= ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS) {
+		if (housekeepingStructure.simplyCommutatedParameterIds.size() >= ECSSMaxSimplyCommutatedParameters) {
 			ErrorHandler::reportError(
 			    request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
 			return;

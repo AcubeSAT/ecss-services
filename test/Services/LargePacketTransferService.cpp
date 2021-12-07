@@ -9,7 +9,7 @@
 LargePacketTransferService& lPT = Services.largePacketTransferService;
 
 TEST_CASE("First Downlink Part Report TM[13,1]", "[service][st13]") {
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>("12345678");
+	String<ECSSMaxFixedOctetStringSize> string = String<ECSSMaxFixedOctetStringSize>("12345678");
 	lPT.firstDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -17,14 +17,14 @@ TEST_CASE("First Downlink Part Report TM[13,1]", "[service][st13]") {
 	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
 	CHECK(report.readUint16() == 1);
 	CHECK(report.readUint16() == 1);
-	uint8_t string2[ECSS_MAX_FIXED_OCTET_STRING_SIZE];
+	uint8_t string2[ECSSMaxFixedOctetStringSize];
 	report.readOctetString(string2);
-	auto a = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>(string2, 8);
+	auto a = String<ECSSMaxFixedOctetStringSize>(string2, 8);
 	CHECK(string.compare(a) == 0);
 }
 
 TEST_CASE("Intermediate Downlink Part Report TM[13,2]", "[service][st13]") {
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>("12345678");
+	String<ECSSMaxFixedOctetStringSize> string = String<ECSSMaxFixedOctetStringSize>("12345678");
 	lPT.intermediateDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -32,14 +32,14 @@ TEST_CASE("Intermediate Downlink Part Report TM[13,2]", "[service][st13]") {
 	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
 	CHECK(report.readUint16() == 1);
 	CHECK(report.readUint16() == 1);
-	uint8_t string2[ECSS_MAX_FIXED_OCTET_STRING_SIZE];
+	uint8_t string2[ECSSMaxFixedOctetStringSize];
 	report.readOctetString(string2);
-	auto a = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>(string2, 8);
+	auto a = String<ECSSMaxFixedOctetStringSize>(string2, 8);
 	CHECK(string.compare(a) == 0);
 }
 
 TEST_CASE("Last Downlink Part Report TM[13,3]", "[service][st13]") {
-	String<ECSS_MAX_FIXED_OCTET_STRING_SIZE> string = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>("12345678");
+	String<ECSSMaxFixedOctetStringSize> string = String<ECSSMaxFixedOctetStringSize>("12345678");
 	lPT.lastDownlinkPartReport(1, 1, string);
 	REQUIRE(ServiceTests::hasOneMessage());
 	Message report = ServiceTests::get(0);
@@ -47,9 +47,9 @@ TEST_CASE("Last Downlink Part Report TM[13,3]", "[service][st13]") {
 	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
 	CHECK(report.readUint16() == 1);
 	CHECK(report.readUint16() == 1);
-	uint8_t string2[ECSS_MAX_FIXED_OCTET_STRING_SIZE];
+	uint8_t string2[ECSSMaxFixedOctetStringSize];
 	report.readOctetString(string2);
-	auto a = String<ECSS_MAX_FIXED_OCTET_STRING_SIZE>(string2, 8);
+	auto a = String<ECSSMaxFixedOctetStringSize>(string2, 8);
 	CHECK(string.compare(a) == 0);
 }
 
@@ -81,7 +81,7 @@ TEST_CASE("Split function", "[no][service]") {
 		uint16_t partSequenceNumber = i;
 		CHECK(largeMessageTransactionIdentifier == ServiceTests::get(i).readUint16());
 		CHECK(partSequenceNumber == ServiceTests::get(i).readUint16());
-		CHECK(ECSS_MAX_FIXED_OCTET_STRING_SIZE == ServiceTests::get(i).readUint16());
+		CHECK(ECSSMaxFixedOctetStringSize == ServiceTests::get(i).readUint16());
 		for (int j = 0; j < 256; j++){
 			message5.appendUint8(ServiceTests::get(i).readUint8());
 		}

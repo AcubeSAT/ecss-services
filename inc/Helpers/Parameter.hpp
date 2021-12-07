@@ -34,6 +34,7 @@ class ParameterBase {
 public:
 	virtual void appendValueToMessage(Message& message) = 0;
 	virtual void setValueFromMessage(Message& message) = 0;
+	virtual double getValueAsDouble() = 0;
 };
 
 /**
@@ -55,6 +56,10 @@ public:
 
 	inline DataType getValue() {
 		return currentValue;
+	}
+
+	inline double getValueAsDouble() override {
+		return static_cast<double>(currentValue);
 	}
 
 	/**

@@ -27,7 +27,7 @@ public:
 	/**
 	 * Vector containing the IDs of the simply commutated parameters, contained in the housekeeping structure.
 	 */
-	etl::vector<uint16_t, ECSS_MAX_SIMPLY_COMMUTATED_PARAMETERS> simplyCommutatedParameterIds;
+	etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters> simplyCommutatedParameterIds;
 
 	HousekeepingStructure() = default;
 };

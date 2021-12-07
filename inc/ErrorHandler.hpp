@@ -168,7 +168,8 @@ public:
 		 */
 		RequestedDeletionOfEnabledHousekeeping = 14,
 		/**
-		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure (ST[03])
+		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure
+		 * (ST[03])
 		 */
 		AlreadyExistingParameter = 15,
 		/**
@@ -186,7 +187,19 @@ public:
 		 * number of simply commutated parameters for this structure is already reached (ST[03])
 		 */
 		ExceededMaxNumberOfSimplyCommutatedParameters = 18,
-
+		/* Attempt to set a reporting rate which is smaller than the parameter sampling rate.
+		 * ST[04]
+		 */
+		InvalidReportingRateError = 19,
+		/**
+		 * Attempt to set a sampling rate which is greater than the parameter reporting rate.
+		 * ST[04]
+		 */
+		InvalidSamplingRateError = 20,
+		/**
+		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
+		 */
+		MaxStatisticDefinitionsReached = 21,
 	};
 
 	/**

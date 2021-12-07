@@ -1,3 +1,4 @@
+
 #ifndef ECSS_SERVICES_SYSTEMPARAMETERS_HPP
 #define ECSS_SERVICES_SYSTEMPARAMETERS_HPP
 
@@ -35,7 +36,7 @@ public:
 	/**
 	 * The key of the array is the ID of the parameter as specified in PUS
 	 */
-	etl::array<std::reference_wrapper<ParameterBase>, ECSS_PARAMETER_COUNT> parametersArray = {
+	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> parametersArray = {
 	    parameter1, parameter2, parameter3, parameter4,  parameter5,  parameter6,
 	    parameter7, parameter8, parameter9, parameter10, parameter11, parameter12};
 

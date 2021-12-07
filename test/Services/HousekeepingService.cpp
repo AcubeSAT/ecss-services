@@ -62,10 +62,6 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 	static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id1].get()).setValue(33);
 	static_cast<Parameter<uint8_t>&>(systemParameters.parametersArray[id2].get()).setValue(77);
 	static_cast<Parameter<uint32_t>&>(systemParameters.parametersArray[id3].get()).setValue(99);
-
-	REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id1].get()).getValue() == 33);
-	REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id2].get()).getValue() == 77);
-	REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id3].get()).getValue() == 99);
 }
 
 /**

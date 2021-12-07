@@ -104,7 +104,7 @@ public:
 	//
 	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	// Message::appendBits() relies on this in order to easily OR the requested bits.
-	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = {0};
+	uint8_t data[ECSSMaxMessageSize] = {0};
 
 	// private:
 	uint8_t currentBit = 0;
@@ -351,6 +351,15 @@ public:
 	}
 
 	/**
+	 * Adds a double to the end of the message
+	 */
+	void appendDouble(double value) {
+		static_assert(sizeof(uint64_t) == sizeof(value), "Double numbers must be 64 bits long");
+
+		return appendUint64(reinterpret_cast<uint64_t&>(value));
+	}
+
+	/**
 	 * Adds a N-byte string to the end of the message
 	 *
 	 *
@@ -512,6 +521,13 @@ public:
 		return reinterpret_cast<float&>(value);
 	}
 
+	float readDouble() {
+		static_assert(sizeof(uint64_t) == sizeof(double), "Double numbers must be 64 bits long");
+
+		uint64_t value = readUint64();
+		return reinterpret_cast<double&>(value);
+	}
+
 	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
@@ -541,7 +557,7 @@ public:
 
 		uint16_t length = readUint16();
 		ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort);
-		ASSERT_REQUEST((readPosition + length) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+		ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
 		string.append(data + readPosition, length);
 		readPosition += length;
@@ -656,6 +672,10 @@ template <>
 inline void Message::append(const float& value) {
 	appendFloat(value);
 }
+template <>
+inline void Message::append(const double& value) {
+	appendDouble(value);
+}
 
 /**
  * Appends an ETL string to the message. ETL strings are handled as ECSS octet strings, meaning that the string size
@@ -708,6 +728,10 @@ inline char Message::read() {
 template <>
 inline float Message::read() {
 	return readFloat();
+}
+template <>
+inline double Message::read() {
+	return readDouble();
 }
 
 #endif // ECSS_SERVICES_PACKET_H
