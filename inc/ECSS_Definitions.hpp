@@ -170,6 +170,6 @@ inline const bool SupportsStandardDeviation = true;
 /**
  * @brief Defines the max number of housekeeping structs that a housekeeping service can contain
  */
-#define ECSSMaxHousekeepingStructures 10
+inline const uint8_t ECSSMaxHousekeepingStructures = 10;
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

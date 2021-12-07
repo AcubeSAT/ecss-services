@@ -2,6 +2,7 @@
 #ifndef ECSS_SERVICES_SYSTEMPARAMETERS_HPP
 #define ECSS_SERVICES_SYSTEMPARAMETERS_HPP
 
+#include <iostream>
 #include "Helpers/Parameter.hpp"
 #include "etl/vector.h"
 /**
@@ -50,6 +51,7 @@ public:
 	inline ParameterBase& getParameter(uint16_t parameterId) {
 		if (parameterId >= parametersArray.size()) {
 			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
+			return parametersArray[0];
 		}
 		return parametersArray[parameterId];
 	}
