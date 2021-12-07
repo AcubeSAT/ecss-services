@@ -263,8 +263,8 @@ TEST_CASE("Add/Update statistics definitions") {
 		uint16_t paramId1 = 0;
 		uint16_t paramId2 = 1;
 		uint16_t paramId3 = 2;
-		uint16_t paramId4 = 24;
-		uint16_t paramId5 = 43;
+		uint16_t paramId4 = systemParameters.parametersArray.size() + 24;
+		uint16_t paramId5 = systemParameters.parametersArray.size() + 1;
 		uint16_t paramId6 = 3;
 
 		uint16_t interval1 = 14;
