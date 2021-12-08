@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Specify the directories for #includes
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include"
-        "lib/logger/inc")
+        "${PROJECT_SOURCE_DIR}/lib/logger/inc")
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
