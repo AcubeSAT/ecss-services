@@ -1,6 +1,9 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
+services:
+  - name: docker:dind
+    alias: localhost
 
 
 stages:
@@ -19,7 +22,7 @@ check-build:
   script:
     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always"
     - make -j$(nproc)
-    
+
 cppcheck:
   image: spacedot/cppcheck:2.5
   stage: analyze
@@ -92,7 +95,7 @@ ikos:
     - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
     - BROWSER=lynx ikos-view output.db & disown
-    - wget http://127.0.0.1:8080
+    - wget localhost:8080
   after_script:
     - mv ikos-report.txt ikos-report
     - mv index.html ikos-report
@@ -132,4 +135,4 @@ pages:
     paths:
       - public # Upload the resulting website
         #  only:
-        #    - branches # Deploy on all branches
+      #    - branches # Deploy on all branches
