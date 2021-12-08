@@ -37,10 +37,12 @@ add_library(common OBJECT
         src/Services/RequestVerificationService.cpp
         src/Services/TestService.cpp
         src/Services/LargePacketTransferService.cpp
-    	src/Services/EventActionService.cpp
+        src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
-        src/Services/OnBoardMonitoringService.cpp)
+        src/Services/ParameterStatisticsService.cpp
+        src/Helpers/Statistic.cpp
+        )
 
 # Specify the .cpp files for the executables
 file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")

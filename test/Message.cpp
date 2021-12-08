@@ -157,6 +157,15 @@ TEST_CASE("Requirement 7.3.6 (Real)", "[message][ecss]") {
 	CHECK(message.read<float>() == -9003.53135f);
 }
 
+TEST_CASE("Test appending double") {
+	Message message(0, 0, Message::TC, 0);
+	message.append<double>(2.324);
+
+	REQUIRE(message.dataSize == 8);
+
+	CHECK(message.read<double>() == Approx(2.324).epsilon(0.0001));
+}
+
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 

@@ -32,7 +32,7 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 	// Check for a valid memory ID first
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
 		// Variable declaration
-		uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
+		uint8_t readData[ECSSMaxStringSize]; // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 		if (memoryID == MemoryManagementService::MemoryID::FLASH) {
@@ -83,7 +83,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	// Check for a valid memory ID first
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
 		// Variable declaration
-		uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
+		uint8_t readData[ECSSMaxStringSize]; // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 		// Append the data to report message
@@ -129,7 +129,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
 		// Variable declaration
-		uint8_t readData[ECSS_MAX_STRING_SIZE]; // Preallocate the array
+		uint8_t readData[ECSSMaxStringSize]; // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 		// Append the data to report message
@@ -171,32 +171,32 @@ bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID
 
 	switch (memId) {
 		case MemoryManagementService::MemoryID::DTCMRAM:
-			if ((address >= DTCMRAM_LOWER_LIM) && (address <= DTCMRAM_UPPER_LIM)) {
+			if ((address >= DTCMRAMLowerLim) && (address <= DTCMRAMUpperLim)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::ITCMRAM:
-			if ((address >= ITCMRAM_LOWER_LIM) && (address <= ITCMRAM_UPPER_LIM)) {
+			if ((address >= ITCMRAMLowerLim) && (address <= ITCMRAMUpperLim)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::RAM_D1:
-			if ((address >= RAM_D1_LOWER_LIM) && (address <= RAM_D1_UPPER_LIM)) {
+			if ((address >= RAMD1LowerLim) && (address <= RAMD1UpperLim)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::RAM_D2:
-			if ((address >= RAM_D2_LOWER_LIM) && (address <= RAM_D2_UPPER_LIM)) {
+			if ((address >= RAMD2LowerLim) && (address <= RAMD2UpperLim)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::RAM_D3:
-			if ((address >= RAM_D3_LOWER_LIM) && (address <= RAM_D3_UPPER_LIM)) {
+			if ((address >= RAMD3LowerLim) && (address <= RAMD3UpperLim)) {
 				validIndicator = true;
 			}
 			break;
 		case MemoryManagementService::MemoryID::FLASH:
-			if ((address >= FLASH_LOWER_LIM) && (address <= FLASH_UPPER_LIM)) {
+			if ((address >= FlashLowerLim) && (address <= FlashUpperLim)) {
 				validIndicator = true;
 			}
 			break;
@@ -225,14 +225,14 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, uint16_t
 
 void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
-		case 2:
-			rawDataMemorySubservice.loadRawData(message); // TC[6,2]
+		case LoadRawMemoryDataAreas:
+			rawDataMemorySubservice.loadRawData(message);
 			break;
-		case 5:
-			rawDataMemorySubservice.dumpRawData(message); // TC[6,5]
+		case DumpRawMemoryData:
+			rawDataMemorySubservice.dumpRawData(message);
 			break;
-		case 9:
-			rawDataMemorySubservice.checkRawData(message); // TC[6,9]
+		case CheckRawMemoryData:
+			rawDataMemorySubservice.checkRawData(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

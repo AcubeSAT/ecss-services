@@ -23,10 +23,10 @@ void TestService::onBoardConnection(Message& request) {
 
 void TestService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case AreYouAliveTest:
 			areYouAlive(message);
 			break;
-		case 3:
+		case OnBoardConnectionTest:
 			onBoardConnection(message);
 			break;
 		default:

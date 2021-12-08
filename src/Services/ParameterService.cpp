@@ -2,7 +2,8 @@
 #ifdef SERVICE_PARAMETER
 
 #include "Services/ParameterService.hpp"
-#include "Services/Parameter.hpp"
+#include "Helpers/Parameter.hpp"
+#include "Parameters/SystemParameters.hpp"
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
@@ -63,11 +64,11 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 void ParameterService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
-			reportParameters(message); // TC[20,1]
+		case ReportParameterValues:
+			reportParameters(message);
 			break;
-		case 3:
-			setParameters(message); // TC[20,3]
+		case SetParameterValues:
+			setParameters(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
