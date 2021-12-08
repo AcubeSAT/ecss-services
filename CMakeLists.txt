@@ -23,7 +23,6 @@ include_directories(${ECSS_CONFIGURATION})
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
         logger/src/Logger.cpp
-        logger/src/Platform/x86/Logger.cpp
         src/Service.cpp
         src/ErrorHandler.cpp
         src/Message.cpp
@@ -47,7 +46,8 @@ add_library(common OBJECT
         )
 
 # Specify the .cpp files for the executables
-file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
+file(GLOB x86_main_SRC "src/Platform/x86/*.cpp" "logger/src/Platform/x86/*.cpp")
+
 add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
