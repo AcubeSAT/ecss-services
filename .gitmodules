@@ -7,6 +7,3 @@
 [submodule "ci/page_style/doxygen_dark_theme"]
 	path = ci/page_style/doxygen_dark_theme
 	url = https://github.com/MaJerle/doxygen_dark_theme.git
-[submodule "logger"]
-	path = logger
-	url = https://gitlab.com/acubesat/obc/logger.git
