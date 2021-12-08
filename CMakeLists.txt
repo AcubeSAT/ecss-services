@@ -5,7 +5,8 @@ project(ecss_services)
 set(CMAKE_CXX_STANDARD 17)
 
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include")
+include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include"
+        "${PROJECT_SOURCE_DIR}/logger/inc")
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -21,9 +22,10 @@ include_directories(${ECSS_CONFIGURATION})
 
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
+        logger/src/Logger.cpp
+        logger/src/Platform/x86/Logger.cpp
         src/Service.cpp
         src/ErrorHandler.cpp
-        src/Logger.cpp
         src/Message.cpp
         src/MessageParser.cpp
         src/ServicePool.cpp
