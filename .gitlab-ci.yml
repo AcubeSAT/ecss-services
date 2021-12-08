@@ -91,14 +91,14 @@ ikos:
     - ikos tests.bc
     - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
+    - ikos-view output.db & disown
+    - wget http://localhost:8080
   after_script:
-    - cat ikos-report.txt
     - mv ikos-report.txt ikos-report
+    - mv index.html ikos-report
   artifacts:
     paths:
       - ./ikos-report
-      - output.db
-
 coverage:
   image: spacedot/coverage:gcovr-5.0-lcov-1.15
   stage: test
