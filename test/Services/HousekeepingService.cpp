@@ -621,10 +621,10 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 TEST_CASE("Getting a reference of a parameter") {
 	SECTION("Valid parameter requested") {
 		uint16_t parameterId = 7;
-		REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.getParameter(parameterId)).getValue() == 55);
+		REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.getParameter(parameterId)->get()).getValue() == 55);
 
 		parameterId = 11;
-		REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.getParameter(parameterId)).getValue() == 1);
+		REQUIRE(static_cast<Parameter<uint16_t>&>(systemParameters.getParameter(parameterId)->get()).getValue() == 1);
 	}
 	SECTION("Invalid parameter requested") {
 		uint16_t parameterId = systemParameters.parametersArray.size() + 1;

@@ -48,12 +48,12 @@ public:
 	 *
 	 * @param parameterId the id of the parameter, whose reference is to be returned.
 	 */
-	inline ParameterBase& getParameter(uint16_t parameterId) {
+	std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId) {
 		if (parameterId >= parametersArray.size()) {
 			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
-			return parametersArray[0];
+			return {};
 		}
-		return parametersArray[parameterId];
+		return {parametersArray[parameterId]};
 	}
 };
 
