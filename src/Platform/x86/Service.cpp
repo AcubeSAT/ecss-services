@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include <giLogger.hpp>
+#include <Logger.hpp>
 #include "Service.hpp"
 
 void Service::storeMessage(Message& message) {
