@@ -92,7 +92,7 @@ ikos:
     - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
     - BROWSER=lynx ikos-view output.db & disown
-    - wget docker:8080
+    - wget http://127.0.0.1:8080
   after_script:
     - mv ikos-report.txt ikos-report
     - mv index.html ikos-report
