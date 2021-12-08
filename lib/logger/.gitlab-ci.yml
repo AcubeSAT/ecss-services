@@ -1,0 +1,85 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+
+
+stages:
+  - build
+  - analyze
+
+
+check-build:
+  image: spacedot/build-base # temporary till I figure out how to push build-base
+  stage: build
+  variables:
+    GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
+    CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
+  script:
+    - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always"
+    - make -j$(nproc)
+    
+cppcheck:
+  image: spacedot/cppcheck:2.5
+  stage: analyze
+  before_script:
+    - cppcheck --version
+  allow_failure: true
+  script:
+    - cd $CI_PROJECT_DIR
+    - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
+      --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
+      --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
+      --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
+      --xml --xml-version=2 2>report.xml -I ./inc ./src
+  after_script:
+    - mkdir cppcheck-html-report
+    - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
+  artifacts:
+    when: on_failure
+    paths:
+      - ./cppcheck-html-report
+
+clang-tidy:
+  image: spacedot/clang-tools:13.0.0-html-1.3.7
+  stage: analyze
+  script:
+    - cd $CI_PROJECT_DIR
+    - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --checks=* `find $CI_PROJECT_DIR/src -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` >> clang-tidy-output.log
+  after_script:
+    - mkdir clang-tidy-html-report
+    - clang-tidy-html clang-tidy-output.log
+    - mv clang.html clang-tidy-html-report
+  artifacts:
+    paths:
+      - ./clang-tidy-html-report
+
+clang-analyzer:
+  image: spacedot/clang-tools:13.0.0-html-1.3.7
+  stage: analyze
+  before_script:
+    - mkdir scan-build-html-report
+  script:
+    - cd $CI_PROJECT_DIR
+    - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    - scan-build -o ./scan-build-html-report make
+  artifacts:
+    paths:
+      - ./scan-build-html-report
+
+ikos:
+  image: spacedot/ikos:3.0
+  stage: analyze
+  before_script:
+    - mkdir ikos-report
+  script:
+    - cd $CI_PROJECT_DIR
+    - ikos-scan cmake .
+    - ikos-scan make
+    - ikos Logger.bc
+    - ikos-report -o=ikos-report.txt output.db
+  after_script:
+    - mv ikos-report.txt ikos-report
+  artifacts:
+    paths:
+      - ./ikos-report
