@@ -5,14 +5,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "PacketStore.hpp"
-#include "StorageAndRetrievalConfigurations/ApplicationProcessConfiguration.hpp"
-#include "StorageAndRetrievalConfigurations/HousekeepingReportConfiguration.hpp"
-#include "StorageAndRetrievalConfigurations/EventReportBlockingConfiguration.hpp"
 #include "etl/map.h"
-
-/**
- * @TODO: make function that skips the invalid messages as a whole, iterating over every invalid element.
- */
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -24,22 +17,74 @@
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class StorageAndRetrievalService : public Service {
-public:
+private:
+	/**
+	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
+	 */
+	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
 
+	/**
+	 * Helper function to enhance the readability-simplicity of the code. Basically reads a string from the message
+	 * and returns it.
+	 */
+	String<ECSS_MAX_PACKET_STORE_ID_SIZE> readPacketStoreId(Message& message);
+
+	/**
+	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
+	 * requested time.
+	 */
+	void deleteContentUntil(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint32_t timeLimit);
+
+	/**
+	 * Helper function that, given a time-limit, deletes every packet stored in every packet-store contained in the
+	 * Storage and Retrieval Subservice.
+	 */
+	void deleteContentUntil(uint32_t timeLimit);
+
+	/**
+	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
+	 * store.
+	 *
+	 * @todo: may needs to be template, depending on the timestamping type.
+	 */
+	bool copyPacketsFrom(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime,
+	                     TimeWindowType timeWindow);
+
+	/**
+	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
+	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
+	 */
+	void copyFromTagToTag(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime);
+
+	/**
+	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
+	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
+	 */
+	void copyAfterTimeTag(PacketStore& source, PacketStore& target, uint32_t startTime);
+
+	/**
+	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
+	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
+	 */
+	void copyBeforeTimeTag(PacketStore& source, PacketStore& target, uint32_t endTime);
+
+	/**
+	 * Forms the content summary of the specified packet-store and appends it to a report message.
+	 */
+	void createContentSummary(Message& report, String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId);
+
+public:
 	inline static const uint8_t ServiceType = 15;
 
 	enum MessageType : uint8_t {
-		EnableStorageFunction = 1,
-		DisableStorageFunction = 2,
+		EnableStorageInPacketStores = 1,
+		DisableStorageInPacketStores = 2,
 		AddReportTypesToAppProcessConfiguration = 3,
-		DeleteReportTypesFromAppProcessConfiguration = 4,
-		ReportAppConfigurationContent = 5,
-		AppConfigurationContentReport = 6,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
 		ReportContentSummaryOfPacketStores = 12,
 		PacketStoreContentSummaryReport = 13,
-		ChangeOpenRetrievalStartTimeTag = 14,
+		ChangeOpenRetrievalStartingTime = 14,
 		ResumeOpenRetrievalOfPacketStores = 15,
 		SuspendOpenRetrievalOfPacketStores = 16,
 		AbortByTimeRangeRetrieval = 17,
@@ -53,116 +98,112 @@ public:
 		ResizePacketStores = 25,
 		ChangeTypeToCircular = 26,
 		ChangeTypeToBounded = 27,
-		ChangeVirtualChannel = 28,
-		AddStructuresToHousekeepingConfiguration = 29,
-		DeleteStructuresFromHousekeepingConfiguration = 30,
-		DeleteEventDefinitionsFromEventReportConfiguration = 33,
-		AddEventDefinitionsToEventReportConfiguration = 34,
-		ReportHousekeepingConfigurationContent = 35,
-		HousekeepingConfigurationContentReport = 36,
-		ReportEventConfigurationContent = 39,
-		EventConfigurationContentReport = 40
+		ChangeVirtualChannel = 28
 	};
 
-	StorageAndRetrievalService();
+	StorageAndRetrievalService() = default;
 
-	enum VirtualChannels : uint8_t {
-		MIN = 1,
-		MAX = 10
-	};
+	/**
+	 * The virtual channels used by the Storage and Retrieval Subservice.
+	 */
+	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
 
-	enum TimeStamping : uint8_t {
-	    StorageBased = 0,
-		PacketBased = 1
-	};
+	/**
+	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
+	 */
+	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
 
 	/**
 	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	typedef String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreKey;
-	etl::map <packetStoreKey, PacketStore, ECSS_MAX_PACKET_STORES> packetStores;
+	typedef String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreKey;
+	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
+	/**
+	 * Whether the Storage and Retrieval Subservice supports the cyclical update of packets.
+	 */
 	const bool supportsCircularType = true;
+
+	/**
+	 * Whether the Storage and Retrieval Subservice supports rejecting new packets while the packet store is full.
+	 */
 	const bool supportsBoundedType = true;
 
 	/**
-	* @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
- 	*/
+	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
+	 */
 	const bool supportsConcurrentRetrievalRequests = false;
 	const uint16_t maxConcurrentRetrievalRequests = 5;
 
 	/**
-	* @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
-	*/
+	 * @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
+	 */
 	const bool supportsQueuingRetrievalRequests = true;
 
 	/**
-	* @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
-	*/
+	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
+	 */
 	const bool supportsPrioritizingRetrievals = false;
 
 	/**
 	 * @brief Support for the by-time-range retrieval of packets.
 	 */
 	const bool supportsByTimeRangeRetrieval = true;
+
 	/**
 	 * @todo: add prioritization policy for retrievals if prioritization is supported
 	 */
 	const TimeStamping timeStamping = PacketBased;
 
-	const bool fromTagToTag = true;
-	const bool afterTimeTag = false;
-	const bool beforeTimeTag = false;
-
 	/**
-	* TC[15,1] request to enable the packet stores' storage function
-	*/
+	 * TC[15,1] request to enable the packet stores' storage function
+	 */
 	void enableStorageFunction(Message& request);
 
 	/**
-	* TC[15,2] request to disable the packet stores' storage function
-	*/
+	 * TC[15,2] request to disable the packet stores' storage function
+	 */
 	void disableStorageFunction(Message& request);
 
 	/**
-	* TC[15,14] change the open retrieval start time tag
-	*/
+	 * TC[15,14] change the open retrieval start time tag
+	 */
 	void changeOpenRetrievalStartTimeTag(Message& request);
 
 	/**
-	* TC[15,15] resume the open retrieval of packet stores
-	*/
-    void resumeOpenRetrievalOfPacketStores(Message& request);
-
-  	/**
-	* TC[15,16] suspend the open retrieval of packet stores
-	*/
-    void suspendOpenRetrievalOfPacketStores(Message& request);
+	 * TC[15,15] resume the open retrieval of packet stores
+	 */
+	void resumeOpenRetrievalOfPacketStores(Message& request);
 
 	/**
-	* TC[15,9] start the by-time-range retrieval of packet stores
-	*/
+	 * TC[15,16] suspend the open retrieval of packet stores
+	 */
+	void suspendOpenRetrievalOfPacketStores(Message& request);
+
+	/**
+	 * TC[15,9] start the by-time-range retrieval of packet stores
+	 */
 	void startByTimeRangeRetrieval(Message& request);
 
 	/**
-	* TC[15,17] abort the by-time-range retrieval of packet stores
-	*/
+	 * TC[15,17] abort the by-time-range retrieval of packet stores
+	 */
 	void abortByTimeRangeRetrieval(Message& request);
 
 	/**
-	* This function takes a TC[15,18] 'report the status of packet stores' request as argument and responds with a
-	* TM[15,19] 'packet stores status' report message.
-	*/
+	 * This function takes a TC[15,18] 'report the status of packet stores' request as argument and responds with a
+	 * TM[15,19] 'packet stores status' report message.
+	 */
 	void packetStoresStatusReport(Message& request);
 
 	/**
-	* TC[15,11] delete the packet store content up to the specified time
-	*/
+	 * TC[15,11] delete the packet store content up to the specified time
+	 */
 	void deletePacketStoreContent(Message& request);
 
 	/**
-	* TC[15,20] create packet stores
-	*/
+	 * TC[15,20] create packet stores
+	 */
 	void createPacketStores(Message& request);
 
 	/**
@@ -179,10 +220,7 @@ public:
 	/**
 	 * TC[15,24] copy the packets contained into a packet store, selected by the time window
 	 */
-	void copyPacketsInTimeWindow(Message& request,
-	                             bool beforeTimeTag,
-	                             bool afterTimeTag,
-	                             bool fromTagToTag);
+	void copyPacketsInTimeWindow(Message& request, TimeWindowType timeWindow);
 
 	/**
 	 * TC[15,25] resize packet stores
@@ -209,286 +247,6 @@ public:
 	 * 13] 'packet store content summary report' report message.
 	 */
 	void packetStoreContentSummaryReport(Message& request);
-
-	/**
-	 * Packet Selection Subservice
-	 *
-	 * This subservice is meant for controlling the storage of reports generated by the application process hosting
-	 * that subservice.
-	 */
-	class PacketSelectionSubservice {
-	private:
-		StorageAndRetrievalService& mainService;
-	public:
-		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent,
-		                                   uint16_t numOfControlledAppProcs,
-		                                   uint16_t maxEventDefIds,
-		                                   uint16_t maxHousekeepingStructIds,
-		                                   uint16_t maxReportTypeDefs,
-		                                   uint16_t maxServiceTypeDefs);
-
-		const bool supportsStorageControlOfHousekeepingReports = true;
-		const bool supportsStorageControlOfEventReports = true;
-
-		etl::vector <uint16_t, ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES> controlledAppProcesses;
-
-		const bool supportsSubsamplingRate;
-		const uint16_t numOfControlledAppProcesses;
-		const uint16_t maxServiceTypeDefinitions;     //Per Application Process Definition
-		const uint16_t maxReportTypeDefinitions;      //This is per Service Type Definition
-		const uint16_t maxHousekeepingStructureIds;   //Per Housekeeping storage-control definition
-		const uint16_t maxEventDefinitionIds;         //Per Event-Report storage-control definition
-
-		/**
-		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
-		 * application processes.
-		 */
-		ApplicationProcessConfiguration applicationProcessConfiguration;
-		/**
-		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
-		 * housekeeping reports.
-		 */
-		HousekeepingReportConfiguration housekeepingReportConfiguration;
-		/**
-		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
-		 * events.
-		 */
-		EventReportBlockingConfiguration eventReportConfiguration;
-
-		/*******************************************************************************
-		 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 	Helper Functions     ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-		 *******************************************************************************/
-
-		/**
-		 * checks if the requested application process id is controlled by the packet selection subservice.
-		 */
-		bool appIsControlled(uint16_t applicationId, Message& request);
-
-		/**
-		 * checks if the maximum number of report type definitions are reached, in order to decide whether to put a new
-		 * report type definition.
-		 */
-		bool exceedsMaxReportDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
-		                                 uint16_t applicationId,
-		                                 uint16_t serviceId,
-		                                 Message&request);
-
-		/**
-		 * checks if the maximum number of service type definitions are reached, in order to decide whether to put a
-		 * new service type definition.
-		 */
-		bool exceedsMaxServiceDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
-
-		/**
-		 * checks if there are no report definitions inside a service type definition, so it decides whether to put a
-		 * new report type definition.
-		 */
-		bool noReportDefinitionInService(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
-		                                 uint16_t applicationId,
-		                                 uint16_t serviceId,
-		                                 Message& request);
-
-		/**
-		 * checks if there are no service type definitions inside an application definition, so it decides whether to
-		 * put a new report type definition.
-		 */
-		bool noServiceDefinitionInApplication(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
-
-		/**
-		 * checks if the requested application ID already exists in the definition, to decide whether to add it or not.
-		 */
-		bool appExistsInDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
-
-		/**
-		 * Creates an application definition and adds it to the application process storage control configuration.
-		 * Only use if the specified App Id does not exist already.
-		 */
-		void createAppDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
-
-		/**
-		 * checks if the requested service type already exists in the application, to decide whether to add it or not.
-		 */
-		bool serviceExistsInApp(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
-
-		/**
-		 * Creates a service type definition and adds it to the specified application definition. Only use if the
-		 * specified service type definition does not exist already.
-		 */
-		void createServiceDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
-
-		/**
-		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
-		 */
-		bool reportExistsInService(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
-		                           uint16_t applicationId,
-		                           uint16_t serviceId,
-		                           uint16_t reportId,
-		                           uint16_t &index);
-
-		/**
-		 * Creates a report type definition and adds it to the specified service definition. Only use if the
-		 * specified report type definition does not exist already.
-		 */
-		void createReportDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
-		                            uint16_t applicationId,
-		                            uint16_t serviceId,
-		                            uint16_t reportId);
-
-		/**
-		 * Deletes all report type definitions of a specified service type definition.
-		 */
-		void deleteReportDefinitionsOfService(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
-		                                      uint16_t applicationId,
-		                                      uint16_t serviceId,
-		                                      bool deleteAll,
-		                                      uint16_t index);
-
-		/**
-		 * Checks if there are any report definitions in the specified service type and application process.
-		 */
-		bool serviceHasReportDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId);
-
-		/**
-		 * Checks if there are any service definitions in the specified application process
-		 */
-		bool appHasServiceDefinitions(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
-
-		/**
-		 * Deletes all service type definitions of a specified application process
-		 */
-		void deleteServiceDefinitionsOfApp(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
-		                                   uint16_t applicationId,
-		                                   bool deleteAll,
-		                                   uint16_t serviceId);
-
-		/**
-		 * checks if the maximum number of housekeeping structures are reached, in order to decide whether to add a new
-		 * structure.
-		 */
-		bool exceedsMaxStructureIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message&request);
-
-		/**
-		 * Checks if there are no structure Ids in the definition
-		 */
-		bool noStructureInDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
-
-		/**
-		 * Creates new Housekeeping definition
-		 */
-		void createHousekeepingDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
-
-		/**
-		 * Checks if the Housekeeping Definition already exists
-		 */
-		bool housekeepingDefinitionExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
-
-		/**
-		 * Checks if the requested structure already exists in a housekeeping definition
-		 */
-		bool structureExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t structureId, uint16_t &index);
-
-		/**
-		 * Deletes either all or specified housekeeping structure ids
-		 */
-		void deleteStructureIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
-
-		/**
-		 * Checks if the maximum number of event definitions are reached, in order to decide whether to add a new
-		 * definition.
-		 */
-		bool exceedsMaxEventDefinitionIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
-
-		/**
-		 * Checks if a event report blocking definition contains no event report definition IDs, to know whether to
-		 * abort the request to add new ones.
-		 */
-		bool noEventInDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request);
-
-		/**
-		 * Checks if a event blocking storage control definition exists for the requested packet store.
-		 */
-		bool eventBlockingDefinitionExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
-
-		/**
-		 * Creates a new event blocking storage control definition for a given packet store id
-		 */
-		void createEventReportBlockingDefinition(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId);
-
-		/**
-		 * Checks if an event definition identifier exists for a specified packet store and a specified event report
-		 * blocking storage control definition.
-		 */
-		bool eventDefinitionIdExists(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId, uint16_t &index);
-
-		/**
-		 * Adds a new event definition identifier in a specified packet store and a specified event report
-		 * blocking storage control definition.
-		 */
-		void createEventDefinitionId(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId);
-
-		/**
-		 * Deletes wither all or the specified event definition IDs from a  specified packet store and a specified
-		 * event report blocking storage control definition.
-		 */
-		void deleteEventDefinitionIds(String <ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index);
-
-
-		/*******************************************************************************
-		 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 	  TC/TM Implementations      ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-		 *******************************************************************************/
-
-		/**
-		 * TC[15,3] add report types to an application process storage control configuration
-		 */
-		void addReportTypesToAppProcessConfiguration(Message& request);
-
-		/**
-		 * TC[15,4] delete report types from an application process storage control configuration
-		 */
-		void deleteReportTypesFromAppProcessConfiguration(Message& request);
-
-		/**
-		 * This function takes a TC[15,5] 'report the application process storage control configuration content' request
-		 * as argument, and responds with a TM[15,6] 'application process storage control configuration content report'
-		 * message.
-		 */
-		void appConfigurationContentReport(Message& request);
-
-		/**
-		 * TC[15,29] add structure identifiers to the housekeeping parameter report storage control configuration
-		 */
-		void addStructuresToHousekeepingConfiguration(Message& request);
-
-		/**
-		 * TC[15,30] delete structure identifiers from the housekeeping parameter report storage control configuration
-		 */
-		void deleteStructuresFromHousekeepingConfiguration(Message& request);
-
-		/**
-		 * This function takes a TC[15,35] 'report the housekeeping parameter report storage control configuration
-		 * content' request as argument, and responds with a TM[15,36] 'housekeeping parameter report storage control
-		 * configuration content report' message.
-		 */
-		void housekeepingConfigurationContentReport(Message& request);
-
-		/**
-		 * TC[15,34] add event definition identifiers to the event report blocking storage-control configuration
-		 */
-		void addEventDefinitionsToEventReportConfiguration(Message& request);
-
-		/**
-		 * TC[15,33] delete event definition identifiers from the event report blocking storage-control configuration
-		 */
-		void deleteEventDefinitionsFromEventReportConfiguration(Message& request);
-
-		/**
-		 * This function takes a TC[15,39] 'report the event report blocking storage control configuration
-		 * content' request as argument, and responds with a TM[15,40] 'event report blocking configuration content
-		 * report' message.
-		 */
-		void eventConfigurationContentReport(Message& request);
-
-	} packetSelectionSubservice;
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

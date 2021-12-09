@@ -1,2 +1,0 @@
-#include "StorageAndRetrievalConfigurations/ApplicationProcessConfiguration.hpp"
-

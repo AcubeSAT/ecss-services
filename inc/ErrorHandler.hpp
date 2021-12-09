@@ -76,7 +76,11 @@ public:
 		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 11
+		NestedMessageTooLarge = 11,
+		/**
+		 * Request to copy packets in a time window, whose type is not recognized (ST(15)).
+		 */
+		InvalidTimeWindowType = 12
 	};
 
 	/**

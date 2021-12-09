@@ -1,6 +1,8 @@
 #ifndef ECSS_SERVICES_ECSS_DEFINITIONS_H
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
+#include<stdint.h>
+
 /**
  * @defgroup ECSSDefinitions ECSS Defined Constants
  *
@@ -154,7 +156,7 @@
 /**
  * @brief the max number of TM packets that a packet store in ST[15] can store
  */
-#define ECSS_MAX_PACKETS_IN_PACKET_STORE 20
+inline const uint16_t ECSSMaxPacketStoreSize = 20;
 
 /**
  * @brief the max number of application processes that an app process storage control configuration can store in ST[15]
@@ -187,7 +189,7 @@
 /**
  * @brief the max number of packet stores that a packet selection subservice can handle in ST[15]
  */
-#define ECSS_MAX_PACKET_STORES 4
+inline const uint16_t ECSSMaxPacketStores = 4;
 
 /**
  * @brief the max number of event definition Ids that can be contained inside an event report definition in ST[15]
