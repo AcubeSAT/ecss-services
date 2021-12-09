@@ -18,9 +18,9 @@ class PacketStore {
 public:
 	uint8_t virtualChannel;
 	uint16_t retrievalPriority;
-	uint32_t openRetrievalStartTimeTag; // What type is it?? (absolute time)
-	uint32_t retrievalStartTime;
-	uint32_t retrievalEndTime;
+	uint32_t openRetrievalStartTimeTag = 0; // What type is it?? (absolute time)
+	uint32_t retrievalStartTime = 0;
+	uint32_t retrievalEndTime = 0;
 	uint64_t sizeInBytes;
 
 	/**

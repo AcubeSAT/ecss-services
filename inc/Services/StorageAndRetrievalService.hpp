@@ -17,7 +17,7 @@
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class StorageAndRetrievalService : public Service {
-private:
+public:
 	/**
 	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
 	 */
@@ -79,7 +79,6 @@ public:
 	enum MessageType : uint8_t {
 		EnableStorageInPacketStores = 1,
 		DisableStorageInPacketStores = 2,
-		AddReportTypesToAppProcessConfiguration = 3,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
 		ReportContentSummaryOfPacketStores = 12,

@@ -92,12 +92,16 @@ bool StorageAndRetrievalService::copyPacketsFrom(PacketStore& source, PacketStor
 void StorageAndRetrievalService::createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize> packetStoreId) {
 	uint32_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
 	report.appendUint32(oldestStoredPacketTime);
+
 	uint32_t newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
 	report.appendUint32(newestStoredPacketTime);
+
 	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
+
 	auto fillingPercentage =
 	    static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100 / ECSSMaxPacketStoreSize);
 	report.appendUint16(fillingPercentage);
+
 	uint16_t numOfPacketsToBeTransferred = 0;
 	for (auto& packet : packetStores[packetStoreId].storedTelemetryPackets) {
 		if (packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag) {
@@ -118,6 +122,7 @@ void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 		}
 		return;
 	}
+
 	for (int i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
@@ -138,6 +143,7 @@ void StorageAndRetrievalService::disableStorageFunction(Message& request) {
 		}
 		return;
 	}
+
 	for (int i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
@@ -167,6 +173,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 		}
 		return;
 	}
+
 	for (int i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
@@ -439,6 +446,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 		}
 		return;
 	}
+
 	for (int i = 0; i < numOfPacketStores; i++) {
 		auto idToDelete = readPacketStoreId(request);
 		if (packetStores.find(idToDelete) == packetStores.end()) {
@@ -475,7 +483,7 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 		report.appendUint16(packetStore.second.sizeInBytes);
 		uint8_t typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
 		report.appendUint8(typeCode);
-		report.appendUint16(packetStore.second.virtualChannel);
+		report.appendUint8(packetStore.second.virtualChannel);
 	}
 	storeMessage(report);
 }
