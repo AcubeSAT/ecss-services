@@ -27,13 +27,13 @@ private:
 	 * Helper function to enhance the readability-simplicity of the code. Basically reads a string from the message
 	 * and returns it.
 	 */
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> readPacketStoreId(Message& message);
+	String<ECSSMaxPacketStoreIdSize> readPacketStoreId(Message& message);
 
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
 	 * requested time.
 	 */
-	void deleteContentUntil(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint32_t timeLimit);
+	void deleteContentUntil(String<ECSSMaxPacketStoreIdSize> packetStoreId, uint32_t timeLimit);
 
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in every packet-store contained in the
@@ -71,7 +71,7 @@ private:
 	/**
 	 * Forms the content summary of the specified packet-store and appends it to a report message.
 	 */
-	void createContentSummary(Message& report, String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId);
+	void createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize> packetStoreId);
 
 public:
 	inline static const uint8_t ServiceType = 15;
@@ -116,7 +116,7 @@ public:
 	/**
 	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	typedef String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreKey;
+	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
 	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**

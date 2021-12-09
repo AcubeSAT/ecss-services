@@ -5,14 +5,14 @@
  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 	  Storage and Retrieval     ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
  ******************************************************************************/
 
-String<ECSS_MAX_PACKET_STORE_ID_SIZE> StorageAndRetrievalService::readPacketStoreId(Message& message) {
-	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
+String<ECSSMaxPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
+	uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
 	message.readOctetString(packetStoreData);
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
+	String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
 	return packetStoreId;
 }
 
-void StorageAndRetrievalService::deleteContentUntil(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
+void StorageAndRetrievalService::deleteContentUntil(String<ECSSMaxPacketStoreIdSize> packetStoreId,
                                                     uint32_t timeLimit) {
 	for (auto& tmPacket : packetStores[packetStoreId].storedTelemetryPackets) {
 		/**
@@ -89,8 +89,7 @@ bool StorageAndRetrievalService::copyPacketsFrom(PacketStore& source, PacketStor
 	return true;
 }
 
-void StorageAndRetrievalService::createContentSummary(Message& report,
-                                                      String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId) {
+void StorageAndRetrievalService::createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize> packetStoreId) {
 	uint32_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
 	report.appendUint32(oldestStoredPacketTime);
 	uint32_t newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
@@ -411,7 +410,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		int numOfPacketStoresToDelete = 0;
-		etl::string<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoresToDelete[packetStores.size()];
+		etl::string<ECSSMaxPacketStoreIdSize> packetStoresToDelete[packetStores.size()];
 		for (auto& packetStore : packetStores) {
 			if (packetStore.second.storageStatus) {
 				ErrorHandler::reportError(
@@ -432,10 +431,10 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			numOfPacketStoresToDelete++;
 		}
 		for (int l = 0; l < numOfPacketStoresToDelete; l++) {
-			uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
-			etl::string<ECSS_MAX_PACKET_STORE_ID_SIZE> idToDelete = packetStoresToDelete[l];
+			uint8_t data[ECSSMaxPacketStoreIdSize];
+			etl::string<ECSSMaxPacketStoreIdSize> idToDelete = packetStoresToDelete[l];
 			std::copy(idToDelete.begin(), idToDelete.end(), data);
-			String<ECSS_MAX_PACKET_STORE_ID_SIZE> key(data);
+			String<ECSSMaxPacketStoreIdSize> key(data);
 			packetStores.erase(key);
 		}
 		return;

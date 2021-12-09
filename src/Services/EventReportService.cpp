@@ -9,7 +9,7 @@
  * @todo: Add message type in TCs
  * @todo: this code is error prone, depending on parameters given, add fail safes (probably?)
  */
-void EventReportService::informativeEventReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
+void EventReportService::informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	// TM[5,1]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
@@ -23,7 +23,7 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 }
 
 void
-EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
+EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	lowSeverityEventCount++;
 	// TM[5,2]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -40,7 +40,7 @@ EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSS_EV
 }
 
 void
-EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
+EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	mediumSeverityEventCount++;
 	// TM[5,3]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -57,7 +57,7 @@ EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSS
 }
 
 void
-EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSS_EVENT_DATA_AUXILIARY_MAX_SIZE>& data) {
+EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	highSeverityEventCount++;
 	// TM[5,4]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -115,7 +115,7 @@ void EventReportService::disableReportGeneration(Message message) {
 
 void EventReportService::requestListOfDisabledEvents(Message message) {
 	// TC[5,7]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvent);
+	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents);
 
 	listOfDisabledEventsReport();
 }
@@ -137,11 +137,14 @@ void EventReportService::listOfDisabledEventsReport() {
 
 void EventReportService::execute(Message& message) {
 	switch (message.messageType) {
-		case 5: enableReportGeneration(message); // TC[5,5]
+		case EnableReportGenerationOfEvents:
+			enableReportGeneration(message);
 			break;
-		case 6: disableReportGeneration(message); // TC[5,6]
+		case DisableReportGenerationOfEvents:
+			disableReportGeneration(message);
 			break;
-		case 7: requestListOfDisabledEvents(message); // TC[5,7]
+		case ReportListOfDisabledEvents:
+			requestListOfDisabledEvents(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

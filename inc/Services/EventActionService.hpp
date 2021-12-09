@@ -65,7 +65,7 @@ public:
 
 	friend EventReportService;
 
-	etl::multimap<uint16_t, EventActionDefinition, ECSS_EVENT_ACTION_STRUCT_MAP_SIZE>
+	etl::multimap<uint16_t, EventActionDefinition, ECSSEventActionStructMapSize>
 		eventActionDefinitionMap;
 
 	EventActionService() {

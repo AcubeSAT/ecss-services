@@ -19,13 +19,13 @@ void buildPacketCreationRequest(Message& request) {
 	uint8_t packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
 		for (auto& x : packetStoreData) {
 			x = 0;
 		}
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendOctetString(packetStoreId);
 		request.appendUint16(sizes[i]);
 		if (!(i % 2)) {
@@ -38,15 +38,15 @@ void buildPacketCreationRequest(Message& request) {
 }
 
 void addTelemetryPacketsInPacketStores() {
-	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-	uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-	uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-	uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+	uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+	uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+	uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps799";
+	uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+	String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+	String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+	String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+	String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
 
 	for (auto& timestamp : timestamps1) {
 		Message tmPacket;
@@ -66,7 +66,7 @@ void addTelemetryPacketsInPacketStores() {
 	}
 }
 
-Message buildReportTypeAdditionRequest(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
+Message buildReportTypeAdditionRequest(String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
 	Message request(StorageAndRetrievalService::ServiceType,
 	                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration, Message::TC, 1);
 	request.appendOctetString(packetStoreId);
@@ -187,15 +187,15 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::MaxNumberOfPacketStoresReached) == 1);
 		CHECK(Services.storageAndRetrieval.packetStores.size() == 4);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
 
 		CHECK(Services.storageAndRetrieval.packetStores[id].sizeInBytes == 200);
 		CHECK(Services.storageAndRetrieval.packetStores[id2].sizeInBytes == 340);
@@ -222,26 +222,26 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps33";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps33";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps1111";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
 		request.appendOctetString(id3);
 		request.appendOctetString(id4);
 
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		CHECK(Services.storageAndRetrieval.packetStores[id].storageStatus == false);
 		CHECK(Services.storageAndRetrieval.packetStores[id3].storageStatus == false);
@@ -276,28 +276,28 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps33";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps33";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps1111";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
 		request.appendOctetString(id3);
 		request.appendOctetString(id4);
 
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData7[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData7[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id7(packetStoreData7);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id7(packetStoreData7);
 
 		CHECK(Services.storageAndRetrieval.packetStores[id2].storageStatus == true);
 		CHECK(Services.storageAndRetrieval.packetStores[id5].storageStatus == true);
@@ -337,19 +337,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		request.appendUint32(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -401,19 +401,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -464,19 +464,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -524,19 +524,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint32_t fromTime = 4;
 		uint32_t toTime = 18;
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendUint32(fromTime);
@@ -596,19 +596,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -646,14 +646,14 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportStatusOfPacketStores, Message::TC, 1);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps5555";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
 
 		Services.storageAndRetrieval.packetStores[id].storageStatus = false;
 		Services.storageAndRetrieval.packetStores[id].byTimeRangeRetrievalStatus = true;
@@ -668,9 +668,9 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.messageType == StorageAndRetrievalService::MessageType::PacketStoresStatusReport);
 
 		// Packet store 1
-		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
+		uint8_t data[ECSSMaxPacketStoreIdSize];
 		report.readOctetString(data);
-		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+		for (int i = 0; i < ECSSMaxPacketStoreIdSize; i++) {
 			CHECK(data[i] == packetStoreData[i]);
 		}
 		CHECK(report.readBoolean() == false);
@@ -678,7 +678,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.readBoolean() == true);
 		// Packet store 2
 		report.readOctetString(data);
-		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+		for (int i = 0; i < ECSSMaxPacketStoreIdSize; i++) {
 			CHECK(data[i] == packetStoreData2[i]);
 		}
 		CHECK(report.readBoolean() == true);
@@ -686,7 +686,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.readBoolean() == false);
 		// Packet store 3
 		report.readOctetString(data);
-		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+		for (int i = 0; i < ECSSMaxPacketStoreIdSize; i++) {
 			CHECK(data[i] == packetStoreData4[i]);
 		}
 		CHECK(report.readBoolean() == false);
@@ -694,7 +694,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		CHECK(report.readBoolean() == false);
 		// Packet store 4
 		report.readOctetString(data);
-		for (int i = 0; i < ECSS_MAX_PACKET_STORE_ID_SIZE; i++) {
+		for (int i = 0; i < ECSSMaxPacketStoreIdSize; i++) {
 			CHECK(data[i] == packetStoreData3[i]);
 		}
 		CHECK(report.readBoolean() == false);
@@ -711,19 +711,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		request.appendUint32(timeLimit);
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -781,17 +781,17 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportConfigurationOfPacketStores, Message::TC, 1);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps25";
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 34);
 		Message report = ServiceTests::get(33);
 		CHECK(report.messageType == StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport);
-		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
+		uint8_t data[ECSSMaxPacketStoreIdSize];
 		CHECK(report.readUint16() == 4);
 
 		/**
@@ -856,10 +856,10 @@ TEST_CASE("Storage And Retrieval Service") {
 		request.appendUint16(0);
 		uint32_t timeTag1 = 0;
 		uint32_t timeTag2 = 4;
-		uint8_t fromPacketStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId(fromPacketStoreData);
-		uint8_t toPacketStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> toPacketStoreId(toPacketStoreData);
+		uint8_t fromPacketStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId(fromPacketStoreData);
+		uint8_t toPacketStoreData[ECSSMaxPacketStoreIdSize] = "ps799";
+		String<ECSSMaxPacketStoreIdSize> toPacketStoreId(toPacketStoreData);
 		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
 		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
 
@@ -888,8 +888,8 @@ TEST_CASE("Storage And Retrieval Service") {
 		request2.appendUint16(0);
 		timeTag1 = 35;
 		timeTag2 = 52;
-		uint8_t fromPacketStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId2(fromPacketStoreData2);
+		uint8_t fromPacketStoreData2[ECSSMaxPacketStoreIdSize] = "ps5555";
+		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId2(fromPacketStoreData2);
 		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
 		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
 
@@ -918,8 +918,8 @@ TEST_CASE("Storage And Retrieval Service") {
 		request3.appendUint16(0);
 		timeTag1 = 3;
 		timeTag2 = 27;
-		uint8_t fromPacketStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId3(fromPacketStoreData3);
+		uint8_t fromPacketStoreData3[ECSSMaxPacketStoreIdSize] = "ps25";
+		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId3(fromPacketStoreData3);
 		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
 		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
 
@@ -944,8 +944,8 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message request4(StorageAndRetrievalService::ServiceType,
 		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 		request4.appendUint16(0);
-		uint8_t fromPacketStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps21";
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId4(fromPacketStoreData4);
+		uint8_t fromPacketStoreData4[ECSSMaxPacketStoreIdSize] = "ps21";
+		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId4(fromPacketStoreData4);
 
 		request4.appendUint32(timeTag1);
 		request4.appendUint32(timeTag2);
@@ -978,8 +978,8 @@ TEST_CASE("Storage And Retrieval Service") {
 		request5.appendUint16(0);
 		timeTag1 = 5;
 		timeTag2 = 3;
-		uint8_t fromPacketStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId5(fromPacketStoreData5);
+		uint8_t fromPacketStoreData5[ECSSMaxPacketStoreIdSize] = "ps2";
+		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId5(fromPacketStoreData5);
 
 		request5.appendUint32(timeTag1);
 		request5.appendUint32(timeTag2);
@@ -1014,8 +1014,8 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message request7(StorageAndRetrievalService::ServiceType,
 		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 		request7.appendUint16(0);
-		uint8_t fromPacketStoreData7[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> fromPacketStoreId7(fromPacketStoreData7);
+		uint8_t fromPacketStoreData7[ECSSMaxPacketStoreIdSize] = "ps5555";
+		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId7(fromPacketStoreData7);
 
 		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
 		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
@@ -1043,19 +1043,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendUint16(444);
@@ -1092,19 +1092,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeTypeToCircular, Message::TC, 1);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		Services.storageAndRetrieval.packetStores[id].packetStoreType = PacketStore::Bounded;
 		Services.storageAndRetrieval.packetStores[id4].packetStoreType = PacketStore::Bounded;
@@ -1156,19 +1156,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id2);
 		MessageParser::execute(request);
@@ -1215,19 +1215,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		uint8_t virtualChannel = 5;
 
@@ -1286,19 +1286,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
@@ -1310,7 +1310,7 @@ TEST_CASE("Storage And Retrieval Service") {
 		Message report = ServiceTests::get(58);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 9);
 
-		uint8_t data[ECSS_MAX_PACKET_STORE_ID_SIZE];
+		uint8_t data[ECSSMaxPacketStoreIdSize];
 		CHECK(report.readUint16() == 1);
 		report.readOctetString(data);
 		int index = 0;
@@ -1384,19 +1384,19 @@ TEST_CASE("Storage And Retrieval Service") {
 		uint16_t numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 
-		uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-		uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-		uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-		uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-		uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-		uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps7444";
+		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps1111";
+		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData5[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData6[ECSSMaxPacketStoreIdSize] = "ps25";
 
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-		String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
+		String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
+		String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
+		String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
+		String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+		String<ECSSMaxPacketStoreIdSize> id5(packetStoreData5);
+		String<ECSSMaxPacketStoreIdSize> id6(packetStoreData6);
 
 		request.appendOctetString(id);
 		request.appendOctetString(id2);
