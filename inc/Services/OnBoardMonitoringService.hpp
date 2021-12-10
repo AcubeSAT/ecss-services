@@ -1,5 +1,13 @@
 #ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
+#include <Message.hpp>
+#include "Service.hpp"
+#include "Parameters/SystemParameters.hpp"
+#include "Helpers/Parameter.hpp"
+#include "etl/map.h"
+#include "ECSS_Definitions.hpp"
+
+
 
 class OnBoardMonitoringService : public Service {
 
@@ -21,6 +29,38 @@ public:
 		ReportStatusOfParameterMonitoringDefinition = 13,
 		ParameterMonitoringDefinitionStatusReport = 14
 	};
+
+	enum ParameterMonitoringCheckingStatus : uint8_t {
+		ExpectedValueCheckUnchecked = 1,
+		ExpectedValueCheckInvalid = 2,
+		ExpectedValueCheckExpectedValue = 3,
+		ExpectedValueCheckUnexpectedValue = 4,
+		LimitCheckUnchecked = 5,
+		LimitCheckInvalid = 6,
+		LimitCheckWithinLimits = 7,
+		LimitCheckBelowLowLimit = 8,
+		LimitCheckAboveHighLimit = 9,
+		DeltaCheckUnchecked = 10,
+		DeltaCheckInvalid = 11,
+		DeltaCheckWithinThreshold = 12,
+		DeltaCheckBelowLowThreshold = 13,
+		DeltaCheckAboveHighThreshold = 14
+	};
+
+	//TODO: Evaluate the parameter data type
+	etl::map<uint16_t, Parameter<uint32_t>, ECSSMaxParameters> ParameterMonitoringList;
+
+	etl::map<Parameter<uint32_t>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
+
+	etl::map<Parameter<uint32_t>, uint16_t, ECSSMaxParameters> RepetitionCounter;
+
+	etl::map<Parameter<uint32_t>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
+
+
+	/**
+	 * If true, parameter monitoring is enabled
+	 */
+	bool parameterMonitoringFunctionStatus = false;
 
 	/**
 	 * TC[12,1]
