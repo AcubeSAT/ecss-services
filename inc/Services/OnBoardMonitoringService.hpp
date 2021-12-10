@@ -50,11 +50,11 @@ public:
 	//TODO: Evaluate the parameter data type
 	etl::map<uint16_t, Parameter<uint>, ECSSMaxParameters> ParameterMonitoringList;
 
-	etl::map<Parameter<uint32_t>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
+	etl::map<Parameter<uint>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
 
-	etl::map<Parameter<uint32_t>, uint16_t, ECSSMaxParameters> RepetitionCounter;
+	etl::map<Parameter<uint>, uint16_t, ECSSMaxParameters> RepetitionCounter;
 
-	etl::map<Parameter<uint32_t>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
+	etl::map<Parameter<uint>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
 
 
 	/**
