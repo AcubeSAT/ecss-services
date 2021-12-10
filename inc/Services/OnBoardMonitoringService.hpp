@@ -31,20 +31,16 @@ public:
 	};
 
 	enum ParameterMonitoringCheckingStatus : uint8_t {
-		ExpectedValueCheckUnchecked = 1,
-		ExpectedValueCheckInvalid = 2,
-		ExpectedValueCheckExpectedValue = 3,
-		ExpectedValueCheckUnexpectedValue = 4,
-		LimitCheckUnchecked = 5,
-		LimitCheckInvalid = 6,
-		LimitCheckWithinLimits = 7,
-		LimitCheckBelowLowLimit = 8,
-		LimitCheckAboveHighLimit = 9,
-		DeltaCheckUnchecked = 10,
-		DeltaCheckInvalid = 11,
-		DeltaCheckWithinThreshold = 12,
-		DeltaCheckBelowLowThreshold = 13,
-		DeltaCheckAboveHighThreshold = 14
+		Unchecked = 1,
+		Invalid = 2,
+		ExpectedValue = 3,
+		UnexpectedValue = 4,
+		WithinLimits = 5,
+		BelowLowLimit = 6,
+		AboveHighLimit = 7,
+		WithinThreshold = 8,
+		BelowLowThreshold = 9,
+		AboveHighThreshold = 10
 	};
 
 	//TODO: Evaluate the parameter data type
