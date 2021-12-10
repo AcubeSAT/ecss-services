@@ -6,8 +6,7 @@
 #include "Helpers/Parameter.hpp"
 #include "etl/map.h"
 #include "ECSS_Definitions.hpp"
-
-
+#include "etl/list.h"
 
 class OnBoardMonitoringService : public Service {
 
@@ -43,14 +42,13 @@ public:
 		AboveHighThreshold = 10
 	};
 
-	//TODO: Evaluate the parameter data type
-	etl::map<uint16_t, Parameter<uint>, ECSSMaxParameters> ParameterMonitoringList;
+	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
 
-	etl::map<Parameter<uint>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
+	etl::map<std::reference_wrapper<ParameterBase>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
 
-	etl::map<Parameter<uint>, uint16_t, ECSSMaxParameters> RepetitionCounter;
+	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionCounter;
 
-	etl::map<Parameter<uint>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
+	etl::map<std::reference_wrapper<ParameterBase>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
 
 
 	/**
