@@ -48,7 +48,7 @@ public:
 	};
 
 	//TODO: Evaluate the parameter data type
-	etl::map<uint16_t, Parameter<uint32_t>, ECSSMaxParameters> ParameterMonitoringList;
+	etl::map<uint16_t, Parameter<uint>, ECSSMaxParameters> ParameterMonitoringList;
 
 	etl::map<Parameter<uint32_t>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
 
