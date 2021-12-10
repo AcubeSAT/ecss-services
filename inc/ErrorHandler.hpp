@@ -76,7 +76,16 @@ public:
 		/**
 		 * A Message that is included within another message is too large
 		 */
-		NestedMessageTooLarge = 11
+		NestedMessageTooLarge = 11,
+		/**
+		 * A request to access a non existing housekeeping structure in ST[03]
+		 */
+		NonExistentHousekeeping = 12,
+		/**
+		 * Attempt to access an invalid parameter in ST[03]
+		 */
+		NonExistentParameter = 13,
+
 	};
 
 	/**
