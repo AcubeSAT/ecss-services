@@ -25,17 +25,6 @@ void StorageAndRetrievalService::deleteContentUntil(String<ECSSMaxPacketStoreIdS
 	}
 }
 
-void StorageAndRetrievalService::deleteContentUntil(uint32_t timeLimit) {
-	for (auto& packetStore : packetStores) {
-		for (auto& tmPacket : packetStore.second.storedTelemetryPackets) {
-			if (tmPacket.first > timeLimit) {
-				break;
-			}
-			packetStore.second.storedTelemetryPackets.pop_front();
-		}
-	}
-}
-
 void StorageAndRetrievalService::copyFromTagToTag(PacketStore& source, PacketStore& target, uint32_t startTime,
                                                   uint32_t endTime) {
 	for (auto& packet : source.storedTelemetryPackets) {
@@ -347,8 +336,21 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 
 	uint32_t timeLimit = request.readUint32(); // todo: decide the time-format
 	uint16_t numOfPacketStores = request.readUint16();
+
 	if (numOfPacketStores == 0) {
-		deleteContentUntil(timeLimit);
+		for (auto& packetStore : packetStores) {
+			if (packetStore.second.byTimeRangeRetrievalStatus) {
+				ErrorHandler::reportError(
+				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
+				continue;
+			}
+			if (packetStore.second.openRetrievalStatus == PacketStore::InProgress) {
+				ErrorHandler::reportError(
+				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
+				continue;
+			}
+			deleteContentUntil(packetStore.first, timeLimit);
+		}
 		return;
 	}
 	for (int i = 0; i < numOfPacketStores; i++) {

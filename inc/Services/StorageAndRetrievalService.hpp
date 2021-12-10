@@ -36,12 +36,6 @@ public:
 	void deleteContentUntil(String<ECSSMaxPacketStoreIdSize> packetStoreId, uint32_t timeLimit);
 
 	/**
-	 * Helper function that, given a time-limit, deletes every packet stored in every packet-store contained in the
-	 * Storage and Retrieval Subservice.
-	 */
-	void deleteContentUntil(uint32_t timeLimit);
-
-	/**
 	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
 	 * store.
 	 *
