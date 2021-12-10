@@ -12,7 +12,7 @@ String<ECSSMaxPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(M
 	return packetStoreId;
 }
 
-void StorageAndRetrievalService::deleteContentUntil(String<ECSSMaxPacketStoreIdSize> packetStoreId,
+void StorageAndRetrievalService::deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId,
                                                     uint32_t timeLimit) {
 	for (auto& tmPacket : packetStores[packetStoreId].storedTelemetryPackets) {
 		/**
@@ -78,7 +78,8 @@ bool StorageAndRetrievalService::copyPacketsFrom(PacketStore& source, PacketStor
 	return true;
 }
 
-void StorageAndRetrievalService::createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize> packetStoreId) {
+void StorageAndRetrievalService::createContentSummary(Message& report,
+                                                      String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
 	uint32_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
 	report.appendUint32(oldestStoredPacketTime);
 
@@ -493,7 +494,8 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request, TimeWindowType timeWindow) {
 	request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow);
 
-	uint16_t timeTagsTypeCode = request.readUint16();
+	request.skipBytes(2);
+	//	uint16_t timeTagsTypeCode = request.readUint16();
 	//	TimeStamping timeTagsType = (!timeTagsTypeCode) ? StorageBased : PacketBased; //todo: actually figure out
 	uint32_t timeTag1 = request.readUint32();
 	uint32_t timeTag2 = request.readUint32();

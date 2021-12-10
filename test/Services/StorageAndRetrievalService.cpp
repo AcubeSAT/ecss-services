@@ -17,15 +17,13 @@ void initializePacketStores() {
 	uint16_t offsets[5] = {0, 3, 7, 12, 18};
 	uint16_t sizes[4] = {100, 200, 550, 340};
 	uint8_t virtualChannels[4] = {4, 6, 1, 2};
-	uint8_t packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
-		for (auto& data : packetStoreData) {
-			data = 0;
-		}
+		std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
+
 		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
 		PacketStore newPacketStore;
 		newPacketStore.sizeInBytes = sizes[i];
@@ -46,11 +44,10 @@ void validPacketStoreCreationRequest(Message& request) {
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
-		for (auto& data : packetStoreData) {
-			data = 0;
-		}
+		std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
+
 		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendOctetString(packetStoreId);
 		request.appendUint16(sizes[i]);
@@ -75,11 +72,10 @@ void invalidPacketStoreCreationRequest(Message& request) {
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
-		for (auto& x : packetStoreData) {
-			x = 0;
-		}
+		std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
-		          packetStoreData); // for(auto x:packetStoreData){std::cout<<x<<" ";}std::cout<<std::endl;
+		          packetStoreData);
+
 		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendOctetString(packetStoreId);
 		request.appendUint16(sizes[i]);

@@ -33,7 +33,7 @@ public:
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
 	 * requested time.
 	 */
-	void deleteContentUntil(String<ECSSMaxPacketStoreIdSize> packetStoreId, uint32_t timeLimit);
+	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
 
 	/**
 	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
@@ -65,7 +65,7 @@ public:
 	/**
 	 * Forms the content summary of the specified packet-store and appends it to a report message.
 	 */
-	void createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize> packetStoreId);
+	void createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize>& packetStoreId);
 
 public:
 	inline static const uint8_t ServiceType = 15;
