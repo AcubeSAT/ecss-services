@@ -2131,202 +2131,295 @@ TEST_CASE("Deleting packet store content") {
 	}
 }
 
-// TEST_CASE("Storage And Retrieval Service") {
+TEST_CASE("Copying packets in time window") {
+	SECTION("Time-tag1 earlier than the earliest stored time-tag, and time-tag2 in between the existing ones") {
+		/**
+		 * CASE 1:
+		 *
+		 * 	(tag1)--------(earliest packet timestamp)-----(..more packets..)-----(tag2)--------(latest packet timestamp)
+		 * 				left-most packet in deque				tag2 somewhere inside		right-most packet in deque
+		 */
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
 
-//	SECTION("Copying packets in time window") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		addTelemetryPacketsInPacketStores();
-//
-//		/**
-//		 * CASE 1:
-//		 *
-//		 * 	(tag1)--------(earlier packet timestamp)-----(..more packets)-----(tag2)--------(latest packet timestamp)
-//		 * 				left-most packet in deque				tag2 somewehere inside		right-most packet in deque
-//		 */
-//		request.appendUint16(0);
-//		uint32_t timeTag1 = 0;
-//		uint32_t timeTag2 = 4;
-//		uint8_t fromPacketStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
-//		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId(fromPacketStoreData);
-//		uint8_t toPacketStoreData[ECSSMaxPacketStoreIdSize] = "ps799";
-//		String<ECSSMaxPacketStoreIdSize> toPacketStoreId(toPacketStoreData);
-//		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
-//
-//		request.appendUint32(timeTag1);
-//		request.appendUint32(timeTag2);
-//		request.appendOctetString(fromPacketStoreId);
-//		request.appendOctetString(toPacketStoreId);
-//
-//		MessageParser::execute(request);
-//		CHECK(ServiceTests::count() == 34);
-//
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.size() == 2);
-//		int index = 0;
-//		for (auto& tmPacket : Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets) {
-//			CHECK(tmPacket.first == timestamps1[index++]);
-//		}
-//
-//		/**
-//		 * CASE 2:
-//		 *
-//		 * 	(earlier packet timestamp)-------(tag1)-----(..more packets)-----(tag2)--------(latest packet timestamp)
-//		 * 	left-most packet in deque						both tag1 and tag2 inside 		right-most packet in deque
-//		 */
-//		Message request2(StorageAndRetrievalService::ServiceType,
-//		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		request2.appendUint16(0);
-//		timeTag1 = 35;
-//		timeTag2 = 52;
-//		uint8_t fromPacketStoreData2[ECSSMaxPacketStoreIdSize] = "ps5555";
-//		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId2(fromPacketStoreData2);
-//		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
-//
-//		request2.appendUint32(timeTag1);
-//		request2.appendUint32(timeTag2);
-//		request2.appendOctetString(fromPacketStoreId2);
-//		request2.appendOctetString(toPacketStoreId);
-//
-//		MessageParser::execute(request2);
-//		CHECK(ServiceTests::count() == 34);
-//
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.size() == 4);
-//		index = 3;
-//		for (auto& tmPacket : Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets) {
-//			CHECK(tmPacket.first == timestamps4[index++]);
-//		}
-//
-//		/**
-//		 * CASE 3:
-//		 *
-//		 * 	(earlier packet timestamp)-------(tag1)-----(..more packets)-----(latest packet timestamp)--------(tag2)
-//		 * 	left-most packet in deque		tag1 inside						right-most packet in deque
-//		 */
-//		Message request3(StorageAndRetrievalService::ServiceType,
-//		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		request3.appendUint16(0);
-//		timeTag1 = 3;
-//		timeTag2 = 27;
-//		uint8_t fromPacketStoreData3[ECSSMaxPacketStoreIdSize] = "ps25";
-//		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId3(fromPacketStoreData3);
-//		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
-//
-//		request3.appendUint32(timeTag1);
-//		request3.appendUint32(timeTag2);
-//		request3.appendOctetString(fromPacketStoreId3);
-//		request3.appendOctetString(toPacketStoreId);
-//
-//		MessageParser::execute(request3);
-//		CHECK(ServiceTests::count() == 34);
-//
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.size() == 3);
-//		index = 2;
-//		for (auto& tmPacket : Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets) {
-//			CHECK(tmPacket.first == timestamps2[index++]);
-//		}
-//
-//		/**
-//		 * CASE 4: Invalid packet store
-//		 */
-//		// Invalid fromPacket
-//		Message request4(StorageAndRetrievalService::ServiceType,
-//		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		request4.appendUint16(0);
-//		uint8_t fromPacketStoreData4[ECSSMaxPacketStoreIdSize] = "ps21";
-//		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId4(fromPacketStoreData4);
-//
-//		request4.appendUint32(timeTag1);
-//		request4.appendUint32(timeTag2);
-//		request4.appendOctetString(fromPacketStoreId4);
-//		request4.appendOctetString(toPacketStoreId);
-//
-//		MessageParser::execute(request4);
-//		CHECK(ServiceTests::count() == 35);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 1);
-//
-//		// Invalid toPacket
-//		Message request44(StorageAndRetrievalService::ServiceType,
-//		                  StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		request44.appendUint16(0);
-//
-//		request44.appendUint32(timeTag1);
-//		request44.appendUint32(timeTag2);
-//		request44.appendOctetString(fromPacketStoreId3);
-//		request44.appendOctetString(fromPacketStoreId4);
-//
-//		MessageParser::execute(request44);
-//		CHECK(ServiceTests::count() == 36);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 2);
-//
-//		/**
-//		 * CASE 5: Invalid time window
-//		 */
-//		Message request5(StorageAndRetrievalService::ServiceType,
-//		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		request5.appendUint16(0);
-//		timeTag1 = 5;
-//		timeTag2 = 3;
-//		uint8_t fromPacketStoreData5[ECSSMaxPacketStoreIdSize] = "ps2";
-//		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId5(fromPacketStoreData5);
-//
-//		request5.appendUint32(timeTag1);
-//		request5.appendUint32(timeTag2);
-//		request5.appendOctetString(fromPacketStoreId5);
-//		request5.appendOctetString(toPacketStoreId);
-//
-//		MessageParser::execute(request5);
-//		CHECK(ServiceTests::count() == 37);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidTimeWindow) == 2);
-//
-//		/**
-//		 * CASE 6: Destination packet NOT empty
-//		 */
-//		Message request6(StorageAndRetrievalService::ServiceType,
-//		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		request6.appendUint16(0);
-//		timeTag1 = 3;
-//		timeTag2 = 7;
-//
-//		request6.appendUint32(timeTag1);
-//		request6.appendUint32(timeTag2);
-//		request6.appendOctetString(fromPacketStoreId5);
-//		request6.appendOctetString(toPacketStoreId);
-//
-//		MessageParser::execute(request6);
-//		CHECK(ServiceTests::count() == 38);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DestinationPacketStoreNotEmtpy) == 1);
-//
-//		/**
-//		 * CASE 7: No packets inside the requested time window in the source packet
-//		 */
-//		Message request7(StorageAndRetrievalService::ServiceType,
-//		                 StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
-//		request7.appendUint16(0);
-//		uint8_t fromPacketStoreData7[ECSSMaxPacketStoreIdSize] = "ps5555";
-//		String<ECSSMaxPacketStoreIdSize> fromPacketStoreId7(fromPacketStoreData7);
-//
-//		Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.clear(); // empty ps799
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
-//		timeTag1 = 0;
-//		timeTag2 = 3;
-//
-//		request7.appendUint32(timeTag1);
-//		request7.appendUint32(timeTag2);
-//		request7.appendOctetString(fromPacketStoreId7);
-//		request7.appendOctetString(toPacketStoreId);
-//
-//		MessageParser::execute(request7);
-//		CHECK(ServiceTests::count() == 39);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::CopyOfPacketsFailed) == 1);
-//		CHECK(Services.storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
-//
-//		/**
-//		 * todo: test the 'afterTimeTag' and 'beforeTimeTag' as well
-//		 */
-//	}
-//
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
 
-// }
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 0;
+		uint32_t timeTag2 = 4;
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& targetPacketStore = storageAndRetrieval.packetStores[toPacketStoreId];
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 2);
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			REQUIRE(tmPacket.first == timestamps1[index++]);
+		}
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Both time-tags in between the stored timestamps") {
+		/**
+		 * CASE 2:
+		 *
+		 * 	(earlier packet timestamp)-------(tag1)-----(..more packets)-----(tag2)--------(latest packet timestamp)
+		 * 	left-most packet in deque						both tag1 and tag2 inside 		right-most packet in deque
+		 */
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 35;
+		uint32_t timeTag2 = 52;
+		auto fromPacketStoreId = packetStoreIds[3];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& targetPacketStore = storageAndRetrieval.packetStores[toPacketStoreId];
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 4);
+		int index = 3;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			REQUIRE(tmPacket.first == timestamps4[index++]);
+		}
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Time-tag1 in between the stored timestamps and tag2 larger than the max timestamp") {
+		/**
+		 * CASE 3:
+		 *
+		 * 	(earlier packet timestamp)-------(tag1)-----(..more packets)-----(latest packet timestamp)--------(tag2)
+		 * 	left-most packet in deque		tag1 inside						right-most packet in deque
+		 */
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 3;
+		uint32_t timeTag2 = 27;
+		auto fromPacketStoreId = packetStoreIds[1];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& targetPacketStore = storageAndRetrieval.packetStores[toPacketStoreId];
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		int index = 2;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			REQUIRE(tmPacket.first == timestamps2[index++]);
+		}
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Invalid packet store requested") {
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
+		padWithZeros(correctPacketStoreIds);
+
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[correctPacketStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 3;
+		uint32_t timeTag2 = 27;
+		auto fromPacketStoreId = wrongPacketStoreIds[0];
+		auto toPacketStoreId = correctPacketStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 1);
+		REQUIRE(storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Invalid time window requested") {
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 26;
+		uint32_t timeTag2 = 17;
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidTimeWindow) == 1);
+		REQUIRE(storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Destination packet not empty") {
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		REQUIRE(not storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 3;
+		uint32_t timeTag2 = 7;
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DestinationPacketStoreNotEmtpy) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("No packets contained into the requested time-window") {
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 0;
+		uint32_t timeTag2 = 3;
+		auto fromPacketStoreId = packetStoreIds[3];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::CopyOfPacketsFailed) == 1);
+		CHECK(storageAndRetrieval.packetStores[toPacketStoreId].storedTelemetryPackets.empty());
+
+		ServiceTests::reset();
+		Services.reset();
+
+		/**
+		 * todo: test the 'afterTimeTag' and 'beforeTimeTag' as well
+		 */
+	}
+}
