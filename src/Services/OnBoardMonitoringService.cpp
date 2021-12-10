@@ -1,74 +1,64 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_ONBOARDMONITORING
-
 #include <Message.hpp>
 #include "Services/OnBoardMonitoringService.hpp"
 
-void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message){
+void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
+
+	parameterMonitoringFunctionStatus = true;
+
+	uint16_t numOfParameters = systemParameters.parametersArray.size();
+	for (uint16_t i = 0; i < numOfParameters; i++) {
+		uint16_t currentId = message.readUint16();
+	}
 }
 
-void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message){
+void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
-
 }
 
-void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& message){
+void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& message) {
 	message.assertTC(ServiceType, ChangeMaximumTransitionReportingDelay);
-
 }
 
-void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& message){
+void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions);
-
 }
 
-void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message){
+void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, AddParameterMonitoringDefinitions);
-
 }
 
-void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& message){
+void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DeleteParameterMonitoringDefinitions);
-
 }
 
-void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message){
+void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
-
 }
 
-void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& message){
+void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
-
 }
 
-void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& message){
+void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& message) {
 	message.assertTC(ServiceType, ParameterMonitoringDefinitionReport);
-
 }
 
-void OnBoardMonitoringService::reportOutOfLimits(Message& message){
+void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
 	message.assertTC(ServiceType, ReportOutOfLimits);
-
 }
 
-void OnBoardMonitoringService::outOfLimitsReport(){
+void OnBoardMonitoringService::outOfLimitsReport() {}
 
-}
+void OnBoardMonitoringService::checkTransitionReport() {}
 
-void OnBoardMonitoringService::checkTransitionReport(){
-
-}
-
-void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Message& message){
+void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Message& message) {
 	message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition);
-
 }
 
-void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport(){
-
-}
+void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {}
 
 void OnBoardMonitoringService::execute(Message& message) {
 	switch (message.messageType) {
