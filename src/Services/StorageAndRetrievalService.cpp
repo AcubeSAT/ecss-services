@@ -93,11 +93,11 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 	report.appendUint16(fillingPercentage);
 
 	uint16_t numOfPacketsToBeTransferred = 0;
-	for (auto& packet : packetStores[packetStoreId].storedTelemetryPackets) {
-		if (packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag) {
-			numOfPacketsToBeTransferred++;
-		}
-	}
+	numOfPacketsToBeTransferred = std::count_if(
+	    std::begin(packetStores[packetStoreId].storedTelemetryPackets),
+	    std::end(packetStores[packetStoreId].storedTelemetryPackets), [this, &packetStoreId](auto packet) {
+		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
+	    });
 	fillingPercentage = static_cast<uint16_t>(numOfPacketsToBeTransferred * 100 / ECSSMaxPacketStoreSize);
 	report.appendUint16(fillingPercentage);
 }
