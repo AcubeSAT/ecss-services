@@ -148,7 +148,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 		return;
 	}
 	auto& housekeepingStructure = housekeepingStructures.at(targetStructId);
-	if (housekeepingStructures.at(targetStructId).periodicGenerationActionStatus) {
+	if (housekeepingStructure.periodicGenerationActionStatus) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
 		return;
 	}
