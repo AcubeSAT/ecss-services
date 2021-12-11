@@ -113,11 +113,6 @@ inline const uint16_t ECSSEventActionStructMapSize = 256;
 inline const uint8_t ECSSMaxDeltaOfReleaseTime = 60;
 
 /**
- * The maximum number of stored parameters in the \ref ParameterService
- */
-inline const uint8_t ECSSMaxParameters = 5;
-
-/**
  * The max number of simply commutated parameters per housekeeping structure in ST(03)
  */
 inline const uint16_t ECSSMaxSimplyCommutatedParameters = 10;
