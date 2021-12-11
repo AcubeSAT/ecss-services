@@ -252,6 +252,6 @@ void HousekeepingService::execute(Message& message) {
 	}
 }
 
-bool HousekeepingService::existsInVector(etl::vector<uint16_t, 10> ids, uint16_t parameterId) {
+bool HousekeepingService::existsInVector(const etl::vector<uint16_t, 10>& ids, uint16_t parameterId) {
 	return std::find(std::begin(ids), std::end(ids), parameterId) != std::end(ids);
 }
