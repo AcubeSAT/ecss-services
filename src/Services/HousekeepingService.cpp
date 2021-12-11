@@ -120,7 +120,6 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	housekeepingReport.appendUint8(structureId);
 	for (auto& id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
 		systemParameters.getParameter(id)->get().appendValueToMessage(housekeepingReport);
-//		systemParameters.getParameter(id).appendValueToMessage(housekeepingReport);
 	}
 	storeMessage(housekeepingReport);
 }
