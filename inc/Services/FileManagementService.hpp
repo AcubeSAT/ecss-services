@@ -70,6 +70,13 @@ private:
         char objectName[ECSS_MAX_STRING_SIZE];
     };
 
+    struct FoundFilesReportStruct{
+        char repositoryPath[ECSS_MAX_STRING_SIZE];
+        char searchPattern[ECSS_MAX_STRING_SIZE];
+        // Seperated by /0
+        char filePath[ECSS_MAX_STRING_SIZE];
+    };
+
     enum operationStatusType : uint8_t{
         inProgress = 1,
         waitingResources = 2,

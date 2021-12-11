@@ -28,6 +28,65 @@ int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString, uint8_t mes
     return -10;
 }
 
+uint8_t wildcardStringMatch(char* line, char* pattern)
+{
+    // Wildcard flag
+    uint8_t wildcard = 0;
+
+    // Start iterating over the pattern's and line's chars
+    do
+    {
+        // Check if the pattern char matches the string's char
+        if (*pattern == *line)
+        {
+            // Increment both pointers to the next char
+            line++;
+            pattern++;
+        }
+        else if (*pattern == FileManagementService::wildcard)
+        {
+            // Check if the next char of the pattern is the null terminator (ex "test.tx*\0")
+            // Increment the pattern counter in order to show the next char
+            if (*(++pattern) == '\0')
+            {
+                return 1;
+            }
+
+            // Activate the wildcard flag
+            wildcard = 1;
+        }
+        else if (wildcard)
+        {
+            // Check if the pattern's next character after the wildcard is matched with the string's char
+            if (*line == *pattern)
+            {
+                // De-activate the wildcard flag and increment the pointers
+                wildcard = 0;
+                line++;
+                pattern++;
+            }
+            else
+            {
+                line++;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    } while (*line);
+
+    // Check if the whole pattern has been scanned
+    if (*pattern == '\0')
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 uint8_t FileManagementService::getStringUntilZeroTerminator(Message &message, char extractedString[ECSS_MAX_STRING_SIZE], uint8_t &stringSize)
 {
 
@@ -281,23 +340,26 @@ int32_t littleFsReportFile(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_
 
                 // Object type is file
                 return LFS_TYPE_REG;
-                break;
 
             case(LFS_TYPE_DIR):
 
                 // Object type is directory
                 return LFS_TYPE_DIR;
-                break;
+
+            case (LFS_ERR_NOENT):
+
+                // There is no file in this path
+                return LFS_ERR_NOENT;
 
             default:
 
                 // Return error, invalid object type (in case the return is other than those above)
-                return -3;
+                return LFS_ERR_INVAL;
         }
     }
     else
     {
-        // There is no file with this path
+        // LittleFs generated error
         return -4;
     }
 
@@ -619,20 +681,113 @@ void FileManagementService::findFile(Message &message)
         lfs_info info_struct;
 
         // Report the requested object if it exists
-        int32_t exactObjectFindStatus = ::littleFsReportFile(repositoryPathString, repositoryPathSize, searchPatternString,
+        int32_t extractObjectFindStatus = littleFsReportFile(repositoryPathString, repositoryPathSize, searchPatternString,
                                                              searchPatternSize, &info_struct);
 
-        // TODO create a struct and put the requested details in it
+        // Check the underlying file system response
+        if(extractObjectFindStatus == LFS_ERR_NOENT)
+        {
+            // No file found in this path
+            FoundFilesReportStruct report;
+            strcpy(report.repositoryPath, reinterpret_cast<char *>(repositoryPathString.data()));
+            strcpy(report.searchPattern, reinterpret_cast<char *>(searchPatternString.data()));
+            strcpy(report.filePath, reinterpret_cast<char *>(0));
+
+            // Call TM[23,8]
+            foundFileReport(report);
+        }
+        else if((extractObjectFindStatus == LFS_TYPE_DIR) || (extractObjectFindStatus == LFS_TYPE_REG))
+        {
+            // An object found at this path
+            FoundFilesReportStruct report;
+            strcpy(report.repositoryPath, reinterpret_cast<char *>(repositoryPathString.data()));
+            strcpy(report.searchPattern, reinterpret_cast<char *>(searchPatternString.data()));
+            strcpy(report.filePath, reinterpret_cast<char *>(searchPatternString.data()));
+
+            // Call TM[23,8]
+            foundFileReport(report);
+        }
+        else
+        {
+            // Report failed completion of execution
+            ErrorHandler::reportError(message,ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+        }
     }
     else
     {
-        // TODO here the struct has to be vector or something
+        // Lfs struct for directory information
+        lfs_dir info_directory;
+
+        // Check if the repository exists
+        int32_t repositoryExists = pathIsValidForARepository(repositoryPathString, repositoryPathSize);
+
+        if(repositoryExists == 0)
+        {
+            // Open the requested directory
+            int32_t lfsDirectoryOpenStatus = lfs_dir_open(&fs1, &info_directory, reinterpret_cast<const char *>(repositoryPathString.data()));
+
+            // Check the status of the above operation
+            if(lfsDirectoryOpenStatus == 0)
+            {
+                // Info struct for every object found in the requested repository
+                lfs_info info_struct;
+
+                // Report struct
+                FoundFilesReportStruct report;
+                strcpy(report.repositoryPath, reinterpret_cast<const char *>(repositoryPathString.data()));
+                strcpy(report.searchPattern, reinterpret_cast<const char *>(searchPatternString.data()));
+
+                // Go through all the objects in the repository and store their information in the info_struct
+                while(1)
+                {
+                    // Read the next entry in the repository
+                    int32_t lfsDirectoryReadStatus = lfs_dir_read(&fs1, &info_directory, &info_struct);
+
+                    // Check if there was an error during the read operation
+                    if(lfsDirectoryReadStatus < 0)
+                    {
+                        // Report failed completion of execution
+                        ErrorHandler::reportError(message,ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+                        break;
+                    }
+                    // Check if there are no other entries in the repository
+                    else if(lfsDirectoryReadStatus)
+                    {
+                        // Exit the for loop
+                        break;
+                    }
+                    // For every entry found, match the name with the requested pattern
+                    else
+                    {
+                        // Check if there is a match with an object
+                        if(wildcardStringMatch(info_struct.name, reinterpret_cast<char *>(searchPatternString.data())) == 1)
+                        {
+                            // Put it in the filePath character array
+                            strcpy(report.filePath,reinterpret_cast<const char *>(info_struct.name));
+                        }
+                    }
+                }
+
+
+            }
+            else
+            {
+                // Report failed start of execution due to inability to open the requested repository
+                ErrorHandler::reportError(message,ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+            }
+        }
+        else
+        {
+            // Report failed start of execution due to invalid repository path
+            ErrorHandler::reportError(message,ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+        }
+
+
+
+
+
+
     }
-
-
-
-
-
 
 }
 
