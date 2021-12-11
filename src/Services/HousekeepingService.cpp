@@ -223,36 +223,37 @@ void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uin
 
 void HousekeepingService::execute(Message& message) {
 	switch (message.messageType) {
-		case 1:
+		case CreateHousekeepingReportStructure:
 			createHousekeepingReportStructure(message);
 			break;
-		case 3:
+		case DeleteHousekeepingReportStructure:
 			deleteHousekeepingReportStructure(message);
 			break;
-		case 5:
+		case EnablePeriodicHousekeepingParametersReport:
 			enablePeriodicHousekeepingParametersReport(message);
 			break;
-		case 6:
+		case DisablePeriodicHousekeepingParametersReport:
 			disablePeriodicHousekeepingParametersReport(message);
 			break;
-		case 9:
+		case ReportHousekeepingStructures:
 			reportHousekeepingStructures(message);
 			break;
-		case 27:
+		case GenerateOneShotHousekeepingReport:
 			generateOneShotHousekeepingReport(message);
 			break;
-		case 29:
+		case AppendParametersToHousekeepingStructure:
 			appendParametersToHousekeepingStructure(message);
 			break;
-		case 31:
+		case ModifyCollectionIntervalOfStructures:
 			modifyCollectionIntervalOfStructures(message);
 			break;
-		case 33:
+		case ReportHousekeepingPeriodicProperties:
 			reportHousekeepingPeriodicProperties(message);
 			break;
 	}
 }
 
-bool HousekeepingService::existsInVector(const etl::vector<uint16_t, 10>& ids, uint16_t parameterId) {
+bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxHousekeepingStructures>& ids,
+                                         uint16_t parameterId) {
 	return std::find(std::begin(ids), std::end(ids), parameterId) != std::end(ids);
 }
