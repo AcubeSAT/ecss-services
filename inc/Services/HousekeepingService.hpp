@@ -17,7 +17,7 @@
 class HousekeepingService : Service {
 private:
 	/**
-	 * Appends periodic properties of housekeeping structure to message.
+	 * Appends the periodic properties of a housekeeping structure to a message.
 	 */
 	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
 
