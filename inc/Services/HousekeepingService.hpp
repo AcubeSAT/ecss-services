@@ -102,7 +102,7 @@ public:
 	void appendParametersToHousekeepingStructure(Message& request);
 
 	/**
-	 * This function receives a message type TC[3,31] 'modify' the collection interval of specified structures'.
+	 * This function receives a message type TC[3,31] 'modify the collection interval of specified structures'.
 	 */
 	void modifyCollectionIntervalOfStructures(Message& request);
 
