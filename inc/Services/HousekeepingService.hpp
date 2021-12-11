@@ -107,7 +107,7 @@ public:
 	void modifyCollectionIntervalOfStructures(Message& request);
 
 	/**
-	 * This function takes as argument, a message type TC[3,33] 'report housekeeping periodic properties' and
+	 * This function takes as argument a message type TC[3,33] 'report housekeeping periodic properties' and
 	 * responds with a TM[3,35] 'housekeeping periodic properties report'.
 	 */
 	void reportHousekeepingPeriodicProperties(Message& request);
