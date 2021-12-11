@@ -533,7 +533,6 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		for (auto& id : simplyCommutatedIds) {
 			request.appendUint16(id);
 		}
-		HousekeepingStructure& structToCheck = housekeepingService.housekeepingStructures[structId];
 		REQUIRE(housekeepingService.housekeepingStructures.find(structId) !=
 		        housekeepingService.housekeepingStructures.end());
 		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameterIds.size() == 3);
