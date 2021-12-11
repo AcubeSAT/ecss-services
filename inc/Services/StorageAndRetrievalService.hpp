@@ -18,10 +18,95 @@
  */
 class StorageAndRetrievalService : public Service {
 public:
+	inline static const uint8_t ServiceType = 15;
+
+	enum MessageType : uint8_t {
+		EnableStorageInPacketStores = 1,
+		DisableStorageInPacketStores = 2,
+		StartByTimeRangeRetrieval = 9,
+		DeletePacketStoreContent = 11,
+		ReportContentSummaryOfPacketStores = 12,
+		PacketStoreContentSummaryReport = 13,
+		ChangeOpenRetrievalStartingTime = 14,
+		ResumeOpenRetrievalOfPacketStores = 15,
+		SuspendOpenRetrievalOfPacketStores = 16,
+		AbortByTimeRangeRetrieval = 17,
+		ReportStatusOfPacketStores = 18,
+		PacketStoresStatusReport = 19,
+		CreatePacketStores = 20,
+		DeletePacketStores = 21,
+		ReportConfigurationOfPacketStores = 22,
+		PacketStoreConfigurationReport = 23,
+		CopyPacketsInTimeWindow = 24,
+		ResizePacketStores = 25,
+		ChangeTypeToCircular = 26,
+		ChangeTypeToBounded = 27,
+		ChangeVirtualChannel = 28
+	};
+
+	StorageAndRetrievalService() = default;
+
+	/**
+	 * The virtual channels used by the Storage and Retrieval Subservice.
+	 */
+	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
+
+	/**
+	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
+	 */
+	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
+
 	/**
 	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
 	 */
 	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
+
+	/**
+	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
+	 */
+	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
+	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
+
+	/**
+	 * Whether the Storage and Retrieval Subservice supports the cyclical update of packets.
+	 */
+	const bool supportsCircularType = true;
+
+	/**
+	 * Whether the Storage and Retrieval Subservice supports rejecting new packets while the packet store is full.
+	 */
+	const bool supportsBoundedType = true;
+
+	/**
+	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
+	 */
+	const bool supportsConcurrentRetrievalRequests = false;
+	const uint16_t maxConcurrentRetrievalRequests = 5;
+	TimeWindowType timeWindowType = FromTagToTag;
+
+	/**
+	 * @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
+	 */
+	const bool supportsQueuingRetrievalRequests = true;
+
+	/**
+	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
+	 */
+	const bool supportsPrioritizingRetrievals = false;
+
+	/**
+	 * @brief Support for the by-time-range retrieval of packets.
+	 */
+	const bool supportsByTimeRangeRetrieval = true;
+
+	/**
+	 * @todo: add prioritization policy for retrievals if prioritization is supported
+	 */
+	const TimeStamping timeStamping = PacketBased;
+
+	/************************************************************************************************************
+	 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              | Helper Functions |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 ************************************************************************************************************/
 
 	/**
 	 * Helper function to enhance the readability-simplicity of the code. Basically reads a string from the message
@@ -67,87 +152,9 @@ public:
 	 */
 	void createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize>& packetStoreId);
 
-public:
-	inline static const uint8_t ServiceType = 15;
-
-	enum MessageType : uint8_t {
-		EnableStorageInPacketStores = 1,
-		DisableStorageInPacketStores = 2,
-		StartByTimeRangeRetrieval = 9,
-		DeletePacketStoreContent = 11,
-		ReportContentSummaryOfPacketStores = 12,
-		PacketStoreContentSummaryReport = 13,
-		ChangeOpenRetrievalStartingTime = 14,
-		ResumeOpenRetrievalOfPacketStores = 15,
-		SuspendOpenRetrievalOfPacketStores = 16,
-		AbortByTimeRangeRetrieval = 17,
-		ReportStatusOfPacketStores = 18,
-		PacketStoresStatusReport = 19,
-		CreatePacketStores = 20,
-		DeletePacketStores = 21,
-		ReportConfigurationOfPacketStores = 22,
-		PacketStoreConfigurationReport = 23,
-		CopyPacketsInTimeWindow = 24,
-		ResizePacketStores = 25,
-		ChangeTypeToCircular = 26,
-		ChangeTypeToBounded = 27,
-		ChangeVirtualChannel = 28
-	};
-
-	StorageAndRetrievalService() = default;
-
-	/**
-	 * The virtual channels used by the Storage and Retrieval Subservice.
-	 */
-	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
-
-	/**
-	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
-	 */
-	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
-
-	/**
-	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
-	 */
-	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
-	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
-
-	/**
-	 * Whether the Storage and Retrieval Subservice supports the cyclical update of packets.
-	 */
-	const bool supportsCircularType = true;
-
-	/**
-	 * Whether the Storage and Retrieval Subservice supports rejecting new packets while the packet store is full.
-	 */
-	const bool supportsBoundedType = true;
-
-	/**
-	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
-	 */
-	const bool supportsConcurrentRetrievalRequests = false;
-	const uint16_t maxConcurrentRetrievalRequests = 5;
-	TimeWindowType timeWindowType = FromTagToTag;
-
-	/**
-	 * @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
-	 */
-	const bool supportsQueuingRetrievalRequests = true;
-
-	/**
-	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
-	 */
-	const bool supportsPrioritizingRetrievals = false;
-
-	/**
-	 * @brief Support for the by-time-range retrieval of packets.
-	 */
-	const bool supportsByTimeRangeRetrieval = true;
-
-	/**
-	 * @todo: add prioritization policy for retrievals if prioritization is supported
-	 */
-	const TimeStamping timeStamping = PacketBased;
+	/************************************************************************************************************
+	 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                 | TCs/TMs |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	 ************************************************************************************************************/
 
 	/**
 	 * TC[15,1] request to enable the packet stores' storage function
