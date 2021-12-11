@@ -27,8 +27,6 @@ void buildRequest(Message& request, uint8_t idToCreate) {
  * Initializes 3 housekeeping structures with IDs = {0, 4, 6}
  */
 void initializeHousekeepingStructures() {
-	Message request(HousekeepingService::ServiceType,
-	                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
 	uint8_t ids[3] = {0, 4, 6};
 	uint32_t interval = 7;
 	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
