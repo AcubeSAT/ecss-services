@@ -18,6 +18,10 @@ class HousekeepingService : Service {
 private:
 	/**
 	 * Appends the periodic properties of a housekeeping structure to a message.
+	 *
+	 * @note The structureId is checked before being passed in this function, so there is a convention that the ID is
+	 * valid. If this function needs to be called from another point of the code, the case of an invalid ID passed as
+	 * argument will lead in undefined behavior.
 	 */
 	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
 
