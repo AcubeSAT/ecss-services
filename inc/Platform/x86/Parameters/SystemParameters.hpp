@@ -53,7 +53,7 @@ public:
 			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
 			return {};
 		}
-		return {parametersArray[parameterId]};
+		return parametersArray[parameterId];
 	}
 };
 
