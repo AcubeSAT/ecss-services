@@ -53,6 +53,10 @@ add_executable(ecss_services
         ${x86_main_SRC}
         )
 
+# Logs all levels of messages. This command can be added by other users of this
+# library to override the respective log level.
+target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
+
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
     file(GLOB test_main_SRC "test/*.cpp")
