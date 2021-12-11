@@ -139,8 +139,6 @@ inline const uint8_t ECSSFunctionNameLength = 32;
  */
 inline const uint8_t ECSSFunctionMaxArgLength = 32;
 
-/** @} */
-
 /**
  * @brief The maximum size of a log message
  */
@@ -171,5 +169,7 @@ inline const bool SupportsStandardDeviation = true;
  * @brief Defines the max number of housekeeping structs that a housekeeping service can contain
  */
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
+
+/** @} */
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
