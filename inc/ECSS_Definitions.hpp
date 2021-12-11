@@ -142,7 +142,6 @@ inline const uint16_t LoggerMaxMessageSize = 512;
 /**
  * @brief Size of the array holding the Parameter objects for the ST[20] parameter service
  */
-
 inline const uint8_t ECSSParameterCount = 12;
 
 /**
