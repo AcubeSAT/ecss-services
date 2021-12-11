@@ -24,7 +24,7 @@ private:
 	/**
 	 * Returns true if the given parameter ID exists in the parameters contained in the housekeeping structure.
 	 */
-	bool existsInVector(etl::vector<uint16_t, ECSSMaxHousekeepingStructures> ids, uint16_t parameterId);
+	bool existsInVector(const etl::vector<uint16_t, ECSSMaxHousekeepingStructures>& ids, uint16_t parameterId);
 
 public:
 	inline static const uint8_t ServiceType = 3;
