@@ -155,6 +155,11 @@ void addTelemetryPacketsInPacketStores() {
 	}
 }
 
+void resetPacketStores() {
+	storageAndRetrieval.packetStores.clear();
+	REQUIRE(storageAndRetrieval.packetStores.empty());
+}
+
 TEST_CASE("Read packet store ID from a message") {
 	SECTION("First successful read") {
 		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "Racoon";
@@ -176,6 +181,572 @@ TEST_CASE("Read packet store ID from a message") {
 
 		packetStoreId = storageAndRetrieval.readPacketStoreId(message);
 		REQUIRE(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(packetStoreId)));
+	}
+}
+
+TEST_CASE("Deletion of packet store content") {
+	SECTION("Time-tag earlier than the earliest stored timestamp") {
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+		PacketStore newPacketStore;
+		storageAndRetrieval.packetStores.insert({packetStoreId, newPacketStore});
+		auto& packetStore = storageAndRetrieval.packetStores[packetStoreId];
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			packetStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		REQUIRE(packetStore.storedTelemetryPackets.size() == 6);
+		uint32_t timeTag = 1;
+		storageAndRetrieval.deleteContentUntil(packetStoreId, timeTag);
+		REQUIRE(packetStore.storedTelemetryPackets.size() == 6);
+
+		uint32_t existingTimestamps[6];
+		int index = 0;
+		for (auto& tmPacket : packetStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(std::equal(std::begin(timestamps1), std::end(timestamps1), std::begin(existingTimestamps)));
+
+		storageAndRetrieval.packetStores.erase(packetStoreId);
+		REQUIRE(storageAndRetrieval.packetStores.empty());
+	}
+
+	SECTION("Time-tag in between stored timestamps") {
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+		PacketStore newPacketStore;
+		storageAndRetrieval.packetStores.insert({packetStoreId, newPacketStore});
+		auto& packetStore = storageAndRetrieval.packetStores[packetStoreId];
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			packetStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		REQUIRE(packetStore.storedTelemetryPackets.size() == 6);
+		uint32_t timeTag = 6;
+
+		storageAndRetrieval.deleteContentUntil(packetStoreId, timeTag);
+
+		REQUIRE(packetStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {7, 9, 11};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : packetStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		storageAndRetrieval.packetStores.erase(packetStoreId);
+		REQUIRE(storageAndRetrieval.packetStores.empty());
+	}
+
+	SECTION("Time-tag larger than the largest stored timestamps") {
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+		PacketStore newPacketStore;
+		storageAndRetrieval.packetStores.insert({packetStoreId, newPacketStore});
+		auto& packetStore = storageAndRetrieval.packetStores[packetStoreId];
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			packetStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		REQUIRE(packetStore.storedTelemetryPackets.size() == 6);
+		uint32_t timeTag = 12;
+
+		storageAndRetrieval.deleteContentUntil(packetStoreId, timeTag);
+
+		REQUIRE(packetStore.storedTelemetryPackets.empty());
+		storageAndRetrieval.packetStores.erase(packetStoreId);
+		REQUIRE(storageAndRetrieval.packetStores.empty());
+	}
+}
+
+TEST_CASE("Copy packet store content between two specified timestamps") {
+	SECTION("Both time-tags earlier than the earliest stored timestamp") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		uint32_t startTime = 0;
+		uint32_t endTime = 1;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyFromTagToTag(sourcePacketStore, targetPacketStore, startTime, endTime);
+
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+		resetPacketStores();
+	}
+
+	SECTION("Tag-1 earlier than the earliest stored timestamp and tag-2 in between the stored timestamps") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t startTime = 1;
+		uint32_t endTime = 5;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyFromTagToTag(sourcePacketStore, targetPacketStore, startTime, endTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {2, 4, 5};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Both tag-1 and tag-2 in between the stored timestamps") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t startTime = 6;
+		uint32_t endTime = 9;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyFromTagToTag(sourcePacketStore, targetPacketStore, startTime, endTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 2);
+		uint32_t expectedTimestamps[2] = {7, 9};
+		uint32_t existingTimestamps[2];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Tag-1 in between the stored timestamps and tag-2 larger than the largest stored timestamp") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t startTime = 6;
+		uint32_t endTime = 14;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyFromTagToTag(sourcePacketStore, targetPacketStore, startTime, endTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {7, 9, 11};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Both tag-1 and tag-2 larger than largest stored timestamp") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t startTime = 12;
+		uint32_t endTime = 17;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyFromTagToTag(sourcePacketStore, targetPacketStore, startTime, endTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+		resetPacketStores();
+	}
+}
+
+TEST_CASE("Copy packet store content after specified time-tag") {
+	SECTION("Time-tag earlier than the earliest stored timestamp") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t startTime = 1;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyAfterTimeTag(sourcePacketStore, targetPacketStore, startTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 6);
+		uint32_t existingTimestamps[6];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(std::equal(std::begin(timestamps1), std::end(timestamps1), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Time-tag in between the stored timestamps") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t startTime = 6;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyAfterTimeTag(sourcePacketStore, targetPacketStore, startTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {7, 9, 11};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Time-tag larger than the largest stored timestamp") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t startTime = 12;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyAfterTimeTag(sourcePacketStore, targetPacketStore, startTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+		resetPacketStores();
+	}
+}
+
+TEST_CASE("Copy packet store content before specified time-tag") {
+	SECTION("Time-tag larger than the largest stored timestamp") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t endTime = 12;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyBeforeTimeTag(sourcePacketStore, targetPacketStore, endTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 6);
+		uint32_t existingTimestamps[6];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(std::equal(std::begin(timestamps1), std::end(timestamps1), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Time-tag in between the stored timestamps") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t endTime = 6;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyBeforeTimeTag(sourcePacketStore, targetPacketStore, endTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {2, 4, 5};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Time-tag earlier than the earliest stored timestamp") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		uint32_t endTime = 1;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyBeforeTimeTag(sourcePacketStore, targetPacketStore, endTime);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+		resetPacketStores();
+	}
+}
+
+TEST_CASE("Selecting the time-window type for the copying of packet store content") {
+	SECTION("From tag to tag") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		StorageAndRetrievalService::TimeWindowType timeWindowType = StorageAndRetrievalService::FromTagToTag;
+		uint32_t startTime = 6;
+		uint32_t endTime = 9;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyPacketsFrom(sourcePacketStore, targetPacketStore, startTime, endTime, timeWindowType);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 2);
+		uint32_t expectedTimestamps[2] = {7, 9};
+		uint32_t existingTimestamps[2];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("After time tag") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		StorageAndRetrievalService::TimeWindowType timeWindowType = StorageAndRetrievalService::AfterTimeTag;
+		uint32_t startTime = 6;
+		uint32_t endTime = 13;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyPacketsFrom(sourcePacketStore, targetPacketStore, startTime, endTime, timeWindowType);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {7, 9, 11};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+
+	SECTION("Before time tag") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store so that, the copy can occur
+		auto& targetPacketStore = storageAndRetrieval.packetStores[packetStoreIds[2]];
+		targetPacketStore.storedTelemetryPackets.clear();
+		REQUIRE(targetPacketStore.storedTelemetryPackets.empty());
+
+		auto& sourcePacketStore = storageAndRetrieval.packetStores[packetStoreIds[0]];
+		StorageAndRetrievalService::TimeWindowType timeWindowType = StorageAndRetrievalService::BeforeTimeTag;
+		uint32_t startTime = 0;
+		uint32_t endTime = 6;
+
+		for (auto& timestamp : timestamps1) {
+			Message tmPacket;
+			sourcePacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.copyPacketsFrom(sourcePacketStore, targetPacketStore, startTime, endTime, timeWindowType);
+
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {2, 4, 5};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+		resetPacketStores();
+	}
+}
+
+TEST_CASE("Form the content summary report message") {
+	SECTION("Successful content summary formation") {
+		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps1";
+		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+		PacketStore newPacketStore;
+		newPacketStore.openRetrievalStartTimeTag = 47;
+
+		for (auto& timestamp : timestamps4) {
+			Message tmPacket;
+			newPacketStore.storedTelemetryPackets.push_back({timestamp, tmPacket});
+		}
+
+		storageAndRetrieval.packetStores.insert({packetStoreId, newPacketStore});
+		Message report;
+
+		storageAndRetrieval.createContentSummary(report, packetStoreId);
+
+		REQUIRE(report.readUint32() == 4);
+		REQUIRE(report.readUint32() == 58);
+		REQUIRE(report.readUint32() == 47);
+		REQUIRE(report.readUint16() == 40);
+		REQUIRE(report.readUint16() == 15);
+
+		resetPacketStores();
 	}
 }
 
@@ -2127,7 +2698,7 @@ TEST_CASE("Deleting packet store content") {
 	}
 }
 
-TEST_CASE("Copying packets in time window") {
+TEST_CASE("Copying packets in time window, from tag to tag") {
 	SECTION("Time-tag1 earlier than the earliest stored time-tag, and time-tag2 in between the existing ones") {
 		/**
 		 * CASE 1:
@@ -2413,9 +2984,103 @@ TEST_CASE("Copying packets in time window") {
 
 		ServiceTests::reset();
 		Services.reset();
+	}
+}
 
-		/**
-		 * todo: test the 'afterTimeTag' and 'beforeTimeTag' as well
-		 */
+TEST_CASE("Copying packets in time window, after time-tag") {
+	SECTION("Valid copying of packet store content") {
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 6;
+		uint32_t timeTag2 = 0;
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::AfterTimeTag;
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& targetPacketStore = storageAndRetrieval.packetStores[toPacketStoreId];
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {7, 9, 11};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Copying packets in time window, before time-tag") {
+	SECTION("Valid copying of packet store content") {
+		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
+
+		REQUIRE(storageAndRetrieval.packetStores.size() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		// Empty the target packet store, so the copy can occur
+		storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.clear();
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
+
+		uint16_t timeType = 0;
+		uint32_t timeTag1 = 0;
+		uint32_t timeTag2 = 6;
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
+
+		request.appendUint16(timeType);
+		request.appendUint32(timeTag1);
+		request.appendUint32(timeTag2);
+		request.appendOctetString(fromPacketStoreId);
+		request.appendOctetString(toPacketStoreId);
+
+		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::BeforeTimeTag;
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& targetPacketStore = storageAndRetrieval.packetStores[toPacketStoreId];
+		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
+		uint32_t expectedTimestamps[3] = {2, 4, 5};
+		uint32_t existingTimestamps[3];
+
+		int index = 0;
+		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+			existingTimestamps[index++] = tmPacket.first;
+		}
+		REQUIRE(
+		    std::equal(std::begin(expectedTimestamps), std::end(expectedTimestamps), std::begin(existingTimestamps)));
+
+		ServiceTests::reset();
+		Services.reset();
 	}
 }

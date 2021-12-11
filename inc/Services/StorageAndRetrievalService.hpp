@@ -127,6 +127,7 @@ public:
 	 */
 	const bool supportsConcurrentRetrievalRequests = false;
 	const uint16_t maxConcurrentRetrievalRequests = 5;
+	TimeWindowType timeWindowType = FromTagToTag;
 
 	/**
 	 * @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)

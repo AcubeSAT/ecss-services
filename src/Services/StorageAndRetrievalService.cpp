@@ -1,10 +1,6 @@
 #include <iostream>
 #include "Services/StorageAndRetrievalService.hpp"
 
-/******************************************************************************
- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 	  Storage and Retrieval     ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
- ******************************************************************************/
-
 String<ECSSMaxPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
 	uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
 	message.readOctetString(packetStoreData);
@@ -59,16 +55,16 @@ void StorageAndRetrievalService::copyBeforeTimeTag(PacketStore& source, PacketSt
 bool StorageAndRetrievalService::copyPacketsFrom(PacketStore& source, PacketStore& target, uint32_t startTime,
                                                  uint32_t endTime, TimeWindowType timeWindow) {
 	switch (timeWindow) {
-		case 0:
+		case FromTagToTag:
 			if (endTime < source.storedTelemetryPackets.front().first) {
 				return false;
 			}
 			copyFromTagToTag(source, target, startTime, endTime);
 			break;
-		case 1:
+		case AfterTimeTag:
 			copyAfterTimeTag(source, target, startTime);
 			break;
-		case 2:
+		case BeforeTimeTag:
 			copyBeforeTimeTag(source, target, endTime);
 			break;
 		default:
@@ -507,7 +503,7 @@ void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request, TimeW
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	if (timeTag1 >= timeTag2) {
+	if (timeWindow == FromTagToTag and timeTag1 >= timeTag2) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 		return;
 	}
@@ -714,7 +710,7 @@ void StorageAndRetrievalService::execute(Message& request) {
 			packetStoreConfigurationReport(request);
 			break;
 		case 24:
-			copyPacketsInTimeWindow(request, FromTagToTag);
+			copyPacketsInTimeWindow(request, timeWindowType);
 			break;
 		case 25:
 			resizePacketStores(request);
