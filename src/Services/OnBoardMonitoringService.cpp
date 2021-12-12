@@ -8,7 +8,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 
 	parameterMonitoringFunctionStatus = true;
-	//TODO: Add more error reports
+	// TODO: Add more error reports
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
@@ -22,13 +22,11 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 				CheckingStatus.insert({currentParameter->get(), Unchecked});
 				RepetitionCounter.insert({currentParameter->get(), 0});
 				ParameterMonitoringStatus.insert({currentParameter->get(), true});
-			}
-			else{
+			} else {
 				CheckingStatus.find(currentParameter->get())->second = Unchecked;
 				RepetitionCounter.find(currentParameter->get())->second = 0;
 			}
-		}
-		else{
+		} else {
 			ErrorHandler::reportError(message, ErrorHandler::InternalErrorType::NonExistentParameter);
 		}
 	}
