@@ -106,8 +106,8 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	message.messageType = messageType;
 	message.responseBand = Message::ResponseBand(response_band);
 	message.acknowledgementFlags = acknowledgement_flags;
-	memcpy(message.data, data + ECSSSecondaryTCHeaderLength, length);
-//	std::copy(data + ECSSSecondaryTCHeaderLength, data + ECSSSecondaryTCHeaderLength + length, message.data);
+	//memcpy(message.data, data + ECSSSecondaryTCHeaderLength, length);
+	std::copy(data + ECSSSecondaryTCHeaderLength, data + ECSSSecondaryTCHeaderLength + length, message.data);
 	message.dataSize = length;
 }
 
@@ -204,12 +204,12 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	header[5] = packetDataLength & 0xffU;
 
 
-	String<CCSDSMaxMessageSize> ccsdsMessage(header, 6);
+	String<CCSDSMaxMessageSize> ccsdsMessage(header, CCSDSPrimaryHeaderLength);
 	ccsdsMessage.append(ecssMessage);
 
 	if(ECSSCRCIncluded) {
 		uint16_t crcField =
-		    CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 + packetDataLength);
+		    CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderLength + packetDataLength);
 		ccsdsMessage.push_back(static_cast<uint8_t>(crcField >> 8U));
 		ccsdsMessage.push_back(static_cast<uint8_t>(crcField & 0xFF));
 	}

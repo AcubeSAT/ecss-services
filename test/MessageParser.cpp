@@ -28,7 +28,8 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 8199;
 	message.responseBand = static_cast<Message::ResponseBand>(0);
 	message.acknowledgementFlags = 0;
-	memcpy(message.data, "hello", 5);
+	String<5> sourceString = "hello";
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
 	message.dataSize = 5;
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
@@ -78,15 +79,16 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.messageTypeCounter = 2;
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
-#if ECSS_CRC_INCLUDED
-	CHECK(createdPacket.size() == 22);
-	CHECK(memcmp(createdPacket.data(), wantedPacket, 20) == 0);
+	if(ECSSCRCIncluded) {
+		CHECK(createdPacket.size() == 22);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, 20) == 0);
 
-	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-	uint8_t crc_verification = CRCHelper::validateCRC(packet, 22);
-	CHECK(crc_verification == 0);
-#else
-	CHECK(createdPacket.size() == 18);
-	CHECK((createdPacket == String<18>(wantedPacket)));
-#endif
+		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+		uint8_t crc_verification = CRCHelper::validateCRC(packet, 22);
+		CHECK(crc_verification == 0);
+	}
+	else {
+		CHECK(createdPacket.size() == 18);
+		CHECK((createdPacket == String<18>(wantedPacket)));
+	}
 }

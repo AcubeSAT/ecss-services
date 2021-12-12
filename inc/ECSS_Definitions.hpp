@@ -32,7 +32,7 @@ inline const uint8_t ECSSSecondaryTMHeaderLength = 7;
 /**
  * ECSS TC secondary packet header length in bytes
  */
-inline const uint8_t ECSSSecondaryTCHeaderLength = 5;
+inline const uint8_t ECSSSecondaryTCHeaderLength = 3;
 
 /**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
