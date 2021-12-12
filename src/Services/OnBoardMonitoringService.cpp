@@ -8,10 +8,14 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 
 	parameterMonitoringFunctionStatus = true;
-	//TODO: Add error reports
+	//TODO: Add more error reports
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
+		if (currentId >= systemParameters.parametersArray.size()) {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			return;
+		}
 		if (auto currentParameter = systemParameters.getParameter(currentId)) {
 			if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
 				ParameterMonitoringList.insert({currentId, currentParameter->get()});
