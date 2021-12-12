@@ -2,18 +2,30 @@
 #ifdef SERVICE_ONBOARDMONITORING
 #include <Message.hpp>
 #include "Services/OnBoardMonitoringService.hpp"
+#include "etl/map.h"
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 
 	parameterMonitoringFunctionStatus = true;
-
+	//TODO: Add error reports
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
-		auto currentParameter = systemParameters.getParameter(currentId);
-		if(currentParameter){
-			ParameterMonitoringList.insert({currentId, currentParameter});
+		if (auto currentParameter = systemParameters.getParameter(currentId)) {
+			if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
+				ParameterMonitoringList.insert({currentId, currentParameter->get()});
+				CheckingStatus.insert({currentParameter->get(), Unchecked});
+				RepetitionCounter.insert({currentParameter->get(), 0});
+				ParameterMonitoringStatus.insert({currentParameter->get(), true});
+			}
+			else{
+				CheckingStatus.find(currentParameter->get())->second = Unchecked;
+				RepetitionCounter.find(currentParameter->get())->second = 0;
+			}
+		}
+		else{
+			ErrorHandler::reportError(message, ErrorHandler::InternalErrorType::NonExistentParameter);
 		}
 	}
 }
