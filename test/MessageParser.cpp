@@ -1,13 +1,8 @@
 #include <catch2/catch.hpp>
-#include <Services/TestService.hpp>
-#include <Services/RequestVerificationService.hpp>
 #include <Message.hpp>
 #include <cstring>
 #include "Helpers/CRCHelper.hpp"
 #include "MessageParser.hpp"
-#include "Services/ServiceTests.hpp"
-#include "ServicePool.hpp"
-
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x08, 0x20, 0x81, 0x1f, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
@@ -23,8 +18,7 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 }
 
 TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
-	uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x08, 0x00, 0x81, 0x1f, 0x68, 0x65, 0x6c, 0x6c,
-		0x6f};
+	uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x08, 0x00, 0x81, 0x1f, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
 	Message message;
 	message.packetType = Message::TC;
@@ -37,21 +31,20 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	memcpy(message.data, "hello", 5);
 	message.dataSize = 5;
 
-	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
+	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
+	if (ECSSCRCIncluded) {
+		CHECK(createdPacket.size() == 16);
 
-#if ECSS_CRC_INCLUDED
-	CHECK(createdPacket.size() == 16);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, 14) == 0);
 
-	CHECK(memcmp(createdPacket.data(), wantedPacket, 14) == 0);
-
-	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-	uint8_t crc_verification = CRCHelper::validateCRC(packet, 16);
-	CHECK(crc_verification == 0);
-#else
-	CHECK(createdPacket.size() == 14);
-	CHECK(memcmp(createdPacket.data(), wantedPacket, 14) == 0);
-#endif
+		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+		uint8_t crc_verification = CRCHelper::validateCRC(packet, 16);
+		CHECK(crc_verification == 0);
+	} else {
+		CHECK(createdPacket.size() == 14);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, 14) == 0);
+	}
 }
 
 TEST_CASE("TM message parsing", "[MessageParser]") {
@@ -79,10 +72,11 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 77;
 	message.serviceType = 22;
 	message.messageType = 17;
-	memcpy(message.data, "hellohi", 7);
+	String<7> sourceString = "hellohi";
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
 	message.dataSize = 7;
 	message.messageTypeCounter = 2;
-	String<CCSDS_MAX_MESSAGE_SIZE> createdPacket = MessageParser::compose(message);
+	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
 #if ECSS_CRC_INCLUDED
 	CHECK(createdPacket.size() == 22);

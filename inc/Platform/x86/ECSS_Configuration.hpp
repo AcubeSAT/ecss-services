@@ -9,9 +9,6 @@
  * @see ServiceDefinitions Define the service types that will be compiled
  */
 
-// Log all levels of messages
-#define LOGLEVEL_TRACE
-
 /**
  * @defgroup ServiceDefinitions Service compilation switches
  * These preprocessor defines control whether the compilation of each ECSS service is enabled. By not defining one of
@@ -30,6 +27,7 @@
 #define SERVICE_LARGEPACKET         ///<  Compile ST[13] large packet transfer
 #define SERVICE_MEMORY              ///<  Compile ST[06] memory management
 #define SERVICE_PARAMETER           ///<  Compile ST[20] parameter management
+#define SERVICE_PARAMETERSTATISTICS ///<  Compile ST[04] parameter statistics
 #define SERVICE_REQUESTVERIFICATION ///<  Compile ST[01] request verification
 #define SERVICE_TEST                ///<  Compile ST[17] test
 #define SERVICE_TIME                ///<  Compile ST[09] time management

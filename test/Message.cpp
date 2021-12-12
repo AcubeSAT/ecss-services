@@ -1,6 +1,7 @@
 #include <catch2/catch.hpp>
 #include <Message.hpp>
 #include <ServicePool.hpp>
+#include "etl/String.hpp"
 #include "Services/EventReportService.hpp"
 
 TEST_CASE("Message is usable", "[message]") {
@@ -63,13 +64,13 @@ TEST_CASE("Requirement 5.3.1", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.2 (Boolean)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.appendBoolean(false);
-	message.appendBoolean(true);
+	message.append<bool>(false);
+	message.append<bool>(true);
 
 	REQUIRE(message.dataSize == 2);
 
-	CHECK_FALSE(message.readBoolean());
-	CHECK(message.readBoolean());
+	CHECK_FALSE(message.read<bool>());
+	CHECK(message.read<bool>());
 }
 
 TEST_CASE("Requirement 7.3.3 (Enumerated)", "[message][ecss]") {
@@ -93,17 +94,19 @@ TEST_CASE("Requirement 7.3.3 (Enumerated)", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.appendUint8(230);
-	message.appendUint16(15933);
-	message.appendUint32(2000001);
-	message.appendUint64(12446744073709551615ULL);
+	message.append<char>(110);
+	message.append<uint8_t>(230);
+	message.append<uint16_t>(15933);
+	message.append<uint32_t>(2000001);
+	message.append<uint64_t>(12446744073709551615ULL);
 
-	REQUIRE(message.dataSize == 1 + 2 + 4 + 8);
+	REQUIRE(message.dataSize == 1 + 1 + 2 + 4 + 8);
 
-	CHECK(message.readUint8() == 230);
-	CHECK(message.readUint16() == 15933);
-	CHECK(message.readUint32() == 2000001);
-	CHECK(message.readUint64() == 12446744073709551615ULL);
+	CHECK(message.read<char>() == 110);
+	CHECK(message.read<uint8_t>() == 230);
+	CHECK(message.read<uint16_t>() == 15933);
+	CHECK(message.read<uint32_t>() == 2000001);
+	CHECK(message.read<uint64_t>() == 12446744073709551615ULL);
 
 	SECTION("7.4.3") {
 		/**
@@ -112,25 +115,25 @@ TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 		 * processors store data in little endian format. As a result, special care needs to be
 		 * taken for compliance.
 		 */
-		CHECK(message.data[1] == 0x3e);
-		CHECK(message.data[2] == 0x3d);
+		CHECK(message.data[2] == 0x3e);
+		CHECK(message.data[3] == 0x3d);
 	}
 }
 
 TEST_CASE("Requirement 7.3.5 (Signed integer)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.appendSint8(-16);
-	message.appendSint16(-7009);
-	message.appendSint32(-2000001);
-	message.appendSint32(15839011);
+	message.append<int8_t>(-16);
+	message.append<int16_t>(-7009);
+	message.append<int32_t>(-2000001);
+	message.append<int32_t>(15839011);
 
 	REQUIRE(message.dataSize == 1 + 2 + 4 + 4);
 
-	CHECK(message.readSint8() == -16);
-	CHECK(message.readSint16() == -7009);
-	CHECK(message.readSint32() == -2000001);
-	CHECK(message.readSint32() == 15839011);
+	CHECK(message.read<int8_t>() == -16);
+	CHECK(message.read<int16_t>() == -7009);
+	CHECK(message.read<int32_t>() == -2000001);
+	CHECK(message.read<int32_t>() == 15839011);
 
 	SECTION("7.4.3") {
 		// Make sure the endianness of the message data is correct
@@ -145,25 +148,38 @@ TEST_CASE("Requirement 7.3.5 (Signed integer)", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.6 (Real)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.appendFloat(7.209f);
-	message.appendFloat(-9003.53135f);
+	message.append<float>(7.209f);
+	message.append<float>(-9003.53135f);
 
 	REQUIRE(message.dataSize == 8);
 
-	CHECK(message.readFloat() == 7.209f);
-	CHECK(message.readFloat() == -9003.53135f);
+	CHECK(message.read<float>() == 7.209f);
+	CHECK(message.read<float>() == -9003.53135f);
+}
+
+TEST_CASE("Test appending double") {
+	Message message(0, 0, Message::TC, 0);
+	message.append<double>(2.324);
+
+	REQUIRE(message.dataSize == 8);
+
+	CHECK(message.read<double>() == Approx(2.324).epsilon(0.0001));
 }
 
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
 	message.appendString(String<4>("test"));
+	message.append<etl::istring>(String<4>("gaus"));
 
-	REQUIRE(message.dataSize == 4);
+	REQUIRE(message.dataSize == 4 + 6);
 
 	char string[5];
 	message.readCString(string, 4);
 	CHECK_THAT(string, Catch::Matchers::Equals("test"));
+
+	auto output = message.readOctetString<10>();
+	CHECK_THAT(output.c_str(), Catch::Matchers::Equals("gaus"));
 }
 
 TEST_CASE("Requirement 7.3.13 (Packet)", "[message][ecss]") {

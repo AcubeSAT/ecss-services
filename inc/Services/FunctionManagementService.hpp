@@ -49,8 +49,8 @@
  * @endcode
  */
 
-typedef String<ECSS_FUNCTION_NAME_LENGTH> functionName;
-typedef etl::map<functionName, void (*)(String<ECSS_FUNCTION_MAX_ARG_LENGTH>), ECSS_FUNCTION_MAP_SIZE> FunctionMap;
+typedef String<ECSSFunctionNameLength> functionName;
+typedef etl::map<functionName, void (*)(String<ECSSFunctionMaxArgLength>), ECSSFunctionMapSize> FunctionMap;
 
 class FunctionManagementService : public Service {
 	/**
@@ -88,7 +88,7 @@ public:
 	 * @param ptr pointer to a function of void return type and a MAX_ARG_LENGTH-lengthed byte
 	 * string as argument (which contains the actual arguments of the function)
 	 */
-	void include(String<ECSS_FUNCTION_NAME_LENGTH> funcName, void (*ptr)(String<ECSS_FUNCTION_MAX_ARG_LENGTH>));
+	void include(String<ECSSFunctionNameLength> funcName, void (*ptr)(String<ECSSFunctionMaxArgLength>));
 
 	int getMapSize() {
 		return funcPtrIndex.size();

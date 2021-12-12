@@ -33,7 +33,7 @@
 class MessageParser {
 public:
 	/**
-     * This function takes as input TC packets and calls the proper services' functions that have been
+	 * This function takes as input TC packets and calls the proper services' functions that have been
 	 * implemented to handle TC packets.
 	 *
 	 * @param message Contains the necessary parameters to call the suitable subservice
@@ -58,7 +58,7 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	static Message parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data);
+	static Message parseECSSTC(String<ECSSTCRequestStringSize> data);
 
 	/**
 	 * @brief Overloaded version of \ref MessageParser::parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data)
@@ -75,14 +75,14 @@ public:
 	 * error. Messages smaller than \p size are padded with zeros. When `size = 0`, there is no size limit.
 	 * @return A String class containing the parsed Message
 	 */
-	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSS(const Message& message, uint16_t size = 0u); // Ignore-MISRA
+	static String<CCSDSMaxMessageSize> composeECSS(const Message& message, uint16_t size = 0u); // Ignore-MISRA
 
 	/**
 	 * @brief Converts a TC or TM message to a packet string, appending the ECSS and then the CCSDS header
 	 * @param message The Message object to be parsed to a String
 	 * @return A String class containing the parsed Message
 	 */
-	static String<CCSDS_MAX_MESSAGE_SIZE> compose(const Message& message);
+	static String<CCSDSMaxMessageSize> compose(const Message& message);
 
 private:
 	/**
@@ -107,11 +107,11 @@ private:
 	 */
 	static void parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
 
-	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSSTC(const Message& message, uint16_t size);
+	static String<CCSDSMaxMessageSize> composeECSSTC(const Message& message, uint16_t size);
 
-	static String<CCSDS_MAX_MESSAGE_SIZE> composeECSSTM(const Message& message, uint16_t size);
+	static String<CCSDSMaxMessageSize> composeECSSTM(const Message& message, uint16_t size);
 
-	static String<CCSDS_MAX_MESSAGE_SIZE> reachRequestedSize(String<CCSDS_MAX_MESSAGE_SIZE> dataString, uint16_t size, const Message& message);
+	static String<CCSDSMaxMessageSize> reachRequestedSize(String<CCSDSMaxMessageSize> dataString, uint16_t size, const Message& message);
 };
 
 #endif // ECSS_SERVICES_MESSAGEPARSER_HPP

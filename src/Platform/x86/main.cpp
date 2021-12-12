@@ -1,5 +1,4 @@
 #include <iostream>
-#include <ServicePool.hpp>
 #include <Logger.hpp>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeHelper.hpp"
@@ -12,12 +11,14 @@
 #include "Services/EventActionService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
-#include "ServicePool.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+#include "Helpers/Statistic.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
-#include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
+#include "ServicePool.hpp"
+#include <ctime>
 
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
@@ -40,7 +41,8 @@ int main() {
 
 	// ST[17] test
 	TestService& testService = Services.testService;
-	Message receivedPacket = Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
+	Message receivedPacket =
+	    Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
 	testService.areYouAlive(receivedPacket);
 	receivedPacket = Message(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest, Message::TC, 1);
 	receivedPacket.appendUint16(7);
@@ -50,14 +52,16 @@ int main() {
 	ParameterService& paramService = Services.parameterManagement;
 
 	// Test code for reportParameter
-	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues, Message::TC, 1); // application id is a dummy number (1)
+	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+	                             Message::TC, 1); // application id is a dummy number (1)
 	sentPacket.appendUint16(2); // number of contained IDs
 	sentPacket.appendUint16(0); // first ID
 	sentPacket.appendUint16(1); // second ID
 	paramService.reportParameters(sentPacket);
 
 	// Test code for setParameter
-	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1); // application id is a dummy number (1)
+	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
+	                              Message::TC, 1); // application id is a dummy number (1)
 	sentPacket2.appendUint16(2); // number of contained IDs
 	sentPacket2.appendUint16(0); // first parameter ID
 	sentPacket2.appendUint32(63238); // settings for first parameter
@@ -76,7 +80,8 @@ int main() {
 	*(pStr + 2) = 0;
 
 	MemoryManagementService& memMangService = Services.memoryManagement;
-	Message rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
+	Message rcvPack = Message(MemoryManagementService::ServiceType,
+	                          MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3); // Iteration count
 	rcvPack.appendUint64(reinterpret_cast<uint64_t>(string)); // Start address
@@ -89,7 +94,8 @@ int main() {
 	rcvPack.appendUint16(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
-	rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
+	rcvPack = Message(MemoryManagementService::ServiceType,
+	                  MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
@@ -102,7 +108,8 @@ int main() {
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
 
-	rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
+	rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData,
+	                  Message::TC, 1);
 
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2); // Iteration count
@@ -116,33 +123,41 @@ int main() {
 
 	RequestVerificationService& reqVerifService = Services.requestVerification;
 
-	Message receivedMessage = Message(RequestVerificationService::ServiceType,
-		RequestVerificationService::MessageType::SuccessfulAcceptanceReport,
-		Message::TC, 3);
+	Message receivedMessage =
+	    Message(RequestVerificationService::ServiceType,
+	            RequestVerificationService::MessageType::SuccessfulAcceptanceReport, Message::TC, 3);
 	reqVerifService.successAcceptanceVerification(receivedMessage);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedAcceptanceReport, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedAcceptanceReport, Message::TC, 3);
 	reqVerifService.failAcceptanceVerification(receivedMessage, ErrorHandler::UnknownAcceptanceError);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulStartOfExecution, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::SuccessfulStartOfExecution, Message::TC, 3);
 	reqVerifService.successStartExecutionVerification(receivedMessage);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedStartOfExecution, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedStartOfExecution, Message::TC, 3);
 	reqVerifService.failStartExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionStartError);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulProgressOfExecution, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::SuccessfulProgressOfExecution, Message::TC, 3);
 	reqVerifService.successProgressExecutionVerification(receivedMessage, 0);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedProgressOfExecution, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedProgressOfExecution, Message::TC, 3);
 	reqVerifService.failProgressExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionProgressError, 0);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::SuccessfulCompletionOfExecution, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::SuccessfulCompletionOfExecution, Message::TC, 3);
 	reqVerifService.successCompletionExecutionVerification(receivedMessage);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedCompletionOfExecution, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedCompletionOfExecution, Message::TC, 3);
 	reqVerifService.failCompletionExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionCompletionError);
 
-	receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
 
 	// ST[05] (5,1 to 5,4) test [works]
@@ -169,16 +184,19 @@ int main() {
 	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
 	                                        EventReportService::MediumSeverityUnknownEvent};
 	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
-	Message eventMessage(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
+	Message eventMessage(EventReportService::ServiceType,
+	                     EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	eventMessage.appendUint16(2);
 	eventMessage.appendEnum16(eventIDs[0]);
 	eventMessage.appendEnum16(eventIDs[1]);
 
-	Message eventMessage2(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
+	Message eventMessage2(EventReportService::ServiceType,
+	                      EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
 	eventMessage2.appendUint16(1);
 	eventMessage2.appendEnum16(eventIDs2[0]);
 
-	Message eventMessage3(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvent, Message::TC, 1);
+	Message eventMessage3(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents,
+	                      Message::TC, 1);
 	eventReportService.disableReportGeneration(eventMessage);
 	eventReportService.listOfDisabledEventsReport();
 	eventReportService.enableReportGeneration(eventMessage2);
@@ -186,9 +204,10 @@ int main() {
 
 	// ST[19] test
 
-	EventActionService & eventActionService = Services.eventAction;
+	EventActionService& eventActionService = Services.eventAction;
 
-	Message eventActionDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 1);
+	Message eventActionDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
+	                              Message::TC, 1);
 	eventActionDefinition.appendEnum16(0);
 	eventActionDefinition.appendEnum16(2);
 	eventActionDefinition.appendEnum16(1);
@@ -196,7 +215,8 @@ int main() {
 	eventActionDefinition.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition);
 
-	Message eventActionDefinition1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 1);
+	Message eventActionDefinition1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
+	                               Message::TC, 1);
 	eventActionDefinition1.appendEnum16(0);
 	eventActionDefinition1.appendEnum16(2);
 	eventActionDefinition1.appendEnum16(1);
@@ -205,7 +225,8 @@ int main() {
 	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.addEventActionDefinitions(eventActionDefinition1);
 
-	Message eventActionDefinition2(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 1);
+	Message eventActionDefinition2(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
+	                               Message::TC, 1);
 	eventActionDefinition2.appendEnum16(0);
 	eventActionDefinition2.appendEnum16(4);
 	eventActionDefinition2.appendEnum16(2);
@@ -213,7 +234,8 @@ int main() {
 	eventActionDefinition2.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition2);
 
-	Message eventActionDefinition7(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 1);
+	Message eventActionDefinition7(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
+	                               Message::TC, 1);
 	eventActionDefinition7.appendEnum16(0);
 	eventActionDefinition7.appendEnum16(4);
 	eventActionDefinition7.appendEnum16(4);
@@ -222,11 +244,12 @@ int main() {
 	eventActionService.addEventActionDefinitions(eventActionDefinition7);
 
 	std::cout << "Status should be 000:";
-	for (auto& element : eventActionService.eventActionDefinitionMap){
+	for (auto& element : eventActionService.eventActionDefinitionMap) {
 		std::cout << element.second.enabled;
 	}
 
-	Message eventActionDefinition5(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 1);
+	Message eventActionDefinition5(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction,
+	                               Message::TC, 1);
 	eventActionDefinition5.appendUint16(3);
 	eventActionDefinition5.appendUint16(0);
 	eventActionDefinition5.appendUint16(2);
@@ -240,11 +263,12 @@ int main() {
 
 	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
 	std::cout << "\nStatus should be 111:";
-	for (auto& element : eventActionService.eventActionDefinitionMap){
+	for (auto& element : eventActionService.eventActionDefinitionMap) {
 		std::cout << element.second.enabled;
 	}
 
-	Message eventActionDefinition3(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 1);
+	Message eventActionDefinition3(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
+	                               Message::TC, 1);
 	eventActionDefinition3.appendUint16(3);
 	eventActionDefinition3.appendUint16(0);
 	eventActionDefinition3.appendUint16(2);
@@ -257,13 +281,14 @@ int main() {
 	eventActionDefinition3.appendUint16(4);
 	eventActionService.disableEventActionDefinitions(eventActionDefinition3);
 	std::cout << "Status should be 000:";
-	for (auto& element : eventActionService.eventActionDefinitionMap){
+	for (auto& element : eventActionService.eventActionDefinitionMap) {
 		std::cout << element.second.enabled;
 	}
 
 	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
 
-	Message eventActionDefinition4(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 1);
+	Message eventActionDefinition4(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction,
+	                               Message::TC, 1);
 	eventActionDefinition4.appendUint16(1);
 	eventActionDefinition4.appendUint16(0);
 	eventActionDefinition4.appendUint16(2);
@@ -272,7 +297,8 @@ int main() {
 	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
 
-	Message eventActionDefinition6(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 1);
+	Message eventActionDefinition6(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
+	                               Message::TC, 1);
 	eventActionDefinition6.appendUint16(1);
 	eventActionDefinition6.appendUint16(0);
 	eventActionDefinition6.appendUint16(2);
@@ -281,13 +307,13 @@ int main() {
 	std::cout << "After this message there should NOT be a failed start of execution error \n";
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
 
-
 	// ST13 test
 
 	LargePacketTransferService largePacketTransferService;
 	String<256> dataToTransfer = "12345678";
 	largePacketTransferService.firstDownlinkPartReport(LargePacketTransferService::ServiceType,
-		LargePacketTransferService::MessageType::FirstDownlinkPartReport, dataToTransfer);
+	                                                   LargePacketTransferService::MessageType::FirstDownlinkPartReport,
+	                                                   dataToTransfer);
 
 	// ST[11] test
 	TimeBasedSchedulingService timeBasedSchedulingService;
@@ -295,7 +321,9 @@ int main() {
 	std::cout << "\n\nST[11] service is running";
 	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
 
-	Message receivedMsg = Message(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
+	Message receivedMsg =
+	    Message(TimeBasedSchedulingService::ServiceType,
+	            TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
 	Message testMessage1(6, 5, Message::TC, 1);
 	Message testMessage2(4, 5, Message::TC, 1);
 	testMessage1.appendUint16(4253); // Append dummy data
@@ -304,7 +332,8 @@ int main() {
 	timeBasedSchedulingService.enableScheduleExecution(receivedMsg); // Enable the schedule
 
 	// Insert activities in the schedule
-	receivedMsg = Message(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
 	receivedMsg.appendUint32(currentTime + 1556435U);
@@ -315,17 +344,20 @@ int main() {
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
 	// Time shift activities
-	receivedMsg = Message(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
 	receivedMsg.appendSint32(-6789);
 	timeBasedSchedulingService.timeShiftAllActivities(receivedMsg);
 	std::cout << "Activities should be time shifted by: " << -6789 << " seconds." << std::endl;
 
 	// Report the activities
-	receivedMsg = Message(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
 	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);
 
 	// Report the activities by ID
-	receivedMsg = Message(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 	LOG_NOTICE << "ECSS Services test complete";

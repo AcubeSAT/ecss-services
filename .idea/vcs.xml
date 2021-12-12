@@ -9,5 +9,7 @@
     <mapping directory="$PROJECT_DIR$/ecss-services/lib/etl" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/Catch2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/etl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/logger" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/logger/lib/etl" vcs="Git" />
   </component>
 </project>

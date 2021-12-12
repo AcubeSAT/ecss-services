@@ -17,11 +17,11 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
-	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
+	CHECK(report.readBits(3) == CCSDSPacketVersion);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 47);
-	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
+	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::MessageTooShort);
 }
@@ -40,11 +40,11 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
-	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
+	CHECK(report.readBits(3) == CCSDSPacketVersion);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
-	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
+	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionStartError);
 }
@@ -63,11 +63,11 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 7);
 
-	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
+	CHECK(report.readBits(3) == CCSDSPacketVersion);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
-	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
+	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionProgressError);
 	CHECK(report.readByte() == 0); // stepID
@@ -87,11 +87,11 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
-	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
+	CHECK(report.readBits(3) == CCSDSPacketVersion);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 56);
-	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
+	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionCompletionError);
 }
@@ -110,11 +110,11 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	CHECK(report.packetType == Message::TM);
 	REQUIRE(report.dataSize == 6);
 
-	CHECK(report.readBits(3) == CCSDS_PACKET_VERSION);
+	CHECK(report.readBits(3) == CCSDSPacketVersion);
 	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
 	CHECK(report.readBits(1) == 1);
 	CHECK(report.readBits(11) == 71);
-	CHECK(report.readBits(2) == ECSS_SEQUENCE_FLAGS);
+	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownRoutingError);
 }
