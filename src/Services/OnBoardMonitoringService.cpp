@@ -11,6 +11,10 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
+		auto currentParameter = systemParameters.getParameter(currentId);
+		if(currentParameter){
+			ParameterMonitoringList.insert({currentId, currentParameter});
+		}
 	}
 }
 
