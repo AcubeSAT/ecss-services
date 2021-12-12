@@ -34,6 +34,27 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 
 void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
+
+	parameterMonitoringFunctionStatus = false;
+	// TODO: Add more error reports
+	uint16_t numOfParameters = systemParameters.parametersArray.size();
+	for (uint16_t i = 0; i < numOfParameters; i++) {
+		uint16_t currentId = message.readUint16();
+		if (currentId >= systemParameters.parametersArray.size()) {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			return;
+		}
+		if (auto currentParameter = systemParameters.getParameter(currentId)) {
+			if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
+				ParameterMonitoringStatus.find(currentParameter->get())->second = false;
+			}
+			else{
+				ErrorHandler::reportError(message, ErrorHandler::InternalErrorType::NonExistentParameter);
+			}
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::InternalErrorType::NonExistentParameter);
+		}
+	}
 }
 
 void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& message) {
