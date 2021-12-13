@@ -49,10 +49,10 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 				ParameterMonitoringStatus.find(currentParameter->get())->second = false;
 			}
 			else{
-				ErrorHandler::reportError(message, ErrorHandler::InternalErrorType::NonExistentParameter);
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			}
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::InternalErrorType::NonExistentParameter);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 		}
 	}
 }
