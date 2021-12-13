@@ -10,5 +10,5 @@
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoring;
 
 TEST_CASE(" "){
-	CHECK(1==1)
+	CHECK(1==1);
 }
