@@ -8,7 +8,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 
 	parameterMonitoringFunctionStatus = true;
-	// TODO: Add more error reports
+	// TODO: Evaluate if more error reports are necessary
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
@@ -36,7 +36,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
 
 	parameterMonitoringFunctionStatus = false;
-	// TODO: Add more error reports
+	// TODO: Evaluate if more error reports are necessary
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
