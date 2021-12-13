@@ -16,18 +16,16 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			return;
 		}
+		//TODO: Examine why merging the following two if statements in 1, does not work.
 		if (auto currentParameter = systemParameters.getParameter(currentId)) {
 			if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
-				ParameterMonitoringList.insert({currentId, currentParameter->get()});
-				CheckingStatus.insert({currentParameter->get(), Unchecked});
-				RepetitionCounter.insert({currentParameter->get(), 0});
-				ParameterMonitoringStatus.insert({currentParameter->get(), true});
-			} else {
-				CheckingStatus.find(currentParameter->get())->second = Unchecked;
 				RepetitionCounter.find(currentParameter->get())->second = 0;
+				ParameterMonitoringStatus.find(currentParameter->get())->second = true;
+			} else {
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			}
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::InternalErrorType::NonExistentParameter);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 		}
 	}
 }
