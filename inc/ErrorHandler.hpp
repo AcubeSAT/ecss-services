@@ -170,11 +170,17 @@ public:
 		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
 		 */
 		MaxStatisticDefinitionsReached = 12,
+		//TODO: Maybe find shorter names for the below errors
 		/**
 		 * Attempt to delete all parameter monitoring definitions but the Parameter Monitoring Function Status is
 		 * enabled.
 		 */
-		 InvalidRequestToDeleteAllParameterMonitoringDefinitionsError = 13
+		InvalidRequestToDeleteAllParameterMonitoringDefinitionsError = 13,
+		/**
+		 * Attempt to delete one parameter monitoring definition but it's Parameter Monitoring Status is
+		 * enabled.
+		 */
+		InvalidRequestToDeleteParameterMonitoringDefinitionError = 14
 	};
 
 	/**
