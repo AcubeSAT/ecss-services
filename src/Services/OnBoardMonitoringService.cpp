@@ -6,7 +6,6 @@
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
-
 	parameterMonitoringFunctionStatus = true;
 	// TODO: Evaluate if more error reports are necessary
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
@@ -32,7 +31,6 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 
 void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
-
 	parameterMonitoringFunctionStatus = false;
 	// TODO: Evaluate if more error reports are necessary
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
@@ -66,8 +64,7 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 		ErrorHandler::reportError(
 		    message,
 		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError);
-	}
-	else{
+	} else {
 		ParameterMonitoringList.clear();
 		CheckTransitionList.clear();
 	}
@@ -79,6 +76,17 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 
 void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DeleteParameterMonitoringDefinitions);
+	uint16_t numberOfIds = message.readUint16();
+	uint16_t currentParameterId = message.readUint16();
+	for (uint16_t i = 0; i < numberOfIds; i++) {
+		if (ParameterMonitoringList.find(currentParameterId) == ParameterMonitoringList.end() ||
+		    ParameterMonitoringStatus.at(systemParameters.getParameter(currentParameterId)->get())) {
+			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinitionError);
+		} else {
+			ParameterMonitoringList.erase(currentParameterId);
+		}
+		currentParameterId = message.readUint16();
+	}
 }
 
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
@@ -103,9 +111,23 @@ void OnBoardMonitoringService::checkTransitionReport() {}
 
 void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Message& message) {
 	message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition);
+	// TODO: Add error reports
+	parameterMonitoringDefinitionStatusReport();
 }
 
-void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {}
+void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
+	// TODO: Check if application id must be 1
+	Message parameterMonitoringDefinitionStatusReport(
+	    ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, 1);
+	// TODO: Check if N must be inserted first.
+	parameterMonitoringDefinitionStatusReport.appendUint16(ParameterMonitoringList.size());
+	for (auto& currentParameter : ParameterMonitoringList) {
+		parameterMonitoringDefinitionStatusReport.appendEnumerated(16, currentParameter.first);
+		parameterMonitoringDefinitionStatusReport.appendEnumerated(
+		    16, ParameterMonitoringStatus.at(currentParameter.second));
+	}
+	storeMessage(parameterMonitoringDefinitionStatusReport);
+}
 
 void OnBoardMonitoringService::execute(Message& message) {
 	switch (message.messageType) {
