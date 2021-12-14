@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #include <Message.hpp>
+#include "etl/array.h"
 #include "Service.hpp"
 #include "Parameters/SystemParameters.hpp"
 #include "Helpers/Parameter.hpp"
@@ -9,7 +10,6 @@
 #include "etl/list.h"
 
 class OnBoardMonitoringService : public Service {
-
 public:
 	inline static const uint8_t ServiceType = 12;
 	enum MessageType : uint8_t {
@@ -46,12 +46,15 @@ public:
 
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
 
-	etl::map<std::reference_wrapper<ParameterBase>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
+	etl::map<std::reference_wrapper<ParameterBase>, ParameterMonitoringCheckingStatus, ECSSMaxParameters>
+	    CheckingStatus;
 
 	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionCounter;
 
 	etl::map<std::reference_wrapper<ParameterBase>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
 
+	etl::map<std::reference_wrapper<ParameterBase>, etl::array<ParameterMonitoringCheckingStatus, 2>, ECSSMaxParameters>
+	    CheckTransitionList;
 
 	/**
 	 * If true, parameter monitoring is enabled
