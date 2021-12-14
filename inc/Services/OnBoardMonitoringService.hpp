@@ -42,6 +42,8 @@ public:
 		AboveHighThreshold = 10
 	};
 
+	uint16_t maximumTransitionReportingDelay = 0;
+
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
 
 	etl::map<std::reference_wrapper<ParameterBase>, ParameterMonitoringCheckingStatus, ECSSMaxParameters> CheckingStatus;
