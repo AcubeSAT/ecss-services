@@ -16,7 +16,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			return;
 		}
-		//TODO: Examine why merging the following two if statements in 1, does not work.
+		// TODO: Examine why merging the following two if statements in 1, does not work.
 		if (auto currentParameter = systemParameters.getParameter(currentId)) {
 			if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
 				RepetitionCounter.find(currentParameter->get())->second = 0;
@@ -46,8 +46,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 			if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
 				ParameterMonitoringStatus.find(currentParameter->get())->second = false;
 				CheckingStatus.find(currentParameter->get())->second = Unchecked;
-			}
-			else{
+			} else {
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			}
 		} else {
@@ -63,6 +62,15 @@ void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& me
 
 void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions);
+	if (parameterMonitoringFunctionStatus) {
+		ErrorHandler::reportError(
+		    message,
+		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError);
+	}
+	else{
+		ParameterMonitoringList.clear();
+		CheckTransitionList.clear();
+	}
 }
 
 void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message) {
