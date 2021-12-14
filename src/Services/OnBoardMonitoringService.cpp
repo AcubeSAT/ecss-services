@@ -58,6 +58,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 
 void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& message) {
 	message.assertTC(ServiceType, ChangeMaximumTransitionReportingDelay);
+	maximumTransitionReportingDelay = message.readUint16();
 }
 
 void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& message) {
