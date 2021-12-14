@@ -67,7 +67,7 @@ TEST_CASE("Requirement 7.3.2 (Boolean)", "[message][ecss]") {
 	message.append<bool>(false);
 	message.append<bool>(true);
 
-	REQUIRE(message.dataSize == 2);
+	REQUIRE(message.dataSize == 3);
 
 	CHECK_FALSE(message.read<bool>());
 	CHECK(message.read<bool>());
