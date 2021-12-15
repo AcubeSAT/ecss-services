@@ -46,7 +46,32 @@ public:
 
 	};
 
-	enum CheckTypes : uint8_t { LimitCheck = 1, ExpectedValueCheck = 2, DeltaCheck = 3 };
+	struct LimitCheck {
+		uint16_t lowLimit;
+		Event belowLowLimitEvent;
+		uint16_t highLimit;
+		Event aboveHighLimitEvent;
+	};
+
+	struct ExpectedValueCheck {
+		uint16_t expectedValue;
+		uint8_t mask;
+		Event notExpectedValueEvent;
+	};
+
+	struct DeltaCheck {
+		uint16_t numberOfConsecutiveDeltaChecks;
+		uint16_t lowDeltaThreshold;
+		Event belowLowThresholdEvent;
+		uint16_t highDeltaThreshold;
+		Event aboveHighThresholdEvent;
+	};
+
+	struct CheckTypes {
+		LimitCheck limitCheck;
+		ExpectedValueCheck expectedValueCheck;
+		DeltaCheck deltaCheck;
+	};
 
 	uint16_t maximumTransitionReportingDelay = 0;
 
