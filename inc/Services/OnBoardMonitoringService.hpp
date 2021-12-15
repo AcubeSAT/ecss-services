@@ -29,7 +29,7 @@ public:
 		ParameterMonitoringDefinitionStatusReport = 14
 	};
 
-	enum ParameterMonitoringCheckingStatus : uint8_t {
+	enum CheckingStatus : uint8_t {
 		Unchecked = 1,
 		Invalid = 2,
 		ExpectedValue = 3,
@@ -46,14 +46,14 @@ public:
 
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
 
-	etl::map<std::reference_wrapper<ParameterBase>, ParameterMonitoringCheckingStatus, ECSSMaxParameters>
-	    CheckingStatus;
+	etl::map<std::reference_wrapper<ParameterBase>, CheckingStatus, ECSSMaxParameters>
+	    ParameterMonitoringCheckingStatus;
 
 	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionCounter;
 
 	etl::map<std::reference_wrapper<ParameterBase>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
 
-	etl::map<std::reference_wrapper<ParameterBase>, etl::array<ParameterMonitoringCheckingStatus, 2>, ECSSMaxParameters>
+	etl::map<std::reference_wrapper<ParameterBase>, etl::array<CheckingStatus, 2>, ECSSMaxParameters>
 	    CheckTransitionList;
 
 	/**
