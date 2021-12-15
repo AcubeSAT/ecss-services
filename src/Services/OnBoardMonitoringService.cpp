@@ -111,15 +111,13 @@ void OnBoardMonitoringService::checkTransitionReport() {}
 
 void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Message& message) {
 	message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition);
-	// TODO: Add error reports
 	parameterMonitoringDefinitionStatusReport();
 }
 
 void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	// TODO: Check if application id must be 1
 	Message parameterMonitoringDefinitionStatusReport(
-	    ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, 1);
-	// TODO: Check if N must be inserted first.
+	    ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, 0);
 	parameterMonitoringDefinitionStatusReport.appendUint16(ParameterMonitoringList.size());
 	for (auto& currentParameter : ParameterMonitoringList) {
 		parameterMonitoringDefinitionStatusReport.appendEnumerated(16, currentParameter.first);
