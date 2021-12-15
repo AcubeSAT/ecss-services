@@ -41,6 +41,10 @@ public:
 		BelowLowThreshold = 9,
 		AboveHighThreshold = 10
 	};
+	//TODO: Find out if events should be declared here or in EventReportService.hpp
+	enum Event : uint8_t {
+
+	};
 
 	enum CheckTypes : uint8_t { LimitCheck = 1, ExpectedValueCheck = 2, DeltaCheck = 3 };
 
