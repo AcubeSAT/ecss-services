@@ -43,7 +43,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 		if (auto currentParameter = systemParameters.getParameter(currentId)) {
 			if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
 				ParameterMonitoringStatus.find(currentParameter->get())->second = false;
-				CheckingStatus.find(currentParameter->get())->second = Unchecked;
+				ParameterMonitoringCheckingStatus.find(currentParameter->get())->second = Unchecked;
 			} else {
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			}
