@@ -43,7 +43,11 @@ public:
 	};
 	//TODO: Find out if events should be declared here or in EventReportService.hpp
 	enum Event : uint8_t {
-
+		BelowLowLimitEvent = 1,
+		AboveHighLimitEvent = 2,
+		NotExpectedValueEvent = 3,
+		BelowLowThresholdEvent = 4,
+		AboveHighThresholdEvent = 5
 	};
 
 	struct LimitCheck {
