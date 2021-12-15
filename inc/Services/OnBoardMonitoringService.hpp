@@ -42,6 +42,12 @@ public:
 		AboveHighThreshold = 10
 	};
 
+	enum CheckTypes : uint8_t {
+		LimitCheck = 1,
+		ExpectedValueCheck = 2,
+		DeltaCheck = 3
+	};
+
 	uint16_t maximumTransitionReportingDelay = 0;
 
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
