@@ -72,6 +72,62 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 
 void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, AddParameterMonitoringDefinitions);
+	// TODO: Undertand error types 6.12.3.9.1.e.3-4.
+	// TODO: Evaluate if the optional values in TC[12,5] are going to be used.
+	uint16_t numberOfIds = message.readUint16();
+	for (uint16_t i = 0; i < numberOfIds; i++) {
+		uint16_t currentPMONId = message.readUint16();
+		uint16_t currentParameterId = message.readUint16();
+		uint16_t currentParameterRepetitionNumber = message.readUint16();
+		// TODO: Find out how to handle enumerated values.
+		uint16_t currentCheckType = message.readEnum16();
+		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end()) {
+			if (ParameterMonitoringList.full()) {
+				ErrorHandler::reportError(message,
+				                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
+			} else {
+				if (auto parameterToBeAdded = systemParameters.getParameter(currentParameterId)) {
+					ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
+					RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
+					ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
+					if (currentCheckType == LimitCheck) {
+						// TODO: Find out how we read deduced message values.
+						uint8_t lowLimit = message.readUint8();
+						// TODO: Evaluate if the below cast is right.
+						auto belowLowLimitEventId = static_cast<Event>(message.readEnum8());
+						uint8_t highLimit = message.readUint8();
+						auto aboveHighLimitEventId = static_cast<Event>(message.readEnum8());
+						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), LimitCheck});
+						struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
+						                                aboveHighLimitEventId};
+						LimitCheckParameters.insert({parameterToBeAdded->get(), limitCheck});
+					} else if (currentCheckType == ExpectedValueCheck) {
+						uint8_t mask = message.readUint8();
+						uint8_t expectedValue = message.readUint8();
+						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
+						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), ExpectedValueCheck});
+						struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue, notExpectedValueEventId};
+						ExpectedValueCheckParameters.insert({parameterToBeAdded->get(), expectedValueCheck});
+					} else if (currentCheckType == DeltaCheck) {
+						uint8_t lowDeltaThreshold = message.readUint8();
+						auto belowLowThresholdEventId = static_cast<Event>(message.readEnum8());
+						uint8_t highDeltaThreshold = message.readUint8();
+						auto aboveHighThresholdEventId = static_cast<Event>(message.readEnum8());
+						uint8_t numberOfConsecutiveDeltaChecks = message.readUint8();
+						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), DeltaCheck});
+						struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
+						                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
+						DeltaCheckParameters.insert({parameterToBeAdded->get(), deltaCheck});
+					}
+				}
+				else{
+					ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+				}
+			}
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::AddAlreadyExistingParameter);
+		}
+	}
 }
 
 void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& message) {
