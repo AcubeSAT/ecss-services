@@ -180,7 +180,15 @@ public:
 		 * Attempt to delete one parameter monitoring definition but it's Parameter Monitoring Status is
 		 * enabled.
 		 */
-		InvalidRequestToDeleteParameterMonitoringDefinitionError = 14
+		InvalidRequestToDeleteParameterMonitoringDefinitionError = 14,
+		/**
+		 * Attempt to add a parameter that already exists to the Parameter Monitoring List.
+		 */
+		AddAlreadyExistingParameter = 15,
+		/**
+		 * Attempt to add a parameter in the Parameter Monitoring List but it's full
+		 */
+		ParameterMonitoringListIsFull = 16
 	};
 
 	/**
