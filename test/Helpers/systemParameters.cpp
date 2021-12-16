@@ -13,11 +13,10 @@ TEST_CASE("Getting a reference of a parameter") {
 
 	SECTION("Invalid parameter requested") {
 		uint16_t parameterId = systemParameters.parametersArray.size() + 1;
-		systemParameters.getParameter(parameterId);
+		REQUIRE(not systemParameters.getParameter(parameterId));
 
 		parameterId = parameterId + 24;
-		systemParameters.getParameter(parameterId);
-
+		REQUIRE(not systemParameters.getParameter(parameterId));
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentParameter) == 2);
 	}
 }
