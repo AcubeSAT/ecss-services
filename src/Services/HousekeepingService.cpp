@@ -254,7 +254,7 @@ void HousekeepingService::execute(Message& message) {
 	}
 }
 
-bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxHousekeepingStructures>& ids,
+bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids,
                                          uint16_t parameterId) {
 	return std::find(std::begin(ids), std::end(ids), parameterId) != std::end(ids);
 }
