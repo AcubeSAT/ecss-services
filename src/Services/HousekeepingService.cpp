@@ -23,6 +23,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		uint16_t newParamId = request.readUint16();
 		if (existsInVector(newStructure.simplyCommutatedParameterIds, newParamId)) {
+			ErrorHandler::reportError(request,ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 			continue;
 		}
 		newStructure.simplyCommutatedParameterIds.push_back(newParamId);

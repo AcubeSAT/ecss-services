@@ -174,6 +174,9 @@ TEST_CASE("Create housekeeping structure") {
 		}
 
 		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 5);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter) == 5);
 		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
 
 		REQUIRE(newStruct.simplyCommutatedParameterIds.size() == 4);
