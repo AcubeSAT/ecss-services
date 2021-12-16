@@ -41,7 +41,7 @@ public:
 		BelowLowThreshold = 9,
 		AboveHighThreshold = 10
 	};
-	//TODO: Find out if events should be declared here or in EventReportService.hpp
+	// TODO: Find out if events should be declared here or in EventReportService.hpp
 	enum Event : uint8_t {
 		BelowLowLimitEvent = 1,
 		AboveHighLimitEvent = 2,
@@ -71,7 +71,7 @@ public:
 		Event aboveHighThresholdEvent;
 	};
 
-	struct CheckTypes {
+	struct CheckType {
 		LimitCheck limitCheck;
 		ExpectedValueCheck expectedValueCheck;
 		DeltaCheck deltaCheck;
@@ -91,7 +91,7 @@ public:
 	etl::map<std::reference_wrapper<ParameterBase>, etl::array<CheckingStatus, 2>, ECSSMaxParameters>
 	    CheckTransitionList;
 
-	etl::map<std::reference_wrapper<ParameterBase>, CheckTypes, ECSSMaxParameters> ParameterMonitoringCheckTypes;
+	etl::map<std::reference_wrapper<ParameterBase>, CheckType, ECSSMaxParameters> ParameterMonitoringCheckTypes;
 
 	/**
 	 * If true, parameter monitoring is enabled
