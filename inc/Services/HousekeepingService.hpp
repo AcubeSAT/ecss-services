@@ -28,7 +28,8 @@ private:
 	/**
 	 * Returns true if the given parameter ID exists in the parameters contained in the housekeeping structure.
 	 */
-	static bool existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids, uint16_t parameterId);
+	static bool existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids,
+	                           uint16_t parameterId);
 
 public:
 	inline static const uint8_t ServiceType = 3;
@@ -102,6 +103,10 @@ public:
 	/**
 	 * This function receives a message type TC[3,29] 'append new parameters to an already existing housekeeping
 	 * structure'
+	 *
+	 * @note As per 6.3.3.8.d.4, in case of an invalid parameter, the whole message shall be rejected. However, a
+	 * convention was made, saying that it would be more practical to just skip the invalid parameter and continue
+	 * processing the rest of the message.
 	 */
 	void appendParametersToHousekeepingStructure(Message& request);
 
