@@ -188,7 +188,17 @@ public:
 		/**
 		 * Attempt to add a parameter in the Parameter Monitoring List but it's full
 		 */
-		ParameterMonitoringListIsFull = 16
+		ParameterMonitoringListIsFull = 16,
+		/**
+		 * Attempt to add or modify a limit check parameter monitoring definition, but the high limit is lower than
+		 * the low limit.
+		 */
+		HighLimitIsLowerThanLowLimit = 17,
+		/**
+		 * Attempt to add or modify a delta check parameter monitoring definition, but the high threshold is lower than
+		 * the low threshold.
+		 */
+		HighThresholdIsLowerThanLowThreshold = 17
 	};
 
 	/**
