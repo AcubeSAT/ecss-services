@@ -1,33 +1,20 @@
 #ifndef ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 
-// TODO: actually define this
-#define MAX_NUM_OF_DEFINITIONS 10
-
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Parameters/SystemParameters.hpp"
+#include "Helpers/Statistic.hpp"
 #include "etl/deque.h"
-#include "Statistics/SystemStatistics.hpp"
+#include "etl/map.h"
 
 /**
- * Implementation of the ST[04] parameter management service,
- * as defined in ECSS-E-ST-70-41C. Regarding the variable types
- * 0 means uint8, 1 means uint16 and 2 means uint32 (watch the implementation
- * of TC[02]).
- *
+ * Implementation of the ST[04] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
-
-//extern bool supportsStandardDeviation = true;
-
 class ParameterStatisticsService : public Service {
 public:
-
-	//TODO: implement the statistic parsing from the dequeue and the resetting of each parameter's vector after
-	//      resetFlag or periodic reset.
-
 	inline static const uint8_t ServiceType = 4;
 
 	enum MessageType : uint8_t {
@@ -42,72 +29,86 @@ public:
 		ParameterStatisticsDefinitionsReport = 9,
 	};
 
-	bool periodicStatisticsReportingStatus = false;     // 1 means that periodic reporting is enabled
-	bool hasAutomaticStatisticsReset = false;
-	bool supportsStandardDeviation = true;
-	uint16_t periodicStatisticsReportingInterval = 0;
-	uint16_t numOfStatisticsDefinitions = 0;
-	uint16_t nonDefinedStatistics = 0;
-
-	ParameterStatisticsService() = default;
 	/**
-	 * This function receives a TM[4,1] packet and
-	 * returns a TM[4,2] packet containing the parameter
-	 * statistics report.
-	 *
-	 * @param resetFlag: a TC[4, 1] packet carrying a boolean value
+	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
-	void reportParameterStatistics(Message& resetFlag);
+	etl::map<uint16_t, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
-	 * TC[4,3] reset parameter statistics thus clear all samples and values.
+	 * true means that the periodic statistics reporting is enabled
+	 */
+	bool periodicStatisticsReportingStatus = false;
+	/**
+	 * If true, after every report reset the parameter statistics.
+	 */
+	bool hasAutomaticStatisticsReset = false; // todo: do const
+	/**
+	 * Indicates whether to append/read the sampling interval to/from message
+	 */
+	const bool supportsSamplingInterval = true;
+	/**
+	 * The parameter statistics reporting interval
+	 */
+	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
+
+	/**
+	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
+	 */
+	void reportParameterStatistics(Message& request);
+
+	/**
+	 * Constructs and stores a TM[4,2] packet containing the parameter statistics report.
+	 */
+	void parameterStatisticsReport();
+
+	/**
+	 * TC[4,3] reset parameter statistics, clearing all samples and values. This is the function called by TC from
+	 * the GS.
+	 */
+	void resetParameterStatistics(Message& request);
+
+	/**
+	 * This function clears all the samples.
 	 */
 	void resetParameterStatistics();
 
 	/**
-	 * TC[4,4] enable periodic parameter reporting
-	 *
-	 * @param request: contains a boolean value
+	 * TC[4,4] enable periodic parameter statistics reporting
 	 */
 	void enablePeriodicStatisticsReporting(Message& request);
 
 	/**
-	 * TM[4,5] disable periodic parameter reporting
-	 *
-	 * @param request: contains a boolean value
+	 * TC[4,5] disable periodic parameter statistics reporting
 	 */
 	void disablePeriodicStatisticsReporting(Message& request);
 
 	/**
-	 * TM[4,6] add or update parameter statistics definitions
-	 *
-	 * @param paramIds: Ids of the parameters. Could be followed by intervals.
+	 * TC[4,6] add or update parameter statistics definitions
 	 */
-	void addOrUpdateStatisticsDefinitions(Message& paramIds);
+	void addOrUpdateStatisticsDefinitions(Message& request);
 
 	/**
-	 * TM[4,7] delete parameter statistics definitions
-	 * 		   One version specifies the IDs of the
-	 * 		   parameters whose definitions are to
-	 * 		   be deleted.The second version deletes
-	 * 		   all definitions
-	 *
-	 * @param paramIds: Ids of the parameters
+	 * TC[4,7] delete parameter statistics definitions.
 	 */
-	void deleteStatisticsDefinitions(Message& paramIds);
-	void deleteAllStatisticsDefinitions();
+	void deleteStatisticsDefinitions(Message& request);
 
 	/**
-	 * This function receives a TM[4,8] packet and
-	 * returns a TM[4,9] packet containing the parameter
-	 * statistics definitions report.
-	 *
-	 * @param
+	 * TC[4,8] report the parameter statistics definitions, by calling statisticsDefinitionsReport()
 	 */
 	void reportStatisticsDefinitions(Message& request);
+	/**
+	 * Constructs and stores a TM[4,9] packet containing the parameter statistics definitions report.
+	 */
+	void statisticsDefinitionsReport();
 
+	/**
+	 * Calls the suitable function that executes a telecommand packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param message Contains the necessary parameters to call the suitable subservice
+	 */
+	void execute(Message& message);
 };
-
-extern ParameterStatisticsService parameterStatisticsService;
 
 #endif

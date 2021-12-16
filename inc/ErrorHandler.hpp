@@ -158,6 +158,7 @@ public:
 		 */
 		EventActionDefinitionsMapIsFull = 11,
 		/**
+<<<<<<< HEAD
 		 * Attempt to report/delete non existing housekeeping structure (St[03])
 		 */
 		RequestedNonExistingStructure = 12,
@@ -177,7 +178,11 @@ public:
 		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
 		 * enabled (ST[03])
 		 */
-		RequestedAppendToPeriodicStructure = 16
+		RequestedAppendToPeriodicStructure = 16,
+		/**
+		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
+		 */
+		MaxStatisticDefinitionsReached = 17,
 	};
 
 	/**

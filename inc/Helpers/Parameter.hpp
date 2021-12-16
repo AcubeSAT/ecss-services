@@ -41,6 +41,7 @@ public:
 	void setParameterIsActive(bool paramIsActive) {
 		this -> parameterIsActive = paramIsActive;
 	}
+	virtual double getValueAsDouble() = 0;
 };
 
 /**
@@ -64,6 +65,10 @@ public:
 		return currentValue;
 	}
 
+	inline double getValueAsDouble() override {
+		return static_cast<double>(currentValue);
+	}
+
 	/**
 	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that paremeter
 	 */
@@ -80,4 +85,4 @@ public:
 
 };
 
-#endif //ECSS_SERVICES_PARAMETER_HPP
+#endif // ECSS_SERVICES_PARAMETER_HPP

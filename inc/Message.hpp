@@ -104,7 +104,7 @@ public:
 	//
 	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	// Message::appendBits() relies on this in order to easily OR the requested bits.
-	uint8_t data[ECSS_MAX_MESSAGE_SIZE] = {0};
+	uint8_t data[ECSSMaxMessageSize] = {0};
 
 	// private:
 	uint8_t currentBit = 0;
@@ -353,6 +353,15 @@ public:
 	}
 
 	/**
+	 * Adds a double to the end of the message
+	 */
+	void appendDouble(double value) {
+		static_assert(sizeof(uint64_t) == sizeof(value), "Double numbers must be 64 bits long");
+
+		return appendUint64(reinterpret_cast<uint64_t&>(value));
+	}
+
+	/**
 	 * Adds a N-byte string to the end of the message
 	 *
 	 *
@@ -514,6 +523,13 @@ public:
 		return reinterpret_cast<float&>(value);
 	}
 
+	float readDouble() {
+		static_assert(sizeof(uint64_t) == sizeof(double), "Double numbers must be 64 bits long");
+
+		uint64_t value = readUint64();
+		return reinterpret_cast<double&>(value);
+	}
+
 	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
@@ -537,13 +553,13 @@ public:
 	 * https://www.fluentcpp.com/2017/08/15/function-templates-partial-specialization-cpp/
 	 * @tparam MAX_SIZE The memory size of the string in bytes, which corresponds to the max string size
 	 */
-	template<const size_t MAX_SIZE>
+	template <const size_t MAX_SIZE>
 	String<MAX_SIZE> readOctetString() {
 		String<MAX_SIZE> string("");
 
 		uint16_t length = readUint16();
 		ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort);
-		ASSERT_REQUEST((readPosition + length) <= ECSS_MAX_MESSAGE_SIZE, ErrorHandler::MessageTooShort);
+		ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
 		string.append(data + readPosition, length);
 		readPosition += length;
@@ -616,37 +632,108 @@ public:
 	}
 };
 
-template<> inline void Message::append(const uint8_t& value) { appendUint8(value); }
-template<> inline void Message::append(const uint16_t& value) { appendUint16(value); }
-template<> inline void Message::append(const uint32_t& value) { appendUint32(value); }
-template<> inline void Message::append(const uint64_t& value) { appendUint64(value); }
+template <>
+inline void Message::append(const uint8_t& value) {
+	appendUint8(value);
+}
+template <>
+inline void Message::append(const uint16_t& value) {
+	appendUint16(value);
+}
+template <>
+inline void Message::append(const uint32_t& value) {
+	appendUint32(value);
+}
+template <>
+inline void Message::append(const uint64_t& value) {
+	appendUint64(value);
+}
 
-template<> inline void Message::append(const int8_t& value) { appendSint8(value); }
-template<> inline void Message::append(const int16_t& value) { appendSint16(value); }
-template<> inline void Message::append(const int32_t& value) { appendSint32(value); }
+template <>
+inline void Message::append(const int8_t& value) {
+	appendSint8(value);
+}
+template <>
+inline void Message::append(const int16_t& value) {
+	appendSint16(value);
+}
+template <>
+inline void Message::append(const int32_t& value) {
+	appendSint32(value);
+}
 
-template<> inline void Message::append(const bool& value) { appendBoolean(value); }
-template<> inline void Message::append(const char& value) { appendByte(value); }
-template<> inline void Message::append(const float& value) { appendFloat(value); }
+template <>
+inline void Message::append(const bool& value) {
+	appendBoolean(value);
+}
+template <>
+inline void Message::append(const char& value) {
+	appendByte(value);
+}
+template <>
+inline void Message::append(const float& value) {
+	appendFloat(value);
+}
+template <>
+inline void Message::append(const double& value) {
+	appendDouble(value);
+}
 
 /**
  * Appends an ETL string to the message. ETL strings are handled as ECSS octet strings, meaning that the string size
  * is appended as a byte before the string itself. To append other string sequences, see the Message::appendString()
  * functions
  */
-template<> inline void Message::append(const etl::istring& value) { appendOctetString(value); }
+template <>
+inline void Message::append(const etl::istring& value) {
+	appendOctetString(value);
+}
 
-template<> inline uint8_t Message::read() { return readUint8(); }
-template<> inline uint16_t Message::read() { return readUint16(); }
-template<> inline uint32_t Message::read() { return readUint32(); }
-template<> inline uint64_t Message::read() { return readUint64(); }
+template <>
+inline uint8_t Message::read() {
+	return readUint8();
+}
+template <>
+inline uint16_t Message::read() {
+	return readUint16();
+}
+template <>
+inline uint32_t Message::read() {
+	return readUint32();
+}
+template <>
+inline uint64_t Message::read() {
+	return readUint64();
+}
 
-template<> inline int8_t Message::read() { return readSint8(); }
-template<> inline int16_t Message::read() { return readSint16(); }
-template<> inline int32_t Message::read() { return readSint32(); }
+template <>
+inline int8_t Message::read() {
+	return readSint8();
+}
+template <>
+inline int16_t Message::read() {
+	return readSint16();
+}
+template <>
+inline int32_t Message::read() {
+	return readSint32();
+}
 
-template<> inline bool Message::read<bool>() { return readBoolean(); }
-template<> inline char Message::read() { return readByte(); }
-template<> inline float Message::read() { return readFloat(); }
+template <>
+inline bool Message::read<bool>() {
+	return readBoolean();
+}
+template <>
+inline char Message::read() {
+	return readByte();
+}
+template <>
+inline float Message::read() {
+	return readFloat();
+}
+template <>
+inline double Message::read() {
+	return readDouble();
+}
 
 #endif // ECSS_SERVICES_PACKET_H
