@@ -3,6 +3,7 @@
 #define ECSS_SERVICES_SYSTEMPARAMETERS_HPP
 
 #include "Helpers/Parameter.hpp"
+#include <optional>
 #include "etl/vector.h"
 /**
  * @author Athanasios Theocharis <athatheoc@gmail.com>
