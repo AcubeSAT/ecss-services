@@ -118,7 +118,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
 
 	housekeepingReport.appendUint8(structureId);
-	for (auto& id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
+	for (auto id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
 		if (auto parameter = systemParameters.getParameter(id)) {
 			parameter->get().appendValueToMessage(housekeepingReport);
 		}
