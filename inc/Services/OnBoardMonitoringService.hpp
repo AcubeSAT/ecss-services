@@ -50,6 +50,12 @@ public:
 		AboveHighThresholdEvent = 5
 	};
 
+	enum CheckType : uint8_t {
+		LimitCheck = 1,
+		ExpectedValueCheck = 2,
+		DeltaCheck = 3
+	};
+
 	struct LimitCheck {
 		uint16_t lowLimit;
 		Event belowLowLimitEvent;
@@ -71,11 +77,6 @@ public:
 		Event aboveHighThresholdEvent;
 	};
 
-	struct CheckType {
-		LimitCheck limitCheck;
-		ExpectedValueCheck expectedValueCheck;
-		DeltaCheck deltaCheck;
-	};
 
 	uint16_t maximumTransitionReportingDelay = 0;
 
@@ -92,6 +93,12 @@ public:
 	    CheckTransitionList;
 
 	etl::map<std::reference_wrapper<ParameterBase>, CheckType, ECSSMaxParameters> ParameterMonitoringCheckTypes;
+
+	etl::map<std::reference_wrapper<ParameterBase>, struct LimitCheck, ECSSMaxParameters> LimitCheckParameters;
+
+	etl::map<std::reference_wrapper<ParameterBase>, struct ExpectedValueCheck, ECSSMaxParameters> ExpectedValueCheckParameters;
+
+	etl::map<std::reference_wrapper<ParameterBase>, struct DeltaCheck, ECSSMaxParameters> DeltaCheckParameters;
 
 	/**
 	 * If true, parameter monitoring is enabled
