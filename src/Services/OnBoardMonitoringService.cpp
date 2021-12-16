@@ -80,16 +80,13 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		uint16_t currentParameterId = message.readUint16();
 		uint16_t currentParameterRepetitionNumber = message.readUint16();
 		// TODO: Find out how to handle enumerated values.
-		uint16_t currentCheckType = message.readEnum16();
+		uint16_t currentCheckType = message.readEnum8();
 		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end()) {
 			if (ParameterMonitoringList.full()) {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
 			} else {
 				if (auto parameterToBeAdded = systemParameters.getParameter(currentParameterId)) {
-					ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
-					RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
-					ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 					if (currentCheckType == LimitCheck) {
 						// TODO: Find out how we read deduced message values.
 						uint8_t lowLimit = message.readUint8();
@@ -97,6 +94,14 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						auto belowLowLimitEventId = static_cast<Event>(message.readEnum8());
 						uint8_t highLimit = message.readUint8();
 						auto aboveHighLimitEventId = static_cast<Event>(message.readEnum8());
+						if (highLimit <= lowLimit) {
+							ErrorHandler::reportError(
+							    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
+							return;
+						}
+						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
+						RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
+						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), LimitCheck});
 						struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
 						                                aboveHighLimitEventId};
@@ -105,6 +110,9 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						uint8_t mask = message.readUint8();
 						uint8_t expectedValue = message.readUint8();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
+						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
+						RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
+						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), ExpectedValueCheck});
 						struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue, notExpectedValueEventId};
 						ExpectedValueCheckParameters.insert({parameterToBeAdded->get(), expectedValueCheck});
@@ -114,13 +122,20 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						uint8_t highDeltaThreshold = message.readUint8();
 						auto aboveHighThresholdEventId = static_cast<Event>(message.readEnum8());
 						uint8_t numberOfConsecutiveDeltaChecks = message.readUint8();
+						if (highDeltaThreshold <= lowDeltaThreshold) {
+							ErrorHandler::reportError(
+							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
+							return;
+						}
+						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
+						RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
+						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), DeltaCheck});
 						struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
 						                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
 						DeltaCheckParameters.insert({parameterToBeAdded->get(), deltaCheck});
 					}
-				}
-				else{
+				} else {
 					ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 				}
 			}
