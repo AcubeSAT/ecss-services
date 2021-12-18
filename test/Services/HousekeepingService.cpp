@@ -469,7 +469,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		Services.reset();
 	}
 
-	SECTION("Periodic structure") {
+	SECTION("Enabled structure") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, Message::TC, 1);
 		// Enable 1 periodic struct with id=0
