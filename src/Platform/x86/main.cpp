@@ -18,7 +18,6 @@
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
 #include "ServicePool.hpp"
-#include "../../../test/Services/ServiceTests.hpp"
 #include <ctime>
 
 int main() {
