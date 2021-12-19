@@ -2,11 +2,12 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/ParameterService.hpp"
+#include "ServicePool.hpp"
 
 static void resetParameterValues() {
-	systemParameters.parameter1.setValue(3);
-	systemParameters.parameter2.setValue(7);
-	systemParameters.parameter3.setValue(10);
+	SystemParameters::parameter1.setValue(3);
+	SystemParameters::parameter2.setValue(7);
+	SystemParameters::parameter3.setValue(10);
 };
 
 TEST_CASE("Parameter Report Subservice") {
@@ -94,9 +95,9 @@ TEST_CASE("Parameter Setting Subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
 		CHECK(ServiceTests::count() == 1);
 
-		CHECK(systemParameters.parameter1.getValue() == 3);
-		CHECK(systemParameters.parameter2.getValue() == 7);
-		CHECK(systemParameters.parameter3.getValue() == 10);
+		CHECK(SystemParameters::parameter1.getValue() == 3);
+		CHECK(SystemParameters::parameter2.getValue() == 7);
+		CHECK(SystemParameters::parameter3.getValue() == 10);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -116,9 +117,9 @@ TEST_CASE("Parameter Setting Subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
 		CHECK(ServiceTests::count() == 1);
 
-		CHECK(systemParameters.parameter1.getValue() == 1);
-		CHECK(systemParameters.parameter2.getValue() == 2);
-		CHECK(systemParameters.parameter3.getValue() == 10);
+		CHECK(SystemParameters::parameter1.getValue() == 1);
+		CHECK(SystemParameters::parameter2.getValue() == 2);
+		CHECK(SystemParameters::parameter3.getValue() == 10);
 
 		resetParameterValues();
 
@@ -140,9 +141,9 @@ TEST_CASE("Parameter Setting Subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
 		CHECK(ServiceTests::count() == 1);
 
-		CHECK(systemParameters.parameter1.getValue() == 1);
-		CHECK(systemParameters.parameter2.getValue() == 7);
-		CHECK(systemParameters.parameter3.getValue() == 10);
+		CHECK(SystemParameters::parameter1.getValue() == 1);
+		CHECK(SystemParameters::parameter2.getValue() == 7);
+		CHECK(SystemParameters::parameter3.getValue() == 10);
 
 		resetParameterValues();
 
@@ -162,9 +163,9 @@ TEST_CASE("Parameter Setting Subservice") {
 
 		MessageParser::execute(request);
 
-		CHECK(systemParameters.parameter1.getValue() == 1);
-		CHECK(systemParameters.parameter2.getValue() == 2);
-		CHECK(systemParameters.parameter3.getValue() == 3);
+		CHECK(SystemParameters::parameter1.getValue() == 1);
+		CHECK(SystemParameters::parameter2.getValue() == 2);
+		CHECK(SystemParameters::parameter3.getValue() == 3);
 
 		resetParameterValues();
 

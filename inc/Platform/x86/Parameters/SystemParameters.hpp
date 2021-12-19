@@ -21,4 +21,4 @@ inline Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
 inline Parameter<uint32_t> parameter3 = Parameter<uint32_t>(10);
 inline Parameter<uint32_t> parameter4 = Parameter<uint32_t>(24);
 
-}; // namespace SystemParameters
+} // namespace SystemParameters
