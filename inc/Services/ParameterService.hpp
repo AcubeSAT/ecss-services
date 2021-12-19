@@ -32,7 +32,14 @@ public:
 		SetParameterValues = 3,
 	};
 
-	ParameterService() = default;
+	/**
+	 * The key of the array is the ID of the parameter as specified in PUS
+	 */
+	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> parametersArray;
+
+	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> initializeParametersArray();
+
+	ParameterService();
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

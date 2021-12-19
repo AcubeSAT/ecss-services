@@ -5,9 +5,19 @@
 #include "Helpers/Parameter.hpp"
 #include "Parameters/SystemParameters.hpp"
 
+inline etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount>
+ParameterService::initializeParametersArray() {
+	return etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount>(
+	    {SystemParameters::parameter1, SystemParameters::parameter2,
+	     SystemParameters::parameter3, SystemParameters::parameter4});
+}
+
+ParameterService::ParameterService() : parametersArray(initializeParametersArray()) {}
+
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
-	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport, Message::TM, 1);
+	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport,
+	                        Message::TM, 1);
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -19,7 +29,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t numberOfValidIds = 0;
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		if (paramIds.readUint16() < systemParameters.parametersArray.size()) {
+		if (paramIds.readUint16() < parametersArray.size()) {
 			numberOfValidIds++;
 		}
 	}
@@ -29,9 +39,9 @@ void ParameterService::reportParameters(Message& paramIds) {
 	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		if (currId < systemParameters.parametersArray.size()) {
+		if (currId < parametersArray.size()) {
 			parameterReport.appendUint16(currId);
-			systemParameters.parametersArray[currId].get().appendValueToMessage(parameterReport);
+			parametersArray[currId].get().appendValueToMessage(parameterReport);
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
@@ -41,11 +51,10 @@ void ParameterService::reportParameters(Message& paramIds) {
 }
 
 void ParameterService::setParameters(Message& newParamValues) {
-
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues, newParamValues,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues,
+	                            newParamValues, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(newParamValues.serviceType == ParameterService::ServiceType, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
@@ -53,8 +62,8 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		if (currId < systemParameters.parametersArray.size()) {
-			systemParameters.parametersArray[currId].get().setValueFromMessage(newParamValues);
+		if (currId < parametersArray.size()) {
+			parametersArray[currId].get().setValueFromMessage(newParamValues);
 		} else {
 			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);
 			break; // Setting next parameters is impossible, since the size of value to be read is unknown

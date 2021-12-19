@@ -2,6 +2,7 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
 #include "Services/ParameterStatisticsService.hpp"
+#include "ServicePool.hpp"
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
@@ -91,7 +92,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 	uint16_t numOfIds = request.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currentId = request.readUint16();
-		if (currentId >= systemParameters.parametersArray.size()) {
+		if (currentId >= Services.parameterManagement.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
 			if (supportsSamplingInterval) {
 				request.skipBytes(2);
@@ -139,7 +140,7 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	}
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currentId = request.readUint16();
-		if (currentId >= systemParameters.parametersArray.size()) {
+		if (currentId >= Services.parameterManagement.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 			continue;
 		}
