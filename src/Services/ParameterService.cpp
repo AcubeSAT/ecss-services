@@ -5,12 +5,6 @@
 #include "Helpers/Parameter.hpp"
 #include "Parameters/SystemParameters.hpp"
 
-inline etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount>
-ParameterService::initializeParametersArray() {
-	return etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount>(
-	    {SystemParameters::parameter1, SystemParameters::parameter2,
-	     SystemParameters::parameter3, SystemParameters::parameter4});
-}
 
 ParameterService::ParameterService() : parametersArray(initializeParametersArray()) {}
 
