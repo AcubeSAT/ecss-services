@@ -168,6 +168,135 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
+	uint16_t numberOfIds = message.readUint16();
+	for (uint16_t i = 0; i < numberOfIds; i++) {
+		uint16_t currentPMONId = message.readUint16();
+		uint16_t currentParameterId = message.readUint16();
+		uint16_t currentParameterRepetitionNumber = message.readUint16();
+		uint16_t currentCheckType = message.readEnum8();
+		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
+			if (auto parameterToBeAdded = systemParameters.getParameter(currentParameterId)) {
+				// TODO: Find out how to compare the items below.
+				if (static_cast<std::reference_wrapper<ParameterBase>>(parameterToBeAdded->get()) !=
+				    ParameterMonitoringList.find(currentPMONId)->second) {
+					if (currentCheckType == LimitCheck) {
+						uint8_t lowLimit = message.readUint8();
+						auto belowLowLimitEventId = static_cast<Event>(message.readEnum8());
+						uint8_t highLimit = message.readUint8();
+						auto aboveHighLimitEventId = static_cast<Event>(message.readEnum8());
+						if (highLimit <= lowLimit) {
+							ErrorHandler::reportError(
+							    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
+							return;
+						}
+						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
+						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+						    LimitCheck) {
+							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowLimit =
+							    lowLimit;
+							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.belowLowLimitEvent = belowLowLimitEventId;
+							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highLimit =
+							    highLimit;
+							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.aboveHighLimitEvent = aboveHighLimitEventId;
+						} else {
+							ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second =
+							    LimitCheck;
+							struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
+							                                aboveHighLimitEventId};
+							LimitCheckParameters.insert({parameterToBeAdded->get(), limitCheck});
+							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+							    ExpectedValueCheck) {
+								ExpectedValueCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							}
+							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+							    DeltaCheck) {
+								DeltaCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							}
+						}
+
+					} else if (currentCheckType == ExpectedValueCheck) {
+						uint8_t mask = message.readUint8();
+						uint8_t expectedValue = message.readUint8();
+						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
+						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
+						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+						    ExpectedValueCheck) {
+							ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.mask =
+							    mask;
+							ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.expectedValue = expectedValue;
+							ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.notExpectedValueEvent = notExpectedValueEventId;
+						} else {
+							ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second =
+							    ExpectedValueCheck;
+							struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue,
+							                                                notExpectedValueEventId};
+							ExpectedValueCheckParameters.insert({parameterToBeAdded->get(), expectedValueCheck});
+							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+							    LimitCheck) {
+								LimitCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							}
+							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+							    DeltaCheck) {
+								DeltaCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							}
+						}
+
+					} else if (currentCheckType == DeltaCheck) {
+						uint8_t lowDeltaThreshold = message.readUint8();
+						auto belowLowThresholdEventId = static_cast<Event>(message.readEnum8());
+						uint8_t highDeltaThreshold = message.readUint8();
+						auto aboveHighThresholdEventId = static_cast<Event>(message.readEnum8());
+						uint8_t numberOfConsecutiveDeltaChecks = message.readUint8();
+						if (highDeltaThreshold <= lowDeltaThreshold) {
+							ErrorHandler::reportError(
+							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
+							return;
+						}
+						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
+						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+						    DeltaCheck) {
+							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.lowDeltaThreshold = lowDeltaThreshold;
+							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.belowLowThresholdEvent = belowLowThresholdEventId;
+							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.highDeltaThreshold = highDeltaThreshold;
+							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.aboveHighThresholdEvent = aboveHighThresholdEventId;
+							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+							    ->second.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
+						} else {
+							ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second =
+							    DeltaCheck;
+							struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
+							                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
+							DeltaCheckParameters.insert({parameterToBeAdded->get(), deltaCheck});
+							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+							    LimitCheck) {
+								LimitCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							}
+							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+							    ExpectedValueCheck) {
+								ExpectedValueCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							}
+						}
+					}
+				} else {
+					ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
+					                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
+				}
+			} else {
+				ErrorHandler::reportError(message, ErrorHandler::GetNonExistingParameter);
+			}
+		} else {
+			ErrorHandler::reportError(
+			    message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
+		}
+	}
 }
 
 void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& message) {
