@@ -100,7 +100,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 							return;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
-						RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
+						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
+						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), LimitCheck});
 						struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
@@ -111,7 +112,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						uint8_t expectedValue = message.readUint8();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
-						RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
+						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
+						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), ExpectedValueCheck});
 						struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue, notExpectedValueEventId};
@@ -128,7 +130,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 							return;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
-						RepetitionCounter.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
+						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
+						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), DeltaCheck});
 						struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
