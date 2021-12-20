@@ -23,7 +23,6 @@
  */
 class ParameterService : public Service {
 public:
-
 	inline static const uint8_t ServiceType = 20;
 
 	enum MessageType : uint8_t {
@@ -33,13 +32,24 @@ public:
 	};
 
 	/**
-	 * The key of the array is the ID of the parameter as specified in PUS
+	 * Array containing instances of the \ref Parameter class.
+	 * It stores all the parameters of the \ref SystemParameters namespace.
+	 * The parameters here are under the responsibility of \ref ParameterService.
+	 * The key of the array is the ID of the parameter as specified in PUS.
 	 */
 	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> parametersArray;
 
+	/**
+	 * @return array storing the initial System parameters drawn
+	 * 		   from \ref SystemParameters namespace
+	 */
 	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> initializeParametersArray();
 
-	ParameterService();
+	/**
+	 * The Constructor initializes \var parametersArray
+	 * by calling \fn initializeParametersArray
+	 */
+	ParameterService() : parametersArray(initializeParametersArray()) {}
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
