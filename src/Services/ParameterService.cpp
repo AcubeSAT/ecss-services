@@ -5,7 +5,7 @@
 #include "Helpers/Parameter.hpp"
 #include "Parameters/SystemParameters.hpp"
 
-
+ParameterService::ParameterService() : parametersArray(initializeParametersArray()) {}
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
