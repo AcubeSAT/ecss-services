@@ -379,7 +379,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	for (auto& currentParameter : ParameterMonitoringList) {
 		parameterMonitoringDefinitionStatusReport.appendEnumerated(16, currentParameter.first);
 		parameterMonitoringDefinitionStatusReport.appendEnumerated(
-		    16, ParameterMonitoringStatus.at(currentParameter.second));
+		    1, ParameterMonitoringStatus.at(currentParameter.second));
 	}
 	storeMessage(parameterMonitoringDefinitionStatusReport);
 }
