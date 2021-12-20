@@ -106,7 +106,6 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	message.messageType = messageType;
 	message.responseBand = Message::ResponseBand(response_band);
 	message.acknowledgementFlags = acknowledgement_flags;
-	//memcpy(message.data, data + ECSSSecondaryTCHeaderLength, length);
 	std::copy(data + ECSSSecondaryTCHeaderLength, data + ECSSSecondaryTCHeaderLength + length, message.data);
 	message.dataSize = length;
 }
@@ -232,6 +231,6 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 
 	message.timeAtCreation = messageTime;
 	message.messageTypeCounter = messageTypeCounter;
-	memcpy(message.data, data + ECSSSecondaryTMHeaderLength, length);
+	std::copy(data + ECSSSecondaryTMHeaderLength, data + ECSSSecondaryTMHeaderLength + length, message.data);
 	message.dataSize = length;
 }
