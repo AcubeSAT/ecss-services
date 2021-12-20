@@ -198,7 +198,16 @@ public:
 		 * Attempt to add or modify a delta check parameter monitoring definition, but the high threshold is lower than
 		 * the low threshold.
 		 */
-		HighThresholdIsLowerThanLowThreshold = 17
+		HighThresholdIsLowerThanLowThreshold = 17,
+		/**
+		 * Attempt to modify a non existent parameter.
+		 */
+		ModifyParameterNotInTheParameterMonitoringList = 18,
+		/**
+		 * Attempt to modify a parameter monitoring definition, but the instruction refers to a monitored parameter
+		 * that is not the one used in that parameter monitoring definition.
+		 */
+		DifferentParameterMonitoringDefinitionAndMonitoredParameter = 19
 	};
 
 	/**
