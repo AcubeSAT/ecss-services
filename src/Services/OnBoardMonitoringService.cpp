@@ -302,10 +302,60 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
+	parameterMonitoringDefinitionReport(message);
 }
 
 void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& message) {
 	message.assertTC(ServiceType, ParameterMonitoringDefinitionReport);
+	Message parameterMonitoringDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport,
+	                                            Message::TM, 0);
+	// TODO: Check if maximum transition reporting delay is needed.
+	parameterMonitoringDefinitionReport.appendUint16(maximumTransitionReportingDelay);
+	uint16_t numberOfIds = message.readUint16();
+	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
+	uint16_t currentPMONId = message.readUint16();
+	for (uint16_t i = 0; i < numberOfIds; i++) {
+		parameterMonitoringDefinitionReport.appendEnumerated(16, currentPMONId);
+		// TODO:Find out how to get the monitored parameter id.
+		parameterMonitoringDefinitionReport.appendEnumerated(
+		    1, ParameterMonitoringStatus.find(ParameterMonitoringList.at(currentPMONId))->second);
+		parameterMonitoringDefinitionReport.appendEnumerated(
+		    16, RepetitionNumber.find(ParameterMonitoringList.at(currentPMONId))->second);
+		parameterMonitoringDefinitionReport.appendEnumerated(
+		    8, ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second);
+		if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second == LimitCheck) {
+			parameterMonitoringDefinitionReport.appendUint16(
+			    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowLimit);
+			parameterMonitoringDefinitionReport.appendEnumerated(
+			    8, LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowLimitEvent);
+			parameterMonitoringDefinitionReport.appendUint16(
+			    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highLimit);
+			parameterMonitoringDefinitionReport.appendEnumerated(
+			    8, LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighLimitEvent);
+		} else if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+		           ExpectedValueCheck) {
+			parameterMonitoringDefinitionReport.appendUint8(
+			    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.mask);
+			parameterMonitoringDefinitionReport.appendUint16(
+			    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.expectedValue);
+			parameterMonitoringDefinitionReport.appendEnumerated(
+			    8, ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+			           ->second.notExpectedValueEvent);
+		} else {
+			parameterMonitoringDefinitionReport.appendUint16(
+			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowDeltaThreshold);
+			parameterMonitoringDefinitionReport.appendEnumerated(
+			    8, DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowThresholdEvent);
+			parameterMonitoringDefinitionReport.appendUint16(
+			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highDeltaThreshold);
+			parameterMonitoringDefinitionReport.appendEnumerated(
+			    8,
+			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighThresholdEvent);
+			parameterMonitoringDefinitionReport.appendUint16(
+			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.numberOfConsecutiveDeltaChecks);
+		}
+	}
+	storeMessage(parameterMonitoringDefinitionReport);
 }
 
 void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
