@@ -75,6 +75,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	// TODO: Undertand error types 6.12.3.9.1.e.3-4.
 	// TODO: Evaluate if the optional values in TC[12,5] are going to be used.
 	uint16_t numberOfIds = message.readUint16();
+	// TODO: Move the initialisation of all values out of the loop.
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		uint16_t currentPMONId = message.readUint16();
 		uint16_t currentParameterId = message.readUint16();
