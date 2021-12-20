@@ -6,7 +6,7 @@
 #include "Parameters/SystemParameters.hpp"
 
 
-ParameterService::ParameterService() : parametersArray(initializeParametersArray()) {}
+ParameterService::ParameterService() : parametersArray(ParameterService::initializeParametersArray()) {}
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
