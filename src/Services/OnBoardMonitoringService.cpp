@@ -104,6 +104,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), LimitCheck});
+						ParameterMonitoringCheckingStatus.insert({parameterToBeAdded->get(), Unchecked});
 						struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
 						                                aboveHighLimitEventId};
 						LimitCheckParameters.insert({parameterToBeAdded->get(), limitCheck});
@@ -116,6 +117,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), ExpectedValueCheck});
+						ParameterMonitoringCheckingStatus.insert({parameterToBeAdded->get(), Unchecked});
 						struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue, notExpectedValueEventId};
 						ExpectedValueCheckParameters.insert({parameterToBeAdded->get(), expectedValueCheck});
 					} else if (currentCheckType == DeltaCheck) {
@@ -134,6 +136,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
 						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), DeltaCheck});
+						ParameterMonitoringCheckingStatus.insert({parameterToBeAdded->get(), Unchecked});
 						struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
 						                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
 						DeltaCheckParameters.insert({parameterToBeAdded->get(), deltaCheck});
