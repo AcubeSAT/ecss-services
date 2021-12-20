@@ -87,6 +87,8 @@ public:
 
 	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionCounter;
 
+	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionNumber;
+
 	etl::map<std::reference_wrapper<ParameterBase>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
 
 	etl::map<std::reference_wrapper<ParameterBase>, etl::array<CheckingStatus, 2>, ECSSMaxParameters>
