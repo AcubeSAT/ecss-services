@@ -13,4 +13,6 @@ ParameterService::initializeParametersArray() {
 	     SystemParameters::parameter3, SystemParameters::parameter4});
 }
 
+ParameterService::ParameterService() : parametersArray(initializeParametersArray()) {}
+
 #endif
