@@ -7,9 +7,11 @@
 
 /**
  * This namespace was created for the purpose of initializing
- * all the parameters of the specific subsystem.
+ * parameters used by ecss-services.
  * It initializes parameters that are instances of the \ref Parameter class.
- * Different subsystems should have their own implementations of this namespace.
+ * Different subsystems should have their own implementations of this namespace,
+ * containing all parameters of the specific subsystem, inside inc/Platform
+ * directory of their main project.
  * These parameters are stored inside the \ref ParameterService class.
  */
 namespace SystemParameters {

@@ -40,7 +40,9 @@ public:
 	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> parametersArray;
 
 	/**
-	 * @return array storing the initial System parameters drawn
+	 * Different subsystems should have their own implementations of this function,
+	 * inside src/Platform directory of their main project.
+	 * @return array containing the initial System parameters drawn
 	 * 		   from \ref SystemParameters namespace
 	 */
 	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> initializeParametersArray();
