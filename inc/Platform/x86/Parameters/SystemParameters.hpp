@@ -1,4 +1,8 @@
+#ifndef ECSS_SERVICES_SYSTEMPARAMETERS_HPP
+#define ECSS_SERVICES_SYSTEMPARAMETERS_HPP
+
 #include "Helpers/Parameter.hpp"
+#include <optional>
 #include "etl/vector.h"
 /**
  * @author Athanasios Theocharis <athatheoc@gmail.com>
@@ -19,14 +23,39 @@ public:
 	Parameter<uint8_t> parameter1 = Parameter<uint8_t>(3);
 	Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
 	Parameter<uint32_t> parameter3 = Parameter<uint32_t>(10);
-	Parameter<uint32_t> parameter4 = Parameter<uint32_t>(24);
+	Parameter<uint32_t> parameter4 = Parameter<uint32_t>(5);
+	Parameter<uint8_t> parameter5 = Parameter<uint8_t>(11);
+	Parameter<uint32_t> parameter6 = Parameter<uint32_t>(23);
+	Parameter<uint32_t> parameter7 = Parameter<uint32_t>(53);
+	Parameter<uint8_t> parameter8 = Parameter<uint8_t>(55);
+	Parameter<uint16_t> parameter9 = Parameter<uint16_t>(32);
+	Parameter<uint32_t> parameter10 = Parameter<uint32_t>(43);
+	Parameter<uint32_t> parameter11 = Parameter<uint32_t>(91);
+	Parameter<uint8_t> parameter12 = Parameter<uint8_t>(1);
+
 	/**
 	 * The key of the array is the ID of the parameter as specified in PUS
 	 */
-	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> parametersArray = {parameter1, parameter2,
-	                                                                                           parameter3, parameter4};
+	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> parametersArray = {
+	    parameter1, parameter2, parameter3, parameter4,  parameter5,  parameter6,
+	    parameter7, parameter8, parameter9, parameter10, parameter11, parameter12};
 
 	SystemParameters() = default;
+
+	/**
+	 * This is a simple getter function, which returns a reference to a specified parameter, from the parametersArray.
+	 *
+	 * @param parameterId the id of the parameter, whose reference is to be returned.
+	 */
+	std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId) {
+		if (parameterId >= parametersArray.size()) {
+			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
+			return {};
+		}
+		return parametersArray[parameterId];
+	}
 };
 
 extern SystemParameters systemParameters;
+
+#endif
