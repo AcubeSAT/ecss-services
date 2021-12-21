@@ -1,6 +1,8 @@
+#ifndef ECSS_SERVICES_SYSTEMPARAMETERS_HPP
+#define ECSS_SERVICES_SYSTEMPARAMETERS_HPP
+
 #include "Helpers/Parameter.hpp"
 #include "etl/vector.h"
-
 /**
  * @author Athanasios Theocharis <athatheoc@gmail.com>
  */
@@ -18,5 +20,28 @@ namespace SystemParameters {
 	inline Parameter<uint8_t> parameter1 = Parameter<uint8_t>(3);
 	inline Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
 	inline Parameter<uint32_t> parameter3 = Parameter<uint32_t>(10);
-	inline Parameter<uint32_t> parameter4 = Parameter<uint32_t>(24);
+	inline Parameter<uint32_t> parameter4 = Parameter<uint32_t>(5); //24
+	inline Parameter<uint8_t> parameter5 = Parameter<uint8_t>(11);
+	inline Parameter<uint32_t> parameter6 = Parameter<uint32_t>(23);
+	inline Parameter<uint32_t> parameter7 = Parameter<uint32_t>(53);
+	inline Parameter<uint8_t> parameter8 = Parameter<uint8_t>(55);
+	inline Parameter<uint16_t> parameter9 = Parameter<uint16_t>(32);
+	inline Parameter<uint32_t> parameter10 = Parameter<uint32_t>(43);
+	inline Parameter<uint32_t> parameter11 = Parameter<uint32_t>(91);
+	inline Parameter<uint8_t> parameter12 = Parameter<uint8_t>(1);
+
+    /**
+	 * This is a simple getter function, which returns a reference to a specified parameter, from the parametersArray.
+	 *
+	 * @param parameterId the id of the parameter, whose reference is to be returned.
+     */
+    std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId) {
+	    if (parameterId >= parametersArray.size()) {
+		    ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
+		    return {};
+	    }
+	    return parametersArray[parameterId];
+    }
 }
+
+#endif

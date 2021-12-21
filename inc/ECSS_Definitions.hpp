@@ -113,9 +113,9 @@ inline const uint16_t ECSSEventActionStructMapSize = 256;
 inline const uint8_t ECSSMaxDeltaOfReleaseTime = 60;
 
 /**
- * The maximum number of stored parameters in the \ref ParameterService
+ * The max number of simply commutated parameters per housekeeping structure in ST[03]
  */
-inline const uint8_t ECSSMaxParameters = 5;
+inline const uint16_t ECSSMaxSimplyCommutatedParameters = 10;
 
 /**
  * The number of functions supported by the \ref FunctionManagementService
@@ -134,8 +134,6 @@ inline const uint8_t ECSSFunctionNameLength = 32;
  */
 inline const uint8_t ECSSFunctionMaxArgLength = 32;
 
-/** @} */
-
 /**
  * @brief The maximum size of a log message
  */
@@ -144,7 +142,7 @@ inline const uint16_t LoggerMaxMessageSize = 512;
 /**
  * @brief Size of the array holding the Parameter objects for the ST[20] parameter service
  */
-inline const uint8_t ECSSParameterCount = 4;
+inline const uint8_t ECSSParameterCount = 12;
 
 /**
  * @brief Defines whether the optional CRC field is included
@@ -160,5 +158,12 @@ inline const uint8_t ECSSMaxStatisticParameters = 4;
  * Whether the ST[04] statistics calculation supports the reporting of stddev
  */
 inline const bool SupportsStandardDeviation = true;
+
+/**
+ * @brief Defines the max number of housekeeping structs that the housekeeping service can contain
+ */
+inline const uint8_t ECSSMaxHousekeepingStructures = 10;
+
+/** @} */
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
