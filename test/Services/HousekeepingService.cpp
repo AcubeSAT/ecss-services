@@ -119,7 +119,7 @@ TEST_CASE("Create housekeeping structure") {
 
 		MessageParser::execute(request);
 
-		CHECK(housekeepingService.housekeepingStructures.size() == 0);
+		CHECK(housekeepingService.housekeepingStructures.size() == 1);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 1);
