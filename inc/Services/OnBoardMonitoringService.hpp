@@ -81,6 +81,8 @@ public:
 	uint16_t maximumTransitionReportingDelay = 0;
 
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
+	// TODO: Add insertions in ParameterMonitoringIds for each insertion in ParameterMonitoringList.
+	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> ParameterMonitoringIds;
 
 	etl::map<std::reference_wrapper<ParameterBase>, CheckingStatus, ECSSMaxParameters>
 	    ParameterMonitoringCheckingStatus;
