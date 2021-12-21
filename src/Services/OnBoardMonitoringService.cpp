@@ -101,6 +101,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 							return;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
+						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
 						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
 						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
@@ -114,6 +115,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						uint8_t expectedValue = message.readUint8();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
+						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
 						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
 						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
@@ -133,6 +135,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 							return;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
+						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
 						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
 						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
 						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
