@@ -467,7 +467,13 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			checkTransitionReport.appendUint16(systemParameters.getParameter(1)->get().getValueAsDouble());
 			// TODO:Replace 1 with the monitored parameter id.
 			// TODO:Evaluate if the conversion from double to uint is ok.
-			// TODO: Find out what the limit crossed should be in here.
+			// TODO: Find out what the limit crossed should be here.
+			if (transition.second.at(1) == UnexpectedValue) {
+				checkTransitionReport.appendUint16(
+				    ExpectedValueCheckParameters.find(transition.first)->second.expectedValue);
+			} else {
+				checkTransitionReport.appendByte(0);
+			}
 			checkTransitionReport.appendEnumerated(8, transition.second.at(0));
 			checkTransitionReport.appendEnumerated(8, transition.second.at(1));
 			// TODO: Find out how to get the transition time.
@@ -479,6 +485,13 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			// TODO:Replace 1 with the monitored parameter id.
 			// TODO:Evaluate if the conversion from double to uint is ok.
 			// TODO: Find out what the limit crossed should be here.
+			if (transition.second.at(1) == BelowLowLimit) {
+				checkTransitionReport.appendUint16(LimitCheckParameters.find(transition.first)->second.lowLimit);
+			} else if (transition.second.at(1) == AboveHighLimit) {
+				checkTransitionReport.appendUint16(LimitCheckParameters.find(transition.first)->second.highLimit);
+			} else {
+				checkTransitionReport.appendByte(0);
+			}
 			checkTransitionReport.appendEnumerated(8, transition.second.at(0));
 			checkTransitionReport.appendEnumerated(8, transition.second.at(1));
 			// TODO: Find out how to get the transition time.
@@ -490,6 +503,13 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			// TODO:Replace 1 with the monitored parameter id.
 			// TODO:Evaluate if the conversion from double to uint is ok.
 			// TODO: Find out what the limit crossed should be here.
+			if (transition.second.at(1) == BelowLowThreshold) {
+				checkTransitionReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.lowDeltaThreshold);
+			} else if (transition.second.at(1) == AboveHighThreshold) {
+				checkTransitionReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.highDeltaThreshold);
+			} else {
+				checkTransitionReport.appendByte(0);
+			}
 			checkTransitionReport.appendEnumerated(8, transition.second.at(0));
 			checkTransitionReport.appendEnumerated(8, transition.second.at(1));
 			// TODO: Find out how to get the transition time.
