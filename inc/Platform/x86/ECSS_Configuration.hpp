@@ -9,9 +9,6 @@
  * @see ServiceDefinitions Define the service types that will be compiled
  */
 
-// Log all levels of messages
-#define LOGLEVEL_TRACE
-
 /**
  * @defgroup ServiceDefinitions Service compilation switches
  * These preprocessor defines control whether the compilation of each ECSS service is enabled. By not defining one of
