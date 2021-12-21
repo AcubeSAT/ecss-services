@@ -352,7 +352,8 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			    8,
 			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighThresholdEvent);
 			parameterMonitoringDefinitionReport.appendUint16(
-			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.numberOfConsecutiveDeltaChecks);
+			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+			        ->second.numberOfConsecutiveDeltaChecks);
 		}
 	}
 	storeMessage(parameterMonitoringDefinitionReport);
@@ -360,9 +361,96 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 
 void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
 	message.assertTC(ServiceType, ReportOutOfLimits);
+	outOfLimitsReport();
 }
 
-void OnBoardMonitoringService::outOfLimitsReport() {}
+void OnBoardMonitoringService::outOfLimitsReport() {
+	Message outOfLimitsReport(ServiceType, MessageType::OutOfLimitsReport, Message::TM, 0);
+	// TODO: Find a way to calculate the transitions to be reported before getting in the loop.
+	outOfLimitsReport.appendUint16(CheckTransitionList.size());
+	for (auto& transition : CheckTransitionList) {
+		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
+			if ((transition.second.at(0) == Unchecked && transition.second.at(1) == UnexpectedValue) ||
+			    (transition.second.at(0) == Invalid && transition.second.at(1) == UnexpectedValue) ||
+			    (transition.second.at(0) == ExpectedValue && transition.second.at(1) == UnexpectedValue)) {
+				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				// TODO:Find out how to get the monitored parameter id.
+				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
+				outOfLimitsReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
+				outOfLimitsReport.appendUint16(systemParameters.getParameter(1)->get().getValueAsDouble());
+				// TODO:Replace 1 with the monitored parameter id.
+				// TODO:Evaluate if the conversion from double to uint is ok.
+				outOfLimitsReport.appendUint16(
+				    ExpectedValueCheckParameters.find(transition.first)->second.expectedValue);
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(0));
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(1));
+				// TODO: Find out how to get the transition time.
+			}
+		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
+			if ((transition.second.at(0) == Unchecked && transition.second.at(1) == BelowLowLimit) ||
+			    (transition.second.at(0) == Invalid && transition.second.at(1) == BelowLowLimit) ||
+			    (transition.second.at(0) == WithinLimits && transition.second.at(1) == BelowLowLimit) ||
+			    (transition.second.at(0) == AboveHighLimit && transition.second.at(1) == BelowLowLimit)) {
+				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				// TODO:Find out how to get the monitored parameter id.
+				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
+				outOfLimitsReport.appendUint16(systemParameters.getParameter(1)->get().getValueAsDouble());
+				// TODO:Replace 1 with the monitored parameter id.
+				// TODO:Evaluate if the conversion from double to uint is ok.
+				outOfLimitsReport.appendUint16(LimitCheckParameters.find(transition.first)->second.lowLimit);
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(0));
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(1));
+				// TODO: Find out how to get the transition time.
+			} else if ((transition.second.at(0) == Unchecked && transition.second.at(1) == AboveHighLimit) ||
+			           (transition.second.at(0) == Invalid && transition.second.at(1) == AboveHighLimit) ||
+			           (transition.second.at(0) == WithinLimits && transition.second.at(1) == AboveHighLimit) ||
+			           (transition.second.at(0) == BelowLowLimit && transition.second.at(1) == AboveHighLimit)) {
+				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				// TODO:Find out how to get the monitored parameter id.
+				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
+				outOfLimitsReport.appendUint16(systemParameters.getParameter(1)->get().getValueAsDouble());
+				// TODO:Replace 1 with the monitored parameter id.
+				// TODO:Evaluate if the conversion from double to uint is ok.
+				outOfLimitsReport.appendUint16(LimitCheckParameters.find(transition.first)->second.highLimit);
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(0));
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(1));
+				// TODO: Find out how to get the transition time.
+			}
+		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
+			if ((transition.second.at(0) == Unchecked && transition.second.at(1) == BelowLowThreshold) ||
+			    (transition.second.at(0) == Invalid && transition.second.at(1) == BelowLowThreshold) ||
+			    (transition.second.at(0) == WithinLimits && transition.second.at(1) == BelowLowThreshold) ||
+			    (transition.second.at(0) == AboveHighThreshold && transition.second.at(1) == BelowLowThreshold)) {
+				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				// TODO:Find out how to get the monitored parameter id.
+				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
+				outOfLimitsReport.appendUint16(systemParameters.getParameter(1)->get().getValueAsDouble());
+				// TODO:Replace 1 with the monitored parameter id.
+				// TODO:Evaluate if the conversion from double to uint is ok.
+				outOfLimitsReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.lowDeltaThreshold);
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(0));
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(1));
+				// TODO: Find out how to get the transition time.
+			} else if ((transition.second.at(0) == Unchecked && transition.second.at(1) == AboveHighThreshold) ||
+			           (transition.second.at(0) == Invalid && transition.second.at(1) == AboveHighThreshold) ||
+			           (transition.second.at(0) == WithinLimits && transition.second.at(1) == AboveHighThreshold) ||
+			           (transition.second.at(0) == BelowLowThreshold &&
+			            transition.second.at(1) == AboveHighThreshold)) {
+				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				// TODO:Find out how to get the monitored parameter id.
+				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
+				outOfLimitsReport.appendUint16(systemParameters.getParameter(1)->get().getValueAsDouble());
+				// TODO:Replace 1 with the monitored parameter id.
+				// TODO:Evaluate if the conversion from double to uint is ok.
+				outOfLimitsReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.highDeltaThreshold);
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(0));
+				outOfLimitsReport.appendEnumerated(8, transition.second.at(1));
+				// TODO: Find out how to get the transition time.
+			}
+		}
+	}
+	storeMessage(outOfLimitsReport);
+}
 
 void OnBoardMonitoringService::checkTransitionReport() {}
 
@@ -372,7 +460,6 @@ void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Messa
 }
 
 void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
-	// TODO: Check if application id must be 1
 	Message parameterMonitoringDefinitionStatusReport(
 	    ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, 0);
 	parameterMonitoringDefinitionStatusReport.appendUint16(ParameterMonitoringList.size());
