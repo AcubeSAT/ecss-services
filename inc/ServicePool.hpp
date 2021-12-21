@@ -12,6 +12,7 @@
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
+#include "Services/HousekeepingService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
 /**
@@ -36,10 +37,6 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
-#ifdef SERVICE_PARAMETERSTATISTICS
-	ParameterStatisticsService parameterStatistics;
-#endif
-
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
@@ -52,6 +49,10 @@ public:
 	FunctionManagementService functionManagement;
 #endif
 
+#ifdef SERVICE_HOUSEKEEPING
+	HousekeepingService housekeeping;
+#endif
+
 #ifdef SERVICE_LARGEPACKET
 	LargePacketTransferService largePacketTransferService;
 #endif
@@ -62,6 +63,10 @@ public:
 
 #ifdef SERVICE_PARAMETER
 	ParameterService parameterManagement;
+#endif
+
+#ifdef SERVICE_PARAMETERSTATISTICS
+	ParameterStatisticsService parameterStatistics;
 #endif
 
 #ifdef SERVICE_REQUESTVERIFICATION

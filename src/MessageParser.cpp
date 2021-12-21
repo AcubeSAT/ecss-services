@@ -8,6 +8,12 @@
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
+#ifdef SERVICE_HOUSEKEEPING
+		case HousekeepingService::ServiceType:
+			Services.housekeeping.execute(message);
+			break;
+#endif
+
 #ifdef SERVICE_PARAMETERSTATISTICS
 		case ParameterStatisticsService::ServiceType:
 			Services.parameterStatistics.execute(message);

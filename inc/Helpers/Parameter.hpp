@@ -54,7 +54,7 @@ public:
 		currentValue = value;
 	}
 
-	DataType getValue() {
+	inline DataType getValue() {
 		return currentValue;
 	}
 

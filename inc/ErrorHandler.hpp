@@ -80,7 +80,15 @@ public:
 		/**
 		 * Request to copy packets in a time window, whose type is not recognized (ST(15)).
 		 */
-		InvalidTimeWindowType = 12
+		InvalidTimeWindowType = 12,
+		/**
+		 * A request to access a non existing housekeeping structure in ST[03]
+		 */
+		NonExistentHousekeeping = 13,
+		/**
+		 * Attempt to access an invalid parameter in ST[03]
+		 */
+		NonExistentParameter = 14,
 	};
 
 	/**
@@ -209,36 +217,67 @@ public:
 		 */
 		InvalidReportingRateError = 24,
 		/**
-		 * Attempt to set a sampling rate which is greater than the parameter reporting rate.
+		 * Attempt to add definition to the struct map but its already full.(ST[19])
+		 */
+		EventActionDefinitionsMapIsFull = 25,
+		/**
+		 * Attempt to report/delete non existing housekeeping structure (ST[03])
+		 */
+		RequestedNonExistingStructure = 26,
+		/**
+		 * Attempt to create already created structure (ST[03])
+		 */
+		RequestedAlreadyExistingStructure = 27,
+		/**
+		 * Attempt to delete structure which has the periodic reporting status enabled (ST[03]) as per 6.3.3.5.2(d-2)
+		 */
+		RequestedDeletionOfEnabledHousekeeping = 28,
+		/**
+		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure
+		 * (ST[03])
+		 */
+		AlreadyExistingParameter = 29,
+		/**
+		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
+		 * enabled (ST[03])
+		 */
+		RequestedAppendToEnabledHousekeeping = 30,
+		/**
+		 * Attempt to create a new housekeeping structure in Housekeeping Service, when the maximum number of
+		 * housekeeping structures is already reached (ST[03])
+		 */
+		ExceededMaxNumberOfHousekeepingStructures = 31,
+		/**
+		 * Attempt to add a new simply commutated parameter in a specific housekeeping structure, but the maximum
+		 * number of simply commutated parameters for this structure is already reached (ST[03])
+		 */
+		ExceededMaxNumberOfSimplyCommutatedParameters = 32,
+		/* Attempt to set a reporting rate which is smaller than the parameter sampling rate.
 		 * ST[04]
 		 */
-		InvalidSamplingRateError = 25,
-		/**
-		 * Attempt to add definition to the struct map but its already full. (ST[19])
-		 */
-		EventActionDefinitionsMapIsFull = 26,
+		InvalidSamplingRateError = 33,
 		/**
 		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
 		 */
-		MaxStatisticDefinitionsReached = 27,
+		MaxStatisticDefinitionsReached = 34,
 		/**
 		 * Attempt to set the virtual channel of a packet store to a invalid value (ST[15])
 		 */
-		InvalidVirtualChannel = 28,
+		InvalidVirtualChannel = 35,
 		/**
 		 * Attempt to delete a packet store, whose storage status is enabled (ST[15])
 		 */
-		DeletionOfPacketStoreWithStorageStatusEnabled = 29,
+		DeletionOfPacketStoreWithStorageStatusEnabled = 36,
 		/**
 		 * Attempt to copy packets from a packet store to another, but either no packet timestamp falls inside the
 		 * specified timestamp, or more than one boolean argument were given as true in the 'copyPacketsTo' function
 		 * (ST[15])
 		 */
-		CopyOfPacketsFailed = 30,
+		CopyOfPacketsFailed = 37,
 		/**
 		 * Attempt to set a packet store size to a value that the available memory cannot handle (ST[15]).
 		 */
-		UnableToHandlePacketStoreSize = 31
+		UnableToHandlePacketStoreSize = 38,
 	};
 
 	/**

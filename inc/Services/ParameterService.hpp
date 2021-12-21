@@ -23,7 +23,6 @@
  */
 class ParameterService : public Service {
 public:
-
 	inline static const uint8_t ServiceType = 20;
 
 	enum MessageType : uint8_t {

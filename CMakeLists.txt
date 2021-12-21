@@ -43,6 +43,7 @@ add_library(common OBJECT
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
         src/Services/StorageAndRetrievalService.cpp
+        src/Services/HousekeepingService.cpp
         src/Services/ParameterStatisticsService.cpp
         src/Helpers/Statistic.cpp
         )
