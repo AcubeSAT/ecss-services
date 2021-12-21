@@ -7,7 +7,8 @@
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
-	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport, Message::TM, 1);
+	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport,
+	                        Message::TM, 1);
 
 	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -41,11 +42,10 @@ void ParameterService::reportParameters(Message& paramIds) {
 }
 
 void ParameterService::setParameters(Message& newParamValues) {
-
 	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues, newParamValues,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues,
+	                            newParamValues, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(newParamValues.serviceType == ParameterService::ServiceType, newParamValues,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
