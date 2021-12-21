@@ -235,6 +235,10 @@ public:
 		 * (ST[15])
 		 */
 		CopyOfPacketsFailed = 30,
+		/**
+		 * Attempt to set a packet store size to a value that the available memory cannot handle (ST[15]).
+		 */
+		UnableToHandlePacketStoreSize = 31
 	};
 
 	/**

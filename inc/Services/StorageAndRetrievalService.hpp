@@ -4,8 +4,12 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "PacketStore.hpp"
+#include "Helpers/PacketStore.hpp"
 #include "etl/map.h"
+
+/**
+ * @todo: add prioritization policy for retrievals if prioritization is supported
+ */
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -17,6 +21,56 @@
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class StorageAndRetrievalService : public Service {
+private:
+	/**
+	 * Helper function to enhance the readability-simplicity of the code. Basically reads a string from the message
+	 * and returns it.
+	 */
+	String<ECSSMaxPacketStoreIdSize> readPacketStoreId(Message& message);
+
+	/**
+	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
+	 * requested time.
+	 *
+	 * @note Its functionality is indirectly tested in the test-case named 'Deleting packet store content'.
+	 */
+	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
+
+	/**
+	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
+	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
+	 *
+	 * @note Its functionality is indirectly tested in the test case named 'Copying packets in time window, from tag to
+	 * tag'.
+	 */
+	void copyFromTagToTag(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime);
+
+	/**
+	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
+	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
+	 *
+	 * @note Its functionality is indirectly tested in the test case named 'Copying packets in time window, after
+	 * time-tag'.
+	 */
+	void copyAfterTimeTag(PacketStore& source, PacketStore& target, uint32_t startTime);
+
+	/**
+	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
+	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
+	 *
+	 * @note Its functionality is indirectly tested in the test case named 'Copying packets in time window, before
+	 * time-tag'.
+	 */
+	void copyBeforeTimeTag(PacketStore& source, PacketStore& target, uint32_t endTime);
+
+	/**
+	 * Forms the content summary of the specified packet-store and appends it to a report message.
+	 *
+	 * @note Its functionality is indirectly tested in the test case named 'Reporting the content summary of packet
+	 * stores'.
+	 */
+	void createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+
 public:
 	inline static const uint8_t ServiceType = 15;
 
@@ -47,17 +101,17 @@ public:
 	StorageAndRetrievalService() = default;
 
 	/**
-	 * The virtual channels used by the Storage and Retrieval Subservice.
+	 * @brief The virtual channels used by the Storage and Retrieval Subservice.
 	 */
 	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
 
 	/**
-	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
+	 * @brief The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
 	 */
 	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
 
 	/**
-	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
+	 * @brief Different types of packet retrieval from a packet store, relative to a specified time-tag.
 	 */
 	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
 
@@ -68,20 +122,29 @@ public:
 	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
-	 * Whether the Storage and Retrieval Subservice supports the cyclical update of packets.
+	 * @brief Whether the Storage and Retrieval Subservice supports the cyclical update of packets (Circular type).
 	 */
-	const bool supportsCircularType = true;
+	const bool supportsOverwritingOldPackets = true;
 
 	/**
-	 * Whether the Storage and Retrieval Subservice supports rejecting new packets while the packet store is full.
+	 * @brief Whether the Storage and Retrieval Subservice supports rejecting new packets while the packet store is
+	 * full (Bounded type)
 	 */
-	const bool supportsBoundedType = true;
+	const bool supportsRejectingNewPackets = true;
 
 	/**
 	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
 	 */
 	const bool supportsConcurrentRetrievalRequests = false;
+
+	/**
+	 * @brief The max number of concurrent retrieval requests supported by the subservice.
+	 */
 	const uint16_t maxConcurrentRetrievalRequests = 5;
+
+	/**
+	 * @brief The type of the time window in which the retrieval shall occur.
+	 */
 	TimeWindowType timeWindowType = FromTagToTag;
 
 	/**
@@ -100,25 +163,9 @@ public:
 	const bool supportsByTimeRangeRetrieval = true;
 
 	/**
-	 * @todo: add prioritization policy for retrievals if prioritization is supported
+	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
 	 */
 	const TimeStamping timeStamping = PacketBased;
-
-	/************************************************************************************************************
-	 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~              | Helper Functions |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 ************************************************************************************************************/
-
-	/**
-	 * Helper function to enhance the readability-simplicity of the code. Basically reads a string from the message
-	 * and returns it.
-	 */
-	String<ECSSMaxPacketStoreIdSize> readPacketStoreId(Message& message);
-
-	/**
-	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
-	 * requested time.
-	 */
-	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
 
 	/**
 	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
@@ -128,33 +175,6 @@ public:
 	 */
 	bool copyPacketsFrom(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime,
 	                     TimeWindowType timeWindow);
-
-	/**
-	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
-	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
-	 */
-	void copyFromTagToTag(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime);
-
-	/**
-	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
-	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
-	 */
-	void copyAfterTimeTag(PacketStore& source, PacketStore& target, uint32_t startTime);
-
-	/**
-	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
-	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
-	 */
-	void copyBeforeTimeTag(PacketStore& source, PacketStore& target, uint32_t endTime);
-
-	/**
-	 * Forms the content summary of the specified packet-store and appends it to a report message.
-	 */
-	void createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize>& packetStoreId);
-
-	/************************************************************************************************************
-	 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                 | TCs/TMs |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	 ************************************************************************************************************/
 
 	/**
 	 * TC[15,1] request to enable the packet stores' storage function

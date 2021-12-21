@@ -162,6 +162,11 @@ inline const uint8_t ECSSMaxStatisticParameters = 4;
 inline const bool SupportsStandardDeviation = true;
 
 /**
+ * @brief the max number of bytes allowed for a packet store to handle in ST[15].
+ */
+inline const uint16_t ECSSMaxPacketStoreSizeInBytes = 1000;
+
+/**
  * @brief the max number of TM packets that a packet store in ST[15] can store
  */
 inline const uint16_t ECSSMaxPacketStoreSize = 20;

@@ -56,15 +56,22 @@ bool StorageAndRetrievalService::copyPacketsFrom(PacketStore& source, PacketStor
                                                  uint32_t endTime, TimeWindowType timeWindow) {
 	switch (timeWindow) {
 		case FromTagToTag:
-			if (endTime < source.storedTelemetryPackets.front().first) {
+			if (endTime < source.storedTelemetryPackets.front().first ||
+			    startTime > source.storedTelemetryPackets.back().first) {
 				return false;
 			}
 			copyFromTagToTag(source, target, startTime, endTime);
 			break;
 		case AfterTimeTag:
+			if (startTime > source.storedTelemetryPackets.back().first) {
+				return false;
+			}
 			copyAfterTimeTag(source, target, startTime);
 			break;
 		case BeforeTimeTag:
+			if (endTime < source.storedTelemetryPackets.front().first) {
+				return false;
+			}
 			copyBeforeTimeTag(source, target, endTime);
 			break;
 		default:
@@ -270,11 +277,6 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 			continue;
 		}
-		//		if (retrievalEndTime <= packetStores[packetStoreId].storedTelemetryPackets.end()->first and
-		//		retrievalEndTime <=
-		//		                                                                                         timeNow) {
-		//
-		//		}
 		/**
 		 * @todo: 6.15.3.5.2.d(4), actually count the current time
 		 */
@@ -396,9 +398,6 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel);
 			continue;
 		}
-		/**
-		 * @todo: actually check if the available memory can handle the new creation
-		 */
 		PacketStore newPacketStore;
 		newPacketStore.sizeInBytes = packetStoreSize;
 		newPacketStore.packetStoreType = packetStoreType;
@@ -528,25 +527,28 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 			continue;
 		}
-		/**
-		 * @todo: check if the current memory availability can handle the new size requested
-		 */
-		if (packetStores[packetStoreId].storageStatus) {
+		auto& packetStore = packetStores[packetStoreId];
+
+		if (packetStoreSize >= ECSSMaxPacketStoreSizeInBytes) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnableToHandlePacketStoreSize);
+			continue;
+		}
+		if (packetStore.storageStatus) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 			continue;
 		}
-		if (packetStores[packetStoreId].openRetrievalStatus == PacketStore::InProgress) {
+		if (packetStore.openRetrievalStatus == PacketStore::InProgress) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
 			continue;
 		}
-		if (packetStores[packetStoreId].byTimeRangeRetrievalStatus) {
+		if (packetStore.byTimeRangeRetrievalStatus) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
 			continue;
 		}
-		packetStores[packetStoreId].sizeInBytes = packetStoreSize;
+		packetStore.sizeInBytes = packetStoreSize;
 	}
 }
 
@@ -670,58 +672,58 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 
 void StorageAndRetrievalService::execute(Message& request) {
 	switch (request.messageType) {
-		case 1:
+		case EnableStorageInPacketStores:
 			enableStorageFunction(request);
 			break;
-		case 2:
+		case DisableStorageInPacketStores:
 			disableStorageFunction(request);
 			break;
-		case 9:
+		case StartByTimeRangeRetrieval:
 			startByTimeRangeRetrieval(request);
 			break;
-		case 11:
+		case DeletePacketStoreContent:
 			deletePacketStoreContent(request);
 			break;
-		case 12:
+		case ReportContentSummaryOfPacketStores:
 			packetStoreContentSummaryReport(request);
 			break;
-		case 14:
+		case ChangeOpenRetrievalStartingTime:
 			changeOpenRetrievalStartTimeTag(request);
 			break;
-		case 15:
+		case ResumeOpenRetrievalOfPacketStores:
 			resumeOpenRetrievalOfPacketStores(request);
 			break;
-		case 16:
+		case SuspendOpenRetrievalOfPacketStores:
 			suspendOpenRetrievalOfPacketStores(request);
 			break;
-		case 17:
+		case AbortByTimeRangeRetrieval:
 			abortByTimeRangeRetrieval(request);
 			break;
-		case 18:
+		case ReportStatusOfPacketStores:
 			packetStoresStatusReport(request);
 			break;
-		case 20:
+		case CreatePacketStores:
 			createPacketStores(request);
 			break;
-		case 21:
+		case DeletePacketStores:
 			deletePacketStores(request);
 			break;
-		case 22:
+		case ReportConfigurationOfPacketStores:
 			packetStoreConfigurationReport(request);
 			break;
-		case 24:
+		case CopyPacketsInTimeWindow:
 			copyPacketsInTimeWindow(request, timeWindowType);
 			break;
-		case 25:
+		case ResizePacketStores:
 			resizePacketStores(request);
 			break;
-		case 26:
+		case ChangeTypeToCircular:
 			changeTypeToCircular(request);
 			break;
-		case 27:
+		case ChangeTypeToBounded:
 			changeTypeToBounded(request);
 			break;
-		case 28:
+		case ChangeVirtualChannel:
 			changeVirtualChannel(request);
 			break;
 	}

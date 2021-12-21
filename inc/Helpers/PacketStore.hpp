@@ -18,7 +18,7 @@ class PacketStore {
 public:
 	uint8_t virtualChannel;
 	uint16_t retrievalPriority;
-	uint32_t openRetrievalStartTimeTag = 0; // What type is it?? (absolute time)
+	uint32_t openRetrievalStartTimeTag = 0;
 	uint32_t retrievalStartTime = 0;
 	uint32_t retrievalEndTime = 0;
 	uint64_t sizeInBytes;
@@ -58,6 +58,16 @@ public:
 	 * 				[][][][][][][][][][][][][][][][][][][]	<--- deque
 	 */
 	etl::deque<std::pair<uint32_t, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
+
+	/**
+	 * Returns the packet store's current size in bytes.
+	 *
+	 * @note
+	 * I believe that this function is going to be needed during the FreeRTOS integration, when we will actively
+	 * update the telemetry packets of each packet-store. At that moment, we should know whether we are exceeding the
+	 * maximum allowable number of bytes for the specified packet store.
+	 */
+	uint16_t calculateSizeInBytes();
 };
 
 #endif
