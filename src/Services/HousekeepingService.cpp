@@ -1,4 +1,5 @@
 #include "Services/HousekeepingService.hpp"
+#include "ServicePool.hpp"
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure);
@@ -119,7 +120,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 
 	housekeepingReport.appendUint8(structureId);
 	for (auto id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
-		if (auto parameter = systemParameters.getParameter(id)) {
+		if (auto parameter = Services.parameterManagement.getParameter(id)) {
 			parameter->get().appendValueToMessage(housekeepingReport);
 		}
 	}
@@ -162,7 +163,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 			return;
 		}
 		uint16_t newParamId = request.readUint16();
-		if (newParamId >= systemParameters.parametersArray.size()) {
+		if (newParamId >= Services.parameterManagement.parametersArray.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}

@@ -3,6 +3,7 @@
 
 #include "Helpers/Parameter.hpp"
 #include "etl/vector.h"
+
 /**
  * @author Athanasios Theocharis <athatheoc@gmail.com>
  */
@@ -29,19 +30,6 @@ namespace SystemParameters {
 	inline Parameter<uint32_t> parameter10 = Parameter<uint32_t>(43);
 	inline Parameter<uint32_t> parameter11 = Parameter<uint32_t>(91);
 	inline Parameter<uint8_t> parameter12 = Parameter<uint8_t>(1);
-
-    /**
-	 * This is a simple getter function, which returns a reference to a specified parameter, from the parametersArray.
-	 *
-	 * @param parameterId the id of the parameter, whose reference is to be returned.
-     */
-    std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId) {
-	    if (parameterId >= parametersArray.size()) {
-		    ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
-		    return {};
-	    }
-	    return parametersArray[parameterId];
-    }
 }
 
 #endif

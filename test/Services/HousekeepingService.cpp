@@ -57,9 +57,9 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 	Message samples(HousekeepingService::ServiceType,
 	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
 
-	static_cast<Parameter<uint16_t>&>(systemParameters.parametersArray[id1].get()).setValue(33);
-	static_cast<Parameter<uint8_t>&>(systemParameters.parametersArray[id2].get()).setValue(77);
-	static_cast<Parameter<uint32_t>&>(systemParameters.parametersArray[id3].get()).setValue(99);
+	static_cast<Parameter<uint16_t>&>(Services.parameterManagement.parametersArray[id1].get()).setValue(33);
+	static_cast<Parameter<uint8_t>&>(Services.parameterManagement.parametersArray[id2].get()).setValue(77);
+	static_cast<Parameter<uint32_t>&>(Services.parameterManagement.parametersArray[id3].get()).setValue(99);
 }
 
 /**

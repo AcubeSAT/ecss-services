@@ -3,8 +3,14 @@
 
 #include "Services/ParameterService.hpp"
 #include "Helpers/Parameter.hpp"
-#include "Parameters/SystemParameters.hpp"
 
+std::optional<std::reference_wrapper<ParameterBase>> ParameterService::getParameter(uint16_t parameterId) {
+	if (parameterId >= parametersArray.size()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
+		return {};
+	}
+	return parametersArray[parameterId];
+}
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]

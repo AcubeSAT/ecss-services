@@ -54,6 +54,13 @@ public:
 	ParameterService() : parametersArray(initializeParametersArray()) {}
 
 	/**
+	 * This is a simple getter function, which returns a reference to a specified parameter, from the parametersArray.
+	 *
+	 * @param parameterId the id of the parameter, whose reference is to be returned.
+	 */
+	std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId);
+
+	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet
 	 * containing the current configuration
 	 * **for the parameters specified in the carried valid IDs**.
