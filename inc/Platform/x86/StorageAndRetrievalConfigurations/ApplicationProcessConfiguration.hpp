@@ -18,11 +18,16 @@
  */
 class ApplicationProcessConfiguration {
 public:
-	typedef etl::map <uint16_t, ApplicationProcessDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS>
+	/**
+	 * Map containing the application process definitions (key), each followed by the list of service type definitions.
+	 */
+	typedef etl::map<uint16_t, ApplicationProcessDefinition, ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES>
 	    applicationProcessDefinitions;
 
-	//First is the packet store ID
-	etl::map <String <ECSS_MAX_PACKET_STORE_ID_SIZE>, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
+	/**
+	 * Map containing the packet store IDs (key), each followed by the application process definition.
+	 */
+	etl::map<String<ECSS_MAX_PACKET_STORE_ID_SIZE>, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
 };
 
 #endif

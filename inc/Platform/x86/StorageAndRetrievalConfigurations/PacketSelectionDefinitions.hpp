@@ -19,7 +19,15 @@
  */
 class ApplicationProcessDefinition {
 public:
+	//todo: make it contain message subtype
+	/**
+	 * Vector containing the message subtypes, contained per service type definition
+	 */
 	typedef etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypeDefinitions;
+
+	/**
+	 * Map containing the service type definitions (key), each followed by the list of report type definitions.
+	 */
 	etl::map <uint16_t, reportTypeDefinitions, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypeDefinitions;
 };
 
