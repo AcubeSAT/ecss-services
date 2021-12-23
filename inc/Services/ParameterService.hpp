@@ -5,6 +5,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
+#include "etl/map.h"
 
 /**
  * Implementation of the ST[20] parameter management service,
@@ -22,6 +23,26 @@
  * The parameters to be managed are initialized and kept in \ref SystemParameters.
  */
 class ParameterService : public Service {
+private:
+	typedef etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSParameterCount> ParameterMap;
+
+	/**
+	 * Map storing the IDs and references to each parameter
+	 * of the \ref PlatformParameters namespace.
+	 * The key of the map is the ID of the parameter as specified in PUS.
+	 * The parameters here are under the responsibility of \ref ParameterService.
+	 */
+	ParameterMap parameters;
+
+	/**
+	 * Different subsystems should have their own implementations of this function,
+	 * inside the src/Platform directory of their main project.
+	 *
+	 * @return array containing the initial parameters drawn
+	 * 		   from \ref PlatformParameters namespace
+	 */
+	ParameterMap initializeParametersArray();
+
 public:
 	inline static const uint8_t ServiceType = 20;
 
@@ -32,33 +53,34 @@ public:
 	};
 
 	/**
-	 * Array containing instances of the \ref Parameter class.
-	 * It stores all the parameters of the \ref SystemParameters namespace.
-	 * The parameters here are under the responsibility of \ref ParameterService.
-	 * The key of the array is the ID of the parameter as specified in PUS.
-	 */
-	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> parametersArray;
-
-	/**
-	 * Different subsystems should have their own implementations of this function,
-	 * inside src/Platform directory of their main project.
-	 * @return array containing the initial System parameters drawn
-	 * 		   from \ref SystemParameters namespace
-	 */
-	etl::array<std::reference_wrapper<ParameterBase>, ECSSParameterCount> initializeParametersArray();
-
-	/**
-	 * The Constructor initializes \var parametersArray
+	 * The Constructor initializes \var parameters
 	 * by calling \fn initializeParametersArray
 	 */
-	ParameterService() : parametersArray(initializeParametersArray()) {}
+	ParameterService() : parameters(initializeParametersArray()) {}
 
 	/**
-	 * This is a simple getter function, which returns a reference to a specified parameter, from the parametersArray.
+	 * Checks if \var parameters contains a reference to a parameter with
+	 * the given parameter ID as key
+	 *
+	 * @param parameterId the given ID
+	 * @return True if there is a reference to a parameter with the given ID, False otherwise
+	 */
+	bool parameterExists(uint16_t parameterId) const {
+		return parameterId < ECSSParameterCount;
+	}
+
+	/**
+	 * This is a simple getter function, which returns a reference to
+	 * a specified parameter, from the \var parameters.
 	 *
 	 * @param parameterId the id of the parameter, whose reference is to be returned.
 	 */
-	std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId);
+	std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId) const {
+		if (!parameterExists(parameterId)) {
+			return {};
+		}
+		return parameters.at(parameterId);
+	}
 
 	/**
 	 * This function receives a TC[20, 1] packet and returns a TM[20, 2] packet

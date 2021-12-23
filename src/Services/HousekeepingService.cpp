@@ -163,7 +163,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 			return;
 		}
 		uint16_t newParamId = request.readUint16();
-		if (newParamId >= Services.parameterManagement.parametersArray.size()) {
+		if (!Services.parameterManagement.parameterExists(newParamId)) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}

@@ -1,6 +1,7 @@
-#include "Platform/x86/Parameters/SystemParameters.hpp"
+#include "Platform/x86/Parameters/PlatformParameters.hpp"
 #include "catch2/catch.hpp"
 #include "../Services/ServiceTests.hpp"
+#include "ECSS_Definitions.hpp"
 
 TEST_CASE("Getting a reference of a parameter") {
 	SECTION("Valid parameter requested") {
@@ -14,7 +15,7 @@ TEST_CASE("Getting a reference of a parameter") {
 	}
 
 	SECTION("Invalid parameter requested") {
-		uint16_t parameterId = Services.parameterManagement.parametersArray.size() + 1;
+		uint16_t parameterId = ECSSParameterCount + 1;
 		REQUIRE(not Services.parameterManagement.getParameter(parameterId));
 
 		parameterId = parameterId + 24;

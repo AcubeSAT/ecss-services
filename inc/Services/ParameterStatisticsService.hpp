@@ -4,7 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "Parameters/SystemParameters.hpp"
+#include "Parameters/PlatformParameters.hpp"
 #include "Helpers/Statistic.hpp"
 #include "etl/deque.h"
 #include "etl/map.h"

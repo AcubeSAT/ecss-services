@@ -4,13 +4,6 @@
 #include "Services/ParameterService.hpp"
 #include "Helpers/Parameter.hpp"
 
-std::optional<std::reference_wrapper<ParameterBase>> ParameterService::getParameter(uint16_t parameterId) {
-	if (parameterId >= parametersArray.size()) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentParameter);
-		return {};
-	}
-	return parametersArray[parameterId];
-}
 
 void ParameterService::reportParameters(Message& paramIds) {
 	// TM[20,2]
@@ -27,7 +20,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t numberOfValidIds = 0;
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		if (paramIds.readUint16() < parametersArray.size()) {
+		if (parameterExists(paramIds.readUint16())) {
 			numberOfValidIds++;
 		}
 	}
@@ -37,9 +30,9 @@ void ParameterService::reportParameters(Message& paramIds) {
 	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		if (currId < parametersArray.size()) {
+		if (parameterExists(currId)) {
 			parameterReport.appendUint16(currId);
-			parametersArray[currId].get().appendValueToMessage(parameterReport);
+			parameters.at(currId).get().appendValueToMessage(parameterReport);
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
@@ -60,8 +53,8 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		if (currId < parametersArray.size()) {
-			parametersArray[currId].get().setValueFromMessage(newParamValues);
+		if (parameterExists(currId)) {
+			parameters.at(currId).get().setValueFromMessage(newParamValues);
 		} else {
 			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);
 			break; // Setting next parameters is impossible, since the size of value to be read is unknown
