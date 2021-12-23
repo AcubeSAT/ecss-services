@@ -4,7 +4,7 @@
 #include "Services/ParameterService.hpp"
 #include "Parameters/PlatformParameters.hpp"
 
-ParameterService::ParameterMap ParameterService::initializeParametersArray() {
+ParameterService::ParameterMap ParameterService::initializeParametersMap() {
 	return ParameterMap({{(uint16_t)0, PlatformParameters::parameter1},
 	                     {static_cast<uint16_t>(1), PlatformParameters::parameter2},
 	                     {static_cast<uint16_t>(2), PlatformParameters::parameter3},

@@ -13,13 +13,4 @@ TEST_CASE("Getting a reference of a parameter") {
 		REQUIRE(static_cast<Parameter<uint16_t>&>(Services.parameterManagement.getParameter(parameterId)->get())
 		            .getValue() == 1);
 	}
-
-	SECTION("Invalid parameter requested") {
-		uint16_t parameterId = ECSSParameterCount + 1;
-		REQUIRE(not Services.parameterManagement.getParameter(parameterId));
-
-		parameterId = parameterId + 24;
-		REQUIRE(not Services.parameterManagement.getParameter(parameterId));
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentParameter) == 2);
-	}
 }

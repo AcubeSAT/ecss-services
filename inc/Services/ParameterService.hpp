@@ -38,10 +38,10 @@ private:
 	 * Different subsystems should have their own implementations of this function,
 	 * inside the src/Platform directory of their main project.
 	 *
-	 * @return array containing the initial parameters drawn
+	 * @return map containing the initial parameters drawn
 	 * 		   from \ref PlatformParameters namespace
 	 */
-	ParameterMap initializeParametersArray();
+	ParameterMap initializeParametersMap();
 
 public:
 	inline static const uint8_t ServiceType = 20;
@@ -56,7 +56,7 @@ public:
 	 * The Constructor initializes \var parameters
 	 * by calling \fn initializeParametersArray
 	 */
-	ParameterService() : parameters(initializeParametersArray()) {}
+	ParameterService() : parameters(initializeParametersMap()) {}
 
 	/**
 	 * Checks if \var parameters contains a reference to a parameter with
@@ -66,7 +66,7 @@ public:
 	 * @return True if there is a reference to a parameter with the given ID, False otherwise
 	 */
 	bool parameterExists(uint16_t parameterId) const {
-		return parameterId < ECSSParameterCount;
+		return parameters.find(parameterId) != parameters.end();
 	}
 
 	/**
