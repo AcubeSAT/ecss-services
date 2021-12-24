@@ -21,7 +21,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 		// TODO: Examine why merging the following two if statements in 1, does not work.
 		if (auto currentParameter = systemParameters.getParameter(currentId)) {
 			if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
-				RepetitionCounter.find(currentParameter->get())->second = 0;
+				RepetitionNumber.find(currentParameter->get())->second = 0;
 				ParameterMonitoringStatus.find(currentParameter->get())->second = true;
 			} else {
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
@@ -414,14 +414,14 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				outOfLimitsReport.appendEnumerated(8, transition.second.at(firstTransitionIndex));
 				outOfLimitsReport.appendEnumerated(8, transition.second.at(secondTransitionIndex));
 				// TODO: Find out how to get the transition time.
-			} else if ((transition.second.at(firstTransitionIndex) == Unchecked && transition.second.at(secondTransitionIndex) == 
-			                                                                           AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == Invalid && transition.second.at(secondTransitionIndex) == 
-			                                                      AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == WithinLimits && transition.second.at(secondTransitionIndex) == 
-			                                                                              AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == BelowLowLimit && transition.second.at(secondTransitionIndex) == 
-			                                                            AboveHighLimit)) {
+			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+			           (transition.second.at(firstTransitionIndex) == Invalid &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+			           (transition.second.at(firstTransitionIndex) == BelowLowLimit &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit)) {
 				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
 				// TODO:Find out how to get the monitored parameter id.
 				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
@@ -434,10 +434,14 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				// TODO: Find out how to get the transition time.
 			}
 		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
-			if ((transition.second.at(firstTransitionIndex) == Unchecked && transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == Invalid && transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == WithinLimits && transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold && transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
+			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+			    (transition.second.at(firstTransitionIndex) == Invalid &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
 				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
 				// TODO:Find out how to get the monitored parameter id.
 				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
@@ -448,9 +452,12 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				outOfLimitsReport.appendEnumerated(8, transition.second.at(firstTransitionIndex));
 				outOfLimitsReport.appendEnumerated(8, transition.second.at(secondTransitionIndex));
 				// TODO: Find out how to get the transition time.
-			} else if ((transition.second.at(firstTransitionIndex) == Unchecked && transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == Invalid && transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == WithinLimits && transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+			           (transition.second.at(firstTransitionIndex) == Invalid &&
+			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
 			           (transition.second.at(firstTransitionIndex) == BelowLowThreshold &&
 			            transition.second.at(secondTransitionIndex) == AboveHighThreshold)) {
 				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
