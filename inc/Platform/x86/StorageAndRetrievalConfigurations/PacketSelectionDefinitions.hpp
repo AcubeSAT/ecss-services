@@ -19,16 +19,16 @@
  */
 class ApplicationProcessDefinition {
 public:
-	//todo: make it contain message subtype
+	// todo: make it contain message subtype
 	/**
 	 * Vector containing the message subtypes, contained per service type definition
 	 */
-	typedef etl::vector <uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypeDefinitions;
+	typedef etl::vector<uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypeDefinitions;
 
 	/**
 	 * Map containing the service type definitions (key), each followed by the list of report type definitions.
 	 */
-	etl::map <uint16_t, reportTypeDefinitions, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypeDefinitions;
+	etl::map<uint16_t, reportTypeDefinitions, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypeDefinitions;
 };
 
 /**
@@ -38,7 +38,8 @@ public:
  */
 class HousekeepingDefinition {
 public:
-	etl::vector <std::pair <uint16_t, uint16_t>, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
+	etl::vector<uint16_t, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> subsamplingRates;
+	etl::vector<uint8_t, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
 };
 
 /**
@@ -47,7 +48,7 @@ public:
  */
 class EventDefinition {
 public:
-	etl::vector <uint16_t, ECSS_MAX_EVENT_DEFINITION_IDS> eventDefinitionIds;
+	etl::vector<uint16_t, ECSS_MAX_EVENT_DEFINITION_IDS> eventDefinitionIds;
 };
 
 #endif

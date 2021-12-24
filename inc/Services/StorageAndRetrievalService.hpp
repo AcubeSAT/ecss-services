@@ -94,14 +94,14 @@ public:
 		                                 uint16_t applicationId, uint16_t serviceId, Message& request);
 
 		/**
-		 * checks if the maximum number of service type definitions are reached, in order to decide whether to put a
+		 * checks if the maximum number of service type definitions is reached, in order to decide whether to put a
 		 * new service type definition.
 		 */
 		bool exceedsMaxServiceDefinitions(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
 		                                  Message& request);
 
 		/**
-		 * checks if there are no report definitions inside a service type definition, so it decides whether to put a
+		 * Checks if there are no report definitions inside a service type definition, so it decides whether to add a
 		 * new report type definition.
 		 */
 		bool noReportDefinitionInService(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
@@ -109,7 +109,7 @@ public:
 
 		/**
 		 * Checks if there are no service type definitions inside an application definition, so it decides whether to
-		 * put a new report type definition.
+		 * add a new report type definition.
 		 */
 		bool noServiceDefinitionInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                      uint16_t applicationId, Message& request);
@@ -130,8 +130,8 @@ public:
 		 * Performs the necessary error checking for a specific application and decides whether the instruction to
 		 * add a report type is valid or not.
 		 */
-		bool checkApplication(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
-		                      Message& request);
+		bool checkApplicationForReportTypes(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                    uint16_t applicationId, Message& request);
 
 		/**
 		 * Performs the necessary error checking for a specific service type and decides whether the instruction to
@@ -141,25 +141,28 @@ public:
 		                  uint16_t serviceId, Message& request);
 
 		/**
-		 * Creates a report type definition and adds it to the specified service definition. Only use if the
-		 * specified report type definition does not exist already.
+		 * Creates a report type definition and adds it to the specified service definition.
 		 */
 		void addReportDefinition(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
 		                         uint16_t serviceId, uint16_t reportId);
 
 		/**
 		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
+		 * Returns the position of the 'reportId' inside the vector if it exists, and -1 if not.
 		 */
 		int reportExistsInService(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
 		                          uint16_t serviceId, uint16_t reportId);
 
 		/**
-		 * checks if the requested application ID already exists in the definition, to decide whether to add it or not.
+		 * Checks if the requested application ID already exists in the application process configuration, to decide
+		 * whether
+		 * to add it or not.
 		 */
-		bool appExistsInDefinition(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId);
+		bool appExistsInApplicationConfiguration(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                         uint16_t applicationId);
 
 		/**
-		 * checks if the requested service type already exists in the application, to decide whether to add it or not.
+		 * Checks if the requested service type already exists in the application, to decide whether to add it or not.
 		 */
 		bool serviceExistsInApp(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
 		                        uint16_t serviceId);
@@ -168,13 +171,73 @@ public:
 		 * Deletes either specified, or all report type definitions of a specified service type definition.
 		 */
 		void deleteReportDefinitionsOfService(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
-		                                      uint16_t applicationId, uint16_t serviceId, bool deleteAll, int index);
+		                                      uint16_t applicationId, uint16_t serviceId, int index);
 
 		/**
 		 * Deletes all service type definitions of a specified application process
 		 */
 		void deleteServiceDefinitionsOfApp(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                   uint16_t applicationId, bool deleteAll, uint16_t serviceId);
+
+		/**
+		 * Performs the necessary error checking for a specific application and decides whether the request to add a
+		 * new housekeeping structure ID is valid.
+		 */
+		bool checkApplicationForHousekeeping(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                     uint16_t applicationId, Message& request);
+
+		/**
+		 * Checks if the maximum number of housekeeping structure IDs is reached, in order to decide
+		 * whether to put a new housekeeping structure ID.
+		 */
+		bool exceedsMaxHousekeepingStructures(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                      uint16_t applicationId, Message& request);
+
+		/**
+		 * Checks if there are no housekeeping structure IDs inside an application, so it decides whether to add a
+		 * new housekeeping structure ID.
+		 */
+		bool noStructureIdsInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                 uint16_t applicationId, Message& request);
+
+		/**
+		 * Adds a new housekeeping structure ID to the specified application. This version takes into consideration
+		 * the subsampling rate and adds it to the related vector.
+		 */
+		void addHousekeepingStructureId(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                uint16_t applicationId, uint8_t structureId, uint16_t subsamplingRate);
+
+		/**
+		 * Adds a new housekeeping structure ID to the specified application. This version does not take into
+		 * consideration the subsampling rate.
+		 */
+		void addHousekeepingStructureId(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                uint16_t applicationId, uint8_t structureId);
+
+		/**
+		 * Adds all the housekeeping structure IDs, for a specified packet store and a specified application.
+		 */
+		void addAllHousekeepingStructuresOfApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                               uint16_t applicationId);
+
+		/**
+		 * Checks if the requested application ID already exists in the housekeeping configuration, to decide whether
+		 * to add it or not.
+		 */
+		bool appExistsInHousekeepingConfiguration(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                          uint16_t applicationId);
+
+		/**
+		 *
+		 */
+		int structureIdExistsInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                   uint16_t applicationId, uint8_t structureId);
+
+		/**
+		 *
+		 */
+		void deleteHousekeepingStructure(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                 uint16_t applicationId, uint16_t index);
 
 	public:
 		/**
@@ -206,7 +269,7 @@ public:
 		const uint16_t numOfControlledAppProcesses;
 		const uint16_t maxServiceTypeDefinitions; // Per Application Process Definition
 		const uint16_t maxReportTypeDefinitions; // This is per Service Type Definition
-		const uint16_t maxHousekeepingStructureIds; // Per Housekeeping storage-control definition
+		const uint8_t maxHousekeepingStructureIds; // Per Housekeeping storage-control definition
 		const uint16_t maxEventDefinitionIds; // Per Event-Report storage-control definition
 
 		/**
@@ -360,27 +423,24 @@ public:
 		 */
 		void appConfigurationContentReport(Message& request);
 
-		//		/**
-		//		 * TC[15,29] add structure identifiers to the housekeeping parameter report storage control
-		// configuration
-		//		 */
-		//		void addStructuresToHousekeepingConfiguration(Message& request);
-		//
-		//		/**
-		//		 * TC[15,30] delete structure identifiers from the housekeeping parameter report storage control
-		// configuration
-		//		 */
-		//		void deleteStructuresFromHousekeepingConfiguration(Message& request);
-		//
-		//		/**
-		//		 * This function takes a TC[15,35] 'report the housekeeping parameter report storage control
-		// configuration
-		//		 * content' request as argument, and responds with a TM[15,36] 'housekeeping parameter report storage
-		// control
-		//		 * configuration content report' message.
-		//		 */
-		//		void housekeepingConfigurationContentReport(Message& request);
-		//
+		/**
+		 * TC[15,29] 'add structure identifiers to the housekeeping parameter report storage control configuration'.
+		 */
+		void addStructuresToHousekeepingConfiguration(Message& request);
+
+		/**
+		 * TC[15,30] 'delete structure identifiers from the housekeeping parameter report storage control
+		 * configuration'.
+		 */
+		void deleteStructuresFromHousekeepingConfiguration(Message& request);
+
+		/**
+		 * This function takes a TC[15,35] 'report the housekeeping parameter report storage control configuration
+		 * content' request as argument, and responds with a TM[15,36] 'housekeeping parameter report storage control
+		 * configuration content report' message.
+		 */
+		void housekeepingConfigurationContentReport(Message& request);
+
 		//		/**
 		//		 * TC[15,34] add event definition identifiers to the event report blocking storage-control configuration
 		//		 */
