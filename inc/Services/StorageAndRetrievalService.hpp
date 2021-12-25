@@ -24,39 +24,18 @@ public:
 	inline static const uint8_t ServiceType = 15;
 
 	enum MessageType : uint8_t {
-		EnableStorageFunction = 1,
-		DisableStorageFunction = 2,
 		AddReportTypesToAppProcessConfiguration = 3,
 		DeleteReportTypesFromAppProcessConfiguration = 4,
 		ReportAppConfigurationContent = 5,
 		AppConfigurationContentReport = 6,
-		StartByTimeRangeRetrieval = 9,
-		DeletePacketStoreContent = 11,
-		ReportContentSummaryOfPacketStores = 12,
-		PacketStoreContentSummaryReport = 13,
-		ChangeOpenRetrievalStartTimeTag = 14,
-		ResumeOpenRetrievalOfPacketStores = 15,
-		SuspendOpenRetrievalOfPacketStores = 16,
-		AbortByTimeRangeRetrieval = 17,
-		ReportStatusOfPacketStores = 18,
-		PacketStoresStatusReport = 19,
-		CreatePacketStores = 20,
-		DeletePacketStores = 21,
-		ReportConfigurationOfPacketStores = 22,
-		PacketStoreConfigurationReport = 23,
-		CopyPacketsInTimeWindow = 24,
-		ResizePacketStores = 25,
-		ChangeTypeToCircular = 26,
-		ChangeTypeToBounded = 27,
-		ChangeVirtualChannel = 28,
 		AddStructuresToHousekeepingConfiguration = 29,
 		DeleteStructuresFromHousekeepingConfiguration = 30,
 		DeleteEventDefinitionsFromEventReportConfiguration = 33,
 		AddEventDefinitionsToEventReportConfiguration = 34,
 		ReportHousekeepingConfigurationContent = 35,
 		HousekeepingConfigurationContentReport = 36,
-		ReportEventConfigurationContent = 39,
-		EventConfigurationContentReport = 40
+		ReportEventReportConfigurationContent = 39,
+		EventReportConfigurationContentReport = 40
 	};
 
 	StorageAndRetrievalService();
@@ -82,20 +61,18 @@ public:
 		bool packetStoreExists(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId);
 
 		/**
-		 * checks if the requested application process id is controlled by the packet selection subservice.
+		 * Checks if the requested application process id is controlled by the packet selection subservice.
 		 */
 		bool appIsControlled(uint16_t applicationId, Message& request);
 
 		/**
-		 * checks if the maximum number of report type definitions are reached, in order to decide whether to put a
-		 * new report type definition.
+		 * Checks if the maximum number of report type definitions are reached.
 		 */
 		bool exceedsMaxReportDefinitions(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                 uint16_t applicationId, uint16_t serviceId, Message& request);
 
 		/**
-		 * checks if the maximum number of service type definitions is reached, in order to decide whether to put a
-		 * new service type definition.
+		 * Checks if the maximum number of service type definitions is reached.
 		 */
 		bool exceedsMaxServiceDefinitions(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
 		                                  Message& request);
@@ -108,8 +85,7 @@ public:
 		                                 uint16_t serviceId, Message& request);
 
 		/**
-		 * Checks if there are no service type definitions inside an application definition, so it decides whether to
-		 * add a new report type definition.
+		 * Checks if there are no service type definitions inside an application definition.
 		 */
 		bool noServiceDefinitionInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                      uint16_t applicationId, Message& request);
@@ -135,7 +111,7 @@ public:
 
 		/**
 		 * Performs the necessary error checking for a specific service type and decides whether the instruction to
-		 * add a report type is valid or not.
+		 * add a report type in the application process configuration is valid or not.
 		 */
 		bool checkService(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
 		                  uint16_t serviceId, Message& request);
@@ -155,8 +131,7 @@ public:
 
 		/**
 		 * Checks if the requested application ID already exists in the application process configuration, to decide
-		 * whether
-		 * to add it or not.
+		 * whether to add it or not.
 		 */
 		bool appExistsInApplicationConfiguration(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                         uint16_t applicationId);
@@ -181,21 +156,19 @@ public:
 
 		/**
 		 * Performs the necessary error checking for a specific application and decides whether the request to add a
-		 * new housekeeping structure ID is valid.
+		 * new housekeeping structure ID in the housekeeping configuration is valid.
 		 */
 		bool checkApplicationForHousekeeping(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                     uint16_t applicationId, Message& request);
 
 		/**
-		 * Checks if the maximum number of housekeeping structure IDs is reached, in order to decide
-		 * whether to put a new housekeeping structure ID.
+		 * Checks if the maximum number of housekeeping structure IDs is reached.
 		 */
 		bool exceedsMaxHousekeepingStructures(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                      uint16_t applicationId, Message& request);
 
 		/**
-		 * Checks if there are no housekeeping structure IDs inside an application, so it decides whether to add a
-		 * new housekeeping structure ID.
+		 * Checks if there are no housekeeping structure IDs inside an application.
 		 */
 		bool noStructureIdsInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                 uint16_t applicationId, Message& request);
@@ -228,16 +201,65 @@ public:
 		                                          uint16_t applicationId);
 
 		/**
-		 *
+		 * Checks if the specified housekeeping structure ID exists in the specified application process.
 		 */
 		int structureIdExistsInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                   uint16_t applicationId, uint8_t structureId);
 
 		/**
-		 *
+		 * Deletes a housekeeping structure ID from the housekeeping configuration of the packet selection subservice.
 		 */
 		void deleteHousekeepingStructure(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
 		                                 uint16_t applicationId, uint16_t index);
+
+		/**
+		 * Performs the necessary error checking for a specific application and decides whether the request to add a
+		 * new event report definition in the event report configuration is valid.
+		 */
+		bool checkApplicationForEventReports(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                     uint16_t applicationId, Message& request);
+
+		/**
+		 * Checks if the maximum number of event definitions for a specific application is reached.
+		 */
+		bool exceedsMaxEventDefinitions(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                uint16_t applicationId, Message& request);
+
+		/**
+		 * Checks if there are no event definition IDs for a specific application process.
+		 */
+		bool noEventDefinitionIdsInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                       uint16_t applicationId, Message& request);
+
+		/**
+		 * Adds a new event definition ID into a specified application process.
+		 */
+		void addEventDefinitionId(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
+		                          uint16_t eventDefinitionId);
+
+		/**
+		 * Adds all the event definitions of a specified application process, to the event report configuration.
+		 */
+		void addAllEventDefinitionsOfApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                         uint16_t applicationId);
+
+		/**
+		 * Checks if the specified application ID exists in the event report configuration.
+		 */
+		bool appExistsInEventReportConfiguration(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                         uint16_t applicationId);
+
+		/**
+		 * Checks if an event definition ID exists in the specified application process.
+		 */
+		int eventDefinitionIdExistsInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
+		                                         uint16_t applicationId, uint16_t eventDefinitionId);
+
+		/**
+		 * Deletes an event definition ID from the specified application process.
+		 */
+		void deleteEventDefinition(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId,
+		                           uint16_t index);
 
 	public:
 		/**
@@ -288,124 +310,6 @@ public:
 		 */
 		EventReportBlockingConfiguration eventReportConfiguration;
 
-		//		/**
-		//		 * Creates an application definition and adds it to the application process storage control
-		// configuration.
-		//		 * Only use if the specified App Id does not exist already.
-		//		 */
-		//		void createAppDefinition(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t
-		// applicationId);
-		//
-
-		//		/**
-		//		 * Creates a service type definition and adds it to the specified application definition. Only use if
-		// the
-		//		 * specified service type definition does not exist already.
-		//		 */
-		//		void createServiceDefinition(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t
-		// applicationId, 		                             uint16_t serviceId);
-
-		//		/**
-		//		 * Checks if there are any report definitions in the specified service type and application process.
-		//		 */
-		//		bool serviceHasReportDefinitions(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId, 		                                 uint16_t serviceId);
-		//
-		//		/**
-		//		 * Checks if there are any service definitions in the specified application process
-		//		 */
-		//		bool appHasServiceDefinitions(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId);
-
-		//		/**
-		//		 * checks if the maximum number of housekeeping structures are reached, in order to decide whether to
-		// add a new
-		//		 * structure.
-		//		 */
-		//		bool exceedsMaxStructureIds(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId,
-		//		                            Message& request);
-		//
-		//		/**
-		//		 * Checks if there are no structure Ids in the definition
-		//		 */
-		//		bool noStructureInDefinition(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId, 		                             Message& request);
-		//
-		//		/**
-		//		 * Creates new Housekeeping definition
-		//		 */
-		//		void createHousekeepingDefinition(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId);
-		//
-		//		/**
-		//		 * Checks if the Housekeeping Definition already exists
-		//		 */
-		//		bool housekeepingDefinitionExists(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId);
-		//
-		//		/**
-		//		 * Checks if the requested structure already exists in a housekeeping definition
-		//		 */
-		//		bool structureExists(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId,
-		//		                     uint16_t structureId, uint16_t& index);
-		//
-		//		/**
-		//		 * Deletes either all or specified housekeeping structure ids
-		//		 */
-		//		void deleteStructureIds(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId,
-		//		                        bool deleteAll, uint16_t index);
-		//
-		//		/**
-		//		 * Checks if the maximum number of event definitions are reached, in order to decide whether to add a
-		// new
-		//		 * definition.
-		//		 */
-		//		bool exceedsMaxEventDefinitionIds(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId, 		                                  Message& request);
-		//
-		//		/**
-		//		 * Checks if a event report blocking definition contains no event report definition IDs, to know whether
-		// to
-		//		 * abort the request to add new ones.
-		//		 */
-		//		bool noEventInDefinition(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId,
-		//		                         Message& request);
-		//
-		//		/**
-		//		 * Checks if a event blocking storage control definition exists for the requested packet store.
-		//		 */
-		//		bool eventBlockingDefinitionExists(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId);
-		//
-		//		/**
-		//		 * Creates a new event blocking storage control definition for a given packet store id
-		//		 */
-		//		void createEventReportBlockingDefinition(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId,
-		//		                                         uint16_t applicationId);
-		//
-		//		/**
-		//		 * Checks if an event definition identifier exists for a specified packet store and a specified event
-		// report
-		//		 * blocking storage control definition.
-		//		 */
-		//		bool eventDefinitionIdExists(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId, 		                             uint16_t eventId, uint16_t& index);
-		//
-		//		/**
-		//		 * Adds a new event definition identifier in a specified packet store and a specified event report
-		//		 * blocking storage control definition.
-		//		 */
-		//		void createEventDefinitionId(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId, 		                             uint16_t eventId);
-		//
-		//		/**
-		//		 * Deletes wither all or the specified event definition IDs from a  specified packet store and a
-		// specified
-		//		 * event report blocking storage control definition.
-		//		 */
-		//		void deleteEventDefinitionIds(String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t
-		// applicationId, 		                              bool deleteAll, uint16_t index);
-
 		/**
 		 * TC[15,3] 'add report types to an application process storage control configuration'.
 		 */
@@ -418,10 +322,14 @@ public:
 
 		/**
 		 * This function takes a TC[15,5] 'report the application process storage control configuration content' request
-		 * as argument, and responds with a TM[15,6] 'application process storage control configuration content report'
-		 * message.
+		 * as argument, and performs the necessary error checking.
 		 */
-		void appConfigurationContentReport(Message& request);
+		void reportAppConfigurationContent(Message& request);
+
+		/**
+		 * Creates and stores a TM[15,6] 'application process storage control configuration content report'.
+		 */
+		void appConfigurationContentReport(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId);
 
 		/**
 		 * TC[15,29] 'add structure identifiers to the housekeeping parameter report storage control configuration'.
@@ -436,29 +344,36 @@ public:
 
 		/**
 		 * This function takes a TC[15,35] 'report the housekeeping parameter report storage control configuration
-		 * content' request as argument, and responds with a TM[15,36] 'housekeeping parameter report storage control
-		 * configuration content report' message.
+		 * content' request as argument, and performs the necessary error checking.
 		 */
-		void housekeepingConfigurationContentReport(Message& request);
+		void reportHousekeepingConfigurationContent(Message& request);
 
-		//		/**
-		//		 * TC[15,34] add event definition identifiers to the event report blocking storage-control configuration
-		//		 */
-		//		void addEventDefinitionsToEventReportConfiguration(Message& request);
-		//
-		//		/**
-		//		 * TC[15,33] delete event definition identifiers from the event report blocking storage-control
-		// configuration
-		//		 */
-		//		void deleteEventDefinitionsFromEventReportConfiguration(Message& request);
-		//
-		//		/**
-		//		 * This function takes a TC[15,39] 'report the event report blocking storage control configuration
-		//		 * content' request as argument, and responds with a TM[15,40] 'event report blocking configuration
-		// content
-		//		 * report' message.
-		//		 */
-		//		void eventConfigurationContentReport(Message& request);
+		/**
+		 * Creates and stores a TM[15,36] 'housekeeping parameter report storage control configuration content
+		 * report'.
+		 */
+		void housekeepingConfigurationContentReport(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId);
+
+		/**
+		 * TC[15,34] 'add event definition identifiers to the event report blocking storage-control configuration'.
+		 */
+		void addEventDefinitionsToEventReportConfiguration(Message& request);
+
+		/**
+		 * TC[15,33] 'delete event definition identifiers from the event report blocking storage-control configuration'.
+		 */
+		void deleteEventDefinitionsFromEventReportConfiguration(Message& request);
+
+		/**
+		 * This function takes a TC[15,39] 'report the event report blocking storage control configuration
+		 * content' request as argument, and performs the necessary error checking.
+		 */
+		void reportEventReportConfigurationContent(Message& request);
+
+		/**
+		 * Creates and stores a TM[15,40] 'event report blocking configuration content report'.
+		 */
+		void eventReportConfigurationContentReport(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId);
 
 	} packetSelectionSubservice;
 

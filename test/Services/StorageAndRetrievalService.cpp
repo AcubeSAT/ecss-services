@@ -389,7 +389,7 @@ TEST_CASE("Reporting of the application process configuration content") {
 		                StorageAndRetrievalService::MessageType::ReportAppConfigurationContent, Message::TC, 1);
 		request.appendOctetString(packetStoreIds[0]);
 
-		packetSelection.appConfigurationContentReport(request);
+		packetSelection.reportAppConfigurationContent(request);
 
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);

@@ -251,57 +251,6 @@ int StorageAndRetrievalService::PacketSelectionSubservice::structureIdExistsInAp
 	return -1;
 }
 
-// bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxStructureIds(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request) {
-//	if (housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.size() >=
-//	    maxHousekeepingStructureIds) {
-//		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxHousekeepingStructureIdsReached);
-//		return true;
-//	}
-//	return false;
-//}
-//
-// bool StorageAndRetrievalService::PacketSelectionSubservice::noStructureInDefinition(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request) {
-//	if (housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.empty()) {
-//		ErrorHandler::reportError(
-//		    request, ErrorHandler::ExecutionStartErrorType::NonExistingHousekeepingStructureIdInDefinition);
-//		return true;
-//	}
-//	return false;
-//}
-//
-// bool StorageAndRetrievalService::PacketSelectionSubservice::housekeepingDefinitionExists(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId) {
-//	if (housekeepingReportConfiguration.definitions[packetStoreId].find(applicationId) !=
-//	    housekeepingReportConfiguration.definitions[packetStoreId].end()) {
-//		return true;
-//	}
-//	return false;
-//}
-//
-// void StorageAndRetrievalService::PacketSelectionSubservice::createHousekeepingDefinition(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId) {
-//	etl::vector<std::pair<uint16_t, uint16_t>, ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL> housekeepingStructIds;
-//	HousekeepingDefinition newDefinition;
-//	newDefinition.housekeepingStructIds = housekeepingStructIds;
-//	housekeepingReportConfiguration.definitions[packetStoreId].insert({applicationId, newDefinition});
-//}
-//
-// bool StorageAndRetrievalService::PacketSelectionSubservice::structureExists(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t structureId,
-//    uint16_t& index) {
-//	uint16_t position = 0;
-//	for (auto& id : housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds) {
-//		if (id.first == structureId) {
-//			index = position;
-//			return true;
-//		}
-//		position++;
-//	}
-//	return false;
-//}
-
 void StorageAndRetrievalService::PacketSelectionSubservice::deleteHousekeepingStructure(
     const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t index) {
 	auto& structureIds =
@@ -314,74 +263,73 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteHousekeepingSt
 	}
 }
 
-// bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxEventDefinitionIds(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request) {
-//	if (eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.size() >=
-//	    maxEventDefinitionIds) {
-//		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxEventDefinitionIdsReached);
-//		return true;
-//	}
-//	return false;
-//}
-//
-// bool StorageAndRetrievalService::PacketSelectionSubservice::noEventInDefinition(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, Message& request) {
-//	if (eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.empty()) {
-//		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NoEventDefinitionExistsInApp);
-//		return true;
-//	}
-//	return false;
-//}
-//
-// bool StorageAndRetrievalService::PacketSelectionSubservice::eventBlockingDefinitionExists(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId) {
-//	if (eventReportConfiguration.definitions[packetStoreId].find(applicationId) !=
-//	    eventReportConfiguration.definitions[packetStoreId].end()) {
-//		return true;
-//	}
-//	return false;
-//}
-//
-// void StorageAndRetrievalService::PacketSelectionSubservice::createEventReportBlockingDefinition(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId) {
-//	etl::vector<uint16_t, ECSS_MAX_EVENT_DEFINITION_IDS> eventDefinitionIds;
-//	EventDefinition newDefinition;
-//	newDefinition.eventDefinitionIds = eventDefinitionIds;
-//	eventReportConfiguration.definitions[packetStoreId].insert({applicationId, newDefinition});
-//}
-//
-// bool StorageAndRetrievalService::PacketSelectionSubservice::eventDefinitionIdExists(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId, uint16_t& index) {
-//	uint16_t position = 0;
-//	for (auto& id : eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds) {
-//		if (id == eventId) {
-//			index = position;
-//			return true;
-//		}
-//		position++;
-//	}
-//	return false;
-//}
-//
-// void StorageAndRetrievalService::PacketSelectionSubservice::createEventDefinitionId(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t eventId) {
-//	eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.push_back(eventId);
-//}
-//
-// void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitionIds(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, bool deleteAll, uint16_t index) {
-//	if (deleteAll and
-//	    (not eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.empty())) {
-//		eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.clear();
-//	} else {
-//		auto iterator =
-//		    eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.begin() + index;
-//		eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.erase(iterator);
-//		if (eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.empty()) {
-//			eventReportConfiguration.definitions[packetStoreId].erase(applicationId);
-//		}
-//	}
-//}
+bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationForEventReports(
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+	return (not appIsControlled(applicationId, request) ||
+	        noEventDefinitionIdsInApplication(packetStoreId, applicationId, request) ||
+	        exceedsMaxEventDefinitions(packetStoreId, applicationId, request));
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxEventDefinitions(
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+	if (eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.size() >=
+	    maxEventDefinitionIds) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxEventDefinitionIdsReached);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::noEventDefinitionIdsInApplication(
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+	if (eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NoEventDefinitionExistsInApp);
+		return true;
+	}
+	return false;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionId(
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t eventDefinitionId) {
+	eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.push_back(eventDefinitionId);
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::addAllEventDefinitionsOfApplication(
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+	eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.clear();
+}
+
+bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInEventReportConfiguration(
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+	auto& applications = eventReportConfiguration.definitions[packetStoreId];
+	if (applications.find(applicationId) != applications.end()) {
+		return true;
+	}
+	return false;
+}
+
+int StorageAndRetrievalService::PacketSelectionSubservice::eventDefinitionIdExistsInApplication(
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t eventDefinitionId) {
+	uint16_t position = 0;
+	for (auto& id : eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds) {
+		if (id == eventDefinitionId) {
+			return position;
+		}
+		position++;
+	}
+	return -1;
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinition(
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t index) {
+	auto& structureIds = eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds;
+
+	auto iterator = structureIds.begin() + index;
+	structureIds.erase(iterator);
+	if (structureIds.empty()) {
+		eventReportConfiguration.definitions[packetStoreId].erase(applicationId);
+	}
+}
 
 String<ECSS_MAX_PACKET_STORE_ID_SIZE>
 StorageAndRetrievalService::PacketSelectionSubservice::readPacketStoreId(Message& request) {
@@ -503,7 +451,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 	}
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationContentReport(Message& request) {
+void StorageAndRetrievalService::PacketSelectionSubservice::reportAppConfigurationContent(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportAppConfigurationContent);
 
 	auto packetStoreId = readPacketStoreId(request);
@@ -512,6 +460,11 @@ void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationCont
 		return;
 	}
 
+	appConfigurationContentReport(packetStoreId);
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationContentReport(
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
 	Message report(ServiceType, MessageType::AppConfigurationContentReport, Message::TM, 1);
 
 	report.appendOctetString(packetStoreId);
@@ -535,7 +488,6 @@ void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationCont
 			}
 		}
 	}
-
 	mainService.storeMessage(report);
 }
 
@@ -616,7 +568,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructuresFrom
 	}
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigurationContentReport(Message& request) {
+void StorageAndRetrievalService::PacketSelectionSubservice::reportHousekeepingConfigurationContent(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportHousekeepingConfigurationContent);
 
 	auto packetStoreId = readPacketStoreId(request);
@@ -625,6 +577,11 @@ void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigur
 		return;
 	}
 
+	housekeepingConfigurationContentReport(packetStoreId);
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigurationContentReport(
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
 	Message report(ServiceType, MessageType::HousekeepingConfigurationContentReport, Message::TM, 1);
 	report.appendOctetString(packetStoreId);
 
@@ -649,142 +606,108 @@ void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigur
 	mainService.storeMessage(report);
 }
 
-// void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionsToEventReportConfiguration(
-//    Message& request) {
-//	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
-//	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//	ErrorHandler::assertRequest(request.messageType == MessageType::AddEventDefinitionsToEventReportConfiguration,
-//	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
-//	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//
-//	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
-//	request.readOctetString(packetStoreData);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
-//	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
-//		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-//		return;
-//	}
-//	uint16_t numOfApplicationIds = request.readUint16();
-//	for (int i = 0; i < numOfApplicationIds; i++) {
-//		uint16_t applicationId = request.readUint16();
-//		if (not appIsControlled(applicationId, request)) {
-//			continue;
-//		}
-//		if (exceedsMaxEventDefinitionIds(packetStoreId, applicationId, request)) {
-//			continue;
-//		}
-//		if (noEventInDefinition(packetStoreId, applicationId, request)) {
-//			continue;
-//		}
-//		if (not eventBlockingDefinitionExists(packetStoreId, applicationId)) {
-//			createEventReportBlockingDefinition(packetStoreId, applicationId);
-//		}
-//		uint16_t numOfEventIds = request.readUint16();
-//		if (!numOfEventIds) {
-//			if (not eventBlockingDefinitionExists(packetStoreId, applicationId)) {
-//				createEventReportBlockingDefinition(packetStoreId, applicationId);
-//			}
-//			deleteEventDefinitionIds(packetStoreId, applicationId, true, 0);
-//			return;
-//		}
-//		for (int j = 0; j < numOfEventIds; j++) {
-//			uint16_t eventId = request.readUint16();
-//			uint16_t garbage = 0;
-//			if (not eventDefinitionIdExists(packetStoreId, applicationId, eventId, garbage)) {
-//				createEventDefinitionId(packetStoreId, applicationId, eventId);
-//			}
-//		}
-//	}
-//}
-//
-// void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitionsFromEventReportConfiguration(
-//    Message& request) {
-//	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
-//	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//	ErrorHandler::assertRequest(request.messageType == MessageType::DeleteEventDefinitionsFromEventReportConfiguration,
-//	                            request, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
-//	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
-//	request.readOctetString(packetStoreData);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
-//	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
-//		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-//		return;
-//	}
-//	uint16_t numOfApplicationIds = request.readUint16();
-//	if (!numOfApplicationIds) {
-//		eventReportConfiguration.definitions[packetStoreId].clear();
-//		return;
-//	}
-//	for (int i = 0; i < numOfApplicationIds; i++) {
-//		uint16_t applicationId = request.readUint16();
-//		if (not eventBlockingDefinitionExists(packetStoreId, applicationId)) {
-//			ErrorHandler::reportError(request,
-//			                          ErrorHandler::ExecutionStartErrorType::NonExistingEventReportBlockingDefinition);
-//			continue;
-//		}
-//		uint16_t numOfEventIds = request.readUint16();
-//		if (!numOfEventIds) {
-//			eventReportConfiguration.definitions[packetStoreId].erase(applicationId);
-//			return;
-//		}
-//		for (int j = 0; j < numOfEventIds; j++) {
-//			uint16_t eventId = request.readUint16();
-//			uint16_t index = 0;
-//			if (not eventDefinitionIdExists(packetStoreId, applicationId, eventId, index)) {
-//				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingEventDefinitionId);
-//				continue;
-//			}
-//			deleteEventDefinitionIds(packetStoreId, applicationId, false, index);
-//		}
-//	}
-//}
-//
-// void StorageAndRetrievalService::PacketSelectionSubservice::eventConfigurationContentReport(Message& request) {
-//	ErrorHandler::assertRequest(request.packetType == Message::TC, request,
-//	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//	ErrorHandler::assertRequest(request.messageType == MessageType::ReportEventConfigurationContent, request,
-//	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//	ErrorHandler::assertRequest(request.serviceType == ServiceType, request,
-//	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-//
-//	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE];
-//	request.readOctetString(packetStoreData);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId(packetStoreData);
-//	if (mainService.packetStores.find(packetStoreId) == mainService.packetStores.end()) {
-//		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-//		return;
-//	}
-//	Message contentReport(ServiceType, MessageType::EventConfigurationContentReport, Message::TM, 1);
-//	contentReport.appendString(packetStoreId);
-//	uint16_t numOfApplications = eventReportConfiguration.definitions[packetStoreId].size();
-//	contentReport.appendUint16(numOfApplications);
-//	for (auto& app : eventReportConfiguration.definitions[packetStoreId]) {
-//		contentReport.appendUint16(app.first);
-//		contentReport.appendUint16(app.second.eventDefinitionIds.size());
-//		for (auto& id : app.second.eventDefinitionIds) {
-//			contentReport.appendUint16(id);
-//		}
-//	}
-//	mainService.storeMessage(contentReport);
-//}
+void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionsToEventReportConfiguration(
+    Message& request) {
+	request.assertTC(ServiceType, MessageType::AddEventDefinitionsToEventReportConfiguration);
 
-// void StorageAndRetrievalService::PacketSelectionSubservice::createAppDefinition(
-//     const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
-//	typedef etl::vector<uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
-//	etl::map<uint16_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
-//	ApplicationProcessDefinition newAppDefinition;
-//	newAppDefinition.serviceTypeDefinitions = serviceTypes;
-//	applicationProcessConfiguration.definitions[packetStoreId].insert({applicationId, newAppDefinition});
-// }
-//
+	auto packetStoreId = readPacketStoreId(request);
+	if (not packetStoreExists(packetStoreId)) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	uint16_t numOfApplications = request.readUint16();
 
-//
-// void StorageAndRetrievalService::PacketSelectionSubservice::createServiceDefinition(
-//     const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId) {
-//	etl::vector<uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
-//	applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.insert(
-//	    {serviceId, reportTypes});
-// }
+	for (int i = 0; i < numOfApplications; i++) {
+		uint16_t applicationId = request.readUint16();
+		uint16_t numOfEventDefinitions = request.readUint16();
+
+		if (checkApplicationForEventReports(packetStoreId, applicationId, request)) {
+			continue;
+		}
+		if (numOfEventDefinitions == 0) {
+			addAllEventDefinitionsOfApplication(packetStoreId, applicationId);
+			continue;
+		}
+
+		for (int j = 0; j < numOfEventDefinitions; j++) {
+			uint16_t eventDefinitionId = request.readUint16();
+			addEventDefinitionId(packetStoreId, applicationId, eventDefinitionId);
+		}
+	}
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitionsFromEventReportConfiguration(
+    Message& request) {
+	request.assertTC(ServiceType, MessageType::DeleteEventDefinitionsFromEventReportConfiguration);
+
+	auto packetStoreId = readPacketStoreId(request);
+	if (not packetStoreExists(packetStoreId)) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	uint16_t numOfApplications = request.readUint16();
+
+	if (numOfApplications == 0) {
+		eventReportConfiguration.definitions.clear();
+		return;
+	}
+
+	for (int i = 0; i < numOfApplications; i++) {
+		uint16_t applicationId = request.readUint16();
+		uint16_t numOfEventDefinitions = request.readUint16();
+
+		if (not appExistsInEventReportConfiguration(packetStoreId, applicationId)) {
+			ErrorHandler::reportError(request,
+			                          ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
+			continue;
+		}
+		if (numOfEventDefinitions == 0) {
+			eventReportConfiguration.definitions[packetStoreId].erase(applicationId);
+			continue;
+		}
+
+		for (int j = 0; j < numOfEventDefinitions; j++) {
+			uint16_t eventDefinitionId = request.readUint16();
+			int position = eventDefinitionIdExistsInApplication(packetStoreId, applicationId, eventDefinitionId);
+			if (position == -1) {
+				ErrorHandler::reportError(
+				    request, ErrorHandler::ExecutionStartErrorType::NonExistingEventDefinitionIdInDefinition);
+				continue;
+			}
+			deleteEventDefinition(packetStoreId, applicationId, position);
+		}
+	}
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::reportEventReportConfigurationContent(Message& request) {
+	request.assertTC(ServiceType, MessageType::ReportEventReportConfigurationContent);
+
+	auto packetStoreId = readPacketStoreId(request);
+	if (not packetStoreExists(packetStoreId)) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+
+	eventReportConfigurationContentReport(packetStoreId);
+}
+
+void StorageAndRetrievalService::PacketSelectionSubservice::eventReportConfigurationContentReport(
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
+	Message report(ServiceType, MessageType::EventReportConfigurationContentReport, Message::TM, 1);
+
+	report.appendOctetString(packetStoreId);
+	uint16_t numOfApplications = eventReportConfiguration.definitions[packetStoreId].size();
+	report.appendUint16(numOfApplications);
+
+	for (auto& application : eventReportConfiguration.definitions[packetStoreId]) {
+		uint16_t applicationId = application.first;
+		uint16_t numOfEventDefinitions = application.second.eventDefinitionIds.size();
+		report.appendUint16(applicationId);
+		report.appendUint16(numOfEventDefinitions);
+
+		for (auto& eventDefinitionId : application.second.eventDefinitionIds) {
+			report.appendUint16(eventDefinitionId);
+		}
+	}
+	mainService.storeMessage(report);
+}

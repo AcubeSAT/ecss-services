@@ -144,131 +144,61 @@ public:
 		 */
 		GetNonExistingParameter = 8,
 		/**
-		 * Attempt to change a non-existent packet store (ST[15])
-		 */
-		SetNonExistingPacketStore = 9,
-		/**
 		 * Attempt to access a packet store that does not exist (ST[15])
 		 */
-		GetNonExistingPacketStore = 10,
-		/**
-		 * Attempt to change the start time tag of a packet store, whose open retrieval status is in progress (ST[15])
-		 */
-		SetPacketStoreWithOpenRetrievalInProgress = 11,
-		/**
-		 * Attempt to resume open retrieval of a packet store, whose by-time-range retrieval is enabled (ST[15])
-		 */
-		SetPacketStoreWithByTimeRangeRetrieval = 12,
-		/**
-		 * Attempt to access a packet with by-time range retrieval enabled (ST[15])
-		 */
-		GetPacketStoreWithByTimeRangeRetrieval = 13,
-		/**
-		 * Attempt to start the by-time-range retrieval of packet store, whose open retrieval is in progress (ST[15])
-		 */
-		GetPacketStoreWithOpenRetrievalInProgress = 14,
-		/**
-		 * Start time of retrieval is later than the end time (ST[15])
-		 */
-		InvalidRetrievalTimesRelation = 15,
-		/**
-		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
-		 */
-		ByTimeRangeRetrievalAlreadyEnabled = 16,
-		/**
-		 * Attempt to create packet store, whose ID already exists (ST[15])
-		 */
-		AlreadyExistingPacketStore = 17,
-		/**
-		 * Attempt to create packet store, when the max number of packet stores is already reached (ST[15])
-		 */
-		MaxNumberOfPacketStoresReached = 18,
-		/**
-		 * Attempt to access a packet store with the storage status enabled (ST[15])
-		 */
-		GetPacketStoreWithStorageStatusEnabled = 19,
-		/**
-		 * Attempt to delete a packet whose by time range retrieval status is enabled (ST[15])
-		 */
-		DeletionOfPacketWithByTimeRangeRetrieval = 20,
-		/**
-		 * Attempt to delete a packet whose open retrieval status is in progress (ST[15])
-		 */
-		DeletionOfPacketWithOpenRetrievalInProgress = 21,
-		/**
-		 * Requested a time window where the start time is larger than the end time (ST[15])
-		 */
-		InvalidTimeWindow = 22,
-		/**
-		 * Attempt to copy a packet store to a destination packet store that is not empty (ST[15])
-		 */
-		DestinationPacketStoreNotEmtpy = 23,
+		GetNonExistingPacketStore = 9,
 		/**
 		 * Request to change the storage control configuration of an application ID that's not controlled by the packet
 		 * selection subservice (ST[15])
 		 */
-		UnControlledApplicationProcessId = 24,
+		UnControlledApplicationProcessId = 10,
 		/**
 		 * Attempt to add a new service type definition, after the max number of service type definitions has already
 		 * been reached (ST[15])
 		 */
-		MaxServiceTypeDefinitionsReached = 25,
+		MaxServiceTypeDefinitionsReached = 11,
 		/**
 		 * Attempt to add a new report type definition, after the max number of report type definitions has already
 		 * been reached (ST[15])
 		 */
-		MaxReportTypeDefinitionsReached = 26,
+		MaxReportTypeDefinitionsReached = 12,
 		/**
 		 * Attempt to add a new report type definition in a service type with no report type definitions (ST[15])
 		 */
-		NonExistingReportTypeDefinitionInService = 27,
+		NonExistingReportTypeDefinitionInService = 13,
 		/**
 		 * Attempt to access a non existing service type in an application storage control configuration (ST[15])
 		 */
-		NonExistingServiceTypeDefinitionInApp = 28,
+		NonExistingServiceTypeDefinitionInApp = 14,
 		/**
 		 * Attempt to access a non existing application process in the definition (ST[15])
 		 */
-		NonExistingApplicationInDefinition = 29,
+		NonExistingApplicationInDefinition = 15,
 		/**
-		 * Attempt to add new housekeeping structure id, when the max number of structures is already reached (ST[15])
+		 * Attempt to add new housekeeping structure ID, when the max number of structures is already reached (ST[15])
 		 */
-		MaxHousekeepingStructureIdsReached = 30,
+		MaxHousekeepingStructureIdsReached = 16,
 		/**
 		 * The requested structure id does not exist in the requested housekeeping parameter report definition (ST[15])
 		 */
-		NonExistingHousekeepingStructureIdInDefinition = 31,
+		NonExistingHousekeepingStructureIdInDefinition = 17,
 		/**
-		 * Attempt to add new event report definition id, when the max number of event definitions for the specified
+		 * Attempt to add new event report definition ID, when the max number of event definitions for the specified
 		 * packet store and the specified event report blocking definition is already reached (ST[15])
 		 */
-		MaxEventDefinitionIdsReached = 32,
+		MaxEventDefinitionIdsReached = 18,
 		/**
 		 * Attempt to add new event definition in a event report blocking definition with no event definitions (ST[15])
 		 */
-		NoEventDefinitionExistsInApp = 33,
+		NoEventDefinitionExistsInApp = 19,
 		/**
 		 * Attempt to access a non existing event report blocking definition (ST[15])
 		 */
-		NonExistingEventReportBlockingDefinition = 34,
+		NonExistingEventReportBlockingDefinition = 20,
 		/**
-		 * Attempt to access a non existing event definition id (ST[15])
+		 * Attempt to access a non existing event definition ID (ST[15])
 		 */
-		NonExistingEventDefinitionId = 35,
-		/**
-		 * Attempt to set the virtual channel of a packet store to a invalid value (ST[15])
-		 */
-		InvalidVirtualChannel = 36,
-		/**
-		 * Attempt to delete a packet store, whose storage status is enabled (ST[15])
-		 */
-		DeletionOfPacketStoreWithStorageStatusEnabled = 37,
-		/**
-		 * Attempt to copy packets from a packet store to another, but either no packet timestamp falls inside the
-		 * specified timestamp, or more than one boolean argument were given as true in the 'copyPacketsTo' function
-		 * (ST[15])
-		 */
-		CopyOfPacketsFailed = 38,
+		NonExistingEventDefinitionIdInDefinition = 21,
 
 	};
 
