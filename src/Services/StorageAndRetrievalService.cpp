@@ -331,9 +331,6 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::packetStoreExists(co
 	return mainService.packetStores.find(packetStoreId) != mainService.packetStores.end();
 }
 
-/**
- * @todo: skip bytes when invalid request.
- */
 void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
 	request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration);
 
@@ -346,11 +343,16 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 
 	for (int i = 0; i < numOfApplicationIds; i++) {
 		uint16_t applicationId = request.readUint16();
-		//		if (checkApplicationForReportTypes(packetStoreId, applicationId, request)) {
-		//			continue;
-		//		}
 		uint16_t numOfServiceIds = request.readUint16();
 
+		if (checkApplicationForReportTypes(packetStoreId, applicationId, request)) {
+			for (int k = 0; k < numOfServiceIds; k++) {
+				request.skipBytes(2); // todo: change the bytes if change the type.
+				uint16_t numOfMessageTypes = request.readUint16();
+				request.skipBytes(numOfMessageTypes * 2);
+			}
+			continue;
+		}
 		if (numOfServiceIds == 0) {
 			addAllReportDefinitionsOfApplication(packetStoreId, applicationId);
 			continue;
@@ -395,13 +397,18 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 
 	for (int i = 0; i < numOfApplicationIds; i++) {
 		uint16_t applicationId = request.readUint16();
+		uint16_t numOfServiceIds = request.readUint16();
+
 		if (not appExistsInApplicationConfiguration(packetStoreId, applicationId)) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
+			for (int k = 0; k < numOfServiceIds; k++) {
+				request.skipBytes(2);
+				uint16_t numOfMessageTypes = request.readUint16();
+				request.skipBytes(numOfMessageTypes * 2);
+			}
 			continue;
 		}
-		uint16_t numOfServiceIds = request.readUint16();
-
 		if (numOfServiceIds == 0) {
 			applicationProcessConfiguration.definitions[packetStoreId].erase(applicationId);
 			continue;
@@ -409,13 +416,14 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 
 		for (int j = 0; j < numOfServiceIds; j++) {
 			uint16_t serviceId = request.readUint16();
+			uint16_t numOfMessageTypes = request.readUint16();
+
 			if (not serviceExistsInApp(packetStoreId, applicationId, serviceId)) {
 				ErrorHandler::reportError(request,
 				                          ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinitionInApp);
+				request.skipBytes(numOfMessageTypes);
 				continue;
 			}
-			uint16_t numOfMessageTypes = request.readUint16();
-
 			if (numOfMessageTypes == 0) {
 				applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.erase(
 				    serviceId);
@@ -491,9 +499,9 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHouse
 		uint8_t numOfStructures = request.readUint8();
 
 		if (checkApplicationForHousekeeping(packetStoreId, applicationId, request)) {
+			request.skipBytes(numOfStructures * (1 + 2));
 			continue;
 		}
-
 		if (numOfStructures == 0) {
 			addAllHousekeepingStructuresOfApplication(packetStoreId, applicationId);
 			continue;
@@ -533,6 +541,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructuresFrom
 		if (not appExistsInHousekeepingConfiguration(packetStoreId, applicationId)) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
+			request.skipBytes(numOfStructures * 1);
 			continue;
 		}
 		if (numOfStructures == 0) {
@@ -607,6 +616,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionsT
 		uint16_t numOfEventDefinitions = request.readUint16();
 
 		if (checkApplicationForEventReports(packetStoreId, applicationId, request)) {
+			request.skipBytes(numOfEventDefinitions * 2);
 			continue;
 		}
 		if (numOfEventDefinitions == 0) {
@@ -644,6 +654,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitio
 		if (not appExistsInEventReportConfiguration(packetStoreId, applicationId)) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
+			request.skipBytes(numOfEventDefinitions * 2);
 			continue;
 		}
 		if (numOfEventDefinitions == 0) {
