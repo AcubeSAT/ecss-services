@@ -167,19 +167,13 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(
     const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId) {
 	auto& serviceTypes =
 	    applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions;
-	if (serviceTypes.find(serviceId) != serviceTypes.end()) {
-		return true;
-	}
-	return false;
+	return serviceTypes.find(serviceId) != serviceTypes.end();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInApplicationConfiguration(
     const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
 	auto& applications = applicationProcessConfiguration.definitions[packetStoreId];
-	if (applications.find(applicationId) != applications.end()) {
-		return true;
-	}
-	return false;
+	return applications.find(applicationId) != applications.end();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationForHousekeeping(
@@ -233,10 +227,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addAllHousekeepingSt
 bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInHousekeepingConfiguration(
     const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
 	auto& applications = housekeepingReportConfiguration.definitions[packetStoreId];
-	if (applications.find(applicationId) != applications.end()) {
-		return true;
-	}
-	return false;
+	return applications.find(applicationId) != applications.end();
 }
 
 int StorageAndRetrievalService::PacketSelectionSubservice::structureIdExistsInApplication(
@@ -302,10 +293,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addAllEventDefinitio
 bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInEventReportConfiguration(
     const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
 	auto& applications = eventReportConfiguration.definitions[packetStoreId];
-	if (applications.find(applicationId) != applications.end()) {
-		return true;
-	}
-	return false;
+	return applications.find(applicationId) != applications.end();
 }
 
 int StorageAndRetrievalService::PacketSelectionSubservice::eventDefinitionIdExistsInApplication(
@@ -340,10 +328,7 @@ StorageAndRetrievalService::PacketSelectionSubservice::readPacketStoreId(Message
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::packetStoreExists(const String<10>& packetStoreId) {
-	if (mainService.packetStores.find(packetStoreId) != mainService.packetStores.end()) {
-		return true;
-	}
-	return false;
+	return mainService.packetStores.find(packetStoreId) != mainService.packetStores.end();
 }
 
 /**
