@@ -41,7 +41,7 @@ private:
 	 * @return map containing the initial parameters drawn
 	 * 		   from \ref PlatformParameters namespace
 	 */
-	ParameterMap initializeParametersMap();
+	void initializeParameterMap();
 
 public:
 	inline static const uint8_t ServiceType = 20;
@@ -56,7 +56,9 @@ public:
 	 * The Constructor initializes \var parameters
 	 * by calling \fn initializeParametersArray
 	 */
-	ParameterService() : parameters(initializeParametersMap()) {}
+	ParameterService() {
+		initializeParameterMap();
+	}
 
 	/**
 	 * Checks if \var parameters contains a reference to a parameter with
@@ -76,10 +78,13 @@ public:
 	 * @param parameterId the id of the parameter, whose reference is to be returned.
 	 */
 	std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId) const {
-		if (!parameterExists(parameterId)) {
+		auto parameter = parameters.find(parameterId);
+
+		if (parameter != parameters.end()) {
+			return parameter->second;
+		} else {
 			return {};
 		}
-		return parameters.at(parameterId);
 	}
 
 	/**

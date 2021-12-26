@@ -60,7 +60,7 @@ target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
 
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
-    file(GLOB test_main_SRC "test/*.cpp" "src/Platform/x86/Services/*.cpp")
+    file(GLOB test_main_SRC "test/*.cpp")
     file(GLOB test_SRC "test/**/*.cpp")
 
     add_subdirectory(lib/Catch2)

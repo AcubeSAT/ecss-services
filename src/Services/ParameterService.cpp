@@ -30,9 +30,9 @@ void ParameterService::reportParameters(Message& paramIds) {
 	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		if (parameterExists(currId)) {
+		if (auto parameter = getParameter(currId)) {
 			parameterReport.appendUint16(currId);
-			parameters.at(currId).get().appendValueToMessage(parameterReport);
+			parameter->get().appendValueToMessage(parameterReport);
 		} else {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 		}
@@ -53,8 +53,8 @@ void ParameterService::setParameters(Message& newParamValues) {
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		if (parameterExists(currId)) {
-			parameters.at(currId).get().setValueFromMessage(newParamValues);
+		if (auto parameter = getParameter(currId)) {
+			parameter->get().setValueFromMessage(newParamValues);
 		} else {
 			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);
 			break; // Setting next parameters is impossible, since the size of value to be read is unknown

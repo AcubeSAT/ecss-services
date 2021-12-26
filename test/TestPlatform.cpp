@@ -5,6 +5,8 @@
 #include <Service.hpp>
 #include <Logger.hpp>
 #include "Services/ServiceTests.hpp"
+#include "Helpers/Parameter.hpp"
+#include "Services/ParameterService.hpp"
 
 // Explicit template specializations for the logError() function
 template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
@@ -57,4 +59,38 @@ struct ServiceTestsListener : Catch::TestEventListenerBase {
 		ServiceTests::reset();
 	}
 };
+
+/**
+ * Extension of x86's specific \ref PlatformParameters namespace.
+ * The parameters declared below are only used for testing purposes.
+ */
+namespace PlatformParameters {
+	inline Parameter<uint32_t> parameter4(5);
+	inline Parameter<uint8_t> parameter5(11);
+	inline Parameter<uint32_t> parameter6(23);
+	inline Parameter<uint32_t> parameter7(53);
+	inline Parameter<uint8_t> parameter8(55);
+	inline Parameter<uint16_t> parameter9(32);
+	inline Parameter<uint32_t> parameter10(43);
+	inline Parameter<uint32_t> parameter11(91);
+	inline Parameter<uint8_t> parameter12(1);
+}
+
+/**
+ * Specific definition for \ref ParameterService's initialize function, for testing purposes.
+ */
+void ParameterService::initializeParameterMap() {
+	parameters = {{static_cast<uint16_t>(0), PlatformParameters::parameter1},
+	              {static_cast<uint16_t>(1), PlatformParameters::parameter2},
+	              {static_cast<uint16_t>(2), PlatformParameters::parameter3},
+	              {static_cast<uint16_t>(3), PlatformParameters::parameter4},
+	              {static_cast<uint16_t>(4), PlatformParameters::parameter5},
+	              {static_cast<uint16_t>(5), PlatformParameters::parameter6},
+	              {static_cast<uint16_t>(6), PlatformParameters::parameter7},
+	              {static_cast<uint16_t>(7), PlatformParameters::parameter8},
+	              {static_cast<uint16_t>(8), PlatformParameters::parameter9},
+	              {static_cast<uint16_t>(9), PlatformParameters::parameter10},
+	              {static_cast<uint16_t>(10), PlatformParameters::parameter11},
+	              {static_cast<uint16_t>(11), PlatformParameters::parameter12}};
+}
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
