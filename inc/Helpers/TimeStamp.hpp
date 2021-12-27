@@ -29,7 +29,7 @@ private:
 	typedef typename std::conditional<(seconds_counter_bytes + fractional_counter_bytes) < 4, uint32_t, uint64_t>::type
 	    tai_counter_t;
 	tai_counter_t tai_counter;
-	CUC_header_t CUC_header = Time::build_CUC_header<CUC_header_t, seconds_counter_bytes, fractional_counter_bytes>();
+	CUC_header_t CUC_header = Time::buildCUCHeader<CUC_header_t, seconds_counter_bytes, fractional_counter_bytes>();
 
 public:
 	/**
@@ -52,14 +52,14 @@ public:
 	 * @param timestamp a complete CUC time stamp including header, of the maximum possible size, zero padded to the
 	 * right
 	 */
-	TimeStamp(etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp);
+	TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp);
 
 	/**
 	 * Initialize the instant from a UTC timestamp struct
 	 *
 	 * @param timestamp a UTC timestamp, from Unix Epoch
 	 */
-	TimeStamp(UTC_Timestamp timestamp);
+	TimeStamp(UTCTimestamp timestamp);
 
 	/**
 	 * Get the representation as seconds from epoch in TAI
@@ -73,14 +73,14 @@ public:
 	 *
 	 * @return the instant, represented in the CCSDS CUC format
 	 */
-	const etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> as_CUC_timestamp();
+	const etl::array<uint8_t, Time::CUCTimestampMaximumSize> as_CUC_timestamp();
 
 	/**
 	 * Get the representation as a UTC timestamp
 	 *
 	 * @return the instant, represented in the structure that holds UTC timestamps
 	 */
-	const UTC_Timestamp as_UTC_timestamp();
+	const UTCTimestamp as_UTC_timestamp();
 
 	/**
 	 * Compare two instants.

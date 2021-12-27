@@ -1,7 +1,7 @@
 #include "Helpers/TimeFormats.hpp"
 #include <iomanip>
 
-UTC_Timestamp::UTC_Timestamp() {
+UTCTimestamp::UTCTimestamp() {
 	// Unix epoch 1/1/1970
 	year = 1970;
 	month = 1;
@@ -11,7 +11,7 @@ UTC_Timestamp::UTC_Timestamp() {
 	second = 0;
 }
 
-UTC_Timestamp::UTC_Timestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
+UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
 	// check if the parameters make sense
 	ASSERT_INTERNAL(2019 <= year, ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= month) && (month <= 12), ErrorHandler::InternalErrorType::InvalidDate);
@@ -29,7 +29,7 @@ UTC_Timestamp::UTC_Timestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t 
 	this->second = second;
 }
 
-bool UTC_Timestamp::operator<(const UTC_Timestamp& Date) {
+bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
 	// compare years
 	if (this->year < Date.year) {
 		return true;
@@ -78,7 +78,7 @@ bool UTC_Timestamp::operator<(const UTC_Timestamp& Date) {
 	return false;
 }
 
-bool UTC_Timestamp::operator>(const UTC_Timestamp& Date) {
+bool UTCTimestamp::operator>(const UTCTimestamp& Date) {
 	if (this->year > Date.year) {
 		return true;
 	}
@@ -116,7 +116,7 @@ bool UTC_Timestamp::operator>(const UTC_Timestamp& Date) {
 	return false;
 }
 
-bool UTC_Timestamp::operator==(const UTC_Timestamp& Date) {
+bool UTCTimestamp::operator==(const UTCTimestamp& Date) {
 	if (this->year != Date.year) {
 		return false;
 	}
@@ -138,15 +138,15 @@ bool UTC_Timestamp::operator==(const UTC_Timestamp& Date) {
 	return true;
 }
 
-bool UTC_Timestamp::operator<=(const UTC_Timestamp& Date) {
+bool UTCTimestamp::operator<=(const UTCTimestamp& Date) {
 	return ((*this < Date) || (*this == Date));
 }
 
-bool UTC_Timestamp::operator>=(const UTC_Timestamp& Date) {
+bool UTCTimestamp::operator>=(const UTCTimestamp& Date) {
 	return ((*this > Date) || (*this == Date));
 }
 
-std::ostream& operator<<(std::ostream& o, UTC_Timestamp const& Date) { // NOLINT
+std::ostream& operator<<(std::ostream& o, UTCTimestamp const& Date) { // NOLINT
 	// YYYY-MM-DDTHH:mm:ss.sssZ
 	o.fill('0');
 	o << static_cast<int>(Date.year) << "-" << std::setw(2) << static_cast<int>(Date.month) << "-" << std::setw(2)

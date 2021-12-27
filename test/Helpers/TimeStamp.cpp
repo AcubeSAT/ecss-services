@@ -13,34 +13,34 @@ TEST_CASE("TimeStamp class construction") {
 	// }
 
 	SECTION("Test CUC headers generation") {
-		uint8_t cuc_header1 = build_CUC_header<uint8_t, 2, 2>();
+		uint8_t cuc_header1 = buildCUCHeader<uint8_t, 2, 2>();
 		CHECK(cuc_header1 == 0b00100110);
 
-		uint8_t cuc_header2 = build_CUC_header<uint8_t, 4, 1>();
+		uint8_t cuc_header2 = buildCUCHeader<uint8_t, 4, 1>();
 		CHECK(cuc_header2 == 0b00101101);
 
-		uint8_t cuc_header3 = build_CUC_header<uint8_t, 1, 1>();
+		uint8_t cuc_header3 = buildCUCHeader<uint8_t, 1, 1>();
 		CHECK(cuc_header3 == 0b00100001);
 
-		uint16_t cuc_header4 = build_CUC_header<uint16_t, 5, 1>();
+		uint16_t cuc_header4 = buildCUCHeader<uint16_t, 5, 1>();
 		CHECK(cuc_header4 == 0b1010110110100000);
 
-		uint16_t cuc_header5 = build_CUC_header<uint16_t, 1, 6>();
+		uint16_t cuc_header5 = buildCUCHeader<uint16_t, 1, 6>();
 		CHECK(cuc_header5 == 0b1010001110011000);
 
-		uint16_t cuc_header6 = build_CUC_header<uint16_t, 7, 1>();
+		uint16_t cuc_header6 = buildCUCHeader<uint16_t, 7, 1>();
 		CHECK(cuc_header6 == 0b1010110111100000);
 	}
 
 	SECTION("Check TAI idempotence") {
 		int input_time = 1000;
-		TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(input_time);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(input_time);
 		REQUIRE(Epoch.as_TAI_seconds() == input_time); // check initialization has intended effect
 	}
 
 	SECTION("Check CUC idempotence") {
 		etl::array<uint8_t, 9> input_time1 = {0b00100110, 0, 1, 1, 3, 0, 0, 0, 0};
-		TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch1(input_time1);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch1(input_time1);
 		etl::array<uint8_t, 9> test_return1 = Epoch1.as_CUC_timestamp();
 
 		for (auto i = 0; i < 9; i++) {
@@ -69,16 +69,16 @@ TEST_CASE("TimeStamp class construction") {
 
 	SECTION("Check UTC idempotence") {
 		{
-			UTC_Timestamp timestamp1(2020, 4, 10, 10, 15, 0); // 10 Apr 2020, 10:15:00;
-			TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(timestamp1);
-			UTC_Timestamp timestamp2 = Epoch.as_UTC_timestamp();
+			UTCTimestamp timestamp1(2020, 4, 10, 10, 15, 0); // 10 Apr 2020, 10:15:00;
+			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
+			UTCTimestamp timestamp2 = Epoch.as_UTC_timestamp();
 			bool cond = (timestamp2 == timestamp1);
 			REQUIRE(cond);
 		}
 		{
-			UTC_Timestamp timestamp1(2035, 1, 1, 0, 0, 1); // 1 Jan 2035 midnight passed;
-			TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(timestamp1);
-			UTC_Timestamp timestamp2 = Epoch.as_UTC_timestamp();
+			UTCTimestamp timestamp1(2035, 1, 1, 0, 0, 1); // 1 Jan 2035 midnight passed;
+			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
+			UTCTimestamp timestamp2 = Epoch.as_UTC_timestamp();
 			bool cond = (timestamp2 == timestamp1);
 			REQUIRE(cond);
 		}
@@ -86,13 +86,13 @@ TEST_CASE("TimeStamp class construction") {
 
 	SECTION("UTC conversion to and from seconds timestamps") {
 		{
-			UTC_Timestamp timestamp1(2020, 12, 5, 0, 0, 0); // 5 Dec 2020, midnight;
-			TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(timestamp1);
+			UTCTimestamp timestamp1(2020, 12, 5, 0, 0, 0); // 5 Dec 2020, midnight;
+			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
 			REQUIRE(Epoch.as_TAI_seconds() == 1607126400);
 		}
 		{
-			UTC_Timestamp timestamp1(2020, 2, 29, 0, 0, 0); // 5 Dec 2020, midnight;
-			TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(timestamp1);
+			UTCTimestamp timestamp1(2020, 2, 29, 0, 0, 0); // 5 Dec 2020, midnight;
+			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
 			REQUIRE(Epoch.as_TAI_seconds() == 1582934400);
 		}
 	}
@@ -124,7 +124,7 @@ TEST_CASE("TimeStamp class construction") {
 
 	SECTION("Check runtime class size") {
 		int input_time = 1000;
-		TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(input_time);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(input_time);
 		REQUIRE(sizeof(Epoch) < 32);
 	}
 }

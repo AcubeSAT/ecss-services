@@ -14,16 +14,16 @@
 namespace Time
 {
 ///@{
-inline constexpr uint8_t SECONDS_PER_MINUTE = 60;
-inline constexpr uint16_t SECONDS_PER_HOUR = 3600;
-inline constexpr uint32_t SECONDS_PER_DAY = 86400;
-static constexpr uint8_t DAYSOFMONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+inline constexpr uint8_t SecondsPerMinute = 60;
+inline constexpr uint16_t SecondsPerHour = 3600;
+inline constexpr uint32_t SecondsPerDay = 86400;
+static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 ///@}
 
 ///@{
 /** I have no idea what this means */
-inline constexpr uint8_t ACUBESAT_CUC_SECONDS_COUNTER_BYTES = 2;
-inline constexpr uint8_t ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES = 2;
+inline constexpr uint8_t CUCSecondsBytes = 2;
+inline constexpr uint8_t CUCFractionalBytes = 2;
 ///@}
 
 /** The AcubeSAT epoch (clock measurement starting time) */
@@ -50,13 +50,13 @@ inline constexpr uint8_t ACUBESAT_EPOCH_DAY = 1;
  *
  * @todo Update AcubeSAT epoch to 2020.01.01.
  */
-inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800;
+inline constexpr uint32_t EpochSecondsFromUnix = 1546300800;
 
-inline constexpr uint8_t MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP = 9;
+inline constexpr uint8_t CUCTimestampMaximumSize = 9;
 
 static_assert(ACUBESAT_EPOCH_YEAR >= 2019);
 static_assert(ACUBESAT_EPOCH_MONTH < 11 && ACUBESAT_EPOCH_MONTH >= 0);
-static_assert(ACUBESAT_EPOCH_DAY < DAYSOFMONTH[ACUBESAT_EPOCH_MONTH]);
+static_assert(ACUBESAT_EPOCH_DAY < DaysOfMonth[ACUBESAT_EPOCH_MONTH]);
 
 /**
  * Builds the short P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
@@ -65,14 +65,14 @@ static_assert(ACUBESAT_EPOCH_DAY < DAYSOFMONTH[ACUBESAT_EPOCH_MONTH]);
  * time units.
  *
  * @see CCSDS 301.0-B-4, Section 3.2.2
- * @tparam seconds_counter_bytes The number of octets used to represent the basic time units
- * @tparam fractional_counter_bytes The number of octets used to represent the fractional time units
+ * @tparam secondsBytes The number of octets used to represent the basic time units
+ * @tparam fractionalBytes The number of octets used to represent the fractional time units
  * @return A single byte, representing the P-field contents
  */
-template <int seconds_counter_bytes, int fractional_counter_bytes>
-inline constexpr uint8_t build_short_CUC_header() {
-	static_assert(seconds_counter_bytes <= 4, "Use build_long_CUC_header instead");
-	static_assert(fractional_counter_bytes <= 3, "Use build_long_CUC_header instead");
+template <int secondsBytes, int fractionalBytes>
+inline constexpr uint8_t buildShortCUCHeader() {
+	static_assert(secondsBytes <= 4, "Use buildLongCUCHeader instead");
+	static_assert(fractionalBytes <= 3, "Use buildLongCUCHeader instead");
 
 	uint8_t header = 0;
 
@@ -85,11 +85,11 @@ inline constexpr uint8_t build_short_CUC_header() {
 
 	// Number of bytes in the basic time unit
 	header <<= 2U;
-	header += seconds_counter_bytes - 1;
+	header += secondsBytes - 1;
 
 	// Number of bytes in the fractional unit
 	header <<= 2U;
-	header += fractional_counter_bytes;
+	header += fractionalBytes;
 
 	return header;
 }
@@ -101,26 +101,26 @@ inline constexpr uint8_t build_short_CUC_header() {
  * timestamp, which could not fit in a short P-field.
  *
  * @see CCSDS 301.0-B-4, Section 3.2.2
- * @tparam seconds_counter_bytes The number of octets used to represent the basic time units
- * @tparam fractional_counter_bytes The number of octets used to represent the fractional time units
+ * @tparam secondsBytes The number of octets used to represent the basic time units
+ * @tparam fractionalBytes The number of octets used to represent the fractional time units
  * @return Two bytes, representing the P-field contents
  */
-template <int seconds_counter_bytes, int fractional_counter_bytes>
-inline constexpr uint16_t build_long_CUC_header() {
+template <int secondsBytes, int fractionalBytes>
+inline constexpr uint16_t buildLongCUCHeader() {
 	// cppcheck-suppress redundantCondition
-	static_assert(seconds_counter_bytes > 4 || fractional_counter_bytes > 3, "Use build_short_CUC_header instead");
-	static_assert(seconds_counter_bytes <= 7,
+	static_assert(secondsBytes > 4 || fractionalBytes > 3, "Use buildShortCUCHeader instead");
+	static_assert(secondsBytes <= 7,
 	              "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
-	static_assert(fractional_counter_bytes <= 6,
+	static_assert(fractionalBytes <= 6,
 	              "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
 
 	uint16_t header = 0;
 
-	uint8_t first_octet_number_of_seconds_bytes = std::min(4, seconds_counter_bytes);
-	uint8_t second_octet_number_of_seconds_bytes = seconds_counter_bytes - first_octet_number_of_seconds_bytes;
+	uint8_t octet1secondsBytes = std::min(4, secondsBytes);
+	uint8_t octet2secondsBytes = secondsBytes - octet1secondsBytes;
 
-	uint8_t first_octet_number_of_fractional_bytes = std::min(3, fractional_counter_bytes);
-	uint8_t second_octet_number_of_fractional_bytes = fractional_counter_bytes - first_octet_number_of_fractional_bytes;
+	uint8_t octet1fractionalBytes = std::min(3, fractionalBytes);
+	uint8_t octet2fractionalBytes = fractionalBytes - octet1fractionalBytes;
 
 	// P-Field extension is 1, CUC header is extended
 	header += 1;
@@ -131,11 +131,11 @@ inline constexpr uint16_t build_long_CUC_header() {
 
 	// // Number of bytes in the basic time unit
 	header <<= 2U;
-	header += first_octet_number_of_seconds_bytes - 1;
+	header += octet1secondsBytes - 1;
 
 	// Number of bytes in the fractional unit
 	header <<= 2U;
-	header += first_octet_number_of_fractional_bytes;
+	header += octet1fractionalBytes;
 
 	// P-Field extension is 1, CUC header was extended
 	header <<= 1U;
@@ -143,11 +143,11 @@ inline constexpr uint16_t build_long_CUC_header() {
 
 	// Number of bytes in the extended basic time unit
 	header <<= 2U;
-	header += second_octet_number_of_seconds_bytes;
+	header += octet2secondsBytes;
 
 	// Number of bytes in the extended fractional unit
 	header <<= 2U;
-	header += second_octet_number_of_fractional_bytes;
+	header += octet2fractionalBytes;
 
 	// Last 3 LSB are reserved for custom mission use
 	header <<= 3U;
@@ -171,28 +171,28 @@ inline constexpr uint16_t build_long_CUC_header() {
  *
  * @see CCSDS 301.0-B-4, Section 3.2.2
  * @tparam T An arbitrary `uint` return type of the header
- * @tparam seconds_counter_bytes The number of octets used to represent the basic time units
- * @tparam fractional_counter_bytes The number of octets used to represent the fractional time units
+ * @tparam secondsBytes The number of octets used to represent the basic time units
+ * @tparam fractionalBytes The number of octets used to represent the fractional time units
  * @return One or two bytes representing the header
  */
-template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
-inline constexpr T build_CUC_header() {
+template <typename T, int secondsBytes, int fractionalBytes>
+inline constexpr T buildCUCHeader() {
 	// TODO: Gitlab issue #106
-	static_assert((seconds_counter_bytes + fractional_counter_bytes) <= 8,
+	static_assert((secondsBytes + fractionalBytes) <= 8,
 	              "Complete arbitrary precision not supported");
 	// cppcheck-suppress syntaxError
 	// cppcheck-suppress redundantCondition
-	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3) {
-		return build_short_CUC_header<seconds_counter_bytes, fractional_counter_bytes>();
+	if constexpr (secondsBytes <= 4 && fractionalBytes <= 3) {
+		return buildShortCUCHeader<secondsBytes, fractionalBytes>();
 	} else {
-		return build_long_CUC_header<seconds_counter_bytes, fractional_counter_bytes>();
+		return buildLongCUCHeader<secondsBytes, fractionalBytes>();
 	}
 }
 
 /**
  * Returns whether a year is a leap year according to the Gregorian calendar
  */
-constexpr bool is_leap_year(uint16_t year) {
+constexpr bool isLeapYear(uint16_t year) {
 	if ((year % 4) != 0) {
 		return false;
 	}
@@ -214,7 +214,7 @@ constexpr bool is_leap_year(uint16_t year) {
  * @note
  * This class represents UTC (Coordinated Universal Time) date
  */
-class UTC_Timestamp {
+class UTCTimestamp {
 public:
 	uint16_t year;
 	uint8_t month;
@@ -226,7 +226,7 @@ public:
 	/**
 	 * Initialise a timestamp with the Unix epoch 1/1/1970 00:00:00
 	 */
-	UTC_Timestamp();
+	UTCTimestamp();
 
 	/**
 	 *
@@ -239,24 +239,24 @@ public:
 	 * @param minute UTC minutes
 	 * @param second UTC seconds
 	 */
-	UTC_Timestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
+	UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
 
 	/**
-	 * @param text_timestamp the timestamp to parse into a UTC date
+	 * @param textT the timestamp to parse into a UTC date
 	 * @todo Too expensive to implement (?). It is better to remove this and open it as another issue, or create
 	 * a platform-specific converter that will be only used in x86.
 	 */
-	UTC_Timestamp(etl::string<32> text_timestamp);
+	UTCTimestamp(etl::string<32> textTimestamp);
 
 	/**
 	 * Compare two timestamps.
 	 * @param Date the date that will be compared with the pointer `this`
 	 */
-	bool operator<(const UTC_Timestamp& Date);
-	bool operator>(const UTC_Timestamp& Date); ///< @copydoc UTC_Timestamp::operator<
-	bool operator==(const UTC_Timestamp& Date); ///< @copydoc UTC_Timestamp::operator<
-	bool operator<=(const UTC_Timestamp& Date); ///< @copydoc UTC_Timestamp::operator<
-	bool operator>=(const UTC_Timestamp& Date); ///< @copydoc UTC_Timestamp::operator<
+	bool operator<(const UTCTimestamp& Date);
+	bool operator>(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
+	bool operator==(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
+	bool operator<=(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
+	bool operator>=(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
 
 	/**
 	 * Pretty-print timestamp.
@@ -264,5 +264,5 @@ public:
 	 * @todo Find if we can forego including <ostream> here
 	 * @param Date the date that will be output
 	 */
-	friend std::ostream& operator<<(std::ostream& o, UTC_Timestamp const& Date);
+	friend std::ostream& operator<<(std::ostream& o, UTCTimestamp const& Date);
 };

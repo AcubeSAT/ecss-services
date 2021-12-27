@@ -11,7 +11,7 @@
 //// FROM CUC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
-    etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp) {
+    etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp) {
 	// process header
 	int header_size = 1;
 	if (timestamp[0] & 0b10000000) {
@@ -72,20 +72,20 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
 
 //// FROM UTC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(UTC_Timestamp timestamp) {
-	int seconds = Time::UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS;
+TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(UTCTimestamp timestamp) {
+	int seconds = Time::EpochSecondsFromUnix;
 	for (int year = Time::ACUBESAT_EPOCH_YEAR; year < timestamp.year; ++year) {
-		seconds += (Time::is_leap_year(year) ? 366 : 365) * Time::SECONDS_PER_DAY;
+		seconds += (Time::isLeapYear(year) ? 366 : 365) * Time::SecondsPerDay;
 	}
 	for (int month = Time::ACUBESAT_EPOCH_MONTH; month < timestamp.month; ++month) {
-		seconds += Time::DAYSOFMONTH[month - 1] * Time::SECONDS_PER_DAY;
-		if ((month == 2U) && Time::is_leap_year(timestamp.year)) {
-			seconds += Time::SECONDS_PER_DAY;
+		seconds += Time::DaysOfMonth[month - 1] * Time::SecondsPerDay;
+		if ((month == 2U) && Time::isLeapYear(timestamp.year)) {
+			seconds += Time::SecondsPerDay;
 		}
 	}
-	seconds += (timestamp.day - Time::ACUBESAT_EPOCH_DAY) * Time::SECONDS_PER_DAY;
-	seconds += timestamp.hour * Time::SECONDS_PER_HOUR;
-	seconds += timestamp.minute * Time::SECONDS_PER_MINUTE;
+	seconds += (timestamp.day - Time::ACUBESAT_EPOCH_DAY) * Time::SecondsPerDay;
+	seconds += timestamp.hour * Time::SecondsPerHour;
+	seconds += timestamp.minute * Time::SecondsPerMinute;
 	seconds += timestamp.second;
 	tai_counter = static_cast<tai_counter_t>(seconds) << 8 * fractional_counter_bytes;
 }
@@ -97,9 +97,9 @@ const int TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_TAI_sec
 }
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-const etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP>
+const etl::array<uint8_t, Time::CUCTimestampMaximumSize>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp() {
-	etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> return_array = {0};
+	etl::array<uint8_t, Time::CUCTimestampMaximumSize> return_array = {0};
 	int index_first_non_header_byte;
 
   // cppcheck-suppress redundantCondition
@@ -129,16 +129,16 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp() {
 }
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-const UTC_Timestamp TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_UTC_timestamp() {
+const UTCTimestamp TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_UTC_timestamp() {
 	using namespace Time;
 
 	int seconds = as_TAI_seconds();
 
 	// elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
-	ASSERT_INTERNAL(seconds >= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS,
+	ASSERT_INTERNAL(seconds >= EpochSecondsFromUnix,
 	                ErrorHandler::InternalErrorType::InvalidDate);
 
-	seconds -= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS; // elapsed seconds from Unix epoch until AcubeSAT custom
+	seconds -= EpochSecondsFromUnix; // elapsed seconds from Unix epoch until AcubeSAT custom
 	// epoch 00:00:00 (UTC)
 	int year_utc = ACUBESAT_EPOCH_YEAR;
 	int month_utc = ACUBESAT_EPOCH_MONTH;
@@ -148,44 +148,44 @@ const UTC_Timestamp TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::
 	int second = 0;
 
 	// calculate years
-	while (seconds >= (is_leap_year(year_utc) ? 366 : 365) * SECONDS_PER_DAY) {
-		seconds -= (is_leap_year(year_utc) ? 366 : 365) * SECONDS_PER_DAY;
+	while (seconds >= (isLeapYear(year_utc) ? 366 : 365) * SecondsPerDay) {
+		seconds -= (isLeapYear(year_utc) ? 366 : 365) * SecondsPerDay;
 		year_utc++;
 	}
 
 	// calculate months
 	int current_month = 0;
-	while (seconds >= (DAYSOFMONTH[current_month] * SECONDS_PER_DAY)) {
+	while (seconds >= (DaysOfMonth[current_month] * SecondsPerDay)) {
 		month_utc++;
-		seconds -= (DAYSOFMONTH[current_month] * SECONDS_PER_DAY);
+		seconds -= (DaysOfMonth[current_month] * SecondsPerDay);
 		current_month++;
-		if ((current_month == 1U) && is_leap_year(year_utc)) {
-			if (seconds <= (28 * SECONDS_PER_DAY)) {
+		if ((current_month == 1U) && isLeapYear(year_utc)) {
+			if (seconds <= (28 * SecondsPerDay)) {
 				break;
 			}
 			month_utc++;
-			seconds -= 29 * SECONDS_PER_DAY;
+			seconds -= 29 * SecondsPerDay;
 			current_month++;
 		}
 	}
 
 	// calculate days
-	day_utc = seconds / SECONDS_PER_DAY;
-	seconds -= day_utc * SECONDS_PER_DAY;
+	day_utc = seconds / SecondsPerDay;
+	seconds -= day_utc * SecondsPerDay;
 	day_utc++; // add 1 day because we start count from 1 January (and not 0 January!)
 
 	// calculate hours
-	hour = seconds / SECONDS_PER_HOUR;
-	seconds -= hour * SECONDS_PER_HOUR;
+	hour = seconds / SecondsPerHour;
+	seconds -= hour * SecondsPerHour;
 
 	// calculate minutes
-	minute = seconds / SECONDS_PER_MINUTE;
-	seconds -= minute * SECONDS_PER_MINUTE;
+	minute = seconds / SecondsPerMinute;
+	seconds -= minute * SecondsPerMinute;
 
 	// calculate seconds
 	second = seconds;
 
-	return UTC_Timestamp(year_utc, month_utc, day_utc, hour, minute, second);
+	return UTCTimestamp(year_utc, month_utc, day_utc, hour, minute, second);
 }
 
 ////////////// OPERATORS ///////////
