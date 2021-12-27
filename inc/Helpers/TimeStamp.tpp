@@ -6,7 +6,7 @@
 #define SECONDS_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00001100
 #define FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00000011
 
-bool is_leap_year(uint16_t year);
+bool Time::is_leap_year(uint16_t year);
 
 ////////////: CONSTRUCTORS ////////////
 //// FROM CDS TIMESTAMP
@@ -18,7 +18,7 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(AcubeSAT_C
 //// FROM CUC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
-    etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp) {
+    etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp) {
 	// process header
 	int header_size = 1;
 	if (timestamp[0] & 0b10000000) {
@@ -80,19 +80,19 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
 //// FROM UTC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(UTC_Timestamp timestamp) {
-	int seconds = UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS;
-	for (int year = ACUBESAT_EPOCH_YEAR; year < timestamp.year; ++year) {
-		seconds += (is_leap_year(year) ? 366 : 365) * SECONDS_PER_DAY;
+	int seconds = Time::UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS;
+	for (int year = Time::ACUBESAT_EPOCH_YEAR; year < timestamp.year; ++year) {
+		seconds += (Time::is_leap_year(year) ? 366 : 365) * Time::SECONDS_PER_DAY;
 	}
-	for (int month = ACUBESAT_EPOCH_MONTH; month < timestamp.month; ++month) {
-		seconds += DAYSOFMONTH[month - 1] * SECONDS_PER_DAY;
-		if ((month == 2U) && is_leap_year(timestamp.year)) {
-			seconds += SECONDS_PER_DAY;
+	for (int month = Time::ACUBESAT_EPOCH_MONTH; month < timestamp.month; ++month) {
+		seconds += Time::DAYSOFMONTH[month - 1] * Time::SECONDS_PER_DAY;
+		if ((month == 2U) && Time::is_leap_year(timestamp.year)) {
+			seconds += Time::SECONDS_PER_DAY;
 		}
 	}
-	seconds += (timestamp.day - ACUBESAT_EPOCH_DAY) * SECONDS_PER_DAY;
-	seconds += timestamp.hour * SECONDS_PER_HOUR;
-	seconds += timestamp.minute * SECONDS_PER_MINUTE;
+	seconds += (timestamp.day - Time::ACUBESAT_EPOCH_DAY) * Time::SECONDS_PER_DAY;
+	seconds += timestamp.hour * Time::SECONDS_PER_HOUR;
+	seconds += timestamp.minute * Time::SECONDS_PER_MINUTE;
 	seconds += timestamp.second;
 	tai_counter = static_cast<tai_counter_t>(seconds) << 8 * fractional_counter_bytes;
 }
@@ -104,9 +104,9 @@ const int TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_TAI_sec
 }
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP>
+const etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp() {
-	etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> return_array = {0};
+	etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> return_array = {0};
 	int index_first_non_header_byte;
 
   // cppcheck-suppress redundantCondition
@@ -137,12 +137,16 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_CUC_timestamp() {
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 const UTC_Timestamp TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::as_UTC_timestamp() {
+	using namespace Time;
+
 	int seconds = as_TAI_seconds();
 
 	// elapsed seconds should be between dates, that are after 1/1/2019 and Unix epoch
-	ASSERT_INTERNAL(seconds >= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(seconds >= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS,
+	                ErrorHandler::InternalErrorType::InvalidDate);
 
-	seconds -= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS; // elapsed seconds from Unix epoch until AcubeSAT custom epoch 00:00:00 (UTC)
+	seconds -= UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS; // elapsed seconds from Unix epoch until AcubeSAT custom
+	// epoch 00:00:00 (UTC)
 	int year_utc = ACUBESAT_EPOCH_YEAR;
 	int month_utc = ACUBESAT_EPOCH_MONTH;
 	int day_utc = ACUBESAT_EPOCH_DAY;

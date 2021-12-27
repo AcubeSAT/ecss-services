@@ -1,7 +1,7 @@
 #include "Helpers/TimeFormats.hpp"
 #include <iomanip>
 
-bool is_leap_year(uint16_t year) {
+bool Time::is_leap_year(uint16_t year) {
 	if ((year % 4) != 0) {
 		return false;
 	}

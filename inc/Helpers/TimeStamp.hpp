@@ -29,7 +29,7 @@ private:
 	typedef typename std::conditional<(seconds_counter_bytes + fractional_counter_bytes) < 4, uint32_t, uint64_t>::type
 	    tai_counter_t;
 	tai_counter_t tai_counter;
-	CUC_header_t CUC_header = build_CUC_header<CUC_header_t, seconds_counter_bytes, fractional_counter_bytes>();
+	CUC_header_t CUC_header = Time::build_CUC_header<CUC_header_t, seconds_counter_bytes, fractional_counter_bytes>();
 
 public:
 	/**
@@ -52,7 +52,7 @@ public:
 	 * @param timestamp a complete CUC time stamp including header, of the maximum possible size, zero padded to the
 	 * right
 	 */
-	TimeStamp(etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp);
+	TimeStamp(etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> timestamp);
 
 	/**
 	 * Initialize the instant from a UTC timestamp struct
@@ -80,7 +80,7 @@ public:
 	 *
 	 * @return the instant, represented in the CCSDS CUC format
 	 */
-	const etl::array<uint8_t, MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> as_CUC_timestamp();
+	const etl::array<uint8_t, Time::MAXIMUM_BYTES_FOR_COMPLETE_CUC_TIMESTAMP> as_CUC_timestamp();
 
 	/**
 	 * Get the representation as a UTC timestamp

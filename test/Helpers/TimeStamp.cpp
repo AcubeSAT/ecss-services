@@ -4,6 +4,8 @@
 #include <typeinfo>
 #include <iostream>
 
+using namespace Time;
+
 TEST_CASE("TimeStamp class construction") {
 	// SECTION("Initialize with excessive precision, breaks at compile time"){
 	//   TimeStamp<5, 10> Epoch3;
