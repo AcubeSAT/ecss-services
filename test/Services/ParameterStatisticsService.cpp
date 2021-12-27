@@ -2,6 +2,7 @@
 #include "catch2/catch.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
+#include "ECSS_Definitions.hpp"
 
 /**
  * System-statistics initialization, so there are actual statistics in the map to work with.
@@ -263,8 +264,8 @@ TEST_CASE("Add/Update statistics definitions") {
 		uint16_t paramId1 = 0;
 		uint16_t paramId2 = 1;
 		uint16_t paramId3 = 2;
-		uint16_t paramId4 = systemParameters.parametersArray.size() + 24;
-		uint16_t paramId5 = systemParameters.parametersArray.size() + 1;
+		uint16_t paramId4 = ECSSParameterCount + 24;
+		uint16_t paramId5 = ECSSParameterCount + 1;
 		uint16_t paramId6 = 3;
 
 		uint16_t interval1 = 14;
