@@ -8,7 +8,23 @@
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
-void initialiseParameterMonitoringDefinitions(uint16_t numberOfParameters) {}
+void initialiseParameterMonitoringDefinitions() {
+	Parameter<uint8_t> parameter1 = Parameter<uint8_t>(3);
+	Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
+	Parameter<uint32_t> parameter3 = Parameter<uint32_t>(9);
+
+	onBoardMonitoringService.RepetitionNumber.insert({parameter1, 10});
+	onBoardMonitoringService.RepetitionNumber.insert({parameter2, 2});
+	onBoardMonitoringService.RepetitionNumber.insert({parameter3, 5});
+
+	onBoardMonitoringService.ParameterMonitoringList.insert({0, parameter1});
+	onBoardMonitoringService.ParameterMonitoringList.insert({1, parameter2});
+	onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
+
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter1, false});
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter2, false});
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter3, false});
+}
 
 void clearAllMaps() {
 	onBoardMonitoringService.ParameterMonitoringList.clear();
@@ -26,21 +42,7 @@ void clearAllMaps() {
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {
 	SECTION("Valid request to enable Parameter Monitoring Definitions") {
-		Parameter<uint8_t> parameter1 = Parameter<uint8_t>(3);
-		Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
-		Parameter<uint32_t> parameter3 = Parameter<uint32_t>(9);
-
-		onBoardMonitoringService.RepetitionNumber.insert({parameter1, 10});
-		onBoardMonitoringService.RepetitionNumber.insert({parameter2, 2});
-		onBoardMonitoringService.RepetitionNumber.insert({parameter3, 5});
-
-		onBoardMonitoringService.ParameterMonitoringList.insert({0, parameter1});
-		onBoardMonitoringService.ParameterMonitoringList.insert({1, parameter2});
-		onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
-
-		onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter1, false});
-		onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter2, false});
-		onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter3, false});
+		initialiseParameterMonitoringDefinitions();
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
@@ -67,21 +69,7 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 	}
 	SECTION("Request to enable Parameter MonitoringDefinitions with the last ID of the request exceeding the size of "
 	        "the Parameter Monitoring List") {
-		Parameter<uint8_t> parameter1 = Parameter<uint8_t>(3);
-		Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
-		Parameter<uint32_t> parameter3 = Parameter<uint32_t>(9);
-
-		onBoardMonitoringService.RepetitionNumber.insert({parameter1, 10});
-		onBoardMonitoringService.RepetitionNumber.insert({parameter2, 2});
-		onBoardMonitoringService.RepetitionNumber.insert({parameter3, 5});
-
-		onBoardMonitoringService.ParameterMonitoringList.insert({0, parameter1});
-		onBoardMonitoringService.ParameterMonitoringList.insert({1, parameter2});
-		onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
-
-		onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter1, false});
-		onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter2, false});
-		onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter3, false});
+		initialiseParameterMonitoringDefinitions();
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
