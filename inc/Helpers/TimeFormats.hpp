@@ -13,7 +13,6 @@
  */
 namespace Time
 {
-
 ///@{
 inline constexpr uint8_t SECONDS_PER_MINUTE = 60;
 inline constexpr uint16_t SECONDS_PER_HOUR = 3600;
@@ -193,7 +192,15 @@ inline constexpr T build_CUC_header() {
 /**
  * Returns whether a year is a leap year according to the Gregorian calendar
  */
-bool is_leap_year(uint16_t year);
+constexpr bool is_leap_year(uint16_t year) {
+	if ((year % 4) != 0) {
+		return false;
+	}
+	if ((year % 100) != 0) {
+		return true;
+	}
+	return (year % 400) == 0;
+}
 
 } // namespace Time
 

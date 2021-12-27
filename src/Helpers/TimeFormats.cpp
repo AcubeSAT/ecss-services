@@ -1,16 +1,6 @@
 #include "Helpers/TimeFormats.hpp"
 #include <iomanip>
 
-bool Time::is_leap_year(uint16_t year) {
-	if ((year % 4) != 0) {
-		return false;
-	}
-	if ((year % 100) != 0) {
-		return true;
-	}
-	return (year % 400) == 0;
-}
-
 UTC_Timestamp::UTC_Timestamp() {
 	// Unix epoch 1/1/1970
 	year = 1970;
