@@ -3,7 +3,6 @@
 #include <Message.hpp>
 #include "etl/array.h"
 #include "Service.hpp"
-#include "Parameters/SystemParameters.hpp"
 #include "Helpers/Parameter.hpp"
 #include "etl/map.h"
 #include "ECSS_Definitions.hpp"
