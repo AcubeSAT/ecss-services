@@ -17,7 +17,8 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			RepetitionNumber.find(ParameterMonitoringList.find(currentId)->second)->second = 0;
 			ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentId)->second)->second = true;
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
+			ErrorHandler::reportError(
+			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
 	}
 }
@@ -25,23 +26,15 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = false;
-	// TODO: Evaluate if more error reports are necessary
 	uint16_t numberOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
-		if (currentId >= systemParameters.parametersArray.size()) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-			return;
-		}
-		if (auto currentParameter = systemParameters.getParameter(currentId)) {
-			if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-				ParameterMonitoringStatus.find(currentParameter->get())->second = false;
-				ParameterMonitoringCheckingStatus.find(currentParameter->get())->second = Unchecked;
-			} else {
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-			}
+		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
+			ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentId)->second)->second = false;
+			ParameterMonitoringCheckingStatus.find(ParameterMonitoringList.find(currentId)->second)->second = Unchecked;
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			ErrorHandler::reportError(
+			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
 	}
 }
