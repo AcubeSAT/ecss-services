@@ -11,11 +11,6 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = true;
 	uint16_t numberOfParameters = systemParameters.parametersArray.size();
-	if (numberOfParameters >= ParameterMonitoringList.size()) {
-		ErrorHandler::reportError(
-		    message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToEnableParameterMonitoringDefinitions);
-		return;
-	}
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
