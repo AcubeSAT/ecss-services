@@ -10,25 +10,22 @@
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = true;
-	// TODO: Evaluate if more error reports are necessary
 	uint16_t numOfParameters = systemParameters.parametersArray.size();
 	for (uint16_t i = 0; i < numOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
-		if (currentId >= systemParameters.parametersArray.size()) {
+		if (currentId >= ParameterMonitoringList.size()) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			return;
 		}
 		// TODO: Examine why merging the following two if statements in 1, does not work.
-		if (auto currentParameter = systemParameters.getParameter(currentId)) {
-			if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
-				RepetitionNumber.find(currentParameter->get())->second = 0;
-				ParameterMonitoringStatus.find(currentParameter->get())->second = true;
-			} else {
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-			}
+
+		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
+			RepetitionNumber.find(ParameterMonitoringList.find(currentId)->second)->second = 0;
+			ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentId)->second)->second = true;
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 		}
+
 	}
 }
 
