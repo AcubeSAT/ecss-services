@@ -3,8 +3,6 @@
 #include "macros.hpp"
 #include "etl/String.hpp"
 
-// SEE CCSDS 301.0-B-4
-
 /**
  * An armada of utilities regarding timekeeping, timestamps and conversion between different internal and string
  * time formats. This file implements [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf).
@@ -45,7 +43,6 @@ inline constexpr struct {
  * The system epoch is defined by @ref Epoch.
  * This constant is used for conversion between Unix and other timestamps.
  * Leap seconds are not taken into account here.
- * You can use a utility such as .
  *
  * @warning This value MUST be updated after every change of the system @ref Epoch. You can use utilities such as
  * https://www.unixtimestamp.com/ to obtain a correct result.
@@ -181,8 +178,7 @@ inline constexpr uint16_t buildLongCUCHeader() {
 template <typename T, int secondsBytes, int fractionalBytes>
 inline constexpr T buildCUCHeader() {
 	// TODO: Gitlab issue #106
-	static_assert((secondsBytes + fractionalBytes) <= 8,
-	              "Complete arbitrary precision not supported");
+	static_assert((secondsBytes + fractionalBytes) <= 8, "Complete arbitrary precision not supported");
 	// cppcheck-suppress syntaxError
 	// cppcheck-suppress redundantCondition
 	if constexpr (secondsBytes <= 4 && fractionalBytes <= 3) {
