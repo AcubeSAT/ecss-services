@@ -21,6 +21,10 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.ParameterMonitoringList.insert({1, parameter2});
 	onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
 
+	onBoardMonitoringService.ParameterMonitoringIds.insert({parameter1, 0});
+	onBoardMonitoringService.ParameterMonitoringIds.insert({parameter2, 1});
+	onBoardMonitoringService.ParameterMonitoringIds.insert({parameter3, 2});
+
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter1, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter2, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter3, false});
@@ -59,12 +63,24 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions);
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.find(parameter1)->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.find(parameter2)->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.find(parameter3)->second == true);
-		CHECK(onBoardMonitoringService.RepetitionNumber.find(parameter1)->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber.find(parameter2)->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber.find(parameter3)->second == 0);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == true);
+		CHECK(onBoardMonitoringService.RepetitionNumber
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == 0);
 		clearAllMaps();
 	}
 	SECTION("Request to enable Parameter MonitoringDefinitions with the last ID of the request exceeding the size of "
@@ -88,12 +104,24 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.find(parameter1)->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.find(parameter2)->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.find(parameter3)->second == true);
-		CHECK(onBoardMonitoringService.RepetitionNumber.find(parameter1)->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber.find(parameter2)->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber.find(parameter3)->second == 0);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == true);
+		CHECK(onBoardMonitoringService.RepetitionNumber
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == 0);
 		clearAllMaps();
 	}
 }
