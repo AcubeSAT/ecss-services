@@ -37,7 +37,6 @@ inline constexpr struct {
 	uint16_t year;
 	uint8_t month;
 	uint8_t day;
-	uint32_t secondsFromUnix;
 } Epoch { 2019, 1, 1, };
 
 /**
@@ -246,7 +245,7 @@ public:
 	UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second);
 
 	/**
-	 * @param textT the timestamp to parse into a UTC date
+	 * @param textTimestamp the timestamp to parse into a UTC date
 	 * @todo Too expensive to implement (?). It is better to remove this and open it as another issue, or create
 	 * a platform-specific converter that will be only used in x86.
 	 */
@@ -257,10 +256,10 @@ public:
 	 * @param Date the date that will be compared with the pointer `this`
 	 */
 	bool operator<(const UTCTimestamp& Date);
-	bool operator>(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
-	bool operator==(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
-	bool operator<=(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
-	bool operator>=(const UTCTimestamp& Date); ///< @copydoc UTC_Timestamp::operator<
+	bool operator>(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
+	bool operator==(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
+	bool operator<=(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
+	bool operator>=(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
 
 	/**
 	 * Pretty-print timestamp.
