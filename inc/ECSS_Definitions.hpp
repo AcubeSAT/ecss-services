@@ -164,6 +164,8 @@ inline const bool SupportsStandardDeviation = true;
  */
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
 
+inline const uint8_t ECSSMaxParameters = 10; //TODO: Ask whether this should exist
+
 /** @} */
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
