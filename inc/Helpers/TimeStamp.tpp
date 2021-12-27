@@ -74,16 +74,16 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(UTCTimestamp timestamp) {
 	int seconds = Time::EpochSecondsFromUnix;
-	for (int year = Time::ACUBESAT_EPOCH_YEAR; year < timestamp.year; ++year) {
+	for (int year = Time::Epoch.year; year < timestamp.year; ++year) {
 		seconds += (Time::isLeapYear(year) ? 366 : 365) * Time::SecondsPerDay;
 	}
-	for (int month = Time::ACUBESAT_EPOCH_MONTH; month < timestamp.month; ++month) {
+	for (int month = Time::Epoch.month; month < timestamp.month; ++month) {
 		seconds += Time::DaysOfMonth[month - 1] * Time::SecondsPerDay;
 		if ((month == 2U) && Time::isLeapYear(timestamp.year)) {
 			seconds += Time::SecondsPerDay;
 		}
 	}
-	seconds += (timestamp.day - Time::ACUBESAT_EPOCH_DAY) * Time::SecondsPerDay;
+	seconds += (timestamp.day - Time::Epoch.day) * Time::SecondsPerDay;
 	seconds += timestamp.hour * Time::SecondsPerHour;
 	seconds += timestamp.minute * Time::SecondsPerMinute;
 	seconds += timestamp.second;
@@ -140,9 +140,9 @@ const UTCTimestamp TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::a
 
 	seconds -= EpochSecondsFromUnix; // elapsed seconds from Unix epoch until AcubeSAT custom
 	// epoch 00:00:00 (UTC)
-	int year_utc = ACUBESAT_EPOCH_YEAR;
-	int month_utc = ACUBESAT_EPOCH_MONTH;
-	int day_utc = ACUBESAT_EPOCH_DAY;
+	int year_utc = Epoch.year;
+	int month_utc = Epoch.month;
+	int day_utc = Epoch.day;
 	int hour = 0;
 	int minute = 0;
 	int second = 0;

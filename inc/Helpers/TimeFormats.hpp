@@ -13,50 +13,54 @@
  */
 namespace Time
 {
-///@{
 inline constexpr uint8_t SecondsPerMinute = 60;
 inline constexpr uint16_t SecondsPerHour = 3600;
 inline constexpr uint32_t SecondsPerDay = 86400;
 static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-///@}
 
-///@{
-/** I have no idea what this means */
+/**
+ * Number of bytes used for the basic time units of the CUC header for this mission
+ */
 inline constexpr uint8_t CUCSecondsBytes = 2;
+
+/**
+ * Number of bytes used for the fractional time units of the CUC header for this mission
+ */
 inline constexpr uint8_t CUCFractionalBytes = 2;
-///@}
-
-/** The AcubeSAT epoch (clock measurement starting time) */
-inline constexpr uint16_t ACUBESAT_EPOCH_YEAR = 2019;
-/**
- * Starts counting from 0-11.
- */
-inline constexpr uint8_t ACUBESAT_EPOCH_MONTH = 1;
-/**
- * Counting between 0-30.
- */
-inline constexpr uint8_t ACUBESAT_EPOCH_DAY = 1;
 
 /**
- * Number of seconds elapsed between the UNIX epoch (1 January 1970) and the AcubeSAT epoch.
+ * The system epoch (clock measurement starting time)
+ * All timestamps emitted by the ECSS services will show the elapsed time (seconds, days etc.) from this epoch.
+ * @todo Update AcubeSAT epoch to 2020.01.01.
+ */
+inline constexpr struct {
+	uint16_t year;
+	uint8_t month;
+	uint8_t day;
+	uint32_t secondsFromUnix;
+} Epoch { 2019, 1, 1, };
+
+/**
+ * Number of seconds elapsed between the UNIX epoch (1 January 1970) and the system epoch.
  *
- * The AcubeSAT epoch is defined by @ref ACUBESAT_EPOCH_YEAR, @ref ACUBESAT_EPOCH_MONTH, @ref ACUBESAT_EPOCH_DAY.
+ * The system epoch is defined by @ref Epoch.
  * This constant is used for conversion between Unix and other timestamps.
  * Leap seconds are not taken into account here.
  * You can use a utility such as .
  *
- * @warning This value MUST be updated after every change of the AcubeSAT epoch. You can use utilities such as
+ * @warning This value MUST be updated after every change of the system @ref Epoch. You can use utilities such as
  * https://www.unixtimestamp.com/ to obtain a correct result.
- *
- * @todo Update AcubeSAT epoch to 2020.01.01.
  */
 inline constexpr uint32_t EpochSecondsFromUnix = 1546300800;
 
+/**
+ * The maximum theoretical size in bytes of a CUC timestamp, including headers (P-field and T-field)
+ */
 inline constexpr uint8_t CUCTimestampMaximumSize = 9;
 
-static_assert(ACUBESAT_EPOCH_YEAR >= 2019);
-static_assert(ACUBESAT_EPOCH_MONTH < 11 && ACUBESAT_EPOCH_MONTH >= 0);
-static_assert(ACUBESAT_EPOCH_DAY < DaysOfMonth[ACUBESAT_EPOCH_MONTH]);
+static_assert(Epoch.year >= 2019);
+static_assert(Epoch.month < 11 && Epoch.month >= 0);
+static_assert(Epoch.day < DaysOfMonth[Epoch.month]);
 
 /**
  * Builds the short P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
