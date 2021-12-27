@@ -7,6 +7,7 @@
 #include "Services/ServiceTests.hpp"
 #include "Helpers/Parameter.hpp"
 #include "Services/ParameterService.hpp"
+#include "Parameters/PlatformParameters.hpp"
 
 // Explicit template specializations for the logError() function
 template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);

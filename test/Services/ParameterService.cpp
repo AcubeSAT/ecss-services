@@ -2,6 +2,7 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/ParameterService.hpp"
+#include "Parameters/PlatformParameters.hpp"
 
 static void resetParameterValues() {
 	PlatformParameters::parameter1.setValue(3);

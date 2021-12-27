@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PARAMETERSERVICE_HPP
 #define ECSS_SERVICES_PARAMETERSERVICE_HPP
 
+#include <optional>
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
