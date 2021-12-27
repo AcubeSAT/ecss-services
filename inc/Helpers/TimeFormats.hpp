@@ -182,11 +182,11 @@ inline constexpr T build_CUC_header() {
 	              "Complete arbitrary precision not supported");
 	// cppcheck-suppress syntaxError
 	// cppcheck-suppress redundantCondition
-	if constexpr (seconds_counter_bytes <= 4 &&
-	              fractional_counter_bytes <= 3) // if constexpr not supported yet in cppcheck
+	if constexpr (seconds_counter_bytes <= 4 && fractional_counter_bytes <= 3) {
 		return build_short_CUC_header<seconds_counter_bytes, fractional_counter_bytes>();
-	else
+	} else {
 		return build_long_CUC_header<seconds_counter_bytes, fractional_counter_bytes>();
+	}
 }
 
 /**
