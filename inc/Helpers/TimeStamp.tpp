@@ -9,11 +9,6 @@
 bool Time::is_leap_year(uint16_t year);
 
 ////////////: CONSTRUCTORS ////////////
-//// FROM CDS TIMESTAMP
-template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
-TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(AcubeSAT_CDS_timestamp timestamp) {
-	// tai_counter = 0; //See Issue #105 on Gitlab
-}
 
 //// FROM CUC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>

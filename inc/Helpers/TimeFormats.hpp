@@ -191,79 +191,11 @@ inline constexpr T build_CUC_header() {
 }
 
 /**
- * Builds the entire P-field of the CDS (CCSDS Day Segmented Time Code) format, as defined in CCSDS 301.0-B-4.
- *
- * The P-field contains the metadata of the timestamp, including information about its size and epoch.
- *
- * This function implements the following hardcoded choices from the standard:
- *  - Time-code identification is set to an _agency-defined epoch_. This is represented by @ref ACUBESAT_EPOCH_YEAR.
- *  - The day segment is 16-bits long
- *  - The submillisecond segment is 32-bits long, and represents picoseconds
- *
- * @note The P-field (header) does not contain the timestamp information, but only the description of the timestamp's
- * structure. It may be entirely omitted if the structure is known beforehand.
- * @note The CDS time format requires leap second correction
- *
- * @see CCSDS 301.0-B-4, Section 3.3.2
- * @return One byte representing the header
- */
-inline constexpr uint8_t build_AcubeSAT_CDS_header() {
-	uint8_t header = 0;
-
-	// bit 0 is at 0
-	header += 0;
-	header <<= 1U;
-
-	// timecode identification
-	header += 0b100;
-	header <<= 3U;
-
-	// AcubeSAT is using custom TAI epoch
-	header += 1;
-	header <<= 1U;
-
-	// AcubeSAT is using 16 bits day count segment
-	header += 0;
-	header <<= 1U;
-
-	// AcubeSAT is using picosecond resolution
-	header += 0b10;
-	// header << 2;
-
-	return header;
-}
-
-/**
  * Returns whether a year is a leap year according to the Gregorian calendar
  */
 bool is_leap_year(uint16_t year);
 
 } // namespace Time
-
-/**
- * A class representing a CDS (CCSDS Day Segmented Time Code) timestamp
- *
- * @todo Remove this class, it is not used.
- * @see CCSDS 301.0-B-4, Section 3.3.2
- */
-class AcubeSAT_CDS_timestamp {
-public:
-	static constexpr uint8_t P_FIELD = Time::build_AcubeSAT_CDS_header();
-	uint16_t day;
-	uint16_t ms_of_day;
-	uint32_t submilliseconds;
-
-	/**
-	 * Converts the internal representation of the timestamp to a byte string
-	 * @todo Not implemented
-	 */
-	uint64_t to_CDS_timestamp();
-	/**
-	 * Given a CDS string, converts it to the internal representation
-	 * @todo Not implemented
-	 */
-	static AcubeSAT_CDS_timestamp from_CDS_timestamp(uint64_t);
-};
 
 /**
  * A class that represents a UTC time and date according to ISO 8601

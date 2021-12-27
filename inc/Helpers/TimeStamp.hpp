@@ -62,13 +62,6 @@ public:
 	TimeStamp(UTC_Timestamp timestamp);
 
 	/**
-	 * Initialize the instant from an AcubeSAT CDS timestamp
-	 *
-	 * @param timestamp a CDS timestamp, in the format from DDJF_TTC, from epoch 2020.01.01
-	 */
-	TimeStamp(AcubeSAT_CDS_timestamp timestamp);
-
-	/**
 	 * Get the representation as seconds from epoch in TAI
 	 *
 	 * @return the seconds elapsed in TAI since 1 Jan 1958, cut to the integer part
