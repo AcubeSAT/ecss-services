@@ -12,6 +12,7 @@
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
+#include "Services/OnBoardMonitoringService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -73,6 +74,10 @@ public:
 
 #ifdef SERVICE_TIMESCHEDULING
 	TimeBasedSchedulingService timeBasedScheduling;
+#endif
+
+#ifdef SERVICE_ONBOARDMONITORING
+	OnBoardMonitoringService onBoardMonitoringService;
 #endif
 
 	/**
