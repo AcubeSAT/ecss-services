@@ -13,6 +13,8 @@ void initialiseParameterMonitoringDefinitions() {
 	Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
 	Parameter<uint32_t> parameter3 = Parameter<uint32_t>(9);
 
+	onBoardMonitoringService.parameterMonitoringFunctionStatus = true;
+
 	onBoardMonitoringService.RepetitionNumber.insert({parameter1, 10});
 	onBoardMonitoringService.RepetitionNumber.insert({parameter2, 2});
 	onBoardMonitoringService.RepetitionNumber.insert({parameter3, 5});
@@ -122,6 +124,84 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.RepetitionNumber
 		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
 		          ->second == 0);
+		clearAllMaps();
+	}
+}
+
+TEST_CASE("Disable Parameter Monitoring Definitions") {
+	SECTION("Valid request to enable Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint8(3);
+		request.appendEnum16(0);
+		request.appendEnum16(1);
+		request.appendEnum16(2);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == OnBoardMonitoringService::Unchecked);
+		clearAllMaps();
+	}
+	SECTION("Request to disable Parameter MonitoringDefinitions with the last ID of the request exceeding the size of "
+	        "the Parameter Monitoring List") {
+		initialiseParameterMonitoringDefinitions();
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint8(4);
+		request.appendEnum16(0);
+		request.appendEnum16(1);
+		request.appendEnum16(2);
+		request.appendEnum16(3);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
+		          ->second == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
+		          ->second == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
+		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
+		          ->second == OnBoardMonitoringService::Unchecked);
 		clearAllMaps();
 	}
 }
