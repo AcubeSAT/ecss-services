@@ -11,6 +11,7 @@
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
+#include "Services/HousekeepingService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
 
@@ -50,6 +51,10 @@ public:
 
 #ifdef SERVICE_FUNCTION
 	FunctionManagementService functionManagement;
+#endif
+
+#ifdef SERVICE_HOUSEKEEPING
+	HousekeepingService housekeeping;
 #endif
 
 #ifdef SERVICE_LARGEPACKET

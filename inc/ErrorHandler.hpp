@@ -85,7 +85,6 @@ public:
 		 * Attempt to access an invalid parameter in ST[03]
 		 */
 		NonExistentParameter = 13,
-
 	};
 
 	/**
