@@ -17,8 +17,6 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			return;
 		}
-		// TODO: Examine why merging the following two if statements in 1, does not work.
-
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
 			RepetitionNumber.find(ParameterMonitoringList.find(currentId)->second)->second = 0;
 			ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentId)->second)->second = true;
