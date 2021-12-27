@@ -13,22 +13,22 @@ TEST_CASE("TimeStamp class construction") {
 	// }
 
 	SECTION("Test CUC headers generation") {
-		uint8_t cuc_header1 = buildCUCHeader<uint8_t, 2, 2>();
+		auto cuc_header1 = buildCUCHeader<uint8_t, 2, 2>();
 		CHECK(cuc_header1 == 0b00100110);
 
-		uint8_t cuc_header2 = buildCUCHeader<uint8_t, 4, 1>();
+		auto cuc_header2 = buildCUCHeader<uint8_t, 4, 1>();
 		CHECK(cuc_header2 == 0b00101101);
 
-		uint8_t cuc_header3 = buildCUCHeader<uint8_t, 1, 1>();
+		auto cuc_header3 = buildCUCHeader<uint8_t, 1, 1>();
 		CHECK(cuc_header3 == 0b00100001);
 
-		uint16_t cuc_header4 = buildCUCHeader<uint16_t, 5, 1>();
+		auto cuc_header4 = buildCUCHeader<uint16_t, 5, 1>();
 		CHECK(cuc_header4 == 0b1010110110100000);
 
-		uint16_t cuc_header5 = buildCUCHeader<uint16_t, 1, 6>();
+		auto cuc_header5 = buildCUCHeader<uint16_t, 1, 6>();
 		CHECK(cuc_header5 == 0b1010001110011000);
 
-		uint16_t cuc_header6 = buildCUCHeader<uint16_t, 7, 1>();
+		auto cuc_header6 = buildCUCHeader<uint16_t, 7, 1>();
 		CHECK(cuc_header6 == 0b1010110111100000);
 	}
 

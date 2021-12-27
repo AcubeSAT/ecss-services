@@ -88,12 +88,29 @@ public:
 	 * @param TimeStamp the date that will be compared with the pointer `this`
 	 * @return true if the condition is satisfied
 	 */
-	bool operator<(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
-	bool operator>(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
-	bool operator==(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
-	bool operator!=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
-	bool operator<=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
-	bool operator>=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& TimeStamp) const;
+	bool operator<(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& timestamp) const {
+		return tai_counter < timestamp.tai_counter;
+	}
+
+	bool operator>(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& timestamp) const {
+		return tai_counter > timestamp.tai_counter;
+	}
+
+	bool operator==(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& timestamp) const {
+		return tai_counter == timestamp.tai_counter;
+	}
+
+	bool operator!=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& timestamp) const {
+		return tai_counter != timestamp.tai_counter;
+	}
+
+	bool operator<=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& timestamp) const {
+		return tai_counter <= timestamp.tai_counter;
+	}
+
+	bool operator>=(const TimeStamp<seconds_counter_bytes, fractional_counter_bytes>& timestamp) const {
+		return tai_counter >= timestamp.tai_counter;
+	}
 };
 ////////////////////////////////////////////////
 
