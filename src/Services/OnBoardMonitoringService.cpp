@@ -10,20 +10,20 @@
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = true;
-	uint16_t numOfParameters = systemParameters.parametersArray.size();
-	for (uint16_t i = 0; i < numOfParameters; i++) {
+	uint16_t numberOfParameters = systemParameters.parametersArray.size();
+	if (numberOfParameters >= ParameterMonitoringList.size()) {
+		ErrorHandler::reportError(
+		    message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToEnableParameterMonitoringDefinitions);
+		return;
+	}
+	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
-		if (currentId >= ParameterMonitoringList.size()) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
-			return;
-		}
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
 			RepetitionNumber.find(ParameterMonitoringList.find(currentId)->second)->second = 0;
 			ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentId)->second)->second = true;
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
-
 	}
 }
 
@@ -31,8 +31,8 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = false;
 	// TODO: Evaluate if more error reports are necessary
-	uint16_t numOfParameters = systemParameters.parametersArray.size();
-	for (uint16_t i = 0; i < numOfParameters; i++) {
+	uint16_t numberOfParameters = systemParameters.parametersArray.size();
+	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
 		if (currentId >= systemParameters.parametersArray.size()) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
