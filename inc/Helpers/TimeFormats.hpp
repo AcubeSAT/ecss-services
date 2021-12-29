@@ -30,6 +30,7 @@ static_assert(ACUBESAT_EPOCH_DAY < DAYSOFMONTH[ACUBESAT_EPOCH_MONTH]);
 //////////////////////////////////////////////
 
 //////// HELPER CONSTEXPR ////////
+// Build CUC header at compile time for timestamps that have a short (1 byte) header
 template <int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr uint8_t build_short_CUC_header() {
 	static_assert(seconds_counter_bytes <= 4, "Use build_long_CUC_header instead");
@@ -55,6 +56,7 @@ inline constexpr uint8_t build_short_CUC_header() {
 	return header;
 }
 
+// Build CUC header at compile time for timestamps that have a long (2 byte) header
 template <int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr uint16_t build_long_CUC_header() {
 	// cppcheck-suppress redundantCondition
