@@ -27,17 +27,14 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(
 
 	int timestamp_fractional_bytes_count = 0;
 	int timestamp_seconds_bytes_count = 1;
-	// int epoch_param = 0;
 
 	if (header_size == 2) {
-		// epoch_param = (timestamp[0] & 0b01110000) >> 4;
 		timestamp_seconds_bytes_count += (timestamp[0] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
 		timestamp_seconds_bytes_count += (timestamp[1] & SECONDS_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 5;
 		timestamp_fractional_bytes_count =
 		    ((timestamp[0] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0) +
 		    ((timestamp[1] & FRACTIONAL_FROM_DOUBLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE2) >> 2);
 	} else if (header_size == 1) {
-		// epoch_param = (timestamp[0] & 0b01110000) >> 4;
 		timestamp_seconds_bytes_count += (timestamp[0] & SECONDS_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 2;
 		timestamp_fractional_bytes_count =
 		    (timestamp[0] & FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1) >> 0;
