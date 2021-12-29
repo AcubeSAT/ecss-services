@@ -44,7 +44,7 @@ inline constexpr uint8_t build_short_CUC_header() {
 	header = header << 3;
 	header += 0b010;
 
-	// // Number of bytes in the basic time unit
+	// Number of bytes in the basic time unit
 	header = header << 2;
 	header += seconds_counter_bytes - 1;
 
