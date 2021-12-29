@@ -12,7 +12,7 @@ bool is_leap_year(uint16_t year);
 //// FROM CDS TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(AcubeSAT_CDS_timestamp timestamp) {
-	// tai_counter = 0; //See Issue #105 on Gitlab
+	// tai_counter = 0; //TODO: see Issue #105 on Gitlab
 }
 
 //// FROM CUC TIMESTAMP
@@ -229,4 +229,4 @@ bool TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::operator>=(
 	return tai_counter >= TimeStamp.tai_counter;
 }
 /// ARITHMETIC
-// See Issue #104 on Gitlab repository
+// TODO: see Issue #104 on Gitlab repository

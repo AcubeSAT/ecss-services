@@ -105,7 +105,7 @@ inline constexpr uint16_t build_long_CUC_header() {
 template <typename T, int seconds_counter_bytes, int fractional_counter_bytes>
 inline constexpr T build_CUC_header() {
 	static_assert((seconds_counter_bytes + fractional_counter_bytes) <= 8,
-	              "Complete arbitrary precision not yet supported"); // See Issue #106 on Gitlab
+	              "Complete arbitrary precision not yet supported"); // TODO: see Issue #106 on Gitlab
 	// cppcheck-suppress syntaxError
 	// cppcheck-suppress redundantCondition
 	if constexpr (seconds_counter_bytes <= 4 &&
