@@ -24,10 +24,20 @@ class TimeStamp {
 private:
 	static_assert(seconds_counter_bytes + fractional_counter_bytes <= 8,
 	              "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
-	typedef typename std::conditional < seconds_counter_bytes < 4 &&
-	    fractional_counter_bytes<3, uint8_t, uint16_t>::type CUC_header_t;
-	typedef typename std::conditional<(seconds_counter_bytes + fractional_counter_bytes) < 4, uint32_t, uint64_t>::type
-	    tai_counter_t;
+	typedef typename std::conditional
+			<
+			seconds_counter_bytes < 4 && fractional_counter_bytes < 3,
+			uint8_t,
+			uint16_t
+			>
+			::type CUC_header_t;
+	typedef typename std::conditional
+			<
+			(seconds_counter_bytes + fractional_counter_bytes) < 4,
+			uint32_t,
+			uint64_t
+			>
+			::type tai_counter_t;
 	tai_counter_t tai_counter;
 	CUC_header_t CUC_header = build_CUC_header<CUC_header_t, seconds_counter_bytes, fractional_counter_bytes>();
 
