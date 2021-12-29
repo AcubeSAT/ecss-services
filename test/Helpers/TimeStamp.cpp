@@ -26,7 +26,7 @@ TEST_CASE("TimeStamp class construction") {
 		CHECK(cuc_header4 == 0b1010110110100000);
 
 		auto cuc_header5 = buildCUCHeader<uint16_t, 1, 6>();
-		CHECK(cuc_header5 == 0b1010001110011000);
+		CHECK(cuc_header5 == 0b1010001110001100);
 
 		auto cuc_header6 = buildCUCHeader<uint16_t, 7, 1>();
 		CHECK(cuc_header6 == 0b1010110111100000);
@@ -57,7 +57,7 @@ TEST_CASE("TimeStamp class construction") {
 			REQUIRE(test);
 		}
 
-		etl::array<uint8_t, 9> input_time3 = {0b10100011, 0b10011000, 218, 103, 11, 0, 3, 23, 2};
+		etl::array<uint8_t, 9> input_time3 = {0b10100011, 0b10001100, 218, 103, 11, 0, 3, 23, 2};
 		TimeStamp<1, 6> Epoch3(input_time3);
 		etl::array<uint8_t, 9> test_return3 = Epoch3.as_CUC_timestamp();
 

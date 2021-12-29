@@ -146,11 +146,11 @@ inline constexpr uint16_t buildLongCUCHeader() {
 	header += octet2secondsBytes;
 
 	// Number of bytes in the extended fractional unit
-	header <<= 2U;
+	header <<= 3U;
 	header += octet2fractionalBytes;
 
 	// Last 3 LSB are reserved for custom mission use
-	header <<= 3U;
+	header <<= 2U;
 	header += 0;
 
 	return header;
