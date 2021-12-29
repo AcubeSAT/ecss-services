@@ -6,7 +6,16 @@
 #define SECONDS_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00001100
 #define FRACTIONAL_FROM_SINGLE_BYTE_CUC_TIMESTAMP_BITMASK_BYTE1 0b00000011
 
+#include <math.h>
+
 ////////////: CONSTRUCTORS ////////////
+//// FROM TAI SECONDS
+template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
+TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(int tai_seconds_from_AcubeSAT_epoch) {
+  constexpr uint64_t max_seconds_counter_value = static_cast<uint64_t>(pow(2, seconds_counter_bytes)) - 1;
+  tai_counter = static_cast<tai_counter_t>(tai_seconds_from_AcubeSAT_epoch) << 8 * fractional_counter_bytes;
+  ASSERT_INTERNAL(tai_seconds_from_AcubeSAT_epoch >= max_seconds_counter_value, ErrorHandler::InternalErrorType::InvalidTimeStampInput);
+}
 
 //// FROM CUC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>

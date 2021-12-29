@@ -43,9 +43,8 @@ public:
 	 *
 	 * @param seconds an integer number of seconds from AcubeSAT custom epoch
 	 */
-	TimeStamp(int tai_seconds_from_AcubeSAT_epoch)
-	    : tai_counter(static_cast<tai_counter_t>(tai_seconds_from_AcubeSAT_epoch) << 8 * fractional_counter_bytes){};
-
+	TimeStamp(int tai_seconds_from_AcubeSAT_epoch);
+	
 	/**
 	 * Initialize the instant from the bytes of a CUC time stamp
 	 *
