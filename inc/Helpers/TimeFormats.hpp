@@ -92,11 +92,11 @@ inline constexpr uint16_t build_long_CUC_header() {
 	header += second_octet_number_of_seconds_bytes;
 
 	// Number of bytes in the extended fractional unit
-	header = header << 2;
+	header = header << 3;
 	header += second_octet_number_of_fractional_bytes;
 
-	// Last 3 LSB are reserved for custom mission use
-	header = header << 3;
+	// Last 3 LSb are reserved for custom mission use
+	header = header << 2;
 	header += 0;
 
 	return header;
