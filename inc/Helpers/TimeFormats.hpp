@@ -13,7 +13,11 @@ static constexpr uint8_t DAYSOFMONTH[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 
 
 inline constexpr uint8_t ACUBESAT_CUC_SECONDS_COUNTER_BYTES = 2; // PER DDJF_TTC
 inline constexpr uint8_t ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES = 2; // PER DDJF_TTC
-inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800; // TODO correct for 2020.01.01
+// Unix Epoch includes leap seconds.
+// Currently set at 01 Jan 2019 00h00m00s, TODO correct to set to 01 Jan. 2020 00h00m00s.
+// May be broken, see Issue #121 on Gitlab.
+inline constexpr uint32_t UNIX_TO_ACUBESAT_EPOCH_ELAPSED_SECONDS = 1546300800;
+//
 inline constexpr uint16_t ACUBESAT_EPOCH_YEAR = 2019;
 inline constexpr uint8_t ACUBESAT_EPOCH_MONTH = 1;
 inline constexpr uint8_t ACUBESAT_EPOCH_DAY = 1;
