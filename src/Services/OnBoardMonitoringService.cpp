@@ -69,7 +69,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		uint16_t currentParameterId = message.readUint16();
 		uint16_t currentParameterRepetitionNumber = message.readUint16();
 		uint16_t currentCheckType = message.readEnum8();
-		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end()) {
+		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
 			if (ParameterMonitoringList.full()) {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
