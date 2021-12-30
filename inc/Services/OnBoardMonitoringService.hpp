@@ -85,9 +85,14 @@ public:
 
 	etl::map<std::reference_wrapper<ParameterBase>, CheckingStatus, ECSSMaxParameters>
 	    ParameterMonitoringCheckingStatus;
-
+	/**
+	 * Stores the number of consecutive checks that have been conducted for each parameter.
+	 */
 	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionCounter;
-
+	/**
+	 * Stores the number of consecutive checks that need to be conducted for each parameter in order to set a new
+	 * Checking status.
+	 */
 	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionNumber;
 
 	etl::map<std::reference_wrapper<ParameterBase>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
