@@ -57,22 +57,32 @@ StorageAndRetrievalService::PacketSelectionSubservice packetSelection =
     StorageAndRetrievalService::PacketSelectionSubservice(Services.storageAndRetrieval, 0, 0, 0, 0, 0);
 
 uint8_t apps[] = {0, 1};
+
 uint8_t services[2][2] = {{MemoryManagementService::ServiceType, RequestVerificationService::ServiceType},
                           {EventActionService::ServiceType, ParameterService::ServiceType}};
+
 uint8_t reports[] = {StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport,
                      ParameterService::MessageType::ParameterValuesReport,
                      EventActionService::MessageType::EventActionStatusReport};
+
 uint8_t reports2[] = {StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport,
                       ParameterService::MessageType::ParameterValuesReport,
                       EventReportService::MessageType::InformativeEventReport,
                       StorageAndRetrievalService::MessageType::AppConfigurationContentReport};
+
+uint8_t structures[2][2] = {{3, 7}, {5, 9}};
+
+uint16_t rates[2][2] = {{1, 3}, {2, 4}};
+
+uint8_t events[2][2] = {{EventReportService::Event::InformativeUnknownEvent, EventReportService::Event::WWDGReset},
+                        {EventReportService::Event::AssertionFail, EventReportService::Event::LowSeverityUnknownEvent}};
 
 void initializeAppProcessConfiguration(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool makeSame) {
 	uint8_t numOfApplications = 2;
 
 	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
 	typedef etl::map<uint8_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
-	etl::map<uint16_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+	etl::map<uint8_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
 
 	auto& configuration = packetSelection.applicationProcessConfiguration.definitions[packetStoreId];
 
@@ -96,6 +106,27 @@ void initializeAppProcessConfiguration(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& pa
 				}
 				configuration[applicationId].serviceTypeDefinitions[serviceId].push_back(messageType);
 			}
+		}
+	}
+}
+
+void initializeHousekeepingConfiguration(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
+	uint8_t numOfApplications = 2;
+
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> structureIds;
+	etl::map<uint8_t, structureIds, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+
+	auto& configuration = packetSelection.housekeepingReportConfiguration.definitions[packetStoreId];
+
+	for (int i = 0; i < numOfApplications; i++) {
+		uint8_t applicationId = apps[i];
+		uint8_t numOfStructures = 2;
+
+		for (int j = 0; j < numOfStructures; j++) {
+			uint8_t structureId = structures[i][j];
+			uint16_t subsamplingRate = rates[i][j];
+			configuration[applicationId].housekeepingStructIds.push_back(structureId);
+			configuration[applicationId].subsamplingRates.push_back(subsamplingRate);
 		}
 	}
 }
@@ -219,8 +250,167 @@ Message buildReportTypeAdditionRequest3(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& p
 	return request;
 }
 
+Message buildStructuresAdditionRequest2(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
+	uint8_t numOfApplications = 2;
+
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> structureIds;
+	etl::map<uint8_t, structureIds, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+
+	for (int i = 0; i < numOfApplications; i++) {
+		uint8_t applicationId = apps[i];
+		applicationDefinitions[applicationId].clear();
+	}
+
+	Message request(StorageAndRetrievalService::ServiceType,
+	                StorageAndRetrievalService::MessageType::AddStructuresToHousekeepingConfiguration, Message::TC, 1);
+
+	request.appendOctetString(packetStoreId);
+	request.appendUint8(applicationDefinitions.size());
+
+	for (auto& applicationDefinition : applicationDefinitions) {
+		request.appendUint8(applicationDefinition.first);
+		request.appendUint8(applicationDefinition.second.size());
+	}
+
+	packetSelection.controlledApplications.push_back(0);
+	packetSelection.controlledApplications.push_back(1);
+
+	return request;
+}
+
 void resetAppProcessConfiguration() {
 	packetSelection.applicationProcessConfiguration.definitions.clear();
+	packetSelection.controlledApplications.clear();
+}
+
+Message buildHousekeepingRequest(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool isDeletionRequest) {
+	uint8_t numOfApplications = 2;
+
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> structureIds;
+	etl::map<uint8_t, structureIds, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+
+	for (int i = 0; i < numOfApplications; i++) {
+		uint8_t applicationId = apps[i];
+		uint8_t numOfStructures = 2;
+
+		for (int j = 0; j < numOfStructures; j++) {
+			uint8_t structureId = structures[i][j];
+			applicationDefinitions[applicationId].push_back(structureId);
+		}
+	}
+
+	StorageAndRetrievalService::MessageType messageType =
+	    (isDeletionRequest) ? StorageAndRetrievalService::MessageType::DeleteStructuresFromHousekeepingConfiguration
+	                        : StorageAndRetrievalService::MessageType::AddStructuresToHousekeepingConfiguration;
+
+	Message request(StorageAndRetrievalService::ServiceType, messageType, Message::TC, 1);
+
+	request.appendOctetString(packetStoreId);
+	request.appendUint8(applicationDefinitions.size());
+
+	int i = 0;
+	int j = 0;
+	for (auto& applicationDefinition : applicationDefinitions) {
+		request.appendUint8(applicationDefinition.first);
+		request.appendUint8(applicationDefinition.second.size());
+
+		for (auto structureId : applicationDefinition.second) {
+			request.appendUint8(structureId);
+			if (packetSelection.supportsSubsamplingRate) {
+				request.appendUint16(rates[i][j]);
+				j++;
+			}
+		}
+		i++;
+	}
+
+	packetSelection.controlledApplications.push_back(0);
+	packetSelection.controlledApplications.push_back(1);
+
+	return request;
+}
+
+void resetHousekeepingConfiguration() {
+	packetSelection.housekeepingReportConfiguration.definitions.clear();
+	packetSelection.controlledApplications.clear();
+}
+
+Message buildEventReportRequest(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool isDeletionRequest) {
+	uint8_t numOfApplications = 2;
+
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> eventDefinitionIds;
+	etl::map<uint8_t, eventDefinitionIds, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+
+	for (int i = 0; i < numOfApplications; i++) {
+		uint8_t applicationId = apps[i];
+		uint8_t numOfEventDefinitions = 2;
+
+		for (int j = 0; j < numOfEventDefinitions; j++) {
+			uint8_t eventDefinitionId = events[i][j];
+			applicationDefinitions[applicationId].push_back(eventDefinitionId);
+		}
+	}
+
+	StorageAndRetrievalService::MessageType messageType =
+	    (isDeletionRequest)
+	        ? StorageAndRetrievalService::MessageType::DeleteEventDefinitionsFromEventReportConfiguration
+	        : StorageAndRetrievalService::MessageType::AddEventDefinitionsToEventReportConfiguration;
+
+	Message request(StorageAndRetrievalService::ServiceType, messageType, Message::TC, 1);
+
+	request.appendOctetString(packetStoreId);
+	request.appendUint8(applicationDefinitions.size());
+
+	for (auto& applicationDefinition : applicationDefinitions) {
+		request.appendUint8(applicationDefinition.first);
+		request.appendUint8(applicationDefinition.second.size());
+
+		for (auto eventDefinitionId : applicationDefinition.second) {
+			request.appendUint8(eventDefinitionId);
+		}
+	}
+
+	packetSelection.controlledApplications.push_back(0);
+	packetSelection.controlledApplications.push_back(1);
+
+	return request;
+}
+
+Message buildEventReportRequest2(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool isDeletionRequest) {
+	uint8_t numOfApplications = 2;
+
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> eventDefinitionIds;
+	etl::map<uint8_t, eventDefinitionIds, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+
+	for (int i = 0; i < numOfApplications; i++) {
+		uint8_t applicationId = apps[i];
+		applicationDefinitions[applicationId].clear();
+	}
+
+	StorageAndRetrievalService::MessageType messageType =
+	    (isDeletionRequest)
+	        ? StorageAndRetrievalService::MessageType::DeleteEventDefinitionsFromEventReportConfiguration
+	        : StorageAndRetrievalService::MessageType::AddEventDefinitionsToEventReportConfiguration;
+
+	Message request(StorageAndRetrievalService::ServiceType, messageType, Message::TC, 1);
+
+	request.appendOctetString(packetStoreId);
+	request.appendUint8(applicationDefinitions.size());
+
+	for (auto& applicationDefinition : applicationDefinitions) {
+		request.appendUint8(applicationDefinition.first);
+		request.appendUint8(applicationDefinition.second.size());
+	}
+
+	packetSelection.controlledApplications.push_back(0);
+	packetSelection.controlledApplications.push_back(1);
+
+	return request;
+}
+
+void resetEventReportConfiguration() {
+	packetSelection.eventReportConfiguration.definitions.clear();
+	packetSelection.controlledApplications.clear();
 }
 
 TEST_CASE("Adding report types to an application process configuration") {
@@ -441,56 +631,117 @@ TEST_CASE("Reporting of the application process configuration content") {
 		REQUIRE(report.readEnum8() == ParameterService::MessageType::ParameterValuesReport);
 		REQUIRE(report.readEnum8() == EventActionService::MessageType::EventActionStatusReport);
 
+		resetAppProcessConfiguration();
 		ServiceTests::reset();
 		Services.reset();
 	}
 }
 
-// SECTION("Adding report types to application process storage control configuration") {
-//	Message createPacketStores(StorageAndRetrievalService::ServiceType,
-//	                           StorageAndRetrievalService::MessageType::CreatePacketStores, Message::TC, 1);
-//	Services.storageAndRetrieval.packetStores.clear();
-//	buildPacketCreationRequest(createPacketStores);
-//
-//	MessageParser::execute(createPacketStores);
-//
-//	Message request(StorageAndRetrievalService::ServiceType,
-//	                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration, Message::TC, 1);
-//
-//	uint8_t packetStoreData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
-//	uint8_t packetStoreData2[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps7444";
-//	uint8_t packetStoreData3[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps1111";
-//	uint8_t packetStoreData4[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps799";
-//	uint8_t packetStoreData5[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps5555";
-//	uint8_t packetStoreData6[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps25";
-//
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id(packetStoreData);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id2(packetStoreData2);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id3(packetStoreData3);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id4(packetStoreData4);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id5(packetStoreData5);
-//	String<ECSS_MAX_PACKET_STORE_ID_SIZE> id6(packetStoreData6);
-//
-//	CHECK(packetSelection.controlledAppProcesses.empty());
-//	etl::vector<uint16_t, 5> applicationIdsToBeControlled = {1, 2, 3, 4, 5};
-//	for (auto& appId : applicationIdsToBeControlled) {
-//		packetSelection.controlledAppProcesses.push_back(appId);
-//	}
-//	CHECK(packetSelection.controlledAppProcesses.size() == applicationIdsToBeControlled.size());
-//
-//	request.appendOctetString(id2);
-//	packetSelection.addReportTypesToAppProcessConfiguration(request);
-//
-//	CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 12);
-//	CHECK(packetSelection.applicationProcessConfiguration.definitions.empty());
-//
-//	Message request2 = buildReportTypeAdditionRequest(id);
-//	packetSelection.addReportTypesToAppProcessConfiguration(request2);
-//
-//	CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 12);
-//	CHECK(packetSelection.applicationProcessConfiguration.definitions.size() == 1);
-//	CHECK(packetSelection.applicationProcessConfiguration.definitions[id].size() == 2);
-//	// App Ids added are (1,2)
-//	//		CHECK(packetSelection.applicationProcessConfiguration.definitions[id][1].serviceTypeDefinitions.size() ==
-//	//4);
-//
+TEST_CASE("Adding housekeeping structure IDs to a housekeeping configuration") {
+	SECTION("Valid addition of specified housekeeping structure IDs") {
+		initializePacketStores();
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		auto request = buildHousekeepingRequest(packetStoreIds[0], false);
+		packetSelection.addStructuresToHousekeepingConfiguration(request);
+
+		int c1 = 0;
+		int c2 = 0;
+		REQUIRE(packetSelection.housekeepingReportConfiguration.definitions[packetStoreIds[0]].size() == 2);
+
+		for (const auto& applicationId :
+		     packetSelection.housekeepingReportConfiguration.definitions[packetStoreIds[0]]) {
+			REQUIRE(applicationId.first == apps[c1]);
+			REQUIRE(applicationId.second.housekeepingStructIds.size() == 2);
+			if (packetSelection.supportsSubsamplingRate) {
+				REQUIRE(applicationId.second.subsamplingRates.size() == 2);
+			}
+
+			for (const auto& structureId : applicationId.second.housekeepingStructIds) {
+				REQUIRE(std::find(std::begin(structures[c1]), std::end(structures[c1]), structureId) !=
+				        std::end(structures[c1]));
+			}
+			c1++;
+		}
+		resetHousekeepingConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid addition of all housekeeping structure IDs for a specified application") {
+		initializePacketStores();
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		auto request = buildStructuresAdditionRequest2(packetStoreIds[0]);
+		packetSelection.addStructuresToHousekeepingConfiguration(request);
+
+		int c1 = 0;
+		int c2 = 0;
+		REQUIRE(packetSelection.housekeepingReportConfiguration.definitions[packetStoreIds[0]].size() == 2);
+
+		for (const auto& applicationId :
+		     packetSelection.housekeepingReportConfiguration.definitions[packetStoreIds[0]]) {
+			REQUIRE(applicationId.first == apps[c1++]);
+			REQUIRE(applicationId.second.housekeepingStructIds.empty());
+			if (packetSelection.supportsSubsamplingRate) {
+				REQUIRE(applicationId.second.subsamplingRates.empty());
+			}
+		}
+		resetHousekeepingConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Adding event definitions to an event report configuration") {
+	SECTION("Valid addition of specified event definitions") {
+		initializePacketStores();
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		auto request = buildEventReportRequest(packetStoreIds[0], false);
+		packetSelection.addEventDefinitionsToEventReportConfiguration(request);
+
+		int c1 = 0;
+		int c2 = 0;
+		REQUIRE(packetSelection.eventReportConfiguration.definitions[packetStoreIds[0]].size() == 2);
+
+		for (const auto& applicationId : packetSelection.eventReportConfiguration.definitions[packetStoreIds[0]]) {
+			REQUIRE(applicationId.first == apps[c1]);
+			REQUIRE(applicationId.second.eventDefinitionIds.size() == 2);
+
+			for (const auto& eventDefinitionId : applicationId.second.eventDefinitionIds) {
+				REQUIRE(std::find(std::begin(events[c1]), std::end(events[c1]), eventDefinitionId) !=
+				        std::end(events[c1]));
+			}
+			c1++;
+		}
+		resetEventReportConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid addition of all event definition IDs for a specified application") {
+		initializePacketStores();
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		auto request = buildEventReportRequest2(packetStoreIds[0], false);
+		packetSelection.addEventDefinitionsToEventReportConfiguration(request);
+
+		int c1 = 0;
+		int c2 = 0;
+		REQUIRE(packetSelection.eventReportConfiguration.definitions[packetStoreIds[0]].size() == 2);
+
+		for (const auto& applicationId :
+		     packetSelection.eventReportConfiguration.definitions[packetStoreIds[0]]) {
+			REQUIRE(applicationId.first == apps[c1++]);
+			REQUIRE(applicationId.second.eventDefinitionIds.empty());
+		}
+		resetEventReportConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+}

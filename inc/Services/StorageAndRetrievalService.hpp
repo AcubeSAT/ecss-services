@@ -242,7 +242,7 @@ public:
 		 * Adds a new event definition ID into a specified application process.
 		 */
 		void addEventDefinitionId(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId,
-		                          uint16_t eventDefinitionId);
+		                          uint8_t eventDefinitionId);
 
 		/**
 		 * Adds all the event definitions of a specified application process, to the event report configuration.
@@ -260,7 +260,7 @@ public:
 		 * Checks if an event definition ID exists in the specified application process.
 		 */
 		int eventDefinitionIdExistsInApplication(const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId,
-		                                         uint8_t applicationId, uint16_t eventDefinitionId);
+		                                         uint8_t applicationId, uint8_t eventDefinitionId);
 
 		/**
 		 * Deletes an event definition ID from the specified application process.
@@ -294,12 +294,12 @@ public:
 		/**
 		 * Support to subsample the storage of housekeeping reports as per 5.15.4.2.1.d
 		 */
-		const bool supportsSubsamplingRate;
+		const bool supportsSubsamplingRate = true;
 		const uint8_t numOfControlledAppProcesses;
 		const uint8_t maxServiceTypeDefinitions; // Per Application Process Definition
 		const uint8_t maxReportTypeDefinitions; // This is per Service Type Definition
 		const uint8_t maxHousekeepingStructureIds; // Per Housekeeping storage-control definition
-		const uint16_t maxEventDefinitionIds; // Per Event-Report storage-control definition
+		const uint8_t maxEventDefinitionIds; // Per Event-Report storage-control definition
 
 		/**
 		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from

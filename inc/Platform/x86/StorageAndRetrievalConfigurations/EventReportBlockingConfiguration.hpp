@@ -18,7 +18,7 @@
  */
 class EventReportBlockingConfiguration {
 public:
-	typedef etl::map<uint16_t, EventDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationProcessDefinitions;
+	typedef etl::map<uint8_t, EventDefinition, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationProcessDefinitions;
 
 	etl::map<String<ECSS_MAX_PACKET_STORE_ID_SIZE>, applicationProcessDefinitions, ECSS_MAX_PACKET_STORES> definitions;
 };

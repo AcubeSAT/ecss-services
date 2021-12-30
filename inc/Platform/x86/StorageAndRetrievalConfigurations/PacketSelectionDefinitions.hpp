@@ -48,7 +48,7 @@ public:
  */
 class EventDefinition {
 public:
-	etl::vector<uint16_t, ECSS_MAX_EVENT_DEFINITION_IDS> eventDefinitionIds;
+	etl::vector<uint8_t, ECSS_MAX_EVENT_DEFINITION_IDS> eventDefinitionIds;
 };
 
 #endif

@@ -279,7 +279,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::noEventDefinitionIds
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionId(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint16_t eventDefinitionId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t eventDefinitionId) {
 	eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.push_back(eventDefinitionId);
 }
 
@@ -295,7 +295,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInEventRepo
 }
 
 int StorageAndRetrievalService::PacketSelectionSubservice::eventDefinitionIdExistsInApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint16_t eventDefinitionId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t eventDefinitionId) {
 	uint16_t position = 0;
 	for (auto& id : eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds) {
 		if (id == eventDefinitionId) {
@@ -490,16 +490,16 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHouse
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	uint16_t numOfApplications = request.readUint16();
+	uint8_t numOfApplications = request.readUint8();
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint8_t applicationId = request.readUint16();
+		uint8_t applicationId = request.readUint8();
 		uint8_t numOfStructures = request.readUint8();
 
-		if (checkApplicationForHousekeeping(packetStoreId, applicationId, request)) {
-			request.skipBytes(numOfStructures * (1 + 2));
-			continue;
-		}
+		//		if (checkApplicationForHousekeeping(packetStoreId, applicationId, request)) {
+		//			request.skipBytes(numOfStructures * (1 + 2));
+		//			continue;
+		//		}
 		if (numOfStructures == 0) {
 			addAllHousekeepingStructuresOfApplication(packetStoreId, applicationId);
 			continue;
@@ -525,7 +525,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructuresFrom
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	uint16_t numOfApplications = request.readUint16();
+	uint8_t numOfApplications = request.readUint8();
 
 	if (numOfApplications == 0) {
 		housekeepingReportConfiguration.definitions.clear();
@@ -533,7 +533,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructuresFrom
 	}
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint8_t applicationId = request.readUint16();
+		uint8_t applicationId = request.readUint8();
 		uint8_t numOfStructures = request.readUint8();
 
 		if (not appExistsInHousekeepingConfiguration(packetStoreId, applicationId)) {
@@ -577,13 +577,13 @@ void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigur
 	Message report(ServiceType, MessageType::HousekeepingConfigurationContentReport, Message::TM, 1);
 	report.appendOctetString(packetStoreId);
 
-	uint16_t numOfApplications = housekeepingReportConfiguration.definitions[packetStoreId].size();
-	report.appendUint16(numOfApplications);
+	uint8_t numOfApplications = housekeepingReportConfiguration.definitions[packetStoreId].size();
+	report.appendUint8(numOfApplications);
 
 	for (auto& application : housekeepingReportConfiguration.definitions[packetStoreId]) {
 		uint8_t applicationId = application.first;
 		uint8_t numOfStructures = application.second.housekeepingStructIds.size();
-		report.appendUint16(applicationId);
+		report.appendUint8(applicationId);
 		report.appendUint8(numOfStructures);
 
 		for (int i = 0; i < numOfStructures; i++) {
@@ -607,23 +607,23 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionsT
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	uint16_t numOfApplications = request.readUint16();
+	uint8_t numOfApplications = request.readUint8();
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint8_t applicationId = request.readUint16();
-		uint16_t numOfEventDefinitions = request.readUint16();
+		uint8_t applicationId = request.readUint8();
+		uint8_t numOfEventDefinitions = request.readUint8();
 
-		if (checkApplicationForEventReports(packetStoreId, applicationId, request)) {
-			request.skipBytes(numOfEventDefinitions * 2);
-			continue;
-		}
+//		if (checkApplicationForEventReports(packetStoreId, applicationId, request)) {
+//			request.skipBytes(numOfEventDefinitions * 2);
+//			continue;
+//		}
 		if (numOfEventDefinitions == 0) {
 			addAllEventDefinitionsOfApplication(packetStoreId, applicationId);
 			continue;
 		}
 
 		for (int j = 0; j < numOfEventDefinitions; j++) {
-			uint16_t eventDefinitionId = request.readUint16();
+			uint8_t eventDefinitionId = request.readUint8();
 			addEventDefinitionId(packetStoreId, applicationId, eventDefinitionId);
 		}
 	}
@@ -638,7 +638,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitio
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	uint16_t numOfApplications = request.readUint16();
+	uint8_t numOfApplications = request.readUint8();
 
 	if (numOfApplications == 0) {
 		eventReportConfiguration.definitions.clear();
@@ -646,8 +646,8 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitio
 	}
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint8_t applicationId = request.readUint16();
-		uint16_t numOfEventDefinitions = request.readUint16();
+		uint8_t applicationId = request.readUint8();
+		uint8_t numOfEventDefinitions = request.readUint8();
 
 		if (not appExistsInEventReportConfiguration(packetStoreId, applicationId)) {
 			ErrorHandler::reportError(request,
@@ -661,7 +661,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitio
 		}
 
 		for (int j = 0; j < numOfEventDefinitions; j++) {
-			uint16_t eventDefinitionId = request.readUint16();
+			uint8_t eventDefinitionId = request.readUint8();
 			int position = eventDefinitionIdExistsInApplication(packetStoreId, applicationId, eventDefinitionId);
 			if (position == -1) {
 				ErrorHandler::reportError(
@@ -690,17 +690,17 @@ void StorageAndRetrievalService::PacketSelectionSubservice::eventReportConfigura
 	Message report(ServiceType, MessageType::EventReportConfigurationContentReport, Message::TM, 1);
 
 	report.appendOctetString(packetStoreId);
-	uint16_t numOfApplications = eventReportConfiguration.definitions[packetStoreId].size();
-	report.appendUint16(numOfApplications);
+	uint8_t numOfApplications = eventReportConfiguration.definitions[packetStoreId].size();
+	report.appendUint8(numOfApplications);
 
 	for (auto& application : eventReportConfiguration.definitions[packetStoreId]) {
 		uint8_t applicationId = application.first;
 		uint16_t numOfEventDefinitions = application.second.eventDefinitionIds.size();
-		report.appendUint16(applicationId);
-		report.appendUint16(numOfEventDefinitions);
+		report.appendUint8(applicationId);
+		report.appendUint8(numOfEventDefinitions);
 
-		for (auto& eventDefinitionId : application.second.eventDefinitionIds) {
-			report.appendUint16(eventDefinitionId);
+		for (auto eventDefinitionId : application.second.eventDefinitionIds) {
+			report.appendUint8(eventDefinitionId);
 		}
 	}
 	mainService.storeMessage(report);

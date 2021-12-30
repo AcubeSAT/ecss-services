@@ -20,6 +20,9 @@
 #include "etl/String.hpp"
 
 int main() {
+//	etl::array<uint8_t , 5> arr {};
+//	arr[0] = ParameterService::MessageType::ParameterValuesReport;
+
 //	String <10> str(data);
 //
 //	Message mes(ParameterService::ServiceType,ParameterService::MessageType::ParameterValuesReport,Message::TC,1);
