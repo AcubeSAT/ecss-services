@@ -64,6 +64,7 @@ public:
 
 	struct ExpectedValueCheck {
 		uint16_t expectedValue;
+		//TODO: Find what variable type is a bit string.
 		uint8_t mask;
 		Event notExpectedValueEvent;
 	};
