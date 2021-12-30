@@ -2,8 +2,10 @@
 #define ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 
 #include <Service.hpp>
-#include "../../lib/littlefs/lfs.h"
 
+extern "C" {
+#include "../../lib/littlefs/lfs.h"
+};
 #define MAX_FILE_SIZE_BYTES 4096
 #define MAX_FILE_COPY_OPERATIONS 10
 #define MAX_FILE_NAME_SIZE 256
@@ -75,6 +77,7 @@ private:
         char searchPattern[ECSS_MAX_STRING_SIZE];
         // Seperated by /0
         char filePath[ECSS_MAX_STRING_SIZE];
+        uint8_t numberOfFiles = 0;
     };
 
     enum operationStatusType : uint8_t{
@@ -122,7 +125,8 @@ public:
 
     enum ErrorType : uint8_t {
         FailedStartOfExecution = 1,
-        FailedCompletionOfExecution = 2
+        FailedProgressOfExecution = 2,
+        FailedCompletionOfExecution = 3
     };
 
     FileManagementService()
@@ -195,7 +199,7 @@ public:
     /*
      * TM[23,8] Found file report, generated after the arrival of a TC[23,7]
      */
-    void foundFileReport(char repositoryPath[ECSS_MAX_STRING_SIZE], uint8_t repositoryPathSize, char fileName[ECSS_MAX_STRING_SIZE], uint8_t fileNameSize);
+    void foundFileReport(FoundFilesReportStruct report);
 
     /*
      * TC[23,9] Create a directory
@@ -285,7 +289,7 @@ public:
      * @param messageStringSize : The actual size of the message
      * @return status of execution (1: Message does not contain any wildcards, -1: Message contains at least one wildcard)
      */
-    int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString, uint8_t messageStringSize);
+    static int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString, uint8_t messageStringSize);
 
     /**
      * The purpose of this function is to take care of the extraction process for the object path variable
@@ -316,7 +320,7 @@ public:
      * @param fileNameSize : The actual size of the fileName
      * @param flags : Input flags that determines the creation status
      */
-    int32_t littleFsCreateFile(lfs_t &fs, lfs_file_t &file, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
+    static int32_t littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
                                String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize, int flags);
 
     /**
@@ -339,7 +343,7 @@ public:
      * @param fileName : The file name
      * @param fileNameSize : The actual size of the fileName
      */
-    int32_t littleFsDeleteFile(lfs_t &fs, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
+    int32_t littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
                                String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize);
 
     /**

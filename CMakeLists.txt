@@ -5,7 +5,7 @@ project(ecss_services)
 set(CMAKE_CXX_STANDARD 17)
 
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include" "${PROJECT_SOURCE_DIR}/lib/littlefs/lfs.h")
+include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include" "${PROJECT_SOURCE_DIR}/lib/littlefs")
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -40,7 +40,9 @@ add_library(common OBJECT
     	src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
-        src/Services/FileManagementService.cpp)
+        src/Services/FileManagementService.cpp
+        lib/littlefs/lfs.c
+        lib/littlefs/lfs_util.c)
 
 # Specify the .cpp files for the executables
 file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
