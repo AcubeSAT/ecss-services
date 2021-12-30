@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "PacketSelectionDefinitions.hpp"
+#include <etl/String.hpp>
 #include "etl/map.h"
 #include "etl/vector.h"
 
@@ -21,7 +22,7 @@ public:
 	/**
 	 * Map containing the application process definitions (key), each followed by the list of service type definitions.
 	 */
-	typedef etl::map<uint16_t, ApplicationProcessDefinition, ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES>
+	typedef etl::map<uint8_t, ApplicationProcessDefinition, ECSS_MAX_CONTROLLED_APPLICATION_PROCESSES>
 	    applicationProcessDefinitions;
 
 	/**

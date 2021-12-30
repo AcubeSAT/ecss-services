@@ -15,7 +15,7 @@ StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice
       maxHousekeepingStructureIds(maxHousekeepingStructIds), maxReportTypeDefinitions(maxReportTypeDefs),
       maxServiceTypeDefinitions(maxServiceTypeDefs), supportsSubsamplingRate(true) {}
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::appIsControlled(uint16_t applicationId, Message& request) {
+bool StorageAndRetrievalService::PacketSelectionSubservice::appIsControlled(uint8_t applicationId, Message& request) {
 	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
 	    controlledApplications.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnControlledApplicationProcessId);
@@ -25,7 +25,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::appIsControlled(uint
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefinitions(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId,
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId,
     Message& request) {
 	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId]
 	        .serviceTypeDefinitions[serviceId]
@@ -37,7 +37,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxReportDefi
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDefinitions(
-    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.size() >=
 	    maxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypeDefinitionsReached);
@@ -47,8 +47,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxServiceDef
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::noReportDefinitionInService(
-    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId,
-    Message& request) {
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId, Message& request) {
 	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId]
 	        .serviceTypeDefinitions[serviceId]
 	        .empty()) {
@@ -60,7 +59,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::noReportDefinitionIn
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::noServiceDefinitionInApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.empty()) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinitionInApp);
@@ -70,40 +69,39 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::noServiceDefinitionI
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addReportDefinition(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId,
-    uint16_t reportId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId,
+    uint8_t reportId) {
 	applicationProcessConfiguration.definitions[packetStoreId][applicationId]
 	    .serviceTypeDefinitions[serviceId]
 	    .push_back(reportId);
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addAllReportDefinitionsOfApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId) {
 	applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.clear();
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addAllReportDefinitionsOfService(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId) {
 	applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId].clear();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationForReportTypes(
-    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	return (not appIsControlled(applicationId, request) ||
 	        noServiceDefinitionInApplication(packetStoreId, applicationId, request) ||
 	        exceedsMaxServiceDefinitions(packetStoreId, applicationId, request));
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::checkService(
-    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId,
-    Message& request) {
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId, Message& request) {
 	return (noReportDefinitionInService(packetStoreId, applicationId, serviceId, request) ||
 	        exceedsMaxReportDefinitions(packetStoreId, applicationId, serviceId, request));
 }
 
 int StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInService(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId,
-    uint16_t reportId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId,
+    uint8_t reportId) {
 	uint16_t position = 0;
 	for (auto& id :
 	     applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions[serviceId]) {
@@ -116,7 +114,7 @@ int StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInService
 }
 
 // bool StorageAndRetrievalService::PacketSelectionSubservice::serviceHasReportDefinitions(
-//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId, uint16_t serviceId) {
+//    String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint8_t applicationId, uint16_t serviceId) {
 //	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId]
 //	        .serviceTypeDefinitions[serviceId]
 //	        .empty()) {
@@ -126,7 +124,7 @@ int StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInService
 //}
 
 void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportDefinitionsOfService(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId, int index) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId, int index) {
 	auto& tempList = applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions;
 
 	auto iter = tempList[serviceId].begin() + index;
@@ -142,7 +140,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportDefiniti
 }
 
 // bool StorageAndRetrievalService::PacketSelectionSubservice::appHasServiceDefinitions(
-//     String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint16_t applicationId) {
+//     String<ECSS_MAX_PACKET_STORE_ID_SIZE> packetStoreId, uint8_t applicationId) {
 //	if (applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.empty()) {
 //		return false;
 //	}
@@ -150,8 +148,8 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportDefiniti
 // }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinitionsOfApp(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, bool deleteAll,
-    uint16_t serviceId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, bool deleteAll,
+    uint8_t serviceId) {
 	if (deleteAll) {
 		applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions.clear();
 	} else {
@@ -164,27 +162,27 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteServiceDefinit
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::serviceExistsInApp(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t serviceId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t serviceId) {
 	auto& serviceTypes =
 	    applicationProcessConfiguration.definitions[packetStoreId][applicationId].serviceTypeDefinitions;
 	return serviceTypes.find(serviceId) != serviceTypes.end();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInApplicationConfiguration(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId) {
 	auto& applications = applicationProcessConfiguration.definitions[packetStoreId];
 	return applications.find(applicationId) != applications.end();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationForHousekeeping(
-    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	return (not appIsControlled(applicationId, request) ||
 	        noStructureIdsInApplication(packetStoreId, applicationId, request) ||
 	        exceedsMaxHousekeepingStructures(packetStoreId, applicationId, request));
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxHousekeepingStructures(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	if (housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.size() >=
 	    maxHousekeepingStructureIds) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxHousekeepingStructureIdsReached);
@@ -194,7 +192,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxHousekeepi
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::noStructureIdsInApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	if (housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.empty()) {
 		ErrorHandler::reportError(
 		    request, ErrorHandler::ExecutionStartErrorType::NonExistingHousekeepingStructureIdInDefinition);
@@ -204,7 +202,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::noStructureIdsInAppl
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addHousekeepingStructureId(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint8_t structureId,
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t structureId,
     uint16_t subsamplingRate) {
 	housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.push_back(
 	    structureId);
@@ -213,25 +211,25 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addHousekeepingStruc
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addHousekeepingStructureId(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint8_t structureId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t structureId) {
 	housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.push_back(
 	    structureId);
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addAllHousekeepingStructuresOfApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId) {
 	housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds.clear();
 	housekeepingReportConfiguration.definitions[packetStoreId][applicationId].subsamplingRates.clear();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInHousekeepingConfiguration(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId) {
 	auto& applications = housekeepingReportConfiguration.definitions[packetStoreId];
 	return applications.find(applicationId) != applications.end();
 }
 
 int StorageAndRetrievalService::PacketSelectionSubservice::structureIdExistsInApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint8_t structureId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint8_t structureId) {
 	uint16_t position = 0;
 	for (auto& id : housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds) {
 		if (id == structureId) {
@@ -243,7 +241,7 @@ int StorageAndRetrievalService::PacketSelectionSubservice::structureIdExistsInAp
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::deleteHousekeepingStructure(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t index) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint16_t index) {
 	auto& structureIds =
 	    housekeepingReportConfiguration.definitions[packetStoreId][applicationId].housekeepingStructIds;
 
@@ -255,14 +253,14 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteHousekeepingSt
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationForEventReports(
-    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	return (not appIsControlled(applicationId, request) ||
 	        noEventDefinitionIdsInApplication(packetStoreId, applicationId, request) ||
 	        exceedsMaxEventDefinitions(packetStoreId, applicationId, request));
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxEventDefinitions(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	if (eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.size() >=
 	    maxEventDefinitionIds) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxEventDefinitionIdsReached);
@@ -272,7 +270,7 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::exceedsMaxEventDefin
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::noEventDefinitionIdsInApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, Message& request) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, Message& request) {
 	if (eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.empty()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NoEventDefinitionExistsInApp);
 		return true;
@@ -281,23 +279,23 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::noEventDefinitionIds
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionId(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t eventDefinitionId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint16_t eventDefinitionId) {
 	eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.push_back(eventDefinitionId);
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addAllEventDefinitionsOfApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId) {
 	eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds.clear();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::appExistsInEventReportConfiguration(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId) {
 	auto& applications = eventReportConfiguration.definitions[packetStoreId];
 	return applications.find(applicationId) != applications.end();
 }
 
 int StorageAndRetrievalService::PacketSelectionSubservice::eventDefinitionIdExistsInApplication(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t eventDefinitionId) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint16_t eventDefinitionId) {
 	uint16_t position = 0;
 	for (auto& id : eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds) {
 		if (id == eventDefinitionId) {
@@ -309,7 +307,7 @@ int StorageAndRetrievalService::PacketSelectionSubservice::eventDefinitionIdExis
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinition(
-    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint16_t applicationId, uint16_t index) {
+    const String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, uint8_t applicationId, uint16_t index) {
 	auto& structureIds = eventReportConfiguration.definitions[packetStoreId][applicationId].eventDefinitionIds;
 
 	auto iterator = structureIds.begin() + index;
@@ -339,27 +337,27 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	uint16_t numOfApplicationIds = request.readUint16();
+	uint8_t numOfApplicationIds = request.readUint8();
 
 	for (int i = 0; i < numOfApplicationIds; i++) {
-		uint16_t applicationId = request.readUint16();
-		uint16_t numOfServiceIds = request.readUint16();
+		uint8_t applicationId = request.readUint8();
+		uint8_t numOfServiceIds = request.readUint8();
 
-		if (checkApplicationForReportTypes(packetStoreId, applicationId, request)) {
-			for (int k = 0; k < numOfServiceIds; k++) {
-				request.skipBytes(2); // todo: change the bytes if change the type.
-				uint16_t numOfMessageTypes = request.readUint16();
-				request.skipBytes(numOfMessageTypes * 2);
-			}
-			continue;
-		}
+		//		if (checkApplicationForReportTypes(packetStoreId, applicationId, request)) {
+		//			for (int k = 0; k < numOfServiceIds; k++) {
+		//				request.skipBytes(2); // todo: change the bytes if change the type.
+		//				uint16_t numOfMessageTypes = request.readUint16();
+		//				request.skipBytes(numOfMessageTypes * 2);
+		//			}
+		//			continue;
+		//		}
 		if (numOfServiceIds == 0) {
 			addAllReportDefinitionsOfApplication(packetStoreId, applicationId);
 			continue;
 		}
 
-		for (int j = 0; j < numOfServiceIds; j++) {
-			uint16_t serviceId = request.readUint16();
+		for (uint8_t j = 0; j < numOfServiceIds; j++) {
+			uint8_t serviceId = request.readUint8();
 			//			if (checkService(packetStoreId, applicationId, serviceId, request)) {
 			//				continue;
 			//			}
@@ -371,7 +369,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 			}
 
 			for (int k = 0; k < numOfMessageTypes; k++) {
-				uint16_t messageType = request.readUint16();
+				auto messageType = request.readEnum8();
 				addReportDefinition(packetStoreId, applicationId, serviceId, messageType);
 			}
 		}
@@ -387,7 +385,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
 		return;
 	}
-	uint16_t numOfApplicationIds = request.readUint16();
+	uint8_t numOfApplicationIds = request.readUint8();
 
 	if (numOfApplicationIds == 0) {
 		applicationProcessConfiguration.definitions.clear();
@@ -396,13 +394,13 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 	}
 
 	for (int i = 0; i < numOfApplicationIds; i++) {
-		uint16_t applicationId = request.readUint16();
-		uint16_t numOfServiceIds = request.readUint16();
+		uint8_t applicationId = request.readUint8();
+		uint8_t numOfServiceIds = request.readUint8();
 
 		if (not appExistsInApplicationConfiguration(packetStoreId, applicationId)) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::NonExistingApplicationInDefinition);
-			for (int k = 0; k < numOfServiceIds; k++) {
+			for (uint8_t k = 0; k < numOfServiceIds; k++) {
 				request.skipBytes(2);
 				uint16_t numOfMessageTypes = request.readUint16();
 				request.skipBytes(numOfMessageTypes * 2);
@@ -414,8 +412,8 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 			continue;
 		}
 
-		for (int j = 0; j < numOfServiceIds; j++) {
-			uint16_t serviceId = request.readUint16();
+		for (uint8_t j = 0; j < numOfServiceIds; j++) {
+			uint8_t serviceId = request.readUint8();
 			uint16_t numOfMessageTypes = request.readUint16();
 
 			if (not serviceExistsInApp(packetStoreId, applicationId, serviceId)) {
@@ -431,7 +429,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteReportTypesFro
 			}
 
 			for (int k = 0; k < numOfMessageTypes; k++) {
-				uint16_t messageType = request.readUint16();
+				uint8_t messageType = request.readEnum8();
 				auto position = reportExistsInService(packetStoreId, applicationId, serviceId, messageType);
 				if (position == -1) {
 					ErrorHandler::reportError(
@@ -461,23 +459,23 @@ void StorageAndRetrievalService::PacketSelectionSubservice::appConfigurationCont
 	Message report(ServiceType, MessageType::AppConfigurationContentReport, Message::TM, 1);
 
 	report.appendOctetString(packetStoreId);
-	uint16_t numOfApplications = applicationProcessConfiguration.definitions[packetStoreId].size();
-	report.appendUint16(numOfApplications);
+	uint8_t numOfApplications = applicationProcessConfiguration.definitions[packetStoreId].size();
+	report.appendUint8(numOfApplications);
 
 	for (auto& application : applicationProcessConfiguration.definitions[packetStoreId]) {
-		uint16_t applicationId = application.first;
-		uint16_t numOfServices = application.second.serviceTypeDefinitions.size();
-		report.appendUint16(applicationId);
-		report.appendUint16(numOfServices);
+		uint8_t applicationId = application.first;
+		uint8_t numOfServices = application.second.serviceTypeDefinitions.size();
+		report.appendUint8(applicationId);
+		report.appendUint8(numOfServices);
 
 		for (auto& service : application.second.serviceTypeDefinitions) {
-			uint16_t serviceId = service.first;
+			uint8_t serviceId = service.first;
 			uint16_t numOfMessageTypes = service.second.size();
-			report.appendUint16(serviceId);
+			report.appendUint8(serviceId);
 			report.appendUint16(numOfMessageTypes);
 
 			for (auto messageType : service.second) {
-				report.appendUint16(messageType);
+				report.appendEnum8(messageType);
 			}
 		}
 	}
@@ -495,7 +493,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addStructuresToHouse
 	uint16_t numOfApplications = request.readUint16();
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = request.readUint16();
+		uint8_t applicationId = request.readUint16();
 		uint8_t numOfStructures = request.readUint8();
 
 		if (checkApplicationForHousekeeping(packetStoreId, applicationId, request)) {
@@ -535,7 +533,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteStructuresFrom
 	}
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = request.readUint16();
+		uint8_t applicationId = request.readUint16();
 		uint8_t numOfStructures = request.readUint8();
 
 		if (not appExistsInHousekeepingConfiguration(packetStoreId, applicationId)) {
@@ -583,7 +581,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::housekeepingConfigur
 	report.appendUint16(numOfApplications);
 
 	for (auto& application : housekeepingReportConfiguration.definitions[packetStoreId]) {
-		uint16_t applicationId = application.first;
+		uint8_t applicationId = application.first;
 		uint8_t numOfStructures = application.second.housekeepingStructIds.size();
 		report.appendUint16(applicationId);
 		report.appendUint8(numOfStructures);
@@ -612,7 +610,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addEventDefinitionsT
 	uint16_t numOfApplications = request.readUint16();
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = request.readUint16();
+		uint8_t applicationId = request.readUint16();
 		uint16_t numOfEventDefinitions = request.readUint16();
 
 		if (checkApplicationForEventReports(packetStoreId, applicationId, request)) {
@@ -648,7 +646,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::deleteEventDefinitio
 	}
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = request.readUint16();
+		uint8_t applicationId = request.readUint16();
 		uint16_t numOfEventDefinitions = request.readUint16();
 
 		if (not appExistsInEventReportConfiguration(packetStoreId, applicationId)) {
@@ -696,7 +694,7 @@ void StorageAndRetrievalService::PacketSelectionSubservice::eventReportConfigura
 	report.appendUint16(numOfApplications);
 
 	for (auto& application : eventReportConfiguration.definitions[packetStoreId]) {
-		uint16_t applicationId = application.first;
+		uint8_t applicationId = application.first;
 		uint16_t numOfEventDefinitions = application.second.eventDefinitionIds.size();
 		report.appendUint16(applicationId);
 		report.appendUint16(numOfEventDefinitions);

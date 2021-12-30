@@ -56,33 +56,39 @@ void padWithZeros(etl::array<String<ECSS_MAX_PACKET_STORE_ID_SIZE>, 4>& packetSt
 StorageAndRetrievalService::PacketSelectionSubservice packetSelection =
     StorageAndRetrievalService::PacketSelectionSubservice(Services.storageAndRetrieval, 0, 0, 0, 0, 0);
 
-uint16_t apps[] = {0, 1};
-uint16_t services[2][2] = {{1, 3}, {4, 15}};
-uint16_t reports[] = {5, 13, 21};
-uint16_t reports2[] = {5, 13, 35, 7};
+uint8_t apps[] = {0, 1};
+uint8_t services[2][2] = {{MemoryManagementService::ServiceType, RequestVerificationService::ServiceType},
+                          {EventActionService::ServiceType, ParameterService::ServiceType}};
+uint8_t reports[] = {StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport,
+                     ParameterService::MessageType::ParameterValuesReport,
+                     EventActionService::MessageType::EventActionStatusReport};
+uint8_t reports2[] = {StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport,
+                      ParameterService::MessageType::ParameterValuesReport,
+                      EventReportService::MessageType::InformativeEventReport,
+                      StorageAndRetrievalService::MessageType::AppConfigurationContentReport};
 
 void initializeAppProcessConfiguration(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool makeSame) {
-	uint16_t numOfApplications = 2;
+	uint8_t numOfApplications = 2;
 
-	typedef etl::vector<uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
-	typedef etl::map<uint16_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
+	typedef etl::map<uint8_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
 	etl::map<uint16_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
 
 	auto& configuration = packetSelection.applicationProcessConfiguration.definitions[packetStoreId];
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = apps[i];
-		uint16_t numOfServices = 2;
+		uint8_t applicationId = apps[i];
+		uint8_t numOfServices = 2;
 
 		for (int j = 0; j < numOfServices; j++) {
-			uint16_t serviceId = services[i][j];
+			uint8_t serviceId = services[i][j];
 			uint16_t numOfMessageTypes = 4;
 			if (makeSame) {
 				numOfMessageTypes = 3;
 			}
 
 			for (int k = 0; k < numOfMessageTypes; k++) {
-				uint16_t messageType = 0;
+				uint8_t messageType = 0;
 				if (makeSame) {
 					messageType = reports[k];
 				} else {
@@ -95,22 +101,22 @@ void initializeAppProcessConfiguration(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& pa
 }
 
 Message buildRequest(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool isDeletionRequest) {
-	uint16_t numOfApplications = 2;
+	uint8_t numOfApplications = 2;
 
-	typedef etl::vector<uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
-	typedef etl::map<uint16_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
-	etl::map<uint16_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
+	typedef etl::map<uint8_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
+	etl::map<uint8_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = apps[i];
-		uint16_t numOfServices = 2;
+		uint8_t applicationId = apps[i];
+		uint8_t numOfServices = 2;
 
 		for (int j = 0; j < numOfServices; j++) {
-			uint16_t serviceId = services[i][j];
+			uint8_t serviceId = services[i][j];
 			uint16_t numOfMessageTypes = 3;
 
 			for (int k = 0; k < numOfMessageTypes; k++) {
-				uint16_t messageType = reports[k];
+				uint8_t messageType = reports[k];
 				applicationDefinitions[applicationId][serviceId].push_back(messageType);
 			}
 		}
@@ -123,18 +129,18 @@ Message buildRequest(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool 
 	Message request(StorageAndRetrievalService::ServiceType, messageType, Message::TC, 1);
 
 	request.appendOctetString(packetStoreId);
-	request.appendUint16(applicationDefinitions.size());
+	request.appendUint8(applicationDefinitions.size());
 
 	for (auto& applicationDefinition : applicationDefinitions) {
-		request.appendUint16(applicationDefinition.first);
-		request.appendUint16(applicationDefinition.second.size());
+		request.appendUint8(applicationDefinition.first);
+		request.appendUint8(applicationDefinition.second.size());
 
 		for (auto& serviceDefinition : applicationDefinition.second) {
-			request.appendUint16(serviceDefinition.first);
+			request.appendUint8(serviceDefinition.first);
 			request.appendUint16(serviceDefinition.second.size());
 
-			for (auto& reportDefinition : serviceDefinition.second) {
-				request.appendUint16(reportDefinition);
+			for (auto reportDefinition : serviceDefinition.second) {
+				request.appendUint8(reportDefinition);
 			}
 		}
 	}
@@ -146,18 +152,18 @@ Message buildRequest(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId, bool 
 }
 
 Message buildReportTypeAdditionRequest2(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
-	uint16_t numOfApplications = 2;
+	uint8_t numOfApplications = 2;
 
-	typedef etl::vector<uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
-	typedef etl::map<uint16_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
-	etl::map<uint16_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
+	typedef etl::map<uint8_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
+	etl::map<uint8_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = apps[i];
-		uint16_t numOfServices = 2;
+		uint8_t applicationId = apps[i];
+		uint8_t numOfServices = 2;
 
 		for (int j = 0; j < numOfServices; j++) {
-			uint16_t serviceId = services[i][j];
+			uint8_t serviceId = services[i][j];
 			applicationDefinitions[applicationId][serviceId].clear();
 		}
 	}
@@ -166,14 +172,14 @@ Message buildReportTypeAdditionRequest2(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& p
 	                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration, Message::TC, 1);
 
 	request.appendOctetString(packetStoreId);
-	request.appendUint16(applicationDefinitions.size());
+	request.appendUint8(applicationDefinitions.size());
 
 	for (auto& applicationDefinition : applicationDefinitions) {
-		request.appendUint16(applicationDefinition.first);
-		request.appendUint16(applicationDefinition.second.size());
+		request.appendUint8(applicationDefinition.first);
+		request.appendUint8(applicationDefinition.second.size());
 
 		for (auto& serviceDefinition : applicationDefinition.second) {
-			request.appendUint16(serviceDefinition.first);
+			request.appendUint8(serviceDefinition.first);
 			request.appendUint16(serviceDefinition.second.size());
 		}
 	}
@@ -185,14 +191,14 @@ Message buildReportTypeAdditionRequest2(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& p
 }
 
 Message buildReportTypeAdditionRequest3(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& packetStoreId) {
-	uint16_t numOfApplications = 2;
+	uint8_t numOfApplications = 2;
 
-	typedef etl::vector<uint16_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
-	typedef etl::map<uint16_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
-	etl::map<uint16_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
+	typedef etl::vector<uint8_t, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS> reportTypes;
+	typedef etl::map<uint8_t, reportTypes, ECSS_MAX_SERVICE_TYPE_DEFINITIONS> serviceTypes;
+	etl::map<uint8_t, serviceTypes, ECSS_MAX_APPLICATION_PROCESS_DEFINITIONS> applicationDefinitions;
 
 	for (int i = 0; i < numOfApplications; i++) {
-		uint16_t applicationId = apps[i];
+		uint8_t applicationId = apps[i];
 		applicationDefinitions[applicationId].clear();
 	}
 
@@ -200,11 +206,11 @@ Message buildReportTypeAdditionRequest3(String<ECSS_MAX_PACKET_STORE_ID_SIZE>& p
 	                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration, Message::TC, 1);
 
 	request.appendOctetString(packetStoreId);
-	request.appendUint16(applicationDefinitions.size());
+	request.appendUint8(applicationDefinitions.size());
 
 	for (auto& applicationDefinition : applicationDefinitions) {
-		request.appendUint16(applicationDefinition.first);
-		request.appendUint16(applicationDefinition.second.size());
+		request.appendUint8(applicationDefinition.first);
+		request.appendUint8(applicationDefinition.second.size());
 	}
 
 	packetSelection.controlledApplications.push_back(0);
@@ -237,7 +243,9 @@ TEST_CASE("Adding report types to an application process configuration") {
 			REQUIRE(applicationId.second.serviceTypeDefinitions.size() == 2);
 
 			for (const auto& serviceId : applicationId.second.serviceTypeDefinitions) {
-				REQUIRE(serviceId.first == services[c1][c2]);
+				uint8_t targetServiceId = serviceId.first;
+				REQUIRE(std::find(std::begin(services[c1]), std::end(services[c1]), targetServiceId) !=
+				        std::end(services[c1]));
 				REQUIRE(serviceId.second.size() == 3);
 
 				for (auto reportId : serviceId.second) {
@@ -271,7 +279,9 @@ TEST_CASE("Adding report types to an application process configuration") {
 			REQUIRE(applicationId.second.serviceTypeDefinitions.size() == 2);
 
 			for (const auto& serviceId : applicationId.second.serviceTypeDefinitions) {
-				REQUIRE(serviceId.first == services[c1][c2]);
+				uint8_t targetServiceId = serviceId.first;
+				REQUIRE(std::find(std::begin(services[c1]), std::end(services[c1]), targetServiceId) !=
+				        std::end(services[c1]));
 				REQUIRE(serviceId.second.empty());
 				c2++;
 			}
@@ -318,9 +328,9 @@ TEST_CASE("Deleting report types from an application process configuration") {
 		REQUIRE(configuration[0].serviceTypeDefinitions.size() == 2);
 		REQUIRE(configuration[1].serviceTypeDefinitions.size() == 2);
 		REQUIRE(configuration[0].serviceTypeDefinitions[1].size() == 4);
-		REQUIRE(configuration[0].serviceTypeDefinitions[3].size() == 4);
-		REQUIRE(configuration[1].serviceTypeDefinitions[4].size() == 4);
-		REQUIRE(configuration[1].serviceTypeDefinitions[15].size() == 4);
+		REQUIRE(configuration[0].serviceTypeDefinitions[6].size() == 4);
+		REQUIRE(configuration[1].serviceTypeDefinitions[19].size() == 4);
+		REQUIRE(configuration[1].serviceTypeDefinitions[20].size() == 4);
 
 		auto request = buildRequest(packetStoreId, true);
 		packetSelection.deleteReportTypesFromAppProcessConfiguration(request);
@@ -332,11 +342,12 @@ TEST_CASE("Deleting report types from an application process configuration") {
 		REQUIRE(configuration[0].serviceTypeDefinitions.size() == 2);
 		REQUIRE(configuration[1].serviceTypeDefinitions.size() == 2);
 		REQUIRE(configuration[0].serviceTypeDefinitions[1].size() == 2);
-		REQUIRE(configuration[0].serviceTypeDefinitions[3].size() == 2);
-		REQUIRE(configuration[1].serviceTypeDefinitions[4].size() == 2);
-		REQUIRE(configuration[1].serviceTypeDefinitions[15].size() == 2);
+		REQUIRE(configuration[0].serviceTypeDefinitions[6].size() == 2);
+		REQUIRE(configuration[1].serviceTypeDefinitions[19].size() == 2);
+		REQUIRE(configuration[1].serviceTypeDefinitions[20].size() == 2);
 
-		uint16_t expectedReportTypes[] = {35, 7};
+		uint8_t expectedReportTypes[] = {EventReportService::MessageType::InformativeEventReport,
+		                                 StorageAndRetrievalService::MessageType::AppConfigurationContentReport};
 
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
@@ -363,9 +374,9 @@ TEST_CASE("Deleting report types from an application process configuration") {
 		REQUIRE(configuration[0].serviceTypeDefinitions.size() == 2);
 		REQUIRE(configuration[1].serviceTypeDefinitions.size() == 2);
 		REQUIRE(configuration[0].serviceTypeDefinitions[1].size() == 3);
-		REQUIRE(configuration[0].serviceTypeDefinitions[3].size() == 3);
-		REQUIRE(configuration[1].serviceTypeDefinitions[4].size() == 3);
-		REQUIRE(configuration[1].serviceTypeDefinitions[15].size() == 3);
+		REQUIRE(configuration[0].serviceTypeDefinitions[6].size() == 3);
+		REQUIRE(configuration[1].serviceTypeDefinitions[19].size() == 3);
+		REQUIRE(configuration[1].serviceTypeDefinitions[20].size() == 3);
 
 		auto request = buildRequest(packetStoreId, true);
 		packetSelection.deleteReportTypesFromAppProcessConfiguration(request);
@@ -399,33 +410,36 @@ TEST_CASE("Reporting of the application process configuration content") {
 		report.readOctetString(data);
 		uint8_t expectedData[ECSS_MAX_PACKET_STORE_ID_SIZE] = "ps2";
 
-		REQUIRE(std::equal(std::begin(data), std::end(data), std::begin(expectedData)));
-		REQUIRE(report.readUint16() == 2);  //Number of applications
-		REQUIRE(report.readUint16() == 0);  //App-1
-		REQUIRE(report.readUint16() == 2);  //Number of services
-		REQUIRE(report.readUint16() == 1);  //Service-1
-		REQUIRE(report.readUint16() == 3);  //Number of reports
-		REQUIRE(report.readUint16() == 5);  //Report-1
-		REQUIRE(report.readUint16() == 13); //Report-2
-		REQUIRE(report.readUint16() == 21); //Report-3
-		REQUIRE(report.readUint16() == 3);  //Service-2
-		REQUIRE(report.readUint16() == 3);  //Number of reports
-		REQUIRE(report.readUint16() == 5);
-		REQUIRE(report.readUint16() == 13);
-		REQUIRE(report.readUint16() == 21);
+		uint8_t services343[2][2] = {{EventActionService::ServiceType, ParameterService::ServiceType},
+		                             {MemoryManagementService::ServiceType, RequestVerificationService::ServiceType}};
 
-		REQUIRE(report.readUint16() == 1);  //App-2
-		REQUIRE(report.readUint16() == 2);  //Number of services
-		REQUIRE(report.readUint16() == 4);  //Service-1
-		REQUIRE(report.readUint16() == 3);  //Number of reports
-		REQUIRE(report.readUint16() == 5);  //Report-1
-		REQUIRE(report.readUint16() == 13); //Report-2
-		REQUIRE(report.readUint16() == 21); //Report-3
-		REQUIRE(report.readUint16() == 15); //Service-2
-		REQUIRE(report.readUint16() == 3);  //Number of reports
-		REQUIRE(report.readUint16() == 5);
-		REQUIRE(report.readUint16() == 13);
-		REQUIRE(report.readUint16() == 21);
+		REQUIRE(std::equal(std::begin(data), std::end(data), std::begin(expectedData)));
+		REQUIRE(report.readUint8() == 2); // Number of applications
+		REQUIRE(report.readUint8() == 0); // App-1
+		REQUIRE(report.readUint8() == 2); // Number of services
+		REQUIRE(report.readUint8() == RequestVerificationService::ServiceType); // Service-1
+		REQUIRE(report.readUint16() == 3); // Number of reports
+		REQUIRE(report.readEnum8() == StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport);
+		REQUIRE(report.readEnum8() == ParameterService::MessageType::ParameterValuesReport);
+		REQUIRE(report.readEnum8() == EventActionService::MessageType::EventActionStatusReport);
+		REQUIRE(report.readUint8() == MemoryManagementService::ServiceType); // Service-2
+		REQUIRE(report.readUint16() == 3); // Number of reports
+		REQUIRE(report.readEnum8() == StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport);
+		REQUIRE(report.readEnum8() == ParameterService::MessageType::ParameterValuesReport);
+		REQUIRE(report.readEnum8() == EventActionService::MessageType::EventActionStatusReport);
+
+		REQUIRE(report.readUint8() == 1); // App-2
+		REQUIRE(report.readUint8() == 2); // Number of services
+		REQUIRE(report.readUint8() == EventActionService::ServiceType); // Service-1
+		REQUIRE(report.readUint16() == 3); // Number of reports
+		REQUIRE(report.readEnum8() == StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport);
+		REQUIRE(report.readEnum8() == ParameterService::MessageType::ParameterValuesReport);
+		REQUIRE(report.readEnum8() == EventActionService::MessageType::EventActionStatusReport);
+		REQUIRE(report.readUint8() == ParameterService::ServiceType); // Service-2
+		REQUIRE(report.readUint16() == 3); // Number of reports
+		REQUIRE(report.readEnum8() == StorageAndRetrievalService::MessageType::EventReportConfigurationContentReport);
+		REQUIRE(report.readEnum8() == ParameterService::MessageType::ParameterValuesReport);
+		REQUIRE(report.readEnum8() == EventActionService::MessageType::EventActionStatusReport);
 
 		ServiceTests::reset();
 		Services.reset();
