@@ -401,4 +401,25 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ParameterMonitoringListIsFull) == 1);
 		clearAllMaps();
 	}
+
+	SECTION("Parameter Monitoring Definition already exists"){
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 0;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendUint16(PMONId);
+		MessageParser::execute(request);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddAlreadyExistingParameter) == 1);
+		clearAllMaps();
+	}
 }
