@@ -35,13 +35,13 @@ TEST_CASE("TimeStamp class construction") {
 	SECTION("Check TAI idempotence") {
 		int input_time = 1000;
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(input_time);
-		REQUIRE(Epoch.as_TAI_seconds() == input_time); // check initialization has intended effect
+		REQUIRE(Epoch.asTAIseconds() == input_time); // check initialization has intended effect
 	}
 
 	SECTION("Check CUC idempotence") {
 		etl::array<uint8_t, 9> input_time1 = {0b00100110, 0, 1, 1, 3, 0, 0, 0, 0};
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch1(input_time1);
-		etl::array<uint8_t, 9> test_return1 = Epoch1.as_CUC_timestamp();
+		etl::array<uint8_t, 9> test_return1 = Epoch1.toCUCtimestamp();
 
 		for (auto i = 0; i < 9; i++) {
 			bool test = input_time1[i] == test_return1[i];
@@ -50,7 +50,7 @@ TEST_CASE("TimeStamp class construction") {
 
 		etl::array<uint8_t, 9> input_time2 = {0b10101101, 0b10100000, 218, 103, 11, 0, 3, 23, 0};
 		TimeStamp<5, 1> Epoch2(input_time2);
-		etl::array<uint8_t, 9> test_return2 = Epoch2.as_CUC_timestamp();
+		etl::array<uint8_t, 9> test_return2 = Epoch2.toCUCtimestamp();
 
 		for (auto i = 0; i < 9; i++) {
 			bool test = input_time2[i] == test_return2[i];
@@ -59,7 +59,7 @@ TEST_CASE("TimeStamp class construction") {
 
 		etl::array<uint8_t, 9> input_time3 = {0b10100011, 0b10001100, 218, 103, 11, 0, 3, 23, 2};
 		TimeStamp<1, 6> Epoch3(input_time3);
-		etl::array<uint8_t, 9> test_return3 = Epoch3.as_CUC_timestamp();
+		etl::array<uint8_t, 9> test_return3 = Epoch3.toCUCtimestamp();
 
 		for (auto i = 0; i < 9; i++) {
 			bool test = input_time3[i] == test_return3[i];
@@ -71,14 +71,14 @@ TEST_CASE("TimeStamp class construction") {
 		{
 			UTCTimestamp timestamp1(2020, 4, 10, 10, 15, 0); // 10 Apr 2020, 10:15:00;
 			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-			UTCTimestamp timestamp2 = Epoch.as_UTC_timestamp();
+			UTCTimestamp timestamp2 = Epoch.toUTCtimestamp();
 			bool cond = (timestamp2 == timestamp1);
 			REQUIRE(cond);
 		}
 		{
 			UTCTimestamp timestamp1(2035, 1, 1, 0, 0, 1); // 1 Jan 2035 midnight passed;
 			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-			UTCTimestamp timestamp2 = Epoch.as_UTC_timestamp();
+			UTCTimestamp timestamp2 = Epoch.toUTCtimestamp();
 			bool cond = (timestamp2 == timestamp1);
 			REQUIRE(cond);
 		}
@@ -88,12 +88,12 @@ TEST_CASE("TimeStamp class construction") {
 		{
 			UTCTimestamp timestamp1(2020, 12, 5, 0, 0, 0); // 5 Dec 2020, midnight;
 			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-			REQUIRE(Epoch.as_TAI_seconds() == 1607126400);
+			REQUIRE(Epoch.asTAIseconds() == 1607126400);
 		}
 		{
 			UTCTimestamp timestamp1(2020, 2, 29, 0, 0, 0); // 5 Dec 2020, midnight;
 			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-			REQUIRE(Epoch.as_TAI_seconds() == 1582934400);
+			REQUIRE(Epoch.asTAIseconds() == 1582934400);
 		}
 	}
 
