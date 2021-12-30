@@ -390,7 +390,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		request.appendUint16(PMONId);
-		MessageParser::execute(request);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -411,7 +410,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		request.appendUint16(PMONId);
-		MessageParser::execute(request);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -421,5 +419,66 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddAlreadyExistingParameter) == 1);
 		clearAllMaps();
+	}
+
+	SECTION("High limit is lower than low limit"){
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 0;
+		uint16_t monitoredParameterId = 0;
+		uint16_t repetitionNumber = 5;
+		uint16_t lowLimit = 8;
+		uint16_t highLimit = 2;
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendUint16(PMONId);
+		request.appendUint16(monitoredParameterId);
+		request.appendUint16(repetitionNumber);
+		request.appendEnum8(onBoardMonitoringService.LimitCheck);
+		request.appendUint16(lowLimit);
+		request.appendEnum8(onBoardMonitoringService.BelowLowLimitEvent);
+		request.appendUint16(highLimit);
+		request.appendEnum8(onBoardMonitoringService.AboveHighLimitEvent);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
+	}
+
+	SECTION("High threshold is lower than low threshold"){
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 0;
+		uint16_t monitoredParameterId = 0;
+		uint16_t repetitionNumber = 5;
+		uint16_t lowDeltaThreshold = 8;
+		uint16_t highDeltaThreshold = 2;
+		uint16_t numberOfConsecutiveDeltaChecks = 5;
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendUint16(PMONId);
+		request.appendUint16(monitoredParameterId);
+		request.appendUint16(repetitionNumber);
+		request.appendEnum8(onBoardMonitoringService.DeltaCheck);
+		request.appendUint16(lowDeltaThreshold);
+		request.appendEnum8(onBoardMonitoringService.BelowLowThresholdEvent);
+		request.appendUint16(highDeltaThreshold);
+		request.appendEnum8(onBoardMonitoringService.AboveHighThresholdEvent);
+		request.appendUint16(numberOfConsecutiveDeltaChecks);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
 	}
 }
