@@ -14,6 +14,7 @@ void initialiseParameterMonitoringDefinitions() {
 	Parameter<uint32_t> parameter3 = Parameter<uint32_t>(9);
 
 	onBoardMonitoringService.parameterMonitoringFunctionStatus = true;
+	onBoardMonitoringService.maximumTransitionReportingDelay = 0;
 
 	onBoardMonitoringService.RepetitionNumber.insert({parameter1, 10});
 	onBoardMonitoringService.RepetitionNumber.insert({parameter2, 2});
@@ -204,4 +205,20 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		          ->second == OnBoardMonitoringService::Unchecked);
 		clearAllMaps();
 	}
+}
+
+TEST_CASE("Change Maximum Transition Reporting Delay"){
+	initialiseParameterMonitoringDefinitions();
+	Message request =
+		Message(OnBoardMonitoringService::ServiceType,
+			OnBoardMonitoringService::MessageType::ChangeMaximumTransitionReportingDelay, Message::TC, 0);
+	uint16_t newMaximumTransitionReportingDelay = 10;
+	request.appendUint16(newMaximumTransitionReportingDelay);
+	MessageParser::execute(request);
+	CHECK(ServiceTests::count() == 1);
+
+	Message report = ServiceTests::get(0);
+	CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+	CHECK(report.messageType == OnBoardMonitoringService::MessageType::ChangeMaximumTransitionReportingDelay);
+	CHECK(onBoardMonitoringService.maximumTransitionReportingDelay == newMaximumTransitionReportingDelay);
 }
