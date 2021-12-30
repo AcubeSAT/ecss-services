@@ -207,11 +207,11 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 	}
 }
 
-TEST_CASE("Change Maximum Transition Reporting Delay"){
+TEST_CASE("Change Maximum Transition Reporting Delay") {
 	initialiseParameterMonitoringDefinitions();
 	Message request =
-		Message(OnBoardMonitoringService::ServiceType,
-			OnBoardMonitoringService::MessageType::ChangeMaximumTransitionReportingDelay, Message::TC, 0);
+	    Message(OnBoardMonitoringService::ServiceType,
+	            OnBoardMonitoringService::MessageType::ChangeMaximumTransitionReportingDelay, Message::TC, 0);
 	uint16_t newMaximumTransitionReportingDelay = 10;
 	request.appendUint16(newMaximumTransitionReportingDelay);
 	MessageParser::execute(request);
@@ -221,4 +221,37 @@ TEST_CASE("Change Maximum Transition Reporting Delay"){
 	CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 	CHECK(report.messageType == OnBoardMonitoringService::MessageType::ChangeMaximumTransitionReportingDelay);
 	CHECK(onBoardMonitoringService.maximumTransitionReportingDelay == newMaximumTransitionReportingDelay);
+}
+
+TEST_CASE("Delete all Parameter Monitoring Definitions") {
+	SECTION("Valid request to delete all Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		onBoardMonitoringService.parameterMonitoringFunctionStatus = false;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions);
+		CHECK(onBoardMonitoringService.ParameterMonitoringList.empty());
+		CHECK(onBoardMonitoringService.CheckTransitionList.empty());
+	}
+	SECTION("Invalid request to delete all Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError) == 1);
+		CHECK(!onBoardMonitoringService.ParameterMonitoringList.empty());
+		CHECK(!onBoardMonitoringService.CheckTransitionList.empty());
+	}
 }
