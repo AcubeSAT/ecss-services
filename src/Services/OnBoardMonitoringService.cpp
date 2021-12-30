@@ -63,7 +63,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	// TODO: Undertand error types 6.12.3.9.1.e.3-4.
 	// TODO: Evaluate if the optional values in TC[12,5] are going to be used.
 	uint16_t numberOfIds = message.readUint16();
-	ParameterService parameterService;
+	ParameterService parameterService = ParameterService();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		uint16_t currentPMONId = message.readUint16();
 		uint16_t currentParameterId = message.readUint16();
@@ -85,7 +85,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						if (highLimit <= lowLimit) {
 							ErrorHandler::reportError(
 							    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
-							return;
+							break;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
 						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
@@ -120,7 +120,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						if (highDeltaThreshold <= lowDeltaThreshold) {
 							ErrorHandler::reportError(
 							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
-							return;
+							break;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
 						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
@@ -161,7 +161,7 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
 	uint16_t numberOfIds = message.readUint16();
-	ParameterService parameterService;
+	ParameterService parameterService = ParameterService();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		uint16_t currentPMONId = message.readUint16();
 		uint16_t currentParameterId = message.readUint16();
@@ -180,7 +180,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 						if (highLimit <= lowLimit) {
 							ErrorHandler::reportError(
 							    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
-							return;
+							break;
 						}
 						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
 						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
@@ -247,7 +247,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 						if (highDeltaThreshold <= lowDeltaThreshold) {
 							ErrorHandler::reportError(
 							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
-							return;
+							break;
 						}
 						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
 						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
@@ -359,7 +359,7 @@ void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
 void OnBoardMonitoringService::outOfLimitsReport() {
 	Message outOfLimitsReport(ServiceType, MessageType::OutOfLimitsReport, Message::TM, 0);
 	// TODO: Find a way to calculate the transitions to be reported before getting in the loop.
-	ParameterService parameterService;
+	ParameterService parameterService = ParameterService();
 	outOfLimitsReport.appendUint16(CheckTransitionList.size());
 	for (auto& transition : CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
@@ -466,7 +466,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 void OnBoardMonitoringService::checkTransitionReport() {
 	Message checkTransitionReport(ServiceType, CheckTransitionReport, Message::TM, 0);
 	checkTransitionReport.appendUint16(CheckTransitionList.size());
-	ParameterService parameterService;
+	ParameterService parameterService = ParameterService();
 	for (auto& transition : CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
 			checkTransitionReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
