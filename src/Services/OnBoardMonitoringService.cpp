@@ -63,13 +63,11 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	// TODO: Undertand error types 6.12.3.9.1.e.3-4.
 	// TODO: Evaluate if the optional values in TC[12,5] are going to be used.
 	uint16_t numberOfIds = message.readUint16();
-	// TODO: Move the initialisation of all values out of the loop.
 	ParameterService parameterService;
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		uint16_t currentPMONId = message.readUint16();
 		uint16_t currentParameterId = message.readUint16();
 		uint16_t currentParameterRepetitionNumber = message.readUint16();
-		// TODO: Find out how to handle enumerated values.
 		uint16_t currentCheckType = message.readEnum8();
 		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end()) {
 			if (ParameterMonitoringList.full()) {
@@ -100,6 +98,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						                                aboveHighLimitEventId};
 						LimitCheckParameters.insert({parameterToBeAdded->get(), limitCheck});
 					} else if (currentCheckType == ExpectedValueCheck) {
+						//TODO: Find out how to read bit string.
 						uint8_t mask = message.readUint8();
 						uint8_t expectedValue = message.readUint8();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
