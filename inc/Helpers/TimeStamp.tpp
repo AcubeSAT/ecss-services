@@ -8,12 +8,16 @@
 
 #include <cmath>
 
+template <uint8_t secondsBytes, uint8_t fractionalBytes>
+constexpr bool TimeStamp<secondsBytes, fractionalBytes>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
+	constexpr uint64_t maxSecondCounterValue = (1U << secondsBytes) - 1;
+
+	return seconds < maxSecondCounterValue;
+}
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes>
 TimeStamp<secondsBytes, fractionalBytes>::TimeStamp(int taiSecondsFromEpoch) {
-	constexpr uint64_t maxSecondCounterValue = (1U << secondsBytes) - 1;
-	ASSERT_INTERNAL(taiSecondsFromEpoch < maxSecondCounterValue,
-	                ErrorHandler::InternalErrorType::InvalidTimeStampInput);
+	ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)),ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 
 	taiCounter = static_cast<TAICounter_t>(taiSecondsFromEpoch) << 8 * fractionalBytes;
 }

@@ -39,6 +39,13 @@ private:
 	 */
 	static constexpr CUCHeader_t CUCHeader = Time::buildCUCHeader<CUCHeader_t, secondsBytes, fractionalBytes>();
 
+	/**
+	 * Returns whether the amount of @ref seconds can be represented by this TimeStamp.
+	 * If @ref seconds is too large, the number of @ref secondsByte may not be enough to represent this timestamp.
+	 *
+	 * @param seconds The amount of seconds from \ref Epoch
+	 */
+	static constexpr bool areSecondsValid(TAICounter_t seconds);
 public:
 	/**
 	 * Initialize the TimeStamp at \ref Epoch
