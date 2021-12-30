@@ -54,6 +54,7 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 	} else {
 		//TODO: Check if all the maps need to be cleared.
 		ParameterMonitoringList.clear();
+		ParameterMonitoringIds.clear();
 		CheckTransitionList.clear();
 	}
 }
@@ -147,11 +148,13 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, DeleteParameterMonitoringDefinitions);
 	uint16_t numberOfIds = message.readUint16();
 	uint16_t currentPMONId = message.readUint16();
+	//TODO: Check if the PMON definition needs to be erased from all maps.
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end() ||
 		    ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentPMONId)->second)->second) {
 			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinitionError);
 		} else {
+			ParameterMonitoringIds.erase(ParameterMonitoringList.at(currentPMONId));
 			ParameterMonitoringList.erase(currentPMONId);
 		}
 		currentPMONId = message.readUint16();
