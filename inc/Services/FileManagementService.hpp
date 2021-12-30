@@ -34,8 +34,7 @@ extern "C" {
  */
 
 
-// Global lfs struct
-lfs_t fs1;
+
 
 class FileManagementService : public Service {
 private:

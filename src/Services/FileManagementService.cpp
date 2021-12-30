@@ -6,6 +6,8 @@
 #include "etl/vector.h"
 #include "../../lib/littlefs/lfs.h"
 
+// Global lfs struct
+lfs_t fs1;
 
 #define REPOSITORY_SUMMARY_REPORT_MAX_OBJECTS 4096
 
