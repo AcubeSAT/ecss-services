@@ -52,6 +52,7 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 		    message,
 		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError);
 	} else {
+		//TODO: Check if all the maps need to be cleared.
 		ParameterMonitoringList.clear();
 		CheckTransitionList.clear();
 	}
