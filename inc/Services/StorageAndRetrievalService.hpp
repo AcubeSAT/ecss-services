@@ -68,7 +68,7 @@ private:
 	 * @note Its functionality is indirectly tested in the test case named 'Reporting the content summary of packet
 	 * stores'.
 	 */
-	void createContentSummary(Message& report, String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+	void createContentSummary(Message& report, const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
 
 public:
 	inline static const uint8_t ServiceType = 15;
