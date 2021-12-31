@@ -105,7 +105,7 @@ public:
 	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
 
 	/**
-	 * @brief The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
+	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
 	 */
 	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
 
