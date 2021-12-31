@@ -15,8 +15,36 @@ void StorageAndRetrievalService::deleteContentUntil(const String<ECSSMaxPacketSt
 	}
 }
 
-void StorageAndRetrievalService::copyFromTagToTag(const PacketStore& source, PacketStore& target, uint32_t startTime,
-                                                  uint32_t endTime) {
+void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
+	uint32_t startTime = request.readUint32();
+	uint32_t endTime = request.readUint32();
+
+	auto fromPacketStoreId = readPacketStoreId(request);
+	auto toPacketStoreId = readPacketStoreId(request);
+
+	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
+	    packetStores.find(toPacketStoreId) == packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (startTime >= endTime) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
+		return;
+	}
+	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+		return;
+	}
+
+	const auto& source = packetStores[fromPacketStoreId];
+	auto& target = packetStores[toPacketStoreId];
+
+	if (endTime < source.storedTelemetryPackets.front().first ||
+	    startTime > source.storedTelemetryPackets.back().first) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
+		return;
+	}
+
 	for (auto& packet : source.storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
@@ -28,7 +56,30 @@ void StorageAndRetrievalService::copyFromTagToTag(const PacketStore& source, Pac
 	}
 }
 
-void StorageAndRetrievalService::copyAfterTimeTag(const PacketStore& source, PacketStore& target, uint32_t startTime) {
+void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
+	uint32_t startTime = request.readUint32();
+
+	auto fromPacketStoreId = readPacketStoreId(request);
+	auto toPacketStoreId = readPacketStoreId(request);
+
+	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
+	    packetStores.find(toPacketStoreId) == packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+		return;
+	}
+
+	const auto& source = packetStores[fromPacketStoreId];
+	auto& target = packetStores[toPacketStoreId];
+
+	if (startTime > source.storedTelemetryPackets.back().first) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
+		return;
+	}
+
 	for (auto& packet : source.storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
@@ -37,7 +88,30 @@ void StorageAndRetrievalService::copyAfterTimeTag(const PacketStore& source, Pac
 	}
 }
 
-void StorageAndRetrievalService::copyBeforeTimeTag(const PacketStore& source, PacketStore& target, uint32_t endTime) {
+void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
+	uint32_t endTime = request.readUint32();
+
+	auto fromPacketStoreId = readPacketStoreId(request);
+	auto toPacketStoreId = readPacketStoreId(request);
+
+	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
+	    packetStores.find(toPacketStoreId) == packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return;
+	}
+	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+		return;
+	}
+
+	const auto& source = packetStores[fromPacketStoreId];
+	auto& target = packetStores[toPacketStoreId];
+
+	if (endTime < source.storedTelemetryPackets.front().first) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
+		return;
+	}
+
 	for (auto& packet : source.storedTelemetryPackets) {
 		if (packet.first > endTime) {
 			break;
@@ -46,34 +120,34 @@ void StorageAndRetrievalService::copyBeforeTimeTag(const PacketStore& source, Pa
 	}
 }
 
-bool StorageAndRetrievalService::copyPacketsFrom(const PacketStore& source, PacketStore& target, uint32_t startTime,
-                                                 uint32_t endTime, TimeWindowType timeWindow) {
-	switch (timeWindow) {
-		case FromTagToTag:
-			if (endTime < source.storedTelemetryPackets.front().first ||
-			    startTime > source.storedTelemetryPackets.back().first) {
-				return false;
-			}
-			copyFromTagToTag(source, target, startTime, endTime);
-			break;
-		case AfterTimeTag:
-			if (startTime > source.storedTelemetryPackets.back().first) {
-				return false;
-			}
-			copyAfterTimeTag(source, target, startTime);
-			break;
-		case BeforeTimeTag:
-			if (endTime < source.storedTelemetryPackets.front().first) {
-				return false;
-			}
-			copyBeforeTimeTag(source, target, endTime);
-			break;
-		default:
-			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidTimeWindowType);
-			return false;
-	}
-	return true;
-}
+// bool StorageAndRetrievalService::copyPacketsFrom(const PacketStore& source, PacketStore& target, uint32_t startTime,
+//                                                  uint32_t endTime, TimeWindowType timeWindow) {
+//	switch (timeWindow) {
+//		case FromTagToTag:
+//			if (endTime < source.storedTelemetryPackets.front().first ||
+//			    startTime > source.storedTelemetryPackets.back().first) {
+//				return false;
+//			}
+//			copyFromTagToTag(source, target, startTime, endTime);
+//			break;
+//		case AfterTimeTag:
+//			if (startTime > source.storedTelemetryPackets.back().first) {
+//				return false;
+//			}
+//			copyAfterTimeTag(source, target, startTime);
+//			break;
+//		case BeforeTimeTag:
+//			if (endTime < source.storedTelemetryPackets.front().first) {
+//				return false;
+//			}
+//			copyBeforeTimeTag(source, target, endTime);
+//			break;
+//		default:
+//			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidTimeWindowType);
+//			return false;
+//	}
+//	return true;
+// }
 
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
@@ -525,33 +599,23 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 	storeMessage(report);
 }
 
-void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request, TimeWindowType timeWindow) {
+void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
 	request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow);
 
-	request.skipBytes(2);
-	//	uint16_t timeTagsTypeCode = request.readUint16();
-	//	TimeStamping timeTagsType = (!timeTagsTypeCode) ? StorageBased : PacketBased; //todo: actually figure out
-	uint32_t timeTag1 = request.readUint32();
-	uint32_t timeTag2 = request.readUint32();
-	auto fromPacketStoreId = readPacketStoreId(request);
-	auto toPacketStoreId = readPacketStoreId(request);
-
-	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
-	    packetStores.find(toPacketStoreId) == packetStores.end()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-		return;
-	}
-	if (timeWindow == FromTagToTag and timeTag1 >= timeTag2) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
-		return;
-	}
-	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
-		return;
-	}
-	if (not copyPacketsFrom(packetStores[fromPacketStoreId], packetStores[toPacketStoreId], timeTag1, timeTag2,
-	                        timeWindow)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
+	uint8_t typeOfTimeWindow = request.readEnum8();
+	switch (typeOfTimeWindow) {
+		case FromTagToTag:
+			copyFromTagToTag(request);
+			break;
+		case AfterTimeTag:
+			copyAfterTimeTag(request);
+			break;
+		case BeforeTimeTag:
+			copyBeforeTimeTag(request);
+			break;
+		default:
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
+			break;
 	}
 }
 
@@ -717,7 +781,7 @@ void StorageAndRetrievalService::execute(Message& request) {
 			packetStoreConfigurationReport(request);
 			break;
 		case CopyPacketsInTimeWindow:
-			copyPacketsInTimeWindow(request, timeWindowType);
+			copyPacketsInTimeWindow(request);
 			break;
 		case ResizePacketStores:
 			resizePacketStores(request);

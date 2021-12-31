@@ -2163,13 +2163,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 0;
 		uint32_t timeTag2 = 1;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2207,13 +2207,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 0;
 		uint32_t timeTag2 = 4;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2254,13 +2254,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 35;
 		uint32_t timeTag2 = 52;
 		auto fromPacketStoreId = packetStoreIds[3];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2301,13 +2301,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 3;
 		uint32_t timeTag2 = 27;
 		auto fromPacketStoreId = packetStoreIds[1];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2329,7 +2329,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 
 	SECTION("Both time-tags larger than largest stored time-tag") {
 		/**
-		 * CASE 0:
+		 * CASE 4:
 		 *
 		 * 	(earliest packet timestamp)-----(..more packets..)-----(latest packet timestamp)-----(tag1)-------(tag2)
 		 *   left-most packet in deque	     tag2 somewhere inside   right-most packet in deque
@@ -2348,13 +2348,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 12;
 		uint32_t timeTag2 = 14;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2387,13 +2387,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 3;
 		uint32_t timeTag2 = 27;
 		auto fromPacketStoreId = wrongPacketStoreIds[0];
 		auto toPacketStoreId = correctPacketStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2424,13 +2424,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 26;
 		uint32_t timeTag2 = 17;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2459,13 +2459,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 3;
 		uint32_t timeTag2 = 7;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2495,13 +2495,13 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		uint32_t timeTag1 = 0;
 		uint32_t timeTag2 = 3;
 		auto fromPacketStoreId = packetStoreIds[3];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
@@ -2534,19 +2534,16 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
 		uint32_t timeTag1 = 6;
-		uint32_t timeTag2 = 0;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
 		request.appendOctetString(toPacketStoreId);
 
-		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::AfterTimeTag;
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
@@ -2581,19 +2578,16 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
 		uint32_t timeTag1 = 1;
-		uint32_t timeTag2 = 0;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
 		request.appendOctetString(toPacketStoreId);
 
-		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::AfterTimeTag;
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
@@ -2626,19 +2620,16 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
 		uint32_t timeTag1 = 25;
-		uint32_t timeTag2 = 0;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
 		request.appendOctetString(toPacketStoreId);
 
-		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::AfterTimeTag;
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
@@ -2667,19 +2658,16 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
-		uint32_t timeTag1 = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
 		uint32_t timeTag2 = 6;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
-		request.appendUint32(timeTag1);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
 		request.appendOctetString(toPacketStoreId);
 
-		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::BeforeTimeTag;
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
@@ -2714,19 +2702,16 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
-		uint32_t timeTag1 = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
 		uint32_t timeTag2 = 56;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
-		request.appendUint32(timeTag1);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
 		request.appendOctetString(toPacketStoreId);
 
-		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::BeforeTimeTag;
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
@@ -2759,19 +2744,16 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
-		uint16_t timeType = 0;
-		uint32_t timeTag1 = 0;
+		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
 		uint32_t timeTag2 = 1;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
-		request.appendUint16(timeType);
-		request.appendUint32(timeTag1);
+		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
 		request.appendOctetString(fromPacketStoreId);
 		request.appendOctetString(toPacketStoreId);
 
-		storageAndRetrieval.timeWindowType = StorageAndRetrievalService::BeforeTimeTag;
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);

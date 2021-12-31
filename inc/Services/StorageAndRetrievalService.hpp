@@ -44,33 +44,22 @@ private:
 	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
 
 	/**
-	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
-	 * store.
-	 *
-	 * @return true if the copy of packets was successful, false otherwise.
-	 *
-	 * @todo: may needs to be template, depending on the timestamping type.
-	 */
-	bool copyPacketsFrom(const PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime,
-	                     TimeWindowType timeWindow);
-
-	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
 	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
 	 */
-	void copyFromTagToTag(const PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime);
+	void copyFromTagToTag(Message& request);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
 	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
 	 */
-	void copyAfterTimeTag(const PacketStore& source, PacketStore& target, uint32_t startTime);
+	void copyAfterTimeTag(Message& request);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
 	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
 	 */
-	void copyBeforeTimeTag(const PacketStore& source, PacketStore& target, uint32_t endTime);
+	void copyBeforeTimeTag(Message& request);
 
 	/**
 	 * Forms the content summary of the specified packet-store and appends it to a report message.
@@ -127,11 +116,6 @@ public:
 	 * @brief Support for the by-time-range retrieval of packets.
 	 */
 	const bool supportsByTimeRangeRetrieval = true;
-
-	/**
-	 * @brief The type of the time window in which the retrieval shall occur.
-	 */
-	TimeWindowType timeWindowType = FromTagToTag;
 
 	/**
 	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
@@ -209,7 +193,7 @@ public:
 	/**
 	 * TC[15,24] copy the packets contained into a packet store, selected by the time window
 	 */
-	void copyPacketsInTimeWindow(Message& request, TimeWindowType timeWindow);
+	void copyPacketsInTimeWindow(Message& request);
 
 	/**
 	 * TC[15,25] resize packet stores
