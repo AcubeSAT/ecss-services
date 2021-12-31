@@ -12,7 +12,7 @@
 #include "Services/EventActionService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
-//#include "Services/FileManagementService.hpp"
+#include "Services/FileManagementService.hpp"
 #include "ServicePool.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
@@ -23,7 +23,40 @@
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
-	Message packet = Message(0, 0, Message::TC, 1);
+    FileManagementService& fileManagementService = Services.fileManagementService;
+
+    Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+    String<64> data1 = "test1";
+    String<64> nullString = "@";
+    String<64> data2 = "test2";
+    message.appendString(data1);
+    message.appendString(nullString);
+    message.appendString(data2);
+    message.appendString(nullString);
+    message.appendUint16(100);
+
+    fileManagementService.createFile(message);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    Message packet = Message(0, 0, Message::TC, 1);
 
 	packet.appendString(String<5>("hello"));
 	packet.appendBits(15, 0x28a8);

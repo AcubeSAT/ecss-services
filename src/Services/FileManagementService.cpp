@@ -80,8 +80,8 @@ FileManagementService::getStringUntilZeroTerminator(Message &message, char extra
     currentChar[charCounter] = (char) message.readByte();
 
     // Increment the counter until '\0' is reached
-    while (currentChar[charCounter] != '\0') {
-        charCounter++;
+    while (currentChar[charCounter] != '@') {
+
 
         // Check if size is below the maximum allowed
         if (charCounter == ECSS_MAX_STRING_SIZE) {
@@ -91,6 +91,7 @@ FileManagementService::getStringUntilZeroTerminator(Message &message, char extra
 
         // Pass the char byte and increment the size of the string
         extractedString[stringSize] = currentChar[charCounter];
+        charCounter++;
         stringSize++;
 
         // Increment the char pointer and read next byte
@@ -143,10 +144,11 @@ FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<EC
     // Copy the repositoryPath to a char array, in order to use it in lfs_stat
     auto *fileNameChar = reinterpret_cast<uint8_t *>(fileName.data());
 
-    // Concatenate 2 strings in 1. From now on use objectPath
-    char objectPath[sizeof(repositoryPathSize + fileNameSize)];
-    strcat(objectPath, reinterpret_cast<const char *>(repositoryPathChar));
-    strcat(objectPath, reinterpret_cast<const char *>(fileNameChar));
+    // Concatenate 2 strings in 1. From now on use objectPathString
+
+    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
+    objectPathString.append((const char *)repositoryPathChar);
+    objectPathString.append((const char *)fileNameChar);
 
     // Check the size of the object path
     if ((repositoryPathSize + fileNameSize) > ECSS_MAX_STRING_SIZE) {
@@ -155,7 +157,7 @@ FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<EC
     }
 
     // Create the file using lfs_file_open with the appropriate flags
-    int32_t lfsCreateFileStatus = lfs_file_open(fs, file, objectPath, flags);
+    int32_t lfsCreateFileStatus = lfs_file_open(fs, file, objectPathString.data(), flags);
 
     return lfsCreateFileStatus;
 }
@@ -383,7 +385,9 @@ void FileManagementService::createFile(Message &message) {
             //Calling lfs_file_close to release any allocated resources
             if (lfs_file_close(&fs1, &file) >= 0) {
                 //Successful file creation
-            } else {
+            }
+            else
+            {
                 //LittleFs generated error
                 //TODO The error codes that littlefs will produce are documented, so we could integrate them but later
                 ErrorHandler::reportError(message,

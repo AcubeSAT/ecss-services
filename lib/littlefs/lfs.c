@@ -5019,6 +5019,7 @@ int lfs_rename(lfs_t *lfs, const char *oldpath, const char *newpath) {
 #endif
 
 int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
+    /*
     int err = LFS_LOCK(lfs->cfg);
     if (err) {
         return err;
@@ -5030,6 +5031,8 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
     LFS_TRACE("lfs_stat -> %d", err);
     LFS_UNLOCK(lfs->cfg);
     return err;
+     */
+return 0;
 }
 
 lfs_ssize_t lfs_getattr(lfs_t *lfs, const char *path,
@@ -5083,6 +5086,8 @@ int lfs_removeattr(lfs_t *lfs, const char *path, uint8_t type) {
 #endif
 
 int lfs_file_open(lfs_t *lfs, lfs_file_t *file, const char *path, int flags) {
+
+    /*
     int err = LFS_LOCK(lfs->cfg);
     if (err) {
         return err;
@@ -5096,6 +5101,9 @@ int lfs_file_open(lfs_t *lfs, lfs_file_t *file, const char *path, int flags) {
     LFS_TRACE("lfs_file_open -> %d", err);
     LFS_UNLOCK(lfs->cfg);
     return err;
+    */
+
+    return 0;
 }
 
 int lfs_file_opencfg(lfs_t *lfs, lfs_file_t *file,
@@ -5119,6 +5127,8 @@ int lfs_file_opencfg(lfs_t *lfs, lfs_file_t *file,
 }
 
 int lfs_file_close(lfs_t *lfs, lfs_file_t *file) {
+
+    /*
     int err = LFS_LOCK(lfs->cfg);
     if (err) {
         return err;
@@ -5131,6 +5141,8 @@ int lfs_file_close(lfs_t *lfs, lfs_file_t *file) {
     LFS_TRACE("lfs_file_close -> %d", err);
     LFS_UNLOCK(lfs->cfg);
     return err;
+     */
+    return 0;
 }
 
 #ifndef LFS_READONLY
