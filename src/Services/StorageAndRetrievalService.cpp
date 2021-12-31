@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Services/StorageAndRetrievalService.hpp"
 
 String<ECSSMaxPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
