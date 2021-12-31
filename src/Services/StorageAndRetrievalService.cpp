@@ -318,7 +318,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 
 	Message report(ServiceType, MessageType::PacketStoreContentSummaryReport, Message::TM, 1);
 	uint16_t numOfPacketStores = request.readUint16();
-	// For all packet stores
+
 	if (numOfPacketStores == 0) {
 		report.appendUint16(packetStores.size());
 		for (auto& packetStore : packetStores) {
@@ -329,7 +329,6 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 		storeMessage(report);
 		return;
 	}
-	// For specified packet stores
 	uint16_t numOfValidPacketStores = 0;
 	for (uint16_t i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
