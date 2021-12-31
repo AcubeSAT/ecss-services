@@ -21,7 +21,6 @@ class StorageAndRetrievalService : public Service {
 	 * @todo: add prioritization policy for retrievals if prioritization is supported
 	 */
 public:
-
 	/**
 	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
 	 */
@@ -47,6 +46,8 @@ private:
 	/**
 	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
 	 * store.
+	 *
+	 * @return true if the copy of packets was successful, false otherwise.
 	 *
 	 * @todo: may needs to be template, depending on the timestamping type.
 	 */
@@ -113,35 +114,9 @@ public:
 	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
-	 * @brief Whether the Storage and Retrieval Subservice supports the cyclical update of packets (Circular type).
-	 */
-	const bool supportsOverwritingOldPackets = true;
-
-	/**
-	 * @brief Whether the Storage and Retrieval Subservice supports rejecting new packets while the packet store is
-	 * full (Bounded type)
-	 */
-	const bool supportsRejectingNewPackets = true;
-
-	/**
 	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
 	 */
 	const bool supportsConcurrentRetrievalRequests = false;
-
-	/**
-	 * @brief The max number of concurrent retrieval requests supported by the subservice.
-	 */
-	const uint16_t maxConcurrentRetrievalRequests = 5;
-
-	/**
-	 * @brief The type of the time window in which the retrieval shall occur.
-	 */
-	TimeWindowType timeWindowType = FromTagToTag;
-
-	/**
-	 * @brief Support for the capability to queue requests pending their execution as per 6.15.3.1(k)
-	 */
-	const bool supportsQueuingRetrievalRequests = true;
 
 	/**
 	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
@@ -152,6 +127,11 @@ public:
 	 * @brief Support for the by-time-range retrieval of packets.
 	 */
 	const bool supportsByTimeRangeRetrieval = true;
+
+	/**
+	 * @brief The type of the time window in which the retrieval shall occur.
+	 */
+	TimeWindowType timeWindowType = FromTagToTag;
 
 	/**
 	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
@@ -169,6 +149,22 @@ public:
 	void disableStorageFunction(Message& request);
 
 	/**
+	 * TC[15,9] start the by-time-range retrieval of packet stores
+	 */
+	void startByTimeRangeRetrieval(Message& request);
+
+	/**
+	 * TC[15,11] delete the packet store content up to the specified time
+	 */
+	void deletePacketStoreContent(Message& request);
+
+	/**
+	 * This function takes a TC[15,12] 'report the packet store content summary' as argument and responds with a TM[15,
+	 * 13] 'packet store content summary report' report message.
+	 */
+	void packetStoreContentSummaryReport(Message& request);
+
+	/**
 	 * TC[15,14] change the open retrieval start time tag
 	 */
 	void changeOpenRetrievalStartTimeTag(Message& request);
@@ -184,11 +180,6 @@ public:
 	void suspendOpenRetrievalOfPacketStores(Message& request);
 
 	/**
-	 * TC[15,9] start the by-time-range retrieval of packet stores
-	 */
-	void startByTimeRangeRetrieval(Message& request);
-
-	/**
 	 * TC[15,17] abort the by-time-range retrieval of packet stores
 	 */
 	void abortByTimeRangeRetrieval(Message& request);
@@ -198,11 +189,6 @@ public:
 	 * TM[15,19] 'packet stores status' report message.
 	 */
 	void packetStoresStatusReport(Message& request);
-
-	/**
-	 * TC[15,11] delete the packet store content up to the specified time
-	 */
-	void deletePacketStoreContent(Message& request);
 
 	/**
 	 * TC[15,20] create packet stores
@@ -244,12 +230,6 @@ public:
 	 * TC[15,28] change the virtual channel used by a packet store
 	 */
 	void changeVirtualChannel(Message& request);
-
-	/**
-	 * This function takes a TC[15,12] 'report the packet store content summary' as argument and responds with a TM[15,
-	 * 13] 'packet store content summary report' report message.
-	 */
-	void packetStoreContentSummaryReport(Message& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

@@ -141,6 +141,142 @@ void StorageAndRetrievalService::disableStorageFunction(Message& request) {
 	}
 }
 
+void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
+	request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval);
+
+	uint16_t numOfPacketStores = request.readUint16();
+	bool errorFlag = false;
+
+	for (int i = 0; i < numOfPacketStores; i++) {
+		auto packetStoreId = readPacketStoreId(request);
+		if (packetStores.find(packetStoreId) == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
+			errorFlag = true;
+		} else if ((not supportsConcurrentRetrievalRequests) and
+		           packetStores[packetStoreId].openRetrievalStatus == PacketStore::InProgress) {
+			ErrorHandler::reportError(request,
+			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
+			errorFlag = true;
+		} else if (packetStores[packetStoreId].byTimeRangeRetrievalStatus) {
+			ErrorHandler::reportError(request,
+			                          ErrorHandler::ExecutionStartErrorType::ByTimeRangeRetrievalAlreadyEnabled);
+			errorFlag = true;
+		}
+		if (errorFlag) {
+			uint16_t numberOfBytesToSkip = (supportsPrioritizingRetrievals) ? 10 : 8;
+			request.skipBytes(numberOfBytesToSkip);
+			errorFlag = false;
+			continue;
+		}
+		uint16_t priority = 0;
+		if (supportsPrioritizingRetrievals) {
+			priority = request.readUint16();
+		}
+		uint32_t retrievalStartTime = request.readUint32();
+		uint32_t retrievalEndTime = request.readUint32();
+
+		if (retrievalStartTime >= retrievalEndTime) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
+			continue;
+		}
+		/**
+		 * @todo: 6.15.3.5.2.d(4), actually count the current time
+		 */
+		auto& packetStore = packetStores[packetStoreId];
+		packetStore.byTimeRangeRetrievalStatus = true;
+		packetStore.retrievalStartTime = retrievalStartTime;
+		packetStore.retrievalEndTime = retrievalEndTime;
+		if (supportsPrioritizingRetrievals) {
+			packetStore.retrievalPriority = priority;
+		}
+		/**
+		 * @todo: start the by-time-range retrieval process according to the priority policy
+		 */
+	}
+}
+
+void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
+	request.assertTC(ServiceType, MessageType::DeletePacketStoreContent);
+
+	uint32_t timeLimit = request.readUint32(); // todo: decide the time-format
+	uint16_t numOfPacketStores = request.readUint16();
+
+	if (numOfPacketStores == 0) {
+		for (auto& packetStore : packetStores) {
+			if (packetStore.second.byTimeRangeRetrievalStatus) {
+				ErrorHandler::reportError(
+				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
+				continue;
+			}
+			if (packetStore.second.openRetrievalStatus == PacketStore::InProgress) {
+				ErrorHandler::reportError(
+				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
+				continue;
+			}
+			deleteContentUntil(packetStore.first, timeLimit);
+		}
+		return;
+	}
+	for (int i = 0; i < numOfPacketStores; i++) {
+		auto packetStoreId = readPacketStoreId(request);
+		if (packetStores.find(packetStoreId) == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
+			continue;
+		}
+		if (packetStores[packetStoreId].byTimeRangeRetrievalStatus) {
+			ErrorHandler::reportError(request,
+			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
+			continue;
+		}
+		if (packetStores[packetStoreId].openRetrievalStatus == PacketStore::InProgress) {
+			ErrorHandler::reportError(request,
+			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
+			continue;
+		}
+		deleteContentUntil(packetStoreId, timeLimit);
+	}
+}
+
+void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& request) {
+	request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores);
+
+	Message report(ServiceType, MessageType::PacketStoreContentSummaryReport, Message::TM, 1);
+	uint16_t numOfPacketStores = request.readUint16();
+	// For all packet stores
+	if (numOfPacketStores == 0) {
+		report.appendUint16(packetStores.size());
+		for (auto& packetStore : packetStores) {
+			auto packetStoreId = packetStore.first;
+			report.appendOctetString(packetStoreId);
+			createContentSummary(report, packetStoreId);
+		}
+		storeMessage(report);
+		return;
+	}
+	// For specified packet stores
+	uint16_t numOfValidPacketStores = 0;
+	for (int i = 0; i < numOfPacketStores; i++) {
+		auto packetStoreId = readPacketStoreId(request);
+		if (packetStores.find(packetStoreId) != packetStores.end()) {
+			numOfValidPacketStores++;
+		}
+	}
+	report.appendUint16(numOfValidPacketStores);
+	request.resetRead();
+	numOfPacketStores = request.readUint16();
+
+	for (int i = 0; i < numOfPacketStores; i++) {
+		auto packetStoreId = readPacketStoreId(request);
+		if (packetStores.find(packetStoreId) == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+			continue;
+		}
+		report.appendOctetString(packetStoreId);
+		createContentSummary(report, packetStoreId);
+	}
+	storeMessage(report);
+}
+
 void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& request) {
 	request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime);
 
@@ -235,60 +371,6 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 	}
 }
 
-void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
-	request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval);
-
-	uint16_t numOfPacketStores = request.readUint16();
-	bool errorFlag = false;
-
-	for (int i = 0; i < numOfPacketStores; i++) {
-		auto packetStoreId = readPacketStoreId(request);
-		if (packetStores.find(packetStoreId) == packetStores.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
-			errorFlag = true;
-		} else if ((not supportsConcurrentRetrievalRequests) and
-		           packetStores[packetStoreId].openRetrievalStatus == PacketStore::InProgress) {
-			ErrorHandler::reportError(request,
-			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
-			errorFlag = true;
-		} else if (packetStores[packetStoreId].byTimeRangeRetrievalStatus) {
-			ErrorHandler::reportError(request,
-			                          ErrorHandler::ExecutionStartErrorType::ByTimeRangeRetrievalAlreadyEnabled);
-			errorFlag = true;
-		}
-		if (errorFlag) {
-			uint16_t numberOfBytesToSkip = (supportsPrioritizingRetrievals) ? 10 : 8;
-			request.skipBytes(numberOfBytesToSkip);
-			errorFlag = false;
-			continue;
-		}
-		uint16_t priority = 0;
-		if (supportsPrioritizingRetrievals) {
-			priority = request.readUint16();
-		}
-		uint32_t retrievalStartTime = request.readUint32();
-		uint32_t retrievalEndTime = request.readUint32();
-
-		if (retrievalStartTime >= retrievalEndTime) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
-			continue;
-		}
-		/**
-		 * @todo: 6.15.3.5.2.d(4), actually count the current time
-		 */
-		auto& packetStore = packetStores[packetStoreId];
-		packetStore.byTimeRangeRetrievalStatus = true;
-		packetStore.retrievalStartTime = retrievalStartTime;
-		packetStore.retrievalEndTime = retrievalEndTime;
-		if (supportsPrioritizingRetrievals) {
-			packetStore.retrievalPriority = priority;
-		}
-		/**
-		 * @todo: start the by-time-range retrieval process according to the priority policy
-		 */
-	}
-}
-
 void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 	request.assertTC(ServiceType, MessageType::AbortByTimeRangeRetrieval);
 
@@ -325,48 +407,6 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 		}
 	}
 	storeMessage(report);
-}
-
-void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeletePacketStoreContent);
-
-	uint32_t timeLimit = request.readUint32(); // todo: decide the time-format
-	uint16_t numOfPacketStores = request.readUint16();
-
-	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
-			if (packetStore.second.byTimeRangeRetrievalStatus) {
-				ErrorHandler::reportError(
-				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
-				continue;
-			}
-			if (packetStore.second.openRetrievalStatus == PacketStore::InProgress) {
-				ErrorHandler::reportError(
-				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
-				continue;
-			}
-			deleteContentUntil(packetStore.first, timeLimit);
-		}
-		return;
-	}
-	for (int i = 0; i < numOfPacketStores; i++) {
-		auto packetStoreId = readPacketStoreId(request);
-		if (packetStores.find(packetStoreId) == packetStores.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
-			continue;
-		}
-		if (packetStores[packetStoreId].byTimeRangeRetrievalStatus) {
-			ErrorHandler::reportError(request,
-			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
-			continue;
-		}
-		if (packetStores[packetStoreId].openRetrievalStatus == PacketStore::InProgress) {
-			ErrorHandler::reportError(request,
-			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
-			continue;
-		}
-		deleteContentUntil(packetStoreId, timeLimit);
-	}
 }
 
 void StorageAndRetrievalService::createPacketStores(Message& request) {
@@ -633,46 +673,6 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 		return;
 	}
 	packetStore.virtualChannel = virtualChannel;
-}
-
-void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores);
-
-	Message report(ServiceType, MessageType::PacketStoreContentSummaryReport, Message::TM, 1);
-	uint16_t numOfPacketStores = request.readUint16();
-	// For all packet stores
-	if (numOfPacketStores == 0) {
-		report.appendUint16(packetStores.size());
-		for (auto& packetStore : packetStores) {
-			auto packetStoreId = packetStore.first;
-			report.appendOctetString(packetStoreId);
-			createContentSummary(report, packetStoreId);
-		}
-		storeMessage(report);
-		return;
-	}
-	// For specified packet stores
-	uint16_t numOfValidPacketStores = 0;
-	for (int i = 0; i < numOfPacketStores; i++) {
-		auto packetStoreId = readPacketStoreId(request);
-		if (packetStores.find(packetStoreId) != packetStores.end()) {
-			numOfValidPacketStores++;
-		}
-	}
-	report.appendUint16(numOfValidPacketStores);
-	request.resetRead();
-	numOfPacketStores = request.readUint16();
-
-	for (int i = 0; i < numOfPacketStores; i++) {
-		auto packetStoreId = readPacketStoreId(request);
-		if (packetStores.find(packetStoreId) == packetStores.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-			continue;
-		}
-		report.appendOctetString(packetStoreId);
-		createContentSummary(report, packetStoreId);
-	}
-	storeMessage(report);
 }
 
 void StorageAndRetrievalService::execute(Message& request) {
