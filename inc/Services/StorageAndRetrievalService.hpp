@@ -32,7 +32,7 @@ public:
 	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
 
 	/**
-	 * @brief Different types of packet retrieval from a packet store, relative to a specified time-tag.
+	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
 	 */
 	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
 
@@ -45,8 +45,6 @@ private:
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
 	 * requested time.
-	 *
-	 * @note Its functionality is indirectly tested in the test-case named 'Deleting packet store content'.
 	 */
 	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
 
@@ -62,35 +60,23 @@ private:
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
 	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
-	 *
-	 * @note Its functionality is indirectly tested in the test case named 'Copying packets in time window, from tag to
-	 * tag'.
 	 */
 	void copyFromTagToTag(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
 	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
-	 *
-	 * @note Its functionality is indirectly tested in the test case named 'Copying packets in time window, after
-	 * time-tag'.
 	 */
 	void copyAfterTimeTag(PacketStore& source, PacketStore& target, uint32_t startTime);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
 	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
-	 *
-	 * @note Its functionality is indirectly tested in the test case named 'Copying packets in time window, before
-	 * time-tag'.
 	 */
 	void copyBeforeTimeTag(PacketStore& source, PacketStore& target, uint32_t endTime);
 
 	/**
 	 * Forms the content summary of the specified packet-store and appends it to a report message.
-	 *
-	 * @note Its functionality is indirectly tested in the test case named 'Reporting the content summary of packet
-	 * stores'.
 	 */
 	void createContentSummary(Message& report, const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
 
