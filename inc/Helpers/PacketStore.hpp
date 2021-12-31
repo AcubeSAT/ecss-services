@@ -63,9 +63,6 @@ public:
 	 * Returns the packet store's current size in bytes.
 	 *
 	 * @note
-	 * I believe that this function is going to be needed during the FreeRTOS integration, when we will actively
-	 * update the telemetry packets of each packet-store. At that moment, we should know whether we are exceeding the
-	 * maximum allowable number of bytes for the specified packet store.
 	 */
 	uint16_t calculateSizeInBytes();
 };
