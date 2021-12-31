@@ -23,8 +23,7 @@
 class StorageAndRetrievalService : public Service {
 private:
 	/**
-	 * Helper function to enhance the readability-simplicity of the code. Basically reads a string from the message
-	 * and returns it.
+	 * Helper function that reads the packet store ID string from a TM[15] message
 	 */
 	String<ECSSMaxPacketStoreIdSize> readPacketStoreId(Message& message);
 
