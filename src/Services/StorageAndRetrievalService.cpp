@@ -161,9 +161,9 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 
 	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
-	auto fillingPercentage1 = static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f /
+	auto filledPercentage1 = static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f /
 	                                               ECSSMaxPacketStoreSize);
-	report.appendUint16(fillingPercentage1);
+	report.appendUint16(filledPercentage1);
 
 	uint16_t numOfPacketsToBeTransferred = 0;
 	numOfPacketsToBeTransferred = std::count_if(
@@ -171,8 +171,8 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 	    std::end(packetStores[packetStoreId].storedTelemetryPackets), [this, &packetStoreId](auto packet) {
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
 	    });
-	auto fillingPercentage2 = static_cast<uint16_t>(numOfPacketsToBeTransferred * 100 / ECSSMaxPacketStoreSize);
-	report.appendUint16(fillingPercentage2);
+	auto filledPercentage2 = static_cast<uint16_t>(numOfPacketsToBeTransferred * 100 / ECSSMaxPacketStoreSize);
+	report.appendUint16(filledPercentage2);
 }
 
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
