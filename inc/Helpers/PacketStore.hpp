@@ -35,7 +35,7 @@ public:
 	enum PacketStoreOpenRetrievalStatus : uint8_t { InProgress = 0, Suspended = 1 };
 
 	/**
-	 * @brief defines whether the storage of TM packets is enabled for this packet store
+	 * defines whether the storage of TM packets is enabled for this packet store
 	 */
 	bool storageStatus;
 
