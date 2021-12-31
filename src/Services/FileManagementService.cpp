@@ -290,13 +290,13 @@ int32_t FileManagementService::littleFsReportFile(String<ECSS_MAX_STRING_SIZE> r
     // Copy the repositoryString to a char array, in order to concatenate in one string
     auto *fileNameStringChar = reinterpret_cast<uint8_t *>(fileNameString.data());
 
-    // Concatenate 2 strings in 1. From now on use objectPath
-    char objectPath[sizeof(repositoryStringSize + fileNameStringSize)];
-    strcat(objectPath, reinterpret_cast<const char *>(repositoryStringChar));
-    strcat(objectPath, reinterpret_cast<const char *>(fileNameStringChar));
+    // Concatenate 2 strings in 1. From now on use objectPathString
+    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
+    objectPathString.append((const char *)repositoryStringChar);
+    objectPathString.append((const char *)fileNameStringChar);
 
     // Call lfs_stat to fill the infoStruct with information about the object
-    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPath, infoStruct);
+    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPathString.data(), infoStruct);
 
     if (infoStructFillStatus >= 0) {
         // Check if the object is a file or a directory
@@ -458,7 +458,7 @@ void FileManagementService::reportAttributes(Message &message) {
 
     // Extract the repository path, which is the first string in this message
     char repositoryPath[ECSS_MAX_STRING_SIZE];
-    uint8_t repositoryPathSize;
+    uint8_t repositoryPathSize = 0;
     uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPath, repositoryPathSize);
     String<ECSS_MAX_STRING_SIZE> repositoryPathString((uint8_t *) repositoryPath, repositoryPathSize);
 
@@ -476,38 +476,43 @@ void FileManagementService::reportAttributes(Message &message) {
     int32_t fileNameStringWildcardStatus = checkForWildcard(fileNameString, fileNameSize);
 
     // Check the repository name extraction status
-    if (repositoryPathExtractionStatus != 0) {
+    if (repositoryPathExtractionStatus != 0)
+    {
         // Size of repository path is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
         // Check the file name extraction status
-    else if (fileNameExtractionStatus != 0) {
+    else if (fileNameExtractionStatus != 0)
+    {
         // Size of file name is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
         // Check if there are any wildcard in the repository path
-    else if (repositoyryStringWildcardStatus != -10) {
-        // Size of file name is too large
+    else if (repositoyryStringWildcardStatus != -10)
+    {
+        // There is a wildcard in the repository path
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
     }
 
         // Check if there are any wildcard in the file name
-    else if (fileNameStringWildcardStatus != -10) {
-        // Size of file name is too large
+    else if (fileNameStringWildcardStatus != -10)
+    {
+        // There is a wildcard in the file name
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
     }
 
         // Check if the concatenated size of the object path is valid
-    else if ((repositoryPathSize + fileNameSize) > ECSS_MAX_STRING_SIZE) {
+    else if ((repositoryPathSize + fileNameSize) > ECSS_MAX_STRING_SIZE)
+    {
         // Size of file name is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-
     }
 
-        // Check the validity of the request at service level
-    else {
+    // Check the validity of the request at service level
+    else
+    {
         // Struct that will store the file information
         lfs_info infoStruct;
 
@@ -517,25 +522,6 @@ void FileManagementService::reportAttributes(Message &message) {
 
         // Handle each possible outcome
         switch (reportFileStatus) {
-            case (-1):
-
-                // There is a wildcard in the object string
-                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
-                break;
-
-            case (-2):
-
-                // The size of the object path is too large
-                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-                break;
-
-            case (-3):
-
-                // Invalid object type returned from littleFs.
-                // TODO : Define steps in reportProgressError (3rd argument). Invalid littlefs' response can be 2.
-                ErrorHandler::reportProgressError(message,
-                                          ErrorHandler::ExecutionProgressErrorType::UnknownExecutionProgressError, 2);
-                break;
 
             case (-4):
 
@@ -555,10 +541,12 @@ void FileManagementService::reportAttributes(Message &message) {
                 // TODO : Define steps in reportProgressError (3rd argument). Logical wrong littlefs' response can be 3.
                 ErrorHandler::reportProgressError(message,
                                           ErrorHandler::ExecutionProgressErrorType::UnknownExecutionProgressError, 3);
+                break;
 
             default:
 
                 // Unknown error
+                // TODO : Possibly more error messages depending on littlefs return types
                 ErrorHandler::reportError(message,
                                           ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
                 break;
@@ -575,10 +563,13 @@ void FileManagementService::fileAttributeReport(String<ECSS_MAX_STRING_SIZE> rep
 
     // Append the repository string and then the file name string
     report.appendString(repositoryString);
+    //report.appendOctetString(repositoryString);
     report.appendString(fileNameString);
+    //report.appendString(repositoryString);
+    //report.appendString(fileNameString);
 
     // Append the size of the file
-    report.appendSint32(infoStruct.size);
+    report.appendSint16((int16_t)infoStruct.size);
 
     // Store the TM
     storeMessage(report);
