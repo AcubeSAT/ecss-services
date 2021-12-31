@@ -66,8 +66,9 @@ void invalidPacketStoreCreationRequest(Message& request) {
 	uint8_t concatenatedPacketStoreNames[] = "ps2ps1ps2ps44ps0000";
 	uint16_t offsets[6] = {0, 3, 6, 9, 13, 19};
 	uint16_t sizes[5] = {33, 55, 66, 77, 99};
-	uint8_t virtualChannels[5] = {5, StorageAndRetrievalService::VirtualChannels::MIN - 1, 1,
-	                              StorageAndRetrievalService::VirtualChannels::MAX + 1, 2};
+	uint8_t invalidChannel1 = VirtualChannelLimits.min - 1;
+	uint8_t invalidChannel2 = VirtualChannelLimits.max + 1;
+	uint8_t virtualChannels[5] = {5, invalidChannel1, 1, invalidChannel2, 2};
 	uint8_t packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
@@ -1686,7 +1687,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 			                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
 			request.appendOctetString(finalIds[i]);
-			request.appendUint8(i == 3 ? StorageAndRetrievalService::VirtualChannels::MAX + 1 : 3);
+			request.appendUint8(i == 3 ? VirtualChannelLimits.max + 1 : 3);
 			MessageParser::execute(request);
 			CHECK(ServiceTests::count() == i + 1);
 			CHECK(ServiceTests::countThrownErrors(expectedErrors[i]) == 1);

@@ -15,7 +15,7 @@ void StorageAndRetrievalService::deleteContentUntil(const String<ECSSMaxPacketSt
 	}
 }
 
-void StorageAndRetrievalService::copyFromTagToTag(PacketStore& source, PacketStore& target, uint32_t startTime,
+void StorageAndRetrievalService::copyFromTagToTag(const PacketStore& source, PacketStore& target, uint32_t startTime,
                                                   uint32_t endTime) {
 	for (auto& packet : source.storedTelemetryPackets) {
 		if (packet.first < startTime) {
@@ -28,7 +28,7 @@ void StorageAndRetrievalService::copyFromTagToTag(PacketStore& source, PacketSto
 	}
 }
 
-void StorageAndRetrievalService::copyAfterTimeTag(PacketStore& source, PacketStore& target, uint32_t startTime) {
+void StorageAndRetrievalService::copyAfterTimeTag(const PacketStore& source, PacketStore& target, uint32_t startTime) {
 	for (auto& packet : source.storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
@@ -37,7 +37,7 @@ void StorageAndRetrievalService::copyAfterTimeTag(PacketStore& source, PacketSto
 	}
 }
 
-void StorageAndRetrievalService::copyBeforeTimeTag(PacketStore& source, PacketStore& target, uint32_t endTime) {
+void StorageAndRetrievalService::copyBeforeTimeTag(const PacketStore& source, PacketStore& target, uint32_t endTime) {
 	for (auto& packet : source.storedTelemetryPackets) {
 		if (packet.first > endTime) {
 			break;
@@ -46,7 +46,7 @@ void StorageAndRetrievalService::copyBeforeTimeTag(PacketStore& source, PacketSt
 	}
 }
 
-bool StorageAndRetrievalService::copyPacketsFrom(PacketStore& source, PacketStore& target, uint32_t startTime,
+bool StorageAndRetrievalService::copyPacketsFrom(const PacketStore& source, PacketStore& target, uint32_t startTime,
                                                  uint32_t endTime, TimeWindowType timeWindow) {
 	switch (timeWindow) {
 		case FromTagToTag:
@@ -85,8 +85,8 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 
 	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
-	auto fillingPercentage =
-	    static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f / ECSSMaxPacketStoreSize);
+	auto fillingPercentage = static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f /
+	                                               ECSSMaxPacketStoreSize);
 	report.appendUint16(fillingPercentage);
 
 	uint16_t numOfPacketsToBeTransferred = 0;
@@ -391,7 +391,7 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 		PacketStore::PacketStoreType packetStoreType = (typeCode == 0) ? PacketStore::Circular : PacketStore::Bounded;
 		uint8_t virtualChannel = request.readUint8();
 
-		if (virtualChannel < MIN or virtualChannel > MAX) {
+		if (virtualChannel < VirtualChannelLimits.min or virtualChannel > VirtualChannelLimits.max) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel);
 			continue;
 		}
@@ -618,7 +618,7 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 	}
 	auto& packetStore = packetStores[idToChange];
 
-	if (virtualChannel < MIN or virtualChannel > MAX) {
+	if (virtualChannel < VirtualChannelLimits.min or virtualChannel > VirtualChannelLimits.max) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel);
 		return;
 	}

@@ -21,10 +21,6 @@ class StorageAndRetrievalService : public Service {
 	 * @todo: add prioritization policy for retrievals if prioritization is supported
 	 */
 public:
-	/**
-	 * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
-	 */
-	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
 
 	/**
 	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
@@ -54,26 +50,26 @@ private:
 	 *
 	 * @todo: may needs to be template, depending on the timestamping type.
 	 */
-	bool copyPacketsFrom(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime,
+	bool copyPacketsFrom(const PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime,
 	                     TimeWindowType timeWindow);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
 	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
 	 */
-	void copyFromTagToTag(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime);
+	void copyFromTagToTag(const PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
 	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
 	 */
-	void copyAfterTimeTag(PacketStore& source, PacketStore& target, uint32_t startTime);
+	void copyAfterTimeTag(const PacketStore& source, PacketStore& target, uint32_t startTime);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
 	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
 	 */
-	void copyBeforeTimeTag(PacketStore& source, PacketStore& target, uint32_t endTime);
+	void copyBeforeTimeTag(const PacketStore& source, PacketStore& target, uint32_t endTime);
 
 	/**
 	 * Forms the content summary of the specified packet-store and appends it to a report message.

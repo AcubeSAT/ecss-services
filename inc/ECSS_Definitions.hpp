@@ -183,5 +183,13 @@ inline const uint16_t ECSSMaxPacketStoreIdSize = 15;
  */
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
 
+/**
+ * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
+ */
+inline struct {
+	uint8_t min = 1;
+	uint8_t max = 10;
+} VirtualChannelLimits;
+
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
