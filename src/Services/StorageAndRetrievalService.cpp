@@ -22,38 +22,65 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
 
-	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
-	    packetStores.find(toPacketStoreId) == packetStores.end()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-		return;
-	}
-	if (startTime >= endTime) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
-		return;
-	}
-	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+	if (failedFromTagToTag(fromPacketStoreId, toPacketStoreId, startTime, endTime, request)) {
 		return;
 	}
 
-	const auto& source = packetStores[fromPacketStoreId];
-	auto& target = packetStores[toPacketStoreId];
-
-	if (endTime < source.storedTelemetryPackets.front().first ||
-	    startTime > source.storedTelemetryPackets.back().first) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
-		return;
-	}
-
-	for (auto& packet : source.storedTelemetryPackets) {
+	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
 		}
 		if (packet.first > endTime) {
 			break;
 		}
-		target.storedTelemetryPackets.push_back(packet);
+		packetStores[toPacketStoreId].storedTelemetryPackets.push_back(packet);
 	}
+}
+
+bool StorageAndRetrievalService::invalidPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
+                                                     Message& request) {
+	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
+	    packetStores.find(toPacketStoreId) == packetStores.end()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::invalidTimeWindow(uint32_t startTime, uint32_t endTime, Message& request) {
+	if (startTime >= endTime) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::invalidDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
+                                                               Message& request) {
+	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+                                                         uint32_t startTime, uint32_t endTime, Message& request) {
+	if (endTime < packetStores[fromPacketStoreId].storedTelemetryPackets.front().first ||
+	    startTime > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+                                                    const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
+                                                    uint32_t startTime, uint32_t endTime, Message& request) {
+	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	        invalidTimeWindow(startTime, endTime, request) or invalidDestinationPacketStore(toPacketStoreId, request) or
+	        noTimestampInTimeWindow(fromPacketStoreId, startTime, endTime, request));
 }
 
 void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
@@ -62,30 +89,40 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
 
-	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
-	    packetStores.find(toPacketStoreId) == packetStores.end()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-		return;
-	}
-	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+	if (failedAfterTimeTag(fromPacketStoreId, toPacketStoreId, startTime, request)) {
 		return;
 	}
 
-	const auto& source = packetStores[fromPacketStoreId];
-	auto& target = packetStores[toPacketStoreId];
-
-	if (startTime > source.storedTelemetryPackets.back().first) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
-		return;
-	}
-
-	for (auto& packet : source.storedTelemetryPackets) {
+	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
 		}
-		target.storedTelemetryPackets.push_back(packet);
+		packetStores[toPacketStoreId].storedTelemetryPackets.push_back(packet);
 	}
+}
+
+bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+                                                         uint32_t timeTag, Message& request, bool isAfterTimeTag) {
+	if (isAfterTimeTag) {
+		if (timeTag > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
+			return true;
+		}
+		return false;
+	}
+	if (timeTag < packetStores[fromPacketStoreId].storedTelemetryPackets.front().first) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
+		return true;
+	}
+	return false;
+}
+
+bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+                                                    const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
+                                                    uint32_t startTime, Message& request) {
+	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	        invalidDestinationPacketStore(toPacketStoreId, request) or
+	        noTimestampInTimeWindow(fromPacketStoreId, startTime, request, true));
 }
 
 void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
@@ -94,30 +131,24 @@ void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
 
-	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
-	    packetStores.find(toPacketStoreId) == packetStores.end()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
-		return;
-	}
-	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
+	if (failedBeforeTimeTag(fromPacketStoreId, toPacketStoreId, endTime, request)) {
 		return;
 	}
 
-	const auto& source = packetStores[fromPacketStoreId];
-	auto& target = packetStores[toPacketStoreId];
-
-	if (endTime < source.storedTelemetryPackets.front().first) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
-		return;
-	}
-
-	for (auto& packet : source.storedTelemetryPackets) {
+	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first > endTime) {
 			break;
 		}
-		target.storedTelemetryPackets.push_back(packet);
+		packetStores[toPacketStoreId].storedTelemetryPackets.push_back(packet);
 	}
+}
+
+bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
+                                                     uint32_t endTime, Message& request) {
+	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	        invalidDestinationPacketStore(toPacketStoreId, request) or
+	        noTimestampInTimeWindow(fromPacketStoreId, endTime, request, false));
 }
 
 // bool StorageAndRetrievalService::copyPacketsFrom(const PacketStore& source, PacketStore& target, uint32_t startTime,
