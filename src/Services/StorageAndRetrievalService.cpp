@@ -731,5 +731,8 @@ void StorageAndRetrievalService::execute(Message& request) {
 		case ChangeVirtualChannel:
 			changeVirtualChannel(request);
 			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+			break;
 	}
 }
