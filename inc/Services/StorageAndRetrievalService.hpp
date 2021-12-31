@@ -114,10 +114,11 @@ public:
 	 */
 	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
 
+	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
+
 	/**
 	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
 	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
