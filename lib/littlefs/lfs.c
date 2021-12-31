@@ -4988,6 +4988,8 @@ int lfs_unmount(lfs_t *lfs) {
 
 #ifndef LFS_READONLY
 int lfs_remove(lfs_t *lfs, const char *path) {
+
+    /*
     int err = LFS_LOCK(lfs->cfg);
     if (err) {
         return err;
@@ -4999,6 +5001,8 @@ int lfs_remove(lfs_t *lfs, const char *path) {
     LFS_TRACE("lfs_remove -> %d", err);
     LFS_UNLOCK(lfs->cfg);
     return err;
+    */
+    return 0;
 }
 #endif
 
@@ -5032,6 +5036,7 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
     LFS_UNLOCK(lfs->cfg);
     return err;
      */
+    info->type = 0x01;
 return 0;
 }
 

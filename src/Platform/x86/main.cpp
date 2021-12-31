@@ -23,8 +23,10 @@
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
+
     FileManagementService& fileManagementService = Services.fileManagementService;
 
+    /* Create file
     Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
     String<64> data1 = "test1";
     String<64> nullString = "@";
@@ -36,7 +38,20 @@ int main() {
     message.appendUint16(100);
 
     fileManagementService.createFile(message);
+    */
 
+    /* Manually adjust lfs_stat in order to get the user story correct
+    Message message(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
+    String<64> data1 = "test1";
+    String<64> nullString = "@";
+    String<64> data2 = "test2";
+    message.appendString(data1);
+    message.appendString(nullString);
+    message.appendString(data2);
+    message.appendString(nullString);
+    */
+
+    fileManagementService.deleteFile(message);
 
 
 

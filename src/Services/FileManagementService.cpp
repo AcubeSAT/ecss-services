@@ -145,7 +145,6 @@ FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<EC
     auto *fileNameChar = reinterpret_cast<uint8_t *>(fileName.data());
 
     // Concatenate 2 strings in 1. From now on use objectPathString
-
     String<ECSS_MAX_STRING_SIZE> objectPathString = "";
     objectPathString.append((const char *)repositoryPathChar);
     objectPathString.append((const char *)fileNameChar);
@@ -190,10 +189,10 @@ int32_t FileManagementService::pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZ
     // Copy the repositoryString to a char array, in order to concatenate in one string
     auto *fileNameStringChar = reinterpret_cast<uint8_t *>(fileNameString.data());
 
-    // Concatenate 2 strings in 1. From now on use objectPath
-    char objectPath[sizeof(repositoryStringSize + fileNameStringSize)];
-    strcat(objectPath, reinterpret_cast<const char *>(repositoryStringChar));
-    strcat(objectPath, reinterpret_cast<const char *>(fileNameStringChar));
+    // Concatenate 2 strings in 1. From now on use objectPathString
+    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
+    objectPathString.append((const char *)repositoryStringChar);
+    objectPathString.append((const char *)fileNameStringChar);
 
     // Check for objectPath size
     if ((repositoryStringSize + fileNameStringSize) > ECSS_MAX_STRING_SIZE) {
@@ -202,7 +201,7 @@ int32_t FileManagementService::pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZ
     }
 
     // Call lfs_stat to fill the infoStruct with information about the object
-    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPath, pInfo);
+    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPathString.data(), pInfo);
 
     // Check if the lfs_stat is completed successfully
     if (infoStructFillStatus >= 0) {
@@ -240,13 +239,13 @@ int32_t FileManagementService::littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STR
     // Copy the repositoryString to a char array, in order to use it in lfs_stat
     auto *fileNameStringChar = reinterpret_cast<uint8_t *>(fileName.data());
 
-    // Concatenate 2 strings in 1. From now on use objectPath
-    char objectPath[sizeof(repositoryPathSize + fileNameSize)];
-    strcat(objectPath, reinterpret_cast<const char *>(repositoryStringChar));
-    strcat(objectPath, reinterpret_cast<const char *>(fileNameStringChar));
+    // Concatenate 2 strings in 1. From now on use objectPathString
+    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
+    objectPathString.append((const char *)repositoryStringChar);
+    objectPathString.append((const char *)fileNameStringChar);
 
     // Call lfs_remove
-    int32_t lfsDeleteFileStatus = lfs_remove(fs, objectPath);
+    int32_t lfsDeleteFileStatus = lfs_remove(fs, objectPathString.data());
 
     // Return status of deletion for the lfs function
     return lfsDeleteFileStatus;
@@ -408,7 +407,7 @@ void FileManagementService::deleteFile(Message &message) {
 
     // Extract the repository path, which is the first string in this message
     char repositoryPath[ECSS_MAX_STRING_SIZE];
-    uint8_t repositoryPathSize;
+    uint8_t repositoryPathSize = 0;
     uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPath, repositoryPathSize);
     String<ECSS_MAX_STRING_SIZE> repositoryPathString((uint8_t *) repositoryPath, repositoryPathSize);
 
@@ -418,30 +417,34 @@ void FileManagementService::deleteFile(Message &message) {
     uint8_t fileNameExtractionStatus = getStringUntilZeroTerminator(message, fileName, fileNameSize);
     String<ECSS_MAX_STRING_SIZE> fileNameString((uint8_t *) fileName, fileNameSize);
 
-    // Extract the file size in bytes
-    uint16_t fileSizeBytes = message.readUint16();
-
     // Check the repository name extraction status
-    if (repositoryPathExtractionStatus != 0) {
+    if (repositoryPathExtractionStatus != 0)
+    {
         // Size of repository path is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
         // Check the file name extraction status
-    else if (fileNameExtractionStatus != 0) {
+    else if (fileNameExtractionStatus != 0)
+    {
         // Size of file name is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
         // Check the validity of the request at service level
-    else if (pathIsValidForDeletion(repositoryPathString, repositoryPathSize, fileNameString, fileNameSize) != 1) {
+    else if (pathIsValidForDeletion(repositoryPathString, repositoryPathSize, fileNameString, fileNameSize) != 1)
+    {
         // Invalid path
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
-    } else {
+    }
+    else
+    {
         // Call lfs_remove in order to delete the file
         if (littleFsDeleteFile(&fs1, repositoryPathString, repositoryPathSize, fileNameString, fileNameSize) >= 0) {
             //Successful Deletion
-        } else {
+        }
+        else
+        {
             //LittleFs generated error
             ErrorHandler::reportError(message,
                                       ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
