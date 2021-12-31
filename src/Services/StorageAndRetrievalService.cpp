@@ -475,8 +475,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 		auto packetStoreId = packetStore.first;
 		report.appendOctetString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageStatus);
-		uint8_t code = (packetStore.second.openRetrievalStatus == PacketStore::InProgress) ? 0 : 1;
-		report.appendUint8(code);
+		report.appendEnum8(packetStore.second.openRetrievalStatus);
 		if (supportsByTimeRangeRetrieval) {
 			report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
 		}

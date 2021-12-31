@@ -1206,25 +1206,25 @@ TEST_CASE("Reporting the status of packet stores") {
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData)));
 		CHECK(report.readBoolean() == true);
-		CHECK(report.readUint8() == 0);
+		CHECK(report.readEnum8() == 1);
 		CHECK(report.readBoolean() == false);
 		// Packet store 2
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData2)));
 		CHECK(report.readBoolean() == false);
-		CHECK(report.readUint8() == 1);
+		CHECK(report.readEnum8() == 0);
 		CHECK(report.readBoolean() == true);
 		// Packet store 3
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData4)));
 		CHECK(report.readBoolean() == false);
-		CHECK(report.readUint8() == 1);
+		CHECK(report.readEnum8() == 0);
 		CHECK(report.readBoolean() == true);
 		// Packet store 4
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData3)));
 		CHECK(report.readBoolean() == true);
-		CHECK(report.readUint8() == 0);
+		CHECK(report.readEnum8() == 1);
 		CHECK(report.readBoolean() == false);
 
 		ServiceTests::reset();

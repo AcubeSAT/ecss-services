@@ -35,7 +35,7 @@ private:
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
 	 */
-	String<ECSSMaxPacketStoreIdSize> readPacketStoreId(Message& message);
+	static String<ECSSMaxPacketStoreIdSize> readPacketStoreId(Message& message);
 
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
