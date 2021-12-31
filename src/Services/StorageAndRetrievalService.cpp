@@ -91,7 +91,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
 	auto fillingPercentage =
-	    static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100 / ECSSMaxPacketStoreSize);
+	    static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f / ECSSMaxPacketStoreSize);
 	report.appendUint16(fillingPercentage);
 
 	uint16_t numOfPacketsToBeTransferred = 0;
