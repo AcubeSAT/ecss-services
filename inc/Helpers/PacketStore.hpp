@@ -60,7 +60,7 @@ public:
 	etl::deque<std::pair<uint32_t, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
 
 	/**
-	 * Returns the packet store's current size in bytes.
+	 * Returns the sum of the sizes of the packets stored in this PacketStore, in bytes.
 	 *
 	 * @note
 	 */
