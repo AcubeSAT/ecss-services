@@ -1,18 +1,13 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
 String<ECSSMaxPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
-	uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
-	message.readOctetString(packetStoreData);
-	String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+	auto packetStoreId = message.readOctetString<ECSSMaxPacketStoreIdSize>();
 	return packetStoreId;
 }
 
 void StorageAndRetrievalService::deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId,
                                                     uint32_t timeLimit) {
 	for (auto& tmPacket : packetStores[packetStoreId].storedTelemetryPackets) {
-		/**
-		 * @todo: actually compare the real time formats.
-		 */
 		if (tmPacket.first > timeLimit) {
 			break;
 		}
@@ -81,7 +76,7 @@ bool StorageAndRetrievalService::copyPacketsFrom(PacketStore& source, PacketStor
 }
 
 void StorageAndRetrievalService::createContentSummary(Message& report,
-                                                      String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
+                                                      const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
 	uint32_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
 	report.appendUint32(oldestStoredPacketTime);
 
