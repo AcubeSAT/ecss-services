@@ -100,7 +100,7 @@ public:
 	StorageAndRetrievalService() = default;
 
 	/**
-	 * @brief The virtual channels used by the Storage and Retrieval Subservice.
+	 * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
 	 */
 	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
 
