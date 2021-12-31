@@ -7,7 +7,7 @@
 #include "Message.hpp"
 
 /**
- * @todo: add a way of measuring each packets store's size in bytes
+ * @todo: add a way of defining each packets store's size in bytes
  */
 
 /**
