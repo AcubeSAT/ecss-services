@@ -8,10 +8,6 @@
 #include "etl/map.h"
 
 /**
- * @todo: add prioritization policy for retrievals if prioritization is supported
- */
-
-/**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
  *
  * @brief This Service:
@@ -21,6 +17,25 @@
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class StorageAndRetrievalService : public Service {
+	/**
+	 * @todo: add prioritization policy for retrievals if prioritization is supported
+	 */
+public:
+	/**
+	 * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
+	 */
+	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
+
+	/**
+	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
+	 */
+	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
+
+	/**
+	 * @brief Different types of packet retrieval from a packet store, relative to a specified time-tag.
+	 */
+	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
+
 private:
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
@@ -34,6 +49,15 @@ private:
 	 * @note Its functionality is indirectly tested in the test-case named 'Deleting packet store content'.
 	 */
 	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
+
+	/**
+	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
+	 * store.
+	 *
+	 * @todo: may needs to be template, depending on the timestamping type.
+	 */
+	bool copyPacketsFrom(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime,
+	                     TimeWindowType timeWindow);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -99,21 +123,6 @@ public:
 
 	StorageAndRetrievalService() = default;
 
-	/**
-	 * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
-	 */
-	enum VirtualChannels : uint8_t { MIN = 1, MAX = 10 };
-
-	/**
-	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
-	 */
-	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
-
-	/**
-	 * @brief Different types of packet retrieval from a packet store, relative to a specified time-tag.
-	 */
-	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
-
 	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
 
 	/**
@@ -166,15 +175,6 @@ public:
 	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
 	 */
 	const TimeStamping timeStamping = PacketBased;
-
-	/**
-	 * Helper function that copies all the packets within the start-time -> end-time window to the destination packet
-	 * store.
-	 *
-	 * @todo: may needs to be template, depending on the timestamping type.
-	 */
-	bool copyPacketsFrom(PacketStore& source, PacketStore& target, uint32_t startTime, uint32_t endTime,
-	                     TimeWindowType timeWindow);
 
 	/**
 	 * TC[15,1] request to enable the packet stores' storage function
