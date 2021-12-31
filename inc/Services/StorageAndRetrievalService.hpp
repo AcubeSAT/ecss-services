@@ -58,7 +58,7 @@ private:
 	/**
 	 * Checks the validity of the specified time window.
 	 */
-	static bool invalidTimeWindow(unsigned int startTime, unsigned int endTime, Message& request);
+	static bool invalidTimeWindow(uint32_t startTime, uint32_t endTime, Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -68,15 +68,15 @@ private:
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, unsigned int startTime,
-	                             unsigned int endTime, Message& request);
+	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t startTime,
+	                             uint32_t endTime, Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of FromTagToTag copying of packets.
 	 */
 	bool failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, unsigned int startTime,
-	                        unsigned int endTime, Message& request);
+	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
+	                        uint32_t endTime, Message& request);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
@@ -89,14 +89,14 @@ private:
 	 * @param isAfterTimeTag true indicates that we are examine the case of AfterTimeTag. Otherwise, we are referring
 	 * to the case of BeforeTimeTag.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, unsigned int timeTag,
+	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
 	                             Message& request, bool isAfterTimeTag);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
 	 */
 	bool failedAfterTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, unsigned int startTime,
+	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
 	                        Message& request);
 
 	/**
@@ -109,7 +109,7 @@ private:
 	 * Performs all the necessary error checking for the case of BeforeTimeTag copying of packets.
 	 */
 	bool failedBeforeTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, unsigned int endTime,
+	                         const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t endTime,
 	                         Message& request);
 
 	/**
