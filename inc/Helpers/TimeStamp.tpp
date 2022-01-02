@@ -45,24 +45,18 @@ TimeStamp<secondsCounter, fractionalBytes>::TimeStamp(etl::array<uint8_t, Time::
 	}
 
 	// do checks wrt template precision parameters
-	ASSERT_INTERNAL(inputSecondsBytes <= secondsCounter,
-	                ErrorHandler::InternalErrorType::InvalidTimeStampInput);
-	ASSERT_INTERNAL(inputFractionalBytes <= fractionalBytes,
-	                ErrorHandler::InternalErrorType::InvalidTimeStampInput);
+	ASSERT_INTERNAL(inputSecondsBytes <= secondsCounter,ErrorHandler::InternalErrorType::InvalidTimeStampInput);
+	ASSERT_INTERNAL(inputFractionalBytes <= fractionalBytes,ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 
 	// put timestamp into internal counter
 	taiCounter = 0;
 	// add seconds until run out of bytes on input array
-	for (auto i = 0; i < inputSecondsBytes; i++) {
+	for (auto i = 0; i < inputSecondsBytes + inputFractionalBytes; i++) {
 		taiCounter = taiCounter << 8;
 		taiCounter += timestamp[headerSize + i];
 	}
-	// add fractional until run out of bytes on input array
-	for (auto i = 0; i < inputFractionalBytes; i++) {
-		taiCounter = taiCounter << 8;
-		taiCounter += timestamp[headerSize + inputSecondsBytes + i];
-	}
 	// pad rightmost bytes to full length
+	// TODO: What about seconds?
 	taiCounter = taiCounter << 8 * (fractionalBytes - inputFractionalBytes);
 }
 
