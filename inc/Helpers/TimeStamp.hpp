@@ -86,14 +86,14 @@ public:
 	 *
 	 * @return The TimeStamp, represented in the CCSDS CUC format
 	 */
-	const etl::array<uint8_t, Time::CUCTimestampMaximumSize> toCUCtimestamp();
+	etl::array<uint8_t, Time::CUCTimestampMaximumSize> toCUCtimestamp();
 
 	/**
 	 * Get the representation as a UTC timestamp
 	 *
 	 * @return The TimeStamp, represented in the structure that holds UTC timestamps
 	 */
-	const UTCTimestamp toUTCtimestamp();
+	UTCTimestamp toUTCtimestamp();
 
 	/**
 	 * Compare two instants.
