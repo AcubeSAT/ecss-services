@@ -75,6 +75,7 @@ uint8_t
 FileManagementService::getStringUntilZeroTerminator(Message &message, char extractedString[ECSS_MAX_STRING_SIZE],
                                                     uint8_t &stringSize) {
 
+    // TODO : Change should be done in order to get rid of the extra char array and use only the String
     char currentChar[ECSS_MAX_STRING_SIZE];
     uint8_t charCounter = 0;
     currentChar[charCounter] = (char) message.readByte();
@@ -821,9 +822,12 @@ void FileManagementService::createDirectory(Message &message) {
     // Check if the size of the object path (repository + directory path) is less than ECSS_MAX_STRING_SIZE
     uint8_t objectPathSizeOverflowStatus;
 
-    if ((uint16_t) repositoryPathSize + (uint16_t) directoryNameSize < ECSS_MAX_STRING_SIZE) {
+    if ((uint16_t) repositoryPathSize + (uint16_t) directoryNameSize < ECSS_MAX_STRING_SIZE)
+    {
         objectPathSizeOverflowStatus = 0;
-    } else {
+    }
+    else
+    {
         objectPathSizeOverflowStatus = 1;
     }
 
@@ -843,7 +847,9 @@ void FileManagementService::createDirectory(Message &message) {
             ErrorHandler::reportError(message,
                                       ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
         }
-    } else {
+    }
+    else
+    {
         // Create failed start of execution error
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
     }
@@ -874,39 +880,78 @@ void FileManagementService::deleteDirectory(Message &message) {
     // Check if the size of the object path (repository + directory path) is less than ECSS_MAX_STRING_SIZE
     uint8_t objectPathSizeOverflowStatus;
 
-    if (repositoryPathSize + directoryNameSize < ECSS_MAX_STRING_SIZE) {
+    if (repositoryPathSize + directoryNameSize < ECSS_MAX_STRING_SIZE)
+    {
         objectPathSizeOverflowStatus = 0;
-    } else {
+    }
+    else
+    {
         objectPathSizeOverflowStatus = 1;
     }
 
     // Info struct to store the repository's attributes
-    lfs_info info_struct;
+    lfs_dir info_directory;
 
-    // Get the status of the directory
-    int32_t directoryEmptyStatus = littleFsReportFile(repositoryPathString, repositoryPathSize, directoryNameString,
-                                                      directoryNameSize, &info_struct);
+    // Check repository path is valid AND directory name is valid AND object path does not overflow
+    if ((repositoryPathIsValid == 0) && (directoryNameIsValid == 0) && (objectPathSizeOverflowStatus == 0))
+    {
+        // Open the requested directory
+        int32_t lfsDirectoryOpenStatus = lfs_dir_open(&fs1, &info_directory,
+                                                      reinterpret_cast<const char *>(repositoryPathString.data()));
 
-    // Check if the directory is empty (can be deleted)
-    if ((directoryEmptyStatus == LFS_ERR_NOENT) && (repositoryPathIsValid == 0) && (directoryNameIsValid == -10) &&
-        (objectPathSizeOverflowStatus == 0)) {
-        // Concatenate repository and directory String to repository string and use it from now on as the object path
-        // TODO maybe we should check for slashes "/" and handle all the possible cases (ex "/" is missing, too many etc)
-        repositoryPathString.append(directoryNameString);
+        // Check the status of the above operation
+        if (lfsDirectoryOpenStatus == 0)
+        {
+            // Info struct, just for argument for lfs_dir_open. No usage otherwise.
+            lfs_info info_struct;
 
-        // Create the directory
-        int32_t removeDirStatus = lfs_remove(&fs1, reinterpret_cast<const char *>(repositoryPathString.data()));
+            // Check if the directory is empty
+            // TODO : Maybe an approach with a timeout instead of a while(1) is more appropriate
+            int32_t lfsDirectoryReadStatus = lfs_dir_read(&fs1, &info_directory, &info_struct);
 
-        // Check if the Directory is created successfully
-        if (removeDirStatus < 0) {
-            // Create failed completion of execution error
+            // If it is indeed empty
+            if(lfsDirectoryReadStatus == 0)
+            {
+                // Delete the directory
+                int32_t removeDirStatus = lfs_remove(&fs1, reinterpret_cast<const char *>(repositoryPathString.data()));
+
+                // Check if the Directory is deleted successfully
+                if (removeDirStatus < 0)
+                {
+                    // Create failed completion of execution error
+                    ErrorHandler::reportError(message,
+                                              ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+                }
+            }
+            // Directory is not empty
+            else if(lfsDirectoryReadStatus > 0)
+            {
+                // The directory which is requested to be deleted is not empty, hence can't be deleted
+                ErrorHandler::reportError(message,ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+            }
+            // The lfs_dir_read function failed
+            else
+            {
+                // The lfs_dir_read couldn't be processed correctly
+                // TODO : More than 1 reason's this can happen. Possibly out of scope so an error handler is an overkill
+                // TODO : for this one
+                ErrorHandler::reportError(message,ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+            }
+        }
+        else
+        {
+            // Report failed start of execution due to inability to open the requested repository
             ErrorHandler::reportError(message,
                                       ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
         }
-    } else {
-        //Create a failed start of execution error
-        // TODO can possibly be more than one handles for this in order to get more comprehensive debug information
-        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+    }
+    else
+    {
+        // Report failed start of execution due to inability to open the requested repository
+        // TODO : There are many possible reasons why this can happen, needs addressing with an error handler (?) for
+        // TODO : every one of the possible outcomes
+        ErrorHandler::reportError(message,
+                                  ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
     }
 }
 
@@ -950,33 +995,45 @@ void FileManagementService::renameDirectory(Message &message) {
     // Check if the new repository + directory name size is less than ECSS_MAX_STRING_SIZE
     uint8_t objectPathNameSizeStatus;
 
-    if ((uint16_t) repositoryPathSize + (uint16_t) newDirectoryNameSize < ECSS_MAX_STRING_SIZE) {
+    if ((uint16_t) repositoryPathSize + (uint16_t) newDirectoryNameSize < ECSS_MAX_STRING_SIZE)
+    {
         objectPathNameSizeStatus = 0;
-    } else {
+    }
+    else
+    {
         objectPathNameSizeStatus = 1;
     }
 
     // Check if all the conditions are matched, else generate a failed start of execution error
-    if ((repositoryPartIsValid == 0) && (oldDirectoryStatus == 0) && (newDirectoryStatus == -10) &&
-        (objectPathNameSizeStatus == 0)) {
-        // Append the old path to the repository and create a new one in order to pass the into the lfs_remove function
+    if ((repositoryPartIsValid == 0) && (oldDirectoryStatus == 2) && (newDirectoryStatus == -10) &&
+        (objectPathNameSizeStatus == 0))
+    {
+        // Create an new string to house the new directory string, with the repository prefix
+        String<ECSS_MAX_STRING_SIZE> newDirectoryPathString(repositoryPathString);
+
+        // TODO : Same addressing here must be needed for the concatenation of the strings (missing "/" etc)
+        // Append the old path to the repository prefix in order to pass the into the lfs_remove function
         repositoryPathString.append(oldDirectoryString);
 
-        String<ECSS_MAX_STRING_SIZE> newDirectoryPathString(repositoryPathString);
+        // Append the new path to the repository prefix in order to pass the into the lfs_remove function
         newDirectoryPathString.append(newDirectoryString);
-
 
         // Call litleFs directory renaming function
         int32_t lfsRenameStatus = lfs_rename(&fs1, reinterpret_cast<const char *>(repositoryPathString.data()),
                                              reinterpret_cast<const char *>(newDirectoryPathString.data()));
 
         // Check if the littleFs function executed without any errors
-        if (lfsRenameStatus < 0) {
+        if (lfsRenameStatus < 0)
+        {
             // An error was detected, create a failed completion of execution error
+            // TODO : More than 1 reason's this can happen. Possibly out of scope so an error handler is an overkill
+            // TODO : for this one
             ErrorHandler::reportError(message,
                                       ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
         }
-    } else {
+    }
+    else
+    {
         // TODO we can mask all the possible failures at this point an create different error reports
         // Create failed start of execution error
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);

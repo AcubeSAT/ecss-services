@@ -75,8 +75,19 @@ int main() {
     fileManagementService.findFile(message);
     */
 
-
-
+    Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFile, Message::TC, 0);
+    String<64> data1 = "test1";
+    String<64> nullString = "@";
+    String<64> data2 = "test2";
+    String<64> data3 = "test3";
+    message.appendString(data1);
+    message.appendString(nullString);
+    message.appendString(data2);
+    message.appendString(nullString);
+    message.appendString(data3);
+    message.appendString(nullString);
+    //fileManagementService.createDirectory(message);
+    fileManagementService.renameDirectory(message);
 
 
 

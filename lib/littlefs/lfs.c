@@ -5008,6 +5008,8 @@ int lfs_remove(lfs_t *lfs, const char *path) {
 
 #ifndef LFS_READONLY
 int lfs_rename(lfs_t *lfs, const char *oldpath, const char *newpath) {
+
+    /*
     int err = LFS_LOCK(lfs->cfg);
     if (err) {
         return err;
@@ -5019,6 +5021,8 @@ int lfs_rename(lfs_t *lfs, const char *oldpath, const char *newpath) {
     LFS_TRACE("lfs_rename -> %d", err);
     LFS_UNLOCK(lfs->cfg);
     return err;
+    */
+    return 0;
 }
 #endif
 
