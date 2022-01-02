@@ -1,5 +1,6 @@
 #include "catch2/catch.hpp"
-#include "Helpers/TimeFormats.hpp"
+#include "Helpers/Time.hpp"
+#include "Helpers/UTCTimestamp.hpp"
 #include "../Services/ServiceTests.hpp"
 
 TEST_CASE("UTC timestamps") {

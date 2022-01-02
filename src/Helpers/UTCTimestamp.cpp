@@ -1,4 +1,5 @@
-#include "Helpers/TimeFormats.hpp"
+#include "Helpers/Time.hpp"
+#include "Helpers/UTCTimestamp.hpp"
 #include <iomanip>
 
 UTCTimestamp::UTCTimestamp() {
