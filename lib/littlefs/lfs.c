@@ -5036,7 +5036,7 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
     LFS_UNLOCK(lfs->cfg);
     return err;
      */
-    info->type = 0x01;
+    info->type = 0x02;
 return 0;
 }
 
@@ -5299,6 +5299,7 @@ int lfs_mkdir(lfs_t *lfs, const char *path) {
 #endif
 
 int lfs_dir_open(lfs_t *lfs, lfs_dir_t *dir, const char *path) {
+    /*
     int err = LFS_LOCK(lfs->cfg);
     if (err) {
         return err;
@@ -5311,6 +5312,8 @@ int lfs_dir_open(lfs_t *lfs, lfs_dir_t *dir, const char *path) {
     LFS_TRACE("lfs_dir_open -> %d", err);
     LFS_UNLOCK(lfs->cfg);
     return err;
+    */
+    return 0;
 }
 
 int lfs_dir_close(lfs_t *lfs, lfs_dir_t *dir) {
@@ -5328,6 +5331,8 @@ int lfs_dir_close(lfs_t *lfs, lfs_dir_t *dir) {
 }
 
 int lfs_dir_read(lfs_t *lfs, lfs_dir_t *dir, struct lfs_info *info) {
+
+    /*
     int err = LFS_LOCK(lfs->cfg);
     if (err) {
         return err;
@@ -5340,6 +5345,36 @@ int lfs_dir_read(lfs_t *lfs, lfs_dir_t *dir, struct lfs_info *info) {
     LFS_TRACE("lfs_dir_read -> %d", err);
     LFS_UNLOCK(lfs->cfg);
     return err;
+    */
+
+    /* Stub code for TC[23,7] TM[23,8]
+    static uint8_t loopCounter = 0;
+    char test2[10] = "test2";
+    char ttest2[10] = "ttest2";
+
+    switch(loopCounter)
+    {
+
+        case(0):
+
+            strcpy(info->name, (const char *)test2);
+            loopCounter = 1;
+            return 1;
+            break;
+
+        case(1):
+
+            strcpy(info->name, (const char *)ttest2);
+            loopCounter = 2;
+            return 1;
+            break;
+
+        case(2):
+
+            return 0;
+    }
+    */
+    return 0;
 }
 
 int lfs_dir_seek(lfs_t *lfs, lfs_dir_t *dir, lfs_off_t off) {

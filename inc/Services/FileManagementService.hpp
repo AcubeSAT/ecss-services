@@ -89,6 +89,7 @@ public:
 
     inline static const uint8_t ServiceType = 23;
     static const char wildcard = '?';
+    static const char variableStringTerminator = '@';
 
     /*
      * @todo must be initialized with void fill(0).

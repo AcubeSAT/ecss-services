@@ -129,8 +129,11 @@ int32_t FileManagementService::pathIsValidForCreation(String<ECSS_MAX_STRING_SIZ
     }
 }
 
-void getNumberOfBytesUntillZeroTerminator(char *characterArray, uint8_t *size) {
-    while (characterArray != "\0") {
+void getNumberOfBytesUntillZeroTerminator(char *characterArray, uint8_t &size)
+{
+    while (*characterArray != '\0')
+    {
+        characterArray++;
         size++;
     }
 }
@@ -264,16 +267,22 @@ int32_t FileManagementService::pathIsValidForARepository(String<ECSS_MAX_STRING_
     int32_t infoStructFillStatus = lfs_stat(&fs1, repositoryStringChar, pInfo);
 
     // Check if the lfs_stat is completed successfully
-    if (infoStructFillStatus >= 0) {
+    if (infoStructFillStatus >= 0)
+    {
         // Check what type of object is found
-        if (infoStruct.type == LFS_TYPE_DIR) {
+        if (infoStruct.type == LFS_TYPE_DIR)
+        {
             // The object is a directory
             return 0;
-        } else {
+        }
+        else
+        {
             // The object is a file
             return 1;
         }
-    } else {
+    }
+    else
+    {
         // Return error code that there is no object
         return 2;
     }
@@ -581,7 +590,7 @@ void FileManagementService::findFile(Message &message) {
 
     // Extract the repository path, which is the first string in this message
     char repositoryPath[ECSS_MAX_STRING_SIZE];
-    uint8_t repositoryPathSize;
+    uint8_t repositoryPathSize = 0;
     uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPath, repositoryPathSize);
     String<ECSS_MAX_STRING_SIZE> repositoryPathString((uint8_t *) repositoryPath, repositoryPathSize);
 
@@ -591,12 +600,6 @@ void FileManagementService::findFile(Message &message) {
     uint8_t searchPatternExtractionStatus = getStringUntilZeroTerminator(message, searchPattern, searchPatternSize);
     String<ECSS_MAX_STRING_SIZE> searchPatternString((uint8_t *) searchPattern, searchPatternSize);
 
-    // Check the repository name extraction status
-    if (repositoryPathExtractionStatus != 0) {
-        // Size of repository path is too large
-        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-    }
-
     // Extract the wildcard position in the repository path if any.
     // If there is not a wildcard in the repository path, then return -10.
     int32_t repositoryPathWildcardPositionIndex = checkForWildcard(repositoryPathString, repositoryPathSize);
@@ -605,14 +608,27 @@ void FileManagementService::findFile(Message &message) {
     // If there is not a wildcard in the search pattern, then return -10.
     int32_t searchPatternWildcardPositionIndex = checkForWildcard(searchPatternString, searchPatternSize);
 
-
+    // Check the repository name extraction status
+    if (repositoryPathExtractionStatus != 0)
+    {
+        // Size of repository path is too large
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+    }
+    // Check the search pattern extraction status
+    else if (searchPatternExtractionStatus != 0)
+    {
+        // Size of search pattern is too large
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+    }
     // Check if there is a wildcard in the repositoryPath
-    if (repositoryPathWildcardPositionIndex != -10) {
+    else if (repositoryPathWildcardPositionIndex != -10)
+    {
         // Report failed start of execution notification
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
     }
         // Check if there is a wildcard in the search pattern
-    else if (searchPatternWildcardPositionIndex == -10) {
+    else if (searchPatternWildcardPositionIndex == -10)
+    {
         // Info struct to store the files attributes
         lfs_info info_struct;
 
@@ -622,16 +638,21 @@ void FileManagementService::findFile(Message &message) {
                                                              searchPatternSize, &info_struct);
 
         // Check the underlying file system response
-        if (extractObjectFindStatus == LFS_ERR_NOENT) {
+        if (extractObjectFindStatus == LFS_ERR_NOENT)
+        {
             // No file found in this path
+            // TODO : What to do with report.numberOfFiles ?
             FoundFilesReportStruct report;
             strcpy(report.repositoryPath, reinterpret_cast<char *>(repositoryPathString.data()));
             strcpy(report.searchPattern, reinterpret_cast<char *>(searchPatternString.data()));
             strcpy(report.filePath, reinterpret_cast<char *>(0));
+            report.numberOfFiles = 0;
 
             // Call TM[23,8]
             foundFileReport(report);
-        } else if ((extractObjectFindStatus == LFS_TYPE_DIR) || (extractObjectFindStatus == LFS_TYPE_REG)) {
+        }
+        else if ((extractObjectFindStatus == LFS_TYPE_DIR) || (extractObjectFindStatus == LFS_TYPE_REG))
+        {
             // An object found at this path
             FoundFilesReportStruct report;
             strcpy(report.repositoryPath, reinterpret_cast<char *>(repositoryPathString.data()));
@@ -641,25 +662,31 @@ void FileManagementService::findFile(Message &message) {
 
             // Call TM[23,8]
             foundFileReport(report);
-        } else {
+        }
+        else
+        {
             // Report failed completion of execution
             ErrorHandler::reportError(message,
                                       ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
         }
-    } else {
+    }
+    else
+    {
         // Lfs struct for directory information
         lfs_dir info_directory;
 
         // Check if the repository exists
         int32_t repositoryExists = pathIsValidForARepository(repositoryPathString, repositoryPathSize);
 
-        if (repositoryExists == 0) {
+        if (repositoryExists == 0)
+        {
             // Open the requested directory
             int32_t lfsDirectoryOpenStatus = lfs_dir_open(&fs1, &info_directory,
                                                           reinterpret_cast<const char *>(repositoryPathString.data()));
 
             // Check the status of the above operation
-            if (lfsDirectoryOpenStatus == 0) {
+            if (lfsDirectoryOpenStatus == 0)
+            {
                 // Info struct for every object found in the requested repository
                 lfs_info info_struct;
 
@@ -672,37 +699,46 @@ void FileManagementService::findFile(Message &message) {
                 String<ECSS_MAX_STRING_SIZE> filePaths((""));
 
                 // Go through all the objects in the repository and store their information in the info_struct
-                while (1) {
+                // TODO : Maybe an approach with a timeout instead of a while(1) is more appropriate
+                while (1)
+                {
                     // Read the next entry in the repository
                     int32_t lfsDirectoryReadStatus = lfs_dir_read(&fs1, &info_directory, &info_struct);
 
                     // Check if there was an error during the read operation
-                    if (lfsDirectoryReadStatus < 0) {
+                    if (lfsDirectoryReadStatus < 0)
+                    {
                         // Report failed completion of execution
                         ErrorHandler::reportError(message,
                                                   ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
                         break;
                     }
                         // Check if there are no other entries in the repository
-                    else if (lfsDirectoryReadStatus == 0) {
+                    else if (lfsDirectoryReadStatus == 0)
+                    {
                         // Exit the for loop
                         break;
                     }
                         // For every entry found, match the name with the requested pattern
-                    else {
+                    else
+                    {
                         // Check if there is a match with a file
                         if (wildcardStringMatch(info_struct.name,
-                                                reinterpret_cast<char *>(searchPatternString.data())) == 1) {
+                                                reinterpret_cast<char *>(searchPatternString.data())) == 1)
+                        {
                             // Find the actual size of the file's name
                             uint8_t fileNameSize = 0;
                             getNumberOfBytesUntillZeroTerminator(reinterpret_cast<char *>(info_struct.name),
-                                                                 &fileNameSize);
+                                                                 fileNameSize);
 
                             // TODO check for truncation
 
                             // Put it in the filePath character array
                             filePaths.append((const char *) info_struct.name, fileNameSize);
-                            filePaths.append((const char *) "\0", 1);
+                            filePaths.append((const char *) "@", 1);
+
+                            // Increment the numberOfFiles counter
+                            report.numberOfFiles++;
                         }
                     }
                 }
@@ -711,12 +747,16 @@ void FileManagementService::findFile(Message &message) {
 
                 // Call TM[23,8]
                 foundFileReport(report);
-            } else {
+            }
+            else
+            {
                 // Report failed start of execution due to inability to open the requested repository
                 ErrorHandler::reportError(message,
                                           ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
             }
-        } else {
+        }
+        else
+        {
             // Report failed start of execution due to invalid repository path
             ErrorHandler::reportError(message,
                                       ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
@@ -734,9 +774,11 @@ void FileManagementService::foundFileReport(FoundFilesReportStruct filesReport) 
     uint8_t searchPatternSize = 0;
     uint8_t filePathsSize = 0;
 
-    getNumberOfBytesUntillZeroTerminator(reinterpret_cast<char *>(filesReport.repositoryPath), &repositoryPathSize);
-    getNumberOfBytesUntillZeroTerminator(reinterpret_cast<char *>(filesReport.searchPattern), &searchPatternSize);
-    getNumberOfBytesUntillZeroTerminator(reinterpret_cast<char *>(filesReport.filePath), &filePathsSize);
+    // TODO : Check initialization of the strings. After the actual message, there is a chance that garbage other than
+    // TODO : 0 will appear, so the size of the string wiil be different.
+    getNumberOfBytesUntillZeroTerminator(reinterpret_cast<char *>(filesReport.repositoryPath), repositoryPathSize);
+    getNumberOfBytesUntillZeroTerminator(reinterpret_cast<char *>(filesReport.searchPattern), searchPatternSize);
+    getNumberOfBytesUntillZeroTerminator(reinterpret_cast<char *>(filesReport.filePath), filePathsSize);
 
     String<ECSS_MAX_STRING_SIZE> repositoryPath(reinterpret_cast<uint8_t *>(filesReport.repositoryPath),
                                                 repositoryPathSize);
@@ -745,9 +787,12 @@ void FileManagementService::foundFileReport(FoundFilesReportStruct filesReport) 
     String<ECSS_MAX_STRING_SIZE> filePaths(reinterpret_cast<uint8_t *>(filesReport.filePath), filePathsSize);
 
     report.appendString(repositoryPath);
+    report.appendUint8((uint8_t)variableStringTerminator);
     report.appendString(searchPattern);
-    report.appendUint16(filesReport.numberOfFiles);
+    report.appendUint8((uint8_t)variableStringTerminator);
+    report.appendUint32(filesReport.numberOfFiles);
     report.appendString(filePaths);
+    report.appendUint8((uint8_t)variableStringTerminator);
 
 }
 
@@ -757,7 +802,7 @@ void FileManagementService::createDirectory(Message &message) {
 
     // Extract the repository path, which is the first string in this message
     char repositoryPath[ECSS_MAX_STRING_SIZE];
-    uint8_t repositoryPathSize;
+    uint8_t repositoryPathSize = 0;
     uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPath, repositoryPathSize);
     String<ECSS_MAX_STRING_SIZE> repositoryPathString((uint8_t *) repositoryPath, repositoryPathSize);
 
