@@ -631,15 +631,55 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		          .find(parameterService.getParameter(PMONIds.at(1))->get())
 		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		         .find(parameterService.getParameter(PMONIds.at(2))->get())
-		         ->second.expectedValue == expectedValue);
+		          .find(parameterService.getParameter(PMONIds.at(2))->get())
+		          ->second.expectedValue == expectedValue);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
 		          .find(parameterService.getParameter(PMONIds.at(2))->get())
 		          ->second.mask == expetedValueCheckMask);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
 		          .find(parameterService.getParameter(PMONIds.at(2))->get())
 		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
+	}
 
+	SECTION("Modify parameter not in the Parameter Monitoring List"){
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 4;
+		uint16_t monitoredParameterId = 4;
+		uint16_t repetitionNumber = 10;
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendUint16(PMONId);
+		request.appendUint16(monitoredParameterId);
+		request.appendUint16(repetitionNumber);
+		MessageParser::execute(request);
+
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ModifyParameterNotInTheParameterMonitoringList) == 1);
+	}
+
+	SECTION("Monitored parameter ID does not match the Parameter Monitoring Definition"){
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 0;
+		uint16_t monitoredParameterId = 1;
+		uint16_t repetitionNumber = 10;
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendUint16(PMONId);
+		request.appendUint16(monitoredParameterId);
+		request.appendUint16(repetitionNumber);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DifferentParameterMonitoringDefinitionAndMonitoredParameter) == 1);
+	}
 	SECTION("High limit is lower than low limit") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
@@ -651,7 +691,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+		            OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		request.appendUint16(PMONId);
 		request.appendUint16(monitoredParameterId);
