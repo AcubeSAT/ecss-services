@@ -186,6 +186,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							break;
 						}
 						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
+						ParameterMonitoringCheckingStatus.find(parameterToBeModified->get())->second = Unchecked;
 						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
 						    LimitCheck) {
 							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowLimit =
@@ -217,6 +218,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 						uint8_t expectedValue = message.readUint8();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
 						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
+						ParameterMonitoringCheckingStatus.find(parameterToBeModified->get())->second = Unchecked;
 						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
 						    ExpectedValueCheck) {
 							ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.mask =
@@ -253,6 +255,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							break;
 						}
 						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
+						ParameterMonitoringCheckingStatus.find(parameterToBeModified->get())->second = Unchecked;
 						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
 						    DeltaCheck) {
 							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
