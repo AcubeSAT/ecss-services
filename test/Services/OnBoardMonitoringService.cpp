@@ -26,6 +26,11 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.RepetitionNumber.insert({parameter3, 5});
 	onBoardMonitoringService.RepetitionNumber.insert({parameter4, 6});
 
+	onBoardMonitoringService.RepetitionCounter.insert({parameter1, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({parameter2, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({parameter3, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({parameter4, 0});
+
 	onBoardMonitoringService.ParameterMonitoringList.insert({0, parameter1});
 	onBoardMonitoringService.ParameterMonitoringList.insert({1, parameter2});
 	onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
@@ -40,7 +45,19 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter2, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter3, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter4, true});
-}
+
+	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert(
+	    {parameter1, onBoardMonitoringService.ExpectedValueCheck});
+	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({parameter2, onBoardMonitoringService.LimitCheck});
+	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({parameter3, onBoardMonitoringService.DeltaCheck});
+
+	struct OnBoardMonitoringService::ExpectedValueCheck expectedValueCheck = {};
+	onBoardMonitoringService.ExpectedValueCheckParameters.insert({parameter1, expectedValueCheck});
+	struct OnBoardMonitoringService::LimitCheck limitCheck = {};
+	onBoardMonitoringService.LimitCheckParameters.insert({parameter2, limitCheck});
+	struct OnBoardMonitoringService::DeltaCheck deltaCheck = {};
+	onBoardMonitoringService.DeltaCheckParameters.insert({parameter3, deltaCheck});
+};
 
 void clearAllMaps() {
 	onBoardMonitoringService.ParameterMonitoringList.clear();
