@@ -171,9 +171,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		uint16_t currentParameterRepetitionNumber = message.readUint16();
 		uint16_t currentCheckType = message.readEnum8();
 		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
-			if (auto parameterToBeAdded = parameterService.getParameter(currentParameterId)) {
+			if (auto parameterToBeModified = parameterService.getParameter(currentParameterId)) {
 				// TODO: Find out how to compare the items below.
-				if (static_cast<std::reference_wrapper<ParameterBase>>(parameterToBeAdded->get()) !=
+				if (static_cast<std::reference_wrapper<ParameterBase>>(parameterToBeModified->get()) !=
 				    ParameterMonitoringList.find(currentPMONId)->second) {
 					if (currentCheckType == LimitCheck) {
 						uint8_t lowLimit = message.readUint8();
@@ -201,7 +201,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							    LimitCheck;
 							struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
 							                                aboveHighLimitEventId};
-							LimitCheckParameters.insert({parameterToBeAdded->get(), limitCheck});
+							LimitCheckParameters.insert({parameterToBeModified->get(), limitCheck});
 							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
 							    ExpectedValueCheck) {
 								ExpectedValueCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
@@ -230,7 +230,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							    ExpectedValueCheck;
 							struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue,
 							                                                notExpectedValueEventId};
-							ExpectedValueCheckParameters.insert({parameterToBeAdded->get(), expectedValueCheck});
+							ExpectedValueCheckParameters.insert({parameterToBeModified->get(), expectedValueCheck});
 							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
 							    LimitCheck) {
 								LimitCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
@@ -270,7 +270,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							    DeltaCheck;
 							struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
 							                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
-							DeltaCheckParameters.insert({parameterToBeAdded->get(), deltaCheck});
+							DeltaCheckParameters.insert({parameterToBeModified->get(), deltaCheck});
 							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
 							    LimitCheck) {
 								LimitCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
