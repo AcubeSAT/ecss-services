@@ -1,7 +1,6 @@
 #include <iostream>
 #include <Logger.hpp>
 #include "Helpers/CRCHelper.hpp"
-#include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
