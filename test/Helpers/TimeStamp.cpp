@@ -32,7 +32,7 @@ TEST_CASE("TimeStamp class construction") {
 
 	SECTION("Check TAI idempotence") {
 		int input_time = 1000;
-		TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES, ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> Epoch(input_time);
+		AcubesatTimestamp_t Epoch(input_time);
 		REQUIRE(Epoch.as_TAI_seconds() == input_time); // check initialization has intended effect
 	}
 

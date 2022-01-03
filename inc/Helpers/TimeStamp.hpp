@@ -54,7 +54,7 @@ public:
 	 * @param seconds an integer number of seconds from AcubeSAT custom epoch
 	 */
 	TimeStamp(int tai_seconds_from_AcubeSAT_epoch);
-	
+
 	/**
 	 * Initialize the instant from the bytes of a CUC time stamp
 	 *
@@ -118,3 +118,5 @@ public:
 ////////////////////////////////////////////////
 
 #endif
+
+typedef TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES,ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> AcubesatTimestamp_t;
