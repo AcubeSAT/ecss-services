@@ -5,6 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
 #include "Message.hpp"
+#include "Helpers/TimeStamp.hpp"
 
 /**
  * @todo: add a way of defining each packets store's size in bytes
@@ -28,15 +29,15 @@ public:
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
 	 */
-	uint32_t openRetrievalStartTimeTag = 0;
+	AcubesatTimestamp_t openRetrievalStartTimeTag = 0;
 	/**
 	 * The start time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	uint32_t retrievalStartTime = 0;
+	AcubesatTimestamp_t retrievalStartTime = 0;
 	/**
 	 * The end time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	uint32_t retrievalEndTime = 0;
+	AcubesatTimestamp_t retrievalEndTime = 0;
 	/**
 	 * The size of the packet store, in bytes.
 	 */
@@ -76,7 +77,7 @@ public:
 	 * 				old packets  <---------->  new packets
 	 * 				[][][][][][][][][][][][][][][][][][][]	<--- deque
 	 */
-	etl::deque<std::pair<uint32_t, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
+	etl::deque<std::pair<AcubesatTimestamp_t, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
 
 	/**
 	 * Returns the sum of the sizes of the packets stored in this PacketStore, in bytes.

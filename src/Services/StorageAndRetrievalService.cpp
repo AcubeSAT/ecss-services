@@ -6,7 +6,7 @@ String<ECSSMaxPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(M
 }
 
 void StorageAndRetrievalService::deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId,
-                                                    uint32_t timeLimit) {
+                                                    AcubesatTimestamp_t timeLimit) {
 	for (auto& tmPacket : packetStores[packetStoreId].storedTelemetryPackets) {
 		if (tmPacket.first > timeLimit) {
 			break;
@@ -16,8 +16,8 @@ void StorageAndRetrievalService::deleteContentUntil(const String<ECSSMaxPacketSt
 }
 
 void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
-	uint32_t startTime = request.readUint32();
-	uint32_t endTime = request.readUint32();
+	AcubesatTimestamp_t startTime(request.readUint32()); //TODO make request.read dynamic
+	AcubesatTimestamp_t endTime(request.readUint32()); //TODO make request.read dynamic
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -48,7 +48,7 @@ bool StorageAndRetrievalService::invalidPacketStores(const String<ECSSMaxPacketS
 	return false;
 }
 
-bool StorageAndRetrievalService::invalidTimeWindow(uint32_t startTime, uint32_t endTime, Message& request) {
+bool StorageAndRetrievalService::invalidTimeWindow(AcubesatTimestamp_t startTime, AcubesatTimestamp_t endTime, Message& request) {
 	if (startTime >= endTime) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 		return true;
@@ -66,7 +66,7 @@ bool StorageAndRetrievalService::invalidDestinationPacketStore(const String<ECSS
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-                                                         uint32_t startTime, uint32_t endTime, Message& request) {
+                                                         AcubesatTimestamp_t startTime, AcubesatTimestamp_t endTime, Message& request) {
 	if (endTime < packetStores[fromPacketStoreId].storedTelemetryPackets.front().first ||
 	    startTime > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -77,14 +77,14 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPac
 
 bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
-                                                    uint32_t startTime, uint32_t endTime, Message& request) {
+                                                    AcubesatTimestamp_t startTime, AcubesatTimestamp_t endTime, Message& request) {
 	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        invalidTimeWindow(startTime, endTime, request) or invalidDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, endTime, request));
 }
 
 void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
-	uint32_t startTime = request.readUint32();
+	AcubesatTimestamp_t startTime(request.readUint32()); //TODO make request.read dynamic
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -102,7 +102,7 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-                                                         uint32_t timeTag, Message& request, bool isAfterTimeTag) {
+                                                         AcubesatTimestamp_t timeTag, Message& request, bool isAfterTimeTag) {
 	if (isAfterTimeTag) {
 		if (timeTag > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -119,14 +119,14 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPac
 
 bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
-                                                    uint32_t startTime, Message& request) {
+                                                    AcubesatTimestamp_t startTime, Message& request) {
 	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        invalidDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, request, true));
 }
 
 void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
-	uint32_t endTime = request.readUint32();
+	AcubesatTimestamp_t endTime(request.readUint32()); //TODO make request.read dynamic
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -145,7 +145,7 @@ void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
 
 bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                      const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
-                                                     uint32_t endTime, Message& request) {
+                                                     AcubesatTimestamp_t endTime, Message& request) {
 	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        invalidDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, endTime, request, false));
@@ -153,13 +153,13 @@ bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSMaxPacketS
 
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
-	uint32_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
-	report.appendUint32(oldestStoredPacketTime);
+	AcubesatTimestamp_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
+	report.appendUint32(oldestStoredPacketTime.as_TAI_seconds()); //TODO change for actual TM/TC Actubesat format
 
-	uint32_t newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
-	report.appendUint32(newestStoredPacketTime);
+	AcubesatTimestamp_t newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
+	report.appendUint32(newestStoredPacketTime.as_TAI_seconds()); //TODO change for actual TM/TC Actubesat format
 
-	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
+	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag.as_TAI_seconds());
 
 	auto filledPercentage1 = static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f /
 	                                               ECSSMaxPacketStoreSize);
@@ -248,8 +248,8 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		if (supportsPrioritizingRetrievals) {
 			priority = request.readUint16();
 		}
-		uint32_t retrievalStartTime = request.readUint32();
-		uint32_t retrievalEndTime = request.readUint32();
+		AcubesatTimestamp_t retrievalStartTime(request.readUint32()); //TODO make request.read dynamic
+		AcubesatTimestamp_t retrievalEndTime(request.readUint32()); //TODO make request.read dynamic
 
 		if (retrievalStartTime >= retrievalEndTime) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);

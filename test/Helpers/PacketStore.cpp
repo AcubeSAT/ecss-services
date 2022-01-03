@@ -8,10 +8,14 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		tm1.appendFloat(5.6);
 
 		PacketStore packetStore;
-		packetStore.storedTelemetryPackets.push_back({2, tm1});
+		AcubesatTimestamp_t ts1(2);
+		packetStore.storedTelemetryPackets.push_back({ts1 , tm1});
 
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 1);
 		REQUIRE(packetStore.calculateSizeInBytes() == 5);
+
+		auto ts1_after = std::get<0>(packetStore.storedTelemetryPackets.front());
+		REQUIRE(ts1_after == ts1);
 
 		Message tm2;
 		tm2.appendBoolean(true);
@@ -19,7 +23,8 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		tm2.appendUint8(3);
 		tm2.appendUint32(55);
 
-		packetStore.storedTelemetryPackets.push_back({2, tm2});
+		AcubesatTimestamp_t ts2(2);
+		packetStore.storedTelemetryPackets.push_back({ts2, tm2});
 
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 2);
 		REQUIRE(packetStore.calculateSizeInBytes() == 13);
@@ -29,7 +34,8 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		tm3.appendUint8(3);
 		tm3.appendUint32(55);
 
-		packetStore.storedTelemetryPackets.push_back({3, tm3});
+		AcubesatTimestamp_t ts3({0b00100110, 0, 1, 1, 3, 0, 0, 0, 0});
+		packetStore.storedTelemetryPackets.push_back({ts3, tm3});
 
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 3);
 		REQUIRE(packetStore.calculateSizeInBytes() == 26);
