@@ -1,20 +1,12 @@
-#include "Helpers/Time.hpp"
-#include "Helpers/UTCTimestamp.hpp"
+#include "Time/Time.hpp"
+#include "Time/UTCTimestamp.hpp"
 #include <iomanip>
 
-UTCTimestamp::UTCTimestamp() {
-	// Unix epoch 1/1/1970
-	year = 1970;
-	month = 1;
-	day = 1;
-	hour = 0;
-	minute = 0;
-	second = 0;
-}
+UTCTimestamp::UTCTimestamp() : year(1970), month(1), second(0), minute(0), hour(0), day(1)
+{}
 
 UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
-	// check if the parameters make sense
-	ASSERT_INTERNAL(2019 <= year, ErrorHandler::InternalErrorType::InvalidDate);
+	ASSERT_INTERNAL(1970 <= year, ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= month) && (month <= 12), ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= day) && (day <= 31), ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL(hour < 24, ErrorHandler::InternalErrorType::InvalidDate);
@@ -30,8 +22,7 @@ UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t ho
 	this->second = second;
 }
 
-bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
-	// compare years
+bool UTCTimestamp::operator<(const UTCTimestamp& Date) const {
 	if (this->year < Date.year) {
 		return true;
 	}
@@ -39,7 +30,6 @@ bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
 		return false;
 	}
 
-	// compare months
 	if (this->month < Date.month) {
 		return true;
 	}
@@ -47,7 +37,6 @@ bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
 		return false;
 	}
 
-	// compare days
 	if (this->day < Date.day) {
 		return true;
 	}
@@ -55,7 +44,6 @@ bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
 		return false;
 	}
 
-	// compare hours
 	if (this->hour < Date.hour) {
 		return true;
 	}
@@ -63,7 +51,6 @@ bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
 		return false;
 	}
 
-	// compare minutes
 	if (this->minute < Date.minute) {
 		return true;
 	}
@@ -71,7 +58,6 @@ bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
 		return false;
 	}
 
-	// compare seconds
 	if (this->second < Date.second) {
 		return true;
 	}
@@ -79,7 +65,7 @@ bool UTCTimestamp::operator<(const UTCTimestamp& Date) {
 	return false;
 }
 
-bool UTCTimestamp::operator>(const UTCTimestamp& Date) {
+bool UTCTimestamp::operator>(const UTCTimestamp& Date) const {
 	if (this->year > Date.year) {
 		return true;
 	}
@@ -117,7 +103,7 @@ bool UTCTimestamp::operator>(const UTCTimestamp& Date) {
 	return false;
 }
 
-bool UTCTimestamp::operator==(const UTCTimestamp& Date) {
+bool UTCTimestamp::operator==(const UTCTimestamp& Date) const {
 	if (this->year != Date.year) {
 		return false;
 	}
@@ -139,19 +125,10 @@ bool UTCTimestamp::operator==(const UTCTimestamp& Date) {
 	return true;
 }
 
-bool UTCTimestamp::operator<=(const UTCTimestamp& Date) {
+bool UTCTimestamp::operator<=(const UTCTimestamp& Date) const {
 	return ((*this < Date) || (*this == Date));
 }
 
-bool UTCTimestamp::operator>=(const UTCTimestamp& Date) {
+bool UTCTimestamp::operator>=(const UTCTimestamp& Date) const {
 	return ((*this > Date) || (*this == Date));
-}
-
-std::ostream& operator<<(std::ostream& o, UTCTimestamp const& Date) { // NOLINT
-	// YYYY-MM-DDTHH:mm:ss.sssZ
-	o.fill('0');
-	o << static_cast<int>(Date.year) << "-" << std::setw(2) << static_cast<int>(Date.month) << "-" << std::setw(2)
-	  << static_cast<int>(Date.day) << "T" << std::setw(2) << static_cast<int>(Date.hour) << ":" << std::setw(2)
-	  << static_cast<int>(Date.minute) << ":" << std::setw(2) << static_cast<int>(Date.second) << ":000Z" << std::endl;
-	return o;
 }

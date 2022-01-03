@@ -1,11 +1,11 @@
 #include "catch2/catch.hpp"
-#include "Helpers/Time.hpp"
-#include "Helpers/UTCTimestamp.hpp"
+#include "Time/Time.hpp"
+#include "Time/UTCTimestamp.hpp"
 #include "../Services/ServiceTests.hpp"
 
 TEST_CASE("UTC timestamps") {
 	// invalid year
-	UTCTimestamp Timestamp0{2018, 4, 10, 10, 15, 0};
+	UTCTimestamp Timestamp0{1950, 4, 10, 10, 15, 0};
 
 	// invalid month
 	UTCTimestamp Timestamp1{2020, 60, 10, 10, 15, 0};

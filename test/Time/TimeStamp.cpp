@@ -1,5 +1,5 @@
 #include "catch2/catch.hpp"
-#include "Helpers/TimeStamp.hpp"
+#include "Time/TimeStamp.hpp"
 #include "../Services/ServiceTests.hpp"
 #include <typeinfo>
 #include <iostream>
@@ -11,8 +11,8 @@ TEST_CASE("TimeStamp class construction") {
 	//   TimeStamp<5, 10> Epoch3;
 	//   TimeStamp<4, 4> Epoch4;
 	// }
-
-	SECTION("Test CUC headers generation") {
+}
+	TEST_CASE("Test CUC headers generation") {
 		auto cuc_header1 = buildCUCHeader<uint8_t, 2, 2>();
 		CHECK(cuc_header1 == 0b00100110);
 
@@ -32,13 +32,13 @@ TEST_CASE("TimeStamp class construction") {
 		CHECK(cuc_header6 == 0b1010110111100000);
 	}
 
-	SECTION("Check TAI idempotence") {
+    TEST_CASE("Check TAI idempotence") {
 		int input_time = 1000;
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(input_time);
 		REQUIRE(Epoch.asTAIseconds() == input_time); // check initialization has intended effect
 	}
 
-	SECTION("Check CUC idempotence") {
+    TEST_CASE("Check CUC idempotence") {
 		etl::array<uint8_t, 9> input_time1 = {0b00100110, 0, 1, 1, 3, 0, 0, 0, 0};
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch1(input_time1);
 		etl::array<uint8_t, 9> test_return1 = Epoch1.toCUCtimestamp();
@@ -67,7 +67,7 @@ TEST_CASE("TimeStamp class construction") {
 		}
 	}
 
-	SECTION("Check UTC idempotence") {
+    TEST_CASE("Check UTC idempotence") {
 		{
 			UTCTimestamp timestamp1(2020, 4, 10, 10, 15, 0); // 10 Apr 2020, 10:15:00;
 			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
@@ -84,7 +84,7 @@ TEST_CASE("TimeStamp class construction") {
 		}
 	}
 
-	SECTION("UTC conversion to and from seconds timestamps") {
+    TEST_CASE("UTC conversion to and from seconds timestamps") {
 		{
 			UTCTimestamp timestamp1(2020, 12, 5, 0, 0, 0); // 5 Dec 2020, midnight;
 			TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
@@ -103,7 +103,7 @@ TEST_CASE("TimeStamp class construction") {
 	//   REQUIRE(Epoch1==Epoch2);
 	// }
 
-	SECTION("Check operators") {
+    TEST_CASE("Check operators") {
 		TimeStamp<1, 2> Epoch1;
 		TimeStamp<1, 2> Epoch2;
 		TimeStamp<1, 2> Epoch3(10);
@@ -122,9 +122,9 @@ TEST_CASE("TimeStamp class construction") {
 		// REQUIRE(Epoch1==Epoch7); //should fail at compile, different templates
 	}
 
-	SECTION("Check runtime class size") {
+    TEST_CASE("Check runtime class size") {
 		int input_time = 1000;
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(input_time);
 		REQUIRE(sizeof(Epoch) < 32);
 	}
-}
+

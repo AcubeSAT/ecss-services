@@ -28,8 +28,7 @@ add_library(common OBJECT
         src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
-        src/Helpers/UTCTimestamp.cpp
-        src/Platform/x86/Parameters/SystemParameters.cpp
+        src/Time/UTCTimestamp.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
         src/Services/ParameterService.cpp
@@ -42,7 +41,7 @@ add_library(common OBJECT
         )
 
 # Specify the .cpp files for the executables
-file(GLOB x86_main_SRC "src/Platform/x86/*.cpp")
+file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
 add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
@@ -51,7 +50,7 @@ add_executable(ecss_services
 IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
     # Gather all the .cpp files corresponding to tests
     file(GLOB test_main_SRC "test/*.cpp")
-    file(GLOB test_SRC "test/**/*.cpp")
+    file(GLOB test_SRC "test/**/*.cpp" "src/Platform/x86/Parameters/SystemParameters.cpp")
 
     add_subdirectory(lib/Catch2)
     add_executable(tests

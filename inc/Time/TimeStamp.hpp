@@ -5,8 +5,8 @@
 #include <algorithm>
 #include "macros.hpp"
 #include <etl/array.h>
-#include "Helpers/Time.hpp"
-#include "Helpers/UTCTimestamp.hpp"
+#include "Time.hpp"
+#include "UTCTimestamp.hpp"
 
 /**
  * A class that represents an instant in time, with convenient conversion

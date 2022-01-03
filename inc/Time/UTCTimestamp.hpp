@@ -1,3 +1,8 @@
+#pragma once
+
+#include <cstdint>
+#include <etl/String.hpp>
+
 /**
 * A class that represents a UTC time and date according to ISO 8601
 *
@@ -46,18 +51,10 @@ public:
 	* Compare two timestamps.
 	* @param Date the date that will be compared with the pointer `this`
 	*/
-   bool operator<(const UTCTimestamp& Date);
-   bool operator>(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
-   bool operator==(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
-   bool operator<=(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
-   bool operator>=(const UTCTimestamp& Date); ///< @copydoc UTCTimestamp::operator<
-
-   /**
-	* Pretty-print timestamp.
-	*
-	* @todo Find if we can forego including <ostream> here
-	* @param Date the date that will be output
-	*/
-   friend std::ostream& operator<<(std::ostream& o, UTCTimestamp const& Date);
+   bool operator<(const UTCTimestamp& Date) const;
+   bool operator>(const UTCTimestamp& Date) const; ///< @copydoc UTCTimestamp::operator<
+   bool operator==(const UTCTimestamp& Date) const; ///< @copydoc UTCTimestamp::operator<
+   bool operator<=(const UTCTimestamp& Date) const; ///< @copydoc UTCTimestamp::operator<
+   bool operator>=(const UTCTimestamp& Date) const; ///< @copydoc UTCTimestamp::operator<
 };
 
