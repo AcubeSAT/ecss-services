@@ -1,6 +1,4 @@
-#ifndef ECSS_SERVICES_TIME_HPP
-#define ECSS_SERVICES_TIME_HPP
-
+#pragma once
 #include <cstdint>
 #include <algorithm>
 #include "macros.hpp"
@@ -116,7 +114,5 @@ public:
 ////// TEMPLATED METHODS INSTANTIATION /////////
 #include "TimeStamp.tpp"
 ////////////////////////////////////////////////
-
-#endif
 
 typedef TimeStamp<ACUBESAT_CUC_SECONDS_COUNTER_BYTES,ACUBESAT_CUC_FRACTIONAL_COUNTER_BYTES> AcubesatTimestamp_t;
