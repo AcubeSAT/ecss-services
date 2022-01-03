@@ -613,66 +613,32 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		          parameterService.getParameter(PMONIds.at(1))->get()) == onBoardMonitoringService.Unchecked);
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(
 		          parameterService.getParameter(PMONIds.at(2))->get()) == onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
+		          ->second.lowLimit == lowLimit);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
+		          ->second.highLimit == highLimit);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
+		          ->second.belowLowLimitEvent == onBoardMonitoringService.BelowLowLimitEvent);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
+		          ->second.aboveHighLimitEvent == onBoardMonitoringService.AboveHighLimitEvent);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(0))->get())
+		          .find(parameterService.getParameter(PMONIds.at(1))->get())
 		          ->second.expectedValue == expectedValue);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(0))->get())
+		          .find(parameterService.getParameter(PMONIds.at(1))->get())
 		          ->second.mask == expetedValueCheckMask);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(0))->get())
+		          .find(parameterService.getParameter(PMONIds.at(1))->get())
 		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.lowLimit == lowLimit);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.highLimit == highLimit);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.belowLowLimitEvent == onBoardMonitoringService.BelowLowLimitEvent);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.aboveHighLimitEvent == onBoardMonitoringService.AboveHighLimitEvent);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.lowDeltaThreshold == lowDeltaThreshold);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.highDeltaThreshold == highDeltaThreshold);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.belowLowThresholdEvent == onBoardMonitoringService.BelowLowThresholdEvent);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.aboveHighThresholdEvent == onBoardMonitoringService.AboveHighThresholdEvent);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.numberOfConsecutiveDeltaChecks == numberOfConsecutiveDeltaChecks);
-	}
-
-	SECTION("Parameter Monitoring List is full") {
-		initialiseParameterMonitoringDefinitions();
-		uint16_t numberOfIds = 1;
-		uint16_t PMONId = 3;
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
-		request.appendUint16(numberOfIds);
-		request.appendUint16(PMONId);
-
-		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ParameterMonitoringListIsFull) == 1);
-		clearAllMaps();
-	}
-
-	SECTION("Parameter Monitoring Definition already exists") {
-		initialiseParameterMonitoringDefinitions();
-		uint16_t numberOfIds = 1;
-		uint16_t PMONId = 0;
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
-		request.appendUint16(numberOfIds);
-		request.appendUint16(PMONId);
-
-		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddAlreadyExistingParameter) == 1);
-		clearAllMaps();
-	}
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
+		         .find(parameterService.getParameter(PMONIds.at(2))->get())
+		         ->second.expectedValue == expectedValue);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
+		          .find(parameterService.getParameter(PMONIds.at(2))->get())
+		          ->second.mask == expetedValueCheckMask);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
+		          .find(parameterService.getParameter(PMONIds.at(2))->get())
+		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
 
 	SECTION("High limit is lower than low limit") {
 		initialiseParameterMonitoringDefinitions();
