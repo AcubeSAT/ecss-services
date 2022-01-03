@@ -254,6 +254,7 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 
 TEST_CASE("Add Parameter Monitoring Definitions") {
 	SECTION("Valid Request to add Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
@@ -402,6 +403,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	}
 
 	SECTION("High limit is lower than low limit") {
+		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 0;
@@ -428,6 +430,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	}
 
 	SECTION("High threshold is lower than low threshold") {
+		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 0;
@@ -469,6 +472,36 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 		request.appendEnum16(PMONIds.at(1));
 		request.appendEnum16(PMONIds.at(2));
 		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 0);
+		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(0)) ==
+		      onBoardMonitoringService.ParameterMonitoringList.end());
+		CHECK(
+		    onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(0))->get()) ==
+		    onBoardMonitoringService.ParameterMonitoringIds.end());
+		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(1)) ==
+		      onBoardMonitoringService.ParameterMonitoringList.end());
+		CHECK(
+		    onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(1))->get()) ==
+		    onBoardMonitoringService.ParameterMonitoringIds.end());
+		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(2)) ==
+		      onBoardMonitoringService.ParameterMonitoringList.end());
+		CHECK(
+		    onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(2))->get()) ==
+		    onBoardMonitoringService.ParameterMonitoringIds.end());
+	}
+	SECTION("Two invalid requests to delete a Parameter Monitoring Definition and two valid ones") {
+		initialiseParameterMonitoringDefinitions();
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteParameterMonitoringDefinitions, Message::TC, 0);
+		uint16_t numberOfIds = 4;
+		request.appendUint16(numberOfIds);
+		etl::array<uint16_t, 4> PMONIds = {0, 1, 3, 4};
+		request.appendEnum16(PMONIds.at(0));
+		request.appendEnum16(PMONIds.at(1));
+		request.appendEnum16(PMONIds.at(2));
+		request.appendEnum16(PMONIds.at(3));
+		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinitionError) == 1);
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(0)) ==
@@ -485,36 +518,6 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.ParameterMonitoringList.end());
 		CHECK(
 		    onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(3))->get()) !=
-		    onBoardMonitoringService.ParameterMonitoringIds.end());
-	}
-	SECTION("Two invalid requests to delete a Parameter Monitoring Definition and two valid ones") {
-		initialiseParameterMonitoringDefinitions();
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::DeleteParameterMonitoringDefinitions, Message::TC, 0);
-		uint16_t numberOfIds = 4;
-		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 1, 3, 4};
-		request.appendEnum16(PMONIds.at(0));
-		request.appendEnum16(PMONIds.at(1));
-		request.appendEnum16(PMONIds.at(2));
-		request.appendEnum16(PMONIds.at(3));
-		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 0);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(0)) ==
-		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(
-		    onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(0))->get()) ==
-		    onBoardMonitoringService.ParameterMonitoringIds.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(1)) ==
-		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(
-		    onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(1))->get()) ==
-		    onBoardMonitoringService.ParameterMonitoringIds.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(2)) ==
-		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(
-		    onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(2))->get()) ==
 		    onBoardMonitoringService.ParameterMonitoringIds.end());
 	}
 }
