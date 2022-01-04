@@ -844,3 +844,25 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		clearAllMaps();
 	}
 }
+
+TEST_CASE("Report status of Parameter Monitoring Definitions"){
+	initialiseParameterMonitoringDefinitions();
+	Message request =
+	    Message(OnBoardMonitoringService::ServiceType,
+	            OnBoardMonitoringService::MessageType::ReportStatusOfParameterMonitoringDefinition, Message::TC, 0);
+	MessageParser::execute(request);
+	CHECK(ServiceTests::count() == 1);
+	Message report = ServiceTests::get(0);
+	CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+	CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionStatusReport);
+	CHECK(report.readUint16() == onBoardMonitoringService.ParameterMonitoringList.size());
+	CHECK(report.readUint16() == 0);
+	CHECK(report.readEnumerated(1) == false);
+	CHECK(report.readUint16() == 1);
+	CHECK(report.readEnumerated(1) == false);
+	CHECK(report.readUint16() == 2);
+	CHECK(report.readEnumerated(1) == false);
+	CHECK(report.readUint16() == 3);
+	CHECK(report.readEnumerated(1) == false);
+	clearAllMaps();
+}
