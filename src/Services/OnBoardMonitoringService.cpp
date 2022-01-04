@@ -313,45 +313,52 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
 	uint16_t currentPMONId = message.readUint16();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
-		// TODO:Find out how to get the monitored parameter id.
-		parameterMonitoringDefinitionReport.appendEnumerated(
-		    1, ParameterMonitoringStatus.find(ParameterMonitoringList.at(currentPMONId))->second);
-		parameterMonitoringDefinitionReport.appendEnum16(
-		    RepetitionNumber.find(ParameterMonitoringList.at(currentPMONId))->second);
-		parameterMonitoringDefinitionReport.appendEnum8(
-		    ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second);
-		if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second == LimitCheck) {
-			parameterMonitoringDefinitionReport.appendUint16(
-			    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowLimit);
+		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()){
+			parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
+			// TODO:Find out how to get the monitored parameter id.
+			parameterMonitoringDefinitionReport.appendEnumerated(
+			    1, ParameterMonitoringStatus.find(ParameterMonitoringList.at(currentPMONId))->second);
+			parameterMonitoringDefinitionReport.appendEnum16(
+			    RepetitionNumber.find(ParameterMonitoringList.at(currentPMONId))->second);
 			parameterMonitoringDefinitionReport.appendEnum8(
-			    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowLimitEvent);
-			parameterMonitoringDefinitionReport.appendUint16(
-			    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highLimit);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighLimitEvent);
-		} else if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-		           ExpectedValueCheck) {
-			parameterMonitoringDefinitionReport.appendUint8(
-			    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.mask);
-			parameterMonitoringDefinitionReport.appendUint16(
-			    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.expectedValue);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-			        ->second.notExpectedValueEvent);
-		} else {
-			parameterMonitoringDefinitionReport.appendUint16(
-			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowDeltaThreshold);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowThresholdEvent);
-			parameterMonitoringDefinitionReport.appendUint16(
-			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highDeltaThreshold);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighThresholdEvent);
-			parameterMonitoringDefinitionReport.appendUint16(
-			    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-			        ->second.numberOfConsecutiveDeltaChecks);
+			    ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second);
+			if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second == LimitCheck) {
+				parameterMonitoringDefinitionReport.appendUint16(
+				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowLimit);
+				parameterMonitoringDefinitionReport.appendEnum8(
+				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowLimitEvent);
+				parameterMonitoringDefinitionReport.appendUint16(
+				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highLimit);
+				parameterMonitoringDefinitionReport.appendEnum8(
+				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighLimitEvent);
+			} else if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
+			           ExpectedValueCheck) {
+				parameterMonitoringDefinitionReport.appendUint8(
+				    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.mask);
+				parameterMonitoringDefinitionReport.appendUint16(
+				    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.expectedValue);
+				parameterMonitoringDefinitionReport.appendEnum8(
+				    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+				        ->second.notExpectedValueEvent);
+			} else {
+				parameterMonitoringDefinitionReport.appendUint16(
+				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowDeltaThreshold);
+				parameterMonitoringDefinitionReport.appendEnum8(
+				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowThresholdEvent);
+				parameterMonitoringDefinitionReport.appendUint16(
+				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highDeltaThreshold);
+				parameterMonitoringDefinitionReport.appendEnum8(
+				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighThresholdEvent);
+				parameterMonitoringDefinitionReport.appendUint16(
+				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
+				        ->second.numberOfConsecutiveDeltaChecks);
+			}
 		}
+		else{
+			ErrorHandler::reportError(message, ErrorHandler::ReportParameterNotInTheParameterMonitoringList);
+		}
+
+		currentPMONId = message.readUint16();
 	}
 	storeMessage(parameterMonitoringDefinitionReport);
 }
