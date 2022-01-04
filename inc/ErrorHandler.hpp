@@ -209,7 +209,11 @@ public:
 		/**
 		 * Attempt to get a parameter monitoring definition that does not exist.
 		 */
-		GetNonExistingParameterMonitoringDefinition = 20
+		GetNonExistingParameterMonitoringDefinition = 20,
+		/**
+		 * Request to report a non existent parameter monitoring definition.
+		 */
+		ReportParameterNotInTheParameterMonitoringList = 18,
 	};
 
 	/**
