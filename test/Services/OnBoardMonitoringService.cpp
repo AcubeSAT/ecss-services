@@ -641,7 +641,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
 	}
 
-	SECTION("Modify parameter not in the Parameter Monitoring List"){
+	SECTION("Modify parameter not in the Parameter Monitoring List") {
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 4;
 		uint16_t monitoredParameterId = 4;
@@ -656,12 +656,11 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.appendUint16(repetitionNumber);
 		MessageParser::execute(request);
 
-
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ModifyParameterNotInTheParameterMonitoringList) == 1);
 	}
 
-	SECTION("Monitored parameter ID does not match the Parameter Monitoring Definition"){
+	SECTION("Monitored parameter ID does not match the Parameter Monitoring Definition") {
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 1;
@@ -678,7 +677,8 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DifferentParameterMonitoringDefinitionAndMonitoredParameter) == 1);
+		CHECK(ServiceTests::countThrownErrors(
+		          ErrorHandler::DifferentParameterMonitoringDefinitionAndMonitoredParameter) == 1);
 	}
 	SECTION("High limit is lower than low limit") {
 		initialiseParameterMonitoringDefinitions();
@@ -734,5 +734,113 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
+	}
+}
+
+TEST_CASE("Report Parameter Monitoring Definitions") {
+	SECTION("Valid request to report Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 3;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
+		request.appendUint16(PMONIds.at(0));
+		request.appendUint16(PMONIds.at(1));
+		request.appendUint16(PMONIds.at(2));
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
+		CHECK(report.readEnum16() == PMONIds.at(0));
+		CHECK(report.readEnumerated(1) ==
+		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(0))->get()));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(0))->get()));
+		CHECK(report.readUint8() ==
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).mask);
+		CHECK(
+		    report.readUint16() ==
+		    onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).expectedValue);
+		CHECK(report.readEnum8() ==
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get())
+		          .notExpectedValueEvent);
+		CHECK(report.readEnum16() == PMONIds.at(1));
+		CHECK(report.readEnumerated(1) ==
+		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(1))->get()));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(1))->get()));
+		CHECK(report.readUint16() ==
+		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).lowLimit);
+		CHECK(report.readEnum8() ==
+		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).belowLowLimitEvent);
+		CHECK(report.readUint16() ==
+		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).highLimit);
+		CHECK(report.readEnum8() ==
+		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).aboveHighLimitEvent);
+		CHECK(report.readEnum16() == PMONIds.at(2));
+		CHECK(report.readEnumerated(1) ==
+		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(2))->get()));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(2))->get()));
+		CHECK(report.readUint16() ==
+		      onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get()).lowDeltaThreshold);
+		CHECK(report.readEnum8() == onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get())
+		                                .belowLowThresholdEvent);
+		CHECK(report.readUint16() ==
+		      onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get()).highDeltaThreshold);
+		CHECK(report.readEnum8() == onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get())
+		                                .aboveHighThresholdEvent);
+		CHECK(report.readUint16() ==
+		      onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get())
+		          .numberOfConsecutiveDeltaChecks);
+		clearAllMaps();
+	}
+
+	SECTION("Invalid request to report Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 5;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendUint16(PMONId);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
+		clearAllMaps();
+	}
+
+	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 2;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		etl::array<uint16_t, 3> PMONIds = {0, 5};
+		request.appendUint16(PMONIds.at(0));
+		request.appendUint16(PMONIds.at(1));
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
+
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
+		CHECK(report.readEnum16() == PMONIds.at(0));
+		CHECK(report.readEnumerated(1) ==
+		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(0))->get()));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(0))->get()));
+		CHECK(report.readUint8() ==
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).mask);
+		CHECK(
+		    report.readUint16() ==
+		    onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).expectedValue);
+		CHECK(report.readEnum8() ==
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get())
+		          .notExpectedValueEvent);
+		clearAllMaps();
 	}
 }
