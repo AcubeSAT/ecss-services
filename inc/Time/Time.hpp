@@ -29,14 +29,14 @@
  * precision and performance for the least amount of memory, and is directly compatible with internal timestamps
  * used, without loss of precision.
  *
- * @subsection Epoch Epoch
+ * @section Epoch Epoch
  *
  * Internal timestamp representations can use a single point in time referring to $t=0$. This point is referred to as
  * the **Epoch** and is stored in @ref Time::Epoch. CSSDS suggests using _1 January 1958_ as the Epoch. UNIX uses _1
  * January 1970_. In this repository however, each implementor can choose a different epoch (e.g. the start of the
  * mission).
  *
- * @subsection DevUtils Developer utilities
+ * @section DevUtils Developer utilities
  * Timestamp classes are designed to make the developer's life easier.
  *
  * You can easily compare timestamps without having to call any other functions:
@@ -49,7 +49,7 @@
  * std::cout << utcTimestamp << std::endl;
  * @endcode
  *
- * @subsection UTC UTC and Leap seconds
+ * @section UTC UTC and Leap seconds
  * All internal timestamps are represented in the GMT+00:00 timezone due to the high expense of timezone
  * calculations.
  *
@@ -136,7 +136,7 @@ inline constexpr uint8_t buildShortCUCHeader() {
 	// P-Field extension is 0, CUC header is not extended
 	header += 0;
 
-	// AcubeSAT is using custom TAI epoch ("agency-defined epoch")
+	// We are using a custom TAI epoch ("agency-defined epoch")
 	header <<= 3U;
 	header += 0b010;
 
@@ -182,11 +182,11 @@ inline constexpr uint16_t buildLongCUCHeader() {
 	// P-Field extension is 1, CUC header is extended
 	header += 1;
 
-	// AcubeSAT is using custom TAI epoch at 01 Jan 2020
+	// We are using custom a TAI epoch
 	header <<= 3U;
 	header += 0b010;
 
-	// // Number of bytes in the basic time unit
+	// Number of bytes in the basic time unit
 	header <<= 2U;
 	header += octet1secondsBytes - 1;
 
@@ -220,7 +220,7 @@ inline constexpr uint16_t buildLongCUCHeader() {
  * is implemented for arbitrary sizes (_octet count_) for the basic and fractional time units.
  *
  * The following options cannot be changed:
- *   - Time-code identification is set to an _agency-defined epoch_. This is represented by @ref ACUBESAT_EPOCH_YEAR.
+ *   - Time-code identification is set to an _agency-defined epoch_. This is represented by @ref Epoch.
  *   - Bits 6-7 of octet 2 (_reserved_) are set to `0`
  *
  * @note The P-field (header) does not contain the timestamp information, but only the description of the timestamp's

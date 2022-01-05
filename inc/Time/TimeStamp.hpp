@@ -31,7 +31,7 @@ private:
 	/**
 	 * Integer counter of time units since the @ref Time::Epoch. This number essentially represents the timestamp.
 	 *
-	 * The unit represented by this variable depends on @ref secondsBytes and @ref fractionalBytes. The fractional
+	 * The unit represented by this variable depends on `secondsBytes` and `fractionalBytes`. The fractional
 	 * part is included as the least significant bits of this variable, and the base part follows.
 	 */
 	TAICounter_t taiCounter;
@@ -48,8 +48,8 @@ private:
 	static constexpr uint64_t maxSecondCounterValue = (1U << (8U * secondsBytes)) - 1;
 
 	/**
-	 * Returns whether the amount of @param seconds can be represented by this TimeStamp.
-	 * If @ref seconds is too large, the number of @ref secondsByte may not be enough to represent this timestamp.
+	 * Returns whether the amount of `seconds` can be represented by this TimeStamp.
+	 * If `seconds` is too large, the number of `secondsByte` may not be enough to represent this timestamp.
 	 *
 	 * @param seconds The amount of seconds from @ref Time::Epoch
 	 */
@@ -63,7 +63,7 @@ public:
 	/**
 	 * Initialize the TimeStamp from a duration from epoch in TAI (leap seconds not accounted)
 	 *
-	 * @param seconds An integer number of seconds from the custom @ref Time::Epoch
+	 * @param taiSecondsFromEpoch An integer number of seconds from the custom @ref Time::Epoch
 	 */
 	explicit TimeStamp(uint64_t taiSecondsFromEpoch);
 
@@ -116,7 +116,7 @@ public:
 	/**
 	 * Compare two timestamps.
 	 *
-	 * @param TimeStamp the date that will be compared with the pointer `this`
+	 * @param timestamp the date that will be compared with the pointer `this`
 	 * @return true if the condition is satisfied
 	 */
 	bool operator<(const TimeStamp<secondsBytes, fractionalBytes>& timestamp) const {

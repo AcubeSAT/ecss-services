@@ -16,14 +16,14 @@ TimeStamp<secondsCounter, fractionalBytes>::TimeStamp(etl::array<uint8_t, Time::
 	uint8_t headerSize = 1;
 	if ((timestamp[0] & 0b10000000U) != 0) {
 		headerSize = 2;
-	};
+	}
 
-	uint8_t inputSecondsBytes = ((timestamp[0] & 0b00001100U) >> 2) + 1U;
-	uint8_t inputFractionalBytes = (timestamp[0] & 0b00000011U) >> 0;
+	uint8_t inputSecondsBytes = ((timestamp[0] & 0b00001100U) >> 2U) + 1U;
+	uint8_t inputFractionalBytes = (timestamp[0] & 0b00000011U) >> 0U;
 
 	if (headerSize == 2) {
-		inputSecondsBytes += (timestamp[1] & 0b01100000U) >> 5;
-		inputFractionalBytes += (timestamp[1] & 0b00011100U) >> 2;
+		inputSecondsBytes += (timestamp[1] & 0b01100000U) >> 5U;
+		inputFractionalBytes += (timestamp[1] & 0b00011100U) >> 2U;
 	}
 
 	// check input validity (useless bytes set to 0)
@@ -161,5 +161,5 @@ UTCTimestamp TimeStamp<secondsBytes, fractionalBytes>::toUTCtimestamp() {
 
 	second = totalSeconds;
 
-	return UTCTimestamp(yearUTC, monthUTC, dayUTC, hour, minute, second);
+	return {yearUTC, monthUTC, dayUTC, hour, minute, second};
 }
