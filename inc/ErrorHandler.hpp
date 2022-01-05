@@ -78,9 +78,17 @@ public:
 		 */
 		NestedMessageTooLarge = 11,
 		/**
+		 * A request to access a non existing housekeeping structure in ST[03]
+		 */
+		NonExistentHousekeeping = 12,
+		/**
+		 * Attempt to access an invalid parameter in ST[03]
+		 */
+		NonExistentParameter = 13,
+		/**
 		 * Invalid TimeStamp parameters at creation
 		 */
-		InvalidTimeStampInput = 12
+		InvalidTimeStampInput = 14
 	};
 
 	/**
@@ -148,23 +156,54 @@ public:
 		 */
 		GetNonExistingParameter = 8,
 		/**
-		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
-		 * ST[04]
-		 */
-		InvalidReportingRateError = 9,
-		/**
-		 * Attempt to set a sampling rate which is greater than the parameter reporting rate.
-		 * ST[04]
-		 */
-		InvalidSamplingRateError = 10,
-		/**
 		 * Attempt to add definition to the struct map but its already full. (ST[19])
 		 */
 		EventActionDefinitionsMapIsFull = 11,
 		/**
+		 * Attempt to report/delete non existing housekeeping structure (ST[03])
+		 */
+		RequestedNonExistingStructure = 12,
+		/**
+		 * Attempt to create already created structure (ST[03])
+		 */
+		RequestedAlreadyExistingStructure = 13,
+		/**
+		 * Attempt to delete structure which has the periodic reporting status enabled (ST[03]) as per 6.3.3.5.2(d-2)
+		 */
+		RequestedDeletionOfEnabledHousekeeping = 14,
+		/**
+		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure
+		 * (ST[03])
+		 */
+		AlreadyExistingParameter = 15,
+		/**
+		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
+		 * enabled (ST[03])
+		 */
+		RequestedAppendToEnabledHousekeeping = 16,
+		/**
+		 * Attempt to create a new housekeeping structure in Housekeeping Service, when the maximum number of
+		 * housekeeping structures is already reached (ST[03])
+		 */
+		ExceededMaxNumberOfHousekeepingStructures = 17,
+		/**
+		 * Attempt to add a new simply commutated parameter in a specific housekeeping structure, but the maximum
+		 * number of simply commutated parameters for this structure is already reached (ST[03])
+		 */
+		ExceededMaxNumberOfSimplyCommutatedParameters = 18,
+		/* Attempt to set a reporting rate which is smaller than the parameter sampling rate.
+		 * ST[04]
+		 */
+		InvalidReportingRateError = 19,
+		/**
+		 * Attempt to set a sampling rate which is greater than the parameter reporting rate.
+		 * ST[04]
+		 */
+		InvalidSamplingRateError = 20,
+		/**
 		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
 		 */
-		MaxStatisticDefinitionsReached = 12,
+		MaxStatisticDefinitionsReached = 21,
 	};
 
 	/**
