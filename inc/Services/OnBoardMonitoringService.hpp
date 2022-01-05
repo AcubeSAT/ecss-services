@@ -49,11 +49,7 @@ public:
 		AboveHighThresholdEvent = 5
 	};
 
-	enum CheckType : uint8_t {
-		LimitCheck = 1,
-		ExpectedValueCheck = 2,
-		DeltaCheck = 3
-	};
+	enum CheckType : uint8_t { LimitCheck = 1, ExpectedValueCheck = 2, DeltaCheck = 3 };
 
 	struct LimitCheck {
 		uint16_t lowLimit;
@@ -64,7 +60,7 @@ public:
 
 	struct ExpectedValueCheck {
 		uint16_t expectedValue;
-		//TODO: Find what variable type is a bit string.
+		// TODO: Find what variable type is a bit string.
 		uint8_t mask;
 		Event notExpectedValueEvent;
 	};
@@ -77,41 +73,36 @@ public:
 		Event aboveHighThresholdEvent;
 	};
 
-
 	uint16_t maximumTransitionReportingDelay = 0;
 
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
-
-	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> ParameterMonitoringIds;
 	/**
 	 * Stores the Parameter Monitoring Ids that correspond to the Monitored Parameter Ids.
 	 */
-	etl::map<uint16_t , uint16_t, ECSSMaxParameters> MonitoredParameterIds;
+	etl::map<uint16_t, uint16_t, ECSSMaxParameters> MonitoredParameterIds;
 
-	etl::map<std::reference_wrapper<ParameterBase>, CheckingStatus, ECSSMaxParameters>
-	    ParameterMonitoringCheckingStatus;
+	etl::map<uint16_t, CheckingStatus, ECSSMaxParameters> ParameterMonitoringCheckingStatus;
 	/**
-	 * Stores the number of consecutive checks that have been conducted for each parameter.
+	 * Stores the number of consecutive checks that have been conducted for each Parameter Monitoring Defintion.
 	 */
-	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionCounter;
+	etl::map<uint16_t, uint16_t, ECSSMaxParameters> RepetitionCounter;
 	/**
 	 * Stores the number of consecutive checks that need to be conducted for each parameter in order to set a new
 	 * Checking status.
 	 */
-	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> RepetitionNumber;
+	etl::map<uint16_t, uint16_t, ECSSMaxParameters> RepetitionNumber;
 
-	etl::map<std::reference_wrapper<ParameterBase>, bool, ECSSMaxParameters> ParameterMonitoringStatus;
+	etl::map<uint16_t, bool, ECSSMaxParameters> ParameterMonitoringStatus;
 
-	etl::map<std::reference_wrapper<ParameterBase>, etl::array<CheckingStatus, 2>, ECSSMaxParameters>
-	    CheckTransitionList;
+	etl::map<uint16_t, etl::array<CheckingStatus, 2>, ECSSMaxParameters> CheckTransitionList;
 
-	etl::map<std::reference_wrapper<ParameterBase>, CheckType, ECSSMaxParameters> ParameterMonitoringCheckTypes;
+	etl::map<uint16_t, CheckType, ECSSMaxParameters> ParameterMonitoringCheckTypes;
 
-	etl::map<std::reference_wrapper<ParameterBase>, struct LimitCheck, ECSSMaxParameters> LimitCheckParameters;
+	etl::map<uint16_t, struct LimitCheck, ECSSMaxParameters> LimitCheckParameters;
 
-	etl::map<std::reference_wrapper<ParameterBase>, struct ExpectedValueCheck, ECSSMaxParameters> ExpectedValueCheckParameters;
+	etl::map<uint16_t, struct ExpectedValueCheck, ECSSMaxParameters> ExpectedValueCheckParameters;
 
-	etl::map<std::reference_wrapper<ParameterBase>, struct DeltaCheck, ECSSMaxParameters> DeltaCheckParameters;
+	etl::map<uint16_t, struct DeltaCheck, ECSSMaxParameters> DeltaCheckParameters;
 
 	/**
 	 * If true, parameter monitoring is enabled

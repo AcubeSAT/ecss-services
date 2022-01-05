@@ -15,8 +15,8 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			RepetitionNumber.find(ParameterMonitoringList.find(currentId)->second)->second = 0;
-			ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentId)->second)->second = true;
+			RepetitionNumber.at(currentId) = 0;
+			ParameterMonitoringStatus.at(currentId) = true;
 		} else {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
@@ -31,8 +31,8 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readUint16();
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentId)->second)->second = false;
-			ParameterMonitoringCheckingStatus.find(ParameterMonitoringList.find(currentId)->second)->second = Unchecked;
+			ParameterMonitoringStatus.at(currentId) = false;
+			ParameterMonitoringCheckingStatus.at(currentId) = Unchecked;
 		} else {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
@@ -54,7 +54,6 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 	} else {
 		// TODO: Check if all the maps need to be cleared.
 		ParameterMonitoringList.clear();
-		ParameterMonitoringIds.clear();
 		CheckTransitionList.clear();
 	}
 }
@@ -65,17 +64,18 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	// TODO: Evaluate if the optional values in TC[12,5] are going to be used.
 	uint16_t numberOfIds = message.readUint16();
 	ParameterService parameterService = ParameterService();
+	uint16_t currentPMONId = message.readUint16();
+	uint16_t currentMonitoredParameterId = message.readUint16();
+	uint16_t currentParameterRepetitionNumber = message.readUint16();
+	uint16_t currentCheckType = message.readEnum8();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		uint16_t currentPMONId = message.readUint16();
-		uint16_t currentParameterId = message.readUint16();
-		uint16_t currentParameterRepetitionNumber = message.readUint16();
-		uint16_t currentCheckType = message.readEnum8();
 		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
 			if (ParameterMonitoringList.full()) {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
+				break;
 			} else {
-				if (auto parameterToBeAdded = parameterService.getParameter(currentParameterId)) {
+				if (auto parameterToBeAdded = parameterService.getParameter(currentMonitoredParameterId)) {
 					if (currentCheckType == LimitCheck) {
 						// TODO: Find out how we read deduced message values.
 						uint8_t lowLimit = message.readUint8();
@@ -89,29 +89,29 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 							break;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
-						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
-						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
-						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
-						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
-						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), LimitCheck});
-						ParameterMonitoringCheckingStatus.insert({parameterToBeAdded->get(), Unchecked});
+						MonitoredParameterIds.insert({currentMonitoredParameterId, currentPMONId});
+						RepetitionCounter.insert({currentPMONId, 0});
+						RepetitionNumber.insert({currentPMONId, currentParameterRepetitionNumber});
+						ParameterMonitoringStatus.insert({currentPMONId, false});
+						ParameterMonitoringCheckTypes.insert({currentPMONId, LimitCheck});
+						ParameterMonitoringCheckingStatus.insert({currentPMONId, Unchecked});
 						struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
 						                                aboveHighLimitEventId};
-						LimitCheckParameters.insert({parameterToBeAdded->get(), limitCheck});
+						LimitCheckParameters.insert({currentPMONId, limitCheck});
 					} else if (currentCheckType == ExpectedValueCheck) {
 						// TODO: Find out how to read bit string.
 						uint8_t mask = message.readUint8();
 						uint8_t expectedValue = message.readUint8();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
-						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
-						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
-						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
-						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
-						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), ExpectedValueCheck});
-						ParameterMonitoringCheckingStatus.insert({parameterToBeAdded->get(), Unchecked});
+						MonitoredParameterIds.insert({currentMonitoredParameterId, currentPMONId});
+						RepetitionCounter.insert({currentPMONId, 0});
+						RepetitionNumber.insert({currentPMONId, currentParameterRepetitionNumber});
+						ParameterMonitoringStatus.insert({currentPMONId, false});
+						ParameterMonitoringCheckTypes.insert({currentPMONId, ExpectedValueCheck});
+						ParameterMonitoringCheckingStatus.insert({currentPMONId, Unchecked});
 						struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue, notExpectedValueEventId};
-						ExpectedValueCheckParameters.insert({parameterToBeAdded->get(), expectedValueCheck});
+						ExpectedValueCheckParameters.insert({currentPMONId, expectedValueCheck});
 					} else if (currentCheckType == DeltaCheck) {
 						uint8_t lowDeltaThreshold = message.readUint8();
 						auto belowLowThresholdEventId = static_cast<Event>(message.readEnum8());
@@ -124,15 +124,15 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 							break;
 						}
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
-						ParameterMonitoringIds.insert({parameterToBeAdded->get(), currentPMONId});
-						RepetitionCounter.insert({parameterToBeAdded->get(), 0});
-						RepetitionNumber.insert({parameterToBeAdded->get(), currentParameterRepetitionNumber});
-						ParameterMonitoringStatus.insert({parameterToBeAdded->get(), false});
-						ParameterMonitoringCheckTypes.insert({parameterToBeAdded->get(), DeltaCheck});
-						ParameterMonitoringCheckingStatus.insert({parameterToBeAdded->get(), Unchecked});
+						MonitoredParameterIds.insert({currentMonitoredParameterId, currentPMONId});
+						RepetitionCounter.insert({currentPMONId, 0});
+						RepetitionNumber.insert({currentPMONId, currentParameterRepetitionNumber});
+						ParameterMonitoringStatus.insert({currentPMONId, false});
+						ParameterMonitoringCheckTypes.insert({currentPMONId, DeltaCheck});
+						ParameterMonitoringCheckingStatus.insert({currentPMONId, Unchecked});
 						struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
 						                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
-						DeltaCheckParameters.insert({parameterToBeAdded->get(), deltaCheck});
+						DeltaCheckParameters.insert({currentPMONId, deltaCheck});
 					}
 				} else {
 					ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
@@ -141,6 +141,10 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::AddAlreadyExistingParameter);
 		}
+		currentPMONId = message.readUint16();
+		currentMonitoredParameterId = message.readUint16();
+		currentParameterRepetitionNumber = message.readUint16();
+		currentCheckType = message.readEnum8();
 	}
 }
 
@@ -151,10 +155,9 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 	// TODO: Check if the PMON definition needs to be erased from all maps.
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end() ||
-		    ParameterMonitoringStatus.find(ParameterMonitoringList.find(currentPMONId)->second)->second) {
+		    ParameterMonitoringStatus.at(currentPMONId)) {
 			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinitionError);
 		} else {
-			ParameterMonitoringIds.erase(ParameterMonitoringList.at(currentPMONId));
 			ParameterMonitoringList.erase(currentPMONId);
 		}
 		currentPMONId = message.readUint16();
@@ -167,14 +170,13 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 	ParameterService parameterService = ParameterService();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		uint16_t currentPMONId = message.readUint16();
-		uint16_t currentParameterId = message.readUint16();
+		uint16_t currentMonitoredParameterId = message.readUint16();
 		uint16_t currentParameterRepetitionNumber = message.readUint16();
 		uint16_t currentCheckType = message.readEnum8();
 		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
-			if (auto parameterToBeModified = parameterService.getParameter(currentParameterId)) {
+			if (auto parameterToBeModified = parameterService.getParameter(currentMonitoredParameterId)) {
 				// TODO: Find out how to compare the items below.
-				if (static_cast<std::reference_wrapper<ParameterBase>>(parameterToBeModified->get()) !=
-				    ParameterMonitoringList.find(currentPMONId)->second) {
+				if (MonitoredParameterIds.at(currentMonitoredParameterId) == currentPMONId) {
 					if (currentCheckType == LimitCheck) {
 						uint8_t lowLimit = message.readUint8();
 						auto belowLowLimitEventId = static_cast<Event>(message.readEnum8());
@@ -185,31 +187,23 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
 							break;
 						}
-						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
-						ParameterMonitoringCheckingStatus.find(parameterToBeModified->get())->second = Unchecked;
-						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-						    LimitCheck) {
-							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowLimit =
-							    lowLimit;
-							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.belowLowLimitEvent = belowLowLimitEventId;
-							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highLimit =
-							    highLimit;
-							LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.aboveHighLimitEvent = aboveHighLimitEventId;
+						RepetitionCounter.at(currentPMONId) = 0;
+						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
+						if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
+							LimitCheckParameters.at(currentPMONId).lowLimit = lowLimit;
+							LimitCheckParameters.at(currentPMONId).belowLowLimitEvent = belowLowLimitEventId;
+							LimitCheckParameters.at(currentPMONId).highLimit = highLimit;
+							LimitCheckParameters.at(currentPMONId).aboveHighLimitEvent = aboveHighLimitEventId;
 						} else {
-							ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second =
-							    LimitCheck;
+							ParameterMonitoringCheckTypes.at(currentPMONId) = LimitCheck;
 							struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
 							                                aboveHighLimitEventId};
-							LimitCheckParameters.insert({parameterToBeModified->get(), limitCheck});
-							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-							    ExpectedValueCheck) {
-								ExpectedValueCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							LimitCheckParameters.insert({currentPMONId, limitCheck});
+							if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
+								ExpectedValueCheckParameters.erase(currentPMONId);
 							}
-							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-							    DeltaCheck) {
-								DeltaCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
+								DeltaCheckParameters.erase(currentPMONId);
 							}
 						}
 
@@ -217,29 +211,23 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 						uint8_t mask = message.readUint8();
 						uint8_t expectedValue = message.readUint8();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
-						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
-						ParameterMonitoringCheckingStatus.find(parameterToBeModified->get())->second = Unchecked;
-						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-						    ExpectedValueCheck) {
-							ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.mask =
-							    mask;
-							ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.expectedValue = expectedValue;
-							ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.notExpectedValueEvent = notExpectedValueEventId;
+						RepetitionCounter.at(currentPMONId) = 0;
+						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
+						if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
+							ExpectedValueCheckParameters.find(currentPMONId)->second.mask = mask;
+							ExpectedValueCheckParameters.find(currentPMONId)->second.expectedValue = expectedValue;
+							ExpectedValueCheckParameters.find(currentPMONId)->second.notExpectedValueEvent =
+							    notExpectedValueEventId;
 						} else {
-							ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second =
-							    ExpectedValueCheck;
+							ParameterMonitoringCheckTypes.at(currentPMONId) = ExpectedValueCheck;
 							struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue,
 							                                                notExpectedValueEventId};
-							ExpectedValueCheckParameters.insert({parameterToBeModified->get(), expectedValueCheck});
-							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-							    LimitCheck) {
-								LimitCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							ExpectedValueCheckParameters.insert({currentPMONId, expectedValueCheck});
+							if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
+								LimitCheckParameters.erase(currentPMONId);
 							}
-							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-							    DeltaCheck) {
-								DeltaCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
+								DeltaCheckParameters.erase(currentPMONId);
 							}
 						}
 
@@ -254,33 +242,25 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
 							break;
 						}
-						RepetitionCounter.find(ParameterMonitoringList.at(currentPMONId))->second = 0;
-						ParameterMonitoringCheckingStatus.find(parameterToBeModified->get())->second = Unchecked;
-						if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-						    DeltaCheck) {
-							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.lowDeltaThreshold = lowDeltaThreshold;
-							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.belowLowThresholdEvent = belowLowThresholdEventId;
-							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.highDeltaThreshold = highDeltaThreshold;
-							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.aboveHighThresholdEvent = aboveHighThresholdEventId;
-							DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-							    ->second.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
+						RepetitionCounter.at(currentPMONId) = 0;
+						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
+						if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
+							DeltaCheckParameters.at(currentPMONId).lowDeltaThreshold = lowDeltaThreshold;
+							DeltaCheckParameters.at(currentPMONId).belowLowThresholdEvent = belowLowThresholdEventId;
+							DeltaCheckParameters.at(currentPMONId).highDeltaThreshold = highDeltaThreshold;
+							DeltaCheckParameters.at(currentPMONId).aboveHighThresholdEvent = aboveHighThresholdEventId;
+							DeltaCheckParameters.at(currentPMONId).numberOfConsecutiveDeltaChecks =
+							    numberOfConsecutiveDeltaChecks;
 						} else {
-							ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second =
-							    DeltaCheck;
+							ParameterMonitoringCheckTypes.at(currentPMONId) = DeltaCheck;
 							struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
 							                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
-							DeltaCheckParameters.insert({parameterToBeModified->get(), deltaCheck});
-							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-							    LimitCheck) {
-								LimitCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							DeltaCheckParameters.insert({currentPMONId, deltaCheck});
+							if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
+								LimitCheckParameters.erase(currentPMONId);
 							}
-							if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-							    ExpectedValueCheck) {
-								ExpectedValueCheckParameters.erase(ParameterMonitoringList.at(currentPMONId));
+							if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
+								ExpectedValueCheckParameters.erase(currentPMONId);
 							}
 						}
 					}
@@ -313,48 +293,38 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
 	uint16_t currentPMONId = message.readUint16();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()){
+		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
 			parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
 			// TODO:Find out how to get the monitored parameter id.
-			parameterMonitoringDefinitionReport.appendEnumerated(
-			    1, ParameterMonitoringStatus.find(ParameterMonitoringList.at(currentPMONId))->second);
-			parameterMonitoringDefinitionReport.appendEnum16(
-			    RepetitionNumber.find(ParameterMonitoringList.at(currentPMONId))->second);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second);
-			if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second == LimitCheck) {
-				parameterMonitoringDefinitionReport.appendUint16(
-				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowLimit);
+			parameterMonitoringDefinitionReport.appendEnumerated(1, ParameterMonitoringStatus.at(currentPMONId));
+			parameterMonitoringDefinitionReport.appendEnum16(RepetitionNumber.at(currentPMONId));
+			parameterMonitoringDefinitionReport.appendEnum8(ParameterMonitoringCheckTypes.at(currentPMONId));
+			if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
+				parameterMonitoringDefinitionReport.appendUint16(LimitCheckParameters.at(currentPMONId).lowLimit);
 				parameterMonitoringDefinitionReport.appendEnum8(
-				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowLimitEvent);
-				parameterMonitoringDefinitionReport.appendUint16(
-				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highLimit);
+				    LimitCheckParameters.at(currentPMONId).belowLowLimitEvent);
+				parameterMonitoringDefinitionReport.appendUint16(LimitCheckParameters.at(currentPMONId).highLimit);
 				parameterMonitoringDefinitionReport.appendEnum8(
-				    LimitCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighLimitEvent);
-			} else if (ParameterMonitoringCheckTypes.find(ParameterMonitoringList.at(currentPMONId))->second ==
-			           ExpectedValueCheck) {
-				parameterMonitoringDefinitionReport.appendUint8(
-				    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.mask);
+				    LimitCheckParameters.at(currentPMONId).aboveHighLimitEvent);
+			} else if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
+				parameterMonitoringDefinitionReport.appendUint8(ExpectedValueCheckParameters.at(currentPMONId).mask);
 				parameterMonitoringDefinitionReport.appendUint16(
-				    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.expectedValue);
+				    ExpectedValueCheckParameters.at(currentPMONId).expectedValue);
 				parameterMonitoringDefinitionReport.appendEnum8(
-				    ExpectedValueCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-				        ->second.notExpectedValueEvent);
+				    ExpectedValueCheckParameters.at(currentPMONId).notExpectedValueEvent);
 			} else {
 				parameterMonitoringDefinitionReport.appendUint16(
-				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.lowDeltaThreshold);
+				    DeltaCheckParameters.at(currentPMONId).lowDeltaThreshold);
 				parameterMonitoringDefinitionReport.appendEnum8(
-				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.belowLowThresholdEvent);
+				    DeltaCheckParameters.at(currentPMONId).belowLowThresholdEvent);
 				parameterMonitoringDefinitionReport.appendUint16(
-				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.highDeltaThreshold);
+				    DeltaCheckParameters.at(currentPMONId).highDeltaThreshold);
 				parameterMonitoringDefinitionReport.appendEnum8(
-				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))->second.aboveHighThresholdEvent);
+				    DeltaCheckParameters.at(currentPMONId).aboveHighThresholdEvent);
 				parameterMonitoringDefinitionReport.appendUint16(
-				    DeltaCheckParameters.find(ParameterMonitoringList.at(currentPMONId))
-				        ->second.numberOfConsecutiveDeltaChecks);
+				    DeltaCheckParameters.at(currentPMONId).numberOfConsecutiveDeltaChecks);
 			}
-		}
-		else{
+		} else {
 			ErrorHandler::reportError(message, ErrorHandler::ReportParameterNotInTheParameterMonitoringList);
 		}
 
@@ -381,7 +351,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
 			    (transition.second.at(firstTransitionIndex) == ExpectedValue &&
 			     transition.second.at(secondTransitionIndex) == UnexpectedValue)) {
-				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				outOfLimitsReport.appendEnumerated(16, transition.first);
 				// TODO:Find out how to get the monitored parameter id.
 				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
@@ -403,7 +373,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
 			    (transition.second.at(firstTransitionIndex) == AboveHighLimit &&
 			     transition.second.at(secondTransitionIndex) == BelowLowLimit)) {
-				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				outOfLimitsReport.appendEnumerated(16, transition.first);
 				// TODO:Find out how to get the monitored parameter id.
 				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(parameterService.getParameter(1)->get().getValueAsDouble());
@@ -421,7 +391,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
 			           (transition.second.at(firstTransitionIndex) == BelowLowLimit &&
 			            transition.second.at(secondTransitionIndex) == AboveHighLimit)) {
-				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				outOfLimitsReport.appendEnumerated(16, transition.first);
 				// TODO:Find out how to get the monitored parameter id.
 				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(parameterService.getParameter(1)->get().getValueAsDouble());
@@ -441,7 +411,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
 			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold &&
 			     transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
-				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				outOfLimitsReport.appendEnumerated(16, transition.first);
 				// TODO:Find out how to get the monitored parameter id.
 				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(parameterService.getParameter(1)->get().getValueAsDouble());
@@ -459,7 +429,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
 			           (transition.second.at(firstTransitionIndex) == BelowLowThreshold &&
 			            transition.second.at(secondTransitionIndex) == AboveHighThreshold)) {
-				outOfLimitsReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+				outOfLimitsReport.appendEnumerated(16, transition.first);
 				// TODO:Find out how to get the monitored parameter id.
 				outOfLimitsReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(parameterService.getParameter(1)->get().getValueAsDouble());
@@ -481,7 +451,7 @@ void OnBoardMonitoringService::checkTransitionReport() {
 	ParameterService parameterService = ParameterService();
 	for (auto& transition : CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
-			checkTransitionReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+			checkTransitionReport.appendEnumerated(16, transition.first);
 			// TODO:Find out how to get the monitored parameter id.
 			checkTransitionReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 			checkTransitionReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
@@ -499,7 +469,7 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			checkTransitionReport.appendEnumerated(8, transition.second.at(secondTransitionIndex));
 			// TODO: Find out how to get the transition time.
 		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
-			checkTransitionReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+			checkTransitionReport.appendEnumerated(16, transition.first);
 			// TODO:Find out how to get the monitored parameter id.
 			checkTransitionReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 			checkTransitionReport.appendUint16(parameterService.getParameter(1)->get().getValueAsDouble());
@@ -517,7 +487,7 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			checkTransitionReport.appendEnumerated(8, transition.second.at(secondTransitionIndex));
 			// TODO: Find out how to get the transition time.
 		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
-			checkTransitionReport.appendEnumerated(16, ParameterMonitoringIds.find(transition.first)->second);
+			checkTransitionReport.appendEnumerated(16, transition.first);
 			// TODO:Find out how to get the monitored parameter id.
 			checkTransitionReport.appendEnumerated(8, ParameterMonitoringCheckTypes.find(transition.first)->second);
 			checkTransitionReport.appendUint16(parameterService.getParameter(1)->get().getValueAsDouble());
@@ -552,7 +522,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	for (auto& currentParameter : ParameterMonitoringList) {
 		parameterMonitoringDefinitionStatusReport.appendEnumerated(16, currentParameter.first);
 		parameterMonitoringDefinitionStatusReport.appendEnumerated(
-		    1, ParameterMonitoringStatus.at(currentParameter.second));
+		    1, ParameterMonitoringStatus.at(currentParameter.first));
 	}
 	storeMessage(parameterMonitoringDefinitionStatusReport);
 }

@@ -21,56 +21,45 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.parameterMonitoringFunctionStatus = true;
 	onBoardMonitoringService.maximumTransitionReportingDelay = 0;
 
-	onBoardMonitoringService.RepetitionNumber.insert({parameter1, 10});
-	onBoardMonitoringService.RepetitionNumber.insert({parameter2, 2});
-	onBoardMonitoringService.RepetitionNumber.insert({parameter3, 5});
-	onBoardMonitoringService.RepetitionNumber.insert({parameter4, 6});
+	onBoardMonitoringService.RepetitionNumber.insert({0, 10});
+	onBoardMonitoringService.RepetitionNumber.insert({1, 2});
+	onBoardMonitoringService.RepetitionNumber.insert({2, 5});
+	onBoardMonitoringService.RepetitionNumber.insert({3, 6});
 
-	onBoardMonitoringService.RepetitionCounter.insert({parameter1, 0});
-	onBoardMonitoringService.RepetitionCounter.insert({parameter2, 0});
-	onBoardMonitoringService.RepetitionCounter.insert({parameter3, 0});
-	onBoardMonitoringService.RepetitionCounter.insert({parameter4, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({0, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({1, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({2, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({3, 0});
 
 	onBoardMonitoringService.ParameterMonitoringList.insert({0, parameter1});
 	onBoardMonitoringService.ParameterMonitoringList.insert({1, parameter2});
 	onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
 	onBoardMonitoringService.ParameterMonitoringList.insert({3, parameter3});
 
-	onBoardMonitoringService.ParameterMonitoringIds.insert({parameter1, 0});
-	onBoardMonitoringService.ParameterMonitoringIds.insert({parameter2, 1});
-	onBoardMonitoringService.ParameterMonitoringIds.insert({parameter3, 2});
-	onBoardMonitoringService.ParameterMonitoringIds.insert({parameter4, 3});
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({0, false});
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({1, false});
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({2, false});
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({3, true});
 
-	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter1, false});
-	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter2, false});
-	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter3, false});
-	onBoardMonitoringService.ParameterMonitoringStatus.insert({parameter4, true});
+	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({0, OnBoardMonitoringService::Unchecked});
+	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({1, OnBoardMonitoringService::Unchecked});
+	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({2, OnBoardMonitoringService::Unchecked});
+	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({3, OnBoardMonitoringService::Unchecked});
 
-	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert(
-	    {parameter1, OnBoardMonitoringService::Unchecked});
-	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert(
-	    {parameter2, OnBoardMonitoringService::Unchecked});
-	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert(
-	    {parameter3, OnBoardMonitoringService::Unchecked});
-	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert(
-	    {parameter4, OnBoardMonitoringService::Unchecked});
-
-	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert(
-	    {parameter1, onBoardMonitoringService.ExpectedValueCheck});
-	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({parameter2, onBoardMonitoringService.LimitCheck});
-	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({parameter3, onBoardMonitoringService.DeltaCheck});
+	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({0, onBoardMonitoringService.ExpectedValueCheck});
+	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({1, onBoardMonitoringService.LimitCheck});
+	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({2, onBoardMonitoringService.DeltaCheck});
 
 	struct OnBoardMonitoringService::ExpectedValueCheck expectedValueCheck = {};
-	onBoardMonitoringService.ExpectedValueCheckParameters.insert({parameter1, expectedValueCheck});
+	onBoardMonitoringService.ExpectedValueCheckParameters.insert({0, expectedValueCheck});
 	struct OnBoardMonitoringService::LimitCheck limitCheck = {};
-	onBoardMonitoringService.LimitCheckParameters.insert({parameter2, limitCheck});
+	onBoardMonitoringService.LimitCheckParameters.insert({1, limitCheck});
 	struct OnBoardMonitoringService::DeltaCheck deltaCheck = {};
-	onBoardMonitoringService.DeltaCheckParameters.insert({parameter3, deltaCheck});
+	onBoardMonitoringService.DeltaCheckParameters.insert({2, deltaCheck});
 };
 
 void clearAllMaps() {
 	onBoardMonitoringService.ParameterMonitoringList.clear();
-	onBoardMonitoringService.ParameterMonitoringIds.clear();
 	onBoardMonitoringService.ParameterMonitoringCheckingStatus.clear();
 	onBoardMonitoringService.RepetitionCounter.clear();
 	onBoardMonitoringService.RepetitionNumber.clear();
@@ -111,24 +100,12 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 0);
 
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == true);
-		CHECK(onBoardMonitoringService.RepetitionNumber
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == 0);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(0) == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(1) == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(2) == true);
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(0) == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(1) == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(2) == 0);
 		clearAllMaps();
 	}
 	SECTION("Request to enable Parameter MonitoringDefinitions with the last ID of the request exceeding the size of "
@@ -148,24 +125,12 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == true);
-		CHECK(onBoardMonitoringService.RepetitionNumber
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == 0);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(0) == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(1) == true);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(2) == true);
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(0) == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(1) == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(2) == 0);
 		clearAllMaps();
 	}
 }
@@ -183,24 +148,13 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(0) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(1) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(2) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(0) == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(1) == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(2) == OnBoardMonitoringService::Unchecked);
+
 		clearAllMaps();
 	}
 	SECTION("Request to disable Parameter MonitoringDefinitions with the last ID of the request exceeding the size of "
@@ -218,24 +172,12 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(0)->second)
-		          ->second == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(1)->second)
-		          ->second == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus
-		          .find(onBoardMonitoringService.ParameterMonitoringList.find(2)->second)
-		          ->second == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(0) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(1) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(2) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(0) == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(1) == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(2) == OnBoardMonitoringService::Unchecked);
 		clearAllMaps();
 	}
 }
@@ -334,66 +276,50 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.ParameterMonitoringList.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(2)) !=
 		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.at(parameterService.getParameter(PMONIds.at(0))->get()) ==
-		      0);
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.at(parameterService.getParameter(PMONIds.at(1))->get()) ==
-		      1);
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.at(parameterService.getParameter(PMONIds.at(2))->get()) ==
-		      2);
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(parameterService.getParameter(PMONIds.at(0))->get()) == 0);
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(parameterService.getParameter(PMONIds.at(1))->get()) == 0);
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(parameterService.getParameter(PMONIds.at(2))->get()) == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber.at(parameterService.getParameter(PMONIds.at(0))->get()) ==
-		      repetitionNumbers.at(0));
-		CHECK(onBoardMonitoringService.RepetitionNumber.at(parameterService.getParameter(PMONIds.at(1))->get()) ==
-		      repetitionNumbers.at(1));
-		CHECK(onBoardMonitoringService.RepetitionNumber.at(parameterService.getParameter(PMONIds.at(2))->get()) ==
-		      repetitionNumbers.at(2));
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(
-		          parameterService.getParameter(PMONIds.at(0))->get()) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(
-		          parameterService.getParameter(PMONIds.at(1))->get()) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(
-		          parameterService.getParameter(PMONIds.at(2))->get()) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(
-		          parameterService.getParameter(PMONIds.at(0))->get()) == onBoardMonitoringService.ExpectedValueCheck);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(
-		          parameterService.getParameter(PMONIds.at(1))->get()) == onBoardMonitoringService.LimitCheck);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(
-		          parameterService.getParameter(PMONIds.at(2))->get()) == onBoardMonitoringService.DeltaCheck);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(
-		          parameterService.getParameter(PMONIds.at(0))->get()) == onBoardMonitoringService.Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(
-		          parameterService.getParameter(PMONIds.at(1))->get()) == onBoardMonitoringService.Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(
-		          parameterService.getParameter(PMONIds.at(2))->get()) == onBoardMonitoringService.Unchecked);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(0))->get())
-		          ->second.expectedValue == expectedValue);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(0))->get())
-		          ->second.mask == expetedValueCheckMask);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(0))->get())
-		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.lowLimit == lowLimit);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.highLimit == highLimit);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.belowLowLimitEvent == onBoardMonitoringService.BelowLowLimitEvent);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.aboveHighLimitEvent == onBoardMonitoringService.AboveHighLimitEvent);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.lowDeltaThreshold == lowDeltaThreshold);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.highDeltaThreshold == highDeltaThreshold);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.belowLowThresholdEvent == onBoardMonitoringService.BelowLowThresholdEvent);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.aboveHighThresholdEvent == onBoardMonitoringService.AboveHighThresholdEvent);
-		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.numberOfConsecutiveDeltaChecks == numberOfConsecutiveDeltaChecks);
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(0) == 0));
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(1) == 0));
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(2) == 0));
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)) == repetitionNumbers.at(0));
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(1)) == repetitionNumbers.at(1));
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(2)) == repetitionNumbers.at(2));
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(1)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(2)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(0)) ==
+		      onBoardMonitoringService.ExpectedValueCheck);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(1)) ==
+		      onBoardMonitoringService.LimitCheck);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(2)) ==
+		      onBoardMonitoringService.DeltaCheck);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(0)) ==
+		      onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(1)) ==
+		      onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(2)) ==
+		      onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(0))->second.expectedValue ==
+		      expectedValue);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(0))->second.mask ==
+		      expetedValueCheckMask);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(0))->second.notExpectedValueEvent ==
+		      onBoardMonitoringService.NotExpectedValueEvent);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(1))->second.lowLimit == lowLimit);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(1))->second.highLimit == highLimit);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(1))->second.belowLowLimitEvent ==
+		      onBoardMonitoringService.BelowLowLimitEvent);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(1))->second.aboveHighLimitEvent ==
+		      onBoardMonitoringService.AboveHighLimitEvent);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(2))->second.lowDeltaThreshold ==
+		      lowDeltaThreshold);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(2))->second.highDeltaThreshold ==
+		      highDeltaThreshold);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(2))->second.belowLowThresholdEvent ==
+		      onBoardMonitoringService.BelowLowThresholdEvent);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(2))->second.aboveHighThresholdEvent ==
+		      onBoardMonitoringService.AboveHighThresholdEvent);
+		CHECK(
+		    onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(2))->second.numberOfConsecutiveDeltaChecks ==
+		    numberOfConsecutiveDeltaChecks);
 	}
 
 	SECTION("Parameter Monitoring List is full") {
@@ -501,16 +427,10 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 0);
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(0)) ==
 		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(0))->get()) ==
-		      onBoardMonitoringService.ParameterMonitoringIds.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(1)) ==
 		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(1))->get()) ==
-		      onBoardMonitoringService.ParameterMonitoringIds.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(2)) ==
 		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(2))->get()) ==
-		      onBoardMonitoringService.ParameterMonitoringIds.end());
 	}
 	SECTION("Two invalid requests to delete a Parameter Monitoring Definition and two valid ones") {
 		initialiseParameterMonitoringDefinitions();
@@ -530,16 +450,10 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 		      1);
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(0)) ==
 		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(0))->get()) ==
-		      onBoardMonitoringService.ParameterMonitoringIds.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(1)) ==
 		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(1))->get()) ==
-		      onBoardMonitoringService.ParameterMonitoringIds.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(3)) !=
 		      onBoardMonitoringService.ParameterMonitoringList.end());
-		CHECK(onBoardMonitoringService.ParameterMonitoringIds.find(getParameter(PMONIds.at(3))->get()) !=
-		      onBoardMonitoringService.ParameterMonitoringIds.end());
 	}
 }
 
@@ -592,53 +506,42 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(parameterService.getParameter(PMONIds.at(0))->get()) == 0);
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(parameterService.getParameter(PMONIds.at(1))->get()) == 0);
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(parameterService.getParameter(PMONIds.at(2))->get()) == 0);
-		CHECK(onBoardMonitoringService.RepetitionNumber.at(parameterService.getParameter(PMONIds.at(0))->get()) ==
-		      repetitionNumbers.at(0));
-		CHECK(onBoardMonitoringService.RepetitionNumber.at(parameterService.getParameter(PMONIds.at(1))->get()) ==
-		      repetitionNumbers.at(1));
-		CHECK(onBoardMonitoringService.RepetitionNumber.at(parameterService.getParameter(PMONIds.at(2))->get()) ==
-		      repetitionNumbers.at(2));
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(
-		          parameterService.getParameter(PMONIds.at(0))->get()) == onBoardMonitoringService.LimitCheck);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(
-		          parameterService.getParameter(PMONIds.at(1))->get()) == onBoardMonitoringService.ExpectedValueCheck);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(
-		          parameterService.getParameter(PMONIds.at(2))->get()) == onBoardMonitoringService.ExpectedValueCheck);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(
-		          parameterService.getParameter(PMONIds.at(0))->get()) == onBoardMonitoringService.Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(
-		          parameterService.getParameter(PMONIds.at(1))->get()) == onBoardMonitoringService.Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(
-		          parameterService.getParameter(PMONIds.at(2))->get()) == onBoardMonitoringService.Unchecked);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
-		          ->second.lowLimit == lowLimit);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
-		          ->second.highLimit == highLimit);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
-		          ->second.belowLowLimitEvent == onBoardMonitoringService.BelowLowLimitEvent);
-		CHECK(onBoardMonitoringService.LimitCheckParameters.find(parameterService.getParameter(PMONIds.at(0))->get())
-		          ->second.aboveHighLimitEvent == onBoardMonitoringService.AboveHighLimitEvent);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.expectedValue == expectedValue);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.mask == expetedValueCheckMask);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(1))->get())
-		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.expectedValue == expectedValue);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.mask == expetedValueCheckMask);
-		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters
-		          .find(parameterService.getParameter(PMONIds.at(2))->get())
-		          ->second.notExpectedValueEvent == onBoardMonitoringService.NotExpectedValueEvent);
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(0)) == 0);
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(1)) == 0);
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(2)) == 0);
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)) == repetitionNumbers.at(0));
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(1)) == repetitionNumbers.at(1));
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(2)) == repetitionNumbers.at(2));
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(0)) ==
+		      onBoardMonitoringService.LimitCheck);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(1)) ==
+		      onBoardMonitoringService.ExpectedValueCheck);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(2)) ==
+		      onBoardMonitoringService.ExpectedValueCheck);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(0)) ==
+		      onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(1)) ==
+		      onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(2)) ==
+		      onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(0))->second.lowLimit == lowLimit);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(0))->second.highLimit == highLimit);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(0))->second.belowLowLimitEvent ==
+		      onBoardMonitoringService.BelowLowLimitEvent);
+		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(0))->second.aboveHighLimitEvent ==
+		      onBoardMonitoringService.AboveHighLimitEvent);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(1))->second.expectedValue ==
+		      expectedValue);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(1))->second.mask ==
+		      expetedValueCheckMask);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(1))->second.notExpectedValueEvent ==
+		      onBoardMonitoringService.NotExpectedValueEvent);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(2))->second.expectedValue ==
+		      expectedValue);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(2))->second.mask ==
+		      expetedValueCheckMask);
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(2))->second.notExpectedValueEvent ==
+		      onBoardMonitoringService.NotExpectedValueEvent);
 	}
 
 	SECTION("Modify parameter not in the Parameter Monitoring List") {
@@ -756,44 +659,33 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
 		CHECK(report.readEnum16() == PMONIds.at(0));
-		CHECK(report.readEnumerated(1) ==
-		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(0))->get()));
-		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(0))->get()));
-		CHECK(report.readUint8() ==
-		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).mask);
-		CHECK(
-		    report.readUint16() ==
-		    onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).expectedValue);
+		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)));
+		CHECK(report.readUint8() == onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).mask);
+		CHECK(report.readUint16() ==
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).expectedValue);
 		CHECK(report.readEnum8() ==
-		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get())
-		          .notExpectedValueEvent);
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).notExpectedValueEvent);
 		CHECK(report.readEnum16() == PMONIds.at(1));
-		CHECK(report.readEnumerated(1) ==
-		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(1))->get()));
-		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(1))->get()));
-		CHECK(report.readUint16() ==
-		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).lowLimit);
+		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(1)));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(1)));
+		CHECK(report.readUint16() == onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).lowLimit);
+		CHECK(report.readEnum8() == onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).belowLowLimitEvent);
+		CHECK(report.readUint16() == onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).highLimit);
 		CHECK(report.readEnum8() ==
-		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).belowLowLimitEvent);
-		CHECK(report.readUint16() ==
-		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).highLimit);
-		CHECK(report.readEnum8() ==
-		      onBoardMonitoringService.LimitCheckParameters.at(getParameter(PMONIds.at(1))->get()).aboveHighLimitEvent);
+		      onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).aboveHighLimitEvent);
 		CHECK(report.readEnum16() == PMONIds.at(2));
-		CHECK(report.readEnumerated(1) ==
-		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(2))->get()));
-		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(2))->get()));
+		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(2)));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(2)));
+		CHECK(report.readUint16() == onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(1)).lowDeltaThreshold);
+		CHECK(report.readEnum8() ==
+		      onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(1)).belowLowThresholdEvent);
 		CHECK(report.readUint16() ==
-		      onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get()).lowDeltaThreshold);
-		CHECK(report.readEnum8() == onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get())
-		                                .belowLowThresholdEvent);
+		      onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(1)).highDeltaThreshold);
+		CHECK(report.readEnum8() ==
+		      onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(1)).aboveHighThresholdEvent);
 		CHECK(report.readUint16() ==
-		      onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get()).highDeltaThreshold);
-		CHECK(report.readEnum8() == onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get())
-		                                .aboveHighThresholdEvent);
-		CHECK(report.readUint16() ==
-		      onBoardMonitoringService.DeltaCheckParameters.at(getParameter(PMONIds.at(1))->get())
-		          .numberOfConsecutiveDeltaChecks);
+		      onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(1)).numberOfConsecutiveDeltaChecks);
 		clearAllMaps();
 	}
 
@@ -830,22 +722,18 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
 		CHECK(report.readEnum16() == PMONIds.at(0));
-		CHECK(report.readEnumerated(1) ==
-		      onBoardMonitoringService.ParameterMonitoringStatus.at(getParameter(PMONIds.at(0))->get()));
-		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(getParameter(PMONIds.at(0))->get()));
-		CHECK(report.readUint8() ==
-		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).mask);
-		CHECK(
-		    report.readUint16() ==
-		    onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get()).expectedValue);
+		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)));
+		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)));
+		CHECK(report.readUint8() == onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).mask);
+		CHECK(report.readUint16() ==
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).expectedValue);
 		CHECK(report.readEnum8() ==
-		      onBoardMonitoringService.ExpectedValueCheckParameters.at(getParameter(PMONIds.at(0))->get())
-		          .notExpectedValueEvent);
+		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).notExpectedValueEvent);
 		clearAllMaps();
 	}
 }
 
-TEST_CASE("Report status of Parameter Monitoring Definitions"){
+TEST_CASE("Report status of Parameter Monitoring Definitions") {
 	initialiseParameterMonitoringDefinitions();
 	Message request =
 	    Message(OnBoardMonitoringService::ServiceType,
