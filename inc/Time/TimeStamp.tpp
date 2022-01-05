@@ -51,7 +51,7 @@ TimeStamp<secondsCounter, fractionalBytes>::TimeStamp(etl::array<uint8_t, Time::
 
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(const UTCTimestamp& timestamp) {
-	TAICounter_t seconds = Time::EpochSecondsFromUnix;
+	TAICounter_t seconds = 0;
 	for (int year = Time::Epoch.year; year < timestamp.year; ++year) {
 		seconds += (Time::isLeapYear(year) ? 366 : 365) * Time::SecondsPerDay;
 	}
@@ -65,6 +65,7 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(const UTCT
 	seconds += timestamp.hour * Time::SecondsPerHour;
 	seconds += timestamp.minute * Time::SecondsPerMinute;
 	seconds += timestamp.second;
+	// TODO: Add check that `seconds` is within bounds (?)
 	taiCounter = static_cast<TAICounter_t>(seconds) << 8 * fractional_counter_bytes;
 }
 

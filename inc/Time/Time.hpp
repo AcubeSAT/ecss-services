@@ -87,13 +87,12 @@ inline constexpr uint8_t CUCFractionalBytes = 2;
 /**
  * The system epoch (clock measurement starting time)
  * All timestamps emitted by the ECSS services will show the elapsed time (seconds, days etc.) from this epoch.
- * @todo Update AcubeSAT epoch to 2020.01.01.
  */
 inline constexpr struct {
 	uint16_t year;
 	uint8_t month;
 	uint8_t day;
-} Epoch { 2019, 1, 1, };
+} Epoch { 2020, 1, 1, };
 
 /**
  * Number of seconds elapsed between the UNIX epoch (1 January 1970) and the system epoch.
@@ -105,7 +104,7 @@ inline constexpr struct {
  * @warning This value MUST be updated after every change of the system @ref Epoch. You can use utilities such as
  * https://www.unixtimestamp.com/ to obtain a correct result.
  */
-inline constexpr uint32_t EpochSecondsFromUnix = 1546300800;
+inline constexpr uint32_t EpochSecondsFromUnix = 1577836800;
 
 /**
  * The maximum theoretical size in bytes of a CUC timestamp, including headers (P-field and T-field)

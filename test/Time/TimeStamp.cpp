@@ -109,14 +109,14 @@ TEST_CASE("UTC idempotence") {
 
 TEST_CASE("UTC conversion to and from seconds timestamps") {
 	{
-		UTCTimestamp timestamp1(2020, 12, 5, 0, 0, 0); // 5 Dec 2020, midnight;
+		UTCTimestamp timestamp1(2020, 12, 5, 0, 0, 0);
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-		REQUIRE(Epoch.asTAIseconds() == 1607126400);
+		REQUIRE(Epoch.asTAIseconds() == 29289600);
 	}
 	{
-		UTCTimestamp timestamp1(2020, 2, 29, 0, 0, 0); // 5 Dec 2020, midnight;
+		UTCTimestamp timestamp1(2020, 2, 29, 0, 0, 0);
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-		REQUIRE(Epoch.asTAIseconds() == 1582934400);
+		REQUIRE(Epoch.asTAIseconds() == 5097600);
 	}
 }
 
