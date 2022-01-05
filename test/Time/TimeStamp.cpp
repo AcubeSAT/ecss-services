@@ -1,8 +1,5 @@
 #include "catch2/catch.hpp"
 #include "Time/TimeStamp.hpp"
-#include "../Services/ServiceTests.hpp"
-#include <typeinfo>
-#include <iostream>
 
 using namespace Time;
 
@@ -35,34 +32,34 @@ TEST_CASE("CUC headers generation") {
 
 TEST_CASE("TAI idempotence") {
 	int input_time = 1000;
-	TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(input_time);
+	TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(input_time);
 
-	REQUIRE(Epoch.asTAIseconds() == input_time);
+	REQUIRE(time.asTAIseconds() == input_time);
 }
 
 TEST_CASE("CUC idempotence") {
-	etl::array<uint8_t, 9> input_time1 = {0b00101010, 0, 1, 1, 3, 0, 0, 0, 0};
-	TimeStamp<3, 2> Epoch1(input_time1);
-	etl::array<uint8_t, 9> test_return1 = Epoch1.toCUCtimestamp();
+	etl::array<uint8_t, 9> input1 = {0b00101010, 0, 1, 1, 3, 0, 0, 0, 0};
+	TimeStamp<3, 2> time1(input1);
+	etl::array<uint8_t, 9> cuc1 = time1.toCUCtimestamp();
 
 	for (uint8_t i = 0; i < 9; i++) {
-		CHECK(input_time1[i] == test_return1[i]);
+		CHECK(input1[i] == cuc1[i]);
 	}
 
-	etl::array<uint8_t, 9> input_time2 = {0b10101101, 0b10100000, 218, 103, 11, 0, 3, 23, 0};
-	TimeStamp<5, 1> Epoch2(input_time2);
-	etl::array<uint8_t, 9> test_return2 = Epoch2.toCUCtimestamp();
+	etl::array<uint8_t, 9> input2 = {0b10101101, 0b10100000, 218, 103, 11, 0, 3, 23, 0};
+	TimeStamp<5, 1> time2(input2);
+	etl::array<uint8_t, 9> cuc2 = time2.toCUCtimestamp();
 
 	for (auto i = 0; i < 9; i++) {
-		CHECK(input_time2[i] == test_return2[i]);
+		CHECK(input2[i] == cuc2[i]);
 	}
 
-	etl::array<uint8_t, 9> input_time3 = {0b10100011, 0b10001100, 218, 103, 11, 0, 3, 23, 2};
-	TimeStamp<1, 6> Epoch3(input_time3);
-	etl::array<uint8_t, 9> test_return3 = Epoch3.toCUCtimestamp();
+	etl::array<uint8_t, 9> input3 = {0b10100011, 0b10001100, 218, 103, 11, 0, 3, 23, 2};
+	TimeStamp<1, 6> time3(input3);
+	etl::array<uint8_t, 9> cuc3 = time3.toCUCtimestamp();
 
 	for (auto i = 0; i < 9; i++) {
-		CHECK(input_time3[i] == test_return3[i]);
+		CHECK(input3[i] == cuc3[i]);
 	}
 }
 
@@ -93,15 +90,15 @@ TEST_CASE("Conversion between CUC formats") {
 TEST_CASE("UTC idempotence") {
 	{
 		UTCTimestamp timestamp1(2020, 4, 10, 10, 15, 0); // 10 Apr 2020, 10:15:00;
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-		UTCTimestamp timestamp2 = Epoch.toUTCtimestamp();
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		UTCTimestamp timestamp2 = time.toUTCtimestamp();
 		bool cond = (timestamp2 == timestamp1);
 		REQUIRE(cond);
 	}
 	{
 		UTCTimestamp timestamp1(2035, 1, 1, 0, 0, 1); // 1 Jan 2035 midnight passed;
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-		UTCTimestamp timestamp2 = Epoch.toUTCtimestamp();
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		UTCTimestamp timestamp2 = time.toUTCtimestamp();
 		bool cond = (timestamp2 == timestamp1);
 		REQUIRE(cond);
 	}
@@ -110,47 +107,47 @@ TEST_CASE("UTC idempotence") {
 TEST_CASE("UTC conversion to and from seconds timestamps") {
 	{
 		UTCTimestamp timestamp1(2020, 12, 5, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-		REQUIRE(Epoch.asTAIseconds() == 29289600);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		REQUIRE(time.asTAIseconds() == 29289600);
 	}
 	{
 		UTCTimestamp timestamp1(2020, 2, 29, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-		REQUIRE(Epoch.asTAIseconds() == 5097600);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		REQUIRE(time.asTAIseconds() == 5097600);
 	}
 	{
 		UTCTimestamp timestamp1(2025, 3, 10, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
-		REQUIRE(Epoch.asTAIseconds() == 163728000);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		REQUIRE(time.asTAIseconds() == 163728000);
 	}
 }
 
 // SECTION("Check different templates, should break at compile"){
-//   TimeStamp<1, 2> Epoch1;
-//   TimeStamp<4, 4> Epoch2;
-//   REQUIRE(Epoch1==Epoch2);
+//   TimeStamp<1, 2> time1;
+//   TimeStamp<4, 4> time2;
+//   REQUIRE(time1==time2);
 // }
 
 TEST_CASE("Time operators") {
-	TimeStamp<1, 2> Epoch1;
-	TimeStamp<1, 2> Epoch2;
-	TimeStamp<1, 2> Epoch3(10);
-	TimeStamp<1, 2> Epoch4(12);
-	TimeStamp<1, 2> Epoch5(10);
-	TimeStamp<2, 2> Epoch6;
-	REQUIRE(Epoch1 == Epoch2);
-	REQUIRE(Epoch2 == Epoch1);
-	REQUIRE(Epoch3 == Epoch5);
-	REQUIRE(Epoch1 != Epoch3);
-	REQUIRE(Epoch3 != Epoch4);
-	REQUIRE(Epoch3 <= Epoch4);
-	REQUIRE(Epoch3 < Epoch4);
+	TimeStamp<1, 2> time1;
+	TimeStamp<1, 2> time2;
+	TimeStamp<1, 2> time3(10);
+	TimeStamp<1, 2> time4(12);
+	TimeStamp<1, 2> time5(10);
+	TimeStamp<2, 2> time6;
+	REQUIRE(time1 == time2);
+	REQUIRE(time2 == time1);
+	REQUIRE(time3 == time5);
+	REQUIRE(time1 != time3);
+	REQUIRE(time3 != time4);
+	REQUIRE(time3 <= time4);
+	REQUIRE(time3 < time4);
 
-	// REQUIRE(Epoch1==Epoch6); //should fail at compile, different templates
+	// REQUIRE(time1 == time6); //should fail at compile, different templates
 }
 
 TEST_CASE("Time runtime class size") {
 	int input_time = 1000;
-	TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(input_time);
-	REQUIRE(sizeof(Epoch) < 32);
+	TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(input_time);
+	REQUIRE(sizeof(time) < 32);
 }
