@@ -4,8 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "Parameter.hpp"
-#include "Parameters/SystemParameters.hpp"
+#include "Helpers/Parameter.hpp"
 
 /**
  * Implementation of the ST[20] parameter management service,
