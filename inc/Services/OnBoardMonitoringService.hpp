@@ -83,6 +83,10 @@ public:
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
 
 	etl::map<std::reference_wrapper<ParameterBase>, uint16_t, ECSSMaxParameters> ParameterMonitoringIds;
+	/**
+	 * Stores the Parameter Monitoring Ids that correspond to the Monitored Parameter Ids.
+	 */
+	etl::map<uint16_t , uint16_t, ECSSMaxParameters> MonitoredParameterIds;
 
 	etl::map<std::reference_wrapper<ParameterBase>, CheckingStatus, ECSSMaxParameters>
 	    ParameterMonitoringCheckingStatus;
