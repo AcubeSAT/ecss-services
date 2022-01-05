@@ -18,16 +18,16 @@ TimeStamp<secondsCounter, fractionalBytes>::TimeStamp(etl::array<uint8_t, Time::
 		headerSize = 2;
 	};
 
-	uint8_t inputSecondsBytes = (timestamp[0] & 0b00001100U) >> 2;
+	uint8_t inputSecondsBytes = ((timestamp[0] & 0b00001100U) >> 2) + 1U;
 	uint8_t inputFractionalBytes = (timestamp[0] & 0b00000011U) >> 0;
 
 	if (headerSize == 2) {
 		inputSecondsBytes += (timestamp[1] & 0b01100000U) >> 5;
-		inputFractionalBytes += (timestamp[1] & 0b00011000U) >> 2;
+		inputFractionalBytes += (timestamp[1] & 0b00011100U) >> 2;
 	}
 
 	// check input validity (useless bytes set to 0)
-	for (int i = headerSize + inputSecondsBytes + inputFractionalBytes; i < 9; i++) {
+	for (int i = headerSize + inputSecondsBytes + inputFractionalBytes; i < Time::CUCTimestampMaximumSize; i++) {
 		if (timestamp[i] != 0) {
 			ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 			break;
