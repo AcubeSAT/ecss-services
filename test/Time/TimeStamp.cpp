@@ -118,6 +118,11 @@ TEST_CASE("UTC conversion to and from seconds timestamps") {
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
 		REQUIRE(Epoch.asTAIseconds() == 5097600);
 	}
+	{
+		UTCTimestamp timestamp1(2025, 3, 10, 0, 0, 0);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> Epoch(timestamp1);
+		REQUIRE(Epoch.asTAIseconds() == 163728000);
+	}
 }
 
 // SECTION("Check different templates, should break at compile"){
