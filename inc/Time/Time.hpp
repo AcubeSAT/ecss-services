@@ -4,9 +4,67 @@
 #include "etl/String.hpp"
 
 /**
+ * @defgroup Time Time
+ *
+ * Group of classes, functions and variables to represent and operate on time
+ *
+ * The implementation of the ECSS services requires storing and handling timestamps quite often. However, in an embedded
+ * system with mission-critical tasks, it is wide to avoid the complexity of a full time management system, as the one
+ * that comes with Linux or contains [large timezone databases](https://en.wikipedia.org/wiki/Tz_database).
+ *
+ * This repository provides a set of classes and utilities that allow handling of on-board spacecraft time. Most formats
+ * are compatible to the [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf) specification, and are
+ * customisable to support different precisions, lengths and durations. Additionally, a number of formats and headers
+ * are provided so that timestamps can be transmitted and received from the Ground Station.
+ *
+ * The base timestamp class representing an instant in time is @ref TimeStamp. This is used as the internal
+ * representation of all moments in this repository. Additional formats are provided for convenience and compatibility
+ * with other systems:
+ *  - @ref UTCTimestamp
+ *
+ * You can convert between different types of timestamp, either by using constructors, or conversion functions
+ * defined in each timestamp class.
+ *
+ * Note that you should try sticking to the default @ref TimeStamp class unless needed, as it provides the best
+ * precision and performance for the least amount of memory, and is directly compatible with internal timestamps
+ * used, without loss of precision.
+ *
+ * @subsection Epoch Epoch
+ *
+ * Internal timestamp representations can use a single point in time referring to $t=0$. This point is referred to as
+ * the **Epoch** and is stored in @ref Time::Epoch. CSSDS suggests using _1 January 1958_ as the Epoch. UNIX uses _1
+ * January 1970_. In this repository however, each implementor can choose a different epoch (e.g. the start of the
+ * mission).
+ *
+ * @subsection DevUtils Developer utilities
+ * Timestamp classes are designed to make the developer's life easier.
+ *
+ * You can easily compare timestamps without having to call any other functions:
+ * @code
+ * if (timestamp1 < timestamp2)
+ * @endcode
+ *
+ * If you are building on x86, you can directly print UTC timestamps:
+ * @code
+ * std::cout << utcTimestamp << std::endl;
+ * @endcode
+ *
+ * @subsection UTC UTC and Leap seconds
+ * All internal timestamps are represented in the GMT+00:00 timezone due to the high expense of timezone
+ * calculations.
+ *
+ * This implementation uses **TAI (International Atomic Time)** instead of UTC (Coordinated Universal Time).
+ * [TAI](https://en.wikipedia.org/wiki/International_Atomic_Time) is equivalent to UTC, with the exception of leap
+ * seconds, which are occasionally added to match terrestrial and astronomical time. As leap seconds are added after
+ * human intervention to UTC, it is impossible for a satellite to know the exact UTC time without ground station
+ * intervention.
+ */
+
+/**
  * An armada of utilities regarding timekeeping, timestamps and conversion between different internal and string
  * time formats. This file implements [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf).
  *
+ * @ingroup Time
  * @author Baptiste Fournier
  */
 namespace Time

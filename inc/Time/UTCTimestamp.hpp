@@ -10,6 +10,7 @@
 * for timestamp storage in the satellite due to its high performance and memory cost, but it can be used for
 * debugging and logging purposes.
 *
+* @ingroup Time
 * @note
 * This class represents UTC (Coordinated Universal Time) date
 */

@@ -16,6 +16,7 @@
  * This class uses internally TAI time, and handles UTC leap seconds at conversion to and
  * from UTC time system.
  *
+ * @ingroup Time
  * @author Baptiste Fournier
  * @see [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf)
  */
@@ -28,7 +29,7 @@ private:
 	typedef typename std::conditional<(secondsBytes + fractionalBytes < 4), uint32_t, uint64_t>::type TAICounter_t;
 
 	/**
-	 * Integer counter of time units since the @ref Epoch. This number essentially represents the timestamp.
+	 * Integer counter of time units since the @ref Time::Epoch. This number essentially represents the timestamp.
 	 *
 	 * The unit represented by this variable depends on @ref secondsBytes and @ref fractionalBytes. The fractional
 	 * part is included as the least significant bits of this variable, and the base part follows.
@@ -41,24 +42,30 @@ private:
 	static constexpr CUCHeader_t CUCHeader = Time::buildCUCHeader<CUCHeader_t, secondsBytes, fractionalBytes>();
 
 	/**
-	 * Returns whether the amount of @ref seconds can be represented by this TimeStamp.
+	 * The maximum value that can fit in @ref taiCounter, or the maximum number of seconds since epoch that can be
+	 * represented in this base class
+	 */
+	static constexpr uint64_t maxSecondCounterValue = (1U << (8U * secondsBytes)) - 1;
+
+	/**
+	 * Returns whether the amount of @param seconds can be represented by this TimeStamp.
 	 * If @ref seconds is too large, the number of @ref secondsByte may not be enough to represent this timestamp.
 	 *
-	 * @param seconds The amount of seconds from \ref Epoch
+	 * @param seconds The amount of seconds from @ref Time::Epoch
 	 */
 	static constexpr bool areSecondsValid(TAICounter_t seconds);
 public:
 	/**
-	 * Initialize the TimeStamp at \ref Epoch
+	 * Initialize the TimeStamp at @ref Time::Epoch
 	 */
 	TimeStamp() : taiCounter(0){};
 
 	/**
 	 * Initialize the TimeStamp from a duration from epoch in TAI (leap seconds not accounted)
 	 *
-	 * @param seconds An integer number of seconds from the custom \Epoch
+	 * @param seconds An integer number of seconds from the custom @ref Time::Epoch
 	 */
-	explicit TimeStamp(int taiSecondsFromEpoch);
+	explicit TimeStamp(uint64_t taiSecondsFromEpoch);
 
 	/**
 	 * Initialize the TimeStamp from the bytes of a CUC time stamp
@@ -78,9 +85,19 @@ public:
 	/**
 	 * Get the representation as seconds from epoch in TAI
 	 *
-	 * @return the seconds elapsed in TAI since 1 Jan 1958, cut to the integer part
+	 * @return The seconds elapsed in TAI since @ref Time::Epoch. This function is explicitly defined
 	 */
-	int asTAIseconds();
+	TAICounter_t asTAIseconds();
+
+	/**
+	 * Get the representation as seconds from epoch in TAI, for a floating-point representation.
+	 * For an integer result, see the overloaded @ref asTAIseconds function.
+	 *
+	 * @todo Implement integer seconds in this function
+	 * @tparam T The return type of the seconds (float or double).
+	 * @return The seconds elapsed in TAI since @ref Time::Epoch
+	 */
+	template<typename T> T asTAIseconds();
 
 	/**
 	 * Get the representation as CUC formatted bytes
@@ -97,7 +114,7 @@ public:
 	UTCTimestamp toUTCtimestamp();
 
 	/**
-	 * Compare two instants.
+	 * Compare two timestamps.
 	 *
 	 * @param TimeStamp the date that will be compared with the pointer `this`
 	 * @return true if the condition is satisfied

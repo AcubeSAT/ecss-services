@@ -1,12 +1,10 @@
 template <uint8_t secondsBytes, uint8_t fractionalBytes>
 constexpr bool TimeStamp<secondsBytes, fractionalBytes>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
-	constexpr uint64_t maxSecondCounterValue = (1U << (8U * secondsBytes)) - 1;
-
 	return seconds < maxSecondCounterValue;
 }
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes>
-TimeStamp<secondsBytes, fractionalBytes>::TimeStamp(int taiSecondsFromEpoch) {
+TimeStamp<secondsBytes, fractionalBytes>::TimeStamp(uint64_t taiSecondsFromEpoch) {
 	ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)),ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 
 	taiCounter = static_cast<TAICounter_t>(taiSecondsFromEpoch) << 8 * fractionalBytes;
@@ -48,11 +46,9 @@ TimeStamp<secondsCounter, fractionalBytes>::TimeStamp(etl::array<uint8_t, Time::
 		taiCounter += timestamp[headerSize + i];
 	}
 	// pad rightmost bytes to full length
-	// TODO: What about seconds?
 	taiCounter = taiCounter << 8 * (fractionalBytes - inputFractionalBytes);
 }
 
-//// FROM UTC TIMESTAMP
 template <uint8_t seconds_counter_bytes, uint8_t fractional_counter_bytes>
 TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(const UTCTimestamp& timestamp) {
 	TAICounter_t seconds = Time::EpochSecondsFromUnix;
@@ -72,10 +68,23 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(const UTCT
 	taiCounter = static_cast<TAICounter_t>(seconds) << 8 * fractional_counter_bytes;
 }
 
-////////////// GETTER ///////////////
 template <uint8_t secondsBytes, uint8_t fractionalBytes>
-int TimeStamp<secondsBytes, fractionalBytes>::asTAIseconds() {
+typename TimeStamp<secondsBytes, fractionalBytes>::TAICounter_t TimeStamp<secondsBytes, fractionalBytes>::asTAIseconds() {
 	return taiCounter >> (8 * fractionalBytes);
+}
+
+template <uint8_t secondsBytes, uint8_t fractionalBytes>
+template <typename T>
+T TimeStamp<secondsBytes, fractionalBytes>::asTAIseconds() {
+	static_assert(std::is_floating_point_v<T>, "TimeStamp::asTAIseconds() only accepts numeric types.");
+	static_assert(std::numeric_limits<T>::max() >= maxSecondCounterValue);
+
+	TAICounter_t decimalPart = taiCounter >> (8 * fractionalBytes);
+
+	T fractionalPart = taiCounter - (decimalPart << (8 * fractionalBytes));
+	T fractionalPartMax = (1U << (8U * fractionalBytes)) - 1U;
+
+	return decimalPart + fractionalPart / fractionalPartMax;
 }
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes>
