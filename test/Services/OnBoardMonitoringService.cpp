@@ -58,12 +58,14 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({2, onBoardMonitoringService.DeltaCheck});
 	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({3, onBoardMonitoringService.DeltaCheck});
 
-
-	struct OnBoardMonitoringService::ExpectedValueCheck expectedValueCheck = {};
+	struct OnBoardMonitoringService::ExpectedValueCheck expectedValueCheck = {
+	    5, 8, onBoardMonitoringService.NotExpectedValueEvent};
 	onBoardMonitoringService.ExpectedValueCheckParameters.insert({0, expectedValueCheck});
-	struct OnBoardMonitoringService::LimitCheck limitCheck = {};
+	struct OnBoardMonitoringService::LimitCheck limitCheck = {1, onBoardMonitoringService.BelowLowLimitEvent, 2,
+	                                                          onBoardMonitoringService.AboveHighLimitEvent};
 	onBoardMonitoringService.LimitCheckParameters.insert({1, limitCheck});
-	struct OnBoardMonitoringService::DeltaCheck deltaCheck = {};
+	struct OnBoardMonitoringService::DeltaCheck deltaCheck = {5, 2, onBoardMonitoringService.BelowLowThresholdEvent, 10,
+	                                                          onBoardMonitoringService.AboveHighThresholdEvent};
 	onBoardMonitoringService.DeltaCheckParameters.insert({2, deltaCheck});
 	onBoardMonitoringService.DeltaCheckParameters.insert({3, deltaCheck});
 };
