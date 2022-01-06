@@ -73,9 +73,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	// TODO: Undertand error types 6.12.3.9.1.e.3-4.
 	// TODO: Evaluate if the optional values in TC[12,5] are going to be used.
 	uint16_t numberOfIds = message.readUint16();
-	ParameterService parameterService = ParameterService();
-	uint16_t currentPMONId = message.readUint16();
-	uint16_t currentMonitoredParameterId = message.readUint16();
+	uint16_t currentPMONId = message.readEnum16();
+	uint16_t currentMonitoredParameterId = message.readEnum16();
 	uint16_t currentParameterRepetitionNumber = message.readUint16();
 	uint16_t currentCheckType = message.readEnum8();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
@@ -85,7 +84,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
 				break;
 			} else {
-				if (auto parameterToBeAdded = parameterService.getParameter(currentMonitoredParameterId)) {
+				if (auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
 					if (currentCheckType == LimitCheck) {
 						// TODO: Find out how we read deduced message values.
 						uint8_t lowLimit = message.readUint8();
@@ -139,8 +138,9 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						ParameterMonitoringStatus.insert({currentPMONId, false});
 						ParameterMonitoringCheckTypes.insert({currentPMONId, DeltaCheck});
 						ParameterMonitoringCheckingStatus.insert({currentPMONId, Unchecked});
-						struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
-						                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
+						struct DeltaCheck deltaCheck = {numberOfConsecutiveDeltaChecks, lowDeltaThreshold,
+						                                belowLowThresholdEventId, highDeltaThreshold,
+						                                aboveHighThresholdEventId};
 						DeltaCheckParameters.insert({currentPMONId, deltaCheck});
 					}
 				} else {
@@ -195,7 +195,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		uint16_t currentParameterRepetitionNumber = message.readUint16();
 		uint16_t currentCheckType = message.readEnum8();
 		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
-			if (auto parameterToBeModified = parameterService.getParameter(currentMonitoredParameterId)) {
+			if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
 				if (MonitoredParameterIds.at(currentPMONId) == currentMonitoredParameterId) {
 					if (currentCheckType == LimitCheck) {
 						uint8_t lowLimit = message.readUint8();
@@ -431,7 +431,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
 				outOfLimitsReport.appendUint16(
-				    parameterService.getParameter(MonitoredParameterIds.at(transition.first))
+				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
 				        ->get()
 				        .getValueAsDouble());
 				// TODO:Evaluate if the conversion from double to uint is ok.
@@ -454,7 +454,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
 				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(
-				    parameterService.getParameter(MonitoredParameterIds.at(transition.first))
+				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
 				        ->get()
 				        .getValueAsDouble());
 				// TODO:Evaluate if the conversion from double to uint is ok.
@@ -474,7 +474,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
 				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(
-				    parameterService.getParameter(MonitoredParameterIds.at(transition.first))
+				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
 				        ->get()
 				        .getValueAsDouble());
 				// TODO:Evaluate if the conversion from double to uint is ok.
@@ -496,7 +496,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
 				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(
-				    parameterService.getParameter(MonitoredParameterIds.at(transition.first))
+				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
 				        ->get()
 				        .getValueAsDouble());
 				// TODO:Evaluate if the conversion from double to uint is ok.
@@ -516,7 +516,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
 				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 				outOfLimitsReport.appendUint16(
-				    parameterService.getParameter(MonitoredParameterIds.at(transition.first))
+				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
 				        ->get()
 				        .getValueAsDouble());
 				// TODO:Evaluate if the conversion from double to uint is ok.
@@ -533,7 +533,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 void OnBoardMonitoringService::checkTransitionReport() {
 	Message checkTransitionReport(ServiceType, CheckTransitionReport, Message::TM, 0);
 	checkTransitionReport.appendUint16(CheckTransitionList.size());
-	ParameterService parameterService = ParameterService();
+
 	for (auto& transition : CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
 			checkTransitionReport.appendEnum16(transition.first);
@@ -541,7 +541,9 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 			checkTransitionReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
 			checkTransitionReport.appendUint16(
-			    parameterService.getParameter(MonitoredParameterIds.at(transition.first))->get().getValueAsDouble());
+			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+			        ->get()
+			        .getValueAsDouble());
 			// TODO:Evaluate if the conversion from double to uint is ok.
 			// TODO: Find out what the limit crossed should be here.
 			if (transition.second.at(secondTransitionIndex) == UnexpectedValue) {
@@ -558,7 +560,9 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
 			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 			checkTransitionReport.appendUint16(
-			    parameterService.getParameter(MonitoredParameterIds.at(transition.first))->get().getValueAsDouble());
+			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+			        ->get()
+			        .getValueAsDouble());
 			// TODO:Evaluate if the conversion from double to uint is ok.
 			// TODO: Find out what the limit crossed should be here.
 			if (transition.second.at(secondTransitionIndex) == BelowLowLimit) {
@@ -576,7 +580,9 @@ void OnBoardMonitoringService::checkTransitionReport() {
 			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
 			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
 			checkTransitionReport.appendUint16(
-			    parameterService.getParameter(MonitoredParameterIds.at(transition.first))->get().getValueAsDouble());
+			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+			        ->get()
+			        .getValueAsDouble());
 			// TODO:Evaluate if the conversion from double to uint is ok.
 			// TODO: Find out what the limit crossed should be here.
 			if (transition.second.at(secondTransitionIndex) == BelowLowThreshold) {
