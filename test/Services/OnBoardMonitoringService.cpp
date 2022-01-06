@@ -136,49 +136,62 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 }
 
 TEST_CASE("Disable Parameter Monitoring Definitions") {
-	SECTION("Valid request to enable Parameter Monitoring Definitions") {
+	SECTION("3 valid requests to enable Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
-		request.appendUint8(3);
-		request.appendEnum16(0);
-		request.appendEnum16(1);
-		request.appendEnum16(2);
+		uint16_t numberOfIds = 3;
+		request.appendUint16(numberOfIds);
+		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
+		request.appendEnum16(PMONIds.at(0));
+		request.appendEnum16(PMONIds.at(1));
+		request.appendEnum16(PMONIds.at(2));
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(0) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(1) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(2) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(0) == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(1) == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(2) == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(1)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(2)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(0)) ==
+		      OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(1)) ==
+		      OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(2)) ==
+		      OnBoardMonitoringService::Unchecked);
 
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
-	SECTION("Request to disable Parameter MonitoringDefinitions with the last ID of the request exceeding the size of "
-	        "the Parameter Monitoring List") {
+	SECTION("3 valid requests to enable Parameter Monitoring Definitions and 1 invalid") {
 		initialiseParameterMonitoringDefinitions();
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
-		request.appendUint8(4);
-		request.appendEnum16(0);
-		request.appendEnum16(1);
-		request.appendEnum16(2);
-		request.appendEnum16(3);
+		uint16_t numberOfIds = 4;
+		request.appendUint16(numberOfIds);
+		etl::array<uint16_t, 4> PMONIds = {0, 1, 2, 10};
+		request.appendEnum16(PMONIds.at(0));
+		request.appendEnum16(PMONIds.at(1));
+		request.appendEnum16(PMONIds.at(2));
+		request.appendEnum16(PMONIds.at(3));
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(0) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(1) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(2) == false);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(0) == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(1) == OnBoardMonitoringService::Unchecked);
-		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(2) == OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(1)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(2)) == false);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(0)) ==
+		      OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(1)) ==
+		      OnBoardMonitoringService::Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(2)) ==
+		      OnBoardMonitoringService::Unchecked);
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
 
