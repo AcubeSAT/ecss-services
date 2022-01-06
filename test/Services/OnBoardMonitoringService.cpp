@@ -36,6 +36,11 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
 	onBoardMonitoringService.ParameterMonitoringList.insert({3, parameter3});
 
+	onBoardMonitoringService.MonitoredParameterIds.insert({0, 0});
+	onBoardMonitoringService.MonitoredParameterIds.insert({1, 1});
+	onBoardMonitoringService.MonitoredParameterIds.insert({2, 2});
+	onBoardMonitoringService.MonitoredParameterIds.insert({3, 3});
+
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({0, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({1, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({2, false});
@@ -60,6 +65,7 @@ void initialiseParameterMonitoringDefinitions() {
 
 void clearAllMaps() {
 	onBoardMonitoringService.ParameterMonitoringList.clear();
+	onBoardMonitoringService.MonitoredParameterIds.clear();
 	onBoardMonitoringService.ParameterMonitoringCheckingStatus.clear();
 	onBoardMonitoringService.RepetitionCounter.clear();
 	onBoardMonitoringService.RepetitionNumber.clear();
