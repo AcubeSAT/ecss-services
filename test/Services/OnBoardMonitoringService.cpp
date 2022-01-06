@@ -248,7 +248,6 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 
 TEST_CASE("Add Parameter Monitoring Definitions") {
 	SECTION("Valid Request to add Parameter Monitoring Definitions") {
-		initialiseParameterMonitoringDefinitions();
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
@@ -302,6 +301,12 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.ParameterMonitoringList.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.find(PMONIds.at(2)) !=
 		      onBoardMonitoringService.ParameterMonitoringList.end());
+		CHECK(onBoardMonitoringService.MonitoredParameterIds.find(PMONIds.at(0)) !=
+		      onBoardMonitoringService.MonitoredParameterIds.end());
+		CHECK(onBoardMonitoringService.MonitoredParameterIds.find(PMONIds.at(1)) !=
+		      onBoardMonitoringService.MonitoredParameterIds.end());
+		CHECK(onBoardMonitoringService.MonitoredParameterIds.find(PMONIds.at(2)) !=
+		      onBoardMonitoringService.MonitoredParameterIds.end());
 		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(0) == 0));
 		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(1) == 0));
 		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(2) == 0));
@@ -351,12 +356,18 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	SECTION("Parameter Monitoring List is full") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		uint16_t PMONId = 3;
+		uint16_t PMONId = 4;
+		uint16_t monitoredParameterId = 0;
+		uint16_t repetitionNumber = 5;
+
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		request.appendUint16(PMONId);
+		request.appendEnum16(monitoredParameterId);
+		request.appendUint16(repetitionNumber);
+		request.appendEnum8(onBoardMonitoringService.ExpectedValueCheck);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -368,15 +379,43 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
+		uint16_t monitoredParameterId = 0;
+		uint16_t repetitionNumber = 5;
+
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		request.appendUint16(PMONId);
+		request.appendEnum16(monitoredParameterId);
+		request.appendUint16(repetitionNumber);
+		request.appendEnum8(onBoardMonitoringService.ExpectedValueCheck);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddAlreadyExistingParameter) == 1);
+		clearAllMaps();
+	}
+
+	SECTION("Add Parameter Monitoring Definition with a non-existing parameter") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 4;
+		uint16_t monitoredParameterId = 10;
+		uint16_t repetitionNumber = 5;
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendUint16(PMONId);
+		request.appendEnum16(monitoredParameterId);
+		request.appendUint16(repetitionNumber);
+		request.appendEnum8(onBoardMonitoringService.ExpectedValueCheck);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		clearAllMaps();
 	}
 
