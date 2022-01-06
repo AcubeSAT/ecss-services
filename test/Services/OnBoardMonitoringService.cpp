@@ -852,10 +852,12 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
+		CHECK(report.readUint16() == numberOfIds);
 		CHECK(report.readEnum16() == PMONIds.at(0));
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(0)));
 		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)));
 		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)));
+		CHECK(report.readEnum8() == onBoardMonitoringService.ExpectedValueCheck);
 		CHECK(report.readUint8() == onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).mask);
 		CHECK(report.readUint16() ==
 		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).expectedValue);
@@ -865,6 +867,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(1)));
 		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(1)));
 		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(1)));
+		CHECK(report.readEnum8() == onBoardMonitoringService.LimitCheck);
 		CHECK(report.readUint16() == onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).lowLimit);
 		CHECK(report.readEnum8() == onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).belowLowLimitEvent);
 		CHECK(report.readUint16() == onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).highLimit);
@@ -874,6 +877,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(2)));
 		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(2)));
 		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(2)));
+		CHECK(report.readEnum8() == onBoardMonitoringService.DeltaCheck);
 		CHECK(report.readUint16() == onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(2)).lowDeltaThreshold);
 		CHECK(report.readEnum8() ==
 		      onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(2)).belowLowThresholdEvent);
