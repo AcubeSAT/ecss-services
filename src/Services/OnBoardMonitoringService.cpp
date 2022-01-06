@@ -2,8 +2,8 @@
 #ifdef SERVICE_ONBOARDMONITORING
 #include <Message.hpp>
 #include "Services/OnBoardMonitoringService.hpp"
-#include "Services/ParameterService.hpp"
 #include "etl/map.h"
+#include "ServicePool.hpp"
 
 #define firstTransitionIndex 0
 #define secondTransitionIndex 1
@@ -12,15 +12,16 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = true;
 	uint16_t numberOfParameters = message.readUint16();
+	uint16_t currentId = message.readEnum16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
-		uint16_t currentId = message.readUint16();
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			RepetitionNumber.at(currentId) = 0;
+			RepetitionCounter.at(currentId) = 0;
 			ParameterMonitoringStatus.at(currentId) = true;
 		} else {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
+		currentId = message.readEnum16();
 	}
 }
 
@@ -28,8 +29,8 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = false;
 	uint16_t numberOfParameters = message.readUint16();
+	uint16_t currentId = message.readEnum16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
-		uint16_t currentId = message.readUint16();
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
 			ParameterMonitoringStatus.at(currentId) = false;
 			ParameterMonitoringCheckingStatus.at(currentId) = Unchecked;
@@ -37,6 +38,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
+		currentId = message.readEnum16();
 	}
 }
 
