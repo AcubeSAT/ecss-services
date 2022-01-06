@@ -209,8 +209,18 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
+
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.empty());
+		CHECK(onBoardMonitoringService.MonitoredParameterIds.empty());
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.empty());
+		CHECK(onBoardMonitoringService.RepetitionCounter.empty());
+		CHECK(onBoardMonitoringService.RepetitionNumber.empty());
+		CHECK(onBoardMonitoringService.ParameterMonitoringStatus.empty());
 		CHECK(onBoardMonitoringService.CheckTransitionList.empty());
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.empty());
+		CHECK(onBoardMonitoringService.LimitCheckParameters.empty());
+		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.empty());
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.empty());
 	}
 	SECTION("Invalid request to delete all Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
@@ -221,8 +231,18 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError) == 1);
+
 		CHECK(!onBoardMonitoringService.ParameterMonitoringList.empty());
+		CHECK(!onBoardMonitoringService.MonitoredParameterIds.empty());
+		CHECK(!onBoardMonitoringService.ParameterMonitoringCheckingStatus.empty());
+		CHECK(!onBoardMonitoringService.RepetitionCounter.empty());
+		CHECK(!onBoardMonitoringService.RepetitionNumber.empty());
+		CHECK(!onBoardMonitoringService.ParameterMonitoringStatus.empty());
 		CHECK(!onBoardMonitoringService.CheckTransitionList.empty());
+		CHECK(!onBoardMonitoringService.ParameterMonitoringCheckTypes.empty());
+		CHECK(!onBoardMonitoringService.LimitCheckParameters.empty());
+		CHECK(!onBoardMonitoringService.ExpectedValueCheckParameters.empty());
+		CHECK(!onBoardMonitoringService.DeltaCheckParameters.empty());
 	}
 }
 
