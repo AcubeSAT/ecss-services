@@ -188,7 +188,6 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
 	uint16_t numberOfIds = message.readUint16();
-	ParameterService parameterService = ParameterService();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		uint16_t currentPMONId = message.readUint16();
 		uint16_t currentMonitoredParameterId = message.readUint16();
@@ -361,7 +360,6 @@ void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
 void OnBoardMonitoringService::outOfLimitsReport() {
 	Message outOfLimitsReport(ServiceType, MessageType::OutOfLimitsReport, Message::TM, 0);
 	uint16_t numberOfTransitions = 0;
-	ParameterService parameterService = ParameterService();
 
 	for (auto& transition : CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
