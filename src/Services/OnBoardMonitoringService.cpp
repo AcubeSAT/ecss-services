@@ -359,9 +359,64 @@ void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
 
 void OnBoardMonitoringService::outOfLimitsReport() {
 	Message outOfLimitsReport(ServiceType, MessageType::OutOfLimitsReport, Message::TM, 0);
-	// TODO: Find a way to calculate the transitions to be reported before getting in the loop.
+	uint16_t numberOfTransitions = 0;
 	ParameterService parameterService = ParameterService();
-	outOfLimitsReport.appendUint16(CheckTransitionList.size());
+
+	for (auto& transition : CheckTransitionList) {
+		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
+			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
+			    (transition.second.at(firstTransitionIndex) == Invalid &&
+			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
+			    (transition.second.at(firstTransitionIndex) == ExpectedValue &&
+			     transition.second.at(secondTransitionIndex) == UnexpectedValue)) {
+				numberOfTransitions++;
+			}
+		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
+			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+			    (transition.second.at(firstTransitionIndex) == Invalid &&
+			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
+			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+			    (transition.second.at(firstTransitionIndex) == AboveHighLimit &&
+			     transition.second.at(secondTransitionIndex) == BelowLowLimit)) {
+				numberOfTransitions++;
+			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+			           (transition.second.at(firstTransitionIndex) == Invalid &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+			           (transition.second.at(firstTransitionIndex) == BelowLowLimit &&
+			            transition.second.at(secondTransitionIndex) == AboveHighLimit)) {
+				numberOfTransitions++;
+			}
+		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
+			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+			    (transition.second.at(firstTransitionIndex) == Invalid &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold &&
+			     transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
+				numberOfTransitions++;
+			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+			           (transition.second.at(firstTransitionIndex) == Invalid &&
+			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+			           (transition.second.at(firstTransitionIndex) == BelowLowThreshold &&
+			            transition.second.at(secondTransitionIndex) == AboveHighThreshold)) {
+				numberOfTransitions++;
+			}
+		}
+	}
+
+	outOfLimitsReport.appendUint16(numberOfTransitions);
+
 	for (auto& transition : CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
 			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
