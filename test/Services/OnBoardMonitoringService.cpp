@@ -41,6 +41,8 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.MonitoredParameterIds.insert({2, 2});
 	onBoardMonitoringService.MonitoredParameterIds.insert({3, 3});
 
+	onBoardMonitoringService.CheckTransitionList.insert({});
+
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({0, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({1, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({2, false});
@@ -205,6 +207,9 @@ TEST_CASE("Change Maximum Transition Reporting Delay") {
 	MessageParser::execute(request);
 	CHECK(ServiceTests::count() == 0);
 	CHECK(onBoardMonitoringService.maximumTransitionReportingDelay == newMaximumTransitionReportingDelay);
+	clearAllMaps();
+	ServiceTests::reset();
+	Services.reset();
 }
 
 TEST_CASE("Delete all Parameter Monitoring Definitions") {
@@ -228,6 +233,9 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.LimitCheckParameters.empty());
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.empty());
 		CHECK(onBoardMonitoringService.DeltaCheckParameters.empty());
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 	SECTION("Invalid request to delete all Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
@@ -250,6 +258,9 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		CHECK(!onBoardMonitoringService.LimitCheckParameters.empty());
 		CHECK(!onBoardMonitoringService.ExpectedValueCheckParameters.empty());
 		CHECK(!onBoardMonitoringService.DeltaCheckParameters.empty());
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
 
@@ -358,6 +369,9 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(
 		    onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(2))->second.numberOfConsecutiveDeltaChecks ==
 		    numberOfConsecutiveDeltaChecks);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("Parameter Monitoring List is full") {
@@ -380,6 +394,8 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ParameterMonitoringListIsFull) == 1);
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("Parameter Monitoring Definition already exists") {
@@ -402,10 +418,11 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddAlreadyExistingParameter) == 1);
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("Add Parameter Monitoring Definition with a non-existing parameter") {
-		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 4;
 		uint16_t monitoredParameterId = 10;
@@ -424,10 +441,11 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("High limit is lower than low limit") {
-		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 0;
@@ -451,10 +469,12 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("High threshold is lower than low threshold") {
-		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 0;
@@ -480,6 +500,9 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
 
@@ -540,6 +563,9 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.ParameterMonitoringStatus.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.find(PMONIds.at(2)) ==
 		      onBoardMonitoringService.ParameterMonitoringCheckTypes.end());
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("Two invalid requests to delete a Parameter Monitoring Definition and two valid ones") {
@@ -601,6 +627,9 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.ParameterMonitoringStatus.end());
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.find(PMONIds.at(3)) !=
 		      onBoardMonitoringService.ParameterMonitoringCheckTypes.end());
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
 
@@ -689,6 +718,9 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		      expetedValueCheckMask);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(2))->second.notExpectedValueEvent ==
 		      onBoardMonitoringService.NotExpectedValueEvent);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("Modify parameter not in the Parameter Monitoring List") {
@@ -711,6 +743,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	}
 
 	SECTION("Monitored parameter ID does not match the Parameter Monitoring Definition") {
+		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 1;
@@ -729,6 +762,9 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::DifferentParameterMonitoringDefinitionAndMonitoredParameter) == 1);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 	SECTION("High limit is lower than low limit") {
 		initialiseParameterMonitoringDefinitions();
@@ -755,6 +791,9 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("High threshold is lower than low threshold") {
@@ -784,6 +823,9 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
 
@@ -837,6 +879,8 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readUint16() ==
 		      onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(2)).numberOfConsecutiveDeltaChecks);
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("Invalid request to report Parameter Monitoring Definitions") {
@@ -852,6 +896,8 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
@@ -881,6 +927,8 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readEnum8() ==
 		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).notExpectedValueEvent);
 		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
 
@@ -904,4 +952,6 @@ TEST_CASE("Report status of Parameter Monitoring Definitions") {
 	CHECK(report.readUint16() == 3);
 	CHECK(report.readEnumerated(1) == false);
 	clearAllMaps();
+	ServiceTests::reset();
+	Services.reset();
 }
