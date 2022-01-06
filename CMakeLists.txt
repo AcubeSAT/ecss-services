@@ -41,6 +41,7 @@ add_library(common OBJECT
         src/Services/FunctionManagementService.cpp
         src/Services/HousekeepingService.cpp
         src/Services/ParameterStatisticsService.cpp
+        src/Services/OnBoardMonitoringService.cpp
         src/Helpers/Statistic.cpp
         )
 
