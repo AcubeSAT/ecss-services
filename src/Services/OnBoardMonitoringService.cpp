@@ -326,7 +326,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
 			parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
 			parameterMonitoringDefinitionReport.appendEnum16(MonitoredParameterIds.at(currentPMONId));
-			parameterMonitoringDefinitionReport.appendEnumerated(1, ParameterMonitoringStatus.at(currentPMONId));
+			parameterMonitoringDefinitionReport.appendEnum8(ParameterMonitoringStatus.at(currentPMONId));
 			parameterMonitoringDefinitionReport.appendEnum16(RepetitionNumber.at(currentPMONId));
 			parameterMonitoringDefinitionReport.appendEnum8(ParameterMonitoringCheckTypes.at(currentPMONId));
 			if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
@@ -621,8 +621,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	parameterMonitoringDefinitionStatusReport.appendUint16(ParameterMonitoringList.size());
 	for (auto& currentParameter : ParameterMonitoringList) {
 		parameterMonitoringDefinitionStatusReport.appendEnum16(currentParameter.first);
-		parameterMonitoringDefinitionStatusReport.appendEnumerated(
-		    1, ParameterMonitoringStatus.at(currentParameter.first));
+		parameterMonitoringDefinitionStatusReport.appendEnum8(ParameterMonitoringStatus.at(currentParameter.first));
 	}
 	storeMessage(parameterMonitoringDefinitionStatusReport);
 }
