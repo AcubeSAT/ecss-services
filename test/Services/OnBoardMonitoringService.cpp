@@ -10,13 +10,12 @@
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
-ParameterService parameterService = ParameterService();
-
 void initialiseParameterMonitoringDefinitions() {
 	Parameter<uint8_t> parameter1 = Parameter<uint8_t>(3);
 	Parameter<uint16_t> parameter2 = Parameter<uint16_t>(7);
 	Parameter<uint32_t> parameter3 = Parameter<uint32_t>(9);
 	Parameter<uint32_t> parameter4 = Parameter<uint32_t>(2);
+	Parameter<uint32_t> parameter5 = Parameter<uint32_t>(10);
 
 	onBoardMonitoringService.parameterMonitoringFunctionStatus = true;
 	onBoardMonitoringService.maximumTransitionReportingDelay = 0;
@@ -25,21 +24,25 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.RepetitionNumber.insert({1, 2});
 	onBoardMonitoringService.RepetitionNumber.insert({2, 5});
 	onBoardMonitoringService.RepetitionNumber.insert({3, 6});
+	onBoardMonitoringService.RepetitionNumber.insert({4, 7});
 
 	onBoardMonitoringService.RepetitionCounter.insert({0, 0});
 	onBoardMonitoringService.RepetitionCounter.insert({1, 0});
 	onBoardMonitoringService.RepetitionCounter.insert({2, 0});
 	onBoardMonitoringService.RepetitionCounter.insert({3, 0});
+	onBoardMonitoringService.RepetitionCounter.insert({4, 0});
 
 	onBoardMonitoringService.ParameterMonitoringList.insert({0, parameter1});
 	onBoardMonitoringService.ParameterMonitoringList.insert({1, parameter2});
 	onBoardMonitoringService.ParameterMonitoringList.insert({2, parameter3});
-	onBoardMonitoringService.ParameterMonitoringList.insert({3, parameter3});
+	onBoardMonitoringService.ParameterMonitoringList.insert({3, parameter4});
+	onBoardMonitoringService.ParameterMonitoringList.insert({4, parameter5});
 
 	onBoardMonitoringService.MonitoredParameterIds.insert({0, 0});
 	onBoardMonitoringService.MonitoredParameterIds.insert({1, 1});
 	onBoardMonitoringService.MonitoredParameterIds.insert({2, 2});
 	onBoardMonitoringService.MonitoredParameterIds.insert({3, 3});
+	onBoardMonitoringService.MonitoredParameterIds.insert({4, 4});
 
 	onBoardMonitoringService.CheckTransitionList.insert({});
 
@@ -47,16 +50,19 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({1, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({2, false});
 	onBoardMonitoringService.ParameterMonitoringStatus.insert({3, true});
+	onBoardMonitoringService.ParameterMonitoringStatus.insert({4, false});
 
 	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({0, OnBoardMonitoringService::Unchecked});
 	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({1, OnBoardMonitoringService::Unchecked});
 	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({2, OnBoardMonitoringService::Unchecked});
 	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({3, OnBoardMonitoringService::Unchecked});
+	onBoardMonitoringService.ParameterMonitoringCheckingStatus.insert({4, OnBoardMonitoringService::Unchecked});
 
 	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({0, onBoardMonitoringService.ExpectedValueCheck});
 	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({1, onBoardMonitoringService.LimitCheck});
 	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({2, onBoardMonitoringService.DeltaCheck});
 	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({3, onBoardMonitoringService.DeltaCheck});
+	onBoardMonitoringService.ParameterMonitoringCheckTypes.insert({4, onBoardMonitoringService.ExpectedValueCheck});
 
 	struct OnBoardMonitoringService::ExpectedValueCheck expectedValueCheck = {
 	    5, 8, onBoardMonitoringService.NotExpectedValueEvent};
@@ -68,6 +74,7 @@ void initialiseParameterMonitoringDefinitions() {
 	                                                          onBoardMonitoringService.AboveHighThresholdEvent};
 	onBoardMonitoringService.DeltaCheckParameters.insert({2, deltaCheck});
 	onBoardMonitoringService.DeltaCheckParameters.insert({3, deltaCheck});
+	onBoardMonitoringService.ExpectedValueCheckParameters.insert({4, expectedValueCheck});
 };
 
 void clearAllMaps() {
@@ -382,8 +389,8 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	SECTION("Parameter Monitoring List is full") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		uint16_t PMONId = 4;
-		uint16_t monitoredParameterId = 0;
+		uint16_t PMONId = 5;
+		uint16_t monitoredParameterId = 5;
 		uint16_t repetitionNumber = 5;
 
 		Message request =
@@ -580,7 +587,7 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DeleteParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 1, 3, 4};
+		etl::array<uint16_t, 4> PMONIds = {0, 1, 3, 10};
 		request.appendEnum16(PMONIds.at(0));
 		request.appendEnum16(PMONIds.at(1));
 		request.appendEnum16(PMONIds.at(2));
@@ -644,11 +651,11 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
-		uint16_t numberOfIds = 3;
+		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
-		etl::array<uint16_t, 3> monitoredParameterIds = {0, 1, 2};
-		etl::array<uint16_t, 3> repetitionNumbers = {5, 3, 8};
+		etl::array<uint16_t, 4> PMONIds = {0, 1, 2, 4};
+		etl::array<uint16_t, 4> monitoredParameterIds = {0, 1, 2, 4};
+		etl::array<uint16_t, 4> repetitionNumbers = {5, 3, 8, 10};
 		uint8_t expetedValueCheckMask = 2;
 		uint16_t expectedValue = 10;
 		uint16_t lowLimit = 3;
@@ -684,26 +691,42 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.appendEnum16(expectedValue);
 		request.appendEnum8(onBoardMonitoringService.NotExpectedValueEvent);
 
+		request.appendEnum16(PMONIds.at(3));
+		request.appendEnum16(monitoredParameterIds.at(3));
+		request.appendUint16(repetitionNumbers.at(3));
+		request.appendEnum8(onBoardMonitoringService.DeltaCheck);
+		request.appendUint16(lowDeltaThreshold);
+		request.appendEnum8(onBoardMonitoringService.BelowLowThresholdEvent);
+		request.appendUint16(highDeltaThreshold);
+		request.appendEnum8(onBoardMonitoringService.AboveHighThresholdEvent);
+		request.appendUint16(numberOfConsecutiveDeltaChecks);
+
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
 		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(0)) == 0);
 		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(1)) == 0);
 		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(2)) == 0);
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(3)) == 0);
 		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)) == repetitionNumbers.at(0));
 		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(1)) == repetitionNumbers.at(1));
 		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(2)) == repetitionNumbers.at(2));
+		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(3)) == repetitionNumbers.at(3));
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(0)) ==
 		      onBoardMonitoringService.LimitCheck);
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(1)) ==
 		      onBoardMonitoringService.ExpectedValueCheck);
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(2)) ==
 		      onBoardMonitoringService.ExpectedValueCheck);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckTypes.at(PMONIds.at(3)) ==
+		      onBoardMonitoringService.DeltaCheck);
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(0)) ==
 		      onBoardMonitoringService.Unchecked);
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(1)) ==
 		      onBoardMonitoringService.Unchecked);
 		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(2)) ==
+		      onBoardMonitoringService.Unchecked);
+		CHECK(onBoardMonitoringService.ParameterMonitoringCheckingStatus.at(PMONIds.at(3)) ==
 		      onBoardMonitoringService.Unchecked);
 		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(0))->second.lowLimit == lowLimit);
 		CHECK(onBoardMonitoringService.LimitCheckParameters.find(PMONIds.at(0))->second.highLimit == highLimit);
@@ -723,6 +746,16 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		      expetedValueCheckMask);
 		CHECK(onBoardMonitoringService.ExpectedValueCheckParameters.find(PMONIds.at(2))->second.notExpectedValueEvent ==
 		      onBoardMonitoringService.NotExpectedValueEvent);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(3))->second.lowDeltaThreshold ==
+		      lowDeltaThreshold);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(3))->second.belowLowThresholdEvent ==
+		      onBoardMonitoringService.BelowLowThresholdEvent);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(3))->second.highDeltaThreshold ==
+		      highDeltaThreshold);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(3))->second.aboveHighThresholdEvent ==
+		      onBoardMonitoringService.AboveHighThresholdEvent);
+		CHECK(onBoardMonitoringService.DeltaCheckParameters.find(PMONIds.at(3))->second.numberOfConsecutiveDeltaChecks ==
+		      numberOfConsecutiveDeltaChecks);
 		clearAllMaps();
 		ServiceTests::reset();
 		Services.reset();
@@ -730,8 +763,8 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 	SECTION("Modify parameter not in the Parameter Monitoring List") {
 		uint16_t numberOfIds = 1;
-		uint16_t PMONId = 4;
-		uint16_t monitoredParameterId = 4;
+		uint16_t PMONId = 15;
+		uint16_t monitoredParameterId = 15;
 		uint16_t repetitionNumber = 10;
 
 		Message request =
@@ -745,6 +778,9 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ModifyParameterNotInTheParameterMonitoringList) == 1);
+		clearAllMaps();
+		ServiceTests::reset();
+		Services.reset();
 	}
 
 	SECTION("Monitored parameter ID does not match the Parameter Monitoring Definition") {
@@ -752,7 +788,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 1;
-		uint16_t repetitionNumber = 10;
+		uint16_t repetitionNumber = 5;
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
@@ -813,7 +849,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+		            OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		request.appendUint16(PMONId);
 		request.appendUint16(monitoredParameterId);
