@@ -891,7 +891,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readUint16() == numberOfIds);
 		CHECK(report.readEnum16() == PMONIds.at(0));
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(0)));
-		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)));
+		CHECK(report.readEnum8() == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)));
 		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)));
 		CHECK(report.readEnum8() == onBoardMonitoringService.ExpectedValueCheck);
 		CHECK(report.readUint8() == onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).mask);
@@ -901,7 +901,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).notExpectedValueEvent);
 		CHECK(report.readEnum16() == PMONIds.at(1));
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(1)));
-		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(1)));
+		CHECK(report.readEnum8() == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(1)));
 		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(1)));
 		CHECK(report.readEnum8() == onBoardMonitoringService.LimitCheck);
 		CHECK(report.readUint16() == onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).lowLimit);
@@ -911,7 +911,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.LimitCheckParameters.at(PMONIds.at(1)).aboveHighLimitEvent);
 		CHECK(report.readEnum16() == PMONIds.at(2));
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(2)));
-		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(2)));
+		CHECK(report.readEnum8() == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(2)));
 		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(2)));
 		CHECK(report.readEnum8() == onBoardMonitoringService.DeltaCheck);
 		CHECK(report.readUint16() == onBoardMonitoringService.DeltaCheckParameters.at(PMONIds.at(2)).lowDeltaThreshold);
@@ -964,7 +964,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
 		CHECK(report.readEnum16() == PMONIds.at(0));
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(0)));
-		CHECK(report.readEnumerated(1) == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)));
+		CHECK(report.readEnum8() == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds.at(0)));
 		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)));
 		CHECK(report.readUint8() == onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds.at(0)).mask);
 		CHECK(report.readUint16() ==
@@ -988,14 +988,16 @@ TEST_CASE("Report status of Parameter Monitoring Definitions") {
 	CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 	CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionStatusReport);
 	CHECK(report.readUint16() == onBoardMonitoringService.ParameterMonitoringList.size());
-	CHECK(report.readUint16() == 0);
-	CHECK(report.readEnumerated(1) == false);
-	CHECK(report.readUint16() == 1);
-	CHECK(report.readEnumerated(1) == false);
-	CHECK(report.readUint16() == 2);
-	CHECK(report.readEnumerated(1) == false);
-	CHECK(report.readUint16() == 3);
-	CHECK(report.readEnumerated(1) == false);
+	CHECK(report.readEnum16() == 0);
+	CHECK(report.readEnum8() == false);
+	CHECK(report.readEnum16() == 1);
+	CHECK(report.readEnum8() == false);
+	CHECK(report.readEnum16() == 2);
+	CHECK(report.readEnum8() == false);
+	CHECK(report.readEnum16() == 3);
+	CHECK(report.readEnum8() == true);
+	CHECK(report.readEnum16() == 4);
+	CHECK(report.readEnum8() == false);
 	clearAllMaps();
 	ServiceTests::reset();
 	Services.reset();
