@@ -74,34 +74,50 @@ public:
 	};
 
 	uint16_t maximumTransitionReportingDelay = 0;
-
+	/**
+	 * Map storing the parameters for each parameter monitoring definition.
+	 */
 	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
 	/**
-	 * Stores the Monitored Parameter Ids that correspond to the Parameter Monitoring Ids.
+	 * Map storing the Monitored Parameter Ids that correspond to the Parameter Monitoring Ids.
 	 */
 	etl::map<uint16_t, uint16_t, ECSSMaxParameters> MonitoredParameterIds;
-
+	/**
+	 * Map storing the checking status for each parameter monitoring definition.
+	 */
 	etl::map<uint16_t, CheckingStatus, ECSSMaxParameters> ParameterMonitoringCheckingStatus;
 	/**
-	 * Stores the number of consecutive checks that have been conducted for each Parameter Monitoring Defintion.
+	 * Map storing the number of consecutive checks that have been conducted for each parameter monitoring definition.
 	 */
 	etl::map<uint16_t, uint16_t, ECSSMaxParameters> RepetitionCounter;
 	/**
-	 * Stores the number of consecutive checks that need to be conducted for each parameter in order to set a new
-	 * Checking status.
+	 * Map storing the number of consecutive checks that need to be conducted for each parameter in order to set a new
+	 * checking status.
 	 */
 	etl::map<uint16_t, uint16_t, ECSSMaxParameters> RepetitionNumber;
-
+	/**
+	 * Map storing the status of each parameter monitoring definition.
+	 */
 	etl::map<uint16_t, bool, ECSSMaxParameters> ParameterMonitoringStatus;
-
+	/**
+	 * Map storing the transitions of each parameter monitoring definition's status.
+	 */
 	etl::map<uint16_t, etl::array<CheckingStatus, 2>, ECSSMaxParameters> CheckTransitionList;
-
+	/**
+	 * Map storing the check type of each parameter monitoring definition.
+	 */
 	etl::map<uint16_t, CheckType, ECSSMaxParameters> ParameterMonitoringCheckTypes;
-
+	/**
+	 * Map storing the type-specific parameters for limit checks.
+	 */
 	etl::map<uint16_t, struct LimitCheck, ECSSMaxParameters> LimitCheckParameters;
-
+	/**
+	 * Map storing the type-specific parameters for expected value checks.
+	 */
 	etl::map<uint16_t, struct ExpectedValueCheck, ECSSMaxParameters> ExpectedValueCheckParameters;
-
+	/**
+	 * Map storing the type-specific parameters for delta checks.
+	 */
 	etl::map<uint16_t, struct DeltaCheck, ECSSMaxParameters> DeltaCheckParameters;
 
 	/**
@@ -128,56 +144,6 @@ public:
 	 * TC[12,4]
 	 */
 	void deleteAllParameterMonitoringDefinitions(Message& message);
-
-	/**
-	 * TC[12,5]
-	 */
-	void addParameterMonitoringDefinitions(Message& message);
-
-	/**
-	 * TC[12,6]
-	 */
-	void deleteParameterMonitoringDefinitions(Message& message);
-
-	/**
-	 * TC[12,7]
-	 */
-	void modifyParameterMonitoringDefinitions(Message& message);
-
-	/**
-	 * TC[12,8]
-	 */
-	void reportParameterMonitoringDefinitions(Message& message);
-
-	/**
-	 * TM[12,9]
-	 */
-	void parameterMonitoringDefinitionReport(Message& message);
-
-	/**
-	 * TC[12,10]
-	 */
-	void reportOutOfLimits(Message& message);
-
-	/**
-	 * TM[12,11]
-	 */
-	void outOfLimitsReport();
-
-	/**
-	 * TM[12,12]
-	 */
-	void checkTransitionReport();
-
-	/**
-	 * TC[12,13]
-	 */
-	void reportStatusOfParameterMonitoringDefinition(Message& message);
-
-	/**
-	 * TM[12,14]
-	 */
-	void parameterMonitoringDefinitionStatusReport();
 
 	void execute(Message& message);
 };
