@@ -330,9 +330,9 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		      onBoardMonitoringService.MonitoredParameterIds.end());
 		CHECK(onBoardMonitoringService.MonitoredParameterIds.find(PMONIds.at(2)) !=
 		      onBoardMonitoringService.MonitoredParameterIds.end());
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(0) == 0));
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(1) == 0));
-		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(2) == 0));
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(0)) == 0);
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(1)) == 0);
+		CHECK(onBoardMonitoringService.RepetitionCounter.at(PMONIds.at(2)) == 0);
 		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(0)) == repetitionNumbers.at(0));
 		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(1)) == repetitionNumbers.at(1));
 		CHECK(onBoardMonitoringService.RepetitionNumber.at(PMONIds.at(2)) == repetitionNumbers.at(2));
@@ -430,7 +430,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	SECTION("Add Parameter Monitoring Definition with a non-existing parameter") {
 		uint16_t numberOfIds = 1;
 		uint16_t PMONId = 4;
-		uint16_t monitoredParameterId = 10;
+		uint16_t monitoredParameterId = 100;
 		uint16_t repetitionNumber = 5;
 
 		Message request =
