@@ -314,15 +314,15 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 }
 
 void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& message) {
-	message.assertTC(ServiceType, ParameterMonitoringDefinitionReport);
+	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
 	Message parameterMonitoringDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport,
 	                                            Message::TM, 0);
 	// TODO: Check if maximum transition reporting delay is needed.
 	parameterMonitoringDefinitionReport.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();
 	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
-	uint16_t currentPMONId = message.readUint16();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
+		auto currentPMONId = message.readEnum16();
 		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
 			parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
 			parameterMonitoringDefinitionReport.appendEnum16(MonitoredParameterIds.at(currentPMONId));
@@ -357,8 +357,6 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::ReportParameterNotInTheParameterMonitoringList);
 		}
-
-		currentPMONId = message.readUint16();
 	}
 	storeMessage(parameterMonitoringDefinitionReport);
 }
