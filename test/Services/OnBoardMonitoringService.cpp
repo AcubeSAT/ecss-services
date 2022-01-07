@@ -879,15 +879,16 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
-		request.appendUint16(PMONIds.at(0));
-		request.appendUint16(PMONIds.at(1));
-		request.appendUint16(PMONIds.at(2));
+		request.appendEnum16(PMONIds.at(0));
+		request.appendEnum16(PMONIds.at(1));
+		request.appendEnum16(PMONIds.at(2));
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
-		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
+		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
 		CHECK(report.readUint16() == numberOfIds);
 		CHECK(report.readEnum16() == PMONIds.at(0));
 		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds.at(0)));
