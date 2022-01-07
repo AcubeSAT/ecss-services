@@ -3,10 +3,7 @@
 #include <Message.hpp>
 #include "Services/OnBoardMonitoringService.hpp"
 #include "etl/map.h"
-#include "ServicePool.hpp"
 
-#define firstTransitionIndex 0
-#define secondTransitionIndex 1
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
