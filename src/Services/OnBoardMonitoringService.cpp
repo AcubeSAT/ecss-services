@@ -78,7 +78,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	uint16_t currentParameterRepetitionNumber = message.readUint16();
 	uint16_t currentCheckType = message.readEnum8();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
+		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end()) {
 			if (ParameterMonitoringList.full()) {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
@@ -86,10 +86,10 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			} else {
 				if (auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
 					if (currentCheckType == LimitCheck) {
-						// TODO: Find out how we read deduced message values.
-						uint8_t lowLimit = message.readUint8();
+						// TODO: Find out how to read deduced message values.
+						uint8_t lowLimit = message.readUint16();
 						auto belowLowLimitEventId = static_cast<Event>(message.readEnum8());
-						uint8_t highLimit = message.readUint8();
+						uint8_t highLimit = message.readUint16();
 						auto aboveHighLimitEventId = static_cast<Event>(message.readEnum8());
 						if (highLimit <= lowLimit) {
 							ErrorHandler::reportError(
@@ -109,7 +109,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 					} else if (currentCheckType == ExpectedValueCheck) {
 						// TODO: Find out how to read bit string.
 						uint8_t mask = message.readUint8();
-						uint8_t expectedValue = message.readUint8();
+						uint8_t expectedValue = message.readEnum16();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
 						ParameterMonitoringList.insert({currentPMONId, parameterToBeAdded->get()});
 						MonitoredParameterIds.insert({currentPMONId, currentMonitoredParameterId});
@@ -118,14 +118,14 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 						ParameterMonitoringStatus.insert({currentPMONId, false});
 						ParameterMonitoringCheckTypes.insert({currentPMONId, ExpectedValueCheck});
 						ParameterMonitoringCheckingStatus.insert({currentPMONId, Unchecked});
-						struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue, notExpectedValueEventId};
+						struct ExpectedValueCheck expectedValueCheck = {expectedValue, mask, notExpectedValueEventId};
 						ExpectedValueCheckParameters.insert({currentPMONId, expectedValueCheck});
 					} else if (currentCheckType == DeltaCheck) {
-						uint8_t lowDeltaThreshold = message.readUint8();
+						uint8_t lowDeltaThreshold = message.readUint16();
 						auto belowLowThresholdEventId = static_cast<Event>(message.readEnum8());
-						uint8_t highDeltaThreshold = message.readUint8();
+						uint8_t highDeltaThreshold = message.readUint16();
 						auto aboveHighThresholdEventId = static_cast<Event>(message.readEnum8());
-						uint8_t numberOfConsecutiveDeltaChecks = message.readUint8();
+						uint8_t numberOfConsecutiveDeltaChecks = message.readUint16();
 						if (highDeltaThreshold <= lowDeltaThreshold) {
 							ErrorHandler::reportError(
 							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
@@ -150,8 +150,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::AddAlreadyExistingParameter);
 		}
-		currentPMONId = message.readUint16();
-		currentMonitoredParameterId = message.readUint16();
+		currentPMONId = message.readEnum16();
+		currentMonitoredParameterId = message.readEnum16();
 		currentParameterRepetitionNumber = message.readUint16();
 		currentCheckType = message.readEnum8();
 	}
