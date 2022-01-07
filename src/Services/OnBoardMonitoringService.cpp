@@ -188,18 +188,19 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
 	uint16_t numberOfIds = message.readUint16();
+	uint16_t currentPMONId = message.readEnum16();
+	uint16_t currentMonitoredParameterId = message.readEnum16();
+	uint16_t currentParameterRepetitionNumber = message.readUint16();
+	uint16_t currentCheckType = message.readEnum8();
+
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		uint16_t currentPMONId = message.readUint16();
-		uint16_t currentMonitoredParameterId = message.readUint16();
-		uint16_t currentParameterRepetitionNumber = message.readUint16();
-		uint16_t currentCheckType = message.readEnum8();
 		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
 			if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
 				if (MonitoredParameterIds.at(currentPMONId) == currentMonitoredParameterId) {
 					if (currentCheckType == LimitCheck) {
-						uint8_t lowLimit = message.readUint8();
+						uint8_t lowLimit = message.readUint16();
 						auto belowLowLimitEventId = static_cast<Event>(message.readEnum8());
-						uint8_t highLimit = message.readUint8();
+						uint8_t highLimit = message.readUint16();
 						auto aboveHighLimitEventId = static_cast<Event>(message.readEnum8());
 						if (highLimit <= lowLimit) {
 							ErrorHandler::reportError(
@@ -207,6 +208,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							break;
 						}
 						RepetitionCounter.at(currentPMONId) = 0;
+						RepetitionNumber.at(currentPMONId) = currentParameterRepetitionNumber;
 						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
 						if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
 							LimitCheckParameters.at(currentPMONId).lowLimit = lowLimit;
@@ -228,9 +230,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 					} else if (currentCheckType == ExpectedValueCheck) {
 						uint8_t mask = message.readUint8();
-						uint8_t expectedValue = message.readUint8();
+						uint8_t expectedValue = message.readEnum16();
 						auto notExpectedValueEventId = static_cast<Event>(message.readEnum8());
 						RepetitionCounter.at(currentPMONId) = 0;
+						RepetitionNumber.at(currentPMONId) = currentParameterRepetitionNumber;
 						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
 						if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
 							ExpectedValueCheckParameters.find(currentPMONId)->second.mask = mask;
@@ -239,7 +242,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							    notExpectedValueEventId;
 						} else {
 							ParameterMonitoringCheckTypes.at(currentPMONId) = ExpectedValueCheck;
-							struct ExpectedValueCheck expectedValueCheck = {mask, expectedValue,
+							struct ExpectedValueCheck expectedValueCheck = {expectedValue, mask,
 							                                                notExpectedValueEventId};
 							ExpectedValueCheckParameters.insert({currentPMONId, expectedValueCheck});
 							if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
@@ -251,17 +254,18 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 						}
 
 					} else if (currentCheckType == DeltaCheck) {
-						uint8_t lowDeltaThreshold = message.readUint8();
+						uint8_t lowDeltaThreshold = message.readUint16();
 						auto belowLowThresholdEventId = static_cast<Event>(message.readEnum8());
-						uint8_t highDeltaThreshold = message.readUint8();
+						uint8_t highDeltaThreshold = message.readUint16();
 						auto aboveHighThresholdEventId = static_cast<Event>(message.readEnum8());
-						uint8_t numberOfConsecutiveDeltaChecks = message.readUint8();
+						uint8_t numberOfConsecutiveDeltaChecks = message.readUint16();
 						if (highDeltaThreshold <= lowDeltaThreshold) {
 							ErrorHandler::reportError(
 							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
 							break;
 						}
 						RepetitionCounter.at(currentPMONId) = 0;
+						RepetitionNumber.at(currentPMONId) = currentParameterRepetitionNumber;
 						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
 						if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
 							DeltaCheckParameters.at(currentPMONId).lowDeltaThreshold = lowDeltaThreshold;
@@ -272,8 +276,8 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 							    numberOfConsecutiveDeltaChecks;
 						} else {
 							ParameterMonitoringCheckTypes.at(currentPMONId) = DeltaCheck;
-							struct DeltaCheck deltaCheck = {lowDeltaThreshold, belowLowThresholdEventId,
-							                                aboveHighThresholdEventId, numberOfConsecutiveDeltaChecks};
+							struct DeltaCheck deltaCheck = {numberOfConsecutiveDeltaChecks, lowDeltaThreshold,
+							                                belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId};
 							DeltaCheckParameters.insert({currentPMONId, deltaCheck});
 							if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
 								LimitCheckParameters.erase(currentPMONId);
@@ -286,14 +290,21 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				} else {
 					ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
 					                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
+					break;
 				}
 			} else {
 				ErrorHandler::reportError(message, ErrorHandler::GetNonExistingParameter);
+				break;
 			}
 		} else {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
+			break;
 		}
+		currentPMONId = message.readEnum16();
+		currentMonitoredParameterId = message.readEnum16();
+		currentParameterRepetitionNumber = message.readUint16();
+		currentCheckType = message.readEnum8();
 	}
 }
 
