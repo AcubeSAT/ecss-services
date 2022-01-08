@@ -54,7 +54,7 @@ public:
 	enum PacketStoreOpenRetrievalStatus : bool { Suspended = false, InProgress = true };
 
 	/**
-	 * defines whether the storage of TM packets is enabled for this packet store
++	 * Whether the storage of TM packets is enabled for this packet store
 	 */
 	bool storageStatus;
 
