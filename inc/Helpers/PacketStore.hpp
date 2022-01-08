@@ -7,10 +7,6 @@
 #include "Message.hpp"
 
 /**
- * @todo: add a way of defining each packets store's size in bytes
- */
-
-/**
  * This is the Packet Store class, needed for the Storage-Retrieval Service. The purpose of the packet-store is to
  * store all the TM packets transmitted by the other Services.
  */
@@ -23,7 +19,7 @@ public:
 	/**
 	 * The priority policy used by the storage and retrieval service to retrieve packets stored into packet stores.
 	 */
-	uint16_t retrievalPriority;
+	uint8_t retrievalPriority;
 	/**
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
@@ -38,7 +34,9 @@ public:
 	 */
 	uint32_t retrievalEndTime = 0;
 	/**
-	 * The size of the packet store, in bytes.
+	 * The maximum size of the packet store, in bytes.
+	 *
+	 * @todo: add a way of defining each packets store's size in bytes
 	 */
 	uint64_t sizeInBytes;
 
@@ -80,8 +78,6 @@ public:
 
 	/**
 	 * Returns the sum of the sizes of the packets stored in this PacketStore, in bytes.
-	 *
-	 * @note
 	 */
 	uint16_t calculateSizeInBytes();
 };

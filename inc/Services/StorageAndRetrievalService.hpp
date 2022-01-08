@@ -17,9 +17,6 @@
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class StorageAndRetrievalService : public Service {
-	/**
-	 * @todo: add prioritization policy for retrievals if prioritization is supported
-	 */
 public:
 	/**
 	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
@@ -31,6 +28,35 @@ public:
 	 */
 	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
 
+	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
+
+	/**
+	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
+	 */
+	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
+
+	/**
+	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
+	 */
+	const bool supportsConcurrentRetrievalRequests = false;
+
+	/**
+	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
+	 *
+	 * @todo: add prioritization policy for retrievals if prioritization is supported
+	 */
+	const bool supportsPrioritizingRetrievals = false;
+
+	/**
+	 * @brief Support for the by-time-range retrieval of packets.
+	 */
+	const bool supportsByTimeRangeRetrieval = true;
+
+	/**
+	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
+	 */
+	const TimeStamping timeStamping = PacketBased;
+
 private:
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
@@ -40,39 +66,67 @@ private:
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
 	 * requested time.
+	 *
+	 * @param packetStoreId required to access the correct packet store.
+	 * @param timeLimit the limit until which, packets are deleted.
 	 */
 	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
 
 	/**
-	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
+	 * * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
 	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
+	 *
+	 * @param request used to read the time-tags, the packet store IDs and to raise errors.
 	 */
 	void copyFromTagToTag(Message& request);
 
 	/**
-	 * Checks the validity of the two requested packet stores.
+	 * Checks if the two requested packet stores exist.
+	 *
+	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
+	 * @param toPacketStoreId  the target packet store, which is going to receive the new content.
+	 * @param request used to raise errors.
+	 * @return true if an error has occurred.
 	 */
 	bool invalidPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
 	                         const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
 	 * Checks the validity of the specified time window.
+	 *
+	 * @param request used to raise errors.
 	 */
 	static bool invalidTimeWindow(uint32_t startTime, uint32_t endTime, Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
+	 *
+	 * @param toPacketStoreId  the target packet store, which is going to receive the new content. Needed for error
+	 * checking.
+	 * @param request used to raise errors.
 	 */
 	bool invalidDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
+	 *
+	 * @param fromPacketStoreId  the source packet store, whose content is to be copied. Needed for error checking.
+	 * @param request used to raise errors.
+	 *
+	 * @note
+	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
+	 * regarding these variables, should have already occurred.
 	 */
 	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t startTime,
 	                             uint32_t endTime, Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of FromTagToTag copying of packets.
+	 *
+	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
+	 * @param toPacketStoreId  the target packet store, which is going to receive the new content.
+	 * @param request used to raise errors.
+	 * @return true if an error has occurred.
 	 */
 	bool failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
 	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
@@ -81,19 +135,29 @@ private:
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
 	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
+	 *
+	 * @param request used to read the time-tag, the packet store IDs and to raise errors.
 	 */
 	void copyAfterTimeTag(Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
-	 * @param isAfterTimeTag true indicates that we are examine the case of AfterTimeTag. Otherwise, we are referring
+	 *
+	 * @param isAfterTimeTag true indicates that we are examining the case of AfterTimeTag. Otherwise, we are referring
 	 * to the case of BeforeTimeTag.
+	 * @param request used to raise errors.
+	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
 	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
 	                             Message& request, bool isAfterTimeTag);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
+	 *
+	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
+	 * @param toPacketStoreId  the target packet store, which is going to receive the new content.
+	 * @param request used to raise errors.
+	 * @return true if an error has occurred.
 	 */
 	bool failedAfterTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
 	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
@@ -102,11 +166,18 @@ private:
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
 	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
+	 *
+	 * @param request used to raise errors.
 	 */
 	void copyBeforeTimeTag(Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of BeforeTimeTag copying of packets.
+	 *
+	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
+	 * @param toPacketStoreId  the target packet store, which is going to receive the new content.
+	 * @param request used to raise errors.
+	 * @return true if an error has occurred.
 	 */
 	bool failedBeforeTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
 	                         const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t endTime,
@@ -116,6 +187,14 @@ private:
 	 * Forms the content summary of the specified packet-store and appends it to a report message.
 	 */
 	void createContentSummary(Message& report, const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+
+	/**
+	 * Performs the necessary error checking for a request to start the by-time-range retrieval process.
+	 *
+	 * @param request used to raise errors.
+	 * @return true if an error has occurred.
+	 */
+	bool failedStartOfByTimeRangeRetrieval(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, Message& request);
 
 public:
 	inline static const uint8_t ServiceType = 15;
@@ -145,33 +224,6 @@ public:
 	};
 
 	StorageAndRetrievalService() = default;
-
-	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
-
-	/**
-	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
-	 */
-	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
-
-	/**
-	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
-	 */
-	const bool supportsConcurrentRetrievalRequests = false;
-
-	/**
-	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
-	 */
-	const bool supportsPrioritizingRetrievals = false;
-
-	/**
-	 * @brief Support for the by-time-range retrieval of packets.
-	 */
-	const bool supportsByTimeRangeRetrieval = true;
-
-	/**
-	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
-	 */
-	const TimeStamping timeStamping = PacketBased;
 
 	/**
 	 * TC[15,1] request to enable the packet stores' storage function
@@ -271,7 +323,7 @@ public:
 	 * is the ground station.
 	 *
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
-	 * @param param Contains the necessary parameters to call the suitable subservice
+	 * @param request Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& request);
 };

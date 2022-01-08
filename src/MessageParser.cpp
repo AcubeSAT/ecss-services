@@ -46,7 +46,7 @@ void MessageParser::execute(Message& message) {
 
 #ifdef SERVICE_STORAGEANDRETRIEVAL
 		case StorageAndRetrievalService::ServiceType:
-			Services.storageAndRetrieval.execute(message); // ST[15]
+			Services.storageAndRetrieval.execute(message);
 			break;
 #endif
 
