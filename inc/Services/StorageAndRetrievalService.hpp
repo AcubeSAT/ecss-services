@@ -36,23 +36,6 @@ public:
 	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
-	 * @brief Support for the capability to handle multiple retrieval requests in parallel as per 6.15.3.1(i)
-	 */
-	const bool supportsConcurrentRetrievalRequests = false;
-
-	/**
-	 * @brief Support for the capability to prioritize packet retrieval as per 6.15.3.1(m)
-	 *
-	 * @todo: add prioritization policy for retrievals if prioritization is supported
-	 */
-	const bool supportsPrioritizingRetrievals = false;
-
-	/**
-	 * @brief Support for the by-time-range retrieval of packets.
-	 */
-	const bool supportsByTimeRangeRetrieval = true;
-
-	/**
 	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
 	 */
 	const TimeStamping timeStamping = PacketBased;

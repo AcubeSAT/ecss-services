@@ -182,8 +182,7 @@ bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
 	if (packetStores.find(packetStoreId) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingPacketStore);
 		errorFlag = true;
-	} else if ((not supportsConcurrentRetrievalRequests) and
-	           packetStores[packetStoreId].openRetrievalStatus == PacketStore::InProgress) {
+	} else if (packetStores[packetStoreId].openRetrievalStatus == PacketStore::InProgress) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
 		errorFlag = true;
@@ -192,7 +191,7 @@ bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
 		errorFlag = true;
 	}
 	if (errorFlag) {
-		uint16_t numberOfBytesToSkip = (supportsPrioritizingRetrievals) ? 10 : 8;
+		uint16_t numberOfBytesToSkip = 8;
 		request.skipBytes(numberOfBytesToSkip);
 		return true;
 	}
@@ -252,10 +251,6 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		if (failedStartOfByTimeRangeRetrieval(packetStoreId, request)) {
 			continue;
 		}
-		uint8_t priority = 0;
-		if (supportsPrioritizingRetrievals) {
-			priority = request.readUint8();
-		}
 		uint32_t retrievalStartTime = request.readUint32();
 		uint32_t retrievalEndTime = request.readUint32();
 
@@ -270,10 +265,6 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		packetStore.byTimeRangeRetrievalStatus = true;
 		packetStore.retrievalStartTime = retrievalStartTime;
 		packetStore.retrievalEndTime = retrievalEndTime;
-		if (supportsPrioritizingRetrievals) {
-			packetStore.retrievalPriority = priority;
-		}
-
 		// todo: start the by-time-range retrieval process according to the priority policy
 	}
 }
@@ -400,16 +391,12 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore : packetStores) {
-			if ((not supportsConcurrentRetrievalRequests) and packetStore.second.byTimeRangeRetrievalStatus) {
+			if (packetStore.second.byTimeRangeRetrievalStatus) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
 				continue;
 			}
 			packetStore.second.openRetrievalStatus = PacketStore::InProgress;
-			if (supportsPrioritizingRetrievals) {
-				uint8_t newRetrievalPriority = request.readUint8();
-				packetStore.second.retrievalPriority = newRetrievalPriority;
-			}
 		}
 		return;
 	}
@@ -420,16 +407,12 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 			continue;
 		}
 		auto& packetStore = packetStores[packetStoreId];
-		if ((not supportsConcurrentRetrievalRequests) and packetStore.byTimeRangeRetrievalStatus) {
+		if (packetStore.byTimeRangeRetrievalStatus) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
 			continue;
 		}
 		packetStore.openRetrievalStatus = PacketStore::InProgress;
-		if (supportsPrioritizingRetrievals) {
-			uint8_t newRetrievalPriority = request.readUint8();
-			packetStore.retrievalPriority = newRetrievalPriority;
-		}
 	}
 }
 
@@ -483,9 +466,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 		report.appendOctetString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageStatus);
 		report.appendEnum8(packetStore.second.openRetrievalStatus);
-		if (supportsByTimeRangeRetrieval) {
-			report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
-		}
+		report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
 	}
 	storeMessage(report);
 }
