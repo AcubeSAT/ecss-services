@@ -71,7 +71,7 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool invalidPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+	bool checkPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
 	                         const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
@@ -79,7 +79,7 @@ private:
 	 *
 	 * @param request used to raise errors.
 	 */
-	static bool invalidTimeWindow(uint32_t startTime, uint32_t endTime, Message& request);
+	static bool checkTimeWindow(uint32_t startTime, uint32_t endTime, Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -88,7 +88,7 @@ private:
 	 * checking.
 	 * @param request used to raise errors.
 	 */
-	bool invalidDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
+	bool checkDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.

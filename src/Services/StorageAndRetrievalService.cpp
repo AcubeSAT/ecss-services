@@ -37,7 +37,7 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 	}
 }
 
-bool StorageAndRetrievalService::invalidPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
+bool StorageAndRetrievalService::checkPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                      const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                      Message& request) {
 	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
@@ -48,7 +48,7 @@ bool StorageAndRetrievalService::invalidPacketStores(const String<ECSSMaxPacketS
 	return false;
 }
 
-bool StorageAndRetrievalService::invalidTimeWindow(uint32_t startTime, uint32_t endTime, Message& request) {
+bool StorageAndRetrievalService::checkTimeWindow(uint32_t startTime, uint32_t endTime, Message& request) {
 	if (startTime >= endTime) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 		return true;
@@ -56,7 +56,7 @@ bool StorageAndRetrievalService::invalidTimeWindow(uint32_t startTime, uint32_t 
 	return false;
 }
 
-bool StorageAndRetrievalService::invalidDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
+bool StorageAndRetrievalService::checkDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                                Message& request) {
 	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
@@ -78,8 +78,8 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPac
 bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                     uint32_t startTime, uint32_t endTime, Message& request) {
-	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
-	        invalidTimeWindow(startTime, endTime, request) or invalidDestinationPacketStore(toPacketStoreId, request) or
+	return (checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	        checkTimeWindow(startTime, endTime, request) or checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, endTime, request));
 }
 
@@ -120,8 +120,8 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPac
 bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                     uint32_t startTime, Message& request) {
-	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
-	        invalidDestinationPacketStore(toPacketStoreId, request) or
+	return (checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, request, true));
 }
 
@@ -146,8 +146,8 @@ void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
 bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                      const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                      uint32_t endTime, Message& request) {
-	return (invalidPacketStores(fromPacketStoreId, toPacketStoreId, request) or
-	        invalidDestinationPacketStore(toPacketStoreId, request) or
+	return (checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, endTime, request, false));
 }
 
