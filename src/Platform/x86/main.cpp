@@ -26,7 +26,7 @@ int main() {
 
     FileManagementService& fileManagementService = Services.fileManagementService;
 
-    /* Create file
+
     Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
     String<64> data1 = "test1";
     String<64> nullString = "@";
@@ -35,10 +35,9 @@ int main() {
     message.appendString(nullString);
     message.appendString(data2);
     message.appendString(nullString);
-    message.appendUint16(100);
+    message.appendUint32(100);
 
     fileManagementService.createFile(message);
-    */
 
     /* Manually adjust lfs_stat in order to get the user story correct
     Message message(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
@@ -75,6 +74,7 @@ int main() {
     fileManagementService.findFile(message);
     */
 
+    /*
     Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFile, Message::TC, 0);
     String<64> data1 = "test1";
     String<64> nullString = "@";
@@ -88,7 +88,7 @@ int main() {
     message.appendString(nullString);
     //fileManagementService.createDirectory(message);
     fileManagementService.renameDirectory(message);
-
+    */
 
 
 

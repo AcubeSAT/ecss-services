@@ -183,6 +183,18 @@ public:
 		 * Address of a memory is out of the defined range for the type of memory
 		 */
 		AddressOutOfRange = 2,
+        /**
+         * File already exists, thus can't be created again
+         */
+        FileAlreadyExists = 3,
+        /**
+         * LittleFs lfs_file_close function generic error
+         */
+        LittleFsFileClose = 4,
+        /**
+         * LittleFs lfs_file_open function generic error
+         */
+        LittleFsFileOpen = 4,
 	};
 
 	/**

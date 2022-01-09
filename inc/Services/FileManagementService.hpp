@@ -293,19 +293,20 @@ public:
 
     /**
      * The purpose of this function is to take care of the extraction process for the object path variable
-     * Parses the message until a '\0' is found. Then returns the actual string, excluding the '\0' char
+     * Parses the message until a '@' is found. Then returns the actual string, excluding the '@' char
      * @param message : The message that we want to parse
-     * @param extractedString : pointer to a char buffer that will house the extracted string
+     * @param extractedString : pointer to a String<ECSS_MAX_STRING_SIZE> that will house the extracted string
      * @return status of execution (0: Successful completion, 1: Error occurred)
      */
-    uint8_t getStringUntilZeroTerminator(Message& message, char extractedString[ECSS_MAX_STRING_SIZE], uint8_t &stringSize);
+    uint8_t getStringUntilZeroTerminator(Message& message, String<ECSS_MAX_STRING_SIZE> &extractedString);
 
     /**
      * The purpose of this function is to check if the object path is valid for creation
      * Checks if there is an object at this path AND if it is a file, not a directory
      * @param repositoryString : Pointer to the repository
      * @param repositoryStringSize : The actual size of the repositoryString
-     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     * @return status of execution (2: Object is a directory, 1: Object is a file, -1: Invalid type of object,
+     *                             -2: lfs_stat() returned an error code)
      */
     int32_t pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize);
 
@@ -321,7 +322,7 @@ public:
      * @param flags : Input flags that determines the creation status
      */
     static int32_t littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
-                               String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize, int flags);
+                               String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize, int32_t flags);
 
     /**
      * The purpose of this function is to check if the object path is valid for deletion

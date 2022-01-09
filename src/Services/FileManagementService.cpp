@@ -72,31 +72,30 @@ uint8_t wildcardStringMatch(char *line, char *pattern) {
 }
 
 uint8_t
-FileManagementService::getStringUntilZeroTerminator(Message &message, char extractedString[ECSS_MAX_STRING_SIZE],
-                                                    uint8_t &stringSize) {
+FileManagementService::getStringUntilZeroTerminator(Message &message, String<ECSS_MAX_STRING_SIZE> &extractedString)
+{
 
-    // TODO : Change should be done in order to get rid of the extra char array and use only the String
-    char currentChar[ECSS_MAX_STRING_SIZE];
+    char currentChar = '0';
     uint8_t charCounter = 0;
-    currentChar[charCounter] = (char) message.readByte();
+    currentChar = (char) message.readByte();
 
-    // Increment the counter until '\0' is reached
-    while (currentChar[charCounter] != '@') {
-
+    // Increment the counter until '@' is reached
+    while (currentChar != '@')
+    {
 
         // Check if size is below the maximum allowed
-        if (charCounter == ECSS_MAX_STRING_SIZE) {
+        if (charCounter == ECSS_MAX_STRING_SIZE)
+        {
             ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
             return 1; // This should be interpreted as error code
         }
 
         // Pass the char byte and increment the size of the string
-        extractedString[stringSize] = currentChar[charCounter];
+        extractedString.append(1, currentChar);
         charCounter++;
-        stringSize++;
 
         // Increment the char pointer and read next byte
-        currentChar[charCounter] = message.readByte();
+        currentChar = message.readByte();
     }
 
     return 0; // This should be interpreted as ok code
@@ -115,18 +114,29 @@ int32_t FileManagementService::pathIsValidForCreation(String<ECSS_MAX_STRING_SIZ
     int32_t infoStructFillStatus = lfs_stat(&fs1, (const char *) repositoryStringChar, pInfo);
 
     // Check if the repository exists and no errors are produced during the lfs_stat() execution
-    if (infoStructFillStatus >= 0) {
+    if (infoStructFillStatus >= 0)
+    {
         // Check if the object at the end of the path is a file or a repository
-        if (infoStruct.type == LFS_TYPE_DIR) {
+        if (infoStruct.type == LFS_TYPE_DIR)
+        {
             // The object is a directory
-            return 0;
-        } else {
-            // The object is a file
-            return 1;
+            return LFS_TYPE_DIR;
         }
-    } else {
-        // Return NO_OBJECT_AT_THIS_PATH
-        return 2;
+        else if (infoStruct.type == LFS_TYPE_REG)
+        {
+            // The object is a file
+            return LFS_TYPE_REG;
+        }
+        else
+        {
+            // Info type is invalid
+            return -1;
+        }
+    }
+    else
+    {
+        // lfs_stat() returned an error code
+        return -2;
     }
 }
 
@@ -139,31 +149,83 @@ void getNumberOfBytesUntillZeroTerminator(char *characterArray, uint8_t &size)
     }
 }
 
+void checkForSlashes(String<ECSS_MAX_STRING_SIZE> &objectPathString, uint8_t *fileNameChar)
+{
+    // Last character of the repository path string
+    char lastPathCharacter = objectPathString.back();
+    // First character of the file name string
+    char firstFileCharacter = *fileNameChar;
+
+    // Check all possible conditions for the existence or not, of slashes
+    // There are 4 possible conditions :
+    // a) Both are slashes
+    // b) Only the last character of the repository path has
+    // c) Only the last character of the file name has
+    // d) None of the has a slash
+    if(lastPathCharacter == '/')
+    {
+        if(firstFileCharacter == '/')
+        {
+            // Condition a). Just increment the file name pointer
+            fileNameChar++;
+        }
+        else
+        {
+            // Condition b). Leave as is.
+        }
+    }
+    else
+    {
+        if(firstFileCharacter == '/')
+        {
+            // Condition c). Leave as is.
+        }
+        else
+        {
+            // Condition d). Add a slash between the 2 strings.
+            objectPathString.append(1,'/');
+        }
+    }
+}
+
 int32_t
-FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
-                   String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize, int flags) {
-    // Copy the repositoryPath to a char array, in order to use it in lfs_stat
-    auto *repositoryPathChar = reinterpret_cast<uint8_t *>(repositoryPath.data());
-
-    // Copy the repositoryPath to a char array, in order to use it in lfs_stat
-    auto *fileNameChar = reinterpret_cast<uint8_t *>(fileName.data());
-
-    // Concatenate 2 strings in 1. From now on use objectPathString
-    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
-    objectPathString.append((const char *)repositoryPathChar);
-    objectPathString.append((const char *)fileNameChar);
+FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath,
+                                          uint8_t repositoryPathSize,  String<ECSS_MAX_STRING_SIZE> fileName,
+                                          uint8_t fileNameSize, int32_t flags)
+{
 
     // Check the size of the object path
-    if ((repositoryPathSize + fileNameSize) > ECSS_MAX_STRING_SIZE) {
+    if ((repositoryPathSize + fileNameSize) > ECSS_MAX_STRING_SIZE)
+    {
         // Return error code that indicates too large object path
         return -1;
     }
+
+    // Pointer to repository path string data
+    auto *repositoryPathChar = reinterpret_cast<uint8_t *>(repositoryPath.data());
+
+    // Pointer to file name string data
+    auto *fileNameChar = reinterpret_cast<uint8_t *>(fileName.data());
+
+    // String that will house the object path (repository path + file name)
+    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
+
+    // Append the repository path
+    objectPathString.append((const char *)repositoryPathChar);
+
+    // Check for the existence of slashes and adapt accordingly
+    checkForSlashes(objectPathString, fileNameChar);
+
+    // Append the file name
+    objectPathString.append((const char *)fileNameChar);
 
     // Create the file using lfs_file_open with the appropriate flags
     int32_t lfsCreateFileStatus = lfs_file_open(fs, file, objectPathString.data(), flags);
 
     return lfsCreateFileStatus;
 }
+
+
 
 int32_t FileManagementService::pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize,
                                String<ECSS_MAX_STRING_SIZE> fileNameString, uint8_t fileNameStringSize) {
@@ -340,77 +402,96 @@ int32_t FileManagementService::littleFsReportFile(String<ECSS_MAX_STRING_SIZE> r
 
 void FileManagementService::createFile(Message &message) {
     // TC[23,1]
-    // TODO should i implement fileLockedStatus and additionalFileAttributes ?
+    // TODO implement fileLockedStatus but later as an extra feature
     message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile);
 
-    //Extract the repository path, which is the first string in this message
-    char repositoryPath[ECSS_MAX_STRING_SIZE];
-    uint8_t repositoryPathSize = 0;
-    uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPath, repositoryPathSize);
-    String<ECSS_MAX_STRING_SIZE> repositoryPathString((uint8_t *) repositoryPath, repositoryPathSize);
+    // Extract the repository path, which is the first string in this message
+    String<ECSS_MAX_STRING_SIZE> repositoryPathString("");
+    uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPathString);
+    uint8_t repositoryPathSize = repositoryPathString.size();
 
+    // Extract the file name, which is the second string in this message
+    String<ECSS_MAX_STRING_SIZE> fileNameString("");
+    uint8_t fileNameExtractionStatus = getStringUntilZeroTerminator(message, fileNameString);
+    uint8_t fileNameSize = fileNameString.size();
 
-    //Extract the file name, which is the second string in this message
-    char fileName[ECSS_MAX_STRING_SIZE];
-    uint8_t fileNameSize = 0;
-    uint8_t fileNameExtractionStatus = getStringUntilZeroTerminator(message, fileName, fileNameSize);
-    String<ECSS_MAX_STRING_SIZE> fileNameString((uint8_t *) fileName, fileNameSize);
-
-    //Extract the file size in bytes
-    uint16_t fileSizeBytes = message.readUint16();
+    // Extract the file size in bytes
+    uint16_t fileSizeBytes = message.readUint32();
 
     // Check the repository name extraction status
-    if (repositoryPathExtractionStatus != 0) {
+    if (repositoryPathExtractionStatus != 0)
+    {
         // Size of repository path is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
-        // Check the file name extraction status
-    else if (fileNameExtractionStatus != 0) {
+    // Check the file name extraction status
+    else if (fileNameExtractionStatus != 0)
+    {
         // Size of file name is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
-        //Check the validity of the request at service level
-    else if (fileSizeBytes > MAX_FILE_SIZE_BYTES) {
+    //Check the validity of the request at service level
+    else if (fileSizeBytes > MAX_FILE_SIZE_BYTES)
+    {
         //Size of file out of bounds
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
     }
 
-        // Check if the path is valid for creation of a file
-    else if (pathIsValidForCreation(repositoryPathString, repositoryPathSize) != 1) {
+    // Check if the path is valid for creation of a file
+    else if (pathIsValidForCreation(repositoryPathString, repositoryPathSize) != LFS_TYPE_DIR)
+    {
         //Invalid path
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
     }
 
-        // Proceed with the creation
-    else {
+    // Proceed with the creation
+    else
+    {
         // Declare the lfs_file_t object
         lfs_file_t file;
 
-        // Call lfs_file_open to create the file
-        if (littleFsCreateFile(&fs1, &file, repositoryPathString, repositoryPathSize, fileNameString, fileNameSize,
-                               0b1100000011) >= 0) {
-            //Calling lfs_file_close to release any allocated resources
-            if (lfs_file_close(&fs1, &file) >= 0) {
-                //Successful file creation
+        // Call littleFsCreateFile in order to create the file
+        int32_t createFileStatus = littleFsCreateFile(&fs1, &file, repositoryPathString, repositoryPathSize,
+                                                      fileNameString, fileNameSize,LFS_O_CREAT);
+        // Check the status of the above function
+        if (createFileStatus >= 0)
+        {
+            // Calling lfs_file_close to release any allocated resources
+            if (lfs_file_close(&fs1, &file) >= 0)
+            {
+                // Successful file creation
             }
             else
             {
-                //LittleFs generated error
-                //TODO The error codes that littlefs will produce are documented, so we could integrate them but later
+                // LittleFs generated error
                 ErrorHandler::reportError(message,
-                                          ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileClose);
             }
-        } else {
-            //LittleFs generated error
-            //TODO The error codes that littlefs will produce are documented, so we could integrate them but later
+        }
+        else if(createFileStatus == -1)
+        {
+            // Object's path size if greater that ECSS_MAX_STRING_SIZE
             ErrorHandler::reportError(message,
-                                      ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+                                      ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+        }
+        else if(createFileStatus == LFS_ERR_EXIST)
+        {
+            // File already exists, so the creation was not successful
+            ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
+        }
+        else
+        {
+            // LittleFs generated error
+            ErrorHandler::reportError(message,
+                                      ErrorHandler::ExecutionCompletionErrorType::LittleFsFileOpen);
         }
     }
 }
 
+
+/*
 void FileManagementService::deleteFile(Message &message) {
     // TC[23,2]
     message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile);
@@ -585,6 +666,10 @@ void FileManagementService::fileAttributeReport(String<ECSS_MAX_STRING_SIZE> rep
     storeMessage(report);
 }
 
+
+
+*/
+/*
 void FileManagementService::findFile(Message &message) {
     // TC[23,7]
     message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::FindFile);
@@ -1039,6 +1124,9 @@ void FileManagementService::renameDirectory(Message &message) {
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
     }
 }
+
+
+*/
 /*
 void FileManagementService::reportSummaryDirectory(Message &message)
 {
