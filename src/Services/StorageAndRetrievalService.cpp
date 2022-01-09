@@ -38,8 +38,8 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 }
 
 bool StorageAndRetrievalService::checkPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
-                                                     Message& request) {
+                                                   const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
+                                                   Message& request) {
 	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
 	    packetStores.find(toPacketStoreId) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore);
@@ -57,7 +57,7 @@ bool StorageAndRetrievalService::checkTimeWindow(uint32_t startTime, uint32_t en
 }
 
 bool StorageAndRetrievalService::checkDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
-                                                               Message& request) {
+                                                             Message& request) {
 	if (not packetStores[toPacketStoreId].storedTelemetryPackets.empty()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::DestinationPacketStoreNotEmtpy);
 		return true;
@@ -196,6 +196,33 @@ bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
 		return true;
 	}
 	return false;
+}
+
+void StorageAndRetrievalService::addPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId,
+                                                const PacketStore& packetStore) {
+	packetStores.insert({packetStoreId, packetStore});
+}
+
+void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId,
+                                                           uint32_t timestamp) {
+	Message tmPacket;
+	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, tmPacket});
+}
+
+void StorageAndRetrievalService::resetPacketStores() {
+	packetStores.clear();
+}
+
+uint16_t StorageAndRetrievalService::currentNumberOfPacketStores() {
+	return packetStores.size();
+}
+
+PacketStore& StorageAndRetrievalService::getPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
+	return packetStores[packetStoreId];
+}
+
+bool StorageAndRetrievalService::packetStoreExists(const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
+	return packetStores.find(packetStoreId) != packetStores.end();
 }
 
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
@@ -788,3 +815,4 @@ void StorageAndRetrievalService::execute(Message& request) {
 			break;
 	}
 }
+

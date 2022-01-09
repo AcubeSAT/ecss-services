@@ -28,6 +28,12 @@ public:
 	 */
 	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
 
+	/**
+	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
+	 */
+	const TimeStamping timeStamping = PacketBased;
+
+private:
 	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
 
 	/**
@@ -35,12 +41,6 @@ public:
 	 */
 	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
-	/**
-	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
-	 */
-	const TimeStamping timeStamping = PacketBased;
-
-private:
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
 	 */
@@ -72,7 +72,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool checkPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
+	                       const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
 	 * Checks the validity of the specified time window.
@@ -207,6 +207,36 @@ public:
 	};
 
 	StorageAndRetrievalService() = default;
+
+	/**
+	 * Adds new packet store into packet stores.
+	 */
+	void addPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, const PacketStore& packetStore);
+
+	/**
+	 * Adds telemetry to the specified packet store and timestamps it.
+	 */
+	void addTelemetryToPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timestamp);
+
+	/**
+	 * Deletes the content from all the packet stores.
+	 */
+	void resetPacketStores();
+
+	/**
+	 * Returns the current number of existing packet stores.
+	 */
+	uint16_t currentNumberOfPacketStores();
+
+	/**
+	 * Returns the packet store with the specified packet store ID.
+	 */
+	PacketStore& getPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+
+	/**
+	 * Returns true if the specified packet store is present in packet stores.
+	 */
+	bool packetStoreExists(const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
 
 	/**
 	 * TC[15,1] request to enable the packet stores' storage function
