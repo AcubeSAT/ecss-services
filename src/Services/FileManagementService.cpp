@@ -11,20 +11,23 @@ lfs_t fs1;
 
 #define REPOSITORY_SUMMARY_REPORT_MAX_OBJECTS 4096
 
-int32_t FileManagementService::checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString, uint8_t messageStringSize) {
+int32_t FileManagementService::checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString)
+{
     // Copy the repositoryString to a char array, in order to use it in lfs_stat
     auto *messageStringChar = reinterpret_cast<uint8_t *>(messageString.data());
 
     // Check for wildcards in repositoryStringChar
-    for (uint8_t currentChar = 0; currentChar < messageStringSize; currentChar++) {
+    for (uint8_t currentChar = 0; currentChar < messageString.size(); currentChar++)
+    {
         // Iterate over the string
-        if (messageStringChar[currentChar] == FileManagementService::wildcard) {
+        if (messageStringChar[currentChar] == FileManagementService::wildcard)
+        {
             // Return the position of the index
             return currentChar;
         }
     }
 
-    // Return status code 10 if there is no wildcard
+    // Return status code -10 if there is no wildcard
     return -10;
 }
 
@@ -101,17 +104,24 @@ FileManagementService::getStringUntilZeroTerminator(Message &message, String<ECS
     return 0; // This should be interpreted as ok code
 }
 
-int32_t FileManagementService::pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString,
-                                                      uint8_t repositoryStringSize) {
-    lfs_info *pInfo;
+int32_t FileManagementService::pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString)
+{
     lfs_info infoStruct;
-    pInfo = &infoStruct;
+
+    // Check if there are any wildcards in the repositoryString
+    int8_t repositoyryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString);
+
+    if (repositoyryStringWildcardStatus != -10)
+    {
+        // Return error code which indicates that there is a wildcard in the repository's path string
+        return -1;
+    }
 
     // Copy the repositoryString to a char array, in order to use it in lfs_stat
     auto *repositoryStringChar = reinterpret_cast<uint8_t *>(repositoryString.data());
 
     // Call lfs_stat in order to fill the info_struct with data
-    int32_t infoStructFillStatus = lfs_stat(&fs1, (const char *) repositoryStringChar, pInfo);
+    int32_t infoStructFillStatus = lfs_stat(&fs1, (const char *) repositoryStringChar, &infoStruct);
 
     // Check if the repository exists and no errors are produced during the lfs_stat() execution
     if (infoStructFillStatus >= 0)
@@ -130,13 +140,13 @@ int32_t FileManagementService::pathIsValidForCreation(String<ECSS_MAX_STRING_SIZ
         else
         {
             // Info type is invalid
-            return -1;
+            return -2;
         }
     }
     else
     {
         // lfs_stat() returned an error code
-        return -2;
+        return infoStructFillStatus;
     }
 }
 
@@ -190,12 +200,11 @@ void checkForSlashes(String<ECSS_MAX_STRING_SIZE> &objectPathString, uint8_t *fi
 
 int32_t
 FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath,
-                                          uint8_t repositoryPathSize,  String<ECSS_MAX_STRING_SIZE> fileName,
-                                          uint8_t fileNameSize, int32_t flags)
+                                          String<ECSS_MAX_STRING_SIZE> fileName, int32_t flags)
 {
 
     // Check the size of the object path
-    if ((repositoryPathSize + fileNameSize) > ECSS_MAX_STRING_SIZE)
+    if ((repositoryPath.size() + fileName.size()) > ECSS_MAX_STRING_SIZE)
     {
         // Return error code that indicates too large object path
         return -1;
@@ -227,52 +236,63 @@ FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<EC
 
 
 
-int32_t FileManagementService::pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize,
-                               String<ECSS_MAX_STRING_SIZE> fileNameString, uint8_t fileNameStringSize) {
-    lfs_info *pInfo;
-    lfs_info infoStruct;
-    pInfo = &infoStruct;
-
+int32_t FileManagementService::pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString,
+                                                      String<ECSS_MAX_STRING_SIZE> fileNameString)
+{
     // Check if there are any wildcards in the repositoryString
-    int8_t repositoyryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString, repositoryStringSize);
+    int8_t repositoyryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString);
 
     if (repositoyryStringWildcardStatus != -10) {
-        // Return error code which indicates that there is a wildcard in the message
+        // Return error code which indicates that there is a wildcard in the repository's path string
         return -1;
     }
 
     // Check if there are any wildcards in the fileNameString
-    int8_t fileNameStringWildcardStatus = FileManagementService::checkForWildcard(fileNameString, fileNameStringSize);
+    int8_t fileNameStringWildcardStatus = FileManagementService::checkForWildcard(fileNameString);
 
-    if (fileNameStringWildcardStatus != -10) {
-        // Return error code which indicates that there is a wildcard in the message
-        return -1;
-    }
-
-    // Copy the repositoryString to a char array, in order to concatenate in one string
-    auto *repositoryStringChar = reinterpret_cast<uint8_t *>(repositoryString.data());
-
-    // Copy the repositoryString to a char array, in order to concatenate in one string
-    auto *fileNameStringChar = reinterpret_cast<uint8_t *>(fileNameString.data());
-
-    // Concatenate 2 strings in 1. From now on use objectPathString
-    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
-    objectPathString.append((const char *)repositoryStringChar);
-    objectPathString.append((const char *)fileNameStringChar);
-
-    // Check for objectPath size
-    if ((repositoryStringSize + fileNameStringSize) > ECSS_MAX_STRING_SIZE) {
-        // Return error code which indicates that the object path size is too large
+    if (fileNameStringWildcardStatus != -10)
+    {
+        // Return error code which indicates that there is a wildcard in the file's name string
         return -2;
     }
 
+    // Pointer to repository path string data
+    auto *repositoryPathChar = reinterpret_cast<uint8_t *>(repositoryString.data());
+
+    // Pointer to file name string data
+    auto *fileNameChar = reinterpret_cast<uint8_t *>(fileNameString.data());
+
+    // String that will house the object path (repository path + file name)
+    String<ECSS_MAX_STRING_SIZE> objectPathString = "";
+
+    // Append the repository path
+    objectPathString.append((const char *)repositoryPathChar);
+
+    // Check for the existence of slashes and adapt accordingly
+    checkForSlashes(objectPathString, fileNameChar);
+
+    // Append the file name
+    objectPathString.append((const char *)fileNameChar);
+
+    // Check for objectPath size
+    if (objectPathString.size() > ECSS_MAX_STRING_SIZE )
+    {
+        // Return error code which indicates that the object path size is too large
+        return -3;
+    }
+
+    // Info struct, that will house the type of the requested object
+    lfs_info infoStruct;
+
     // Call lfs_stat to fill the infoStruct with information about the object
-    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPathString.data(), pInfo);
+    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPathString.data(), &infoStruct);
 
     // Check if the lfs_stat is completed successfully
-    if (infoStructFillStatus >= 0) {
+    if (infoStructFillStatus >= 0)
+    {
         // Check if the object is a file or a directory
-        switch (pInfo->type) {
+        switch (infoStruct.type)
+        {
             case (LFS_TYPE_REG):
 
                 // Object type is file
@@ -288,27 +308,37 @@ int32_t FileManagementService::pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZ
             default:
 
                 // Return error, invalid object type (in case the return is other than those above)
-                return -3;
+                return -4;
         }
-    } else {
-        // Return error code that there is no object
-        return -4;
+    }
+    else
+    {
+        // lfs_stat returned an error code
+        return infoStructFillStatus;
     }
 
 }
 
-int32_t FileManagementService::littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
-                           String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize) {
-    // Copy the repositoryString to a char array, in order to use it in lfs_stat
-    auto *repositoryStringChar = reinterpret_cast<uint8_t *>(repositoryPath.data());
+int32_t FileManagementService::littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STRING_SIZE> repositoryPath,
+                                                  String<ECSS_MAX_STRING_SIZE> fileName)
+{
+    // Pointer to repository path string data
+    auto *repositoryPathChar = reinterpret_cast<uint8_t *>(repositoryPath.data());
 
-    // Copy the repositoryString to a char array, in order to use it in lfs_stat
-    auto *fileNameStringChar = reinterpret_cast<uint8_t *>(fileName.data());
+    // Pointer to file name string data
+    auto *fileNameChar = reinterpret_cast<uint8_t *>(fileName.data());
 
-    // Concatenate 2 strings in 1. From now on use objectPathString
+    // String that will house the object path (repository path + file name)
     String<ECSS_MAX_STRING_SIZE> objectPathString = "";
-    objectPathString.append((const char *)repositoryStringChar);
-    objectPathString.append((const char *)fileNameStringChar);
+
+    // Append the repository path
+    objectPathString.append((const char *)repositoryPathChar);
+
+    // Check for the existence of slashes and adapt accordingly
+    checkForSlashes(objectPathString, fileNameChar);
+
+    // Append the file name
+    objectPathString.append((const char *)fileNameChar);
 
     // Call lfs_remove
     int32_t lfsDeleteFileStatus = lfs_remove(fs, objectPathString.data());
@@ -400,20 +430,20 @@ int32_t FileManagementService::littleFsReportFile(String<ECSS_MAX_STRING_SIZE> r
 
 }
 
-void FileManagementService::createFile(Message &message) {
+void FileManagementService::createFile(Message &message)
+{
     // TC[23,1]
     // TODO implement fileLockedStatus but later as an extra feature
-    message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile);
+    message.assertTC(FileManagementService::ServiceType,
+                     FileManagementService::MessageType::CreateFile);
 
     // Extract the repository path, which is the first string in this message
     String<ECSS_MAX_STRING_SIZE> repositoryPathString("");
     uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPathString);
-    uint8_t repositoryPathSize = repositoryPathString.size();
 
     // Extract the file name, which is the second string in this message
     String<ECSS_MAX_STRING_SIZE> fileNameString("");
     uint8_t fileNameExtractionStatus = getStringUntilZeroTerminator(message, fileNameString);
-    uint8_t fileNameSize = fileNameString.size();
 
     // Extract the file size in bytes
     uint16_t fileSizeBytes = message.readUint32();
@@ -440,73 +470,103 @@ void FileManagementService::createFile(Message &message) {
     }
 
     // Check if the path is valid for creation of a file
-    else if (pathIsValidForCreation(repositoryPathString, repositoryPathSize) != LFS_TYPE_DIR)
-    {
-        //Invalid path
-        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
-    }
-
-    // Proceed with the creation
     else
     {
-        // Declare the lfs_file_t object
-        lfs_file_t file;
 
-        // Call littleFsCreateFile in order to create the file
-        int32_t createFileStatus = littleFsCreateFile(&fs1, &file, repositoryPathString, repositoryPathSize,
-                                                      fileNameString, fileNameSize,LFS_O_CREAT);
+        int32_t pathIsValidForCreationStatus = pathIsValidForCreation(repositoryPathString);
+
         // Check the status of the above function
-        if (createFileStatus >= 0)
+        switch (pathIsValidForCreationStatus)
         {
-            // Calling lfs_file_close to release any allocated resources
-            if (lfs_file_close(&fs1, &file) >= 0)
+            // Repository path leads to a repository, so proceed with the file creation
+            case LFS_TYPE_DIR:
             {
-                // Successful file creation
+                // Declare the lfs_file_t object
+                lfs_file_t file;
+
+                // Call littleFsCreateFile in order to create the file
+                int32_t createFileStatus = littleFsCreateFile(&fs1, &file, repositoryPathString,
+                                                              fileNameString,LFS_O_CREAT);
+                // Check the status of the above function
+                if (createFileStatus >= 0)
+                {
+                    // Calling lfs_file_close to release any allocated resources
+                    if (lfs_file_close(&fs1, &file) >= 0)
+                    {
+                        // Successful file creation
+                    }
+                    else
+                    {
+                        // LittleFs lfs_file_close() generated error
+                        ErrorHandler::reportError(message,
+                                                  ErrorHandler::ExecutionCompletionErrorType::LittleFsFileCloseFailed);
+                    }
+                }
+                else if(createFileStatus == -1)
+                {
+                    // Object's path size if greater that ECSS_MAX_STRING_SIZE
+                    ErrorHandler::reportError(message,
+                                              ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+                }
+                else if(createFileStatus == LFS_ERR_EXIST)
+                {
+                    // File already exists, so the creation was not successful
+                    ErrorHandler::reportError(message,
+                                              ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
+                }
+                else
+                {
+                    // LittleFs lfs_file_open() generated error
+                    ErrorHandler::reportError(message,
+                                              ErrorHandler::ExecutionCompletionErrorType::LittleFsFileOpenFailed);
+                }
+                break;
             }
-            else
-            {
-                // LittleFs generated error
+
+            case LFS_TYPE_REG:
+
+                // Repository path leads to a file, not a repository
                 ErrorHandler::reportError(message,
-                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileClose);
-            }
-        }
-        else if(createFileStatus == -1)
-        {
-            // Object's path size if greater that ECSS_MAX_STRING_SIZE
-            ErrorHandler::reportError(message,
-                                      ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-        }
-        else if(createFileStatus == LFS_ERR_EXIST)
-        {
-            // File already exists, so the creation was not successful
-            ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
-        }
-        else
-        {
-            // LittleFs generated error
-            ErrorHandler::reportError(message,
-                                      ErrorHandler::ExecutionCompletionErrorType::LittleFsFileOpen);
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+                break;
+
+            case(-1):
+
+                // The repository's path contains a wildcard
+                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+                break;
+
+            case(-2):
+
+                // The object's type is unexpected
+                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedFileType);
+                break;
+
+            default:
+
+                // lfs_stat (called from pathIsValidForCreation() ) return an error code
+                ErrorHandler::reportError(message,
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
+                break;
         }
     }
 }
 
 
-/*
-void FileManagementService::deleteFile(Message &message) {
+
+void FileManagementService::deleteFile(Message &message)
+{
     // TC[23,2]
-    message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile);
+    message.assertTC(FileManagementService::ServiceType,
+                     FileManagementService::MessageType::DeleteFile);
 
     // Extract the repository path, which is the first string in this message
-    char repositoryPath[ECSS_MAX_STRING_SIZE];
-    uint8_t repositoryPathSize = 0;
-    uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPath, repositoryPathSize);
-    String<ECSS_MAX_STRING_SIZE> repositoryPathString((uint8_t *) repositoryPath, repositoryPathSize);
+    String<ECSS_MAX_STRING_SIZE> repositoryPathString("");
+    uint8_t repositoryPathExtractionStatus = getStringUntilZeroTerminator(message, repositoryPathString);
 
     // Extract the file name, which is the second string in this message
-    char fileName[ECSS_MAX_STRING_SIZE];
-    uint8_t fileNameSize = 0;
-    uint8_t fileNameExtractionStatus = getStringUntilZeroTerminator(message, fileName, fileNameSize);
-    String<ECSS_MAX_STRING_SIZE> fileNameString((uint8_t *) fileName, fileNameSize);
+    String<ECSS_MAX_STRING_SIZE> fileNameString("");
+    uint8_t fileNameExtractionStatus = getStringUntilZeroTerminator(message, fileNameString);
 
     // Check the repository name extraction status
     if (repositoryPathExtractionStatus != 0)
@@ -515,34 +575,86 @@ void FileManagementService::deleteFile(Message &message) {
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
-        // Check the file name extraction status
+    // Check the file name extraction status
     else if (fileNameExtractionStatus != 0)
     {
         // Size of file name is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
     }
 
-        // Check the validity of the request at service level
-    else if (pathIsValidForDeletion(repositoryPathString, repositoryPathSize, fileNameString, fileNameSize) != 1)
-    {
-        // Invalid path
-        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
-    }
+    // Check the validity of the object path
     else
     {
-        // Call lfs_remove in order to delete the file
-        if (littleFsDeleteFile(&fs1, repositoryPathString, repositoryPathSize, fileNameString, fileNameSize) >= 0) {
-            //Successful Deletion
-        }
-        else
+        // Check for wildcards, size and littleFs errors.
+        int32_t pathIsValidForDeletionStatus = pathIsValidForDeletion(repositoryPathString,
+                                                                      fileNameString);
+
+        // Check the status of the above function
+        switch (pathIsValidForDeletionStatus)
         {
-            //LittleFs generated error
-            ErrorHandler::reportError(message,
-                                      ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+
+            case LFS_TYPE_REG:
+            {
+                // The object is a file, so proceed with the deletion process
+                int32_t littleFsDeleteFileStatus = littleFsDeleteFile(&fs1, repositoryPathString,
+                                                                      fileNameString);
+
+                // Check the status of the deletion
+                if (littleFsDeleteFileStatus >= 0)
+                {
+                    // File was deleted successfully
+                }
+                else
+                {
+                    // LittleFs lfs_remove() failed
+                    ErrorHandler::reportError(message,
+                                              ErrorHandler::ExecutionCompletionErrorType::LittleFsRemoveFailed);
+                }
+                break;
+            }
+
+            case LFS_TYPE_DIR:
+
+                // The object's type is a directory, so it can't be removed by this TC, which is only used for files
+                ErrorHandler::reportError(message,
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+                break;
+
+            case(-1):
+
+                // The repository's path contains a wildcard
+                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+                break;
+
+            case(-2):
+
+                // The file's name contains a wildcard
+                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+                break;
+
+            case(-3):
+
+                // The object's path exceeds ECSS_MAX_STRING_SIZE
+                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+                break;
+
+            case(-4):
+
+                // The object's type is unexpected
+                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedFileType);
+                break;
+
+            default:
+
+                // lfs_stat (called from pathIsValidForDeletion() ) return an error code
+                ErrorHandler::reportError(message,
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
+                break;
+
         }
     }
 }
-
+/*
 void FileManagementService::reportAttributes(Message &message) {
     // TC[23,3]
     message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes);

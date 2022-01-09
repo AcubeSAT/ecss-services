@@ -154,7 +154,15 @@ public:
 		/**
 		 * Size of string is bigger than allowed
 		 */
-		SizeOfStringIsOutOfBounds = 11
+		SizeOfStringIsOutOfBounds = 11,
+        /**
+		 * A wildcard found where it shouldn't be present
+		 */
+        UnexpectedWildcard = 12,
+        /**
+		 * A file type that in not LFS_TYPE_REG nor LFS_TYPE_DIR
+		 */
+        UnexpectedFileType = 13,
 	};
 
 	/**
@@ -190,11 +198,23 @@ public:
         /**
          * LittleFs lfs_file_close function generic error
          */
-        LittleFsFileClose = 4,
+        LittleFsFileCloseFailed = 4,
         /**
          * LittleFs lfs_file_open function generic error
          */
-        LittleFsFileOpen = 4,
+        LittleFsFileOpenFailed = 4,
+        /**
+         * Invalid object type returned from littleFs
+         */
+        LittleFsInvalidObjectType = 5,
+        /**
+         * LittleFs lfs_stat function generic error
+         */
+        LittleFsStatFailed = 6,
+        /**
+         * LittleFs lfs_remove function generic error
+         */
+        LittleFsRemoveFailed = 6,
 	};
 
 	/**

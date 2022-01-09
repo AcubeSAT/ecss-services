@@ -286,10 +286,9 @@ public:
     /**
      * The purpose of this function is to check if there is a wildcard in a given string
      * @param messageString : The message passed as a String
-     * @param messageStringSize : The actual size of the message
      * @return status of execution (1: Message does not contain any wildcards, -1: Message contains at least one wildcard)
      */
-    static int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString, uint8_t messageStringSize);
+    static int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString);
 
     /**
      * The purpose of this function is to take care of the extraction process for the object path variable
@@ -304,11 +303,10 @@ public:
      * The purpose of this function is to check if the object path is valid for creation
      * Checks if there is an object at this path AND if it is a file, not a directory
      * @param repositoryString : Pointer to the repository
-     * @param repositoryStringSize : The actual size of the repositoryString
      * @return status of execution (2: Object is a directory, 1: Object is a file, -1: Invalid type of object,
      *                             -2: lfs_stat() returned an error code)
      */
-    int32_t pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize);
+    int32_t pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString);
 
     /**
      * The purpose of this function is to initiate a creation of a file using littleFs
@@ -316,36 +314,31 @@ public:
      * @param fs : Pointer to the file system struct
      * @param file : Pointer to the file struct
      * @param repositoryPath : The repository path
-     * @param repositoryPathSize : The actual size of the repositoryPath
      * @param fileName : The file name
-     * @param fileNameSize : The actual size of the fileName
      * @param flags : Input flags that determines the creation status
      */
-    static int32_t littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
-                               String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize, int32_t flags);
+    static int32_t littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath,
+                               String<ECSS_MAX_STRING_SIZE> fileName, int32_t flags);
 
     /**
      * The purpose of this function is to check if the object path is valid for deletion
      * Checks if there is an object at this path, if it is a file and does not contain any wildcards
      * @param repositoryString : String with the repository name
-     * @param repositoryStringSize : The actual size of the repositoryString
      * @param fileNameString : String with the file name
-     * @param fileNameStringSize : The actual size of the fileName
      * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
      */
-    int32_t pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize, String<ECSS_MAX_STRING_SIZE> fileNameString, uint8_t fileNameStringSize);
+    int32_t pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString,
+                                   String<ECSS_MAX_STRING_SIZE> fileNameString);
 
     /**
      * The purpose of this function is to initiate the deletion of a file using littleFs
      * Checks if there is already a file with this name and if there is a wildcard in the object path
      * @param fs : Pointer to the file system struct
      * @param repositoryPath : The repository path
-     * @param repositoryPathSize : The actual size of the repositoryPath
      * @param fileName : The file name
-     * @param fileNameSize : The actual size of the fileName
      */
-    int32_t littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STRING_SIZE> repositoryPath, uint8_t repositoryPathSize,
-                               String<ECSS_MAX_STRING_SIZE> fileName, uint8_t fileNameSize);
+    int32_t littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STRING_SIZE> repositoryPath,
+                               String<ECSS_MAX_STRING_SIZE> fileName);
 
     /**
      * The purpose of this function is to check if the file is valid for a repo

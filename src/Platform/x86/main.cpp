@@ -27,7 +27,7 @@ int main() {
     FileManagementService& fileManagementService = Services.fileManagementService;
 
 
-    Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+    Message message(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
     String<64> data1 = "test1";
     String<64> nullString = "@";
     String<64> data2 = "test2";
