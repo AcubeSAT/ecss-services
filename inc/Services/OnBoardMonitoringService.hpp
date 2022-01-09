@@ -1,6 +1,6 @@
 #ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
-#include <Message.hpp>
+#include "Message.hpp"
 #include "etl/array.h"
 #include "Service.hpp"
 #include "Helpers/Parameter.hpp"
