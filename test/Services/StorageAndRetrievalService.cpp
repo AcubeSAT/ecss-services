@@ -341,7 +341,7 @@ TEST_CASE("Deleting packet stores") {
 
 		CHECK(ServiceTests::count() == 4);
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 4);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 4);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -418,7 +418,7 @@ TEST_CASE("Deleting packet stores") {
 		REQUIRE(storageAndRetrieval.packetStoreExists(correctPacketStoreIds[1]));
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DeletionOfPacketStoreWithStorageStatusEnabled) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DeletionOfPacketWithByTimeRangeRetrieval) == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 4);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 4);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -476,7 +476,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 3);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -557,7 +557,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 3);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -651,7 +651,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 6);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 3);
 
 		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag == 0);
@@ -759,7 +759,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 6);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithByTimeRangeRetrieval) == 3);
 
 		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStatus ==
@@ -867,7 +867,7 @@ TEST_CASE("Suspending the open retrieval process") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 3);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 
 		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStatus ==
 		        PacketStore::Suspended);
@@ -998,7 +998,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 6);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ByTimeRangeRetrievalAlreadyEnabled) == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithOpenRetrievalInProgress) == 1);
 
@@ -1113,7 +1113,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 3);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 		for (auto& packetStoreId : correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 		}
@@ -1410,7 +1410,7 @@ TEST_CASE("Resizing the packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 4);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 4);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 4);
 		int i = 0;
 		for (auto& packetStoreId : correctPacketStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).sizeInBytes == oldSizes[i++]);
@@ -1485,7 +1485,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
-		    ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore,
+		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress};
@@ -1573,7 +1573,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
-		    ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore,
+		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress};
@@ -1665,7 +1665,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
-		    ErrorHandler::ExecutionStartErrorType::GetNonExistingPacketStore,
+		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress,
 		    ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel};
@@ -1841,7 +1841,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 3);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 2);
 
 		Message report = ServiceTests::get(2);
 		REQUIRE(report.messageType == StorageAndRetrievalService::MessageType::PacketStoreContentSummaryReport);
@@ -2115,7 +2115,7 @@ TEST_CASE("Deleting packet store content") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 7);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithByTimeRangeRetrieval) == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 2);
 
@@ -2390,7 +2390,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingPacketStore) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 1);
 		REQUIRE(storageAndRetrieval.getPacketStore(toPacketStoreId).storedTelemetryPackets.empty());
 
 		ServiceTests::reset();

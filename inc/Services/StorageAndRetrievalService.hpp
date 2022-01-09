@@ -64,6 +64,22 @@ private:
 	void copyFromTagToTag(Message& request);
 
 	/**
+	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
+	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
+	 *
+	 * @param request used to read the time-tag, the packet store IDs and to raise errors.
+	 */
+	void copyAfterTimeTag(Message& request);
+
+	/**
+	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
+	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
+	 *
+	 * @param request used to raise errors.
+	 */
+	void copyBeforeTimeTag(Message& request);
+
+	/**
 	 * Checks if the two requested packet stores exist.
 	 *
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
@@ -104,6 +120,17 @@ private:
 	                             uint32_t endTime, Message& request);
 
 	/**
+	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
+	 *
+	 * @param isAfterTimeTag true indicates that we are examining the case of AfterTimeTag. Otherwise, we are referring
+	 * to the case of BeforeTimeTag.
+	 * @param request used to raise errors.
+	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
+	 */
+	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
+	                             Message& request, bool isAfterTimeTag);
+
+	/**
 	 * Performs all the necessary error checking for the case of FromTagToTag copying of packets.
 	 *
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
@@ -114,25 +141,6 @@ private:
 	bool failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
 	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
 	                        uint32_t endTime, Message& request);
-
-	/**
-	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is after the
-	 * specified time-tag as per 6.15.3.8.4.d(2) of the standard.
-	 *
-	 * @param request used to read the time-tag, the packet store IDs and to raise errors.
-	 */
-	void copyAfterTimeTag(Message& request);
-
-	/**
-	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
-	 *
-	 * @param isAfterTimeTag true indicates that we are examining the case of AfterTimeTag. Otherwise, we are referring
-	 * to the case of BeforeTimeTag.
-	 * @param request used to raise errors.
-	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
-	 */
-	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
-	                             Message& request, bool isAfterTimeTag);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
@@ -146,13 +154,7 @@ private:
 	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
 	                        Message& request);
 
-	/**
-	 * Copies all TM packets from source packet store to the target packet-store, whose time-stamp is before the
-	 * specified time-tag as per 6.15.3.8.4.d(3) of the standard.
-	 *
-	 * @param request used to raise errors.
-	 */
-	void copyBeforeTimeTag(Message& request);
+
 
 	/**
 	 * Performs all the necessary error checking for the case of BeforeTimeTag copying of packets.
@@ -167,17 +169,17 @@ private:
 	                         Message& request);
 
 	/**
-	 * Forms the content summary of the specified packet-store and appends it to a report message.
-	 */
-	void createContentSummary(Message& report, const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
-
-	/**
 	 * Performs the necessary error checking for a request to start the by-time-range retrieval process.
 	 *
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
 	bool failedStartOfByTimeRangeRetrieval(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, Message& request);
+
+	/**
+	 * Forms the content summary of the specified packet-store and appends it to a report message.
+	 */
+	void createContentSummary(Message& report, const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
 
 public:
 	inline static const uint8_t ServiceType = 15;
@@ -237,6 +239,14 @@ public:
 	 * Returns true if the specified packet store is present in packet stores.
 	 */
 	bool packetStoreExists(const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+
+	/**
+	 * The purpose of this function is to avoid duplicating the same checks in different TC implementations. It
+	 * performs the error checking, which is common across the functions and then, it performs the specified job.
+	 *
+	 * @param function the job to be done after the error checking.
+	 */
+	void executeOnPacketStores(Message& request, const std::function<void(PacketStore&)>& function);
 
 	/**
 	 * TC[15,1] request to enable the packet stores' storage function

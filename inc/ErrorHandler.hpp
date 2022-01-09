@@ -160,128 +160,125 @@ public:
 		 */
 		GetNonExistingParameter = 8,
 		/**
-		 * Attempt to change a non-existent packet store (ST[15])
-		 */
-		SetNonExistingPacketStore = 9,
-		/**
 		 * Attempt to access a packet store that does not exist (ST[15])
 		 */
-		GetNonExistingPacketStore = 10,
+		NonExistingPacketStore = 9,
 		/**
 		 * Attempt to change the start time tag of a packet store, whose open retrieval status is in progress (ST[15])
 		 */
-		SetPacketStoreWithOpenRetrievalInProgress = 11,
+		SetPacketStoreWithOpenRetrievalInProgress = 10,
 		/**
 		 * Attempt to resume open retrieval of a packet store, whose by-time-range retrieval is enabled (ST[15])
 		 */
-		SetPacketStoreWithByTimeRangeRetrieval = 12,
+		SetPacketStoreWithByTimeRangeRetrieval = 11,
 		/**
 		 * Attempt to access a packet with by-time range retrieval enabled (ST[15])
 		 */
-		GetPacketStoreWithByTimeRangeRetrieval = 13,
+		GetPacketStoreWithByTimeRangeRetrieval = 12,
 		/**
 		 * Attempt to start the by-time-range retrieval of packet store, whose open retrieval is in progress (ST[15])
 		 */
-		GetPacketStoreWithOpenRetrievalInProgress = 14,
+		GetPacketStoreWithOpenRetrievalInProgress = 13,
 		/**
 		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
 		 */
-		ByTimeRangeRetrievalAlreadyEnabled = 16,
+		ByTimeRangeRetrievalAlreadyEnabled = 14,
 		/**
 		 * Attempt to create packet store, whose ID already exists (ST[15])
 		 */
-		AlreadyExistingPacketStore = 17,
+		AlreadyExistingPacketStore = 15,
 		/**
 		 * Attempt to create packet store, when the max number of packet stores is already reached (ST[15])
 		 */
-		MaxNumberOfPacketStoresReached = 18,
+		MaxNumberOfPacketStoresReached = 16,
 		/**
 		 * Attempt to access a packet store with the storage status enabled (ST[15])
 		 */
-		GetPacketStoreWithStorageStatusEnabled = 19,
+		GetPacketStoreWithStorageStatusEnabled = 17,
 		/**
 		 * Attempt to delete a packet whose by time range retrieval status is enabled (ST[15])
 		 */
-		DeletionOfPacketWithByTimeRangeRetrieval = 20,
+		DeletionOfPacketWithByTimeRangeRetrieval = 18,
 		/**
 		 * Attempt to delete a packet whose open retrieval status is in progress (ST[15])
 		 */
-		DeletionOfPacketWithOpenRetrievalInProgress = 21,
+		DeletionOfPacketWithOpenRetrievalInProgress = 19,
 		/**
 		 * Requested a time window where the start time is larger than the end time (ST[15])
 		 */
-		InvalidTimeWindow = 22,
+		InvalidTimeWindow = 20,
 		/**
 		 * Attempt to copy a packet store to a destination packet store that is not empty (ST[15])
 		 */
-		DestinationPacketStoreNotEmtpy = 23,
+		DestinationPacketStoreNotEmtpy = 21,
 		/**
 		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
 		 * ST[04]
 		 */
-		InvalidReportingRateError = 24,
+		InvalidReportingRateError = 22,
 		/**
 		 * Attempt to add definition to the struct map but its already full.(ST[19])
 		 */
-		EventActionDefinitionsMapIsFull = 25,
+		EventActionDefinitionsMapIsFull = 23,
 		/**
 		 * Attempt to report/delete non existing housekeeping structure (ST[03])
 		 */
-		RequestedNonExistingStructure = 26,
+		RequestedNonExistingStructure = 24,
 		/**
 		 * Attempt to create already created structure (ST[03])
 		 */
-		RequestedAlreadyExistingStructure = 27,
+		RequestedAlreadyExistingStructure = 25,
 		/**
 		 * Attempt to delete structure which has the periodic reporting status enabled (ST[03]) as per 6.3.3.5.2(d-2)
 		 */
-		RequestedDeletionOfEnabledHousekeeping = 28,
+		RequestedDeletionOfEnabledHousekeeping = 26,
 		/**
 		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure
 		 * (ST[03])
 		 */
-		AlreadyExistingParameter = 29,
+		AlreadyExistingParameter = 27,
 		/**
 		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
 		 * enabled (ST[03])
 		 */
-		RequestedAppendToEnabledHousekeeping = 30,
+		RequestedAppendToEnabledHousekeeping = 28,
 		/**
 		 * Attempt to create a new housekeeping structure in Housekeeping Service, when the maximum number of
 		 * housekeeping structures is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfHousekeepingStructures = 31,
+		ExceededMaxNumberOfHousekeepingStructures = 29,
 		/**
 		 * Attempt to add a new simply commutated parameter in a specific housekeeping structure, but the maximum
 		 * number of simply commutated parameters for this structure is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfSimplyCommutatedParameters = 32,
-		/* Attempt to set a reporting rate which is smaller than the parameter sampling rate.
+		ExceededMaxNumberOfSimplyCommutatedParameters = 30,
+		/**
+		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
 		 * ST[04]
 		 */
-		InvalidSamplingRateError = 33,
+		InvalidSamplingRateError = 31,
 		/**
 		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
 		 */
-		MaxStatisticDefinitionsReached = 34,
+		MaxStatisticDefinitionsReached = 32,
 		/**
 		 * Attempt to set the virtual channel of a packet store to a invalid value (ST[15])
 		 */
-		InvalidVirtualChannel = 35,
+		InvalidVirtualChannel = 33,
 		/**
 		 * Attempt to delete a packet store, whose storage status is enabled (ST[15])
 		 */
-		DeletionOfPacketStoreWithStorageStatusEnabled = 36,
+		DeletionOfPacketStoreWithStorageStatusEnabled = 34,
 		/**
 		 * Attempt to copy packets from a packet store to another, but either no packet timestamp falls inside the
 		 * specified timestamp, or more than one boolean argument were given as true in the 'copyPacketsTo' function
 		 * (ST[15])
 		 */
-		CopyOfPacketsFailed = 37,
+		CopyOfPacketsFailed = 35,
 		/**
 		 * Attempt to set a packet store size to a value that the available memory cannot handle (ST[15]).
 		 */
-		UnableToHandlePacketStoreSize = 38,
+		UnableToHandlePacketStoreSize = 36,
 	};
 
 	/**
