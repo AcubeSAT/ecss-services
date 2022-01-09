@@ -12,8 +12,8 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	uint16_t currentId = message.readEnum16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			RepetitionCounter.at(currentId) = 0;
-			ParameterMonitoringStatus.at(currentId) = true;
+			ParameterMonitoringList.at(currentId).get().repetitionNumber = 0;
+			ParameterMonitoringList.at(currentId).get().monitoringStatus = true;
 		} else {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
@@ -29,8 +29,8 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	uint16_t currentId = message.readEnum16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			ParameterMonitoringStatus.at(currentId) = false;
-			ParameterMonitoringCheckingStatus.at(currentId) = Unchecked;
+			ParameterMonitoringList.at(currentId).get().monitoringStatus = false;
+			ParameterMonitoringList.at(currentId).get().checkingStatus = PMONBase::Unchecked;
 		} else {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
@@ -52,16 +52,6 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError);
 	} else {
 		ParameterMonitoringList.clear();
-		MonitoredParameterIds.clear();
-		ParameterMonitoringCheckingStatus.clear();
-		RepetitionCounter.clear();
-		RepetitionNumber.clear();
-		ParameterMonitoringStatus.clear();
-		CheckTransitionList.clear();
-		ParameterMonitoringCheckTypes.clear();
-		LimitCheckParameters.clear();
-		ExpectedValueCheckParameters.clear();
-		DeltaCheckParameters.clear();
 	}
 }
 

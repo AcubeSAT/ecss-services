@@ -8,6 +8,108 @@
 #include "ECSS_Definitions.hpp"
 #include "etl/list.h"
 
+class PMONBase {
+public:
+	enum CheckingStatus : uint8_t {
+		Unchecked = 1,
+		Invalid = 2,
+		ExpectedValue = 3,
+		UnexpectedValue = 4,
+		WithinLimits = 5,
+		BelowLowLimit = 6,
+		AboveHighLimit = 7,
+		WithinThreshold = 8,
+		BelowLowThreshold = 9,
+		AboveHighThreshold = 10
+	};
+
+	enum CheckType : uint8_t { LimitCheck = 1, ExpectedValueCheck = 2, DeltaCheck = 3 };
+
+	std::reference_wrapper<ParameterBase> monitoredParameter;
+	CheckType checkType;
+	uint16_t monitoredParameterId;
+	uint16_t repetitionNumber;
+	uint16_t repetitionCounter;
+	bool monitoringStatus;
+	CheckingStatus checkingStatus;
+	etl::array<CheckingStatus, 2> checkTransitionList;
+	PMONBase(std::reference_wrapper<ParameterBase> monitoredParameter, CheckType checkType,
+	         uint16_t monitoredParameterId, uint16_t repetitionNumber, uint16_t repetitionCounter,
+	         bool monitoringStatus, CheckingStatus checkingStatus, etl::array<CheckingStatus, 2> checkTransitionList)
+	    : monitoredParameter(monitoredParameter) {
+		this->checkType = checkType;
+		this->monitoredParameterId = monitoredParameterId;
+		this->repetitionNumber = repetitionNumber;
+		this->repetitionCounter = repetitionCounter;
+		this->monitoringStatus = monitoringStatus;
+		this->checkingStatus = checkingStatus;
+		this->checkTransitionList = checkTransitionList;
+	}
+};
+
+class PMONExpectedValueCheck : PMONBase {
+public:
+	uint16_t expectedValue;
+	uint16_t mask;
+	uint16_t notExpectedValueEvent;
+	PMONExpectedValueCheck(std::reference_wrapper<ParameterBase> monitoredParameter, PMONBase::CheckType checkType,
+	                       uint16_t monitoredParameterId, uint16_t repetitionNumber, uint16_t repetitionCounter,
+	                       bool monitoringStatus, PMONBase::CheckingStatus checkingStatus,
+	                       etl::array<PMONBase::CheckingStatus, 2> checkTransitionList, uint16_t expectedValue,
+	                       uint16_t mask, uint16_t notExpectedValueEvent)
+	    : PMONBase(monitoredParameter, checkType, monitoredParameterId, repetitionNumber, repetitionCounter,
+	               monitoringStatus, checkingStatus, checkTransitionList) {
+		this->expectedValue = expectedValue;
+		this->mask = mask;
+		this->notExpectedValueEvent = notExpectedValueEvent;
+	}
+};
+
+class PMONLimitCheck : PMONBase {
+public:
+	uint16_t lowLimit;
+	uint16_t belowLowLimitEvent;
+	uint16_t highLimit;
+	uint16_t aboveHighLimitEvent;
+
+	PMONLimitCheck(std::reference_wrapper<ParameterBase> monitoredParameter, PMONBase::CheckType checkType,
+	               uint16_t monitoredParameterId, uint16_t repetitionNumber, uint16_t repetitionCounter,
+	               bool monitoringStatus, PMONBase::CheckingStatus checkingStatus,
+	               etl::array<PMONBase::CheckingStatus, 2> checkTransitionList, uint16_t lowLimit,
+	               uint16_t belowLowLimitEvent, uint16_t highLimit, uint16_t aboveHighLimitEvent)
+	    : PMONBase(monitoredParameter, checkType, monitoredParameterId, repetitionNumber, repetitionCounter,
+	               monitoringStatus, checkingStatus, checkTransitionList) {
+		this->lowLimit = lowLimit;
+		this->belowLowLimitEvent = belowLowLimitEvent;
+		this->highLimit = highLimit;
+		this->aboveHighLimitEvent = aboveHighLimitEvent;
+	}
+};
+
+class PMONDeltaCheck : PMONBase {
+public:
+	uint16_t numberOfConsecutiveDeltaChecks;
+	uint16_t lowDeltaThreshold;
+	uint16_t belowLowThresholdEvent;
+	uint16_t highDeltaThreshold;
+	uint16_t aboveHighThresholdEvent;
+
+	PMONDeltaCheck(std::reference_wrapper<ParameterBase> monitoredParameter, PMONBase::CheckType checkType,
+	               uint16_t monitoredParameterId, uint16_t repetitionNumber, uint16_t repetitionCounter,
+	               bool monitoringStatus, PMONBase::CheckingStatus checkingStatus,
+	               etl::array<PMONBase::CheckingStatus, 2> checkTransitionList, uint16_t numberOfConsecutiveDeltaChecks,
+	               uint16_t lowDeltaThreshold, uint16_t belowLowThresholdEvent, uint16_t highDeltaThreshold,
+	               uint16_t aboveHighThresholdEvent)
+	    : PMONBase(monitoredParameter, checkType, monitoredParameterId, repetitionNumber, repetitionCounter,
+	               monitoringStatus, checkingStatus, checkTransitionList) {
+		this->numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
+		this->lowDeltaThreshold = lowDeltaThreshold;
+		this->belowLowThresholdEvent = belowLowThresholdEvent;
+		this->highDeltaThreshold = highDeltaThreshold;
+		this->aboveHighThresholdEvent = aboveHighThresholdEvent;
+	}
+};
+
 class OnBoardMonitoringService : public Service {
 public:
 	inline static const uint8_t ServiceType = 12;
@@ -28,98 +130,11 @@ public:
 		ParameterMonitoringDefinitionStatusReport = 14
 	};
 
-	enum CheckingStatus : uint8_t {
-		Unchecked = 1,
-		Invalid = 2,
-		ExpectedValue = 3,
-		UnexpectedValue = 4,
-		WithinLimits = 5,
-		BelowLowLimit = 6,
-		AboveHighLimit = 7,
-		WithinThreshold = 8,
-		BelowLowThreshold = 9,
-		AboveHighThreshold = 10
-	};
-	// TODO: Find out if events should be declared here or in EventReportService.hpp
-	enum Event : uint8_t {
-		BelowLowLimitEvent = 1,
-		AboveHighLimitEvent = 2,
-		NotExpectedValueEvent = 3,
-		BelowLowThresholdEvent = 4,
-		AboveHighThresholdEvent = 5
-	};
-
-	enum CheckType : uint8_t { LimitCheck = 1, ExpectedValueCheck = 2, DeltaCheck = 3 };
-
-	struct LimitCheck {
-		uint16_t lowLimit;
-		Event belowLowLimitEvent;
-		uint16_t highLimit;
-		Event aboveHighLimitEvent;
-	};
-
-	struct ExpectedValueCheck {
-		uint16_t expectedValue;
-		// TODO: Find what variable type is a bit string.
-		uint8_t mask;
-		Event notExpectedValueEvent;
-	};
-
-	struct DeltaCheck {
-		uint16_t numberOfConsecutiveDeltaChecks;
-		uint16_t lowDeltaThreshold;
-		Event belowLowThresholdEvent;
-		uint16_t highDeltaThreshold;
-		Event aboveHighThresholdEvent;
-	};
-
 	uint16_t maximumTransitionReportingDelay = 0;
 	/**
-	 * Map storing the parameters for each parameter monitoring definition.
+	 * Map storing the parameter monitoring definitions.
 	 */
-	etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSMaxParameters> ParameterMonitoringList;
-	/**
-	 * Map storing the Monitored Parameter Ids that correspond to the Parameter Monitoring Ids.
-	 */
-	etl::map<uint16_t, uint16_t, ECSSMaxParameters> MonitoredParameterIds;
-	/**
-	 * Map storing the checking status for each parameter monitoring definition.
-	 */
-	etl::map<uint16_t, CheckingStatus, ECSSMaxParameters> ParameterMonitoringCheckingStatus;
-	/**
-	 * Map storing the number of consecutive checks that have been conducted for each parameter monitoring definition.
-	 */
-	etl::map<uint16_t, uint16_t, ECSSMaxParameters> RepetitionCounter;
-	/**
-	 * Map storing the number of consecutive checks that need to be conducted for each parameter in order to set a new
-	 * checking status.
-	 */
-	etl::map<uint16_t, uint16_t, ECSSMaxParameters> RepetitionNumber;
-	/**
-	 * Map storing the status of each parameter monitoring definition.
-	 */
-	etl::map<uint16_t, bool, ECSSMaxParameters> ParameterMonitoringStatus;
-	/**
-	 * Map storing the transitions of each parameter monitoring definition's status.
-	 */
-	etl::map<uint16_t, etl::array<CheckingStatus, 2>, ECSSMaxParameters> CheckTransitionList;
-	/**
-	 * Map storing the check type of each parameter monitoring definition.
-	 */
-	etl::map<uint16_t, CheckType, ECSSMaxParameters> ParameterMonitoringCheckTypes;
-	/**
-	 * Map storing the type-specific parameters for limit checks.
-	 */
-	etl::map<uint16_t, struct LimitCheck, ECSSMaxParameters> LimitCheckParameters;
-	/**
-	 * Map storing the type-specific parameters for expected value checks.
-	 */
-	etl::map<uint16_t, struct ExpectedValueCheck, ECSSMaxParameters> ExpectedValueCheckParameters;
-	/**
-	 * Map storing the type-specific parameters for delta checks.
-	 */
-	etl::map<uint16_t, struct DeltaCheck, ECSSMaxParameters> DeltaCheckParameters;
-
+	etl::map<uint16_t, std::reference_wrapper<PMONBase>, ECSSMaxMonitoringDefinitions> ParameterMonitoringList;
 	/**
 	 * If true, parameter monitoring is enabled
 	 */
