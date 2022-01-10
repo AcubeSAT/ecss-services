@@ -164,6 +164,12 @@ inline const bool SupportsStandardDeviation = true;
  */
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
 
+/**
+ * The max number of controlled application processes
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxControlledApplications = 5;
+
 /** @} */
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
