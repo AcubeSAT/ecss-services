@@ -6,6 +6,7 @@ standard.
 
 ## Directories
 - **ci**: GitLab CI configuration files
+- **docs**: Source code usage and development documentation
 - **inc**: All headers and libraries used in the code
 - **lib**: External libraries used in the code
 - **src**: All source files are included here
@@ -13,3 +14,5 @@ standard.
 
 ## Documentation
 Full documentation about this project based on code comments is available at https://acubesat.gitlab.io/obc/ecss-services/docs/.
+
+## Implementation status
