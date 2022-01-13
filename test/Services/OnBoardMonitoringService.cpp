@@ -53,17 +53,23 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 0);
 
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().monitoringStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().monitoringStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(2)).get().monitoringStatus == true);
+		bool status = onBoardMonitoringService.ParameterMonitoringList.at(PMONIds[0]).get().monitoringStatus;
+		CHECK((onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().monitoringStatus == true));
+		status = onBoardMonitoringService.ParameterMonitoringList.at(PMONIds[1]).get().monitoringStatus;
+		CHECK((onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().monitoringStatus == true));
+		status = onBoardMonitoringService.ParameterMonitoringList.at(PMONIds[2]).get().monitoringStatus;
+		CHECK((onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(2)).get().monitoringStatus == true));
+		uint16_t counter = onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().repetitionCounter;
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().repetitionCounter == 0);
+		counter = onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().repetitionCounter;
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().repetitionCounter == 0);
+		counter = onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(2)).get().repetitionCounter;
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(2)).get().repetitionCounter == 0);
 
 		ServiceTests::reset();
 		Services.reset();
 	}
-	SECTION("3 valid requests to enable Parameter Monitoring Definitions and 1 invalid") {
+	SECTION("2 valid requests to enable Parameter Monitoring Definitions and 1 invalid") {
 		initialiseParameterMonitoringDefinitions();
 
 		Message request =
@@ -71,22 +77,19 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 1, 2, 10};
+		etl::array<uint16_t, 4> PMONIds = {0, 1,10};
 		request.appendEnum16(PMONIds.at(0));
 		request.appendEnum16(PMONIds.at(1));
 		request.appendEnum16(PMONIds.at(2));
-		request.appendEnum16(PMONIds.at(3));
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().monitoringStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().monitoringStatus == true);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(2)).get().monitoringStatus == true);
+		CHECK((onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().monitoringStatus == true));
+		CHECK((onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().monitoringStatus == true));
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().repetitionCounter == 0);
 		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().repetitionCounter == 0);
-		CHECK(onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(2)).get().repetitionCounter == 0);
 
 		ServiceTests::reset();
 		Services.reset();
