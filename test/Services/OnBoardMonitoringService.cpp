@@ -18,7 +18,7 @@ void initialiseParameterMonitoringDefinitions() {
 
 	etl::array<PMONExpectedValueCheck::CheckingStatus, 2> checkTransitionList = {};
 	auto monitoringDefinition1 =
-	    PMONExpectedValueCheck(parameter1, PMONExpectedValueCheck::ExpectedValueCheck, 0, 10, 0, false,
+	    PMONExpectedValueCheck(parameter1, PMONExpectedValueCheck::ExpectedValueCheck, 0, 10, 8, false,
 	                           PMONExpectedValueCheck::Unchecked, checkTransitionList, 5, 8, 1);
 	auto monitoringDefinition2 = PMONLimitCheck(parameter2, PMONBase::DeltaCheck, 0, 10, 0, false, PMONBase::Unchecked,
 	                                            checkTransitionList, 1, 1, 2, 2);
@@ -102,6 +102,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		request.appendEnum16(PMONIds.at(0));
 		request.appendEnum16(PMONIds.at(1));
 		request.appendEnum16(PMONIds.at(2));
+		onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(0)).get().monitoringStatus = true;
+		onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(1)).get().monitoringStatus = true;
+		onBoardMonitoringService.ParameterMonitoringList.at(PMONIds.at(2)).get().monitoringStatus = true;
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
