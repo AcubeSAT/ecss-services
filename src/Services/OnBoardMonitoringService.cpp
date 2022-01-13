@@ -9,8 +9,8 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 	parameterMonitoringFunctionStatus = true;
 	uint16_t numberOfParameters = message.readUint16();
-	uint16_t currentId = message.readEnum16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
+		uint16_t currentId = message.readEnum16();
 		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
 			ParameterMonitoringList.at(currentId).get().repetitionNumber = 0;
 			ParameterMonitoringList.at(currentId).get().monitoringStatus = true;
@@ -18,7 +18,6 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
-		currentId = message.readEnum16();
 	}
 }
 
