@@ -11,13 +11,13 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	uint16_t numberOfParameters = message.readUint16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readEnum16();
-		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			ParameterMonitoringList.at(currentId).get().repetitionNumber = 0;
-			ParameterMonitoringList.at(currentId).get().monitoringStatus = true;
-		} else {
+		if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
+			break;
 		}
+		ParameterMonitoringList.at(currentId).get().repetitionNumber = 0;
+		ParameterMonitoringList.at(currentId).get().monitoringStatus = true;
 	}
 }
 
