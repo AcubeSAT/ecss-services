@@ -8,7 +8,6 @@
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 
-	parameterMonitoringFunctionStatus = true;
 	uint16_t numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
 		uint16_t currentId = message.readEnum16();
