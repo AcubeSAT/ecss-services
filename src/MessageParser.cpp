@@ -9,8 +9,8 @@ void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
 #ifdef SERVICE_ONBOARDMONITORING
 		case OnBoardMonitoringService::ServiceType:
-		    Services.onBoardMonitoringService.execute(message);
-		    break;
+			Services.onBoardMonitoringService.execute(message);
+			break;
 #endif
 
 #ifdef SERVICE_HOUSEKEEPING
