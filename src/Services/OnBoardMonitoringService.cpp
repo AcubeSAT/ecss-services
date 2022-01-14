@@ -11,13 +11,13 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	uint16_t numberOfParameters = message.readUint16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readEnum16();
-		if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
+		if (parameterMonitoringList.find(currentId) == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			break;
 		}
-		ParameterMonitoringList.at(currentId).get().repetitionNumber = 0;
-		ParameterMonitoringList.at(currentId).get().monitoringStatus = true;
+		parameterMonitoringList.at(currentId).get().repetitionNumber = 0;
+		parameterMonitoringList.at(currentId).get().monitoringStatus = true;
 	}
 }
 
@@ -27,13 +27,13 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	uint16_t numberOfParameters = message.readUint16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readEnum16();
-		if (ParameterMonitoringList.find(currentId) == ParameterMonitoringList.end()) {
+		if (parameterMonitoringList.find(currentId) == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
-		ParameterMonitoringList.at(currentId).get().monitoringStatus = false;
-		bool status = ParameterMonitoringList.at(currentId).get().monitoringStatus;
-		ParameterMonitoringList.at(currentId).get().checkingStatus = PMONBase::Unchecked;
+		parameterMonitoringList.at(currentId).get().monitoringStatus = false;
+		bool status = parameterMonitoringList.at(currentId).get().monitoringStatus;
+		parameterMonitoringList.at(currentId).get().checkingStatus = PMONBase::Unchecked;
 	}
 }
 
@@ -49,7 +49,7 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 		    message,
 		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError);
 	} else {
-		ParameterMonitoringList.clear();
+		parameterMonitoringList.clear();
 	}
 }
 

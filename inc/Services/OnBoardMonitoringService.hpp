@@ -38,6 +38,7 @@ public:
 	         uint16_t monitoredParameterId, uint16_t repetitionNumber, uint16_t repetitionCounter,
 	         bool monitoringStatus, CheckingStatus checkingStatus, etl::array<CheckingStatus, 2> checkTransitionList)
 	    : monitoredParameter(monitoredParameter) {
+		this->monitoredParameter = monitoredParameter;
 		this->checkType = checkType;
 		this->monitoredParameterId = monitoredParameterId;
 		this->repetitionNumber = repetitionNumber;
@@ -135,7 +136,7 @@ public:
 	/**
 	 * Map storing the parameter monitoring definitions.
 	 */
-	etl::map<uint16_t, std::reference_wrapper<PMONBase>, ECSSMaxMonitoringDefinitions> ParameterMonitoringList;
+	etl::map<uint16_t, std::reference_wrapper<PMONBase>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 	/**
 	 * If true, parameter monitoring is enabled
 	 */
