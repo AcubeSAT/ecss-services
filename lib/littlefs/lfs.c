@@ -5040,7 +5040,31 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
     LFS_UNLOCK(lfs->cfg);
     return err;
      */
-    info->type = 0x02;
+
+    static uint32_t counter = 0;
+
+    switch (counter)
+    {
+        case 0:
+            info->type = LFS_TYPE_DIR;
+            counter++;
+            break;
+
+        case 1:
+            info->type = LFS_TYPE_REG;
+            counter++;
+            break;
+
+        case 2:
+            info->type = 10;
+            counter++;
+            break;
+        case 3:
+            counter++;
+            return -10;
+            break;
+    }
+
 return 0;
 }
 

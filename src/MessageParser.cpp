@@ -42,6 +42,11 @@ void MessageParser::execute(Message& message) {
 			break;
 #endif
 
+#ifdef SERVICE_FILE_MANAGEMENT
+        case 23: Services.fileManagementService.execute(message); // ST[23]
+            break;
+#endif
+
 		default: ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }

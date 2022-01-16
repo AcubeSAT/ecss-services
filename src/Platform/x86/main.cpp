@@ -21,12 +21,10 @@
 #include "etl/String.hpp"
 
 int main() {
-	LOG_NOTICE << "ECSS Services test application";
+	//LOG_NOTICE << "ECSS Services test application";
 
-
+    /*
     FileManagementService& fileManagementService = Services.fileManagementService;
-
-
     Message message(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
     String<64> data1 = "test1";
     String<64> nullString = "@";
@@ -39,6 +37,7 @@ int main() {
 
     fileManagementService.createFile(message);
 
+    */
     /* Manually adjust lfs_stat in order to get the user story correct
     Message message(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
     String<64> data1 = "test1";

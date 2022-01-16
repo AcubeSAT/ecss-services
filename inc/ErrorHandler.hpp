@@ -163,6 +163,14 @@ public:
 		 * A file type that in not LFS_TYPE_REG nor LFS_TYPE_DIR
 		 */
         UnexpectedFileType = 13,
+        /**
+		 * A file type that was expected to by LFS_TYPE_DIR is LFS_TYPE_REG instead
+		 */
+        RepositoryPathLeadsToFile = 14,
+        /**
+         * LittleFs lfs_stat function generic error
+         */
+        LittleFsStatFailed = 15,
 	};
 
 	/**
@@ -202,19 +210,16 @@ public:
         /**
          * LittleFs lfs_file_open function generic error
          */
-        LittleFsFileOpenFailed = 4,
+        LittleFsFileOpenFailed = 5,
         /**
          * Invalid object type returned from littleFs
          */
-        LittleFsInvalidObjectType = 5,
-        /**
-         * LittleFs lfs_stat function generic error
-         */
-        LittleFsStatFailed = 6,
+        LittleFsInvalidObjectType = 6,
         /**
          * LittleFs lfs_remove function generic error
          */
-        LittleFsRemoveFailed = 6,
+        LittleFsRemoveFailed = 7,
+
 	};
 
 	/**

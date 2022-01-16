@@ -60,6 +60,9 @@ private:
     uint16_t unallocatedMemory = 0;
     uint8_t periodicReportingInterval = 0;
 
+    // Global lfs struct
+    lfs_t fs1;
+
     struct fileCopyStatusNotification {
         uint8_t operationId = 0;
         uint8_t operationStatus = 0;
@@ -85,10 +88,91 @@ private:
         onHold = 3
     };
 
+    //------------------------------------------------------------------------
+
+    /**
+     * The purpose of this function is to check if there is a wildcard in a given string
+     * @param messageString : The message passed as a String
+     * @return status of execution (1: Message does not contain any wildcards, -10: Message contains at least one wildcard)
+     */
+    static int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString);
+
+    /**
+     * The purpose of this function is to take care of the extraction process for the object path variable
+     * Parses the message until a '@' is found. Then returns the actual string, excluding the '@' char
+     * @param message : The message that we want to parse
+     * @param extractedString : pointer to a String<ECSS_MAX_STRING_SIZE> that will house the extracted string
+     * @return status of execution (0: Successful completion, 1: Error occurred)
+     */
+    uint8_t getStringUntilZeroTerminator(Message& message, String<ECSS_MAX_STRING_SIZE> &extractedString);
+
+    /**
+     * The purpose of this function is to check if the object path is valid for creation
+     * Checks if there is an object at this path AND if it is a file, not a directory
+     * @param repositoryString : Pointer to the repository
+     * @return status of execution (2: Object is a directory, 1: Object is a file, -1: Invalid type of object,
+     *                             -2: lfs_stat() returned an error code)
+     */
+    int32_t pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString);
+
+    /**
+     * The purpose of this function is to initiate a creation of a file using littleFs
+     * Checks if there is already a file with this name
+     * @param fs : Pointer to the file system struct
+     * @param file : Pointer to the file struct
+     * @param repositoryPath : The repository path
+     * @param fileName : The file name
+     * @param flags : Input flags that determines the creation status
+     */
+    static int32_t littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath,
+                                      String<ECSS_MAX_STRING_SIZE> fileName, int32_t flags);
+
+    /**
+     * The purpose of this function is to check if the object path is valid for deletion
+     * Checks if there is an object at this path, if it is a file and does not contain any wildcards
+     * @param repositoryString : String with the repository name
+     * @param fileNameString : String with the file name
+     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     */
+    int32_t pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString,
+                                   String<ECSS_MAX_STRING_SIZE> fileNameString);
+
+    /**
+     * The purpose of this function is to initiate the deletion of a file using littleFs
+     * Checks if there is already a file with this name and if there is a wildcard in the object path
+     * @param fs : Pointer to the file system struct
+     * @param repositoryPath : The repository path
+     * @param fileName : The file name
+     */
+    int32_t littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STRING_SIZE> repositoryPath,
+                               String<ECSS_MAX_STRING_SIZE> fileName);
+
+    /**
+     * The purpose of this function is to check if the file is valid for a repo
+     * Checks if there is an object at this path, if it is a repo and does not contain any wildcards
+     * @param repositoryString : String with the repository name
+     * @param repositoryStringSize : The actual size of the repositoryString
+     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     */
+    int32_t pathIsValidForARepository(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize);
+
+
+    /**
+     * The purpose of this function is to initiate the lfs_stat function, which will fill the info struct with all
+     * the necessary information about a files report.
+     * Checks if there is an object at this path, if it is a file and does not contain any wildcards,
+     * @param repositoryString : String with the repository name
+     * @param fileNameString : String with the file name
+     * @return status of execution (-22: Object type is invalid, -4 littleFs generated error,
+     *                               1: Object is a file, 2: Error occurred)
+     */
+    int32_t littleFsReportFile(String<ECSS_MAX_STRING_SIZE> repositoryString,
+                               String<ECSS_MAX_STRING_SIZE> fileNameString, lfs_info *infoStruct);
+
 public:
 
     inline static const uint8_t ServiceType = 23;
-    static const char wildcard = '?';
+    static const char wildcard = '*';
     static const char variableStringTerminator = '@';
 
     /*
@@ -173,9 +257,8 @@ public:
      * TM[23,4] Create a report with the attributes of a file
      */
     void fileAttributeReport(String<ECSS_MAX_STRING_SIZE> repositoryString,
-                                                    uint8_t repositoryStringSize,
-                                                    String<ECSS_MAX_STRING_SIZE> fileNameString,
-                                                    uint8_t fileNameStringSize, lfs_info infoStruct);
+                             String<ECSS_MAX_STRING_SIZE> fileNameString,
+                             uint32_t fileSize);
 
     /*
      * TC[23,5] Lock a file, makes it read only. This function should work if and only if locking functionality
@@ -281,87 +364,15 @@ public:
      */
     void disablePeriodicReportingOfFileCopyStatus(Message& message);
 
-    //------------------------------------------------------------------------
-
     /**
-     * The purpose of this function is to check if there is a wildcard in a given string
-     * @param messageString : The message passed as a String
-     * @return status of execution (1: Message does not contain any wildcards, -1: Message contains at least one wildcard)
-     */
-    static int32_t checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString);
+	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param message Contains the necessary parameters to call the suitable subservice
+	 */
+    void execute(Message& message);
 
-    /**
-     * The purpose of this function is to take care of the extraction process for the object path variable
-     * Parses the message until a '@' is found. Then returns the actual string, excluding the '@' char
-     * @param message : The message that we want to parse
-     * @param extractedString : pointer to a String<ECSS_MAX_STRING_SIZE> that will house the extracted string
-     * @return status of execution (0: Successful completion, 1: Error occurred)
-     */
-    uint8_t getStringUntilZeroTerminator(Message& message, String<ECSS_MAX_STRING_SIZE> &extractedString);
-
-    /**
-     * The purpose of this function is to check if the object path is valid for creation
-     * Checks if there is an object at this path AND if it is a file, not a directory
-     * @param repositoryString : Pointer to the repository
-     * @return status of execution (2: Object is a directory, 1: Object is a file, -1: Invalid type of object,
-     *                             -2: lfs_stat() returned an error code)
-     */
-    int32_t pathIsValidForCreation(String<ECSS_MAX_STRING_SIZE> repositoryString);
-
-    /**
-     * The purpose of this function is to initiate a creation of a file using littleFs
-     * Checks if there is already a file with this name
-     * @param fs : Pointer to the file system struct
-     * @param file : Pointer to the file struct
-     * @param repositoryPath : The repository path
-     * @param fileName : The file name
-     * @param flags : Input flags that determines the creation status
-     */
-    static int32_t littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSS_MAX_STRING_SIZE> repositoryPath,
-                               String<ECSS_MAX_STRING_SIZE> fileName, int32_t flags);
-
-    /**
-     * The purpose of this function is to check if the object path is valid for deletion
-     * Checks if there is an object at this path, if it is a file and does not contain any wildcards
-     * @param repositoryString : String with the repository name
-     * @param fileNameString : String with the file name
-     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
-     */
-    int32_t pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZE> repositoryString,
-                                   String<ECSS_MAX_STRING_SIZE> fileNameString);
-
-    /**
-     * The purpose of this function is to initiate the deletion of a file using littleFs
-     * Checks if there is already a file with this name and if there is a wildcard in the object path
-     * @param fs : Pointer to the file system struct
-     * @param repositoryPath : The repository path
-     * @param fileName : The file name
-     */
-    int32_t littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STRING_SIZE> repositoryPath,
-                               String<ECSS_MAX_STRING_SIZE> fileName);
-
-    /**
-     * The purpose of this function is to check if the file is valid for a repo
-     * Checks if there is an object at this path, if it is a repo and does not contain any wildcards
-     * @param repositoryString : String with the repository name
-     * @param repositoryStringSize : The actual size of the repositoryString
-     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
-     */
-    int32_t pathIsValidForARepository(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize);
-
-
-    /**
-     * The purpose of this function is to initiate the lfs_stat function, which will fill the info struct with all
-     * the necessary information about a files report.
-     * Checks if there is an object at this path, if it is a file and does not contain any wildcards,
-     * @param repositoryString : String with the repository name
-     * @param repositoryStringSize : The actual size of the repositoryString
-     * @param fileNameString : String with the file name
-     * @param fileNameStringSize : The actual size of the fileName
-     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
-     */
-    int32_t littleFsReportFile(String<ECSS_MAX_STRING_SIZE> repositoryString, uint8_t repositoryStringSize,
-                               String<ECSS_MAX_STRING_SIZE> fileNameString, uint8_t fileNameStringSize, lfs_info *infoStruct);
 };
 
 #endif //ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
