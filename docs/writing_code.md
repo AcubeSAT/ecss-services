@@ -13,16 +13,20 @@ The following C++ features are **forbidden** from use in flight-ready software:
    This prohibits use of `malloc`/`free`, `new`/`delete` and almost most `std::` containers.
 2. **Run-Time Type Inference** (RTTI).
 
-   This prohibits use of `dynamic_cast`, `typeid` and `std::type_info`
+   This prohibits use of `dynamic_cast`, `typeid` and `std::type_info`.
 3. **Exceptions**
 4. **Multiple inheritance**
-5. Some features only available in [hosted implementations](https://en.cppreference.com/w/cpp/freestanding)
+5. Some features only available in [hosted implementations](https://en.cppreference.com/w/cpp/freestanding).
 
    If a C++ or compiler feature is not available in a bare-metal microcontroller, then it cannot be used in this repository.
 
-   This prohibits use of libraries such as `<ctime>`, `<pthreads>`
+   This prohibits use of libraries such as `<ctime>`, `<pthreads>`, `<iostream>` and others.
 
 @see [DDJF_OBSW](https://gitlab.com/acubesat/documentation/cdr-public/-/blob/master/DDJF/DDJF_OBSW.pdf)
+
+There are no strict requirements about compiler portability: ecss-services is built around modern versions of `gcc` and
+`clang`. While no unexpected behaviour mush be invoked, and the code must remain portable across different
+architectures, we occasionally use compiler-specific features to aid performance or memory management.
 
 ## Code standards {#seandards}
 

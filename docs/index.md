@@ -11,7 +11,7 @@ satellite or embedded system.
 
 ## How to read this documentation
 
-This documentation contains the technical documentation for the implementation of the ECSS documentation. For a description of the requirement see [version A](https://ecss.nl/standard/ecss-e-70-41a-ground-systems-and-operations-telemetry-and-telecommand-packet-utilization/) and [version C](https://ecss.nl/standard/ecss-e-st-70-41c-space-engineering-telemetry-and-telecommand-packet-utilization-15-april-2016/) of the standard.
+This documentation contains the technical documentation for the implementation of the ECSS documentation. For a description of the requirements see [version A](https://ecss.nl/standard/ecss-e-70-41a-ground-systems-and-operations-telemetry-and-telecommand-packet-utilization/) and [version C](https://ecss.nl/standard/ecss-e-st-70-41c-space-engineering-telemetry-and-telecommand-packet-utilization-15-april-2016/) of the standard.
 
 To get into the documentation you can read:
 1. A list of [pages](pages.html) that contain generic information on the philosophy, design and usage of the services

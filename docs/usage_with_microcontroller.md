@@ -1,10 +1,18 @@
-# Usage with a microcontroller
+# Usage with a microcontroller {#usage-mcu}
 
 @tableofcontents
 
 ecss-services relies on many functions that may not be readily available to a microcontroller, such as printing,
 getting the time, transmitting packets etc. That's why you will have to implement a few simple functions by yourself
 when porting this library to a microcontroller.
+
+The library is also attempting to be modular enough to support the needs of your own spacecraft. After setting it up,
+you will be able to specify your own parameters, functions, events, and other definitions. All limits and numeric
+constants are not hard-coded, but can be modified in @ref ECSSDefinitions.
+
+@attention The ecss-services repository is not designed to be used as a static or dynamic library. Due to the embedded
+nature of the project, ecss-services may have a different binary output for every different usecase. You will need to
+compile this library independently for different projects.
 
 ## Examples
 
@@ -21,6 +29,28 @@ code for these functions that will make them work on your platform.
 The `inc/Platform` and `src/Platform` directories contain some platform-specific code that has already been prepared.
 The **`x86`** subdirectory includes all the code necessary to run on a Linux platform, i.e. your computer. This code is
 only used when building for a desktop environment, and is not compiled when building for a microcontroller.
+
+## Integration with CMake
+
+While `ecss-services` is a typical C++ project, it is built and based around the [CMake build
+system](https://cmake.org/). If you are using CMake in your project, you can easily integrate `ecss-services` in your
+`CMakeLists.txt` file, just by adding these lines:
+
+```cmake
+# ecss-services include directories
+include_directories(lib/ecss-services/inc)
+include_directories(lib/ecss-services/inc/Platform/x86)
+include_directories(lib/ecss-services/lib/etl/include)
+include_directories(lib/ecss-services/lib/logger/inc)
+
+# Build ecss-services and link it to the project
+add_subdirectory(lib/ecss-services EXCLUDE_FROM_ALL)
+target_link_libraries(<project_name> common)
+```
+
+Assuming your project is called `<project_name>` and the library is installed in `lib/ecss-services`, the above lines
+will automatically compile ecss-services for you using the compiler applicable to your application, and link them to
+your project.
 
 ## Functions to implement
 
@@ -56,6 +86,22 @@ void Logger::log(Logger::LogLevel level, etl::istring &message) {
     MCU_Serial_Write(output);
 }
 ```
+
+#### Setting the log level
+You will also need to set the **minimum log level** of your application by setting the relevant `LOGLEVEL` constants.
+
+For example, you can add this to your `CMakeLists.txt` to log all messages:
+```cmake
+add_compile_definitions(LOGLEVEL_TRACE)
+```
+
+For a list of all possible log levels, refer to the documentation of the Logger.
+
+@note If you want to have different log levels for different parts of your application, you can use [`target_compile_definitions`](https://cmake.org/cmake/help/latest/command/target_compile_definitions.html).
+
+@note All logs with a level lower than the specified one will not be compiled at all, and will not be included in any
+form in the resulting binary. This means that disabled log messages _will not_ have any negative impact on the
+performance and size of your program.
 
 ### Message transmission
 
@@ -98,7 +144,7 @@ void ErrorHandler::logError(ErrorType errorType) {
 }
 ```
 
-### Service initialisation
+## Service initialisation
 
 Platform-specific code also gives a chance to every Service to use pre-initialised entities (e.g. parameters, monitoring
 definitions etc.) during boot. The following functions are called at initialisation:
@@ -114,3 +160,13 @@ void ParameterService::initializeParameterMap() {
 	parameters = {{0, parameter1}, {1, parameter2}, {2, parameter3}};
 }
 ```
+
+## Receiving messages
+
+After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can
+be done easily:
+```cpp
+MessageParser::parse(string, size);
+```
+
+You can use the rest of the @ref MessageParser functions if you have a more specific use-case.

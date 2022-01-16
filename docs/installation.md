@@ -52,10 +52,8 @@ to run some unit tests and verify that the code works correctly.
 Apart from compiling the services, you can also generate other outputs if you want.
 
 ### Integrating with your code {#integrating}
-While ecss-services can run independently, the repo is built as a library. Follow the instructions in ??? to integrate
-with your space or ground segment code.
-
-@todo Add link to instructions
+While ecss-services can run independently, the repo is built as a library. Follow the instructions in
+[Usage with a microcontroller](docs/usage_with_microcontroller.md) to integrate with your space or ground segment code.
 
 
 ### Creating the documentation {#documentation}
