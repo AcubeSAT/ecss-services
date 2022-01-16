@@ -5059,10 +5059,16 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
             info->type = 10;
             counter++;
             break;
+
         case 3:
             counter++;
             return -10;
             break;
+
+        default:
+            info->type = LFS_TYPE_DIR;
+            break;
+
     }
 
 return 0;
@@ -5136,6 +5142,27 @@ int lfs_file_open(lfs_t *lfs, lfs_file_t *file, const char *path, int flags) {
     return err;
     */
 
+    static uint32_t counter = 0;
+
+    switch (counter)
+    {
+        case 0:
+            counter++;
+            return 0;
+            break;
+
+        case 1:
+            counter++;
+            return LFS_ERR_EXIST;
+            break;
+
+        case 2:
+            counter++;
+            return -15;
+            break;
+
+    }
+
     return 0;
 }
 
@@ -5175,6 +5202,23 @@ int lfs_file_close(lfs_t *lfs, lfs_file_t *file) {
     LFS_UNLOCK(lfs->cfg);
     return err;
      */
+
+    static uint32_t counter = 0;
+
+    switch (counter)
+    {
+        case 0:
+            counter++;
+            return 0;
+            break;
+
+        case 1:
+            counter++;
+            return -10;
+            break;
+
+    }
+
     return 0;
 }
 

@@ -126,6 +126,76 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]"){
     CHECK(ServiceTests::countErrors() == 7);
     CHECK(ServiceTests::thrownError(ErrorHandler::LittleFsStatFailed));
 
+    // Object's path string size is too large
+    Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+    String<1024> repo9 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
+    String<1024> file9 = "test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2";
+    message9.appendString(repo9);
+    message9.appendString(nullString);
+    message9.appendString(file9);
+    message9.appendString(nullString);
+    message9.appendUint32(1000);
+
+    MessageParser::execute(message9);
+    CHECK(ServiceTests::countErrors() == 8);
+    CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
+
+    // File name contains a wildcard
+    Message message10(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+    String<1024> repo10 = "test1";
+    String<1024> file10 = "test2*";
+    message10.appendString(repo10);
+    message10.appendString(nullString);
+    message10.appendString(file10);
+    message10.appendString(nullString);
+    message10.appendUint32(1000);
+
+    MessageParser::execute(message10);
+    CHECK(ServiceTests::countErrors() == 9);
+    CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+
+    // File already exists
+    Message message11(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+    String<1024> repo11 = "test1";
+    String<1024> file11 = "test2";
+    message11.appendString(repo11);
+    message11.appendString(nullString);
+    message11.appendString(file11);
+    message11.appendString(nullString);
+    message11.appendUint32(1000);
+
+    MessageParser::execute(message11);
+    CHECK(ServiceTests::countErrors() == 10);
+    CHECK(ServiceTests::thrownError(ErrorHandler::FileAlreadyExists));
+
+    // LittleFs generated an error during the creation of the file
+    Message message12(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+    String<1024> repo12 = "test1";
+    String<1024> file12 = "test2";
+    message12.appendString(repo12);
+    message12.appendString(nullString);
+    message12.appendString(file12);
+    message12.appendString(nullString);
+    message12.appendUint32(1000);
+
+    MessageParser::execute(message12);
+    CHECK(ServiceTests::countErrors() == 11);
+    CHECK(ServiceTests::thrownError(ErrorHandler::LittleFsFileOpenFailed));
+
+    // LittleFs failed to close the file after creation, in order to synchronize the file system
+    Message message13(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+    String<1024> repo13 = "test1";
+    String<1024> file13 = "test2";
+    message13.appendString(repo13);
+    message13.appendString(nullString);
+    message13.appendString(file13);
+    message13.appendString(nullString);
+    message13.appendUint32(1000);
+
+    MessageParser::execute(message13);
+    CHECK(ServiceTests::countErrors() == 12);
+    CHECK(ServiceTests::thrownError(ErrorHandler::LittleFsFileCloseFailed));
+
 }
 
 
