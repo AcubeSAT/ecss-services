@@ -339,39 +339,169 @@ TEST_CASE("Delete a file TC[23,2]", "[service][st23]") {
     MessageParser::execute(message10);
     CHECK(ServiceTests::countErrors() == 9);
     CHECK(ServiceTests::thrownError(ErrorHandler::LittleFsRemoveFailed));
-
-
 }
 
-/*
+TEST_CASE("Report attributes of a file TC[23,3]", "[service][st23]") {
 
-TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
+    String<64> nullString = "@";
 
-    // Add a message that is too large to check for the corresponding error
-    Message message(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-    message.appendEnum16(0);
-    message.appendEnum16(1);
-    message.appendEnum16(1);
-    String<128> data = "0123456789012345678901234567890123456789012345678901234567890123456789";
-    message.appendString(data);
+    // Good scenario
+    Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<64> repo1 = "test1";
+    String<64> file1 = "test2";
+    message.appendString(repo1);
+    message.appendString(nullString);
+    message.appendString(file1);
+    message.appendString(nullString);
+    message.appendUint32(100);
 
     MessageParser::execute(message);
-    CHECK(ServiceTests::thrownError(ErrorHandler::MessageTooLarge));
+    CHECK(ServiceTests::countErrors() == 0);
+
+    // Repository's path string is too large
+    Message message2(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<1024> repo2 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
+    String<64> file2 = "test2";
+    message2.appendString(repo2);
+    message2.appendString(nullString);
+    message2.appendString(file2);
+    message2.appendString(nullString);
+    message2.appendUint32(100);
+
+    MessageParser::execute(message2);
     CHECK(ServiceTests::countErrors() == 1);
+    CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
 
-    // Add an event-action definition to check if the values are inserted correctly
-    Message message1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-    message1.appendEnum16(0);
-    message1.appendEnum16(2);
-    message1.appendEnum16(1);
-    data = "01234";
-    message1.appendString(data);
-    MessageParser::execute(message1);
+    // File' name string is too large
+    Message message3(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<1024> file3 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
+    String<64> repo3 = "test2";
+    message3.appendString(repo3);
+    message3.appendString(nullString);
+    message3.appendString(file3);
+    message3.appendString(nullString);
+    message3.appendUint32(100);
 
-    CHECK(eventActionService.eventActionDefinitionMap.lower_bound(2)->second.applicationId == 0);
-    CHECK(eventActionService.eventActionDefinitionMap.lower_bound(2)->second.eventDefinitionID == 2);
-    CHECK(eventActionService.eventActionDefinitionMap.lower_bound(2)->second.enabled == 0);
-    CHECK(eventActionService.eventActionDefinitionMap.lower_bound(2)->second.request.compare(data) == 0);
+    MessageParser::execute(message3);
+    CHECK(ServiceTests::countErrors() == 2);
+    CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
+
+    // Repository name has a wildcard
+    Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<64> repo4 = "test1*";
+    String<64> file4 = "test2";
+    message4.appendString(repo4);
+    message4.appendString(nullString);
+    message4.appendString(file4);
+    message4.appendString(nullString);
+    message4.appendUint32(1000);
+
+    MessageParser::execute(message4);
+    CHECK(ServiceTests::countErrors() == 3);
+    CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+
+    // File name contains a wildcard
+    Message message5(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<1024> repo5 = "test1";
+    String<1024> file5 = "test2*";
+    message5.appendString(repo5);
+    message5.appendString(nullString);
+    message5.appendString(file5);
+    message5.appendString(nullString);
+    message5.appendUint32(1000);
+
+    MessageParser::execute(message5);
+    CHECK(ServiceTests::countErrors() == 4);
+    CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+
+    // Object's path string size is too large
+    Message message6(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<1024> repo6 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
+    String<1024> file6 = "test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2";
+    message6.appendString(repo6);
+    message6.appendString(nullString);
+    message6.appendString(file6);
+    message6.appendString(nullString);
+    message6.appendUint32(1000);
+
+    MessageParser::execute(message6);
+    CHECK(ServiceTests::countErrors() == 5);
+    CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
+
+    // The object's type is invalid
+    Message message7(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<64> repo7 = "test1";
+    String<64> file7 = "test2";
+    message7.appendString(repo7);
+    message7.appendString(nullString);
+    message7.appendString(file7);
+    message7.appendString(nullString);
+    message7.appendUint32(100);
+
+    MessageParser::execute(message7);
+    CHECK(ServiceTests::countErrors() == 6);
+    CHECK(ServiceTests::thrownError(ErrorHandler::LittleFsInvalidObjectType));
+
+    // The object's type a directory, not a file
+    Message message8(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<64> repo8 = "test1";
+    String<64> file8 = "test2";
+    message8.appendString(repo8);
+    message8.appendString(nullString);
+    message8.appendString(file8);
+    message8.appendString(nullString);
+    message8.appendUint32(100);
+
+    MessageParser::execute(message8);
+    CHECK(ServiceTests::countErrors() == 7);
+    CHECK(ServiceTests::thrownError(ErrorHandler::LittleFsInvalidObjectType));
+
+    // lfs_stat (used to retrieve object's information) failed
+    Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes, Message::TC, 0);
+    String<64> repo9 = "test1";
+    String<64> file9 = "test2";
+    message9.appendString(repo9);
+    message9.appendString(nullString);
+    message9.appendString(file9);
+    message9.appendString(nullString);
+    message9.appendUint32(100);
+
+    MessageParser::execute(message9);
+    CHECK(ServiceTests::countErrors() == 8);
+    CHECK(ServiceTests::thrownError(ErrorHandler::LittleFsStatFailed));
 }
 
-*/
+TEST_CASE("File attributes report TM[23,4]", "[service][st23]") {
+
+    String<64> nullString = "@";
+
+    Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes,
+                    Message::TC, 0);
+    String<64> repo1 = "test1";
+    String<64> file1 = "test2";
+    message.appendString(repo1);
+    message.appendString(nullString);
+    message.appendString(file1);
+    message.appendString(nullString);
+
+    MessageParser::execute(message);
+    CHECK(ServiceTests::countErrors() == 0);
+    REQUIRE(ServiceTests::hasOneMessage());
+
+    // Checking the contents of the report
+    Message report = ServiceTests::get(0);
+
+    CHECK(report.readByte() == 't');
+    CHECK(report.readByte() == 'e');
+    CHECK(report.readByte() == 's');
+    CHECK(report.readByte() == 't');
+    CHECK(report.readByte() == '1');
+    CHECK(report.readByte() == '@');
+    CHECK(report.readByte() == 't');
+    CHECK(report.readByte() == 'e');
+    CHECK(report.readByte() == 's');
+    CHECK(report.readByte() == 't');
+    CHECK(report.readByte() == '2');
+    CHECK(report.readSint32() == 100);
+
+}

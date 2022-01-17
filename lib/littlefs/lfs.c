@@ -5073,7 +5073,7 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
 
     switch (counter)
     {
-        // TC[23,1] Create a file
+        // TC[23,1] Create a file --------------------------------------
 
         case 0:
             info->type = LFS_TYPE_DIR;
@@ -5120,7 +5120,7 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
             counter++;
             break;
 
-            // TC[23,2] Delete a file
+            // TC[23,2] Delete a file ----------------------------------------
 
         case 9:
             info->type = LFS_TYPE_REG;
@@ -5139,7 +5139,52 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
 
         case 12:
             counter++;
+            return -10;
+            break;
+
+        case 13:
+            counter++;
+            info->type = LFS_TYPE_DIR;
+            break;
+
+        case 14:
+            counter++;
             info->type = LFS_TYPE_REG;
+            break;
+
+            // TM[23,4] File attributes report ------------------
+
+        case 15:
+            // Good scenario
+            counter++;
+            info->type = LFS_TYPE_REG;
+            info->size = 100;
+            break;
+
+            // TC[23,3] Report attributes of a file ------------------
+
+        case 16:
+            // Good scenario
+            counter++;
+            info->type = LFS_TYPE_REG;
+            break;
+
+        case 17:
+            // Unknown file type
+            counter++;
+            info->type = 15;
+            break;
+
+        case 18:
+            // Object's type is a directory, not a file
+            counter++;
+            info->type = LFS_TYPE_DIR;
+            break;
+
+        case 19:
+            // lfs_stat failed for this file
+            counter++;
+            return -10;
             break;
 
     }

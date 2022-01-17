@@ -400,7 +400,14 @@ int32_t FileManagementService::littleFsReportFile(String<ECSS_MAX_STRING_SIZE> r
 
     // Concatenate 2 strings in 1. From now on use objectPathString
     String<ECSS_MAX_STRING_SIZE> objectPathString = "";
+
+    // Append the repository path string
     objectPathString.append((const char *)repositoryStringChar);
+
+    // Check for the existence of slashes and adapt accordingly
+    checkForSlashes(objectPathString, fileNameStringChar);
+
+    // Append the file name string
     objectPathString.append((const char *)fileNameStringChar);
 
     // Call lfs_stat to fill the infoStruct with information about the object
@@ -424,7 +431,7 @@ int32_t FileManagementService::littleFsReportFile(String<ECSS_MAX_STRING_SIZE> r
             default:
 
                 // Return error, invalid object type (in case the return is other than those above)
-                return LFS_ERR_INVAL;
+                return -1;
         }
     }
     else
@@ -735,20 +742,20 @@ void FileManagementService::reportAttributes(Message &message) {
         switch (reportFileStatus)
         {
 
-            case (-4):
+            case (-1):
 
                 // The object type is invalid
                 ErrorHandler::reportError(message,
                                           ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
                 break;
 
-            case (1):
+            case (LFS_TYPE_REG):
 
                 // Create a TM[23,4] fileAttributeReport
                 fileAttributeReport(repositoryPathString, fileNameString, infoStruct.size);
                 break;
 
-            case (2):
+            case (LFS_TYPE_DIR):
 
                 // Object is a directory
                 ErrorHandler::reportError(message,
@@ -760,7 +767,7 @@ void FileManagementService::reportAttributes(Message &message) {
                 // Unknown error
                 // TODO : Possibly more error messages depending on littlefs return types
                 ErrorHandler::reportError(message,
-                                          ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
                 break;
         }
     }
@@ -773,8 +780,13 @@ void FileManagementService::fileAttributeReport(String<ECSS_MAX_STRING_SIZE> rep
     //TM[23,4]
     Message report = createTM(MessageType::ReportAttributes);
 
-    // Append the repository string and then the file name string
+    // Append the repository string
     report.appendString(repositoryString);
+
+    // Append @ in order to separate them
+    report.appendUint8('@');
+
+    // Append the file name string
     report.appendString(fileNameString);
 
     // Append the size of the file
