@@ -120,10 +120,12 @@ pages:
   stage: deploy
   script:
     - mkdir .public
-    - cp -r ./{docs,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
+    - cp -r ./{docs/html,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
     - ls ./.public
     - find ./.public
     - mv .public public
+  after_script:
+    - "echo -e \e[1;92mBase page for this branch:\e[0m \e[0;36m${CI_PAGES_URL}\e[0m"
   artifacts:
     paths:
       - public # Upload the resulting website
