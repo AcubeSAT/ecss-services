@@ -20,18 +20,6 @@ Each Service is represented by a class. All Services reside inside the @ref Serv
 and Telemetry in the form of @ref Message "Messages". A Message represents a _Space Packet_, as defined by [CCSDS
 133.0-B-2](https://public.ccsds.org/Pubs/133x0b2e1.pdf). Messages are managed and distributed by the @ref MessageParser class.
 
-A few entities defined in ECSS-E-ST-70-41C are used throughout the code and are useful to keep in mind:
-1. **@ref Parameter "Parameters"**. A parameter is a value (often numerical) that represents a small piece of data which
-   can be sent to or received from the satellite. Parameters can represent sensor outputs, configuration values, status
-   indicators, or everything else.
-
-   Parameters are mainly handled by the @ref ParameterService, but they are regularly used throughout the code when
-   dealing with satellite data.
-2. **Events**. Events represent expected or unexpected occurences on the spacecraft.
-
-   The @ref EventReportService is mainly responsible for management of on-board events. Other services provide the
-   capability of generating or responding to on-board events.
-
 ## Reading and Writing Messages
 
 The Message is the simplest unit of information that is transferred between space and ground. A Message contains its
