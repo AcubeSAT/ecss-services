@@ -5002,6 +5002,34 @@ int lfs_remove(lfs_t *lfs, const char *path) {
     LFS_UNLOCK(lfs->cfg);
     return err;
     */
+
+    static uint32_t counter = 0;
+
+    switch (counter)
+    {
+        // TC[23,2] Delete a file
+        case 0:
+            counter++;
+            return 0;
+            break;
+
+        case 1:
+            counter++;
+            return -10;
+            break;
+
+            // -----------
+
+        case 2:
+            counter++;
+            break;
+
+        case 3:
+            counter++;
+            break;
+
+    }
+
     return 0;
 }
 #endif
@@ -5045,6 +5073,8 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
 
     switch (counter)
     {
+        // TC[23,1] Create a file
+
         case 0:
             info->type = LFS_TYPE_DIR;
             counter++;
@@ -5065,8 +5095,51 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
             return -10;
             break;
 
-        default:
+        case 4:
             info->type = LFS_TYPE_DIR;
+            counter++;
+            break;
+
+        case 5:
+            info->type = LFS_TYPE_DIR;
+            counter++;
+            break;
+
+        case 6:
+            info->type = LFS_TYPE_DIR;
+            counter++;
+            break;
+
+        case 7:
+            info->type = LFS_TYPE_DIR;
+            counter++;
+            break;
+
+        case 8:
+            info->type = LFS_TYPE_DIR;
+            counter++;
+            break;
+
+            // TC[23,2] Delete a file
+
+        case 9:
+            info->type = LFS_TYPE_REG;
+            counter++;
+            break;
+
+        case 10:
+            counter++;
+            return -5;
+            break;
+
+        case 11:
+            counter++;
+            info->type = LFS_TYPE_DIR;
+            break;
+
+        case 12:
+            counter++;
+            info->type = LFS_TYPE_REG;
             break;
 
     }

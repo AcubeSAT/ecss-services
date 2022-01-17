@@ -550,14 +550,14 @@ void FileManagementService::createFile(Message &message)
             case(-2):
 
                 // The object's type is unexpected
-                ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedFileType);
+                ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
                 break;
 
             default:
 
                 // lfs_stat (called from pathIsValidForCreation()) return an error code
                 ErrorHandler::reportError(message,
-                                          ErrorHandler::ExecutionStartErrorType::LittleFsStatFailed);
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
                 break;
         }
     }
@@ -660,7 +660,7 @@ void FileManagementService::deleteFile(Message &message)
                 // lfs_stat (called from pathIsValidForDeletion()) return an error code, during the search for the
                 // repository, that was sent by the TC
                 ErrorHandler::reportError(message,
-                                          ErrorHandler::ExecutionStartErrorType::LittleFsStatFailed);
+                                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
                 break;
 
         }

@@ -167,10 +167,7 @@ public:
 		 * A file type that was expected to by LFS_TYPE_DIR is LFS_TYPE_REG instead
 		 */
         RepositoryPathLeadsToFile = 14,
-        /**
-         * LittleFs lfs_stat function generic error
-         */
-        LittleFsStatFailed = 15,
+
 	};
 
 	/**
@@ -219,6 +216,10 @@ public:
          * LittleFs lfs_remove function generic error
          */
         LittleFsRemoveFailed = 7,
+        /**
+         * LittleFs lfs_stat function generic error
+         */
+        LittleFsStatFailed = 8,
 
 	};
 
