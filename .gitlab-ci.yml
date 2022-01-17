@@ -125,7 +125,7 @@ pages:
     - find ./.public
     - mv .public public
   after_script:
-    - "echo -e \e[1;92mBase page for this branch:\e[0m \e[0;36m${CI_PAGES_URL}\e[0m"
+    - "echo Base page for this branch: ${CI_PAGES_URL}"
   artifacts:
     paths:
       - public # Upload the resulting website
