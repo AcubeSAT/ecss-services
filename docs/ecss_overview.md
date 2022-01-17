@@ -1,9 +1,10 @@
 # Overview to the PUS standard {#pus-overview}
 
+@tableofcontents
+
 The `ecss-services` library implements the ECSS-E-ST-70-41C **Telemetry and telecommand packet utilization** standard,
-released by the European Cooperation for Space Standardization. The complete text of the standard is [available after a
-free
-registration](https://ecss.nl/standard/ecss-e-st-70-41c-space-engineering-telemetry-and-telecommand-packet-utilization-15-april-2016/).
+released by the European Cooperation for Space Standardization. The complete text of the standard is
+[available after a free registration](https://ecss.nl/standard/ecss-e-st-70-41c-space-engineering-telemetry-and-telecommand-packet-utilization-15-april-2016/).
 This page summarises the core concepts of the standard, and how it can be useful to a typical space mission.
 
 The ECSS-E-ST-70-41C standard (also called **Packet Utilisation Standard**, or **PUS** for short) lists a number of
@@ -36,8 +37,8 @@ A few entities defined in ECSS-E-ST-70-41C are used throughout the standard and 
 3. **Application Processes** (AP). An Application Process is any physical (hardware) or logical (software) entity that
    can handle PUS messages.
 
-   In most cases, an Application Process will be a single microcontroller or subsystem. For example, the <attr
-   name="On-Board Computer">OBC</attr>, <attr name="Attitude Determination and Control Subsystem">ADCS</attr> and Ground
+   In most cases, an Application Process will be a single microcontroller or subsystem. For example, the
+   <span title="On-Board Computer">OBC</span>, <span title="Attitude Determination and Control Subsystem">ADCS</span> and Ground
    Station may be different Application Processes.
 
    Typically, a message will have an AP as a source, and another AP as its destination. For example, if the Ground
@@ -62,19 +63,19 @@ Each service is further divided into some **subservices** that are logical group
 large space mission may split every subservice into different parts of the hardware. However, this implementation _makes
 no distinction between subservices_.
 
-**`ST[01]`: Request verification**
+<b>`ST[01]`: Request verification</b>
 
 Provides acknowledgement or failure reports for executed commands. This service essentially informs the operators about
 the status of TCs sent to the spacecraft, and reports any occurred errors during parsing or execution.
 
-See @ref #error_handler for more information regarding error handling on this library.
+See @ref #error-handling for more information regarding error handling on this library.
 
-**`ST[02]`: Device access**
+<b>`ST[02]`: Device access</b>
 
 Allows toggling, controlling and configuring on-board peripherals that rely on simple protocols to communicate
 (such as I2C).
 
-**`ST[03]`: Housekeeping**
+<b>`ST[03]`: Housekeeping</b>
 
 Produces periodic TM reports with values of parameters. This service is the one providing the most essential information
 about the status of the spacecraft.
@@ -84,12 +85,12 @@ ST[03] is also highly configurable during flight. For example, it allows:
 - How often the parameters should be transmitted
 - Enabling/disabling specific types of periodic reports at will
 
-**`ST[04]`: Parameter statistics reporting**
+<b>`ST[04]`: Parameter statistics reporting</b>
 
 Allows reporting statistics (min, max, mean, standard deviation) for specific parameters over specified durations. This
 is a data-efficient alternative to the `ST[03]` housekeeping service.
 
-**`ST[05]`: Event reporting**
+<b>`ST[05]`: Event reporting</b>
 
 Generates reports when notable occurrences take place on-board, such as:
 
@@ -97,24 +98,24 @@ Generates reports when notable occurrences take place on-board, such as:
 - Detected failures or anomalies
 - Predefined steps during an operation
 
-**`ST[06]`: Memory management**
+<b>`ST[06]`: Memory management</b>
 
 Allows writing and reading directly from an on-board memory unit. This can be useful for debugging and investigative
 purposes, fetching mission data, or uploading new software to the spacecraft's memories. The service also allows
 downlinking and uplinking files in a file system.
 
-**`ST[08]`: Function management**
+<b>`ST[08]`: Function management</b>
 
 Provides the capability of running predefined actions that can receive further parameters. These actions can correspond
 to payload, platform, or any other functionality.
 
-**`ST[09]`: Time management**
+<b>`ST[09]`: Time management</b>
 
 Allows periodic reporting of the current spacecraft time for observability and correlation purposes.
 
-**`ST[11]`: Time-based scheduling**
+<b>`ST[11]`: Time-based scheduling</b>
 
-Allows the operators to **"time-tag"** telecommands for execution at future timestamps, instead of immediately. Its use
+Allows the operators to <b>"time-tag"</b> telecommands for execution at future timestamps, instead of immediately. Its use
 is essential when communication with your spacecraft is not guaranteed for the entirety of its orbit.
 
 This is one of the most complicated services to use, as it allows complex functionality such as:
@@ -123,12 +124,12 @@ This is one of the most complicated services to use, as it allows complex functi
 - Running a command after successful execution of another command
 - Running a command only if another command fails
 
-**`ST[12]`: On-board monitoring**
+<b>`ST[12]`: On-board monitoring</b>
 
 This service allows checking parameter values to ensure that they remain within configurable limits. Whenever a
 violation occurs, an `ST[05]` event can be optionally generated for further processing.
 
-**`ST[13]`: Large packet transfer**
+<b>`ST[13]`: Large packet transfer</b>
 
 Provides a method of message segmentation, for message payloads that are too large to fit within the maximum allowed
 length for TC or TM.
@@ -136,11 +137,11 @@ length for TC or TM.
 The maximum limits are usually imposed by the lower communication layers. For example, the Communications subsystem of a
 satellite may use a transceiver that can only send packets up to 64 bytes long.
 
-**`ST[14]`: Real-time forwarding control**
+<b>`ST[14]`: Real-time forwarding control</b>
 
 This service is responsible of controlling which types of generated reports are immediately transmitted to the ground.
 
-**`ST[15]`: On-board storage and retrieval**
+<b>`ST[15]`: On-board storage and retrieval</b>
 
 Allows storing generated TM reports on-board.
 
@@ -150,33 +151,33 @@ will be necessary to store all messages until they can be downlinked safely. The
 - Filter packets by their type
 - Filter packets by the time of their creation
 
-**`ST[17]`: Test**
+<b>`ST[17]`: Test</b>
 
 Allows performing on-board connection checks, similar to "pinging" a machine and asking if it is alive.
 
-**`ST[18]`: On-board operations procedure**
+<b>`ST[18]`: On-board operations procedure</b>
 
 Allows loading, controlling (start, suspend, resume, abort) and configuring On-Board Control Procedures, which are
 sequences of commands written in an application-specific language.
 
-**`ST[19]`: Event-action**
+<b>`ST[19]`: Event-action</b>
 
 Provides the capability of automatically executing arbitrary actions when an `ST[05]` event is triggered. This service
 can be an essential component when planning the autonomous functionalities of a spacecraft.
 
-**`ST[20]`: On-board parameter management**
+<b>`ST[20]`: On-board parameter management</b>
 
 Provides the capability of reading and setting on-board parameters.
 
-**`ST[21]`: Request sequencing**
+<b>`ST[21]`: Request sequencing</b>
 
 Allows operators to load series of TCs to be executed in a sequential order.
 
-**`ST[22]`: Position-based scheduling**
+<b>`ST[22]`: Position-based scheduling</b>
 
 Provides the capability of executing TCs when the spacecraft reaches a specific point in its orbit.
 
-**`ST[23]`: File management**
+<b>`ST[23]`: File management</b>
 
 Provides the capability of managing on-board file systems, with functions such as *copy*, *move*, *delete*, or *create
 directory*.
@@ -194,7 +195,7 @@ The capability also exists to define _custom_ services and message types, if nee
   communication between different subsytems onboard a spacecraft.
 - This repository _does not implement the entire standard_. A subset has been selected that should be useful to our
   mission, or to any CubeSat that requires some basic functionality. ECSS characteristically mentions that this standard
-  serves as a _"menu"_ from which to select all relevant services.
+  serves as a "menu" from which to select all relevant services.
 - While all services are designed in a modular manner, there are often various relationships between them (e.g. ST[05]
   event reporting — ST[19] event-action). Additionally, some services provide _observable_ parameters (e.g. ST[23] may
   provide the available memory space as an observable)

@@ -49,7 +49,7 @@ message) is tied to **the TM that caused it**. That means that every ST[01] repo
 problematic TM, such as its packet type and counter. The report also contains the **error type** and any **auxiliary
 data** available for this error.
 
-To report an error tied to a Message, you can use @ref ErrorHandler::reportError:
+To report an error tied to a Message, you can use @ref ErrorHandler::reportError.
 ```cpp
 ErrorHandler::reportError(message, errorType);
 ```
@@ -62,7 +62,7 @@ These will check if your Message is of a specific type, and call `reportError` o
 Errors that are not tied to a specific TC and are caused independently by a microcontroller are termed _internal
 errors_. While they are still managed by the @ref ErrorHandler, they are not part of the standard.
 
-To report an internal error, you can use @ref ErrorHandler::reportInternalError:
+To report an internal error, you can use @ref ErrorHandler::reportInternalError.
 ```cpp
 ErrorHandler::reportInternalError(errorType);
 ```
