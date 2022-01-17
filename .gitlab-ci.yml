@@ -75,7 +75,7 @@ doxygen:
     - doxygen
   artifacts:
     paths:
-      - ./docs
+      - ./docs/html
 
 ikos:
   image: spacedot/ikos:3.0
