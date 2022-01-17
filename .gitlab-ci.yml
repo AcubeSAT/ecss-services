@@ -72,7 +72,7 @@ doxygen:
   stage: analyze
   script:
     - cd $CI_PROJECT_DIR
-    - doxygen doxygen.conf
+    - doxygen
   artifacts:
     paths:
       - ./docs
