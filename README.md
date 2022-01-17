@@ -16,3 +16,20 @@ standard.
 Full documentation about this project based on code comments is available at https://acubesat.gitlab.io/obc/ecss-services/docs/.
 
 ## Implementation status
+
+| Service Type | Service Name                   | Implementation   |
+|--------------|--------------------------------|------------------|
+| ST[01]       | Request Verification           | Full             |
+| ST[03]       | Housekeeping                   | Partial          |
+| ST[04]       | Parameter Statistics Reporting | Partial          |
+| ST[05]       | Event Reporting                | Partial          |
+| ST[06]       | Memory Management              | Partial          |
+| ST[08]       | Function Management            | Full             |
+| ST[11]       | Time-based Scheduling          | Partial          |
+| ST[12]       | On-board Monitoring            | Work in progress |
+| ST[13]       | Large Packer Transfer          | Partial          |
+| ST[15]       | On-board Storage and Retrieval | Work in progress |
+| ST[17]       | Test                           | Partial          |
+| ST[19]       | Event-action                   | Partial          |
+| ST[20]       | Parameter Management           | Partial          |
+| ST[23]       | File Management                | Work in progress |
