@@ -65,6 +65,10 @@ public:
 	MemoryManagementService memoryManagement;
 #endif
 
+#ifdef SERVICE_ONBOARDMONITORING
+	OnBoardMonitoringService onBoardMonitoringService;
+#endif
+
 #ifdef SERVICE_PARAMETER
 	ParameterService parameterManagement;
 #endif
@@ -81,9 +85,6 @@ public:
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
 
-#ifdef SERVICE_ONBOARDMONITORING
-	OnBoardMonitoringService onBoardMonitoringService;
-#endif
 
 	/**
 	 * The default ServicePool constructor
