@@ -25,17 +25,17 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 
 void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
-	parameterMonitoringFunctionStatus = false;
 	uint16_t numberOfParameters = message.readUint16();
 	for (uint16_t i = 0; i < numberOfParameters; i++) {
 		uint16_t currentId = message.readEnum16();
-		if (parameterMonitoringList.find(currentId) == parameterMonitoringList.end()) {
+		auto definition = parameterMonitoringList.find(currentId);
+		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
+			break;
 		}
-		parameterMonitoringList.at(currentId).get().monitoringEnabled = false;
-		bool status = parameterMonitoringList.at(currentId).get().monitoringEnabled;
-		parameterMonitoringList.at(currentId).get().checkingStatus = PMONBase::Unchecked;
+		definition->second.get().monitoringEnabled = false;
+		definition->second.get().checkingStatus = PMONBase::Unchecked;
 	}
 }
 
