@@ -43,7 +43,7 @@ add_library(common OBJECT
         src/Services/ParameterStatisticsService.cpp
         src/Services/OnBoardMonitoringService.cpp
         src/Helpers/Statistic.cpp
-        )
+        src/Helpers/PMONBase.cpp)
 
 # Specify the .cpp files for the executables
 file(GLOB x86_main_SRC "src/Platform/x86/*.cpp" "src/Platform/x86/Services/*.cpp"

@@ -7,14 +7,10 @@
 #include <ServicePool.hpp>
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
-auto parameter1 = Parameter<uint8_t>(3);
-auto parameter2 = Parameter<uint16_t>(7);
-auto parameter3 = Parameter<uint32_t>(9);
-auto parameter4 = Parameter<uint32_t>(2);
-auto monitoringDefinition1 = PMONExpectedValueCheck(parameter1, 0);
-auto monitoringDefinition2 = PMONLimitCheck(parameter2, 1);
-auto monitoringDefinition3 = PMONDeltaCheck(parameter3, 2);
-auto monitoringDefinition4 = PMONDeltaCheck(parameter4, 3);
+auto monitoringDefinition1 = PMONExpectedValueCheck(0, 7, 10, 8, 0);
+auto monitoringDefinition2 = PMONLimitCheck(1, 7, 2, 1, 9, 2);
+auto monitoringDefinition3 = PMONDeltaCheck(2, 7, 5, 3, 3, 11, 4);
+auto monitoringDefinition4 = PMONDeltaCheck(3, 7, 5, 3, 3, 11, 4);;
 
 
 void initialiseParameterMonitoringDefinitions() {

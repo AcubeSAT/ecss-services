@@ -8,87 +8,11 @@
 #include "etl/map.h"
 #include "ECSS_Definitions.hpp"
 #include "etl/list.h"
-
-/**
- * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
- */
-class PMONBase {
-public:
-	enum CheckingStatus : uint8_t {
-		Unchecked = 1,
-		Invalid = 2,
-		ExpectedValue = 3,
-		UnexpectedValue = 4,
-		WithinLimits = 5,
-		BelowLowLimit = 6,
-		AboveHighLimit = 7,
-		WithinThreshold = 8,
-		BelowLowThreshold = 9,
-		AboveHighThreshold = 10
-	};
-
-	std::reference_wrapper<ParameterBase> monitoredParameter;
-	uint16_t monitoredParameterId;
-	/**
-	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
-	 */
-	uint16_t repetitionNumber;
-	/**
-	 * The number of checks that have been conducted so far.
-	 */
-	uint16_t repetitionCounter = 0;
-	bool monitoringEnabled = false;
-	CheckingStatus checkingStatus = Unchecked;
-	etl::array<CheckingStatus, 2> checkTransitionList;
-
-	PMONBase(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
-	    : monitoredParameter(std::ref(monitoredParameter)), monitoredParameterId(monitoredParameterId){};
-};
-
-/**
- * Contains the variables specific to Parameter Monitoring definitions of expected value check type.
- */
-class PMONExpectedValueCheck : public PMONBase {
-public:
-	double expectedValue;
-	uint64_t mask;
-	uint16_t unexpectedValueEvent;
-
-	explicit PMONExpectedValueCheck(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
-	    : PMONBase(monitoredParameter, monitoredParameterId){};
-};
-
-/**
- * Contains the variables specific to Parameter Monitoring definitions of limit check type.
- */
-class PMONLimitCheck : public PMONBase {
-public:
-	double lowLimit;
-	uint16_t belowLowLimitEvent;
-	double highLimit;
-	uint16_t aboveHighLimitEvent;
-
-	explicit PMONLimitCheck(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
-	    : PMONBase(monitoredParameter, monitoredParameterId){};
-};
-
-/**
- * Contains the variables specific to Parameter Monitoring definitions of delta check type.
- */
-class PMONDeltaCheck : public PMONBase {
-public:
-	uint16_t numberOfConsecutiveDeltaChecks;
-	double lowDeltaThreshold;
-	uint16_t belowLowThresholdEvent;
-	double highDeltaThreshold;
-	uint16_t aboveHighThresholdEvent;
-
-	explicit PMONDeltaCheck(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
-	    : PMONBase(monitoredParameter, monitoredParameterId){};
-};
+#include "Helpers/PMONBase.hpp"
 
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
+ * @ingroup Services
  * @author Konstantinos Michopoulos <konstantinos.michopoulos@gmail.com>
  */
 class OnBoardMonitoringService : public Service {
@@ -128,20 +52,20 @@ public:
 	/*
 	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
 	 */
-	void addPMONDefinition(uint16_t PMONId, std::reference_wrapper<PMONBase> PMONDefinition){
+	void addPMONDefinition(uint16_t PMONId, std::reference_wrapper<PMONBase> PMONDefinition) {
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
 	}
 	/**
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */
-	std::reference_wrapper<PMONBase> getPMONDefinition(uint16_t PMONId){
+	std::reference_wrapper<PMONBase> getPMONDefinition(uint16_t PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
 	/**
 	 * @return true if PMONList is empty.
 	 */
-	bool isPMONListEmpty(){
+	bool isPMONListEmpty() {
 		return parameterMonitoringList.empty();
 	}
 	/**
