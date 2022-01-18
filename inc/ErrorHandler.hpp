@@ -233,7 +233,7 @@ public:
 		 */
 		HighThresholdIsLowerThanLowThreshold = 25,
 		/**
-		 * Attempt to modify a non existent parameter.
+		 * Attempt to modify a non existent Parameter Monitoring definition.
 		 */
 		ModifyParameterNotInTheParameterMonitoringList = 26,
 		/**
