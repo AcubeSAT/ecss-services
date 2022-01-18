@@ -37,8 +37,8 @@ public:
 	 * The number of checks that have been conducted so far.
 	 */
 	uint16_t repetitionCounter = 0;
-	bool monitoringEnabled;
-	CheckingStatus checkingStatus;
+	bool monitoringEnabled = false;
+	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList;
 
 	PMONBase(ParameterBase& monitoredParameter, uint16_t repetitionNumber)
@@ -52,7 +52,7 @@ class PMONExpectedValueCheck : public PMONBase {
 public:
 	double expectedValue;
 	uint16_t mask;
-	uint16_t UnexpectedValueEvent;
+	uint16_t unexpectedValueEvent;
 
 	explicit PMONExpectedValueCheck(ParameterBase& monitoredParameter, uint16_t repetitionNumber)
 	    : PMONBase(monitoredParameter, repetitionNumber);
@@ -130,6 +130,13 @@ public:
 	 */
 	void addPMONDefinition(uint16_t PMONId, std::reference_wrapper<PMONBase> PMONDefinition){
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
+	}
+	/**
+	 * @param PMONId
+	 * @return Parameter Monitoring definition
+	 */
+	std::reference_wrapper<PMONBase> getPMONDefinition(uint16_t PMONId){
+		return parameterMonitoringList.at(PMONId);
 	}
 	/**
 	 * TC[12,1]
