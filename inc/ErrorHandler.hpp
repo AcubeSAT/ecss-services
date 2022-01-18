@@ -208,12 +208,12 @@ public:
 		 * Attempt to delete all parameter monitoring definitions but the Parameter Monitoring Function Status is
 		 * enabled.
 		 */
-		InvalidRequestToDeleteAllParameterMonitoringDefinitionsError = 20,
+		InvalidRequestToDeleteAllParameterMonitoringDefinitions = 20,
 		/**
-		 * Attempt to delete one parameter monitoring definition but it's Parameter Monitoring Status is
+		 * Attempt to delete one parameter monitoring definition but its Parameter Monitoring Status is
 		 * enabled.
 		 */
-		InvalidRequestToDeleteParameterMonitoringDefinitionError = 21,
+		InvalidRequestToDeleteParameterMonitoringDefinition = 21,
 		/**
 		 * Attempt to add a parameter that already exists to the Parameter Monitoring List.
 		 */

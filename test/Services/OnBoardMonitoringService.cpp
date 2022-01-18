@@ -185,7 +185,7 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(
-		          ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError) == 1);
+		          ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitions) == 1);
 
 		CHECK(!onBoardMonitoringService.parameterMonitoringList.empty());
 
