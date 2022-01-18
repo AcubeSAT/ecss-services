@@ -123,6 +123,9 @@ public:
 	 */
 	bool parameterMonitoringFunctionStatus = false;
 
+	void addPMONDefinition(uint16_t PMONId, std::reference_wrapper<PMONBase> PMONDefinition){
+		parameterMonitoringList.insert({PMONId, PMONDefinition});
+	}
 	/**
 	 * TC[12,1]
 	 */
