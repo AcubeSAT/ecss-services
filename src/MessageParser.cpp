@@ -7,11 +7,6 @@
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
-#ifdef SERVICE_ONBOARDMONITORING
-		case OnBoardMonitoringService::ServiceType:
-			Services.onBoardMonitoringService.execute(message);
-			break;
-#endif
 
 #ifdef SERVICE_HOUSEKEEPING
 		case HousekeepingService::ServiceType:
@@ -46,6 +41,12 @@ void MessageParser::execute(Message& message) {
 #ifdef SERVICE_TIMESCHEDULING
 		case TimeBasedSchedulingService::ServiceType:
 			Services.timeBasedScheduling.execute(message);
+			break;
+#endif
+
+#ifdef SERVICE_ONBOARDMONITORING
+		case OnBoardMonitoringService::ServiceType:
+			Services.onBoardMonitoringService.execute(message);
 			break;
 #endif
 
