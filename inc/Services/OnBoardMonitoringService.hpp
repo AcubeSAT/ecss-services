@@ -26,7 +26,13 @@ public:
 
 	std::reference_wrapper<ParameterBase> monitoredParameter;
 	uint16_t monitoredParameterId;
+	/**
+	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
+	 */
 	uint16_t repetitionNumber;
+	/**
+	 * The number of checks that have been conducted so far.
+	 */
 	uint16_t repetitionCounter;
 	bool monitoringStatus;
 	CheckingStatus checkingStatus;
