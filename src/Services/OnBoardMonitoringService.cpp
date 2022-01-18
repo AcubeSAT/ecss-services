@@ -4,7 +4,6 @@
 #include "Services/OnBoardMonitoringService.hpp"
 #include "etl/map.h"
 
-
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 
@@ -19,14 +18,14 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 		}
 		definition->second.get().repetitionNumber = 0;
 		definition->second.get().monitoringEnabled = true;
-
 	}
 }
 
 void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
-	uint16_t numberOfParameters = message.readUint16();
-	for (uint16_t i = 0; i < numberOfParameters; i++) {
+
+	uint16_t numberOfPMONDefinitions = message.readUint16();
+	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
 		uint16_t currentId = message.readEnum16();
 		auto definition = parameterMonitoringList.find(currentId);
 		if (definition == parameterMonitoringList.end()) {
@@ -48,13 +47,11 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 	message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions);
 	if (parameterMonitoringFunctionStatus) {
 		ErrorHandler::reportError(
-		    message,
-		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
+		    message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
 		return;
 	}
 	parameterMonitoringList.clear();
 }
-
 
 void OnBoardMonitoringService::execute(Message& message) {
 	switch (message.messageType) {
