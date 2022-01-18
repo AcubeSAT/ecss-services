@@ -3,9 +3,7 @@
 #include <Message.hpp>
 #include "ServiceTests.hpp"
 #include <etl/array.h>
-#include "Services/ParameterService.hpp"
 #include <etl/String.hpp>
-#include <cstring>
 #include <ServicePool.hpp>
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
