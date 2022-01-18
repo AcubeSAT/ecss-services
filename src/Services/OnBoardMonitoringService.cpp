@@ -17,7 +17,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			break;
 		}
 		parameterMonitoringList.at(currentId).get().repetitionNumber = 0;
-		parameterMonitoringList.at(currentId).get().monitoringStatus = true;
+		parameterMonitoringList.at(currentId).get().monitoringEnabled = true;
 	}
 }
 
@@ -31,8 +31,8 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		}
-		parameterMonitoringList.at(currentId).get().monitoringStatus = false;
-		bool status = parameterMonitoringList.at(currentId).get().monitoringStatus;
+		parameterMonitoringList.at(currentId).get().monitoringEnabled = false;
+		bool status = parameterMonitoringList.at(currentId).get().monitoringEnabled;
 		parameterMonitoringList.at(currentId).get().checkingStatus = PMONBase::Unchecked;
 	}
 }

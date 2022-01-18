@@ -48,9 +48,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringStatus == true));
-		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringStatus == true));
-		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringStatus == true));
+		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringEnabled == true));
+		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringEnabled == true));
+		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringEnabled == true));
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().repetitionCounter == 0);
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().repetitionCounter == 0);
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().repetitionCounter == 0);
@@ -75,8 +75,8 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringStatus == true));
-		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringStatus == true));
+		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringEnabled == true));
+		CHECK((onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringEnabled == true));
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().repetitionCounter == 0);
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().repetitionCounter == 0);
 
@@ -97,15 +97,15 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
-		onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringStatus = true;
-		onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringStatus = true;
-		onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringStatus = true;
+		onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringEnabled = true;
+		onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringEnabled = true;
+		onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringEnabled = true;
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringStatus == false);
-		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringStatus == false);
-		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringStatus == false);
+		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringEnabled == false);
+		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringEnabled == false);
+		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().checkingStatus ==
 		      PMONBase::Unchecked);
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().checkingStatus ==
@@ -132,9 +132,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
-		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringStatus == false);
-		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringStatus == false);
-		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringStatus == false);
+		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().monitoringEnabled == false);
+		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().monitoringEnabled == false);
+		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[2]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[0]).get().checkingStatus ==
 		      PMONBase::Unchecked);
 		CHECK(onBoardMonitoringService.parameterMonitoringList.at(PMONIds[1]).get().checkingStatus ==

@@ -37,18 +37,18 @@ public:
 	 * The number of checks that have been conducted so far.
 	 */
 	uint16_t repetitionCounter;
-	bool monitoringStatus;
+	bool monitoringEnabled;
 	CheckingStatus checkingStatus;
 	etl::array<CheckingStatus, 2> checkTransitionList;
 	PMONBase(std::reference_wrapper<ParameterBase> monitoredParameter, uint16_t monitoredParameterId,
-	         uint16_t repetitionNumber, uint16_t repetitionCounter, bool monitoringStatus,
+	         uint16_t repetitionNumber, uint16_t repetitionCounter, bool monitoringEnabled,
 	         CheckingStatus checkingStatus, etl::array<CheckingStatus, 2> checkTransitionList)
 	    : monitoredParameter(monitoredParameter) {
 		this->monitoredParameter = monitoredParameter;
 		this->monitoredParameterId = monitoredParameterId;
 		this->repetitionNumber = repetitionNumber;
 		this->repetitionCounter = repetitionCounter;
-		this->monitoringStatus = monitoringStatus;
+		this->monitoringEnabled = monitoringEnabled;
 		this->checkingStatus = checkingStatus;
 		this->checkTransitionList = checkTransitionList;
 	}
@@ -64,10 +64,10 @@ public:
 	uint16_t notExpectedValueEvent;
 	explicit PMONExpectedValueCheck(std::reference_wrapper<ParameterBase> monitoredParameter,
 		uint16_t monitoredParameterId, uint16_t repetitionNumber,
-		uint16_t repetitionCounter, bool monitoringStatus, CheckingStatus checkingStatus,
+		uint16_t repetitionCounter, bool monitoringEnabled, CheckingStatus checkingStatus,
 		etl::array<CheckingStatus, 2> checkTransitionList, double expectedValue,
 		uint16_t mask, uint16_t notExpectedValueEvent)
-		: PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringStatus,
+		: PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringEnabled,
 		checkingStatus, checkTransitionList) {
 		this->expectedValue = expectedValue;
 		this->mask = mask;
@@ -86,10 +86,10 @@ public:
 	uint16_t aboveHighLimitEvent;
 
 	PMONLimitCheck(std::reference_wrapper<ParameterBase> monitoredParameter, uint16_t monitoredParameterId,
-	               uint16_t repetitionNumber, uint16_t repetitionCounter, bool monitoringStatus,
+	               uint16_t repetitionNumber, uint16_t repetitionCounter, bool monitoringEnabled,
 	               PMONBase::CheckingStatus checkingStatus, etl::array<PMONBase::CheckingStatus, 2> checkTransitionList,
 	               double lowLimit, uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
-	    : PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringStatus,
+	    : PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringEnabled,
 	               checkingStatus, checkTransitionList) {
 		this->lowLimit = lowLimit;
 		this->belowLowLimitEvent = belowLowLimitEvent;
@@ -110,11 +110,11 @@ public:
 	uint16_t aboveHighThresholdEvent;
 
 	PMONDeltaCheck(std::reference_wrapper<ParameterBase> monitoredParameter, uint16_t monitoredParameterId,
-	               uint16_t repetitionNumber, uint16_t repetitionCounter, bool monitoringStatus,
+	               uint16_t repetitionNumber, uint16_t repetitionCounter, bool monitoringEnabled,
 	               PMONBase::CheckingStatus checkingStatus, etl::array<PMONBase::CheckingStatus, 2> checkTransitionList,
 	               uint16_t numberOfConsecutiveDeltaChecks, double lowDeltaThreshold, uint16_t belowLowThresholdEvent,
 	               double highDeltaThreshold, uint16_t aboveHighThresholdEvent)
-	    : PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringStatus,
+	    : PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringEnabled,
 	               checkingStatus, checkTransitionList) {
 		this->numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
 		this->lowDeltaThreshold = lowDeltaThreshold;
