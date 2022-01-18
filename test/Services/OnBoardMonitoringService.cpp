@@ -108,7 +108,6 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
-		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
 		CHECK((onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == true));
 		CHECK((onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled == true));
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionCounter == 0);
@@ -212,6 +211,7 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 	}
 	SECTION("Invalid request to delete all Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
+		onBoardMonitoringService.parameterMonitoringFunctionStatus = true;
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
