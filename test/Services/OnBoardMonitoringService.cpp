@@ -156,7 +156,7 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 1, 2, 10};
+		etl::array<uint16_t, 4> PMONIds = {0, 10, 2, 1};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
@@ -166,11 +166,11 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == false);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled == false);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus ==
 		      PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkingStatus ==
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkingStatus ==
 		      PMONBase::Unchecked);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus ==
 		      PMONBase::Unchecked);
