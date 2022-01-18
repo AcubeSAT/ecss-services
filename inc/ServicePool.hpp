@@ -37,9 +37,6 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
-#ifdef SERVICE_PARAMETERSTATISTICS
-	ParameterStatisticsService parameterStatistics;
-#endif
 
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
@@ -71,6 +68,10 @@ public:
 
 #ifdef SERVICE_PARAMETER
 	ParameterService parameterManagement;
+#endif
+
+#ifdef SERVICE_PARAMETERSTATISTICS
+	ParameterStatisticsService parameterStatistics;
 #endif
 
 #ifdef SERVICE_REQUESTVERIFICATION
