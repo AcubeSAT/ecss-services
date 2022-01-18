@@ -1,6 +1,6 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_ONBOARDMONITORING
-#include <Message.hpp>
+#include "Message.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
 #include "etl/map.h"
 
@@ -11,13 +11,15 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	uint16_t numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
 		uint16_t currentId = message.readEnum16();
-		if (parameterMonitoringList.find(currentId) == parameterMonitoringList.end()) {
+		auto definition = parameterMonitoringList.find(currentId);
+		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			break;
 		}
-		parameterMonitoringList.at(currentId).get().repetitionNumber = 0;
-		parameterMonitoringList.at(currentId).get().monitoringEnabled = true;
+		definition->second.get().repetitionNumber = 0;
+		definition->second.get().monitoringEnabled = true;
+
 	}
 }
 
