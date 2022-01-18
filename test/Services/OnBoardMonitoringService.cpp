@@ -205,8 +205,7 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
-
-		CHECK(onBoardMonitoringService.parameterMonitoringList.empty());
+		CHECK(onBoardMonitoringService.isPMONListEmpty());
 
 		ServiceTests::reset();
 		Services.reset();
@@ -221,7 +220,7 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitions) == 1);
 
-		CHECK(!onBoardMonitoringService.parameterMonitoringList.empty());
+		CHECK(!onBoardMonitoringService.isPMONListEmpty());
 
 		ServiceTests::reset();
 		Services.reset();

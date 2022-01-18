@@ -139,6 +139,12 @@ public:
 		return parameterMonitoringList.at(PMONId);
 	}
 	/**
+	 * @return true if PMONList is empty.
+	 */
+	bool isPMONListEmpty(){
+		return parameterMonitoringList.empty();
+	}
+	/**
 	 * TC[12,1]
 	 */
 	void enableParameterMonitoringDefinitions(Message& message);
