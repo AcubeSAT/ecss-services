@@ -9,6 +9,9 @@
 #include "ECSS_Definitions.hpp"
 #include "etl/list.h"
 
+/**
+ * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
+ */
 class PMONBase {
 public:
 	enum CheckingStatus : uint8_t {
@@ -51,24 +54,30 @@ public:
 	}
 };
 
+/**
+ * Contains the variables specific to Parameter Monitoring definitions of expected value check type.
+ */
 class PMONExpectedValueCheck : public PMONBase {
 public:
 	double expectedValue;
 	uint16_t mask;
 	uint16_t notExpectedValueEvent;
 	explicit PMONExpectedValueCheck(std::reference_wrapper<ParameterBase> monitoredParameter,
-	                                uint16_t monitoredParameterId, uint16_t repetitionNumber,
-	                                uint16_t repetitionCounter, bool monitoringStatus, CheckingStatus checkingStatus,
-	                                etl::array<CheckingStatus, 2> checkTransitionList, double expectedValue,
-	                                uint16_t mask, uint16_t notExpectedValueEvent)
-	    : PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringStatus,
-	               checkingStatus, checkTransitionList) {
+		uint16_t monitoredParameterId, uint16_t repetitionNumber,
+		uint16_t repetitionCounter, bool monitoringStatus, CheckingStatus checkingStatus,
+		etl::array<CheckingStatus, 2> checkTransitionList, double expectedValue,
+		uint16_t mask, uint16_t notExpectedValueEvent)
+		: PMONBase(monitoredParameter, monitoredParameterId, repetitionNumber, repetitionCounter, monitoringStatus,
+		checkingStatus, checkTransitionList) {
 		this->expectedValue = expectedValue;
 		this->mask = mask;
 		this->notExpectedValueEvent = notExpectedValueEvent;
 	}
 };
 
+/**
+ * Contains the variables specific to Parameter Monitoring definitions of limit check type.
+ */
 class PMONLimitCheck : public PMONBase {
 public:
 	double lowLimit;
@@ -89,6 +98,9 @@ public:
 	}
 };
 
+/**
+ * Contains the variables specific to Parameter Monitoring definitions of delta check type.
+ */
 class PMONDeltaCheck : public PMONBase {
 public:
 	uint16_t numberOfConsecutiveDeltaChecks;
@@ -112,6 +124,10 @@ public:
 	}
 };
 
+/**
+ * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
+ * @author Konstantinos Michopoulos <konstantinos.michopoulos@gmail.com>
+ */
 class OnBoardMonitoringService : public Service {
 public:
 	inline static const uint8_t ServiceType = 12;
