@@ -50,9 +50,8 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 		ErrorHandler::reportError(
 		    message,
 		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
-	} else {
-		parameterMonitoringList.clear();
 	}
+	parameterMonitoringList.clear();
 }
 
 
