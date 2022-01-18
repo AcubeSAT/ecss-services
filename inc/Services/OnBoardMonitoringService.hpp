@@ -116,13 +116,18 @@ public:
 		ReportStatusOfParameterMonitoringDefinition = 13,
 		ParameterMonitoringDefinitionStatusReport = 14
 	};
-
+	/**
+	 * The maximum time between two transition reports.
+	 * Measured in "on-board parameter minimum sampling interval" units (see 5.4.3.2c in ECSS-E-ST-70-41C).
+	 */
 	uint16_t maximumTransitionReportingDelay = 0;
 	/**
 	 * If true, parameter monitoring is enabled
 	 */
 	bool parameterMonitoringFunctionStatus = false;
-
+	/*
+	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
+	 */
 	void addPMONDefinition(uint16_t PMONId, std::reference_wrapper<PMONBase> PMONDefinition){
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
 	}
