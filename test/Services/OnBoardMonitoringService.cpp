@@ -109,7 +109,6 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
 		CHECK(onBoardMonitoringService.parameterMonitoringFunctionStatus == true);
-		onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled
 		CHECK((onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == true));
 		CHECK((onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled == true));
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionCounter == 0);
