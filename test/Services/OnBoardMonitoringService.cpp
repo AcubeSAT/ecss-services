@@ -21,7 +21,7 @@ void initialiseParameterMonitoringDefinitions() {
 	uint16_t repetitionNumber = 7;
 	etl::array<PMONExpectedValueCheck::CheckingStatus, 2> checkTransitionList = {};
 	double expectedValue = 10;
-	uint16_t mask = 8;
+	uint64_t mask = 8;
 	uint16_t unexpectedValueEvent = 0;
 	double lowLimit = 2;
 	uint16_t belowLowLimitEvent = 1;

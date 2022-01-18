@@ -51,7 +51,7 @@ public:
 class PMONExpectedValueCheck : public PMONBase {
 public:
 	double expectedValue;
-	uint16_t mask;
+	uint64_t mask;
 	uint16_t unexpectedValueEvent;
 
 	explicit PMONExpectedValueCheck(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
