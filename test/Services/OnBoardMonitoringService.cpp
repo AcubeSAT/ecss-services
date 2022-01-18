@@ -15,15 +15,14 @@ void initialiseParameterMonitoringDefinitions() {
 	auto parameter4 = Parameter<uint32_t>(2);
 
 	etl::array<PMONExpectedValueCheck::CheckingStatus, 2> checkTransitionList = {};
-	auto monitoringDefinition1 =
-	    PMONExpectedValueCheck(parameter1, PMONExpectedValueCheck::ExpectedValueCheck, 0, 10, 8, false,
-	                           PMONExpectedValueCheck::Unchecked, checkTransitionList, 5, 8, 1);
-	auto monitoringDefinition2 = PMONLimitCheck(parameter2, PMONBase::DeltaCheck, 0, 10, 0, false, PMONBase::Unchecked,
-	                                            checkTransitionList, 1, 1, 2, 2);
-	auto monitoringDefinition3 = PMONDeltaCheck(parameter3, PMONBase::DeltaCheck, 0, 10, 0, false, PMONBase::Unchecked,
-	                                            checkTransitionList, 5, 2, 1, 10, 2);
-	auto monitoringDefinition4 = PMONDeltaCheck(parameter4, PMONBase::DeltaCheck, 0, 10, 0, true, PMONBase::Unchecked,
-	                                            checkTransitionList, 5, 2, 1, 10, 2);
+	auto monitoringDefinition1 = PMONExpectedValueCheck(parameter1, 0, 10, 8, false, PMONExpectedValueCheck::Unchecked,
+	                                                    checkTransitionList, 5, 8, 1);
+	auto monitoringDefinition2 =
+	    PMONLimitCheck(parameter2, 0, 10, 0, false, PMONBase::Unchecked, checkTransitionList, 1, 1, 2, 2);
+	auto monitoringDefinition3 =
+	    PMONDeltaCheck(parameter3, 0, 10, 0, false, PMONBase::Unchecked, checkTransitionList, 5, 2, 1, 10, 2);
+	auto monitoringDefinition4 =
+	    PMONDeltaCheck(parameter4, 0, 10, 0, true, PMONBase::Unchecked, checkTransitionList, 5, 2, 1, 10, 2);
 
 	onBoardMonitoringService.maximumTransitionReportingDelay = 0;
 	onBoardMonitoringService.parameterMonitoringList.insert({0, monitoringDefinition1});
@@ -67,7 +66,7 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 1,10};
+		etl::array<uint16_t, 4> PMONIds = {0, 1, 10};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
