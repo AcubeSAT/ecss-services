@@ -11,13 +11,14 @@ auto parameter1 = Parameter<uint8_t>(3);
 auto parameter2 = Parameter<uint16_t>(7);
 auto parameter3 = Parameter<uint32_t>(9);
 auto parameter4 = Parameter<uint32_t>(2);
-auto monitoringDefinition1 = PMONExpectedValueCheck(parameter1, 5);
-auto monitoringDefinition2 = PMONLimitCheck(parameter2, 6);
-auto monitoringDefinition3 = PMONDeltaCheck(parameter3, 7);
-auto monitoringDefinition4 = PMONDeltaCheck(parameter4, 8);
+auto monitoringDefinition1 = PMONExpectedValueCheck(parameter1, 0);
+auto monitoringDefinition2 = PMONLimitCheck(parameter2, 1);
+auto monitoringDefinition3 = PMONDeltaCheck(parameter3, 2);
+auto monitoringDefinition4 = PMONDeltaCheck(parameter4, 3);
 
 
 void initialiseParameterMonitoringDefinitions() {
+	uint16_t repetitionNumber = 7;
 	etl::array<PMONExpectedValueCheck::CheckingStatus, 2> checkTransitionList = {};
 	double expectedValue = 10;
 	uint16_t mask = 8;
@@ -32,19 +33,31 @@ void initialiseParameterMonitoringDefinitions() {
 	double highDeltaThreshold = 11;
 	uint16_t aboveHighThresholdEvent = 4;
 
+	monitoringDefinition1.repetitionNumber = repetitionNumber;
 	monitoringDefinition1.checkTransitionList = checkTransitionList;
 	monitoringDefinition1.expectedValue = expectedValue;
 	monitoringDefinition1.mask = mask;
 	monitoringDefinition1.unexpectedValueEvent = unexpectedValueEvent;
+
+	monitoringDefinition2.repetitionNumber = repetitionNumber;
 	monitoringDefinition2.lowLimit = lowLimit;
 	monitoringDefinition2.belowLowLimitEvent = belowLowLimitEvent;
 	monitoringDefinition2.highLimit = highLimit;
 	monitoringDefinition2.aboveHighLimitEvent = aboveHighLimitEvent;
+
+	monitoringDefinition3.repetitionNumber = repetitionNumber;
 	monitoringDefinition3.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
 	monitoringDefinition3.lowDeltaThreshold = lowDeltaThreshold;
 	monitoringDefinition3.belowLowThresholdEvent = belowLowThresholdEvent;
 	monitoringDefinition3.highDeltaThreshold = highDeltaThreshold;
 	monitoringDefinition3.aboveHighThresholdEvent = highDeltaThreshold;
+
+	monitoringDefinition4.repetitionNumber = repetitionNumber;
+	monitoringDefinition4.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
+	monitoringDefinition4.lowDeltaThreshold = lowDeltaThreshold;
+	monitoringDefinition4.belowLowThresholdEvent = belowLowThresholdEvent;
+	monitoringDefinition4.highDeltaThreshold = highDeltaThreshold;
+	monitoringDefinition4.aboveHighThresholdEvent = highDeltaThreshold;
 
 	onBoardMonitoringService.addPMONDefinition(0, monitoringDefinition1);
 	onBoardMonitoringService.addPMONDefinition(1, monitoringDefinition2);

@@ -41,8 +41,8 @@ public:
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList;
 
-	PMONBase(ParameterBase& monitoredParameter, uint16_t repetitionNumber)
-	    : monitoredParameter(std::ref(monitoredParameter)), repetitionNumber(repetitionNumber);
+	PMONBase(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
+	    : monitoredParameter(std::ref(monitoredParameter)), monitoredParameterId(monitoredParameterId){};
 };
 
 /**
@@ -54,8 +54,8 @@ public:
 	uint16_t mask;
 	uint16_t unexpectedValueEvent;
 
-	explicit PMONExpectedValueCheck(ParameterBase& monitoredParameter, uint16_t repetitionNumber)
-	    : PMONBase(monitoredParameter, repetitionNumber);
+	explicit PMONExpectedValueCheck(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
+	    : PMONBase(monitoredParameter, monitoredParameterId){};
 };
 
 /**
@@ -68,8 +68,8 @@ public:
 	double highLimit;
 	uint16_t aboveHighLimitEvent;
 
-	explicit PMONLimitCheck(ParameterBase& monitoredParameter, uint16_t repetitionNumber)
-	    : PMONBase(monitoredParameter, repetitionNumber);
+	explicit PMONLimitCheck(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
+	    : PMONBase(monitoredParameter, monitoredParameterId){};
 };
 
 /**
@@ -83,8 +83,8 @@ public:
 	double highDeltaThreshold;
 	uint16_t aboveHighThresholdEvent;
 
-	explicit PMONDeltaCheck(ParameterBase& monitoredParameter, uint16_t repetitionNumber)
-	    : PMONBase(monitoredParameter, repetitionNumber);
+	explicit PMONDeltaCheck(ParameterBase& monitoredParameter, uint16_t monitoredParameterId)
+	    : PMONBase(monitoredParameter, monitoredParameterId){};
 };
 
 /**
