@@ -42,6 +42,10 @@ public:
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 
+private:
+	/**
+	 * monitoredParameterId is assumed to be correct and not checked.
+	 */
 	PMONBase(uint16_t monitoredParameterId, uint16_t repetitionNumber);
 };
 
