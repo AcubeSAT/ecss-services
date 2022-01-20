@@ -116,7 +116,7 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 }
 
 TEST_CASE("Disable Parameter Monitoring Definitions") {
-	SECTION("3 valid requests to enable Parameter Monitoring Definitions") {
+	SECTION("3 valid requests to disable Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
@@ -146,7 +146,7 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		ServiceTests::reset();
 		Services.reset();
 	}
-	SECTION("3 valid requests to enable Parameter Monitoring Definitions and 1 invalid") {
+	SECTION("3 valid requests to disable Parameter Monitoring Definitions and 1 invalid") {
 		initialiseParameterMonitoringDefinitions();
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
