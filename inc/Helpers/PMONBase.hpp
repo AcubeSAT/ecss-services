@@ -42,7 +42,7 @@ public:
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 
-private:
+protected:
 	/**
 	 * monitoredParameterId is assumed to be correct and not checked.
 	 */
