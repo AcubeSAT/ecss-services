@@ -43,6 +43,9 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 
 protected:
+	PMONBase() : monitoredParameter(monitoredParameter){
+
+	};
 	/**
 	 * monitoredParameterId is assumed to be correct and not checked.
 	 */
@@ -58,9 +61,10 @@ public:
 	uint64_t mask;
 	uint16_t unexpectedValueEvent;
 
-	explicit PMONExpectedValueCheck(uint16_t monitoredParameterId,
-	                                uint16_t repetitionNumber, double expectedValue, uint64_t mask,
-	                                uint16_t unexpectedValueEvent)
+	PMONExpectedValueCheck(){};
+
+	explicit PMONExpectedValueCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double expectedValue,
+	                                uint64_t mask, uint16_t unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
 	      PMONBase(monitoredParameterId, repetitionNumber){};
 };
@@ -75,12 +79,12 @@ public:
 	double highLimit;
 	uint16_t aboveHighLimitEvent;
 
-	explicit PMONLimitCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber,
-	                        double lowLimit, uint16_t belowLowLimitEvent, double highLimit,
-	                        uint16_t aboveHighLimitEvent)
+	PMONLimitCheck(){};
+
+	explicit PMONLimitCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double lowLimit,
+	                        uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
-	      aboveHighLimitEvent(aboveHighLimitEvent),
-	      PMONBase(monitoredParameterId, repetitionNumber){};
+	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber){};
 };
 
 /**
@@ -94,13 +98,14 @@ public:
 	double highDeltaThreshold;
 	uint16_t aboveHighThresholdEvent;
 
+	PMONDeltaCheck(){};
+
 	explicit PMONDeltaCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber,
 	                        uint16_t numberOfConsecutiveDeltaChecks, double lowDeltaThreshold,
 	                        uint16_t belowLowThresholdEvent, double highDeltaThreshold,
 	                        uint16_t aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
-	      aboveHighThresholdEvent(aboveHighThresholdEvent),
-	      PMONBase(monitoredParameterId, repetitionNumber){};
+	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber){};
 };
 #endif // ECSS_SERVICES_PMONBASE_HPP
