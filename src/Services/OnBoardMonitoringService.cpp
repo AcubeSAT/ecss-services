@@ -14,7 +14,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
-			break;
+			continue;
 		}
 		definition->second.get().repetitionNumber = 0;
 		definition->second.get().monitoringEnabled = true;
@@ -31,7 +31,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
-			break;
+			continue;
 		}
 		definition->second.get().monitoringEnabled = false;
 		definition->second.get().checkingStatus = PMONBase::Unchecked;
