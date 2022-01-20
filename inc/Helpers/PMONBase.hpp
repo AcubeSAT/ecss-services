@@ -47,7 +47,7 @@ protected:
 
 	};
 	/**
-	 * monitoredParameterId is assumed to be correct and not checked.
+	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
 	PMONBase(uint16_t monitoredParameterId, uint16_t repetitionNumber);
 };
