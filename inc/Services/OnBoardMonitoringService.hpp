@@ -69,22 +69,24 @@ public:
 		return parameterMonitoringList.empty();
 	}
 	/**
-	 * TC[12,1]
+	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
 	void enableParameterMonitoringDefinitions(Message& message);
 
 	/**
-	 * TC[12,2]
+	 * Disables the PMON definitions which correspond to the ids in TC[12,2]
 	 */
 	void disableParameterMonitoringDefinitions(Message& message);
 
 	/**
 	 * TC[12,3]
+	 * Changes the maximum time between two transition reports.
 	 */
 	void changeMaximumTransitionReportingDelay(Message& message);
 
 	/**
 	 * TC[12,4]
+	 * Deletes all the PMON definitions in the PMON list.
 	 */
 	void deleteAllParameterMonitoringDefinitions(Message& message);
 
