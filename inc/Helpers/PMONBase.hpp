@@ -43,9 +43,6 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 
 protected:
-	PMONBase() : monitoredParameter(monitoredParameter){
-
-	};
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
@@ -60,8 +57,6 @@ public:
 	double expectedValue;
 	uint64_t mask;
 	uint16_t unexpectedValueEvent;
-
-	PMONExpectedValueCheck(){};
 
 	explicit PMONExpectedValueCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double expectedValue,
 	                                uint64_t mask, uint16_t unexpectedValueEvent)
@@ -79,8 +74,6 @@ public:
 	double highLimit;
 	uint16_t aboveHighLimitEvent;
 
-	PMONLimitCheck(){};
-
 	explicit PMONLimitCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double lowLimit,
 	                        uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
@@ -97,8 +90,6 @@ public:
 	uint16_t belowLowThresholdEvent;
 	double highDeltaThreshold;
 	uint16_t aboveHighThresholdEvent;
-
-	PMONDeltaCheck(){};
 
 	explicit PMONDeltaCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber,
 	                        uint16_t numberOfConsecutiveDeltaChecks, double lowDeltaThreshold,

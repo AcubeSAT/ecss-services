@@ -8,10 +8,10 @@
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
-auto monitoringDefinition1 = PMONExpectedValueCheck();
-auto monitoringDefinition2 = PMONLimitCheck();
-auto monitoringDefinition3 = PMONDeltaCheck();
-auto monitoringDefinition4 = PMONDeltaCheck();;
+auto monitoringDefinition1 = PMONExpectedValueCheck(0,0,0,0,0);
+auto monitoringDefinition2 = PMONLimitCheck(0,0,0,0,0,0);
+auto monitoringDefinition3 = PMONDeltaCheck(0,0,0,0,0,0,0);
+auto monitoringDefinition4 = PMONDeltaCheck(0,0,0,0,0,0,0);
 
 
 void initialiseParameterMonitoringDefinitions() {
