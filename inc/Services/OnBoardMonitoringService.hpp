@@ -74,7 +74,7 @@ public:
 	void enableParameterMonitoringDefinitions(Message& message);
 
 	/**
-	 * Disables the PMON definitions which correspond to the ids in TC[12,2]
+	 * Disables the PMON definitions which correspond to the ids in TC[12,2].
 	 */
 	void disableParameterMonitoringDefinitions(Message& message);
 
