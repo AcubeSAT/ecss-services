@@ -23,15 +23,17 @@ struct Fixtures {
 	uint16_t belowLowThresholdEvent = 3;
 	double highDeltaThreshold = 11;
 	uint16_t aboveHighThresholdEvent = 4;
-	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(7,{}, 10, 8, 0);
+	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(7, {}, 10, 8, 0);
 	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, {}, 2, 1, 9, 2);
 	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(7, {}, 5, 3, 3, 11, 4);
 	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, {}, 5, 3, 3, 11, 4);
 
 	/*
-     * Constructor to modify monitoring definitions if needed
+	 * Constructor to modify monitoring definitions if needed
 	 */
-	Fixtures() { monitoringDefinition1.monitoringEnabled = true; }
+	Fixtures() {
+		monitoringDefinition1.monitoringEnabled = true;
+	}
 };
 
 Fixtures fixtures;
@@ -45,7 +47,6 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.addPMONDefinition(2, fixtures.monitoringDefinition3);
 	onBoardMonitoringService.addPMONDefinition(3, fixtures.monitoringDefinition4);
 }
-
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {
 	SECTION("3 valid requests to enable Parameter Monitoring Definitions") {
@@ -121,12 +122,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled == false);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus ==
-		      PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkingStatus ==
-		      PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus ==
-		      PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkingStatus == PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMONBase::Unchecked);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -152,12 +150,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled == false);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus ==
-		      PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus ==
-		      PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkingStatus ==
-		      PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkingStatus == PMONBase::Unchecked);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -201,8 +196,8 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(
-		          ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitions) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitions) ==
+		      1);
 
 		CHECK(!onBoardMonitoringService.isPMONListEmpty());
 

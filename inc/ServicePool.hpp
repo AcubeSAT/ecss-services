@@ -37,7 +37,6 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
-
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
@@ -85,7 +84,6 @@ public:
 #ifdef SERVICE_TIMESCHEDULING
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
-
 
 	/**
 	 * The default ServicePool constructor
