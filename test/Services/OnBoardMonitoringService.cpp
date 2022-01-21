@@ -8,13 +8,7 @@
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
-auto monitoringDefinition1 = PMONExpectedValueCheck(0,0,0,0,0);
-auto monitoringDefinition2 = PMONLimitCheck(0,0,0,0,0,0);
-auto monitoringDefinition3 = PMONDeltaCheck(0,0,0,0,0,0,0);
-auto monitoringDefinition4 = PMONDeltaCheck(0,0,0,0,0,0,0);
-
-
-void initialiseParameterMonitoringDefinitions() {
+struct Fixtures {
 	uint16_t repetitionNumber = 7;
 	etl::array<PMONExpectedValueCheck::CheckingStatus, 2> checkTransitionList = {};
 	double expectedValue = 10;
@@ -29,38 +23,29 @@ void initialiseParameterMonitoringDefinitions() {
 	uint16_t belowLowThresholdEvent = 3;
 	double highDeltaThreshold = 11;
 	uint16_t aboveHighThresholdEvent = 4;
+	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(7,{}, 10, 8, 0);
+	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, {}, 2, 1, 9, 2);
+	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(7, {}, 5, 3, 3, 11, 4);
+	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, {}, 5, 3, 3, 11, 4);
 
-	monitoringDefinition1.repetitionNumber = repetitionNumber;
-	monitoringDefinition1.checkTransitionList = checkTransitionList;
-	monitoringDefinition1.expectedValue = expectedValue;
-	monitoringDefinition1.mask = mask;
-	monitoringDefinition1.unexpectedValueEvent = unexpectedValueEvent;
-
-	monitoringDefinition2.repetitionNumber = repetitionNumber;
-	monitoringDefinition2.lowLimit = lowLimit;
-	monitoringDefinition2.belowLowLimitEvent = belowLowLimitEvent;
-	monitoringDefinition2.highLimit = highLimit;
-	monitoringDefinition2.aboveHighLimitEvent = aboveHighLimitEvent;
-
-	monitoringDefinition3.repetitionNumber = repetitionNumber;
-	monitoringDefinition3.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
-	monitoringDefinition3.lowDeltaThreshold = lowDeltaThreshold;
-	monitoringDefinition3.belowLowThresholdEvent = belowLowThresholdEvent;
-	monitoringDefinition3.highDeltaThreshold = highDeltaThreshold;
-	monitoringDefinition3.aboveHighThresholdEvent = highDeltaThreshold;
-
-	monitoringDefinition4.repetitionNumber = repetitionNumber;
-	monitoringDefinition4.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
-	monitoringDefinition4.lowDeltaThreshold = lowDeltaThreshold;
-	monitoringDefinition4.belowLowThresholdEvent = belowLowThresholdEvent;
-	monitoringDefinition4.highDeltaThreshold = highDeltaThreshold;
-	monitoringDefinition4.aboveHighThresholdEvent = highDeltaThreshold;
-
-	onBoardMonitoringService.addPMONDefinition(0, monitoringDefinition1);
-	onBoardMonitoringService.addPMONDefinition(1, monitoringDefinition2);
-	onBoardMonitoringService.addPMONDefinition(2, monitoringDefinition3);
-	onBoardMonitoringService.addPMONDefinition(3, monitoringDefinition4);
+	/*
+     * Constructor to modify monitoring definitions if needed
+	 */
+	Fixtures() { monitoringDefinition1.monitoringEnabled = true; }
 };
+
+Fixtures fixtures;
+
+void initialiseParameterMonitoringDefinitions() {
+	// Reset fixtures to the defaults set up by the constructor
+	new (&fixtures) Fixtures();
+
+	onBoardMonitoringService.addPMONDefinition(0, fixtures.monitoringDefinition1);
+	onBoardMonitoringService.addPMONDefinition(1, fixtures.monitoringDefinition2);
+	onBoardMonitoringService.addPMONDefinition(2, fixtures.monitoringDefinition3);
+	onBoardMonitoringService.addPMONDefinition(3, fixtures.monitoringDefinition4);
+}
+
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {
 	SECTION("3 valid requests to enable Parameter Monitoring Definitions") {
