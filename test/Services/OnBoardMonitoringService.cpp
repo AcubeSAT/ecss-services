@@ -9,10 +9,10 @@
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
 struct Fixtures {
-	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(7, {}, 10, 8, 0);
-	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, {}, 2, 1, 9, 2);
-	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(7, {}, 5, 3, 3, 11, 4);
-	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, {}, 5, 3, 3, 11, 4);
+	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(7, 5, 10, 8, 0);
+	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, 5, 2, 1, 9, 2);
+	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
+	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
 
 	/*
 	 * Constructor to modify monitoring definitions if needed
