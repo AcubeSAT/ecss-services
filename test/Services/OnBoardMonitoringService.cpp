@@ -9,20 +9,6 @@
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
 struct Fixtures {
-	uint16_t repetitionNumber = 7;
-	etl::array<PMONExpectedValueCheck::CheckingStatus, 2> checkTransitionList = {};
-	double expectedValue = 10;
-	uint64_t mask = 8;
-	uint16_t unexpectedValueEvent = 0;
-	double lowLimit = 2;
-	uint16_t belowLowLimitEvent = 1;
-	double highLimit = 9;
-	uint16_t aboveHighLimitEvent = 2;
-	uint16_t numberOfConsecutiveDeltaChecks = 5;
-	double lowDeltaThreshold = 3;
-	uint16_t belowLowThresholdEvent = 3;
-	double highDeltaThreshold = 11;
-	uint16_t aboveHighThresholdEvent = 4;
 	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(7, {}, 10, 8, 0);
 	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, {}, 2, 1, 9, 2);
 	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(7, {}, 5, 3, 3, 11, 4);
