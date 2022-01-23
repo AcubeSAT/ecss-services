@@ -159,7 +159,7 @@ void getNumberOfBytesUntillZeroTerminator(char *characterArray, uint8_t &size)
     }
 }
 
-void checkForSlashes(String<ECSS_MAX_STRING_SIZE> &objectPathString, uint8_t *fileNameChar)
+void checkForSlashes(String<ECSS_MAX_STRING_SIZE> &objectPathString, uint8_t *&fileNameChar)
 {
     // Last character of the repository path string
     char lastPathCharacter = objectPathString.back();
@@ -177,7 +177,7 @@ void checkForSlashes(String<ECSS_MAX_STRING_SIZE> &objectPathString, uint8_t *fi
         if(firstFileCharacter == '/')
         {
             // Condition a). Just increment the file name pointer
-            fileNameChar++;
+            fileNameChar = fileNameChar + 1;
         }
         else
         {

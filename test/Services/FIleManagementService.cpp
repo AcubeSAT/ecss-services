@@ -16,8 +16,8 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]"){
 
     // Good scenario
     Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
-    String<64> repo1 = "test1";
-    String<64> file1 = "test2";
+    String<64> repo1 = "test1/";
+    String<64> file1 = "/test2";
     message.appendString(repo1);
     message.appendString(nullString);
     message.appendString(file1);
