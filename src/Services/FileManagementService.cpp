@@ -12,7 +12,7 @@ int32_t FileManagementService::checkForWildcard(String<ECSS_MAX_STRING_SIZE> mes
     auto *messageStringChar = reinterpret_cast<uint8_t *>(messageString.data());
 
     // Check for wildcards in repositoryStringChar
-    for (uint32_t currentChar = 0; currentChar < messageString.size(); currentChar++)
+    for (unsigned long currentChar = 0; currentChar < messageString.size(); currentChar++)
     {
         // Iterate over the string
         if (messageStringChar[currentChar] == FileManagementService::wildcard)
@@ -372,15 +372,22 @@ int32_t FileManagementService::pathIsValidForARepository(String<ECSS_MAX_STRING_
     if (infoStructFillStatus >= 0)
     {
         // Check what type of object is found
-        if (infoStruct.type == LFS_TYPE_DIR)
+        switch (infoStruct.type)
         {
-            // The object is a directory
-            return 0;
-        }
-        else
-        {
-            // The object is a file
-            return 1;
+            case LFS_TYPE_DIR:
+                // The object is a directory
+                return 0;
+                break;
+
+            case LFS_TYPE_REG:
+                // The object is a file
+                return 1;
+                break;
+
+            default:
+                // Invalid object type
+                return 2;
+                break;
         }
     }
     else
