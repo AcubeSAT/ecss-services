@@ -12,7 +12,7 @@ int32_t FileManagementService::checkForWildcard(String<ECSS_MAX_STRING_SIZE> mes
     auto *messageStringChar = reinterpret_cast<uint8_t *>(messageString.data());
 
     // Check for wildcards in repositoryStringChar
-    for (unsigned long currentChar = 0; currentChar < messageString.size(); currentChar++)
+    for (uint64_t currentChar = 0; currentChar < messageString.size(); currentChar++)
     {
         // Iterate over the string
         if (messageStringChar[currentChar] == FileManagementService::wildcard)
@@ -46,7 +46,7 @@ uint8_t wildcardStringMatch(char *line, char *pattern) {
 
             // Activate the wildcard flag
             wildcard = 1;
-        } else if (wildcard != 0u) {
+        } else if (wildcard != 0U) {
             // Check if the pattern's next character after the wildcard is matched with the string's char
             if (*line == *pattern) {
                 // De-activate the wildcard flag and increment the pointers
