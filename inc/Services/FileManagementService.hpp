@@ -10,6 +10,7 @@ extern "C" {
 #define MAX_FILE_COPY_OPERATIONS 10
 #define MAX_FILE_NAME_SIZE 256
 #define MAX_OPERATION_IDENTIFIERS 256
+#define REPOSITORY_SUMMARY_REPORT_MAX_OBJECTS 4096
 
 /**
  * Implementation of ST[23] file management service
@@ -256,8 +257,8 @@ public:
     /*
      * TM[23,4] Create a report with the attributes of a file
      */
-    void fileAttributeReport(String<ECSS_MAX_STRING_SIZE> repositoryString,
-                             String<ECSS_MAX_STRING_SIZE> fileNameString,
+    void fileAttributeReport(const String<ECSS_MAX_STRING_SIZE>& repositoryString,
+                             const String<ECSS_MAX_STRING_SIZE>& fileNameString,
                              uint32_t fileSize);
 
     /*

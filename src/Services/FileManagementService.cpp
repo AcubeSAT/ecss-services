@@ -6,16 +6,13 @@
 #include "etl/vector.h"
 #include "../../lib/littlefs/lfs.h"
 
-
-#define REPOSITORY_SUMMARY_REPORT_MAX_OBJECTS 4096
-
 int32_t FileManagementService::checkForWildcard(String<ECSS_MAX_STRING_SIZE> messageString)
 {
     // Copy the repositoryString to a char array, in order to use it in lfs_stat
     auto *messageStringChar = reinterpret_cast<uint8_t *>(messageString.data());
 
     // Check for wildcards in repositoryStringChar
-    for (uint8_t currentChar = 0; currentChar < messageString.size(); currentChar++)
+    for (uint32_t currentChar = 0; currentChar < messageString.size(); currentChar++)
     {
         // Iterate over the string
         if (messageStringChar[currentChar] == FileManagementService::wildcard)
@@ -49,7 +46,7 @@ uint8_t wildcardStringMatch(char *line, char *pattern) {
 
             // Activate the wildcard flag
             wildcard = 1;
-        } else if (wildcard) {
+        } else if (wildcard != 0u) {
             // Check if the pattern's next character after the wildcard is matched with the string's char
             if (*line == *pattern) {
                 // De-activate the wildcard flag and increment the pointers
@@ -62,14 +59,17 @@ uint8_t wildcardStringMatch(char *line, char *pattern) {
         } else {
             return 0;
         }
-    } while (*line);
+    } while (*line != 0);
 
     // Check if the whole pattern has been scanned
-    if (*pattern == '\0') {
+    if (*pattern == '\0')
+    {
         return 1;
-    } else {
-        return 0;
     }
+
+    // If not, return 0
+    return 0;
+
 }
 
 uint8_t FileManagementService::getStringUntilZeroTerminator(Message &message,
@@ -78,7 +78,7 @@ uint8_t FileManagementService::getStringUntilZeroTerminator(Message &message,
 
     char currentChar = '0';
     uint8_t charCounter = 0;
-    currentChar = (char) message.readByte();
+    currentChar = static_cast<char>(message.readByte());
 
     // Increment the counter until '@' is reached
     while (currentChar != '@')
@@ -119,26 +119,28 @@ int32_t FileManagementService::pathIsValidForCreation(String<ECSS_MAX_STRING_SIZ
     auto *repositoryStringChar = reinterpret_cast<uint8_t *>(repositoryString.data());
 
     // Call lfs_stat in order to fill the info_struct with data
-    int32_t infoStructFillStatus = lfs_stat(&fs1, (const char *) repositoryStringChar, &infoStruct);
+    int32_t infoStructFillStatus = lfs_stat(&fs1,  reinterpret_cast<const char *>(repositoryStringChar), &infoStruct);
 
     // Check if the repository exists and no errors are produced during the lfs_stat() execution
     if (infoStructFillStatus >= 0)
     {
         // Check if the object at the end of the path is a file or a repository
-        if (infoStruct.type == LFS_TYPE_DIR)
+        switch (infoStruct.type)
         {
-            // The object is a directory
-            return LFS_TYPE_DIR;
-        }
-        else if (infoStruct.type == LFS_TYPE_REG)
-        {
-            // The object is a file
-            return LFS_TYPE_REG;
-        }
-        else
-        {
-            // Info type is invalid
-            return -2;
+            case LFS_TYPE_DIR:
+                // The object is a directory
+                return LFS_TYPE_DIR;
+                break;
+
+            case LFS_TYPE_REG:
+                // The object is a file
+                return LFS_TYPE_REG;
+                break;
+
+            default:
+                // Info type is invalid
+                return -2;
+                break;
         }
     }
     else
@@ -227,13 +229,13 @@ int32_t FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file,
     String<ECSS_MAX_STRING_SIZE> objectPathString = "";
 
     // Append the repository path
-    objectPathString.append((const char *)repositoryPathChar);
+    objectPathString.append(reinterpret_cast<const char *>(repositoryPathChar));
 
     // Check for the existence of slashes and adapt accordingly
     checkForSlashes(objectPathString, fileNameChar);
 
     // Append the file name
-    objectPathString.append((const char *)fileNameChar);
+    objectPathString.append(reinterpret_cast<const char *>(fileNameChar));
 
     // Create the file using lfs_file_open with the appropriate flags
     int32_t lfsCreateFileStatus = lfs_file_open(fs, file, objectPathString.data(), flags);
@@ -271,13 +273,13 @@ int32_t FileManagementService::pathIsValidForDeletion(String<ECSS_MAX_STRING_SIZ
     String<ECSS_MAX_STRING_SIZE> objectPathString = "";
 
     // Append the repository path
-    objectPathString.append((const char *)repositoryPathChar);
+    objectPathString.append(reinterpret_cast<const char *>(repositoryPathChar));
 
     // Check for the existence of slashes and adapt accordingly
     checkForSlashes(objectPathString, fileNameChar);
 
     // Append the file name
-    objectPathString.append((const char *)fileNameChar);
+    objectPathString.append(reinterpret_cast<const char *>(fileNameChar));
 
     // Check for objectPath size
     if (objectPathString.size() > ECSS_MAX_STRING_SIZE )
@@ -337,13 +339,13 @@ int32_t FileManagementService::littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STR
     String<ECSS_MAX_STRING_SIZE> objectPathString = "";
 
     // Append the repository path
-    objectPathString.append((const char *)repositoryPathChar);
+    objectPathString.append(reinterpret_cast<const char *>(repositoryPathChar));
 
     // Check for the existence of slashes and adapt accordingly
     checkForSlashes(objectPathString, fileNameChar);
 
     // Append the file name
-    objectPathString.append((const char *)fileNameChar);
+    objectPathString.append(reinterpret_cast<const char *>(fileNameChar));
 
     // Call lfs_remove
     int32_t lfsDeleteFileStatus = lfs_remove(fs, objectPathString.data());
@@ -354,7 +356,8 @@ int32_t FileManagementService::littleFsDeleteFile(lfs_t *fs, String<ECSS_MAX_STR
 }
 
 int32_t FileManagementService::pathIsValidForARepository(String<ECSS_MAX_STRING_SIZE> repositoryString,
-                                                         uint8_t repositoryStringSize) {
+                                                         uint8_t                      repositoryStringSize)
+{
     lfs_info *pInfo;
     lfs_info infoStruct;
     pInfo = &infoStruct;
@@ -402,13 +405,13 @@ int32_t FileManagementService::littleFsReportFile(String<ECSS_MAX_STRING_SIZE> r
     String<ECSS_MAX_STRING_SIZE> objectPathString = "";
 
     // Append the repository path string
-    objectPathString.append((const char *)repositoryStringChar);
+    objectPathString.append(reinterpret_cast<const char *>(repositoryStringChar));
 
     // Check for the existence of slashes and adapt accordingly
     checkForSlashes(objectPathString, fileNameStringChar);
 
     // Append the file name string
-    objectPathString.append((const char *)fileNameStringChar);
+    objectPathString.append(reinterpret_cast<const char *>(fileNameStringChar));
 
     // Call lfs_stat to fill the infoStruct with information about the object
     int32_t infoStructFillStatus = lfs_stat(&fs1, objectPathString.data(), infoStruct);
@@ -773,8 +776,8 @@ void FileManagementService::reportAttributes(Message &message) {
     }
 }
 
-void FileManagementService::fileAttributeReport(String<ECSS_MAX_STRING_SIZE> repositoryString,
-                                                String<ECSS_MAX_STRING_SIZE> fileNameString,
+void FileManagementService::fileAttributeReport(const String<ECSS_MAX_STRING_SIZE>& repositoryString,
+                                                const String<ECSS_MAX_STRING_SIZE>& fileNameString,
                                                 uint32_t fileSize)
 {
     //TM[23,4]
