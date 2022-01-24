@@ -21,19 +21,20 @@
 #define SERVICE_ALL ///< Enables compilation of all the ECSS services
 
 #ifdef SERVICE_ALL
-#define SERVICE_EVENTACTION         ///<  Compile ST[19] event-action
-#define SERVICE_EVENTREPORT         ///<  Compile ST[05] event reporting
-#define SERVICE_FUNCTION            ///<  Compile ST[08] function management
-#define SERVICE_HOUSEKEEPING        ///<  Compile ST[03] housekeeping
-#define SERVICE_LARGEPACKET         ///<  Compile ST[13] large packet transfer
-#define SERVICE_MEMORY              ///<  Compile ST[06] memory management
-#define SERVICE_PARAMETER           ///<  Compile ST[20] parameter management
+#define SERVICE_EVENTACTION ///<  Compile ST[19] event-action
+#define SERVICE_EVENTREPORT ///<  Compile ST[05] event reporting
+#define SERVICE_FUNCTION ///<  Compile ST[08] function management
+#define SERVICE_HOUSEKEEPING ///<  Compile ST[03] housekeeping
+#define SERVICE_LARGEPACKET ///<  Compile ST[13] large packet transfer
+#define SERVICE_MEMORY ///<  Compile ST[06] memory management
+#define SERVICE_ONBOARDMONITORING ///<  Compile ST[12] on-board monitoring
+#define SERVICE_PARAMETER ///<  Compile ST[20] parameter management
 #define SERVICE_PARAMETERSTATISTICS ///<  Compile ST[04] parameter statistics
 #define SERVICE_REQUESTVERIFICATION ///<  Compile ST[01] request verification
-#define SERVICE_TEST                ///<  Compile ST[17] test
-#define SERVICE_TIME                ///<  Compile ST[09] time management
-#define SERVICE_TIMESCHEDULING      ///<  Compile ST[11] time-based scheduling
+#define SERVICE_TEST ///<  Compile ST[17] test
+#define SERVICE_TIME ///<  Compile ST[09] time management
+#define SERVICE_TIMESCHEDULING ///<  Compile ST[11] time-based scheduling
 #endif
 /** @} */
 
-#endif //ECSS_SERVICES_ECSS_CONFIGURATION_HPP
+#endif // ECSS_SERVICES_ECSS_CONFIGURATION_HPP
