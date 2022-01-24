@@ -9,46 +9,51 @@
 void EventActionService::addEventActionDefinitions(Message& message) {
 	// TC[19,1]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction);
-	uint16_t applicationID = message.readEnum16();
-	uint16_t eventDefinitionID = message.readEnum16();
-	uint16_t eventActionDefinitionID = message.readEnum16();
-	bool canBeAdded = true;
-	if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
-		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
-		for (auto& element = range.first; element != range.second; ++element) {
-			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
-				canBeAdded = false;
-				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		uint16_t applicationID = message.readEnum16();
+		uint16_t eventDefinitionID = message.readEnum16();
+		uint16_t eventActionDefinitionID = message.readEnum16();
+		bool canBeAdded = true;
+		if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
+			auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
+			for (auto& element = range.first; element != range.second; ++element) {
+				if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
+					canBeAdded = false;
+					ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
+				}
 			}
 		}
-	}
 
-	if ((message.dataSize - 6) > ECSSTCRequestStringSize) {
-		canBeAdded = false;
-		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
-	}
-	if (canBeAdded) {
-		char data[ECSSTCRequestStringSize] = { 0 };
-		message.readString(data, message.dataSize - 6);
-		EventActionDefinition temp;
-		temp.enabled = false;
-		temp.applicationId = applicationID;
-		temp.eventDefinitionID = eventDefinitionID;
-		temp.eventActionDefinitionID = eventActionDefinitionID;
-		temp.request = String<ECSSTCRequestStringSize>(data);
-		if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
-			ErrorHandler::reportError(message,ErrorHandler::EventActionDefinitionsMapIsFull);
-		} else {
-			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
+		uint16_t stringSize = message.readUint16();
+		if (stringSize > ECSSTCRequestStringSize) {
+			canBeAdded = false;
+			ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
+		}
+		if (canBeAdded) {
+			char data[ECSSTCRequestStringSize] = {0};
+			message.readString(data, stringSize);
+			EventActionDefinition temp;
+			temp.enabled = false;
+			temp.applicationId = applicationID;
+			temp.eventDefinitionID = eventDefinitionID;
+			temp.eventActionDefinitionID = eventActionDefinitionID;
+			temp.request = String<ECSSTCRequestStringSize>(data);
+			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
+				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
+			} else {
+				eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
+			}
 		}
 	}
 }
 
 void EventActionService::deleteEventActionDefinitions(Message& message) {
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction);
-	uint16_t numberOfEventActionDefinitions = message.readUint16();
-	bool definitionIDexists = false;
-	for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	// bool definitionIDexists = false;
+	for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		bool definitionIDexists = false;
 		message.skipBytes(2);
 		uint16_t eventDefinitionID = message.readEnum16();
 		uint16_t eventActionDefinitionID = message.readEnum16();
@@ -84,9 +89,9 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 void EventActionService::enableEventActionDefinitions(Message& message) {
 	// TC[19,4]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction);
-	uint16_t numberOfEventActionDefinitions = message.readUint16();
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
-		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.skipBytes(2); // Skips reading the application ID
 			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
@@ -117,9 +122,9 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 void EventActionService::disableEventActionDefinitions(Message& message) {
 	// TC[19,5]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction);
-	uint16_t numberOfEventActionDefinitions = message.readUint16();
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
-		for (uint16_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.skipBytes(2); // Skips reading applicationID
 			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();

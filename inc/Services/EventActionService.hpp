@@ -118,7 +118,7 @@ public:
 	void enableEventActionFunction(Message& message);
 
 	/**
-	 * TC[19,9] disable the event-actioni function
+	 * TC[19,9] disable the event-action function
 	 */
 	void disableEventActionFunction(Message& message);
 
