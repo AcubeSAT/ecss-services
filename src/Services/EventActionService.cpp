@@ -47,8 +47,9 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		}
 	}
 }
-
+// TODO check "definitionIDexists" position
 void EventActionService::deleteEventActionDefinitions(Message& message) {
+	// TC[19,2]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction);
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	// bool definitionIDexists = false;

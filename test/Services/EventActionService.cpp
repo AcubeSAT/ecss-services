@@ -67,16 +67,17 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 
 	// Adding multiple event-action definitions
 	Message message4(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+	uint8_t numberOfEventActionDefinitions = 3;
 	uint16_t applicationIDs[] = {1, 2, 0};
 	uint16_t eventDefinitionIDs[] = {4, 5, 6};
 	uint16_t eventActionDefinitionIDs[] = {3, 2, 1};
-	String<128> data2[] = {"123", "456", "789"};
-	message4.appendUint8(3);
-	for(uint8_t i = 0; i < 3; i++) {
+	String<64> dataArray[] = {"123", "456", "789"};
+	message4.appendUint8(numberOfEventActionDefinitions);
+	for(uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 		message4.appendEnum16(applicationIDs[i]);
 		message4.appendEnum16(eventDefinitionIDs[i]);
 		message4.appendEnum16(eventActionDefinitionIDs[i]);
-		message4.appendOctetString(data2[i]);
+		message4.appendOctetString(dataArray[i]);
 	}
 	MessageParser::execute(message4);
 
@@ -88,7 +89,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		CHECK(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second
 		          .eventActionDefinitionID == eventActionDefinitionIDs[i]);
 		CHECK(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.enabled == 0);
-		CHECK(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.request.compare(data2[i]) == 0);
+		CHECK(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.request.compare(dataArray[i]) == 0);
 	}
 }
 
@@ -96,38 +97,27 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 
 	// Add messages for the purpose of deleting them
 	Message message0(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message0.appendUint8(1);
-	message0.appendEnum16(1);
-	message0.appendEnum16(0);
-	message0.appendEnum16(1);
-	String<64> data = "0";
-	message0.appendString(data);
+	uint8_t numberOfEventActionDefinitions = 3;
+	uint16_t applicationIDs[] = {1, 1, 1};
+	uint16_t eventDefinitionIDs[] = {0, 1, 2};
+	uint16_t eventActionDefinitionIDs[] = {1, 1, 1};
+	String<64> data[] = {"0", "1", "2"};
+	message0.appendUint8(numberOfEventActionDefinitions);
+	for(uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		message0.appendEnum16(applicationIDs[i]);
+		message0.appendEnum16(eventDefinitionIDs[i]);
+		message0.appendEnum16(eventActionDefinitionIDs[i]);
+		message0.appendOctetString(data[i]);
+	}
 	MessageParser::execute(message0);
 
-	Message message1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+	Message message1(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction,
+	                 Message::TC, 0);
 	message1.appendUint8(1);
 	message1.appendEnum16(1);
+	message1.appendEnum16(2);
 	message1.appendEnum16(1);
-	message1.appendEnum16(1);
-	data = "1";
-	message1.appendString(data);
 	MessageParser::execute(message1);
-
-	Message message2(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message2.appendUint8(1);
-	message2.appendEnum16(1);
-	message2.appendEnum16(2);
-	message2.appendEnum16(1);
-	data = "2";
-	message2.appendString(data);
-	MessageParser::execute(message2);
-
-	Message message5(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
-	message5.appendUint8(1);
-	message5.appendEnum16(1);
-	message5.appendEnum16(2);
-	message5.appendEnum16(1);
-	MessageParser::execute(message5);
 
 	// Checking the values after deleting some definitions
 
@@ -144,41 +134,45 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	CHECK(eventActionService.eventActionDefinitionMap.find(2) == eventActionService.eventActionDefinitionMap.end());
 
 	// Enabling a definition to check for errors in the case of an attempt to delete it
-	Message message8(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
-	message8.appendUint8(1);
-	message8.appendEnum16(1);
-	message8.appendEnum16(1);
-	message8.appendEnum16(1);
-	MessageParser::execute(message8);
+	Message message2(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
+	                0);
+	message2.appendUint8(1);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	MessageParser::execute(message2);
 
-	Message message6(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
-	message6.appendUint8(1);
-	message6.appendEnum16(1);
-	message6.appendEnum16(1);
-	message6.appendEnum16(1);
-	MessageParser::execute(message6);
+	Message message3(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC,
+	                0);
+	message3.appendUint8(1);
+	message3.appendEnum16(1);
+	message3.appendEnum16(1);
+	message3.appendEnum16(1);
+	MessageParser::execute(message3);
 
 	// Checking for errors in the case mentioned above
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionDeleteEnabledDefinitionError));
 	CHECK(ServiceTests::countErrors() == 1);
 
 	// Checking for errors in the case of an unknown definition
-	Message message7(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
-	message7.appendUint8(1);
-	message7.appendEnum16(1);
-	message7.appendEnum16(10);
-	message7.appendEnum16(1);
-	MessageParser::execute(message7);
+	Message message4(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC,
+	                0);
+	message4.appendUint8(1);
+	message4.appendEnum16(1);
+	message4.appendEnum16(10);
+	message4.appendEnum16(1);
+	MessageParser::execute(message4);
 
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventDefinitionError));
 	CHECK(ServiceTests::countErrors() == 2);
 
-	Message message9(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
-	message9.appendUint8(1);
-	message9.appendEnum16(1);
-	message9.appendEnum16(1);
-	message9.appendEnum16(10);
-	MessageParser::execute(message9);
+	Message message5(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC,
+	                0);
+	message5.appendUint8(1);
+	message5.appendEnum16(1);
+	message5.appendEnum16(1);
+	message5.appendEnum16(10);
+	MessageParser::execute(message5);
 
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionIDError));
 	CHECK(ServiceTests::countErrors() == 3);
@@ -188,49 +182,19 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 
 	// Adding event action definitions to delete them later
 	Message message0(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message0.appendUint8(1);
-	message0.appendEnum16(1);
-	message0.appendEnum16(0);
-	message0.appendEnum16(1);
-	String<64> data = "0";
-	message0.appendString(data);
+	uint8_t numberOfEventActionDefinitions = 5;
+	uint16_t applicationIDs[] = {1, 1, 1, 1, 1};
+	uint16_t eventDefinitionIDs[] = {0, 1, 2, 3, 4};
+	uint16_t eventActionDefinitionIDs[] = {1, 1, 1, 1, 1};
+	String<64> data[] = {"0", "1", "2", "3", "4"};
+	message0.appendUint8(numberOfEventActionDefinitions);
+	for(uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		message0.appendEnum16(applicationIDs[i]);
+		message0.appendEnum16(eventDefinitionIDs[i]);
+		message0.appendEnum16(eventActionDefinitionIDs[i]);
+		message0.appendOctetString(data[i]);
+	}
 	MessageParser::execute(message0);
-
-	Message message1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message1.appendUint8(1);
-	message1.appendEnum16(1);
-	message1.appendEnum16(1);
-	message1.appendEnum16(1);
-	data = "1";
-	message1.appendString(data);
-	MessageParser::execute(message1);
-
-	Message message2(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message2.appendUint8(1);
-	message2.appendEnum16(1);
-	message2.appendEnum16(2);
-	message2.appendEnum16(1);
-	data = "2";
-	message2.appendString(data);
-	MessageParser::execute(message2);
-
-	Message message3(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message3.appendUint8(1);
-	message3.appendEnum16(1);
-	message3.appendEnum16(3);
-	message3.appendEnum16(1);
-	data = "3";
-	message3.appendString(data);
-	MessageParser::execute(message3);
-
-	Message message4(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message4.appendUint8(1);
-	message4.appendEnum16(1);
-	message4.appendEnum16(4);
-	message4.appendEnum16(1);
-	data = "4";
-	message4.appendString(data);
-	MessageParser::execute(message4);
 
 	Message message(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction, Message::TC, 0);
 	MessageParser::execute(message);
@@ -245,60 +209,59 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 
 	// Adding event action definitions to enable them
 	Message message0(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message0.appendUint8(1);
+	message0.appendUint8(2);
 	message0.appendEnum16(1);
 	message0.appendEnum16(0);
 	message0.appendEnum16(1);
 	String<64> data = "0";
-	message0.appendString(data);
-	MessageParser::execute(message0);
-
-	Message message1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message1.appendUint8(1);
-	message1.appendEnum16(1);
-	message1.appendEnum16(1);
-	message1.appendEnum16(1);
+	message0.appendOctetString(data);
+	message0.appendEnum16(1);
+	message0.appendEnum16(1);
+	message0.appendEnum16(1);
 	data = "00";
-	message1.appendString(data);
-	MessageParser::execute(message1);
+	message0.appendOctetString(data);
+	MessageParser::execute(message0);
 
 	// Checking their enabled status
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(0)->second.enabled == 0);
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(1)->second.enabled == 0);
 
 	// Creating a message to enable the previous messages
-	Message message3(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
-	message3.appendUint8(2);
-	message3.appendEnum16(1);
-	message3.appendEnum16(0);
-	message3.appendEnum16(1);
-	message3.appendEnum16(1);
-	message3.appendEnum16(1);
-	message3.appendEnum16(1);
-	MessageParser::execute(message3);
+	Message message2(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
+	                0);
+	message2.appendUint8(2);
+	message2.appendEnum16(1);
+	message2.appendEnum16(0);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	MessageParser::execute(message2);
 
 	// Checking if the messages are enabled
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(0)->second.enabled == 1);
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(1)->second.enabled == 1);
 
 	// Checking for errors in the case of an attempt to enable an unknown definition
-	Message message7(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
-	message7.appendUint8(1);
-	message7.appendUint16(1);
-	message7.appendEnum16(2);
-	message7.appendEnum16(6);
-	MessageParser::execute(message7);
+	Message message3(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
+	                0);
+	message3.appendUint8(1);
+	message3.appendUint16(1);
+	message3.appendEnum16(2);
+	message3.appendEnum16(6);
+	MessageParser::execute(message3);
 
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventDefinitionError));
 	CHECK(ServiceTests::countErrors() == 1);
 
 	// Checking for errors in the case of an attempt to enable an unknown definition
-	Message message8(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
-	message8.appendUint8(1);
-	message8.appendEnum16(1);
-	message8.appendEnum16(1);
-	message8.appendEnum16(10);
-	MessageParser::execute(message8);
+	Message message4(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
+	                0);
+	message4.appendUint8(1);
+	message4.appendEnum16(1);
+	message4.appendEnum16(1);
+	message4.appendEnum16(10);
+	MessageParser::execute(message4);
 
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionIDError));
 	CHECK(ServiceTests::countErrors() == 2);
@@ -308,75 +271,75 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 
 	// Adding event action definitions to enable them
 	Message message0(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message0.appendUint8(1);
+	message0.appendUint8(2);
 	message0.appendEnum16(1);
 	message0.appendEnum16(0);
 	message0.appendEnum16(1);
 	String<64> data = "0";
-	message0.appendString(data);
-	MessageParser::execute(message0);
-
-	Message message1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message1.appendUint8(1);
-	message1.appendEnum16(1);
-	message1.appendEnum16(1);
-	message1.appendEnum16(1);
+	message0.appendOctetString(data);
+	message0.appendEnum16(1);
+	message0.appendEnum16(1);
+	message0.appendEnum16(1);
 	data = "00";
-	message1.appendString(data);
-	MessageParser::execute(message1);
+	message0.appendOctetString(data);
+	MessageParser::execute(message0);
 
 	// Checking their enabled status
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(0)->second.enabled == 0);
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(1)->second.enabled == 0);
 
 	// Creating a message to enable the previous messages
-	Message message3(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
-	message3.appendUint16(2);
-	message3.appendEnum16(1);
-	message3.appendEnum16(0);
-	message3.appendEnum16(1);
-	message3.appendEnum16(1);
-	message3.appendEnum16(1);
-	message3.appendEnum16(1);
-	MessageParser::execute(message3);
+	Message message1(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
+	                0);
+	message1.appendUint16(2);
+	message1.appendEnum16(1);
+	message1.appendEnum16(0);
+	message1.appendEnum16(1);
+	message1.appendEnum16(1);
+	message1.appendEnum16(1);
+	message1.appendEnum16(1);
+	MessageParser::execute(message1);
 
 	// Checking if the messages are enabled
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(0)->second.enabled == 1);
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(1)->second.enabled == 1);
 
 	// Creating a message to enable the previous messages
-	Message message4(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
-	message4.appendUint16(2);
-	message4.appendEnum16(1);
-	message4.appendEnum16(0);
-	message4.appendEnum16(1);
-	message4.appendEnum16(1);
-	message4.appendEnum16(1);
-	message4.appendEnum16(1);
-	MessageParser::execute(message4);
+	Message message2(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
+	                Message::TC, 0);
+	message2.appendUint16(2);
+	message2.appendEnum16(1);
+	message2.appendEnum16(0);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	message2.appendEnum16(1);
+	MessageParser::execute(message2);
 
 	// Checking if the messages are enabled
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(0)->second.enabled == 0);
 	CHECK(eventActionService.eventActionDefinitionMap.lower_bound(1)->second.enabled == 0);
 
 	// Checking for errors in the case of an attempt to disable an unknown definition
-	Message message7(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
-	message7.appendUint8(1);
-	message7.appendEnum16(1);
-	message7.appendEnum16(2);
-	message7.appendEnum16(6);
-	MessageParser::execute(message7);
+	Message message3(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
+	                Message::TC, 0);
+	message3.appendUint8(1);
+	message3.appendEnum16(1);
+	message3.appendEnum16(2);
+	message3.appendEnum16(6);
+	MessageParser::execute(message3);
 
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventDefinitionError));
 	CHECK(ServiceTests::countErrors() == 1);
 
 	// Checking for errors in the case of an attempt to enable an unknown definition
-	Message message8(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
-	message8.appendUint8(1);
-	message8.appendEnum16(1);
-	message8.appendEnum16(1);
-	message8.appendEnum16(10);
-	MessageParser::execute(message8);
+	Message message4(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
+	                Message::TC, 0);
+	message4.appendUint8(1);
+	message4.appendEnum16(1);
+	message4.appendEnum16(1);
+	message4.appendEnum16(10);
+	MessageParser::execute(message4);
 
 	CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionIDError));
 	CHECK(ServiceTests::countErrors() == 2);
@@ -398,28 +361,27 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 
 	// Adding event-action definitions to report them
 	Message message0(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+	message0.appendUint8(2);
 	message0.appendEnum16(1);
 	message0.appendEnum16(0);
 	message0.appendEnum16(1);
 	String<64> data = "0";
-	message0.appendString(data);
+	message0.appendOctetString(data);
+	message0.appendEnum16(1);
+	message0.appendEnum16(2);
+	message0.appendEnum16(1);
+	data = "2";
+	message0.appendOctetString(data);
 	MessageParser::execute(message0);
 
-	Message message1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	message1.appendEnum16(1);
-	message1.appendEnum16(2);
-	message1.appendEnum16(1);
-	data = "2";
-	message1.appendString(data);
-	MessageParser::execute(message1);
-
 	// Enablilng one of the two
-	Message message2(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
-	message2.appendUint16(1);
-	message2.appendEnum16(1);
-	message2.appendEnum16(0);
-	message2.appendEnum16(1);
-	eventActionService.enableEventActionDefinitions(message2);
+	Message message1(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
+	                0);
+	message1.appendUint8(1);
+	message1.appendEnum16(1);
+	message1.appendEnum16(0);
+	message1.appendEnum16(1);
+	eventActionService.enableEventActionDefinitions(message1);
 
 	eventActionService.eventActionStatusReport();
 	REQUIRE(ServiceTests::hasOneMessage());
