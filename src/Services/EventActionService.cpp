@@ -15,13 +15,11 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		uint16_t eventDefinitionID = message.readEnum16();
 		uint16_t eventActionDefinitionID = message.readEnum16();
 		bool canBeAdded = true;
-		if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
-			auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
-			for (auto& element = range.first; element != range.second; ++element) {
-				if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
-					canBeAdded = false;
-					ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
-				}
+		for(auto& element : eventActionDefinitionMap) {
+			if (element.second.eventActionDefinitionID == eventActionDefinitionID) {
+				canBeAdded = false;
+				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
+				break;
 			}
 		}
 
@@ -47,6 +45,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		}
 	}
 }
+
 // TODO check "definitionIDexists" position
 void EventActionService::deleteEventActionDefinitions(Message& message) {
 	// TC[19,2]
