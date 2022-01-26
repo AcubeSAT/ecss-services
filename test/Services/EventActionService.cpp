@@ -442,7 +442,7 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	message0.appendOctetString(data);
 	message0.appendEnum16(1);
 	message0.appendEnum16(2);
-	message0.appendEnum16(1);
+	message0.appendEnum16(3);
 	data = "2";
 	message0.appendOctetString(data);
 	MessageParser::execute(message0);
@@ -454,7 +454,7 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	message1.appendEnum16(1);
 	message1.appendEnum16(0);
 	message1.appendEnum16(1);
-	eventActionService.enableEventActionDefinitions(message1);
+	MessageParser::execute(message1);
 
 	eventActionService.eventActionStatusReport();
 	REQUIRE(ServiceTests::hasOneMessage());
@@ -468,7 +468,7 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	CHECK(report.readBoolean() == 1);
 	CHECK(report.readEnum16() == 1);
 	CHECK(report.readEnum16() == 2);
-	CHECK(report.readEnum16() == 1);
+	CHECK(report.readEnum16() == 3);
 	CHECK(report.readBoolean() == 0);
 }
 
