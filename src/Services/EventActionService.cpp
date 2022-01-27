@@ -9,8 +9,8 @@
 void EventActionService::addEventActionDefinitions(Message& message) {
 	// TC[19,1]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction);
-	const uint8_t numberOfEventActionDefinitions = message.readUint8();
-	for (uint8_t counter = 0; counter < numberOfEventActionDefinitions; counter++) {
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	while (numberOfEventActionDefinitions-- != 0) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
 		uint16_t eventActionDefinitionID = message.readEnum16();
@@ -50,8 +50,8 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 void EventActionService::deleteEventActionDefinitions(Message& message) {
 	// TC[19,2]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction);
-	const uint8_t numberOfEventActionDefinitions = message.readUint8();
-	for (uint8_t counter = 0; counter < numberOfEventActionDefinitions; counter++) {
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	while (numberOfEventActionDefinitions-- != 0) {
 		message.skipBytes(2);
 		uint16_t eventDefinitionID = message.readEnum16();
 		uint16_t eventActionDefinitionID = message.readEnum16();
@@ -90,9 +90,9 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 void EventActionService::enableEventActionDefinitions(Message& message) {
 	// TC[19,4]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction);
-	const uint8_t numberOfEventActionDefinitions = message.readUint8();
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
-		for (uint8_t counter = 0; counter < numberOfEventActionDefinitions; counter++) {
+		while (numberOfEventActionDefinitions-- != 0) {
 			message.skipBytes(2); // Skips reading the application ID
 			 uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
@@ -124,9 +124,9 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 void EventActionService::disableEventActionDefinitions(Message& message) {
 	// TC[19,5]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction);
-	const uint8_t numberOfEventActionDefinitions = message.readUint8();
+	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
-		for (uint8_t counter = 0; counter < numberOfEventActionDefinitions; counter++) {
+		while (numberOfEventActionDefinitions-- != 0) {
 			message.skipBytes(2); // Skips reading applicationID
 			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
