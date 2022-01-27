@@ -59,7 +59,7 @@ public:
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
 		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
-		String<64> request = "";
+		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 	};
 
@@ -133,7 +133,7 @@ public:
 	 * Getter for event-action function status
 	 * @return eventActionFunctionStatus
 	 */
-	bool getEventActionFunctionStatus() {
+	bool getEventActionFunctionStatus() const {
 		return eventActionFunctionStatus;
 	}
 
