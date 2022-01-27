@@ -15,7 +15,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		message.appendEnum16(0);
 		message.appendEnum16(2);
 		message.appendEnum16(0);
-		String<64> data = "010101";
+		String<ECSSTCRequestStringSize> data = "010101";
 		message.appendOctetString(data);
 		MessageParser::execute(message);
 
@@ -32,7 +32,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		uint16_t applicationIDs[] = {0, 1, 2};
 		uint16_t eventDefinitionIDs[] = {3, 5, 4};
 		uint16_t eventActionDefinitionIDs[] = {1, 2, 3};
-		String<64> dataArray[] = {"123", "456", "789"};
+		String<ECSSTCRequestStringSize> dataArray[] = {"123", "456", "789"};
 		message.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.appendEnum16(applicationIDs[i]);
@@ -57,7 +57,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		uint16_t applicationIDs[] = {0, 1, 2};
 		uint16_t eventDefinitionIDs[] = {2, 2, 2};
 		uint16_t eventActionDefinitionIDs[] = {7, 4, 5};
-		String<64> dataArray[] = {"321", "654", "987"};
+		String<ECSSTCRequestStringSize> dataArray[] = {"321", "654", "987"};
 		message.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.appendEnum16(applicationIDs[i]);
@@ -97,7 +97,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		message.appendEnum16(1);
 		message.appendEnum16(3);
 		message.appendEnum16(1);
-		String<64> data = "123";
+		String<ECSSTCRequestStringSize> data = "123";
 		message.appendOctetString(data);
 		message.appendEnum16(1);
 		message.appendEnum16(5);
@@ -116,7 +116,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		message.appendEnum16(1);
 		message.appendEnum16(3);
 		message.appendEnum16(98);
-		String<64> data = "456";
+		String<ECSSTCRequestStringSize> data = "456";
 		message.appendOctetString(data);
 		message.appendEnum16(1);
 		message.appendEnum16(3);
@@ -139,7 +139,7 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 0, 2};
 		uint16_t eventDefinitionIDs[] = {0, 4, 2, 4, 1, 4, 5};
 		uint16_t eventActionDefinitionIDs[] = {1, 7, 9, 65, 46, 27, 11};
-		String<64> data[] = {"0", "1", "2", "3", "4", "5", "6"};
+		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6"};
 		message0.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message0.appendEnum16(applicationIDs[i]);
@@ -168,8 +168,6 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 		message2.appendEnum16(11);
 		MessageParser::execute(message2);
 
-		// Checking the values after deleting some definitions
-
 		REQUIRE(eventActionService.eventActionDefinitionMap.count(0) == 1);
 		REQUIRE(eventActionService.eventActionDefinitionMap.count(4) == 2);
 		REQUIRE(eventActionService.eventActionDefinitionMap.count(2) == 0);
@@ -178,7 +176,6 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	}
 
 	SECTION("Trying to delete an enabled event-action definition") {
-		// Enabling a definition to check for errors in the case of an attempt to delete it
 		Message message2(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
 		                 0);
 		message2.appendUint8(1);
@@ -195,12 +192,11 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 		message3.appendEnum16(46);
 		MessageParser::execute(message3);
 
-		// Checking for errors in the case mentioned above
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionDeleteEnabledDefinitionError));
 		CHECK(ServiceTests::countErrors() == 1);
 	}
 
-	SECTION("Trying to delete an unknown definition") {
+	SECTION("Trying to delete an unknown event-action definition") {
 		Message message5(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC,
 		                 0);
 		message5.appendUint8(1);
@@ -211,6 +207,21 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionIDError));
 		CHECK(ServiceTests::countErrors() == 2);
+	}
+
+    SECTION("Trying to delete an existing event-action definition with the wrong event definition ID") {
+		Message message(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
+		message.appendUint8(2);
+		message.appendEnum16(1);
+		message.appendEnum16(0);
+		message.appendEnum16(1);
+		message.appendEnum16(0);
+		message.appendEnum16(5);
+		message.appendEnum16(7);
+		MessageParser::execute(message);
+
+		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventDefinitionError));
+		CHECK(ServiceTests::countErrors() == 3);
 
 		eventActionService.eventActionDefinitionMap.clear();
 	}
@@ -224,7 +235,7 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 	uint16_t applicationIDs[] = {1, 1, 1, 1, 1};
 	uint16_t eventDefinitionIDs[] = {0, 1, 2, 3, 4};
 	uint16_t eventActionDefinitionIDs[] = {0, 1, 2, 3, 4};
-	String<64> data[] = {"0", "1", "2", "3", "4"};
+	String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4"};
 	message0.appendUint8(numberOfEventActionDefinitions);
 	for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 		message0.appendEnum16(applicationIDs[i]);
@@ -239,7 +250,7 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 	Message message(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction, Message::TC, 0);
 	MessageParser::execute(message);
 
-	CHECK(eventActionService.eventActionDefinitionMap.size() == 0);
+	CHECK(eventActionService.eventActionDefinitionMap.empty());
 }
 
 TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
@@ -249,7 +260,7 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2};
 		uint16_t eventDefinitionIDs[] = {0, 4, 2, 4, 1, 5};
 		uint16_t eventActionDefinitionIDs[] = {724, 171, 447, 547, 588, 729};
-		String<64> data[] = {"0", "1", "2", "3", "4", "5"};
+		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5"};
 		message0.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message0.appendEnum16(applicationIDs[i]);
@@ -259,13 +270,11 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 		}
 		MessageParser::execute(message0);
 
-		// Checking their enabled status
 		auto range = eventActionService.eventActionDefinitionMap.find(4);
 		REQUIRE(!range->second.enabled);
 		REQUIRE(!std::next(range)->second.enabled);
 		REQUIRE(!eventActionService.eventActionDefinitionMap.find(1)->second.enabled);
 
-		// Creating a message to enable the previous messages
 		Message message2(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
 		                 0);
 		message2.appendUint8(3);
@@ -279,8 +288,6 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 		message2.appendEnum16(4);
 		message2.appendEnum16(547);
 		MessageParser::execute(message2);
-
-		// Checking if the messages are enabled
 
 		CHECK(range->second.enabled);
 		CHECK(std::next(range)->second.enabled);
@@ -298,18 +305,22 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionIDError));
 		CHECK(ServiceTests::countErrors() == 1);
+	}
 
-//		// Checking for errors in the case of an attempt to enable an unknown definition
-//		Message message4(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
-//		                 0);
-//		message4.appendUint8(1);
-//		message4.appendEnum16(1);
-//		message4.appendEnum16(1);
-//		message4.appendEnum16(10);
-//		MessageParser::execute(message4);
-//
-//		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionIDError));
-//		CHECK(ServiceTests::countErrors() == 2);
+	SECTION("Trying to enable an existing event-action definition with the wrong event definition ID") {
+		Message message(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
+		message.appendUint8(2);
+		message.appendEnum16(1);
+		message.appendEnum16(0);
+		message.appendEnum16(724);
+		message.appendEnum16(1);
+		message.appendEnum16(3);
+		message.appendEnum16(447);
+		MessageParser::execute(message);
+
+		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventDefinitionError));
+		CHECK(ServiceTests::countErrors() == 2);
+
 		eventActionService.eventActionDefinitionMap.clear();
 	}
 
@@ -319,7 +330,7 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1};
 		uint16_t eventDefinitionIDs[] = {0, 4, 2, 4, 1, 5, 1, 23};
 		uint16_t eventActionDefinitionIDs[] = {724, 171, 447, 547, 588, 729, 45, 555};
-		String<64> data[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
+		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
 		message0.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message0.appendEnum16(applicationIDs[i]);
@@ -348,7 +359,7 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
 		uint16_t eventDefinitionIDs[] = {0, 4, 2, 4, 1, 5, 1, 23, 1};
 		uint16_t eventActionDefinitionIDs[] = {724, 171, 447, 547, 588, 729, 45, 555, 234};
-		String<64> data[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
+		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
 		message0.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message0.appendEnum16(applicationIDs[i]);
@@ -399,8 +410,39 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 		CHECK(!range->second.enabled);
 		CHECK(!std::next(range)->second.enabled);
 		CHECK(!eventActionService.eventActionDefinitionMap.find(5)->second.enabled);
-		range = eventActionService.eventActionDefinitionMap.find(1);
-		CHECK(!range->second.enabled);
+		CHECK(!eventActionService.eventActionDefinitionMap.find(1)->second.enabled);
+	}
+
+	SECTION("Trying to disable unknown definitions") {
+		Message message3(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
+		message3.appendUint8(2);
+		message3.appendUint16(2);
+		message3.appendEnum16(5);
+		message3.appendEnum16(6);
+		message3.appendUint16(2);
+		message3.appendEnum16(5);
+		message3.appendEnum16(13);
+		MessageParser::execute(message3);
+
+		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionIDError));
+		CHECK(ServiceTests::countErrors() == 2);
+	}
+
+	SECTION("Trying to disable an existing event-action definition with the wrong event definition ID") {
+		Message message(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
+		message.appendUint8(2);
+		message.appendEnum16(1);
+		message.appendEnum16(2);
+		message.appendEnum16(447);
+		message.appendEnum16(0);
+		message.appendEnum16(3);
+		message.appendEnum16(45);
+		MessageParser::execute(message);
+
+		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventDefinitionError));
+		CHECK(ServiceTests::countErrors() == 3);
+
+		eventActionService.eventActionDefinitionMap.clear();
 	}
 
     SECTION("Disable all event action definitions") {
@@ -438,7 +480,7 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	message0.appendEnum16(1);
 	message0.appendEnum16(0);
 	message0.appendEnum16(1);
-	String<64> data = "0";
+	String<ECSSTCRequestStringSize> data = "0";
 	message0.appendOctetString(data);
 	message0.appendEnum16(1);
 	message0.appendEnum16(2);
@@ -447,7 +489,6 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	message0.appendOctetString(data);
 	MessageParser::execute(message0);
 
-	// Enablilng one of the two
 	Message message1(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
 	                 0);
 	message1.appendUint8(1);
@@ -473,21 +514,32 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 }
 
 TEST_CASE("Enable event-action function TC[19,8]", "[service][st19]") {
-
-	// A message to enable event action function
-
 	Message message(EventActionService::ServiceType, EventActionService::MessageType::EnableEventActionFunction, Message::TC, 0);
 	eventActionService.enableEventActionFunction(message);
 	CHECK(eventActionService.getEventActionFunctionStatus());
 }
 
 TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
-
-	// A message to disable event action function
 	Message message(EventActionService::ServiceType, EventActionService::MessageType::DisableEventActionFunction, Message::TC, 0);
 	eventActionService.disableEventActionFunction(message);
 	CHECK(eventActionService.getEventActionFunctionStatus() == false);
 }
 
 TEST_CASE("Execute a TC request", "[service][st19]") {
+	Message message(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+	uint8_t numberOfEventActionDefinitions = 3;
+	uint16_t applicationIDs[] = {0, 1, 2};
+	uint16_t eventDefinitionIDs[] = {3, 5, 4};
+	uint16_t eventActionDefinitionIDs[] = {1, 2, 3};
+	String<ECSSTCRequestStringSize> dataArray[] = {"123", "456", "789"};
+	message.appendUint8(numberOfEventActionDefinitions);
+	for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		message.appendEnum16(applicationIDs[i]);
+		message.appendEnum16(eventDefinitionIDs[i]);
+		message.appendEnum16(eventActionDefinitionIDs[i]);
+		message.appendOctetString(dataArray[i]);
+	}
+	MessageParser::execute(message);
+
+
 }
