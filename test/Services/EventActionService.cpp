@@ -15,15 +15,16 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		message.appendEnum16(0);
 		message.appendEnum16(2);
 		message.appendEnum16(0);
-		String<ECSSTCRequestStringSize> data = "010101";
+		String<CCSDSMaxMessageSize> data = "12345";
 		message.appendOctetString(data);
 		MessageParser::execute(message);
 
-		REQUIRE(eventActionService.eventActionDefinitionMap.find(2)->second.applicationId == 0);
-		REQUIRE(eventActionService.eventActionDefinitionMap.find(2)->second.eventDefinitionID == 2);
-		REQUIRE(eventActionService.eventActionDefinitionMap.find(2)->second.eventActionDefinitionID == 0);
-		REQUIRE(!eventActionService.eventActionDefinitionMap.find(2)->second.enabled);
-		REQUIRE(eventActionService.eventActionDefinitionMap.find(2)->second.request.compare(data) == 0);
+		auto element = eventActionService.eventActionDefinitionMap.find(2);
+		CHECK(element->second.applicationId == 0);
+		CHECK(element->second.eventDefinitionID == 2);
+		CHECK(element->second.eventActionDefinitionID == 0);
+		CHECK(!element->second.enabled);
+		CHECK(element->second.request.compare(data) == 0);
 	}
 
 	SECTION("Adding multiple event-action definitions for different events") {
@@ -32,7 +33,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		uint16_t applicationIDs[] = {0, 1, 2};
 		uint16_t eventDefinitionIDs[] = {3, 5, 4};
 		uint16_t eventActionDefinitionIDs[] = {1, 2, 3};
-		String<ECSSTCRequestStringSize> dataArray[] = {"123", "456", "789"};
+		String<CCSDSMaxMessageSize> dataArray[] = {"123", "456", "789"};
 		message.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.appendEnum16(applicationIDs[i]);
@@ -43,11 +44,13 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		MessageParser::execute(message);
 
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
-			REQUIRE(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.applicationId == applicationIDs[i]);
-			REQUIRE(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.eventDefinitionID == eventDefinitionIDs[i]);
-			REQUIRE(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.eventActionDefinitionID == eventActionDefinitionIDs[i]);
-			REQUIRE(!eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.enabled);
-			REQUIRE(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i])->second.request.compare(dataArray[i]) == 0);
+			auto element = eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i]);
+			REQUIRE(element->second.applicationId == applicationIDs[i]);
+			REQUIRE(element->second.eventDefinitionID == eventDefinitionIDs[i]);
+			REQUIRE(element->second.eventActionDefinitionID == eventActionDefinitionIDs[i]);
+			REQUIRE(!element->second.enabled);
+			REQUIRE(element->second.request.compare(dataArray[i]) == 0);
+			REQUIRE(element->second.request.size() == dataArray[i].size());
 		}
 	}
 
@@ -57,7 +60,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		uint16_t applicationIDs[] = {0, 1, 2};
 		uint16_t eventDefinitionIDs[] = {2, 2, 2};
 		uint16_t eventActionDefinitionIDs[] = {7, 4, 5};
-		String<ECSSTCRequestStringSize> dataArray[] = {"321", "654", "987"};
+		String<CCSDSMaxMessageSize> dataArray[] = {"321", "654", "987"};
 		message.appendUint8(numberOfEventActionDefinitions);
 		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
 			message.appendEnum16(applicationIDs[i]);
@@ -97,7 +100,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		message.appendEnum16(1);
 		message.appendEnum16(3);
 		message.appendEnum16(1);
-		String<ECSSTCRequestStringSize> data = "123";
+		String<CCSDSMaxMessageSize> data = "123";
 		message.appendOctetString(data);
 		message.appendEnum16(1);
 		message.appendEnum16(5);
@@ -515,4 +518,47 @@ TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
 	Message message(EventActionService::ServiceType, EventActionService::MessageType::DisableEventActionFunction, Message::TC, 0);
 	eventActionService.disableEventActionFunction(message);
 	CHECK(eventActionService.getEventActionFunctionStatus() == false);
+}
+
+TEST_CASE("Execute a TC request", "[service][st19]") {
+	SECTION("Action: Disable event-action definition") {
+		Message message(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+		message.appendUint8(1);
+		message.appendEnum16(0);
+		message.appendEnum16(15);
+		message.appendEnum16(16);
+
+		Message messageToBeExecuted(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
+		messageToBeExecuted.appendUint8(1);
+		messageToBeExecuted.appendEnum16(0);
+		messageToBeExecuted.appendEnum16(15);
+		messageToBeExecuted.appendEnum16(16);
+		String<CCSDSMaxMessageSize> data = MessageParser::composeECSS(messageToBeExecuted, 12);
+		message.appendOctetString(data);
+		MessageParser::execute(message);
+
+		CHECK(eventActionService.eventActionDefinitionMap.find(15)->second.request[3] == (data[3]));
+
+		Message message3(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
+		message3.appendUint8(1);
+		message3.appendEnum16(0);
+		message3.appendEnum16(15);
+		message3.appendEnum16(16);
+		MessageParser::execute(message3);
+		CHECK(eventActionService.eventActionDefinitionMap.find(15)->second.enabled);
+
+		Message message123(EventActionService::ServiceType, EventActionService::MessageType::EnableEventActionFunction, Message::TC, 0);
+		eventActionService.enableEventActionFunction(message123);
+		REQUIRE(eventActionService.getEventActionFunctionStatus());
+
+		eventActionService.executeAction(15);
+
+		CHECK(!eventActionService.eventActionDefinitionMap.find(15)->second.enabled);
+		CHECK(ServiceTests::countErrors() == 0);
+	}
+
+	SECTION("Action: Add event-action definition") {
+
+	}
+
 }

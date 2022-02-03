@@ -126,11 +126,11 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	message.dataSize = length;
 }
 
-Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
+Message MessageParser::parseECSSTC(String<CCSDSMaxMessageSize> data) {
 	Message message;
 	auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
 	message.packetType = Message::TC;
-	parseECSSTCHeader(dataInt, ECSSTCRequestStringSize, message);
+	parseECSSTCHeader(dataInt, data.size(), message);
 	return message;
 }
 

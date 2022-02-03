@@ -58,7 +58,7 @@ public:
 	 * this great analysis:
 	 * stackoverflow.com/questions/15078638/can-i-turn-unsigned-char-into-char-and-vice-versa
 	 */
-	static Message parseECSSTC(String<ECSSTCRequestStringSize> data);
+	static Message parseECSSTC(String<CCSDSMaxMessageSize> data);
 
 	/**
 	 * @brief Overloaded version of \ref MessageParser::parseECSSTC(String<ECSS_TC_REQUEST_STRING_SIZE> data)

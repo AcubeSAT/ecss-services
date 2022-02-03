@@ -31,7 +31,7 @@ private:
 	 * Event-action function status
 	 */
 	bool eventActionFunctionStatus;
-
+public:
 	/**
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
@@ -59,7 +59,7 @@ public:
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
 		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
-		String<ECSSTCRequestStringSize> request = "";
+		String<CCSDSMaxMessageSize> request = "";
 		bool enabled = false;
 	};
 
