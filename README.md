@@ -4,6 +4,10 @@ In this repository you can find the implementation of the ECSS services, based
 on the [ECSS-E-ST-70-41C](https://ecss.nl/standard/ecss-e-st-70-41c-space-engineering-telemetry-and-telecommand-packet-utilization-15-april-2016/)
 standard.
 
+## Documentation
+You can read the complete documentation of this project at https://acubesat.gitlab.io/obc/ecss-services/docs/.
+This includes installation instructions, a usage guide, and detailed descriptions of all public functions and definitions.
+
 ## Directories
 - **ci**: GitLab CI configuration files
 - **docs**: Source code usage and development documentation
@@ -11,9 +15,6 @@ standard.
 - **lib**: External libraries used in the code
 - **src**: All source files are included here
 - **test**: Unit test implementation
-
-## Documentation
-Full documentation about this project based on code comments is available at https://acubesat.gitlab.io/obc/ecss-services/docs/.
 
 ## Implementation status
 
