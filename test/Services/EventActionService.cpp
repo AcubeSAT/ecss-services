@@ -228,7 +228,7 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 		enableAllDefinitions.appendUint8(0);
 		MessageParser::execute(enableAllDefinitions);
 
-		for(const auto& iterator : eventActionService.eventActionDefinitionMap) {
+		for (const auto& iterator: eventActionService.eventActionDefinitionMap) {
 			CHECK(iterator.second.enabled);
 		}
 
@@ -308,7 +308,7 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 		CHECK(ServiceTests::countErrors() == 2);
 	}
 
-    SECTION("Trying to delete an existing event-action definition with the wrong event definition ID") {
+	SECTION("Trying to delete an existing event-action definition with the wrong event definition ID") {
 		Message deleteDefinition(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
 		deleteDefinition.appendUint8(2);
 		deleteDefinition.appendEnum16(1);
@@ -440,7 +440,7 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 		CHECK(ServiceTests::countErrors() == 3);
 	}
 
-    SECTION("Disable all event action definitions") {
+	SECTION("Disable all event action definitions") {
 		REQUIRE(!eventActionService.eventActionDefinitionMap.empty());
 
 		Message enableAllDefinitions(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
@@ -451,7 +451,7 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 		disableAllDefinitions.appendUint8(0);
 		MessageParser::execute(disableAllDefinitions);
 
-		for(const auto& iterator : eventActionService.eventActionDefinitionMap) {
+		for (const auto& iterator: eventActionService.eventActionDefinitionMap) {
 			CHECK(!iterator.second.enabled);
 		}
 	}
@@ -482,7 +482,7 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	MessageParser::execute(addDefinitions);
 
 	Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
-	                 0);
+	                         0);
 	enableDefinition.appendUint8(1);
 	enableDefinition.appendEnum16(1);
 	enableDefinition.appendEnum16(0);
