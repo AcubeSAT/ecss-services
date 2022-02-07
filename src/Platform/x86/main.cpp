@@ -18,27 +18,91 @@
 #include "etl/String.hpp"
 #include "ServicePool.hpp"
 #include <ctime>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sstream>
 
 int main() {
-	LOG_NOTICE << "ECSS Services test application";
 
-	Message packet = Message(0, 0, Message::TC, 1);
+    LOG_DEBUG << "Setting up YAMCS Connection";
+    int addrlen, msglen;
+    char message[300];
+    int s;
+    struct sockaddr_in yamcs, addr;
 
-	packet.appendString(String<5>("hello"));
-	packet.appendBits(15, 0x28a8);
-	packet.appendBits(1, 1);
-	packet.appendFloat(5.7);
-	packet.appendSint32(-123456789);
+    //UDP Socket creation
+    s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (s < 0)
+    {
+        printf("\nUDP socket creation failed");
+        return 1;
+    } else{
+        LOG_DEBUG<<"Socket created successfully";
+    }
 
-	std::cout << "Hello, World!" << std::endl;
-	std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
+    //UDP set timeout
+    struct timeval timeout;
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+    if (setsockopt (s, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof timeout) < 0)    {
+        printf("\nerror in setting timeout");
+        return 1;
+    }else {
+        LOG_DEBUG << "Timeout set successfully to" << timeout.tv_sec<<"seconds";
+        yamcs.sin_port = htons(10025);
+    }
+    //UDP SOCKET Binding
+    if (bind(s, (sockaddr *)&yamcs, sizeof(yamcs))<0)
+    {
+        printf("\nUDP socket binding failed\n");
+        return 1;
+    }
+    else
+    {
+        LOG_DEBUG<<"Binding finished successfully";
+    }
+    LOG_DEBUG<<"Finished with setting up the connection";
 
-	char string[6];
-	packet.readCString(string, 5);
-	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
-	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
-//
-//	// ST[17] test
+    LOG_NOTICE << "ECSS Services test application";
+
+    LOG_NOTICE<<"Receiving TCs from YAMCS";
+    //UDP Receiving broadcasted data
+    addrlen = sizeof(addr);
+    while(1) {
+        std::ostringstream ss;
+        msglen = recvfrom(s, message, sizeof(message), 0, (struct sockaddr *) &addr,
+                          reinterpret_cast<socklen_t *>(&addrlen));
+        if (msglen < 0) {
+            printf("Timeout exceeded\n");
+            printf("No messages from YAMCS received\n");
+            break;
+        }
+        for(int i=0; i<msglen; i++) {
+            ss << static_cast<int>(message[i]) << " ";
+        }
+        LOG_NOTICE<<ss.str();
+    }
+
+    Message packet = Message(0, 0, Message::TC, 1);
+
+    packet.appendString(String<5>("hello"));
+    packet.appendBits(15, 0x28a8);
+    packet.appendBits(1, 1);
+    packet.appendFloat(5.7);
+    packet.appendSint32(-123456789);
+
+    std::cout << "Hello, World!" << std::endl;
+    std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
+
+    char string[6];
+    packet.readCString(string, 5);
+    std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
+    std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
+
+    //	// ST[17] test
 //	TestService& testService = Services.testService;
 //	Message receivedPacket =
 //	    Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);

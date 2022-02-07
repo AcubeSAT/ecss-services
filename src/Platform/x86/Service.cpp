@@ -10,6 +10,7 @@
 #include <sys/types.h> // uint16_t
 #include <sys/socket.h> // socket, sendto
 #include <unistd.h> // close
+
 void Service::storeMessage(Message& message) {
 	// appends the remaining bits to complete a byte
 	message.finalize();
