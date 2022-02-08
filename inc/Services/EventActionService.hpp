@@ -59,7 +59,7 @@ public:
 		uint16_t applicationId = 0;
 		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
 		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
-		String<CCSDSMaxMessageSize> request = "";
+		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 	};
 

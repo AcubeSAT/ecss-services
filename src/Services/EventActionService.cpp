@@ -23,21 +23,16 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 				break;
 			}
 		}
-		//TODO change ECSSTCRequestStringSize
-		uint16_t stringSize = message.readUint16();
-		if (stringSize > ECSSTCRequestStringSize) {
-			canBeAdded = false;
-			ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
-		}
+
 		if (canBeAdded) {
-			uint8_t data[CCSDSMaxMessageSize] = {0};
-			message.readString(data, stringSize);
+			uint8_t data[ECSSTCRequestStringSize] = {0};
+			message.readString(data, ECSSTCRequestStringSize);
 			EventActionDefinition temp;
 			temp.enabled = false;
 			temp.applicationId = applicationID;
 			temp.eventDefinitionID = eventDefinitionID;
 			temp.eventActionDefinitionID = eventActionDefinitionID;
-			temp.request = String<CCSDSMaxMessageSize>(data, stringSize);
+			temp.request = String<ECSSTCRequestStringSize>(data);
 			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
 			} else {
