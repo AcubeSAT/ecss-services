@@ -1,10 +1,15 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTACTION
 
-#include "Services/EventActionService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
+#include "Services/EventActionService.hpp"
 
+EventActionService::EventActionDefinition::EventActionDefinition(uint16_t applicationID, uint16_t eventDefinitionID,
+                                                                 uint16_t eventActionDefinitionID, Message& message)
+    : applicationID(applicationID), eventDefinitionID(eventDefinitionID), eventActionDefinitionID(eventActionDefinitionID), request(message.data + message.readPosition) {
+	message.readPosition += ECSSTCRequestStringSize;
+}
 
 void EventActionService::addEventActionDefinitions(Message& message) {
 	// TC[19,1]
@@ -16,7 +21,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		uint16_t eventActionDefinitionID = message.readEnum16();
 		bool canBeAdded = true;
 
-		for(auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
+		for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
 				canBeAdded = false;
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
@@ -25,17 +30,10 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		}
 
 		if (canBeAdded) {
-			uint8_t data[ECSSTCRequestStringSize] = {0};
-			message.readString(data, ECSSTCRequestStringSize);
-			EventActionDefinition temp;
-			temp.enabled = false;
-			temp.applicationId = applicationID;
-			temp.eventDefinitionID = eventDefinitionID;
-			temp.eventActionDefinitionID = eventActionDefinitionID;
-			temp.request = String<ECSSTCRequestStringSize>(data);
 			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
 			} else {
+				EventActionDefinition temp(applicationID, eventDefinitionID, eventActionDefinitionID, message);
 				eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 			}
 		}
@@ -52,16 +50,14 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 		uint16_t eventActionDefinitionID = message.readEnum16();
 		bool actionDefinitionExists = false;
 
-		for(auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
+		for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
 				actionDefinitionExists = true;
 				if (element->second.enabled) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
-				}
-				else if (element->first != eventDefinitionID) {
+				} else if (element->first != eventDefinitionID) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
-				}
-				else {
+				} else {
 					eventActionDefinitionMap.erase(element);
 				}
 				break;
@@ -89,17 +85,16 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
 			message.skipBytes(2); // Skips reading the application ID
-			 uint16_t eventDefinitionID = message.readEnum16();
+			uint16_t eventDefinitionID = message.readEnum16();
 			uint16_t eventActionDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
 
-			for(auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
+			for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 				if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
 					actionDefinitionExists = true;
 					if (element->first != eventDefinitionID) {
 						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
-					}
-					else {
+					} else {
 						element->second.enabled = true;
 					}
 					break;
@@ -110,7 +105,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 			}
 		}
 	} else {
-		for (auto& element : eventActionDefinitionMap) {
+		for (auto& element: eventActionDefinitionMap) {
 			element.second.enabled = true;
 		}
 	}
@@ -127,13 +122,12 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 			uint16_t eventActionDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
 
-			for(auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
+			for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 				if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
 					actionDefinitionExists = true;
 					if (element->first != eventDefinitionID) {
 						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
-					}
-					else {
+					} else {
 						element->second.enabled = false;
 					}
 					break;
@@ -144,7 +138,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 			}
 		}
 	} else {
-		for (auto& element : eventActionDefinitionMap) {
+		for (auto& element: eventActionDefinitionMap) {
 			element.second.enabled = false;
 		}
 	}
@@ -162,8 +156,8 @@ void EventActionService::eventActionStatusReport() {
 	Message report = createTM(EventActionStatusReport);
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
-	for (const auto& element : eventActionDefinitionMap) {
-		report.appendEnum16(element.second.applicationId);
+	for (const auto& element: eventActionDefinitionMap) {
+		report.appendEnum16(element.second.applicationID);
 		report.appendEnum16(element.second.eventDefinitionID);
 		report.appendEnum16(element.second.eventActionDefinitionID);
 		report.appendBoolean(element.second.enabled);
@@ -219,7 +213,7 @@ void EventActionService::execute(Message& message) {
 		case ReportStatusOfEachEventAction:
 			requestEventActionDefinitionStatus(message);
 			break;
-		case EnableEventActionFunction :
+		case EnableEventActionFunction:
 			enableEventActionFunction(message);
 			break;
 		case DisableEventActionFunction:

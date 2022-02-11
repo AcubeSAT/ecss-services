@@ -20,12 +20,11 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		MessageParser::execute(addDefinition);
 
 		auto element = eventActionService.eventActionDefinitionMap.find(2);
-		CHECK(element->second.applicationId == 0);
+		CHECK(element->second.applicationID == 0);
 		CHECK(element->second.eventDefinitionID == 2);
 		CHECK(element->second.eventActionDefinitionID == 0);
 		CHECK(!element->second.enabled);
-		CHECK(element->second.request.size() == ECSSTCRequestStringSize);
-		for (uint8_t i = 0; i < data.size(); ++i) {
+		for (auto i = 0; i < data.size(); ++i) {
 			CHECK(data[i] == element->second.request[i]);
 		}
 	}
@@ -38,7 +37,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		uint16_t eventActionDefinitionIDs[] = {1, 2, 3};
 		String<ECSSTCRequestStringSize> dataArray[] = {"123", "456", "789"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			addDefinitions.appendEnum16(applicationIDs[i]);
 			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
 			addDefinitions.appendEnum16(eventActionDefinitionIDs[i]);
@@ -46,9 +45,9 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		}
 		MessageParser::execute(addDefinitions);
 
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			auto element = eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i]);
-			CHECK(element->second.applicationId == applicationIDs[i]);
+			CHECK(element->second.applicationID == applicationIDs[i]);
 			CHECK(element->second.eventDefinitionID == eventDefinitionIDs[i]);
 			CHECK(element->second.eventActionDefinitionID == eventActionDefinitionIDs[i]);
 			CHECK(!element->second.enabled);
@@ -64,7 +63,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		uint16_t eventActionDefinitionIDs[] = {7, 4, 5};
 		String<ECSSTCRequestStringSize> dataArray[] = {"321", "654", "987"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			addDefinitions.appendEnum16(applicationIDs[i]);
 			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
 			addDefinitions.appendEnum16(eventActionDefinitionIDs[i]);
@@ -133,7 +132,7 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 		uint16_t eventActionDefinitionIDs[] = {724, 171, 447, 547, 588, 729};
 		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			addDefinitions.appendEnum16(applicationIDs[i]);
 			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
 			addDefinitions.appendEnum16(eventActionDefinitionIDs[i]);
@@ -203,7 +202,7 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 		uint16_t eventActionDefinitionIDs[] = {724, 171, 447, 547, 588, 729, 45, 555};
 		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			addDefinitions.appendEnum16(applicationIDs[i]);
 			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
 			addDefinitions.appendEnum16(eventActionDefinitionIDs[i]);
@@ -232,7 +231,7 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 		uint16_t eventActionDefinitionIDs[] = {1, 7, 9, 65, 46, 27, 11};
 		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			addDefinitions.appendEnum16(applicationIDs[i]);
 			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
 			addDefinitions.appendEnum16(eventActionDefinitionIDs[i]);
@@ -321,7 +320,7 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 	uint16_t eventActionDefinitionIDs[] = {0, 1, 2, 3, 4};
 	String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4"};
 	addDefinition.appendUint8(numberOfEventActionDefinitions);
-	for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 		addDefinition.appendEnum16(applicationIDs[i]);
 		addDefinition.appendEnum16(eventDefinitionIDs[i]);
 		addDefinition.appendEnum16(eventActionDefinitionIDs[i]);
@@ -346,7 +345,7 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 		uint16_t eventActionDefinitionIDs[] = {724, 171, 447, 547, 588, 729, 45, 555, 234};
 		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			addDefinitions.appendEnum16(applicationIDs[i]);
 			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
 			addDefinitions.appendEnum16(eventActionDefinitionIDs[i]);
@@ -564,7 +563,7 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 		eventActionService.executeAction(9);
 
 		auto element = eventActionService.eventActionDefinitionMap.find(74);
-		CHECK(element->second.applicationId == 0);
+		CHECK(element->second.applicationID == 0);
 		CHECK(element->second.eventDefinitionID == 74);
 		CHECK(element->second.eventActionDefinitionID == 87);
 		CHECK(!element->second.enabled);
@@ -617,7 +616,7 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 		uint16_t eventActionDefinitionIDs[] = {1, 2, 3};
 		String<ECSSTCRequestStringSize> dataArray[] = {"123", "456", "789"};
 		addDummyDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (uint8_t i = 0; i < numberOfEventActionDefinitions; i++) {
+		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 			addDummyDefinitions.appendEnum16(applicationIDs[i]);
 			addDummyDefinitions.appendEnum16(eventDefinitionIDs[i]);
 			addDummyDefinitions.appendEnum16(eventActionDefinitionIDs[i]);

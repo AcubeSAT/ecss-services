@@ -12,7 +12,6 @@
  * ECSS 8.19 && 6.19
  *
  * @ingroup Services
- * @note: Make sure to check the note in the addEventActionDefinition()
  * @note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
  * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions
  * be executed when one event takes place. This defies the standard.
@@ -50,11 +49,14 @@ public:
 
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
-		uint16_t applicationId = 0;
+		uint16_t applicationID = 0;
 		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
 		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
+
+		EventActionDefinition (uint16_t applicationID, uint16_t eventDefinitionID,
+		                      uint16_t eventActionDefinitionID, Message& message);
 	};
 
 	friend EventReportService;
@@ -69,10 +71,6 @@ public:
 
 	/**
 	 * TC[19,1] add event-action definitions
-	 *
-	 * Note: We have abolished multiple additions in one Telecommand packet. Only one
-	 * event-action definition will be added per TC packet. That means there will be just an
-	 * application ID, an event definition ID and the TC request.
 	 */
 	void addEventActionDefinitions(Message& message);
 
