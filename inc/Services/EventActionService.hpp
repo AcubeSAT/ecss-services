@@ -31,12 +31,6 @@ private:
 	 * Event-action function status
 	 */
 	bool eventActionFunctionStatus;
-public:
-	/**
-	 * Custom function that is called right after an event takes place, to initiate
-	 * the execution of the action
-	 */
-	void executeAction(uint16_t eventID);
 
 public:
 
@@ -136,6 +130,12 @@ public:
 	bool getEventActionFunctionStatus() const {
 		return eventActionFunctionStatus;
 	}
+
+	/**
+	 * Custom function that is called right after an event takes place, to initiate
+	 * the execution of the action
+	 */
+	void executeAction(uint16_t eventID);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
