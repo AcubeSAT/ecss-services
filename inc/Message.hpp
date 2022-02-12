@@ -202,7 +202,7 @@ public:
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
-	 * ECSS_MAX_STRING_SIZE. This function does NOT place a \0 at the end of the created string.
+	 * ECSSMaxStringSize. This function does NOT place a \0 at the end of the created string.
 	 */
 	void readString(char* string, uint16_t size);
 
@@ -210,7 +210,7 @@ public:
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
-	 * ECSS_MAX_STRING_SIZE. This function does NOT place a \0 at the end of the created string
+	 * ECSSMaxStringSize. This function does NOT place a \0 at the end of the created string
 	 * @todo Is uint16_t size too much or not enough? It has to be defined
 	 */
 	void readString(uint8_t* string, uint16_t size);
@@ -219,7 +219,7 @@ public:
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
-	 * ECSS_MAX_STRING_SIZE + 1. This function DOES place a \0 at the end of the created string,
+	 * ECSSMaxStringSize + 1. This function DOES place a \0 at the end of the created string,
 	 * meaning that \p string should contain 1 more byte than the string stored in the message.
 	 */
 	void readCString(char* string, uint16_t size);

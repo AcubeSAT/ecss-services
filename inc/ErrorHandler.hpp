@@ -248,8 +248,32 @@ public:
 		/**
 		 * Request to report a non existent parameter monitoring definition.
 		 */
-		ReportParameterNotInTheParameterMonitoringList = 29
-	};
+		ReportParameterNotInTheParameterMonitoringList = 29,
+        /**
+         * Size of file is bigger than allowed
+         */
+        SizeOfFileIsOutOfBounds = 30,
+        /**
+         * Object path is invalid
+         */
+        ObjectPathIsInvalid = 31,
+        /**
+         * Size of string is bigger than allowed
+         */
+        SizeOfStringIsOutOfBounds = 31,
+        /**
+		 * A wildcard found where it shouldn't be present
+		 */
+        UnexpectedWildcard = 32,
+        /**
+		 * A file type that in not LFS_TYPE_REG nor LFS_TYPE_DIR
+		 */
+        UnexpectedFileType = 33,
+        /**
+		 * A file type that was expected to by LFS_TYPE_DIR is LFS_TYPE_REG instead
+		 */
+        RepositoryPathLeadsToFile = 34,
+    };
 
 	/**
 	 * The error code for failed progress of execution reports, as specified in ECSS 5.3.5.2.3g
@@ -277,7 +301,32 @@ public:
 		 * Address of a memory is out of the defined range for the type of memory
 		 */
 		AddressOutOfRange = 2,
-	};
+        /**
+         * File already exists, thus can't be created again
+         */
+        FileAlreadyExists = 3,
+        /**
+         * LittleFs lfs_file_close function generic error
+         */
+        LittleFsFileCloseFailed = 4,
+        /**
+         * LittleFs lfs_file_open function generic error
+         */
+        LittleFsFileOpenFailed = 5,
+        /**
+         * Invalid object type returned from littleFs
+         */
+        LittleFsInvalidObjectType = 6,
+        /**
+         * LittleFs lfs_remove function generic error
+         */
+        LittleFsRemoveFailed = 7,
+        /**
+         * LittleFs lfs_stat function generic error
+         */
+        LittleFsStatFailed = 8,
+
+    };
 
 	/**
 	 * The error code for failed routing reports, as specified in ECSS 6.1.3.3d
