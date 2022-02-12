@@ -6,9 +6,9 @@
 #include "etl/vector.h"
 #include "../../lib/littlefs/lfs.h"
 
-int32_t FileManagementService::checkForWildcard(String<ECSSMaxStringSize> messageString)
+int8_t FileManagementService::checkForWildcard(String<ECSSMaxStringSize> messageString)
 {
-    // Copy the repositoryString to a char array, in order to use it in lfs_stat
+    // Copy the repositoryString to a char pointer, in order to use it in lfs_stat
     auto *messageStringChar = reinterpret_cast<uint8_t *>(messageString.data());
 
     // Check for wildcards in repositoryStringChar
@@ -22,8 +22,8 @@ int32_t FileManagementService::checkForWildcard(String<ECSSMaxStringSize> messag
         }
     }
 
-    // Return status code -10 if there is no wildcard
-    return -10;
+    // Return status code -1 if there is no wildcard
+    return -1;
 }
 
 uint8_t wildcardStringMatch(char *line, char *pattern) {
@@ -72,16 +72,17 @@ uint8_t wildcardStringMatch(char *line, char *pattern) {
 
 }
 
-uint8_t FileManagementService::getStringUntilZeroTerminator(Message &message,
+uint8_t FileManagementService::getStringUntilZeroTerminator(Message                   &message,
                                                             String<ECSSMaxStringSize> &extractedString)
 {
-
-    char currentChar = '0';
+    // Counter which counts the size of the string
     uint8_t charCounter = 0;
-    currentChar = static_cast<char>(message.readByte());
+
+    // Current character
+    char currentChar = static_cast<char>(message.readByte());
 
     // Increment the counter until '@' is reached
-    while (currentChar != '@')
+    while (currentChar != FileManagementService::variableStringTerminator)
     {
 
         // Check if size is below the maximum allowed
@@ -104,12 +105,13 @@ uint8_t FileManagementService::getStringUntilZeroTerminator(Message &message,
 
 int32_t FileManagementService::pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString)
 {
+    // Info struct that will house the necessary information for the repository
     lfs_info infoStruct;
 
     // Check if there are any wildcards in the repositoryString
-    int8_t repositoyryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString);
+    int8_t repositoryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString);
 
-    if (repositoyryStringWildcardStatus != -10)
+    if (repositoryStringWildcardStatus != -1)
     {
         // Return error code which indicates that there is a wildcard in the repository's path string
         return -1;
@@ -119,7 +121,9 @@ int32_t FileManagementService::pathIsValidForCreation(String<ECSSMaxStringSize> 
     auto *repositoryStringChar = reinterpret_cast<uint8_t *>(repositoryString.data());
 
     // Call lfs_stat in order to fill the info_struct with data
-    int32_t infoStructFillStatus = lfs_stat(&fs1,  reinterpret_cast<const char *>(repositoryStringChar), &infoStruct);
+    int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject,
+                                            reinterpret_cast<const char *>(repositoryStringChar),
+                                            &infoStruct);
 
     // Check if the repository exists and no errors are produced during the lfs_stat() execution
     if (infoStructFillStatus >= 0)
@@ -159,7 +163,7 @@ void getNumberOfBytesUntillZeroTerminator(char *characterArray, uint8_t &size)
     }
 }
 
-void checkForSlashes(String<ECSSMaxStringSize> &objectPathString, uint8_t *&fileNameChar)
+void FileManagementService::checkForSlashes(String<ECSSMaxStringSize> &objectPathString, uint8_t *&fileNameChar)
 {
     // Last character of the repository path string
     char lastPathCharacter = objectPathString.back();
@@ -198,9 +202,11 @@ void checkForSlashes(String<ECSSMaxStringSize> &objectPathString, uint8_t *&file
     }
 }
 
-int32_t FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file,
+int32_t FileManagementService::littleFsCreateFile(lfs_t                     *fileSystem,
+                                                  lfs_file_t                *file,
                                                   String<ECSSMaxStringSize> repositoryPath,
-                                                  String<ECSSMaxStringSize> fileName, int32_t flags)
+                                                  String<ECSSMaxStringSize> fileName,
+                                                  int32_t                   flags)
 {
 
     // Check the size of the object path
@@ -213,7 +219,7 @@ int32_t FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file,
     // Check if there are any wildcards in the file name
     int8_t fileNameWildcardStatus = FileManagementService::checkForWildcard(fileName);
 
-    if (fileNameWildcardStatus != -10)
+    if (fileNameWildcardStatus != -1)
     {
         // Return error code which indicates that there is a wildcard in the repository's path string
         return -2;
@@ -238,7 +244,7 @@ int32_t FileManagementService::littleFsCreateFile(lfs_t *fs, lfs_file_t *file,
     objectPathString.append(reinterpret_cast<const char *>(fileNameChar));
 
     // Create the file using lfs_file_open with the appropriate flags
-    int32_t lfsCreateFileStatus = lfs_file_open(fs, file, objectPathString.data(), flags);
+    int32_t lfsCreateFileStatus = lfs_file_open(&onBoardFileSystemObject, file, objectPathString.data(), flags);
 
     return lfsCreateFileStatus;
 }
@@ -249,7 +255,7 @@ int32_t FileManagementService::pathIsValidForDeletion(String<ECSSMaxStringSize> 
     // Check if there are any wildcards in the repositoryString
     int8_t repositoyryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString);
 
-    if (repositoyryStringWildcardStatus != -10) {
+    if (repositoyryStringWildcardStatus != -1) {
         // Return error code which indicates that there is a wildcard in the repository's path string
         return -1;
     }
@@ -257,7 +263,7 @@ int32_t FileManagementService::pathIsValidForDeletion(String<ECSSMaxStringSize> 
     // Check if there are any wildcards in the fileNameString
     int8_t fileNameStringWildcardStatus = FileManagementService::checkForWildcard(fileNameString);
 
-    if (fileNameStringWildcardStatus != -10)
+    if (fileNameStringWildcardStatus != -1)
     {
         // Return error code which indicates that there is a wildcard in the file's name string
         return -2;
@@ -292,7 +298,7 @@ int32_t FileManagementService::pathIsValidForDeletion(String<ECSSMaxStringSize> 
     lfs_info infoStruct;
 
     // Call lfs_stat to fill the infoStruct with information about the object
-    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPathString.data(), &infoStruct);
+    int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), &infoStruct);
 
     // Check if the lfs_stat is completed successfully
     if (infoStructFillStatus >= 0)
@@ -366,7 +372,7 @@ int32_t FileManagementService::pathIsValidForARepository(String<ECSSMaxStringSiz
     auto *repositoryStringChar = reinterpret_cast<const char *>(repositoryString.data());
 
     // Call lfs_stat to fill the infoStruct with information about the object
-    int32_t infoStructFillStatus = lfs_stat(&fs1, repositoryStringChar, pInfo);
+    int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, repositoryStringChar, pInfo);
 
     // Check if the lfs_stat is completed successfully
     if (infoStructFillStatus >= 0)
@@ -422,7 +428,7 @@ int32_t FileManagementService::littleFsReportFile(String<ECSSMaxStringSize> repo
     objectPathString.append(reinterpret_cast<const char *>(fileNameStringChar));
 
     // Call lfs_stat to fill the infoStruct with information about the object
-    int32_t infoStructFillStatus = lfs_stat(&fs1, objectPathString.data(), infoStruct);
+    int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), infoStruct);
 
     if (infoStructFillStatus >= 0)
     {
@@ -476,23 +482,26 @@ void FileManagementService::createFile(Message &message)
     {
         // Size of repository path is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+        return;
     }
 
-        // Check the file name extraction status
-    else if (fileNameExtractionStatus != 0)
+    // Check the file name extraction status
+    if (fileNameExtractionStatus != 0)
     {
         // Size of file name is too large
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+        return;
     }
 
-        //Check the validity of the request at service level
-    else if (fileSizeBytes > MAX_FILE_SIZE_BYTES)
+    //Check the validity of the request at service level
+    if (fileSizeBytes > MAX_FILE_SIZE_BYTES)
     {
         //Size of file out of bounds
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
+        return;
     }
 
-        // Check if the path is valid for creation of a file
+    // Check if the path is valid for creation of a file
     else
     {
 
@@ -508,46 +517,58 @@ void FileManagementService::createFile(Message &message)
                 lfs_file_t file;
 
                 // Call littleFsCreateFile in order to create the file
-                int32_t createFileStatus = littleFsCreateFile(&fs1, &file, repositoryPathString,
-                                                              fileNameString,LFS_O_CREAT);
+                int32_t createFileStatus = littleFsCreateFile(&onBoardFileSystemObject,
+                                                              &file,
+                                                              repositoryPathString,
+                                                              fileNameString,
+                                                              LFS_O_CREAT);
                 // Check the status of the above function
                 if (createFileStatus >= 0)
                 {
                     // Calling lfs_file_close to release any allocated resources
-                    if (lfs_file_close(&fs1, &file) >= 0)
+                    if (lfs_file_close(&onBoardFileSystemObject, &file) >= 0)
                     {
                         // Successful file creation
+                        return;
                     }
                     else
                     {
                         // LittleFs lfs_file_close() generated error, during the synchronization of the file system
                         ErrorHandler::reportError(message,
                                                   ErrorHandler::ExecutionCompletionErrorType::LittleFsFileCloseFailed);
+                        return;
                     }
                 }
-                else if(createFileStatus == -1)
+
+                // Object's path size is greater than ECSSMaxStringSize
+                if(createFileStatus == -1)
                 {
-                    // Object's path size if greater that ECSS_MAX_STRING_SIZE
                     ErrorHandler::reportError(message,
                                               ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+                    return;
                 }
-                else if(createFileStatus == -2)
+
+                // File's name contains a wildcard
+                if(createFileStatus == -2)
                 {
-                    // File's name contains a wildcard
                     ErrorHandler::reportError(message,
                                               ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+                    return;
                 }
-                else if(createFileStatus == LFS_ERR_EXIST)
+
+                // File already exists, so the creation was not successful
+                if(createFileStatus == LFS_ERR_EXIST)
                 {
-                    // File already exists, so the creation was not successful
                     ErrorHandler::reportError(message,
                                               ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
+                    return;
                 }
-                else
+                // LittleFs lfs_file_open() generated error, during the creation of the file
+                if(createFileStatus < 0)
                 {
-                    // LittleFs lfs_file_open() generated error, during the creation of the file
                     ErrorHandler::reportError(message,
                                               ErrorHandler::ExecutionCompletionErrorType::LittleFsFileOpenFailed);
+                    return;
                 }
                 break;
             }
@@ -623,7 +644,7 @@ void FileManagementService::deleteFile(Message &message)
             case LFS_TYPE_REG:
             {
                 // The object is a file, so proceed with the deletion process
-                int32_t littleFsDeleteFileStatus = littleFsDeleteFile(&fs1, repositoryPathString,
+                int32_t littleFsDeleteFileStatus = littleFsDeleteFile(&onBoardFileSystemObject, repositoryPathString,
                                                                       fileNameString);
 
                 // Check the status of the deletion
@@ -699,10 +720,10 @@ void FileManagementService::reportAttributes(Message &message) {
 
 
     // Extract, if any, wildcards in the repositoryString
-    int32_t repositoyryStringWildcardStatus = checkForWildcard(repositoryPathString);
+    int8_t repositoyryStringWildcardStatus = checkForWildcard(repositoryPathString);
 
     //  Extract, if any, wildcards in the fileNameString
-    int32_t fileNameStringWildcardStatus = checkForWildcard(fileNameString);
+    int8_t fileNameStringWildcardStatus = checkForWildcard(fileNameString);
 
     // Check the repository name extraction status
     if (repositoryPathExtractionStatus != 0)
@@ -719,14 +740,14 @@ void FileManagementService::reportAttributes(Message &message) {
     }
 
         // Check if there are any wildcard in the repository path
-    else if (repositoyryStringWildcardStatus != -10)
+    else if (repositoyryStringWildcardStatus != -1)
     {
         // There is a wildcard in the repository path
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
     }
 
         // Check if there are any wildcard in the file name
-    else if (fileNameStringWildcardStatus != -10)
+    else if (fileNameStringWildcardStatus != -1)
     {
         // There is a wildcard in the file name
         ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);

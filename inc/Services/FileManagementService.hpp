@@ -62,7 +62,7 @@ private:
     uint8_t periodicReportingInterval = 0;
 
     // Global lfs struct
-    lfs_t fs1;
+    lfs_t onBoardFileSystemObject;
 
     struct fileCopyStatusNotification {
         uint8_t operationId = 0;
@@ -94,9 +94,9 @@ private:
     /**
      * The purpose of this function is to check if there is a wildcard in a given string
      * @param messageString : The message passed as a String
-     * @return status of execution (1: Message does not contain any wildcards, -10: Message contains at least one wildcard)
+     * @return status of execution (1: Message does not contain any wildcards, -1: Message contains at least one wildcard)
      */
-    static int32_t checkForWildcard(String<ECSSMaxStringSize> messageString);
+    static int8_t checkForWildcard(String<ECSSMaxStringSize> messageString);
 
     /**
      * The purpose of this function is to take care of the extraction process for the object path variable
@@ -105,28 +105,43 @@ private:
      * @param extractedString : pointer to a String<ECSSMaxStringSize> that will house the extracted string
      * @return status of execution (0: Successful completion, 1: Error occurred)
      */
-    uint8_t getStringUntilZeroTerminator(Message& message, String<ECSSMaxStringSize> &extractedString);
+    static uint8_t getStringUntilZeroTerminator(Message& message, String<ECSSMaxStringSize> &extractedString);
 
     /**
      * The purpose of this function is to check if the object path is valid for creation
-     * Checks if there is an object at this path AND if it is a file, not a directory
-     * @param repositoryString : Pointer to the repository
-     * @return status of execution (2: Object is a directory, 1: Object is a file, -1: Invalid type of object,
-     *                             -2: lfs_stat() returned an error code)
+     * Checks if there is an object at this path and returns its type.
+     * @param repositoryString : Pointer to the repository path
+     * @return status of execution (2: Object is a directory, 1: Object is a file, -1: Repository path contains a wildcard
+     *                             -2: Invalid type of object, Negative LittleFS error code: lfs_stat() returned an error code)
      */
     int32_t pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString);
 
     /**
      * The purpose of this function is to initiate a creation of a file using littleFs
      * Checks if there is already a file with this name
-     * @param fs : Pointer to the file system struct
+     * @param fileSystem : Pointer to the file system struct
      * @param file : Pointer to the file struct
      * @param repositoryPath : The repository path
      * @param fileName : The file name
      * @param flags : Input flags that determines the creation status
+     * @return status of execution (-1: File's object path name is too large, -2: there is a wildcard in the repository's path string,
+     *                              lfs_open_file status: Status of the lfs function that creates a file)
      */
-    static int32_t littleFsCreateFile(lfs_t *fs, lfs_file_t *file, String<ECSSMaxStringSize> repositoryPath,
-                                      String<ECSSMaxStringSize> fileName, int32_t flags);
+    int32_t littleFsCreateFile(lfs_t                     *fileSystem,
+                               lfs_file_t                *file,
+                               String<ECSSMaxStringSize> repositoryPath,
+                               String<ECSSMaxStringSize> fileName,
+                               int32_t                   flags);
+
+    /**
+     * The purpose of this function is to check if the the strings that compose the object path (repository string and
+     * file name string) are seperated with a slash "/" between them. If they are not seperated by one and only one
+     * slash, then it modifies the object path accordingly.
+     * @param objectPathString : String that will house the complete object path
+     * @param fileNameString : String with the file name
+     * @return -
+     */
+    void checkForSlashes(String<ECSSMaxStringSize> &objectPathString, uint8_t *&fileNameChar);
 
     /**
      * The purpose of this function is to check if the object path is valid for deletion
