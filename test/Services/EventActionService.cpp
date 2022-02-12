@@ -120,6 +120,34 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		CHECK(ServiceTests::countErrors() == 1);
 
 		eventActionService.eventActionDefinitionMap.clear();
+		ServiceTests::reset();
+	}
+
+	SECTION("Add an event-action definition when the eventActionDefinitionMap is full") {
+		Message message(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+		String<ECSSTCRequestStringSize> data = "123";
+		message.appendFixedString(data);
+
+		for(uint16_t eventActionDefinitionID = 0; eventActionDefinitionID < 256; ++eventActionDefinitionID) {
+			EventActionService::EventActionDefinition temp(0, 1, eventActionDefinitionID, message);
+			eventActionService.eventActionDefinitionMap.insert(std::make_pair(1, temp));
+			message.resetRead();
+		}
+
+		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+		addDefinitions.appendUint8(2);
+		addDefinitions.appendEnum16(1);
+		addDefinitions.appendEnum16(3);
+		addDefinitions.appendEnum16(2000);
+		addDefinitions.appendEnum16(1);
+		addDefinitions.appendEnum16(4);
+		addDefinitions.appendEnum16(2001);
+		addDefinitions.appendFixedString(data);
+		MessageParser::execute(addDefinitions);
+
+		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionDefinitionsMapIsFull));
+		CHECK(ServiceTests::countErrors() == 2);
+		eventActionService.eventActionDefinitionMap.clear();
 	}
 }
 
