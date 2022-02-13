@@ -148,7 +148,12 @@ private:
      * Checks if there is an object at this path, if it is a file and does not contain any wildcards
      * @param repositoryString : String with the repository name
      * @param fileNameString : String with the file name
-     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
+     * @return status of execution (2: Object is a directory, 1: Object is a file,
+     *                             -1: If there is a wildcard in the repository's path string
+     *                             -2: If there is a wildcard in the file's name string
+     *                             -3: Object path size is too large
+     *                             -4: Invalid object type
+     *                             Other negative code: lfs_stat returned error code)
      */
     int32_t pathIsValidForDeletion(String<ECSSMaxStringSize> repositoryString,
                                    String<ECSSMaxStringSize> fileNameString);
@@ -159,8 +164,10 @@ private:
      * @param fs : Pointer to the file system struct
      * @param repositoryPath : The repository path
      * @param fileName : The file name
+     * @return lfs_remove status of execution
      */
-    int32_t littleFsDeleteFile(lfs_t *fs, String<ECSSMaxStringSize> repositoryPath,
+    int32_t littleFsDeleteFile(lfs_t                     *fs,
+                               String<ECSSMaxStringSize> repositoryPath,
                                String<ECSSMaxStringSize> fileName);
 
     /**
@@ -179,11 +186,15 @@ private:
      * Checks if there is an object at this path, if it is a file and does not contain any wildcards,
      * @param repositoryString : String with the repository name
      * @param fileNameString : String with the file name
-     * @return status of execution (-22: Object type is invalid, -4 littleFs generated error,
-     *                               1: Object is a file, 2: Error occurred)
+     * @param infoStruct : lfs_info which will house the file's attributes
+     * @return status of execution (-1 invalid object type,
+     *                               1: Object is a file,
+     *                               2: Object is a directory
+     *                               Any error code that lfs_stat might return)
      */
     int32_t littleFsReportFile(String<ECSSMaxStringSize> repositoryString,
-                               String<ECSSMaxStringSize> fileNameString, lfs_info *infoStruct);
+                               String<ECSSMaxStringSize> fileNameString,
+                               lfs_info                  *infoStruct);
 
 public:
 
@@ -274,7 +285,7 @@ public:
      */
     void fileAttributeReport(const String<ECSSMaxStringSize>& repositoryString,
                              const String<ECSSMaxStringSize>& fileNameString,
-                             uint32_t fileSize);
+                             uint32_t                         fileSize);
 
     /*
      * TC[23,5] Lock a file, makes it read only. This function should work if and only if locking functionality
