@@ -171,16 +171,6 @@ private:
                                String<ECSSMaxStringSize> fileName);
 
     /**
-     * The purpose of this function is to check if the file is valid for a repo
-     * Checks if there is an object at this path, if it is a repo and does not contain any wildcards
-     * @param repositoryString : String with the repository name
-     * @param repositoryStringSize : The actual size of the repositoryString
-     * @return status of execution (0: Object is a directory, 1: Object is a file, 2: Error occurred)
-     */
-    int32_t pathIsValidForARepository(String<ECSSMaxStringSize> repositoryString, uint8_t repositoryStringSize);
-
-
-    /**
      * The purpose of this function is to initiate the lfs_stat function, which will fill the info struct with all
      * the necessary information about a files report.
      * Checks if there is an object at this path, if it is a file and does not contain any wildcards,
