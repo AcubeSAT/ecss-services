@@ -45,9 +45,8 @@ add_library(common OBJECT
         src/Helpers/Statistic.cpp
         src/Helpers/PMONBase.cpp
         src/Services/FileManagementService.cpp
-        lib/littlefs/lfs.c
-        lib/littlefs/lfs_util.c
-        )
+        src/Helpers/lfs_stub.c
+        src/Helpers/lfs_util_stub.c)
 
 # Specify the .cpp files for the executables
 file(GLOB x86_main_SRC "src/Platform/x86/*.cpp" "src/Platform/x86/Services/*.cpp"

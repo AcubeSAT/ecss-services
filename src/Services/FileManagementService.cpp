@@ -4,7 +4,7 @@
 #include "MessageParser.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
-#include "../../lib/littlefs/lfs.h"
+#include "Helpers/lfs_stub.h"
 
 int8_t FileManagementService::checkForWildcard(String<ECSSMaxStringSize> messageString)
 {
