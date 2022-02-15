@@ -4,7 +4,7 @@
 #include <Service.hpp>
 
 extern "C" {
-#include "../../lib/littlefs/lfs.h"
+#include "Helpers/lfs_stub.h"
 };
 #define MAX_FILE_SIZE_BYTES 4096
 #define MAX_FILE_COPY_OPERATIONS 10
