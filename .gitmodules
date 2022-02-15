@@ -10,6 +10,3 @@
 [submodule "lib/logger"]
 	path = lib/logger
 	url = https://gitlab.com/acubesat/obc/logger.git
-[submodule "lib/littlefs"]
-	path = lib/littlefs
-	url = https://github.com/littlefs-project/littlefs.git
