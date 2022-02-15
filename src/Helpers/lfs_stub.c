@@ -5152,39 +5152,39 @@ int lfs_stat(lfs_t *lfs, const char *path, struct lfs_info *info) {
             info->type = LFS_TYPE_REG;
             break;
 
-            // TM[23,4] File attributes report ------------------
+            // TC[23,3] Report attributes of a file ------------------
 
         case 15:
             // Good scenario
             counter++;
             info->type = LFS_TYPE_REG;
-            info->size = 100;
             break;
-
-            // TC[23,3] Report attributes of a file ------------------
 
         case 16:
-            // Good scenario
-            counter++;
-            info->type = LFS_TYPE_REG;
-            break;
-
-        case 17:
             // Unknown file type
             counter++;
             info->type = 15;
             break;
 
-        case 18:
+        case 17:
             // Object's type is a directory, not a file
             counter++;
             info->type = LFS_TYPE_DIR;
             break;
 
-        case 19:
+        case 18:
             // lfs_stat failed for this file
             counter++;
             return -10;
+            break;
+
+            // TM[23,4] File attributes report ------------------
+
+        case 19:
+            // Good scenario
+            counter++;
+            info->type = LFS_TYPE_REG;
+            info->size = 100;
             break;
 
     }
