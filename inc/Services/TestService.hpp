@@ -31,6 +31,11 @@ public:
 	void areYouAlive(Message& request);
 
 	/**
+	 * TC[17,2] receive an are-you-alive test report
+	 */
+	void areYouAliveTestReport(Message& request);
+
+	/**
 	 * TC[17,3] perform an on-board connection test
 	 *
 	 * @todo Only respond if we have the correct APID

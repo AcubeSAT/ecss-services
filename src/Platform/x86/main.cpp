@@ -1,6 +1,8 @@
 #include <iostream>
 #include <Logger.hpp>
 #include "Helpers/CRCHelper.hpp"
+#include "Services/HousekeepingService.hpp"
+#include "Services/OnBoardMonitoringService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
@@ -102,15 +104,35 @@ int main() {
     std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
     std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
-    //	// ST[17] test
-//	TestService& testService = Services.testService;
-//	Message receivedPacket =
-//	    Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
+//	//ST[03] test not working
+//	HousekeepingService& housekeepingService = Services.housekeeping;
+//	Message housekeepingPacket = Message(HousekeepingService::ServiceType, HousekeepingService::MessageType::HousekeepingStructuresReport, Message::TM, 1);
+//	housekeepingService.housekeepingStructureReport(10);
+
+//	//ST[04] for TM[4.2] works. Uncomment 122-125 to test. See start_time_ST04, end_time_ST04 and N_ST04 at yamcs TM parameters
+//	ParameterStatisticsService& parameterStatisticsService = Services.parameterStatistics;
+//	Message parameterStatisticsPacket = Message(ParameterStatisticsService::ServiceType, ParameterStatisticsService::MessageType::ParameterStatisticsReport, Message::TM, 1);
+//	parameterStatisticsService.parameterStatisticsReport();
+
+//	//ST[12] for TM[12,9] works
+//	OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
+//	Message onBoardMonitoringPacket = Message(OnBoardMonitoringService::ServiceType, OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport, Message::TM, 1);
+//	onBoardMonitoringService.parameterMonitoringDefinitionReport(onBoardMonitoringPacket);
+
+//	// ST[17] test
+
+	//TM[17,2] works
+	TestService& testService = Services.testService;
+	Message testPacket = Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTestReport, Message::TM, 1);
+	testService.areYouAliveTestReport(testPacket);
+
+//	Message receivedPacket = Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
 //	testService.areYouAlive(receivedPacket);
+
 //	receivedPacket = Message(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest, Message::TC, 1);
 //	receivedPacket.appendUint16(7);
 //	testService.onBoardConnection(receivedPacket);
-//
+
 //	// ST[20] test
 //	ParameterService& paramService = Services.parameterManagement;
 //
@@ -182,14 +204,14 @@ int main() {
 //	rcvPack.appendUint16(1);
 //	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
-	// ST[01] test
+//	// ST[01] test
 
-	RequestVerificationService& reqVerifService = Services.requestVerification;
+//	RequestVerificationService& reqVerifService = Services.requestVerification;
 
-	Message receivedMessage =
-	    Message(RequestVerificationService::ServiceType,
-	            RequestVerificationService::MessageType::SuccessfulAcceptanceReport, Message::TC, 3);
-	reqVerifService.successAcceptanceVerification(receivedMessage);
+//    Message receivedMessage =
+//	    Message(RequestVerificationService::ServiceType,
+//	            RequestVerificationService::MessageType::SuccessfulAcceptanceReport, Message::TC, 3);
+//	reqVerifService.successAcceptanceVerification(receivedMessage);
 //
 //	receivedMessage = Message(RequestVerificationService::ServiceType,
 //	                          RequestVerificationService::MessageType::FailedAcceptanceReport, Message::TC, 3);

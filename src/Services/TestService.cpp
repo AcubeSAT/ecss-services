@@ -11,6 +11,11 @@ void TestService::areYouAlive(Message& request) {
 	storeMessage(report);
 }
 
+void TestService::areYouAliveTestReport(Message& message) {
+	message.append(0);
+	storeMessage(message);
+}
+
 void TestService::onBoardConnection(Message& request) {
 	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
 	// TM[17,4] on-board connection test report

@@ -90,6 +90,12 @@ public:
 	 */
 	void deleteAllParameterMonitoringDefinitions(Message& message);
 
+	/**
+	 * TC[12,9]
+	 * Transmission of a parameter monitoring definition report.
+	 */
+	 void parameterMonitoringDefinitionReport(Message& message);
+
 	void execute(Message& message);
 };
 

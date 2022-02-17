@@ -53,6 +53,16 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 	parameterMonitoringList.clear();
 }
 
+void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& message) {
+	message.appendUint8(1);
+	message.appendUint8(1);
+	message.appendUint16(1);
+	message.appendUint16(1);
+	message.appendUint16(1);
+	storeMessage(message);
+}
+
+
 void OnBoardMonitoringService::execute(Message& message) {
 	switch (message.messageType) {
 		case EnableParameterMonitoringDefinitions:
