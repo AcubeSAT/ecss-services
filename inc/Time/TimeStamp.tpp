@@ -116,10 +116,6 @@ UTCTimestamp TimeStamp<secondsBytes, fractionalBytes>::toUTCtimestamp() {
 
 	uint32_t totalSeconds = asTAIseconds();
 
-	//ASSERT_INTERNAL(totalSeconds >= EpochSecondsFromUnix,ErrorHandler::InternalErrorType::InvalidDate);
-
-	//totalSeconds -= EpochSecondsFromUnix;
-
 	uint16_t yearUTC = Epoch.year;
 	uint8_t monthUTC = Epoch.month;
 	uint8_t dayUTC = Epoch.day;
