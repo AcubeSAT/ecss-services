@@ -154,12 +154,12 @@ bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSMaxPacketS
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
 	AcubesatTimestamp_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
-	report.appendUint32(oldestStoredPacketTime.as_TAI_seconds()); //TODO change for actual TM/TC Actubesat format
+	report.appendUint32(oldestStoredPacketTime.asTAIseconds()); //TODO change for actual TM/TC Actubesat format
 
 	AcubesatTimestamp_t newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
-	report.appendUint32(newestStoredPacketTime.as_TAI_seconds()); //TODO change for actual TM/TC Actubesat format
+	report.appendUint32(newestStoredPacketTime.asTAIseconds()); //TODO change for actual TM/TC Actubesat format
 
-	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag.as_TAI_seconds());
+	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag.asTAIseconds());
 
 	auto filledPercentage1 = static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f /
 	                                               ECSSMaxPacketStoreSize);
@@ -274,7 +274,7 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 	request.assertTC(ServiceType, MessageType::DeletePacketStoreContent);
 
-	uint32_t timeLimit = request.readUint32(); // todo: decide the time-format
+	AcubesatTimestamp_t timeLimit(request.readUint32()); // todo: decide the time-format
 	uint16_t numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
@@ -355,7 +355,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& request) {
 	request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime);
 
-	uint32_t newStartTimeTag = request.readUint32();
+	AcubesatTimestamp_t newStartTimeTag(request.readUint32());
 	/**
 	 * @todo: check if newStartTimeTag is in the future
 	 */

@@ -5,7 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
 #include "Message.hpp"
-#include "Helpers/TimeStamp.hpp"
+#include "Time/TimeStamp.hpp"
 
 /**
  * @todo: add a way of defining each packets store's size in bytes
@@ -29,15 +29,15 @@ public:
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
 	 */
-	AcubesatTimestamp_t openRetrievalStartTimeTag = 0;
+	AcubesatTimestamp_t openRetrievalStartTimeTag = AcubesatTimestamp_t(0);
 	/**
 	 * The start time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	AcubesatTimestamp_t retrievalStartTime = 0;
+	AcubesatTimestamp_t retrievalStartTime = AcubesatTimestamp_t(0);
 	/**
 	 * The end time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	AcubesatTimestamp_t retrievalEndTime = 0;
+	AcubesatTimestamp_t retrievalEndTime = AcubesatTimestamp_t(0);
 	/**
 	 * The size of the packet store, in bytes.
 	 */

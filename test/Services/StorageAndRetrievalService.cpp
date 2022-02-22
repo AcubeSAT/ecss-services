@@ -3,14 +3,14 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
-#include "Helpers/TimeStamp.hpp"
+#include "Time/TimeStamp.hpp"
 
 StorageAndRetrievalService& storageAndRetrieval = Services.storageAndRetrieval;
 
-AcubesatTimestamp_t timestamps1[6] = {2, 4, 5, 7, 9, 11};
-AcubesatTimestamp_t timestamps2[5] = {0, 1, 4, 15, 22};
-AcubesatTimestamp_t timestamps3[4] = {4, 7, 9, 14};
-AcubesatTimestamp_t timestamps4[8] = {4, 6, 34, 40, 44, 51, 52, 58};
+AcubesatTimestamp_t timestamps1[6] = {AcubesatTimestamp_t(2), AcubesatTimestamp_t(4), AcubesatTimestamp_t(5), AcubesatTimestamp_t(7), AcubesatTimestamp_t(9), AcubesatTimestamp_t(11)};
+AcubesatTimestamp_t timestamps2[5] = {AcubesatTimestamp_t(0), AcubesatTimestamp_t(1), AcubesatTimestamp_t(4), AcubesatTimestamp_t(15), AcubesatTimestamp_t(22)};
+AcubesatTimestamp_t timestamps3[4] = {AcubesatTimestamp_t(4), AcubesatTimestamp_t(7), AcubesatTimestamp_t(9), AcubesatTimestamp_t(14)};
+AcubesatTimestamp_t timestamps4[8] = {AcubesatTimestamp_t(4), AcubesatTimestamp_t(6), AcubesatTimestamp_t(34), AcubesatTimestamp_t(40), AcubesatTimestamp_t(44), AcubesatTimestamp_t(51), AcubesatTimestamp_t(52), AcubesatTimestamp_t(58)};
 
 void initializePacketStores() {
 	uint16_t numOfPacketStores = 4;
@@ -612,7 +612,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 
 		for (auto& packetStoreId : packetStoreIds) {
 			REQUIRE(storageAndRetrieval.packetStores.find(packetStoreId) != storageAndRetrieval.packetStores.end());
-			REQUIRE(storageAndRetrieval.packetStores[packetStoreId].openRetrievalStartTimeTag == 0);
+			REQUIRE(storageAndRetrieval.packetStores[packetStoreId].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
 			storageAndRetrieval.packetStores[packetStoreId].openRetrievalStatus = PacketStore::Suspended;
 			request.appendOctetString(packetStoreId);
 		}
@@ -620,10 +620,10 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].openRetrievalStartTimeTag == 200);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[1]].openRetrievalStartTimeTag == 200);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].openRetrievalStartTimeTag == 0);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].openRetrievalStartTimeTag == 0);
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].openRetrievalStartTimeTag == AcubesatTimestamp_t(200));
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[1]].openRetrievalStartTimeTag == AcubesatTimestamp_t(200));
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -647,7 +647,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto packetStoreId = correctPacketStoreIds[i];
 			REQUIRE(storageAndRetrieval.packetStores.find(packetStoreId) != storageAndRetrieval.packetStores.end());
-			REQUIRE(storageAndRetrieval.packetStores[packetStoreId].openRetrievalStartTimeTag == 0);
+			REQUIRE(storageAndRetrieval.packetStores[packetStoreId].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
 			storageAndRetrieval.packetStores[packetStoreId].openRetrievalStatus = PacketStore::InProgress;
 			request.appendOctetString(packetStoreId);
 		}
@@ -664,10 +664,10 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingPacketStore) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 3);
 
-		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[0]].openRetrievalStartTimeTag == 0);
-		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[1]].openRetrievalStartTimeTag == 0);
-		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[2]].openRetrievalStartTimeTag == 0);
-		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[3]].openRetrievalStartTimeTag == 0);
+		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[0]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
+		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[1]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
+		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[2]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
+		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[3]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -689,7 +689,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 
 		for (auto& packetStoreId : packetStoreIds) {
 			REQUIRE(storageAndRetrieval.packetStores.find(packetStoreId) != storageAndRetrieval.packetStores.end());
-			REQUIRE(storageAndRetrieval.packetStores[packetStoreId].openRetrievalStartTimeTag == 0);
+			REQUIRE(storageAndRetrieval.packetStores[packetStoreId].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
 			storageAndRetrieval.packetStores[packetStoreId].openRetrievalStatus = PacketStore::Suspended;
 		}
 		storageAndRetrieval.packetStores[packetStoreIds[2]].openRetrievalStatus = PacketStore::InProgress;
@@ -700,10 +700,10 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 2);
 
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].openRetrievalStartTimeTag == 200);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[1]].openRetrievalStartTimeTag == 200);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].openRetrievalStartTimeTag == 0);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].openRetrievalStartTimeTag == 0);
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].openRetrievalStartTimeTag == AcubesatTimestamp_t(200));
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[1]].openRetrievalStartTimeTag == AcubesatTimestamp_t(200));
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].openRetrievalStartTimeTag == AcubesatTimestamp_t(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -942,8 +942,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		uint32_t timeTags1[4] = {20, 30, 40, 50};
-		uint32_t timeTags2[4] = {60, 70, 80, 90};
+		AcubesatTimestamp_t timeTags1[4] = {AcubesatTimestamp_t(20), AcubesatTimestamp_t(30), AcubesatTimestamp_t(40), AcubesatTimestamp_t(50)};
+		AcubesatTimestamp_t timeTags2[4] = {AcubesatTimestamp_t(60), AcubesatTimestamp_t(70), AcubesatTimestamp_t(80), AcubesatTimestamp_t(90)};
 
 		int index = 0;
 		for (auto& packetStoreId : packetStoreIds) {
@@ -951,10 +951,10 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			storageAndRetrieval.packetStores[packetStoreId].openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.packetStores[packetStoreId].byTimeRangeRetrievalStatus = false;
 			request.appendOctetString(packetStoreId);
-			uint32_t timeTag1 = timeTags1[index];
-			uint32_t timeTag2 = timeTags2[index++];
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			AcubesatTimestamp_t timeTag1 = timeTags1[index];
+			AcubesatTimestamp_t timeTag2 = timeTags2[index++];
+			request.appendUint32(timeTag1.asTAIseconds());
+			request.appendUint32(timeTag2.asTAIseconds());
 		}
 
 		MessageParser::execute(request);
@@ -966,8 +966,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[i]].retrievalEndTime == timeTags2[i]);
 		}
 		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].byTimeRangeRetrievalStatus == false);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].retrievalStartTime == 0);
-		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].retrievalEndTime == 0);
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].retrievalStartTime == AcubesatTimestamp_t(0));
+		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].retrievalEndTime == AcubesatTimestamp_t(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1021,11 +1021,11 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[i]].byTimeRangeRetrievalStatus ==
 			        (i % 2 == 0));
-			REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[i]].retrievalStartTime == 0);
-			REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[i]].retrievalEndTime == 0);
+			REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[i]].retrievalStartTime == AcubesatTimestamp_t(0));
+			REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[i]].retrievalEndTime == AcubesatTimestamp_t(0));
 		}
 		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[3]].byTimeRangeRetrievalStatus == false);
-		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[3]].retrievalStartTime == 0);
+		REQUIRE(storageAndRetrieval.packetStores[correctPacketStoreIds[3]].retrievalStartTime == AcubesatTimestamp_t(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1065,8 +1065,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].byTimeRangeRetrievalStatus == false);
 
 		for (auto& packetStore : storageAndRetrieval.packetStores) {
-			REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].retrievalStartTime == 0);
-			REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].retrievalEndTime == 0);
+			REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].retrievalStartTime == AcubesatTimestamp_t(0));
+			REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[0]].retrievalEndTime == AcubesatTimestamp_t(0));
 		}
 
 		ServiceTests::reset();
@@ -1720,7 +1720,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint16_t numOfPacketStores = 2;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
-			storageAndRetrieval.packetStores[packetStoreIds[i]].openRetrievalStartTimeTag = 5;
+			storageAndRetrieval.packetStores[packetStoreIds[i]].openRetrievalStartTimeTag = AcubesatTimestamp_t(5);
 			request.appendOctetString(packetStoreIds[i]);
 		}
 
@@ -1738,16 +1738,16 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSMaxPacketStoreIdSize];
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0].as_TAI_seconds());
-		CHECK(report.readUint32() == timestamps1[5].as_TAI_seconds());
+		CHECK(report.readUint32() == timestamps1[0].asTAIseconds());
+		CHECK(report.readUint32() == timestamps1[5].asTAIseconds());
 		CHECK(report.readUint32() == 5);
 		CHECK(report.readUint16() == 30);
 		CHECK(report.readUint16() == 20);
 		// Packet store 2
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.readUint32() == timestamps2[0].as_TAI_seconds());
-		CHECK(report.readUint32() == timestamps2[4].as_TAI_seconds());
+		CHECK(report.readUint32() == timestamps2[0].asTAIseconds());
+		CHECK(report.readUint32() == timestamps2[4].asTAIseconds());
 		CHECK(report.readUint32() == 5);
 		CHECK(report.readUint16() == 25);
 		CHECK(report.readUint16() == 10);
@@ -1766,7 +1766,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 
 		int count = 0;
 		for (auto& packetStore : storageAndRetrieval.packetStores) {
-			packetStore.second.openRetrievalStartTimeTag = (count == 3) ? 20 : 15;
+			packetStore.second.openRetrievalStartTimeTag = (count == 3) ? AcubesatTimestamp_t(20) : AcubesatTimestamp_t(15);
 			count++;
 		}
 
@@ -1792,32 +1792,32 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSMaxPacketStoreIdSize];
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0].as_TAI_seconds());
-		CHECK(report.readUint32() == timestamps1[5].as_TAI_seconds());
+		CHECK(report.readUint32() == timestamps1[0].asTAIseconds());
+		CHECK(report.readUint32() == timestamps1[5].asTAIseconds());
 		CHECK(report.readUint32() == 15);
 		CHECK(report.readUint16() == 30);
 		CHECK(report.readUint16() == 0);
 		// Packet store 2
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.readUint32() == timestamps2[0].as_TAI_seconds());
-		CHECK(report.readUint32() == timestamps2[4].as_TAI_seconds());
+		CHECK(report.readUint32() == timestamps2[0].asTAIseconds());
+		CHECK(report.readUint32() == timestamps2[4].asTAIseconds());
 		CHECK(report.readUint32() == 15);
 		CHECK(report.readUint16() == 25);
 		CHECK(report.readUint16() == 10);
 		// Packet store 3
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
-		CHECK(report.readUint32() == timestamps4[0].as_TAI_seconds());
-		CHECK(report.readUint32() == timestamps4[7].as_TAI_seconds());
+		CHECK(report.readUint32() == timestamps4[0].asTAIseconds());
+		CHECK(report.readUint32() == timestamps4[7].asTAIseconds());
 		CHECK(report.readUint32() == 15);
 		CHECK(report.readUint16() == 40);
 		CHECK(report.readUint16() == 30);
 		// Packet store 4
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
-		CHECK(report.readUint32() == timestamps3[0].as_TAI_seconds());
-		CHECK(report.readUint32() == timestamps3[3].as_TAI_seconds());
+		CHECK(report.readUint32() == timestamps3[0].asTAIseconds());
+		CHECK(report.readUint32() == timestamps3[3].asTAIseconds());
 		CHECK(report.readUint32() == 20);
 		CHECK(report.readUint16() == 20);
 		CHECK(report.readUint16() == 0);
@@ -1838,7 +1838,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		String<ECSSMaxPacketStoreIdSize> finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
 		                                                correctPacketStoreIds[0]};
 
-		storageAndRetrieval.packetStores[correctPacketStoreIds[0]].openRetrievalStartTimeTag = 5;
+		storageAndRetrieval.packetStores[correctPacketStoreIds[0]].openRetrievalStartTimeTag = AcubesatTimestamp_t(5);
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
@@ -1864,8 +1864,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSMaxPacketStoreIdSize];
 		report.readOctetString(data);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0].as_TAI_seconds());
-		CHECK(report.readUint32() == timestamps1[5].as_TAI_seconds());
+		CHECK(report.readUint32() == timestamps1[0].asTAIseconds());
+		CHECK(report.readUint32() == timestamps1[5].asTAIseconds());
 		CHECK(report.readUint32() == 5);
 		CHECK(report.readUint16() == 30);
 		CHECK(report.readUint16() == 20);
@@ -1904,8 +1904,8 @@ TEST_CASE("Deleting packet store content") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		AcubesatTimestamp_t expectedTimeStamps1[3] = {7, 9, 11};
-		AcubesatTimestamp_t expectedTimeStamps2[2] = {15, 22};
+		AcubesatTimestamp_t expectedTimeStamps1[3] = {AcubesatTimestamp_t(7), AcubesatTimestamp_t(9), AcubesatTimestamp_t(11)};
+		AcubesatTimestamp_t expectedTimeStamps2[2] = {AcubesatTimestamp_t(15), AcubesatTimestamp_t(22)};
 		AcubesatTimestamp_t leftTimeStamps1[3];
 		AcubesatTimestamp_t leftTimeStamps2[2];
 
@@ -1956,8 +1956,8 @@ TEST_CASE("Deleting packet store content") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		AcubesatTimestamp_t expectedTimeStamps1[4] = {4, 7, 9, 14};
-		AcubesatTimestamp_t expectedTimeStamps2[8] = {4, 6, 34, 40, 44, 51, 52, 58};
+		AcubesatTimestamp_t expectedTimeStamps1[4] = {AcubesatTimestamp_t(4), AcubesatTimestamp_t(7), AcubesatTimestamp_t(9), AcubesatTimestamp_t(14)};
+		AcubesatTimestamp_t expectedTimeStamps2[8] = {AcubesatTimestamp_t(4), AcubesatTimestamp_t(6), AcubesatTimestamp_t(34), AcubesatTimestamp_t(40), AcubesatTimestamp_t(44), AcubesatTimestamp_t(51), AcubesatTimestamp_t(52), AcubesatTimestamp_t(58)};
 		AcubesatTimestamp_t leftTimeStamps1[4];
 		AcubesatTimestamp_t leftTimeStamps2[8];
 
@@ -2054,9 +2054,9 @@ TEST_CASE("Deleting packet store content") {
 		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[2]].storedTelemetryPackets.empty());
 		REQUIRE(storageAndRetrieval.packetStores[packetStoreIds[3]].storedTelemetryPackets.size() == 6);
 
-		AcubesatTimestamp_t expectedTimeStamps1[6] = {2, 4, 5, 7, 9, 11};
-		AcubesatTimestamp_t expectedTimeStamps2[5] = {0, 1, 4, 15, 22};
-		AcubesatTimestamp_t expectedTimeStamps4[6] = {34, 40, 44, 51, 52, 58};
+		AcubesatTimestamp_t expectedTimeStamps1[6] = {AcubesatTimestamp_t(2), AcubesatTimestamp_t(4), AcubesatTimestamp_t(5), AcubesatTimestamp_t(7), AcubesatTimestamp_t(9), AcubesatTimestamp_t(11)};
+		AcubesatTimestamp_t expectedTimeStamps2[5] = {AcubesatTimestamp_t(0), AcubesatTimestamp_t(1), AcubesatTimestamp_t(4), AcubesatTimestamp_t(15), AcubesatTimestamp_t(22)};
+		AcubesatTimestamp_t expectedTimeStamps4[6] = {AcubesatTimestamp_t(34), AcubesatTimestamp_t(40), AcubesatTimestamp_t(44), AcubesatTimestamp_t(51), AcubesatTimestamp_t(52), AcubesatTimestamp_t(58)};
 
 		AcubesatTimestamp_t leftTimeStamps1[6];
 		AcubesatTimestamp_t leftTimeStamps2[5];
@@ -2550,7 +2550,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.packetStores[toPacketStoreId];
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		AcubesatTimestamp_t expectedTimestamps[3] = {7, 9, 11};
+		AcubesatTimestamp_t expectedTimestamps[3] = {AcubesatTimestamp_t(7), AcubesatTimestamp_t(9), AcubesatTimestamp_t(11)};
 		AcubesatTimestamp_t existingTimestamps[3];
 
 		int index = 0;
@@ -2674,7 +2674,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.packetStores[toPacketStoreId];
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		AcubesatTimestamp_t expectedTimestamps[3] = {2, 4, 5};
+		AcubesatTimestamp_t expectedTimestamps[3] = {AcubesatTimestamp_t(2), AcubesatTimestamp_t(4), AcubesatTimestamp_t(5)};
 		AcubesatTimestamp_t existingTimestamps[3];
 
 		int index = 0;
