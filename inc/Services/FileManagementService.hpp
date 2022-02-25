@@ -15,6 +15,8 @@ extern "C" {
 /**
  * Implementation of ST[23] file management service
  *
+ * @author Christos Ioannidis <xristosioan@gmail.com>
+ *
  * ECSS 6.23 & 8.23
  *
  * The filesystem of the satellite will be structured, meaning files are stored in within directories. For more info
@@ -25,9 +27,12 @@ extern "C" {
  * @todo define the locking status
  * @todo define the searching status (possibly will be supported)
  * @todo define the summary report support
+ * @todo do we need to move files ?
+ * @todo do we need all these operation handling (suspend, abort, report, periodic report)
  * @todo define max number of file copy operations (what is the meaning of having one ?)
  * @todo moving files is allowed ? does littlefs have multiple file transfer handlers
- * @note The wildcard character is set to be '?'.
+ * @note The wildcard character is set to be '*'.
+ * @note The "null terminator" between two variables with dynamic length is '@'
  * @note LittleFS permits only the deletion of empty directories
  *
  * @ingroup services
@@ -35,16 +40,11 @@ extern "C" {
  */
 
 
-
-
 class FileManagementService : public Service {
 private:
 
     bool lockFileSupport = false;
     bool searchFileSupport = false;
-    bool createDirectorySupport = true;
-    bool deleteDirectorySupport = true;
-    bool renameDirectorySupport = true;
     bool summaryReportSupport = false;
     bool moveFileSupport = true;
     bool suspendFileCopyOperationSupport = false;
@@ -53,41 +53,13 @@ private:
     bool abortAllFileCopyOperationSupport = false;
     bool reportProgressOfCopyOperationsSupport = false;
     bool enablePeriodicReportingOfFileCopyStatusSupport = false;
-    bool atLeastOneCopyOperationInProgressFlag = false;
-    bool atLeastOneCopyOperationOnHoldFlag = false;
-    bool atLeastOneCopyOperationFlag = false;
-    bool fileCopyStatusReportingFlag = true;
 
-    uint16_t unallocatedMemory = 0;
-    uint8_t periodicReportingInterval = 0;
-
-    // Global lfs struct
+    /**
+     * LittleFs file system object.
+     * @todo Is one file system enough, do we need more (maybe yes, for su, obc, etc) ?
+     */
     lfs_t onBoardFileSystemObject;
 
-    struct fileCopyStatusNotification {
-        uint8_t operationId = 0;
-        uint8_t operationStatus = 0;
-    };
-
-    struct RepositorySummaryReportStruct{
-        char repositoryPath[ECSSMaxStringSize];
-        uint8_t objectType;
-        char objectName[ECSSMaxStringSize];
-    };
-
-    struct FoundFilesReportStruct{
-        char repositoryPath[ECSSMaxStringSize];
-        char searchPattern[ECSSMaxStringSize];
-        // Seperated by /0
-        char filePath[ECSSMaxStringSize];
-        uint8_t numberOfFiles = 0;
-    };
-
-    enum operationStatusType : uint8_t{
-        inProgress = 1,
-        waitingResources = 2,
-        onHold = 3
-    };
 
     //------------------------------------------------------------------------
 
@@ -105,7 +77,7 @@ private:
      * @param extractedString : pointer to a String<ECSSMaxStringSize> that will house the extracted string
      * @return status of execution (0: Successful completion, 1: Error occurred)
      */
-    static uint8_t getStringUntilZeroTerminator(Message& message, String<ECSSMaxStringSize> &extractedString);
+    static uint8_t getStringUntilZeroTerminator(Message &message, String<ECSSMaxStringSize> &extractedString);
 
     /**
      * The purpose of this function is to check if the object path is valid for creation
@@ -127,11 +99,11 @@ private:
      * @return status of execution (-1: File's object path name is too large, -2: there is a wildcard in the repository's path string,
      *                              lfs_open_file status: Status of the lfs function that creates a file)
      */
-    int32_t littleFsCreateFile(lfs_t                     *fileSystem,
-                               lfs_file_t                *file,
+    int32_t littleFsCreateFile(lfs_t *fileSystem,
+                               lfs_file_t *file,
                                String<ECSSMaxStringSize> repositoryPath,
                                String<ECSSMaxStringSize> fileName,
-                               int32_t                   flags);
+                               int32_t flags);
 
     /**
      * The purpose of this function is to check if the the strings that compose the object path (repository string and
@@ -166,7 +138,7 @@ private:
      * @param fileName : The file name
      * @return lfs_remove status of execution
      */
-    int32_t littleFsDeleteFile(lfs_t                     *fs,
+    int32_t littleFsDeleteFile(lfs_t *fs,
                                String<ECSSMaxStringSize> repositoryPath,
                                String<ECSSMaxStringSize> fileName);
 
@@ -184,18 +156,21 @@ private:
      */
     int32_t littleFsReportFile(String<ECSSMaxStringSize> repositoryString,
                                String<ECSSMaxStringSize> fileNameString,
-                               lfs_info                  *infoStruct);
+                               lfs_info *infoStruct);
 
 public:
 
     inline static const uint8_t ServiceType = 23;
-    static const char wildcard = '*';
-    static const char variableStringTerminator = '@';
 
-    /*
-     * @todo must be initialized with void fill(0).
+    /**
+     * The wildcard character accepted by the service
      */
-    etl::array<uint8_t,MAX_OPERATION_IDENTIFIERS> operationIdArray;
+    static const char wildcard = '*';
+
+    /**
+     * Character which denotes the end of a string and the beginning of the next (if there is any)
+     */
+    static const char variableStringTerminator = '@';
 
     enum MessageType : uint8_t {
         CreateFile = 1,
@@ -224,162 +199,27 @@ public:
         DisablePeriodicReportingOfFileCopy = 24
     };
 
-    enum ErrorType : uint8_t {
-        FailedStartOfExecution = 1,
-        FailedProgressOfExecution = 2,
-        FailedCompletionOfExecution = 3
-    };
-
-    FileManagementService()
-    {
-        const char wildcard = '?';
-        lockFileSupport = false;
-        searchFileSupport = false;
-        createDirectorySupport = true;
-        deleteDirectorySupport = true;
-        renameDirectorySupport = true;
-        summaryReportSupport = false;
-        moveFileSupport = true;
-        suspendFileCopyOperationSupport = false;
-        suspendAllFileCopyOperationSupport = false;
-        abortFileCopyOperationSupport = false;
-        abortAllFileCopyOperationSupport = false;
-        reportProgressOfCopyOperationsSupport = false;
-        enablePeriodicReportingOfFileCopyStatusSupport = false;
-        atLeastOneCopyOperationInProgressFlag = false;
-        atLeastOneCopyOperationOnHoldFlag = false;
-        atLeastOneCopyOperationFlag = false;
-        fileCopyStatusReportingFlag = true;
-
-        unallocatedMemory = 0;
-        periodicReportingInterval = 0;
-    }
-
-    /*
-     * TC[23,1] Create a file
+    /**
+     * TC[23,1] Create a file at the provided repository path, give it the provided file name and file size
      */
-    void createFile(Message& message);
+    void createFile(Message &message);
 
-    /*
-     * TC[23,2] Delete a file
+    /**
+     * TC[23,2] Delete the file at the provided repository path, with the provided file name
      */
-    void deleteFile(Message& message);
+    void deleteFile(Message &message);
 
-    /*
-     * TC[23,3] Report attributes of a file
+    /**
+     * TC[23,3] Report attributes of a file at the provided repository path and file name
      */
-    void reportAttributes(Message& message);
+    void reportAttributes(Message &message);
 
-    /*
-     * TM[23,4] Create a report with the attributes of a file
+    /**
+     * TM[23,4] Create a report with the attributes from a file at the provided object path
      */
-    void fileAttributeReport(const String<ECSSMaxStringSize>& repositoryString,
-                             const String<ECSSMaxStringSize>& fileNameString,
-                             uint32_t                         fileSize);
-
-    /*
-     * TC[23,5] Lock a file, makes it read only. This function should work if and only if locking functionality
-     * is permitted by the subservice
-     */
-    void lockFile(Message& message);
-
-    /*
-     * TC[23,6] Unlock a file, makes it read only. This function should work if and only if locking functionality
-     * is permitted by the subservice
-     */
-    void unlockFile(Message& message);
-
-    /*
-     * TC[23,7] Find a file using the repository path and a search pattern.
-     * Generates a TM[23,8] found file report
-     * @todo The wildcard character must be declared
-     */
-    void findFile(Message& message);
-
-    /*
-     * TM[23,8] Found file report, generated after the arrival of a TC[23,7]
-     */
-    void foundFileReport(FoundFilesReportStruct report);
-
-    /*
-     * TC[23,9] Create a directory
-     */
-    void createDirectory(Message& message);
-
-    /*
-     * TC[23,10] Delete a directory
-     */
-    void deleteDirectory(Message& message);
-
-    /*
-     * TC[23,11] Rename a directory
-     */
-    void renameDirectory(Message& message);
-
-    /*
-     * TC[23,12] Report the summary of a directory
-     */
-    void reportSummaryDirectory(Message& message);
-
-    /*
-     * TM[23,13] Report containing summary of a directory
-     */
-    void summaryDirectoryReport(char repositoryPath[ECSSMaxStringSize], RepositorySummaryReportStruct &summaryStruct);
-
-    /*
-     * TC[23,14] Copy a file
-     */
-    void copyFile(Message& message);
-
-    /*
-     * TC[23,15] Move a file
-     */
-    void moveFile(Message& message);
-
-    /*
-     * TC[23,16] Suspend file copy operations
-     */
-    void suspendFileCopyOperations(Message& message);
-
-    /*
-     * TC[23,17] Resume file copy operations
-     */
-    void resumeFileCopyOperations(Message& message);
-
-    /*
-     * TC[23,18] Abort file copy operations
-     */
-    void abortFileCopyOperations(Message& message);
-
-    /*
-     * TC[23,19] Suspend all file copy operations involving a repository path
-     */
-    void suspendAllFileCopyOperationsInPath(Message& message);
-
-    /*
-     * TC[23,20] Resume all file copy operations involving a repository path
-     */
-    void resumeAllFileCopyOperationsInPath(Message& message);
-
-    /*
-     * TC[23,21] Abort all file copy operations in a repository path
-     */
-    void abortAllFileCopyOperationsInPath(Message& message);
-
-    /*
-     * TC[23,22] Enable periodic reporting of the file copy status
-     */
-    void enablePeriodicReportingOfFileCopyStatus(Message& message);
-
-    /*
-     * TM[23,23] File copy status report
-     */
-    void fileCopyStatusReport();
-
-    /*
-     * TC[23,24] Disable periodic reporting of the file copy status
-     */
-    void disablePeriodicReportingOfFileCopyStatus(Message& message);
+    void fileAttributeReport(const String<ECSSMaxStringSize> &repositoryString,
+                             const String<ECSSMaxStringSize> &fileNameString,
+                             uint32_t fileSize);
 
     /**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
@@ -388,7 +228,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-    void execute(Message& message);
+    void execute(Message &message);
 
 };
 
