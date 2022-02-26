@@ -10,6 +10,19 @@ TimeStamp<secondsBytes, fractionalBytes>::TimeStamp(uint64_t taiSecondsFromEpoch
 	taiCounter = static_cast<TAICounter_t>(taiSecondsFromEpoch) << 8 * fractionalBytes;
 }
 
+template <uint8_t secondsBytes, uint8_t fractionalBytes>
+TimeStamp<secondsBytes, fractionalBytes>::TimeStamp(Time::CustomCUC_t customCUCTimestamp) {
+	ASSERT_INTERNAL(areSecondsValid((customCUCTimestamp.elapsed100msTicks/10)),ErrorHandler::InternalErrorType::InvalidTimeStampInput);
+	taiCounter = static_cast<TAICounter_t>(customCUCTimestamp.elapsed100msTicks/10);
+	if(fractionalBytes>0){
+		TAICounter_t fractionalPart = static_cast<TAICounter_t>(customCUCTimestamp.elapsed100msTicks) - 10 * taiCounter;
+		taiCounter = taiCounter << 8;
+		taiCounter += fractionalPart * 256 / 10;
+		taiCounter = taiCounter << 8 * (fractionalBytes - 1);
+	}
+}
+
+
 template <uint8_t secondsCounter, uint8_t fractionalBytes>
 TimeStamp<secondsCounter, fractionalBytes>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp) {
 	// process header
@@ -72,6 +85,20 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes>::TimeStamp(const UTCT
 template <uint8_t secondsBytes, uint8_t fractionalBytes>
 typename TimeStamp<secondsBytes, fractionalBytes>::TAICounter_t TimeStamp<secondsBytes, fractionalBytes>::asTAIseconds() {
 	return taiCounter >> (8 * fractionalBytes);
+}
+
+template <uint8_t secondsBytes, uint8_t fractionalBytes>
+Time::CustomCUC_t TimeStamp<secondsBytes, fractionalBytes>:: asCustomCUCTimestamp() {
+	TAICounter_t temp = taiCounter;
+	Time::CustomCUC_t return_s = {0};
+	if(fractionalBytes>0){
+		temp = temp >> 8 * (fractionalBytes - 1);
+		return_s.elapsed100msTicks += temp * 10 / 256 ;
+	}
+	else{
+		return_s.elapsed100msTicks += temp * 10;
+	}
+	return return_s;
 }
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes>

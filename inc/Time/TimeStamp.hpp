@@ -68,6 +68,14 @@ public:
 	explicit TimeStamp(uint64_t taiSecondsFromEpoch);
 
 	/**
+	 * Initialize the TimeStamp from a count of 100ms ticks from epoch in TAI (leap seconds not accounted)
+	 *
+	 * @param customCUCTimestamp An struct containing a 64 bit unsigned number of 100ms
+	 * ticks from the custom @ref Time::Epoch
+	 */
+	explicit TimeStamp(Time::CustomCUC_t customCUCTimestamp);
+
+	/**
 	 * Initialize the TimeStamp from the bytes of a CUC time stamp
 	 *
 	 * @param timestamp A complete CUC timestamp including header, of the maximum possible size, zero padded to the
@@ -88,6 +96,14 @@ public:
 	 * @return The seconds elapsed in TAI since @ref Time::Epoch. This function is explicitly defined
 	 */
 	TAICounter_t asTAIseconds();
+
+	/**
+	 * Get the representation as a struct containing 100ms ticks from epoch in TAI
+	 *
+	 * @return An struct containing a 64 bit unsigned number of 100ms
+	 * ticks from the custom @ref Time::Epoch. This function is explicitly defined.
+	 */
+	Time::CustomCUC_t asCustomCUCTimestamp();
 
 	/**
 	 * Get the representation as seconds from epoch in TAI, for a floating-point representation.

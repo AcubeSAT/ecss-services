@@ -259,4 +259,9 @@ constexpr bool isLeapYear(uint16_t year) {
 	return (year % 400) == 0;
 }
 
+typedef struct{
+	uint64_t elapsed100msTicks = 0;
+} CustomCUC_t;
+
+
 } // namespace Time
