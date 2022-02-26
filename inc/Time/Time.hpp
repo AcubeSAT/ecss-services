@@ -93,7 +93,11 @@ inline constexpr struct {
 	uint16_t year;
 	uint8_t month;
 	uint8_t day;
-} Epoch { 2020, 1, 1, };
+} Epoch{
+    2020,
+    1,
+    1,
+};
 
 /**
  * Number of seconds elapsed between the UNIX epoch (1 January 1970) and the system epoch.
@@ -167,10 +171,8 @@ template <int secondsBytes, int fractionalBytes>
 inline constexpr uint16_t buildLongCUCHeader() {
 	// cppcheck-suppress redundantCondition
 	static_assert(secondsBytes > 4 || fractionalBytes > 3, "Use buildShortCUCHeader instead");
-	static_assert(secondsBytes <= 7,
-	              "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
-	static_assert(fractionalBytes <= 6,
-	              "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
+	static_assert(secondsBytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
+	static_assert(fractionalBytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
 
 	uint16_t header = 0;
 
@@ -259,9 +261,8 @@ constexpr bool isLeapYear(uint16_t year) {
 	return (year % 400) == 0;
 }
 
-typedef struct{
+typedef struct {
 	uint64_t elapsed100msTicks = 0;
 } CustomCUC_t;
-
 
 } // namespace Time

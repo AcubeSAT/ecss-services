@@ -54,6 +54,7 @@ private:
 	 * @param seconds The amount of seconds from @ref Time::Epoch
 	 */
 	static constexpr bool areSecondsValid(TAICounter_t seconds);
+
 public:
 	/**
 	 * Initialize the TimeStamp at @ref Time::Epoch
@@ -113,7 +114,8 @@ public:
 	 * @tparam T The return type of the seconds (float or double).
 	 * @return The seconds elapsed in TAI since @ref Time::Epoch
 	 */
-	template<typename T> T asTAIseconds();
+	template <typename T>
+	T asTAIseconds();
 
 	/**
 	 * Get the representation as CUC formatted bytes
@@ -161,6 +163,6 @@ public:
 };
 
 #include "TimeStamp.tpp"
-typedef TimeStamp<Time::CUCSecondsBytes,Time::CUCFractionalBytes> AcubesatTimestamp_t;
+typedef TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> AcubesatTimestamp_t;
 
 #endif

@@ -88,38 +88,37 @@ TEST_CASE("Conversion between CUC formats") {
 }
 
 TEST_CASE("Use of custom Acubesat CUC format") {
-
 	SECTION("Check forward conversion") {
 		Time::CustomCUC_t customCUC1 = {1001};
-		TimeStamp<3,0> time1(customCUC1);
+		TimeStamp<3, 0> time1(customCUC1);
 		CHECK(time1.asTAIseconds() == 100);
 		CHECK(time1.asCustomCUCTimestamp().elapsed100msTicks == 1000);
-		TimeStamp<3,2> time2(customCUC1);
+		TimeStamp<3, 2> time2(customCUC1);
 		CHECK(time2.asTAIseconds() == 100);
 		CHECK(time2.asCustomCUCTimestamp().elapsed100msTicks == 1000);
 
-		//check rounding errors
+		// check rounding errors
 		Time::CustomCUC_t customCUC2 = {1004};
-		TimeStamp<3,0> time3(customCUC2);
+		TimeStamp<3, 0> time3(customCUC2);
 		CHECK(time3.asTAIseconds() == 100);
 		CHECK(time3.asCustomCUCTimestamp().elapsed100msTicks == 1000);
-		TimeStamp<3,2> time4(customCUC2);
+		TimeStamp<3, 2> time4(customCUC2);
 		CHECK(time4.asTAIseconds() == 100);
 		CHECK(time4.asCustomCUCTimestamp().elapsed100msTicks == 1003);
 
-		//check rounding errors
+		// check rounding errors
 		Time::CustomCUC_t customCUC3 = {1005};
-		TimeStamp<3,0> time5(customCUC3);
+		TimeStamp<3, 0> time5(customCUC3);
 		CHECK(time5.asTAIseconds() == 100);
 		CHECK(time5.asCustomCUCTimestamp().elapsed100msTicks == 1000);
-		TimeStamp<3,2> time6(customCUC3);
+		TimeStamp<3, 2> time6(customCUC3);
 		CHECK(time6.asTAIseconds() == 100);
 		CHECK(time6.asCustomCUCTimestamp().elapsed100msTicks == 1005);
 	}
 
 	SECTION("Check idempotence") {
 		Time::CustomCUC_t customCUC1 = {1000};
-		TimeStamp<3,3> time1(customCUC1);
+		TimeStamp<3, 3> time1(customCUC1);
 		Time::CustomCUC_t customCUC2 = time1.asCustomCUCTimestamp();
 		CHECK(customCUC1.elapsed100msTicks == customCUC2.elapsed100msTicks);
 	}
