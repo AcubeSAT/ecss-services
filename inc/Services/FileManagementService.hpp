@@ -25,12 +25,10 @@ extern "C" {
  * @todo specify the set of file attributes (atleast the size in bytes of any file)
  * @todo define the MAX_SIZE_OF_SILE_BYTE
  * @todo define the locking status
- * @todo define the searching status (possibly will be supported)
  * @todo define the summary report support
  * @todo do we need to move files ?
  * @todo do we need all these operation handling (suspend, abort, report, periodic report)
  * @todo define max number of file copy operations (what is the meaning of having one ?)
- * @todo moving files is allowed ? does littlefs have multiple file transfer handlers
  * @note The wildcard character is set to be '*'.
  * @note The "null terminator" between two variables with dynamic length is '@'
  * @note LittleFS permits only the deletion of empty directories
@@ -219,7 +217,7 @@ public:
      */
     void fileAttributeReport(const String<ECSSMaxStringSize> &repositoryString,
                              const String<ECSSMaxStringSize> &fileNameString,
-                             uint32_t fileSize);
+                             uint32_t                        fileSize);
 
     /**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
