@@ -7,10 +7,15 @@ extern "C" {
 #include "Helpers/lfs_stub.h"
 };
 #define MAX_FILE_SIZE_BYTES 4096
-#define MAX_FILE_COPY_OPERATIONS 10
-#define MAX_FILE_NAME_SIZE 256
-#define MAX_OPERATION_IDENTIFIERS 256
-#define REPOSITORY_SUMMARY_REPORT_MAX_OBJECTS 4096
+
+#define WILDCARD_FOUND -1
+#define NO_WILDCARD_FOUND -2
+
+#define OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE -2
+#define OBJECT_TYPE_IS_INVALID -3
+
+#define STRING_TERMINATOR_FOUND 0
+#define STRING_TERMINATOR_NOT_FOUND 1
 
 /**
  * Implementation of ST[23] file management service
@@ -63,8 +68,12 @@ private:
 
     /**
      * The purpose of this function is to check if there is a wildcard in a given string
+     * It scans every character of the sting, until the String.size() is reached. If a wildcard is encountered,
+     * then it return its position in the string (starting from 0).
      * @param messageString : The message passed as a String
-     * @return status of execution (1: Message does not contain any wildcards, -1: Message contains at least one wildcard)
+     * @return status of execution
+     *  NO_WILDCARD_FOUND : Message does not contain any wildcards,
+     *  Else : Message contains at least one wildcard
      */
     static int8_t checkForWildcard(String<ECSSMaxStringSize> messageString);
 
@@ -73,29 +82,37 @@ private:
      * Parses the message until a '@' is found. Then returns the actual string, excluding the '@' char
      * @param message : The message that we want to parse
      * @param extractedString : pointer to a String<ECSSMaxStringSize> that will house the extracted string
-     * @return status of execution (0: Successful completion, 1: Error occurred)
+     * @return status of execution
+     *  STRING_TERMINATOR_FOUND: Successful completion,
+     *  STRING_TERMINATOR_NOT_FOUND: Error occurred
      */
     static uint8_t getStringUntilZeroTerminator(Message &message, String<ECSSMaxStringSize> &extractedString);
 
     /**
      * The purpose of this function is to check if the object path is valid for creation
-     * Checks if there is an object at this path and returns its type.
+     * First it checks for wildcards in the string and then
+     * checks if there is an object at this path and returns its type.
      * @param repositoryString : Pointer to the repository path
-     * @return status of execution (2: Object is a directory, 1: Object is a file, -1: Repository path contains a wildcard
-     *                             -2: Invalid type of object, Negative LittleFS error code: lfs_stat() returned an error code)
+     * @return status of execution
+     *  LFS_TYPE_DIR: Object is a directory,
+     *  LFS_TYPE_REG: Object is a file,
+     *  WILDCARD_FOUND: Repository path contains a wildcard
+     *  OBJECT_TYPE_IS_INVALID: Invalid type of object,
+     *  Negative LittleFS error code: lfs_stat() returned an error code
      */
     int32_t pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString);
 
     /**
      * The purpose of this function is to initiate a creation of a file using littleFs
-     * Checks if there is already a file with this name
      * @param fileSystem : Pointer to the file system struct
      * @param file : Pointer to the file struct
      * @param repositoryPath : The repository path
      * @param fileName : The file name
      * @param flags : Input flags that determines the creation status
-     * @return status of execution (-1: File's object path name is too large, -2: there is a wildcard in the repository's path string,
-     *                              lfs_open_file status: Status of the lfs function that creates a file)
+     * @return status of execution
+     *  OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE : File's object path name is too large,
+     *  WILDCARD_FOUND: there is a wildcard in the repository's path string,
+     *  lfs_open_file status: Status of the lfs function that creates a file
      */
     int32_t littleFsCreateFile(lfs_t *fileSystem,
                                lfs_file_t *file,
@@ -107,6 +124,11 @@ private:
      * The purpose of this function is to check if the the strings that compose the object path (repository string and
      * file name string) are seperated with a slash "/" between them. If they are not seperated by one and only one
      * slash, then it modifies the object path accordingly.
+     * There are 4 possible conditions :
+     * 1) Both are slashes
+     * 2) Only the last character of the repository path has
+     * 3) Only the last character of the file name has
+     * 4) None of the has a slash
      * @param objectPathString : String that will house the complete object path
      * @param fileNameString : String with the file name
      * @return -
@@ -115,22 +137,23 @@ private:
 
     /**
      * The purpose of this function is to check if the object path is valid for deletion
-     * Checks if there is an object at this path, if it is a file and does not contain any wildcards
+     * Checks if there is a file at the object path, does not contain any wildcards and if the
+     * object's path size if less than ECSSMaxStringSize
      * @param repositoryString : String with the repository name
      * @param fileNameString : String with the file name
-     * @return status of execution (2: Object is a directory, 1: Object is a file,
-     *                             -1: If there is a wildcard in the repository's path string
-     *                             -2: If there is a wildcard in the file's name string
-     *                             -3: Object path size is too large
-     *                             -4: Invalid object type
-     *                             Other negative code: lfs_stat returned error code)
+     * @return status of execution
+     *  LFS_TYPE_DIR: Object is a directory,
+     *  LFS_TYPE_REG: Object is a file,
+     *  WILDCARD_FOUND: If there is a wildcard in the repository's or file's name path string
+     *  OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE: Object path size is too large
+     *  OBJECT_TYPE_IS_INVALID: Invalid object type
+     *  Other negative code: lfs_stat returned error code
      */
     int32_t pathIsValidForDeletion(String<ECSSMaxStringSize> repositoryString,
                                    String<ECSSMaxStringSize> fileNameString);
 
     /**
      * The purpose of this function is to initiate the deletion of a file using littleFs
-     * Checks if there is already a file with this name and if there is a wildcard in the object path
      * @param fs : Pointer to the file system struct
      * @param repositoryPath : The repository path
      * @param fileName : The file name
@@ -142,15 +165,15 @@ private:
 
     /**
      * The purpose of this function is to initiate the lfs_stat function, which will fill the info struct with all
-     * the necessary information about a files report.
-     * Checks if there is an object at this path, if it is a file and does not contain any wildcards,
+     * the necessary information about a file's report.
      * @param repositoryString : String with the repository name
      * @param fileNameString : String with the file name
      * @param infoStruct : lfs_info which will house the file's attributes
-     * @return status of execution (-1 invalid object type,
-     *                               1: Object is a file,
-     *                               2: Object is a directory
-     *                               Any error code that lfs_stat might return)
+     * @return status of execution
+     *   OBJECT_TYPE_IS_INVALID invalid object type,
+     *   LFS_TYPE_REG: Object is a file,
+     *   LFS_TYPE_DIR: Object is a directory
+     *   Any error code that lfs_stat might return)
      */
     int32_t littleFsReportFile(String<ECSSMaxStringSize> repositoryString,
                                String<ECSSMaxStringSize> fileNameString,
@@ -199,16 +222,33 @@ public:
 
     /**
      * TC[23,1] Create a file at the provided repository path, give it the provided file name and file size
+     * Checks done prior to creating a file :
+     * - The size of the file is below the maximum allowed file size
+     * - The path is valid, meaning it leads to an existing repository
+     * - The repository's path and file's name do not contain a wildcard
+     * - The file does not already exist
+     * - The object type at the repository path is nothing but a directory (LFS_TYPE_DIR)
+     * - The object path size is less than ECSSMaxStringSize
      */
     void createFile(Message &message);
 
     /**
      * TC[23,2] Delete the file at the provided repository path, with the provided file name
+     * Checks done prior to deleting a file :
+     * - The path is valid, meaning it leads to an existing file
+     * - The repository's path and file's name do not contain a wildcard
+     * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
+     * - The object path size is less than ECSSMaxStringSize
      */
     void deleteFile(Message &message);
 
     /**
      * TC[23,3] Report attributes of a file at the provided repository path and file name
+     * Checks done prior to reporting a file :
+     * - The path is valid, meaning it leads to an existing file
+     * - The repository's path and file's name do not contain a wildcard
+     * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
+     * - The object path size is less than ECSSMaxStringSize
      */
     void reportAttributes(Message &message);
 
