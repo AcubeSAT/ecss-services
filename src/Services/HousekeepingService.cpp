@@ -32,6 +32,42 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	housekeepingStructures.insert({idToCreate, newStructure});
 }
 
+void HousekeepingService::createHousekeepingReportStructure(uint8_t idToCreate, uint32_t collectionInterval,
+                                                            uint16_t numOfSimplyCommutatedParams,
+                                                            etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters> parameters) {
+    if (housekeepingStructures.find(idToCreate) != housekeepingStructures.end()) {
+        Message errorMessage = createStructureErrorMessage(idToCreate, collectionInterval, numOfSimplyCommutatedParams,
+                                                           parameters);
+        ErrorHandler::reportError(errorMessage,
+                                  ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
+        return;
+    }
+    if (housekeepingStructures.size() >= ECSSMaxHousekeepingStructures) {
+        Message errorMessage = createStructureErrorMessage(idToCreate, collectionInterval, numOfSimplyCommutatedParams,
+                                                           parameters);
+        ErrorHandler::reportError(errorMessage,
+                                  ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfHousekeepingStructures);
+        return;
+    }
+
+    HousekeepingStructure newStructure;
+    newStructure.structureId = idToCreate;
+    newStructure.collectionInterval = collectionInterval;
+    newStructure.periodicGenerationActionStatus = false;
+
+    for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
+        uint16_t newParamId = parameters[i];
+        if (existsInVector(newStructure.simplyCommutatedParameterIds, newParamId)) {
+            Message errorMessage = createStructureErrorMessage(idToCreate, collectionInterval,
+                                                               numOfSimplyCommutatedParams, parameters);
+            ErrorHandler::reportError(errorMessage, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+            continue;
+        }
+        newStructure.simplyCommutatedParameterIds.push_back(newParamId);
+    }
+    housekeepingStructures.insert({idToCreate, newStructure});
+}
+
 void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	request.assertTC(ServiceType, MessageType::DeleteHousekeepingReportStructure);
 	uint8_t numOfStructuresToDelete = request.readUint8();
@@ -62,6 +98,23 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 		}
 		housekeepingStructures.at(structIdToEnable).periodicGenerationActionStatus = true;
 	}
+}
+
+void HousekeepingService::enablePeriodicHousekeepingParametersReport(uint8_t numOfStructIds,
+                                                                     etl::vector<uint8_t, ECSSMaxHousekeepingStructures> structIds) {
+    for (uint8_t structId = 0; structId < numOfStructIds; structId++) {
+        if (housekeepingStructures.find(structIds[structId]) == housekeepingStructures.end()) {
+            Message errorMessage = Message(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport,
+                                           Message::TC, 1); //Application ID?
+            errorMessage.appendUint8(numOfStructIds);
+            for (uint8_t i = 0; i < structIds.size(); i++) {
+                errorMessage.appendUint8(structIds[i]);
+            }
+            ErrorHandler::reportError(errorMessage, ErrorHandler::RequestedNonExistingStructure);
+            continue;
+        }
+        housekeepingStructures.at(structIds[structId]).periodicGenerationActionStatus = true;
+    }
 }
 
 void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& request) {
@@ -258,4 +311,18 @@ void HousekeepingService::execute(Message& message) {
 bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids,
                                          uint16_t parameterId) {
 	return std::find(std::begin(ids), std::end(ids), parameterId) != std::end(ids);
+}
+
+Message HousekeepingService::createStructureErrorMessage(uint8_t idToCreate, uint32_t collectionInterval,
+                                                         uint16_t numOfSimplyCommutatedParams,
+                                                         etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters> parameters) {
+    Message errorMessage = Message(HousekeepingService::ServiceType,
+                                   HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+    errorMessage.appendUint8(idToCreate);
+    errorMessage.appendUint32(collectionInterval);
+    errorMessage.appendUint16(numOfSimplyCommutatedParams);
+    for (uint8_t parameter = 0; parameter < parameters.size(); parameter++) {
+        errorMessage.appendUint16(parameters[parameter]);
+    }
+    return errorMessage;
 }

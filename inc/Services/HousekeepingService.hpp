@@ -30,6 +30,24 @@ private:
 	static bool existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids,
 	                           uint16_t parameterId);
 
+    /**
+     * Initializes Housekeeping Structures with the Parameters found in the obc-software.
+     * The function definition is also found in the obc-software repo.
+     */
+    void initializeHousekeepingStructures();
+
+    /**
+     * Helper function to create Error Messages for the createHousekeepingReportStructure function
+     * @param idToCreate
+     * @param collectionInterval
+     * @param numOfSimplyCommutatedParams
+     * @param parameters
+     * @return A message defining the Housekeeping Structure ready to be sent to the ErrorHandler
+     */
+    static Message createStructureErrorMessage(uint8_t idToCreate, uint32_t collectionInterval,
+                                               uint16_t numOfSimplyCommutatedParams, etl::vector<uint16_t,
+                                               ECSSMaxSimplyCommutatedParameters> parameters);
+
 public:
 	inline static const uint8_t ServiceType = 3;
 
@@ -37,6 +55,12 @@ public:
 	 * Map containing the housekeeping structures. Map[i] contains the housekeeping structure with ID = i.
 	 */
 	etl::map<uint8_t, HousekeepingStructure, ECSSMaxHousekeepingStructures> housekeepingStructures;
+
+    /**
+     * A struct containing the structure parameters to be used in initializeHousekeepingStructures().
+     * Its definition lives inside the obc-software repo
+     */
+    struct housekeepingStructureParameters;
 
 	enum MessageType : uint8_t {
 		CreateHousekeepingReportStructure = 1,
@@ -53,12 +77,25 @@ public:
 		HousekeepingPeriodicPropertiesReport = 35,
 	};
 
-	HousekeepingService() = default;
+	HousekeepingService() {
+        initializeHousekeepingStructures();
+    };
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
 	 */
 	void createHousekeepingReportStructure(Message& request);
+
+    /**
+     * Reimplementation of TC[3,1], but passing the parameters manually instead of reading them through a Message.
+     * @param idToCreate
+     * @param collectionInterval
+     * @param numOfSimplyCommutatedParams
+     * @param parameters
+     */
+    void createHousekeepingReportStructure(uint8_t idToCreate, uint32_t collectionInterval,
+                                           uint16_t numOfSimplyCommutatedParams,
+                                           etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters> parameters);
 
 	/**
 	 * Implementation of TC[3,3]. Request to delete a housekeeping parameters report structure.
@@ -70,6 +107,14 @@ public:
 	 * housekeeping structure.
 	 */
 	void enablePeriodicHousekeepingParametersReport(Message& request);
+
+    /**
+     * Reimplementation of TC[3,5], but passing the parameters manually instead of reading them through a Message.
+     * @param numOfStructIds
+     * @param structs
+     */
+    void enablePeriodicHousekeepingParametersReport(uint8_t numOfStructIds, etl::vector<uint8_t,
+            ECSSMaxHousekeepingStructures> structs);
 
 	/**
 	 * Implementation of TC[3,6]. Request to disable the periodic housekeeping parameters reporting for a specific
