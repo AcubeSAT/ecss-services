@@ -77,9 +77,16 @@ public:
 		HousekeepingPeriodicPropertiesReport = 35,
 	};
 
-	HousekeepingService() {
+    /**
+     * If we're using ecss-services inside obc-software, initialize the structures with the function found in obc-software
+     */
+#ifdef ECSS_SERVICES_HOUSEKEEPINGPARAMETERS_HPP
+    HousekeepingService() {
         initializeHousekeepingStructures();
     };
+#else
+    HousekeepingService() = default;
+#endif
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
