@@ -45,28 +45,27 @@ extern "C" {
 
 class FileManagementService : public Service {
 private:
+	bool lockFileSupport = false;
+	bool searchFileSupport = false;
+	bool summaryReportSupport = false;
+	bool moveFileSupport = true;
+	bool suspendFileCopyOperationSupport = false;
+	bool suspendAllFileCopyOperationSupport = false;
+	bool abortFileCopyOperationSupport = false;
+	bool abortAllFileCopyOperationSupport = false;
+	bool reportProgressOfCopyOperationsSupport = false;
+	bool enablePeriodicReportingOfFileCopyStatusSupport = false;
 
-    bool lockFileSupport = false;
-    bool searchFileSupport = false;
-    bool summaryReportSupport = false;
-    bool moveFileSupport = true;
-    bool suspendFileCopyOperationSupport = false;
-    bool suspendAllFileCopyOperationSupport = false;
-    bool abortFileCopyOperationSupport = false;
-    bool abortAllFileCopyOperationSupport = false;
-    bool reportProgressOfCopyOperationsSupport = false;
-    bool enablePeriodicReportingOfFileCopyStatusSupport = false;
-
-    /**
+	/**
      * LittleFs file system object.
      * @todo Is one file system enough, do we need more (maybe yes, for su, obc, etc) ?
      */
-    lfs_t onBoardFileSystemObject;
+	lfs_t onBoardFileSystemObject;
 
 
-    //------------------------------------------------------------------------
+	//------------------------------------------------------------------------
 
-    /**
+	/**
      * The purpose of this function is to check if there is a wildcard in a given string
      * It scans every character of the sting, until the String.size() is reached. If a wildcard is encountered,
      * then it return its position in the string (starting from 0).
@@ -75,9 +74,9 @@ private:
      *  NO_WILDCARD_FOUND : Message does not contain any wildcards,
      *  Else : Message contains at least one wildcard
      */
-    static int8_t checkForWildcard(String<ECSSMaxStringSize> messageString);
+	static int8_t checkForWildcard(String<ECSSMaxStringSize> messageString);
 
-    /**
+	/**
      * The purpose of this function is to take care of the extraction process for the object path variable
      * Parses the message until a '@' is found. Then returns the actual string, excluding the '@' char
      * @param message : The message that we want to parse
@@ -86,9 +85,9 @@ private:
      *  STRING_TERMINATOR_FOUND: Successful completion,
      *  STRING_TERMINATOR_NOT_FOUND: Error occurred
      */
-    static uint8_t getStringUntilZeroTerminator(Message &message, String<ECSSMaxStringSize> &extractedString);
+	static uint8_t getStringUntilZeroTerminator(Message& message, String<ECSSMaxStringSize>& extractedString);
 
-    /**
+	/**
      * The purpose of this function is to check if the object path is valid for creation
      * First it checks for wildcards in the string and then
      * checks if there is an object at this path and returns its type.
@@ -100,9 +99,9 @@ private:
      *  OBJECT_TYPE_IS_INVALID: Invalid type of object,
      *  Negative LittleFS error code: lfs_stat() returned an error code
      */
-    int32_t pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString);
+	int32_t pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString);
 
-    /**
+	/**
      * The purpose of this function is to initiate a creation of a file using littleFs
      * @param fileSystem : Pointer to the file system struct
      * @param file : Pointer to the file struct
@@ -114,13 +113,13 @@ private:
      *  WILDCARD_FOUND: there is a wildcard in the repository's path string,
      *  lfs_open_file status: Status of the lfs function that creates a file
      */
-    int32_t littleFsCreateFile(lfs_t *fileSystem,
-                               lfs_file_t *file,
-                               String<ECSSMaxStringSize> repositoryPath,
-                               String<ECSSMaxStringSize> fileName,
-                               int32_t flags);
+	int32_t littleFsCreateFile(lfs_t* fileSystem,
+	                           lfs_file_t* file,
+	                           String<ECSSMaxStringSize> repositoryPath,
+	                           String<ECSSMaxStringSize> fileName,
+	                           int32_t flags);
 
-    /**
+	/**
      * The purpose of this function is to check if the the strings that compose the object path (repository string and
      * file name string) are seperated with a slash "/" between them. If they are not seperated by one and only one
      * slash, then it modifies the object path accordingly.
@@ -133,9 +132,9 @@ private:
      * @param fileNameString : String with the file name
      * @return -
      */
-    void checkForSlashes(String<ECSSMaxStringSize> &objectPathString, uint8_t *&fileNameChar);
+	void checkForSlashes(String<ECSSMaxStringSize>& objectPathString, uint8_t*& fileNameChar);
 
-    /**
+	/**
      * The purpose of this function is to check if the object path is valid for deletion
      * Checks if there is a file at the object path, does not contain any wildcards and if the
      * object's path size if less than ECSSMaxStringSize
@@ -149,10 +148,10 @@ private:
      *  OBJECT_TYPE_IS_INVALID: Invalid object type
      *  Other negative code: lfs_stat returned error code
      */
-    int32_t pathIsValidForDeletion(String<ECSSMaxStringSize> repositoryString,
-                                   String<ECSSMaxStringSize> fileNameString);
+	int32_t pathIsValidForDeletion(String<ECSSMaxStringSize> repositoryString,
+	                               String<ECSSMaxStringSize> fileNameString);
 
-    /**
+	/**
      * The purpose of this function is to initiate the deletion of a file using littleFs
      * Checks the type of the object, the existence of wildcards in its name and it's path name size
      * @param fs : Pointer to the file system struct
@@ -160,11 +159,11 @@ private:
      * @param fileName : The file name
      * @return lfs_remove status of execution
      */
-    int32_t littleFsDeleteFile(lfs_t *fs,
-                               String<ECSSMaxStringSize> repositoryPath,
-                               String<ECSSMaxStringSize> fileName);
+	int32_t littleFsDeleteFile(lfs_t* fs,
+	                           String<ECSSMaxStringSize> repositoryPath,
+	                           String<ECSSMaxStringSize> fileName);
 
-    /**
+	/**
      * The purpose of this function is to initiate the lfs_stat function, which will fill the info struct with all
      * the necessary information about a file's report.
      * Checks the type of object by means of it's type. If it is not LFS_TYPE_REG, then there is an issue.
@@ -177,52 +176,51 @@ private:
      *   LFS_TYPE_DIR: Object is a directory
      *   Any error code that lfs_stat might return)
      */
-    int32_t littleFsReportFile(String<ECSSMaxStringSize> repositoryString,
-                               String<ECSSMaxStringSize> fileNameString,
-                               lfs_info *infoStruct);
+	int32_t littleFsReportFile(String<ECSSMaxStringSize> repositoryString,
+	                           String<ECSSMaxStringSize> fileNameString,
+	                           lfs_info* infoStruct);
 
 public:
+	inline static const uint8_t ServiceType = 23;
 
-    inline static const uint8_t ServiceType = 23;
-
-    /**
+	/**
      * The wildcard character accepted by the service
      */
-    static const char wildcard = '*';
+	static const char wildcard = '*';
 
-    /**
+	/**
      * Character which denotes the end of a string and the beginning of the next (if there is any)
      */
-    static const char variableStringTerminator = '@';
+	static const char variableStringTerminator = '@';
 
-    enum MessageType : uint8_t {
-        CreateFile = 1,
-        DeleteFile = 2,
-        ReportAttributes = 3,
-        CreateAttributesReport = 4,
-        LockFile = 5,
-        UnlockFile = 6,
-        FindFile = 7,
-        FoundFileReport = 8,
-        CreateDirectory = 9,
-        DeleteDirectory = 10,
-        RenameDirectory = 11,
-        ReportSummaryDirectory = 12,
-        SummaryDirectoryReport = 13,
-        CopyFile = 14,
-        MoveFile = 15,
-        SuspendFileCopyOperation = 16,
-        ResumeFileCopyOperation = 17,
-        AbortFileCopyOperation = 18,
-        SuspendFileCopyOperationInPath = 19,
-        ResumeFileCopyOperationInPath = 20,
-        AbortFileCopyOperationInPath = 21,
-        EnablePeriodicReportingOfFileCopy = 22,
-        FileCopyStatusReport = 23,
-        DisablePeriodicReportingOfFileCopy = 24
-    };
+	enum MessageType : uint8_t {
+		CreateFile = 1,
+		DeleteFile = 2,
+		ReportAttributes = 3,
+		CreateAttributesReport = 4,
+		LockFile = 5,
+		UnlockFile = 6,
+		FindFile = 7,
+		FoundFileReport = 8,
+		CreateDirectory = 9,
+		DeleteDirectory = 10,
+		RenameDirectory = 11,
+		ReportSummaryDirectory = 12,
+		SummaryDirectoryReport = 13,
+		CopyFile = 14,
+		MoveFile = 15,
+		SuspendFileCopyOperation = 16,
+		ResumeFileCopyOperation = 17,
+		AbortFileCopyOperation = 18,
+		SuspendFileCopyOperationInPath = 19,
+		ResumeFileCopyOperationInPath = 20,
+		AbortFileCopyOperationInPath = 21,
+		EnablePeriodicReportingOfFileCopy = 22,
+		FileCopyStatusReport = 23,
+		DisablePeriodicReportingOfFileCopy = 24
+	};
 
-    /**
+	/**
      * TC[23,1] Create a file at the provided repository path, give it the provided file name and file size
      * Checks done prior to creating a file :
      * - The size of the file is below the maximum allowed file size
@@ -232,9 +230,9 @@ public:
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_DIR)
      * - The object path size is less than ECSSMaxStringSize
      */
-    void createFile(Message &message);
+	void createFile(Message& message);
 
-    /**
+	/**
      * TC[23,2] Delete the file at the provided repository path, with the provided file name
      * Checks done prior to deleting a file :
      * - The path is valid, meaning it leads to an existing file
@@ -242,9 +240,9 @@ public:
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
      * - The object path size is less than ECSSMaxStringSize
      */
-    void deleteFile(Message &message);
+	void deleteFile(Message& message);
 
-    /**
+	/**
      * TC[23,3] Report attributes of a file at the provided repository path and file name
      * Checks done prior to reporting a file :
      * - The path is valid, meaning it leads to an existing file
@@ -252,24 +250,23 @@ public:
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
      * - The object path size is less than ECSSMaxStringSize
      */
-    void reportAttributes(Message &message);
+	void reportAttributes(Message& message);
 
-    /**
+	/**
      * TM[23,4] Create a report with the attributes from a file at the provided object path
      */
-    void fileAttributeReport(const String<ECSSMaxStringSize> &repositoryString,
-                             const String<ECSSMaxStringSize> &fileNameString,
-                             uint32_t                        fileSize);
+	void fileAttributeReport(const String<ECSSMaxStringSize>& repositoryString,
+	                         const String<ECSSMaxStringSize>& fileNameString,
+	                         uint32_t fileSize);
 
-    /**
+	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
 	 * is the ground station.
 	 *
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-    void execute(Message &message);
-
+	void execute(Message& message);
 };
 
 
