@@ -154,6 +154,7 @@ private:
 
     /**
      * The purpose of this function is to initiate the deletion of a file using littleFs
+     * Checks the type of the object, the existence of wildcards in its name and it's path name size
      * @param fs : Pointer to the file system struct
      * @param repositoryPath : The repository path
      * @param fileName : The file name
@@ -166,6 +167,7 @@ private:
     /**
      * The purpose of this function is to initiate the lfs_stat function, which will fill the info struct with all
      * the necessary information about a file's report.
+     * Checks the type of object by means of it's type. If it is not LFS_TYPE_REG, then there is an issue.
      * @param repositoryString : String with the repository name
      * @param fileNameString : String with the file name
      * @param infoStruct : lfs_info which will house the file's attributes
