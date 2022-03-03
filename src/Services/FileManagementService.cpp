@@ -6,16 +6,15 @@
 #include "MessageParser.hpp"
 #include "etl/vector.h"
 
-int8_t FileManagementService::checkForWildcard(String<ECSSMaxStringSize> messageString) {
-	auto* messageStringChar = reinterpret_cast<uint8_t*>(messageString.data());
+int16_t FileManagementService::findWildcardPosition(String<ECSSMaxStringSize> messageString) {
 
-	for (uint64_t currentChar = 0; currentChar < messageString.size(); currentChar++) {
-		if (messageStringChar[currentChar] == FileManagementService::wildcard) {
-			return currentChar;
-		}
+	int16_t wildcardPosition = messageString.find(wildcard, 0);
+
+	if (wildcardPosition == -1) {
+		return NO_WILDCARD_FOUND;
+	} else {
+		return wildcardPosition;
 	}
-
-	return NO_WILDCARD_FOUND;
 }
 
 uint8_t FileManagementService::getStringUntilZeroTerminator(Message& message,
@@ -40,7 +39,7 @@ uint8_t FileManagementService::getStringUntilZeroTerminator(Message& message,
 int32_t FileManagementService::pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString) {
 	lfs_info infoStruct;
 
-	int8_t repositoryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString);
+	int8_t repositoryStringWildcardStatus = FileManagementService::findWildcardPosition(repositoryString);
 	if (repositoryStringWildcardStatus != NO_WILDCARD_FOUND) {
 		return WILDCARD_FOUND;
 	}
@@ -97,7 +96,7 @@ int32_t FileManagementService::littleFsCreateFile(lfs_t* fileSystem,
 		return OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE;
 	}
 
-	int8_t fileNameWildcardStatus = FileManagementService::checkForWildcard(fileName);
+	int8_t fileNameWildcardStatus = FileManagementService::findWildcardPosition(fileName);
 	if (fileNameWildcardStatus != NO_WILDCARD_FOUND) {
 		return WILDCARD_FOUND;
 	}
@@ -116,12 +115,12 @@ int32_t FileManagementService::littleFsCreateFile(lfs_t* fileSystem,
 
 int32_t FileManagementService::pathIsValidForDeletion(String<ECSSMaxStringSize> repositoryString,
                                                       String<ECSSMaxStringSize> fileNameString) {
-	int8_t repositoyryStringWildcardStatus = FileManagementService::checkForWildcard(repositoryString);
+	int8_t repositoyryStringWildcardStatus = FileManagementService::findWildcardPosition(repositoryString);
 	if (repositoyryStringWildcardStatus != NO_WILDCARD_FOUND) {
 		return WILDCARD_FOUND;
 	}
 
-	int8_t fileNameStringWildcardStatus = FileManagementService::checkForWildcard(fileNameString);
+	int8_t fileNameStringWildcardStatus = FileManagementService::findWildcardPosition(fileNameString);
 	if (fileNameStringWildcardStatus != NO_WILDCARD_FOUND) {
 		return WILDCARD_FOUND;
 	}
@@ -386,8 +385,8 @@ void FileManagementService::reportAttributes(Message& message) {
 	String<ECSSMaxStringSize> fileNameString("");
 	uint8_t fileNameExtractionStatus = getStringUntilZeroTerminator(message, fileNameString);
 
-	int8_t repositoyryStringWildcardStatus = checkForWildcard(repositoryPathString);
-	int8_t fileNameStringWildcardStatus = checkForWildcard(fileNameString);
+	int8_t repositoyryStringWildcardStatus = findWildcardPosition(repositoryPathString);
+	int8_t fileNameStringWildcardStatus = findWildcardPosition(fileNameString);
 
 	if (repositoryPathExtractionStatus != STRING_TERMINATOR_FOUND) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);

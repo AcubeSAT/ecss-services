@@ -74,7 +74,7 @@ private:
      *  NO_WILDCARD_FOUND : Message does not contain any wildcards,
      *  Else : Message contains at least one wildcard
      */
-	static int8_t checkForWildcard(String<ECSSMaxStringSize> messageString);
+	static int16_t findWildcardPosition(String<ECSSMaxStringSize> messageString);
 
 	/**
      * The purpose of this function is to take care of the extraction process for the object path variable
