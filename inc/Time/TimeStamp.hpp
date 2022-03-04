@@ -163,6 +163,6 @@ public:
 };
 
 #include "TimeStamp.tpp"
-typedef TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> AcubesatTimestamp_t;
+typedef TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> AcubeSATTimeStamp_t;
 
 #endif
