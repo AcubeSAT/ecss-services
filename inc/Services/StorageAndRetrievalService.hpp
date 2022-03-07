@@ -91,7 +91,7 @@ private:
 	                       const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
-	 * Checks the validity of the specified time window.
+	 * Checks whether the time window makes logical sense (end time should be after the start time)
 	 *
 	 * @param request used to raise errors.
 	 */
