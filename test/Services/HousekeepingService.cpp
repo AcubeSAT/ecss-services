@@ -24,6 +24,12 @@ void buildRequest(Message& request, uint8_t idToCreate) {
 }
 
 /**
+ * Stub function to define the HousekeepingService constructor during tests
+ */
+void HousekeepingService::initializeHousekeepingStructures() {
+}
+
+/**
  * Initializes 3 housekeeping structures with IDs = {0, 4, 6}
  */
 void initializeHousekeepingStructures() {
