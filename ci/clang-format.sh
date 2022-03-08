@@ -9,6 +9,6 @@
 
 echo -e "\033[0;34mRunning clang-format...\033[0m"
 
-cd "$(dirname "$0")"
-clang-format-7 -i `find ../src/ ../inc/ ../test/ -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` \
-    -verbose $@
+cd "$(dirname "$0")" || exit
+clang-format -style=file -i "$(find ../src/ ../inc/ ../test/ -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|tpp|c|h)')" \
+    -verbose "$@"
