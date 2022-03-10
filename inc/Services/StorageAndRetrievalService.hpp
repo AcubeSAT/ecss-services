@@ -34,7 +34,7 @@ public:
 	const TimeStampType timeStamping = PacketBased;
 
 private:
-	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
+	typedef String<ECSSMaxPacketStoreKeySize> packetStoreKey;
 
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
