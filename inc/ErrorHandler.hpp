@@ -92,7 +92,7 @@ public:
 		/**
 		 * Invalid TimeStamp parameters at creation
 		 */
-		InvalidTimeStampInput = 15
+		InvalidTimeStampInput = 15,
 	};
 
 	/**
