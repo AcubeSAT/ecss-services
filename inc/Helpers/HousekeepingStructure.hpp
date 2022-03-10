@@ -14,20 +14,27 @@
  */
 class HousekeepingStructure {
 public:
-	uint8_t structureId;
-	/**
-	 * Defined as integer multiples of the minimum sampling interval as per 6.3.3.2.c.5 #NOTE-2.
-	 */
-	uint32_t collectionInterval = 0;
-	/**
-	 * Indicates whether the periodic generation of housekeeping reports is enabled.
-	 */
-	bool periodicGenerationActionStatus = false;
+    uint8_t structureId;
 
-	/**
-	 * Vector containing the IDs of the simply commutated parameters, contained in the housekeeping structure.
-	 */
-	etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters> simplyCommutatedParameterIds;
+    /**
+     * Defined as integer multiples of the minimum sampling interval as per 6.3.3.2.c.5 #NOTE-2.
+     */
+    uint32_t collectionInterval = 0;
+
+    /**
+     * Time needed to pass for the next call of Housekeeping reporting.
+     */
+    uint32_t timeToNextReport = 0;
+
+    /**
+     * Indicates whether the periodic generation of housekeeping reports is enabled.
+     */
+    bool periodicGenerationActionStatus = false;
+
+    /**
+     * Vector containing the IDs of the simply commutated parameters, contained in the housekeeping structure.
+     */
+    etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters> simplyCommutatedParameterIds;
 
 	HousekeepingStructure() = default;
 };
