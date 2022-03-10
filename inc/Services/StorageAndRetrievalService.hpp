@@ -226,7 +226,7 @@ public:
 	void resetPacketStores();
 
 	/**
-	 * Returns the current number of existing packet stores.
+	 * Returns the number of existing packet stores.
 	 */
 	uint16_t currentNumberOfPacketStores();
 
