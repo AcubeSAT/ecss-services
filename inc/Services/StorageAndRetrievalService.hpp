@@ -21,7 +21,7 @@ public:
 	/**
 	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
 	 */
-	enum TimeStamping : uint8_t { StorageBased = 0, PacketBased = 1 };
+	enum TimeStampType : uint8_t { StorageBased = 0, PacketBased = 1 };
 
 	/**
 	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
@@ -31,7 +31,7 @@ public:
 	/**
 	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
 	 */
-	const TimeStamping timeStamping = PacketBased;
+	const TimeStampType timeStamping = PacketBased;
 
 private:
 	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
