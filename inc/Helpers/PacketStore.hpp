@@ -13,7 +13,8 @@
 class PacketStore {
 public:
 	/**
-	 * The virtual channel used to transmit the packet store to the ground station.
+	 * The virtual channel used to transmit the packet store to the ground station. There is an upper and a lower
+	 * bound for the virtual channels, defined in 'ECSSDefinitions' file.
 	 */
 	uint8_t virtualChannel;
 	/**
