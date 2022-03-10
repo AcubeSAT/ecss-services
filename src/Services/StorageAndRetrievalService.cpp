@@ -77,9 +77,9 @@ bool StorageAndRetrievalService::checkPacketStores(const String<ECSSMaxPacketSto
 	if (packetStores.find(fromPacketStoreId) == packetStores.end() or
 	    packetStores.find(toPacketStoreId) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }
 
 bool StorageAndRetrievalService::checkTimeWindow(uint32_t startTime, uint32_t endTime, Message& request) {
@@ -127,7 +127,7 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSMaxPac
 bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                     uint32_t startTime, uint32_t endTime, Message& request) {
-	return (checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkTimeWindow(startTime, endTime, request) or checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, endTime, request));
 }
@@ -135,7 +135,7 @@ bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSMaxPacketSt
 bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                     uint32_t startTime, Message& request) {
-	return (checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, request, true));
 }
@@ -143,7 +143,7 @@ bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSMaxPacketSt
 bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
                                                      const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId,
                                                      uint32_t endTime, Message& request) {
-	return (checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
+	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, endTime, request, false));
 }
