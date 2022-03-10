@@ -34,12 +34,12 @@ public:
 	const TimeStampType timeStamping = PacketBased;
 
 private:
-	typedef String<ECSSMaxPacketStoreKeySize> packetStoreKey;
+	typedef String<ECSSMaxPacketStoreIdSize> packetStoreId;
 
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
+	etl::map<packetStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
