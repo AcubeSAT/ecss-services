@@ -50,12 +50,12 @@ public:
 	/**
 +	 * Whether the storage of TM packets is enabled for this packet store
 	 */
-	bool storageStatus;
+	bool storageStatus = false;
 
 	/**
 	 * Whether the by-time-range retrieval of packet stores is enabled for this packet-store.
 	 */
-	bool byTimeRangeRetrievalStatus;
+	bool byTimeRangeRetrievalStatus = false;
 	PacketStoreType packetStoreType;
 	PacketStoreOpenRetrievalStatus openRetrievalStatus;
 
