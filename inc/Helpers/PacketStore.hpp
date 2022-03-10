@@ -62,7 +62,7 @@ public:
 	PacketStore() = default;
 
 	/**
-	 * A queue containing the TM messages stored by the packet store. Every TM is followed by its timestamp.
+	 * A queue containing the TM messages stored by the packet store. Every TM is accompanied by its timestamp.
 	 *
 	 * @note A convention is made that this should be filled out using `push_back` and NOT `push_front`, dictating that
 	 * earlier packets are placed in the front position. So removing the earlier packets is done with `pop_front`.
