@@ -29,7 +29,7 @@ public:
 	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
 
 	/**
-	 * @brief The type of timestamps that the subservice sets to each incoming telemetry packet.
+	 * The type of timestamps that the subservice sets to each incoming telemetry packet.
 	 */
 	const TimeStampType timeStamping = PacketBased;
 
@@ -37,7 +37,7 @@ private:
 	typedef String<ECSSMaxPacketStoreIdSize> packetStoreKey;
 
 	/**
-	 * @brief All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
+	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
 	etl::map<packetStoreKey, PacketStore, ECSSMaxPacketStores> packetStores;
 
@@ -56,7 +56,7 @@ private:
 	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
 
 	/**
-	 * * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
+	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
 	 * time-tags as per 6.15.3.8.4.d(1) of the standard.
 	 *
 	 * @param request used to read the time-tags, the packet store IDs and to raise errors.
