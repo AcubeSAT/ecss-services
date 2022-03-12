@@ -23,6 +23,7 @@
 #ifdef SERVICE_ALL
 #define SERVICE_EVENTACTION ///<  Compile ST[19] event-action
 #define SERVICE_EVENTREPORT ///<  Compile ST[05] event reporting
+#define SERVICE_FILE_MANAGEMENT ///<  Compile ST[23] file management service
 #define SERVICE_FUNCTION ///<  Compile ST[08] function management
 #define SERVICE_HOUSEKEEPING ///<  Compile ST[03] housekeeping
 #define SERVICE_LARGEPACKET ///<  Compile ST[13] large packet transfer
@@ -34,7 +35,6 @@
 #define SERVICE_TEST ///<  Compile ST[17] test
 #define SERVICE_TIME ///<  Compile ST[09] time management
 #define SERVICE_TIMESCHEDULING ///<  Compile ST[11] time-based scheduling
-#define SERVICE_FILE_MANAGEMENT ///<  Compile ST[23] file management service
 #endif
 /** @} */
 

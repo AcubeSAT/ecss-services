@@ -6,7 +6,8 @@
 extern "C" {
 #include "Helpers/lfs_stub.h"
 };
-#define MAX_FILE_SIZE_BYTES 4096
+
+constexpr uint16_t maxFileSizeBytes = 4096;
 
 #define WILDCARD_FOUND -1
 #define NO_WILDCARD_FOUND -2
@@ -14,8 +15,6 @@ extern "C" {
 #define OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE -2
 #define OBJECT_TYPE_IS_INVALID -3
 
-#define STRING_TERMINATOR_FOUND 0
-#define STRING_TERMINATOR_NOT_FOUND 1
 
 /**
  * Implementation of ST[23] file management service
@@ -57,16 +56,21 @@ private:
 	bool enablePeriodicReportingOfFileCopyStatusSupport = false;
 
 	/**
+	 * Return values indicating whether the search for a string terminator
+	 * in a variable length string was successful or unsuccessful
+	 */
+	enum StringTerminatorStatus : bool {
+		stringTerminatorFound = 0,
+		stringTerminatorNotFound = 1
+	};
+
+	/**
      * LittleFs file system object.
-     * @todo Is one file system enough, do we need more (maybe yes, for su, obc, etc) ?
      */
 	lfs_t onBoardFileSystemObject;
 
-
-	//------------------------------------------------------------------------
-
 	/**
-     * The purpose of this function is to check if there is a wildcard in a given string
+     * Checks if there is a wildcard in a given string
      * It scans every character of the sting, until the String.size() is reached. If a wildcard is encountered,
      * then it return its position in the string (starting from 0).
      * @param messageString : The message passed as a String
@@ -82,10 +86,10 @@ private:
      * @param message : The message that we want to parse
      * @param extractedString : pointer to a String<ECSSMaxStringSize> that will house the extracted string
      * @return status of execution
-     *  STRING_TERMINATOR_FOUND: Successful completion,
-     *  STRING_TERMINATOR_NOT_FOUND: Error occurred
+     *  stringTerminatorFound: Successful completion,
+     *  stringTerminatorNotFound: Error occurred
      */
-	static uint8_t getStringUntilZeroTerminator(Message& message, String<ECSSMaxStringSize>& extractedString);
+	static StringTerminatorStatus getStringUntilZeroTerminator(Message& message, String<ECSSMaxStringSize>& extractedString);
 
 	/**
      * The purpose of this function is to check if the object path is valid for creation
@@ -117,7 +121,7 @@ private:
 	                           lfs_file_t* file,
 	                           String<ECSSMaxStringSize> repositoryPath,
 	                           String<ECSSMaxStringSize> fileName,
-	                           int32_t flags);
+	                           const int32_t flags);
 
 	/**
      * The purpose of this function is to check if the the strings that compose the object path (repository string and
@@ -132,7 +136,7 @@ private:
      * @param fileNameString : String with the file name
      * @return -
      */
-	void checkForSlashes(String<ECSSMaxStringSize>& objectPathString, uint8_t*& fileNameChar);
+	void checkForSlashesAndCompensate(String<ECSSMaxStringSize>& objectPathString, uint8_t*& fileNameChar);
 
 	/**
      * The purpose of this function is to check if the object path is valid for deletion
