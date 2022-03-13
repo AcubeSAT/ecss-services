@@ -115,7 +115,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 		}
-
 		currentPMONId = message.readEnum16();
 		currentMonitoredParameterId = message.readEnum16();
 		currentPMONRepetitionNumber = message.readUint16();
@@ -128,25 +127,12 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 	uint16_t numberOfIds = message.readUint16();
 	uint16_t currentPMONId = message.readUint16();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		if (ParameterMonitoringList.find(currentPMONId) == ParameterMonitoringList.end() ||
-		    ParameterMonitoringStatus.at(currentPMONId)) {
-			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinitionError);
-		} else {
-			ParameterMonitoringList.erase(currentPMONId);
-			MonitoredParameterIds.erase(currentPMONId);
-			ParameterMonitoringCheckingStatus.erase(currentPMONId);
-			RepetitionCounter.erase(currentPMONId);
-			RepetitionNumber.erase(currentPMONId);
-			ParameterMonitoringStatus.erase(currentPMONId);
-			ParameterMonitoringCheckTypes.erase(currentPMONId);
-			if (LimitCheckParameters.find(currentPMONId) != LimitCheckParameters.end()) {
-				LimitCheckParameters.erase(currentPMONId);
-			} else if (ExpectedValueCheckParameters.find(currentPMONId) != ExpectedValueCheckParameters.end()) {
-				ExpectedValueCheckParameters.erase(currentPMONId);
-			} else if (DeltaCheckParameters.find(currentPMONId) != DeltaCheckParameters.end()) {
-				DeltaCheckParameters.erase(currentPMONId);
-			}
+		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end() ||
+		    getPMONDefinition(currentPMONId).get().monitoringEnabled) {
+			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition);
+			continue;
 		}
+		parameterMonitoringList.erase(currentPMONId);
 		currentPMONId = message.readUint16();
 	}
 }
