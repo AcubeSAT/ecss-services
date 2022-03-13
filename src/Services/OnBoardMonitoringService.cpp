@@ -48,20 +48,10 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 	if (parameterMonitoringFunctionStatus) {
 		ErrorHandler::reportError(
 		    message,
-		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitionsError);
-	} else {
-		ParameterMonitoringList.clear();
-		MonitoredParameterIds.clear();
-		ParameterMonitoringCheckingStatus.clear();
-		RepetitionCounter.clear();
-		RepetitionNumber.clear();
-		ParameterMonitoringStatus.clear();
-		CheckTransitionList.clear();
-		ParameterMonitoringCheckTypes.clear();
-		LimitCheckParameters.clear();
-		ExpectedValueCheckParameters.clear();
-		DeltaCheckParameters.clear();
+		    ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
+		return;
 	}
+	parameterMonitoringList.clear();
 }
 
 void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message) {
@@ -366,7 +356,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 	Message outOfLimitsReport(ServiceType, MessageType::OutOfLimitsReport, Message::TM, 0);
 	uint16_t numberOfTransitions = 0;
 
-	for (auto& transition : CheckTransitionList) {
+	for (auto& transition: CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
 			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
 			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
@@ -421,7 +411,7 @@ void OnBoardMonitoringService::outOfLimitsReport() {
 
 	outOfLimitsReport.appendUint16(numberOfTransitions);
 
-	for (auto& transition : CheckTransitionList) {
+	for (auto& transition: CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
 			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
 			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
@@ -537,7 +527,7 @@ void OnBoardMonitoringService::checkTransitionReport() {
 	Message checkTransitionReport(ServiceType, CheckTransitionReport, Message::TM, 0);
 	checkTransitionReport.appendUint16(CheckTransitionList.size());
 
-	for (auto& transition : CheckTransitionList) {
+	for (auto& transition: CheckTransitionList) {
 		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
 			checkTransitionReport.appendEnum16(transition.first);
 			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
@@ -613,15 +603,15 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	Message parameterMonitoringDefinitionStatusReport(
 	    ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, 0);
 	parameterMonitoringDefinitionStatusReport.appendUint16(ParameterMonitoringList.size());
-	for (auto& currentParameter : ParameterMonitoringList) {
+	for (auto& currentParameter: ParameterMonitoringList) {
 		parameterMonitoringDefinitionStatusReport.appendEnum16(currentParameter.first);
 		parameterMonitoringDefinitionStatusReport.appendEnum8(ParameterMonitoringStatus.at(currentParameter.first));
 	}
 	storeMessage(parameterMonitoringDefinitionStatusReport);
-		    message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
-		return;
-	}
-	parameterMonitoringList.clear();
+	        message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
+	        return;
+}
+parameterMonitoringList.clear();
 }
 
 void OnBoardMonitoringService::execute(Message& message) {
