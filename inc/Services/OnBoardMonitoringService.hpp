@@ -1,14 +1,14 @@
 #ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #include <cstdint>
-#include "Message.hpp"
-#include "etl/array.h"
-#include "Service.hpp"
-#include "Helpers/Parameter.hpp"
-#include "etl/map.h"
 #include "ECSS_Definitions.hpp"
-#include "etl/list.h"
 #include "Helpers/PMONBase.hpp"
+#include "Helpers/Parameter.hpp"
+#include "Message.hpp"
+#include "Service.hpp"
+#include "etl/array.h"
+#include "etl/list.h"
+#include "etl/map.h"
 
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
@@ -90,7 +90,7 @@ public:
 	 */
 	void deleteAllParameterMonitoringDefinitions(Message& message);
 
-	 /**
+	/**
 	 * TC[12,5]
 	 */
 	void addParameterMonitoringDefinitions(Message& message);
