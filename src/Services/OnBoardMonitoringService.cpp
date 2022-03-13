@@ -250,7 +250,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 		} else {
 			ErrorHandler::reportError(message, ErrorHandler::GetNonExistingParameter);
-			break;
+			continue;
 		}
 		currentPMONId = message.readEnum16();
 		currentMonitoredParameterId = message.readEnum16();
