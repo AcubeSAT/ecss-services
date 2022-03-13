@@ -27,6 +27,8 @@ public:
 		AboveHighThreshold = 10
 	};
 
+	enum CheckType : uint8_t { LimitCheck = 1, ExpectedValueCheck = 2, DeltaCheck = 3 };
+
 	uint16_t monitoredParameterId;
 
 	std::reference_wrapper<ParameterBase> monitoredParameter;
