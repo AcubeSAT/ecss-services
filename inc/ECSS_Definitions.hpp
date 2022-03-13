@@ -164,7 +164,10 @@ inline const bool SupportsStandardDeviation = true;
  */
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
 
-inline const uint8_t ECSSMaxParameters = 5;
+/**
+ * Maximum number of ST[12] Parameter Monitoring Definitions.
+ */
+inline const uint8_t ECSSMaxMonitoringDefinitions = 4;
 
 /** @} */
 

@@ -1,44 +1,40 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_ONBOARDMONITORING
-#include <Message.hpp>
+#include "Message.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
 #include "etl/map.h"
-#include "ServicePool.hpp"
-
-#define firstTransitionIndex 0
-#define secondTransitionIndex 1
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
-	parameterMonitoringFunctionStatus = true;
-	uint16_t numberOfParameters = message.readUint16();
-	uint16_t currentId = message.readEnum16();
-	for (uint16_t i = 0; i < numberOfParameters; i++) {
-		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			RepetitionCounter.at(currentId) = 0;
-			ParameterMonitoringStatus.at(currentId) = true;
-		} else {
+
+	uint16_t numberOfPMONDefinitions = message.readUint16();
+	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
+		uint16_t currentId = message.readEnum16();
+		auto definition = parameterMonitoringList.find(currentId);
+		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
+			continue;
 		}
-		currentId = message.readEnum16();
+		definition->second.get().repetitionNumber = 0;
+		definition->second.get().monitoringEnabled = true;
 	}
 }
 
 void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
-	parameterMonitoringFunctionStatus = false;
-	uint16_t numberOfParameters = message.readUint16();
-	uint16_t currentId = message.readEnum16();
-	for (uint16_t i = 0; i < numberOfParameters; i++) {
-		if (ParameterMonitoringList.find(currentId) != ParameterMonitoringList.end()) {
-			ParameterMonitoringStatus.at(currentId) = false;
-			ParameterMonitoringCheckingStatus.at(currentId) = Unchecked;
-		} else {
+
+	uint16_t numberOfPMONDefinitions = message.readUint16();
+	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
+		uint16_t currentId = message.readEnum16();
+		auto definition = parameterMonitoringList.find(currentId);
+		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
+			continue;
 		}
-		currentId = message.readEnum16();
+		definition->second.get().monitoringEnabled = false;
+		definition->second.get().checkingStatus = PMONBase::Unchecked;
 	}
 }
 
@@ -622,6 +618,10 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 		parameterMonitoringDefinitionStatusReport.appendEnum8(ParameterMonitoringStatus.at(currentParameter.first));
 	}
 	storeMessage(parameterMonitoringDefinitionStatusReport);
+		    message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
+		return;
+	}
+	parameterMonitoringList.clear();
 }
 
 void OnBoardMonitoringService::execute(Message& message) {
