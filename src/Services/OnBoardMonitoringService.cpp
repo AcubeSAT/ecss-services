@@ -71,7 +71,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		}
 		if (parameterMonitoringList.full()) {
 			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
+			                          ErrorHandler::ExecutionStartErrorType::parameterMonitoringListIsFull);
 			continue;
 		}
 		if (auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
@@ -146,111 +146,110 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 	uint16_t currentCheckType = message.readEnum8();
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
-			if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
-				if (MonitoredParameterIds.at(currentPMONId) == currentMonitoredParameterId) {
-					if (currentCheckType == LimitCheck) {
-						uint8_t lowLimit = message.readUint16();
-						auto belowLowLimitEventId = static_cast<Event>(message.readEnum8());
-						uint8_t highLimit = message.readUint16();
-						auto aboveHighLimitEventId = static_cast<Event>(message.readEnum8());
-						if (highLimit <= lowLimit) {
-							ErrorHandler::reportError(
-							    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
-							break;
-						}
-						RepetitionCounter.at(currentPMONId) = 0;
-						RepetitionNumber.at(currentPMONId) = currentPMONRepetitionNumber;
-						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
-						if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
-							LimitCheckParameters.at(currentPMONId).lowLimit = lowLimit;
-							LimitCheckParameters.at(currentPMONId).belowLowLimitEvent = belowLowLimitEventId;
-							LimitCheckParameters.at(currentPMONId).highLimit = highLimit;
-							LimitCheckParameters.at(currentPMONId).aboveHighLimitEvent = aboveHighLimitEventId;
-						} else {
-							ParameterMonitoringCheckTypes.at(currentPMONId) = LimitCheck;
-							struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
-							                                aboveHighLimitEventId};
-							LimitCheckParameters.insert({currentPMONId, limitCheck});
-							if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
-								ExpectedValueCheckParameters.erase(currentPMONId);
-							}
-							if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
-								DeltaCheckParameters.erase(currentPMONId);
-							}
-						}
-
-					} else if (currentCheckType == ExpectedValueCheck) {
-						uint8_t mask = message.readUint8();
-						uint8_t expectedValue = message.readEnum16();
-						auto unExpectedValueEvent = static_cast<Event>(message.readEnum8());
-						RepetitionCounter.at(currentPMONId) = 0;
-						RepetitionNumber.at(currentPMONId) = currentPMONRepetitionNumber;
-						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
-						if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
-							ExpectedValueCheckParameters.find(currentPMONId)->second.mask = mask;
-							ExpectedValueCheckParameters.find(currentPMONId)->second.expectedValue = expectedValue;
-							ExpectedValueCheckParameters.find(currentPMONId)->second.notExpectedValueEvent =
-							    unExpectedValueEvent;
-						} else {
-							ParameterMonitoringCheckTypes.at(currentPMONId) = ExpectedValueCheck;
-							struct ExpectedValueCheck expectedValueCheck = {expectedValue, mask,
-							                                                unExpectedValueEvent};
-							ExpectedValueCheckParameters.insert({currentPMONId, expectedValueCheck});
-							if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
-								LimitCheckParameters.erase(currentPMONId);
-							}
-							if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
-								DeltaCheckParameters.erase(currentPMONId);
-							}
-						}
-
-					} else if (currentCheckType == DeltaCheck) {
-						uint8_t lowDeltaThreshold = message.readUint16();
-						auto belowLowThresholdEventId = static_cast<Event>(message.readEnum8());
-						uint8_t highDeltaThreshold = message.readUint16();
-						auto aboveHighThresholdEventId = static_cast<Event>(message.readEnum8());
-						uint8_t numberOfConsecutiveDeltaChecks = message.readUint16();
-						if (highDeltaThreshold <= lowDeltaThreshold) {
-							ErrorHandler::reportError(
-							    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
-							break;
-						}
-						RepetitionCounter.at(currentPMONId) = 0;
-						RepetitionNumber.at(currentPMONId) = currentPMONRepetitionNumber;
-						ParameterMonitoringCheckingStatus.at(currentPMONId) = Unchecked;
-						if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
-							DeltaCheckParameters.at(currentPMONId).lowDeltaThreshold = lowDeltaThreshold;
-							DeltaCheckParameters.at(currentPMONId).belowLowThresholdEvent = belowLowThresholdEventId;
-							DeltaCheckParameters.at(currentPMONId).highDeltaThreshold = highDeltaThreshold;
-							DeltaCheckParameters.at(currentPMONId).aboveHighThresholdEvent = aboveHighThresholdEventId;
-							DeltaCheckParameters.at(currentPMONId).numberOfConsecutiveDeltaChecks =
-							    numberOfConsecutiveDeltaChecks;
-						} else {
-							ParameterMonitoringCheckTypes.at(currentPMONId) = DeltaCheck;
-							struct DeltaCheck deltaCheck = {numberOfConsecutiveDeltaChecks, lowDeltaThreshold,
-							                                belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId};
-							DeltaCheckParameters.insert({currentPMONId, deltaCheck});
-							if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
-								LimitCheckParameters.erase(currentPMONId);
-							}
-							if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
-								ExpectedValueCheckParameters.erase(currentPMONId);
-							}
-						}
-					}
-				} else {
-					ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
-					                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
-					break;
-				}
-			} else {
-				ErrorHandler::reportError(message, ErrorHandler::GetNonExistingParameter);
-				break;
-			}
-		} else {
+		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
+			continue;
+		}
+		if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
+			if (parameterMonitoringList.at(currentPMONId).get().monitoredParameterId != currentMonitoredParameterId) {
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
+				                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
+				continue;
+			}
+			if (currentCheckType == PMONBase::LimitCheck) {
+				double lowLimit = message.readDouble();
+				uint16_t belowLowLimitEventId = message.readEnum16();
+				double highLimit = message.readDouble();
+				uint16_t aboveHighLimitEventId = message.readEnum16();
+				if (highLimit <= lowLimit) {
+					ErrorHandler::reportError(
+					    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
+					continue;
+				}
+				parameterMonitoringList.at(currentPMONId).get().repetitionCounter = 0;
+				parameterMonitoringList.at(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				parameterMonitoringList.at(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				if (parameterMonitoringList.at(currentPMONId).get(). == PMONBase::LimitCheck) {
+					LimitCheckParameters.at(currentPMONId).lowLimit = lowLimit;
+					LimitCheckParameters.at(currentPMONId).belowLowLimitEvent = belowLowLimitEventId;
+					LimitCheckParameters.at(currentPMONId).highLimit = highLimit;
+					LimitCheckParameters.at(currentPMONId).aboveHighLimitEvent = aboveHighLimitEventId;
+				} else {
+					ParameterMonitoringCheckTypes.at(currentPMONId) = LimitCheck;
+					struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
+					                                aboveHighLimitEventId};
+					LimitCheckParameters.insert({currentPMONId, limitCheck});
+					if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
+						ExpectedValueCheckParameters.erase(currentPMONId);
+					}
+					if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
+						DeltaCheckParameters.erase(currentPMONId);
+					}
+				}
+
+			} else if (currentCheckType == PMONBase::ExpectedValueCheck) {
+				uint64_t mask = message.readUint64();
+				double expectedValue = message.readDouble();
+				uint16_t unExpectedValueEvent = message.readEnum16();
+				parameterMonitoringList.at(currentPMONId).get().repetitionCounter = 0;
+				parameterMonitoringList.at(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				parameterMonitoringList.at(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
+					ExpectedValueCheckParameters.find(currentPMONId)->second.mask = mask;
+					ExpectedValueCheckParameters.find(currentPMONId)->second.expectedValue = expectedValue;
+					ExpectedValueCheckParameters.find(currentPMONId)->second.notExpectedValueEvent =
+					    unExpectedValueEvent;
+				} else {
+					ParameterMonitoringCheckTypes.at(currentPMONId) = ExpectedValueCheck;
+					struct ExpectedValueCheck expectedValueCheck = {expectedValue, mask,
+					                                                unExpectedValueEvent};
+					ExpectedValueCheckParameters.insert({currentPMONId, expectedValueCheck});
+					if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
+						LimitCheckParameters.erase(currentPMONId);
+					}
+					if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
+						DeltaCheckParameters.erase(currentPMONId);
+					}
+				}
+
+			} else if (currentCheckType == PMONBase::DeltaCheck) {
+				double lowDeltaThreshold = message.readDouble();
+				uint16_t belowLowThresholdEventId = message.readEnum16();
+				double highDeltaThreshold = message.readDouble();
+				uint16_t aboveHighThresholdEventId = message.readEnum16();
+				uint16_t numberOfConsecutiveDeltaChecks = message.readUint16();
+				if (highDeltaThreshold <= lowDeltaThreshold) {
+					ErrorHandler::reportError(
+					    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
+					continue;
+				}
+				parameterMonitoringList.at(currentPMONId).get().repetitionCounter = 0;
+				parameterMonitoringList.at(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				parameterMonitoringList.at(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
+					DeltaCheckParameters.at(currentPMONId).lowDeltaThreshold = lowDeltaThreshold;
+					DeltaCheckParameters.at(currentPMONId).belowLowThresholdEvent = belowLowThresholdEventId;
+					DeltaCheckParameters.at(currentPMONId).highDeltaThreshold = highDeltaThreshold;
+					DeltaCheckParameters.at(currentPMONId).aboveHighThresholdEvent = aboveHighThresholdEventId;
+					DeltaCheckParameters.at(currentPMONId).numberOfConsecutiveDeltaChecks =
+					    numberOfConsecutiveDeltaChecks;
+				} else {
+					ParameterMonitoringCheckTypes.at(currentPMONId) = DeltaCheck;
+					struct DeltaCheck deltaCheck = {numberOfConsecutiveDeltaChecks, lowDeltaThreshold,
+					                                belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId};
+					DeltaCheckParameters.insert({currentPMONId, deltaCheck});
+					if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
+						LimitCheckParameters.erase(currentPMONId);
+					}
+					if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
+						ExpectedValueCheckParameters.erase(currentPMONId);
+					}
+				}
+			}
+
+		} else {
+			ErrorHandler::reportError(message, ErrorHandler::GetNonExistingParameter);
 			break;
 		}
 		currentPMONId = message.readEnum16();
@@ -275,7 +274,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		auto currentPMONId = message.readEnum16();
-		if (ParameterMonitoringList.find(currentPMONId) != ParameterMonitoringList.end()) {
+		if (parameterMonitoringList.find(currentPMONId) != parameterMonitoringList.end()) {
 			parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
 			parameterMonitoringDefinitionReport.appendEnum16(MonitoredParameterIds.at(currentPMONId));
 			parameterMonitoringDefinitionReport.appendEnum8(ParameterMonitoringStatus.at(currentPMONId));
@@ -307,7 +306,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 				    DeltaCheckParameters.at(currentPMONId).numberOfConsecutiveDeltaChecks);
 			}
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ReportParameterNotInTheParameterMonitoringList);
+			ErrorHandler::reportError(message, ErrorHandler::ReportParameterNotInTheparameterMonitoringList);
 		}
 	}
 	storeMessage(parameterMonitoringDefinitionReport);
@@ -568,8 +567,8 @@ void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Messa
 void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	Message parameterMonitoringDefinitionStatusReport(
 	    ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, 0);
-	parameterMonitoringDefinitionStatusReport.appendUint16(ParameterMonitoringList.size());
-	for (auto& currentParameter: ParameterMonitoringList) {
+	parameterMonitoringDefinitionStatusReport.appendUint16(parameterMonitoringList.size());
+	for (auto& currentParameter: parameterMonitoringList) {
 		parameterMonitoringDefinitionStatusReport.appendEnum16(currentParameter.first);
 		parameterMonitoringDefinitionStatusReport.appendEnum8(ParameterMonitoringStatus.at(currentParameter.first));
 	}
