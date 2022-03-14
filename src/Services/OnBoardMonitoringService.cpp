@@ -526,15 +526,13 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	Message parameterMonitoringDefinitionStatusReport(
 	    ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, 0);
 	parameterMonitoringDefinitionStatusReport.appendUint16(parameterMonitoringList.size());
-	for (auto& currentParameter: parameterMonitoringList) {
-		parameterMonitoringDefinitionStatusReport.appendEnum16(currentParameter.first);
-		parameterMonitoringDefinitionStatusReport.appendEnum8(ParameterMonitoringStatus.at(currentParameter.first));
+	for (auto& currentPMONDefinition: parameterMonitoringList) {
+		parameterMonitoringDefinitionStatusReport.appendEnum16(currentPMONDefinition.first);
+		parameterMonitoringDefinitionStatusReport.appendEnum8(currentPMONDefinition.second.get().checkingStatus);
 	}
 	storeMessage(parameterMonitoringDefinitionStatusReport);
-	        message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
-	        return;
 }
-
+	
 
 void OnBoardMonitoringService::execute(Message& message) {
 	switch (message.messageType) {
