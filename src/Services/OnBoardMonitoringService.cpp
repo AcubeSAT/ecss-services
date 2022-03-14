@@ -534,8 +534,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionStatusReport() {
 	        message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);
 	        return;
 }
-parameterMonitoringList.clear();
-}
+
 
 void OnBoardMonitoringService::execute(Message& message) {
 	switch (message.messageType) {
