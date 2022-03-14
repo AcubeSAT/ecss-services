@@ -43,6 +43,7 @@ public:
 	bool monitoringEnabled = false;
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
+	CheckType checkType;
 
 protected:
 	/**

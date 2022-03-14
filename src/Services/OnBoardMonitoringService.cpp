@@ -151,6 +151,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			    message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
 			continue;
 		}
+		//TODO: Implement a parameterExists() function.
 		if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
 			if (parameterMonitoringList.at(currentPMONId).get().monitoredParameterId != currentMonitoredParameterId) {
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
@@ -170,24 +171,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				parameterMonitoringList.at(currentPMONId).get().repetitionCounter = 0;
 				parameterMonitoringList.at(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
 				parameterMonitoringList.at(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
-				if (parameterMonitoringList.at(currentPMONId).get(). == PMONBase::LimitCheck) {
-					LimitCheckParameters.at(currentPMONId).lowLimit = lowLimit;
-					LimitCheckParameters.at(currentPMONId).belowLowLimitEvent = belowLowLimitEventId;
-					LimitCheckParameters.at(currentPMONId).highLimit = highLimit;
-					LimitCheckParameters.at(currentPMONId).aboveHighLimitEvent = aboveHighLimitEventId;
-				} else {
-					ParameterMonitoringCheckTypes.at(currentPMONId) = LimitCheck;
-					struct LimitCheck limitCheck = {lowLimit, belowLowLimitEventId, highLimit,
-					                                aboveHighLimitEventId};
-					LimitCheckParameters.insert({currentPMONId, limitCheck});
-					if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
-						ExpectedValueCheckParameters.erase(currentPMONId);
-					}
-					if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
-						DeltaCheckParameters.erase(currentPMONId);
-					}
-				}
-
+				parameterMonitoringList.erase(currentPMONId);
+				auto monitoringDefinition = PMONLimitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, lowLimit, belowLowLimitEventId,
+				                                           highLimit, aboveHighLimitEventId);
+				addPMONDefinition(currentPMONId, monitoringDefinition);
 			} else if (currentCheckType == PMONBase::ExpectedValueCheck) {
 				uint64_t mask = message.readUint64();
 				double expectedValue = message.readDouble();
@@ -195,24 +182,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				parameterMonitoringList.at(currentPMONId).get().repetitionCounter = 0;
 				parameterMonitoringList.at(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
 				parameterMonitoringList.at(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
-				if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
-					ExpectedValueCheckParameters.find(currentPMONId)->second.mask = mask;
-					ExpectedValueCheckParameters.find(currentPMONId)->second.expectedValue = expectedValue;
-					ExpectedValueCheckParameters.find(currentPMONId)->second.notExpectedValueEvent =
-					    unExpectedValueEvent;
-				} else {
-					ParameterMonitoringCheckTypes.at(currentPMONId) = ExpectedValueCheck;
-					struct ExpectedValueCheck expectedValueCheck = {expectedValue, mask,
-					                                                unExpectedValueEvent};
-					ExpectedValueCheckParameters.insert({currentPMONId, expectedValueCheck});
-					if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
-						LimitCheckParameters.erase(currentPMONId);
-					}
-					if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
-						DeltaCheckParameters.erase(currentPMONId);
-					}
-				}
-
+				parameterMonitoringList.erase(currentPMONId);
+				auto monitoringDefinition = PMONExpectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, expectedValue,
+				                                                   mask, unExpectedValueEvent);
+				addPMONDefinition(currentPMONId, monitoringDefinition);
 			} else if (currentCheckType == PMONBase::DeltaCheck) {
 				double lowDeltaThreshold = message.readDouble();
 				uint16_t belowLowThresholdEventId = message.readEnum16();
@@ -227,25 +200,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				parameterMonitoringList.at(currentPMONId).get().repetitionCounter = 0;
 				parameterMonitoringList.at(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
 				parameterMonitoringList.at(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
-				if (ParameterMonitoringCheckTypes.at(currentPMONId) == DeltaCheck) {
-					DeltaCheckParameters.at(currentPMONId).lowDeltaThreshold = lowDeltaThreshold;
-					DeltaCheckParameters.at(currentPMONId).belowLowThresholdEvent = belowLowThresholdEventId;
-					DeltaCheckParameters.at(currentPMONId).highDeltaThreshold = highDeltaThreshold;
-					DeltaCheckParameters.at(currentPMONId).aboveHighThresholdEvent = aboveHighThresholdEventId;
-					DeltaCheckParameters.at(currentPMONId).numberOfConsecutiveDeltaChecks =
-					    numberOfConsecutiveDeltaChecks;
-				} else {
-					ParameterMonitoringCheckTypes.at(currentPMONId) = DeltaCheck;
-					struct DeltaCheck deltaCheck = {numberOfConsecutiveDeltaChecks, lowDeltaThreshold,
-					                                belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId};
-					DeltaCheckParameters.insert({currentPMONId, deltaCheck});
-					if (ParameterMonitoringCheckTypes.at(currentPMONId) == LimitCheck) {
-						LimitCheckParameters.erase(currentPMONId);
-					}
-					if (ParameterMonitoringCheckTypes.at(currentPMONId) == ExpectedValueCheck) {
-						ExpectedValueCheckParameters.erase(currentPMONId);
-					}
-				}
+				parameterMonitoringList.erase(currentPMONId);
+				auto monitoringDefinition = PMONDeltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, numberOfConsecutiveDeltaChecks,
+				                                           lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
+				addPMONDefinition(currentPMONId, monitoringDefinition);
 			}
 
 		} else {
