@@ -71,7 +71,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		}
 		if (parameterMonitoringList.full()) {
 			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionStartErrorType::parameterMonitoringListIsFull);
+			                          ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
 			continue;
 		}
 		if (auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
