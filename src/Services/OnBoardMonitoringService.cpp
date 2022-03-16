@@ -242,29 +242,21 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().repetitionNumber);
 		parameterMonitoringDefinitionReport.appendEnum8(parameterMonitoringList[currentPMONId].get().checkType);
 		if (parameterMonitoringList[currentPMONId].get().checkType == PMONBase::LimitCheck) {
-			parameterMonitoringDefinitionReport.appendUint16(parameterMonitoringList[currentPMONId].get().lowLimit);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    LimitCheckParameters[currentPMONId].belowLowLimitEvent);
-			parameterMonitoringDefinitionReport.appendUint16(LimitCheckParameters[currentPMONId].highLimit);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    LimitCheckParameters[currentPMONId].aboveHighLimitEvent);
+			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getLowLimit());
+			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getBelowLowLimitEvent());
+			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getHighLimit());
+			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getAboveHighLimitEvent());
 		} else if (parameterMonitoringList[currentPMONId].get().checkType == PMONBase::ExpectedValueCheck) {
-			parameterMonitoringDefinitionReport.appendUint8(ExpectedValueCheckParameters[currentPMONId].mask);
-			parameterMonitoringDefinitionReport.appendUint16(
-			    ExpectedValueCheckParameters[currentPMONId].expectedValue);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    ExpectedValueCheckParameters[currentPMONId].notExpectedValueEvent);
+			parameterMonitoringDefinitionReport.appendUint64(parameterMonitoringList[currentPMONId].get().getMask());
+			parameterMonitoringDefinitionReport.appendDouble(
+			    parameterMonitoringList[currentPMONId].get().getExpectedValue());
+			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getUnexpectedValueEvent());
 		} else {
-			parameterMonitoringDefinitionReport.appendUint16(
-			    DeltaCheckParameters[currentPMONId].lowDeltaThreshold);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    DeltaCheckParameters[currentPMONId].belowLowThresholdEvent);
-			parameterMonitoringDefinitionReport.appendUint16(
-			    DeltaCheckParameters[currentPMONId].highDeltaThreshold);
-			parameterMonitoringDefinitionReport.appendEnum8(
-			    DeltaCheckParameters[currentPMONId].aboveHighThresholdEvent);
-			parameterMonitoringDefinitionReport.appendUint16(
-			    DeltaCheckParameters[currentPMONId].numberOfConsecutiveDeltaChecks);
+			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getLowDeltaThreshold());
+			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getBelowLowThresholdEvent());
+			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getHighDeltaThreshold());
+			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getAboveHighThresholdEvent());
+			parameterMonitoringDefinitionReport.appendUint16(parameterMonitoringList[currentPMONId].get().getNumberOfConsecutiveDeltaChecks());
 		}
 	}
 	storeMessage(parameterMonitoringDefinitionReport);
