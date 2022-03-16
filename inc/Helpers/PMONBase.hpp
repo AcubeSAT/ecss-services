@@ -1,13 +1,13 @@
 #ifndef ECSS_SERVICES_PMONBASE_HPP
 #define ECSS_SERVICES_PMONBASE_HPP
 #include <cstdint>
-#include "Message.hpp"
-#include "etl/array.h"
-#include "Service.hpp"
-#include "Helpers/Parameter.hpp"
-#include "etl/map.h"
 #include "ECSS_Definitions.hpp"
+#include "Helpers/Parameter.hpp"
+#include "Message.hpp"
+#include "Service.hpp"
+#include "etl/array.h"
 #include "etl/list.h"
+#include "etl/map.h"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
@@ -27,7 +27,9 @@ public:
 		AboveHighThreshold = 10
 	};
 
-	enum CheckType : uint8_t { LimitCheck = 1, ExpectedValueCheck = 2, DeltaCheck = 3 };
+	enum CheckType : uint8_t { LimitCheck = 1,
+		                       ExpectedValueCheck = 2,
+		                       DeltaCheck = 3 };
 
 	uint16_t monitoredParameterId;
 
@@ -44,6 +46,21 @@ public:
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
+
+	virtual double getExpectedValue();
+	virtual uint64_t getMask();
+	virtual uint16_t getUnexpectedValueEvent();
+
+	virtual double getLowLimit();
+	virtual uint16_t getBelowLowLimitEvent();
+	virtual double getHighLimit();
+	virtual uint16_t getAboveHighLimitEvent();
+
+	virtual uint16_t getNumberOfConsecutiveDeltaChecks();
+	virtual double getLowDeltaThreshold();
+	virtual uint16_t getBelowLowThresholdEvent();
+	virtual double getHighDeltaThreshold();
+	virtual uint16_t getAboveHighThresholdEvent();
 
 protected:
 	/**
@@ -66,6 +83,18 @@ public:
 	                                uint64_t mask, uint16_t unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
 	      PMONBase(monitoredParameterId, repetitionNumber){};
+
+	double getExpectedValue() override {
+		return expectedValue;
+	}
+
+	uint64_t getMask() override {
+		return mask;
+	}
+
+	uint16_t getUnexpectedValueEvent() override {
+		return unexpectedValueEvent;
+	}
 };
 
 /**
@@ -83,6 +112,22 @@ public:
 	                        uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber){};
+
+	double getLowLimit() override {
+		return lowLimit;
+	}
+
+	uint16_t getBelowLowLimitEvent() override {
+		return belowLowLimitEvent;
+	}
+
+	double getHighLimit() override {
+		return highLimit;
+	}
+
+	uint16_t getAboveHighLimitEvent() override {
+		return aboveHighLimitEvent;
+	}
 };
 
 /**
@@ -104,5 +149,21 @@ public:
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
 	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber){};
+
+	uint16_t getNumberOfConsecutiveDeltaChecks() override{
+		return numberOfConsecutiveDeltaChecks;
+	}
+
+	double getLowDeltaThreshold() override{
+		return lowDeltaThreshold;
+	}
+
+	uint16_t getBelowLowThresholdEvent() override{
+		return belowLowThresholdEvent;
+	}
+
+	uint16_t getAboveHighThresholdEvent() override{
+		return aboveHighThresholdEvent;
+	}
 };
 #endif // ECSS_SERVICES_PMONBASE_HPP
