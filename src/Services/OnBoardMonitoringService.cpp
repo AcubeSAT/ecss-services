@@ -248,7 +248,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			parameterMonitoringDefinitionReport.appendUint16(LimitCheckParameters[currentPMONId].highLimit);
 			parameterMonitoringDefinitionReport.appendEnum8(
 			    LimitCheckParameters[currentPMONId].aboveHighLimitEvent);
-		} else if (ParameterMonitoringCheckTypes[currentPMONId] == ExpectedValueCheck) {
+		} else if (parameterMonitoringList[currentPMONId].get().checkType == PMONBase::ExpectedValueCheck) {
 			parameterMonitoringDefinitionReport.appendUint8(ExpectedValueCheckParameters[currentPMONId].mask);
 			parameterMonitoringDefinitionReport.appendUint16(
 			    ExpectedValueCheckParameters[currentPMONId].expectedValue);
