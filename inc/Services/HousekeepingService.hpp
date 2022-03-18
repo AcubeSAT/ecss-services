@@ -128,6 +128,8 @@ public:
 	 */
 	void reportHousekeepingPeriodicProperties(Message& request);
 
+	uint32_t findNextCollection(uint32_t timePassed);
+
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
 	 * is the ground station.
