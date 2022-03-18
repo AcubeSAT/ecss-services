@@ -5,14 +5,15 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
+#include "Helpers/ForwardControlConfiguration.hpp"
 
 /**
  * Implementation of the ST[14] 'Real Time Forwarding Control Service' as defined in ECSS-E-ST-70-41C.
  *
  * @brief
- * The purpose of this Service is to control the forwarding of the stores telemetry to the ground stations. It
- * includes conditions for all the applications processes that are controlled by the Service, which determine whether
- * a message should be forwarded to the ground station through the corresponding virtual channel.
+ * The purpose of this Service is to control the forwarding of the stores telemetry to the ground station. It includes
+ * conditions for all the application processes that are controlled by the Service, which determine whether a message
+ * should be forwarded to the ground station, through the corresponding virtual channel.
  *
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
@@ -45,6 +46,9 @@ private:
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
 	bool appIsControlled(uint8_t applicationId);
+
+	ForwardControlConfiguration::ApplicationProcess applicationProcessConfiguration;
+	ForwardControlConfiguration::HousekeepingParameterReport housekeepingConfiguration;
 
 public:
 	/**
