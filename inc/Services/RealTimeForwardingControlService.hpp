@@ -44,8 +44,21 @@ private:
 	 */
 	etl::vector<uint8_t, ECSSMaxControlledApplications> controlledApplications;
 
+	/**
+	 * The Application Process configuration, containing all the application process, service type and message type
+	 * definitions.
+	 */
 	ForwardControlConfiguration::ApplicationProcess applicationProcessConfiguration;
+
+	/**
+	 * The Housekeeping Parameter Report configuration, containing all the housekeeping parameter report type
+	 * definitions and the housekeeping report structure IDs.
+	 */
 	ForwardControlConfiguration::HousekeepingParameterReport housekeepingConfiguration;
+
+	/**
+	 * The Event Report Blocking configuration, containing all the event report blocking and event definitions IDs.
+	 */
 	ForwardControlConfiguration::EventReportBlocking eventReportBlockingConfiguration;
 
 	/**
