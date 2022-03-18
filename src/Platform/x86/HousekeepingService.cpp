@@ -9,8 +9,7 @@ void HousekeepingService::initializeHousekeepingStructures() {
 	structure.structureId = 1;
 	structure.periodicGenerationActionStatus = true;
 	structure.collectionInterval = 500;
-	structure.simplyCommutatedParameterIds =
-	    etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>{PlatformParameters::parameter1.getValue()};
+	structure.simplyCommutatedParameterIds = { PlatformParameters::parameter1.getValue() };
 	housekeepingStructures.insert({structure.structureId, structure});
 }
 
