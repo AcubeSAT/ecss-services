@@ -90,8 +90,8 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 		//		}
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
-			uint8_t serviceType = request.readUint8();
 			// todo: check if service type is valid.
+			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
 
 			if (not checkService1(request, applicationID, serviceType, numOfMessages)) {
@@ -116,29 +116,29 @@ void RealTimeForwardingControlService::execute(Message& message) {
 		case AddReportTypesToAppProcessConfiguration:
 			addReportTypesToAppProcessConfiguration(message);
 			break;
-		case DeleteReportTypesFromAppProcessConfiguration:
-			deleteReportTypesFromAppProcessConfiguration(message);
-			break;
-		case ReportAppProcessConfigurationContent:
-			reportAppProcessConfigurationContent(message);
-			break;
-		case AddStructuresToHousekeepingConfiguration:
-			addStructuresToHousekeepingConfiguration(message);
-			break;
-		case DeleteStructuresFromHousekeepingConfiguration:
-			deleteStructuresFromHousekeepingConfiguration(message);
-			break;
-		case ReportHousekeepingConfigurationContent:
-			reportHousekeepingConfigurationContent(message);
-			break;
-		case AddEventDefinitionsToEventReportConfiguration:
-			addEventDefinitionsToEventReportConfiguration(message);
-			break;
-		case DeleteEventDefinitionsFromEventReportConfiguration:
-			deleteEventDefinitionsFromEventReportConfiguration(message);
-			break;
-		case ReportEventReportConfigurationContent:
-			reportEventReportConfigurationContent(message);
-			break;
+//		case DeleteReportTypesFromAppProcessConfiguration:
+//			deleteReportTypesFromAppProcessConfiguration(message);
+//			break;
+//		case ReportAppProcessConfigurationContent:
+//			reportAppProcessConfigurationContent(message);
+//			break;
+//		case AddStructuresToHousekeepingConfiguration:
+//			addStructuresToHousekeepingConfiguration(message);
+//			break;
+//		case DeleteStructuresFromHousekeepingConfiguration:
+//			deleteStructuresFromHousekeepingConfiguration(message);
+//			break;
+//		case ReportHousekeepingConfigurationContent:
+//			reportHousekeepingConfigurationContent(message);
+//			break;
+//		case AddEventDefinitionsToEventReportConfiguration:
+//			addEventDefinitionsToEventReportConfiguration(message);
+//			break;
+//		case DeleteEventDefinitionsFromEventReportConfiguration:
+//			deleteEventDefinitionsFromEventReportConfiguration(message);
+//			break;
+//		case ReportEventReportConfigurationContent:
+//			reportEventReportConfigurationContent(message);
+//			break;
 	}
 }

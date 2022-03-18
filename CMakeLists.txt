@@ -43,6 +43,7 @@ add_library(common OBJECT
         src/Services/HousekeepingService.cpp
         src/Services/ParameterStatisticsService.cpp
         src/Helpers/Statistic.cpp
+        src/Services/RealTimeForwardingControlService.cpp
         )
 
 # Specify the .cpp files for the executables
