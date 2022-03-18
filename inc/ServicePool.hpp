@@ -13,6 +13,7 @@
 #include "Services/FunctionManagementService.hpp"
 #include "Services/HousekeepingService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
+#include "Services/RealTimeForwardingControlService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -66,6 +67,10 @@ public:
 
 #ifdef SERVICE_PARAMETER
 	ParameterService parameterManagement;
+#endif
+
+#ifdef SERVICE_REALTIMEFORWARDINGCONTROL
+	RealTimeForwardingControlService realTimeForwarding;
 #endif
 
 #ifdef SERVICE_REQUESTVERIFICATION

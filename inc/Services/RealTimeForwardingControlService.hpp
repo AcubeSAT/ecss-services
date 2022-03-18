@@ -36,6 +36,8 @@ public:
 		EventReportConfigurationContentReport = 16,
 	};
 
+	RealTimeForwardingControlService() = default;
+
 private:
 	/**
 	 * Contains the Application IDs, controlled by the Service.
