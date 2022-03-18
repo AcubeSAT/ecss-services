@@ -23,6 +23,18 @@ namespace ForwardControlConfiguration
 class ApplicationProcess {
 public:
 	/**
+	 * Empty report type vector, can both mean that we haven't added report types yet, and added all report types. To
+	 * be able to distinguish what the current 'empty' state means, we need this indicator.
+	 */
+	bool notEmptyReports = false;
+
+	/**
+	 * Empty service type vector, can both mean that we haven't added service types yet, and added all service types. To
+	 * be able to distinguish what the current 'empty' state means, we need this indicator.
+	 */
+	bool notEmptyServices = false;
+
+	/**
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
 	 * example, a Report Type definition could be 'ReportHousekeepingStructures'.
 	 */
@@ -39,7 +51,9 @@ public:
 	 * Map containing the Application Process definitions. Each application has its own ID. The ID is used as a
 	 * key to provide access to the list of Service Type definitions, included by the application.
 	 */
-	typedef etl::map<uint8_t, serviceTypeDefinitions, ECSSMaxControlledApplications> applicationProcessDefinitions;
+	etl::map<uint8_t, serviceTypeDefinitions, ECSSMaxControlledApplications> definitions;
+
+	ApplicationProcess() = default;
 };
 
 /**
@@ -62,7 +76,7 @@ public:
 	 * Map containing the Housekeeping definitions (application processes). Each application has its own ID. The ID is
 	 * used as a key to provide access to the list of the Housekeeping structure IDs.
 	 */
-	typedef etl::map<uint8_t, housekeepingStructureIds, ECSSMaxControlledApplications> housekeepingDefinitions;
+	typedef etl::map<uint8_t, housekeepingStructureIds, ECSSMaxControlledApplications> definitions;
 };
 
 /**
@@ -85,7 +99,7 @@ public:
 	 * Map containing the Event Report Blocking definitions (applications). Each application has its own ID. The ID is
 	 * used as a key to provide access to the list of the Event Definitions.
 	 */
-	typedef etl::map<uint8_t, eventDefinitionIds, ECSSMaxControlledApplications> eventReportBlockingDefinitions;
+	typedef etl::map<uint8_t, eventDefinitionIds, ECSSMaxControlledApplications> definitions;
 };
 
 } // namespace ForwardControlConfiguration

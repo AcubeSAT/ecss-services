@@ -42,13 +42,48 @@ private:
 	 */
 	etl::vector<uint8_t, ECSSMaxControlledApplications> controlledApplications;
 
+	ForwardControlConfiguration::ApplicationProcess applicationProcessConfiguration;
+	ForwardControlConfiguration::HousekeepingParameterReport housekeepingConfiguration;
+	ForwardControlConfiguration::EventReportBlocking eventReportBlockingConfiguration;
+
+	/**
+	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
+	 * bytes from the request message, in case of an invalid request.
+	 */
+	bool checkApplication1(Message& request, uint8_t applicationID, uint8_t numOfServices);
+
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
-	bool appIsControlled(uint8_t applicationId);
+	bool appIsControlled(Message& request, uint8_t applicationId);
 
-	ForwardControlConfiguration::ApplicationProcess applicationProcessConfiguration;
-	ForwardControlConfiguration::HousekeepingParameterReport housekeepingConfiguration;
+	/**
+	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
+	 * definitions.
+	 */
+	bool allServiceTypesAllowed(Message& request, uint8_t applicationID);
+
+	/**
+	 * Checks if the maximum number of service type definitions per application process is reached.
+	 */
+	bool maxServiceTypesReached(Message& request, uint8_t applicationID);
+
+	/**
+	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
+	 * from the request message, in case of an invalid request.
+	 */
+	bool checkService1(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
+
+	/**
+	 * Checks if all report types are allowed already, i.e. if the service type definition contains no report type
+	 * definitions.
+	 */
+	bool allReportTypesAllowed(Message& request, uint8_t applicationID, uint8_t serviceType);
+
+	/**
+	 * Checks if the maximum number of report type definitions per service type definition is reached.
+	 */
+	bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType);
 
 public:
 	/**
