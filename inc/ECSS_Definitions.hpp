@@ -170,6 +170,34 @@ inline const uint8_t ECSSMaxHousekeepingStructures = 10;
  */
 inline const uint8_t ECSSMaxControlledApplications = 5;
 
+/**
+ * The max number of report type blocking definitions per service type definition in the application process
+ * configuration
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
+
+/**
+ * The max number of service type definitions per application process type definition in the application process
+ * configuration
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxServiceTypeDefinitions = 15;
+
+/**
+ * The max number of housekeeping structure IDs per housekeeping parameter report type definition in the housekeeping
+ * parameter report configuration
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxHousekeepingStructureIDs = 10;
+
+/**
+ * The max number of event definition IDs per event report blocking type definition in the event report blocking
+ * configuration
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxEventDefinitionIDs = 15;
+
 /** @} */
 
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
