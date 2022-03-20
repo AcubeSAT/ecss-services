@@ -11,6 +11,7 @@
  * Implementation of the ST[03] Housekeeping Reporting Service. The job of the Housekeeping Service is to store
  * parameters in the housekeeping structures so that it can generate housekeeping reports periodically.
  *
+ * @ingroup Services
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
 class HousekeepingService : Service {
