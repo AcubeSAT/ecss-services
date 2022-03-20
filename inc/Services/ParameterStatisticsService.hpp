@@ -10,6 +10,8 @@
 
 /**
  * Implementation of the ST[04] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
+ *
+ * @ingroup Services
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class ParameterStatisticsService : public Service {
