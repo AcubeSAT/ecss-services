@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Services/RealTimeForwardingControlService.hpp"
 
 bool RealTimeForwardingControlService::appIsControlled(Message& request, uint8_t applicationId) {
@@ -25,7 +26,7 @@ bool RealTimeForwardingControlService::checkApplication1(Message& request, uint8
 
 bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, uint8_t applicationID) {
 	if (applicationProcessConfiguration.definitions[applicationID].empty() and
-	    applicationProcessConfiguration.notEmptyServices) {
+	    not applicationProcessConfiguration.serviceNotEmpty[applicationID].empty()) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::AdditionOfAllServiceTypesAlreadyEnabled);
 		return true;
@@ -54,7 +55,7 @@ bool RealTimeForwardingControlService::checkService1(Message& request, uint8_t a
 bool RealTimeForwardingControlService::allReportTypesAllowed(Message& request, uint8_t applicationID,
                                                              uint8_t serviceType) {
 	if (applicationProcessConfiguration.definitions[applicationID][serviceType].empty() and
-	    applicationProcessConfiguration.notEmptyReports) {
+	    applicationProcessConfiguration.serviceNotEmpty[applicationID][serviceType]) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::AdditionOfAllReportTypesAlreadyEnabled);
 		return true;
@@ -72,9 +73,16 @@ bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, u
 	return false;
 }
 
+bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID,
+                                                                             uint8_t serviceType) {
+	return std::find(applicationProcessConfiguration.definitions[applicationID][serviceType].begin(),
+	                 applicationProcessConfiguration.definitions[applicationID][serviceType].end(),
+	                 target) != applicationProcessConfiguration.definitions[applicationID][serviceType].end();
+}
+
 void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {
 	request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration);
-	uint8_t numOfApplications = request.readUint16();
+	uint8_t numOfApplications = request.readUint8();
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
 		uint8_t applicationID = request.readUint8();
@@ -106,6 +114,11 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			for (uint8_t k = 0; k < numOfMessages; k++) {
 				uint8_t messageType = request.readUint8();
 				// todo: check if message type is valid.
+				if (reportExistsInAppProcessConfiguration(messageType, applicationID, serviceType)) {
+					continue;
+				}
+				applicationProcessConfiguration.definitions[applicationID][serviceType].push_back(messageType);
+				applicationProcessConfiguration.serviceNotEmpty[applicationID][serviceType] = true;
 			}
 		}
 	}
@@ -116,29 +129,29 @@ void RealTimeForwardingControlService::execute(Message& message) {
 		case AddReportTypesToAppProcessConfiguration:
 			addReportTypesToAppProcessConfiguration(message);
 			break;
-//		case DeleteReportTypesFromAppProcessConfiguration:
-//			deleteReportTypesFromAppProcessConfiguration(message);
-//			break;
-//		case ReportAppProcessConfigurationContent:
-//			reportAppProcessConfigurationContent(message);
-//			break;
-//		case AddStructuresToHousekeepingConfiguration:
-//			addStructuresToHousekeepingConfiguration(message);
-//			break;
-//		case DeleteStructuresFromHousekeepingConfiguration:
-//			deleteStructuresFromHousekeepingConfiguration(message);
-//			break;
-//		case ReportHousekeepingConfigurationContent:
-//			reportHousekeepingConfigurationContent(message);
-//			break;
-//		case AddEventDefinitionsToEventReportConfiguration:
-//			addEventDefinitionsToEventReportConfiguration(message);
-//			break;
-//		case DeleteEventDefinitionsFromEventReportConfiguration:
-//			deleteEventDefinitionsFromEventReportConfiguration(message);
-//			break;
-//		case ReportEventReportConfigurationContent:
-//			reportEventReportConfigurationContent(message);
-//			break;
+			//		case DeleteReportTypesFromAppProcessConfiguration:
+			//			deleteReportTypesFromAppProcessConfiguration(message);
+			//			break;
+			//		case ReportAppProcessConfigurationContent:
+			//			reportAppProcessConfigurationContent(message);
+			//			break;
+			//		case AddStructuresToHousekeepingConfiguration:
+			//			addStructuresToHousekeepingConfiguration(message);
+			//			break;
+			//		case DeleteStructuresFromHousekeepingConfiguration:
+			//			deleteStructuresFromHousekeepingConfiguration(message);
+			//			break;
+			//		case ReportHousekeepingConfigurationContent:
+			//			reportHousekeepingConfigurationContent(message);
+			//			break;
+			//		case AddEventDefinitionsToEventReportConfiguration:
+			//			addEventDefinitionsToEventReportConfiguration(message);
+			//			break;
+			//		case DeleteEventDefinitionsFromEventReportConfiguration:
+			//			deleteEventDefinitionsFromEventReportConfiguration(message);
+			//			break;
+			//		case ReportEventReportConfigurationContent:
+			//			reportEventReportConfigurationContent(message);
+			//			break;
 	}
 }

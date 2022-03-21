@@ -38,7 +38,6 @@ public:
 
 	RealTimeForwardingControlService() = default;
 
-private:
 	/**
 	 * Contains the Application IDs, controlled by the Service.
 	 */
@@ -60,6 +59,13 @@ private:
 	 * The Event Report Blocking configuration, containing all the event report blocking and event definitions IDs.
 	 */
 	ForwardControlConfiguration::EventReportBlocking eventReportBlockingConfiguration;
+
+private:
+	/**
+	 * Checks whether the specified message type already exists in the specified application process and service
+	 * type definition.
+	 */
+	inline bool reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID, uint8_t serviceType);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary

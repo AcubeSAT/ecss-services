@@ -26,13 +26,15 @@ public:
 	 * Empty report type vector, can both mean that we haven't added report types yet, and added all report types. To
 	 * be able to distinguish what the current 'empty' state means, we need this indicator.
 	 */
-	bool notEmptyReports = false;
+	typedef etl::map<uint8_t, bool, ECSSMaxServiceTypeDefinitions> reportsAreNotEmpty;
 
 	/**
 	 * Empty service type vector, can both mean that we haven't added service types yet, and added all service types. To
 	 * be able to distinguish what the current 'empty' state means, we need this indicator.
 	 */
-	bool notEmptyServices = false;
+	etl::map<uint8_t, reportsAreNotEmpty, ECSSMaxControlledApplications> serviceNotEmpty;
+
+//	etl::map<uint8_t, bool, ECSSMaxControlledApplications> serviceOfAppNotEmpty;
 
 	/**
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
@@ -52,7 +54,6 @@ public:
 	 * key to provide access to the list of Service Type definitions, included by the application.
 	 */
 	etl::map<uint8_t, serviceTypeDefinitions, ECSSMaxControlledApplications> definitions;
-
 	ApplicationProcess() = default;
 };
 
