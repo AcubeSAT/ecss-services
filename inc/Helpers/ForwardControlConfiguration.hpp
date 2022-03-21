@@ -23,14 +23,14 @@ namespace ForwardControlConfiguration
 class ApplicationProcess {
 public:
 	/**
-	 * Empty report type vector, can both mean that we haven't added report types yet, and added all report types. To
-	 * be able to distinguish what the current 'empty' state means, we need this indicator.
+	 * Boolean values for each service type of an application process. See next documentation comment.
 	 */
 	typedef etl::map<uint8_t, bool, ECSSMaxServiceTypeDefinitions> reportsAreNotEmpty;
 
 	/**
-	 * Empty service type vector, can both mean that we haven't added service types yet, and added all service types. To
-	 * be able to distinguish what the current 'empty' state means, we need this indicator.
+	 * Indicates the meaning of a service type being empty of report types. It specifies whether the 'empty' means that
+	 * it has not been filled yet (so we proceed to add new report types) or it is empty because we accept every
+	 * report type for the service.
 	 */
 	etl::map<uint8_t, reportsAreNotEmpty, ECSSMaxControlledApplications> serviceNotEmpty;
 
