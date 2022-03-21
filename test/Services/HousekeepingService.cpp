@@ -629,7 +629,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
     uint32_t timePassed = 0;
     uint32_t nextCollection = 0;
     SECTION("Non existent structures") {
-        nextCollection = housekeepingService.findNextCollection(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
         CHECK(ServiceTests::count() == 0);
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
@@ -639,7 +639,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
             housekeepingStructure.second.collectionInterval = std::numeric_limits<uint32_t>::max();
             housekeepingStructure.second.timeToNextReport = std::numeric_limits<uint32_t>::max();
         }
-        nextCollection = housekeepingService.findNextCollection(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
         CHECK(ServiceTests::count() == 0);
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
@@ -647,27 +647,27 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
         housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
         housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
         housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
-        nextCollection = housekeepingService.findNextCollection(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
         CHECK(nextCollection == 900);
         CHECK(ServiceTests::count() == 3);
-        nextCollection = housekeepingService.findNextCollection(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
 		CHECK(nextCollection == 100);
 		CHECK(ServiceTests::count() == 4);
-		nextCollection = housekeepingService.findNextCollection(timePassed);
+		nextCollection = housekeepingService.reportPendingStructures(timePassed);
 		CHECK(nextCollection == 800);
 		timePassed = nextCollection;
 		CHECK(ServiceTests::count() == 5);
-		nextCollection = housekeepingService.findNextCollection(timePassed);
+		nextCollection = housekeepingService.reportPendingStructures(timePassed);
 		timePassed = nextCollection;
 		CHECK(ServiceTests::count() == 6);
         CHECK(nextCollection == 200);
-        nextCollection = housekeepingService.findNextCollection(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
         CHECK(ServiceTests::count() == 7);
         CHECK(nextCollection == 700);
-        nextCollection = housekeepingService.findNextCollection(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
         CHECK(ServiceTests::count() == 9);
         CHECK(nextCollection == 300);
@@ -677,7 +677,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
             housekeepingStructure.second.collectionInterval = 0;
             housekeepingStructure.second.timeToNextReport = 0;
         }
-        nextCollection = housekeepingService.findNextCollection(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
         CHECK(nextCollection == 0);
     }
 }

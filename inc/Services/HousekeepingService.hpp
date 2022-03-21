@@ -128,7 +128,14 @@ public:
 	 */
 	void reportHousekeepingPeriodicProperties(Message& request);
 
-	uint32_t findNextCollection(uint32_t timePassed);
+	/**
+	 * This function calculates the time needed to pass until the next periodic report for each housekeeping 
+	 * structure. The function also calls the housekeeping reporting functions as needed.
+	 * 
+	 * @param timePassed The time passed since the last execution of the function, in milliseconds.
+	 * @return uint32_t The minimum amount of time until the next periodic housekeeping report, in milliseconds.
+	 */
+	uint32_t reportPendingStructures(uint32_t timePassed);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
