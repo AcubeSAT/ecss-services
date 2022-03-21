@@ -645,31 +645,34 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
     }
     SECTION("Calculating properly defined collection intervals") {
         housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
+        housekeepingService.housekeepingStructures.at(0).timeToNextReport = 900;
         housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
+        housekeepingService.housekeepingStructures.at(4).timeToNextReport = 1000;
         housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
+        housekeepingService.housekeepingStructures.at(6).timeToNextReport = 2700;
         nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
         CHECK(nextCollection == 900);
-        CHECK(ServiceTests::count() == 3);
+        CHECK(ServiceTests::count() == 0);
         nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
 		CHECK(nextCollection == 100);
-		CHECK(ServiceTests::count() == 4);
+		CHECK(ServiceTests::count() == 1);
 		nextCollection = housekeepingService.reportPendingStructures(timePassed);
 		CHECK(nextCollection == 800);
 		timePassed = nextCollection;
-		CHECK(ServiceTests::count() == 5);
+		CHECK(ServiceTests::count() == 2);
 		nextCollection = housekeepingService.reportPendingStructures(timePassed);
 		timePassed = nextCollection;
-		CHECK(ServiceTests::count() == 6);
+		CHECK(ServiceTests::count() == 3);
         CHECK(nextCollection == 200);
         nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
-        CHECK(ServiceTests::count() == 7);
+        CHECK(ServiceTests::count() == 4);
         CHECK(nextCollection == 700);
         nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
-        CHECK(ServiceTests::count() == 9);
+        CHECK(ServiceTests::count() == 6);
         CHECK(nextCollection == 300);
     }
     SECTION("Collection Intervals set to 0") {
