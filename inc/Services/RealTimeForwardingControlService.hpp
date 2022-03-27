@@ -106,6 +106,12 @@ private:
 	 */
 	bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType);
 
+	/**
+	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
+	 * already reached.
+	 */
+	bool checkMessage1(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+
 public:
 	/**
 	 * TC[14,1] 'Add report types to the application process forward control configuration'.

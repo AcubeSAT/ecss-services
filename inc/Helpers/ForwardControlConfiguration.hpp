@@ -31,6 +31,7 @@ public:
 	 * Indicates the meaning of a service type being empty of report types. It specifies whether the 'empty' means that
 	 * it has not been filled yet (so we proceed to add new report types) or it is empty because we accept every
 	 * report type for the service.
+	 * TODO: rename to 'allServicesAllowed'
 	 */
 	etl::map<uint8_t, reportsAreNotEmpty, ECSSMaxControlledApplications> serviceNotEmpty;
 

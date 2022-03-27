@@ -204,17 +204,17 @@ public:
 		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
-		AdditionOfAllReportTypesAlreadyEnabled = 22,
+		AllReportTypesAlreadyAllowed = 22,
 		/**
 		 * Attempt to add a new service type, when the addition of all service types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
-		AdditionOfAllServiceTypesAlreadyEnabled = 23,
+		AllServiceTypesAlreadyAllowed = 23,
 		/**
 		 * Attempt to add a new report type, when the max number of reports types allowed per service type
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */
-		MaxReportTypeDefinitionsReached = 24,
+		MaxReportTypesReached = 24,
 		/**
 		 * Attempt to add a new service type, when the max number of service types allowed per application process
 		 * definition in the Application Process configuration is already reached (ST[14])
@@ -224,7 +224,7 @@ public:
 		 * Attempt to add a report/event definition/housekeeping report type, when the specified application process
 		 * ID is not controlled by the Service (ST[14])
 		 */
-		ApplicationNotControlled = 26,
+		NotControlledApplication = 26,
 	};
 
 	/**
