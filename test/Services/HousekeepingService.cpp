@@ -634,7 +634,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
     SECTION("Collection Intervals set to max") {
-		initializeHousekeepingStructures();
+	initializeHousekeepingStructures();
         for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
             housekeepingStructure.second.collectionInterval = std::numeric_limits<uint32_t>::max();
             housekeepingStructure.second.timeToNextReport = std::numeric_limits<uint32_t>::max();
