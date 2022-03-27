@@ -634,7 +634,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
     SECTION("Collection Intervals set to max") {
-	initializeHousekeepingStructures();
+        initializeHousekeepingStructures();
         for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
             housekeepingStructure.second.collectionInterval = std::numeric_limits<uint32_t>::max();
             housekeepingStructure.second.timeToNextReport = std::numeric_limits<uint32_t>::max();
@@ -656,15 +656,15 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
         CHECK(ServiceTests::count() == 0);
         nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
-		CHECK(nextCollection == 100);
-		CHECK(ServiceTests::count() == 1);
-		nextCollection = housekeepingService.reportPendingStructures(timePassed);
-		CHECK(nextCollection == 800);
-		timePassed = nextCollection;
-		CHECK(ServiceTests::count() == 2);
-		nextCollection = housekeepingService.reportPendingStructures(timePassed);
-		timePassed = nextCollection;
-		CHECK(ServiceTests::count() == 3);
+        CHECK(nextCollection == 100);
+        CHECK(ServiceTests::count() == 1);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
+        CHECK(nextCollection == 800);
+        timePassed = nextCollection;
+        CHECK(ServiceTests::count() == 2);
+        nextCollection = housekeepingService.reportPendingStructures(timePassed);
+        timePassed = nextCollection;
+        CHECK(ServiceTests::count() == 3);
         CHECK(nextCollection == 200);
         nextCollection = housekeepingService.reportPendingStructures(timePassed);
         timePassed = nextCollection;
