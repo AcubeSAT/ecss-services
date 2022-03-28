@@ -153,7 +153,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		}
 		//TODO: Implement a parameterExists() function.
 		if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
-			if (parameterMonitoringList[currentPMONId].get().monitoredParameterId != currentMonitoredParameterId) {
+			if (getPMONDefinition(currentPMONId).get().monitoredParameterId != currentMonitoredParameterId) {
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
 				                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
 				continue;
@@ -168,9 +168,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
 					continue;
 				}
-				parameterMonitoringList[currentPMONId].get().repetitionCounter = 0;
-				parameterMonitoringList[currentPMONId].get().repetitionNumber = currentPMONRepetitionNumber;
-				parameterMonitoringList[currentPMONId].get().checkingStatus = PMONBase::Unchecked;
+				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
+				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
 				auto monitoringDefinition = PMONLimitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, lowLimit, belowLowLimitEventId,
 				                                           highLimit, aboveHighLimitEventId);
@@ -179,9 +179,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				uint64_t mask = message.readUint64();
 				double expectedValue = message.readDouble();
 				uint16_t unExpectedValueEvent = message.readEnum16();
-				parameterMonitoringList[currentPMONId].get().repetitionCounter = 0;
-				parameterMonitoringList[currentPMONId].get().repetitionNumber = currentPMONRepetitionNumber;
-				parameterMonitoringList[currentPMONId].get().checkingStatus = PMONBase::Unchecked;
+				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
+				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
 				auto monitoringDefinition = PMONExpectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, expectedValue,
 				                                                   mask, unExpectedValueEvent);
@@ -197,9 +197,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
 					continue;
 				}
-				parameterMonitoringList[currentPMONId].get().repetitionCounter = 0;
-				parameterMonitoringList[currentPMONId].get().repetitionNumber = currentPMONRepetitionNumber;
-				parameterMonitoringList[currentPMONId].get().checkingStatus = PMONBase::Unchecked;
+				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
+				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
 				auto monitoringDefinition = PMONDeltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, numberOfConsecutiveDeltaChecks,
 				                                           lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
@@ -237,26 +237,26 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			continue;
 		}
 		parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
-		parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().monitoredParameterId);
-		parameterMonitoringDefinitionReport.appendEnum8(parameterMonitoringList[currentPMONId].get().monitoringEnabled);
-		parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().repetitionNumber);
-		parameterMonitoringDefinitionReport.appendEnum8(parameterMonitoringList[currentPMONId].get().checkType);
-		if (parameterMonitoringList[currentPMONId].get().checkType == PMONBase::LimitCheck) {
-			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getLowLimit());
-			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getBelowLowLimitEvent());
-			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getHighLimit());
-			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getAboveHighLimitEvent());
-		} else if (parameterMonitoringList[currentPMONId].get().checkType == PMONBase::ExpectedValueCheck) {
-			parameterMonitoringDefinitionReport.appendUint64(parameterMonitoringList[currentPMONId].get().getMask());
+		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().monitoredParameterId);
+		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().monitoringEnabled);
+		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().repetitionNumber);
+		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().checkType);
+		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::LimitCheck) {
+			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getLowLimit());
+			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getBelowLowLimitEvent());
+			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getHighLimit());
+			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getAboveHighLimitEvent());
+		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::ExpectedValueCheck) {
+			parameterMonitoringDefinitionReport.appendUint64(getPMONDefinition(currentPMONId).get().getMask());
 			parameterMonitoringDefinitionReport.appendDouble(
-			    parameterMonitoringList[currentPMONId].get().getExpectedValue());
-			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getUnexpectedValueEvent());
+			    getPMONDefinition(currentPMONId).get().getExpectedValue());
+			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getUnexpectedValueEvent());
 		} else {
-			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getLowDeltaThreshold());
-			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getBelowLowThresholdEvent());
-			parameterMonitoringDefinitionReport.appendDouble(parameterMonitoringList[currentPMONId].get().getHighDeltaThreshold());
-			parameterMonitoringDefinitionReport.appendEnum16(parameterMonitoringList[currentPMONId].get().getAboveHighThresholdEvent());
-			parameterMonitoringDefinitionReport.appendUint16(parameterMonitoringList[currentPMONId].get().getNumberOfConsecutiveDeltaChecks());
+			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getLowDeltaThreshold());
+			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getBelowLowThresholdEvent());
+			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getHighDeltaThreshold());
+			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getAboveHighThresholdEvent());
+			parameterMonitoringDefinitionReport.appendUint16(getPMONDefinition(currentPMONId).get().getNumberOfConsecutiveDeltaChecks());
 		}
 	}
 	storeMessage(parameterMonitoringDefinitionReport);
@@ -267,247 +267,247 @@ void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
 	outOfLimitsReport();
 }
 
-void OnBoardMonitoringService::outOfLimitsReport() {
-	Message outOfLimitsReport(ServiceType, MessageType::OutOfLimitsReport, Message::TM, 0);
-	uint16_t numberOfTransitions = 0;
-
-	for (auto& transition: CheckTransitionList) {
-		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
-			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
-			    (transition.second.at(firstTransitionIndex) == Invalid &&
-			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
-			    (transition.second.at(firstTransitionIndex) == ExpectedValue &&
-			     transition.second.at(secondTransitionIndex) == UnexpectedValue)) {
-				numberOfTransitions++;
-			}
-		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
-			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
-			    (transition.second.at(firstTransitionIndex) == Invalid &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
-			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
-			    (transition.second.at(firstTransitionIndex) == AboveHighLimit &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit)) {
-				numberOfTransitions++;
-			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == Invalid &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == BelowLowLimit &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit)) {
-				numberOfTransitions++;
-			}
-		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
-			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == Invalid &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
-				numberOfTransitions++;
-			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == Invalid &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == BelowLowThreshold &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold)) {
-				numberOfTransitions++;
-			}
-		}
-	}
-
-	outOfLimitsReport.appendUint16(numberOfTransitions);
-
-	for (auto& transition: CheckTransitionList) {
-		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
-			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
-			    (transition.second.at(firstTransitionIndex) == Invalid &&
-			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
-			    (transition.second.at(firstTransitionIndex) == ExpectedValue &&
-			     transition.second.at(secondTransitionIndex) == UnexpectedValue)) {
-				outOfLimitsReport.appendEnum16(transition.first);
-				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-				outOfLimitsReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
-				outOfLimitsReport.appendUint16(
-				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-				        ->get()
-				        .getValueAsDouble());
-				// TODO:Evaluate if the conversion from double to uint is ok.
-				outOfLimitsReport.appendUint16(
-				    ExpectedValueCheckParameters.find(transition.first)->second.expectedValue);
-				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
-				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
-				// TODO: Find out how to get the transition time.
-			}
-		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
-			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
-			    (transition.second.at(firstTransitionIndex) == Invalid &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
-			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
-			    (transition.second.at(firstTransitionIndex) == AboveHighLimit &&
-			     transition.second.at(secondTransitionIndex) == BelowLowLimit)) {
-				outOfLimitsReport.appendEnum16(transition.first);
-				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-				outOfLimitsReport.appendUint16(
-				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-				        ->get()
-				        .getValueAsDouble());
-				// TODO:Evaluate if the conversion from double to uint is ok.
-				outOfLimitsReport.appendUint16(LimitCheckParameters.find(transition.first)->second.lowLimit);
-				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
-				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
-				// TODO: Find out how to get the transition time.
-			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == Invalid &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
-			           (transition.second.at(firstTransitionIndex) == BelowLowLimit &&
-			            transition.second.at(secondTransitionIndex) == AboveHighLimit)) {
-				outOfLimitsReport.appendEnum16(transition.first);
-				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-				outOfLimitsReport.appendUint16(
-				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-				        ->get()
-				        .getValueAsDouble());
-				// TODO:Evaluate if the conversion from double to uint is ok.
-				outOfLimitsReport.appendUint16(LimitCheckParameters.find(transition.first)->second.highLimit);
-				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
-				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
-				// TODO: Find out how to get the transition time.
-			}
-		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
-			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == Invalid &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
-			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold &&
-			     transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
-				outOfLimitsReport.appendEnum16(transition.first);
-				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-				outOfLimitsReport.appendUint16(
-				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-				        ->get()
-				        .getValueAsDouble());
-				// TODO:Evaluate if the conversion from double to uint is ok.
-				outOfLimitsReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.lowDeltaThreshold);
-				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
-				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
-				// TODO: Find out how to get the transition time.
-			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == Invalid &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
-			           (transition.second.at(firstTransitionIndex) == BelowLowThreshold &&
-			            transition.second.at(secondTransitionIndex) == AboveHighThreshold)) {
-				outOfLimitsReport.appendEnum16(transition.first);
-				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-				outOfLimitsReport.appendUint16(
-				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-				        ->get()
-				        .getValueAsDouble());
-				// TODO:Evaluate if the conversion from double to uint is ok.
-				outOfLimitsReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.highDeltaThreshold);
-				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
-				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
-				// TODO: Find out how to get the transition time.
-			}
-		}
-	}
-	storeMessage(outOfLimitsReport);
-}
-
-void OnBoardMonitoringService::checkTransitionReport() {
-	Message checkTransitionReport(ServiceType, CheckTransitionReport, Message::TM, 0);
-	checkTransitionReport.appendUint16(CheckTransitionList.size());
-
-	for (auto& transition: CheckTransitionList) {
-		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
-			checkTransitionReport.appendEnum16(transition.first);
-			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-			checkTransitionReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
-			checkTransitionReport.appendUint16(
-			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-			        ->get()
-			        .getValueAsDouble());
-			// TODO:Evaluate if the conversion from double to uint is ok.
-			// TODO: Find out what the limit crossed should be here.
-			if (transition.second.at(secondTransitionIndex) == UnexpectedValue) {
-				checkTransitionReport.appendUint16(
-				    ExpectedValueCheckParameters.find(transition.first)->second.expectedValue);
-			} else {
-				checkTransitionReport.appendByte(0);
-			}
-			checkTransitionReport.appendEnum8(transition.second.at(firstTransitionIndex));
-			checkTransitionReport.appendEnum8(transition.second.at(secondTransitionIndex));
-			// TODO: Find out how to get the transition time.
-		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
-			checkTransitionReport.appendEnum16(transition.first);
-			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-			checkTransitionReport.appendUint16(
-			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-			        ->get()
-			        .getValueAsDouble());
-			// TODO:Evaluate if the conversion from double to uint is ok.
-			// TODO: Find out what the limit crossed should be here.
-			if (transition.second.at(secondTransitionIndex) == BelowLowLimit) {
-				checkTransitionReport.appendUint16(LimitCheckParameters.find(transition.first)->second.lowLimit);
-			} else if (transition.second.at(secondTransitionIndex) == AboveHighLimit) {
-				checkTransitionReport.appendUint16(LimitCheckParameters.find(transition.first)->second.highLimit);
-			} else {
-				checkTransitionReport.appendByte(0);
-			}
-			checkTransitionReport.appendEnum8(transition.second.at(firstTransitionIndex));
-			checkTransitionReport.appendEnum8(transition.second.at(secondTransitionIndex));
-			// TODO: Find out how to get the transition time.
-		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
-			checkTransitionReport.appendEnum16(transition.first);
-			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
-			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
-			checkTransitionReport.appendUint16(
-			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
-			        ->get()
-			        .getValueAsDouble());
-			// TODO:Evaluate if the conversion from double to uint is ok.
-			// TODO: Find out what the limit crossed should be here.
-			if (transition.second.at(secondTransitionIndex) == BelowLowThreshold) {
-				checkTransitionReport.appendUint16(
-				    DeltaCheckParameters.find(transition.first)->second.lowDeltaThreshold);
-			} else if (transition.second.at(secondTransitionIndex) == AboveHighThreshold) {
-				checkTransitionReport.appendUint16(
-				    DeltaCheckParameters.find(transition.first)->second.highDeltaThreshold);
-			} else {
-				checkTransitionReport.appendByte(0);
-			}
-			checkTransitionReport.appendEnum8(transition.second.at(firstTransitionIndex));
-			checkTransitionReport.appendEnum8(transition.second.at(secondTransitionIndex));
-			// TODO: Find out how to get the transition time.
-		}
-	}
-}
+//void OnBoardMonitoringService::outOfLimitsReport() {
+//	Message outOfLimitsReport(ServiceType, MessageType::OutOfLimitsReport, Message::TM, 0);
+//	uint16_t numberOfTransitions = 0;
+//
+//	for (auto& transition: CheckTransitionList) {
+//		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
+//			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
+//			    (transition.second.at(firstTransitionIndex) == Invalid &&
+//			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
+//			    (transition.second.at(firstTransitionIndex) == ExpectedValue &&
+//			     transition.second.at(secondTransitionIndex) == UnexpectedValue)) {
+//				numberOfTransitions++;
+//			}
+//		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
+//			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+//			    (transition.second.at(firstTransitionIndex) == Invalid &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+//			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+//			    (transition.second.at(firstTransitionIndex) == AboveHighLimit &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit)) {
+//				numberOfTransitions++;
+//			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+//			           (transition.second.at(firstTransitionIndex) == Invalid &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+//			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+//			           (transition.second.at(firstTransitionIndex) == BelowLowLimit &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit)) {
+//				numberOfTransitions++;
+//			}
+//		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
+//			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+//			    (transition.second.at(firstTransitionIndex) == Invalid &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+//			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+//			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
+//				numberOfTransitions++;
+//			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+//			           (transition.second.at(firstTransitionIndex) == Invalid &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+//			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+//			           (transition.second.at(firstTransitionIndex) == BelowLowThreshold &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold)) {
+//				numberOfTransitions++;
+//			}
+//		}
+//	}
+//
+//	outOfLimitsReport.appendUint16(numberOfTransitions);
+//
+//	for (auto& transition: CheckTransitionList) {
+//		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
+//			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
+//			    (transition.second.at(firstTransitionIndex) == Invalid &&
+//			     transition.second.at(secondTransitionIndex) == UnexpectedValue) ||
+//			    (transition.second.at(firstTransitionIndex) == ExpectedValue &&
+//			     transition.second.at(secondTransitionIndex) == UnexpectedValue)) {
+//				outOfLimitsReport.appendEnum16(transition.first);
+//				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//				outOfLimitsReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
+//				outOfLimitsReport.appendUint16(
+//				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//				        ->get()
+//				        .getValueAsDouble());
+//				// TODO:Evaluate if the conversion from double to uint is ok.
+//				outOfLimitsReport.appendUint16(
+//				    ExpectedValueCheckParameters.find(transition.first)->second.expectedValue);
+//				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//				// TODO: Find out how to get the transition time.
+//			}
+//		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
+//			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+//			    (transition.second.at(firstTransitionIndex) == Invalid &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+//			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit) ||
+//			    (transition.second.at(firstTransitionIndex) == AboveHighLimit &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowLimit)) {
+//				outOfLimitsReport.appendEnum16(transition.first);
+//				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//				outOfLimitsReport.appendUint16(
+//				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//				        ->get()
+//				        .getValueAsDouble());
+//				// TODO:Evaluate if the conversion from double to uint is ok.
+//				outOfLimitsReport.appendUint16(LimitCheckParameters.find(transition.first)->second.lowLimit);
+//				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//				// TODO: Find out how to get the transition time.
+//			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+//			           (transition.second.at(firstTransitionIndex) == Invalid &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+//			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit) ||
+//			           (transition.second.at(firstTransitionIndex) == BelowLowLimit &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighLimit)) {
+//				outOfLimitsReport.appendEnum16(transition.first);
+//				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//				outOfLimitsReport.appendUint16(
+//				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//				        ->get()
+//				        .getValueAsDouble());
+//				// TODO:Evaluate if the conversion from double to uint is ok.
+//				outOfLimitsReport.appendUint16(LimitCheckParameters.find(transition.first)->second.highLimit);
+//				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//				// TODO: Find out how to get the transition time.
+//			}
+//		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
+//			if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+//			    (transition.second.at(firstTransitionIndex) == Invalid &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+//			    (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold) ||
+//			    (transition.second.at(firstTransitionIndex) == AboveHighThreshold &&
+//			     transition.second.at(secondTransitionIndex) == BelowLowThreshold)) {
+//				outOfLimitsReport.appendEnum16(transition.first);
+//				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//				outOfLimitsReport.appendUint16(
+//				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//				        ->get()
+//				        .getValueAsDouble());
+//				// TODO:Evaluate if the conversion from double to uint is ok.
+//				outOfLimitsReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.lowDeltaThreshold);
+//				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//				// TODO: Find out how to get the transition time.
+//			} else if ((transition.second.at(firstTransitionIndex) == Unchecked &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+//			           (transition.second.at(firstTransitionIndex) == Invalid &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+//			           (transition.second.at(firstTransitionIndex) == WithinLimits &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold) ||
+//			           (transition.second.at(firstTransitionIndex) == BelowLowThreshold &&
+//			            transition.second.at(secondTransitionIndex) == AboveHighThreshold)) {
+//				outOfLimitsReport.appendEnum16(transition.first);
+//				outOfLimitsReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//				outOfLimitsReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//				outOfLimitsReport.appendUint16(
+//				    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//				        ->get()
+//				        .getValueAsDouble());
+//				// TODO:Evaluate if the conversion from double to uint is ok.
+//				outOfLimitsReport.appendUint16(DeltaCheckParameters.find(transition.first)->second.highDeltaThreshold);
+//				outOfLimitsReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//				outOfLimitsReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//				// TODO: Find out how to get the transition time.
+//			}
+//		}
+//	}
+//	storeMessage(outOfLimitsReport);
+//}
+//
+//void OnBoardMonitoringService::checkTransitionReport() {
+//	Message checkTransitionReport(ServiceType, CheckTransitionReport, Message::TM, 0);
+//	checkTransitionReport.appendUint16(CheckTransitionList.size());
+//
+//	for (auto& transition: CheckTransitionList) {
+//		if (ParameterMonitoringCheckTypes.find(transition.first)->second == ExpectedValueCheck) {
+//			checkTransitionReport.appendEnum16(transition.first);
+//			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//			checkTransitionReport.appendUint8(ExpectedValueCheckParameters.find(transition.first)->second.mask);
+//			checkTransitionReport.appendUint16(
+//			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//			        ->get()
+//			        .getValueAsDouble());
+//			// TODO:Evaluate if the conversion from double to uint is ok.
+//			// TODO: Find out what the limit crossed should be here.
+//			if (transition.second.at(secondTransitionIndex) == UnexpectedValue) {
+//				checkTransitionReport.appendUint16(
+//				    ExpectedValueCheckParameters.find(transition.first)->second.expectedValue);
+//			} else {
+//				checkTransitionReport.appendByte(0);
+//			}
+//			checkTransitionReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//			checkTransitionReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//			// TODO: Find out how to get the transition time.
+//		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == LimitCheck) {
+//			checkTransitionReport.appendEnum16(transition.first);
+//			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//			checkTransitionReport.appendUint16(
+//			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//			        ->get()
+//			        .getValueAsDouble());
+//			// TODO:Evaluate if the conversion from double to uint is ok.
+//			// TODO: Find out what the limit crossed should be here.
+//			if (transition.second.at(secondTransitionIndex) == BelowLowLimit) {
+//				checkTransitionReport.appendUint16(LimitCheckParameters.find(transition.first)->second.lowLimit);
+//			} else if (transition.second.at(secondTransitionIndex) == AboveHighLimit) {
+//				checkTransitionReport.appendUint16(LimitCheckParameters.find(transition.first)->second.highLimit);
+//			} else {
+//				checkTransitionReport.appendByte(0);
+//			}
+//			checkTransitionReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//			checkTransitionReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//			// TODO: Find out how to get the transition time.
+//		} else if (ParameterMonitoringCheckTypes.find(transition.first)->second == DeltaCheck) {
+//			checkTransitionReport.appendEnum16(transition.first);
+//			checkTransitionReport.appendEnum16(MonitoredParameterIds.at(transition.first));
+//			checkTransitionReport.appendEnum8(ParameterMonitoringCheckTypes.find(transition.first)->second);
+//			checkTransitionReport.appendUint16(
+//			    Services.parameterManagement.getParameter(MonitoredParameterIds.at(transition.first))
+//			        ->get()
+//			        .getValueAsDouble());
+//			// TODO:Evaluate if the conversion from double to uint is ok.
+//			// TODO: Find out what the limit crossed should be here.
+//			if (transition.second.at(secondTransitionIndex) == BelowLowThreshold) {
+//				checkTransitionReport.appendUint16(
+//				    DeltaCheckParameters.find(transition.first)->second.lowDeltaThreshold);
+//			} else if (transition.second.at(secondTransitionIndex) == AboveHighThreshold) {
+//				checkTransitionReport.appendUint16(
+//				    DeltaCheckParameters.find(transition.first)->second.highDeltaThreshold);
+//			} else {
+//				checkTransitionReport.appendByte(0);
+//			}
+//			checkTransitionReport.appendEnum8(transition.second.at(firstTransitionIndex));
+//			checkTransitionReport.appendEnum8(transition.second.at(secondTransitionIndex));
+//			// TODO: Find out how to get the transition time.
+//		}
+//	}
+//}
 
 void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Message& message) {
 	message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition);
