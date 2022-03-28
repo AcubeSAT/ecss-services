@@ -2,18 +2,18 @@
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
 #include "ECSS_Configuration.hpp"
-#include "Services/TimeBasedSchedulingService.hpp"
-#include "Services/LargePacketTransferService.hpp"
-#include "Services/RequestVerificationService.hpp"
-#include "Services/EventReportService.hpp"
 #include "Services/EventActionService.hpp"
-#include "Services/ParameterService.hpp"
-#include "Services/TestService.hpp"
-#include "Services/MemoryManagementService.hpp"
+#include "Services/EventReportService.hpp"
 #include "Services/FunctionManagementService.hpp"
 #include "Services/HousekeepingService.hpp"
-#include "Services/ParameterStatisticsService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/MemoryManagementService.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
+#include "Services/ParameterService.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Services/TestService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -83,10 +83,6 @@ public:
 
 #ifdef SERVICE_TIMESCHEDULING
 	TimeBasedSchedulingService timeBasedScheduling;
-#endif
-
-#ifdef SERVICE_ONBOARDMONITORING
-	OnBoardMonitoringService onBoardMonitoringService;
 #endif
 
 	/**
