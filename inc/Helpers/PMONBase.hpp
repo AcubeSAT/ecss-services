@@ -47,20 +47,20 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
 
-	virtual double getExpectedValue();
-	virtual uint64_t getMask();
-	virtual uint16_t getUnexpectedValueEvent();
+	virtual double getExpectedValue(){};
+	virtual uint64_t getMask(){};
+	virtual uint16_t getUnexpectedValueEvent(){};
 
-	virtual double getLowLimit();
-	virtual uint16_t getBelowLowLimitEvent();
-	virtual double getHighLimit();
-	virtual uint16_t getAboveHighLimitEvent();
+	virtual double getLowLimit(){};
+	virtual uint16_t getBelowLowLimitEvent(){};
+	virtual double getHighLimit(){};
+	virtual uint16_t getAboveHighLimitEvent(){};
 
-	virtual uint16_t getNumberOfConsecutiveDeltaChecks();
-	virtual double getLowDeltaThreshold();
-	virtual uint16_t getBelowLowThresholdEvent();
-	virtual double getHighDeltaThreshold();
-	virtual uint16_t getAboveHighThresholdEvent();
+	virtual uint16_t getNumberOfConsecutiveDeltaChecks(){};
+	virtual double getLowDeltaThreshold(){};
+	virtual uint16_t getBelowLowThresholdEvent(){};
+	virtual double getHighDeltaThreshold(){};
+	virtual uint16_t getAboveHighThresholdEvent(){};
 
 protected:
 	/**
