@@ -299,29 +299,3 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		Services.reset();
 	}
 }
-
-TEST_CASE("Report status of Parameter Monitoring Definitions") {
-	initialiseParameterMonitoringDefinitions();
-	Message request =
-	    Message(OnBoardMonitoringService::ServiceType,
-	            OnBoardMonitoringService::MessageType::ReportStatusOfParameterMonitoringDefinition, Message::TC, 0);
-	MessageParser::execute(request);
-	CHECK(ServiceTests::count() == 1);
-	Message report = ServiceTests::get(0);
-	CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
-	CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionStatusReport);
-	CHECK(report.readUint16() == onBoardMonitoringService.ParameterMonitoringList.size());
-	CHECK(report.readEnum16() == 0);
-	CHECK(report.readEnum8() == false);
-	CHECK(report.readEnum16() == 1);
-	CHECK(report.readEnum8() == false);
-	CHECK(report.readEnum16() == 2);
-	CHECK(report.readEnum8() == false);
-	CHECK(report.readEnum16() == 3);
-	CHECK(report.readEnum8() == true);
-	CHECK(report.readEnum16() == 4);
-	CHECK(report.readEnum8() == false);
-	clearAllMaps();
-	ServiceTests::reset();
-	Services.reset();
-}
