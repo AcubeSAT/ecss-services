@@ -60,7 +60,7 @@ public:
 	 * @return Parameter Monitoring definition
 	 */
 	std::reference_wrapper<PMONBase> getPMONDefinition(uint16_t PMONId) {
-		return parameterMonitoringList.at(PMONId);
+		return parameterMonitoringList[PMONId];
 	}
 	/**
 	 * @return true if PMONList is empty.
