@@ -60,13 +60,16 @@ public:
 	 * @return Parameter Monitoring definition
 	 */
 	std::reference_wrapper<PMONBase> getPMONDefinition(uint16_t PMONId) {
-		return parameterMonitoringList[PMONId];
+		return parameterMonitoringList.at(PMONId);
 	}
 	/**
 	 * @return true if PMONList is empty.
 	 */
 	bool isPMONListEmpty() {
 		return parameterMonitoringList.empty();
+	}
+	uint16_t getCount(uint16_t key){
+		return parameterMonitoringList.count(key);
 	}
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
