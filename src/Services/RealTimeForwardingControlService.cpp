@@ -111,10 +111,12 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			if (not checkService1(request, applicationID, serviceType, numOfMessages)) {
 				continue;
 			}
-			//			if (numOfMessages == 0) {
-			//				// todo: add all report types of the service type to the configuration.
-			//				continue;
-			//			}
+
+			if (numOfMessages == 0) {
+				// todo: add all report types of the service type to the configuration.
+				applicationProcessConfiguration.definitions[applicationID][serviceType].clear();
+				continue;
+			}
 
 			for (uint8_t k = 0; k < numOfMessages; k++) {
 				uint8_t messageType = request.readUint8();

@@ -78,19 +78,25 @@ void initializeCombined(Message& request) {
 			}
 		}
 	}
+}
 
-	//	REQUIRE(request.readUint8() == 3);
-	//	REQUIRE(request.readUint8() == 1);
-	//	REQUIRE(request.readUint8() == 17);
-	//	REQUIRE(request.readUint8() == 1);
-	//	REQUIRE(request.readUint8() == 2);
-	//	REQUIRE(request.readUint8() == HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport);
-	//	REQUIRE(request.readUint8() == HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport);
-	//	REQUIRE(request.readUint8() == 5);
-	//	REQUIRE(request.readUint8() == 2);
-	//	REQUIRE(request.readUint8() == EventReportService::MessageType::InformativeEventReport);
-	//	REQUIRE(request.readUint8() == EventReportService::MessageType::DisabledListEventReport);
-	//	request.resetRead();
+void allReportsOfService(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 2;
+	uint8_t numOfMessagesPerService = 0;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID : applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+		}
+	}
 }
 
 void resetAppProcessConfiguration() {
@@ -332,6 +338,29 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		REQUIRE(servicesAllowed[applicationID3].size() == 1);
 		REQUIRE(servicesAllowed[applicationID3][services[0]] == true);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid addition of all report types of a specified service type") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		allReportsOfService(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		REQUIRE(applicationProcesses[applicationID1].size() == 2);
+		for (auto serviceType: services) {
+			REQUIRE(applicationProcesses[applicationID1].find(serviceType) != applicationProcesses[applicationID1].end());
+			REQUIRE(applicationProcesses[applicationID1][serviceType].empty());
+		}
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
