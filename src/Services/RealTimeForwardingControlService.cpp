@@ -98,10 +98,11 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			continue;
 		}
 
-		//		if (numOfServices == 0) {
-		//			// todo: add all report types of the application process to the configuration.
-		//			continue;
-		//		}
+		if (numOfServices == 0) {
+			// todo: add all report types of the application process to the configuration.
+			applicationProcessConfiguration.definitions[applicationID].clear();
+			continue;
+		}
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
 			// todo: check if service type is valid.
