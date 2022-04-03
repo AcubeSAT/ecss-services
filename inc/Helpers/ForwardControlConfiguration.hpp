@@ -35,8 +35,6 @@ public:
 	 */
 	etl::map<uint8_t, reportsAreNotEmpty, ECSSMaxControlledApplications> serviceNotEmpty;
 
-//	etl::map<uint8_t, bool, ECSSMaxControlledApplications> serviceOfAppNotEmpty;
-
 	/**
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
 	 * example, a Report Type definition could be 'ReportHousekeepingStructures'.

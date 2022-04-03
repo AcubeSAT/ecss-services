@@ -99,7 +99,6 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 		}
 
 		if (numOfServices == 0) {
-			// todo: add all report types of the application process to the configuration.
 			applicationProcessConfiguration.definitions[applicationID].clear();
 			continue;
 		}
@@ -114,7 +113,6 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			}
 
 			if (numOfMessages == 0) {
-				// todo: add all report types of the service type to the configuration.
 				applicationProcessConfiguration.definitions[applicationID][serviceType].clear();
 				continue;
 			}

@@ -506,6 +506,10 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+
+		REQUIRE(applicationProcesses.find(applicationID1) != applicationProcesses.end());
+		REQUIRE(applicationProcesses.find(applicationID2) != applicationProcesses.end());
+		REQUIRE(applicationProcesses.find(3) == applicationProcesses.end());
 		REQUIRE(applicationProcesses[applicationID1].empty());
 		REQUIRE(applicationProcesses[applicationID2].empty());
 
