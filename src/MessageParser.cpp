@@ -79,11 +79,11 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	uint16_t packetHeaderIdentification = (data[0] << 8) | data[1];
 	uint16_t packetSequenceControl = (data[2] << 8) | data[3];
 	uint16_t packetDataLength = (data[4] << 8) | data[5];
-
 	// Individual fields of the CCSDS Space Packet primary header
 	uint8_t versionNumber = data[0] >> 5;
 	Message::PacketType packetType = ((data[0] & 0x10) == 0) ? Message::TM : Message::TC;
 	bool secondaryHeaderFlag = (data[0] & 0x08U) != 0U;
+
 	uint16_t APID = packetHeaderIdentification & static_cast<uint16_t>(0x07ff);
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
 	uint16_t packetSequenceCount = packetSequenceControl & (~0xc000U); // keep last 14 bits
@@ -107,7 +107,7 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 }
 
 void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
-	ErrorHandler::assertRequest(length >= 5, message, ErrorHandler::UnacceptableMessage);
+	ErrorHandler::assertRequest(length >= 3, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
 	uint8_t pusVersion = data[0] >> 4;
@@ -117,12 +117,12 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
 	// Remove the length of the header
-	length -= 5;
+	length -= 3;
 
 	// Copy the data to the message
 	message.serviceType = serviceType;
 	message.messageType = messageType;
-	std::copy(data + 5, data + 5 + length, message.data);
+	std::copy(data + 3, data + 3 + length, message.data);
 	message.dataSize = length;
 }
 
