@@ -11,7 +11,7 @@
  * Implementation of the ST[14] 'Real Time Forwarding Control Service' as defined in ECSS-E-ST-70-41C.
  *
  * @brief
- * The purpose of this Service is to control the forwarding of the stores telemetry to the ground station. It includes
+ * The purpose of this Service is to control the forwarding of the stores' telemetry to the ground station. It includes
  * conditions for all the application processes that are controlled by the Service, which determine whether a message
  * should be forwarded to the ground station, through the corresponding virtual channel.
  *
@@ -65,13 +65,13 @@ private:
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	inline bool reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID, uint8_t serviceType);
+	bool reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID, uint8_t serviceType);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
 	 * bytes from the request message, in case of an invalid request.
 	 */
-	bool checkApplication1(Message& request, uint8_t applicationID, uint8_t numOfServices);
+	bool checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
@@ -93,7 +93,7 @@ private:
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
 	 * from the request message, in case of an invalid request.
 	 */
-	bool checkService1(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
+	bool checkService(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
 
 	/**
 	 * Checks if all report types are allowed already, i.e. if the service type definition contains no report type
@@ -110,7 +110,7 @@ private:
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
 	 * already reached.
 	 */
-	bool checkMessage1(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 public:
 	/**

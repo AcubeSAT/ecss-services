@@ -7,6 +7,10 @@
 #include "etl/map.h"
 #include "Helpers/Parameter.hpp"
 
+/**
+ * Contains all the necessary configuration types, for the ST[14] 'Real Time Forwarding Control Service'.
+ * @author Konstantinos Petridis <petridkon@gmail.com>
+ */
 namespace ForwardControlConfiguration
 {
 /**
@@ -25,15 +29,14 @@ public:
 	/**
 	 * Boolean values for each service type of an application process. See next documentation comment.
 	 */
-	typedef etl::map<uint8_t, bool, ECSSMaxServiceTypeDefinitions> reportsAreNotEmpty;
+	typedef etl::map<uint8_t, bool, ECSSMaxServiceTypeDefinitions> reportsNotEmpty;
 
 	/**
-	 * Indicates the meaning of a service type being empty of report types. It specifies whether the 'empty' means that
-	 * it has not been filled yet (so we proceed to add new report types) or it is empty because we accept every
+	 * Translates the absence of report types, in a service type definition. It specifies whether the 'empty' means that
+	 * it has not been filled yet (so we proceed to add new report types) or it is empty because we block every
 	 * report type for the service.
-	 * TODO: rename to 'allServicesAllowed'
 	 */
-	etl::map<uint8_t, reportsAreNotEmpty, ECSSMaxControlledApplications> serviceNotEmpty;
+	etl::map<uint8_t, reportsNotEmpty, ECSSMaxControlledApplications> notEmpty;
 
 	/**
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
@@ -53,6 +56,7 @@ public:
 	 * key to provide access to the list of Service Type definitions, included by the application.
 	 */
 	etl::map<uint8_t, serviceTypeDefinitions, ECSSMaxControlledApplications> definitions;
+
 	ApplicationProcess() = default;
 };
 
@@ -77,6 +81,8 @@ public:
 	 * used as a key to provide access to the list of the Housekeeping structure IDs.
 	 */
 	typedef etl::map<uint8_t, housekeepingStructureIds, ECSSMaxControlledApplications> definitions;
+
+	HousekeepingParameterReport() = default;
 };
 
 /**
@@ -100,6 +106,8 @@ public:
 	 * used as a key to provide access to the list of the Event Definitions.
 	 */
 	typedef etl::map<uint8_t, eventDefinitionIds, ECSSMaxControlledApplications> definitions;
+
+	EventReportBlocking() = default;
 };
 
 } // namespace ForwardControlConfiguration
