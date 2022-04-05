@@ -80,9 +80,8 @@ bool RealTimeForwardingControlService::checkMessage(Message& request, uint8_t ap
 
 bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID,
                                                                              uint8_t serviceType) {
-	return std::find(applicationProcessConfiguration.definitions[applicationID][serviceType].begin(),
-	                 applicationProcessConfiguration.definitions[applicationID][serviceType].end(),
-	                 target) != applicationProcessConfiguration.definitions[applicationID][serviceType].end();
+	auto& serviceTypes = applicationProcessConfiguration.definitions[applicationID][serviceType];
+	return std::find(serviceTypes.begin(), serviceTypes.end(), target) != serviceTypes.end();
 }
 
 void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {
@@ -131,14 +130,100 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 	}
 }
 
+void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfiguration(Message& request) {
+	request.assertTC(ServiceType, MessageType::DeleteReportTypesFromAppProcessConfiguration);
+
+	uint8_t numOfApplications = request.readUint8();
+	if (numOfApplications == 0) {
+		applicationProcessConfiguration.definitions.clear();
+		applicationProcessConfiguration.notEmpty.clear();
+	}
+
+	for (uint8_t i = 0; i < numOfApplications; i++) {
+		uint8_t applicationID = request.readUint8();
+		uint8_t numOfServices = request.readUint8();
+
+		// application not present in the application process configuration
+		if (applicationProcessConfiguration.definitions.find(applicationID) ==
+		    applicationProcessConfiguration.definitions.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingApplication);
+			for (uint8_t z = 0; z < numOfServices; z++) {
+				request.skipBytes(1);
+				uint8_t numOfMessages = request.readUint8();
+				request.skipBytes(numOfMessages);
+			}
+			continue;
+		}
+
+		// delete the application process
+		if (numOfServices == 0) {
+			applicationProcessConfiguration.definitions.erase(applicationID);
+			applicationProcessConfiguration.notEmpty.erase(applicationID);
+			continue;
+		}
+
+		for (uint8_t j = 0; j < numOfServices; j++) {
+			uint8_t serviceType = request.readUint8();
+			uint8_t numOfMessages = request.readUint8();
+
+			// Service type not present in the specified application process definition
+			if (applicationProcessConfiguration.definitions[applicationID].find(serviceType) ==
+			    applicationProcessConfiguration.definitions[applicationID].end()) {
+				ErrorHandler::reportError(request,
+				                          ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinition);
+				request.skipBytes(numOfMessages);
+				continue;
+			}
+
+			// delete service type
+			if (numOfMessages == 0) {
+				applicationProcessConfiguration.definitions[applicationID].erase(serviceType);
+				applicationProcessConfiguration.notEmpty[applicationID].erase(serviceType);
+				// if empty application
+				if (applicationProcessConfiguration.definitions[applicationID].empty()) {
+					applicationProcessConfiguration.definitions.erase(applicationID);
+					applicationProcessConfiguration.notEmpty.erase(applicationID);
+				}
+				continue;
+			}
+
+			// if not check service
+
+			for (uint8_t k = 0; k < numOfMessages; k++) {
+				uint8_t messageType = request.readUint8();
+
+				if (reportExistsInAppProcessConfiguration(messageType, applicationID, serviceType)) {
+					ErrorHandler::reportError(request,
+					                          ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinition);
+					continue;
+				}
+				// delete
+				auto& reportTypes = applicationProcessConfiguration.definitions[applicationID][serviceType];
+				reportTypes.erase(std::remove(reportTypes.begin(), reportTypes.end(), messageType));
+				// if service is empty, delete service type.
+				if (applicationProcessConfiguration.definitions[applicationID][serviceType].empty()) {
+					applicationProcessConfiguration.definitions[applicationID].erase(serviceType);
+					applicationProcessConfiguration.notEmpty[applicationID].erase(serviceType);
+
+					// if application is empty, delete application
+					if (applicationProcessConfiguration.definitions[applicationID].empty()) {
+						applicationProcessConfiguration.definitions.erase(applicationID);
+						applicationProcessConfiguration.notEmpty.erase(applicationID);
+					}
+				}
+			}
+		}
+	}
+}
+
 void RealTimeForwardingControlService::execute(Message& message) {
 	switch (message.messageType) {
 		case AddReportTypesToAppProcessConfiguration:
 			addReportTypesToAppProcessConfiguration(message);
 			break;
-			//		case DeleteReportTypesFromAppProcessConfiguration:
-			//			deleteReportTypesFromAppProcessConfiguration(message);
-			//			break;
+		case DeleteReportTypesFromAppProcessConfiguration:
+			deleteReportTypesFromAppProcessConfiguration(message);
+			break;
 			//		case ReportAppProcessConfigurationContent:
 			//			reportAppProcessConfigurationContent(message);
 			//			break;

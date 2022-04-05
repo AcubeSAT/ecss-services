@@ -225,6 +225,19 @@ public:
 		 * ID is not controlled by the Service (ST[14])
 		 */
 		NotControlledApplication = 26,
+		/**
+		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
+		 */
+		NonExistingReportTypeDefinition = 27,
+		/**
+		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
+		 */
+		NonExistingServiceTypeDefinition = 28,
+		/**
+		 * Attempt to access a non-existing application process definition, from the application process
+		 * configuration (ST[14])
+		 */
+		NonExistingApplication = 29,
 	};
 
 	/**
