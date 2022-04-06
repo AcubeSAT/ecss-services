@@ -22,11 +22,6 @@ public:
     uint32_t collectionInterval = 0;
 
     /**
-     * Time needed to pass for the next call of Housekeeping reporting.
-     */
-    uint32_t timeToNextReport = 0;
-
-    /**
      * Indicates whether the periodic generation of housekeeping reports is enabled.
      */
     bool periodicGenerationActionStatus = false;

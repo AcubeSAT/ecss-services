@@ -135,7 +135,7 @@ public:
 	 * @param timePassed The time passed since the last execution of the function, in milliseconds.
 	 * @return uint32_t The minimum amount of time until the next periodic housekeeping report, in milliseconds.
 	 */
-	uint32_t reportPendingStructures(uint32_t timePassed);
+	uint32_t reportPendingStructures(uint32_t timeNow);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

@@ -626,10 +626,10 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 }
 
 TEST_CASE("Periodically reporting Housekeeping Structures") {
-    uint32_t timePassed = 0;
     uint32_t nextCollection = 0;
+	uint32_t timeNow = 0;
     SECTION("Non existent structures") {
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
         CHECK(ServiceTests::count() == 0);
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
@@ -637,50 +637,45 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
         initializeHousekeepingStructures();
         for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
             housekeepingStructure.second.collectionInterval = std::numeric_limits<uint32_t>::max();
-            housekeepingStructure.second.timeToNextReport = std::numeric_limits<uint32_t>::max();
         }
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
         CHECK(ServiceTests::count() == 0);
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
     SECTION("Calculating properly defined collection intervals") {
         housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
-        housekeepingService.housekeepingStructures.at(0).timeToNextReport = 900;
         housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
-        housekeepingService.housekeepingStructures.at(4).timeToNextReport = 1000;
         housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
-        housekeepingService.housekeepingStructures.at(6).timeToNextReport = 2700;
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
-        timePassed = nextCollection;
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+		timeNow += nextCollection;
         CHECK(nextCollection == 900);
         CHECK(ServiceTests::count() == 0);
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
-        timePassed = nextCollection;
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+		timeNow += nextCollection;
         CHECK(nextCollection == 100);
         CHECK(ServiceTests::count() == 1);
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
         CHECK(nextCollection == 800);
-        timePassed = nextCollection;
+		timeNow += nextCollection;
         CHECK(ServiceTests::count() == 2);
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
-        timePassed = nextCollection;
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+		timeNow += nextCollection;
         CHECK(ServiceTests::count() == 3);
         CHECK(nextCollection == 200);
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
-        timePassed = nextCollection;
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+		timeNow += nextCollection;
         CHECK(ServiceTests::count() == 4);
         CHECK(nextCollection == 700);
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
-        timePassed = nextCollection;
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+		timeNow += nextCollection;
         CHECK(ServiceTests::count() == 6);
         CHECK(nextCollection == 300);
     }
     SECTION("Collection Intervals set to 0") {
         for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
             housekeepingStructure.second.collectionInterval = 0;
-            housekeepingStructure.second.timeToNextReport = 0;
         }
-        nextCollection = housekeepingService.reportPendingStructures(timePassed);
+        nextCollection = housekeepingService.reportPendingStructures(timeNow);
         CHECK(nextCollection == 0);
     }
 }

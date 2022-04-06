@@ -260,19 +260,18 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 	return std::find(std::begin(ids), std::end(ids), parameterId) != std::end(ids);
 }
 
-uint32_t HousekeepingService::reportPendingStructures(uint32_t timePassed) {
+uint32_t HousekeepingService::reportPendingStructures(uint32_t timeNow) {
     uint32_t nextCollection = std::numeric_limits<uint32_t>::max();
+	uint32_t structureTimeToCollection = 0;
 
     for (auto &housekeepingStructure: housekeepingStructures) {
-        if (housekeepingStructure.second.timeToNextReport <= timePassed) {
-            housekeepingParametersReport(housekeepingStructure.second.structureId);
-            housekeepingStructure.second.timeToNextReport = housekeepingStructure.second.collectionInterval;
-        } else {
-            housekeepingStructure.second.timeToNextReport = housekeepingStructure.second.timeToNextReport - timePassed;
-        }
-        if (housekeepingStructure.second.timeToNextReport < nextCollection) {
-            nextCollection = housekeepingStructure.second.timeToNextReport;
-        }
+		if(timeNow != 0 and timeNow % housekeepingStructure.second.collectionInterval == 0){
+			housekeepingParametersReport(housekeepingStructure.second.structureId);
+		}
+		structureTimeToCollection = housekeepingStructure.second.collectionInterval - timeNow % housekeepingStructure.second.collectionInterval;
+		if(nextCollection > structureTimeToCollection){
+			nextCollection = structureTimeToCollection;
+		}
     }
 
     return nextCollection;
