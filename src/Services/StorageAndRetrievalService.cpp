@@ -215,10 +215,11 @@ uint16_t StorageAndRetrievalService::currentNumberOfPacketStores() {
 }
 
 PacketStore& StorageAndRetrievalService::getPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
-	if (packetStores.find(packetStoreId) == packetStores.end()) {
+    auto packetStore = packetStores.find(packetStoreId);
+	if (packetStore == packetStores.end()) {
 		assert(ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 	}
-	return packetStores[packetStoreId];
+	return *packetStore;
 }
 
 bool StorageAndRetrievalService::packetStoreExists(const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
