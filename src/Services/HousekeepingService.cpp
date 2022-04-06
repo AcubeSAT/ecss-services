@@ -265,6 +265,11 @@ uint32_t HousekeepingService::reportPendingStructures(uint32_t timeNow) {
 	uint32_t structureTimeToCollection = 0;
 
     for (auto &housekeepingStructure: housekeepingStructures) {
+		if(housekeepingStructure.second.collectionInterval == 0){
+			housekeepingParametersReport(housekeepingStructure.second.structureId);
+			nextCollection = 0;
+			continue;
+		}
 		if(timeNow != 0 and timeNow % housekeepingStructure.second.collectionInterval == 0){
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
 		}
