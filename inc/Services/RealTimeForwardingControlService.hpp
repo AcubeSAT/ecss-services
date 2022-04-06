@@ -10,7 +10,6 @@
 /**
  * Implementation of the ST[14] 'Real Time Forwarding Control Service' as defined in ECSS-E-ST-70-41C.
  *
- * @brief
  * The purpose of this Service is to control the forwarding of the stores' telemetry to the ground station. It includes
  * conditions for all the application processes that are controlled by the Service, which determine whether a message
  * should be forwarded to the ground station, through the corresponding virtual channel.
