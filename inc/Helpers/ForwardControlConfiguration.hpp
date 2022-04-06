@@ -27,7 +27,8 @@ namespace ForwardControlConfiguration
 class ApplicationProcess {
 public:
 	/**
-	 * Boolean values for each service type of an application process. See next documentation comment.
+	 * Boolean values for each service type of an application process. True indicates that the service type is not
+	 * empty of report types.
 	 */
 	typedef etl::map<uint8_t, bool, ECSSMaxServiceTypeDefinitions> reportsNotEmpty;
 
