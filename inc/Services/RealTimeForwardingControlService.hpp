@@ -112,6 +112,34 @@ private:
 	 */
 	bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
+	/**
+	 * Checks whether the requested application is present in the application process configuration.
+	 */
+	bool applicationExists(Message& request, uint8_t applicationID, uint8_t numOfServices);
+
+	/**
+	 * Checks whether the requested service type is present in the application process configuration.
+	 */
+	bool serviceTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
+
+	/**
+	 * Checks whether the requested report type is present in the application process configuration.
+	 */
+	bool reportTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+
+	/**
+	 * Deletes the requested service type from the application process configuration. If the deletion results in an
+	 * empty application process, it deletes the corresponding application process definition as well.
+	 */
+	void deleteServiceRecursive(uint8_t applicationID, uint8_t serviceType);
+
+	/**
+	 * Deletes the requested report type from the application process configuration. If the deletion results in an
+	 * empty service, it deletes the corresponding service. If the deletion of the service, results in an empty
+	 * application process, it deletes the corresponding application process definition as well.
+	 */
+	void deleteReportRecursive(uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+
 public:
 	/**
 	 * TC[14,1] 'Add report types to the application process forward control configuration'.
