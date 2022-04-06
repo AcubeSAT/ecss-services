@@ -137,6 +137,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 	if (numOfApplications == 0) {
 		applicationProcessConfiguration.definitions.clear();
 		applicationProcessConfiguration.notEmpty.clear();
+		return;
 	}
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
@@ -192,7 +193,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 			for (uint8_t k = 0; k < numOfMessages; k++) {
 				uint8_t messageType = request.readUint8();
 
-				if (reportExistsInAppProcessConfiguration(messageType, applicationID, serviceType)) {
+				if (not reportExistsInAppProcessConfiguration(messageType, applicationID, serviceType)) {
 					ErrorHandler::reportError(request,
 					                          ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinition);
 					continue;
