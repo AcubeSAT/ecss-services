@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Services/RealTimeForwardingControlService.hpp"
 
 bool RealTimeForwardingControlService::appIsControlled(Message& request, uint8_t applicationId) {
