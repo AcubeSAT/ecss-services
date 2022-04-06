@@ -74,7 +74,7 @@ public:
 	/**
 	 * Vector containing the Housekeeping structure IDs.
 	 */
-	typedef etl::vector<uint8_t, ECSSMaxHousekeepingStructureIDs> housekeepingStructureIds;
+	typedef etl::vector<uint8_t, ECSSMaxHousekeepingStructures> housekeepingStructureIds;
 
 	/**
 	 * Map containing the Housekeeping definitions (application processes). Each application has its own ID. The ID is
