@@ -41,7 +41,7 @@ public:
 	/**
 	 * Contains the Application IDs, controlled by the Service.
 	 */
-	etl::vector<uint8_t, ECSSMaxControlledApplications> controlledApplications;
+	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
 	/**
 	 * The Application Process configuration, containing all the application process, service type and message type

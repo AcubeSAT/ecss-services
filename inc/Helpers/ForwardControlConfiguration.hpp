@@ -36,7 +36,7 @@ public:
 	 * it has not been filled yet (so we proceed to add new report types) or it is empty because we block every
 	 * report type for the service.
 	 */
-	etl::map<uint8_t, reportsNotEmpty, ECSSMaxControlledApplications> notEmpty;
+	etl::map<uint8_t, reportsNotEmpty, ECSSMaxControlledApplicationProcesses> notEmpty;
 
 	/**
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
@@ -55,7 +55,7 @@ public:
 	 * Map containing the Application Process definitions. Each application has its own ID. The ID is used as a
 	 * key to provide access to the list of Service Type definitions, included by the application.
 	 */
-	etl::map<uint8_t, serviceTypeDefinitions, ECSSMaxControlledApplications> definitions;
+	etl::map<uint8_t, serviceTypeDefinitions, ECSSMaxControlledApplicationProcesses> definitions;
 
 	ApplicationProcess() = default;
 };
@@ -80,7 +80,7 @@ public:
 	 * Map containing the Housekeeping definitions (application processes). Each application has its own ID. The ID is
 	 * used as a key to provide access to the list of the Housekeeping structure IDs.
 	 */
-	typedef etl::map<uint8_t, housekeepingStructureIds, ECSSMaxControlledApplications> definitions;
+	typedef etl::map<uint8_t, housekeepingStructureIds, ECSSMaxControlledApplicationProcesses> definitions;
 
 	HousekeepingParameterReport() = default;
 };
@@ -105,7 +105,7 @@ public:
 	 * Map containing the Event Report Blocking definitions (applications). Each application has its own ID. The ID is
 	 * used as a key to provide access to the list of the Event Definitions.
 	 */
-	typedef etl::map<uint8_t, eventDefinitionIds, ECSSMaxControlledApplications> definitions;
+	typedef etl::map<uint8_t, eventDefinitionIds, ECSSMaxControlledApplicationProcesses> definitions;
 
 	EventReportBlocking() = default;
 };
