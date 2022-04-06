@@ -168,7 +168,7 @@ inline const uint8_t ECSSMaxHousekeepingStructures = 10;
  * The max number of controlled application processes
  * @see RealTimeForwardingControlService
  */
-inline const uint8_t ECSSMaxControlledApplications = 5;
+inline const uint8_t ECSSMaxControlledApplicationProcesses = 5;
 
 /**
  * The max number of report type blocking definitions per service type definition in the application process
