@@ -71,17 +71,17 @@ bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, u
 bool RealTimeForwardingControlService::checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType,
                                                     uint8_t messageType) {
 	if (maxReportTypesReached(request, applicationID, serviceType) or
-	    reportExistsInAppProcessConfiguration(messageType, applicationID, serviceType)) {
+	    reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType)) {
 		return false;
 	}
 	return true;
 }
 
-bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID,
-                                                                             uint8_t serviceType) {
+bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType,
+                                                                             uint8_t messageType) {
 	return std::find(applicationProcessConfiguration.definitions[applicationID][serviceType].begin(),
 	                 applicationProcessConfiguration.definitions[applicationID][serviceType].end(),
-	                 target) != applicationProcessConfiguration.definitions[applicationID][serviceType].end();
+	                 messageType) != applicationProcessConfiguration.definitions[applicationID][serviceType].end();
 }
 
 void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {

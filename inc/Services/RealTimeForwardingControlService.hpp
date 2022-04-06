@@ -65,11 +65,13 @@ private:
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID, uint8_t serviceType);
+	bool reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
 	 * bytes from the request message, in case of an invalid request.
+	 *
+	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
 	bool checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID, uint8_t numOfServices);
 
@@ -92,6 +94,8 @@ private:
 	/**
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
 	 * from the request message, in case of an invalid request.
+	 *
+	 * @return True: if the service type is valid and passes all the necessary error checking.
 	 */
 	bool checkService(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
 
@@ -109,6 +113,8 @@ private:
 	/**
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
 	 * already reached.
+	 *
+	 * @return True: if the message type is valid and passes all the necessary error checking.
 	 */
 	bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
