@@ -270,6 +270,120 @@ void messageNotInApplication(Message& request) {
 	}
 }
 
+void deleteValidReportTypes(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 2;
+	uint8_t numOfMessagesPerService = 1;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID : applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+
+			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+				request.appendUint8(messages1[k]);
+			}
+		}
+	}
+}
+
+void deleteReportEmptyService(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 1;
+	uint8_t numOfMessagesPerService = 2;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID : applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+
+			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+				request.appendUint8(messages1[k]);
+			}
+		}
+	}
+}
+
+void deleteReportEmptyApplication(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 2;
+	uint8_t numOfMessagesPerService = 2;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID : applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+
+			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+				request.appendUint8(messages1[k]);
+			}
+		}
+	}
+}
+
+void deleteApplicationProcess(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 0;
+
+	request.appendUint8(numOfApplications);
+	request.appendUint8(applications[0]);
+	request.appendUint8(numOfServicesPerApp);
+}
+
+void deleteService(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 1;
+	uint8_t numOfMessagesPerService = 0;
+
+	request.appendUint8(numOfApplications);
+	for (auto appID : applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+		}
+	}
+}
+
+void deleteServiceEmptyApplication(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 2;
+	uint8_t numOfMessagesPerService = 0;
+
+	request.appendUint8(numOfApplications);
+	for (auto appID : applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+		}
+	}
+}
+
 void resetAppProcessConfiguration() {
 	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
 	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
@@ -733,6 +847,145 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinition) ==
 		      4);
 		checkAppProcessConfig();
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid deletion of report types from the application process configuration") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID = 1;
+		deleteValidReportTypes(request);
+		initializeAppProcessConfig();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto& isNotEmpty = realTimeForwarding.applicationProcessConfiguration.notEmpty;
+
+		REQUIRE(applicationProcesses[applicationID].size() == 2);
+		REQUIRE(applicationProcesses[applicationID][services[0]].size() == 1);
+		REQUIRE(applicationProcesses[applicationID][services[1]].size() == 1);
+		REQUIRE(isNotEmpty[applicationID].size() == 2);
+		REQUIRE(isNotEmpty[applicationID][services[0]] == true);
+		REQUIRE(isNotEmpty[applicationID][services[1]] == true);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Report type deletion, results in empty service type") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID = 1;
+		deleteReportEmptyService(request);
+		initializeAppProcessConfig();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto& isNotEmpty = realTimeForwarding.applicationProcessConfiguration.notEmpty;
+
+		REQUIRE(applicationProcesses[applicationID].size() == 1);
+		REQUIRE(isNotEmpty[applicationID].size() == 1);
+		REQUIRE(applicationProcesses[applicationID].find(services[1]) != applicationProcesses[applicationID].end());
+		REQUIRE(isNotEmpty[applicationID].find(services[1]) != isNotEmpty[applicationID].end());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Report type deletion, results in empty application process definition") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID = 1;
+		deleteReportEmptyApplication(request);
+		initializeAppProcessConfig();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto& isNotEmpty = realTimeForwarding.applicationProcessConfiguration.notEmpty;
+
+		REQUIRE(applicationProcesses.empty());
+		REQUIRE(isNotEmpty.empty());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Delete an application process, from the application process configuration") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		deleteApplicationProcess(request);
+		initializeAppProcessConfig();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto& isNotEmpty = realTimeForwarding.applicationProcessConfiguration.notEmpty;
+
+		REQUIRE(applicationProcesses.empty());
+		REQUIRE(isNotEmpty.empty());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Delete a service type, from the application process configuration") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID = 1;
+		deleteService(request);
+		initializeAppProcessConfig();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto& isNotEmpty = realTimeForwarding.applicationProcessConfiguration.notEmpty;
+
+		REQUIRE(applicationProcesses[applicationID].size() == 1);
+		REQUIRE(isNotEmpty[applicationID].size() == 1);
+		REQUIRE(applicationProcesses[applicationID].find(services[0]) == applicationProcesses[applicationID].end());
+		REQUIRE(isNotEmpty[applicationID].find(services[0]) == isNotEmpty[applicationID].end());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Service type deletion, results in empty application process") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID = 1;
+		deleteServiceEmptyApplication(request);
+		initializeAppProcessConfig();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto& isNotEmpty = realTimeForwarding.applicationProcessConfiguration.notEmpty;
+
+		REQUIRE(applicationProcesses.empty());
+		REQUIRE(isNotEmpty.empty());
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
