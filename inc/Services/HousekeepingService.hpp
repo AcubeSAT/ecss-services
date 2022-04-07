@@ -132,10 +132,14 @@ public:
 	 * This function calculates the time needed to pass until the next periodic report for each housekeeping 
 	 * structure. The function also calls the housekeeping reporting functions as needed.
 	 * 
-	 * @param timePassed The time passed since the last execution of the function, in milliseconds.
+	 * @note Three arguments are needed for resiliency in case the function doesn't execute at the exact time that is expected
+	 * 
+	 * @param currentTime The current system time, in milliseconds.
+	 * @param previousTime The system time of the previous call of the function.
+	 * @param expectedDelay The output of this function after its last execution.
 	 * @return uint32_t The minimum amount of time until the next periodic housekeeping report, in milliseconds.
 	 */
-	uint32_t reportPendingStructures(uint32_t timeNow);
+	uint32_t reportPendingStructures(uint32_t currentTime, uint32_t previousTime, uint32_t expectedDelay);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

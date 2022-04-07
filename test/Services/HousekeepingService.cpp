@@ -627,9 +627,10 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 
 TEST_CASE("Periodically reporting Housekeeping Structures") {
     uint32_t nextCollection = 0;
-	uint32_t timeNow = 0;
+	uint32_t currentTime = 0;
+	uint32_t previousTime = 0;
     SECTION("Non existent structures") {
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
         CHECK(ServiceTests::count() == 0);
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
@@ -638,7 +639,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
         for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
             housekeepingStructure.second.collectionInterval = std::numeric_limits<uint32_t>::max();
         }
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
         CHECK(ServiceTests::count() == 0);
         CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
     }
@@ -646,36 +647,44 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
         housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
         housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
         housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
-		timeNow += nextCollection;
-        CHECK(nextCollection == 900);
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+        CHECK(currentTime == 900);
         CHECK(ServiceTests::count() == 0);
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
-		timeNow += nextCollection;
-        CHECK(nextCollection == 100);
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+        CHECK(currentTime == 1000);
         CHECK(ServiceTests::count() == 1);
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
-        CHECK(nextCollection == 800);
-		timeNow += nextCollection;
+		currentTime += 6;
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+        CHECK(currentTime == 1800);
         CHECK(ServiceTests::count() == 2);
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
-		timeNow += nextCollection;
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
         CHECK(ServiceTests::count() == 3);
-        CHECK(nextCollection == 200);
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
-		timeNow += nextCollection;
+        CHECK(currentTime == 2000);
+		currentTime += 15;
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
         CHECK(ServiceTests::count() == 4);
-        CHECK(nextCollection == 700);
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
-		timeNow += nextCollection;
+        CHECK(currentTime == 2700);
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
         CHECK(ServiceTests::count() == 6);
-        CHECK(nextCollection == 300);
+        CHECK(currentTime == 3000);
     }
     SECTION("Collection Intervals set to 0") {
         for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
             housekeepingStructure.second.collectionInterval = 0;
         }
-        nextCollection = housekeepingService.reportPendingStructures(timeNow);
+        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
         CHECK(nextCollection == 0);
     }
 }
