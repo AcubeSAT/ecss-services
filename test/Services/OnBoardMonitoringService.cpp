@@ -2,9 +2,7 @@
 #include <ServicePool.hpp>
 #include <Services/OnBoardMonitoringService.hpp>
 #include <catch2/catch.hpp>
-#include <etl/String.hpp>
 #include <etl/array.h>
-#include <etl/map.h>
 #include "ServiceTests.hpp"
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
