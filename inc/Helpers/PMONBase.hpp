@@ -47,6 +47,22 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
 
+	uint16_t getRepetitionCounter(){
+		return repetitionCounter;
+	}
+	uint16_t getRepetitionNumber(){
+		return repetitionNumber;
+	}
+	bool isMonitoringEnabled(){
+		return monitoringEnabled;
+	}
+	CheckType getCheckType(){
+		return checkType;
+	}
+	CheckingStatus getCheckingStatus(){
+		return checkingStatus;
+	}
+
 	virtual double getExpectedValue(){};
 	virtual uint64_t getMask(){};
 	virtual uint16_t getUnexpectedValueEvent(){};
