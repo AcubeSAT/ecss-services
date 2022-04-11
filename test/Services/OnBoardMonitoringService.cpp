@@ -239,9 +239,9 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendUint16(repetitionNumbers[2]);
 		request.appendEnum8(PMONBase::DeltaCheck);
 		request.appendDouble(lowDeltaThreshold);
-		request.appendEnum8(belowLowThresholdEvent);
+		request.appendEnum16(belowLowThresholdEvent);
 		request.appendDouble(highDeltaThreshold);
-		request.appendEnum8(aboveHighThresholdEvent);
+		request.appendEnum16(aboveHighThresholdEvent);
 		request.appendUint16(numberOfConsecutiveDeltaChecks);
 
 		MessageParser::execute(request);
