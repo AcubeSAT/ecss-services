@@ -31,6 +31,12 @@ private:
 	static bool existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids,
 	                           uint16_t parameterId);
 
+    /**
+     * Initializes Housekeeping Structures with the Parameters found in the obc-software.
+     * The function definition is also found in the obc-software repo.
+     */
+    void initializeHousekeepingStructures();
+
 public:
 	inline static const uint8_t ServiceType = 3;
 
@@ -54,7 +60,9 @@ public:
 		HousekeepingPeriodicPropertiesReport = 35,
 	};
 
-	HousekeepingService() = default;
+    HousekeepingService() {
+        initializeHousekeepingStructures();
+    };
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
@@ -120,6 +128,19 @@ public:
 	 * responds with a TM[3,35] 'housekeeping periodic properties report'.
 	 */
 	void reportHousekeepingPeriodicProperties(Message& request);
+
+	/**
+	 * This function calculates the time needed to pass until the next periodic report for each housekeeping 
+	 * structure. The function also calls the housekeeping reporting functions as needed.
+	 * 
+	 * @note Three arguments are needed for resiliency in case the function doesn't execute at the exact time that is expected
+	 * 
+	 * @param currentTime The current system time, in milliseconds.
+	 * @param previousTime The system time of the previous call of the function.
+	 * @param expectedDelay The output of this function after its last execution.
+	 * @return uint32_t The minimum amount of time until the next periodic housekeeping report, in milliseconds.
+	 */
+	uint32_t reportPendingStructures(uint32_t currentTime, uint32_t previousTime, uint32_t expectedDelay);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
