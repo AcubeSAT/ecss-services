@@ -1,6 +1,21 @@
 #include <iostream>
 #include "Services/RealTimeForwardingControlService.hpp"
 
+void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applicationID) {
+	for (auto& service : allMessageTypes.messagesOfService) {
+		uint8_t serviceType = service.first;
+		for (auto message : service.second) {
+			applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].push_back(message);
+		}
+	}
+}
+
+void RealTimeForwardingControlService::addAllReportsOfService(uint8_t applicationID, uint8_t serviceType) {
+	for (auto& messageType : allMessageTypes.messagesOfService[serviceType]) {
+		applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].push_back(messageType);
+	}
+}
+
 uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t applicationID) {
 	uint8_t serviceCounter = 0;
 	for (auto& definition : applicationProcessConfiguration.definitions) {
@@ -48,7 +63,7 @@ bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, 
 
 bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, uint8_t applicationID) {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
-//		std::cout<<"err22\n";
+		//		std::cout<<"err22\n";
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
 	}
@@ -66,9 +81,9 @@ bool RealTimeForwardingControlService::checkService(Message& request, uint8_t ap
 
 bool RealTimeForwardingControlService::allReportTypesAllowed(Message& request, uint8_t applicationID,
                                                              uint8_t serviceType) {
-//	std::cout<<"num mess= "<<static_cast<int>(countReportsOfService(applicationID, serviceType))<<"\n";
+	//	std::cout<<"num mess= "<<static_cast<int>(countReportsOfService(applicationID, serviceType))<<"\n";
 	if (countReportsOfService(applicationID, serviceType) >= allMessageTypes.messagesOfService[serviceType].size()) {
-//		std::cout<<"err23\n";
+		//		std::cout<<"err23\n";
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllReportTypesAlreadyAllowed);
 		return true;
 	}
@@ -104,46 +119,46 @@ bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uin
 void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {
 	request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration);
 	uint8_t numOfApplications = request.readUint8();
-//	std::cout << static_cast<int>(numOfApplications) << "\n";
+	//	std::cout << static_cast<int>(numOfApplications) << "\n";
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
 		uint8_t applicationID = request.readUint8();
 		uint8_t numOfServices = request.readUint8();
-//		std::cout << "app= " << static_cast<int>(applicationID) << "\n";
+		//		std::cout << "app= " << static_cast<int>(applicationID) << "\n";
 
 		if (not checkApplicationOfAppProcessConfig(request, applicationID, numOfServices)) {
-//			std::cout << "err1\n";
+			//			std::cout << "err1\n";
 			continue;
 		}
 
-		//		if (numOfServices == 0) {
-		//			applicationProcessConfiguration.definitions[applicationID].clear();
-		//			continue;
-		//		}
+		if (numOfServices == 0) {
+			addAllReportsOfApplication(applicationID);
+			continue;
+		}
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
 			// todo: check if service type is valid.
 			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
-//			std::cout << "serv= " << static_cast<int>(serviceType) << "\n";
-//			std::cout << "size= " << static_cast<int>(countServicesOfApplication(applicationID)) << "\n";
+			//			std::cout << "serv= " << static_cast<int>(serviceType) << "\n";
+			//			std::cout << "size= " << static_cast<int>(countServicesOfApplication(applicationID)) << "\n";
 
 			if (not checkService(request, applicationID, serviceType, numOfMessages)) {
-//				std::cout << "err2\n";
+				//				std::cout << "err2\n";
 				continue;
 			}
 
-			//			if (numOfMessages == 0) {
-			//				applicationProcessConfiguration.definitions[applicationID][serviceType].clear();
-			//				continue;
-			//			}
+			if (numOfMessages == 0) {
+				addAllReportsOfService(applicationID, serviceType);
+				continue;
+			}
 
 			for (uint8_t k = 0; k < numOfMessages; k++) {
 				uint8_t messageType = request.readUint8();
-//				std::cout << "mess= " << static_cast<int>(messageType) << "\n";
+				//				std::cout << "mess= " << static_cast<int>(messageType) << "\n";
 
 				if (not checkMessage(request, applicationID, serviceType, messageType)) {
-//					std::cout << "err3\n";
+					//					std::cout << "err3\n";
 					continue;
 				}
 				// todo: check if message type is valid.

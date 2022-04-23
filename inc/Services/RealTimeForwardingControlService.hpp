@@ -67,6 +67,16 @@ public:
 
 private:
 	/**
+	 * Adds all report types of the specified application process definition, to the application process configuration.
+	 */
+	void addAllReportsOfApplication(uint8_t applicationID);
+
+	/**
+	 * Adds all report types of the specified service type, to the application process configuration.
+	 */
+	 void addAllReportsOfService(uint8_t applicationID, uint8_t serviceType);
+
+	/**
 	 * Counts the number of service types, stored for the specified application process.
 	 */
 	uint8_t countServicesOfApplication(uint8_t applicationID);
