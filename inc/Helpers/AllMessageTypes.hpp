@@ -13,6 +13,9 @@
 #include "Services/EventActionService.hpp"
 #include "Services/ParameterService.hpp"
 
+/**
+ * Class holding all the message types for every service type.
+ */
 class AllMessageTypes {
 public:
 	etl::vector<uint8_t, 15> st01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,

@@ -23,23 +23,13 @@ public:
 
 	enum MessageType : uint8_t {
 		AddReportTypesToAppProcessConfiguration = 1,
-		DeleteReportTypesFromAppProcessConfiguration = 2,
-		ReportAppProcessConfigurationContent = 3,
-		AppProcessConfigurationContentReport = 4,
-		AddStructuresToHousekeepingConfiguration = 5,
-		DeleteStructuresFromHousekeepingConfiguration = 6,
-		ReportHousekeepingConfigurationContent = 7,
-		HousekeepingConfigurationContentReport = 8,
-		DeleteEventDefinitionsFromEventReportConfiguration = 13,
-		AddEventDefinitionsToEventReportConfiguration = 14,
-		ReportEventReportConfigurationContent = 15,
-		EventReportConfigurationContentReport = 16,
 	};
 
 	RealTimeForwardingControlService() = default;
 
 	/**
 	 * All the message types of every service type.
+	 * todo: needs to be updated after the implementation of the remaining ecss services.
 	 */
 	AllMessageTypes allMessageTypes;
 
@@ -52,18 +42,7 @@ public:
 	 * The Application Process configuration, containing all the application process, service type and message type
 	 * definitions.
 	 */
-	ForwardControlConfiguration::ApplicationProcess applicationProcessConfiguration;
-
-	/**
-	 * The Housekeeping Parameter Report configuration, containing all the housekeeping parameter report type
-	 * definitions and the housekeeping report structure IDs.
-	 */
-	ForwardControlConfiguration::HousekeepingParameterReport housekeepingConfiguration;
-
-	/**
-	 * The Event Report Blocking configuration, containing all the event report blocking and event definitions IDs.
-	 */
-	ForwardControlConfiguration::EventReportBlocking eventReportBlockingConfiguration;
+	ApplicationProcessConfiguration applicationProcessConfiguration;
 
 private:
 	/**
@@ -74,7 +53,7 @@ private:
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
 	 */
-	 void addAllReportsOfService(uint8_t applicationID, uint8_t serviceType);
+	void addAllReportsOfService(uint8_t applicationID, uint8_t serviceType);
 
 	/**
 	 * Counts the number of service types, stored for the specified application process.
@@ -149,65 +128,6 @@ public:
 	 * TC[14,1] 'Add report types to the application process forward control configuration'.
 	 */
 	void addReportTypesToAppProcessConfiguration(Message& request);
-
-	/**
-	 * TC[14,2] 'Delete report types from the application process forward control configuration'.
-	 */
-	void deleteReportTypesFromAppProcessConfiguration(Message& request);
-
-	/**
-	 * Receives a TC[14,3] 'Report the application process forward control configuration content' message and
-	 * performs the necessary error checking.
-	 */
-	void reportAppProcessConfigurationContent(Message& request);
-
-	/**
-	 * Creates and stores a TM[14,4] 'Application process forward control configuration content report' message.
-	 */
-	void appProcessConfigurationContentReport();
-
-	/**
-	 * TC[14,5] 'Add structure identifiers to the housekeeping parameter report forward control configuration'.
-	 */
-	void addStructuresToHousekeepingConfiguration(Message& request);
-
-	/**
-	 * TC[14,6] 'Delete structure identifiers from the housekeeping parameter report forward control configuration'.
-	 */
-	void deleteStructuresFromHousekeepingConfiguration(Message& request);
-
-	/**
-	 * Receives a TC[14,7] 'Report the housekeeping parameter report forward control configuration content' message and
-	 * performs the necessary error checking.
-	 */
-	void reportHousekeepingConfigurationContent(Message& request);
-
-	/**
-	 * Creates and stores a TM[14,8] 'Housekeeping parameter report forward control configuration content report'
-	 * message.
-	 */
-	void housekeepingConfigurationContentReport();
-
-	/**
-	 * TC[14,13] 'Delete event definition identifiers from the event report blocking forward control configuration'.
-	 */
-	void deleteEventDefinitionsFromEventReportConfiguration(Message& request);
-
-	/**
-	 * TC[14,14] 'Add event definition identifiers to the event report blocking forward control configuration'.
-	 */
-	void addEventDefinitionsToEventReportConfiguration(Message& request);
-
-	/**
-	 * Receives a TC[14,15] 'Report the event report blocking forward control configuration content' message and
-	 * performs the necessary error checking.
-	 */
-	void reportEventReportConfigurationContent(Message& request);
-
-	/**
-	 * Creates and stores a TM[14,16] 'Event report blocking forward control configuration content report' message.
-	 */
-	void eventReportConfigurationContentReport();
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
