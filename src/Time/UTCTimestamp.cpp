@@ -1,18 +1,11 @@
-#include "Helpers/TimeHelper.hpp"
+#include "Time/Time.hpp"
+#include "Time/UTCTimestamp.hpp"
+#include <iomanip>
 
-TimeAndDate::TimeAndDate() {
-	// Unix epoch 1/1/1970
-	year = 1970;
-	month = 1;
-	day = 1;
-	hour = 0;
-	minute = 0;
-	second = 0;
-}
+UTCTimestamp::UTCTimestamp() : year(1970), month(1), second(0), minute(0), hour(0), day(1) {}
 
-TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
-	// check if the parameters make sense
-	ASSERT_INTERNAL(2019 <= year, ErrorHandler::InternalErrorType::InvalidDate);
+UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
+	ASSERT_INTERNAL(1970 <= year, ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= month) && (month <= 12), ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= day) && (day <= 31), ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL(hour < 24, ErrorHandler::InternalErrorType::InvalidDate);
@@ -28,8 +21,7 @@ TimeAndDate::TimeAndDate(uint16_t year, uint8_t month, uint8_t day, uint8_t hour
 	this->second = second;
 }
 
-bool TimeAndDate::operator<(const TimeAndDate& Date) {
-	// compare years
+bool UTCTimestamp::operator<(const UTCTimestamp& Date) const {
 	if (this->year < Date.year) {
 		return true;
 	}
@@ -37,7 +29,6 @@ bool TimeAndDate::operator<(const TimeAndDate& Date) {
 		return false;
 	}
 
-	// compare months
 	if (this->month < Date.month) {
 		return true;
 	}
@@ -45,7 +36,6 @@ bool TimeAndDate::operator<(const TimeAndDate& Date) {
 		return false;
 	}
 
-	// compare days
 	if (this->day < Date.day) {
 		return true;
 	}
@@ -53,7 +43,6 @@ bool TimeAndDate::operator<(const TimeAndDate& Date) {
 		return false;
 	}
 
-	// compare hours
 	if (this->hour < Date.hour) {
 		return true;
 	}
@@ -61,7 +50,6 @@ bool TimeAndDate::operator<(const TimeAndDate& Date) {
 		return false;
 	}
 
-	// compare minutes
 	if (this->minute < Date.minute) {
 		return true;
 	}
@@ -69,7 +57,6 @@ bool TimeAndDate::operator<(const TimeAndDate& Date) {
 		return false;
 	}
 
-	// compare seconds
 	if (this->second < Date.second) {
 		return true;
 	}
@@ -77,48 +64,37 @@ bool TimeAndDate::operator<(const TimeAndDate& Date) {
 	return false;
 }
 
-bool TimeAndDate::operator>(const TimeAndDate& Date) {
-	// compare years
+bool UTCTimestamp::operator>(const UTCTimestamp& Date) const {
 	if (this->year > Date.year) {
 		return true;
 	}
 	if (this->year < Date.year) {
 		return false;
 	}
-
-	// compare months
 	if (this->month > Date.month) {
 		return true;
 	}
 	if (this->month < Date.month) {
 		return false;
 	}
-
-	// compare days
 	if (this->day > Date.day) {
 		return true;
 	}
 	if (this->day < Date.day) {
 		return false;
 	}
-
-	// compare hours
 	if (this->hour > Date.hour) {
 		return true;
 	}
 	if (this->hour < Date.hour) {
 		return false;
 	}
-
-	// compare minutes
 	if (this->minute > Date.minute) {
 		return true;
 	}
 	if (this->minute < Date.minute) {
 		return false;
 	}
-
-	// compare seconds
 	if (this->second > Date.second) {
 		return true;
 	}
@@ -126,44 +102,32 @@ bool TimeAndDate::operator>(const TimeAndDate& Date) {
 	return false;
 }
 
-bool TimeAndDate::operator==(const TimeAndDate& Date) {
-	// compare years
+bool UTCTimestamp::operator==(const UTCTimestamp& Date) const {
 	if (this->year != Date.year) {
 		return false;
 	}
-
-	// compare months
 	if (this->month != Date.month) {
 		return false;
 	}
-
-	// compare days
 	if (this->day != Date.day) {
 		return false;
 	}
-
-	// compare hours
 	if (this->hour != Date.hour) {
 		return false;
 	}
-
-	// compare minutes
 	if (this->minute != Date.minute) {
 		return false;
 	}
-
-	// compare seconds
 	if (this->second != Date.second) {
 		return false;
 	}
-
 	return true;
 }
 
-bool TimeAndDate::operator<=(const TimeAndDate& Date) {
+bool UTCTimestamp::operator<=(const UTCTimestamp& Date) const {
 	return ((*this < Date) || (*this == Date));
 }
 
-bool TimeAndDate::operator>=(const TimeAndDate& Date) {
+bool UTCTimestamp::operator>=(const UTCTimestamp& Date) const {
 	return ((*this > Date) || (*this == Date));
 }

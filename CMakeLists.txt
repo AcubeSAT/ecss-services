@@ -29,8 +29,7 @@ add_library(common OBJECT
         src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
-        src/Helpers/TimeAndDate.cpp
-        src/Helpers/TimeHelper.cpp
+        src/Time/UTCTimestamp.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
         src/Services/ParameterService.cpp
@@ -42,13 +41,14 @@ add_library(common OBJECT
         src/Services/FunctionManagementService.cpp
         src/Services/HousekeepingService.cpp
         src/Services/ParameterStatisticsService.cpp
+        src/Services/OnBoardMonitoringService.cpp
         src/Helpers/Statistic.cpp
         src/Services/RealTimeForwardingControlService.cpp
+        src/Helpers/PMONBase.cpp
         )
 
 # Specify the .cpp files for the executables
-file(GLOB x86_main_SRC "src/Platform/x86/*.cpp" "src/Platform/x86/Services/*.cpp"
-        "lib/logger/src/Platform/x86/*.cpp")
+file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
 
 add_executable(ecss_services
         $<TARGET_OBJECTS:common>

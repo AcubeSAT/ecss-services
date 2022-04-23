@@ -1,7 +1,8 @@
 #include <iostream>
 #include <Logger.hpp>
+#include <Time/UTCTimestamp.hpp>
+#include <Platform/x86/Helpers/UTCTimestamp.hpp>
 #include "Helpers/CRCHelper.hpp"
-#include "Helpers/TimeHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/RequestVerificationService.hpp"
@@ -361,5 +362,7 @@ int main() {
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 	LOG_NOTICE << "ECSS Services test complete";
+
+	std::cout << UTCTimestamp() << std::endl;
 	return 0;
 }

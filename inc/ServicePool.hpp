@@ -14,6 +14,7 @@
 #include "Services/HousekeepingService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
+#include "Services/OnBoardMonitoringService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -37,10 +38,6 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
-#ifdef SERVICE_PARAMETERSTATISTICS
-	ParameterStatisticsService parameterStatistics;
-#endif
-
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
@@ -65,12 +62,20 @@ public:
 	MemoryManagementService memoryManagement;
 #endif
 
+#ifdef SERVICE_ONBOARDMONITORING
+	OnBoardMonitoringService onBoardMonitoringService;
+#endif
+
 #ifdef SERVICE_PARAMETER
 	ParameterService parameterManagement;
 #endif
 
 #ifdef SERVICE_REALTIMEFORWARDINGCONTROL
 	RealTimeForwardingControlService realTimeForwarding;
+#endif
+
+#ifdef SERVICE_PARAMETERSTATISTICS
+	ParameterStatisticsService parameterStatistics;
 #endif
 
 #ifdef SERVICE_REQUESTVERIFICATION

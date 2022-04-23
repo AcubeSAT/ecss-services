@@ -72,10 +72,10 @@ doxygen:
   stage: analyze
   script:
     - cd $CI_PROJECT_DIR
-    - doxygen doxygen.conf
+    - doxygen
   artifacts:
     paths:
-      - ./docs
+      - ./docs/html
 
 ikos:
   image: spacedot/ikos:3.0
@@ -120,10 +120,13 @@ pages:
   stage: deploy
   script:
     - mkdir .public
-    - cp -r ./{docs,gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
+    - cp -r ./docs/html ./.public/docs
+    - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
     - ls ./.public
     - find ./.public
     - mv .public public
+  after_script:
+    - "echo Base page for this branch: ${CI_PAGES_URL}"
   artifacts:
     paths:
       - public # Upload the resulting website

@@ -27,6 +27,7 @@
 #define SERVICE_HOUSEKEEPING              	///<  Compile ST[03] housekeeping
 #define SERVICE_LARGEPACKET         		///<  Compile ST[13] large packet transfer
 #define SERVICE_MEMORY              		///<  Compile ST[06] memory management
+#define SERVICE_ONBOARDMONITORING 			///<  Compile ST[12] on-board monitoring
 #define SERVICE_PARAMETER           		///<  Compile ST[20] parameter management
 #define SERVICE_PARAMETERSTATISTICS 		///<  Compile ST[04] parameter statistics
 #define SERVICE_REALTIMEFORWARDINGCONTROL   ///< Compile ST[14] real time forwarding control
@@ -34,7 +35,8 @@
 #define SERVICE_TEST                		///<  Compile ST[17] test
 #define SERVICE_TIME                		///<  Compile ST[09] time management
 #define SERVICE_TIMESCHEDULING              ///<  Compile ST[11] time-based scheduling
+
 #endif
 /** @} */
 
-#endif //ECSS_SERVICES_ECSS_CONFIGURATION_HPP
+#endif // ECSS_SERVICES_ECSS_CONFIGURATION_HPP

@@ -1,8 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
-#include <type_traits>
 #include <stdint.h> // for the uint_8t stepID
+#include <type_traits>
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
@@ -85,6 +85,10 @@ public:
 		 * Attempt to access an invalid parameter in ST[03]
 		 */
 		NonExistentParameter = 13,
+		/**
+		 * Invalid TimeStamp parameters at creation
+		 */
+		InvalidTimeStampInput = 14
 	};
 
 	/**
@@ -154,77 +158,122 @@ public:
 		/**
 		 * Attempt to add definition to the struct map but its already full. (ST[19])
 		 */
-		EventActionDefinitionsMapIsFull = 11,
+		EventActionDefinitionsMapIsFull = 9,
 		/**
 		 * Attempt to report/delete non existing housekeeping structure (ST[03])
 		 */
-		RequestedNonExistingStructure = 12,
+		RequestedNonExistingStructure = 10,
 		/**
 		 * Attempt to create already created structure (ST[03])
 		 */
-		RequestedAlreadyExistingStructure = 13,
+		RequestedAlreadyExistingStructure = 11,
 		/**
 		 * Attempt to delete structure which has the periodic reporting status enabled (ST[03]) as per 6.3.3.5.2(d-2)
 		 */
-		RequestedDeletionOfEnabledHousekeeping = 14,
+		RequestedDeletionOfEnabledHousekeeping = 12,
 		/**
 		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure
 		 * (ST[03])
 		 */
-		AlreadyExistingParameter = 15,
+		AlreadyExistingParameter = 13,
 		/**
 		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
 		 * enabled (ST[03])
 		 */
-		RequestedAppendToEnabledHousekeeping = 16,
+		RequestedAppendToEnabledHousekeeping = 14,
 		/**
 		 * Attempt to create a new housekeeping structure in Housekeeping Service, when the maximum number of
 		 * housekeeping structures is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfHousekeepingStructures = 17,
+		ExceededMaxNumberOfHousekeepingStructures = 15,
 		/**
 		 * Attempt to add a new simply commutated parameter in a specific housekeeping structure, but the maximum
 		 * number of simply commutated parameters for this structure is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfSimplyCommutatedParameters = 18,
+		ExceededMaxNumberOfSimplyCommutatedParameters = 16,
 		/* Attempt to set a reporting rate which is smaller than the parameter sampling rate.
 		 * ST[04]
 		 */
-		InvalidReportingRateError = 19,
+		InvalidReportingRateError = 17,
 		/**
 		 * Attempt to set a sampling rate which is greater than the parameter reporting rate.
 		 * ST[04]
 		 */
-		InvalidSamplingRateError = 20,
+		InvalidSamplingRateError = 18,
 		/**
 		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
 		 */
-		MaxStatisticDefinitionsReached = 21,
+		MaxStatisticDefinitionsReached = 19,
 		/**
 		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
-		AllReportTypesAlreadyAllowed = 22,
+		AllReportTypesAlreadyAllowed = 20,
 		/**
 		 * Attempt to add a new service type, when the addition of all service types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
-		AllServiceTypesAlreadyAllowed = 23,
+		AllServiceTypesAlreadyAllowed = 21,
 		/**
 		 * Attempt to add a new report type, when the max number of reports types allowed per service type
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */
-		MaxReportTypesReached = 24,
+		MaxReportTypesReached = 22,
 		/**
 		 * Attempt to add a new service type, when the max number of service types allowed per application process
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */
-		MaxServiceTypesReached = 25,
+		MaxServiceTypesReached = 23,
 		/**
 		 * Attempt to add a report/event definition/housekeeping report type, when the specified application process
 		 * ID is not controlled by the Service (ST[14])
 		 */
-		NotControlledApplication = 26,
+		NotControlledApplication = 24,
+		/**
+		 * Attempt to delete all parameter monitoring definitions but the Parameter Monitoring Function Status is
+		 * enabled.
+		 */
+		InvalidRequestToDeleteAllParameterMonitoringDefinitions = 25,
+		/**
+		 * Attempt to delete one parameter monitoring definition but its Parameter Monitoring Status is
+		 * enabled.
+		 */
+		InvalidRequestToDeleteParameterMonitoringDefinition = 26,
+		/**
+		 * Attempt to add a parameter that already exists to the Parameter Monitoring List.
+		 */
+		AddAlreadyExistingParameter = 27,
+		/**
+		 * Attempt to add a parameter in the Parameter Monitoring List but it's full
+		 */
+		ParameterMonitoringListIsFull = 28,
+		/**
+		 * Attempt to add or modify a limit check parameter monitoring definition, but the high limit is lower than
+		 * the low limit.
+		 */
+		HighLimitIsLowerThanLowLimit = 29,
+		/**
+		 * Attempt to add or modify a delta check parameter monitoring definition, but the high threshold is lower than
+		 * the low threshold.
+		 */
+		HighThresholdIsLowerThanLowThreshold = 30,
+		/**
+		 * Attempt to modify a non existent Parameter Monitoring definition.
+		 */
+		ModifyParameterNotInTheParameterMonitoringList = 31,
+		/**
+		 * Attempt to modify a parameter monitoring definition, but the instruction refers to a monitored parameter
+		 * that is not the one used in that parameter monitoring definition.
+		 */
+		DifferentParameterMonitoringDefinitionAndMonitoredParameter = 32,
+		/**
+		 * Attempt to get a parameter monitoring definition that does not exist.
+		 */
+		GetNonExistingParameterMonitoringDefinition = 33,
+		/**
+		 * Request to report a non existent parameter monitoring definition.
+		 */
+		ReportParameterNotInTheParameterMonitoringList = 34
 	};
 
 	/**
