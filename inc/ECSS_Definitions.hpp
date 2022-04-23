@@ -182,7 +182,7 @@ inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
  * configuration
  * @see RealTimeForwardingControlService
  */
-inline const uint8_t ECSSMaxServiceTypeDefinitions = 15;
+inline const uint8_t ECSSMaxServiceTypeDefinitions = 10;
 
 /**
  * The max number of event definition IDs per event report blocking type definition in the event report blocking

@@ -46,17 +46,25 @@ public:
 	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> reportTypeDefinitions;
 
 	/**
-	 * Map containing the Service Type definitions. Each Service Type definition is accessed via its key-name, of type
-	 * uint8, for example '20' for the  Parameter Management service. Each Service Type definition, contains the
-	 * list of its own Report Type definitions.
+	 * This is the key for the application process configuration map. It contains a pair with the applicationID and
+	 * the serviceType.
 	 */
-	typedef etl::map<uint8_t, reportTypeDefinitions, ECSSMaxServiceTypeDefinitions> serviceTypeDefinitions;
+	typedef std::pair<uint8_t, uint8_t> key;
+
+	//	/**
+	//	 * Map containing the Service Type definitions. Each Service Type definition is accessed via its key-name, of
+	//type
+	//	 * uint8, for example '20' for the  Parameter Management service. Each Service Type definition, contains the
+	//	 * list of its own Report Type definitions.
+	//	 */
+	//	typedef etl::map<uint8_t, reportTypeDefinitions, ECSSMaxServiceTypeDefinitions> serviceTypeDefinitions;
 
 	/**
 	 * Map containing the Application Process definitions. Each application has its own ID. The ID is used as a
 	 * key to provide access to the list of Service Type definitions, included by the application.
 	 */
-	etl::map<uint8_t, serviceTypeDefinitions, ECSSMaxControlledApplicationProcesses> definitions;
+	etl::map<key, reportTypeDefinitions, ECSSMaxControlledApplicationProcesses * ECSSMaxServiceTypeDefinitions>
+	    definitions;
 
 	ApplicationProcess() = default;
 };

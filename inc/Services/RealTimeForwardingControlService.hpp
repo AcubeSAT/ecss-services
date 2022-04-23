@@ -6,6 +6,7 @@
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
 #include "Helpers/ForwardControlConfiguration.hpp"
+#include "Helpers/AllMessageTypes.hpp"
 
 /**
  * Implementation of the ST[14] 'Real Time Forwarding Control Service' as defined in ECSS-E-ST-70-41C.
@@ -38,6 +39,11 @@ public:
 	RealTimeForwardingControlService() = default;
 
 	/**
+	 * All the message types of every service type.
+	 */
+	AllMessageTypes allMessageTypes;
+
+	/**
 	 * Contains the Application IDs, controlled by the Service.
 	 */
 	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
@@ -60,6 +66,17 @@ public:
 	ForwardControlConfiguration::EventReportBlocking eventReportBlockingConfiguration;
 
 private:
+	/**
+	 * Counts the number of service types, stored for the specified application process.
+	 */
+	uint8_t countServicesOfApplication(uint8_t applicationID);
+
+	/**
+	 *
+	 * Counts the number of report types, stored for the specified service type.
+	 */
+	uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
+
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
