@@ -8,8 +8,9 @@
 #include "Helpers/Parameter.hpp"
 
 /**
- * This file implements the Real Time Forward Control configuration, which includes three separate
- * configurations, Application Process configuration, Housekeeping configuration and Event Report configuration.
+ * Implements the Real Time Forward Control configuration, which includes three separate configurations, Application
+ * Process configuration, Housekeeping configuration and Event Report configuration. These configurations contain
+ * definitions, which indicate whether a telemetry message should be forwarded to the ground station.
  *
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
