@@ -219,7 +219,7 @@ PacketStore& StorageAndRetrievalService::getPacketStore(const String<ECSSMaxPack
 	if (packetStore == packetStores.end()) {
 		assert(ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 	}
-	return *packetStore;
+	return packetStore->second;
 }
 
 bool StorageAndRetrievalService::packetStoreExists(const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
