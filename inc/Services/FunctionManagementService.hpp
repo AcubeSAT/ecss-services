@@ -7,6 +7,9 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 
+typedef String<ECSSFunctionNameLength> functionName;
+typedef etl::map<functionName, void (*)(String<ECSSFunctionMaxArgLength>), ECSSFunctionMapSize> FunctionMap;
+
 /**
  * Implementation of the ST[08] function management service
  *
@@ -24,34 +27,6 @@
  * @ingroup Services
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
-
-/**
- * Usage of the include() function:
- *
- * @code
- * void foo(String<MAX_ARG_LENGTH> b) {
- * 		std::cout << "SPAAAACE!" << std::endl;
- * 	}
- *
- * void bar(String<MAX_ARG_LENGTH> b) {
- * 		std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
- * 	}
- *
- * void baz(String<MAX_ARG_LENGTH> b) {
- * 		std::cout << "QWERTYUIOP" << std::endl;
- * 	}
- *
- * 	FunctionManagementService::FunctionManagementService() {
- * 		include(String<FUNC_NAME_LENGTH>("foo"), &foo);
- * 		include(String<FUNC_NAME_LENGTH>("bar"), &bar);
- * 		include(String<FUNC_NAME_LENGTH>("baz"), &baz);
- * 	}
- * @endcode
- */
-
-typedef String<ECSSFunctionNameLength> functionName;
-typedef etl::map<functionName, void (*)(String<ECSSFunctionMaxArgLength>), ECSSFunctionMapSize> FunctionMap;
-
 class FunctionManagementService : public Service {
 	/**
 	 * Map of the function names to their respective pointers. Size controlled by FUNC_MAP_SIZE
@@ -83,6 +58,28 @@ public:
 	/**
 	 * Includes a new function in the pointer map. This enables it to be called by way of a valid
 	 * TC[8,1] message.
+	 *
+	 * Usage of the include() function:
+	 *
+	 * @code
+	 * void foo(String<MAX_ARG_LENGTH> b) {
+	 * 		std::cout << "SPAAAACE!" << std::endl;
+	 * 	}
+	 *
+	 * void bar(String<MAX_ARG_LENGTH> b) {
+	 * 		std::cout << "I HAZ A CUBESAT THAT SNAPS PIX!" << std::endl;
+	 * 	}
+	 *
+	 * void baz(String<MAX_ARG_LENGTH> b) {
+	 * 		std::cout << "QWERTYUIOP" << std::endl;
+	 * 	}
+	 *
+	 * 	FunctionManagementService::FunctionManagementService() {
+	 * 		include(String<FUNC_NAME_LENGTH>("foo"), &foo);
+	 * 		include(String<FUNC_NAME_LENGTH>("bar"), &bar);
+	 * 		include(String<FUNC_NAME_LENGTH>("baz"), &baz);
+	 * 	}
+	 * @endcode
 	 *
 	 * @param funcName the function's name. Max. length is FUNC_NAME_LENGTH bytes.
 	 * @param ptr pointer to a function of void return type and a MAX_ARG_LENGTH-lengthed byte

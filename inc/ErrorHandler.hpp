@@ -279,6 +279,51 @@ public:
 		 * Attempt to set a packet store size to a value that the available memory cannot handle (ST[15]).
 		 */
 		UnableToHandlePacketStoreSize = 36,
+		/**
+		 * Attempt to delete all parameter monitoring definitions but the Parameter Monitoring Function Status is
+		 * enabled.
+		 */
+		InvalidRequestToDeleteAllParameterMonitoringDefinitions = 37,
+		/**
+		 * Attempt to delete one parameter monitoring definition but its Parameter Monitoring Status is
+		 * enabled.
+		 */
+		InvalidRequestToDeleteParameterMonitoringDefinition = 38,
+		/**
+		 * Attempt to add a parameter that already exists to the Parameter Monitoring List.
+		 */
+		AddAlreadyExistingParameter = 39,
+		/**
+		 * Attempt to add a parameter in the Parameter Monitoring List but it's full
+		 */
+		ParameterMonitoringListIsFull = 40,
+		/**
+		 * Attempt to add or modify a limit check parameter monitoring definition, but the high limit is lower than
+		 * the low limit.
+		 */
+		HighLimitIsLowerThanLowLimit = 41,
+		/**
+		 * Attempt to add or modify a delta check parameter monitoring definition, but the high threshold is lower than
+		 * the low threshold.
+		 */
+		HighThresholdIsLowerThanLowThreshold = 42,
+		/**
+		 * Attempt to modify a non existent Parameter Monitoring definition.
+		 */
+		ModifyParameterNotInTheParameterMonitoringList = 43,
+		/**
+		 * Attempt to modify a parameter monitoring definition, but the instruction refers to a monitored parameter
+		 * that is not the one used in that parameter monitoring definition.
+		 */
+		DifferentParameterMonitoringDefinitionAndMonitoredParameter = 44,
+		/**
+		 * Attempt to get a parameter monitoring definition that does not exist.
+		 */
+		GetNonExistingParameterMonitoringDefinition = 45,
+		/**
+		 * Request to report a non existent parameter monitoring definition.
+		 */
+		ReportParameterNotInTheParameterMonitoringList = 46
 	};
 
 	/**

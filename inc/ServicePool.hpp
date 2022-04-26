@@ -14,6 +14,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 #include "Services/HousekeepingService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
+#include "Services/OnBoardMonitoringService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -59,6 +60,10 @@ public:
 
 #ifdef SERVICE_MEMORY
 	MemoryManagementService memoryManagement;
+#endif
+
+#ifdef SERVICE_ONBOARDMONITORING
+	OnBoardMonitoringService onBoardMonitoringService;
 #endif
 
 #ifdef SERVICE_PARAMETER
