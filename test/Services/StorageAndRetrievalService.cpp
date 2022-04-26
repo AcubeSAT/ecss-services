@@ -49,7 +49,7 @@ void validPacketStoreCreationRequest(Message& request) {
 		          packetStoreData);
 
 		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
-		request.appendOctetString(packetStoreId);
+		request.appendString(packetStoreId);
 		request.appendUint16(sizes[i]);
 		if ((i % 2) == 0) {
 			request.appendUint8(packetStoreTypeCode[0]);
@@ -78,7 +78,7 @@ void invalidPacketStoreCreationRequest(Message& request) {
 		          packetStoreData);
 
 		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
-		request.appendOctetString(packetStoreId);
+		request.appendString(packetStoreId);
 		request.appendUint16(sizes[i]);
 		if ((i % 2) == 0) {
 			request.appendUint8(packetStoreTypeCode[0]);
@@ -247,7 +247,7 @@ TEST_CASE("Deleting packet stores") {
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -302,7 +302,7 @@ TEST_CASE("Deleting packet stores") {
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageStatus = true;
@@ -334,7 +334,7 @@ TEST_CASE("Deleting packet stores") {
 
 		for (auto& packetStoreId : packetStoreIds) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -399,12 +399,12 @@ TEST_CASE("Deleting packet stores") {
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		for (auto& packetStoreId : wrongPacketStoreIds) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).storageStatus = true;
@@ -440,7 +440,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		for (int i = 0; i < numOfPacketStores; i++) {
 			REQUIRE(storageAndRetrieval.packetStoreExists(packetStoreIds[i]));
 			storageAndRetrieval.getPacketStore(packetStoreIds[i]).storageStatus = false;
-			request.appendOctetString(packetStoreIds[i]);
+			request.appendString(packetStoreIds[i]);
 		}
 		storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageStatus = false;
 		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageStatus = false;
@@ -470,7 +470,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreIds[i]));
-			request.appendOctetString(packetStoreIds[i]);
+			request.appendString(packetStoreIds[i]);
 		}
 
 		MessageParser::execute(request);
@@ -521,7 +521,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			storageAndRetrieval.getPacketStore(packetStoreIds[i]).storageStatus = true;
-			request.appendOctetString(packetStoreIds[i]);
+			request.appendString(packetStoreIds[i]);
 		}
 		storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageStatus = true;
 		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageStatus = true;
@@ -551,7 +551,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreIds[i]));
-			request.appendOctetString(packetStoreIds[i]);
+			request.appendString(packetStoreIds[i]);
 		}
 
 		MessageParser::execute(request);
@@ -605,7 +605,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		for (auto& packetStoreId : packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -639,13 +639,13 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 			auto packetStoreId = correctPacketStoreIds[i];
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -714,7 +714,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		for (auto& packetStoreId : packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -746,14 +746,14 @@ TEST_CASE("Resuming the open retrieval process") {
 			auto packetStoreId = correctPacketStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).openRetrievalStatus = PacketStore::Suspended;
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -823,7 +823,7 @@ TEST_CASE("Suspending the open retrieval process") {
 		request.appendUint16(numOfPacketStores);
 		for (auto& packetStoreId : packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -854,14 +854,14 @@ TEST_CASE("Suspending the open retrieval process") {
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto packetStoreId = correctPacketStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).openRetrievalStatus = PacketStore::InProgress;
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -933,7 +933,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		for (auto& packetStoreId : packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			uint32_t timeTag1 = timeTags1[index];
 			uint32_t timeTag2 = timeTags2[index++];
 			request.appendUint32(timeTag1);
@@ -977,7 +977,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			    (i % 2 == 0) ? PacketStore::Suspended : PacketStore::InProgress;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
 
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			uint32_t timeTag1 = 20;
 			uint32_t timeTag2 = 40;
 			request.appendUint32(timeTag1);
@@ -988,7 +988,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			uint32_t timeTag1 = 20;
 			uint32_t timeTag2 = 40;
 			request.appendUint32(timeTag1);
@@ -1030,7 +1030,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		for (auto& packetStoreId : packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			uint32_t timeTag1 = 90;
 			uint32_t timeTag2 = 20;
 			request.appendUint32(timeTag1);
@@ -1072,7 +1072,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		for (auto& packetStoreId : packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -1107,7 +1107,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		for (int i = 0; i < numOfPacketStores; i++) {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		MessageParser::execute(request);
@@ -1186,25 +1186,25 @@ TEST_CASE("Reporting the status of packet stores") {
 
 		// Packet store 1
 		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData)));
 		CHECK(report.readBoolean() == true);
 		CHECK(report.readEnum8() == 1);
 		CHECK(report.readBoolean() == false);
 		// Packet store 2
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData2)));
 		CHECK(report.readBoolean() == false);
 		CHECK(report.readEnum8() == 0);
 		CHECK(report.readBoolean() == true);
 		// Packet store 3
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData4)));
 		CHECK(report.readBoolean() == false);
 		CHECK(report.readEnum8() == 0);
 		CHECK(report.readBoolean() == true);
 		// Packet store 4
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData3)));
 		CHECK(report.readBoolean() == true);
 		CHECK(report.readEnum8() == 1);
@@ -1247,25 +1247,25 @@ TEST_CASE("Reporting the configuration of packet stores") {
 
 		// Packet store 1
 		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData)));
 		CHECK(report.readUint16() == 100);
 		CHECK(report.readUint8() == 0);
 		CHECK(report.readUint8() == 4);
 		// Packet store 2
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData2)));
 		CHECK(report.readUint16() == 200);
 		CHECK(report.readUint8() == 1);
 		CHECK(report.readUint8() == 6);
 		// Packet store 3
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData4)));
 		CHECK(report.readUint16() == 340);
 		CHECK(report.readUint8() == 1);
 		CHECK(report.readUint8() == 2);
 		// Packet store 4
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData3)));
 		CHECK(report.readUint16() == 550);
 		CHECK(report.readUint8() == 0);
@@ -1297,7 +1297,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 			packetStore.byTimeRangeRetrievalStatus = false;
 
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			request.appendUint16(newSizes[index]);
 			index++;
 		}
@@ -1334,7 +1334,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.byTimeRangeRetrievalStatus = (index == 1);
 			packetStore.openRetrievalStatus = (index == 3) ? PacketStore::InProgress : PacketStore::Suspended;
 
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			request.appendUint16(35);
 			index++;
 		}
@@ -1375,7 +1375,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			request.appendUint16(newSizes[index++]);
 		}
 
@@ -1403,7 +1403,7 @@ TEST_CASE("Resizing the packet stores") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		for (auto& packetStoreId : wrongPacketStoreIds) {
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 			request.appendUint16(35);
 		}
 
@@ -1439,7 +1439,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeTypeToCircular, Message::TC, 1);
 
-		request.appendOctetString(packetStoreIds[0]);
+		request.appendString(packetStoreIds[0]);
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
@@ -1451,7 +1451,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		Message request2(StorageAndRetrievalService::ServiceType,
 		                 StorageAndRetrievalService::MessageType::ChangeTypeToCircular, Message::TC, 1);
 
-		request2.appendOctetString(packetStoreIds[3]);
+		request2.appendString(packetStoreIds[3]);
 		MessageParser::execute(request2);
 
 		CHECK(ServiceTests::count() == 0);
@@ -1494,7 +1494,7 @@ TEST_CASE("Changing the packet store type to circular") {
 			Message request(StorageAndRetrievalService::ServiceType,
 			                StorageAndRetrievalService::MessageType::ChangeTypeToCircular, Message::TC, 1);
 
-			request.appendOctetString(finalIds[i]);
+			request.appendString(finalIds[i]);
 			MessageParser::execute(request);
 			CHECK(ServiceTests::count() == i + 1);
 			CHECK(ServiceTests::countThrownErrors(expectedErrors[i]) == 1);
@@ -1527,7 +1527,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
 
-		request.appendOctetString(packetStoreIds[0]);
+		request.appendString(packetStoreIds[0]);
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
@@ -1539,7 +1539,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 		Message request2(StorageAndRetrievalService::ServiceType,
 		                 StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
 
-		request2.appendOctetString(packetStoreIds[3]);
+		request2.appendString(packetStoreIds[3]);
 		MessageParser::execute(request2);
 
 		CHECK(ServiceTests::count() == 0);
@@ -1582,7 +1582,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 			Message request(StorageAndRetrievalService::ServiceType,
 			                StorageAndRetrievalService::MessageType::ChangeTypeToBounded, Message::TC, 1);
 
-			request.appendOctetString(finalIds[i]);
+			request.appendString(finalIds[i]);
 			MessageParser::execute(request);
 			CHECK(ServiceTests::count() == i + 1);
 			CHECK(ServiceTests::countThrownErrors(expectedErrors[i]) == 1);
@@ -1615,7 +1615,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
-		request.appendOctetString(packetStoreIds[0]);
+		request.appendString(packetStoreIds[0]);
 		request.appendUint8(virtualChannels[0]);
 
 		MessageParser::execute(request);
@@ -1629,7 +1629,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		Message request2(StorageAndRetrievalService::ServiceType,
 		                 StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
-		request2.appendOctetString(packetStoreIds[3]);
+		request2.appendString(packetStoreIds[3]);
 		request2.appendUint8(virtualChannels[1]);
 
 		MessageParser::execute(request2);
@@ -1674,7 +1674,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 			Message request(StorageAndRetrievalService::ServiceType,
 			                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
-			request.appendOctetString(finalIds[i]);
+			request.appendString(finalIds[i]);
 			request.appendUint8(i == 3 ? VirtualChannelLimits.max + 1 : 3);
 			MessageParser::execute(request);
 			CHECK(ServiceTests::count() == i + 1);
@@ -1708,7 +1708,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			storageAndRetrieval.getPacketStore(packetStoreIds[i]).openRetrievalStartTimeTag = 5;
-			request.appendOctetString(packetStoreIds[i]);
+			request.appendString(packetStoreIds[i]);
 		}
 
 		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
@@ -1723,7 +1723,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 
 		// Packet store 1
 		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
@@ -1731,7 +1731,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 30);
 		CHECK(report.readUint16() == 20);
 		// Packet store 2
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
@@ -1777,7 +1777,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 
 		// Packet store 1
 		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
@@ -1785,7 +1785,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 30);
 		CHECK(report.readUint16() == 0);
 		// Packet store 2
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
@@ -1793,7 +1793,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 25);
 		CHECK(report.readUint16() == 10);
 		// Packet store 3
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
 		CHECK(report.readUint32() == timestamps4[0]);
 		CHECK(report.readUint32() == timestamps4[7]);
@@ -1801,7 +1801,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 40);
 		CHECK(report.readUint16() == 30);
 		// Packet store 4
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
 		CHECK(report.readUint32() == timestamps3[0]);
 		CHECK(report.readUint32() == timestamps3[3]);
@@ -1833,7 +1833,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
-			request.appendOctetString(finalIds[i]);
+			request.appendString(finalIds[i]);
 		}
 
 		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
@@ -1849,7 +1849,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 
 		// Packet store 1
 		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readOctetString(data);
+		report.readString(data, ECSSMaxPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
@@ -1883,7 +1883,7 @@ TEST_CASE("Deleting packet store content") {
 			auto packetStoreId = packetStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets.size() == 6);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).storedTelemetryPackets.size() == 5);
@@ -1935,7 +1935,7 @@ TEST_CASE("Deleting packet store content") {
 			auto packetStoreId = packetStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets.size() == 4);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets.size() == 8);
@@ -1987,7 +1987,7 @@ TEST_CASE("Deleting packet store content") {
 			auto packetStoreId = packetStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets.size() == 4);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets.size() == 8);
@@ -2096,7 +2096,7 @@ TEST_CASE("Deleting packet store content") {
 
 		for (int i = 0; i < 3; i++) {
 			auto packetStoreId = finalIds[i];
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		for (int i = 3; i < 7; i++) {
@@ -2104,7 +2104,7 @@ TEST_CASE("Deleting packet store content") {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (i == 4 || i == 6);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (i == 3 || i == 5) ? PacketStore::InProgress : PacketStore::Suspended;
-			request.appendOctetString(packetStoreId);
+			request.appendString(packetStoreId);
 		}
 
 		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).storedTelemetryPackets.size() == 6);
@@ -2160,8 +2160,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2204,8 +2204,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2251,8 +2251,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2298,8 +2298,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2345,8 +2345,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2384,8 +2384,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2421,8 +2421,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2456,8 +2456,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2492,8 +2492,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2529,8 +2529,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2573,8 +2573,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2615,8 +2615,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2653,8 +2653,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2697,8 +2697,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 
@@ -2739,8 +2739,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
-		request.appendOctetString(fromPacketStoreId);
-		request.appendOctetString(toPacketStoreId);
+		request.appendString(fromPacketStoreId);
+		request.appendString(toPacketStoreId);
 
 		MessageParser::execute(request);
 

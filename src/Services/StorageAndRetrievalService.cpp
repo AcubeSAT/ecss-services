@@ -1,7 +1,8 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
 String<ECSSMaxPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
-	auto packetStoreId = message.readOctetString<ECSSMaxPacketStoreIdSize>();
+	uint8_t packetStoreId[ECSSMaxPacketStoreIdSize];
+	message.readString(packetStoreId, ECSSMaxPacketStoreIdSize);
 	return packetStoreId;
 }
 
@@ -215,7 +216,7 @@ uint16_t StorageAndRetrievalService::currentNumberOfPacketStores() {
 }
 
 PacketStore& StorageAndRetrievalService::getPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId) {
-    auto packetStore = packetStores.find(packetStoreId);
+	auto packetStore = packetStores.find(packetStoreId);
 	if (packetStore == packetStores.end()) {
 		assert(ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 	}
@@ -340,7 +341,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 		report.appendUint16(packetStores.size());
 		for (auto& packetStore : packetStores) {
 			auto packetStoreId = packetStore.first;
-			report.appendOctetString(packetStoreId);
+			report.appendString(packetStoreId);
 			createContentSummary(report, packetStoreId);
 		}
 		storeMessage(report);
@@ -363,7 +364,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
 		}
-		report.appendOctetString(packetStoreId);
+		report.appendString(packetStoreId);
 		createContentSummary(report, packetStoreId);
 	}
 	storeMessage(report);
@@ -482,7 +483,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 	report.appendUint16(packetStores.size());
 	for (auto& packetStore : packetStores) {
 		auto packetStoreId = packetStore.first;
-		report.appendOctetString(packetStoreId);
+		report.appendString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageStatus);
 		report.appendEnum8(packetStore.second.openRetrievalStatus);
 		report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
@@ -597,7 +598,7 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 	report.appendUint16(packetStores.size());
 	for (auto& packetStore : packetStores) {
 		auto packetStoreId = packetStore.first;
-		report.appendOctetString(packetStoreId);
+		report.appendString(packetStoreId);
 		report.appendUint16(packetStore.second.sizeInBytes);
 		uint8_t typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
 		report.appendUint8(typeCode);

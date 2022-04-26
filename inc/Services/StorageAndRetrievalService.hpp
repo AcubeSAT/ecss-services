@@ -154,8 +154,6 @@ private:
 	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
 	                        Message& request);
 
-
-
 	/**
 	 * Performs all the necessary error checking for the case of BeforeTimeTag copying of packets.
 	 *
@@ -242,8 +240,8 @@ public:
 
 	/**
 	 * Given a request that contains a number N, followed by N packet store IDs, this method calls function on every
-     * packet store. Implemented to reduce duplication. If N = 0, then function is applied to all packet stores.
-     * Incorrect packet store IDs are ignored and generate an error.
+	 * packet store. Implemented to reduce duplication. If N = 0, then function is applied to all packet stores.
+	 * Incorrect packet store IDs are ignored and generate an error.
 
 	 * @param function the job to be done after the error checking.
 	 */
