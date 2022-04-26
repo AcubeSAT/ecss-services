@@ -29,7 +29,6 @@ add_library(common OBJECT
         src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
-        src/Helpers/TimeFormats.cpp
         src/Helpers/PacketStore.cpp
         src/Time/UTCTimestamp.cpp
         src/Services/EventReportService.cpp
