@@ -1,23 +1,23 @@
 #ifndef ECSS_SERVICES_ALLMESSAGETYPES_HPP
 #define ECSS_SERVICES_ALLMESSAGETYPES_HPP
 
-#include "Services/RequestVerificationService.hpp"
-#include "Services/HousekeepingService.hpp"
-#include "Services/ParameterStatisticsService.hpp"
-#include "Services/EventReportService.hpp"
-#include "Services/MemoryManagementService.hpp"
-#include "Services/TimeBasedSchedulingService.hpp"
-#include "Services/LargePacketTransferService.hpp"
-#include "Services/RealTimeForwardingControlService.hpp"
-#include "Services/TestService.hpp"
 #include "Services/EventActionService.hpp"
+#include "Services/EventReportService.hpp"
+#include "Services/HousekeepingService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/MemoryManagementService.hpp"
 #include "Services/ParameterService.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+#include "Services/RealTimeForwardingControlService.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Services/TestService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 
 /**
- * Class holding all the message types for every service type.
+ * Namespace containing all the message types for every service type.
+ * todo: needs to be updated after the implementation of the remaining ecss services.
  */
-class AllMessageTypes {
-public:
+namespace AllMessageTypes {
 	etl::vector<uint8_t, 15> st01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,
 	                                         RequestVerificationService::MessageType::FailedCompletionOfExecution,
 	                                         RequestVerificationService::MessageType::FailedProgressOfExecution,
@@ -74,6 +74,7 @@ public:
 	    {TestService::ServiceType, st17Messages},
 	    {EventActionService::ServiceType, st19Messages},
 	    {ParameterService::ServiceType, st20Messages}};
-};
+
+} // namespace AllMessageTypes
 
 #endif

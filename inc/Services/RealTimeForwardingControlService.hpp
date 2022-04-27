@@ -2,11 +2,11 @@
 #define ECSS_SERVICES_REALTIMEFORWARDINGCONTROLSERVICE_HPP
 
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "etl/vector.h"
-#include "Helpers/ForwardControlConfiguration.hpp"
 #include "Helpers/AllMessageTypes.hpp"
+#include "Helpers/ForwardControlConfiguration.hpp"
+#include "Service.hpp"
+#include "etl/vector.h"
 
 /**
  * Implementation of the ST[14] 'Real Time Forwarding Control Service' as defined in ECSS-E-ST-70-41C.
@@ -26,12 +26,6 @@ public:
 	};
 
 	RealTimeForwardingControlService() = default;
-
-	/**
-	 * All the message types of every service type.
-	 * todo: needs to be updated after the implementation of the remaining ecss services.
-	 */
-	AllMessageTypes allMessageTypes;
 
 	/**
 	 * Contains the Application IDs, controlled by the Service.

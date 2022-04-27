@@ -1,9 +1,9 @@
 #include <iostream>
-#include "catch2/catch.hpp"
+#include "ECSS_Definitions.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "ECSS_Definitions.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
+#include "catch2/catch.hpp"
 
 RealTimeForwardingControlService& realTimeForwarding = Services.realTimeForwarding;
 
@@ -24,7 +24,7 @@ void validReportTypes(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID : applications) {
+	for (auto appID: applications) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -48,7 +48,7 @@ void duplicateReportTypes(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID : applications) {
+	for (auto appID: applications) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -97,7 +97,7 @@ void validAllReportsOfService(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID : applications) {
+	for (auto appID: applications) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -144,7 +144,7 @@ void validAllReportsOfApp(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID : applications) {
+	for (auto appID: applications) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 	}
@@ -201,7 +201,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 		REQUIRE(applicationProcesses.size() == 2);
 
-		for (auto appID : applications) {
+		for (auto appID: applications) {
 			for (uint8_t j = 0; j < 2; j++) {
 				uint8_t serviceType = services[j];
 				auto appServicePair = std::make_pair(appID, serviceType);
@@ -307,7 +307,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypes(request);
 
-		for (auto message : realTimeForwarding.allMessageTypes.st03Messages) {
+		for (auto message: AllMessageTypes::st03Messages) {
 			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
 			    .push_back(message);
 		}
@@ -319,7 +319,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		      1);
 		REQUIRE(
 		    realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
-		        .size() == realTimeForwarding.allMessageTypes.messagesOfService[serviceType].size());
+		        .size() == AllMessageTypes::messagesOfService[serviceType].size());
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
@@ -345,8 +345,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		REQUIRE(applicationProcessConfig.definitions[appServicePair1].empty());
 		REQUIRE(applicationProcessConfig.definitions[appServicePair2].empty());
 
-		auto numOfMessages1 = realTimeForwarding.allMessageTypes.messagesOfService[serviceType1].size();
-		auto numOfMessages2 = realTimeForwarding.allMessageTypes.messagesOfService[serviceType2].size();
+		auto numOfMessages1 = AllMessageTypes::messagesOfService[serviceType1].size();
+		auto numOfMessages2 = AllMessageTypes::messagesOfService[serviceType2].size();
 
 		for (uint8_t i = 0; i < numOfMessages1 - 1; i++) {
 			applicationProcessConfig.definitions[appServicePair1].push_back(i);
@@ -385,8 +385,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 		REQUIRE(applicationProcesses.size() == 2);
 
-		for (auto appID : applications) {
-			for (auto& serviceType : services) {
+		for (auto appID: applications) {
+			for (auto& serviceType: services) {
 				auto appServicePair = std::make_pair(appID, serviceType);
 				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
 				REQUIRE(applicationProcesses[appServicePair].size() == 1);
@@ -427,7 +427,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
 		REQUIRE(definitions.size() == 20);
-		for (auto serviceType : allServices) {
+		for (auto serviceType: allServices) {
 			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
 		}
 
@@ -448,9 +448,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		CHECK(ServiceTests::count() == 0);
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
-		for (auto serviceType : services) {
+		for (auto serviceType: services) {
 			REQUIRE(applicationProcesses[std::make_pair(applicationID1, serviceType)].size() ==
-			        realTimeForwarding.allMessageTypes.messagesOfService[serviceType].size());
+			        AllMessageTypes::messagesOfService[serviceType].size());
 		}
 
 		resetAppProcessConfiguration();
@@ -479,7 +479,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		int cnt1 = 0;
 		int cnt2 = 0;
-		for (auto& pair : definitions) {
+		for (auto& pair: definitions) {
 			if (pair.first.first == applicationID1) {
 				cnt1++;
 			} else if (pair.first.first == applicationID2) {
@@ -489,13 +489,13 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		REQUIRE(cnt1 == 10);
 		REQUIRE(cnt2 == 2);
 
-		for (auto& serviceType : allServices) {
+		for (auto& serviceType: allServices) {
 			REQUIRE(definitions[std::make_pair(applicationID1, serviceType)].size() ==
-			        realTimeForwarding.allMessageTypes.messagesOfService[serviceType].size());
+			        AllMessageTypes::messagesOfService[serviceType].size());
 		}
-		for (auto& serviceType : services) {
+		for (auto& serviceType: services) {
 			REQUIRE(definitions[std::make_pair(applicationID2, serviceType)].size() ==
-			        realTimeForwarding.allMessageTypes.messagesOfService[serviceType].size());
+			        AllMessageTypes::messagesOfService[serviceType].size());
 		}
 
 		resetAppProcessConfiguration();
@@ -517,10 +517,10 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
 		REQUIRE(definitions.size() == ECSSMaxServiceTypeDefinitions);
 
-		for (auto serviceType : allServices) {
+		for (auto serviceType: allServices) {
 			REQUIRE(std::equal(definitions[std::make_pair(applicationID1, serviceType)].begin(),
 			                   definitions[std::make_pair(applicationID1, serviceType)].end(),
-			                   realTimeForwarding.allMessageTypes.messagesOfService[serviceType].begin()));
+			                   AllMessageTypes::messagesOfService[serviceType].begin()));
 		}
 
 		resetAppProcessConfiguration();
