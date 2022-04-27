@@ -163,5 +163,7 @@ void RealTimeForwardingControlService::execute(Message& message) {
 		case AddReportTypesToAppProcessConfiguration:
 			addReportTypesToAppProcessConfiguration(message);
 			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
