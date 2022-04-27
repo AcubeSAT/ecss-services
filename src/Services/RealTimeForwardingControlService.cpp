@@ -31,7 +31,7 @@ uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicat
 	return applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].size();
 }
 
-bool RealTimeForwardingControlService::appIsControlled(Message& request, uint8_t applicationId) {
+bool RealTimeForwardingControlService::isAppControlled(Message& request, uint8_t applicationId) {
 	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
 	    controlledApplications.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
@@ -42,7 +42,7 @@ bool RealTimeForwardingControlService::appIsControlled(Message& request, uint8_t
 
 bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID,
                                                                           uint8_t numOfServices) {
-	if (not appIsControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
+	if (not isAppControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
 		for (uint8_t l = 0; l < numOfServices; l++) {
 			request.skipBytes(1);
 			uint8_t numOfMessages = request.readUint8();
@@ -63,7 +63,6 @@ bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, 
 
 bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, uint8_t applicationID) {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
-		//		std::cout<<"err22\n";
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
 	}
@@ -81,9 +80,7 @@ bool RealTimeForwardingControlService::checkService(Message& request, uint8_t ap
 
 bool RealTimeForwardingControlService::allReportTypesAllowed(Message& request, uint8_t applicationID,
                                                              uint8_t serviceType) {
-	//	std::cout<<"num mess= "<<static_cast<int>(countReportsOfService(applicationID, serviceType))<<"\n";
 	if (countReportsOfService(applicationID, serviceType) >= AllMessageTypes::messagesOfService[serviceType].size()) {
-		//		std::cout<<"err23\n";
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllReportTypesAlreadyAllowed);
 		return true;
 	}
