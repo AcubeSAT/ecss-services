@@ -55,7 +55,6 @@ private:
 	uint8_t countServicesOfApplication(uint8_t applicationID);
 
 	/**
-	 *
 	 * Counts the number of report types, stored for the specified service type.
 	 */
 	uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
