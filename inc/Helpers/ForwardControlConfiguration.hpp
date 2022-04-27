@@ -34,8 +34,17 @@ public:
 	typedef std::pair<uint8_t, uint8_t> appServiceKey;
 
 	/**
-	 * Map containing the Application Process definitions. Each application has its own ID. The combination of the
+	 * Map containing the report type definitions. Each application process has its own ID. The combination of the
 	 * application ID and the service type is used as a key to provide access to the list of report type definitions.
+	 *
+	 * @note
+	 * The report type definitions are basically the message types of each service. For example a message type for the
+	 * 'ParameterStatisticsService' (ST04) is 'ParameterStatisticsService::MessageType::ParameterStatisticsReport'. The
+	 * Real Time Forwarding Control Service (ST14) uses this map as a lookup table, to identify whether a requested
+	 * triplet (app->service->message type) is allowed to be forwarded to the ground station via the corresponding virtual
+	 * channel. The requested message type is only forwarded, if the requested application process ID and service type
+	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
+	 * to the appID and service type.
 	 */
 	etl::map<appServiceKey, reportTypeDefinitions,
 	         ECSSMaxControlledApplicationProcesses * ECSSMaxServiceTypeDefinitions>
