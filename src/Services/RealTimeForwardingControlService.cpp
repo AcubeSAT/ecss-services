@@ -5,14 +5,16 @@ void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applic
 	for (auto& service: AllMessageTypes::messagesOfService) {
 		uint8_t serviceType = service.first;
 		for (auto message: service.second) {
-			applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].push_back(message);
+			auto appServicePair = std::make_pair(applicationID, serviceType);
+			applicationProcessConfiguration.definitions[appServicePair].push_back(message);
 		}
 	}
 }
 
 void RealTimeForwardingControlService::addAllReportsOfService(uint8_t applicationID, uint8_t serviceType) {
 	for (auto& messageType: AllMessageTypes::messagesOfService[serviceType]) {
-		applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].push_back(messageType);
+		auto appServicePair = std::make_pair(applicationID, serviceType);
+		applicationProcessConfiguration.definitions[appServicePair].push_back(messageType);
 	}
 }
 
@@ -28,7 +30,8 @@ uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t app
 }
 
 uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicationID, uint8_t serviceType) {
-	return applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].size();
+	auto appServicePair = std::make_pair(applicationID, serviceType);
+	return applicationProcessConfiguration.definitions[appServicePair].size();
 }
 
 bool RealTimeForwardingControlService::isAppControlled(Message& request, uint8_t applicationId) {
@@ -151,7 +154,8 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 					continue;
 				}
 				// todo: check if message type is valid.
-				applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].push_back(
+				auto appServicePair = std::make_pair(applicationID, serviceType);
+				applicationProcessConfiguration.definitions[appServicePair].push_back(
 				    messageType);
 			}
 		}
