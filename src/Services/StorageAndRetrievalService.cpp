@@ -2,7 +2,7 @@
 
 String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
 	uint8_t packetStoreId[ECSSPacketStoreIdSize];
-	message.readString(packetStoreId, ECSxPacketStoreIdSize);
+	message.readString(packetStoreId, ECSSPacketStoreIdSize);
 	return packetStoreId;
 }
 
