@@ -34,7 +34,7 @@ public:
 	const TimeStampType timeStamping = PacketBased;
 
 private:
-	typedef String<ECSSMaxPacketStoreIdSize> packetStoreId;
+	typedef String<ECSSPacketStoreIdSize> packetStoreId;
 
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
@@ -44,7 +44,7 @@ private:
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
 	 */
-	static inline String<ECSSMaxPacketStoreIdSize> readPacketStoreId(Message& message);
+	static inline String<ECSSPacketStoreIdSize> readPacketStoreId(Message& message);
 
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
@@ -53,7 +53,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
+	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -87,8 +87,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool checkPacketStores(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                       const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
+	bool checkPacketStores(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
+	                       const String<ECSSPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
 	 * Checks whether the time window makes logical sense (end time should be after the start time)
@@ -104,7 +104,7 @@ private:
 	 * checking.
 	 * @param request used to raise errors.
 	 */
-	bool checkDestinationPacketStore(const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, Message& request);
+	bool checkDestinationPacketStore(const String<ECSSPacketStoreIdSize>& toPacketStoreId, Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
@@ -116,7 +116,7 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t startTime,
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, uint32_t startTime,
 	                             uint32_t endTime, Message& request);
 
 	/**
@@ -127,7 +127,7 @@ private:
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
 	                             Message& request, bool isAfterTimeTag);
 
 	/**
@@ -138,8 +138,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedFromTagToTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
+	bool failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
 	                        uint32_t endTime, Message& request);
 
 	/**
@@ -150,8 +150,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedAfterTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
+	bool failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
 	                        Message& request);
 
 	/**
@@ -162,8 +162,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedBeforeTimeTag(const String<ECSSMaxPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSMaxPacketStoreIdSize>& toPacketStoreId, uint32_t endTime,
+	bool failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
+	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t endTime,
 	                         Message& request);
 
 	/**
@@ -172,12 +172,12 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedStartOfByTimeRangeRetrieval(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, Message& request);
+	bool failedStartOfByTimeRangeRetrieval(const String<ECSSPacketStoreIdSize>& packetStoreId, Message& request);
 
 	/**
 	 * Forms the content summary of the specified packet-store and appends it to a report message.
 	 */
-	void createContentSummary(Message& report, const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+	void createContentSummary(Message& report, const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 public:
 	inline static const uint8_t ServiceType = 15;
@@ -211,12 +211,12 @@ public:
 	/**
 	 * Adds new packet store into packet stores.
 	 */
-	void addPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, const PacketStore& packetStore);
+	void addPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const PacketStore& packetStore);
 
 	/**
 	 * Adds telemetry to the specified packet store and timestamps it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId, uint32_t timestamp);
+	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, uint32_t timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.
@@ -231,12 +231,12 @@ public:
 	/**
 	 * Returns the packet store with the specified packet store ID.
 	 */
-	PacketStore& getPacketStore(const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+	PacketStore& getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 	/**
 	 * Returns true if the specified packet store is present in packet stores.
 	 */
-	bool packetStoreExists(const String<ECSSMaxPacketStoreIdSize>& packetStoreId);
+	bool packetStoreExists(const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 	/**
 	 * Given a request that contains a number N, followed by N packet store IDs, this method calls function on every

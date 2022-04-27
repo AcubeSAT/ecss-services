@@ -19,12 +19,12 @@ void initializePacketStores() {
 	uint8_t virtualChannels[4] = {4, 6, 1, 2};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
+		uint8_t packetStoreData[ECSSPacketStoreIdSize];
 		std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
 
-		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		PacketStore newPacketStore;
 		newPacketStore.sizeInBytes = sizes[i];
 		newPacketStore.packetStoreType = ((i % 2) == 0) ? PacketStore::Circular : PacketStore::Bounded;
@@ -43,12 +43,12 @@ void validPacketStoreCreationRequest(Message& request) {
 	uint8_t packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
+		uint8_t packetStoreData[ECSSPacketStoreIdSize];
 		std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
 
-		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
 		request.appendUint16(sizes[i]);
 		if ((i % 2) == 0) {
@@ -72,12 +72,12 @@ void invalidPacketStoreCreationRequest(Message& request) {
 	uint8_t packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize];
+		uint8_t packetStoreData[ECSSPacketStoreIdSize];
 		std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
 
-		String<ECSSMaxPacketStoreIdSize> packetStoreId(packetStoreData);
+		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
 		request.appendUint16(sizes[i]);
 		if ((i % 2) == 0) {
@@ -89,43 +89,43 @@ void invalidPacketStoreCreationRequest(Message& request) {
 	}
 }
 
-etl::array<String<ECSSMaxPacketStoreIdSize>, 4> validPacketStoreIds() {
-	uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
-	uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
-	uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps799";
-	uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps5555";
+etl::array<String<ECSSPacketStoreIdSize>, 4> validPacketStoreIds() {
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
+	uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps25";
+	uint8_t packetStoreData3[ECSSPacketStoreIdSize] = "ps799";
+	uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
-	String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
-	String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
-	String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
-	String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+	String<ECSSPacketStoreIdSize> id(packetStoreData);
+	String<ECSSPacketStoreIdSize> id2(packetStoreData2);
+	String<ECSSPacketStoreIdSize> id3(packetStoreData3);
+	String<ECSSPacketStoreIdSize> id4(packetStoreData4);
 
-	etl::array<String<ECSSMaxPacketStoreIdSize>, 4> validPacketStores = {id, id2, id3, id4};
+	etl::array<String<ECSSPacketStoreIdSize>, 4> validPacketStores = {id, id2, id3, id4};
 	return validPacketStores;
 }
 
-etl::array<String<ECSSMaxPacketStoreIdSize>, 4> invalidPacketStoreIds() {
-	uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps1";
-	uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps36";
-	uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps999";
-	uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps1234";
+etl::array<String<ECSSPacketStoreIdSize>, 4> invalidPacketStoreIds() {
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps36";
+	uint8_t packetStoreData3[ECSSPacketStoreIdSize] = "ps999";
+	uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps1234";
 
-	String<ECSSMaxPacketStoreIdSize> id(packetStoreData);
-	String<ECSSMaxPacketStoreIdSize> id2(packetStoreData2);
-	String<ECSSMaxPacketStoreIdSize> id3(packetStoreData3);
-	String<ECSSMaxPacketStoreIdSize> id4(packetStoreData4);
+	String<ECSSPacketStoreIdSize> id(packetStoreData);
+	String<ECSSPacketStoreIdSize> id2(packetStoreData2);
+	String<ECSSPacketStoreIdSize> id3(packetStoreData3);
+	String<ECSSPacketStoreIdSize> id4(packetStoreData4);
 
-	etl::array<String<ECSSMaxPacketStoreIdSize>, 4> validPacketStores = {id, id2, id3, id4};
+	etl::array<String<ECSSPacketStoreIdSize>, 4> validPacketStores = {id, id2, id3, id4};
 	return validPacketStores;
 }
 
-void padWithZeros(etl::array<String<ECSSMaxPacketStoreIdSize>, 4>& packetStoreIds) {
+void padWithZeros(etl::array<String<ECSSPacketStoreIdSize>, 4>& packetStoreIds) {
 	uint8_t offsets[] = {3, 4, 5, 6};
 	int index = 0;
 	// Padding every empty position with zeros, to avoid memory garbage collection, which leads to a faulty result.
 	for (auto& packetStoreId : packetStoreIds) {
 		uint8_t startingPosition = offsets[index++];
-		for (uint8_t i = startingPosition; i < ECSSMaxPacketStoreIdSize; i++) {
+		for (uint8_t i = startingPosition; i < ECSSPacketStoreIdSize; i++) {
 			packetStoreId[i] = 0;
 		}
 	}
@@ -191,8 +191,8 @@ TEST_CASE("Creating packet stores") {
 	}
 
 	SECTION("Invalid packet store creation request") {
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
-		String<ECSSMaxPacketStoreIdSize> existingPacketStoreId(packetStoreData);
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
+		String<ECSSPacketStoreIdSize> existingPacketStoreId(packetStoreData);
 		PacketStore existingPacketStore;
 		storageAndRetrieval.addPacketStore(existingPacketStoreId, existingPacketStore);
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 1);
@@ -1159,10 +1159,10 @@ TEST_CASE("Reporting the status of packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
-		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
-		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps799";
-		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
 		int count = 0;
 		for (auto& packetStoreId : packetStoreIds) {
@@ -1185,26 +1185,26 @@ TEST_CASE("Reporting the status of packet stores") {
 		REQUIRE(report.readUint16() == 4);
 
 		// Packet store 1
-		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		uint8_t data[ECSSPacketStoreIdSize];
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData)));
 		CHECK(report.readBoolean() == true);
 		CHECK(report.readEnum8() == 1);
 		CHECK(report.readBoolean() == false);
 		// Packet store 2
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData2)));
 		CHECK(report.readBoolean() == false);
 		CHECK(report.readEnum8() == 0);
 		CHECK(report.readBoolean() == true);
 		// Packet store 3
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData4)));
 		CHECK(report.readBoolean() == false);
 		CHECK(report.readEnum8() == 0);
 		CHECK(report.readBoolean() == true);
 		// Packet store 4
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData3)));
 		CHECK(report.readBoolean() == true);
 		CHECK(report.readEnum8() == 1);
@@ -1222,10 +1222,10 @@ TEST_CASE("Reporting the configuration of packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
-		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
-		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps799";
-		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
 		int count = 0;
 		for (auto& packetStoreId : packetStoreIds) {
@@ -1246,26 +1246,26 @@ TEST_CASE("Reporting the configuration of packet stores") {
 		REQUIRE(report.readUint16() == 4);
 
 		// Packet store 1
-		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		uint8_t data[ECSSPacketStoreIdSize];
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData)));
 		CHECK(report.readUint16() == 100);
 		CHECK(report.readUint8() == 0);
 		CHECK(report.readUint8() == 4);
 		// Packet store 2
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData2)));
 		CHECK(report.readUint16() == 200);
 		CHECK(report.readUint8() == 1);
 		CHECK(report.readUint8() == 6);
 		// Packet store 3
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData4)));
 		CHECK(report.readUint16() == 340);
 		CHECK(report.readUint8() == 1);
 		CHECK(report.readUint8() == 2);
 		// Packet store 4
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData3)));
 		CHECK(report.readUint16() == 550);
 		CHECK(report.readUint8() == 0);
@@ -1481,7 +1481,7 @@ TEST_CASE("Changing the packet store type to circular") {
 			count++;
 		}
 
-		String<ECSSMaxPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
@@ -1569,7 +1569,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 			count++;
 		}
 
-		String<ECSSMaxPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
@@ -1661,7 +1661,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 			count++;
 		}
 
-		String<ECSSMaxPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
@@ -1711,8 +1711,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 			request.appendString(packetStoreIds[i]);
 		}
 
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
-		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps25";
 
 		MessageParser::execute(request);
 
@@ -1722,8 +1722,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		REQUIRE(report.readUint16() == 2);
 
 		// Packet store 1
-		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		uint8_t data[ECSSPacketStoreIdSize];
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
@@ -1731,7 +1731,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 30);
 		CHECK(report.readUint16() == 20);
 		// Packet store 2
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
@@ -1757,10 +1757,10 @@ TEST_CASE("Reporting the content summary of packet stores") {
 			count++;
 		}
 
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
-		uint8_t packetStoreData2[ECSSMaxPacketStoreIdSize] = "ps25";
-		uint8_t packetStoreData3[ECSSMaxPacketStoreIdSize] = "ps5555";
-		uint8_t packetStoreData4[ECSSMaxPacketStoreIdSize] = "ps799";
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps25";
+		uint8_t packetStoreData3[ECSSPacketStoreIdSize] = "ps5555";
+		uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps799";
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
@@ -1776,8 +1776,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		REQUIRE(report.readUint16() == 4);
 
 		// Packet store 1
-		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		uint8_t data[ECSSPacketStoreIdSize];
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
@@ -1785,7 +1785,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 30);
 		CHECK(report.readUint16() == 0);
 		// Packet store 2
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
@@ -1793,7 +1793,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 25);
 		CHECK(report.readUint16() == 10);
 		// Packet store 3
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
 		CHECK(report.readUint32() == timestamps4[0]);
 		CHECK(report.readUint32() == timestamps4[7]);
@@ -1801,7 +1801,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint16() == 40);
 		CHECK(report.readUint16() == 30);
 		// Packet store 4
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
 		CHECK(report.readUint32() == timestamps3[0]);
 		CHECK(report.readUint32() == timestamps3[3]);
@@ -1822,7 +1822,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		String<ECSSMaxPacketStoreIdSize> finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
+		String<ECSSPacketStoreIdSize> finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
 		                                                correctPacketStoreIds[0]};
 
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag = 5;
@@ -1836,7 +1836,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 			request.appendString(finalIds[i]);
 		}
 
-		uint8_t packetStoreData[ECSSMaxPacketStoreIdSize] = "ps2";
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
 
 		MessageParser::execute(request);
 
@@ -1848,8 +1848,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		REQUIRE(report.readUint16() == 1);
 
 		// Packet store 1
-		uint8_t data[ECSSMaxPacketStoreIdSize];
-		report.readString(data, ECSSMaxPacketStoreIdSize);
+		uint8_t data[ECSSPacketStoreIdSize];
+		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
@@ -2082,7 +2082,7 @@ TEST_CASE("Deleting packet store content") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		String<ECSSMaxPacketStoreIdSize> finalIds[7] = {
+		String<ECSSPacketStoreIdSize> finalIds[7] = {
 		    wrongPacketStoreIds[0],   wrongPacketStoreIds[1],   wrongPacketStoreIds[2],  correctPacketStoreIds[0],
 		    correctPacketStoreIds[1], correctPacketStoreIds[2], correctPacketStoreIds[3]};
 

@@ -177,7 +177,7 @@ inline const uint16_t ECSSMaxPacketStores = 4;
 /**
  * @brief each packet store's id is an etl::string. So this defines the max size of a packet store ID in ST[15]
  */
-inline const uint16_t ECSSMaxPacketStoreIdSize = 15;
+inline const uint16_t ECSSPacketStoreIdSize = 15;
 /**
  * @brief Defines the max number of housekeeping structs that the housekeeping service can contain
  */
