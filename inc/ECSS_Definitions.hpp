@@ -174,6 +174,7 @@ inline const uint8_t ECSSMaxControlledApplicationProcesses = 5;
  * The max number of report type blocking definitions per service type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
+ * todo: must change when a service with more report types is implemented.
  */
 inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
 
@@ -181,6 +182,7 @@ inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
  * The max number of service type definitions per application process type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
+ * todo: must change when all 15 services are implemented.
  */
 inline const uint8_t ECSSMaxServiceTypeDefinitions = 10;
 

@@ -18,62 +18,22 @@
  * todo: needs to be updated after the implementation of the remaining ecss services.
  */
 namespace AllMessageTypes {
-	etl::vector<uint8_t, 15> st01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,
-	                                         RequestVerificationService::MessageType::FailedCompletionOfExecution,
-	                                         RequestVerificationService::MessageType::FailedProgressOfExecution,
-	                                         RequestVerificationService::MessageType::FailedRoutingReport,
-	                                         RequestVerificationService::MessageType::FailedStartOfExecution,
-	                                         RequestVerificationService::MessageType::SuccessfulAcceptanceReport,
-	                                         RequestVerificationService::MessageType::SuccessfulCompletionOfExecution,
-	                                         RequestVerificationService::MessageType::SuccessfulProgressOfExecution,
-	                                         RequestVerificationService::MessageType::SuccessfulStartOfExecution};
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st01Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st03Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st04Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st05Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st06Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st11Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st13Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st17Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st19Messages;
+	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st20Messages;
 
-	etl::vector<uint8_t, 15> st03Messages = {
-	    HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport,
-	    HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport,
-	    HousekeepingService::MessageType::GenerateOneShotHousekeepingReport,
-	    HousekeepingService::MessageType::HousekeepingParametersReport,
-	    HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
-	    HousekeepingService::MessageType::HousekeepingStructuresReport};
-
-	etl::vector<uint8_t, 15> st04Messages = {
-	    ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport,
-	    ParameterStatisticsService::MessageType::ParameterStatisticsReport,
-	};
-
-	etl::vector<uint8_t, 15> st05Messages = {EventReportService::MessageType::HighSeverityAnomalyReport,
-	                                         EventReportService::MessageType::DisabledListEventReport,
-	                                         EventReportService::MessageType::InformativeEventReport,
-	                                         EventReportService::MessageType::LowSeverityAnomalyReport,
-	                                         EventReportService::MessageType::MediumSeverityAnomalyReport};
-
-	etl::vector<uint8_t, 15> st06Messages = {MemoryManagementService::MessageType::CheckRawMemoryDataReport,
-	                                         MemoryManagementService::MessageType::DumpRawMemoryDataReport};
-
-	etl::vector<uint8_t, 15> st11Messages = {TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
-
-	etl::vector<uint8_t, 15> st13Messages = {LargePacketTransferService::MessageType::FirstDownlinkPartReport,
-	                                         LargePacketTransferService::MessageType::InternalDownlinkPartReport,
-	                                         LargePacketTransferService::MessageType::LastDownlinkPartReport};
-
-	etl::vector<uint8_t, 15> st17Messages = {TestService::MessageType::AreYouAliveTestReport,
-	                                         TestService::MessageType::OnBoardConnectionTestReport};
-
-	etl::vector<uint8_t, 15> st19Messages = {EventActionService::MessageType::EventActionStatusReport};
-
-	etl::vector<uint8_t, 15> st20Messages = {ParameterService::MessageType::ParameterValuesReport};
-
-	etl::map<uint8_t, etl::vector<uint8_t, 15>, 100> messagesOfService = {
-	    {RequestVerificationService::ServiceType, st01Messages},
-	    {HousekeepingService::ServiceType, st03Messages},
-	    {ParameterStatisticsService::ServiceType, st04Messages},
-	    {EventReportService::ServiceType, st05Messages},
-	    {MemoryManagementService::ServiceType, st06Messages},
-	    {TimeBasedSchedulingService::ServiceType, st11Messages},
-	    {LargePacketTransferService::ServiceType, st13Messages},
-	    {TestService::ServiceType, st17Messages},
-	    {EventActionService::ServiceType, st19Messages},
-	    {ParameterService::ServiceType, st20Messages}};
+	/**
+	 * Map containing all the message types, per service. The key is the ServiceType and the value,
+	 * an etl vector containing the message types.
+	 */
+	extern etl::map<uint8_t, etl::vector<uint8_t, ECSSMaxReportTypeDefinitions>, ECSSMaxServiceTypeDefinitions> messagesOfService;
 
 } // namespace AllMessageTypes
 
