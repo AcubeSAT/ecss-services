@@ -31,9 +31,10 @@
 #define SERVICE_PARAMETER ///<  Compile ST[20] parameter management
 #define SERVICE_PARAMETERSTATISTICS ///<  Compile ST[04] parameter statistics
 #define SERVICE_REQUESTVERIFICATION ///<  Compile ST[01] request verification
-#define SERVICE_TEST ///<  Compile ST[17] test
-#define SERVICE_TIME ///<  Compile ST[09] time management
-#define SERVICE_TIMESCHEDULING ///<  Compile ST[11] time-based scheduling
+#define SERVICE_STORAGEANDRETRIEVAL ///<  Compile ST[15] storage-and-retrieval of tm packets
+#define SERVICE_TEST                ///<  Compile ST[17] test
+#define SERVICE_TIME                ///<  Compile ST[09] time management
+#define SERVICE_TIMESCHEDULING      ///<  Compile ST[11] time-based scheduling
 #endif
 /** @} */
 

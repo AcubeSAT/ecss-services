@@ -11,6 +11,7 @@
 #include "Services/TestService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
+#include "Services/StorageAndRetrievalService.hpp"
 #include "Services/HousekeepingService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
@@ -75,6 +76,10 @@ public:
 
 #ifdef SERVICE_REQUESTVERIFICATION
 	RequestVerificationService requestVerification;
+#endif
+
+#ifdef SERVICE_STORAGEANDRETRIEVAL
+	StorageAndRetrievalService storageAndRetrieval;
 #endif
 
 #ifdef SERVICE_TEST

@@ -1,9 +1,10 @@
-#include <ServicePool.hpp>
-#include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
-#include "macros.hpp"
-#include "Services/RequestVerificationService.hpp"
+#include <ServicePool.hpp>
+#include <iostream>
+#include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "macros.hpp"
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
@@ -42,6 +43,11 @@ void MessageParser::execute(Message& message) {
 		case TimeBasedSchedulingService::ServiceType:
 			Services.timeBasedScheduling.execute(message);
 			break;
+#endif
+
+#ifdef SERVICE_STORAGEANDRETRIEVAL
+		case StorageAndRetrievalService::ServiceType:
+			Services.storageAndRetrieval.execute(message);
 #endif
 
 #ifdef SERVICE_ONBOARDMONITORING
@@ -188,7 +194,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 
 	// Parts of the header
 	uint16_t packetId = message.applicationId;
-	packetId |= (1U << 11U); // Secondary header flag
+	packetId |= (1U << 11U);                                              // Secondary header flag
 	packetId |= (message.packetType == Message::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
 	uint16_t packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size();
