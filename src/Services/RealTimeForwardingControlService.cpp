@@ -19,6 +19,7 @@ bool RealTimeForwardingControlService::findReportType(uint8_t target, uint8_t ap
 }
 
 void RealTimeForwardingControlService::deleteApplicationProcess(uint8_t applicationID) {
+	// todo : maybe we can decrease the number of operations here.
 	auto& definitions = applicationProcessConfiguration.definitions;
 	auto iter = std::find_if(
 	    std::begin(definitions), std::end(definitions), [applicationID](auto& definition) { return applicationID == definition.first.first; });
