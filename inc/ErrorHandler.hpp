@@ -1,8 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
-#include <type_traits>
 #include <stdint.h> // for the uint_8t stepID
+#include <type_traits>
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
@@ -78,13 +78,21 @@ public:
 		 */
 		NestedMessageTooLarge = 11,
 		/**
+		 * Request to copy packets in a time window, whose type is not recognized (ST(15)).
+		 */
+		InvalidTimeWindowType = 12,
+		/**
 		 * A request to access a non existing housekeeping structure in ST[03]
 		 */
-		NonExistentHousekeeping = 12,
+		NonExistentHousekeeping = 13,
 		/**
 		 * Attempt to access an invalid parameter in ST[03]
 		 */
-		NonExistentParameter = 13,
+		NonExistentParameter = 14,
+		/**
+		 * Invalid TimeStamp parameters at creation
+		 */
+		InvalidTimeStampInput = 15,
 	};
 
 	/**
@@ -152,79 +160,208 @@ public:
 		 */
 		GetNonExistingParameter = 8,
 		/**
-		 * Attempt to add definition to the struct map but its already full. (ST[19])
+		 * Attempt to access a packet store that does not exist (ST[15])
 		 */
-		EventActionDefinitionsMapIsFull = 11,
+		NonExistingPacketStore = 9,
+		/**
+		 * Attempt to change the start time tag of a packet store, whose open retrieval status is in progress (ST[15])
+		 */
+		SetPacketStoreWithOpenRetrievalInProgress = 10,
+		/**
+		 * Attempt to resume open retrieval of a packet store, whose by-time-range retrieval is enabled (ST[15])
+		 */
+		SetPacketStoreWithByTimeRangeRetrieval = 11,
+		/**
+		 * Attempt to access a packet with by-time range retrieval enabled (ST[15])
+		 */
+		GetPacketStoreWithByTimeRangeRetrieval = 12,
+		/**
+		 * Attempt to start the by-time-range retrieval of packet store, whose open retrieval is in progress (ST[15])
+		 */
+		GetPacketStoreWithOpenRetrievalInProgress = 13,
+		/**
+		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
+		 */
+		ByTimeRangeRetrievalAlreadyEnabled = 14,
+		/**
+		 * Attempt to create packet store, whose ID already exists (ST[15])
+		 */
+		AlreadyExistingPacketStore = 15,
+		/**
+		 * Attempt to create packet store, when the max number of packet stores is already reached (ST[15])
+		 */
+		MaxNumberOfPacketStoresReached = 16,
+		/**
+		 * Attempt to access a packet store with the storage status enabled (ST[15])
+		 */
+		GetPacketStoreWithStorageStatusEnabled = 17,
+		/**
+		 * Attempt to delete a packet whose by time range retrieval status is enabled (ST[15])
+		 */
+		DeletionOfPacketWithByTimeRangeRetrieval = 18,
+		/**
+		 * Attempt to delete a packet whose open retrieval status is in progress (ST[15])
+		 */
+		DeletionOfPacketWithOpenRetrievalInProgress = 19,
+		/**
+		 * Requested a time window where the start time is larger than the end time (ST[15])
+		 */
+		InvalidTimeWindow = 20,
+		/**
+		 * Attempt to copy a packet store to a destination packet store that is not empty (ST[15])
+		 */
+		DestinationPacketStoreNotEmtpy = 21,
+		/**
+		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
+		 * ST[04]
+		 */
+		InvalidReportingRateError = 22,
+		/**
+		 * Attempt to add definition to the struct map but its already full.(ST[19])
+		 */
+		EventActionDefinitionsMapIsFull = 23,
 		/**
 		 * Attempt to report/delete non existing housekeeping structure (ST[03])
 		 */
-		RequestedNonExistingStructure = 12,
+		RequestedNonExistingStructure = 24,
 		/**
 		 * Attempt to create already created structure (ST[03])
 		 */
-		RequestedAlreadyExistingStructure = 13,
+		RequestedAlreadyExistingStructure = 25,
 		/**
 		 * Attempt to delete structure which has the periodic reporting status enabled (ST[03]) as per 6.3.3.5.2(d-2)
 		 */
-		RequestedDeletionOfEnabledHousekeeping = 14,
+		RequestedDeletionOfEnabledHousekeeping = 26,
 		/**
 		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure
 		 * (ST[03])
 		 */
-		AlreadyExistingParameter = 15,
+		AlreadyExistingParameter = 27,
 		/**
 		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
 		 * enabled (ST[03])
 		 */
-		RequestedAppendToEnabledHousekeeping = 16,
+		RequestedAppendToEnabledHousekeeping = 28,
 		/**
 		 * Attempt to create a new housekeeping structure in Housekeeping Service, when the maximum number of
 		 * housekeeping structures is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfHousekeepingStructures = 17,
+		ExceededMaxNumberOfHousekeepingStructures = 29,
 		/**
 		 * Attempt to add a new simply commutated parameter in a specific housekeeping structure, but the maximum
 		 * number of simply commutated parameters for this structure is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfSimplyCommutatedParameters = 18,
-		/* Attempt to set a reporting rate which is smaller than the parameter sampling rate.
-		 * ST[04]
-		 */
-		InvalidReportingRateError = 19,
+		ExceededMaxNumberOfSimplyCommutatedParameters = 30,
 		/**
-		 * Attempt to set a sampling rate which is greater than the parameter reporting rate.
+		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
 		 * ST[04]
 		 */
-		InvalidSamplingRateError = 20,
+		InvalidSamplingRateError = 31,
 		/**
 		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
 		 */
-		MaxStatisticDefinitionsReached = 21,
+		MaxStatisticDefinitionsReached = 32,
+		/**
+		 * Attempt to set the virtual channel of a packet store to a invalid value (ST[15])
+		 */
+		InvalidVirtualChannel = 33,
+		/**
+		 * Attempt to delete a packet store, whose storage status is enabled (ST[15])
+		 */
+		DeletionOfPacketStoreWithStorageStatusEnabled = 34,
+		/**
+		 * Attempt to copy packets from a packet store to another, but either no packet timestamp falls inside the
+		 * specified timestamp, or more than one boolean argument were given as true in the 'copyPacketsTo' function
+		 * (ST[15])
+		 */
+		CopyOfPacketsFailed = 35,
+		/**
+		 * Attempt to set a packet store size to a value that the available memory cannot handle (ST[15]).
+		 */
+		UnableToHandlePacketStoreSize = 36,
+		/**
+		 * Attempt to delete all parameter monitoring definitions but the Parameter Monitoring Function Status is
+		 * enabled.
+		 */
+		InvalidRequestToDeleteAllParameterMonitoringDefinitions = 37,
+		/**
+		 * Attempt to delete one parameter monitoring definition but its Parameter Monitoring Status is
+		 * enabled.
+		 */
+		InvalidRequestToDeleteParameterMonitoringDefinition = 38,
+		/**
+		 * Attempt to add a parameter that already exists to the Parameter Monitoring List.
+		 */
+		AddAlreadyExistingParameter = 39,
+		/**
+		 * Attempt to add a parameter in the Parameter Monitoring List but it's full
+		 */
+		ParameterMonitoringListIsFull = 40,
+		/**
+		 * Attempt to add or modify a limit check parameter monitoring definition, but the high limit is lower than
+		 * the low limit.
+		 */
+		HighLimitIsLowerThanLowLimit = 41,
+		/**
+		 * Attempt to add or modify a delta check parameter monitoring definition, but the high threshold is lower than
+		 * the low threshold.
+		 */
+		HighThresholdIsLowerThanLowThreshold = 42,
+		/**
+		 * Attempt to modify a non existent Parameter Monitoring definition.
+		 */
+		ModifyParameterNotInTheParameterMonitoringList = 43,
+		/**
+		 * Attempt to modify a parameter monitoring definition, but the instruction refers to a monitored parameter
+		 * that is not the one used in that parameter monitoring definition.
+		 */
+		DifferentParameterMonitoringDefinitionAndMonitoredParameter = 44,
+		/**
+		 * Attempt to get a parameter monitoring definition that does not exist.
+		 */
+		GetNonExistingParameterMonitoringDefinition = 45,
+		/**
+		 * Request to report a non existent parameter monitoring definition.
+		 */
+		ReportParameterNotInTheParameterMonitoringList = 46,
 		/**
 		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
-		AllReportTypesAlreadyAllowed = 22,
+		AllReportTypesAlreadyAllowed = 47,
 		/**
 		 * Attempt to add a new service type, when the addition of all service types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
-		AllServiceTypesAlreadyAllowed = 23,
+		AllServiceTypesAlreadyAllowed = 48,
 		/**
 		 * Attempt to add a new report type, when the max number of reports types allowed per service type
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */
-		MaxReportTypesReached = 24,
+		MaxReportTypesReached = 49,
 		/**
 		 * Attempt to add a new service type, when the max number of service types allowed per application process
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */
-		MaxServiceTypesReached = 25,
+		MaxServiceTypesReached = 50,
 		/**
 		 * Attempt to add a report/event definition/housekeeping report type, when the specified application process
 		 * ID is not controlled by the Service (ST[14])
 		 */
-		NotControlledApplication = 26,
+		NotControlledApplication = 51,
+		/**
+		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
+		 */
+		NonExistingReportTypeDefinition = 52,
+		/**
+		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
+		 */
+		NonExistingServiceTypeDefinition = 53,
+		/**
+		 * Attempt to access a non-existing application process definition, from the application process
+		 * configuration (ST[14])
+		 */
+		NonExistingApplication = 54,
 	};
 
 	/**

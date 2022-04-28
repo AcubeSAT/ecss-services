@@ -1,7 +1,7 @@
 #ifndef ECSS_SERVICES_ECSS_DEFINITIONS_H
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
-#include <stdint.h>
+#include <cstdint>
 /**
  * @defgroup ECSSDefinitions ECSS Defined Constants
  *
@@ -160,6 +160,25 @@ inline const uint8_t ECSSMaxStatisticParameters = 4;
 inline const bool SupportsStandardDeviation = true;
 
 /**
+ * @brief the max number of bytes allowed for a packet store to handle in ST[15].
+ */
+inline const uint16_t ECSSMaxPacketStoreSizeInBytes = 1000;
+
+/**
+ * @brief the max number of TM packets that a packet store in ST[15] can store
+ */
+inline const uint16_t ECSSMaxPacketStoreSize = 20;
+
+/**
+ * @brief the max number of packet stores that a packet selection subservice can handle in ST[15]
+ */
+inline const uint16_t ECSSMaxPacketStores = 4;
+
+/**
+ * @brief each packet store's id is an etl::string. So this defines the max size of a packet store ID in ST[15]
+ */
+inline const uint16_t ECSSPacketStoreIdSize = 15;
+/**
  * @brief Defines the max number of housekeeping structs that the housekeeping service can contain
  */
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
@@ -191,6 +210,19 @@ inline const uint8_t ECSSMaxServiceTypeDefinitions = 15;
  */
 inline const uint8_t ECSSMaxEventDefinitionIDs = 15;
 
-/** @} */
+/**
+ * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
+ */
+inline struct {
+	uint8_t min = 1;
+	uint8_t max = 10;
+} VirtualChannelLimits;
 
+/**
+ * Maximum number of ST[12] Parameter Monitoring Definitions.
+ */
+inline const uint8_t ECSSMaxMonitoringDefinitions = 4;
+
+
+/** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
