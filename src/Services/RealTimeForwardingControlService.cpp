@@ -134,7 +134,6 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 		}
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
-			// todo: check if service type is valid.
 			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
 
@@ -153,7 +152,6 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 				if (not checkMessage(request, applicationID, serviceType, messageType)) {
 					continue;
 				}
-				// todo: check if message type is valid.
 				auto appServicePair = std::make_pair(applicationID, serviceType);
 				applicationProcessConfiguration.definitions[appServicePair].push_back(
 				    messageType);
