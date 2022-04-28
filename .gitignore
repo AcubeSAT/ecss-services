@@ -1,7 +1,10 @@
 # Build files
 build
 cmake-build-debug
-docs
+
+# Documentation output
+/docs/html
+/docs/latex
 
 # Dump and continuous integration files
 *.dump
