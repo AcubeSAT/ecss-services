@@ -17,6 +17,44 @@ uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPro
 uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
+void checkAppProcessConfig() {
+	auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+
+	// Check if configuration is initialized properly
+	for (auto appID: applications) {
+		REQUIRE(findApplication(appID));
+
+		for (auto serviceType: services) {
+			auto appServicePair = std::make_pair(appID, serviceType);
+			REQUIRE(findServiceType(appID, serviceType));
+			REQUIRE(applicationProcesses[appServicePair].size() == 2);
+
+			for (auto messageType: messages1) {
+				REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
+				                  applicationProcesses[appServicePair].end(),
+				                  messageType) != applicationProcesses[appServicePair].end());
+			}
+		}
+	}
+}
+
+void initializeAppProcessConfig() {
+	//	uint8_t numOfApplications = 1;
+	//	uint8_t numOfServicesPerApp = 2;
+	//	uint8_t numOfMessagesPerService = 2;
+
+	for (auto appID: applications) {
+		for (auto serviceType: services) {
+			auto appServicePair = std::make_pair(appID, serviceType);
+			for (auto messageType: messages1) {
+				realTimeForwarding.applicationProcessConfiguration.definitions[appServicePair].push_back(
+				    messageType);
+			}
+		}
+	}
+	checkAppProcessConfig();
+}
+
 void validReportTypes(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -188,6 +226,7 @@ void resetAppProcessConfiguration() {
 TEST_CASE("Report the the Application Process Configuration content") {
 	SECTION("Valid reporting of the application process configuration content") {
 		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, 1);
+		initializeAppProcessConfig();
 		MessageParser::execute(request);
 	}
 }
