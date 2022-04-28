@@ -9,19 +9,28 @@ RealTimeForwardingControlService& realTimeForwarding = Services.realTimeForwardi
 
 uint8_t applications[] = {1};
 uint8_t services[] = {3, 5};
-uint8_t allServices[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-uint8_t redundantServices[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+uint8_t allServices[] = {1, 3, 4, 5, 6, 11, 13, 17, 19, 20};
 uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
                        HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport};
 
 uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
+bool findApplication(uint8_t targetAppID) {
+	auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+	return std::any_of(std::begin(definitions), std::end(definitions), [targetAppID](auto definition) { return targetAppID == definition.first.first; });
+}
+
+bool findServiceType(uint8_t applicationID, uint8_t targetService) {
+	auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](auto definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
+}
+
 void checkAppProcessConfig() {
 	auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
-
+	uint8_t applications2[] = {1, 2, 3};
 	// Check if configuration is initialized properly
-	for (auto appID: applications) {
+	for (auto appID: applications2) {
 		REQUIRE(findApplication(appID));
 
 		for (auto serviceType: services) {
@@ -39,11 +48,8 @@ void checkAppProcessConfig() {
 }
 
 void initializeAppProcessConfig() {
-	//	uint8_t numOfApplications = 1;
-	//	uint8_t numOfServicesPerApp = 2;
-	//	uint8_t numOfMessagesPerService = 2;
-
-	for (auto appID: applications) {
+	uint8_t applications2[] = {1, 2, 3};
+	for (auto appID: applications2) {
 		for (auto serviceType: services) {
 			auto appServicePair = std::make_pair(appID, serviceType);
 			for (auto messageType: messages1) {
@@ -55,169 +61,6 @@ void initializeAppProcessConfig() {
 	checkAppProcessConfig();
 }
 
-void validReportTypes(Message& request) {
-	uint8_t numOfApplications = 1;
-	uint8_t numOfServicesPerApp = 2;
-	uint8_t numOfMessagesPerService = 2;
-
-	request.appendUint8(numOfApplications);
-
-	for (auto appID: applications) {
-		request.appendUint8(appID);
-		request.appendUint8(numOfServicesPerApp);
-
-		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
-			uint8_t serviceType = services[j];
-			request.appendUint8(serviceType);
-			request.appendUint8(numOfMessagesPerService);
-			uint8_t* messages = (j == 0) ? messages1 : messages2;
-
-			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages[k]);
-			}
-		}
-	}
-}
-
-void duplicateReportTypes(Message& request) {
-	uint8_t numOfApplications = 1;
-	uint8_t numOfServicesPerApp = 2;
-	uint8_t numOfMessagesPerService = 2;
-
-	request.appendUint8(numOfApplications);
-
-	for (auto appID: applications) {
-		request.appendUint8(appID);
-		request.appendUint8(numOfServicesPerApp);
-
-		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
-			uint8_t serviceType = services[j];
-			request.appendUint8(serviceType);
-			request.appendUint8(numOfMessagesPerService);
-
-			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages1[0]);
-			}
-		}
-	}
-}
-
-void validInvalidReportTypes(Message& request) {
-	uint8_t numOfApplications = 3;
-	uint8_t numOfMessagesPerService = 2;
-
-	uint8_t applications2[] = {1, 2, 3};
-	request.appendUint8(numOfApplications);
-
-	for (uint8_t i = 0; i < numOfApplications; i++) {
-		request.appendUint8(applications2[i]);
-		uint8_t numOfServicesPerApp = (i == 0) ? 17 : 2;
-		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
-		request.appendUint8(numOfServicesPerApp);
-
-		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
-			uint8_t serviceType = servicesToPick[j];
-			request.appendUint8(serviceType);
-			request.appendUint8(numOfMessagesPerService);
-			uint8_t* messages = (j == 0) ? messages1 : messages2;
-
-			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages[k]);
-			}
-		}
-	}
-}
-
-void validAllReportsOfService(Message& request) {
-	uint8_t numOfApplications = 1;
-	uint8_t numOfServicesPerApp = 2;
-	uint8_t numOfMessagesPerService = 0;
-
-	request.appendUint8(numOfApplications);
-
-	for (auto appID: applications) {
-		request.appendUint8(appID);
-		request.appendUint8(numOfServicesPerApp);
-
-		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
-			uint8_t serviceType = services[j];
-			request.appendUint8(serviceType);
-			request.appendUint8(numOfMessagesPerService);
-		}
-	}
-}
-
-void validInvalidAllReportsOfService(Message& request) {
-	uint8_t numOfApplications = 3;
-	uint8_t numOfMessagesPerService = 2;
-
-	uint8_t applications2[] = {1, 2, 3};
-	request.appendUint8(numOfApplications);
-
-	for (uint8_t i = 0; i < numOfApplications; i++) {
-		request.appendUint8(applications2[i]);
-		uint8_t numOfServicesPerApp = (i == 0) ? 17 : 2;
-		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
-		request.appendUint8(numOfServicesPerApp);
-
-		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
-			uint8_t serviceType = servicesToPick[j];
-			request.appendUint8(serviceType);
-			uint8_t numOfMessages = (i == 0 or i == 1) ? 0 : numOfMessagesPerService;
-			request.appendUint8(numOfMessages);
-			if (i >= 2) {
-				uint8_t* messages = (j == 0) ? messages1 : messages2;
-
-				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-					request.appendUint8(messages[k]);
-				}
-			}
-		}
-	}
-}
-
-void validAllReportsOfApp(Message& request) {
-	uint8_t numOfApplications = 1;
-	uint8_t numOfServicesPerApp = 0;
-
-	request.appendUint8(numOfApplications);
-
-	for (auto appID: applications) {
-		request.appendUint8(appID);
-		request.appendUint8(numOfServicesPerApp);
-	}
-}
-
-void validInvalidAllReportsOfApp(Message& request) {
-	uint8_t numOfApplications = 3;
-	uint8_t numOfMessagesPerService = 2;
-
-	uint8_t applications2[] = {1, 2, 3};
-	request.appendUint8(numOfApplications);
-
-	for (uint8_t i = 0; i < numOfApplications; i++) {
-		request.appendUint8(applications2[i]);
-		uint8_t numOfServicesPerApp = (i == 0 or i == 1) ? 0 : 2;
-		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
-		request.appendUint8(numOfServicesPerApp);
-
-		if (i >= 2) {
-			for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
-				uint8_t serviceType = servicesToPick[j];
-				request.appendUint8(serviceType);
-				uint8_t numOfMessages = (i == 0 or i == 1) ? 0 : numOfMessagesPerService;
-				request.appendUint8(numOfMessages);
-
-				uint8_t* messages = (j == 0) ? messages1 : messages2;
-
-				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-					request.appendUint8(messages[k]);
-				}
-			}
-		}
-	}
-}
-
 void resetAppProcessConfiguration() {
 	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
 	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
@@ -227,6 +70,90 @@ TEST_CASE("Report the the Application Process Configuration content") {
 	SECTION("Valid reporting of the application process configuration content") {
 		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, 1);
 		initializeAppProcessConfig();
+
 		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		REQUIRE(report.serviceType == RealTimeForwardingControlService::ServiceType);
+		REQUIRE(report.messageType == RealTimeForwardingControlService::MessageType::AppProcessConfigurationContentReport);
+		REQUIRE(report.readUint8() == 3);
+
+		// Application 1
+		REQUIRE(report.readUint8() == 1);
+		REQUIRE(report.readUint8() == 2);            // num of services
+		REQUIRE(report.readUint8() == 3);            // service 1
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 2
+		REQUIRE(report.readUint8() == 5);            // service 2
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 1
+
+		// Application 2
+		REQUIRE(report.readUint8() == 2);
+		REQUIRE(report.readUint8() == 2);            // num of services
+		REQUIRE(report.readUint8() == 3);            // service 1
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 2
+		REQUIRE(report.readUint8() == 5);            // service 2
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 1
+
+		// Application 3
+		REQUIRE(report.readUint8() == 3);
+		REQUIRE(report.readUint8() == 2);            // num of services
+		REQUIRE(report.readUint8() == 3);            // service 1
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 2
+		REQUIRE(report.readUint8() == 5);            // service 2
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 1
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid reporting of the application process configuration content 2") {
+		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, 1);
+
+		for (auto appID: applications) {
+			for (auto serviceType: allServices) {
+				auto appServicePair = std::make_pair(appID, serviceType);
+				for (auto& message: AllMessageTypes::messagesOfService[serviceType]) {
+					realTimeForwarding.applicationProcessConfiguration.definitions[appServicePair].push_back(message);
+				}
+			}
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		REQUIRE(report.serviceType == RealTimeForwardingControlService::ServiceType);
+		REQUIRE(report.messageType == RealTimeForwardingControlService::MessageType::AppProcessConfigurationContentReport);
+		REQUIRE(report.readUint8() == 1);
+
+		for (auto appID: applications) {
+			REQUIRE(report.readUint8() == appID);
+			uint8_t numOfServices = 10;
+			REQUIRE(report.readUint8() == numOfServices);
+
+			for (auto serviceType: allServices) {
+				REQUIRE(report.readUint8() == serviceType);
+				REQUIRE(report.readUint8() == AllMessageTypes::messagesOfService[serviceType].size());
+				for (auto& message: AllMessageTypes::messagesOfService[serviceType]) {
+					REQUIRE(report.readUint8() == message);
+				}
+			}
+		}
+
+		ServiceTests::reset();
+		Services.reset();
 	}
 }

@@ -6,6 +6,7 @@
 #include "Helpers/ForwardControlConfiguration.hpp"
 #include "Service.hpp"
 #include "etl/vector.h"
+#include "Helpers/AllMessageTypes.hpp"
 
 /**
  * Implementation of the ST[14] 'Real Time Forwarding Control Service' as defined in ECSS-E-ST-70-41C.
