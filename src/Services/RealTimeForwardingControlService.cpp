@@ -1,16 +1,37 @@
 #include "Services/RealTimeForwardingControlService.hpp"
 #include <iostream>
 
-bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID,
-                                                                             uint8_t serviceType) {
-	auto& serviceTypes = applicationProcessConfiguration.definitions[applicationID][serviceType];
+bool RealTimeForwardingControlService::findApplication(uint8_t targetAppID) {
+	auto& definitions = applicationProcessConfiguration.definitions;
+	return std::any_of(std::begin(definitions), std::end(definitions), [targetAppID](auto& definition) { return targetAppID == definition.first.first; });
+}
+
+bool RealTimeForwardingControlService::findServiceType(uint8_t applicationID, uint8_t targetService) {
+	auto& definitions = applicationProcessConfiguration.definitions;
+	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](auto& definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
+}
+
+bool RealTimeForwardingControlService::findReportType(uint8_t target, uint8_t applicationID,
+                                                      uint8_t serviceType) {
+	auto appServicePair = std::make_pair(applicationID, serviceType);
+	auto& serviceTypes = applicationProcessConfiguration.definitions[appServicePair];
 	return std::find(serviceTypes.begin(), serviceTypes.end(), target) != serviceTypes.end();
+}
+
+void RealTimeForwardingControlService::deleteApplicationProcess(uint8_t applicationID) {
+	auto& definitions = applicationProcessConfiguration.definitions;
+	auto iter = std::find_if(
+	    std::begin(definitions), std::end(definitions), [applicationID](auto& definition) { return applicationID == definition.first.first; });
+	while (iter != definitions.end()) {
+		definitions.erase(iter);
+		iter = std::find_if(
+		    std::begin(definitions), std::end(definitions), [applicationID](auto& definition) { return applicationID == definition.first.first; });
+	}
 }
 
 bool RealTimeForwardingControlService::applicationExists(Message& request, uint8_t applicationID,
                                                          uint8_t numOfServices) {
-	if (applicationProcessConfiguration.definitions.find(applicationID) ==
-	    applicationProcessConfiguration.definitions.end()) {
+	if (not findApplication(applicationID)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingApplication);
 		for (uint8_t z = 0; z < numOfServices; z++) {
 			request.skipBytes(1);
@@ -24,8 +45,7 @@ bool RealTimeForwardingControlService::applicationExists(Message& request, uint8
 
 bool RealTimeForwardingControlService::serviceTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType,
                                                          uint8_t numOfMessages) {
-	if (applicationProcessConfiguration.definitions[applicationID].find(serviceType) ==
-	    applicationProcessConfiguration.definitions[applicationID].end()) {
+	if (not findServiceType(applicationID, serviceType)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinition);
 		request.skipBytes(numOfMessages);
 		return false;
@@ -35,7 +55,7 @@ bool RealTimeForwardingControlService::serviceTypeExists(Message& request, uint8
 
 bool RealTimeForwardingControlService::reportTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType,
                                                         uint8_t messageType) {
-	if (not reportExistsInAppProcessConfiguration(messageType, applicationID, serviceType)) {
+	if (not findReportType(messageType, applicationID, serviceType)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinition);
 		return false;
 	}
@@ -43,21 +63,17 @@ bool RealTimeForwardingControlService::reportTypeExists(Message& request, uint8_
 }
 
 void RealTimeForwardingControlService::deleteServiceRecursive(uint8_t applicationID, uint8_t serviceType) {
-	applicationProcessConfiguration.definitions[applicationID].erase(serviceType);
-	applicationProcessConfiguration.notEmpty[applicationID].erase(serviceType);
-
-	if (applicationProcessConfiguration.definitions[applicationID].empty()) {
-		applicationProcessConfiguration.definitions.erase(applicationID);
-		applicationProcessConfiguration.notEmpty.erase(applicationID);
-	}
+	auto appServicePair = std::make_pair(applicationID, serviceType);
+	applicationProcessConfiguration.definitions.erase(appServicePair);
 }
 
 void RealTimeForwardingControlService::deleteReportRecursive(uint8_t applicationID, uint8_t serviceType,
                                                              uint8_t messageType) {
-	auto& reportTypes = applicationProcessConfiguration.definitions[applicationID][serviceType];
+	auto appServicePair = std::make_pair(applicationID, serviceType);
+	auto& reportTypes = applicationProcessConfiguration.definitions[appServicePair];
 	reportTypes.erase(std::remove(reportTypes.begin(), reportTypes.end(), messageType));
 
-	if (applicationProcessConfiguration.definitions[applicationID][serviceType].empty()) {
+	if (applicationProcessConfiguration.definitions[appServicePair].empty()) {
 		deleteServiceRecursive(applicationID, serviceType);
 	}
 }
@@ -68,7 +84,6 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 	uint8_t numOfApplications = request.readUint8();
 	if (numOfApplications == 0) {
 		applicationProcessConfiguration.definitions.clear();
-		applicationProcessConfiguration.notEmpty.clear();
 		return;
 	}
 
@@ -80,8 +95,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 			continue;
 		}
 		if (numOfServices == 0) {
-			applicationProcessConfiguration.definitions.erase(applicationID);
-			applicationProcessConfiguration.notEmpty.erase(applicationID);
+			deleteApplicationProcess(applicationID);
 			continue;
 		}
 

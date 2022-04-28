@@ -31,20 +31,35 @@ public:
 	/**
 	 * Contains the Application IDs, controlled by the Service.
 	 */
-	etl::vector<uint8_t, ECSSMaxControlledApplications> controlledApplications;
+	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
 	/**
 	 * The Application Process configuration, containing all the application process, service type and message type
 	 * definitions.
 	 */
-	ForwardControlConfiguration::ApplicationProcess applicationProcessConfiguration;
+	ApplicationProcessConfiguration applicationProcessConfiguration;
 
 private:
+	/**
+	 * Returns true, if the defined application exists in the application process configuration map.
+	 */
+	bool findApplication(uint8_t targetAppID);
+
+	/**
+	 * Returns true, if the defined service type exists in the application process configuration map.
+	 */
+	bool findServiceType(uint8_t applicationID, uint8_t targetService);
+
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool reportExistsInAppProcessConfiguration(uint8_t target, uint8_t applicationID, uint8_t serviceType);
+	bool findReportType(uint8_t target, uint8_t applicationID, uint8_t serviceType);
+
+	/**
+	 * Deletes every pair containing the requested application process ID, from the application process configuration.
+	 */
+	void deleteApplicationProcess(uint8_t applicationID);
 
 	/**
 	 * Checks whether the requested application is present in the application process configuration.
