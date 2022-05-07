@@ -8,16 +8,9 @@
 #include "etl/vector.h"
 
 /**
- * Implements the Real Time Forward Control configuration, which includes three separate configurations, Application
- * Process configuration, Housekeeping configuration and Event Report configuration. These configurations contain
- * definitions, which indicate whether a telemetry message should be forwarded to the ground station.
- *
- * @author Konstantinos Petridis <petridkon@gmail.com>
- */
-
-/**
  * The Application Process configuration. It's basically a map, storing a vector of report type definitions for each
- * pair of (applicationID, serviceType).
+ * pair of (applicationID, serviceType). It contains definitions, which indicate whether a telemetry message, produced
+ * by a service, inside an application process (subsystem), should be forwarded to the ground station.
  */
 class ApplicationProcessConfiguration {
 public:
