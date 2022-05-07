@@ -3,9 +3,9 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "etl/vector.h"
-#include "etl/map.h"
 #include "Helpers/Parameter.hpp"
+#include "etl/map.h"
+#include "etl/vector.h"
 
 /**
  * Implements the Real Time Forward Control configuration, which includes three separate configurations, Application
@@ -25,7 +25,7 @@ public:
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
 	 * example, a Report Type definition could be 'ReportHousekeepingStructures'.
 	 */
-	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> reportTypeDefinitions;
+	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ReportTypeDefinitions;
 
 	/**
 	 * This is the key for the application process configuration map. It contains a pair with the applicationID and
@@ -46,7 +46,7 @@ public:
 	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
 	 * to the appID and service type.
 	 */
-	etl::map<appServiceKey, reportTypeDefinitions,
+	etl::map<appServiceKey, ReportTypeDefinitions,
 	         ECSSMaxControlledApplicationProcesses * ECSSMaxServiceTypeDefinitions>
 	    definitions;
 
