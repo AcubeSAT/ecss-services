@@ -29,6 +29,7 @@ add_library(common OBJECT
         src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
+        src/Helpers/PacketStore.cpp
         src/Time/UTCTimestamp.cpp
         src/Services/EventReportService.cpp
         src/Services/MemoryManagementService.cpp
@@ -39,6 +40,7 @@ add_library(common OBJECT
         src/Services/EventActionService.cpp
         src/Services/TimeBasedSchedulingService.cpp
         src/Services/FunctionManagementService.cpp
+        src/Services/StorageAndRetrievalService.cpp
         src/Services/HousekeepingService.cpp
         src/Services/ParameterStatisticsService.cpp
         src/Services/OnBoardMonitoringService.cpp
