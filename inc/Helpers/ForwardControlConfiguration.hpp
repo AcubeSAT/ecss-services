@@ -31,7 +31,7 @@ public:
 	 * This is the key for the application process configuration map. It contains a pair with the applicationID and
 	 * the serviceType.
 	 */
-	typedef std::pair<uint8_t, uint8_t> appServiceKey;
+	typedef std::pair<uint8_t, uint8_t> AppServiceKey;
 
 	/**
 	 * Map containing the report type definitions. Each application process has its own ID. The combination of the
@@ -46,7 +46,7 @@ public:
 	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
 	 * to the appID and service type.
 	 */
-	etl::map<appServiceKey, ReportTypeDefinitions,
+	etl::map<AppServiceKey, ReportTypeDefinitions,
 	         ECSSMaxControlledApplicationProcesses * ECSSMaxServiceTypeDefinitions>
 	    definitions;
 
