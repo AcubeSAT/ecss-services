@@ -4,10 +4,7 @@
 void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applicationID) {
 	for (auto& service: AllMessageTypes::messagesOfService) {
 		uint8_t serviceType = service.first;
-		for (auto message: service.second) {
-			auto appServicePair = std::make_pair(applicationID, serviceType);
-			applicationProcessConfiguration.definitions[appServicePair].push_back(message);
-		}
+		addAllReportsOfService(applicationID, serviceType);
 	}
 }
 
