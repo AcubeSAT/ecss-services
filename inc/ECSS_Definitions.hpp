@@ -187,6 +187,13 @@ inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
 inline const uint8_t ECSSMaxServiceTypeDefinitions = 10;
 
 /**
+ * The number of possible combinations between application processes and service types, i.e. the number of all
+ * possible (applicationID, serviceType) pairs.
+ */
+inline const uint8_t ECSSMaxApplicationsServicesCombinations = ECSSMaxControlledApplicationProcesses *
+                                                               ECSSMaxServiceTypeDefinitions;
+
+/**
  * The max number of event definition IDs per event report blocking type definition in the event report blocking
  * configuration
  * @see RealTimeForwardingControlService

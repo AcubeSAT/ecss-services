@@ -43,7 +43,7 @@ bool RealTimeForwardingControlService::isAppControlled(Message& request, uint8_t
 bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID,
                                                                           uint8_t numOfServices) {
 	if (not isAppControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
-		for (uint8_t l = 0; l < numOfServices; l++) {
+		for (uint8_t i = 0; i < numOfServices; i++) {
 			request.skipBytes(1);
 			uint8_t numOfMessages = request.readUint8();
 			request.skipBytes(numOfMessages);
