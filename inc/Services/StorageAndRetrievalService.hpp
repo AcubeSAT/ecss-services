@@ -2,11 +2,11 @@
 #define ECSS_SERVICES_STORAGEANDRETRIEVALSERVICE_HPP
 
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/PacketStore.hpp"
-#include "etl/map.h"
 #include "Helpers/PacketSelectionConfiguration.hpp"
+#include "Helpers/PacketStore.hpp"
+#include "Service.hpp"
+#include "etl/map.h"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -22,12 +22,15 @@ public:
 	/**
 	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
 	 */
-	enum TimeStampType : uint8_t { StorageBased = 0, PacketBased = 1 };
+	enum TimeStampType : uint8_t { StorageBased = 0,
+		                           PacketBased = 1 };
 
 	/**
 	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
 	 */
-	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
+	enum TimeWindowType : uint8_t { FromTagToTag = 0,
+		                            AfterTimeTag = 1,
+		                            BeforeTimeTag = 2 };
 
 	/**
 	 * The type of timestamps that the subservice sets to each incoming telemetry packet.
@@ -355,215 +358,75 @@ public:
 		StorageAndRetrievalService& mainService;
 
 		/**
-		 * Reads a packet store ID from a message.
+		 * Adds all report types of the specified application process definition, to the application process configuration.
 		 */
-		static String<ECSSPacketStoreIdSize> readPacketStoreId(Message& request);
+		void addAllReportsOfApplication(uint8_t applicationID);
 
 		/**
-		 * Checks if the specified packet store exists in the packet selection sub-service.
+		 * Adds all report types of the specified service type, to the application process configuration.
 		 */
-		bool packetStoreExists(const String<ECSSPacketStoreIdSize>& packetStoreId);
+		void addAllReportsOfService(uint8_t applicationID, uint8_t serviceType);
 
 		/**
-		 * Checks if the requested application process id is controlled by the packet selection subservice.
+		 * Counts the number of service types, stored for the specified application process.
 		 */
-		bool appIsControlled(uint8_t applicationId, Message& request);
+		uint8_t countServicesOfApplication(uint8_t applicationID);
 
 		/**
-		 * Checks if the maximum number of report type definitions are reached.
+		 * Counts the number of report types, stored for the specified service type.
 		 */
-		bool exceedsMaxReportDefinitions(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                 uint8_t applicationId, uint8_t serviceId, Message& request);
+		uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
 
 		/**
-		 * Checks if the maximum number of service type definitions is reached.
+		 * Checks whether the specified message type already exists in the specified application process and service
+		 * type definition.
 		 */
-		bool exceedsMaxServiceDefinitions(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                                  Message& request);
+		bool reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 		/**
-		 * Checks if there are no report definitions inside a service type definition, so it decides whether to add a
-		 * new report type definition.
+		 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
+		 * bytes from the request message, in case of an invalid request.
+		 *
+		 * @return True: if the application is valid and passes all the necessary error checking.
 		 */
-		bool noReportDefinitionInService(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                                 uint8_t serviceId, Message& request);
+		bool checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID, uint8_t numOfServices);
 
 		/**
-		 * Checks if there are no service type definitions inside an application definition.
+		 * Checks if the specified application process is controlled by the Service and returns true if it does.
 		 */
-		bool noServiceDefinitionInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                      uint8_t applicationId, Message& request);
+		bool isAppControlled(Message& request, uint8_t applicationId);
 
 		/**
-		 * Adds all the report types of an application process, for a specified packet store.
-		 */
-		void addAllReportDefinitionsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                          uint8_t applicationId);
+		 * Checks if all service types are allowed already, i.e. if the application process contains no service type
+		 * definitions.
+         */
+		bool allServiceTypesAllowed(Message& request, uint8_t applicationID);
 
 		/**
-		 * Adds all the report types of a service type, for a specified packet store and application process.
+		 * Checks if the maximum number of service type definitions per application process is reached.
 		 */
-		void addAllReportDefinitionsOfService(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                      uint8_t applicationId, uint8_t serviceId);
+		bool maxServiceTypesReached(Message& request, uint8_t applicationID);
 
 		/**
-		 * Performs the necessary error checking for a specific application and decides whether the instruction to
-		 * add a report type is valid or not.
+		 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
+		 * from the request message, in case of an invalid request.
+		 *
+		 * @return True: if the service type is valid and passes all the necessary error checking.
 		 */
-		bool checkApplicationForReportTypes(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                                    Message& request);
+		bool checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages);
 
 		/**
-		 * Performs the necessary error checking for a specific service type and decides whether the instruction to
-		 * add a report type in the application process configuration is valid or not.
+		 * Checks if the maximum number of report type definitions per service type definition is reached.
 		 */
-		bool checkService(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                  uint8_t serviceId, Message& request);
+		bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType);
 
 		/**
-		 * Creates a report type definition and adds it to the specified service definition.
+		 * Checks if the maximum number of message types that can be contained inside a service type definition, is
+		 * already reached.
+		 *
+		 * @return True: if the message type is valid and passes all the necessary error checking.
 		 */
-		void addReportDefinition(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                         uint8_t serviceId, uint8_t reportId);
-
-		/**
-		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
-		 * Returns the position of the 'reportId' inside the vector if it exists, and -1 if not.
-		 */
-		int reportExistsInService(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                          uint8_t serviceId, uint8_t reportId);
-
-		/**
-		 * Checks if the requested application ID already exists in the application process configuration, to decide
-		 * whether to add it or not.
-		 */
-		bool appExistsInApplicationConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                         uint8_t applicationId);
-
-		/**
-		 * Checks if the requested service type already exists in the application, to decide whether to add it or not.
-		 */
-		bool serviceExistsInApp(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                        uint8_t serviceId);
-
-		/**
-		 * Deletes either specified, or all report type definitions of a specified service type definition.
-		 */
-		void deleteReportDefinitionsOfService(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                      uint8_t applicationId, uint8_t serviceId, int index);
-
-		/**
-		 * Deletes all service type definitions of a specified application process
-		 */
-		void deleteServiceDefinitionsOfApp(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                   uint8_t applicationId, bool deleteAll, uint8_t serviceId);
-
-		/**
-		 * Performs the necessary error checking for a specific application and decides whether the request to add a
-		 * new housekeeping structure ID in the housekeeping configuration is valid.
-		 */
-		bool checkApplicationForHousekeeping(String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                     uint8_t applicationId, Message& request);
-
-		/**
-		 * Checks if the maximum number of housekeeping structure IDs is reached.
-		 */
-		bool exceedsMaxHousekeepingStructures(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                      uint8_t applicationId, Message& request);
-
-		/**
-		 * Checks if there are no housekeeping structure IDs inside an application.
-		 */
-		bool noStructureIdsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                 uint8_t applicationId, Message& request);
-
-		/**
-		 * Adds a new housekeeping structure ID to the specified application. This version takes into consideration
-		 * the subsampling rate and adds it to the related vector.
-		 */
-		void addHousekeepingStructureId(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                uint8_t applicationId, uint8_t structureId, uint16_t subsamplingRate);
-
-		/**
-		 * Adds a new housekeeping structure ID to the specified application. This version does not take into
-		 * consideration the subsampling rate.
-		 */
-		void addHousekeepingStructureId(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                uint8_t applicationId, uint8_t structureId);
-
-		/**
-		 * Adds all the housekeeping structure IDs, for a specified packet store and a specified application.
-		 */
-		void addAllHousekeepingStructuresOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                               uint8_t applicationId);
-
-		/**
-		 * Checks if the requested application ID already exists in the housekeeping configuration, to decide whether
-		 * to add it or not.
-		 */
-		bool appExistsInHousekeepingConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                          uint8_t applicationId);
-
-		/**
-		 * Checks if the specified housekeeping structure ID exists in the specified application process.
-		 */
-		int structureIdExistsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                   uint8_t applicationId, uint8_t structureId);
-
-		/**
-		 * Deletes a housekeeping structure ID from the housekeeping configuration of the packet selection subservice.
-		 */
-		void deleteHousekeepingStructure(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                 uint8_t applicationId, uint16_t index);
-
-		/**
-		 * Performs the necessary error checking for a specific application and decides whether the request to add a
-		 * new event report definition in the event report configuration is valid.
-		 */
-		bool checkApplicationForEventReports(String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                     uint8_t applicationId, Message& request);
-
-		/**
-		 * Checks if the maximum number of event definitions for a specific application is reached.
-		 */
-		bool exceedsMaxEventDefinitions(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                uint8_t applicationId, Message& request);
-
-		/**
-		 * Checks if there are no event definition IDs for a specific application process.
-		 */
-		bool noEventDefinitionIdsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                       uint8_t applicationId, Message& request);
-
-		/**
-		 * Adds a new event definition ID into a specified application process.
-		 */
-		void addEventDefinitionId(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                          uint8_t eventDefinitionId);
-
-		/**
-		 * Adds all the event definitions of a specified application process, to the event report configuration.
-		 */
-		void addAllEventDefinitionsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                         uint8_t applicationId);
-
-		/**
-		 * Checks if the specified application ID exists in the event report configuration.
-		 */
-		bool appExistsInEventReportConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                         uint8_t applicationId);
-
-		/**
-		 * Checks if an event definition ID exists in the specified application process.
-		 */
-		int eventDefinitionIdExistsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
-		                                         uint8_t applicationId, uint8_t eventDefinitionId);
-
-		/**
-		 * Deletes an event definition ID from the specified application process.
-		 */
-		void deleteEventDefinition(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
-		                           uint16_t index);
+		bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 	public:
 		/**
@@ -583,7 +446,7 @@ public:
 		const bool supportsSubsamplingRate = true;
 		const uint8_t numOfControlledAppProcesses;
 		const uint8_t maxServiceTypeDefinitions; // Per Application Process Definition
-		const uint8_t maxReportTypeDefinitions; // This is per Service Type Definition
+		const uint8_t maxReportTypeDefinitions;  // This is per Service Type Definition
 
 		/**
 		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
