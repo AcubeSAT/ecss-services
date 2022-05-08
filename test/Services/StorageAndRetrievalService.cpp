@@ -2753,3 +2753,10 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		Services.reset();
 	}
 }
+
+StorageAndRetrievalService::PacketSelectionSubservice packetSelection =
+    StorageAndRetrievalService::PacketSelectionSubservice(Services.storageAndRetrieval, 0, 0, 0);
+
+TEST_CASE("Add report types to the packet selection subservice") {
+
+}
