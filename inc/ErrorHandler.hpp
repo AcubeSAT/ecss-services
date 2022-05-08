@@ -280,11 +280,6 @@ public:
 		 */
 		UnableToHandlePacketStoreSize = 36,
 		/**
-		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
-		 * Application Process configuration (ST[14])
-		 */
-		AllReportTypesAlreadyAllowed = 20,
-		/**
 		 * Attempt to add a new service type, when the addition of all service types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */

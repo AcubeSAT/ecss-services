@@ -69,22 +69,12 @@ bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, 
 	return false;
 }
 
-bool RealTimeForwardingControlService::checkService(Message& request, uint8_t applicationID, uint8_t serviceType,
-                                                    uint8_t numOfMessages) {
+bool RealTimeForwardingControlService::checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages) {
 	if (maxServiceTypesReached(request, applicationID)) {
 		request.skipBytes(numOfMessages);
 		return false;
 	}
 	return true;
-}
-
-bool RealTimeForwardingControlService::allReportTypesAllowed(Message& request, uint8_t applicationID,
-                                                             uint8_t serviceType) {
-	if (countReportsOfService(applicationID, serviceType) >= AllMessageTypes::messagesOfService[serviceType].size()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllReportTypesAlreadyAllowed);
-		return true;
-	}
-	return false;
 }
 
 bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, uint8_t applicationID,
@@ -134,7 +124,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
 
-			if (not checkService(request, applicationID, serviceType, numOfMessages)) {
+			if (not checkService(request, applicationID, numOfMessages)) {
 				continue;
 			}
 

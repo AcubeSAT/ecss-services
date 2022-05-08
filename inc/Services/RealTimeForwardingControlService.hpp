@@ -95,13 +95,7 @@ private:
 	 *
 	 * @return True: if the service type is valid and passes all the necessary error checking.
 	 */
-	bool checkService(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
-
-	/**
-	 * Checks if all report types are allowed already, i.e. if the service type definition contains no report type
-	 * definitions.
-	 */
-	bool allReportTypesAllowed(Message& request, uint8_t applicationID, uint8_t serviceType);
+	bool checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages);
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
