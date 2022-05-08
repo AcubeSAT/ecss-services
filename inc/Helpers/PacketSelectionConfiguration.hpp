@@ -39,7 +39,10 @@ public:
 	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
 	 * to the appID and service type.
 	 */
-	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
+	typedef etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> AppServiceDefinitions;
+
+	typedef String<ECSSPacketStoreIdSize> PacketStoreID;
+	etl::map<PacketStoreID, AppServiceDefinitions, ECSSMaxPacketStores> definitions;
 
 	ApplicationProcessConfiguration() = default;
 };

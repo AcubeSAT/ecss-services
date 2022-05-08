@@ -3,11 +3,11 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
+#include "Helpers/AllMessageTypes.hpp"
 #include "Helpers/PacketSelectionConfiguration.hpp"
 #include "Helpers/PacketStore.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
-#include "Helpers/AllMessageTypes.hpp"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -355,35 +355,35 @@ public:
 	 * should or should not be stored into the packet stores. For a specific TM message, if the packet selection
 	 * includes a definition related to that message, it means that it can be stored into the packet stores.
 	 */
-	class PacketSelectionSubservice {
+	class PacketSelectionSubservice { // TODO: add and test one more level (packet store ID)
 	private:
 		StorageAndRetrievalService& mainService;
 
 		/**
 		 * Adds all report types of the specified application process definition, to the application process configuration.
 		 */
-		void addAllReportsOfApplication(uint8_t applicationID);
+		void addAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 
 		/**
 		 * Adds all report types of the specified service type, to the application process configuration.
 		 */
-		void addAllReportsOfService(uint8_t applicationID, uint8_t serviceType);
+		void addAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
 
 		/**
 		 * Counts the number of service types, stored for the specified application process.
 		 */
-		uint8_t countServicesOfApplication(uint8_t applicationID);
+		uint8_t countServicesOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 
 		/**
 		 * Counts the number of report types, stored for the specified service type.
 		 */
-		uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
+		uint8_t countReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
 
 		/**
 		 * Checks whether the specified message type already exists in the specified application process and service
 		 * type definition.
 		 */
-		bool reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+		bool reportExistsInAppProcessConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 		/**
 		 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
@@ -391,7 +391,7 @@ public:
 		 *
 		 * @return True: if the application is valid and passes all the necessary error checking.
 		 */
-		bool checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID, uint8_t numOfServices);
+		bool checkApplicationOfAppProcessConfig(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t numOfServices);
 
 		/**
 		 * Checks if the specified application process is controlled by the Service and returns true if it does.
@@ -402,12 +402,12 @@ public:
 		 * Checks if all service types are allowed already, i.e. if the application process contains no service type
 		 * definitions.
          */
-		bool allServiceTypesAllowed(Message& request, uint8_t applicationID);
+		bool allServiceTypesAllowed(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 
 		/**
 		 * Checks if the maximum number of service type definitions per application process is reached.
 		 */
-		bool maxServiceTypesReached(Message& request, uint8_t applicationID);
+		bool maxServiceTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 
 		/**
 		 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -415,12 +415,12 @@ public:
 		 *
 		 * @return True: if the service type is valid and passes all the necessary error checking.
 		 */
-		bool checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages);
+		bool checkService(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t numOfMessages);
 
 		/**
 		 * Checks if the maximum number of report type definitions per service type definition is reached.
 		 */
-		bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType);
+		bool maxReportTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
 
 		/**
 		 * Checks if the maximum number of message types that can be contained inside a service type definition, is
@@ -428,7 +428,7 @@ public:
 		 *
 		 * @return True: if the message type is valid and passes all the necessary error checking.
 		 */
-		bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+		bool checkMessage(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 	public:
 		/**

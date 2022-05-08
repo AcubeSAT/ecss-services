@@ -2936,41 +2936,41 @@ void resetAppProcessConfiguration() {
 }
 
 TEST_CASE("Add report types to the packet selection subservice") {
-	SECTION("Successful addition of report types to the Application Process Configuration") {
-		Message request(StorageAndRetrievalService::ServiceType,
-		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
-
-		uint8_t applicationID = 1;
-		packetSelection.controlledApplications.push_back(applicationID);
-		validReportTypes(request);
-
-		packetSelection.addReportTypesToAppProcessConfiguration(request);
-
-		CHECK(ServiceTests::count() == 0);
-		auto& applicationProcesses = packetSelection.applicationProcessConfiguration.definitions;
-		REQUIRE(applicationProcesses.size() == 2);
-
-		for (auto appID: applications) {
-			for (uint8_t j = 0; j < 2; j++) {
-				uint8_t serviceType = services[j];
-				auto appServicePair = std::make_pair(appID, serviceType);
-				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
-				REQUIRE(applicationProcesses[appServicePair].size() == 2);
-				uint8_t* messages = (j == 0) ? messages1 : messages2;
-
-				for (uint8_t k = 0; k < 2; k++) {
-					REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
-					                  applicationProcesses[appServicePair].end(),
-					                  messages[k]) != applicationProcesses[appServicePair].end());
-				}
-			}
-		}
-
-		resetAppProcessConfiguration();
-		ServiceTests::reset();
-		Services.reset();
-	}
+//	SECTION("Successful addition of report types to the Application Process Configuration") {
+//		Message request(StorageAndRetrievalService::ServiceType,
+//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+//		                Message::TC, 1);
+//
+//		uint8_t applicationID = 1;
+//		packetSelection.controlledApplications.push_back(applicationID);
+//		validReportTypes(request);
+//
+//		packetSelection.addReportTypesToAppProcessConfiguration(request);
+//
+//		CHECK(ServiceTests::count() == 0);
+//		auto& applicationProcesses = packetSelection.applicationProcessConfiguration.definitions;
+//		REQUIRE(applicationProcesses.size() == 2);
+//
+//		for (auto appID: applications) {
+//			for (uint8_t j = 0; j < 2; j++) {
+//				uint8_t serviceType = services[j];
+//				auto appServicePair = std::make_pair(appID, serviceType);
+//				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
+//				REQUIRE(applicationProcesses[appServicePair].size() == 2);
+//				uint8_t* messages = (j == 0) ? messages1 : messages2;
+//
+//				for (uint8_t k = 0; k < 2; k++) {
+//					REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
+//					                  applicationProcesses[appServicePair].end(),
+//					                  messages[k]) != applicationProcesses[appServicePair].end());
+//				}
+//			}
+//		}
+//
+//		resetAppProcessConfiguration();
+//		ServiceTests::reset();
+//		Services.reset();
+//	}
 
 //	SECTION("Requested Application Process is not controlled by the service") {
 //		Message request(StorageAndRetrievalService::ServiceType,

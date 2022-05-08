@@ -758,23 +758,23 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 	packetStore.virtualChannel = virtualChannel;
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::addAllReportsOfApplication(uint8_t applicationID) {
+void StorageAndRetrievalService::PacketSelectionSubservice::addAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
 	for (auto& service: AllMessageTypes::messagesOfService) {
 		uint8_t serviceType = service.first;
-		addAllReportsOfService(applicationID, serviceType);
+		addAllReportsOfService(packetStoreID, applicationID, serviceType);
 	}
 }
 
-void StorageAndRetrievalService::PacketSelectionSubservice::addAllReportsOfService(uint8_t applicationID, uint8_t serviceType) {
+void StorageAndRetrievalService::PacketSelectionSubservice::addAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
 	for (auto& messageType: AllMessageTypes::messagesOfService[serviceType]) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
-		applicationProcessConfiguration.definitions[appServicePair].push_back(messageType);
+		applicationProcessConfiguration.definitions[packetStoreID][appServicePair].push_back(messageType);
 	}
 }
 
-uint8_t StorageAndRetrievalService::PacketSelectionSubservice::countServicesOfApplication(uint8_t applicationID) {
+uint8_t StorageAndRetrievalService::PacketSelectionSubservice::countServicesOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
 	uint8_t serviceCounter = 0;
-	for (auto& definition: applicationProcessConfiguration.definitions) {
+	for (auto& definition: applicationProcessConfiguration.definitions[packetStoreID]) {
 		auto& pair = definition.first;
 		if (pair.first == applicationID) {
 			serviceCounter++;
@@ -783,9 +783,9 @@ uint8_t StorageAndRetrievalService::PacketSelectionSubservice::countServicesOfAp
 	return serviceCounter;
 }
 
-uint8_t StorageAndRetrievalService::PacketSelectionSubservice::countReportsOfService(uint8_t applicationID, uint8_t serviceType) {
+uint8_t StorageAndRetrievalService::PacketSelectionSubservice::countReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
 	auto appServicePair = std::make_pair(applicationID, serviceType);
-	return applicationProcessConfiguration.definitions[appServicePair].size();
+	return applicationProcessConfiguration.definitions[packetStoreID][appServicePair].size();
 }
 
 bool StorageAndRetrievalService::PacketSelectionSubservice::isAppControlled(Message& request, uint8_t applicationId) {
@@ -797,9 +797,9 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::isAppControlled(Mess
 	return true;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID,
+bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationOfAppProcessConfig(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
                                                                                                uint8_t numOfServices) {
-	if (not isAppControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
+	if (not isAppControlled(request, applicationID) or allServiceTypesAllowed(request, packetStoreID, applicationID)) {
 		for (uint8_t i = 0; i < numOfServices; i++) {
 			request.skipBytes(1);
 			uint8_t numOfMessages = request.readUint8();
@@ -810,70 +810,71 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::checkApplicationOfAp
 	return true;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::allServiceTypesAllowed(Message& request, uint8_t applicationID) {
-	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
+bool StorageAndRetrievalService::PacketSelectionSubservice::allServiceTypesAllowed(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
+	if (countServicesOfApplication(packetStoreID, applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
 		return true;
 	}
 	return false;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::maxServiceTypesReached(Message& request, uint8_t applicationID) {
-	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
+bool StorageAndRetrievalService::PacketSelectionSubservice::maxServiceTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
+	if (countServicesOfApplication(packetStoreID, applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
 	}
 	return false;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages) {
-	if (maxServiceTypesReached(request, applicationID)) {
+bool StorageAndRetrievalService::PacketSelectionSubservice::checkService(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t numOfMessages) {
+	if (maxServiceTypesReached(request, packetStoreID, applicationID)) {
 		request.skipBytes(numOfMessages);
 		return false;
 	}
 	return true;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::maxReportTypesReached(Message& request, uint8_t applicationID,
+bool StorageAndRetrievalService::PacketSelectionSubservice::maxReportTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
                                                                                   uint8_t serviceType) {
-	if (countReportsOfService(applicationID, serviceType) >= AllMessageTypes::messagesOfService[serviceType].size()) {
+	if (countReportsOfService(packetStoreID, applicationID, serviceType) >= AllMessageTypes::messagesOfService[serviceType].size()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
 		return true;
 	}
 	return false;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType,
+bool StorageAndRetrievalService::PacketSelectionSubservice::checkMessage(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType,
                                                                          uint8_t messageType) {
-	if (maxReportTypesReached(request, applicationID, serviceType) or
-	    reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType)) {
+	if (maxReportTypesReached(request, packetStoreID, applicationID, serviceType) or
+	    reportExistsInAppProcessConfiguration(packetStoreID, applicationID, serviceType, messageType)) {
 		return false;
 	}
 	return true;
 }
 
-bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType,
+bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInAppProcessConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType,
                                                                                                   uint8_t messageType) {
 	auto appServicePair = std::make_pair(applicationID, serviceType);
-	return std::find(applicationProcessConfiguration.definitions[appServicePair].begin(),
-	                 applicationProcessConfiguration.definitions[appServicePair].end(),
-	                 messageType) != applicationProcessConfiguration.definitions[appServicePair].end();
+	return std::find(applicationProcessConfiguration.definitions[packetStoreID][appServicePair].begin(),
+	                 applicationProcessConfiguration.definitions[packetStoreID][appServicePair].end(),
+	                 messageType) != applicationProcessConfiguration.definitions[packetStoreID][appServicePair].end();
 }
 
 void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
 	request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration);
+	auto packetStoreID = readPacketStoreId(request);
 	uint8_t numOfApplications = request.readUint8();
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
 		uint8_t applicationID = request.readUint8();
 		uint8_t numOfServices = request.readUint8();
 
-		if (not checkApplicationOfAppProcessConfig(request, applicationID, numOfServices)) {
+		if (not checkApplicationOfAppProcessConfig(request, packetStoreID, applicationID, numOfServices)) {
 			continue;
 		}
 
 		if (numOfServices == 0) {
-			addAllReportsOfApplication(applicationID);
+			addAllReportsOfApplication(packetStoreID, applicationID);
 			continue;
 		}
 
@@ -881,23 +882,23 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppP
 			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
 
-			if (not checkService(request, applicationID, numOfMessages)) {
+			if (not checkService(request, packetStoreID, applicationID, numOfMessages)) {
 				continue;
 			}
 
 			if (numOfMessages == 0) {
-				addAllReportsOfService(applicationID, serviceType);
+				addAllReportsOfService(packetStoreID, applicationID, serviceType);
 				continue;
 			}
 
 			for (uint8_t k = 0; k < numOfMessages; k++) {
 				uint8_t messageType = request.readUint8();
 
-				if (not checkMessage(request, applicationID, serviceType, messageType)) {
+				if (not checkMessage(request, packetStoreID, applicationID, serviceType, messageType)) {
 					continue;
 				}
 				auto appServicePair = std::make_pair(applicationID, serviceType);
-				applicationProcessConfiguration.definitions[appServicePair].push_back(
+				applicationProcessConfiguration.definitions[packetStoreID][appServicePair].push_back(
 				    messageType);
 			}
 		}
