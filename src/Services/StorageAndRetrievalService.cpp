@@ -1,5 +1,19 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
+StorageAndRetrievalService::StorageAndRetrievalService()
+    : packetSelectionSubservice(*this, 5, ECSSMax,
+                                ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS,
+                                ECSS_MAX_SERVICE_TYPE_DEFINITIONS) {
+	serviceType = StorageAndRetrievalService::ServiceType;
+}
+
+StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice(
+    StorageAndRetrievalService& parent, uint16_t numOfControlledAppProcs, uint16_t maxEventDefIds,
+    uint16_t maxHousekeepingStructIds, uint16_t maxReportTypeDefs, uint16_t maxServiceTypeDefs)
+    : mainService(parent), numOfControlledAppProcesses(numOfControlledAppProcs), maxEventDefinitionIds(maxEventDefIds),
+      maxHousekeepingStructureIds(maxHousekeepingStructIds), maxReportTypeDefinitions(maxReportTypeDefs),
+      maxServiceTypeDefinitions(maxServiceTypeDefs), supportsSubsamplingRate(true) {}
+
 String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
 	uint8_t packetStoreId[ECSSPacketStoreIdSize];
 	message.readString(packetStoreId, ECSSPacketStoreIdSize);
