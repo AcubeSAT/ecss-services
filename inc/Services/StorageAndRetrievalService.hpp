@@ -7,6 +7,7 @@
 #include "Helpers/PacketStore.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
+#include "Helpers/AllMessageTypes.hpp"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.

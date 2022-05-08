@@ -8,7 +8,6 @@
 #include "Services/MemoryManagementService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
-#include "Services/RealTimeForwardingControlService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
