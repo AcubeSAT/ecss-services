@@ -46,6 +46,7 @@ add_library(common OBJECT
         src/Services/OnBoardMonitoringService.cpp
         src/Helpers/Statistic.cpp
         src/Helpers/PMONBase.cpp
+        src/Helpers/AllMessageTypes.cpp
         )
 
 # Specify the .cpp files for the executables
