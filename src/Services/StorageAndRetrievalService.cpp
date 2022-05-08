@@ -863,6 +863,11 @@ bool StorageAndRetrievalService::PacketSelectionSubservice::reportExistsInAppPro
 void StorageAndRetrievalService::PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
 	request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration);
 	auto packetStoreID = readPacketStoreId(request);
+	if (not mainService.packetStoreExists(packetStoreID)) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
+		return;
+	}
+
 	uint8_t numOfApplications = request.readUint8();
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {

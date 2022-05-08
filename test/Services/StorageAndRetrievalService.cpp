@@ -1,8 +1,8 @@
+#include "Services/StorageAndRetrievalService.hpp"
 #include <iostream>
-#include "catch2/catch.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "Services/StorageAndRetrievalService.hpp"
+#include "catch2/catch.hpp"
 
 StorageAndRetrievalService& storageAndRetrieval = Services.storageAndRetrieval;
 
@@ -123,7 +123,7 @@ void padWithZeros(etl::array<String<ECSSPacketStoreIdSize>, 4>& packetStoreIds) 
 	uint8_t offsets[] = {3, 4, 5, 6};
 	int index = 0;
 	// Padding every empty position with zeros, to avoid memory garbage collection, which leads to a faulty result.
-	for (auto& packetStoreId : packetStoreIds) {
+	for (auto& packetStoreId: packetStoreIds) {
 		uint8_t startingPosition = offsets[index++];
 		for (uint8_t i = startingPosition; i < ECSSPacketStoreIdSize; i++) {
 			packetStoreId[i] = 0;
@@ -134,16 +134,16 @@ void padWithZeros(etl::array<String<ECSSPacketStoreIdSize>, 4>& packetStoreIds) 
 void addTelemetryPacketsInPacketStores() {
 	auto packetStoreIds = validPacketStoreIds();
 
-	for (auto& timestamp : timestamps1) {
+	for (auto& timestamp: timestamps1) {
 		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[0], timestamp);
 	}
-	for (auto& timestamp : timestamps2) {
+	for (auto& timestamp: timestamps2) {
 		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[1], timestamp);
 	}
-	for (auto& timestamp : timestamps3) {
+	for (auto& timestamp: timestamps3) {
 		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[2], timestamp);
 	}
-	for (auto& timestamp : timestamps4) {
+	for (auto& timestamp: timestamps4) {
 		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[3], timestamp);
 	}
 }
@@ -242,7 +242,7 @@ TEST_CASE("Deleting packet stores") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -270,7 +270,7 @@ TEST_CASE("Deleting packet stores") {
 		uint16_t numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -297,7 +297,7 @@ TEST_CASE("Deleting packet stores") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -332,7 +332,7 @@ TEST_CASE("Deleting packet stores") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -358,7 +358,7 @@ TEST_CASE("Deleting packet stores") {
 		uint16_t numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -394,7 +394,7 @@ TEST_CASE("Deleting packet stores") {
 		uint16_t numOfPacketStores = 8;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -402,7 +402,7 @@ TEST_CASE("Deleting packet stores") {
 			request.appendString(packetStoreId);
 		}
 
-		for (auto& packetStoreId : wrongPacketStoreIds) {
+		for (auto& packetStoreId: wrongPacketStoreIds) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -498,7 +498,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageStatus == true);
 		}
 
@@ -578,7 +578,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageStatus == false);
 		}
 
@@ -602,7 +602,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		request.appendUint32(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
@@ -677,7 +677,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		request.appendUint32(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -711,7 +711,7 @@ TEST_CASE("Resuming the open retrieval process") {
 
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
@@ -787,7 +787,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		uint16_t numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -821,7 +821,7 @@ TEST_CASE("Suspending the open retrieval process") {
 
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
 			request.appendString(packetStoreId);
 		}
@@ -894,7 +894,7 @@ TEST_CASE("Suspending the open retrieval process") {
 		uint16_t numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.packetStoreExists(packetStoreId));
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
 		}
@@ -930,7 +930,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		uint32_t timeTags2[4] = {60, 70, 80, 90};
 
 		int index = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
@@ -1027,7 +1027,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
@@ -1047,7 +1047,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).byTimeRangeRetrievalStatus == false);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).byTimeRangeRetrievalStatus == false);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).retrievalStartTime == 0);
 		}
 
@@ -1069,7 +1069,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 			request.appendString(packetStoreId);
@@ -1100,7 +1100,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 		}
 
@@ -1114,7 +1114,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 
 		CHECK(ServiceTests::count() == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 		}
 
@@ -1134,7 +1134,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		uint16_t numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 		}
 
@@ -1165,7 +1165,7 @@ TEST_CASE("Reporting the status of packet stores") {
 		uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
 		int count = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = (count % 2 == 0);
 			packetStore.byTimeRangeRetrievalStatus = (count % 2 != 0);
@@ -1228,7 +1228,7 @@ TEST_CASE("Reporting the configuration of packet stores") {
 		uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
 		int count = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType =
 			    (count % 2 == 0) ? PacketStore::Circular : PacketStore::Bounded;
 			count++;
@@ -1291,7 +1291,7 @@ TEST_CASE("Resizing the packet stores") {
 		uint16_t numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
@@ -1328,7 +1328,7 @@ TEST_CASE("Resizing the packet stores") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = (index % 2 == 0);
 			packetStore.byTimeRangeRetrievalStatus = (index == 1);
@@ -1347,7 +1347,7 @@ TEST_CASE("Resizing the packet stores") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithByTimeRangeRetrieval) == 1);
 		int i = 0;
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).sizeInBytes == oldSizes[i++]);
 		}
 
@@ -1369,7 +1369,7 @@ TEST_CASE("Resizing the packet stores") {
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -1402,7 +1402,7 @@ TEST_CASE("Resizing the packet stores") {
 
 		uint16_t numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
-		for (auto& packetStoreId : wrongPacketStoreIds) {
+		for (auto& packetStoreId: wrongPacketStoreIds) {
 			request.appendString(packetStoreId);
 			request.appendUint16(35);
 		}
@@ -1412,7 +1412,7 @@ TEST_CASE("Resizing the packet stores") {
 		CHECK(ServiceTests::count() == 4);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 4);
 		int i = 0;
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).sizeInBytes == oldSizes[i++]);
 		}
 
@@ -1428,7 +1428,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.packetStoreType = PacketStore::Bounded;
 			packetStore.storageStatus = false;
@@ -1472,7 +1472,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		padWithZeros(correctPacketStoreIds);
 
 		int count = 0;
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.packetStoreType = PacketStore::Bounded;
 			packetStore.storageStatus = (count == 0);
@@ -1482,7 +1482,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		}
 
 		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
-		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
+		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
 		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
@@ -1517,7 +1517,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType = PacketStore::Circular;
 			storageAndRetrieval.getPacketStore(packetStoreId).storageStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
@@ -1560,7 +1560,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 		padWithZeros(correctPacketStoreIds);
 
 		int count = 0;
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType = PacketStore::Circular;
 			storageAndRetrieval.getPacketStore(packetStoreId).storageStatus = (count == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (count == 1);
@@ -1570,7 +1570,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 		}
 
 		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
-		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
+		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
 		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
@@ -1607,7 +1607,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 
 		uint8_t virtualChannels[2] = {1, 5};
 
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -1654,7 +1654,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		uint8_t oldVirtualChannels[4] = {4, 6, 1, 2};
 
 		int count = 0;
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (count == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (count == 1) ? PacketStore::InProgress : PacketStore::Suspended;
@@ -1662,7 +1662,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		}
 
 		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
-		                                                correctPacketStoreIds[1], correctPacketStoreIds[2]};
+		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
 		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
@@ -1682,7 +1682,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		}
 
 		int index = 0;
-		for (auto& packetStoreId : correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).virtualChannel == oldVirtualChannels[index]);
 			index++;
 		}
@@ -1752,7 +1752,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		padWithZeros(packetStoreIds);
 
 		int count = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag = (count == 3) ? 20 : 15;
 			count++;
 		}
@@ -1823,7 +1823,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		padWithZeros(correctPacketStoreIds);
 
 		String<ECSSPacketStoreIdSize> finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
-		                                                correctPacketStoreIds[0]};
+		                                             correctPacketStoreIds[0]};
 
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag = 5;
 
@@ -1897,11 +1897,11 @@ TEST_CASE("Deleting packet store content") {
 		uint32_t leftTimeStamps2[2];
 
 		int count = 0;
-		for (auto& tmPacket : storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
+		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
 			leftTimeStamps1[count++] = tmPacket.first;
 		}
 		count = 0;
-		for (auto& tmPacket : storageAndRetrieval.getPacketStore(packetStoreIds[1]).storedTelemetryPackets) {
+		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[1]).storedTelemetryPackets) {
 			leftTimeStamps2[count++] = tmPacket.first;
 		}
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets.size() == 3);
@@ -1949,11 +1949,11 @@ TEST_CASE("Deleting packet store content") {
 		uint32_t leftTimeStamps2[8];
 
 		int count = 0;
-		for (auto& tmPacket : storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets) {
+		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets) {
 			leftTimeStamps1[count++] = tmPacket.first;
 		}
 		count = 0;
-		for (auto& tmPacket : storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets) {
+		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets) {
 			leftTimeStamps2[count++] = tmPacket.first;
 		}
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets.size() == 4);
@@ -2019,7 +2019,7 @@ TEST_CASE("Deleting packet store content") {
 		request.appendUint16(numOfPacketStores);
 
 		int count = 0;
-		for (auto& packetStoreId : packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (count == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (count == 1) ? PacketStore::InProgress : PacketStore::Suspended;
@@ -2050,15 +2050,15 @@ TEST_CASE("Deleting packet store content") {
 		uint32_t leftTimeStamps4[6];
 
 		count = 0;
-		for (auto& tmPacket : storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
+		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
 			leftTimeStamps1[count++] = tmPacket.first;
 		}
 		count = 0;
-		for (auto& tmPacket : storageAndRetrieval.getPacketStore(packetStoreIds[1]).storedTelemetryPackets) {
+		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[1]).storedTelemetryPackets) {
 			leftTimeStamps2[count++] = tmPacket.first;
 		}
 		count = 0;
-		for (auto& tmPacket : storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets) {
+		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets) {
 			leftTimeStamps4[count++] = tmPacket.first;
 		}
 
@@ -2083,7 +2083,7 @@ TEST_CASE("Deleting packet store content") {
 		padWithZeros(correctPacketStoreIds);
 
 		String<ECSSPacketStoreIdSize> finalIds[7] = {
-		    wrongPacketStoreIds[0],   wrongPacketStoreIds[1],   wrongPacketStoreIds[2],  correctPacketStoreIds[0],
+		    wrongPacketStoreIds[0], wrongPacketStoreIds[1], wrongPacketStoreIds[2], correctPacketStoreIds[0],
 		    correctPacketStoreIds[1], correctPacketStoreIds[2], correctPacketStoreIds[3]};
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -2213,7 +2213,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 2);
 		int index = 0;
-		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
 			REQUIRE(tmPacket.first == timestamps1[index++]);
 		}
 
@@ -2260,7 +2260,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 4);
 		int index = 3;
-		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
 			REQUIRE(tmPacket.first == timestamps4[index++]);
 		}
 
@@ -2307,7 +2307,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
 		int index = 2;
-		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
 			REQUIRE(tmPacket.first == timestamps2[index++]);
 		}
 
@@ -2541,7 +2541,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		uint32_t existingTimestamps[3];
 
 		int index = 0;
-		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
 			existingTimestamps[index++] = tmPacket.first;
 		}
 		REQUIRE(
@@ -2584,7 +2584,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		uint32_t existingTimestamps[6];
 
 		int index = 0;
-		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
 			existingTimestamps[index++] = tmPacket.first;
 		}
 		REQUIRE(std::equal(std::begin(timestamps1), std::end(timestamps1), std::begin(existingTimestamps)));
@@ -2665,7 +2665,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		uint32_t existingTimestamps[3];
 
 		int index = 0;
-		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
 			existingTimestamps[index++] = tmPacket.first;
 		}
 		REQUIRE(
@@ -2708,7 +2708,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		uint32_t existingTimestamps[6];
 
 		int index = 0;
-		for (auto& tmPacket : targetPacketStore.storedTelemetryPackets) {
+		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
 			existingTimestamps[index++] = tmPacket.first;
 		}
 		REQUIRE(std::equal(std::begin(timestamps1), std::end(timestamps1), std::begin(existingTimestamps)));
@@ -2772,6 +2772,11 @@ void validReportTypes(Message& request) {
 	uint8_t numOfServicesPerApp = 2;
 	uint8_t numOfMessagesPerService = 2;
 
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	std::fill(std::begin(packetStoreData) + 3, std::end(packetStoreData), 0);
+	String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+
+	request.appendString(packetStoreId);
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
@@ -2796,6 +2801,11 @@ void duplicateReportTypes(Message& request) {
 	uint8_t numOfServicesPerApp = 2;
 	uint8_t numOfMessagesPerService = 2;
 
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	std::fill(std::begin(packetStoreData) + 3, std::end(packetStoreData), 0);
+	String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+
+	request.appendString(packetStoreId);
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
@@ -2819,6 +2829,11 @@ void validInvalidReportTypes(Message& request) {
 	uint8_t numOfMessagesPerService = 2;
 
 	uint8_t applications2[] = {1, 2, 3};
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	std::fill(std::begin(packetStoreData) + 3, std::end(packetStoreData), 0);
+	String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+
+	request.appendString(packetStoreId);
 	request.appendUint8(numOfApplications);
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
@@ -2845,6 +2860,11 @@ void validAllReportsOfService(Message& request) {
 	uint8_t numOfServicesPerApp = 2;
 	uint8_t numOfMessagesPerService = 0;
 
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	std::fill(std::begin(packetStoreData) + 3, std::end(packetStoreData), 0);
+	String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+
+	request.appendString(packetStoreId);
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
@@ -2864,6 +2884,11 @@ void validInvalidAllReportsOfService(Message& request) {
 	uint8_t numOfMessagesPerService = 2;
 
 	uint8_t applications2[] = {1, 2, 3};
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	std::fill(std::begin(packetStoreData) + 3, std::end(packetStoreData), 0);
+	String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+
+	request.appendString(packetStoreId);
 	request.appendUint8(numOfApplications);
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
@@ -2891,7 +2916,11 @@ void validInvalidAllReportsOfService(Message& request) {
 void validAllReportsOfApp(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 0;
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	std::fill(std::begin(packetStoreData) + 3, std::end(packetStoreData), 0);
+	String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 
+	request.appendString(packetStoreId);
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
@@ -2905,6 +2934,11 @@ void validInvalidAllReportsOfApp(Message& request) {
 	uint8_t numOfMessagesPerService = 2;
 
 	uint8_t applications2[] = {1, 2, 3};
+	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
+	std::fill(std::begin(packetStoreData) + 3, std::end(packetStoreData), 0);
+	String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+
+	request.appendString(packetStoreId);
 	request.appendUint8(numOfApplications);
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
@@ -2930,374 +2964,424 @@ void validInvalidAllReportsOfApp(Message& request) {
 	}
 }
 
+String<ECSSPacketStoreIdSize> addPacketStoreToPacketSelection() {
+	uint8_t packetStoreData[ECSSPacketStoreIdSize];
+	uint8_t name[4] = "ps1";
+	std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
+
+	std::copy(name, name + 3, packetStoreData);
+	String<ECSSPacketStoreIdSize> packetStoreID(packetStoreData);
+	packetSelection.mainService.addPacketStore(packetStoreID, PacketStore());
+	return packetStoreID;
+}
+
 void resetAppProcessConfiguration() {
 	packetSelection.applicationProcessConfiguration.definitions.clear();
+	packetSelection.controlledApplications.clear();
+	packetSelection.mainService.resetPacketStores();
 	REQUIRE(packetSelection.applicationProcessConfiguration.definitions.empty());
 }
 
 TEST_CASE("Add report types to the packet selection subservice") {
-//	SECTION("Successful addition of report types to the Application Process Configuration") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//
-//		uint8_t applicationID = 1;
-//		packetSelection.controlledApplications.push_back(applicationID);
-//		validReportTypes(request);
-//
-//		packetSelection.addReportTypesToAppProcessConfiguration(request);
-//
-//		CHECK(ServiceTests::count() == 0);
-//		auto& applicationProcesses = packetSelection.applicationProcessConfiguration.definitions;
-//		REQUIRE(applicationProcesses.size() == 2);
-//
-//		for (auto appID: applications) {
-//			for (uint8_t j = 0; j < 2; j++) {
-//				uint8_t serviceType = services[j];
-//				auto appServicePair = std::make_pair(appID, serviceType);
-//				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
-//				REQUIRE(applicationProcesses[appServicePair].size() == 2);
-//				uint8_t* messages = (j == 0) ? messages1 : messages2;
-//
-//				for (uint8_t k = 0; k < 2; k++) {
-//					REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
-//					                  applicationProcesses[appServicePair].end(),
-//					                  messages[k]) != applicationProcesses[appServicePair].end());
-//				}
-//			}
-//		}
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
+	SECTION("Successful addition of report types to the Application Process Configuration") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
 
-//	SECTION("Requested Application Process is not controlled by the service") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//
-//		uint8_t applicationID = 1;
-//		validReportTypes(request);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 1);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
-//		REQUIRE(packetSelection.applicationProcessConfiguration.definitions.empty());
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("All service types already allowed") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//
-//		uint8_t applicationID = 1;
-//		packetSelection.controlledApplications.push_back(applicationID);
-//		validReportTypes(request);
-//
-//		for (uint8_t i = 1; i < ECSSMaxServiceTypeDefinitions + 1; i++) {
-//			packetSelection.applicationProcessConfiguration.definitions[std::make_pair(applicationID, i)];
-//		}
-//		CHECK(packetSelection.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 1);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed) ==
-//		      1);
-//		REQUIRE(packetSelection.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Max service types already reached") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//
-//		uint8_t applicationID = 1;
-//		uint8_t serviceType1 = services[0]; // st03
-//		uint8_t serviceType2 = services[1]; // st05
-//
-//		packetSelection.controlledApplications.push_back(applicationID);
-//		validReportTypes(request);
-//
-//		auto& applicationProcessConfig = packetSelection.applicationProcessConfiguration.definitions;
-//
-//		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
-//			applicationProcessConfig[std::make_pair(applicationID, i)];
-//		}
-//		CHECK(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions - 1);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 1);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 1);
-//		REQUIRE(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions);
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("All report types already allowed") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//
-//		uint8_t applicationID = 1;
-//		uint8_t serviceType = services[0]; // st03
-//		packetSelection.controlledApplications.push_back(applicationID);
-//		validReportTypes(request);
-//
-//		for (auto message: AllMessageTypes::messagesOfService[serviceType]) {
-//			packetSelection.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
-//			    .push_back(message);
-//		}
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 2);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) ==
-//		      2);
-//		REQUIRE(
-//		    packetSelection.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
-//		        .size() == AllMessageTypes::messagesOfService[serviceType].size());
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Max report types already reached") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//
-//		uint8_t applicationID = 1;
-//		uint8_t serviceType1 = services[0]; // st03
-//		uint8_t serviceType2 = services[1]; // st05
-//
-//		packetSelection.controlledApplications.push_back(applicationID);
-//		validReportTypes(request);
-//
-//		auto& applicationProcessConfig = packetSelection.applicationProcessConfiguration;
-//
-//		auto appServicePair1 = std::make_pair(applicationID, serviceType1);
-//		auto appServicePair2 = std::make_pair(applicationID, serviceType2);
-//		REQUIRE(applicationProcessConfig.definitions[appServicePair1].empty());
-//		REQUIRE(applicationProcessConfig.definitions[appServicePair2].empty());
-//
-//		auto numOfMessages1 = AllMessageTypes::messagesOfService[serviceType1].size();
-//		auto numOfMessages2 = AllMessageTypes::messagesOfService[serviceType2].size();
-//
-//		for (uint8_t i = 0; i < numOfMessages1 - 1; i++) {
-//			applicationProcessConfig.definitions[appServicePair1].push_back(i);
-//		}
-//		for (uint8_t i = 16; i < numOfMessages2 + 15; i++) {
-//			applicationProcessConfig.definitions[appServicePair2].push_back(i);
-//		}
-//		REQUIRE(applicationProcessConfig.definitions[appServicePair1].size() == numOfMessages1 - 1);
-//		REQUIRE(applicationProcessConfig.definitions[appServicePair2].size() == numOfMessages2 - 1);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 2);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 2);
-//		REQUIRE(applicationProcessConfig.definitions.size() == 2);
-//		REQUIRE(applicationProcessConfig.definitions[appServicePair1].size() == numOfMessages1);
-//		REQUIRE(applicationProcessConfig.definitions[appServicePair2].size() == numOfMessages2);
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Requested  addition of duplicate report type definitions") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//
-//		uint8_t applicationID = 1;
-//		packetSelection.controlledApplications.push_back(applicationID);
-//		duplicateReportTypes(request);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 0);
-//		auto& applicationProcesses = packetSelection.applicationProcessConfiguration.definitions;
-//		REQUIRE(applicationProcesses.size() == 2);
-//
-//		for (auto appID: applications) {
-//			for (auto& serviceType: services) {
-//				auto appServicePair = std::make_pair(appID, serviceType);
-//				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
-//				REQUIRE(applicationProcesses[appServicePair].size() == 1);
-//				REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
-//				                  applicationProcesses[appServicePair].end(),
-//				                  messages1[0]) != applicationProcesses[appServicePair].end());
-//			}
-//		}
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Valid and invalid application-related requests combined") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//		uint8_t applicationID1 = 1;
-//		uint8_t applicationID2 = 2;
-//		uint8_t applicationID3 = 3;
-//		packetSelection.controlledApplications.push_back(applicationID1);
-//		packetSelection.controlledApplications.push_back(applicationID3);
-//		validInvalidReportTypes(request);
-//
-//		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
-//			packetSelection.applicationProcessConfiguration.definitions[std::make_pair(applicationID3, i)];
-//		}
-//		CHECK(packetSelection.applicationProcessConfiguration.definitions.size() ==
-//		      ECSSMaxServiceTypeDefinitions - 1);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 7);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 3);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
-//
-//		auto& definitions = packetSelection.applicationProcessConfiguration.definitions;
-//		REQUIRE(definitions.size() == 20);
-//		for (auto serviceType: allServices) {
-//			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
-//		}
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Valid addition of all report types of a specified service type") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//		uint8_t applicationID1 = 1;
-//		packetSelection.controlledApplications.push_back(applicationID1);
-//		validAllReportsOfService(request);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 0);
-//		auto& applicationProcesses = packetSelection.applicationProcessConfiguration.definitions;
-//		for (auto serviceType: services) {
-//			REQUIRE(applicationProcesses[std::make_pair(applicationID1, serviceType)].size() ==
-//			        AllMessageTypes::messagesOfService[serviceType].size());
-//		}
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Addition of all report types of a service type, combined with invalid requests") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//		uint8_t applicationID1 = 1;
-//		uint8_t applicationID2 = 2;
-//		packetSelection.controlledApplications.push_back(applicationID1);
-//		packetSelection.controlledApplications.push_back(applicationID2);
-//		validInvalidAllReportsOfService(request);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 3);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 2);
-//
-//		auto& definitions = packetSelection.applicationProcessConfiguration.definitions;
-//		REQUIRE(definitions.size() == 12);
-//
-//		int cnt1 = 0;
-//		int cnt2 = 0;
-//		for (auto& pair: definitions) {
-//			if (pair.first.first == applicationID1) {
-//				cnt1++;
-//			} else if (pair.first.first == applicationID2) {
-//				cnt2++;
-//			}
-//		}
-//		REQUIRE(cnt1 == 10);
-//		REQUIRE(cnt2 == 2);
-//
-//		for (auto& serviceType: allServices) {
-//			REQUIRE(definitions[std::make_pair(applicationID1, serviceType)].size() ==
-//			        AllMessageTypes::messagesOfService[serviceType].size());
-//		}
-//		for (auto& serviceType: services) {
-//			REQUIRE(definitions[std::make_pair(applicationID2, serviceType)].size() ==
-//			        AllMessageTypes::messagesOfService[serviceType].size());
-//		}
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Valid addition of all report types of an application process") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//		uint8_t applicationID1 = 1;
-//		packetSelection.controlledApplications.push_back(applicationID1);
-//		validAllReportsOfApp(request);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 0);
-//		auto& definitions = packetSelection.applicationProcessConfiguration.definitions;
-//		REQUIRE(definitions.size() == ECSSMaxServiceTypeDefinitions);
-//
-//		for (auto serviceType: allServices) {
-//			REQUIRE(std::equal(definitions[std::make_pair(applicationID1, serviceType)].begin(),
-//			                   definitions[std::make_pair(applicationID1, serviceType)].end(),
-//			                   AllMessageTypes::messagesOfService[serviceType].begin()));
-//		}
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Addition of all report types of an application process, combined with invalid request") {
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
-//		                Message::TC, 1);
-//		uint8_t applicationID1 = 1;
-//		uint8_t applicationID2 = 2;
-//		packetSelection.controlledApplications.push_back(applicationID1);
-//		packetSelection.controlledApplications.push_back(applicationID2);
-//		validInvalidAllReportsOfApp(request);
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 1);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
-//		auto& definitions = packetSelection.applicationProcessConfiguration.definitions;
-//
-//		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
-//
-//		resetAppProcessConfiguration();
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
+		uint8_t applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(packetSelection.applicationProcessConfiguration.definitions.size() == 1);
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+
+		for (auto appID: applications) {
+			for (uint8_t j = 0; j < 2; j++) {
+				uint8_t serviceType = services[j];
+				auto appServicePair = std::make_pair(appID, serviceType);
+				REQUIRE(definitions.find(appServicePair) != definitions.end());
+				REQUIRE(definitions[appServicePair].size() == 2);
+				uint8_t* messages = (j == 0) ? messages1 : messages2;
+
+				for (uint8_t k = 0; k < 2; k++) {
+					REQUIRE(std::find(definitions[appServicePair].begin(),
+					                  definitions[appServicePair].end(),
+					                  messages[k]) != definitions[appServicePair].end());
+				}
+			}
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Requested packet store, not present in the storage and retrieval subservice") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		packetSelection.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 1);
+		REQUIRE(packetSelection.applicationProcessConfiguration.definitions.empty());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Requested Application Process is not controlled by the service") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		validReportTypes(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		REQUIRE(packetSelection.applicationProcessConfiguration.definitions.empty());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("All service types already allowed") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		for (uint8_t i = 1; i < ECSSMaxServiceTypeDefinitions + 1; i++) {
+			packetSelection.applicationProcessConfiguration.definitions[packetStoreID][std::make_pair(applicationID, i)];
+		}
+		CHECK(packetSelection.applicationProcessConfiguration.definitions[packetStoreID].size() == ECSSMaxServiceTypeDefinitions);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed) ==
+		      1);
+		REQUIRE(packetSelection.applicationProcessConfiguration.definitions[packetStoreID].size() == ECSSMaxServiceTypeDefinitions);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Max service types already reached") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		uint8_t serviceType1 = services[0]; // st03
+		uint8_t serviceType2 = services[1]; // st05
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		auto& applicationProcessConfig = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+
+		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
+			applicationProcessConfig[std::make_pair(applicationID, i)];
+		}
+		CHECK(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions - 1);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 1);
+		REQUIRE(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("All report types already allowed") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		uint8_t serviceType = services[0]; // st03
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		for (auto message: AllMessageTypes::messagesOfService[serviceType]) {
+			packetSelection.applicationProcessConfiguration.definitions[packetStoreID][std::make_pair(applicationID, serviceType)]
+			    .push_back(message);
+		}
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) ==
+		      2);
+		REQUIRE(
+		    packetSelection.applicationProcessConfiguration.definitions[packetStoreID][std::make_pair(applicationID, serviceType)]
+		        .size() == AllMessageTypes::messagesOfService[serviceType].size());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Max report types already reached") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		uint8_t serviceType1 = services[0]; // st03
+		uint8_t serviceType2 = services[1]; // st05
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+
+		auto appServicePair1 = std::make_pair(applicationID, serviceType1);
+		auto appServicePair2 = std::make_pair(applicationID, serviceType2);
+		REQUIRE(definitions[appServicePair1].empty());
+		REQUIRE(definitions[appServicePair2].empty());
+
+		auto numOfMessages1 = AllMessageTypes::messagesOfService[serviceType1].size();
+		auto numOfMessages2 = AllMessageTypes::messagesOfService[serviceType2].size();
+
+		for (uint8_t i = 0; i < numOfMessages1 - 1; i++) {
+			definitions[appServicePair1].push_back(i);
+		}
+		for (uint8_t i = 16; i < numOfMessages2 + 15; i++) {
+			definitions[appServicePair2].push_back(i);
+		}
+		REQUIRE(definitions[appServicePair1].size() == numOfMessages1 - 1);
+		REQUIRE(definitions[appServicePair2].size() == numOfMessages2 - 1);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 2);
+		REQUIRE(definitions.size() == 2);
+		REQUIRE(definitions[appServicePair1].size() == numOfMessages1);
+		REQUIRE(definitions[appServicePair2].size() == numOfMessages2);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Requested  addition of duplicate report type definitions") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		duplicateReportTypes(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+		REQUIRE(definitions.size() == 2);
+
+		for (auto appID: applications) {
+			for (auto& serviceType: services) {
+				auto appServicePair = std::make_pair(appID, serviceType);
+				REQUIRE(definitions.find(appServicePair) != definitions.end());
+				REQUIRE(definitions[appServicePair].size() == 1);
+				REQUIRE(std::find(definitions[appServicePair].begin(),
+				                  definitions[appServicePair].end(),
+				                  messages1[0]) != definitions[appServicePair].end());
+			}
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid and invalid application-related requests combined") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		uint8_t applicationID2 = 2;
+		uint8_t applicationID3 = 3;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID1);
+		packetSelection.controlledApplications.push_back(applicationID3);
+		validInvalidReportTypes(request);
+
+		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
+			packetSelection.applicationProcessConfiguration.definitions[packetStoreID][std::make_pair(applicationID3, i)];
+		}
+		CHECK(packetSelection.applicationProcessConfiguration.definitions[packetStoreID].size() ==
+		      ECSSMaxServiceTypeDefinitions - 1);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 7);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
+
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+		REQUIRE(definitions.size() == 20);
+		for (auto serviceType: allServices) {
+			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid addition of all report types of a specified service type") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID1);
+		validAllReportsOfService(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+		for (auto serviceType: services) {
+			REQUIRE(definitions[std::make_pair(applicationID1, serviceType)].size() ==
+			        AllMessageTypes::messagesOfService[serviceType].size());
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Addition of all report types of a service type, combined with invalid requests") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		uint8_t applicationID2 = 2;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID1);
+		packetSelection.controlledApplications.push_back(applicationID2);
+		validInvalidAllReportsOfService(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 2);
+
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+		REQUIRE(definitions.size() == 12);
+
+		int cnt1 = 0;
+		int cnt2 = 0;
+		for (auto& pair: definitions) {
+			if (pair.first.first == applicationID1) {
+				cnt1++;
+			} else if (pair.first.first == applicationID2) {
+				cnt2++;
+			}
+		}
+		REQUIRE(cnt1 == 10);
+		REQUIRE(cnt2 == 2);
+
+		for (auto& serviceType: allServices) {
+			REQUIRE(definitions[std::make_pair(applicationID1, serviceType)].size() ==
+			        AllMessageTypes::messagesOfService[serviceType].size());
+		}
+		for (auto& serviceType: services) {
+			REQUIRE(definitions[std::make_pair(applicationID2, serviceType)].size() ==
+			        AllMessageTypes::messagesOfService[serviceType].size());
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid addition of all report types of an application process") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID1);
+		validAllReportsOfApp(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+		REQUIRE(definitions.size() == ECSSMaxServiceTypeDefinitions);
+
+		for (auto serviceType: allServices) {
+			REQUIRE(std::equal(definitions[std::make_pair(applicationID1, serviceType)].begin(),
+			                   definitions[std::make_pair(applicationID1, serviceType)].end(),
+			                   AllMessageTypes::messagesOfService[serviceType].begin()));
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Addition of all report types of an application process, combined with invalid request") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		uint8_t applicationID2 = 2;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID1);
+		packetSelection.controlledApplications.push_back(applicationID2);
+		validInvalidAllReportsOfApp(request);
+
+		packetSelection.addReportTypesToAppProcessConfiguration(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		auto& definitions = packetSelection.applicationProcessConfiguration.definitions[packetStoreID];
+
+		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
 }

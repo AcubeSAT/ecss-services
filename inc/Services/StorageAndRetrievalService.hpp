@@ -357,8 +357,6 @@ public:
 	 */
 	class PacketSelectionSubservice { // TODO: add and test one more level (packet store ID)
 	private:
-		StorageAndRetrievalService& mainService;
-
 		/**
 		 * Adds all report types of the specified application process definition, to the application process configuration.
 		 */
@@ -431,6 +429,8 @@ public:
 		bool checkMessage(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 	public:
+		StorageAndRetrievalService& mainService;
+
 		/**
 		 * Constructor of the packet selection sub-service.
 		 */
