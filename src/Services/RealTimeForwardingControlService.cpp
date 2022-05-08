@@ -71,7 +71,7 @@ bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, 
 
 bool RealTimeForwardingControlService::checkService(Message& request, uint8_t applicationID, uint8_t serviceType,
                                                     uint8_t numOfMessages) {
-	if (maxServiceTypesReached(request, applicationID) or allReportTypesAllowed(request, applicationID, serviceType)) {
+	if (maxServiceTypesReached(request, applicationID)) {
 		request.skipBytes(numOfMessages);
 		return false;
 	}

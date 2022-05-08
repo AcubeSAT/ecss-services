@@ -314,9 +314,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AllReportTypesAlreadyAllowed) ==
-		      1);
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) ==
+		      2);
 		REQUIRE(
 		    realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
 		        .size() == AllMessageTypes::messagesOfService[serviceType].size());
