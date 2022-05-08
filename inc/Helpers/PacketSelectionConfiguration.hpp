@@ -42,6 +42,11 @@ public:
 	typedef etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> AppServiceDefinitions;
 
 	typedef String<ECSSPacketStoreIdSize> PacketStoreID;
+
+	/**
+	 * The map containing the application process configuration. The packet store ID is used as key, to access the application
+	 * process definitions, the service type definitions and the message type definitions.
+	 */
 	etl::map<PacketStoreID, AppServiceDefinitions, ECSSMaxPacketStores> definitions;
 
 	ApplicationProcessConfiguration() = default;
