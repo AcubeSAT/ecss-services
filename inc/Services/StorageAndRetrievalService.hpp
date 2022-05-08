@@ -189,6 +189,7 @@ public:
 	enum MessageType : uint8_t {
 		EnableStorageInPacketStores = 1,
 		DisableStorageInPacketStores = 2,
+		AddReportTypesToAppProcessConfiguration = 3,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
 		ReportContentSummaryOfPacketStores = 12,
