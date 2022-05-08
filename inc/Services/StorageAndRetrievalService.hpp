@@ -342,6 +342,266 @@ public:
 	void changeVirtualChannel(Message& request);
 
 	/**
+	 * Implementation of the Packet Selection Subservice of the ST[15] Storage and Retrieval Service.
+	 *
+	 * @brief
+	 * This service provides the capability to control the storage of TM messages to the packet stores of the
+	 * Storage and Retrieval Service. It contains definitions each one indicating whether a specific TM message
+	 * should or should not be stored into the packet stores. For a specific TM message, if the packet selection
+	 * includes a definition related to that message, it means that it can be stored into the packet stores.
+	 */
+	class PacketSelectionSubservice {
+	private:
+		StorageAndRetrievalService& mainService;
+
+		/**
+		 * Reads a packet store ID from a message.
+		 */
+		static String<ECSSPacketStoreIdSize> readPacketStoreId(Message& request);
+
+		/**
+		 * Checks if the specified packet store exists in the packet selection sub-service.
+		 */
+		bool packetStoreExists(const String<ECSSPacketStoreIdSize>& packetStoreId);
+
+		/**
+		 * Checks if the requested application process id is controlled by the packet selection subservice.
+		 */
+		bool appIsControlled(uint8_t applicationId, Message& request);
+
+		/**
+		 * Checks if the maximum number of report type definitions are reached.
+		 */
+		bool exceedsMaxReportDefinitions(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                 uint8_t applicationId, uint8_t serviceId, Message& request);
+
+		/**
+		 * Checks if the maximum number of service type definitions is reached.
+		 */
+		bool exceedsMaxServiceDefinitions(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                                  Message& request);
+
+		/**
+		 * Checks if there are no report definitions inside a service type definition, so it decides whether to add a
+		 * new report type definition.
+		 */
+		bool noReportDefinitionInService(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                                 uint8_t serviceId, Message& request);
+
+		/**
+		 * Checks if there are no service type definitions inside an application definition.
+		 */
+		bool noServiceDefinitionInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                      uint8_t applicationId, Message& request);
+
+		/**
+		 * Adds all the report types of an application process, for a specified packet store.
+		 */
+		void addAllReportDefinitionsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                          uint8_t applicationId);
+
+		/**
+		 * Adds all the report types of a service type, for a specified packet store and application process.
+		 */
+		void addAllReportDefinitionsOfService(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                      uint8_t applicationId, uint8_t serviceId);
+
+		/**
+		 * Performs the necessary error checking for a specific application and decides whether the instruction to
+		 * add a report type is valid or not.
+		 */
+		bool checkApplicationForReportTypes(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                                    Message& request);
+
+		/**
+		 * Performs the necessary error checking for a specific service type and decides whether the instruction to
+		 * add a report type in the application process configuration is valid or not.
+		 */
+		bool checkService(String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                  uint8_t serviceId, Message& request);
+
+		/**
+		 * Creates a report type definition and adds it to the specified service definition.
+		 */
+		void addReportDefinition(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                         uint8_t serviceId, uint8_t reportId);
+
+		/**
+		 * checks if the requested report type already exists in the service type, to decide whether to add it or not.
+		 * Returns the position of the 'reportId' inside the vector if it exists, and -1 if not.
+		 */
+		int reportExistsInService(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                          uint8_t serviceId, uint8_t reportId);
+
+		/**
+		 * Checks if the requested application ID already exists in the application process configuration, to decide
+		 * whether to add it or not.
+		 */
+		bool appExistsInApplicationConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                         uint8_t applicationId);
+
+		/**
+		 * Checks if the requested service type already exists in the application, to decide whether to add it or not.
+		 */
+		bool serviceExistsInApp(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                        uint8_t serviceId);
+
+		/**
+		 * Deletes either specified, or all report type definitions of a specified service type definition.
+		 */
+		void deleteReportDefinitionsOfService(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                      uint8_t applicationId, uint8_t serviceId, int index);
+
+		/**
+		 * Deletes all service type definitions of a specified application process
+		 */
+		void deleteServiceDefinitionsOfApp(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                   uint8_t applicationId, bool deleteAll, uint8_t serviceId);
+
+		/**
+		 * Performs the necessary error checking for a specific application and decides whether the request to add a
+		 * new housekeeping structure ID in the housekeeping configuration is valid.
+		 */
+		bool checkApplicationForHousekeeping(String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                     uint8_t applicationId, Message& request);
+
+		/**
+		 * Checks if the maximum number of housekeeping structure IDs is reached.
+		 */
+		bool exceedsMaxHousekeepingStructures(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                      uint8_t applicationId, Message& request);
+
+		/**
+		 * Checks if there are no housekeeping structure IDs inside an application.
+		 */
+		bool noStructureIdsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                 uint8_t applicationId, Message& request);
+
+		/**
+		 * Adds a new housekeeping structure ID to the specified application. This version takes into consideration
+		 * the subsampling rate and adds it to the related vector.
+		 */
+		void addHousekeepingStructureId(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                uint8_t applicationId, uint8_t structureId, uint16_t subsamplingRate);
+
+		/**
+		 * Adds a new housekeeping structure ID to the specified application. This version does not take into
+		 * consideration the subsampling rate.
+		 */
+		void addHousekeepingStructureId(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                uint8_t applicationId, uint8_t structureId);
+
+		/**
+		 * Adds all the housekeeping structure IDs, for a specified packet store and a specified application.
+		 */
+		void addAllHousekeepingStructuresOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                               uint8_t applicationId);
+
+		/**
+		 * Checks if the requested application ID already exists in the housekeeping configuration, to decide whether
+		 * to add it or not.
+		 */
+		bool appExistsInHousekeepingConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                          uint8_t applicationId);
+
+		/**
+		 * Checks if the specified housekeeping structure ID exists in the specified application process.
+		 */
+		int structureIdExistsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                   uint8_t applicationId, uint8_t structureId);
+
+		/**
+		 * Deletes a housekeeping structure ID from the housekeeping configuration of the packet selection subservice.
+		 */
+		void deleteHousekeepingStructure(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                 uint8_t applicationId, uint16_t index);
+
+		/**
+		 * Performs the necessary error checking for a specific application and decides whether the request to add a
+		 * new event report definition in the event report configuration is valid.
+		 */
+		bool checkApplicationForEventReports(String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                     uint8_t applicationId, Message& request);
+
+		/**
+		 * Checks if the maximum number of event definitions for a specific application is reached.
+		 */
+		bool exceedsMaxEventDefinitions(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                uint8_t applicationId, Message& request);
+
+		/**
+		 * Checks if there are no event definition IDs for a specific application process.
+		 */
+		bool noEventDefinitionIdsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                       uint8_t applicationId, Message& request);
+
+		/**
+		 * Adds a new event definition ID into a specified application process.
+		 */
+		void addEventDefinitionId(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                          uint8_t eventDefinitionId);
+
+		/**
+		 * Adds all the event definitions of a specified application process, to the event report configuration.
+		 */
+		void addAllEventDefinitionsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                         uint8_t applicationId);
+
+		/**
+		 * Checks if the specified application ID exists in the event report configuration.
+		 */
+		bool appExistsInEventReportConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                         uint8_t applicationId);
+
+		/**
+		 * Checks if an event definition ID exists in the specified application process.
+		 */
+		int eventDefinitionIdExistsInApplication(const String<ECSSPacketStoreIdSize>& packetStoreId,
+		                                         uint8_t applicationId, uint8_t eventDefinitionId);
+
+		/**
+		 * Deletes an event definition ID from the specified application process.
+		 */
+		void deleteEventDefinition(const String<ECSSPacketStoreIdSize>& packetStoreId, uint8_t applicationId,
+		                           uint16_t index);
+
+	public:
+		/**
+		 * Constructor of the packet selection sub-service.
+		 */
+		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent, uint16_t numOfControlledAppProcs,
+		                                   uint16_t maxEventDefIds, uint16_t maxHousekeepingStructIds,
+		                                   uint16_t maxReportTypeDefs, uint16_t maxServiceTypeDefs);
+
+		/**
+		 * Vector containing the IDs of the application processes controlled by the packet selection subservice.
+		 */
+		etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
+
+		/**
+		 * Support to subsample the storage of housekeeping reports as per 5.15.4.2.1.d
+		 */
+		const bool supportsSubsamplingRate = true;
+		const uint8_t numOfControlledAppProcesses;
+		const uint8_t maxServiceTypeDefinitions; // Per Application Process Definition
+		const uint8_t maxReportTypeDefinitions; // This is per Service Type Definition
+		const uint8_t maxHousekeepingStructureIds; // Per Housekeeping storage-control definition
+		const uint8_t maxEventDefinitionIds; // Per Event-Report storage-control definition
+
+		/**
+		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
+		 * application processes.
+		 */
+		ApplicationProcessConfiguration applicationProcessConfiguration;
+
+		/**
+		 * TC[15,3] 'add report types to an application process storage control configuration'.
+		 */
+		void addReportTypesToAppProcessConfiguration(Message& request);
+
+	} packetSelectionSubservice;
+
+	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
 	 * is the ground station.
 	 *
