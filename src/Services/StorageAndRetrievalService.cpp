@@ -1,17 +1,14 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
 StorageAndRetrievalService::StorageAndRetrievalService()
-    : packetSelectionSubservice(*this, 5, ECSSMax,
-                                ECSS_MAX_HOUSEKEEPING_STRUCTS_PER_STORAGE_CONTROL, ECSS_MAX_MESSAGE_TYPE_DEFINITIONS,
-                                ECSS_MAX_SERVICE_TYPE_DEFINITIONS) {
+    : packetSelectionSubservice(*this, 5, ECSSMaxReportTypeDefinitions,
+                                ECSSMaxServiceTypeDefinitions) {
 	serviceType = StorageAndRetrievalService::ServiceType;
 }
 
 StorageAndRetrievalService::PacketSelectionSubservice::PacketSelectionSubservice(
-    StorageAndRetrievalService& parent, uint16_t numOfControlledAppProcs, uint16_t maxEventDefIds,
-    uint16_t maxHousekeepingStructIds, uint16_t maxReportTypeDefs, uint16_t maxServiceTypeDefs)
-    : mainService(parent), numOfControlledAppProcesses(numOfControlledAppProcs), maxEventDefinitionIds(maxEventDefIds),
-      maxHousekeepingStructureIds(maxHousekeepingStructIds), maxReportTypeDefinitions(maxReportTypeDefs),
+    StorageAndRetrievalService& parent, uint16_t numOfControlledAppProcs, uint16_t maxReportTypeDefs, uint16_t maxServiceTypeDefs)
+    : mainService(parent), numOfControlledAppProcesses(numOfControlledAppProcs), maxReportTypeDefinitions(maxReportTypeDefs),
       maxServiceTypeDefinitions(maxServiceTypeDefs), supportsSubsamplingRate(true) {}
 
 String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
@@ -39,7 +36,7 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 		return;
 	}
 
-	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
+	for (auto& packet: packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
 		}
@@ -60,7 +57,7 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 		return;
 	}
 
-	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
+	for (auto& packet: packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
 		}
@@ -78,7 +75,7 @@ void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
 		return;
 	}
 
-	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
+	for (auto& packet: packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first > endTime) {
 			break;
 		}
@@ -245,7 +242,7 @@ void StorageAndRetrievalService::executeOnPacketStores(Message& request,
                                                        const std::function<void(PacketStore&)>& function) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			function(packetStore.second);
 		}
 		return;
@@ -310,7 +307,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.byTimeRangeRetrievalStatus) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
@@ -353,7 +350,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 
 	if (numOfPacketStores == 0) {
 		report.appendUint16(packetStores.size());
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			auto packetStoreId = packetStore.first;
 			report.appendString(packetStoreId);
 			createContentSummary(report, packetStoreId);
@@ -393,7 +390,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 	 */
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.openRetrievalStatus == PacketStore::InProgress) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
@@ -424,7 +421,7 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.byTimeRangeRetrievalStatus) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
@@ -455,7 +452,7 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			packetStore.second.openRetrievalStatus = PacketStore::Suspended;
 		}
 		return;
@@ -475,7 +472,7 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			packetStore.second.byTimeRangeRetrievalStatus = false;
 		}
 		return;
@@ -495,7 +492,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 
 	Message report(ServiceType, MessageType::PacketStoresStatusReport, Message::TM, 1);
 	report.appendUint16(packetStores.size());
-	for (auto& packetStore : packetStores) {
+	for (auto& packetStore: packetStores) {
 		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageStatus);
@@ -549,7 +546,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	if (numOfPacketStores == 0) {
 		int numOfPacketStoresToDelete = 0;
 		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[packetStores.size()];
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.storageStatus) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
@@ -610,7 +607,7 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 
 	Message report(ServiceType, MessageType::PacketStoreConfigurationReport, Message::TM, 1);
 	report.appendUint16(packetStores.size());
-	for (auto& packetStore : packetStores) {
+	for (auto& packetStore: packetStores) {
 		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendUint16(packetStore.second.sizeInBytes);

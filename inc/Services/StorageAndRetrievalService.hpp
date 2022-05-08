@@ -570,7 +570,6 @@ public:
 		 * Constructor of the packet selection sub-service.
 		 */
 		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent, uint16_t numOfControlledAppProcs,
-		                                   uint16_t maxEventDefIds, uint16_t maxHousekeepingStructIds,
 		                                   uint16_t maxReportTypeDefs, uint16_t maxServiceTypeDefs);
 
 		/**
@@ -585,8 +584,6 @@ public:
 		const uint8_t numOfControlledAppProcesses;
 		const uint8_t maxServiceTypeDefinitions; // Per Application Process Definition
 		const uint8_t maxReportTypeDefinitions; // This is per Service Type Definition
-		const uint8_t maxHousekeepingStructureIds; // Per Housekeeping storage-control definition
-		const uint8_t maxEventDefinitionIds; // Per Event-Report storage-control definition
 
 		/**
 		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from
