@@ -17,17 +17,6 @@
  * Namespace containing all the message types for every service type.
  */
 namespace AllMessageTypes {
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st01Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st03Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st04Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st05Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st06Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st11Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st13Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st17Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st19Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st20Messages;
-
 	/**
 	 * Map containing all the message types, per service. The key is the ServiceType and the value,
 	 * an etl vector containing the message types.

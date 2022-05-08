@@ -307,7 +307,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypes(request);
 
-		for (auto message: AllMessageTypes::st03Messages) {
+		for (auto message: AllMessageTypes::messagesOfService[serviceType]) {
 			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
 			    .push_back(message);
 		}
