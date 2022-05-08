@@ -6,6 +6,7 @@
 #include "ErrorHandler.hpp"
 #include "Helpers/PacketStore.hpp"
 #include "etl/map.h"
+#include "Helpers/PacketSelectionConfiguration.hpp"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
