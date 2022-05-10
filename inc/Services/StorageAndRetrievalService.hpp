@@ -10,14 +10,15 @@
 #include "etl/map.h"
 
 /**
-* Implementation of the Packet Selection Subservice of the ST[15] Storage and Retrieval Service.
-*
-* @brief
-* This service provides the capability to control the storage of TM messages to the packet stores of the
-* Storage and Retrieval Service. It contains definitions each one indicating whether a specific TM message
-* should or should not be stored into the packet stores. For a specific TM message, if the packet selection
-* includes a definition related to that message, it means that it can be stored into the packet stores.
-*/
+ * Implementation of the Packet Selection Subservice of the ST[15] Storage and Retrieval Service.
+ *
+ * This service provides the capability to control the storage of TM messages to the packet stores of the
+ * Storage and Retrieval Service. It contains definitions each one indicating whether a specific TM message
+ * should or should not be stored into the packet stores. For a specific TM message, if the packet selection
+ * includes a definition related to that message, it means that it can be stored into the packet stores.
+ *
+ * @author Konstantinos Petridis <petridkon@gmail.com>
+ */
 class PacketSelectionSubservice {
 private:
 	/**
