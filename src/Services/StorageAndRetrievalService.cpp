@@ -773,14 +773,8 @@ void StorageAndRetrievalService::PacketSelectionSubservice::addAllReportsOfServi
 }
 
 uint8_t StorageAndRetrievalService::PacketSelectionSubservice::countServicesOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
-	uint8_t serviceCounter = 0;
-	for (auto& definition: applicationProcessConfiguration.definitions[packetStoreID]) {
-		auto& pair = definition.first;
-		if (pair.first == applicationID) {
-			serviceCounter++;
-		}
-	}
-	return serviceCounter;
+	auto& definitions = applicationProcessConfiguration.definitions[packetStoreID];
+	return std::count_if(std::begin(definitions), std::end(definitions), [applicationID](auto& definition) { return applicationID == definition.first.first; });
 }
 
 uint8_t StorageAndRetrievalService::PacketSelectionSubservice::countReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
