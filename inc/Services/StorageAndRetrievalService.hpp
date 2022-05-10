@@ -355,7 +355,7 @@ public:
 	 * should or should not be stored into the packet stores. For a specific TM message, if the packet selection
 	 * includes a definition related to that message, it means that it can be stored into the packet stores.
 	 */
-	class PacketSelectionSubservice { // TODO: add and test one more level (packet store ID)
+	class PacketSelectionSubservice {
 	private:
 		/**
 		 * Adds all report types of the specified application process definition, to the application process configuration.
@@ -368,7 +368,7 @@ public:
 		void addAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
 
 		/**
-		 * Counts the number of service types, stored for the specified application process.
+		 * Counts the number of service types, stored for the specified packet store ID and application process.
 		 */
 		uint8_t countServicesOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 
@@ -378,13 +378,13 @@ public:
 		uint8_t countReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
 
 		/**
-		 * Checks whether the specified message type already exists in the specified application process and service
+		 * Checks whether the specified message type already exists in the specified packet store ID, application process and service
 		 * type definition.
 		 */
 		bool reportExistsInAppProcessConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 		/**
-		 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
+		 * Performs the necessary error checking/logging for a specific packet store ID and application process ID. Also, skips the necessary
 		 * bytes from the request message, in case of an invalid request.
 		 *
 		 * @return True: if the application is valid and passes all the necessary error checking.
@@ -434,21 +434,12 @@ public:
 		/**
 		 * Constructor of the packet selection sub-service.
 		 */
-		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent, uint16_t numOfControlledAppProcs,
-		                                   uint16_t maxReportTypeDefs, uint16_t maxServiceTypeDefs);
+		explicit PacketSelectionSubservice(StorageAndRetrievalService& parent);
 
 		/**
 		 * Vector containing the IDs of the application processes controlled by the packet selection subservice.
 		 */
 		etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
-
-		/**
-		 * Support to subsample the storage of housekeeping reports as per 5.15.4.2.1.d
-		 */
-		const bool supportsSubsamplingRate = true;
-		const uint8_t numOfControlledAppProcesses;
-		const uint8_t maxServiceTypeDefinitions; // Per Application Process Definition
-		const uint8_t maxReportTypeDefinitions;  // This is per Service Type Definition
 
 		/**
 		 * Contains the definitions that the packet selection subservice holds, regarding TM packets coming from

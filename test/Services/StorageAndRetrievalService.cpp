@@ -2755,7 +2755,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 }
 
 StorageAndRetrievalService::PacketSelectionSubservice packetSelection =
-    StorageAndRetrievalService::PacketSelectionSubservice(Services.storageAndRetrieval, 0, 0, 0);
+    StorageAndRetrievalService::PacketSelectionSubservice(Services.storageAndRetrieval);
 
 uint8_t applications[] = {1};
 uint8_t services[] = {3, 5};
