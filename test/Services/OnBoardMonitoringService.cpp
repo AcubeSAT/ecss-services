@@ -478,53 +478,53 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+
+
+	SECTION("Invalid request to report Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 1;
+		uint16_t PMONId = 5;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendEnum16(PMONId);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+
+	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 2;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		etl::array<uint16_t, 2> PMONIds = {0, 5};
+		request.appendEnum16(PMONIds[0]);
+		request.appendEnum16(PMONIds[1]);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
+
+		Message report = ServiceTests::get(1);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
+		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
+		CHECK(report.readUint16() == numberOfIds);
+		CHECK(report.readEnum16() == PMONIds[0]);
+		CHECK(report.readEnum16() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoredParameterId);
+		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled);
+		CHECK(report.readEnum16() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionNumber);
+		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkType);
+		CHECK(report.readUint64() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getMask());
+		CHECK(report.readDouble() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getExpectedValue());
+		CHECK(report.readEnum16() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getUnexpectedValueEvent());
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
-	//
-	//	SECTION("Invalid request to report Parameter Monitoring Definitions") {
-	//		initialiseParameterMonitoringDefinitions();
-	//		uint16_t numberOfIds = 1;
-	//		uint16_t PMONId = 5;
-	//		Message request =
-	//		    Message(OnBoardMonitoringService::ServiceType,
-	//		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
-	//		request.appendUint16(numberOfIds);
-	//		request.appendUint16(PMONId);
-	//		MessageParser::execute(request);
-	//		CHECK(ServiceTests::count() == 1);
-	//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
-	//		clearAllMaps();
-	//		ServiceTests::reset();
-	//		Services.reset();
-	//	}
-	//
-	//	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
-	//		initialiseParameterMonitoringDefinitions();
-	//		uint16_t numberOfIds = 2;
-	//		Message request =
-	//		    Message(OnBoardMonitoringService::ServiceType,
-	//		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
-	//		request.appendUint16(numberOfIds);
-	//		etl::array<uint16_t, 3> PMONIds = {0, 5};
-	//		request.appendUint16(PMONIds[0]);
-	//		request.appendUint16(PMONIds[1]);
-	//		MessageParser::execute(request);
-	//		CHECK(ServiceTests::count() == 2);
-	//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
-	//
-	//		Message report = ServiceTests::get(0);
-	//		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
-	//		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions);
-	//		CHECK(report.readEnum16() == PMONIds[0]);
-	//		CHECK(report.readEnum16() == onBoardMonitoringService.MonitoredParameterIds.at(PMONIds[0]));
-	//		CHECK(report.readEnum8() == onBoardMonitoringService.ParameterMonitoringStatus.at(PMONIds[0]));
-	//		CHECK(report.readEnum16() == onBoardMonitoringService.RepetitionNumber.at(PMONIds[0]));
-	//		CHECK(report.readUint8() == onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds[0]).mask);
-	//		CHECK(report.readUint16() ==
-	//		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds[0]).expectedValue);
-	//		CHECK(report.readEnum8() ==
-	//		      onBoardMonitoringService.ExpectedValueCheckParameters.at(PMONIds[0]).notExpectedValueEvent);
-	//		clearAllMaps();
-	//		ServiceTests::reset();
-	//		Services.reset();
-	//	}
-	//}
