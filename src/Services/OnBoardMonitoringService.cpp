@@ -251,7 +251,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			parameterMonitoringDefinitionReport.appendDouble(
 			    getPMONDefinition(currentPMONId).get().getExpectedValue());
 			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getUnexpectedValueEvent());
-		} else {
+		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::DeltaCheck) {
 			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getLowDeltaThreshold());
 			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getBelowLowThresholdEvent());
 			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getHighDeltaThreshold());
