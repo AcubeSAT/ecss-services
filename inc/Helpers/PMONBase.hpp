@@ -47,19 +47,19 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
 
-	uint16_t getRepetitionCounter(){
+	uint16_t getRepetitionCounter() {
 		return repetitionCounter;
 	}
-	uint16_t getRepetitionNumber(){
+	uint16_t getRepetitionNumber() {
 		return repetitionNumber;
 	}
-	bool isMonitoringEnabled(){
+	bool isMonitoringEnabled() {
 		return monitoringEnabled;
 	}
-	CheckType getCheckType(){
+	CheckType getCheckType() {
 		return checkType;
 	}
-	CheckingStatus getCheckingStatus(){
+	CheckingStatus getCheckingStatus() {
 		return checkingStatus;
 	}
 
@@ -93,12 +93,13 @@ public:
 	double expectedValue;
 	uint64_t mask;
 	uint16_t unexpectedValueEvent;
-	CheckType checkType = ExpectedValueCheck;
 
 	explicit PMONExpectedValueCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double expectedValue,
 	                                uint64_t mask, uint16_t unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
-	      PMONBase(monitoredParameterId, repetitionNumber){};
+	      PMONBase(monitoredParameterId, repetitionNumber) {
+		checkType = ExpectedValueCheck;
+	};
 
 	double getExpectedValue() override {
 		return expectedValue;
@@ -122,12 +123,13 @@ public:
 	uint16_t belowLowLimitEvent;
 	double highLimit;
 	uint16_t aboveHighLimitEvent;
-	CheckType checkType = LimitCheck;
 
 	explicit PMONLimitCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double lowLimit,
 	                        uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
-	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber){};
+	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
+		checkType = LimitCheck;
+	};
 
 	double getLowLimit() override {
 		return lowLimit;
@@ -156,7 +158,6 @@ public:
 	uint16_t belowLowThresholdEvent;
 	double highDeltaThreshold;
 	uint16_t aboveHighThresholdEvent;
-	CheckType checkType = DeltaCheck;
 
 	explicit PMONDeltaCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber,
 	                        uint16_t numberOfConsecutiveDeltaChecks, double lowDeltaThreshold,
@@ -164,21 +165,23 @@ public:
 	                        uint16_t aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
-	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber){};
+	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber) {
+		checkType = DeltaCheck;
+	};
 
-	uint16_t getNumberOfConsecutiveDeltaChecks() override{
+	uint16_t getNumberOfConsecutiveDeltaChecks() override {
 		return numberOfConsecutiveDeltaChecks;
 	}
 
-	double getLowDeltaThreshold() override{
+	double getLowDeltaThreshold() override {
 		return lowDeltaThreshold;
 	}
 
-	uint16_t getBelowLowThresholdEvent() override{
+	uint16_t getBelowLowThresholdEvent() override {
 		return belowLowThresholdEvent;
 	}
 
-	uint16_t getAboveHighThresholdEvent() override{
+	uint16_t getAboveHighThresholdEvent() override {
 		return aboveHighThresholdEvent;
 	}
 };
