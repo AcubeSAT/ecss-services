@@ -181,6 +181,10 @@ public:
 		return belowLowThresholdEvent;
 	}
 
+	double getHighDeltaThreshold() override {
+		return highDeltaThreshold;
+	}
+
 	uint16_t getAboveHighThresholdEvent() override {
 		return aboveHighThresholdEvent;
 	}
