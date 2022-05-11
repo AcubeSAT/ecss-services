@@ -415,15 +415,16 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 TEST_CASE("Report Parameter Monitoring Definitions") {
 	SECTION("Valid request to report Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
-		uint16_t numberOfIds = 3;
+		uint16_t numberOfIds = 4;
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
+		etl::array<uint16_t, 4> PMONIds = {0, 1, 2, 3};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
+		request.appendEnum16(PMONIds[3]);
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 
@@ -468,10 +469,10 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled);
 		CHECK(report.readEnum16() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().repetitionNumber);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkType);
-		CHECK(report.readUint16() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getLowDeltaThreshold());
-		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getBelowLowThresholdEvent());
-		CHECK(report.readUint16() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getHighDeltaThreshold());
-		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getAboveHighThresholdEvent());
+		CHECK(report.readDouble() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getLowDeltaThreshold());
+		CHECK(report.readEnum16() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getBelowLowThresholdEvent());
+		CHECK(report.readDouble() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getHighDeltaThreshold());
+		CHECK(report.readEnum16() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getAboveHighThresholdEvent());
 		CHECK(report.readUint16() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getNumberOfConsecutiveDeltaChecks());
 
 		ServiceTests::reset();
