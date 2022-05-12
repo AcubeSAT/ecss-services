@@ -130,6 +130,7 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end() ||
 		    getPMONDefinition(currentPMONId).get().monitoringEnabled) {
 			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition);
+			currentPMONId = message.readUint16();
 			continue;
 		}
 		parameterMonitoringList.erase(currentPMONId);
