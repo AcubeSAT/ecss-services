@@ -411,6 +411,74 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//	}
 }
 
+TEST_CASE("Delete Parameter Monitoring Definitions") {
+	SECTION("Valid request to Delete Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		const uint16_t numberOfIds = 2;
+		etl::array<uint16_t, numberOfIds> PMONIds = {2, 3};
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.appendEnum16(PMONIds[0]);
+		request.appendEnum16(PMONIds[1]);
+
+		MessageParser::execute(request);
+
+		CHECK(onBoardMonitoringService.getCount(PMONIds[0]) == 0);
+		CHECK(onBoardMonitoringService.getCount(PMONIds[1]) == 0);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Invalid request to Delete Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		const uint16_t numberOfIds = 1;
+		uint16_t PMONId = 0;
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteParameterMonitoringDefinitions, Message::TC, 0);
+
+		request.appendUint16(numberOfIds);
+		request.appendEnum16(PMONId);
+
+		MessageParser::execute(request);
+
+		CHECK(onBoardMonitoringService.getCount(PMONId) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("One valid and one invalid request to Delete Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		const uint16_t numberOfIds = 2;
+		etl::array<uint16_t, numberOfIds> PMONIds = {0, 1};
+
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteParameterMonitoringDefinitions, Message::TC, 0);
+
+		request.appendUint16(numberOfIds);
+		request.appendEnum16(PMONIds[0]);
+		request.appendEnum16(PMONIds[1]);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition) == 1);
+
+		CHECK(onBoardMonitoringService.getCount(PMONIds[0]) == 1);
+		CHECK(onBoardMonitoringService.getCount(PMONIds[1]) == 0);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
 
 TEST_CASE("Report Parameter Monitoring Definitions") {
 	SECTION("Valid request to report Parameter Monitoring Definitions") {
