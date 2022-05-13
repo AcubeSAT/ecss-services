@@ -201,16 +201,16 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
 		etl::array<uint16_t, 3> monitoredParameterIds = {0, 1, 2};
 		etl::array<uint16_t, 3> repetitionNumbers = {5, 3, 8};
-		uint8_t expetedValueCheckMask = 2;
-		uint16_t expectedValue = 10;
+		uint64_t expetedValueCheckMask = 2;
+		double expectedValue = 10;
 		uint16_t unexpectedValueEvent = 5;
-		uint16_t lowLimit = 3;
+		double lowLimit = 3;
 		uint16_t belowLowLimitEvent = 8;
-		uint16_t highLimit = 8;
+		double highLimit = 8;
 		uint16_t aboveHighLimitEvent = 10;
-		uint16_t lowDeltaThreshold = 4;
+		double lowDeltaThreshold = 4;
 		uint16_t belowLowThresholdEvent = 2;
-		uint16_t highDeltaThreshold = 10;
+		double highDeltaThreshold = 10;
 		uint16_t aboveHighThresholdEvent = 1;
 		uint16_t numberOfConsecutiveDeltaChecks = 5;
 
@@ -219,7 +219,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendUint16(repetitionNumbers[0]);
 		request.appendEnum8(PMONBase::ExpectedValueCheck);
 		request.appendUint64(expetedValueCheckMask);
-		// TODO: Find out how to append deduced values.
 		request.appendDouble(expectedValue);
 		request.appendEnum16(unexpectedValueEvent);
 
@@ -249,8 +248,11 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getCount(PMONIds[1]) == 1);
 		CHECK(onBoardMonitoringService.getCount(PMONIds[2]) == 1);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getRepetitionCounter() == 0);
+		auto repNumber1 = onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getRepetitionCounter();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getRepetitionCounter() == 0);
+		auto repNumber2 = onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getRepetitionCounter();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getRepetitionCounter() == 0);
+		auto repNumber3 = onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getRepetitionCounter();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getRepetitionNumber() == repetitionNumbers[0]);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getRepetitionNumber() == repetitionNumbers[1]);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getRepetitionNumber() == repetitionNumbers[2]);
@@ -264,6 +266,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getCheckingStatus() == PMONBase::Unchecked);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getCheckingStatus() == PMONBase::Unchecked);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getExpectedValue() == expectedValue);
+		auto expValue = onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getExpectedValue();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getMask() == expetedValueCheckMask);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getUnexpectedValueEvent() == unexpectedValueEvent);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getLowLimit() == lowLimit);
