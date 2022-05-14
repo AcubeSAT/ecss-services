@@ -1,4 +1,3 @@
-#include <iostream>
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
 #include "ServicePool.hpp"
@@ -20,7 +19,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 
 void ParameterStatisticsService::parameterStatisticsReport() {
 	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
-	report.appendUint64(evaluationStartTime); // Dummy value for start and end time, will change in the end
+	report.appendUint64(evaluationStartTime);
 	auto evaluationStopTime = TimeConverter::currentTimeCustomCUC();
 	report.appendUint64(evaluationStopTime);
 
