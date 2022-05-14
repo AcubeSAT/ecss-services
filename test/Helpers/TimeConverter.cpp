@@ -1,4 +1,4 @@
-#include "TimeConverter.hpp"
+#include "Platform/x86/TimeConverter.hpp"
 #include "catch2/catch.hpp"
 
 TEST_CASE("Conversion of UTC time, to CUC") {

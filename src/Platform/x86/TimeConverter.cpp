@@ -1,4 +1,4 @@
-#include "TimeConverter.hpp"
+#include "Platform/x86/TimeConverter.hpp"
 
 UTCTimestamp TimeConverter::currentTimeUTC() {
 	// todo: in the obc software repo, use the appropriate parameters to get the current UTC time and test it.
