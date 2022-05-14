@@ -17,7 +17,11 @@ public:
 	 * The information needed to compute the UTC time is implementation-specific. This function should
 	 * be reimplemented to work for every format of the time-related parameters.
 	 */
-	static UTCTimestamp currentTimeUTC();
+	static inline UTCTimestamp currentTimeUTC() {
+		// todo: in the obc software repo, use the appropriate parameters to get the current UTC time and test it.
+		UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
+		return currentTime;
+	}
 
 	/**
 	 * Converts the current UTC time, to a CUC formatted timestamp.
@@ -28,7 +32,11 @@ public:
 	 * @return CUC timestamp, formatted as elapsed 100ms ticks.
 	 * @see Time.hpp
 	 */
-	static uint64_t currentTimeCustomCUC();
+	static inline uint64_t currentTimeCustomCUC() {
+		UTCTimestamp timeUTC = currentTimeUTC();
+		TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
+		return timeCUC.asCustomCUCTimestamp().elapsed100msTicks;
+	}
 };
 
 #endif

@@ -46,7 +46,6 @@ add_library(common OBJECT
         src/Services/OnBoardMonitoringService.cpp
         src/Helpers/Statistic.cpp
         src/Helpers/PMONBase.cpp
-        src/Platform/x86/TimeConverter.cpp
         )
 
 # Specify the .cpp files for the executables
