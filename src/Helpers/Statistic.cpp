@@ -4,11 +4,11 @@
 void Statistic::updateStatistics(double value) {
 	if (value > max) {
 		max = value;
-		maxTime = TimeConverter::currentTimeCustomCUC();
+		maxTime = TimeGetter::currentTimeCustomCUC();
 	}
 	if (value < min) {
 		min = value;
-		minTime = TimeConverter::currentTimeCustomCUC();
+		minTime = TimeGetter::currentTimeCustomCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
