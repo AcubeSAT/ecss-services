@@ -1,5 +1,5 @@
-#include "catch2/catch.hpp"
 #include "Time/TimeStamp.hpp"
+#include "catch2/catch.hpp"
 
 using namespace Time;
 

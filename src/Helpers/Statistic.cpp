@@ -10,11 +10,15 @@ void Statistic::updateStatistics(double value) {
 
 	if (value > max) {
 		max = value;
-		// TODO: maxTime = as_CUC_timestamp();
+		UTCTimestamp maxValueTime(2020, 4, 10, 10, 15, 0); // todo: get the current time for max value.
+		TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> time(maxValueTime);
+		maxTime = time.asCustomCUCTimestamp().elapsed100msTicks;
 	}
 	if (value < min) {
 		min = value;
-		// TODO: minTime = as_CUC_timestamp();
+		UTCTimestamp minValueTime(2020, 4, 10, 10, 15, 0); // todo: get the current time for min value.
+		TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> time(minValueTime);
+		maxTime = time.asCustomCUCTimestamp().elapsed100msTicks;
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
