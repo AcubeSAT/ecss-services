@@ -7,7 +7,7 @@
 #include "ErrorHandler.hpp"
 #include "Service.hpp"
 #include "etl/vector.h"
-#include "TimeConverter.hpp"
+#include "../Platform/x86/TimeConverter.hpp"
 
 /**
  * Class containing all the statistics for every parameter. Includes functions that calculate and append the
