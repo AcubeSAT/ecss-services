@@ -1,6 +1,12 @@
 #include <iostream>
 #include "Helpers/Statistic.hpp"
 
+uint64_t Statistic::currentTimeToCustomCUC() {
+	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0); // todo: get the current time for max value.
+	TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> time(currentTime);
+	return time.asCustomCUCTimestamp().elapsed100msTicks;
+}
+
 void Statistic::updateStatistics(double value) {
 	/*
 	 * TODO:
@@ -10,15 +16,11 @@ void Statistic::updateStatistics(double value) {
 
 	if (value > max) {
 		max = value;
-		UTCTimestamp maxValueTime(2020, 4, 10, 10, 15, 0); // todo: get the current time for max value.
-		TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> time(maxValueTime);
-		maxTime = time.asCustomCUCTimestamp().elapsed100msTicks;
+		maxTime = currentTimeToCustomCUC();
 	}
 	if (value < min) {
 		min = value;
-		UTCTimestamp minValueTime(2020, 4, 10, 10, 15, 0); // todo: get the current time for min value.
-		TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> time(minValueTime);
-		maxTime = time.asCustomCUCTimestamp().elapsed100msTicks;
+		minTime = currentTimeToCustomCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
@@ -64,3 +66,4 @@ bool Statistic::statisticsAreInitialized() {
 	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and maxTime == 0 and minTime == 0 and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
 }
+
