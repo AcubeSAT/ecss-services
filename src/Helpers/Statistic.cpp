@@ -1,26 +1,14 @@
-#include <iostream>
 #include "Helpers/Statistic.hpp"
-
-uint64_t Statistic::currentTimeToCustomCUC() {
-	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0); // todo: get the current time for max value.
-	TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> time(currentTime);
-	return time.asCustomCUCTimestamp().elapsed100msTicks;
-}
+#include <iostream>
 
 void Statistic::updateStatistics(double value) {
-	/*
-	 * TODO:
-	 *      if periodic, just calculate next time without the CUC
-	 *      function.
-	 * */
-
 	if (value > max) {
 		max = value;
-		maxTime = currentTimeToCustomCUC();
+		maxTime = TimeConverter::currentTimeCustomCUC();
 	}
 	if (value < min) {
 		min = value;
-		minTime = currentTimeToCustomCUC();
+		minTime = TimeConverter::currentTimeCustomCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
@@ -66,4 +54,3 @@ bool Statistic::statisticsAreInitialized() {
 	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and maxTime == 0 and minTime == 0 and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
 }
-
