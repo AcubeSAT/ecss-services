@@ -1,8 +1,8 @@
 #include <iostream>
-#include "catch2/catch.hpp"
+#include "ECSS_Definitions.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "ECSS_Definitions.hpp"
+#include "catch2/catch.hpp"
 
 /**
  * System-statistics initialization, so there are actual statistics in the map to work with.
@@ -44,26 +44,26 @@ TEST_CASE("Reporting of statistics") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.readUint16() == 1); // start time
-		CHECK(report.readUint16() == 1); // end time
-		CHECK(report.readUint16() == 2); // number of parameters reported
+		CHECK(report.readUint64() == 0);        // start time
+		CHECK(report.readUint64() == 86769000); // end time
+		CHECK(report.readUint16() == 2);        // number of parameters reported
 		// Parameter B
-		CHECK(report.readUint16() == 5); // ID-2
-		CHECK(report.readUint16() == 6); // number of samples
-		CHECK(report.readFloat() == 13); // max value
-		CHECK(report.readUint32() == 0); // max time
-		CHECK(report.readFloat() == 3); // min value
-		CHECK(report.readUint32() == 0); // min time
-		CHECK(report.readFloat() == 8); // mean
+		CHECK(report.readUint16() == 5);        // ID-2
+		CHECK(report.readUint16() == 6);        // number of samples
+		CHECK(report.readFloat() == 13);        // max value
+		CHECK(report.readUint64() == 86769000); // max time
+		CHECK(report.readFloat() == 3);         // min value
+		CHECK(report.readUint64() == 86769000); // min time
+		CHECK(report.readFloat() == 8);         // mean
 		CHECK(report.readFloat() == Approx(3.41565).epsilon(0.01));
 		// Parameter A
-		CHECK(report.readUint16() == 7); // ID-1
-		CHECK(report.readUint16() == 3); // number of samples
-		CHECK(report.readFloat() == 5); // max value
-		CHECK(report.readUint32() == 0); // max time
-		CHECK(report.readFloat() == 1); // min value
-		CHECK(report.readUint32() == 0); // min time
-		CHECK(report.readFloat() == 3); // mean
+		CHECK(report.readUint16() == 7);                  // ID-1
+		CHECK(report.readUint16() == 3);                  // number of samples
+		CHECK(report.readFloat() == 5);                   // max value
+		CHECK(report.readUint64() == 86769000);           // max time
+		CHECK(report.readFloat() == 1);                   // min value
+		CHECK(report.readUint64() == 86769000);           // min time
+		CHECK(report.readFloat() == 3);                   // mean
 		CHECK(static_cast<int>(report.readFloat()) == 1); // stddev
 
 		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
@@ -372,9 +372,9 @@ TEST_CASE("Parameter statistics definition report") {
 
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
-		CHECK(report.readUint16() == 0); // Reporting interval
-		CHECK(report.readUint16() == 2); // Num of valid Ids
-		CHECK(report.readUint16() == 5); // Valid parameter ID
+		CHECK(report.readUint16() == 0);  // Reporting interval
+		CHECK(report.readUint16() == 2);  // Num of valid Ids
+		CHECK(report.readUint16() == 5);  // Valid parameter ID
 		CHECK(report.readUint16() == 12); // Sampling interval
 		CHECK(report.readUint16() == 7);
 		CHECK(report.readUint16() == 0);

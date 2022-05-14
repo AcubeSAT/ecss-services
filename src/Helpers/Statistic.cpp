@@ -19,9 +19,9 @@ void Statistic::updateStatistics(double value) {
 
 void Statistic::appendStatisticsToMessage(Message& report) {
 	report.appendFloat(static_cast<float>(max));
-	report.appendUint32(maxTime);
+	report.appendUint64(maxTime);
 	report.appendFloat(static_cast<float>(min));
-	report.appendUint32(minTime);
+	report.appendUint64(minTime);
 	report.appendFloat(static_cast<float>(mean));
 
 	if (SupportsStandardDeviation) {
