@@ -370,7 +370,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		Services.reset();
 	}
 
-	SECTION("Requested  addition of duplicate report type definitions") {
+	SECTION("Requested addition of duplicate report type definitions") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
