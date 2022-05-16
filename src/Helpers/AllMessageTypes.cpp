@@ -1,4 +1,15 @@
 #include "Helpers/AllMessageTypes.hpp"
+#include "Services/EventActionService.hpp"
+#include "Services/EventReportService.hpp"
+#include "Services/HousekeepingService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/MemoryManagementService.hpp"
+#include "Services/ParameterService.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+#include "Services/RealTimeForwardingControlService.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Services/TestService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 
 namespace AllMessageTypes {
 	etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,
