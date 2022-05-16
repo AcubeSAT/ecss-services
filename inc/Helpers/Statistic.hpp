@@ -7,7 +7,7 @@
 #include "ErrorHandler.hpp"
 #include "Service.hpp"
 #include "etl/vector.h"
-#include "../Platform/x86/TimeGetter.hpp"
+#include "Platform/x86/TimeGetter.hpp"
 
 /**
  * Class containing all the statistics for every parameter. Includes functions that calculate and append the
@@ -17,8 +17,8 @@ class Statistic {
 public:
 	uint16_t selfSamplingInterval = 0;
 	uint16_t sampleCounter = 0;
-	uint64_t maxTime = 0;
-	uint64_t minTime = 0;
+	uint64_t timeOfMaxValue = 0;
+	uint64_t timeOfMinValue = 0;
 	double max = -std::numeric_limits<double>::infinity();
 	double min = std::numeric_limits<double>::infinity();
 	double sumOfSquares = 0;

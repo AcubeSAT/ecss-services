@@ -1,14 +1,13 @@
 #include "Helpers/Statistic.hpp"
-#include <iostream>
 
 void Statistic::updateStatistics(double value) {
 	if (value > max) {
 		max = value;
-		maxTime = TimeGetter::currentTimeCustomCUC();
+		timeOfMaxValue = TimeGetter::currentTimeCustomCUC();
 	}
 	if (value < min) {
 		min = value;
-		minTime = TimeGetter::currentTimeCustomCUC();
+		timeOfMinValue = TimeGetter::currentTimeCustomCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
@@ -19,9 +18,9 @@ void Statistic::updateStatistics(double value) {
 
 void Statistic::appendStatisticsToMessage(Message& report) {
 	report.appendFloat(static_cast<float>(max));
-	report.appendUint64(maxTime);
+	report.appendUint64(timeOfMaxValue);
 	report.appendFloat(static_cast<float>(min));
-	report.appendUint64(minTime);
+	report.appendUint64(timeOfMinValue);
 	report.appendFloat(static_cast<float>(mean));
 
 	if (SupportsStandardDeviation) {
@@ -43,14 +42,14 @@ void Statistic::setSelfSamplingInterval(uint16_t samplingInterval) {
 void Statistic::resetStatistics() {
 	max = -std::numeric_limits<double>::infinity();
 	min = std::numeric_limits<double>::infinity();
-	maxTime = 0;
-	minTime = 0;
+	timeOfMaxValue = 0;
+	timeOfMinValue = 0;
 	mean = 0;
 	sumOfSquares = 0;
 	sampleCounter = 0;
 }
 
 bool Statistic::statisticsAreInitialized() {
-	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and maxTime == 0 and minTime == 0 and
+	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and timeOfMaxValue == 0 and timeOfMinValue == 0 and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
 }

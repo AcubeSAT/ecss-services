@@ -17,7 +17,7 @@
 class ParameterStatisticsService : public Service {
 private:
 	/**
-	 * The time, at which the evaluation of statistics is initialized. It is basically the time when, the statistics
+	 * The time at which the evaluation of statistics is initialized. It is basically the time when the statistics
 	 * are reset.
 	 */
 	uint64_t evaluationStartTime = 0;
