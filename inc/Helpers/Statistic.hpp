@@ -1,8 +1,6 @@
 #ifndef ECSS_SERVICES_STATISTIC_HPP
 #define ECSS_SERVICES_STATISTIC_HPP
 
-#include <cfloat>
-#include <cmath>
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Service.hpp"

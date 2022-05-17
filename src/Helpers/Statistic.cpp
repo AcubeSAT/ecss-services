@@ -1,13 +1,14 @@
 #include "Helpers/Statistic.hpp"
+#include <cmath>
 
 void Statistic::updateStatistics(double value) {
 	if (value > max) {
 		max = value;
-		timeOfMaxValue = TimeGetter::currentTimeCustomCUC();
+		timeOfMaxValue = TimeGetter::getCurrentTimeCustomCUC();
 	}
 	if (value < min) {
 		min = value;
-		timeOfMinValue = TimeGetter::currentTimeCustomCUC();
+		timeOfMinValue = TimeGetter::getCurrentTimeCustomCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);

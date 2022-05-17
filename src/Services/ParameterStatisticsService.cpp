@@ -20,7 +20,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 void ParameterStatisticsService::parameterStatisticsReport() {
 	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
 	report.appendUint64(evaluationStartTime);
-	auto evaluationStopTime = TimeGetter::currentTimeCustomCUC();
+	auto evaluationStopTime = TimeGetter::getCurrentTimeCustomCUC();
 	report.appendUint64(evaluationStopTime);
 
 	uint16_t numOfValidParameters = 0;
@@ -56,7 +56,7 @@ void ParameterStatisticsService::resetParameterStatistics() {
 	for (auto& it: statisticsMap) {
 		it.second.resetStatistics();
 	}
-	evaluationStartTime = TimeGetter::currentTimeCustomCUC();
+	evaluationStartTime = TimeGetter::getCurrentTimeCustomCUC();
 	// TODO: Restart the evaluation of parameter statistics
 }
 
