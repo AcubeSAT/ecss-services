@@ -125,7 +125,7 @@ void validInvalidAllReportsOfService(Message& request) {
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			uint8_t serviceType = servicesToPick[j];
 			request.appendUint8(serviceType);
-			uint8_t numOfMessages = (i == 0 or i == 1) ? 0 : numOfMessagesPerService;
+			uint8_t numOfMessages = (i < 2) ? 0 : numOfMessagesPerService;
 			request.appendUint8(numOfMessages);
 			if (i >= 2) {
 				uint8_t* messages = (j == 0) ? messages1 : messages2;
