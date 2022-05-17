@@ -76,7 +76,7 @@ private:
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
-	bool isAppControlled(Message& request, uint8_t applicationId);
+	bool checkAppControlled(Message& request, uint8_t applicationId);
 
 	/**
 	 * Checks if all service types are allowed already, i.e. if the application process contains no service type

@@ -31,7 +31,7 @@ uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicat
 	return applicationProcessConfiguration.definitions[appServicePair].size();
 }
 
-bool RealTimeForwardingControlService::isAppControlled(Message& request, uint8_t applicationId) {
+bool RealTimeForwardingControlService::checkAppControlled(Message& request, uint8_t applicationId) {
 	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
 	    controlledApplications.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
@@ -42,7 +42,7 @@ bool RealTimeForwardingControlService::isAppControlled(Message& request, uint8_t
 
 bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID,
                                                                           uint8_t numOfServices) {
-	if (not isAppControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
+	if (not checkAppControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
 		for (uint8_t i = 0; i < numOfServices; i++) {
 			request.skipBytes(1);
 			uint8_t numOfMessages = request.readUint8();
