@@ -184,42 +184,6 @@ inline const uint16_t ECSSPacketStoreIdSize = 15;
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
 
 /**
- * The max number of controlled application processes
- * @see RealTimeForwardingControlService
- */
-inline const uint8_t ECSSMaxControlledApplicationProcesses = 5;
-
-/**
- * The max number of report type blocking definitions per service type definition in the application process
- * configuration
- * @see RealTimeForwardingControlService
- * todo: must change when a service with more report types is implemented.
- */
-inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
-
-/**
- * The max number of service type definitions per application process type definition in the application process
- * configuration
- * @see RealTimeForwardingControlService
- * todo: must change when all 15 services are implemented.
- */
-inline const uint8_t ECSSMaxServiceTypeDefinitions = 10;
-
-/**
- * The number of possible combinations between application processes and service types, i.e. the number of all
- * possible (applicationID, serviceType) pairs.
- */
-inline const uint8_t ECSSMaxApplicationsServicesCombinations = ECSSMaxControlledApplicationProcesses *
-                                                               ECSSMaxServiceTypeDefinitions;
-
-/**
- * The max number of event definition IDs per event report blocking type definition in the event report blocking
- * configuration
- * @see RealTimeForwardingControlService
- */
-inline const uint8_t ECSSMaxEventDefinitionIDs = 15;
-
-/**
  * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
  */
 inline struct {
@@ -231,6 +195,7 @@ inline struct {
  * Maximum number of ST[12] Parameter Monitoring Definitions.
  */
 inline const uint8_t ECSSMaxMonitoringDefinitions = 4;
+
 
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
