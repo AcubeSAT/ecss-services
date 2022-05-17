@@ -74,6 +74,12 @@ void MessageParser::execute(Message& message) {
 			break;
 #endif
 
+#ifdef SERVICE_REALTIMEFORWARDINGCONTROL
+		case RealTimeForwardingControlService::ServiceType:
+			Services.realTimeForwarding.execute(message);
+			break;
+#endif
+
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
