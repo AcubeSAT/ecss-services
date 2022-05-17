@@ -28,7 +28,7 @@
 #define SERVICE_ONBOARDMONITORING         ///<  Compile ST[12] on-board monitoring
 #define SERVICE_PARAMETER                 ///<  Compile ST[20] parameter management
 #define SERVICE_PARAMETERSTATISTICS       ///<  Compile ST[04] parameter statistics
-#define SERVICE_REALTIMEFORWARDINGCONTROL ///< Compile ST[14] real time forwarding control
+#define SERVICE_REALTIMEFORWARDINGCONTROL ///<  Compile ST[14] real time forwarding control
 #define SERVICE_REQUESTVERIFICATION       ///<  Compile ST[01] request verification
 #define SERVICE_STORAGEANDRETRIEVAL       ///<  Compile ST[15] storage-and-retrieval of tm packets
 #define SERVICE_TEST                      ///<  Compile ST[17] test

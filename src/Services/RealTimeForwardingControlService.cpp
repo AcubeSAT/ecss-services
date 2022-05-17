@@ -97,10 +97,9 @@ bool RealTimeForwardingControlService::checkMessage(Message& request, uint8_t ap
 
 bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType,
                                                                              uint8_t messageType) {
-	auto appServicePair = std::make_pair(applicationID, serviceType);
-	return std::find(applicationProcessConfiguration.definitions[appServicePair].begin(),
-	                 applicationProcessConfiguration.definitions[appServicePair].end(),
-	                 messageType) != applicationProcessConfiguration.definitions[appServicePair].end();
+	auto key = std::make_pair(applicationID, serviceType);
+    auto& messages = applicationProcessConfiguration.definitions[key];
+	return std::find(messages.begin(), messages.end(), messageType) != messages.end();
 }
 
 void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {
