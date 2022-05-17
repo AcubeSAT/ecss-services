@@ -19,9 +19,9 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 
 void ParameterStatisticsService::parameterStatisticsReport() {
 	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
-	report.appendUint64(evaluationStartTime);
+	report.append(evaluationStartTime);
 	auto evaluationStopTime = TimeGetter::getCurrentTimeCustomCUC();
-	report.appendUint64(evaluationStopTime);
+	report.append(evaluationStopTime);
 
 	uint16_t numOfValidParameters = 0;
 	for (auto& currentStatistic: statisticsMap) {

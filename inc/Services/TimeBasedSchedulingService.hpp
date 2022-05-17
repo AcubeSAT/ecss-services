@@ -8,7 +8,7 @@
 #include "Helpers/CRCHelper.hpp"
 
 // Include platform specific files
-#include "Platform/x86/TimeGetter.hpp"
+#include "Platform/x86/Helpers/TimeGetter.hpp"
 
 /**
  * @def SUB_SCHEDULES_ENABLED
