@@ -334,16 +334,19 @@ public:
 		 * Application Process configuration (ST[14])
 		 */
 		AllServiceTypesAlreadyAllowed = 48,
+
 		/**
 		 * Attempt to add a new report type, when the max number of reports types allowed per service type
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */
 		MaxReportTypesReached = 49,
+
 		/**
 		 * Attempt to add a new service type, when the max number of service types allowed per application process
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */
 		MaxServiceTypesReached = 50,
+
 		/**
 		 * Attempt to add a report/event definition/housekeeping report type, when the specified application process
 		 * ID is not controlled by the Service (ST[14])

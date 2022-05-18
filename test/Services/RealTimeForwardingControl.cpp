@@ -9,13 +9,558 @@ RealTimeForwardingControlService& realTimeForwarding = Services.realTimeForwardi
 
 uint8_t applications[] = {1};
 uint8_t services[] = {3, 5};
-uint8_t allServices[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-uint8_t redundantServices[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+uint8_t allServices[] = {1, 3, 4, 5, 6, 11, 13, 17, 19, 20};
+uint8_t redundantServices[] = {1, 3, 4, 5, 6, 11, 13, 17, 19, 20, 1, 3};
 uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
                        HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport};
 
 uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
+
+void validReportTypes(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 2;
+	uint8_t numOfMessagesPerService = 2;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID: applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+			uint8_t* messages = (j == 0) ? messages1 : messages2;
+
+			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+				request.appendUint8(messages[k]);
+			}
+		}
+	}
+}
+
+void duplicateReportTypes(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 2;
+	uint8_t numOfMessagesPerService = 2;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID: applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+
+			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+				request.appendUint8(messages1[0]);
+			}
+		}
+	}
+}
+
+void validInvalidReportTypes(Message& request) {
+	uint8_t numOfApplications = 3;
+	uint8_t numOfMessagesPerService = 2;
+
+	uint8_t applications2[] = {1, 2, 3};
+	request.appendUint8(numOfApplications);
+
+	for (uint8_t i = 0; i < numOfApplications; i++) {
+		request.appendUint8(applications2[i]);
+		uint8_t numOfServicesPerApp = (i == 0) ? 12 : 2;
+		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = servicesToPick[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+			uint8_t* messages = (j == 0) ? messages1 : messages2;
+
+			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+				request.appendUint8(messages[k]);
+			}
+		}
+	}
+}
+
+void validAllReportsOfService(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 2;
+	uint8_t numOfMessagesPerService = 0;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID: applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = services[j];
+			request.appendUint8(serviceType);
+			request.appendUint8(numOfMessagesPerService);
+		}
+	}
+}
+
+void validInvalidAllReportsOfService(Message& request) {
+	uint8_t numOfApplications = 3;
+	uint8_t numOfMessagesPerService = 2;
+
+	uint8_t applications2[] = {1, 2, 3};
+	request.appendUint8(numOfApplications);
+
+	for (uint8_t i = 0; i < numOfApplications; i++) {
+		request.appendUint8(applications2[i]);
+		uint8_t numOfServicesPerApp = (i == 0) ? 12 : 2;
+		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
+		request.appendUint8(numOfServicesPerApp);
+
+		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+			uint8_t serviceType = servicesToPick[j];
+			request.appendUint8(serviceType);
+			uint8_t numOfMessages = (i < 2) ? 0 : numOfMessagesPerService;
+			request.appendUint8(numOfMessages);
+			if (i >= 2) {
+				uint8_t* messages = (j == 0) ? messages1 : messages2;
+
+				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+					request.appendUint8(messages[k]);
+				}
+			}
+		}
+	}
+}
+
+void validAllReportsOfApp(Message& request) {
+	uint8_t numOfApplications = 1;
+	uint8_t numOfServicesPerApp = 0;
+
+	request.appendUint8(numOfApplications);
+
+	for (auto appID: applications) {
+		request.appendUint8(appID);
+		request.appendUint8(numOfServicesPerApp);
+	}
+}
+
+void validInvalidAllReportsOfApp(Message& request) {
+	uint8_t numOfApplications = 3;
+	uint8_t numOfMessagesPerService = 2;
+
+	uint8_t applications2[] = {1, 2, 3};
+	request.appendUint8(numOfApplications);
+
+	for (uint8_t i = 0; i < numOfApplications; i++) {
+		request.appendUint8(applications2[i]);
+		uint8_t numOfServicesPerApp = (i == 0 or i == 1) ? 0 : 2;
+		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
+		request.appendUint8(numOfServicesPerApp);
+
+		if (i >= 2) {
+			for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
+				uint8_t serviceType = servicesToPick[j];
+				request.appendUint8(serviceType);
+				uint8_t numOfMessages = (i == 0 or i == 1) ? 0 : numOfMessagesPerService;
+				request.appendUint8(numOfMessages);
+
+				uint8_t* messages = (j == 0) ? messages1 : messages2;
+
+				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
+					request.appendUint8(messages[k]);
+				}
+			}
+		}
+	}
+}
+
+void resetAppProcessConfiguration() {
+	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
+	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
+}
+
+TEST_CASE("Add report types to the Application Process Configuration") {
+	SECTION("Successful addition of report types to the Application Process Configuration") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		REQUIRE(applicationProcesses.size() == 2);
+
+		for (auto appID: applications) {
+			for (uint8_t j = 0; j < 2; j++) {
+				uint8_t serviceType = services[j];
+				auto appServicePair = std::make_pair(appID, serviceType);
+				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
+				REQUIRE(applicationProcesses[appServicePair].size() == 2);
+				uint8_t* messages = (j == 0) ? messages1 : messages2;
+
+				for (uint8_t k = 0; k < 2; k++) {
+					REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
+					                  applicationProcesses[appServicePair].end(),
+					                  messages[k]) != applicationProcesses[appServicePair].end());
+				}
+			}
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Requested Application Process is not controlled by the service") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		validReportTypes(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("All service types already allowed") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		for (uint8_t i = 1; i < ECSSMaxServiceTypeDefinitions + 1; i++) {
+			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, i)];
+		}
+		CHECK(realTimeForwarding.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed) ==
+		      1);
+		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Max service types already reached") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		uint8_t serviceType1 = services[0]; // st03
+		uint8_t serviceType2 = services[1]; // st05
+
+		realTimeForwarding.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		auto& applicationProcessConfig = realTimeForwarding.applicationProcessConfiguration.definitions;
+
+		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
+			applicationProcessConfig[std::make_pair(applicationID, i)];
+		}
+		CHECK(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions - 1);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 1);
+		REQUIRE(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("All report types already allowed") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		uint8_t serviceType = services[0]; // st03
+		realTimeForwarding.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		for (auto message: AllMessageTypes::messagesOfService[serviceType]) {
+			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
+			    .push_back(message);
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) ==
+		      2);
+		REQUIRE(
+		    realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
+		        .size() == AllMessageTypes::messagesOfService[serviceType].size());
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Max report types already reached") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		uint8_t serviceType1 = services[0]; // st03
+		uint8_t serviceType2 = services[1]; // st05
+
+		realTimeForwarding.controlledApplications.push_back(applicationID);
+		validReportTypes(request);
+
+		auto& applicationProcessConfig = realTimeForwarding.applicationProcessConfiguration;
+
+		auto appServicePair1 = std::make_pair(applicationID, serviceType1);
+		auto appServicePair2 = std::make_pair(applicationID, serviceType2);
+		REQUIRE(applicationProcessConfig.definitions[appServicePair1].empty());
+		REQUIRE(applicationProcessConfig.definitions[appServicePair2].empty());
+
+		auto numOfMessages1 = AllMessageTypes::messagesOfService[serviceType1].size();
+		auto numOfMessages2 = AllMessageTypes::messagesOfService[serviceType2].size();
+
+		for (uint8_t i = 0; i < numOfMessages1 - 1; i++) {
+			applicationProcessConfig.definitions[appServicePair1].push_back(i);
+		}
+		for (uint8_t i = 16; i < numOfMessages2 + 15; i++) {
+			applicationProcessConfig.definitions[appServicePair2].push_back(i);
+		}
+		REQUIRE(applicationProcessConfig.definitions[appServicePair1].size() == numOfMessages1 - 1);
+		REQUIRE(applicationProcessConfig.definitions[appServicePair2].size() == numOfMessages2 - 1);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 2);
+		REQUIRE(applicationProcessConfig.definitions.size() == 2);
+		REQUIRE(applicationProcessConfig.definitions[appServicePair1].size() == numOfMessages1);
+		REQUIRE(applicationProcessConfig.definitions[appServicePair2].size() == numOfMessages2);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Requested addition of duplicate report type definitions") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t applicationID = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID);
+		duplicateReportTypes(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		REQUIRE(applicationProcesses.size() == 2);
+
+		for (auto appID: applications) {
+			for (auto& serviceType: services) {
+				auto appServicePair = std::make_pair(appID, serviceType);
+				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
+				REQUIRE(applicationProcesses[appServicePair].size() == 1);
+				REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
+				                  applicationProcesses[appServicePair].end(),
+				                  messages1[0]) != applicationProcesses[appServicePair].end());
+			}
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid and invalid application-related requests combined") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		uint8_t applicationID2 = 2;
+		uint8_t applicationID3 = 3;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		realTimeForwarding.controlledApplications.push_back(applicationID3);
+		validInvalidReportTypes(request);
+
+		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
+			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID3, i)];
+		}
+		CHECK(realTimeForwarding.applicationProcessConfiguration.definitions.size() ==
+		      ECSSMaxServiceTypeDefinitions - 1);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 7);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
+
+		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+		REQUIRE(definitions.size() == 20);
+		for (auto serviceType: allServices) {
+			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid addition of all report types of a specified service type") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		validAllReportsOfService(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
+		for (auto serviceType: services) {
+			REQUIRE(applicationProcesses[std::make_pair(applicationID1, serviceType)].size() ==
+			        AllMessageTypes::messagesOfService[serviceType].size());
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Addition of all report types of a service type, combined with invalid requests") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		uint8_t applicationID2 = 2;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		realTimeForwarding.controlledApplications.push_back(applicationID2);
+		validInvalidAllReportsOfService(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 2);
+
+		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+		REQUIRE(definitions.size() == 12);
+
+		int cnt1 = 0;
+		int cnt2 = 0;
+		for (auto& pair: definitions) {
+			if (pair.first.first == applicationID1) {
+				cnt1++;
+			} else if (pair.first.first == applicationID2) {
+				cnt2++;
+			}
+		}
+		REQUIRE(cnt1 == 10);
+		REQUIRE(cnt2 == 2);
+
+		for (auto& serviceType: allServices) {
+			REQUIRE(definitions[std::make_pair(applicationID1, serviceType)].size() ==
+			        AllMessageTypes::messagesOfService[serviceType].size());
+		}
+		for (auto& serviceType: services) {
+			REQUIRE(definitions[std::make_pair(applicationID2, serviceType)].size() ==
+			        AllMessageTypes::messagesOfService[serviceType].size());
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid addition of all report types of an application process") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		validAllReportsOfApp(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+		REQUIRE(definitions.size() == ECSSMaxServiceTypeDefinitions);
+
+		for (auto serviceType: allServices) {
+			REQUIRE(std::equal(definitions[std::make_pair(applicationID1, serviceType)].begin(),
+			                   definitions[std::make_pair(applicationID1, serviceType)].end(),
+			                   AllMessageTypes::messagesOfService[serviceType].begin()));
+		}
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Addition of all report types of an application process, combined with invalid request") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		uint8_t applicationID1 = 1;
+		uint8_t applicationID2 = 2;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		realTimeForwarding.controlledApplications.push_back(applicationID2);
+		validInvalidAllReportsOfApp(request);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
+		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+
+		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
+
+		resetAppProcessConfiguration();
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+uint8_t applications_[] = {1};
+uint8_t services_[] = {3, 5};
+uint8_t allServices_[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+uint8_t redundantServices_[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+uint8_t messages1_[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
+                        HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport};
+
+uint8_t messages2_[] = {EventReportService::MessageType::InformativeEventReport,
+                        EventReportService::MessageType::DisabledListEventReport};
 
 bool findApplication(uint8_t targetAppID) {
 	auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
@@ -31,7 +576,7 @@ void checkAppProcessConfig() {
 	auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 
 	// Check if configuration is initialized properly
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		REQUIRE(findApplication(appID));
 
 		for (auto serviceType: services) {
@@ -39,7 +584,7 @@ void checkAppProcessConfig() {
 			REQUIRE(findServiceType(appID, serviceType));
 			REQUIRE(applicationProcesses[appServicePair].size() == 2);
 
-			for (auto messageType: messages1) {
+			for (auto messageType: messages1_) {
 				REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
 				                  applicationProcesses[appServicePair].end(),
 				                  messageType) != applicationProcesses[appServicePair].end());
@@ -53,10 +598,10 @@ void initializeAppProcessConfig() {
 	//	uint8_t numOfServicesPerApp = 2;
 	//	uint8_t numOfMessagesPerService = 2;
 
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		for (auto serviceType: services) {
 			auto appServicePair = std::make_pair(appID, serviceType);
-			for (auto messageType: messages1) {
+			for (auto messageType: messages1_) {
 				realTimeForwarding.applicationProcessConfiguration.definitions[appServicePair].push_back(
 				    messageType);
 			}
@@ -78,11 +623,11 @@ void checkAppProcessConfig2() {
 		REQUIRE(findApplication(appID));
 
 		uint8_t numOfServices = (i == 2) ? 15 : 2;
-		uint8_t* serviceTypes = (i == 2) ? allServices : services;
+		uint8_t* serviceTypes = (i == 2) ? allServices_ : services_;
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
 			uint8_t serviceType = serviceTypes[j];
-			uint8_t* messages = (i == 2) ? messages2 : messages1;
+			uint8_t* messages = (i == 2) ? messages2_ : messages1_;
 
 			REQUIRE(findServiceType(appID, serviceType));
 			auto appServicePair = std::make_pair(appID, serviceType);
@@ -107,11 +652,11 @@ void initializeAppProcessConfig2() {
 	for (uint8_t i = 0; i < numOfApplications; i++) {
 		uint8_t appID = applications2[i];
 		uint8_t numOfServices = (i == 2) ? 15 : 2;
-		uint8_t* serviceTypes = (i == 2) ? allServices : services;
+		uint8_t* serviceTypes = (i == 2) ? allServices_ : services_;
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
 			uint8_t serviceType = serviceTypes[j];
-			uint8_t* messages = (i == 2) ? messages2 : messages1;
+			uint8_t* messages = (i == 2) ? messages2_ : messages1_;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
 				uint8_t messageType = messages[k];
@@ -130,7 +675,7 @@ void serviceNotInApplication(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -138,7 +683,7 @@ void serviceNotInApplication(Message& request) {
 			uint8_t nonExistingService = 13; // add arbitrary, non-existing service type
 			request.appendUint8(nonExistingService);
 			request.appendUint8(numOfMessagesPerService);
-			uint8_t* messages = (j == 0) ? messages1 : messages2;
+			uint8_t* messages = (j == 0) ? messages1_ : messages2_;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
 				request.appendUint8(messages[k]);
@@ -154,7 +699,7 @@ void messageNotInApplication(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -179,7 +724,7 @@ void deleteValidReportTypes(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -189,7 +734,7 @@ void deleteValidReportTypes(Message& request) {
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages1[k]);
+				request.appendUint8(messages1_[k]);
 			}
 		}
 	}
@@ -202,7 +747,7 @@ void deleteReportEmptyService(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -212,7 +757,7 @@ void deleteReportEmptyService(Message& request) {
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages1[k]);
+				request.appendUint8(messages1_[k]);
 			}
 		}
 	}
@@ -225,17 +770,17 @@ void deleteReportEmptyApplication(Message& request) {
 
 	request.appendUint8(numOfApplications);
 
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
-			uint8_t serviceType = services[j];
+			uint8_t serviceType = services_[j];
 			request.appendUint8(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages1[k]);
+				request.appendUint8(messages1_[k]);
 			}
 		}
 	}
@@ -246,7 +791,7 @@ void deleteApplicationProcess(Message& request) {
 	uint8_t numOfServicesPerApp = 0;
 
 	request.appendUint8(numOfApplications);
-	request.appendUint8(applications[0]);
+	request.appendUint8(applications_[0]);
 	request.appendUint8(numOfServicesPerApp);
 }
 
@@ -256,7 +801,7 @@ void deleteService(Message& request) {
 	uint8_t numOfMessagesPerService = 0;
 
 	request.appendUint8(numOfApplications);
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -274,7 +819,7 @@ void deleteServiceEmptyApplication(Message& request) {
 	uint8_t numOfMessagesPerService = 0;
 
 	request.appendUint8(numOfApplications);
-	for (auto appID: applications) {
+	for (auto appID: applications_) {
 		request.appendUint8(appID);
 		request.appendUint8(numOfServicesPerApp);
 
@@ -304,7 +849,7 @@ void deleteValidInvalidReportTypes(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
 			uint8_t serviceType = validInvalidServices[i][j];
-			uint8_t* messages = (i == 2) ? validInvalidMessages : messages1;
+			uint8_t* messages = (i == 2) ? validInvalidMessages : messages1_;
 
 			request.appendUint8(serviceType);
 			request.appendUint8(numOfMessages);
@@ -315,11 +860,6 @@ void deleteValidInvalidReportTypes(Message& request) {
 			}
 		}
 	}
-}
-
-void resetAppProcessConfiguration() {
-	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
-	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
 }
 
 TEST_CASE("Delete report types from the Application Process Configuration") {
@@ -414,8 +954,8 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 
 		REQUIRE(applicationProcesses.size() == 2);
-		REQUIRE(applicationProcesses[std::make_pair(applicationID, services[0])].size() == 1);
-		REQUIRE(applicationProcesses[std::make_pair(applicationID, services[1])].size() == 1);
+		REQUIRE(applicationProcesses[std::make_pair(applicationID, services_[0])].size() == 1);
+		REQUIRE(applicationProcesses[std::make_pair(applicationID, services_[1])].size() == 1);
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
@@ -437,7 +977,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 
 		CHECK(ServiceTests::count() == 0);
 		REQUIRE(applicationProcesses.size() == 1);
-		REQUIRE(findServiceType(applicationID, services[1]));
+		REQUIRE(findServiceType(applicationID, services_[1]));
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
@@ -497,7 +1037,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 
 		REQUIRE(applicationProcesses.size() == 1);
-		REQUIRE(not findServiceType(applicationID, services[0]));
+		REQUIRE(not findServiceType(applicationID, services_[0]));
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
@@ -517,7 +1057,6 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-
 		REQUIRE(applicationProcesses.empty());
 
 		resetAppProcessConfiguration();
@@ -555,11 +1094,11 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		// Check for appID = 1
 		uint8_t appID1 = remainingApps[0];
 		REQUIRE(std::count_if(std::begin(definitions), std::end(definitions), [appID1](auto& definition) { return appID1 == definition.first.first; }) == 1);
-		REQUIRE(not findServiceType(appID1, services[0]));
-		auto appServicePair = std::make_pair(appID1, services[1]);
+		REQUIRE(not findServiceType(appID1, services_[0]));
+		auto appServicePair = std::make_pair(appID1, services_[1]);
 		REQUIRE(definitions[appServicePair].size() == 2);
 
-		for (auto& message: messages1) {
+		for (auto& message: messages1_) {
 			REQUIRE(std::find(definitions[appServicePair].begin(),
 			                  definitions[appServicePair].end(),
 			                  message) != definitions[appServicePair].end());
@@ -575,8 +1114,8 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 
 		for (uint8_t i = 0; i < 15; i++) {
 			uint8_t numOfMessages = (i == 0 or i == 7) ? 1 : 2; // we only deleted one report from services 1 and 8
-			uint8_t* messages = (i == 0 or i == 7) ? remainingMessage : messages2;
-			auto appServicePair1 = std::make_pair(appID3, allServices[i]);
+			uint8_t* messages = (i == 0 or i == 7) ? remainingMessage : messages2_;
+			auto appServicePair1 = std::make_pair(appID3, allServices_[i]);
 
 			REQUIRE(definitions[appServicePair1].size() == numOfMessages);
 			for (uint8_t j = 0; j < numOfMessages; j++) {

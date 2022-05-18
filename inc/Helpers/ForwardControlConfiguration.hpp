@@ -8,16 +8,9 @@
 #include "etl/vector.h"
 
 /**
- * Implements the Real Time Forward Control configuration, which includes three separate configurations, Application
- * Process configuration, Housekeeping configuration and Event Report configuration. These configurations contain
- * definitions, which indicate whether a telemetry message should be forwarded to the ground station.
- *
- * @author Konstantinos Petridis <petridkon@gmail.com>
- */
-
-/**
  * The Application Process configuration. It's basically a map, storing a vector of report type definitions for each
- * pair of (applicationID, serviceType).
+ * pair of (applicationID, serviceType). It contains definitions, which indicate whether a telemetry message, produced
+ * by a service, inside an application process (subsystem), should be forwarded to the ground station.
  */
 class ApplicationProcessConfiguration {
 public:
@@ -25,13 +18,13 @@ public:
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
 	 * example, a Report Type definition could be 'ReportHousekeepingStructures'.
 	 */
-	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> reportTypeDefinitions;
+	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ReportTypeDefinitions;
 
 	/**
 	 * This is the key for the application process configuration map. It contains a pair with the applicationID and
 	 * the serviceType.
 	 */
-	typedef std::pair<uint8_t, uint8_t> appServiceKey;
+	typedef std::pair<uint8_t, uint8_t> AppServiceKey;
 
 	/**
 	 * Map containing the report type definitions. Each application process has its own ID. The combination of the
@@ -46,9 +39,7 @@ public:
 	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
 	 * to the appID and service type.
 	 */
-	etl::map<appServiceKey, reportTypeDefinitions,
-	         ECSSMaxControlledApplicationProcesses * ECSSMaxServiceTypeDefinitions>
-	    definitions;
+	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
 
 	ApplicationProcessConfiguration() = default;
 };

@@ -47,6 +47,7 @@ add_library(common OBJECT
         src/Helpers/Statistic.cpp
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
+        src/Helpers/AllMessageTypes.cpp
         )
 
 # Specify the .cpp files for the executables
