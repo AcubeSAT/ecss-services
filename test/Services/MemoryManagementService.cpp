@@ -1,8 +1,8 @@
-#include <catch2/catch.hpp>
-#include <Services/MemoryManagementService.hpp>
 #include <Message.hpp>
-#include "ServiceTests.hpp"
+#include <Services/MemoryManagementService.hpp>
+#include <catch2/catch_all.hpp>
 #include "Helpers/CRCHelper.hpp"
+#include "ServiceTests.hpp"
 
 MemoryManagementService& memMangService = Services.memoryManagement;
 
@@ -16,12 +16,12 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	receivedPacket.appendUint16(2); // Iteration count
-	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(pStr)); // Start address
+	receivedPacket.appendUint16(2);                                          // Iteration count
+	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(pStr));           // Start address
 	receivedPacket.appendOctetString(String<2>(data));
-	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 2)); // Append CRC
+	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 2));   // Append CRC
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(pStr + 2)); // Start address
-	receivedPacket.appendOctetString(String<1>(data)); // Append CRC
+	receivedPacket.appendOctetString(String<1>(data));                 // Append CRC
 	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 1));
 	MessageParser::execute(receivedPacket);
 
@@ -39,9 +39,9 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
-	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	receivedPacket.appendUint16(3); // Iteration count (Equal to 3 test strings)
-	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1)); // Start address
+	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
+	receivedPacket.appendUint16(3);                                              // Iteration count (Equal to 3 test strings)
+	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1));       // Start address
 	receivedPacket.appendUint16(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
 
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_2));
@@ -100,9 +100,9 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
-	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	receivedPacket.appendUint16(2); // Iteration count
-	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1)); // Start address
+	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
+	receivedPacket.appendUint16(2);                                              // Iteration count
+	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1));       // Start address
 	receivedPacket.appendUint16(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
 
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_2));

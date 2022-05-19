@@ -1,15 +1,15 @@
-#include <catch2/catch.hpp>
-#include <Services/EventActionService.hpp>
 #include <Message.hpp>
-#include "ServiceTests.hpp"
-#include <etl/String.hpp>
-#include <cstring>
 #include <ServicePool.hpp>
+#include <Services/EventActionService.hpp>
+#include <catch2/catch_all.hpp>
+#include <cstring>
+#include <etl/String.hpp>
+#include "ServiceTests.hpp"
 
 EventActionService& eventActionService = Services.eventAction;
 
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
-	
+
 	// Add a message that is too large to check for the corresponding error
 	Message message(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 	message.appendEnum16(0);
@@ -198,7 +198,7 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 	MessageParser::execute(message);
 
 	// Checking the content of the map
-	for (int i = 0; i < 256; i++){
+	for (int i = 0; i < 256; i++) {
 		CHECK(eventActionService.eventActionDefinitionMap.find(i) == eventActionService.eventActionDefinitionMap.end());
 	}
 }
@@ -410,6 +410,5 @@ TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
 	CHECK(eventActionService.getEventActionFunctionStatus() == false);
 }
 
-TEST_CASE("Execute a TC request", "[service][st19]"){
-
+TEST_CASE("Execute a TC request", "[service][st19]") {
 }
