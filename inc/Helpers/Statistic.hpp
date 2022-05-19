@@ -4,8 +4,8 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Service.hpp"
+#include "TimeGetter.hpp"
 #include "etl/vector.h"
-#include "Platform/x86/Helpers/TimeGetter.hpp"
 
 /**
  * Class containing all the statistics for every parameter. Includes functions that calculate and append the
