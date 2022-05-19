@@ -1,4 +1,4 @@
-#include "Helpers/TimeGetter.hpp"
+#include "Platform/x86/Helpers/TimeGetter.hpp"
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);

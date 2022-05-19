@@ -7,6 +7,7 @@
 #include "Service.hpp"
 #include "etl/deque.h"
 #include "etl/map.h"
+#include "Platform/x86/Helpers/TimeGetter.hpp"
 
 /**
  * Implementation of the ST[04] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
