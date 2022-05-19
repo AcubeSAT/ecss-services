@@ -105,7 +105,7 @@ tests:
     - cd $CI_PROJECT_DIR
     - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" && make tests -j$(nproc)
     - lcov -q --capture --initial --directory . -o coverage_base
-    - ./tests --use-colour yes
+    - ./tests --colour-mode ansi
     - lcov -q --capture --directory . -o coverage_tests
     - lcov -q -a coverage_base -a coverage_tests -o coverage_total_unfiltered
     - lcov -q --remove coverage_total_unfiltered "${PWD}/lib/*" "${PWD}/CMakeFiles/*" "${PWD}/test/*" "${PWD}/src/main.cpp" -o coverage_total_filtered
