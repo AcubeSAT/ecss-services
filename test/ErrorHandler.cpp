@@ -1,7 +1,7 @@
-#include <catch2/catch.hpp>
 #include <ErrorHandler.hpp>
-#include "Services/ServiceTests.hpp"
+#include <catch2/catch_all.hpp>
 #include "Services/RequestVerificationService.hpp"
+#include "Services/ServiceTests.hpp"
 
 TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	Message failedMessage(38, 32, Message::TC, 47);

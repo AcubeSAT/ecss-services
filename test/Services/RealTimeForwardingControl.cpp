@@ -3,7 +3,7 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 RealTimeForwardingControlService& realTimeForwarding = Services.realTimeForwarding;
 

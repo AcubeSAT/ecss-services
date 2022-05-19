@@ -1,10 +1,10 @@
-#include <catch2/catch.hpp>
-#include <Services/LargePacketTransferService.hpp>
 #include <Message.hpp>
-#include "ServiceTests.hpp"
+#include <Services/LargePacketTransferService.hpp>
+#include <catch2/catch_all.hpp>
 #include <cstring>
 #include <etl/String.hpp>
 #include "ECSS_Definitions.hpp"
+#include "ServiceTests.hpp"
 
 LargePacketTransferService& lPT = Services.largePacketTransferService;
 
@@ -70,19 +70,19 @@ TEST_CASE("Last Uplink Part TC[13,11]", "[service][st13]") {
 
 TEST_CASE("Split function", "[no][service]") {
 	Message message(13, 0, Message::TC, 0);
-	for (uint16_t i = 0; i < 800; i++){
+	for (uint16_t i = 0; i < 800; i++) {
 		message.appendUint8(UINT8_MAX);
 	}
 	uint16_t largeMessageTransactionIdentifier = 1;
 	lPT.split(message, largeMessageTransactionIdentifier);
 	Message message5(13, 0, Message::TC, 0);
 
-	for (int i = 0; i < 4; i++){
+	for (int i = 0; i < 4; i++) {
 		uint16_t partSequenceNumber = i;
 		CHECK(largeMessageTransactionIdentifier == ServiceTests::get(i).readUint16());
 		CHECK(partSequenceNumber == ServiceTests::get(i).readUint16());
 		CHECK(ECSSMaxFixedOctetStringSize == ServiceTests::get(i).readUint16());
-		for (int j = 0; j < 256; j++){
+		for (int j = 0; j < 256; j++) {
 			message5.appendUint8(ServiceTests::get(i).readUint8());
 		}
 	}

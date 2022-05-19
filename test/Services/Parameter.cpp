@@ -1,8 +1,8 @@
-#include <iostream>
-#include "catch2/catch.hpp"
 #include "Helpers/Parameter.hpp"
-#include "Services/ParameterService.hpp"
+#include <iostream>
 #include "Message.hpp"
+#include "Services/ParameterService.hpp"
+#include "catch2/catch_all.hpp"
 
 TEST_CASE("Parameter Append") {
 	SECTION("Check correct appending") {
@@ -49,24 +49,24 @@ TEST_CASE("Get value as double") {
 		auto parameter1 = Parameter<uint8_t>(7);
 		uint8_t value = 13;
 		parameter1.setValue(value);
-		CHECK(parameter1.getValueAsDouble() == Approx(13.0).epsilon(0.1));
+		CHECK(parameter1.getValueAsDouble() == Catch::Approx(13.0).epsilon(0.1));
 	}
 	SECTION("uint16 to double") {
 		auto parameter2 = Parameter<uint32_t>(8);
 		uint16_t value = 264;
 		parameter2.setValue(value);
-		CHECK(parameter2.getValueAsDouble() == Approx(264.0).epsilon(0.1));
+		CHECK(parameter2.getValueAsDouble() == Catch::Approx(264.0).epsilon(0.1));
 	}
 	SECTION("uint32 to double") {
 		auto parameter3 = Parameter<uint32_t>(9);
 		uint32_t value = 544;
 		parameter3.setValue(value);
-		CHECK(parameter3.getValueAsDouble() == Approx(544.0).epsilon(0.1));
+		CHECK(parameter3.getValueAsDouble() == Catch::Approx(544.0).epsilon(0.1));
 	}
 	SECTION("float to double") {
 		auto parameter4 = Parameter<float>(10);
 		float value = 14.237;
 		parameter4.setValue(value);
-		CHECK(parameter4.getValueAsDouble() == Approx(14.237).epsilon(0.001));
+		CHECK(parameter4.getValueAsDouble() == Catch::Approx(14.237).epsilon(0.001));
 	}
 }

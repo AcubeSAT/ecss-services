@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 #include "etl/algorithm.h"
 
 HousekeepingService& housekeepingService = Services.housekeeping;
@@ -623,65 +623,65 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 }
 
 TEST_CASE("Periodically reporting Housekeeping Structures") {
-    uint32_t nextCollection = 0;
+	uint32_t nextCollection = 0;
 	uint32_t currentTime = 0;
 	uint32_t previousTime = 0;
-    SECTION("Non existent structures") {
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-        CHECK(ServiceTests::count() == 0);
-        CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
-    }
-    SECTION("Collection Intervals set to max") {
-        initializeHousekeepingStructures();
-        for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
-            housekeepingStructure.second.collectionInterval = std::numeric_limits<uint32_t>::max();
-        }
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-        CHECK(ServiceTests::count() == 0);
-        CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
-    }
-    SECTION("Calculating properly defined collection intervals") {
-        housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
-        housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
-        housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+	SECTION("Non existent structures") {
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		CHECK(ServiceTests::count() == 0);
+		CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
+	}
+	SECTION("Collection Intervals set to max") {
+		initializeHousekeepingStructures();
+		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
+			housekeepingStructure.second.collectionInterval = std::numeric_limits<uint32_t>::max();
+		}
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		CHECK(ServiceTests::count() == 0);
+		CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
+	}
+	SECTION("Calculating properly defined collection intervals") {
+		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
+		housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
+		housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
-        CHECK(currentTime == 900);
-        CHECK(ServiceTests::count() == 0);
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		CHECK(currentTime == 900);
+		CHECK(ServiceTests::count() == 0);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
-        CHECK(currentTime == 1000);
-        CHECK(ServiceTests::count() == 1);
+		CHECK(currentTime == 1000);
+		CHECK(ServiceTests::count() == 1);
 		currentTime += 6;
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
-        CHECK(currentTime == 1800);
-        CHECK(ServiceTests::count() == 2);
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		CHECK(currentTime == 1800);
+		CHECK(ServiceTests::count() == 2);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
-        CHECK(ServiceTests::count() == 3);
-        CHECK(currentTime == 2000);
+		CHECK(ServiceTests::count() == 3);
+		CHECK(currentTime == 2000);
 		currentTime += 15;
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
-        CHECK(ServiceTests::count() == 4);
-        CHECK(currentTime == 2700);
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		CHECK(ServiceTests::count() == 4);
+		CHECK(currentTime == 2700);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
-        CHECK(ServiceTests::count() == 6);
-        CHECK(currentTime == 3000);
-    }
-    SECTION("Collection Intervals set to 0") {
-        for (auto &housekeepingStructure: housekeepingService.housekeepingStructures) {
-            housekeepingStructure.second.collectionInterval = 0;
-        }
-        nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-        CHECK(nextCollection == 0);
-    }
+		CHECK(ServiceTests::count() == 6);
+		CHECK(currentTime == 3000);
+	}
+	SECTION("Collection Intervals set to 0") {
+		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
+			housekeepingStructure.second.collectionInterval = 0;
+		}
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		CHECK(nextCollection == 0);
+	}
 }
