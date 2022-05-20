@@ -21,7 +21,7 @@ private:
 	 * The time at which the evaluation of statistics is initialized. It is basically the time when the statistics
 	 * are reset.
 	 */
-	uint64_t evaluationStartTime = 0;
+	Time::CustomCUC_t evaluationStartTime;
 
 public:
 	inline static const uint8_t ServiceType = 4;

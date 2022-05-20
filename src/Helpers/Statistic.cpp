@@ -43,14 +43,15 @@ void Statistic::setSelfSamplingInterval(uint16_t samplingInterval) {
 void Statistic::resetStatistics() {
 	max = -std::numeric_limits<double>::infinity();
 	min = std::numeric_limits<double>::infinity();
-	timeOfMaxValue = 0;
-	timeOfMinValue = 0;
+	timeOfMaxValue.elapsed100msTicks = 0;
+	timeOfMinValue.elapsed100msTicks = 0;
 	mean = 0;
 	sumOfSquares = 0;
 	sampleCounter = 0;
 }
 
 bool Statistic::statisticsAreInitialized() {
-	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and timeOfMaxValue == 0 and timeOfMinValue == 0 and
+	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and
+	        timeOfMaxValue.elapsed100msTicks == 0 and timeOfMinValue.elapsed100msTicks == 0 and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
 }

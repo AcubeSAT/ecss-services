@@ -12,11 +12,6 @@
 class TimeGetter {
 public:
 	/**
-	 * The type of the CUC format, used for the timestamps.
-	 */
-	typedef uint64_t CUCTimeFormat;
-
-	/**
 	 * @brief Gets the current time in UNIX epoch
 	 * @return Current UNIX epoch time, in elapsed seconds
 	 */
@@ -41,7 +36,7 @@ public:
 	 * @return CUC timestamp, formatted as elapsed 100ms ticks.
 	 * @see Time.hpp
 	 */
-	static CUCTimeFormat getCurrentTimeCustomCUC();
+	static Time::CustomCUC_t getCurrentTimeCustomCUC();
 };
 
 #endif // ECSS_SERVICES_TIMEGETTER_HPP
