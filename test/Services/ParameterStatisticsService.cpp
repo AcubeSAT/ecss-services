@@ -44,7 +44,7 @@ TEST_CASE("Reporting of statistics") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.readUint64() == 0);        // start time
+		CHECK(report.readUint64() == 86769000);  // start time
 		CHECK(report.readUint64() == 86769000); // end time
 		CHECK(report.readUint16() == 2);        // number of parameters reported
 		// Parameter B

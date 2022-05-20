@@ -38,6 +38,8 @@ public:
 		ParameterStatisticsDefinitionsReport = 9,
 	};
 
+	ParameterStatisticsService();
+
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */

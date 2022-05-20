@@ -3,6 +3,8 @@
 #include "ServicePool.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
+ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {}
+
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
 	parameterStatisticsReport();
