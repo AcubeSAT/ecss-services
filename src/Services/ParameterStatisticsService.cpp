@@ -52,12 +52,10 @@ void ParameterStatisticsService::resetParameterStatistics(Message& request) {
 }
 
 void ParameterStatisticsService::resetParameterStatistics() {
-	// TODO: Stop the evaluation of parameter statistics
 	for (auto& it: statisticsMap) {
 		it.second.resetStatistics();
 	}
 	evaluationStartTime = TimeGetter::getCurrentTimeCustomCUC();
-	// TODO: Restart the evaluation of parameter statistics
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
