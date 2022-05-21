@@ -170,3 +170,14 @@ MessageParser::parse(string, size);
 ```
 
 You can use the rest of the @ref MessageParser functions if you have a more specific use-case.
+
+## Using the Timer
+
+A significant portion of the ECSS functionalities, use timestamps for comparing times of message receival for 
+example, or reporting the time of events when creating TMs. However, the time tracking is performed by the MCU, 
+so the time-related functions existing in the ECSS should be re-implemented so that they use actual time and not
+dummy values. The **TimeGetter** class is responsible for giving access to real time, enabling the above mentioned
+capabilities for the ECSS. The function implementations are located under the **/Platform/x86/** directory.
+
+- **getCurrentTimeUTC**: computes the current UTC time. In order to actually acquire the current time, modify the 
+  arguments (which are dummy by default), so that they correspond to their real values.
