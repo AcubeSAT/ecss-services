@@ -1,6 +1,6 @@
-#include <catch2/catch.hpp>
-#include <Services/TestService.hpp>
 #include <Message.hpp>
+#include <Services/TestService.hpp>
+#include <catch2/catch_all.hpp>
 #include "ServiceTests.hpp"
 
 TestService& testService = Services.testService;

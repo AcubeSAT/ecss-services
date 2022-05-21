@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 StorageAndRetrievalService& storageAndRetrieval = Services.storageAndRetrieval;
 

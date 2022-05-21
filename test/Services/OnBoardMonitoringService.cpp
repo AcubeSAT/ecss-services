@@ -1,10 +1,10 @@
-#include <catch2/catch.hpp>
-#include <Services/OnBoardMonitoringService.hpp>
 #include <Message.hpp>
-#include "ServiceTests.hpp"
-#include <etl/array.h>
-#include <etl/String.hpp>
 #include <ServicePool.hpp>
+#include <Services/OnBoardMonitoringService.hpp>
+#include <catch2/catch_all.hpp>
+#include <etl/String.hpp>
+#include <etl/array.h>
+#include "ServiceTests.hpp"
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 

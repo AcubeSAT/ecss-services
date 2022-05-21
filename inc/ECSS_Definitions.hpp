@@ -213,6 +213,13 @@ inline const uint8_t ECSSMaxApplicationsServicesCombinations = ECSSMaxControlled
                                                                ECSSMaxServiceTypeDefinitions;
 
 /**
+ * The max number of event definition IDs per event report blocking type definition in the event report blocking
+ * configuration
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxEventDefinitionIDs = 15;
+
+/**
  * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
  */
 inline struct {
@@ -224,7 +231,6 @@ inline struct {
  * Maximum number of ST[12] Parameter Monitoring Definitions.
  */
 inline const uint8_t ECSSMaxMonitoringDefinitions = 4;
-
 
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
