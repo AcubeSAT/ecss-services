@@ -1,14 +1,14 @@
 #ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #include <cstdint>
-#include "Message.hpp"
-#include "etl/array.h"
-#include "Service.hpp"
-#include "Helpers/Parameter.hpp"
-#include "etl/map.h"
 #include "ECSS_Definitions.hpp"
-#include "etl/list.h"
 #include "Helpers/PMONBase.hpp"
+#include "Helpers/Parameter.hpp"
+#include "Message.hpp"
+#include "Service.hpp"
+#include "etl/array.h"
+#include "etl/list.h"
+#include "etl/map.h"
 
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
@@ -68,6 +68,9 @@ public:
 	bool isPMONListEmpty() {
 		return parameterMonitoringList.empty();
 	}
+	uint16_t getCount(uint16_t key){
+		return parameterMonitoringList.count(key);
+	}
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
@@ -91,10 +94,54 @@ public:
 	void deleteAllParameterMonitoringDefinitions(Message& message);
 
 	/**
-	 * TC[12,9]
-	 * Transmission of a parameter monitoring definition report.
+	 * TC[12,5]
 	 */
-	 void parameterMonitoringDefinitionReport(Message& message);
+	void addParameterMonitoringDefinitions(Message& message);
+
+	/**
+	 * TC[12,6]
+	 */
+	void deleteParameterMonitoringDefinitions(Message& message);
+
+	/**
+	 * TC[12,7]
+	 */
+	void modifyParameterMonitoringDefinitions(Message& message);
+
+	/**
+	 * TC[12,8]
+	 */
+	void reportParameterMonitoringDefinitions(Message& message);
+
+	/**
+	 * TM[12,9]
+	 */
+	void parameterMonitoringDefinitionReport(Message& message);
+
+	/**
+	 * TC[12,10]
+	 */
+	void reportOutOfLimits(Message& message);
+
+	/**
+	 * TM[12,11]
+	 */
+	void outOfLimitsReport();
+
+	/**
+	 * TM[12,12]
+	 */
+	void checkTransitionReport();
+
+	/**
+	 * TC[12,13]
+	 */
+	void reportStatusOfParameterMonitoringDefinition(Message& message);
+
+	/**
+	 * TM[12,14]
+	 */
+	void parameterMonitoringDefinitionStatusReport();
 
 	void execute(Message& message);
 };

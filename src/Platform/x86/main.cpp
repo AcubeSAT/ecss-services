@@ -1,5 +1,7 @@
 #include <iostream>
 #include <Logger.hpp>
+#include <Time/UTCTimestamp.hpp>
+#include <Platform/x86/Helpers/UTCTimestamp.hpp>
 #include "Helpers/CRCHelper.hpp"
 #include "Services/HousekeepingService.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
@@ -154,6 +156,8 @@ int main() {
 
 
 	LOG_NOTICE << "ECSS Services test complete";
+
+	std::cout << UTCTimestamp() << std::endl;
 	return 0;
 	LOG_NOTICE << "ECSS Services test complete";
 	return 0;
