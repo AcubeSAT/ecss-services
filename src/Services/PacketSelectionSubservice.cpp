@@ -1,3 +1,4 @@
+#include "Services/PacketSelectionSubservice.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
 
 PacketSelectionSubservice::PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores) : packetStores(mainServicePacketStores) {}
