@@ -23,18 +23,18 @@ void PacketSelectionSubservice::addAllReportsOfApplication(const String<ECSSPack
 void PacketSelectionSubservice::addAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
 	for (auto& messageType: AllMessageTypes::messagesOfService[serviceType]) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
-		applicationProcessConfiguration.definitions[packetStoreID][appServicePair].push_back(messageType);
+		applicationProcessConfiguration[packetStoreID].definitions[appServicePair].push_back(messageType);
 	}
 }
 
 uint8_t PacketSelectionSubservice::countServicesOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
-	auto& definitions = applicationProcessConfiguration.definitions[packetStoreID];
+	auto& definitions = applicationProcessConfiguration[packetStoreID].definitions;
 	return std::count_if(std::begin(definitions), std::end(definitions), [applicationID](auto& definition) { return applicationID == definition.first.first; });
 }
 
 uint8_t PacketSelectionSubservice::countReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
 	auto appServicePair = std::make_pair(applicationID, serviceType);
-	return applicationProcessConfiguration.definitions[packetStoreID][appServicePair].size();
+	return applicationProcessConfiguration[packetStoreID].definitions[appServicePair].size();
 }
 
 bool PacketSelectionSubservice::isAppControlled(Message& request, uint8_t applicationId) {
@@ -104,9 +104,9 @@ bool PacketSelectionSubservice::checkMessage(Message& request, const String<ECSS
 bool PacketSelectionSubservice::reportExistsInAppProcessConfiguration(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType,
                                                                       uint8_t messageType) {
 	auto appServicePair = std::make_pair(applicationID, serviceType);
-	return std::find(applicationProcessConfiguration.definitions[packetStoreID][appServicePair].begin(),
-	                 applicationProcessConfiguration.definitions[packetStoreID][appServicePair].end(),
-	                 messageType) != applicationProcessConfiguration.definitions[packetStoreID][appServicePair].end();
+	return std::find(applicationProcessConfiguration[packetStoreID].definitions[appServicePair].begin(),
+	                 applicationProcessConfiguration[packetStoreID].definitions[appServicePair].end(),
+	                 messageType) != applicationProcessConfiguration[packetStoreID].definitions[appServicePair].end();
 }
 
 void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
@@ -152,7 +152,7 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 					continue;
 				}
 				auto appServicePair = std::make_pair(applicationID, serviceType);
-				applicationProcessConfiguration.definitions[packetStoreID][appServicePair].push_back(
+				applicationProcessConfiguration[packetStoreID].definitions[appServicePair].push_back(
 				    messageType);
 			}
 		}
