@@ -5,9 +5,9 @@ UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	return currentTime;
 }
 
-uint64_t TimeGetter::getCurrentTimeCustomCUC() {
+Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
 	UTCTimestamp timeUTC = getCurrentTimeUTC();
 	TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
-	TimeGetter::CUCTimeFormat CUCtime = timeCUC.asCustomCUCTimestamp().elapsed100msTicks;
+	Time::CustomCUC_t CUCtime = timeCUC.asCustomCUCTimestamp();
 	return CUCtime;
 }
