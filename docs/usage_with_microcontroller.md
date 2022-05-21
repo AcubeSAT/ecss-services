@@ -17,6 +17,7 @@ compile this library independently for different projects.
 ## Examples
 
 Some people have already integrated this library with their own code:
+
 - [AcubeSAT OBC Software](https://gitlab.com/acubesat/obc/obc-software), integration with ATSAMV71Q21 and FreeRTOS
 - [AcubeSAT FDIR Thesis](https://github.com/kongr45gpen/fdir-demo), integration with ATSAMV71Q21 and FreeRTOS
 - [AcubeSAT OBC Mockup](https://gitlab.com/acubesat/obc/mockup-4), integration with STM32L4S9 and FreeRTOS
@@ -57,13 +58,15 @@ your project.
 The following sections list and explain the functions that need to be implemented by library users. It is enough to
 place the function body inside a compiled `.cpp` file. Otherwise, the linker will show errors about undefined functions.
 
-For more details on the requirements, arguments and return values of each function, refer to their respective documentation.
+For more details on the requirements, arguments and return values of each function, refer to their respective
+documentation.
 
 ### Logger
 
 The logger is responsible for outputting messages through a serial interface used for debugging purposes.
 
 You need to define the following function:
+
 ```cpp
 void Logger::log(Logger::LogLevel level, etl::istring & message);
 ```
@@ -73,6 +76,7 @@ be inspected by the developers. It is suggested to add any extra information tha
 execution thread.
 
 An example definition can be as follows:
+
 ```cpp
 void Logger::log(Logger::LogLevel level, etl::istring &message) {
     etl::string<20> time;
@@ -88,16 +92,19 @@ void Logger::log(Logger::LogLevel level, etl::istring &message) {
 ```
 
 #### Setting the log level
+
 You will also need to set the **minimum log level** of your application by setting the relevant `LOGLEVEL` constants.
 
 For example, you can add this to your `CMakeLists.txt` to log all messages:
+
 ```cmake
 add_compile_definitions(LOGLEVEL_TRACE)
 ```
 
 For a list of all possible log levels, refer to the documentation of the Logger.
 
-@note If you want to have different log levels for different parts of your application, you can use [`target_compile_definitions`](https://cmake.org/cmake/help/latest/command/target_compile_definitions.html).
+@note If you want to have different log levels for different parts of your application, you can
+use [`target_compile_definitions`](https://cmake.org/cmake/help/latest/command/target_compile_definitions.html).
 
 @note All logs with a level lower than the specified one will not be compiled at all, and will not be included in any
 form in the resulting binary. This means that disabled log messages _will not_ have any negative impact on the
@@ -111,6 +118,7 @@ Whenever PUS telemetry is generated, it needs to be transmitted or sent to a rec
 In this function, you can transmit the message via an antenna, send it through an interface for debugging, or both.
 
 An example definition can be as follows:
+
 ```cpp
 void Service::storeMessage(Message& message) {
 	message.finalize();
@@ -129,6 +137,7 @@ The @ref ErrorHandler::logError is responsible for logging errors for debugging 
 ErrorHandler::logError function is used strictly for debugging purposes, and can be left empty if desired.
 
 An example definition can be as follows:
+
 ```cpp
 template <typename ErrorType>
 void ErrorHandler::logError(const Message& message, ErrorType errorType) {
@@ -144,13 +153,69 @@ void ErrorHandler::logError(ErrorType errorType) {
 }
 ```
 
+### Using the Timer
+
+A significant portion of the ECSS functionalities, use timestamps for comparing times of message receival for
+example, or reporting the time of events when creating TMs. However, the time tracking is performed by the MCU,
+so the time-related functions existing in the ECSS should be re-implemented so that they use actual time and not
+dummy values. The **TimeGetter** class is responsible for giving access to real time, enabling the above mentioned
+capabilities for the ECSS. The function implementations are located under the **/Platform/x86/** directory.
+
+#### Getting the current UTC time
+
+The **getCurrentTimeUTC** function computes the current UTC time. In order to actually acquire the current time,
+modify the arguments (which are dummy by default), so that they correspond to their real values. An example is given
+below.
+
+```cpp
+UTCTimestamp TimeGetter::getCurrentTimeUTC() {
+	UTCTimestamp currentTime(onBoardYear, onBoardMonth, onBoardDay, onBoardHour, onBoardMinute, onBoardSecond);
+	return currentTime;
+}
+```
+
+#### On board time formats
+
+The timestamp types used throughout the ECSS, are following specific On-Board-Time-Format standards. For our mission,
+we decided to use the **CUC** time format, however this might not be the case for all the users of the library. In
+order to make the implementation functional with any time format of choice, the following functions should be
+adjusted accordingly.
+
+- **getCurrentTimeCustomCUC**: it is a member of **TimeGetter** and should return the desired time format, given a
+  UTC timestamp.
+  For **CUC**:
+    ```cpp
+    Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
+        UTCTimestamp timeUTC = getCurrentTimeUTC();
+        TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
+        Time::CustomCUC_t CUCtime = timeCUC.asCustomCUCTimestamp();
+        return CUCtime;
+    }
+    ```
+  For an arbitrary time format **TF** of choice:
+    ```cpp
+    Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
+        UTCTimestamp timeUTC = getCurrentTimeUTC();
+        TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
+        Time::TF timeTF = timeTF.asCustomTFTimestamp();
+        return timeTF;
+    }
+    ```
+  Note here that the **TimeStamp** class should be modified as well, so that it represents a timestamp in a way
+  that is easily convertible to TF.
+
+- **appendCustomCUCTimeStamp**: should be implemented accordingly, to append a Time format of choice to a message.
+  This function is a member of the **Message** class, which is found under the **/inc/** directory.
+
 ## Service initialisation
 
 Platform-specific code also gives a chance to every Service to use pre-initialised entities (e.g. parameters, monitoring
 definitions etc.) during boot. The following functions are called at initialisation:
+
 1. @ref ParameterService::initializeParameterMap
 
 An example definition can be as follows:
+
 ```cpp
 Parameter<uint8_t> parameter1(200);
 Parameter<uint8_t> parameter2(150);
@@ -165,19 +230,9 @@ void ParameterService::initializeParameterMap() {
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can
 be done easily:
+
 ```cpp
 MessageParser::parse(string, size);
 ```
 
 You can use the rest of the @ref MessageParser functions if you have a more specific use-case.
-
-## Using the Timer
-
-A significant portion of the ECSS functionalities, use timestamps for comparing times of message receival for 
-example, or reporting the time of events when creating TMs. However, the time tracking is performed by the MCU, 
-so the time-related functions existing in the ECSS should be re-implemented so that they use actual time and not
-dummy values. The **TimeGetter** class is responsible for giving access to real time, enabling the above mentioned
-capabilities for the ECSS. The function implementations are located under the **/Platform/x86/** directory.
-
-- **getCurrentTimeUTC**: computes the current UTC time. In order to actually acquire the current time, modify the 
-  arguments (which are dummy by default), so that they correspond to their real values.
