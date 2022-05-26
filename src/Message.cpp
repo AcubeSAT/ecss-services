@@ -187,8 +187,3 @@ void Message::appendOctetString(const etl::istring& string) {
 	appendUint16(string.size());
 	appendString(string);
 }
-
-void Message::appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC) {
-	appendUint64(timeCUC.elapsed100msTicks);
-}
-
