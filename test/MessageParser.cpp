@@ -1,8 +1,8 @@
-#include <catch2/catch.hpp>
+#include "MessageParser.hpp"
 #include <Message.hpp>
+#include <catch2/catch_all.hpp>
 #include <cstring>
 #include "Helpers/CRCHelper.hpp"
-#include "MessageParser.hpp"
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};

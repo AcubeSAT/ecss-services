@@ -1,5 +1,5 @@
 #include "Helpers/PacketStore.hpp"
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 TEST_CASE("Counting a packet store's size in bytes") {
 	SECTION("Correct counting of size in bytes") {

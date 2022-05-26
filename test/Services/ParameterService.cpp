@@ -1,8 +1,8 @@
-#include "catch2/catch.hpp"
-#include "Message.hpp"
-#include "ServiceTests.hpp"
 #include "Services/ParameterService.hpp"
+#include "Message.hpp"
 #include "Parameters/PlatformParameters.hpp"
+#include "ServiceTests.hpp"
+#include "catch2/catch_all.hpp"
 
 static void resetParameterValues() {
 	PlatformParameters::parameter1.setValue(3);

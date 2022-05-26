@@ -45,7 +45,9 @@ add_library(common OBJECT
         src/Services/ParameterStatisticsService.cpp
         src/Services/OnBoardMonitoringService.cpp
         src/Helpers/Statistic.cpp
+        src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
+        src/Helpers/AllMessageTypes.cpp
         )
 
 # Specify the .cpp files for the executables
@@ -71,5 +73,5 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             ${test_main_SRC}
             ${test_SRC}
             )
-    target_link_libraries(tests Catch2::Catch2)
+    target_link_libraries(tests Catch2::Catch2WithMain)
 ENDIF ()

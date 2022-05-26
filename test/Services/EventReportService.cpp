@@ -1,8 +1,8 @@
-#include <catch2/catch.hpp>
-#include <Services/EventReportService.hpp>
 #include <Message.hpp>
-#include "ServiceTests.hpp"
+#include <Services/EventReportService.hpp>
+#include <catch2/catch_all.hpp>
 #include <cstring>
+#include "ServiceTests.hpp"
 
 EventReportService& eventReportService = Services.eventReport;
 

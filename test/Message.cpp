@@ -1,8 +1,8 @@
-#include <catch2/catch.hpp>
 #include <Message.hpp>
 #include <ServicePool.hpp>
-#include "etl/String.hpp"
+#include <catch2/catch_all.hpp>
 #include "Services/EventReportService.hpp"
+#include "etl/String.hpp"
 
 TEST_CASE("Message is usable", "[message]") {
 	Message message(EventReportService::ServiceType, 17, Message::TC, 3);
@@ -163,7 +163,7 @@ TEST_CASE("Test appending double") {
 
 	REQUIRE(message.dataSize == 8);
 
-	CHECK(message.read<double>() == Approx(2.324).epsilon(0.0001));
+	CHECK(message.read<double>() == Catch::Approx(2.324).epsilon(0.0001));
 }
 
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {

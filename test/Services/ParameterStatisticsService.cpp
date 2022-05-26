@@ -2,7 +2,7 @@
 #include "ECSS_Definitions.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "catch2/catch.hpp"
+#include "catch2/catch_all.hpp"
 
 /**
  * System-statistics initialization, so there are actual statistics in the map to work with.
@@ -55,7 +55,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readFloat() == 3);         // min value
 		CHECK(report.readUint64() == 86769000); // min time
 		CHECK(report.readFloat() == 8);         // mean
-		CHECK(report.readFloat() == Approx(3.41565).epsilon(0.01));
+		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
 		CHECK(report.readUint16() == 7);                  // ID-1
 		CHECK(report.readUint16() == 3);                  // number of samples

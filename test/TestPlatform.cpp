@@ -1,14 +1,14 @@
 #define CATCH_CONFIG_EXTERNAL_INTERFACES
 
-#include <catch2/catch.hpp>
+#include <Logger.hpp>
 #include <Message.hpp>
 #include <Service.hpp>
-#include <Logger.hpp>
-#include "Services/ServiceTests.hpp"
+#include <catch2/catch_all.hpp>
 #include "Helpers/Parameter.hpp"
-#include "Services/ParameterService.hpp"
-#include "Parameters/PlatformParameters.hpp"
 #include "Helpers/TimeGetter.hpp"
+#include "Parameters/PlatformParameters.hpp"
+#include "Services/ParameterService.hpp"
+#include "Services/ServiceTests.hpp"
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
@@ -55,8 +55,8 @@ void Logger::log(Logger::LogLevel level, etl::istring& message) {
 	// Logs while testing are completely ignored
 }
 
-struct ServiceTestsListener : Catch::TestEventListenerBase {
-	using TestEventListenerBase::TestEventListenerBase; // inherit constructor
+struct ServiceTestsListener : Catch::EventListenerBase {
+	using EventListenerBase::EventListenerBase; // inherit constructor
 
 	void sectionEnded(Catch::SectionStats const& sectionStats) override {
 		// Make sure we don't have any errors
@@ -88,7 +88,7 @@ namespace PlatformParameters {
 	inline Parameter<uint32_t> parameter10(43);
 	inline Parameter<uint32_t> parameter11(91);
 	inline Parameter<uint8_t> parameter12(1);
-}
+} // namespace PlatformParameters
 
 /**
  * Specific definition for \ref ParameterService's initialize function, for testing purposes.
