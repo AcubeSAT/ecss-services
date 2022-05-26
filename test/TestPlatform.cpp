@@ -5,9 +5,22 @@
 #include <Service.hpp>
 #include <catch2/catch_all.hpp>
 #include "Helpers/Parameter.hpp"
+#include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/ServiceTests.hpp"
+
+UTCTimestamp TimeGetter::getCurrentTimeUTC() {
+	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
+	return currentTime;
+}
+
+Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
+	UTCTimestamp timeUTC = getCurrentTimeUTC();
+	TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
+	Time::CustomCUC_t CUCtime = timeCUC.asCustomCUCTimestamp();
+	return CUCtime;
+}
 
 // Explicit template specializations for the logError() function
 template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
