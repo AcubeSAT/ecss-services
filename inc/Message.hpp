@@ -150,7 +150,9 @@ public:
 	/**
 	 * Appends a type CustomCUC (CUC formatted timestamp) to the message.
 	 */
-	void appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC);
+	void appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC) {
+		appendUint64(timeCUC.elapsed100msTicks);
+	}
 
 	/**
 	 * Appends a number of bytes to the message
