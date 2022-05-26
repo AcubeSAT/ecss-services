@@ -155,11 +155,10 @@ void ErrorHandler::logError(ErrorType errorType) {
 
 ### Using the Timer
 
-A significant portion of the ECSS functionalities, uses timestamps for comparing times of message reception for
-example, or reporting the time of events when creating TMs. However, the time tracking is performed by the MCU,
-so the time-related functions existing in the ECSS should be re-implemented, as the current functions contain dummy
-values. The **TimeGetter** class is responsible for giving access to real time, enabling the above mentioned
-capabilities for the ECSS. The function implementations are located under the **/Platform/x86/** directory.
+A significant portion of the PUS functionalities uses timestamps, for example in order to compare message reception times,
+or reporting event times as telemetry. However, time tracking is performed by the hardware, so the time-related functions
+existing in the Services should be re-implemented, as the current functions contain dummy values. The **TimeGetter** class
+is responsible for giving access to a Real-Time Clock, enabling the above capabilities.
 
 #### Getting the current UTC time
 
