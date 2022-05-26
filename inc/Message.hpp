@@ -5,8 +5,8 @@
 #include <cstdint>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
-#include "ErrorHandler.hpp"
 #include "macros.hpp"
+#include "Time/Time.hpp"
 
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
@@ -146,6 +146,13 @@ public:
 	 * Appends 4 bytes to the message
 	 */
 	void appendWord(uint32_t value);
+
+	/**
+	 * Appends a type CustomCUC (CUC formatted timestamp) to the message.
+	 */
+	void appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC) {
+		appendUint64(timeCUC.elapsed100msTicks);
+	}
 
 	/**
 	 * Appends a number of bytes to the message
@@ -675,6 +682,10 @@ inline void Message::append(const float& value) {
 template <>
 inline void Message::append(const double& value) {
 	appendDouble(value);
+}
+template <>
+inline void Message::append(const Time::CustomCUC_t& timeCUC) {
+	appendCustomCUCTimeStamp(timeCUC);
 }
 
 /**

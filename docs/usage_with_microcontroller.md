@@ -17,6 +17,7 @@ compile this library independently for different projects.
 ## Examples
 
 Some people have already integrated this library with their own code:
+
 - [AcubeSAT OBC Software](https://gitlab.com/acubesat/obc/obc-software), integration with ATSAMV71Q21 and FreeRTOS
 - [AcubeSAT FDIR Thesis](https://github.com/kongr45gpen/fdir-demo), integration with ATSAMV71Q21 and FreeRTOS
 - [AcubeSAT OBC Mockup](https://gitlab.com/acubesat/obc/mockup-4), integration with STM32L4S9 and FreeRTOS
@@ -57,13 +58,15 @@ your project.
 The following sections list and explain the functions that need to be implemented by library users. It is enough to
 place the function body inside a compiled `.cpp` file. Otherwise, the linker will show errors about undefined functions.
 
-For more details on the requirements, arguments and return values of each function, refer to their respective documentation.
+For more details on the requirements, arguments and return values of each function, refer to their respective
+documentation.
 
 ### Logger
 
 The logger is responsible for outputting messages through a serial interface used for debugging purposes.
 
 You need to define the following function:
+
 ```cpp
 void Logger::log(Logger::LogLevel level, etl::istring & message);
 ```
@@ -73,6 +76,7 @@ be inspected by the developers. It is suggested to add any extra information tha
 execution thread.
 
 An example definition can be as follows:
+
 ```cpp
 void Logger::log(Logger::LogLevel level, etl::istring &message) {
     etl::string<20> time;
@@ -88,16 +92,19 @@ void Logger::log(Logger::LogLevel level, etl::istring &message) {
 ```
 
 #### Setting the log level
+
 You will also need to set the **minimum log level** of your application by setting the relevant `LOGLEVEL` constants.
 
 For example, you can add this to your `CMakeLists.txt` to log all messages:
+
 ```cmake
 add_compile_definitions(LOGLEVEL_TRACE)
 ```
 
 For a list of all possible log levels, refer to the documentation of the Logger.
 
-@note If you want to have different log levels for different parts of your application, you can use [`target_compile_definitions`](https://cmake.org/cmake/help/latest/command/target_compile_definitions.html).
+@note If you want to have different log levels for different parts of your application, you can
+use [`target_compile_definitions`](https://cmake.org/cmake/help/latest/command/target_compile_definitions.html).
 
 @note All logs with a level lower than the specified one will not be compiled at all, and will not be included in any
 form in the resulting binary. This means that disabled log messages _will not_ have any negative impact on the
@@ -111,6 +118,7 @@ Whenever PUS telemetry is generated, it needs to be transmitted or sent to a rec
 In this function, you can transmit the message via an antenna, send it through an interface for debugging, or both.
 
 An example definition can be as follows:
+
 ```cpp
 void Service::storeMessage(Message& message) {
 	message.finalize();
@@ -129,6 +137,7 @@ The @ref ErrorHandler::logError is responsible for logging errors for debugging 
 ErrorHandler::logError function is used strictly for debugging purposes, and can be left empty if desired.
 
 An example definition can be as follows:
+
 ```cpp
 template <typename ErrorType>
 void ErrorHandler::logError(const Message& message, ErrorType errorType) {
@@ -144,13 +153,36 @@ void ErrorHandler::logError(ErrorType errorType) {
 }
 ```
 
+### Using the Timer
+
+A significant portion of the PUS functionalities uses timestamps, for example in order to compare message reception times,
+or reporting event times as telemetry. However, time tracking is performed by the hardware, so the time-related functions
+existing in the Services should be re-implemented, as the current functions contain dummy values. The **TimeGetter** class
+is responsible for giving access to a Real-Time Clock, enabling the above capabilities.
+
+#### Getting the current UTC time
+
+The **getCurrentTimeUTC** function computes the current UTC time. In order to actually acquire the current time,
+modify the arguments (which are dummy by default), so that they correspond to their real values. An example is given
+below.
+
+```cpp
+UTCTimestamp TimeGetter::getCurrentTimeUTC() {
+	UTCTimestamp currentTime(onBoardYear, onBoardMonth, onBoardDay, onBoardHour, onBoardMinute, onBoardSecond);
+	return currentTime;
+}
+```
+
+
 ## Service initialisation
 
 Platform-specific code also gives a chance to every Service to use pre-initialised entities (e.g. parameters, monitoring
 definitions etc.) during boot. The following functions are called at initialisation:
+
 1. @ref ParameterService::initializeParameterMap
 
 An example definition can be as follows:
+
 ```cpp
 Parameter<uint8_t> parameter1(200);
 Parameter<uint8_t> parameter2(150);
@@ -165,6 +197,7 @@ void ParameterService::initializeParameterMap() {
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can
 be done easily:
+
 ```cpp
 MessageParser::parse(string, size);
 ```

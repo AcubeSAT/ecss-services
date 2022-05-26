@@ -166,6 +166,28 @@ TEST_CASE("Test appending double") {
 	CHECK(message.read<double>() == Catch::Approx(2.324).epsilon(0.0001));
 }
 
+TEST_CASE("Append a CUC timestamp") {
+	SECTION("Test 1") {
+		auto timeCUC = TimeGetter::getCurrentTimeCustomCUC();
+		REQUIRE(timeCUC.elapsed100msTicks == 86769000);
+
+		Message message(0, 0, Message::TC, 0);
+		message.appendCustomCUCTimeStamp(timeCUC);
+
+		REQUIRE(message.readUint64() == 86769000);
+	}
+
+	SECTION("Test 2") {
+		Time::CustomCUC_t timeCUC;
+		timeCUC.elapsed100msTicks = 34511;
+
+		Message message(0, 0, Message::TC, 0);
+		message.appendCustomCUCTimeStamp(timeCUC);
+
+		REQUIRE(message.readUint64() == 34511);
+	}
+}
+
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
