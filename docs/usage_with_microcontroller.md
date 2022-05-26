@@ -173,38 +173,6 @@ UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 }
 ```
 
-#### On board time formats
-
-The timestamp types used throughout the ECSS, are following specific On-Board-Time-Format standards. For our mission,
-we decided to use the **CUC** time format, however this might not be the case for all the users of the library. In
-order to make the implementation functional with any time format of choice, the following functions should be
-adjusted accordingly.
-
-- **getCurrentTimeCustomCUC**: it is a member of **TimeGetter** and should return the desired time format, given a
-  UTC timestamp.
-  For **CUC**:
-    ```cpp
-    Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
-        UTCTimestamp timeUTC = getCurrentTimeUTC();
-        TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
-        Time::CustomCUC_t CUCtime = timeCUC.asCustomCUCTimestamp();
-        return CUCtime;
-    }
-    ```
-  For an arbitrary time format **TF** of choice:
-    ```cpp
-    Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
-        UTCTimestamp timeUTC = getCurrentTimeUTC();
-        TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
-        Time::TF timeTF = timeTF.asCustomTFTimestamp();
-        return timeTF;
-    }
-    ```
-  Note here that the **TimeStamp** class should be modified as well, so that it represents a timestamp in a way
-  that is easily convertible to TF.
-
-- **appendCustomCUCTimeStamp**: should be implemented accordingly, to append a Time format of choice to a message.
-  This function is a member of the **Message** class, which is found under the **/inc/** directory.
 
 ## Service initialisation
 
