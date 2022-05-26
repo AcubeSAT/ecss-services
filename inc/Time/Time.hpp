@@ -1,8 +1,10 @@
-#pragma once
+#ifndef ECSS_TIMEHPP
+#define ECSS_TIMEHPP
+
 #include <cstdint>
-#include <Message.hpp>
 #include "macros.hpp"
 #include "etl/String.hpp"
+#include "ErrorHandler.hpp"
 
 /**
  * @defgroup Time Time
@@ -266,3 +268,5 @@ typedef struct {
 } CustomCUC_t;
 
 } // namespace Time
+
+#endif

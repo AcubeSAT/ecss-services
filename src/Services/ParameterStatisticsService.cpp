@@ -1,14 +1,13 @@
-#include <iostream>
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
-#include "Services/ParameterStatisticsService.hpp"
 #include "ServicePool.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+
+ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {}
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
 	parameterStatisticsReport();
-
-	// TODO: append start time and end time to the report
 
 	if (hasAutomaticStatisticsReset) {
 		resetParameterStatistics();
@@ -22,11 +21,12 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 
 void ParameterStatisticsService::parameterStatisticsReport() {
 	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
-	report.appendUint16(1); // Dummy value for start and end time, will change in the end
-	report.appendUint16(1);
-	uint16_t numOfValidParameters = 0;
+	report.append(evaluationStartTime);
+	auto evaluationStopTime = TimeGetter::getCurrentTimeCustomCUC();
+	report.append(evaluationStopTime);
 
-	for (auto& currentStatistic : statisticsMap) {
+	uint16_t numOfValidParameters = 0;
+	for (auto& currentStatistic: statisticsMap) {
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
@@ -35,7 +35,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	}
 	report.appendUint16(numOfValidParameters);
 
-	for (auto& currentStatistic : statisticsMap) {
+	for (auto& currentStatistic: statisticsMap) {
 		uint16_t currentId = currentStatistic.first;
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
@@ -54,11 +54,10 @@ void ParameterStatisticsService::resetParameterStatistics(Message& request) {
 }
 
 void ParameterStatisticsService::resetParameterStatistics() {
-	// TODO: Stop the evaluation of parameter statistics
-	for (auto& it : statisticsMap) {
+	for (auto& it: statisticsMap) {
 		it.second.resetStatistics();
 	}
-	// TODO: Restart the evaluation of parameter statistics
+	evaluationStartTime = TimeGetter::getCurrentTimeCustomCUC();
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
@@ -166,7 +165,7 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 	definitionsReport.appendUint16(currentReportingInterval);
 	definitionsReport.appendUint16(statisticsMap.size());
 
-	for (auto& currentParam : statisticsMap) {
+	for (auto& currentParam: statisticsMap) {
 		uint16_t currentId = currentParam.first;
 		uint16_t samplingInterval = currentParam.second.selfSamplingInterval;
 		definitionsReport.appendUint16(currentId);

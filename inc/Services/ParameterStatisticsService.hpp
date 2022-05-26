@@ -2,9 +2,10 @@
 #define ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Statistic.hpp"
+#include "Helpers/TimeGetter.hpp"
+#include "Service.hpp"
 #include "etl/deque.h"
 #include "etl/map.h"
 
@@ -15,6 +16,13 @@
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class ParameterStatisticsService : public Service {
+private:
+	/**
+	 * The time at which the evaluation of statistics is initialized. It is basically the time when the statistics
+	 * are reset.
+	 */
+	Time::CustomCUC_t evaluationStartTime;
+
 public:
 	inline static const uint8_t ServiceType = 4;
 
@@ -29,6 +37,8 @@ public:
 		ReportParameterStatisticsDefinitions = 8,
 		ParameterStatisticsDefinitionsReport = 9,
 	};
+
+	ParameterStatisticsService();
 
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter

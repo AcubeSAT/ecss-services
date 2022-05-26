@@ -44,25 +44,25 @@ TEST_CASE("Reporting of statistics") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.readUint16() == 1); // start time
-		CHECK(report.readUint16() == 1); // end time
-		CHECK(report.readUint16() == 2); // number of parameters reported
+		CHECK(report.readUint64() == 86769000);  // start time
+		CHECK(report.readUint64() == 86769000); // end time
+		CHECK(report.readUint16() == 2);        // number of parameters reported
 		// Parameter B
-		CHECK(report.readUint16() == 5); // ID-2
-		CHECK(report.readUint16() == 6); // number of samples
-		CHECK(report.readFloat() == 13); // max value
-		CHECK(report.readUint32() == 0); // max time
-		CHECK(report.readFloat() == 3);  // min value
-		CHECK(report.readUint32() == 0); // min time
-		CHECK(report.readFloat() == 8);  // mean
+		CHECK(report.readUint16() == 5);        // ID-2
+		CHECK(report.readUint16() == 6);        // number of samples
+		CHECK(report.readFloat() == 13);        // max value
+		CHECK(report.readUint64() == 86769000); // max time
+		CHECK(report.readFloat() == 3);         // min value
+		CHECK(report.readUint64() == 86769000); // min time
+		CHECK(report.readFloat() == 8);         // mean
 		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
 		CHECK(report.readUint16() == 7);                  // ID-1
 		CHECK(report.readUint16() == 3);                  // number of samples
 		CHECK(report.readFloat() == 5);                   // max value
-		CHECK(report.readUint32() == 0);                  // max time
+		CHECK(report.readUint64() == 86769000);           // max time
 		CHECK(report.readFloat() == 1);                   // min value
-		CHECK(report.readUint32() == 0);                  // min time
+		CHECK(report.readUint64() == 86769000);           // min time
 		CHECK(report.readFloat() == 3);                   // mean
 		CHECK(static_cast<int>(report.readFloat()) == 1); // stddev
 
