@@ -536,10 +536,10 @@ public:
 	}
 
 	Time::CustomCUC_t readCustomCUCTimeStamp(){
-		Time::CustomCUC_t customCuc_t;
+		Time::CustomCUC_t customCUC_t;
 
-		customCuc_t.elapsed100msTicks = readUint64();
-		return customCuc_t;
+		customCUC_t.elapsed100msTicks = readUint64();
+		return customCUC_t;
 	}
 
 	/**
