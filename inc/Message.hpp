@@ -755,4 +755,5 @@ template <>
 inline Time::CustomCUC_t Message::read(){
 	return readCustomCUCTimeStamp();
 }
+
 #endif // ECSS_SERVICES_PACKET_H
