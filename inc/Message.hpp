@@ -535,7 +535,7 @@ public:
 		return reinterpret_cast<double&>(value);
 	}
 
-	Time::CustomCUC_t readCustomCUCTimeStamp(){
+	Time::CustomCUC_t readCustomCUCTimeStamp() {
 		Time::CustomCUC_t customCUC_t;
 
 		customCUC_t.elapsed100msTicks = readUint64();
