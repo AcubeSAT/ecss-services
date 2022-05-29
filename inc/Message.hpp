@@ -535,6 +535,13 @@ public:
 		return reinterpret_cast<double&>(value);
 	}
 
+	Time::CustomCUC_t readCustomCUCTimeStamp(){
+		Time::CustomCUC_t customCuc_t;
+
+		customCuc_t.elapsed100msTicks = readUint64();
+		return customCuc_t;
+	}
+
 	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
@@ -744,5 +751,8 @@ template <>
 inline double Message::read() {
 	return readDouble();
 }
-
+template <>
+inline Time::CustomCUC_t Message::read(){
+	return readCustomCUCTimeStamp();
+}
 #endif // ECSS_SERVICES_PACKET_H
