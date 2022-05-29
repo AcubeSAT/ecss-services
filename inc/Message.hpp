@@ -752,7 +752,7 @@ inline double Message::read() {
 	return readDouble();
 }
 template <>
-inline Time::CustomCUC_t Message::read(){
+inline Time::CustomCUC_t Message::read() {
 	return readCustomCUCTimeStamp();
 }
 
