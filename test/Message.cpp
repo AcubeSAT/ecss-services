@@ -188,6 +188,21 @@ TEST_CASE("Append a CUC timestamp") {
 	}
 }
 
+TEST_CASE("Read a CUC timestamp") {
+	/**
+ 	* Append a custom CUC Time Stamp to a message object and check if is it read corretly
+ 	*/
+		Time::CustomCUC_t timeCUC;
+		timeCUC.elapsed100msTicks = 34511;
+
+		Message message(0, 0, Message::TC, 0);
+		message.appendCustomCUCTimeStamp(timeCUC);
+
+		auto returnTimeCUC = message.readCustomCUCTimeStamp();
+
+		REQUIRE(returnTimeCUC.elapsed100msTicks == 34511);
+}
+
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
