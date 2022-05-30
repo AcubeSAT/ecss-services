@@ -536,9 +536,7 @@ public:
 	}
 
 	/**
-	 * Fetches a timestamp in CUC format consisting of 8 bytes from the current position in the message
-	 *
-	 *	PTC = , PFC =
+	 * Fetches a timestamp in a custom CUC format consisting of 8 bytes from the current position in the message
 	 */
 	Time::CustomCUC_t readCustomCUCTimeStamp() {
 		Time::CustomCUC_t customCUC_t;
