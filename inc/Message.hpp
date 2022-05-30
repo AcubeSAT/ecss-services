@@ -535,6 +535,11 @@ public:
 		return reinterpret_cast<double&>(value);
 	}
 
+	/**
+	 * Fetches a timestamp in CUC format consisting of 8 bytes from the current position in the message
+	 *
+	 *	PTC = , PFC =
+	 */
 	Time::CustomCUC_t readCustomCUCTimeStamp() {
 		Time::CustomCUC_t customCUC_t;
 
