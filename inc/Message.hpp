@@ -536,6 +536,16 @@ public:
 	}
 
 	/**
+	 * Fetches a timestamp in a custom CUC format consisting of 8 bytes from the current position in the message
+	 */
+	Time::CustomCUC_t readCustomCUCTimeStamp() {
+		Time::CustomCUC_t customCUC_t;
+
+		customCUC_t.elapsed100msTicks = readUint64();
+		return customCUC_t;
+	}
+
+	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
 	 * In the current implementation we assume that a preallocated array of sufficient size
@@ -743,6 +753,10 @@ inline float Message::read() {
 template <>
 inline double Message::read() {
 	return readDouble();
+}
+template <>
+inline Time::CustomCUC_t Message::read() {
+	return readCustomCUCTimeStamp();
 }
 
 #endif // ECSS_SERVICES_PACKET_H
