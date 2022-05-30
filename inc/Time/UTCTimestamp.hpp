@@ -49,6 +49,12 @@ public:
 	explicit UTCTimestamp(etl::string<32> textTimestamp);
 
 	/**
+	 * Initialise a timestamp with a date after the Unix epoch 1/1/1970 00:00:00
+	 * @param secondsSinceEpoch seconds passed since the Unix epoch Thursday 1/1/1970 00:00:00
+	 */
+	UTCTimestamp(uint32_t secondsSinceEpoch);
+
+	/**
 	 * Compare two timestamps.
 	 * @param Date the date that will be compared with the pointer `this`
 	 */

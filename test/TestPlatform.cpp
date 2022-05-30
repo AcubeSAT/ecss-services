@@ -10,10 +10,19 @@
 #include "Services/ParameterService.hpp"
 #include "Services/ServiceTests.hpp"
 
+//UTCTimestamp TimeGetter::getCurrentTimeUTC() {
+//	time_t totalTimeInSeconds = static_cast<time_t>(time(nullptr));
+//	tm* time = gmtime(&totalTimeInSeconds);
+//	UTCTimestamp currentTime(time->tm_year, time->tm_mon, time->tm_mday, time->tm_hour, time->tm_min, time->tm_sec);
+//	return currentTime;
+//}
+
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
 	return currentTime;
 }
+
+
 
 Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
 	UTCTimestamp timeUTC = getCurrentTimeUTC();

@@ -21,6 +21,10 @@ UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t ho
 	this->second = second;
 }
 
+UTCTimestamp::UTCTimestamp(uint32_t secondsSinceEpoch) {
+
+}
+
 bool UTCTimestamp::operator<(const UTCTimestamp& Date) const {
 	if (this->year < Date.year) {
 		return true;

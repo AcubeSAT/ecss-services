@@ -42,9 +42,9 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	while (iterationCount-- != 0) {
 		// todo: Get the group ID first, if groups are used
-		uint32_t currentTime = TimeGetter::getSeconds(); // Get the current system time
+		Time::CustomCUC_t currentTime = request.readCustomCUCTimeStamp(); // Get the current system time
 
-		uint32_t releaseTime = request.readUint32(); // Get the specified release time
+		Time::CustomCUC_t releaseTime = request.readCustomCUCTimeStamp();; // Get the specified release time
 		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.skipBytes(ECSSTCRequestStringSize);
@@ -74,7 +74,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
 	assert(request.messageType == TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
 
-	uint32_t current_time = TimeGetter::getSeconds(); // Get the current system time
+	Time::CustomCUC_t current_time = request.readCustomCUCTimeStamp(); // Get the current system time
 
 	// Find the earliest release time. It will be the first element of the iterator pair
 	const auto releaseTimes =
@@ -99,7 +99,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
 	assert(request.messageType == TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
 
-	uint32_t current_time = TimeGetter::getSeconds(); // Get the current system time
+	Time::CustomCUC_t current_time = request.readCustomCUCTimeStamp(); // Get the current system time
 
 	int32_t relativeOffset = request.readSint32(); // Get the offset first
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
@@ -170,7 +170,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	for (auto& activity : scheduledActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 
-		report.appendUint32(activity.requestReleaseTime);
+		report.appendCustomCUCTimeStamp(activity.requestReleaseTime);
 		report.appendString(MessageParser::composeECSS(activity.request));
 	}
 	storeMessage(report); // Save the report
@@ -211,7 +211,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
 	for (auto& match : matchedActivities) {
-		report.appendUint32(match.requestReleaseTime); // todo: Replace with the time parser
+		report.appendCustomCUCTimeStamp(match.requestReleaseTime); // todo: Replace with the time parser
 		report.appendString(MessageParser::composeECSS(match.request));
 	}
 	storeMessage(report); // Save the report
@@ -252,7 +252,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
 	for (auto& match : matchedActivities) {
 		// todo: append sub-schedule and group ID if they are defined
-		report.appendUint32(match.requestReleaseTime);
+		report.appendCustomCUCTimeStamp(match.requestReleaseTime);
 		report.appendUint8(match.requestID.sourceID);
 		report.appendUint16(match.requestID.applicationID);
 		report.appendUint16(match.requestID.sequenceCount);

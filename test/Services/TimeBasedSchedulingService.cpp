@@ -25,7 +25,7 @@ namespace unit_test {
 
 			std::transform(
 			    tmService.scheduledActivities.begin(), tmService.scheduledActivities.end(),
-			    std::back_inserter(listElements), [](auto& activity) -> auto { return &activity; });
+			    std::back_inserter(listElements), [](auto& activity) -> auto{ return &activity; });
 
 			return listElements; // Return the list elements
 		}
@@ -33,8 +33,8 @@ namespace unit_test {
 } // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
-auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
-bool messagesPopulated = false;                          // Indicate whether the test messages are initialized
+const Time::CustomCUC_t currentTime{static_cast<uint64_t>(time(nullptr))}; // Get the current system time
+bool messagesPopulated = false;                                            // Indicate whether the test messages are initialized
 
 // Run this function to set the service up before moving on with further testing
 auto activityInsertion(TimeBasedSchedulingService& timeService) {
@@ -69,19 +69,23 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	receivedMessage.appendUint16(4); // Total number of requests
 
 	// Test activity 1
-	receivedMessage.appendUint32(currentTime + 1556435);
+	Time::CustomCUC_t temp = currentTime + 1556435;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage1, ECSSTCRequestStringSize);
 
 	// Test activity 2
-	receivedMessage.appendUint32(currentTime + 1957232);
+	temp = currentTime + 1957232;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage2, ECSSTCRequestStringSize);
 
 	// Test activity 3
-	receivedMessage.appendUint32(currentTime + 1726435);
+	temp = currentTime + 1726435;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage3, ECSSTCRequestStringSize);
 
 	// Test activity 4
-	receivedMessage.appendUint32(currentTime + 17248435);
+	temp = currentTime + 17248435;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage4, ECSSTCRequestStringSize);
 
 	// Insert activities in the schedule. They have to be inserted sorted
@@ -127,8 +131,8 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 	SECTION("Error throw test") {
 		Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 		receivedMessage.appendUint16(1); // Total number of requests
-
-		receivedMessage.appendUint32(currentTime - 15564350);
+		Time::CustomCUC_t temp = currentTime - 15564350;
+		receivedMessage.appendCustomCUCTimeStamp(temp);
 		MessageParser::execute(receivedMessage); //timeService.insertActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
@@ -270,7 +274,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		uint16_t iterationCount = response.readUint16();
 		CHECK(iterationCount == 2);
 		for (uint16_t i = 0; i < iterationCount; i++) {
-			uint32_t receivedReleaseTime = response.readUint32();
+			Time::CustomCUC_t receivedReleaseTime = response.readCustomCUCTimeStamp();
 
 			Message receivedTCPacket;
 			uint8_t receivedDataStr[ECSSTCRequestStringSize];
@@ -328,7 +332,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 
 		uint16_t iterationCount = response.readUint16();
 		for (uint16_t i = 0; i < iterationCount; i++) {
-			uint32_t receivedReleaseTime = response.readUint32();
+			Time::CustomCUC_t receivedReleaseTime = response.readCustomCUCTimeStamp();
 			uint8_t receivedSourceID = response.readUint8();
 			uint16_t receivedApplicationID = response.readUint16();
 			uint16_t receivedSequenceCount = response.readUint16();
@@ -374,7 +378,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 	REQUIRE(iterationCount == scheduledActivities.size());
 
 	for (uint16_t i = 0; i < iterationCount; i++) {
-		uint32_t receivedReleaseTime = response.readUint32();
+		Time::CustomCUC_t receivedReleaseTime = response.readCustomCUCTimeStamp();
 
 		Message receivedTCPacket;
 		uint8_t receivedDataStr[ECSSTCRequestStringSize];
