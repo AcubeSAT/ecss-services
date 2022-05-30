@@ -82,7 +82,7 @@ private:
 	struct ScheduledActivity {
 		Message request; ///< Hold the received command request
 		RequestID requestID; ///< Request ID, characteristic of the definition
-		uint32_t requestReleaseTime = 0; ///< Keep the command release time
+		Time::CustomCUC_t requestReleaseTime{0}; ///< Keep the command release time
 	};
 
 	/**

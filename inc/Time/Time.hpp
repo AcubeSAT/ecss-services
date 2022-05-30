@@ -269,4 +269,39 @@ typedef struct {
 
 } // namespace Time
 
+inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, uint32_t time) {
+	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
+	return temp;
+}
+
+inline Time::CustomCUC_t operator-(Time::CustomCUC_t customCUC_t, uint32_t time) {
+	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks - time};
+	return temp;
+}
+
+inline Time::CustomCUC_t operator+=(Time::CustomCUC_t& customCUC_t, uint32_t time) {
+	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
+	return temp;
+}
+
+inline bool operator<(Time::CustomCUC_t customCUC_t1, Time::CustomCUC_t customCUC_t2) {
+	return customCUC_t1.elapsed100msTicks < customCUC_t2.elapsed100msTicks;
+}
+
+inline bool operator<(Time::CustomCUC_t customCUC_t, uint32_t time) {
+	return customCUC_t.elapsed100msTicks < time;
+}
+
+inline bool operator==(Time::CustomCUC_t customCUC_t, uint32_t time) {
+	return customCUC_t.elapsed100msTicks == time;
+}
+
+inline bool operator==(uint32_t time, Time::CustomCUC_t customCUC_t) {
+	return customCUC_t.elapsed100msTicks == time;
+}
+
+inline bool operator==(Time::CustomCUC_t customCUC_t1, Time::CustomCUC_t customCUC_t2) {
+	return customCUC_t1.elapsed100msTicks == customCUC_t2.elapsed100msTicks;
+}
+
 #endif

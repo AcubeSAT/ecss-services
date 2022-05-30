@@ -33,7 +33,7 @@ namespace unit_test {
 } // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
-auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
+Time::CustomCUC_t currentTime = TimeGetter::getCurrentTimeCustomCUC(); // Get the current system time
 bool messagesPopulated = false;                          // Indicate whether the test messages are initialized
 
 // Run this function to set the service up before moving on with further testing
@@ -69,19 +69,23 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	receivedMessage.appendUint16(4); // Total number of requests
 
 	// Test activity 1
-	receivedMessage.appendUint32(currentTime + 1556435);
+	Time::CustomCUC_t temp = currentTime + 1556435;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage1, ECSSTCRequestStringSize);
 
 	// Test activity 2
-	receivedMessage.appendUint32(currentTime + 1957232);
+	temp = currentTime + 1957232;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage2, ECSSTCRequestStringSize);
 
 	// Test activity 3
-	receivedMessage.appendUint32(currentTime + 1726435);
+	temp = currentTime + 1726435;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage3, ECSSTCRequestStringSize);
 
 	// Test activity 4
-	receivedMessage.appendUint32(currentTime + 17248435);
+	temp = currentTime + 17248435;
+	receivedMessage.appendCustomCUCTimeStamp(temp);
 	receivedMessage.appendMessage(testMessage4, ECSSTCRequestStringSize);
 
 	// Insert activities in the schedule. They have to be inserted sorted
@@ -128,7 +132,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 		Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 		receivedMessage.appendUint16(1); // Total number of requests
 
-		receivedMessage.appendUint32(currentTime - 15564350);
+		receivedMessage.appendCustomCUCTimeStamp(currentTime - 15564350);
 		MessageParser::execute(receivedMessage); //timeService.insertActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
