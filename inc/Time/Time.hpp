@@ -267,8 +267,6 @@ typedef struct {
 	uint64_t elapsed100msTicks = 0;
 } CustomCUC_t;
 
-
-
 } // namespace Time
 
 /**
@@ -310,10 +308,5 @@ inline bool operator==(Offset time, Time::CustomCUC_t customCUC_t) {
 inline bool operator==(Time::CustomCUC_t customCUC_t1, Time::CustomCUC_t customCUC_t2) {
 	return customCUC_t1.elapsed100msTicks == customCUC_t2.elapsed100msTicks;
 }
-
-/**
- * move and write stuff
- */
-
 
 #endif

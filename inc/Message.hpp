@@ -72,7 +72,7 @@ public:
 
 	enum PacketType {
 		TM = 0, ///< Telemetry
-		TC = 1 ///< Telecommand
+		TC = 1  ///< Telecommand
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
@@ -353,14 +353,13 @@ public:
 	 * PTC = 4, PFC = 16
 	 */
 	void appendSint64(int64_t value) {
-		//return appendWord(reinterpret_cast<uint64_t&>(value));
 		return appendUint64(reinterpret_cast<uint64_t&>(value));
 	}
 
 	/**
 	 * Adds an 8 byte time Offset to the message
 	 */
-	void appendOffset(Offset value){
+	void appendOffset(Offset value) {
 		return appendSint64(value);
 	}
 
@@ -416,7 +415,6 @@ public:
 	 * @param size The fixed number of bytes that the message will take up. The empty last bytes are padded with 0s.
 	 */
 	void appendMessage(const Message& message, uint16_t size);
-
 
 	/**
 	 * Fetches a single-byte boolean value from the current position in the message
@@ -596,8 +594,6 @@ public:
 
 		return size; // Return the string size
 	}
-
-
 
 	/**
 	 * Fetches an N-byte string from the current position in the message. The string can be at most MAX_SIZE long.
@@ -800,6 +796,5 @@ template <>
 inline Offset Message::read() {
 	return readOffset();
 }
-
 
 #endif // ECSS_SERVICES_PACKET_H
