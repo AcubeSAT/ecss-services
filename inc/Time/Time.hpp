@@ -267,21 +267,14 @@ typedef struct {
 	uint64_t elapsed100msTicks = 0;
 } CustomCUC_t;
 
+
+
 } // namespace Time
+
 /**
- *
+ * An offset to shift, if necessary, a CustomCUC_t timestamp
  */
 typedef int64_t Offset;
-
-//inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, uint64_t time) {
-//	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
-//	return temp;
-//}
-//template<typename T>
-//inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, T time) {
-//	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
-//	return temp;
-//}
 
 inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, Offset time) {
 	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};

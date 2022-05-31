@@ -72,7 +72,7 @@ public:
 
 	enum PacketType {
 		TM = 0, ///< Telemetry
-		TC = 1  ///< Telecommand
+		TC = 1 ///< Telecommand
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
@@ -356,22 +356,13 @@ public:
 		//return appendWord(reinterpret_cast<uint64_t&>(value));
 		return appendUint64(reinterpret_cast<uint64_t&>(value));
 	}
+
 	/**
-	 *
-	 * @param value
+	 * Adds an 8 byte time Offset to the message
 	 */
 	void appendOffset(Offset value){
 		return appendSint64(value);
 	}
-
-	/**
-	 *
-	 * @return
-	 */
-	Offset readOffset() {
-		return readSint64();
-	};
-
 
 	/**
 	 * Adds a 4-byte single-precision floating point number to the end of the message
@@ -551,6 +542,12 @@ public:
 		return reinterpret_cast<int64_t&>(value);
 	}
 
+	/**
+	 * Fetches an 8 byte time Offset from the current position in the message
+	 */
+	Offset readOffset() {
+		return readSint64();
+	};
 
 	/**
 	 * Fetches an 4-byte single-precision floating point number from the current position in the
