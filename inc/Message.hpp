@@ -1,12 +1,12 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
-#include "ECSS_Definitions.hpp"
 #include <cstdint>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
-#include "macros.hpp"
+#include "ECSS_Definitions.hpp"
 #include "Time/Time.hpp"
+#include "macros.hpp"
 
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
@@ -72,7 +72,7 @@ public:
 
 	enum PacketType {
 		TM = 0, ///< Telemetry
-		TC = 1 ///< Telecommand
+		TC = 1  ///< Telecommand
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
@@ -347,6 +347,15 @@ public:
 	}
 
 	/**
+	 * Adds a 8 byte signed integer to the end of the message
+	 *
+	 * PTC = 4, PFC = 16
+	 */
+	void appendSint64(int64_t value) {
+		appendUint64(reinterpret_cast<uint64_t&>(value));
+	}
+
+	/**
 	 * Adds a 4-byte single-precision floating point number to the end of the message
 	 *
 	 * PTC = 5, PFC = 1
@@ -512,6 +521,21 @@ public:
 		uint32_t value = readWord();
 		return reinterpret_cast<int32_t&>(value);
 	}
+
+	/**
+	 * Fetches a 4-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 4, PFC = 14
+	 */
+	int64_t readSint64() {
+		uint32_t value = readWord() << 32;
+		int64_t value1 = reinterpret_cast<int64_t&>(value);
+		value = readWord();
+		int64_t value2 = reinterpret_cast<int64_t&>(value);
+
+		return value1 | value2;
+	}
+
 
 	/**
 	 * Fetches an 4-byte single-precision floating point number from the current position in the
