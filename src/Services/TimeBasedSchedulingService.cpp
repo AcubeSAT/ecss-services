@@ -8,29 +8,24 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 }
 
 void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
 	executionFunctionStatus = true;
 }
 
 void TimeBasedSchedulingService::disableScheduleExecution(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction);
-
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction);
 	executionFunctionStatus = false;
 }
 
 void TimeBasedSchedulingService::resetSchedule(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule);
 	executionFunctionStatus = false;
 	scheduledActivities.clear();
 	// todo: Add resetting for sub-schedules and groups, if defined
 }
 
 void TimeBasedSchedulingService::insertActivities(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::InsertActivities);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities);
 
 	// todo: Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16();
@@ -62,8 +57,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
 
 	Time::CustomCUC_t current_time = TimeGetter::getCurrentTimeCustomCUC();
 
@@ -84,8 +78,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 }
 
 void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
 
 	Time::CustomCUC_t current_time = TimeGetter::getCurrentTimeCustomCUC();
 
@@ -117,8 +110,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById);
 
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
@@ -141,8 +133,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
 
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(scheduledActivities.size()));
@@ -157,8 +148,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 }
 
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
 
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
@@ -194,8 +184,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
-	request.assertTC(request.serviceType, TimeBasedSchedulingService::ServiceType);
-	request.assertTC(request.messageType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
 
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
