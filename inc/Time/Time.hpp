@@ -273,27 +273,27 @@ typedef struct {
  */
 typedef int64_t Offset;
 
-inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, uint32_t time) {
-	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
-	return temp;
-}
-
-inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, uint8_t time) {
-	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
-	return temp;
-}
+//inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, uint64_t time) {
+//	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
+//	return temp;
+//}
+//template<typename T>
+//inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, T time) {
+//	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
+//	return temp;
+//}
 
 inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, Offset time) {
 	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
 	return temp;
 }
 
-inline Time::CustomCUC_t operator-(Time::CustomCUC_t customCUC_t, uint32_t time) {
+inline Time::CustomCUC_t operator-(Time::CustomCUC_t customCUC_t, Offset time) {
 	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks - time};
 	return temp;
 }
 
-inline Time::CustomCUC_t operator+=(Time::CustomCUC_t& customCUC_t, uint32_t time) {
+inline Time::CustomCUC_t operator+=(Time::CustomCUC_t customCUC_t, Offset time) {
 	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
 	return temp;
 }
@@ -302,15 +302,15 @@ inline bool operator<(Time::CustomCUC_t customCUC_t1, Time::CustomCUC_t customCU
 	return customCUC_t1.elapsed100msTicks < customCUC_t2.elapsed100msTicks;
 }
 
-inline bool operator<(Time::CustomCUC_t customCUC_t, uint32_t time) {
+inline bool operator<(Time::CustomCUC_t customCUC_t, Offset time) {
 	return customCUC_t.elapsed100msTicks < time;
 }
 
-inline bool operator==(Time::CustomCUC_t customCUC_t, uint32_t time) {
+inline bool operator==(Time::CustomCUC_t customCUC_t, Offset time) {
 	return customCUC_t.elapsed100msTicks == time;
 }
 
-inline bool operator==(uint32_t time, Time::CustomCUC_t customCUC_t) {
+inline bool operator==(Offset time, Time::CustomCUC_t customCUC_t) {
 	return customCUC_t.elapsed100msTicks == time;
 }
 

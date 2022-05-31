@@ -89,7 +89,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	} else {
 		for (auto& activity : scheduledActivities) {
-			activity.requestReleaseTime += relativeOffset; // Time shift each activity
+			activity.requestReleaseTime = activity.requestReleaseTime + relativeOffset; // Time shift each activity
 		}
 	}
 }
@@ -122,7 +122,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 			    (current_time + ECSSTimeMarginForActivation)) {
 				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			} else {
-				requestIDMatch->requestReleaseTime += relativeOffset; // Add the time offset
+				requestIDMatch->requestReleaseTime = requestIDMatch->requestReleaseTime + relativeOffset; // Add the time offset
 			}
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);

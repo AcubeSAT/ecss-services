@@ -154,10 +154,11 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	const Offset timeShift = 6789;
 
 	SECTION("Positive Shift") {
-		receivedMessage.appendOffset(timeShift);
+		receivedMessage.appendOffset(-timeShift);
 
 		CHECK(scheduledActivities.size() == 4);
 		MessageParser::execute(receivedMessage); //timeService.timeShiftAllActivities(receivedMessage);
+
 		bool condition = scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 - timeShift;
 		REQUIRE(condition);
 		condition = scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 - timeShift;
