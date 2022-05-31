@@ -1,9 +1,9 @@
 #include "Message.hpp"
-#include "macros.hpp"
-#include <cstring>
 #include <ErrorHandler.hpp>
-#include <ServicePool.hpp>
 #include <MessageParser.hpp>
+#include <ServicePool.hpp>
+#include <cstring>
+#include "macros.hpp"
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
@@ -174,7 +174,7 @@ void Message::appendString(const etl::istring& string) {
 void Message::appendFixedString(const etl::istring& string) {
 	ASSERT_INTERNAL((dataSize + string.max_size()) < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
 	std::copy(string.data(), string.data() + string.size(), data + dataSize);
-	(void)memset(data + dataSize + string.size(), 0, string.max_size() - string.size());
+	(void) memset(data + dataSize + string.size(), 0, string.max_size() - string.size());
 	dataSize += string.max_size();
 }
 

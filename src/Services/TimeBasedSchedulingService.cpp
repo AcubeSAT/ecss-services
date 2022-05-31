@@ -83,7 +83,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 		                        return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 	                        });
 	// todo: Define what the time format is going to be
-	int32_t relativeOffset = request.readSint32(); // Get the relative offset
+	Offset relativeOffset = request.readOffset(); // Get the relative offset
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) < (current_time + ECSSTimeMarginForActivation)) {
 		// Report the error
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
@@ -101,7 +101,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 
 	Time::CustomCUC_t current_time = TimeGetter::getCurrentTimeCustomCUC(); // Get the current system time
 
-	int32_t relativeOffset = request.readSint32(); // Get the offset first
+	Offset relativeOffset = request.readOffset(); // Get the offset first
 	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
 	while (iterationCount-- != 0) {
 		// Parse the request ID

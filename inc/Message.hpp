@@ -346,14 +346,32 @@ public:
 		return appendWord(reinterpret_cast<uint32_t&>(value));
 	}
 
+
 	/**
 	 * Adds a 8 byte signed integer to the end of the message
 	 *
 	 * PTC = 4, PFC = 16
 	 */
 	void appendSint64(int64_t value) {
-		appendUint64(reinterpret_cast<uint64_t&>(value));
+		//return appendWord(reinterpret_cast<uint64_t&>(value));
+		return appendUint64(reinterpret_cast<uint64_t&>(value));
 	}
+	/**
+	 *
+	 * @param value
+	 */
+	void appendOffset(Offset value){
+		return appendSint64(value);
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	Offset readOffset() {
+		return readSint64();
+	};
+
 
 	/**
 	 * Adds a 4-byte single-precision floating point number to the end of the message
@@ -407,6 +425,7 @@ public:
 	 * @param size The fixed number of bytes that the message will take up. The empty last bytes are padded with 0s.
 	 */
 	void appendMessage(const Message& message, uint16_t size);
+
 
 	/**
 	 * Fetches a single-byte boolean value from the current position in the message
@@ -528,12 +547,8 @@ public:
 	 * PTC = 4, PFC = 14
 	 */
 	int64_t readSint64() {
-		uint32_t value = readWord() << 32;
-		int64_t value1 = reinterpret_cast<int64_t&>(value);
-		value = readWord();
-		int64_t value2 = reinterpret_cast<int64_t&>(value);
-
-		return value1 | value2;
+		uint64_t value = readUint64();
+		return reinterpret_cast<int64_t&>(value);
 	}
 
 
@@ -584,6 +599,8 @@ public:
 
 		return size; // Return the string size
 	}
+
+
 
 	/**
 	 * Fetches an N-byte string from the current position in the message. The string can be at most MAX_SIZE long.
@@ -782,5 +799,10 @@ template <>
 inline Time::CustomCUC_t Message::read() {
 	return readCustomCUCTimeStamp();
 }
+template <>
+inline Offset Message::read() {
+	return readOffset();
+}
+
 
 #endif // ECSS_SERVICES_PACKET_H
