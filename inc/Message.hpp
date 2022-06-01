@@ -359,7 +359,7 @@ public:
 	/**
 	 * Adds an 8 byte time Offset to the message
 	 */
-	void appendOffset(Offset value) {
+	void appendRelativeTime(Time::Offset value) {
 		return appendSint64(value);
 	}
 
@@ -543,7 +543,7 @@ public:
 	/**
 	 * Fetches an 8 byte time Offset from the current position in the message
 	 */
-	Offset readOffset() {
+	Time::Offset readRelativeTime() {
 		return readSint64();
 	};
 
@@ -731,6 +731,10 @@ template <>
 inline void Message::append(const Time::CustomCUC_t& timeCUC) {
 	appendCustomCUCTimeStamp(timeCUC);
 }
+template <>
+inline void Message::append(const Time::Offset& value) {
+	appendRelativeTime(value);
+}
 
 /**
  * Appends an ETL string to the message. ETL strings are handled as ECSS octet strings, meaning that the string size
@@ -793,8 +797,8 @@ inline Time::CustomCUC_t Message::read() {
 	return readCustomCUCTimeStamp();
 }
 template <>
-inline Offset Message::read() {
-	return readOffset();
+inline Time::Offset Message::read() {
+	return readRelativeTime();
 }
 
 #endif // ECSS_SERVICES_PACKET_H

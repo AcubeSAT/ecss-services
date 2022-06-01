@@ -67,12 +67,12 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 		                        return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 	                        });
 	// todo: Define what the time format is going to be
-	Offset relativeOffset = request.readOffset();
+	Time::Offset relativeOffset = request.readRelativeTime();
 	if ((releaseTimes.first->requestReleaseTime + relativeOffset) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	} else {
 		for (auto& activity: scheduledActivities) {
-			activity.requestReleaseTime = activity.requestReleaseTime + relativeOffset;
+			activity.requestReleaseTime += relativeOffset;
 		}
 	}
 }
@@ -82,7 +82,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 
 	Time::CustomCUC_t current_time = TimeGetter::getCurrentTimeCustomCUC();
 
-	Offset relativeOffset = request.readOffset();
+	Time::Offset relativeOffset = request.readRelativeTime();
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
@@ -100,7 +100,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 			    (current_time + ECSSTimeMarginForActivation)) {
 				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			} else {
-				requestIDMatch->requestReleaseTime = requestIDMatch->requestReleaseTime + relativeOffset;
+				requestIDMatch->requestReleaseTime +=  relativeOffset;
 			}
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);

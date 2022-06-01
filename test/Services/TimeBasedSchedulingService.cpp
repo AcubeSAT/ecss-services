@@ -145,10 +145,10 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
 
 	auto scheduledActivities = activityInsertion(timeBasedService);
-	const Offset timeShift = 6789;
+	const Time::Offset timeShift = 6789;
 
 	SECTION("Positive Shift") {
-		receivedMessage.appendOffset(-timeShift);
+		receivedMessage.appendRelativeTime(-timeShift);
 
 		CHECK(scheduledActivities.size() == 4);
 		MessageParser::execute(receivedMessage); //timeService.timeShiftAllActivities(receivedMessage);
@@ -160,7 +160,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	}
 
 	SECTION("Negative Shift") {
-		receivedMessage.appendOffset(timeShift);
+		receivedMessage.appendRelativeTime(timeShift);
 
 		CHECK(scheduledActivities.size() == 4);
 		MessageParser::execute(receivedMessage); //timeService.timeShiftAllActivities(receivedMessage);
@@ -171,7 +171,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	}
 
 	SECTION("Error throwing") {
-		receivedMessage.appendOffset(-6789000); // Provide a huge time shift to cause an error
+		receivedMessage.appendRelativeTime(-6789000); // Provide a huge time shift to cause an error
 
 		CHECK(scheduledActivities.size() == 4);
 		MessageParser::execute(receivedMessage); //timeService.timeShiftAllActivities(receivedMessage);
@@ -188,10 +188,10 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 	CHECK(scheduledActivities.size() == 4);
 
-	const Offset timeShift = 67890000; // Relative time-shift value
+	const Time::Offset timeShift = 67890000; // Relative time-shift value
 
 	SECTION("Positive Shift") {
-		receivedMessage.appendOffset(timeShift);                  // Time-shift value
+		receivedMessage.appendRelativeTime(timeShift);                  // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
@@ -206,7 +206,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	}
 
 	SECTION("Negative Shift") {
-		receivedMessage.appendOffset(-250000);                    // Time-shift value
+		receivedMessage.appendRelativeTime(-250000);                    // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
@@ -221,7 +221,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	}
 
 	SECTION("Error throw on wrong request ID") {
-		receivedMessage.appendOffset(-250000); // Time-shift value
+		receivedMessage.appendRelativeTime(-250000); // Time-shift value
 		receivedMessage.appendUint16(1);       // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);        // Dummy source ID
 		receivedMessage.appendUint16(80);      // Dummy application ID to throw an error
@@ -232,7 +232,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	}
 
 	SECTION("Error throw on wrong time offset") {
-		receivedMessage.appendOffset(-6789000);                   // Time-shift value
+		receivedMessage.appendRelativeTime(-6789000);                   // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID

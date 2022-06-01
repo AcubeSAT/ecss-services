@@ -267,46 +267,36 @@ typedef struct {
 	uint64_t elapsed100msTicks = 0;
 } CustomCUC_t;
 
-} // namespace Time
-
 /**
  * An offset to shift, if necessary, a CustomCUC_t timestamp
  */
 typedef int64_t Offset;
 
-inline Time::CustomCUC_t operator+(Time::CustomCUC_t customCUC_t, Offset time) {
-	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
-	return temp;
+inline Time::CustomCUC_t operator+(const Time::CustomCUC_t customCUC_t, Offset time) {
+	return Time::CustomCUC_t {customCUC_t.elapsed100msTicks + time};
 }
 
-inline Time::CustomCUC_t operator-(Time::CustomCUC_t customCUC_t, Offset time) {
-	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks - time};
-	return temp;
+inline Time::CustomCUC_t operator-(const Time::CustomCUC_t customCUC_t, Offset time) {
+	return Time::CustomCUC_t {customCUC_t.elapsed100msTicks - time};
 }
 
-inline Time::CustomCUC_t operator+=(Time::CustomCUC_t customCUC_t, Offset time) {
-	Time::CustomCUC_t temp{customCUC_t.elapsed100msTicks + time};
-	return temp;
+inline Time::CustomCUC_t& operator+=(Time::CustomCUC_t& time, Offset offset) {
+	time.elapsed100msTicks +=  offset;
+	return time;
 }
 
-inline bool operator<(Time::CustomCUC_t customCUC_t1, Time::CustomCUC_t customCUC_t2) {
-	return customCUC_t1.elapsed100msTicks < customCUC_t2.elapsed100msTicks;
+inline bool operator<(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+	return time1.elapsed100msTicks < time2.elapsed100msTicks;
 }
 
-inline bool operator<(Time::CustomCUC_t customCUC_t, Offset time) {
-	return customCUC_t.elapsed100msTicks < time;
+inline bool operator<(const Time::CustomCUC_t time, Offset offset) {
+	return time.elapsed100msTicks < offset;
 }
 
-inline bool operator==(Time::CustomCUC_t customCUC_t, Offset time) {
-	return customCUC_t.elapsed100msTicks == time;
+inline bool operator==(const Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+	return time1.elapsed100msTicks == time2.elapsed100msTicks;
 }
 
-inline bool operator==(Offset time, Time::CustomCUC_t customCUC_t) {
-	return customCUC_t.elapsed100msTicks == time;
-}
-
-inline bool operator==(Time::CustomCUC_t customCUC_t1, Time::CustomCUC_t customCUC_t2) {
-	return customCUC_t1.elapsed100msTicks == customCUC_t2.elapsed100msTicks;
-}
+} // namespace Time
 
 #endif
