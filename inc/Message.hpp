@@ -359,7 +359,7 @@ public:
 	/**
 	 * Adds an 8 byte time Offset to the message
 	 */
-	void appendRelativeTime(Time::Offset value) {
+	void appendRelativeTime(Time::RelativeTime value) {
 		return appendSint64(value);
 	}
 
@@ -543,7 +543,7 @@ public:
 	/**
 	 * Fetches an 8 byte time Offset from the current position in the message
 	 */
-	Time::Offset readRelativeTime() {
+	Time::RelativeTime readRelativeTime() {
 		return readSint64();
 	};
 
@@ -732,7 +732,7 @@ inline void Message::append(const Time::CustomCUC_t& timeCUC) {
 	appendCustomCUCTimeStamp(timeCUC);
 }
 template <>
-inline void Message::append(const Time::Offset& value) {
+inline void Message::append(const Time::RelativeTime& value) {
 	appendRelativeTime(value);
 }
 
@@ -797,7 +797,7 @@ inline Time::CustomCUC_t Message::read() {
 	return readCustomCUCTimeStamp();
 }
 template <>
-inline Time::Offset Message::read() {
+inline Time::RelativeTime Message::read() {
 	return readRelativeTime();
 }
 

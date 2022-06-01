@@ -268,19 +268,19 @@ typedef struct {
 } CustomCUC_t;
 
 /**
- * An offset to shift, if necessary, a CustomCUC_t timestamp
+ * A time shift for scheduled activities
  */
-typedef int64_t Offset;
+typedef int64_t RelativeTime;
 
-inline Time::CustomCUC_t operator+(const Time::CustomCUC_t customCUC_t, Offset time) {
+inline Time::CustomCUC_t operator+(const Time::CustomCUC_t customCUC_t, RelativeTime time) {
 	return Time::CustomCUC_t {customCUC_t.elapsed100msTicks + time};
 }
 
-inline Time::CustomCUC_t operator-(const Time::CustomCUC_t customCUC_t, Offset time) {
+inline Time::CustomCUC_t operator-(const Time::CustomCUC_t customCUC_t, RelativeTime time) {
 	return Time::CustomCUC_t {customCUC_t.elapsed100msTicks - time};
 }
 
-inline Time::CustomCUC_t& operator+=(Time::CustomCUC_t& time, Offset offset) {
+inline Time::CustomCUC_t& operator+=(Time::CustomCUC_t& time, RelativeTime offset) {
 	time.elapsed100msTicks +=  offset;
 	return time;
 }
@@ -289,7 +289,7 @@ inline bool operator<(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
 	return time1.elapsed100msTicks < time2.elapsed100msTicks;
 }
 
-inline bool operator<(const Time::CustomCUC_t time, Offset offset) {
+inline bool operator<(const Time::CustomCUC_t time, RelativeTime offset) {
 	return time.elapsed100msTicks < offset;
 }
 

@@ -168,11 +168,11 @@ TEST_CASE("Test appending double") {
 
 TEST_CASE("Test appending offset") {
 	Message message(0, 0, Message::TC, 0);
-	message.append<Time::Offset>(555);
+	message.append<Time::RelativeTime>(555);
 
 	REQUIRE(message.dataSize == 8);
 
-	CHECK(message.read<Time::Offset>() == 555);
+	CHECK(message.read<Time::RelativeTime>() == 555);
 }
 
 TEST_CASE("Test appending a CUC timestamp") {
