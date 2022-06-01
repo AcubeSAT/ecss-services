@@ -12,14 +12,6 @@
 class TimeGetter {
 public:
 	/**
-	 * @brief Gets the current time in UNIX epoch
-	 * @return Current UNIX epoch time, in elapsed seconds
-	 */
-	static inline uint32_t getSeconds() {
-		return static_cast<uint32_t>(time(nullptr));
-	}
-
-	/**
 	 * Returns the current UTC time.
 	 * @note
 	 * The information needed to compute the UTC time is implementation-specific. This function should
