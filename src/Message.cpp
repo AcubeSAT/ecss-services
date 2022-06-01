@@ -1,9 +1,9 @@
 #include "Message.hpp"
-#include "macros.hpp"
-#include <cstring>
 #include <ErrorHandler.hpp>
-#include <ServicePool.hpp>
 #include <MessageParser.hpp>
+#include <ServicePool.hpp>
+#include <cstring>
+#include "macros.hpp"
 
 Message::Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
