@@ -25,7 +25,7 @@ namespace unit_test {
 
 			std::transform(
 			    tmService.scheduledActivities.begin(), tmService.scheduledActivities.end(),
-			    std::back_inserter(listElements), [](auto& activity) -> auto { return &activity; });
+			    std::back_inserter(listElements), [](auto& activity) -> auto{ return &activity; });
 
 			return listElements; // Return the list elements
 		}
@@ -69,23 +69,19 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	receivedMessage.appendUint16(4); // Total number of requests
 
 	// Test activity 1
-	Time::CustomCUC_t temp = currentTime + 1556435;
-	receivedMessage.appendCustomCUCTimeStamp(temp);
+	receivedMessage.appendCustomCUCTimeStamp(currentTime + 1556435);
 	receivedMessage.appendMessage(testMessage1, ECSSTCRequestStringSize);
 
 	// Test activity 2
-	temp = currentTime + 1957232;
-	receivedMessage.appendCustomCUCTimeStamp(temp);
+	receivedMessage.appendCustomCUCTimeStamp(currentTime + 1957232);
 	receivedMessage.appendMessage(testMessage2, ECSSTCRequestStringSize);
 
 	// Test activity 3
-	temp = currentTime + 1726435;
-	receivedMessage.appendCustomCUCTimeStamp(temp);
+	receivedMessage.appendCustomCUCTimeStamp(currentTime + 1726435);
 	receivedMessage.appendMessage(testMessage3, ECSSTCRequestStringSize);
 
 	// Test activity 4
-	temp = currentTime + 17248435;
-	receivedMessage.appendCustomCUCTimeStamp(temp);
+	receivedMessage.appendCustomCUCTimeStamp(currentTime + 17248435);
 	receivedMessage.appendMessage(testMessage4, ECSSTCRequestStringSize);
 
 	// Insert activities in the schedule. They have to be inserted sorted
@@ -191,7 +187,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	const Time::Offset timeShift = 67890000; // Relative time-shift value
 
 	SECTION("Positive Shift") {
-		receivedMessage.appendRelativeTime(timeShift);                  // Time-shift value
+		receivedMessage.appendRelativeTime(timeShift);            // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
@@ -206,7 +202,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	}
 
 	SECTION("Negative Shift") {
-		receivedMessage.appendRelativeTime(-250000);                    // Time-shift value
+		receivedMessage.appendRelativeTime(-250000);              // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
@@ -222,17 +218,17 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 
 	SECTION("Error throw on wrong request ID") {
 		receivedMessage.appendRelativeTime(-250000); // Time-shift value
-		receivedMessage.appendUint16(1);       // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);        // Dummy source ID
-		receivedMessage.appendUint16(80);      // Dummy application ID to throw an error
-		receivedMessage.appendUint16(0);       // Dummy sequence count
+		receivedMessage.appendUint16(1);             // Just one instruction to time-shift an activity
+		receivedMessage.appendUint8(0);              // Dummy source ID
+		receivedMessage.appendUint16(80);            // Dummy application ID to throw an error
+		receivedMessage.appendUint16(0);             // Dummy sequence count
 
 		timeBasedService.timeShiftActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
 
 	SECTION("Error throw on wrong time offset") {
-		receivedMessage.appendRelativeTime(-6789000);                   // Time-shift value
+		receivedMessage.appendRelativeTime(-6789000);             // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
