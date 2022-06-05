@@ -129,7 +129,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 		Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 		receivedMessage.appendUint16(1); // Total number of requests
 
-		receivedMessage.appendCustomCUCTimeStamp(currentTime - 15564350);
+		receivedMessage.appendCustomCUCTimeStamp(currentTime - 1556435);
 		MessageParser::execute(receivedMessage); //timeService.insertActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
