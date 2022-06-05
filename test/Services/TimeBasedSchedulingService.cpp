@@ -21,7 +21,7 @@ namespace unit_test {
 		 * accessed, get each element and save it to a vector.
 		 */
 		static auto scheduledActivities(TimeBasedSchedulingService& tmService) {
-			std::vector<TimeBasedSchedulingService::ScheduledActivity*> listElements;
+			std::vector<ScheduledActivity*> listElements;
 
 			std::transform(
 			    tmService.scheduledActivities.begin(), tmService.scheduledActivities.end(),
