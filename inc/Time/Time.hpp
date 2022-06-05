@@ -272,20 +272,32 @@ namespace Time {
 	typedef int64_t RelativeTime;
 
 	inline Time::CustomCUC_t operator+(const Time::CustomCUC_t time, RelativeTime relativeTime) {
-		return Time::CustomCUC_t{time.elapsed100msTicks + relativeTime / 10};
+		return Time::CustomCUC_t{time.elapsed100msTicks + relativeTime * 10};
 	}
 
 	inline Time::CustomCUC_t operator-(const Time::CustomCUC_t time, RelativeTime relativeTime) {
-		return Time::CustomCUC_t{time.elapsed100msTicks - relativeTime / 10};
+		return Time::CustomCUC_t{time.elapsed100msTicks - relativeTime * 10};
 	}
 
 	inline Time::CustomCUC_t& operator+=(Time::CustomCUC_t& time, RelativeTime relativeTime) {
-		time.elapsed100msTicks += relativeTime / 10;
+		time.elapsed100msTicks += relativeTime * 10;
 		return time;
+	}
+
+	inline bool operator - (Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks - time2.elapsed100msTicks;
+	}
+
+	inline bool operator + (Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks + time2.elapsed100msTicks;
 	}
 
 	inline bool operator<(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
 		return time1.elapsed100msTicks < time2.elapsed100msTicks;
+	}
+
+	inline bool operator>(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks > time2.elapsed100msTicks;
 	}
 
 	inline bool operator==(const Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
