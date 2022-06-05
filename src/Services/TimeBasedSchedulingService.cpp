@@ -7,6 +7,21 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
+ScheduledActivity TimeBasedSchedulingService::getScheduledActivities() {
+	auto activity = scheduledActivities.front();
+	RequestID receivedRequestID = activity.requestID;
+
+	const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
+	                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
+		                                             return receivedRequestID != currentElement.requestID;
+	                                             });
+
+	if (requestIDMatch != scheduledActivities.end()) {
+		scheduledActivities.erase(requestIDMatch);
+	}
+	return activity;
+}
+
 void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
 	executionFunctionStatus = true;
