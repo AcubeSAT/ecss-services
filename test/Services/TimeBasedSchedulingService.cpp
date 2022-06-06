@@ -93,6 +93,45 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 
 TimeBasedSchedulingService& timeBasedService = Services.timeBasedScheduling;
 
+TEST_CASE("Get the first activity to be executed and remove it from the list") {
+	Services.reset();
+	auto scheduledActivities = activityInsertion(timeBasedService);
+
+	auto activity = timeBasedService.getScheduledActivities();
+	REQUIRE(testMessage1.bytesEqualWith(activity.request));
+
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	Message response = ServiceTests::get(0);
+	uint16_t iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 3);
+
+	activity = timeBasedService.getScheduledActivities();
+	REQUIRE(testMessage3.bytesEqualWith(activity.request));
+
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	response = ServiceTests::get(1);
+	iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 2);
+
+	activity = timeBasedService.getScheduledActivities();
+	REQUIRE(testMessage2.bytesEqualWith(activity.request));
+
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	response = ServiceTests::get(2);
+	iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 1);
+
+	activity = timeBasedService.getScheduledActivities();
+	REQUIRE(testMessage4.bytesEqualWith(activity.request));
+
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	response = ServiceTests::get(3);
+	iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 0);
+
+}
+
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
@@ -219,7 +258,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	SECTION("Error throw on wrong request ID") {
 		receivedMessage.appendRelativeTime(-250000); // Time-shift value
 		receivedMessage.appendUint16(1);             // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);              // Dummy source ID
+		receivedMessage.appendUint8(0);              // Dummy source IDunit_test::Tester::
 		receivedMessage.appendUint16(80);            // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0);             // Dummy sequence count
 
