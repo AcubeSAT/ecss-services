@@ -148,7 +148,7 @@ public:
 	/**
      * This function returns the first activity to be executed and removes it from the list.
      */
-	ScheduledActivity getScheduledActivities();
+	ScheduledActivity popScheduledAcitivity();
 
 	/**
      * @brief TC[11,1] enable the time-based schedule execution function
