@@ -7,7 +7,7 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
-ScheduledActivity TimeBasedSchedulingService::popScheduledAcitivity() {
+ScheduledActivity TimeBasedSchedulingService::popScheduledActivity() {
 	auto activity = scheduledActivities.front();
 	RequestID receivedRequestID = activity.requestID;
 

@@ -97,7 +97,7 @@ TEST_CASE("Get the first activity to be executed and remove it from the list") {
 	Services.reset();
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
-	auto activity = timeBasedService.popScheduledAcitivity();
+	auto activity = timeBasedService.popScheduledActivity();
 	REQUIRE(testMessage1.bytesEqualWith(activity.request));
 
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
@@ -106,7 +106,7 @@ TEST_CASE("Get the first activity to be executed and remove it from the list") {
 	uint16_t iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 3);
 
-	activity = timeBasedService.popScheduledAcitivity();
+	activity = timeBasedService.popScheduledActivity();
 	REQUIRE(testMessage3.bytesEqualWith(activity.request));
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
@@ -114,7 +114,7 @@ TEST_CASE("Get the first activity to be executed and remove it from the list") {
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 2);
 
-	activity = timeBasedService.popScheduledAcitivity();
+	activity = timeBasedService.popScheduledActivity();
 	REQUIRE(testMessage2.bytesEqualWith(activity.request));
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
@@ -122,7 +122,7 @@ TEST_CASE("Get the first activity to be executed and remove it from the list") {
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 1);
 
-	activity = timeBasedService.popScheduledAcitivity();
+	activity = timeBasedService.popScheduledActivity();
 	REQUIRE(testMessage4.bytesEqualWith(activity.request));
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
