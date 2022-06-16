@@ -307,7 +307,7 @@ namespace Time {
 	/**
 	 * Returns milliseconds from a CustomCUC_t
 	 */
-	uint32_t getMsFromCustomCUC(Time::CustomCUC_t time) {
+	inline uint32_t getMsFromCustomCUC(Time::CustomCUC_t time) {
 		return time.elapsed100msTicks * 100;
 	}
 
