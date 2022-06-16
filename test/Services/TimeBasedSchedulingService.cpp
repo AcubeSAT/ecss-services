@@ -129,7 +129,6 @@ TEST_CASE("Get the first activity to be executed and remove it from the list") {
 	response = ServiceTests::get(3);
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 0);
-
 }
 
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {

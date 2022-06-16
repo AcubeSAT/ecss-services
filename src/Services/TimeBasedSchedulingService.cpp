@@ -115,7 +115,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 			    (current_time + ECSSTimeMarginForActivation)) {
 				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			} else {
-				requestIDMatch->requestReleaseTime +=  relativeOffset;
+				requestIDMatch->requestReleaseTime += relativeOffset;
 			}
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
