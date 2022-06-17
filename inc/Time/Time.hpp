@@ -269,7 +269,7 @@ namespace Time {
 		 * @return The time represented in milliseconds elapsed from the epoch
 		 */
 		uint64_t getMs() {
-			return time.elapsed100msTicks * 100;
+			return elapsed100msTicks * 100;
 		}
 	};
 
