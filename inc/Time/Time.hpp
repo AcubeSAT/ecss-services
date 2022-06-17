@@ -262,9 +262,16 @@ namespace Time {
 		return (year % 400) == 0;
 	}
 
-	typedef struct {
+	struct CustomCUC_t {
 		uint64_t elapsed100msTicks = 0;
-	} CustomCUC_t;
+
+		/**
+		 * @return The time represented in milliseconds elapsed from the epoch
+		 */
+		uint64_t getMs() {
+			return time.elapsed100msTicks * 100;
+		}
+	};
 
 	/**
  	* A time shift for scheduled activities measured in seconds
@@ -302,14 +309,6 @@ namespace Time {
 
 	inline bool operator==(const Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
 		return time1.elapsed100msTicks == time2.elapsed100msTicks;
-	}
-
-	/**
-	 * @param time a CustomCUC_t object
-	 * @returns the time that is represented by the CustomCUC_t object in milliseconds
-	 */
-	inline uint32_t getMsFromCustomCUC(Time::CustomCUC_t time) {
-		return time.elapsed100msTicks * 100;
 	}
 
 } // namespace Time
