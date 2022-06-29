@@ -7,19 +7,27 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
-ScheduledActivity TimeBasedSchedulingService::popScheduledActivity() {
-	auto activity = scheduledActivities.front();
-	RequestID receivedRequestID = activity.requestID;
+Time::CustomCUC_t TimeBasedSchedulingService::popScheduledActivity(Time::CustomCUC_t currentTime) {
+	if (currentTime > scheduledActivities.front().requestReleaseTime || currentTime == scheduledActivities.front().requestReleaseTime) {
+		MessageParser::execute(scheduledActivities.front().request);
 
-	const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
-	                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
-		                                             return receivedRequestID != currentElement.requestID;
-	                                             });
-
-	if (requestIDMatch != scheduledActivities.end()) {
-		scheduledActivities.erase(requestIDMatch);
+		RequestID receivedRequestID = scheduledActivities.front().requestID;
+		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
+		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
+			                                             return receivedRequestID != currentElement.requestID;
+		                                             });
+		if (requestIDMatch != scheduledActivities.end()) {
+			scheduledActivities.erase(requestIDMatch);
+		}
 	}
-	return activity;
+	if(!scheduledActivities.empty()) {
+		return scheduledActivities.front().requestReleaseTime;
+	}
+	else {
+		Time::CustomCUC_t infinity;
+		infinity.elapsed100msTicks = INT_MAX;
+		return infinity;
+	}
 }
 
 void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
