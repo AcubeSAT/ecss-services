@@ -21,7 +21,7 @@ namespace unit_test {
 		 * accessed, get each element and save it to a vector.
 		 */
 		static auto scheduledActivities(TimeBasedSchedulingService& tmService) {
-			std::vector<ScheduledActivity*> listElements;
+			std::vector<TimeBasedSchedulingService::ScheduledActivity*> listElements;
 
 			std::transform(
 			    tmService.scheduledActivities.begin(), tmService.scheduledActivities.end(),
@@ -93,12 +93,12 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 
 TimeBasedSchedulingService& timeBasedService = Services.timeBasedScheduling;
 
-TEST_CASE("Get the first activity to be executed and remove it from the list") {
+TEST_CASE("Execute the first activity, removes it from the list and return the release time of next activity to be executed") {
 	Services.reset();
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
-	auto activity = timeBasedService.popScheduledActivity();
-	REQUIRE(testMessage1.bytesEqualWith(activity.request));
+	auto nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 1556435);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
 
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
 	timeBasedService.detailReportAllActivities(receivedMessage);
@@ -106,29 +106,24 @@ TEST_CASE("Get the first activity to be executed and remove it from the list") {
 	uint16_t iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 3);
 
-	activity = timeBasedService.popScheduledActivity();
-	REQUIRE(testMessage3.bytesEqualWith(activity.request));
+	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 100);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
+
+	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 1726435);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1957232);
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
 	response = ServiceTests::get(1);
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 2);
 
-	activity = timeBasedService.popScheduledActivity();
-	REQUIRE(testMessage2.bytesEqualWith(activity.request));
+	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 1957232);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 17248435);
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
 	response = ServiceTests::get(2);
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 1);
-
-	activity = timeBasedService.popScheduledActivity();
-	REQUIRE(testMessage4.bytesEqualWith(activity.request));
-
-	timeBasedService.detailReportAllActivities(receivedMessage);
-	response = ServiceTests::get(3);
-	iterationCount = response.readUint16();
-	REQUIRE(iterationCount == 0);
 }
 
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
@@ -257,7 +252,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	SECTION("Error throw on wrong request ID") {
 		receivedMessage.appendRelativeTime(-250000); // Time-shift value
 		receivedMessage.appendUint16(1);             // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);              // Dummy source IDunit_test::Tester::
+		receivedMessage.appendUint8(0);              // Dummy source ID
 		receivedMessage.appendUint16(80);            // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0);             // Dummy sequence count
 
