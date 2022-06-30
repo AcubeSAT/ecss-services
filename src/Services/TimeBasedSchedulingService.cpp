@@ -20,10 +20,9 @@ Time::CustomCUC_t TimeBasedSchedulingService::popScheduledActivity(Time::CustomC
 			scheduledActivities.erase(requestIDMatch);
 		}
 	}
-	if(!scheduledActivities.empty()) {
+	if (!scheduledActivities.empty()) {
 		return scheduledActivities.front().requestReleaseTime;
-	}
-	else {
+	} else {
 		Time::CustomCUC_t infinity;
 		infinity.elapsed100msTicks = INT_MAX;
 		return infinity;

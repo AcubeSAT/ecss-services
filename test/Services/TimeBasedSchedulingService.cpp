@@ -58,7 +58,7 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 		testMessage3.appendUint16(456); // Append dummy data
 
 		testMessage4.serviceType = 12;
-		testMessage4.messageType = 23;
+		testMessage4.messageType = 3;
 		testMessage4.packetType = Message::TC;
 		testMessage4.appendUint16(934); // Append dummy data
 
@@ -124,6 +124,14 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	response = ServiceTests::get(2);
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 1);
+
+	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 17248435);
+	REQUIRE(nextActivityExecutionCUCTime.elapsed100msTicks == INT_MAX);
+
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	response = ServiceTests::get(3);
+	iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 0);
 }
 
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
