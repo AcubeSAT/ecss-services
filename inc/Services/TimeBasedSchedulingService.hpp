@@ -144,7 +144,7 @@ public:
 	TimeBasedSchedulingService();
 
 	/**
-	 * This function execute the first activity and removes it from the list.
+	 * This function executes the next activity and removes it from the list.
 	 * @return the requestReleaseTime of next activity to be executed after this time
 	 */
 	Time::CustomCUC_t executeScheduledActivity(Time::CustomCUC_t currentTime);
