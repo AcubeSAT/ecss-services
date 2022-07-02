@@ -166,7 +166,16 @@ TEST_CASE("Test appending double") {
 	CHECK(message.read<double>() == Catch::Approx(2.324).epsilon(0.0001));
 }
 
-TEST_CASE("Append a CUC timestamp") {
+TEST_CASE("Test appending offset") {
+	Message message(0, 0, Message::TC, 0);
+	message.append<Time::RelativeTime>(555);
+
+	REQUIRE(message.dataSize == 8);
+
+	CHECK(message.read<Time::RelativeTime>() == 555);
+}
+
+TEST_CASE("Test appending a CUC timestamp") {
 	SECTION("Test 1") {
 		auto timeCUC = TimeGetter::getCurrentTimeCustomCUC();
 		REQUIRE(timeCUC.elapsed100msTicks == 86769000);
@@ -186,6 +195,21 @@ TEST_CASE("Append a CUC timestamp") {
 
 		REQUIRE(message.readUint64() == 34511);
 	}
+}
+
+TEST_CASE("Test reading a custom CUC timestamp") {
+	/**
+ 	* Append a custom CUC Time Stamp to a message object and check if is it read corretly
+ 	*/
+	Time::CustomCUC_t timeCUC;
+	timeCUC.elapsed100msTicks = 34511;
+
+	Message message(0, 0, Message::TC, 0);
+	message.appendCustomCUCTimeStamp(timeCUC);
+
+	auto returnTimeCUC = message.readCustomCUCTimeStamp();
+
+	REQUIRE(returnTimeCUC.elapsed100msTicks == 34511);
 }
 
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {

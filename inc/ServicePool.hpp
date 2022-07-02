@@ -2,20 +2,21 @@
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
 #include "ECSS_Configuration.hpp"
-#include "Services/TimeBasedSchedulingService.hpp"
-#include "Services/LargePacketTransferService.hpp"
-#include "Services/RequestVerificationService.hpp"
-#include "Services/EventReportService.hpp"
+#include "Services/DummyService.hpp"
 #include "Services/EventActionService.hpp"
-#include "Services/ParameterService.hpp"
-#include "Services/TestService.hpp"
-#include "Services/MemoryManagementService.hpp"
+#include "Services/EventReportService.hpp"
 #include "Services/FunctionManagementService.hpp"
-#include "Services/StorageAndRetrievalService.hpp"
 #include "Services/HousekeepingService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/MemoryManagementService.hpp"
+#include "Services/OnBoardMonitoringService.hpp"
+#include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
-#include "Services/OnBoardMonitoringService.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Services/StorageAndRetrievalService.hpp"
+#include "Services/TestService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -39,6 +40,10 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
+#ifdef SERVICE_DUMMY
+	DummyService dummyService;
+#endif
+
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
