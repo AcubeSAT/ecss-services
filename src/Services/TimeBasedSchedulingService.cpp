@@ -13,7 +13,6 @@ Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::Cus
 		scheduledActivities.pop_front();
 	}
 
-
 	if (!scheduledActivities.empty()) {
 		return scheduledActivities.front().requestReleaseTime;
 	} else {
