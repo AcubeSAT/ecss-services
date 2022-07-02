@@ -10,15 +10,7 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::CustomCUC_t currentTime) {
 	if (currentTime >= scheduledActivities.front().requestReleaseTime) {
 		MessageParser::execute(scheduledActivities.front().request);
-
-		RequestID receivedRequestID = scheduledActivities.front().requestID;
-		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
-		                                             [&receivedRequestID](const ScheduledActivity& currentElement) {
-			                                             return receivedRequestID != currentElement.requestID;
-		                                             });
-		if (requestIDMatch != scheduledActivities.end()) {
-			scheduledActivities.erase(requestIDMatch);
-		}
+		scheduledActivities.pop_front();
 	}
 	if (!scheduledActivities.empty()) {
 		return scheduledActivities.front().requestReleaseTime;
