@@ -8,7 +8,7 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 }
 
 Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::CustomCUC_t currentTime) {
-	if (currentTime > scheduledActivities.front().requestReleaseTime || currentTime == scheduledActivities.front().requestReleaseTime) {
+	if (currentTime >= scheduledActivities.front().requestReleaseTime) {
 		MessageParser::execute(scheduledActivities.front().request);
 
 		RequestID receivedRequestID = scheduledActivities.front().requestID;
