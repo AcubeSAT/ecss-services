@@ -126,7 +126,7 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	REQUIRE(iterationCount == 1);
 
 	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 17248435);
-	REQUIRE(nextActivityExecutionCUCTime.elapsed100msTicks == INT_MAX);
+	REQUIRE(nextActivityExecutionCUCTime.elapsed100msTicks == std::numeric_limits<decltype(nextActivityExecutionCUCTime.elapsed100msTicks)>::max());
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
 	response = ServiceTests::get(3);

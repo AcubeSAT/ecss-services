@@ -24,7 +24,7 @@ Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::Cus
 		return scheduledActivities.front().requestReleaseTime;
 	} else {
 		Time::CustomCUC_t infinity;
-		infinity.elapsed100msTicks = INT_MAX;
+		infinity.elapsed100msTicks = std::numeric_limits<decltype(infinity.elapsed100msTicks)>::max();
 		return infinity;
 	}
 }
