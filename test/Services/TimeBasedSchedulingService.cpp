@@ -97,7 +97,7 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	Services.reset();
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
-	auto nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 1556435);
+	auto nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1556435);
 	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
 
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
@@ -106,10 +106,10 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	uint16_t iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 3);
 
-	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 100);
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 100);
 	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
 
-	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 1726435);
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1726435);
 	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1957232);
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
@@ -117,7 +117,7 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 2);
 
-	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 1957232);
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1957232);
 	REQUIRE(nextActivityExecutionCUCTime == currentTime + 17248435);
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
@@ -125,7 +125,7 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 1);
 
-	nextActivityExecutionCUCTime = timeBasedService.popScheduledActivity(currentTime + 17248435);
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 17248435);
 	REQUIRE(nextActivityExecutionCUCTime.elapsed100msTicks == INT_MAX);
 
 	timeBasedService.detailReportAllActivities(receivedMessage);

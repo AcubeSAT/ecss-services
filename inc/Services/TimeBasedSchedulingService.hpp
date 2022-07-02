@@ -145,9 +145,9 @@ public:
 
 	/**
 	 * This function execute the first activity and removes it from the list.
-	 * @return the requestReleaseTime of next activity to be executed
+	 * @return the requestReleaseTime of next activity to be executed after this time
 	 */
-	Time::CustomCUC_t popScheduledActivity(Time::CustomCUC_t currentTime);
+	Time::CustomCUC_t executeScheduledActivity(Time::CustomCUC_t currentTime);
 
 	/**
 	 * @brief TC[11,1] enable the time-based schedule execution function
