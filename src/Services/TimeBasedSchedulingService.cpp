@@ -13,7 +13,7 @@ Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::Cus
 
 		RequestID receivedRequestID = scheduledActivities.front().requestID;
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
-		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
+		                                             [&receivedRequestID](const ScheduledActivity& currentElement) {
 			                                             return receivedRequestID != currentElement.requestID;
 		                                             });
 		if (requestIDMatch != scheduledActivities.end()) {
