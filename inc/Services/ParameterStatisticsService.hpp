@@ -23,6 +23,11 @@ private:
 	 */
 	Time::CustomCUC_t evaluationStartTime;
 
+	/**
+	 * Stub initializer of the statistics map, so that its content can be accessed during testing.
+	 */
+	void initializeStatistics();
+
 public:
 	inline static const uint8_t ServiceType = 4;
 
@@ -48,7 +53,7 @@ public:
 	/**
 	 * true means that the periodic statistics reporting is enabled
 	 */
-	bool periodicStatisticsReportingStatus = false;
+	bool periodicStatisticsReportingStatus = true;
 	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
@@ -60,7 +65,7 @@ public:
 	/**
 	 * The parameter statistics reporting interval
 	 */
-	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
+	uint16_t reportingIntervalMs = 700;
 
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
