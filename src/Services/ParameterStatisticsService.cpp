@@ -209,4 +209,12 @@ void ParameterStatisticsService::execute(Message& message) {
 void ParameterStatisticsService::initializeStatistics() {
 }
 
+bool ParameterStatisticsService::getPeriodicReportingStatus() {
+	return periodicStatisticsReportingStatus;
+}
+
+void ParameterStatisticsService::setPeriodicReportingStatus(bool status) {
+	periodicStatisticsReportingStatus = status;
+}
+
 #endif

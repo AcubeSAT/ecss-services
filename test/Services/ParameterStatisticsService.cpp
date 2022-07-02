@@ -145,13 +145,13 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request.appendUint16(6);
-		Services.parameterStatistics.periodicStatisticsReportingStatus = false;
+		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.reportingIntervalMs == 700);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == true);
+		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == true);
 		CHECK(Services.parameterStatistics.reportingIntervalMs == 6);
 	}
 
@@ -160,13 +160,13 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request2.appendUint16(3);
-		Services.parameterStatistics.periodicStatisticsReportingStatus = false;
+		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.reportingIntervalMs == 6);
 
 		MessageParser::execute(request2);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidSamplingRateError) == 1);
-		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == false);
+		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == false);
 		CHECK(Services.parameterStatistics.reportingIntervalMs == 6);
 
 		resetSystem();
@@ -181,10 +181,10 @@ TEST_CASE("Disabling the periodic reporting of statistics") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::DisablePeriodicParameterReporting, Message::TC, 1);
-		Services.parameterStatistics.periodicStatisticsReportingStatus = true;
+		Services.parameterStatistics.setPeriodicReportingStatus(true);
 
 		MessageParser::execute(request);
-		REQUIRE(Services.parameterStatistics.periodicStatisticsReportingStatus == false);
+		REQUIRE(Services.parameterStatistics.getPeriodicReportingStatus() == false);
 
 		resetSystem();
 		ServiceTests::reset();
@@ -330,10 +330,10 @@ TEST_CASE("Delete statistics definitions") {
 		request.appendUint16(id1);
 		request.appendUint16(id2);
 
-		Services.parameterStatistics.periodicStatisticsReportingStatus = true;
+		Services.parameterStatistics.setPeriodicReportingStatus(true);
 		MessageParser::execute(request);
 
-		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == true);
+		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == true);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 2);
 	}
@@ -347,7 +347,7 @@ TEST_CASE("Delete statistics definitions") {
 
 		MessageParser::execute(request);
 
-		CHECK(Services.parameterStatistics.periodicStatisticsReportingStatus == false);
+		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == false);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		CHECK(Services.parameterStatistics.statisticsMap.empty());
 

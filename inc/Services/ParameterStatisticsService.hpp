@@ -24,6 +24,11 @@ private:
 	Time::CustomCUC_t evaluationStartTime;
 
 	/**
+	 * true means that the periodic statistics reporting is enabled
+	 */
+	bool periodicStatisticsReportingStatus = true;
+
+	/**
 	 * Stub initializer of the statistics map, so that its content can be accessed during testing.
 	 */
 	void initializeStatistics();
@@ -51,10 +56,6 @@ public:
 	etl::map<uint16_t, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
-	 * true means that the periodic statistics reporting is enabled
-	 */
-	bool periodicStatisticsReportingStatus = true;
-	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
 	bool hasAutomaticStatisticsReset = false; // todo: do const
@@ -66,6 +67,16 @@ public:
 	 * The parameter statistics reporting interval
 	 */
 	uint16_t reportingIntervalMs = 700;
+
+	/**
+	 * Returns the periodic statistics reporting status
+	 */
+	bool getPeriodicReportingStatus();
+
+	/**
+	 * Sets the value of the periodic statistics reporting status
+	 */
+	void setPeriodicReportingStatus(bool status);
 
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
