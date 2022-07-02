@@ -217,4 +217,8 @@ void ParameterStatisticsService::setPeriodicReportingStatus(bool status) {
 	periodicStatisticsReportingStatus = status;
 }
 
+uint16_t ParameterStatisticsService::getReportingIntervalMs() {
+	return reportingIntervalMs;
+}
+
 #endif

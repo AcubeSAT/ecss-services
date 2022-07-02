@@ -29,6 +29,11 @@ private:
 	bool periodicStatisticsReportingStatus = true;
 
 	/**
+	 * The parameter statistics reporting interval
+	 */
+	uint16_t reportingIntervalMs = 700;
+
+	/**
 	 * Stub initializer of the statistics map, so that its content can be accessed during testing.
 	 */
 	void initializeStatistics();
@@ -63,10 +68,6 @@ public:
 	 * Indicates whether to append/read the sampling interval to/from message
 	 */
 	const bool supportsSamplingInterval = true;
-	/**
-	 * The parameter statistics reporting interval
-	 */
-	uint16_t reportingIntervalMs = 700;
 
 	/**
 	 * Returns the periodic statistics reporting status
@@ -77,6 +78,11 @@ public:
 	 * Sets the value of the periodic statistics reporting status
 	 */
 	void setPeriodicReportingStatus(bool status);
+
+	/**
+	 * Returns the periodic statistics reporting status
+	 */
+	uint16_t getReportingIntervalMs();
 
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()

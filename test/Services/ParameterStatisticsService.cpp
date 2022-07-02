@@ -146,13 +146,13 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request.appendUint16(6);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
-		CHECK(Services.parameterStatistics.reportingIntervalMs == 700);
+		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 700);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
 		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == true);
-		CHECK(Services.parameterStatistics.reportingIntervalMs == 6);
+		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 6);
 	}
 
 	SECTION("Invalid reporting interval requested") {
@@ -161,13 +161,13 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
 		request2.appendUint16(3);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
-		CHECK(Services.parameterStatistics.reportingIntervalMs == 6);
+		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 6);
 
 		MessageParser::execute(request2);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidSamplingRateError) == 1);
 		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == false);
-		CHECK(Services.parameterStatistics.reportingIntervalMs == 6);
+		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 6);
 
 		resetSystem();
 		ServiceTests::reset();
