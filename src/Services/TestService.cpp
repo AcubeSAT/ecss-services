@@ -1,6 +1,7 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_TEST
 
+#include "ServicePool.hpp"
 #include "Services/TestService.hpp"
 
 void TestService::areYouAlive(Message& request) {
@@ -16,12 +17,14 @@ void TestService::areYouAliveReport() {
 void TestService::onBoardConnection(Message& request) {
 	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
 	uint16_t applicationProcessId = request.readUint16();
-	onBoardConnectionReport(applicationProcessId);
+	if (applicationProcessId == ApplicationId) {
+		onBoardConnectionReport(applicationProcessId);
+	}
 }
 
 void TestService::onBoardConnectionReport(uint16_t applicationProcessId) {
 	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
-	report.appendUint16(applicationProcessId);
+	report.appendUint16(ApplicationId);
 	storeMessage(report);
 }
 

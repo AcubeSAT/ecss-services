@@ -2,8 +2,8 @@
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
 #include "Service.hpp"
-#include "etl/String.hpp"
 #include "Services/EventReportService.hpp"
+#include "etl/String.hpp"
 #include "etl/multimap.h"
 
 /**
@@ -39,7 +39,6 @@ private:
 	void executeAction(uint16_t eventID);
 
 public:
-
 	inline static const uint8_t ServiceType = 19;
 
 	enum MessageType : uint8_t {
@@ -56,8 +55,8 @@ public:
 
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
-		uint16_t applicationId = 0;
-		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
+		uint16_t applicationId = ApplicationId;
+		uint16_t eventDefinitionID = 65535;   // The ID of the event that might take place
 		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
 		String<64> request = "";
 		bool enabled = false;
@@ -66,7 +65,7 @@ public:
 	friend EventReportService;
 
 	etl::multimap<uint16_t, EventActionDefinition, ECSSEventActionStructMapSize>
-		eventActionDefinitionMap;
+	    eventActionDefinitionMap;
 
 	EventActionService() {
 		serviceType = 19;

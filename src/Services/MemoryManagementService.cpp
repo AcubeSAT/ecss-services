@@ -1,9 +1,9 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_MEMORY
 
-#include "Services/MemoryManagementService.hpp"
 #include <cerrno>
 #include <etl/String.hpp>
+#include "Services/MemoryManagementService.hpp"
 
 // Define the constructors for the classes
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
@@ -23,25 +23,20 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 	 * @todo Add error checking and reporting for the parameters
 	 * @todo Add failure reporting
 	 */
-	// Check if we have the correct packet
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
-
-	// Read the memory ID from the request
 	auto memoryID = MemoryManagementService::MemoryID(request.readEnum8());
 
-	// Check for a valid memory ID first
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		// Variable declaration
-		uint8_t readData[ECSSMaxStringSize]; // Preallocate the array
+		uint8_t readData[ECSSMaxStringSize];            // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 		if (memoryID == MemoryManagementService::MemoryID::FLASH) {
 			// todo: Define FLASH specific access code when we transfer to embedded
 		} else {
 			for (std::size_t j = 0; j < iterationCount; j++) {
-				uint64_t startAddress = request.readUint64(); // Start address of the memory
+				uint64_t startAddress = request.readUint64();            // Start address of the memory
 				uint16_t dataLength = request.readOctetString(readData); // Data length to load
-				uint16_t checksum = request.readBits(16); // Get the CRC checksum from the message
+				uint16_t checksum = request.readBits(16);                // Get the CRC checksum from the message
 
 				// Continue only if the checksum passes
 				if (mainService.dataValidator(readData, checksum, dataLength)) {
@@ -73,27 +68,23 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 }
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
-	// Check if we have the correct packet
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData);
 
-	// Create the report message object of telemetry message subtype 6
 	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	// Check for a valid memory ID first
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
 		// Variable declaration
-		uint8_t readData[ECSSMaxStringSize]; // Preallocate the array
+		uint8_t readData[ECSSMaxStringSize];            // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
-		// Append the data to report message
-		report.appendEnum8(memoryID); // Memory ID
+		report.appendEnum8(memoryID);        // Memory ID
 		report.appendUint16(iterationCount); // Iteration count
 
-		// Iterate N times, as specified in the command message
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			uint64_t startAddress = request.readUint64(); // Data length to read
-			uint16_t readLength = request.readUint16(); // Start address for the memory read
+			uint16_t readLength = request.readUint16();   // Start address for the memory read
 
 			// Read memory data, an octet at a time, checking for a valid address first
 			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
@@ -102,44 +93,39 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
-				// This part is repeated N-times (N = iteration count)
-				report.appendUint64(startAddress); // Start address
+				report.appendUint64(startAddress);                            // Start address
 				report.appendOctetString(String<1024>(readData, readLength)); // Save the
-				// read data
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
 		}
 
-		mainService.storeMessage(report); // Save the report message
-		request.resetRead(); // Reset the reading count
+		mainService.storeMessage(report);
+		request.resetRead();
 	} else {
 		// todo: Send a failed start of execution
 	}
 }
 
 void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
-	// Check if we have the correct packet
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData);
 
-	// Create the report message object of telemetry message subtype 10
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8(); // Read the memory ID from the request
 
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		// Variable declaration
-		uint8_t readData[ECSSMaxStringSize]; // Preallocate the array
+		uint8_t readData[ECSSMaxStringSize];            // Preallocate the array
 		uint16_t iterationCount = request.readUint16(); // Get the iteration count
 
 		// Append the data to report message
-		report.appendEnum8(memoryID); // Memory ID
+		report.appendEnum8(memoryID);        // Memory ID
 		report.appendUint16(iterationCount); // Iteration count
 
 		// Iterate N times, as specified in the command message
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			uint64_t startAddress = request.readUint64(); // Data length to read
-			uint16_t readLength = request.readUint16(); // Start address for the memory read
+			uint16_t readLength = request.readUint16();   // Start address for the memory read
 
 			// Check whether the first and the last addresses are within the limits
 			if (mainService.addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
@@ -150,8 +136,8 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 				}
 
 				// This part is repeated N-times (N = iteration count)
-				report.appendUint64(startAddress); // Start address
-				report.appendUint16(readLength); // Save the read data
+				report.appendUint64(startAddress);                                    // Start address
+				report.appendUint16(readLength);                                      // Save the read data
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength)); // Append CRC
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
@@ -159,7 +145,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		}
 
 		mainService.storeMessage(report); // Save the report message
-		request.resetRead(); // Reset the reading count
+		request.resetRead();              // Reset the reading count
 	} else {
 		// todo: Send a failed start of execution report
 	}

@@ -20,7 +20,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 }
 
 void ParameterStatisticsService::parameterStatisticsReport() {
-	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
+	Message report = createTM(ParameterStatisticsReport);
 	report.append(evaluationStartTime);
 	auto evaluationStopTime = TimeGetter::getCurrentTimeCustomCUC();
 	report.append(evaluationStopTime);
@@ -156,7 +156,7 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 }
 
 void ParameterStatisticsService::statisticsDefinitionsReport() {
-	Message definitionsReport(ServiceType, MessageType::ParameterStatisticsDefinitionsReport, Message::TM, 1);
+	Message definitionsReport = createTM(ParameterStatisticsDefinitionsReport);
 
 	uint16_t currentReportingInterval = 0;
 	if (periodicStatisticsReportingStatus) {
