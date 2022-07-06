@@ -3,9 +3,9 @@
 
 #include <optional>
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
+#include "Service.hpp"
 #include "etl/map.h"
 
 /**
@@ -57,6 +57,7 @@ public:
 	 * by calling \fn initializeParametersArray
 	 */
 	ParameterService() {
+		serviceType = ServiceType;
 		initializeParameterMap();
 	}
 

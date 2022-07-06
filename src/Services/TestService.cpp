@@ -18,11 +18,11 @@ void TestService::onBoardConnection(Message& request) {
 	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
 	uint16_t applicationProcessId = request.readUint16();
 	if (applicationProcessId == ApplicationId) {
-		onBoardConnectionReport(applicationProcessId);
+		onBoardConnectionReport();
 	}
 }
 
-void TestService::onBoardConnectionReport(uint16_t applicationProcessId) {
+void TestService::onBoardConnectionReport() {
 	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
 	report.appendUint16(ApplicationId);
 	storeMessage(report);

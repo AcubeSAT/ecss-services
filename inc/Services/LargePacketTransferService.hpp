@@ -29,7 +29,7 @@ public:
 	 * Default constructor since only functions will be used.
 	 */
 	LargePacketTransferService() {
-		serviceType = 13;
+		serviceType = ServiceType;
 	}
 
 	/**

@@ -68,7 +68,7 @@ public:
 	    eventActionDefinitionMap;
 
 	EventActionService() {
-		serviceType = 19;
+		serviceType = ServiceType;
 		eventActionFunctionStatus = true;
 	}
 
