@@ -34,9 +34,9 @@ private:
 	uint16_t reportingIntervalMs = 700;
 
 	/**
-	 * Stub initializer of the statistics map, so that its content can be accessed during testing.
+	 * Initializer of the statistics map, so that its content can be accessed by FreeRTOS tasks.
 	 */
-	void initializeStatistics();
+	void initializeStatisticsMap();
 
 public:
 	inline static const uint8_t ServiceType = 4;

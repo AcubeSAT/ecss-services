@@ -4,7 +4,7 @@
 #include "Services/ParameterStatisticsService.hpp"
 
 ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {
-	initializeStatistics();
+	initializeStatisticsMap();
 }
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
@@ -206,7 +206,7 @@ void ParameterStatisticsService::execute(Message& message) {
 	}
 }
 
-void ParameterStatisticsService::initializeStatistics() {
+void ParameterStatisticsService::initializeStatisticsMap() {
 }
 
 bool ParameterStatisticsService::getPeriodicReportingStatus() {
