@@ -173,6 +173,48 @@ UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 }
 ```
 
+### Statistics initialization
+
+The related function is named **initializeStatisticsMap** and is a member of the **ParameterStatisticsService** class.
+The function is called by the constructor of the class, making sure that the statistics will be initialized properly
+after creating an instance of the ST04 Service. This function should be implemented according to the specific 
+needs, structure and parameters of an individual project. It basically iterates over the statistics list and initializes
+statistics for parameters of selected IDs. An example is provided below. Let's assume that we have stored the 
+parameter IDs
+
+```c++
+namespace PlatformParameters {
+    enum parameterIDs : uint16_t {
+        onBoardMinute = 0,
+        temperature = 1,
+    };
+}
+```
+
+and we use a data structure to store the statistics.
+
+```cpp
+namespace ParameterStatistics {
+	static etl::array<Statistic, ECSSMaxStatisticParameters> statistics = {
+	    Statistic(),
+	    Statistic(),
+	};
+}
+```
+
+Our initialization function, based on the structure presented above, should look like this:
+
+```cpp
+void ParameterStatisticsService::initializeStatisticsMap() {
+	using namespace PlatformParameters;
+	uint16_t statisticParameterIDs[] = {parameterIDs::onBoardMinute, parameterIDs::temperature};
+	uint8_t idIndex = 0;
+
+	for (auto& statistic: ParameterStatistics::statistics) {
+		statisticsMap.insert({statisticParameterIDs[idIndex++], statistic});
+	}
+}
+```
 
 ## Service initialisation
 
