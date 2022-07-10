@@ -311,6 +311,10 @@ namespace Time {
 		return time1.elapsed100msTicks == time2.elapsed100msTicks;
 	}
 
+	inline bool operator>=(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks >= time2.elapsed100msTicks;
+	}
+
 } // namespace Time
 
 #endif
