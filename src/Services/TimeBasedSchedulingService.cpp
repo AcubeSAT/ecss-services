@@ -7,6 +7,21 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
+Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::CustomCUC_t currentTime) {
+	if (currentTime >= scheduledActivities.front().requestReleaseTime && !scheduledActivities.empty()) {
+		MessageParser::execute(scheduledActivities.front().request);
+		scheduledActivities.pop_front();
+	}
+
+	if (!scheduledActivities.empty()) {
+		return scheduledActivities.front().requestReleaseTime;
+	} else {
+		Time::CustomCUC_t infinity;
+		infinity.elapsed100msTicks = std::numeric_limits<decltype(infinity.elapsed100msTicks)>::max();
+		return infinity;
+	}
+}
+
 void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
 	executionFunctionStatus = true;
@@ -100,7 +115,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 			    (current_time + ECSSTimeMarginForActivation)) {
 				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			} else {
-				requestIDMatch->requestReleaseTime +=  relativeOffset;
+				requestIDMatch->requestReleaseTime += relativeOffset;
 			}
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);

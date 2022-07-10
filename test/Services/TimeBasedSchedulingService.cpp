@@ -58,7 +58,7 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 		testMessage3.appendUint16(456); // Append dummy data
 
 		testMessage4.serviceType = 12;
-		testMessage4.messageType = 23;
+		testMessage4.messageType = 3;
 		testMessage4.packetType = Message::TC;
 		testMessage4.appendUint16(934); // Append dummy data
 
@@ -92,6 +92,47 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 
 
 TimeBasedSchedulingService& timeBasedService = Services.timeBasedScheduling;
+
+TEST_CASE("Execute the first activity, removes it from the list and return the release time of next activity to be executed") {
+	Services.reset();
+	auto scheduledActivities = activityInsertion(timeBasedService);
+
+	auto nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1556435);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
+
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	Message response = ServiceTests::get(0);
+	uint16_t iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 3);
+
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 100);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
+
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1726435);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1957232);
+
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	response = ServiceTests::get(1);
+	iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 2);
+
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1957232);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 17248435);
+
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	response = ServiceTests::get(2);
+	iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 1);
+
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 17248435);
+	REQUIRE(nextActivityExecutionCUCTime.elapsed100msTicks == std::numeric_limits<decltype(nextActivityExecutionCUCTime.elapsed100msTicks)>::max());
+
+	timeBasedService.detailReportAllActivities(receivedMessage);
+	response = ServiceTests::get(3);
+	iterationCount = response.readUint16();
+	REQUIRE(iterationCount == 0);
+}
 
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 	Services.reset();
