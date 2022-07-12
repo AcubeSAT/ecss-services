@@ -2,7 +2,6 @@
 #ifdef SERVICE_PARAMETER
 #include "ServicePool.hpp"
 #include "Services/ParameterStatisticsService.hpp"
-#include "../src/Platform/x86/Services/ParameterStatisticsService.cpp"
 
 ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {
 	initializeStatisticsMap();

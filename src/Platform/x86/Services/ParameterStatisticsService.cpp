@@ -1,7 +1,8 @@
 #include "ECSS_Configuration.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+
 #ifdef SERVICE_PARAMETERSTATISTICS
 
-#include "Services/ParameterStatisticsService.hpp"
 
 void ParameterStatisticsService::initializeStatisticsMap() {
 	statisticsMap = {};
