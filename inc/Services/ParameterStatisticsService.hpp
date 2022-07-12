@@ -72,17 +72,23 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	bool getPeriodicReportingStatus();
+	 inline const bool getPeriodicReportingStatus() {
+		return periodicStatisticsReportingStatus;
+	}
 
 	/**
 	 * Sets the value of the periodic statistics reporting status
 	 */
-	void setPeriodicReportingStatus(bool status);
+	inline void setPeriodicReportingStatus(bool status) {
+		periodicStatisticsReportingStatus = status;
+	}
 
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	uint16_t getReportingIntervalMs();
+	inline const uint16_t getReportingIntervalMs() {
+		return reportingIntervalMs;
+	}
 
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()

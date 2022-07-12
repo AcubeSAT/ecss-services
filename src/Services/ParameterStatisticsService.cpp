@@ -1,5 +1,6 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
+#include "../src/Platform/x86/Services/ParameterStatisticsService.cpp"
 #include "ServicePool.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
@@ -204,21 +205,6 @@ void ParameterStatisticsService::execute(Message& message) {
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
-}
-
-void ParameterStatisticsService::initializeStatisticsMap() {
-}
-
-bool ParameterStatisticsService::getPeriodicReportingStatus() {
-	return periodicStatisticsReportingStatus;
-}
-
-void ParameterStatisticsService::setPeriodicReportingStatus(bool status) {
-	periodicStatisticsReportingStatus = status;
-}
-
-uint16_t ParameterStatisticsService::getReportingIntervalMs() {
-	return reportingIntervalMs;
 }
 
 #endif
