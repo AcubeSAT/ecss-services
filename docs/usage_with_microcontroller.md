@@ -180,7 +180,7 @@ The function is called by the constructor of the class, making sure that the sta
 after creating an instance of the ST04 Service. This function should be implemented according to the specific 
 needs, structure and parameters of an individual project. It basically iterates over the statistics list and initializes
 statistics for parameters of selected IDs. An example is provided below. Let's assume that we have stored the 
-parameter IDs
+parameter IDs:
 
 ```c++
 namespace PlatformParameters {
