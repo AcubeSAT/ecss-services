@@ -203,9 +203,9 @@ structure should look like this:
 
 ```c++
 namespace PlatformParameters {
-    enum parameterIDs : uint16_t {
-        onBoardMinute = 0,
-        temperature = 1,
+    enum ParameterIDs : uint16_t {
+        OnBoardMinute = 0,
+        Temperature = 1,
     };
 }
 
