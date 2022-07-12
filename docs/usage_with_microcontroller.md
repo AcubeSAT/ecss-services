@@ -191,7 +191,7 @@ namespace PlatformParameters {
 }
 ```
 
-and we use a data structure to store the statistics.
+and we use a data structure to store the statistics:
 
 ```cpp
 namespace ParameterStatistics {
