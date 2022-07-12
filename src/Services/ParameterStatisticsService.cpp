@@ -1,6 +1,5 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
-#include "../src/Platform/x86/Services/ParameterStatisticsService.cpp"
 #include "ServicePool.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
