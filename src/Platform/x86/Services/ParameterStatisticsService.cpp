@@ -4,6 +4,7 @@
 #include "Services/ParameterStatisticsService.hpp"
 
 void ParameterStatisticsService::initializeStatisticsMap() {
+	statisticsMap = {};
 }
 
 #endif
