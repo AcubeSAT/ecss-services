@@ -69,6 +69,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		}
 	}
 	sortActivitiesReleaseTime(scheduledActivities);
+	taskNotifier();
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
@@ -272,5 +273,7 @@ void TimeBasedSchedulingService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+void TimeBasedSchedulingService::taskNotifier(){}
 
 #endif
