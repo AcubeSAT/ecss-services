@@ -107,4 +107,7 @@ void ParameterService::initializeParameterMap() {
 	              {static_cast<uint16_t>(10), PlatformParameters::parameter11},
 	              {static_cast<uint16_t>(11), PlatformParameters::parameter12}};
 }
+
+void TimeBasedSchedulingService::taskNotifier() {}
+
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

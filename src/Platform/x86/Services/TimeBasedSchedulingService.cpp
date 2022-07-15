@@ -3,8 +3,6 @@
 
 #include "Services/TimeBasedSchedulingService.hpp"
 
-void TimeBasedSchedulingService::taskNotifier(){
-	int a=0;
-}
+void TimeBasedSchedulingService::taskNotifier() {}
 
 #endif
