@@ -274,6 +274,5 @@ void TimeBasedSchedulingService::execute(Message& message) {
 	}
 }
 
-void TimeBasedSchedulingService::taskNotifier(){}
 
 #endif
