@@ -72,7 +72,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	 inline const bool getPeriodicReportingStatus() {
+	 inline bool getPeriodicReportingStatus() {
 		return periodicStatisticsReportingStatus;
 	}
 
