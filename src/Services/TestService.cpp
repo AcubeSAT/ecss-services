@@ -22,9 +22,9 @@ void TestService::onBoardConnection(Message& request) {
 	}
 }
 
-void TestService::onBoardConnectionReport() {
+void TestService::onBoardConnectionReport(uint16_t applicationProcessId) {
 	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
-	report.appendUint16(ApplicationId);
+	report.appendUint16(applicationProcessId);
 	storeMessage(report);
 }
 
