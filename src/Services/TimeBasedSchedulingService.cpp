@@ -274,5 +274,4 @@ void TimeBasedSchedulingService::execute(Message& message) {
 	}
 }
 
-
 #endif
