@@ -180,6 +180,7 @@ Platform-specific code also gives a chance to every Service to use pre-initialis
 definitions etc.) during boot. The following functions are called at initialisation:
 
 1. @ref ParameterService::initializeParameterMap
+2. @ref TimeBasedSchedulingService::taskNotifier
 
 An example definition can be as follows:
 
