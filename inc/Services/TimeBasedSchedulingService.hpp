@@ -46,11 +46,11 @@ class TimeBasedSchedulingService : public Service {
 private:
 	/**
 	 * @brief Indicator of the schedule execution
-	 *
+	 * True indicates "enabled" and False "disabled" state
 	 * @details The schedule execution indicator will be updated by the process that is running
 	 * the time scheduling service.
 	 */
-	bool executionFunctionStatus = false; // True indicates "enabled" and False "disabled" state
+	bool executionFunctionStatus = false;
 
 	/**
 	 * @brief Request identifier of the received packet

@@ -17,7 +17,7 @@
  *
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
-class RealTimeForwardingControlService {
+class RealTimeForwardingControlService : Service {
 public:
 	inline static const uint8_t ServiceType = 14;
 
@@ -25,7 +25,9 @@ public:
 		AddReportTypesToAppProcessConfiguration = 1,
 	};
 
-	RealTimeForwardingControlService() = default;
+	RealTimeForwardingControlService() {
+		serviceType = ServiceType;
+	}
 
 	/**
 	 * Contains the Application IDs, controlled by the Service.
