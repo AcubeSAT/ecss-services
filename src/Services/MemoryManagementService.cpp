@@ -124,8 +124,8 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
-				report.appendUint64(startAddress)
-				report.appendUint16(readLength)
+				report.appendUint64(startAddress);
+				report.appendUint16(readLength);
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
