@@ -42,7 +42,7 @@ public:
 	/**
 	 * TM[17,4] on-board connection test report to show that the MCU is connected to the on-board
 	 */
-	void onBoardConnectionReport();
+	void onBoardConnectionReport(uint16_t applicationProcessId);
 
 	/**
 	 * It is responsible to call the suitable function that execute the proper subservice. The

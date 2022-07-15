@@ -39,11 +39,11 @@ TEST_CASE("TC[17,3]", "[service][st17]") {
 }
 
 TEST_CASE("TM[17,4]", "[service][st17]") {
-	testService.onBoardConnectionReport();
+	testService.onBoardConnectionReport(40);
 
 	Message response = ServiceTests::get(0);
 	CHECK(response.serviceType == TestService::ServiceType);
 	CHECK(response.messageType == TestService::MessageType::OnBoardConnectionTestReport);
 	REQUIRE(response.dataSize == 2);
-	CHECK(response.readEnum16() == ApplicationId);
+	CHECK(response.readEnum16() == 40);
 }
