@@ -13,7 +13,7 @@ static void resetParameterValues() {
 TEST_CASE("Parameter Report Subservice") {
 	SECTION("All requested parameters invalid") {
 		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
-		                          Message::TC, 1);
+		                          Message::TC, ApplicationId);
 		request.appendUint16(3);
 		request.appendUint16(54432);
 		request.appendUint16(60000);

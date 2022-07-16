@@ -89,7 +89,7 @@ public:
 	 */
 	uint16_t applicationId;
 
-	// 7.4.3.1b
+	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
 
 	// 7.4.1, as defined in CCSDS 133.0-B-1
@@ -233,6 +233,7 @@ public:
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
+	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message

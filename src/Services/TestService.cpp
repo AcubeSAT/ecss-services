@@ -1,6 +1,7 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_TEST
 
+#include "ServicePool.hpp"
 #include "Services/TestService.hpp"
 
 void TestService::areYouAlive(Message& request) {

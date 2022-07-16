@@ -9,7 +9,9 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 
 Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::CustomCUC_t currentTime) {
 	if (currentTime >= scheduledActivities.front().requestReleaseTime && !scheduledActivities.empty()) {
-		MessageParser::execute(scheduledActivities.front().request);
+		if (scheduledActivities.front().requestID.applicationID == ApplicationId) {
+			MessageParser::execute(scheduledActivities.front().request);
+		}
 		scheduledActivities.pop_front();
 	}
 

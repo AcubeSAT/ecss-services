@@ -232,5 +232,11 @@ inline struct {
  */
 inline const uint8_t ECSSMaxMonitoringDefinitions = 4;
 
+/**
+ * 6.18.2.2 The applicationId that is assigned on the specific device that runs these Services.
+ * In the ECSS-E-ST-70-41C the application ID is also referred as application process.
+ */
+inline const uint16_t ApplicationId = 1;
+
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

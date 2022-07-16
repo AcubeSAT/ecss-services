@@ -20,12 +20,16 @@ public:
 		LogString = 128,
 	};
 
+	DummyService() {
+		serviceType = ServiceType;
+	}
+
 	/**
      * Send data as a part of a custom ECSS Message
      * Creates a TM[128, 128]
      */
 	void logAsECSSMessage(const etl::string<LOGGER_MAX_MESSAGE_SIZE>& data) {
-		Message log(ServiceType, MessageType::LogString, Message::TM, 1);
+		Message log = createTM(MessageType::LogString);
 		log.appendString(data);
 		storeMessage(log);
 	}

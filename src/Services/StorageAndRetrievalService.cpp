@@ -334,7 +334,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores);
 
-	Message report(ServiceType, MessageType::PacketStoreContentSummaryReport, Message::TM, 1);
+	Message report = createTM(PacketStoreContentSummaryReport);
 	uint16_t numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
@@ -479,7 +479,7 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportStatusOfPacketStores);
 
-	Message report(ServiceType, MessageType::PacketStoresStatusReport, Message::TM, 1);
+	Message report = createTM(PacketStoresStatusReport);
 	report.appendUint16(packetStores.size());
 	for (auto& packetStore : packetStores) {
 		auto packetStoreId = packetStore.first;
@@ -593,8 +593,8 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 
 void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportConfigurationOfPacketStores);
+	Message report = createTM(PacketStoreConfigurationReport);
 
-	Message report(ServiceType, MessageType::PacketStoreConfigurationReport, Message::TM, 1);
 	report.appendUint16(packetStores.size());
 	for (auto& packetStore : packetStores) {
 		auto packetStoreId = packetStore.first;

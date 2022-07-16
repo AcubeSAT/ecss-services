@@ -20,7 +20,7 @@ public:
 	};
 
 	TestService() {
-		serviceType = 17;
+		serviceType = ServiceType;
 	}
 
 	/**
@@ -41,7 +41,6 @@ public:
 
 	/**
 	 * TM[17,4] on-board connection test report to show that the MCU is connected to the on-board
-	 * @param applicationProcessId
 	 */
 	void onBoardConnectionReport(uint16_t applicationProcessId);
 
