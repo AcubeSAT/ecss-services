@@ -98,14 +98,14 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
-	Message structReport(ServiceType, MessageType::HousekeepingStructuresReport, Message::TM, 1);
+	Message structReport = createTM(MessageType::HousekeepingStructuresReport);
 	structReport.appendUint8(structIdToReport);
 
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
 	structReport.appendUint32(housekeepingStructure->second.collectionInterval);
 	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameterIds.size());
 
-	for (auto parameterId : housekeepingStructure->second.simplyCommutatedParameterIds) {
+	for (auto parameterId: housekeepingStructure->second.simplyCommutatedParameterIds) {
 		structReport.appendUint16(parameterId);
 	}
 	storeMessage(structReport);
@@ -116,10 +116,10 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
-	Message housekeepingReport(ServiceType, MessageType::HousekeepingParametersReport, Message::TM, 1);
+	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
 	housekeepingReport.appendUint8(structureId);
-	for (auto id : housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
+	for (auto id: housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
 		if (auto parameter = Services.parameterManagement.getParameter(id)) {
 			parameter->get().appendValueToMessage(housekeepingReport);
 		}
@@ -201,7 +201,7 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 			numOfValidIds++;
 		}
 	}
-	Message periodicPropertiesReport(ServiceType, MessageType::HousekeepingPeriodicPropertiesReport, Message::TM, 1);
+	Message periodicPropertiesReport = createTM(MessageType::HousekeepingPeriodicPropertiesReport);
 	periodicPropertiesReport.appendUint8(numOfValidIds);
 	request.resetRead();
 	request.readUint8();
@@ -262,25 +262,25 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 
 uint32_t
 HousekeepingService::reportPendingStructures(uint32_t currentTime, uint32_t previousTime, uint32_t expectedDelay) {
-    uint32_t nextCollection = std::numeric_limits<uint32_t>::max();
+	uint32_t nextCollection = std::numeric_limits<uint32_t>::max();
 
-    for (auto &housekeepingStructure: housekeepingStructures) {
-        if (housekeepingStructure.second.collectionInterval == 0) {
-            housekeepingParametersReport(housekeepingStructure.second.structureId);
-            nextCollection = 0;
-            continue;
-        }
-        if (currentTime != 0 and (currentTime % housekeepingStructure.second.collectionInterval == 0 or
-                                  (previousTime + expectedDelay) % housekeepingStructure.second.collectionInterval ==
-                                  0)) {
-            housekeepingParametersReport(housekeepingStructure.second.structureId);
-        }
-        uint32_t structureTimeToCollection = housekeepingStructure.second.collectionInterval -
-                                             currentTime % housekeepingStructure.second.collectionInterval;
-        if (nextCollection > structureTimeToCollection) {
-            nextCollection = structureTimeToCollection;
-        }
-    }
+	for (auto& housekeepingStructure: housekeepingStructures) {
+		if (housekeepingStructure.second.collectionInterval == 0) {
+			housekeepingParametersReport(housekeepingStructure.second.structureId);
+			nextCollection = 0;
+			continue;
+		}
+		if (currentTime != 0 and (currentTime % housekeepingStructure.second.collectionInterval == 0 or
+		                          (previousTime + expectedDelay) % housekeepingStructure.second.collectionInterval ==
+		                              0)) {
+			housekeepingParametersReport(housekeepingStructure.second.structureId);
+		}
+		uint32_t structureTimeToCollection = housekeepingStructure.second.collectionInterval -
+		                                     currentTime % housekeepingStructure.second.collectionInterval;
+		if (nextCollection > structureTimeToCollection) {
+			nextCollection = structureTimeToCollection;
+		}
+	}
 
-    return nextCollection;
+	return nextCollection;
 }

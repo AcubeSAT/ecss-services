@@ -1,11 +1,11 @@
 #ifndef ECSS_SERVICES_HOUSEKEEPINGSERVICE_HPP
 #define ECSS_SERVICES_HOUSEKEEPINGSERVICE_HPP
 
-#include "etl/map.h"
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/HousekeepingStructure.hpp"
+#include "Service.hpp"
+#include "etl/map.h"
 
 /**
  * Implementation of the ST[03] Housekeeping Reporting Service. The job of the Housekeeping Service is to store
@@ -31,11 +31,11 @@ private:
 	static bool existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids,
 	                           uint16_t parameterId);
 
-    /**
+	/**
      * Initializes Housekeeping Structures with the Parameters found in the obc-software.
      * The function definition is also found in the obc-software repo.
      */
-    void initializeHousekeepingStructures();
+	void initializeHousekeepingStructures();
 
 public:
 	inline static const uint8_t ServiceType = 3;
@@ -60,9 +60,10 @@ public:
 		HousekeepingPeriodicPropertiesReport = 35,
 	};
 
-    HousekeepingService() {
-        initializeHousekeepingStructures();
-    };
+	HousekeepingService() {
+		serviceType = ServiceType;
+		initializeHousekeepingStructures();
+	};
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
