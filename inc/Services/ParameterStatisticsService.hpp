@@ -23,6 +23,21 @@ private:
 	 */
 	Time::CustomCUC_t evaluationStartTime;
 
+	/**
+	 * true means that the periodic statistics reporting is enabled
+	 */
+	bool periodicStatisticsReportingStatus = true;
+
+	/**
+	 * The parameter statistics reporting interval
+	 */
+	uint16_t reportingIntervalMs = 700;
+
+	/**
+	 * Initializer of the statistics map, so that its content can be accessed by FreeRTOS tasks.
+	 */
+	void initializeStatisticsMap();
+
 public:
 	inline static const uint8_t ServiceType = 4;
 
@@ -46,10 +61,6 @@ public:
 	etl::map<uint16_t, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
-	 * true means that the periodic statistics reporting is enabled
-	 */
-	bool periodicStatisticsReportingStatus = false;
-	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
 	bool hasAutomaticStatisticsReset = false; // todo: do const
@@ -57,10 +68,27 @@ public:
 	 * Indicates whether to append/read the sampling interval to/from message
 	 */
 	const bool supportsSamplingInterval = true;
+
 	/**
-	 * The parameter statistics reporting interval
+	 * Returns the periodic statistics reporting status
 	 */
-	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
+	 inline bool getPeriodicReportingStatus() {
+		return periodicStatisticsReportingStatus;
+	}
+
+	/**
+	 * Sets the value of the periodic statistics reporting status
+	 */
+	inline void setPeriodicReportingStatus(bool status) {
+		periodicStatisticsReportingStatus = status;
+	}
+
+	/**
+	 * Returns the periodic statistics reporting status
+	 */
+	inline const uint16_t getReportingIntervalMs() {
+		return reportingIntervalMs;
+	}
 
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
