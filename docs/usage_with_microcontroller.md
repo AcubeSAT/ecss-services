@@ -180,7 +180,6 @@ Platform-specific code also gives a chance to every Service to use pre-initialis
 definitions etc.) during boot. The following functions are called at initialisation:
 
 1. @ref ParameterService::initializeParameterMap
-2. @ref TimeBasedSchedulingService::taskNotifier
 
 An example definition can be as follows:
 
@@ -193,7 +192,20 @@ void ParameterService::initializeParameterMap() {
 	parameters = {{0, parameter1}, {1, parameter2}, {2, parameter3}};
 }
 ```
+2. @ref TimeBasedSchedulingService::taskNotifier
 
+To achieve low consumption of computing resources after timeBasedScheduling service activities are executed, a notifier
+should be called to stop the timeBasedSchedulingTask. After a new activity is entered, a notifier should be called by 
+the platform to start the task again.
+
+An example implementation for freeRTOS can be as follows:
+```cpp
+void TimeBasedSchedulingService::taskNotifier() {
+    if (scheduledActivities.size() >= 1) {
+        xTaskNotify(TaskList::timeBasedSchedulingTask->taskHandle, 0, eNoAction);
+    }
+}
+```
 ## Receiving messages
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can
