@@ -8,6 +8,7 @@
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
 #include "Services/ParameterService.hpp"
+#include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
@@ -107,4 +108,9 @@ void ParameterService::initializeParameterMap() {
 	              {static_cast<uint16_t>(10), PlatformParameters::parameter11},
 	              {static_cast<uint16_t>(11), PlatformParameters::parameter12}};
 }
+
+void ParameterStatisticsService::initializeStatisticsMap() {
+	statisticsMap = {};
+}
+
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
