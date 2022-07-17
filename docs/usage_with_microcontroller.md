@@ -193,11 +193,13 @@ void ParameterService::initializeParameterMap() {
 ```
 2. @ref TimeBasedSchedulingService::taskNotifier
 
-To achieve low consumption of computing resources after timeBasedScheduling service activities are executed, a notifier
-should be called to stop the timeBasedSchedulingTask. After a new activity is entered, a notifier should be called by 
-the platform to start the task again.
+In case the TimeBasedScheduling service runs out of activities, instead of the Platform checking periodically if an 
+activity has been entered, the Platform should stop the task until a new activity arrives so low consumption of 
+computing resources can be achieved. With this function, a notifier can be implemented on the Platform to restart the 
+task,  which function is called by TimeBasedScheduling::insertActivities to notify the task to restart after a new 
+activity is inserted.
 
-An example implementation for freeRTOS can be as follows:
+An example implementation for FreeRTOS can be as follows:
 ```cpp
 void TimeBasedSchedulingService::taskNotifier() {
     if (scheduledActivities.size() >= 1) {
