@@ -173,7 +173,6 @@ UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 }
 ```
 
-
 ## Service initialisation
 
 Platform-specific code also gives a chance to every Service to use pre-initialised entities (e.g. parameters, monitoring
@@ -206,6 +205,42 @@ void TimeBasedSchedulingService::taskNotifier() {
     }
 }
 ```
+
+3. @ref ParameterStatisticsService::initializeStatisticsMap
+
+The function is called by the constructor of the class, making sure that the statistics will be initialized properly
+after creating an instance of the ST04 Service. This function should be implemented according to the specific
+needs, structure and parameters of an individual project. It basically iterates over the statistics list and initializes
+statistics for parameters of selected IDs. An example is provided below. Let's assume that we have stored the
+parameter IDs, and we use a data structure to store the statistics. Our initialization function, based on such
+structure should look like this:
+
+```c++
+namespace PlatformParameters {
+    enum ParameterIDs : uint16_t {
+        OnBoardMinute = 0,
+        Temperature = 1,
+    };
+}
+
+namespace ParameterStatistics {
+	static etl::array<Statistic, ECSSMaxStatisticParameters> statistics = {
+	    Statistic(),
+	    Statistic(),
+	};
+}
+
+void ParameterStatisticsService::initializeStatisticsMap() {
+	using namespace PlatformParameters;
+	uint16_t statisticParameterIDs[] = {parameterIDs::onBoardMinute, parameterIDs::temperature};
+	uint8_t idIndex = 0;
+
+    for (auto& statistic: ParameterStatistics::statistics) {
+        statisticsMap.insert({statisticParameterIDs[idIndex++], statistic});
+    }
+}
+```
+
 ## Receiving messages
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can

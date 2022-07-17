@@ -3,7 +3,10 @@
 #include "ServicePool.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
-ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {}
+ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {
+	initializeStatisticsMap();
+	serviceType = ServiceType;
+}
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
@@ -20,7 +23,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 }
 
 void ParameterStatisticsService::parameterStatisticsReport() {
-	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
+	Message report = createTM(ParameterStatisticsReport);
 	report.append(evaluationStartTime);
 	auto evaluationStopTime = TimeGetter::getCurrentTimeCustomCUC();
 	report.append(evaluationStopTime);
@@ -75,14 +78,14 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 		return;
 	}
 	periodicStatisticsReportingStatus = true;
-	reportingInterval = timeInterval;
+	reportingIntervalMs = timeInterval;
 }
 
 void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& request) {
 	request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting);
 
 	periodicStatisticsReportingStatus = false;
-	reportingInterval = 0;
+	reportingIntervalMs = 0;
 }
 
 void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& request) {
@@ -102,7 +105,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 		uint16_t interval = 0;
 		if (supportsSamplingInterval) {
 			interval = request.readUint16();
-			if (interval < reportingInterval) {
+			if (interval < reportingIntervalMs) {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 				continue;
 			}
@@ -156,13 +159,13 @@ void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
 }
 
 void ParameterStatisticsService::statisticsDefinitionsReport() {
-	Message definitionsReport(ServiceType, MessageType::ParameterStatisticsDefinitionsReport, Message::TM, 1);
+	Message definitionsReport = createTM(ParameterStatisticsDefinitionsReport);
 
-	uint16_t currentReportingInterval = 0;
+	uint16_t currentReportingIntervalMs = 0;
 	if (periodicStatisticsReportingStatus) {
-		currentReportingInterval = reportingInterval;
+		currentReportingIntervalMs = reportingIntervalMs;
 	}
-	definitionsReport.appendUint16(currentReportingInterval);
+	definitionsReport.appendUint16(currentReportingIntervalMs);
 	definitionsReport.appendUint16(statisticsMap.size());
 
 	for (auto& currentParam: statisticsMap) {

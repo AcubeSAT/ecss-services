@@ -15,7 +15,7 @@ TEST_CASE("TM[1,1]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::SuccessfulAcceptanceReport);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion); // packet version number
@@ -36,7 +36,7 @@ TEST_CASE("TM[1,2]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::FailedAcceptanceReport);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion);              // packet version number
@@ -58,7 +58,7 @@ TEST_CASE("TM[1,3]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::SuccessfulStartOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion); // packet version number
@@ -79,7 +79,7 @@ TEST_CASE("TM[1,4]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::FailedStartOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion);                  // packet version number
@@ -101,7 +101,7 @@ TEST_CASE("TM[1,5]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 5); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion); // packet version number
@@ -123,7 +123,7 @@ TEST_CASE("TM[1,6]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::FailedProgressOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 7); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion); // packet version number
@@ -146,7 +146,7 @@ TEST_CASE("TM[1,7]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::SuccessfulCompletionOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 4); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion); // packet version number
@@ -166,7 +166,7 @@ TEST_CASE("TM[1,8]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::FailedCompletionOfExecution);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion);                       // packet version number
@@ -188,7 +188,7 @@ TEST_CASE("TM[1,10]", "[service][st01]") {
 	CHECK(response.serviceType == RequestVerificationService::ServiceType);
 	CHECK(response.messageType == RequestVerificationService::MessageType::FailedRoutingReport);
 	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == 0);
+	CHECK(response.applicationId == ApplicationId);
 	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(response.readEnumerated(3) == CCSDSPacketVersion);           // packet version number

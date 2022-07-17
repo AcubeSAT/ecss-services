@@ -45,7 +45,9 @@ public:
 	 * Constructs the function pointer index with all the necessary functions at initialization time
 	 * These functions need to be in scope. Un-default when needed.
 	 */
-	FunctionManagementService() = default;
+	FunctionManagementService() {
+		serviceType = ServiceType;
+	}
 
 	/**
 	 * Calls the function described in the TC[8,1] message *msg*, passing the arguments contained

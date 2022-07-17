@@ -206,7 +206,9 @@ public:
 		ChangeVirtualChannel = 28
 	};
 
-	StorageAndRetrievalService() = default;
+	StorageAndRetrievalService() {
+		serviceType = ServiceType;
+	}
 
 	/**
 	 * Adds new packet store into packet stores.
