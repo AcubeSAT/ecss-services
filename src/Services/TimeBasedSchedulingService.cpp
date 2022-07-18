@@ -71,6 +71,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		}
 	}
 	sortActivitiesReleaseTime(scheduledActivities);
+	notifyNewActivityAddition();
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {

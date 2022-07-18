@@ -115,11 +115,12 @@ private:
 	 */
 	friend struct ::unit_test::Tester;
 
-public:
-	/*
-* ST[11] TimeBased Scheduling Service and Sub-Service Macros, for readability purpose
-*/
+	/**
+     * Notifies the timeBasedSchedulingTask after the insertion of activities to scheduleActivity list.
+     */
+	void notifyNewActivityAddition();
 
+public:
 	inline static const uint8_t ServiceType = 11;
 
 	enum MessageType : uint8_t {

@@ -109,6 +109,8 @@ void ParameterService::initializeParameterMap() {
 	              {static_cast<uint16_t>(11), PlatformParameters::parameter12}};
 }
 
+void TimeBasedSchedulingService::notifyNewActivityAddition() {}
+
 void ParameterStatisticsService::initializeStatisticsMap() {
 	statisticsMap = {};
 }
