@@ -191,13 +191,12 @@ void ParameterService::initializeParameterMap() {
 	parameters = {{0, parameter1}, {1, parameter2}, {2, parameter3}};
 }
 ```
-2. @ref TimeBasedSchedulingService::taskNotifier
+2. @ref TimeBasedSchedulingService::notifyNewActivityAddition
 
-In case the TimeBasedScheduling service runs out of activities, instead of the Platform checking periodically if an 
-activity has been entered, the Platform should stop the task until a new activity arrives so low consumption of 
-computing resources can be achieved. With this function, a notifier can be implemented on the Platform to restart the 
-task, which function is called by TimeBasedScheduling::insertActivities to notify the task to restart after a new 
-activity is inserted.
+The TimeBasedSchedulingService is responsible for storing the activities/TCs to be executed. However, if this list of 
+stored activities is emptied, the Platform Task responsible to execute these TCs should be paused. With this 
+function, a notifier can be implemented and called by `TimeBasedScheduling::insertActivities()` to notify the 
+Task to restart after a new activity is inserted.
 
 An example implementation for FreeRTOS can be as follows:
 ```cpp
