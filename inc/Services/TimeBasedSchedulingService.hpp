@@ -118,7 +118,7 @@ private:
 	/**
      * Notifies the timeBasedSchedulingTask after the insertion of activities to scheduleActivity list.
      */
-	void taskNotifier();
+	void notifyNewActivityAddition();
 
 public:
 	inline static const uint8_t ServiceType = 11;

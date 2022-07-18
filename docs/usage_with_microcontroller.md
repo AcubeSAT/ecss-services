@@ -196,7 +196,7 @@ void ParameterService::initializeParameterMap() {
 In case the TimeBasedScheduling service runs out of activities, instead of the Platform checking periodically if an 
 activity has been entered, the Platform should stop the task until a new activity arrives so low consumption of 
 computing resources can be achieved. With this function, a notifier can be implemented on the Platform to restart the 
-task,  which function is called by TimeBasedScheduling::insertActivities to notify the task to restart after a new 
+task, which function is called by TimeBasedScheduling::insertActivities to notify the task to restart after a new 
 activity is inserted.
 
 An example implementation for FreeRTOS can be as follows:

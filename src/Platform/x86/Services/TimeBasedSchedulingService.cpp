@@ -3,6 +3,6 @@
 
 #include "Services/TimeBasedSchedulingService.hpp"
 
-void TimeBasedSchedulingService::taskNotifier() {}
+void TimeBasedSchedulingService::notifyNewActivityAddition() {}
 
 #endif
