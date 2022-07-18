@@ -191,8 +191,23 @@ void ParameterService::initializeParameterMap() {
 	parameters = {{0, parameter1}, {1, parameter2}, {2, parameter3}};
 }
 ```
+2. @ref TimeBasedSchedulingService::notifyNewActivityAddition
 
-2. @ref ParameterStatisticsService::initializeStatisticsMap
+The TimeBasedSchedulingService is responsible for storing the activities/TCs to be executed. However, if this list of 
+stored activities is emptied, the Platform Task responsible to execute these TCs should be paused. With this 
+function, a notifier can be implemented and called by `TimeBasedScheduling::insertActivities()` to notify the 
+Task to restart after a new activity is inserted.
+
+An example implementation for FreeRTOS can be as follows:
+```cpp
+void TimeBasedSchedulingService::notifyNewActivityAddition() {
+    if (scheduledActivities.size() >= 1) {
+        xTaskNotify(TaskList::timeBasedSchedulingTask->taskHandle, 0, eNoAction);
+    }
+}
+```
+
+3. @ref ParameterStatisticsService::initializeStatisticsMap
 
 The function is called by the constructor of the class, making sure that the statistics will be initialized properly
 after creating an instance of the ST04 Service. This function should be implemented according to the specific
