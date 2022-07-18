@@ -201,7 +201,7 @@ activity is inserted.
 
 An example implementation for FreeRTOS can be as follows:
 ```cpp
-void TimeBasedSchedulingService::taskNotifier() {
+void TimeBasedSchedulingService::notifyNewActivityAddition() {
     if (scheduledActivities.size() >= 1) {
         xTaskNotify(TaskList::timeBasedSchedulingTask->taskHandle, 0, eNoAction);
     }
