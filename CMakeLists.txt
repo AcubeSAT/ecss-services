@@ -3,9 +3,13 @@ project(ecss_services)
 
 # Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
+add_definitions("-std=c++17")
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
 
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include"
+include_directories("${PROJECT_SOURCE_DIR}/inc"
         "${PROJECT_SOURCE_DIR}/lib/logger/inc")
 
 add_custom_target(check

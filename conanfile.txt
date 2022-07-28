@@ -1,0 +1,6 @@
+[requires]
+etl/20.31.3
+
+[generators]
+cmake
+
