@@ -72,7 +72,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	 inline bool getPeriodicReportingStatus() {
+	inline bool getPeriodicReportingStatus() {
 		return periodicStatisticsReportingStatus;
 	}
 
@@ -94,6 +94,13 @@ public:
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
 	 */
 	void reportParameterStatistics(Message& request);
+
+	/**
+	 * Report the parameter statistics, by calling parameterStatisticsReport()
+	 * This is **NOT** the function called by TC. It was created so that this function could be called
+	 * from within a Platform (MCU, x86...) without needing to create a fake TC and pass through multiple functions.
+	 */
+	void reportParameterStatistics(bool reset);
 
 	/**
 	 * Constructs and stores a TM[4,2] packet containing the parameter statistics report.
