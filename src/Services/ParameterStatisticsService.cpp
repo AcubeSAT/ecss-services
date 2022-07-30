@@ -12,13 +12,16 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
 	parameterStatisticsReport();
 
-	if (hasAutomaticStatisticsReset) {
+	if (hasAutomaticStatisticsReset or request.readBoolean()) {
 		resetParameterStatistics();
-	} else {
-		bool resetFlagValue = request.readBoolean();
-		if (resetFlagValue) {
-			resetParameterStatistics();
-		}
+	}
+}
+
+void ParameterStatisticsService::reportParameterStatistics(bool reset) {
+	parameterStatisticsReport();
+
+	if (hasAutomaticStatisticsReset or reset) {
+		resetParameterStatistics();
 	}
 }
 
