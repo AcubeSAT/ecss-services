@@ -17,7 +17,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	}
 }
 
-void ParameterStatisticsService::reportParameterStatistics(bool reset) {
+void ParameterStatisticsService::reportParameterStatistics(const bool reset) {
 	parameterStatisticsReport();
 
 	if (hasAutomaticStatisticsReset or reset) {
