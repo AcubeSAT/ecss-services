@@ -99,6 +99,9 @@ public:
 	 * Report the parameter statistics, by calling parameterStatisticsReport()
 	 * This is **NOT** the function called by TC. It was created so that this function could be called
 	 * from within a Platform (MCU, x86...) without needing to create a fake TC and pass through multiple functions.
+	 *
+	 * @param reset indicates whether each Statistic should be reset. Simulates the argument contained in the TC[4,1]
+	 * that calls reportParameterStatistics(Message& request)
 	 */
 	void reportParameterStatistics(bool reset);
 
