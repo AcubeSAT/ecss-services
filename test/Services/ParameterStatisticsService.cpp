@@ -70,7 +70,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 	}
 
-	SECTION("Report statistics, with auto statistics reset enabled") {
+	SECTION("Report statistics, with auto statistics reset enabled with TC") {
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
