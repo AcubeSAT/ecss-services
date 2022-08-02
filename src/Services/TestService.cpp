@@ -7,7 +7,6 @@ void TestService::areYouAlive(Message& request) {
 	request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest);
 	// TM[17,2] are-you-alive connection test report
 	Message report = createTM(TestService::MessageType::AreYouAliveTestReport);
-
 	storeMessage(report);
 }
 

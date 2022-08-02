@@ -1,9 +1,10 @@
-#include <ServicePool.hpp>
-#include "ErrorHandler.hpp"
 #include "MessageParser.hpp"
-#include "macros.hpp"
-#include "Services/RequestVerificationService.hpp"
+#include <ServicePool.hpp>
+#include <iostream>
+#include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "macros.hpp"
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
@@ -142,23 +143,36 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 }
 
 String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
-	uint8_t header[5];
+	int header_size = 9;
+	uint8_t header[header_size];
 
 	if (message.packetType == Message::TC) {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
-		header[3] = 0;
-		header[4] = 0;
+		header[3] = 0; //counter
+		header[4] = 0; //counter
+		header[5] = 0;
+		header[6] = 13;
+		header[7] = 47;
+		header[8] = 0;
+
+
 	} else {
-		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
+		header[0] = ECSSPUSVersion ; // Assign the pusVersion = 2
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
+		//this is the number of tenths of a second since 1/1/20. 1 day is 864.000 tenths
+		//by this we should get the next day
+		header[5] = 0;
+		header[6] = 13;
+		header[7] = 47;
+		header[8] = 0;
 	}
 
-	String<CCSDSMaxMessageSize> dataString(header, 5);
+	String<CCSDSMaxMessageSize> dataString(header, header_size);
 	dataString.append(message.data, message.dataSize);
 
 	// Make sure to reach the requested size
@@ -196,10 +210,16 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	// Compile the header
 	header[0] = packetId >> 8U;
 	header[1] = packetId & 0xffU;
+	std::cout << " packetId " << packetId << std::endl;
 	header[2] = packetSequenceControl >> 8U;
 	header[3] = packetSequenceControl & 0xffU;
+	std::cout << " packetSequenceControl " << message.packetSequenceCount << std::endl;
 	header[4] = packetDataLength >> 8U;
 	header[5] = packetDataLength & 0xffU;
+	std::cout << " packetDataLength " << packetDataLength << std::endl;
+
+	for(int i = 0 ; i < 6; i++)
+		std::cout << " header[" << i <<"]"<< abs(header[i]) <<std::endl;
 
 	// Compile the final message by appending the header
 	String<CCSDSMaxMessageSize> ccsdsMessage(header, 6);
