@@ -41,9 +41,8 @@ int main() {
 //	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
 	TestService& testService = Services.testService;
-	Message testPacket = Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTestReport, Message::TM, 1);
-//	testService.areYouAlive(testPacket); //first packet
-	testService.execute(testPacket);
+	testService.areYouAliveReport();
+	//testService.execute(testPacket);
 
 //
 //	// ST[20] test
