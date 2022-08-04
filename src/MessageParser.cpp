@@ -154,7 +154,8 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 }
 
 String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
-	uint8_t header[5];
+	int headerSize = 9;
+	uint8_t header[headerSize];
 
 	if (message.packetType == Message::TC) {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
@@ -162,15 +163,24 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[2] = message.messageType;
 		header[3] = 0;
 		header[4] = 0;
+		header[5] = 0;
+		header[6] = 0;
+		header[7] = 0;
+		header[8] = 0;
 	} else {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
+		uint64_t tenths = TimeGetter::getCurrentTimeCustomCUC().elapsed100msTicks;
+		header[5] = (tenths >> 24) & 0xFF;
+		header[6] = (tenths >> 16)& 0xFF;
+		header[7] = (tenths >> 8)& 0xFF;
+		header[8] = (tenths) & 0xFF;
 	}
 
-	String<CCSDSMaxMessageSize> dataString(header, 5);
+	String<CCSDSMaxMessageSize> dataString(header, headerSize);
 	dataString.append(message.data, message.dataSize);
 
 	// Make sure to reach the requested size
