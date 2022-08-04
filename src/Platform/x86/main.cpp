@@ -42,7 +42,8 @@ int main() {
 
 	TestService& testService = Services.testService;
 	Message testPacket = Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTestReport, Message::TM, 1);
-	testService.areYouAlive(testPacket); //first packet
+//	testService.areYouAlive(testPacket); //first packet
+	testService.execute(testPacket);
 
 //
 //	// ST[20] test
@@ -358,7 +359,7 @@ int main() {
 //	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 	LOG_NOTICE << "ECSS Services test complete";
-
-	std::cout << TimeGetter::getCurrentTimeCustomCUC().elapsed100msTicks << std::endl;
+//
+//	std::cout << TimeGetter::getCurrentTimeCustomCUC().elapsed100msTicks << std::endl;
 	return 0;
 }
