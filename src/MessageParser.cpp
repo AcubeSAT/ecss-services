@@ -168,7 +168,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		//by this we should get the next day
 		header[5] = 0;
 		header[6] = 13;
-		header[7] = 47;
+		header[7] = 49;
 		header[8] = 0;
 	}
 

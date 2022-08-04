@@ -147,12 +147,12 @@ int main() {
 //	testService.areYouAliveTestReport(request);
 
 
-	uint8_t structId = 6;
-	std::cout << structId << " " << std::endl;
-	for(int i =0; i<100; i++) {
-		housekeepingService.housekeepingParametersReport(structId);
-		housekeepingService.housekeepingStructureReport(structId);
-	}
+//	uint8_t structId = 6;
+//	std::cout << structId << " " << std::endl;
+//	for(int i =0; i<100; i++) {
+//		housekeepingService.housekeepingParametersReport(structId);
+//		housekeepingService.housekeepingStructureReport(structId);
+//	}
 
 
 	LOG_NOTICE << "ECSS Services test complete";
