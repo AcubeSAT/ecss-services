@@ -155,7 +155,7 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 
 String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
 	uint8_t headerSize = ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize);
-	uint8_t header[headerSize];
+	uint8_t header[ECSSSecondaryTMHeaderSize]; //initialize with the biggest size
 
 	if (message.packetType == Message::TC) {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
