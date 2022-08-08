@@ -159,26 +159,25 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 
 	if (message.packetType == Message::TC) {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
-		header[0] |= 0x00; //ack flags
+		header[0] |= 0x00;                //ack flags
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = message.applicationId >> 8U;
 		header[4] = message.applicationId;
 	} else {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
-		header[0] |= 0x00; //spacecraft time reference status
+		header[0] |= 0x00;                //spacecraft time reference status
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
 		header[5] = message.applicationId >> 8U; //destinationID
-	    header[6] = message.applicationId;
+		header[6] = message.applicationId;
 		uint64_t tenths = TimeGetter::getCurrentTimeCustomCUC().elapsed100msTicks;
-		header[7] = (tenths >> 24) & 0xFF;
-		header[8] = (tenths >> 16) & 0xFF;
-		header[9] = (tenths >> 8) & 0xFF;
-		header[10] = (tenths) & 0xFF;
-
+		header[7] = (tenths >> 24) & 0xffU;
+		header[8] = (tenths >> 16) & 0xffU;
+		header[9] = (tenths >> 8) & 0xffU;
+		header[10] = (tenths) & 0xffU;
 	}
 
 	String<CCSDSMaxMessageSize> dataString(header, headerSize);
