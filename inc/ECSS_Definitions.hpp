@@ -35,7 +35,7 @@ inline const uint16_t CCSDSPrimaryHeaderSize = 6U;
 inline const uint16_t ECSSSecondaryTMHeaderSize = 11U;
 
 /**
- * The size of each Telecommand packet's secondary header
+ * The size of each ECSS Telecommand packet's secondary header
  */
 inline const uint16_t ECSSSecondaryTCHeaderSize = 5U;
 
