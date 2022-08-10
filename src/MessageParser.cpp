@@ -171,7 +171,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
-		header[5] = message.applicationId >> 8U; //destinationID
+		header[5] = message.applicationId >> 8U; // DestinationID
 		header[6] = message.applicationId;
 		uint64_t tenths = TimeGetter::getCurrentTimeCustomCUC().elapsed100msTicks;
 		header[7] = (tenths >> 24) & 0xffU;
