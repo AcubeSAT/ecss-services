@@ -30,7 +30,7 @@ inline const uint16_t ECSSMaxMessageSize = 1024U;
 inline const uint16_t CCSDSPrimaryHeaderSize = 6U;
 
 /**
- * The size of each Telemetry packet's secondary header
+ * The size of each ECSS Telemetry packet's secondary header
  */
 inline const uint16_t ECSSSecondaryTMHeaderSize = 11U;
 
