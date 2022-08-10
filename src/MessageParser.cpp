@@ -166,7 +166,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[4] = message.applicationId;
 	} else {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
-		header[0] |= 0x00;                //spacecraft time reference status
+		header[0] |= 0x00;                // Spacecraft time reference status
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
