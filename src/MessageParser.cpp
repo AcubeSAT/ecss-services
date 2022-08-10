@@ -86,7 +86,7 @@ void MessageParser::execute(Message& message) {
 }
 
 Message MessageParser::parse(uint8_t* data, uint32_t length) {
-	ASSERT_INTERNAL(length > CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket);
+	ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket);
 
 	uint16_t packetHeaderIdentification = (data[0] << 8) | data[1];
 	uint16_t packetSequenceControl = (data[2] << 8) | data[3];
@@ -155,7 +155,7 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 
 String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
 	uint8_t headerSize = ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize);
-	uint8_t header[ECSSSecondaryTMHeaderSize]; //initialize with the biggest size
+	uint8_t header[headerSize];
 
 	if (message.packetType == Message::TC) {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
