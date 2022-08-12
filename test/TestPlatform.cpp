@@ -1,5 +1,6 @@
 #define CATCH_CONFIG_EXTERNAL_INTERFACES
 
+
 #include <Logger.hpp>
 #include <Message.hpp>
 #include <Service.hpp>
