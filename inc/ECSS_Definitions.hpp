@@ -25,9 +25,24 @@
 inline const uint16_t ECSSMaxMessageSize = 1024U;
 
 /**
+ * The size of each CCSDS Space packet primary header
+ */
+inline const uint16_t CCSDSPrimaryHeaderSize = 6U;
+
+/**
+ * The size of each ECSS Telemetry packet's secondary header
+ */
+inline const uint16_t ECSSSecondaryTMHeaderSize = 11U;
+
+/**
+ * The size of each ECSS Telecommand packet's secondary header
+ */
+inline const uint16_t ECSSSecondaryTCHeaderSize = 5U;
+
+/**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
  */
-inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + 6u + 6u + 2u;
+inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + CCSDSPrimaryHeaderSize + ECSSSecondaryTMHeaderSize + 2u;
 
 /**
  * The maximum size of a string to be read or appended to a Message, in bytes
