@@ -13,6 +13,8 @@
  * Per the ECSS-E-ST-70-41C standard, p. 27-28, custom Services and Messages should start above 127.
  */
 class DummyService : public Service {
+private:
+	etl::string<1> termination = "\n";
 
 public:
 	inline static const uint8_t ServiceType = 128;
@@ -31,6 +33,8 @@ public:
 	void logAsECSSMessage(const etl::string<LOGGER_MAX_MESSAGE_SIZE>& data) {
 		Message log = createTM(MessageType::LogString);
 		log.appendString(data);
+		std::copy(termination.data(), termination.data()+1, log.data+log.dataSize);
+		log.dataSize++;
 		storeMessage(log);
 	}
 };
