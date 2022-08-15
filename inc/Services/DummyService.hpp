@@ -33,7 +33,7 @@ public:
 	void logAsECSSMessage(const etl::string<LOGGER_MAX_MESSAGE_SIZE>& data) {
 		Message log = createTM(MessageType::LogString);
 		log.appendString(data);
-		std::copy(termination.data(), termination.data()+1, log.data+log.dataSize);
+		log.appendString(termination);
 		log.dataSize++;
 		storeMessage(log);
 	}
