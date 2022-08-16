@@ -11,15 +11,15 @@
       <option name="SPACE_BEFORE_REFERENCE_IN_DECLARATION" value="false" />
       <option name="SPACE_AFTER_REFERENCE_IN_DECLARATION" value="true" />
     </Objective-C>
-    <Objective-C-extensions>
+    <clangFormatSettings>
+      <option name="ENABLED" value="true" />
+    </clangFormatSettings>
+    <files>
       <extensions>
         <pair source="cpp" header="hpp" fileNamingConvention="PASCAL_CASE" />
         <pair source="c" header="h" fileNamingConvention="NONE" />
       </extensions>
-    </Objective-C-extensions>
-    <clangFormatSettings>
-      <option name="ENABLED" value="true" />
-    </clangFormatSettings>
+    </files>
     <codeStyleSettings language="ObjectiveC">
       <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
       <option name="ALIGN_MULTILINE_FOR" value="false" />

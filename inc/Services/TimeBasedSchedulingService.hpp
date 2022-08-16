@@ -1,14 +1,14 @@
 #ifndef ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 #define ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 
-#include "etl/list.h"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "MessageParser.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "MessageParser.hpp"
+#include "Service.hpp"
+#include "etl/list.h"
 
 // Include platform specific files
-#include "Platform/x86/TimeGetter.hpp"
+#include "Helpers/TimeGetter.hpp"
 
 /**
  * @def SUB_SCHEDULES_ENABLED
@@ -28,9 +28,8 @@
  *
  * @details Define a namespace for the access of the private members to avoid conflicts
  */
-namespace unit_test
-{
-struct Tester;
+namespace unit_test {
+	struct Tester;
 } // namespace unit_test
 
 /**
@@ -47,11 +46,11 @@ class TimeBasedSchedulingService : public Service {
 private:
 	/**
 	 * @brief Indicator of the schedule execution
-	 *
+	 * True indicates "enabled" and False "disabled" state
 	 * @details The schedule execution indicator will be updated by the process that is running
 	 * the time scheduling service.
 	 */
-	bool executionFunctionStatus = false; // True indicates "enabled" and False "disabled" state
+	bool executionFunctionStatus = false;
 
 	/**
 	 * @brief Request identifier of the received packet
@@ -62,7 +61,7 @@ private:
 	struct RequestID {
 		uint16_t applicationID = 0; ///< Application process ID
 		uint16_t sequenceCount = 0; ///< Packet sequence count
-		uint8_t sourceID = 0; ///< Packet source ID
+		uint8_t sourceID = 0;       ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or
@@ -80,9 +79,9 @@ private:
 	 * @todo If groups are used, then the group ID has to be defined here
 	 */
 	struct ScheduledActivity {
-		Message request; ///< Hold the received command request
-		RequestID requestID; ///< Request ID, characteristic of the definition
-		uint32_t requestReleaseTime = 0; ///< Keep the command release time
+		Message request;                         ///< Hold the received command request
+		RequestID requestID;                     ///< Request ID, characteristic of the definition
+		Time::CustomCUC_t requestReleaseTime{0}; ///< Keep the command release time
 	};
 
 	/**
@@ -116,12 +115,12 @@ private:
 	 */
 	friend struct ::unit_test::Tester;
 
+	/**
+     * Notifies the timeBasedSchedulingTask after the insertion of activities to scheduleActivity list.
+     */
+	void notifyNewActivityAddition();
+
 public:
-
-	/*
-* ST[11] TimeBased Scheduling Service and Sub-Service Macros, for readability purpose
-*/
-
 	inline static const uint8_t ServiceType = 11;
 
 	enum MessageType : uint8_t {
@@ -144,6 +143,12 @@ public:
 	 * @details Initializes the serviceType
 	 */
 	TimeBasedSchedulingService();
+
+	/**
+	 * This function executes the next activity and removes it from the list.
+	 * @return the requestReleaseTime of next activity to be executed after this time
+	 */
+	Time::CustomCUC_t executeScheduledActivity(Time::CustomCUC_t currentTime);
 
 	/**
 	 * @brief TC[11,1] enable the time-based schedule execution function
@@ -260,7 +265,7 @@ public:
 	 * Also if an activity with a specified request identifier is not found, generate a failed
 	 * start of execution for that specific instruction.
 	 */
-	void timeShiftActivitiesByID(Message &request);
+	void timeShiftActivitiesByID(Message& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

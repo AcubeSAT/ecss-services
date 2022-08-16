@@ -1,7 +1,7 @@
-#include "catch2/catch.hpp"
+#include "../Services/ServiceTests.hpp"
 #include "Time/Time.hpp"
 #include "Time/UTCTimestamp.hpp"
-#include "../Services/ServiceTests.hpp"
+#include "catch2/catch_all.hpp"
 
 TEST_CASE("UTC timestamps") {
 	// invalid year

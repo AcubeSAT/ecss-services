@@ -1,8 +1,10 @@
-#pragma once
+#ifndef ECSS_TIMEHPP
+#define ECSS_TIMEHPP
+
 #include <cstdint>
-#include <Message.hpp>
-#include "macros.hpp"
+#include "ErrorHandler.hpp"
 #include "etl/String.hpp"
+#include "macros.hpp"
 
 /**
  * @defgroup Time Time
@@ -68,201 +70,251 @@
  * @ingroup Time
  * @author Baptiste Fournier
  */
-namespace Time
-{
-inline constexpr uint8_t SecondsPerMinute = 60;
-inline constexpr uint16_t SecondsPerHour = 3600;
-inline constexpr uint32_t SecondsPerDay = 86400;
-static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+namespace Time {
+	inline constexpr uint8_t SecondsPerMinute = 60;
+	inline constexpr uint16_t SecondsPerHour = 3600;
+	inline constexpr uint32_t SecondsPerDay = 86400;
+	static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-/**
- * Number of bytes used for the basic time units of the CUC header for this mission
- */
-inline constexpr uint8_t CUCSecondsBytes = 2;
+	/**
+	 * Number of bytes used for the basic time units of the CUC header for this mission
+	 */
+	inline constexpr uint8_t CUCSecondsBytes = 2;
 
-/**
- * Number of bytes used for the fractional time units of the CUC header for this mission
- */
-inline constexpr uint8_t CUCFractionalBytes = 2;
+	/**
+	 * Number of bytes used for the fractional time units of the CUC header for this mission
+	 */
+	inline constexpr uint8_t CUCFractionalBytes = 2;
 
-/**
- * The system epoch (clock measurement starting time)
- * All timestamps emitted by the ECSS services will show the elapsed time (seconds, days etc.) from this epoch.
- */
-inline constexpr struct {
-	uint16_t year;
-	uint8_t month;
-	uint8_t day;
-} Epoch{
-    2020,
-    1,
-    1,
-};
+	/**
+	 * The system epoch (clock measurement starting time)
+	 * All timestamps emitted by the ECSS services will show the elapsed time (seconds, days etc.) from this epoch.
+ 	*/
+	inline constexpr struct {
+		uint16_t year;
+		uint8_t month;
+		uint8_t day;
+	} Epoch{
+	    2020,
+	    1,
+	    1,
+	};
 
-/**
- * Number of seconds elapsed between the UNIX epoch (1 January 1970) and the system epoch.
- *
- * The system epoch is defined by @ref Epoch.
- * This constant is used for conversion between Unix and other timestamps.
- * Leap seconds are not taken into account here.
- *
- * @warning This value MUST be updated after every change of the system @ref Epoch. You can use utilities such as
- * https://www.unixtimestamp.com/ to obtain a correct result.
- */
-inline constexpr uint32_t EpochSecondsFromUnix = 1577836800;
+	/**
+	 * Number of seconds elapsed between the UNIX epoch (1 January 1970) and the system epoch.
+	 *
+	 * The system epoch is defined by @ref Epoch.
+	 * This constant is used for conversion between Unix and other timestamps.
+	 * Leap seconds are not taken into account here.
+	 *
+	 * @warning This value MUST be updated after every change of the system @ref Epoch. You can use utilities such as
+	 * https://www.unixtimestamp.com/ to obtain a correct result.
+	 */
+	inline constexpr uint32_t EpochSecondsFromUnix = 1577836800;
 
-/**
- * The maximum theoretical size in bytes of a CUC timestamp, including headers (P-field and T-field)
- */
-inline constexpr uint8_t CUCTimestampMaximumSize = 9;
+	/**
+	 * The maximum theoretical size in bytes of a CUC timestamp, including headers (P-field and T-field)
+	 */
+	inline constexpr uint8_t CUCTimestampMaximumSize = 9;
 
-static_assert(Epoch.year >= 2019);
-static_assert(Epoch.month < 11 && Epoch.month >= 0);
-static_assert(Epoch.day < DaysOfMonth[Epoch.month]);
+	static_assert(Epoch.year >= 2019);
+	static_assert(Epoch.month < 11 && Epoch.month >= 0);
+	static_assert(Epoch.day < DaysOfMonth[Epoch.month]);
 
-/**
- * Builds the short P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
- *
- * The short P-field contains only one byte. It is used when many octets are used to represent the basic or fractional
- * time units.
- *
- * @see CCSDS 301.0-B-4, Section 3.2.2
- * @tparam secondsBytes The number of octets used to represent the basic time units
- * @tparam fractionalBytes The number of octets used to represent the fractional time units
- * @return A single byte, representing the P-field contents
- */
-template <int secondsBytes, int fractionalBytes>
-inline constexpr uint8_t buildShortCUCHeader() {
-	static_assert(secondsBytes <= 4, "Use buildLongCUCHeader instead");
-	static_assert(fractionalBytes <= 3, "Use buildLongCUCHeader instead");
+	/**
+	 * Builds the short P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
+	 *
+	 * The short P-field contains only one byte. It is used when many octets are used to represent the basic or fractional
+	 * time units.
+	 *
+	 * @see CCSDS 301.0-B-4, Section 3.2.2
+	 * @tparam secondsBytes The number of octets used to represent the basic time units
+	 * @tparam fractionalBytes The number of octets used to represent the fractional time units
+	 * @return A single byte, representing the P-field contents
+	 */
+	template <int secondsBytes, int fractionalBytes>
+	inline constexpr uint8_t buildShortCUCHeader() {
+		static_assert(secondsBytes <= 4, "Use buildLongCUCHeader instead");
+		static_assert(fractionalBytes <= 3, "Use buildLongCUCHeader instead");
 
-	uint8_t header = 0;
+		uint8_t header = 0;
 
-	// P-Field extension is 0, CUC header is not extended
-	header += 0;
+		// P-Field extension is 0, CUC header is not extended
+		header += 0;
 
-	// We are using a custom TAI epoch ("agency-defined epoch")
-	header <<= 3U;
-	header += 0b010;
+		// We are using a custom TAI epoch ("agency-defined epoch")
+		header <<= 3U;
+		header += 0b010;
 
-	// Number of bytes in the basic time unit
-	header <<= 2U;
-	header += secondsBytes - 1;
+		// Number of bytes in the basic time unit
+		header <<= 2U;
+		header += secondsBytes - 1;
 
-	// Number of bytes in the fractional unit
-	header <<= 2U;
-	header += fractionalBytes;
+		// Number of bytes in the fractional unit
+		header <<= 2U;
+		header += fractionalBytes;
 
-	return header;
-}
-
-/**
- * Builds the long P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
- *
- * The long P-field contains two bytes. The 2nd byte is used to define the size of the additional octets added to the
- * timestamp, which could not fit in a short P-field.
- *
- * @see CCSDS 301.0-B-4, Section 3.2.2
- * @tparam secondsBytes The number of octets used to represent the basic time units
- * @tparam fractionalBytes The number of octets used to represent the fractional time units
- * @return Two bytes, representing the P-field contents
- */
-template <int secondsBytes, int fractionalBytes>
-inline constexpr uint16_t buildLongCUCHeader() {
-	// cppcheck-suppress redundantCondition
-	static_assert(secondsBytes > 4 || fractionalBytes > 3, "Use buildShortCUCHeader instead");
-	static_assert(secondsBytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
-	static_assert(fractionalBytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
-
-	uint16_t header = 0;
-
-	uint8_t octet1secondsBytes = std::min(4, secondsBytes);
-	uint8_t octet2secondsBytes = secondsBytes - octet1secondsBytes;
-
-	uint8_t octet1fractionalBytes = std::min(3, fractionalBytes);
-	uint8_t octet2fractionalBytes = fractionalBytes - octet1fractionalBytes;
-
-	// P-Field extension is 1, CUC header is extended
-	header += 1;
-
-	// We are using custom a TAI epoch
-	header <<= 3U;
-	header += 0b010;
-
-	// Number of bytes in the basic time unit
-	header <<= 2U;
-	header += octet1secondsBytes - 1;
-
-	// Number of bytes in the fractional unit
-	header <<= 2U;
-	header += octet1fractionalBytes;
-
-	// P-Field extension is 1, CUC header was extended
-	header <<= 1U;
-	header += 1;
-
-	// Number of bytes in the extended basic time unit
-	header <<= 2U;
-	header += octet2secondsBytes;
-
-	// Number of bytes in the extended fractional unit
-	header <<= 3U;
-	header += octet2fractionalBytes;
-
-	// Last 3 LSB are reserved for custom mission use
-	header <<= 2U;
-	header += 0;
-
-	return header;
-}
-
-/**
- * Builds the entire P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
- *
- * The P-field contains the metadata of the timestamp, including information about its size and epoch. This function
- * is implemented for arbitrary sizes (_octet count_) for the basic and fractional time units.
- *
- * The following options cannot be changed:
- *   - Time-code identification is set to an _agency-defined epoch_. This is represented by @ref Epoch.
- *   - Bits 6-7 of octet 2 (_reserved_) are set to `0`
- *
- * @note The P-field (header) does not contain the timestamp information, but only the description of the timestamp's
- * structure. It may be entirely omitted if the structure is known beforehand.
- *
- * @see CCSDS 301.0-B-4, Section 3.2.2
- * @tparam T An arbitrary `uint` return type of the header
- * @tparam secondsBytes The number of octets used to represent the basic time units
- * @tparam fractionalBytes The number of octets used to represent the fractional time units
- * @return One or two bytes representing the header
- */
-template <typename T, int secondsBytes, int fractionalBytes>
-inline constexpr T buildCUCHeader() {
-	// TODO: Gitlab issue #106
-	static_assert((secondsBytes + fractionalBytes) <= 8, "Complete arbitrary precision not supported");
-	// cppcheck-suppress syntaxError
-	// cppcheck-suppress redundantCondition
-	if constexpr (secondsBytes <= 4 && fractionalBytes <= 3) {
-		return buildShortCUCHeader<secondsBytes, fractionalBytes>();
-	} else {
-		return buildLongCUCHeader<secondsBytes, fractionalBytes>();
+		return header;
 	}
-}
 
-/**
- * Returns whether a year is a leap year according to the Gregorian calendar
- */
-constexpr bool isLeapYear(uint16_t year) {
-	if ((year % 4) != 0) {
-		return false;
-	}
-	if ((year % 100) != 0) {
-		return true;
-	}
-	return (year % 400) == 0;
-}
+	/**
+	 * Builds the long P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
+	 *
+	 * The long P-field contains two bytes. The 2nd byte is used to define the size of the additional octets added to the
+	 * timestamp, which could not fit in a short P-field.
+	 *
+	 * @see CCSDS 301.0-B-4, Section 3.2.2
+	 * @tparam secondsBytes The number of octets used to represent the basic time units
+	 * @tparam fractionalBytes The number of octets used to represent the fractional time units
+	 * @return Two bytes, representing the P-field contents
+	 */
+	template <int secondsBytes, int fractionalBytes>
+	inline constexpr uint16_t buildLongCUCHeader() {
+		// cppcheck-suppress redundantCondition
+		static_assert(secondsBytes > 4 || fractionalBytes > 3, "Use buildShortCUCHeader instead");
+		static_assert(secondsBytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
+		static_assert(fractionalBytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
 
-typedef struct {
-	uint64_t elapsed100msTicks = 0;
-} CustomCUC_t;
+		uint16_t header = 0;
+
+		uint8_t octet1secondsBytes = std::min(4, secondsBytes);
+		uint8_t octet2secondsBytes = secondsBytes - octet1secondsBytes;
+
+		uint8_t octet1fractionalBytes = std::min(3, fractionalBytes);
+		uint8_t octet2fractionalBytes = fractionalBytes - octet1fractionalBytes;
+
+		// P-Field extension is 1, CUC header is extended
+		header += 1;
+
+		// We are using custom a TAI epoch
+		header <<= 3U;
+		header += 0b010;
+
+		// Number of bytes in the basic time unit
+		header <<= 2U;
+		header += octet1secondsBytes - 1;
+
+		// Number of bytes in the fractional unit
+		header <<= 2U;
+		header += octet1fractionalBytes;
+
+		// P-Field extension is 1, CUC header was extended
+		header <<= 1U;
+		header += 1;
+
+		// Number of bytes in the extended basic time unit
+		header <<= 2U;
+		header += octet2secondsBytes;
+
+		// Number of bytes in the extended fractional unit
+		header <<= 3U;
+		header += octet2fractionalBytes;
+
+		// Last 3 LSB are reserved for custom mission use
+		header <<= 2U;
+		header += 0;
+
+		return header;
+	}
+
+	/**
+	 * Builds the entire P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
+	 *
+	 * The P-field contains the metadata of the timestamp, including information about its size and epoch. This function
+	 * is implemented for arbitrary sizes (_octet count_) for the basic and fractional time units.
+	 *
+	 * The following options cannot be changed:
+	 *   - Time-code identification is set to an _agency-defined epoch_. This is represented by @ref Epoch.
+	 *   - Bits 6-7 of octet 2 (_reserved_) are set to `0`
+	 *
+	 * @note The P-field (header) does not contain the timestamp information, but only the description of the timestamp's
+	 * structure. It may be entirely omitted if the structure is known beforehand.
+	 *
+	 * @see CCSDS 301.0-B-4, Section 3.2.2
+	 * @tparam T An arbitrary `uint` return type of the header
+	 * @tparam secondsBytes The number of octets used to represent the basic time units
+	 * @tparam fractionalBytes The number of octets used to represent the fractional time units
+	 * @return One or two bytes representing the header
+	 */
+	template <typename T, int secondsBytes, int fractionalBytes>
+	inline constexpr T buildCUCHeader() {
+		// TODO: Gitlab issue #106
+		static_assert((secondsBytes + fractionalBytes) <= 8, "Complete arbitrary precision not supported");
+		// cppcheck-suppress syntaxError
+		// cppcheck-suppress redundantCondition
+		if constexpr (secondsBytes <= 4 && fractionalBytes <= 3) {
+			return buildShortCUCHeader<secondsBytes, fractionalBytes>();
+		} else {
+			return buildLongCUCHeader<secondsBytes, fractionalBytes>();
+		}
+	}
+
+	/**
+	* Returns whether a year is a leap year according to the Gregorian calendar
+	*/
+	constexpr bool isLeapYear(uint16_t year) {
+		if ((year % 4) != 0) {
+			return false;
+		}
+		if ((year % 100) != 0) {
+			return true;
+		}
+		return (year % 400) == 0;
+	}
+
+	struct CustomCUC_t {
+		uint64_t elapsed100msTicks = 0;
+
+		/**
+		 * @return The time represented in milliseconds elapsed from the epoch
+		 */
+		uint64_t getMs() {
+			return elapsed100msTicks * 100;
+		}
+	};
+
+	/**
+ 	* A time shift for scheduled activities measured in seconds
+ 	*/
+	typedef int64_t RelativeTime;
+
+	inline Time::CustomCUC_t operator+(const Time::CustomCUC_t time, RelativeTime relativeTime) {
+		return Time::CustomCUC_t{time.elapsed100msTicks + relativeTime * 10};
+	}
+
+	inline Time::CustomCUC_t operator-(const Time::CustomCUC_t time, RelativeTime relativeTime) {
+		return Time::CustomCUC_t{time.elapsed100msTicks - relativeTime * 10};
+	}
+
+	inline Time::CustomCUC_t& operator+=(Time::CustomCUC_t& time, RelativeTime relativeTime) {
+		time.elapsed100msTicks += relativeTime * 10;
+		return time;
+	}
+
+	inline Time::CustomCUC_t operator-(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return Time::CustomCUC_t{time1.elapsed100msTicks - time2.elapsed100msTicks};
+	}
+
+	inline Time::CustomCUC_t operator+(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return Time::CustomCUC_t{time1.elapsed100msTicks + time2.elapsed100msTicks};
+	}
+
+	inline bool operator<(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks < time2.elapsed100msTicks;
+	}
+
+	inline bool operator>(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks > time2.elapsed100msTicks;
+	}
+
+	inline bool operator==(const Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks == time2.elapsed100msTicks;
+	}
+
+	inline bool operator>=(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
+		return time1.elapsed100msTicks >= time2.elapsed100msTicks;
+	}
 
 } // namespace Time
+
+#endif

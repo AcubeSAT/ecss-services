@@ -2,8 +2,8 @@
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
 #include "Service.hpp"
-#include "etl/String.hpp"
 #include "Services/EventReportService.hpp"
+#include "etl/String.hpp"
 #include "etl/multimap.h"
 
 /**
@@ -12,18 +12,18 @@
  * ECSS 8.19 && 6.19
  *
  * @ingroup Services
- * @note: Make sure to check the note in the addEventActionDefinition()
- * @note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
+ * @note Make sure to check the note in the addEventActionDefinition()
+ * @note A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
  * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions
  * be executed when one event takes place. This defies the standard.
- * @note: The application ID was decided to be abolished as an identifier of the event-action
+ * @note The application ID was decided to be abolished as an identifier of the event-action
  * definition
- * @attention: Every event action definition ID should be different, regardless of the application ID
+ * @attention Every event action definition ID should be different, regardless of the application ID
  *
- * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
+ * @todo Since there are multiple actions per event and in delete/enable/disable functions are
  * multiple instances are accessed, should I find a more efficient way to access them?
- * @todo: check if eventActionFunctionStatus should be private or not
- * @todo: check if eventAction map of definitions should be private or not
+ * @todo check if eventActionFunctionStatus should be private or not
+ * @todo check if eventAction map of definitions should be private or not
  */
 class EventActionService : public Service {
 private:
@@ -39,7 +39,6 @@ private:
 	void executeAction(uint16_t eventID);
 
 public:
-
 	inline static const uint8_t ServiceType = 19;
 
 	enum MessageType : uint8_t {
@@ -56,8 +55,8 @@ public:
 
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
-		uint16_t applicationId = 0;
-		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
+		uint16_t applicationId = ApplicationId;
+		uint16_t eventDefinitionID = 65535;   // The ID of the event that might take place
 		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
 		String<64> request = "";
 		bool enabled = false;
@@ -66,10 +65,10 @@ public:
 	friend EventReportService;
 
 	etl::multimap<uint16_t, EventActionDefinition, ECSSEventActionStructMapSize>
-		eventActionDefinitionMap;
+	    eventActionDefinitionMap;
 
 	EventActionService() {
-		serviceType = 19;
+		serviceType = ServiceType;
 		eventActionFunctionStatus = true;
 	}
 
