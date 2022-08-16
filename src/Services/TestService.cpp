@@ -14,10 +14,10 @@ void TestService::areYouAliveReport() {
 	storeMessage(report);
 }
 
-void TestService::areYouAliveTestReport(Message& message) {
-	message.append(0);
-	storeMessage(message);
-}
+//void TestService::areYouAliveTestReport(Message& message) {
+//	message.append(0);
+//	storeMessage(message);
+//}
 
 void TestService::onBoardConnection(Message& request) {
 	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
