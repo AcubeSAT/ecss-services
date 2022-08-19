@@ -22,6 +22,7 @@
 #include <ctime>
 
 int main() {
+	LogSubsystem::currentSubsystem = LogSubsystem::Subsystem::None;
 	LOG_NOTICE << "ECSS Services test application";
 
 	Message packet = Message(0, 0, Message::TC, 1);

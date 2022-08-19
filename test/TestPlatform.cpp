@@ -53,7 +53,7 @@ void ErrorHandler::logError(ErrorType errorType) {
 	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
 }
 
-void Logger::log(Logger::LogLevel level, etl::istring& message) {
+void Logger::log(Logger::LogLevel level, etl::istring& message, LogSubsystem::Subsystem subsystem) {
 	// Logs while testing are completely ignored
 }
 
