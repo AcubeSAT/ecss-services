@@ -6,19 +6,13 @@
 #include "Parameter.hpp"
 
 /**
- * A Lazy Parameter is a ParameterService parameter that does not keep a value in
- * memory, but calls an external function to fetch a new value whenever needed.
+ * A Notifying parameter will call a function whenever its value is written to.
  *
- * The LazyParameter allows its users to call expensive value-fetching operators
- * ONLY when a value is requested. This prevents having to update a value in
- * memory every so often.
+ * This is useful for updating the state of things when a parameter is changed,
+ * for example to disable/enable peripherals, to make configuration changes etc.
  *
- * This "lazy" fetching is useful when it is expensive (in terms of time, power
- * etc.) to get updated values, e.g. from peripherals or difficult calculations.
- *
- * @warning This class is NOT re-entrant. The developer will have to make sure
- * that only one thread has access to it at a time, otherwise undefined behaviour
- * will occur.
+ * @warning Calling NotifyParameter::setValue will *not* call the notifier
+ * function. You should use setValueLoudly for this purpose instead.
  *
  * @tparam DataType The data type of the parameter's value
  */
@@ -28,13 +22,32 @@ public:
 	using Notifier = std::function<void(const DataType&)>;
 	using Parent = Parameter<DataType>;
 
+	/**
+	 * Constructor without a notifier function. Nothing will then happen when the parameter is updated.
+	 */
 	explicit NotifyParameter(DataType initialValue) : Parent(initialValue) {}
 
+	/**
+	 * Constructor with a default notifier function.
+	 */
 	NotifyParameter(DataType initialValue, const Notifier& notifier) : Parent(initialValue), notifier(notifier) {}
 
+	/**
+	 * Same as Parameter::setValue(), but also calls the NotifyParameter::notifier function, if it
+	 * exists.
+	 */
 	inline void setValueLoudly(DataType value) {
 		Parent::setValue(value);
 
+		if (notifier) {
+			(*notifier)(Parent::currentValue);
+		}
+	}
+
+	/**
+	 * Call the notifier if it exists, without updating the value
+	 */
+	inline void notify() {
 		if (notifier) {
 			(*notifier)(Parent::currentValue);
 		}
@@ -48,10 +61,26 @@ public:
 		}
 	}
 
-	void setNotifier(const Notifier& _notifier) {
+	/**
+	 * Set the notifier function, to be called whenever the value of this parameter is updated.
+	 *
+	 * @note This function will be called even when a _parameter update_ command is received, but the
+	 * new value is the same as the previous one. This is done so that there is an option to repair
+	 * systems with a weird or unknown state.
+	 * @param call Whether to also call the notifier function immediately, to ensure that a change is
+	 * made.
+	 */
+	void setNotifier(const Notifier& _notifier, bool call=true) {
 		notifier = _notifier;
+
+		if (call) {
+			_notifier(Parent::currentValue);
+		}
 	}
 
+	/**
+	 * Unset the notifier function, so that nothing is called when the value of this function is updated.
+	 */
 	void unsetNotifier() {
 		notifier.reset();
 	}

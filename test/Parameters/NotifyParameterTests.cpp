@@ -15,17 +15,17 @@ TEST_CASE("Notify Parameter: Notifier") {
 	parameter.setNotifier([&counter](auto) -> auto{
 		counter++;
 	});
-
-	parameter.setValueLoudly(2);
 	CHECK(counter == 1);
 
 	parameter.setValueLoudly(2);
 	CHECK(counter == 2);
 
-	parameter.unsetNotifier();
+	parameter.setValueLoudly(2);
+	CHECK(counter == 3);
 
+	parameter.unsetNotifier();
 	parameter.setValueLoudly(3);
-	CHECK(counter == 2);
+	CHECK(counter == 3);
 }
 
 TEST_CASE("Notify Parameter: Messages") {
@@ -42,4 +42,22 @@ TEST_CASE("Notify Parameter: Messages") {
 	parameter.setValueFromMessage(message);
 
 	CHECK(storage == 184);
+}
+
+TEST_CASE("Notify Parameter: Extra functionality") {
+	int counter = 0;
+
+	NotifyParameter<uint32_t> parameter(0);
+	auto notifier = [&counter](auto) -> auto{
+		counter++;
+	};
+
+	parameter.setNotifier(notifier);
+	CHECK(counter == 1);
+
+	parameter.setNotifier(notifier, false);
+	CHECK(counter == 1);
+
+	parameter.notify();
+	CHECK(counter == 2);
 }
