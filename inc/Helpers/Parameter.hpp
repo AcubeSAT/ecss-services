@@ -58,7 +58,7 @@ public:
  */
 template <typename DataType>
 class Parameter : public ParameterBase {
-private:
+protected:
 	DataType currentValue;
 
 public:
