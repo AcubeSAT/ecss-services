@@ -69,11 +69,16 @@ TEST_CASE("Lazy Parameter: Messages") {
 TEST_CASE("Lazy Parameter: Complex Types") {
 	LazyParameter<Time::CustomCUC_t> parameter({100});
 
-	CHECK(parameter.getValue().has_value() == false);
+	SECTION("Default value") {
+		CHECK(parameter.getValue().has_value() == false);
+	}
 
-	parameter.setGetter([]() -> Time::CustomCUC_t {
-		return {200};
-	});
+	SECTION("Set value") {
+		parameter.setGetter([]() -> Time::CustomCUC_t {
+			return {200};
+		});
 
-	CHECK(parameter.getValue().value() == Time::CustomCUC_t{200});
+		CHECK(parameter.getValue().value() == Time::CustomCUC_t{200});
+		CHECK(parameter.getValueAsDouble() == 0);
+	}
 }

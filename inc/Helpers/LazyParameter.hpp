@@ -1,9 +1,9 @@
 #ifndef ECSS_SERVICES_LAZYPARAMETER_HPP
 #define ECSS_SERVICES_LAZYPARAMETER_HPP
 
-#include "Parameter.hpp"
-#include <functional>
 #include <etl/optional.h>
+#include <functional>
+#include "Parameter.hpp"
 
 /**
  * A Lazy Parameter is a ParameterServce parameter that does not keep a value in
