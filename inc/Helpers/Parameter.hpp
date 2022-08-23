@@ -58,8 +58,18 @@ public:
 		return currentValue;
 	}
 
+	/**
+	 * Converts the value of a parameter to a double.
+	 *
+	 * Some precision may be lost in the process. If the value is not arithmetic,
+	 * then 0 is returned.
+	 */
 	inline double getValueAsDouble() override {
-		return static_cast<double>(currentValue);
+		if constexpr (std::is_arithmetic_v<DataType>) {
+			return static_cast<double>(currentValue);
+		} else {
+			return 0;
+		}
 	}
 
 	/**

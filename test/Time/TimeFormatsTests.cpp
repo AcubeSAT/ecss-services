@@ -1,6 +1,7 @@
 #include "../Services/ServiceTests.hpp"
 #include "Time/Time.hpp"
 #include "Time/UTCTimestamp.hpp"
+#include "Message.hpp"
 #include "catch2/catch_all.hpp"
 
 TEST_CASE("UTC timestamps") {
@@ -24,4 +25,18 @@ TEST_CASE("UTC timestamps") {
 
 	CHECK(ServiceTests::countErrors() == 6);
 	CHECK(ServiceTests::thrownError(ErrorHandler::InvalidDate));
+}
+
+TEST_CASE("CUC Custom Timestamp as Parameter") {
+	Time::CustomCUC_t time;
+	time.elapsed100msTicks = 999;
+
+	auto parameter = Parameter<Time::CustomCUC_t>(time);
+
+	auto message = Message(0, 0, Message::TC);
+	parameter.appendValueToMessage(message);
+	CHECK(message.dataSize == 8);
+
+	parameter.setValueFromMessage(message);
+	CHECK(time == parameter.getValue());
 }
