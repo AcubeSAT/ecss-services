@@ -6,7 +6,7 @@
 #include "Parameter.hpp"
 
 /**
- * A Lazy Parameter is a ParameterServce parameter that does not keep a value in
+ * A Lazy Parameter is a ParameterService parameter that does not keep a value in
  * memory, but calls an external function to fetch a new value whenever needed.
  *
  * The LazyParameter allows its users to call expensive value-fetching operators
@@ -96,7 +96,6 @@ public:
 		[[maybe_unused]] auto skippedBytes = message.read<DataType>();
 		ErrorHandler::reportError(message, ErrorHandler::ParameterReadOnly);
 	};
-
 private:
 	etl::optional<Getter> getter;
 	DataType fallback;
