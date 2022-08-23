@@ -45,7 +45,7 @@ private:
 	 * The maximum value that can fit in @ref taiCounter, or the maximum number of seconds since epoch that can be
 	 * represented in this base class
 	 */
-	static constexpr uint64_t maxSecondCounterValue = (1U << (8U * secondsBytes)) - 1;
+	static constexpr uint64_t maxSecondCounterValue = (uint64_t{1U} << (8U * secondsBytes)) - 1;
 
 	/**
 	 * Returns whether the amount of `seconds` can be represented by this TimeStamp.
