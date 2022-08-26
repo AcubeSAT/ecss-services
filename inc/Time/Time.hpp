@@ -79,12 +79,12 @@ namespace Time {
 	/**
 	 * Number of bytes used for the basic time units of the CUC header for this mission
 	 */
-	inline constexpr uint8_t CUCSecondsBytes = 2;
+	inline constexpr uint8_t CUCSecondsBytes = 4;
 
 	/**
 	 * Number of bytes used for the fractional time units of the CUC header for this mission
 	 */
-	inline constexpr uint8_t CUCFractionalBytes = 2;
+	inline constexpr uint8_t CUCFractionalBytes = 1;
 
 	/**
 	 * The system epoch (clock measurement starting time)

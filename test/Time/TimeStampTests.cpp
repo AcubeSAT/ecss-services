@@ -1,4 +1,5 @@
 #include "Time/TimeStamp.hpp"
+#include "../Services/ServiceTests.hpp"
 #include "catch2/catch_all.hpp"
 
 using namespace Time;
@@ -143,19 +144,40 @@ TEST_CASE("UTC idempotence") {
 
 TEST_CASE("UTC conversion to and from seconds timestamps") {
 	{
-		UTCTimestamp timestamp1(2020, 12, 5, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		UTCTimestamp utc(2020, 12, 5, 0, 0, 0);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
 		REQUIRE(time.asTAIseconds() == 29289600);
 	}
 	{
-		UTCTimestamp timestamp1(2020, 2, 29, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		UTCTimestamp utc(2020, 2, 29, 0, 0, 0);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
 		REQUIRE(time.asTAIseconds() == 5097600);
 	}
 	{
-		UTCTimestamp timestamp1(2025, 3, 10, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
+		UTCTimestamp utc(2025, 3, 10, 0, 0, 0);
+		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
 		REQUIRE(time.asTAIseconds() == 163728000);
+	}
+}
+
+TEST_CASE("UTC overflow tests") {
+	SECTION("Year too high") {
+		UTCTimestamp utc(2999, 3, 11, 0, 0, 0);
+		TimeStamp<2, 1> time(utc);
+		REQUIRE(ServiceTests::thrownError(ErrorHandler::TimeStampOutOfBounds));
+		ServiceTests::reset();
+	}
+	SECTION("Seconds too high, small variable") {
+		UTCTimestamp utc(Epoch.year, Epoch.month, Epoch.day, 0, 7, 0);
+		TimeStamp<1, 1> time(utc);
+		REQUIRE(ServiceTests::thrownError(ErrorHandler::TimeStampOutOfBounds));
+		ServiceTests::reset();
+	}
+	SECTION("Seconds too high, wide variable") {
+		UTCTimestamp utc(Epoch.year, Epoch.month, Epoch.day, 0, 7, 0);
+		TimeStamp<1, 4> time(utc);
+		REQUIRE(ServiceTests::thrownError(ErrorHandler::TimeStampOutOfBounds));
+		ServiceTests::reset();
 	}
 }
 

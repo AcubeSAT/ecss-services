@@ -54,7 +54,10 @@ void ErrorHandler::logError(ErrorType errorType) {
 }
 
 void Logger::log(Logger::LogLevel level, etl::istring& message) {
-	// Logs while testing are completely ignored
+	// Logs while testing are passed on to Catch2, if they are important enough
+	if (level >= Logger::warning) {
+		INFO(message.c_str());
+	}
 }
 
 struct ServiceTestsListener : Catch::EventListenerBase {
@@ -65,7 +68,7 @@ struct ServiceTestsListener : Catch::EventListenerBase {
 		if (not ServiceTests::isExpectingErrors()) {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
 			// corresponding assertion function from ServiceTests to silence this message.
-
+			INFO("Found " << ServiceTests::countErrors() << " errors at end of section");
 			CHECK(ServiceTests::hasNoErrors());
 		}
 	}

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "macros.hpp"
 #include <etl/array.h>
+#include <chrono>
 #include "Time.hpp"
 #include "UTCTimestamp.hpp"
 
@@ -20,18 +21,21 @@
  * @author Baptiste Fournier
  * @see [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf)
  */
-template <uint8_t secondsBytes, uint8_t fractionalBytes>
+template <uint8_t BaseBytes, uint8_t FractionBytes, int Num = 1, int Denom = 1>
 class TimeStamp {
 private:
-	static_assert(secondsBytes + fractionalBytes <= 8,
+	static_assert(BaseBytes + FractionBytes <= 8,
 	              "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
-	typedef typename std::conditional<(secondsBytes < 4 && fractionalBytes < 3), uint8_t, uint16_t>::type CUCHeader_t;
-	typedef typename std::conditional<(secondsBytes + fractionalBytes < 4), uint32_t, uint64_t>::type TAICounter_t;
+	using CUCHeader_t = typename std::conditional<(BaseBytes < 4 && FractionBytes < 3), uint8_t, uint16_t>::type;
+	using TAICounter_t = typename std::conditional<(BaseBytes + FractionBytes <= 4), uint32_t, uint64_t>::type;
+
+	using Ratio = std::ratio<Num, Denom>;
+	using Duration = std::chrono::duration<std::conditional<(BaseBytes <= 4), uint32_t, uint64_t>, Ratio>;
 
 	/**
 	 * Integer counter of time units since the @ref Time::Epoch. This number essentially represents the timestamp.
 	 *
-	 * The unit represented by this variable depends on `secondsBytes` and `fractionalBytes`. The fractional
+	 * The unit represented by this variable depends on `BaseBytes` and `FractionBytes`. The fractional
 	 * part is included as the least significant bits of this variable, and the base part follows.
 	 */
 	TAICounter_t taiCounter;
@@ -39,13 +43,13 @@ private:
 	/**
 	 * The constant header ("P-value") of the timestamp, if needed to be attached to any message
 	 */
-	static constexpr CUCHeader_t CUCHeader = Time::buildCUCHeader<CUCHeader_t, secondsBytes, fractionalBytes>();
+	static constexpr CUCHeader_t CUCHeader = Time::buildCUCHeader<CUCHeader_t, BaseBytes, FractionBytes>();
 
 	/**
 	 * The maximum value that can fit in @ref taiCounter, or the maximum number of seconds since epoch that can be
 	 * represented in this base class
 	 */
-	static constexpr uint64_t maxSecondCounterValue = (uint64_t{1U} << (8U * secondsBytes)) - 1;
+	static constexpr uint64_t maxSecondCounterValue = (uint64_t{1U} << (8U * BaseBytes)) - 1;
 
 	/**
 	 * Returns whether the amount of `seconds` can be represented by this TimeStamp.
@@ -137,27 +141,27 @@ public:
 	 * @param timestamp the date that will be compared with the pointer `this`
 	 * @return true if the condition is satisfied
 	 */
-	bool operator<(const TimeStamp<secondsBytes, fractionalBytes>& timestamp) const {
+	bool operator<(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
 		return taiCounter < timestamp.taiCounter;
 	}
 
-	bool operator>(const TimeStamp<secondsBytes, fractionalBytes>& timestamp) const {
+	bool operator>(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
 		return taiCounter > timestamp.taiCounter;
 	}
 
-	bool operator==(const TimeStamp<secondsBytes, fractionalBytes>& timestamp) const {
+	bool operator==(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
 		return taiCounter == timestamp.taiCounter;
 	}
 
-	bool operator!=(const TimeStamp<secondsBytes, fractionalBytes>& timestamp) const {
+	bool operator!=(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
 		return taiCounter != timestamp.taiCounter;
 	}
 
-	bool operator<=(const TimeStamp<secondsBytes, fractionalBytes>& timestamp) const {
+	bool operator<=(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
 		return taiCounter <= timestamp.taiCounter;
 	}
 
-	bool operator>=(const TimeStamp<secondsBytes, fractionalBytes>& timestamp) const {
+	bool operator>=(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
 		return taiCounter >= timestamp.taiCounter;
 	}
 };
