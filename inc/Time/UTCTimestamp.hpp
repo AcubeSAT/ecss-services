@@ -106,10 +106,20 @@ public:
 
 private:
 	/**
+	 * Makes sure that all time fields are within their bounds
 	 *
+	 * For example, if `hours == 1, minutes == 63`, then this function will carry over the numbers so that
+	 * `hours == 2, minutes == 3`.
+	 *
+	 * @note This performs max one propagation for every field.
+	 * For example, if `hours == 1, minutes == 123`, then only the first 60 minutes will be carried over.
 	 */
 	void repair();
 
+	/**
+	 * Find the number of days within the current @ref month.
+	 * Includes leap year calculation.
+	 */
 	uint8_t daysOfMonth() const {
 		using namespace Time;
 
