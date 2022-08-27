@@ -131,3 +131,33 @@ bool UTCTimestamp::operator<=(const UTCTimestamp& Date) const {
 bool UTCTimestamp::operator>=(const UTCTimestamp& Date) const {
 	return ((*this > Date) || (*this == Date));
 }
+void UTCTimestamp::repair() {
+	using namespace Time;
+
+	if (second > Time::SecondsPerMinute) {
+		second -= Time::SecondsPerMinute;
+		minute++;
+	}
+
+	const auto MinutesPerHour = SecondsPerHour / SecondsPerMinute;
+	if (minute >= MinutesPerHour) {
+		minute -= MinutesPerHour;
+		hour++;
+	}
+
+	const auto HoursPerDay = SecondsPerDay / SecondsPerHour;
+	if (hour >= HoursPerDay) {
+		hour -= HoursPerDay;
+		day++;
+	}
+
+	if (day > daysOfMonth()) {
+		day -= daysOfMonth();
+		month++;
+	}
+
+	if (month > MonthsPerYear) {
+		month -= MonthsPerYear;
+		year++;
+	}
+}

@@ -75,7 +75,8 @@ namespace Time {
 	inline constexpr uint8_t SecondsPerMinute = 60;
 	inline constexpr uint16_t SecondsPerHour = 3600;
 	inline constexpr uint32_t SecondsPerDay = 86400;
-	static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	inline constexpr uint8_t MonthsPerYear = 12;
+	static constexpr uint8_t DaysOfMonth[MonthsPerYear] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	/**
 	 * Number of bytes used for the basic time units of the CUC header for this mission
@@ -85,7 +86,7 @@ namespace Time {
 	/**
 	 * Number of bytes used for the fractional time units of the CUC header for this mission
 	 */
-	inline constexpr uint8_t CUCFractionalBytes = 1;
+	inline constexpr uint8_t CUCFractionalBytes = 0;
 
 	/**
 	 * The system epoch (clock measurement starting time).
