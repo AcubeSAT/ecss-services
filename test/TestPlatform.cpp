@@ -25,6 +25,12 @@ Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
 	return CUCtime;
 }
 
+Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
+	UTCTimestamp timeUTC = getCurrentTimeUTC();
+	Time::DefaultCUC timeCUC(timeUTC);
+	return timeCUC;
+}
+
 // Explicit template specializations for the logError() function
 template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
 template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionStartErrorType);

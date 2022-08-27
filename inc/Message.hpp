@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
+#include <Time/TimeStamp.hpp>
 #include <cstdint>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
@@ -152,6 +153,20 @@ public:
 	 */
 	void appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC) {
 		appendUint64(timeCUC.elapsed100msTicks);
+	}
+
+	/**
+	 * Appends a type CustomCUC (CUC formatted timestamp) to the message.
+	 */
+	template <class Ts>
+	void appendCUCTimeStamp(const Ts& timestamp) {
+		etl::array<uint8_t, Time::CUCTimestampMaximumSize> text = timestamp.formatAsCUC();
+
+		appendString(String<Time::CUCTimestampMaximumSize>(text.data(), text.size()));
+	}
+
+	void appendDefaultCUCTimeStamp(Time::DefaultCUC timestamp) {
+		appendUint32(timestamp.HACKERS____TODO());
 	}
 
 	/**
@@ -731,6 +746,10 @@ inline void Message::append(const double& value) {
 template <>
 inline void Message::append(const Time::CustomCUC_t& timeCUC) {
 	appendCustomCUCTimeStamp(timeCUC);
+}
+template <>
+inline void Message::append(const Time::DefaultCUC& timeCUC) {
+	appendDefaultCUCTimeStamp(timeCUC);
 }
 template <>
 inline void Message::append(const Time::RelativeTime& value) {

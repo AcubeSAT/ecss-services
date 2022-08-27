@@ -29,6 +29,8 @@ public:
 	 * @see Time.hpp
 	 */
 	static Time::CustomCUC_t getCurrentTimeCustomCUC();
+
+	static Time::DefaultCUC getCurrentTimeDefaultCUC();
 };
 
 #endif // ECSS_SERVICES_TIMEGETTER_HPP
