@@ -3,7 +3,6 @@
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
-	// TODO: See what happens with num/denom
 	return seconds <= MaxSeconds;
 }
 

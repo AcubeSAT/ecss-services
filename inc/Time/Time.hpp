@@ -239,7 +239,6 @@ namespace Time {
 	 */
 	template <typename T, int secondsBytes, int fractionalBytes>
 	inline constexpr T buildCUCHeader() {
-		// TODO: Gitlab issue #106
 		static_assert((secondsBytes + fractionalBytes) <= 8, "Complete arbitrary precision not supported");
 		// cppcheck-suppress syntaxError
 		// cppcheck-suppress redundantCondition
