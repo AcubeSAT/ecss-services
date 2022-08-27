@@ -149,14 +149,7 @@ public:
 	void appendWord(uint32_t value);
 
 	/**
-	 * Appends a type CustomCUC (CUC formatted timestamp) to the message.
-	 */
-	void appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC) {
-		appendUint64(timeCUC.elapsed100msTicks);
-	}
-
-	/**
-	 * Appends a type CustomCUC (CUC formatted timestamp) to the message.
+	 * Appends any CUC timestamp to the message.
 	 */
 	template <class Ts>
 	void appendCUCTimeStamp(const Ts& timestamp) {
@@ -586,16 +579,6 @@ public:
 	}
 
 	/**
-	 * Fetches a timestamp in a custom CUC format consisting of 8 bytes from the current position in the message
-	 */
-	Time::CustomCUC_t readCustomCUCTimeStamp() {
-		Time::CustomCUC_t customCUC_t;
-
-		customCUC_t.elapsed100msTicks = readUint64();
-		return customCUC_t;
-	}
-
-	/**
 	 * Fetches a timestamp in a custom CUC format consisting of 4 bytes from the current position in the message
 	 */
 	Time::DefaultCUC readDefaultCUCTimeStamp() {
@@ -753,10 +736,6 @@ inline void Message::append(const double& value) {
 	appendDouble(value);
 }
 template <>
-inline void Message::append(const Time::CustomCUC_t& timeCUC) {
-	appendCustomCUCTimeStamp(timeCUC);
-}
-template <>
 inline void Message::append(const Time::DefaultCUC& timeCUC) {
 	appendDefaultCUCTimeStamp(timeCUC);
 }
@@ -822,8 +801,8 @@ inline double Message::read() {
 	return readDouble();
 }
 template <>
-inline Time::CustomCUC_t Message::read() {
-	return readCustomCUCTimeStamp();
+inline Time::DefaultCUC Message::read() {
+	return readDefaultCUCTimeStamp();
 }
 template <>
 inline Time::RelativeTime Message::read() {

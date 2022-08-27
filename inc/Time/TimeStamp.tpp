@@ -17,15 +17,6 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFr
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Time::CustomCUC_t customCUCTimestamp) {
-	//TODO Remove CustomCUC_t class
-	TimeStamp<8, 0, 1, 10> input;
-	input.taiCounter = customCUCTimestamp.elapsed100msTicks;
-
-	new (this) TimeStamp<BaseBytes, FractionBytes, Num, Denom>(input);
-}
-
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp) {
 	// process header
 	uint8_t headerSize = 1;
@@ -105,13 +96,6 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asTAIseconds() {
 	using ToDuration = std::chrono::duration<TAICounter_t>;
 
 	return std::chrono::duration_cast<ToDuration>(duration).count();
-}
-
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-Time::CustomCUC_t TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asCustomCUCTimestamp() {
-	//TODO: Remove CustomCUC_t class
-	TimeStamp<8, 0, 1, 10> converted(*this);
-	return {converted.taiCounter};
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>

@@ -3,7 +3,7 @@
 #include "ServicePool.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
-ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {
+ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeDefaultCUC()) {
 	initializeStatisticsMap();
 	serviceType = ServiceType;
 }

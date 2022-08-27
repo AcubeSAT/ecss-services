@@ -18,13 +18,6 @@ UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	return currentTime;
 }
 
-Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
-	UTCTimestamp timeUTC = getCurrentTimeUTC();
-	TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
-	Time::CustomCUC_t CUCtime = timeCUC.asCustomCUCTimestamp();
-	return CUCtime;
-}
-
 Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 	UTCTimestamp timeUTC = getCurrentTimeUTC();
 	Time::DefaultCUC timeCUC(timeUTC);
