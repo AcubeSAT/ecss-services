@@ -42,7 +42,7 @@ TEST_CASE("TAI idempotence") {
 TEST_CASE("CUC idempotence") {
 	etl::array<uint8_t, 9> input1 = {0b00101010, 0, 1, 1, 3, 0, 0, 0, 0};
 	TimeStamp<3, 2> time1(input1);
-	etl::array<uint8_t, 9> cuc1 = time1.toCUCtimestamp();
+	etl::array<uint8_t, 9> cuc1 = time1.formatAsCUC();
 
 	for (uint8_t i = 0; i < 9; i++) {
 		CHECK(input1[i] == cuc1[i]);
@@ -50,7 +50,7 @@ TEST_CASE("CUC idempotence") {
 
 	etl::array<uint8_t, 9> input2 = {0b10101101, 0b10100000, 218, 103, 11, 0, 3, 23, 0};
 	TimeStamp<5, 1> time2(input2);
-	etl::array<uint8_t, 9> cuc2 = time2.toCUCtimestamp();
+	etl::array<uint8_t, 9> cuc2 = time2.formatAsCUC();
 
 	for (auto i = 0; i < 9; i++) {
 		CHECK(input2[i] == cuc2[i]);
@@ -58,7 +58,7 @@ TEST_CASE("CUC idempotence") {
 
 	etl::array<uint8_t, 9> input3 = {0b10100011, 0b10001100, 218, 103, 11, 0, 3, 23, 2};
 	TimeStamp<1, 6> time3(input3);
-	etl::array<uint8_t, 9> cuc3 = time3.toCUCtimestamp();
+	etl::array<uint8_t, 9> cuc3 = time3.formatAsCUC();
 
 	for (auto i = 0; i < 9; i++) {
 		CHECK(input3[i] == cuc3[i]);
@@ -68,7 +68,7 @@ TEST_CASE("CUC idempotence") {
 TEST_CASE("Conversion between CUC formats") {
 	SECTION("Base unit conversion") {
 		TimeStamp<2, 2> time1(20123);
-		TimeStamp<5, 2> time2(time1.toCUCtimestamp());
+		TimeStamp<5, 2> time2(time1.formatAsCUC());
 		CHECK(time1.asTAIseconds() == time2.asTAIseconds());
 	}
 
@@ -76,7 +76,7 @@ TEST_CASE("Conversion between CUC formats") {
 		etl::array<uint8_t, 9> timeInput = {0b00101010, 0, 1, 1, 3, 0, 0, 0, 0};
 		TimeStamp<3, 2> time1(timeInput);
 
-		TimeStamp<3, 5> time2(time1.toCUCtimestamp());
+		TimeStamp<3, 5> time2(time1.formatAsCUC());
 		CHECK(time1.asTAIseconds() == time2.asTAIseconds());
 	}
 
@@ -84,7 +84,7 @@ TEST_CASE("Conversion between CUC formats") {
 		etl::array<uint8_t, 9> timeInput = {0b00101010, 0, 1, 1, 3, 0, 0, 0, 0};
 		TimeStamp<3, 2> time1(timeInput);
 
-		TimeStamp<4, 4> time2(time1.toCUCtimestamp());
+		TimeStamp<4, 4> time2(time1.formatAsCUC());
 		CHECK(time1.asTAIseconds() == time2.asTAIseconds());
 	}
 }

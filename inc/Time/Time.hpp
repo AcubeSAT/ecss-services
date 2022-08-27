@@ -87,7 +87,7 @@ namespace Time {
 	inline constexpr uint8_t CUCFractionalBytes = 1;
 
 	/**
-	 * The system epoch (clock measurement starting time)
+	 * The system epoch (clock measurement starting time).
 	 * All timestamps emitted by the ECSS services will show the elapsed time (seconds, days etc.) from this epoch.
  	*/
 	inline constexpr struct {

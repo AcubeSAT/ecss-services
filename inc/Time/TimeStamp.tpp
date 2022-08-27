@@ -130,7 +130,7 @@ T TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asTAIseconds() {
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-etl::array<uint8_t, Time::CUCTimestampMaximumSize> TimeStamp<BaseBytes, FractionBytes, Num, Denom>::toCUCtimestamp() {
+etl::array<uint8_t, Time::CUCTimestampMaximumSize> TimeStamp<BaseBytes, FractionBytes, Num, Denom>::formatAsCUC() {
 	etl::array<uint8_t, Time::CUCTimestampMaximumSize> returnArray = {0};
 
 	static constexpr uint8_t headerBytes = (BaseBytes < 4 && FractionBytes < 3) ? 1 : 2;

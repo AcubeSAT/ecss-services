@@ -20,14 +20,14 @@
  *
  * The timestamp is defined in relation to a user-defined epoch, set in @ref Time::Epoch.
  *
- * @subsection Setting the base time unit
+ * @section baseunit Setting the base time unit
  * By default, this class measures time in the order of **seconds**. Binary fractions of a second can be specified by increasing the FractionBytes.
  * However, the user can change the base time unit by setting the @p Num and @p Denom template parameters.
  *
  * The base time unit (or period) is then represented by the following:
- * \[
- * \mathm{time unit} = \frac{Num}{Denom} \cdot \mathrm{second}
- * \]
+ * \f[
+ * \text{time unit} = \frac{Num}{Denom} \cdot \text{second}
+ * \f]
  *
  * @note
  * This class uses internally TAI time, and handles UTC leap seconds at conversion to and
@@ -35,8 +35,8 @@
  *
  * @tparam BaseBytes The number of bytes used for the basic time units. This essentially defines the maximum duration from Epoch that this timestamp can represent.
  * @tparam FractionBytes The number of bytes used for the fraction of one basic time unit. This essentially defines the precision of the timestamp.
- * @tparam Num The numerator of the base type ratio
- * @tparam Denom The numerator of the base type ratio
+ * @tparam Num The numerator of the base type ratio (see @ref baseunit)
+ * @tparam Denom The numerator of the base type ratio (see @ref baseunit)
  *
  * @ingroup Time
  * @author Baptiste Fournier
@@ -181,7 +181,6 @@ public:
 	 * Get the representation as seconds from epoch in TAI, for a floating-point representation.
 	 * For an integer result, see the overloaded @ref asTAIseconds function.
 	 *
-	 * @todo Implement integer seconds in this function
 	 * @tparam T The return type of the seconds (float or double).
 	 * @return The seconds elapsed in TAI since @ref Time::Epoch
 	 */
@@ -193,7 +192,7 @@ public:
 	 *
 	 * @return The TimeStamp, represented in the CCSDS CUC format
 	 */
-	etl::array<uint8_t, Time::CUCTimestampMaximumSize> toCUCtimestamp();
+	etl::array<uint8_t, Time::CUCTimestampMaximumSize> formatAsCUC();
 
 	/**
 	 * Get the representation as a UTC timestamp
@@ -234,6 +233,5 @@ public:
 };
 
 #include "TimeStamp.tpp"
-typedef TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> AcubeSATTimeStamp_t;
 
 #endif
