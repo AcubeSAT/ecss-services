@@ -32,6 +32,9 @@ private:
 	using Ratio = std::ratio<Num, Denom>;
 	using Duration = std::chrono::duration<std::conditional<(BaseBytes <= 4), uint32_t, uint64_t>, Ratio>;
 
+	template <uint8_t, uint8_t, int, int>
+	friend class TimeStamp;
+
 	/**
 	 * Integer counter of time units since the @ref Time::Epoch. This number essentially represents the timestamp.
 	 *
@@ -58,6 +61,9 @@ private:
 	 * @param seconds The amount of seconds from @ref Time::Epoch
 	 */
 	static constexpr bool areSecondsValid(TAICounter_t seconds);
+
+	template<int NumIn, int DenomIn>
+	static constexpr TAICounter_t safeMultiply(TAICounter_t a);
 
 public:
 	/**
@@ -94,6 +100,16 @@ public:
 	 * @param timestamp a UTC timestamp, from Unix Epoch
 	 */
 	explicit TimeStamp(const UTCTimestamp& timestamp);
+
+	/**
+	 * Convert a Timestamp to a Timestamp with different parameters
+	 *
+	 * This constructor will convert based on the number of bytes, and base units
+	 *
+	 * @note Internally uses double-precision floating point to allow for arbitrary ratios
+	 */
+	template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1>
+	explicit TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn>);
 
 	/**
 	 * Get the representation as seconds from epoch in TAI

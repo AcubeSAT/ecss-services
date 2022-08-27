@@ -206,7 +206,50 @@ TEST_CASE("Time operators") {
 }
 
 TEST_CASE("Time runtime class size") {
-	int input_time = 1000;
-	TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(input_time);
-	REQUIRE(sizeof(time) < 32);
+	REQUIRE(sizeof(TimeStamp<CUCSecondsBytes, CUCFractionalBytes>) <= 8);
+}
+
+TEST_CASE("CUC conversions") {
+	SECTION("Base unit, without fractions") {
+		TimeStamp<2, 0, 10, 1> time1(100);
+		CHECK(time1.asTAIseconds() == 100);
+
+		TimeStamp<2, 0, 1, 10> time2(time1);
+		CHECK(time2.asTAIseconds() == 100);
+	}
+
+	SECTION("Base unit, with fractions") {
+		TimeStamp<2, 2, 10, 1> time1(100);
+		CHECK(time1.asTAIseconds() == 100);
+
+		TimeStamp<2, 2, 1, 10> time2(time1);
+		CHECK(time2.asTAIseconds() == 100);
+	}
+
+	SECTION("Addition of fraction") {
+		TimeStamp<2, 0, 1, 1> time1(100);
+		CHECK(time1.asTAIseconds() == 100);
+
+		TimeStamp<2, 2, 1, 1> time2(time1);
+		CHECK(time2.asTAIseconds() == 100);
+	}
+
+	SECTION("Removal of fraction") {
+		TimeStamp<2, 2, 1, 1> time1(100);
+		CHECK(time1.asTAIseconds() == 100);
+
+		TimeStamp<2, 0, 1, 1> time2(time1);
+		CHECK(time2.asTAIseconds() == 100);
+	}
+
+	SECTION("Many changes") {
+		TimeStamp<2, 2, 3, 2> time1(100);
+		CHECK(time1.asTAIseconds() == 100);
+
+		TimeStamp<4, 4, 100, 34> time2(time1);
+		CHECK(time2.asTAIseconds() == 100);
+
+		TimeStamp<1, 1, 1, 1> time3(time1);
+		CHECK(time3.asTAIseconds() == 100);
+	}
 }

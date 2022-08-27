@@ -1,5 +1,9 @@
+
+#include "TimeStamp.hpp"
+
 template <uint8_t secondsBytes, uint8_t fractionalBytes, int Num, int Denom>
 constexpr bool TimeStamp<secondsBytes, fractionalBytes, Num, Denom>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
+	// TODO: See what happens with num/denom
 	return seconds < maxSecondCounterValue;
 }
 
@@ -7,7 +11,8 @@ template <uint8_t secondsBytes, uint8_t fractionalBytes, int Num, int Denom>
 TimeStamp<secondsBytes, fractionalBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) {
 	ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::InvalidTimeStampInput);
 
-	taiCounter = static_cast<TAICounter_t>(taiSecondsFromEpoch) << 8 * fractionalBytes;
+	taiCounter = (static_cast<TAICounter_t>(taiSecondsFromEpoch) << (8 * fractionalBytes));
+	taiCounter = safeMultiply<Ratio::num, Ratio::den>(taiCounter);
 }
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes, int Num, int Denom>
@@ -99,7 +104,8 @@ TimeStamp<seconds_counter_bytes, fractional_counter_bytes, Num, Denom>::TimeStam
 template <uint8_t secondsBytes, uint8_t fractionalBytes, int Num, int Denom>
 typename TimeStamp<secondsBytes, fractionalBytes, Num, Denom>::TAICounter_t
 TimeStamp<secondsBytes, fractionalBytes, Num, Denom>::asTAIseconds() {
-	return taiCounter >> (8 * fractionalBytes);
+	using ReverseRatio = std::ratio_divide<std::ratio<1,1>, Ratio>;
+	return safeMultiply<ReverseRatio::num, ReverseRatio::den>(taiCounter >> (8 * fractionalBytes));
 }
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes, int Num, int Denom>
@@ -198,4 +204,35 @@ UTCTimestamp TimeStamp<secondsBytes, fractionalBytes, Num, Denom>::toUTCtimestam
 	second = totalSeconds;
 
 	return {yearUTC, monthUTC, dayUTC, hour, minute, second};
+}
+template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
+template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn, int DenomIn>
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input) {
+	constexpr double InputRatio = static_cast<double>(NumIn) / DenomIn;
+	constexpr double OutputRatio = static_cast<double>(Num) / Denom;
+
+	double inputSeconds = input.taiCounter / static_cast<double>(1 << (8 * FractionBytesIn));
+	inputSeconds /= InputRatio;
+
+	double outputSeconds = inputSeconds * OutputRatio * (1UL << (8 * FractionBytes));
+	if (outputSeconds > maxSecondCounterValue) {
+		ErrorHandler::reportInternalError(ErrorHandler::TimeStampOutOfBounds);
+	}
+
+	taiCounter = static_cast<TAICounter_t>(outputSeconds);
+}
+template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
+template <int NumIn, int DenomIn>
+constexpr typename TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TAICounter_t TimeStamp<BaseBytes, FractionBytes, Num, Denom>::safeMultiply(TimeStamp::TAICounter_t a) {
+	// Creating an std::ratio will simplify the numerator and denominator
+	using RatioIn = std::ratio<NumIn, DenomIn>;
+
+	if constexpr (RatioIn::num == 1) {
+		return a / RatioIn::den;
+	} else if constexpr (RatioIn::den == 1) {
+		return a * RatioIn::num;
+	} else {
+		//TODO it should return a double
+		return static_cast<double>(a) * RatioIn::num / RatioIn::den;
+	}
 }
