@@ -222,28 +222,34 @@ public:
 	 * @param timestamp the date that will be compared with the pointer `this`
 	 * @return true if the condition is satisfied
 	 */
-	bool operator<(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
-		return taiCounter < timestamp.taiCounter;
+	template <class OtherTimestamp>
+	bool operator<(const OtherTimestamp& timestamp) const {
+		return RawDuration(taiCounter) < typename OtherTimestamp::RawDuration(timestamp.taiCounter);
 	}
 
-	bool operator>(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
-		return taiCounter > timestamp.taiCounter;
+	template <class OtherTimestamp>
+	bool operator>(const OtherTimestamp& timestamp) const {
+		return RawDuration(taiCounter) > typename OtherTimestamp::RawDuration(timestamp.taiCounter);
 	}
 
-	bool operator==(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
-		return taiCounter == timestamp.taiCounter;
+	template <class OtherTimestamp>
+	bool operator==(const OtherTimestamp& timestamp) const {
+		return RawDuration(taiCounter) == typename OtherTimestamp::RawDuration(timestamp.taiCounter);
 	}
 
-	bool operator!=(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
-		return taiCounter != timestamp.taiCounter;
+	template <class OtherTimestamp>
+	bool operator!=(const OtherTimestamp& timestamp) const {
+		return RawDuration(taiCounter) != typename OtherTimestamp::RawDuration(timestamp.taiCounter);
 	}
 
-	bool operator<=(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
-		return taiCounter <= timestamp.taiCounter;
+	template <class OtherTimestamp>
+	bool operator<=(const OtherTimestamp& timestamp) const {
+		return RawDuration(taiCounter) <= typename OtherTimestamp::RawDuration(timestamp.taiCounter);
 	}
 
-	bool operator>=(const TimeStamp<BaseBytes, FractionBytes, Num, Denom>& timestamp) const {
-		return taiCounter >= timestamp.taiCounter;
+	template <class OtherTimestamp>
+	bool operator>=(const OtherTimestamp& timestamp) const {
+		return RawDuration(taiCounter) >= typename OtherTimestamp::RawDuration(timestamp.taiCounter);
 	}
 };
 

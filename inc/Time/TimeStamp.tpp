@@ -4,12 +4,12 @@
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
 	// TODO: See what happens with num/denom
-	return seconds < MaxSeconds;
+	return seconds <= MaxSeconds;
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) {
-	ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::InvalidTimeStampInput);
+	ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::TimeStampOutOfBounds);
 
 	using FromDuration = std::chrono::duration<uint64_t>;
 	const auto duration = FromDuration(taiSecondsFromEpoch);

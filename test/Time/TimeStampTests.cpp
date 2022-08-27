@@ -189,21 +189,58 @@ TEST_CASE("UTC overflow tests") {
 // }
 
 TEST_CASE("Time operators") {
-	TimeStamp<1, 2> time1;
-	TimeStamp<1, 2> time2;
-	TimeStamp<1, 2> time3(10);
-	TimeStamp<1, 2> time4(12);
-	TimeStamp<1, 2> time5(10);
-	TimeStamp<2, 2> time6;
-	REQUIRE(time1 == time2);
-	REQUIRE(time2 == time1);
-	REQUIRE(time3 == time5);
-	REQUIRE(time1 != time3);
-	REQUIRE(time3 != time4);
-	REQUIRE(time3 <= time4);
-	REQUIRE(time3 < time4);
+	SECTION("Same type") {
+		TimeStamp<1, 2> time1;
+		TimeStamp<1, 2> time2;
+		TimeStamp<1, 2> time3(10);
+		TimeStamp<1, 2> time4(12);
+		TimeStamp<1, 2> time5(10);
+		CHECK(time1 == time2);
+		CHECK(time2 == time1);
+		CHECK(time3 == time5);
+		CHECK(time1 != time3);
+		CHECK(time3 != time4);
+		CHECK(time3 <= time4);
+		CHECK(time3 < time4);
+	}
 
-	// REQUIRE(time1 == time6); //should fail at compile, different templates
+	SECTION("Different size") {
+		TimeStamp<1, 2> time1(10);
+		TimeStamp<2, 1> time2(10);
+		TimeStamp<3, 2> time3(15);
+		TimeStamp<2, 2> time4(5);
+		CHECK(time1 == time2);
+		CHECK(time3 != time2);
+		CHECK(time4 < time2);
+		CHECK(time3 > time4);
+		CHECK(time2 >= time1);
+		CHECK(time1 <= time3);
+	}
+
+	SECTION("Different units") {
+		TimeStamp<1, 2, 10> time1(10);
+		TimeStamp<1, 2, 1, 10> time2(10);
+		TimeStamp<3, 2, 3, 2> time3(15);
+		TimeStamp<2, 2, 57, 89> time4(5);
+		CHECK(time1 == time2);
+		CHECK(time3 != time2);
+		CHECK(time4 < time2);
+		CHECK(time3 > time4);
+		CHECK(time2 >= time1);
+		CHECK(time1 <= time3);
+	}
+
+	SECTION("Overflow") {
+		TimeStamp<1, 0> time1(1);
+		TimeStamp<4, 4> time2(std::numeric_limits<uint32_t>::max());
+
+		CHECK(time1 != time2);
+		CHECK_FALSE(time1 == time2);
+		CHECK(time1 < time2);
+		CHECK(time1 <= time2);
+		CHECK(time2 > time1);
+		CHECK(time2 >= time1);
+	}
 }
 
 TEST_CASE("Time runtime class size") {
