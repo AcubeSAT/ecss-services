@@ -9,7 +9,7 @@ UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	return currentTime;
 }
 
-Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC(){}() {
+Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 	UTCTimestamp timeUTC = getCurrentTimeUTC();
 	return Time::DefaultCUC(timeUTC);
 }
