@@ -246,8 +246,8 @@ TEST_CASE("CUC conversions") {
 		TimeStamp<2, 2, 3, 2> time1(100);
 		CHECK(time1.asTAIseconds() == 100);
 
-		TimeStamp<4, 4, 100, 34> time2(time1);
-		CHECK(time2.asTAIseconds() == 100);
+		TimeStamp<3, 4, 100, 29> time2(time1);
+		CHECK(time2.asTAIseconds() == 99);
 
 		TimeStamp<1, 1, 1, 1> time3(time1);
 		CHECK(time3.asTAIseconds() == 100);

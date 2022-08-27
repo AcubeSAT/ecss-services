@@ -63,7 +63,7 @@ private:
 	static constexpr bool areSecondsValid(TAICounter_t seconds);
 
 	template<int NumIn, int DenomIn>
-	static constexpr TAICounter_t safeMultiply(TAICounter_t a);
+	static constexpr auto safeMultiply(TAICounter_t a);
 
 public:
 	/**

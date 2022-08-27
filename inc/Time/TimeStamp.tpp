@@ -1,4 +1,3 @@
-
 #include "TimeStamp.hpp"
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes, int Num, int Denom>
@@ -223,14 +222,14 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 }
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <int NumIn, int DenomIn>
-constexpr typename TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TAICounter_t TimeStamp<BaseBytes, FractionBytes, Num, Denom>::safeMultiply(TimeStamp::TAICounter_t a) {
+constexpr auto TimeStamp<BaseBytes, FractionBytes, Num, Denom>::safeMultiply(TimeStamp::TAICounter_t a) {
 	// Creating an std::ratio will simplify the numerator and denominator
 	using RatioIn = std::ratio<NumIn, DenomIn>;
 
 	if constexpr (RatioIn::num == 1) {
-		return a / RatioIn::den;
+		return TAICounter_t{a} / RatioIn::den;
 	} else if constexpr (RatioIn::den == 1) {
-		return a * RatioIn::num;
+		return TAICounter_t{a} * RatioIn::num;
 	} else {
 		//TODO it should return a double
 		return static_cast<double>(a) * RatioIn::num / RatioIn::den;
