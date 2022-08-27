@@ -5,6 +5,7 @@
 #include <Message.hpp>
 #include <Service.hpp>
 #include <catch2/catch_all.hpp>
+#include <cxxabi.h>
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
@@ -51,12 +52,17 @@ void ErrorHandler::logError(const Message& message, ErrorType errorType) {
 template <typename ErrorType>
 void ErrorHandler::logError(ErrorType errorType) {
 	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
+
+	auto errorCategory = abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr);
+	auto errorNumber = std::underlying_type_t<ErrorType>(errorType);
+
+	LOG_ERROR << "Error " << errorCategory << " with number " << errorNumber;
 }
 
 void Logger::log(Logger::LogLevel level, etl::istring& message) {
 	// Logs while testing are passed on to Catch2, if they are important enough
 	if (level >= Logger::warning) {
-		INFO(message.c_str());
+		UNSCOPED_INFO(message.c_str());
 	}
 }
 
@@ -68,7 +74,7 @@ struct ServiceTestsListener : Catch::EventListenerBase {
 		if (not ServiceTests::isExpectingErrors()) {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
 			// corresponding assertion function from ServiceTests to silence this message.
-			INFO("Found " << ServiceTests::countErrors() << " errors at end of section");
+			UNSCOPED_INFO("Found " << ServiceTests::countErrors() << " errors at end of section");
 			CHECK(ServiceTests::hasNoErrors());
 		}
 	}

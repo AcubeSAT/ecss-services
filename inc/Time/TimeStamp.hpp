@@ -13,24 +13,74 @@
  * A class that represents an instant in time, with convenient conversion
  * to and from usual time and date representations
  *
+ * This class is compatible with the CUC (Unsegmented Time Code) format defined in CCSDS 301.0-B-4. It allows specifying:
+ * - Different amount of bytes for the basic time unit
+ * - Different amount of bytes for the fractional time unit
+ * - Different basic time units
+ *
+ * The timestamp is defined in relation to a user-defined epoch, set in @ref Time::Epoch.
+ *
+ * @subsection Setting the base time unit
+ * By default, this class measures time in the order of **seconds**. Binary fractions of a second can be specified by increasing the FractionBytes.
+ * However, the user can change the base time unit by setting the @p Num and @p Denom template parameters.
+ *
+ * The base time unit (or period) is then represented by the following:
+ * \[
+ * \mathm{time unit} = \frac{Num}{Denom} \cdot \mathrm{second}
+ * \]
+ *
  * @note
  * This class uses internally TAI time, and handles UTC leap seconds at conversion to and
  * from UTC time system.
  *
+ * @tparam BaseBytes The number of bytes used for the basic time units. This essentially defines the maximum duration from Epoch that this timestamp can represent.
+ * @tparam FractionBytes The number of bytes used for the fraction of one basic time unit. This essentially defines the precision of the timestamp.
+ * @tparam Num The numerator of the base type ratio
+ * @tparam Denom The numerator of the base type ratio
+ *
  * @ingroup Time
  * @author Baptiste Fournier
+ * @author Konstantinos Kanavouras
  * @see [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf)
  */
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num = 1, int Denom = 1>
+template <uint8_t BaseBytes, uint8_t FractionBytes = 0, int Num = 1, int Denom = 1>
 class TimeStamp {
+public:
+	/**
+	 * The period of the base type, in relation to the second
+	 *
+	 * This type represents the base type of the timestamp.
+	 *
+	 * A ratio of `<1, 1>` (or 1/1) means that this timestamp represents
+	 * seconds. A ratio of `<60, 1>` (or 60/1) means that this class represents 60s of seconds, or minutes. A ratio of `<1, 1000>` (or 1/1000) means that this class represents 1000ths of seconds, or milliseconds.
+	 *
+	 * This type has essentially the same meaning of `Rep` in [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration).
+	 *
+	 * @note std::ratio will simplify the fractions numerator and denominator
+	 */
+	using Ratio = std::ratio<Num, Denom>;
 private:
 	static_assert(BaseBytes + FractionBytes <= 8,
 	              "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
 	using CUCHeader_t = typename std::conditional<(BaseBytes < 4 && FractionBytes < 3), uint8_t, uint16_t>::type;
 	using TAICounter_t = typename std::conditional<(BaseBytes + FractionBytes <= 4), uint32_t, uint64_t>::type;
 
-	using Ratio = std::ratio<Num, Denom>;
-	using Duration = std::chrono::duration<std::conditional<(BaseBytes <= 4), uint32_t, uint64_t>, Ratio>;
+	/**
+	 * The period of the internal counter
+	 *
+	 * Same as @ref Ratio, but instead of representing the Base bytes, it represents the entire value held by @ref taiCounter.
+	 */
+	using RawRatio = std::ratio<Num, Denom * 1UL << (8 * FractionBytes)>;
+
+	/**
+	 * An std::chrono::duration representation of the base type (without the fractional part)
+	 */
+	using Duration = std::chrono::duration<TAICounter_t, Ratio>;
+
+	/**
+	 * An std::chrono::duration representation of the complete @ref taiCounter (including the fractional part)
+	 */
+	using RawDuration = std::chrono::duration<TAICounter_t, RawRatio>;
 
 	template <uint8_t, uint8_t, int, int>
 	friend class TimeStamp;
@@ -49,10 +99,14 @@ private:
 	static constexpr CUCHeader_t CUCHeader = Time::buildCUCHeader<CUCHeader_t, BaseBytes, FractionBytes>();
 
 	/**
-	 * The maximum value that can fit in @ref taiCounter, or the maximum number of seconds since epoch that can be
-	 * represented in this base class
+	 * The maximum value of the base type (seconds, larger or smaller) that can fit in @ref taiCounter
 	 */
-	static constexpr uint64_t maxSecondCounterValue = (uint64_t{1U} << (8U * BaseBytes)) - 1;
+	static constexpr uint64_t MaxBase = (BaseBytes == 8) ? std::numeric_limits<uint64_t>::max() : (1UL << (8 * BaseBytes)) - 1;
+
+	/**
+	 * The maximum number of seconds since epoch that can be represented in this class
+	 */
+	static constexpr uint64_t MaxSeconds = std::chrono::duration_cast<std::chrono::duration<uint64_t>>(Duration(MaxBase)).count();
 
 	/**
 	 * Returns whether the amount of `seconds` can be represented by this TimeStamp.
@@ -61,9 +115,6 @@ private:
 	 * @param seconds The amount of seconds from @ref Time::Epoch
 	 */
 	static constexpr bool areSecondsValid(TAICounter_t seconds);
-
-	template<int NumIn, int DenomIn>
-	static constexpr auto safeMultiply(TAICounter_t a);
 
 public:
 	/**

@@ -3,6 +3,7 @@
 #include "catch2/catch_all.hpp"
 
 using namespace Time;
+using Catch::Approx;
 
 TEST_CASE("TimeStamp class construction") {
 	// SECTION("Initialize with excessive precision, breaks at compile time"){
@@ -96,7 +97,7 @@ TEST_CASE("Use of custom Acubesat CUC format") {
 		CHECK(time1.asCustomCUCTimestamp().elapsed100msTicks == 1000);
 		TimeStamp<3, 2> time2(customCUC1);
 		CHECK(time2.asTAIseconds() == 100);
-		CHECK(time2.asCustomCUCTimestamp().elapsed100msTicks == 1000);
+		CHECK(time2.asCustomCUCTimestamp().elapsed100msTicks == 1001);
 
 		// check rounding errors
 		Time::CustomCUC_t customCUC2 = {1004};
@@ -105,13 +106,13 @@ TEST_CASE("Use of custom Acubesat CUC format") {
 		CHECK(time3.asCustomCUCTimestamp().elapsed100msTicks == 1000);
 		TimeStamp<3, 2> time4(customCUC2);
 		CHECK(time4.asTAIseconds() == 100);
-		CHECK(time4.asCustomCUCTimestamp().elapsed100msTicks == 1003);
+		CHECK(time4.asCustomCUCTimestamp().elapsed100msTicks == 1004);
 
 		// check rounding errors
 		Time::CustomCUC_t customCUC3 = {1005};
 		TimeStamp<3, 0> time5(customCUC3);
-		CHECK(time5.asTAIseconds() == 100);
-		CHECK(time5.asCustomCUCTimestamp().elapsed100msTicks == 1000);
+		CHECK(time5.asTAIseconds() == 101);
+		CHECK(time5.asCustomCUCTimestamp().elapsed100msTicks == 1010);
 		TimeStamp<3, 2> time6(customCUC3);
 		CHECK(time6.asTAIseconds() == 100);
 		CHECK(time6.asCustomCUCTimestamp().elapsed100msTicks == 1005);
@@ -244,13 +245,13 @@ TEST_CASE("CUC conversions") {
 
 	SECTION("Many changes") {
 		TimeStamp<2, 2, 3, 2> time1(1000);
-		CHECK(time1.asTAIseconds() == 1000);
+		CHECK(time1.asTAIseconds() == Approx(1000).epsilon(1));
 
 		TimeStamp<3, 4, 100, 29> time2(time1);
-		CHECK(time2.asTAIseconds() == 999);
+		CHECK(time2.asTAIseconds() == Approx(1000).epsilon(1));
 
 		TimeStamp<1, 1, 1, 1> time3(time1);
-		CHECK(time3.asTAIseconds() == 1000);
+		CHECK(time3.asTAIseconds() == Approx(1000).epsilon(1));
 	}
 
 	SECTION("Large numbers") {

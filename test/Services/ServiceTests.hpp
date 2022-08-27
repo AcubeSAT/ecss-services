@@ -150,6 +150,13 @@ public:
 
 		return thrownErrors.count(std::make_pair(errorSource, errorType));
 	}
+
+	/**
+	 * Get the map of all thrown errors
+	 */
+	static auto getThrownErrors() {
+		return thrownErrors;
+	}
 };
 
 #endif // ECSS_SERVICES_TESTS_SERVICES_SERVICETESTS_HPP
