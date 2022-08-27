@@ -213,10 +213,24 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 	double inputSeconds = input.taiCounter / static_cast<double>(1 << (8 * FractionBytesIn));
 	inputSeconds *= InputRatio;
 
-	double outputSeconds = inputSeconds / OutputRatio * (1UL << (8 * FractionBytes));
-	if (outputSeconds > MaxSeconds) {
-		ErrorHandler::reportInternalError(ErrorHandler::TimeStampOutOfBounds);
-	}
+	ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
 
-	taiCounter = static_cast<TAICounter_t>(round(outputSeconds));
+	double output = inputSeconds / OutputRatio * (1UL << (8 * FractionBytes));
+
+	taiCounter = static_cast<TAICounter_t>(round(output));
+}
+
+template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
+template <class Duration>
+Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() {
+	auto duration = RawDuration(taiCounter);
+
+	return std::chrono::duration_cast<Duration>(duration);
+}
+
+template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
+template <class Duration, typename>
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Duration duration) {
+	auto outputDuration = std::chrono::duration_cast<RawDuration>(duration);
+	taiCounter = outputDuration.count();
 }

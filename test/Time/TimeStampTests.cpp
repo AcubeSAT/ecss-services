@@ -250,7 +250,7 @@ TEST_CASE("CUC conversions") {
 		TimeStamp<3, 4, 100, 29> time2(time1);
 		CHECK(time2.asTAIseconds() == Approx(1000).epsilon(1));
 
-		TimeStamp<1, 1, 1, 1> time3(time1);
+		TimeStamp<2, 1, 1, 1> time3(time1);
 		CHECK(time3.asTAIseconds() == Approx(1000).epsilon(1));
 	}
 
@@ -260,5 +260,35 @@ TEST_CASE("CUC conversions") {
 
 		TimeStamp<2, 1, 7907, 7559> time2(time1);
 		CHECK(time2.asTAIseconds() == 9999);
+	}
+}
+
+TEST_CASE("Duration conversions") {
+	using namespace std::chrono_literals;
+
+	SECTION("Conversion to duration") {
+		TimeStamp<2, 2, 1, 1> time(3600);
+		auto duration = time.asDuration<std::chrono::hours>();
+		CHECK(duration == 1h);
+	}
+
+	SECTION("Conversion from duration") {
+		auto duration = 90min;
+		TimeStamp<2, 2, 1, 1> time(duration);
+		CHECK(time.asTAIseconds() == 5400);
+	}
+
+	SECTION("Duration idempotence") {
+		auto duration = 13532s;
+		TimeStamp<2, 2, 1, 1> time(duration);
+
+		CHECK(time.asDuration() == duration);
+	}
+
+	SECTION("Overflow") {
+		auto duration = 24h;
+		TimeStamp<2, 2, 1, 1> time(duration);
+
+		CHECK(time.asTAIseconds() == 20864);
 	}
 }

@@ -75,7 +75,7 @@ private:
 	/**
 	 * An std::chrono::duration representation of the base type (without the fractional part)
 	 */
-	using Duration = std::chrono::duration<TAICounter_t, Ratio>;
+	using BaseDuration = std::chrono::duration<TAICounter_t, Ratio>;
 
 	/**
 	 * An std::chrono::duration representation of the complete @ref taiCounter (including the fractional part)
@@ -101,12 +101,12 @@ private:
 	/**
 	 * The maximum value of the base type (seconds, larger or smaller) that can fit in @ref taiCounter
 	 */
-	static constexpr uint64_t MaxBase = (BaseBytes == 8) ? std::numeric_limits<uint64_t>::max() : (1UL << (8 * BaseBytes)) - 1;
+	static constexpr uint64_t MaxBase = (BaseBytes == 8) ? std::numeric_limits<uint64_t>::max() : (1UL << 8 * BaseBytes) - 1;
 
 	/**
 	 * The maximum number of seconds since epoch that can be represented in this class
 	 */
-	static constexpr uint64_t MaxSeconds = std::chrono::duration_cast<std::chrono::duration<uint64_t>>(Duration(MaxBase)).count();
+	static constexpr uint64_t MaxSeconds = std::chrono::duration_cast<std::chrono::duration<uint64_t>>(BaseDuration(MaxBase)).count();
 
 	/**
 	 * Returns whether the amount of `seconds` can be represented by this TimeStamp.
@@ -153,7 +153,7 @@ public:
 	explicit TimeStamp(const UTCTimestamp& timestamp);
 
 	/**
-	 * Convert a Timestamp to a Timestamp with different parameters
+	 * Convert a TimeStamp to a TimeStamp with different parameters
 	 *
 	 * This constructor will convert based on the number of bytes, and base units
 	 *
@@ -161,6 +161,14 @@ public:
 	 */
 	template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1>
 	explicit TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn>);
+
+	/**
+	 * Convert an [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration) representing seconds from @ref Time::Epoch
+	 * to a timestamp
+	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are compatible so that no overflow occurs.
+	 */
+	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
+	explicit TimeStamp(Duration duration);
 
 	/**
 	 * Get the representation as seconds from epoch in TAI
@@ -186,6 +194,13 @@ public:
 	 */
 	template <typename T>
 	T asTAIseconds();
+
+	/**
+	 * Converts a TimeStamp to a duration of seconds since the @ref Time::Epoch.
+	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are compatible so that no overflow occurs.
+	 */
+	template <class Duration = std::chrono::seconds>
+	Duration asDuration();
 
 	/**
 	 * Get the representation as CUC formatted bytes

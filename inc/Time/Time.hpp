@@ -2,6 +2,7 @@
 #define ECSS_TIMEHPP
 
 #include <cstdint>
+#include <chrono>
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
 #include "macros.hpp"
@@ -315,6 +316,27 @@ namespace Time {
 		return time1.elapsed100msTicks >= time2.elapsed100msTicks;
 	}
 
+	/**
+	 * is_duration definition to check if a variable is std::chrono::duration
+	 */
+	template<typename T>
+	struct is_duration
+	    : std::false_type
+	{ };
+
+	/**
+	 * is_duration definition to check if a variable is std::chrono::duration
+	 */
+	template<typename Rep, typename Period>
+	struct is_duration<std::chrono::duration<Rep, Period>>
+	    : std::true_type
+	{ };
+
+	/**
+	 * True if T is std::chrono::duration, false if not
+	 */
+	template< class T >
+	inline constexpr bool is_duration_v = is_duration<T>::value;
 } // namespace Time
 
 #endif
