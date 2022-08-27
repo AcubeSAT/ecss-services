@@ -1,5 +1,5 @@
-#include "Time/TimeStamp.hpp"
 #include "../Services/ServiceTests.hpp"
+#include "Time/TimeStamp.hpp"
 #include "catch2/catch_all.hpp"
 
 using namespace Time;

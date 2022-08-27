@@ -1,13 +1,13 @@
 #ifndef ECSS_SERVICES_TIME_HPP
 #define ECSS_SERVICES_TIME_HPP
 
-#include <cstdint>
 #include <algorithm>
-#include "macros.hpp"
-#include <etl/array.h>
 #include <chrono>
+#include <cstdint>
+#include <etl/array.h>
 #include "Time.hpp"
 #include "UTCTimestamp.hpp"
+#include "macros.hpp"
 
 /**
  * A class that represents an instant in time, with convenient conversion
@@ -51,14 +51,16 @@ public:
 	 *
 	 * This type represents the base type of the timestamp.
 	 *
-	 * A ratio of `<1, 1>` (or 1/1) means that this timestamp represents
-	 * seconds. A ratio of `<60, 1>` (or 60/1) means that this class represents 60s of seconds, or minutes. A ratio of `<1, 1000>` (or 1/1000) means that this class represents 1000ths of seconds, or milliseconds.
+	 * A ratio of `<1, 1>` (or 1/1) means that this timestamp represents seconds. A ratio of `<60, 1>` (or 60/1) means
+	 * that this class represents 60s of seconds, or minutes. A ratio of `<1, 1000>` (or 1/1000) means that this class
+	 * represents 1000ths of seconds, or milliseconds.
 	 *
 	 * This type has essentially the same meaning of `Rep` in [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration).
 	 *
 	 * @note std::ratio will simplify the fractions numerator and denominator
 	 */
 	using Ratio = std::ratio<Num, Denom>;
+
 private:
 	static_assert(BaseBytes + FractionBytes <= 8,
 	              "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
@@ -140,8 +142,7 @@ public:
 	/**
 	 * Initialize the TimeStamp from the bytes of a CUC time stamp
 	 *
-	 * @param timestamp A complete CUC timestamp including header, of the maximum possible size, zero padded to the
-	 * right
+	 * @param timestamp A complete CUC timestamp including header, of the maximum possible size, zero padded to the right
 	 */
 	explicit TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp);
 
@@ -165,7 +166,9 @@ public:
 	/**
 	 * Convert an [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration) representing seconds from @ref Time::Epoch
 	 * to a timestamp
-	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are compatible so that no overflow occurs.
+	 *
+	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are
+	 * compatible so that no overflow occurs.
 	 */
 	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
 	explicit TimeStamp(Duration duration);
@@ -197,6 +200,7 @@ public:
 
 	/**
 	 * Converts a TimeStamp to a duration of seconds since the @ref Time::Epoch.
+	 *
 	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are compatible so that no overflow occurs.
 	 */
 	template <class Duration = std::chrono::seconds>
@@ -217,10 +221,8 @@ public:
 	UTCTimestamp toUTCtimestamp();
 
 	/**
-	 * Compare two timestamps.
-	 *
-	 * @param timestamp the date that will be compared with the pointer `this`
-	 * @return true if the condition is satisfied
+	 * @name Comparison operators between timestamps
+	 * @{
 	 */
 	template <class OtherTimestamp>
 	bool operator<(const OtherTimestamp& timestamp) const {
@@ -251,6 +253,9 @@ public:
 	bool operator>=(const OtherTimestamp& timestamp) const {
 		return RawDuration(taiCounter) >= typename OtherTimestamp::RawDuration(timestamp.taiCounter);
 	}
+	/**
+	 * @}
+	 */
 };
 
 #include "TimeStamp.tpp"
