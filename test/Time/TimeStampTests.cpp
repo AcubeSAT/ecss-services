@@ -146,17 +146,22 @@ TEST_CASE("UTC idempotence") {
 TEST_CASE("UTC conversion to and from seconds timestamps") {
 	{
 		UTCTimestamp utc(2020, 12, 5, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
+		TimeStamp<4, 1> time(utc);
 		CHECK(time.asTAIseconds() == 29289600);
 	}
 	{
 		UTCTimestamp utc(2020, 2, 29, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
+		TimeStamp<4, 1> time(utc);
 		CHECK(time.asTAIseconds() == 5097600);
 	}
 	{
 		UTCTimestamp utc(2025, 3, 10, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
+		TimeStamp<4, 1> time(utc);
+		CHECK(time.asTAIseconds() == 163728000);
+	}
+	{
+		UTCTimestamp utc(2025, 3, 10, 0, 0, 0);
+		TimeStamp<4, 1, 2, 3> time(utc);
 		CHECK(time.asTAIseconds() == 163728000);
 	}
 }

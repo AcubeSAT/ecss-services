@@ -95,7 +95,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& t
 
 	ASSERT_INTERNAL(areSecondsValid(seconds), ErrorHandler::TimeStampOutOfBounds);
 
-	taiCounter = static_cast<TAICounter_t>(seconds) << (8 * FractionBytes);
+	taiCounter = std::chrono::duration_cast<RawDuration>(std::chrono::duration<TAICounter_t>(seconds)).count();
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
