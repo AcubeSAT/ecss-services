@@ -335,6 +335,17 @@ namespace Time {
 	 */
 	template <class T>
 	inline constexpr bool is_duration_v = is_duration<T>::value;
+
+	/**
+	 * tick literal
+	 * @todo redefine based on ratio definition
+	 * @param s
+	 * @return
+	 */
+	constexpr std::chrono::duration<uint32_t, std::ratio<1, 10>> operator ""_t(unsigned long long s)
+	{
+		return std::chrono::duration<uint32_t, std::ratio<1, 10>>(s);
+	}
 } // namespace Time
 
 #endif

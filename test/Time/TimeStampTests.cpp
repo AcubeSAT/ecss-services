@@ -91,38 +91,39 @@ TEST_CASE("Conversion between CUC formats") {
 
 TEST_CASE("Use of custom Acubesat CUC format") {
 	SECTION("Check forward conversion") {
-		Time::CustomCUC_t customCUC1 = {1001};
-		TimeStamp<3, 0> time1(customCUC1);
+		using namespace Time;
+		DefaultCUC defaultCUC1(1001_t);
+		TimeStamp<3, 0> time1(defaultCUC1);
 		CHECK(time1.asTAIseconds() == 100);
-		CHECK(time1.asCustomCUCTimestamp().elapsed100msTicks == 1000);
-		TimeStamp<3, 2> time2(customCUC1);
+		CHECK(DefaultCUC(time1).formatAsBytes() == 1000);
+		TimeStamp<3, 2> time2(defaultCUC1);
 		CHECK(time2.asTAIseconds() == 100);
-		CHECK(time2.asCustomCUCTimestamp().elapsed100msTicks == 1001);
+		CHECK(DefaultCUC(time2).formatAsBytes() == 1001);
 
 		// check rounding errors
-		Time::CustomCUC_t customCUC2 = {1004};
-		TimeStamp<3, 0> time3(customCUC2);
+		Time::DefaultCUC defaultCUC2(1004_t);
+		TimeStamp<3, 0> time3(defaultCUC2);
 		CHECK(time3.asTAIseconds() == 100);
-		CHECK(time3.asCustomCUCTimestamp().elapsed100msTicks == 1000);
-		TimeStamp<3, 2> time4(customCUC2);
+		CHECK(DefaultCUC(time3).formatAsBytes() == 1000);
+		TimeStamp<3, 2> time4(defaultCUC2);
 		CHECK(time4.asTAIseconds() == 100);
-		CHECK(time4.asCustomCUCTimestamp().elapsed100msTicks == 1004);
+		CHECK(DefaultCUC(time4).formatAsBytes() == 1004);
 
 		// check rounding errors
-		Time::CustomCUC_t customCUC3 = {1005};
-		TimeStamp<3, 0> time5(customCUC3);
+		Time::DefaultCUC defaultCUC3(1005_t);
+		TimeStamp<3, 0> time5(defaultCUC3);
 		CHECK(time5.asTAIseconds() == 101);
-		CHECK(time5.asCustomCUCTimestamp().elapsed100msTicks == 1010);
-		TimeStamp<3, 2> time6(customCUC3);
+		CHECK(DefaultCUC(time5).formatAsBytes() == 1010);
+		TimeStamp<3, 2> time6(defaultCUC3);
 		CHECK(time6.asTAIseconds() == 100);
-		CHECK(time6.asCustomCUCTimestamp().elapsed100msTicks == 1005);
+		CHECK(DefaultCUC(time6).formatAsBytes() == 1005);
 	}
 
 	SECTION("Check idempotence") {
-		Time::CustomCUC_t customCUC1 = {1000};
-		TimeStamp<3, 3> time1(customCUC1);
-		Time::CustomCUC_t customCUC2 = time1.asCustomCUCTimestamp();
-		CHECK(customCUC1.elapsed100msTicks == customCUC2.elapsed100msTicks);
+		Time::DefaultCUC defaultCUC1(1000_t);
+		TimeStamp<3, 3> time1(defaultCUC1);
+		Time::DefaultCUC defaultCUC2(time1);
+		CHECK(defaultCUC1 == defaultCUC2);
 	}
 }
 
