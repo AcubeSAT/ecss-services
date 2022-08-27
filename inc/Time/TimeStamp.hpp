@@ -211,11 +211,16 @@ public:
 	Duration asDuration();
 
 	/**
-	 * Get the representation as CUC formatted bytes
-	 *
-	 * @return The TimeStamp, represented in the CCSDS CUC format
+	 * Get the representation as CUC formatted bytes, including the header (P-field and T-field)
 	 */
 	etl::array<uint8_t, Time::CUCTimestampMaximumSize> formatAsCUC();
+
+	/**
+	 * Get the representation as CUC formatted bytes, without the header (T-field only)
+	 */
+	TAICounter_t formatAsBytes() const {
+		return taiCounter;
+	}
 
 	/**
 	 * Get the representation as a UTC timestamp

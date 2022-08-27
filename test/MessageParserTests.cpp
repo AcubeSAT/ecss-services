@@ -51,12 +51,11 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x12, 0x20, 0x16,
 	                    0x11,0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00,
 	                    0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	//save time
-	uint64_t tenths = TimeGetter::getCurrentTimeCustomCUC().elapsed100msTicks;
-	packet[13] = (tenths >> 24) & 0xFF;
-	packet[14] = (tenths >> 16) & 0xFF;
-	packet[15] = (tenths >> 8) & 0xFF;
-	packet[16] = (tenths) & 0xFF;
+	uint32_t time = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
+	packet[13] = (time >> 24) & 0xFF;
+	packet[14] = (time >> 16) & 0xFF;
+	packet[15] = (time >> 8) & 0xFF;
+	packet[16] = (time) & 0xFF;
 
 	Message message = MessageParser::parse(packet, 24);
 	CHECK(message.packetType == Message::TM);
@@ -70,7 +69,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	// Add ECSS and CCSDS header
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 	uint32_t messageTime =  (createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF ) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF ) << 24);
-	CHECK(messageTime == tenths);
+	CHECK(messageTime == time);
 
 }
 
@@ -78,12 +77,11 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x12, 0x20, 0x16,
 	                          0x11,0x00, 0x00,0x00, 0x02,0x00, 0x00,0x00,
 	                          0x00, 0x68,0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	//save time
-	uint64_t tenths = TimeGetter::getCurrentTimeCustomCUC().elapsed100msTicks;
-	wantedPacket[13] = (tenths >> 24) & 0xFF;
-	wantedPacket[14] = (tenths >> 16) & 0xFF;
-	wantedPacket[15] = (tenths >> 8) & 0xFF;
-	wantedPacket[16] = (tenths) & 0xFF;
+	uint32_t time = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
+	wantedPacket[13] = (time >> 24) & 0xFF;
+	wantedPacket[14] = (time >> 16) & 0xFF;
+	wantedPacket[15] = (time >> 8) & 0xFF;
+	wantedPacket[16] = (time) & 0xFF;
 
 	Message message;
 	message.packetType = Message::TM;
