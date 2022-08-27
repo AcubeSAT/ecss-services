@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
 #include <cstdint>
+#include <chrono>
 /**
  * @defgroup ECSSDefinitions ECSS Defined Constants
  *
@@ -107,7 +108,7 @@ inline const uint8_t ECSSMaxNumberOfTimeSchedActivities = 10;
  * have in order
  * @see TimeBasedSchedulingService
  */
-inline const uint8_t ECSSTimeMarginForActivation = 60;
+inline constexpr std::chrono::duration<uint8_t> ECSSTimeMarginForActivation(60);
 
 /**
  * @brief Maximum size of an event's auxiliary data

@@ -596,6 +596,15 @@ public:
 	}
 
 	/**
+	 * Fetches a timestamp in a custom CUC format consisting of 4 bytes from the current position in the message
+	 */
+	Time::DefaultCUC readDefaultCUCTimeStamp() {
+		auto time = readUint32();
+		//todo fix
+		return Time::DefaultCUC(std::chrono::milliseconds(100UL * time));
+	}
+
+	/**
 	 * Fetches a N-byte string from the current position in the message
 	 *
 	 * In the current implementation we assume that a preallocated array of sufficient size
