@@ -84,13 +84,17 @@ public:
 		return count() == 1;
 	}
 
+	static void resetErrors() {
+		queuedMessages.clear();
+		thrownErrors.clear();
+		expectingErrors = false;
+	}
+
 	/**
 	 * Reset the testing environment, starting from zero for all parameters
 	 */
 	static void reset() {
-		queuedMessages.clear();
-		thrownErrors.clear();
-		expectingErrors = false;
+		resetErrors();
 
 		Services.reset();
 	}
@@ -152,10 +156,16 @@ public:
 	}
 
 	/**
-	 * Get the map of all thrown errors
+	 * Get the list of all thrown errors
 	 */
-	static auto getThrownErrors() {
-		return thrownErrors;
+	static std::vector<std::pair<ErrorHandler::ErrorSource, uint16_t>> getThrownErrors() {
+		std::vector<std::pair<ErrorHandler::ErrorSource, uint16_t>> errors;
+
+		for (auto error : thrownErrors) {
+			errors.push_back(error.first);
+		}
+
+		return errors;
 	}
 };
 

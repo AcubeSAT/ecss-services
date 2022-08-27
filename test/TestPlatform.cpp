@@ -74,9 +74,14 @@ struct ServiceTestsListener : Catch::EventListenerBase {
 		if (not ServiceTests::isExpectingErrors()) {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
 			// corresponding assertion function from ServiceTests to silence this message.
-			UNSCOPED_INFO("Found " << ServiceTests::countErrors() << " errors at end of section");
+			UNSCOPED_INFO("Found " << ServiceTests::countErrors() << " errors at end of section: ");
+			for (auto error : ServiceTests::getThrownErrors()) {
+				UNSCOPED_INFO("  Error " << error.second << " (type " << error.first << ")");
+			}
 			CHECK(ServiceTests::hasNoErrors());
 		}
+
+		ServiceTests::resetErrors();
 	}
 
 	void testCaseEnded(Catch::TestCaseStats const& testCaseStats) override {
