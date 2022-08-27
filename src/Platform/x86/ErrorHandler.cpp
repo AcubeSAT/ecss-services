@@ -9,6 +9,7 @@
 #include <Message.hpp>
 #include <Logger.hpp>
 #include <type_traits>
+#include "Helpers/EnumMagic.hpp"
 
 // TODO: Find a way to reduce the number of copies of this chunk
 template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
@@ -27,7 +28,7 @@ void ErrorHandler::logError(const Message& message, ErrorType errorType) {
 	     */
 	    << abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr) << " Error "
 	    << "[" << static_cast<uint16_t>(message.serviceType) << "," << static_cast<uint16_t>(message.messageType)
-	    << "]: " << std::underlying_type_t<ErrorType>(errorType);
+	    << "]: " << enum_name(errorType) << " (" << std::underlying_type_t<ErrorType>(errorType) << ")";
 }
 
 template <typename ErrorType>
@@ -39,5 +40,5 @@ void ErrorHandler::logError(ErrorType errorType) {
 	     */
 	    << abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr)
 	    << " Error: "
-	    << std::underlying_type_t<ErrorType>(errorType);
+	    << enum_name(errorType) << " (" << std::underlying_type_t<ErrorType>(errorType) << ")";
 }
