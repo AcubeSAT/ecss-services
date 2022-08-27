@@ -243,13 +243,21 @@ TEST_CASE("CUC conversions") {
 	}
 
 	SECTION("Many changes") {
-		TimeStamp<2, 2, 3, 2> time1(100);
-		CHECK(time1.asTAIseconds() == 100);
+		TimeStamp<2, 2, 3, 2> time1(1000);
+		CHECK(time1.asTAIseconds() == 1000);
 
 		TimeStamp<3, 4, 100, 29> time2(time1);
-		CHECK(time2.asTAIseconds() == 99);
+		CHECK(time2.asTAIseconds() == 999);
 
 		TimeStamp<1, 1, 1, 1> time3(time1);
-		CHECK(time3.asTAIseconds() == 100);
+		CHECK(time3.asTAIseconds() == 1000);
+	}
+
+	SECTION("Large numbers") {
+		TimeStamp<4, 0, 1, 1> time1(10000);
+		CHECK(time1.asTAIseconds() == 10000);
+
+		TimeStamp<2, 1, 7907, 7559> time2(time1);
+		CHECK(time2.asTAIseconds() == 9999);
 	}
 }
