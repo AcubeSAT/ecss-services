@@ -31,7 +31,7 @@ void Service::storeMessage(Message& message) {
 
     // Send data to YAMCS port
 	if(SendToYamcs) {
-		std::string hostname{"127.0.0.1"};
+		const char* hostname = "127.0.0.1";
 		uint16_t port = 10015;
 
 		int sock = ::socket(AF_INET, SOCK_DGRAM, 0);
