@@ -24,42 +24,45 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
 	auto memoryID = MemoryManagementService::MemoryID(request.readEnum8());
 
-	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		uint8_t readData[ECSSMaxStringSize];
-		uint16_t iterationCount = request.readUint16();
+	if (!mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
+		// TODO: Send a failed start of execution
+		return;
+	}
 
-		if (memoryID == MemoryManagementService::MemoryID::FLASH) {
-			// TODO: Define FLASH specific access code when we transfer to embedded
-		} else {
-			for (std::size_t j = 0; j < iterationCount; j++) {
-				uint64_t startAddress = request.readUint64();
-				uint16_t dataLength = request.readOctetString(readData);
-				uint16_t checksum = request.readBits(16);
+	uint8_t readData[ECSSMaxStringSize];
+	uint16_t iterationCount = request.readUint16();
 
-				if (mainService.dataValidator(readData, checksum, dataLength)) {
-					if (mainService.addressValidator(memoryID, startAddress) &&
-					    mainService.addressValidator(memoryID, startAddress + dataLength)) {
-						for (std::size_t i = 0; i < dataLength; i++) {
-							*(reinterpret_cast<uint8_t*>(startAddress) + i) = readData[i];
-						}
+	if (memoryID == MemoryManagementService::MemoryID::FLASH) {
+		// TODO: Define FLASH specific access code when we transfer to embedded
+	} else {
+		for (std::size_t j = 0; j < iterationCount; j++) {
+			uint64_t startAddress = request.readUint64();
+			uint16_t dataLength = request.readOctetString(readData);
+			uint16_t checksum = request.readBits(16);
 
-						for (std::size_t i = 0; i < dataLength; i++) {
-							readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
-						}
-						if (checksum != CRCHelper::calculateCRC(readData, dataLength)) {
-							ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
-						}
-					} else {
-						ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
-					}
-				} else {
-					ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
-					continue;
-				}
+			if (!mainService.dataValidator(readData, checksum, dataLength)) {
+				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+				continue;
+			}
+
+			if (!mainService.addressValidator(memoryID, startAddress) ||
+			    !mainService.addressValidator(memoryID, startAddress + dataLength)) {
+				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+				continue;
+			}
+
+			for (std::size_t i = 0; i < dataLength; i++) {
+				*(reinterpret_cast<uint8_t*>(startAddress) + i) = readData[i];
+			}
+
+			for (std::size_t i = 0; i < dataLength; i++) {
+				readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
+			}
+
+			if (checksum != CRCHelper::calculateCRC(readData, dataLength)) {
+				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 			}
 		}
-	} else {
-		// TODO: Send a failed start of execution
 	}
 }
 

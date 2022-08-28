@@ -231,7 +231,6 @@ public:
 	 */
 	void readCString(char* string, uint16_t size);
 
-public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
 	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
 
@@ -563,7 +562,7 @@ public:
 		return reinterpret_cast<float&>(value);
 	}
 
-	float readDouble() {
+	double readDouble() {
 		static_assert(sizeof(uint64_t) == sizeof(double), "Double numbers must be 64 bits long");
 
 		uint64_t value = readUint64();
@@ -653,7 +652,7 @@ public:
 	 *
 	 * @return True if the message is of correct type, false if not
 	 */
-	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType, uint8_t expectedMessageType) {
+	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		bool status = true;
 
 		if ((packetType != expectedPacketType) || (serviceType != expectedServiceType) ||
@@ -669,7 +668,7 @@ public:
 	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		return assertType(TC, expectedServiceType, expectedMessageType);
 	}
 
@@ -677,7 +676,7 @@ public:
 	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
@@ -729,8 +728,8 @@ inline void Message::append(const double& value) {
 	appendDouble(value);
 }
 template <>
-inline void Message::append(const Time::CustomCUC_t& timeCUC) {
-	appendCustomCUCTimeStamp(timeCUC);
+inline void Message::append(const Time::CustomCUC_t& value) {
+	appendCustomCUCTimeStamp(value);
 }
 template <>
 inline void Message::append(const Time::RelativeTime& value) {
@@ -780,10 +779,6 @@ inline int32_t Message::read() {
 template <>
 inline bool Message::read<bool>() {
 	return readBoolean();
-}
-template <>
-inline char Message::read() {
-	return readByte();
 }
 template <>
 inline float Message::read() {

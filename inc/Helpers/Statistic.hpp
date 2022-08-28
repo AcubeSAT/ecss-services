@@ -39,7 +39,7 @@ public:
 	 * Appends itself to the received Message
 	 * message.
 	 */
-	void appendStatisticsToMessage(Message& report);
+	void appendStatisticsToMessage(Message& report) const;
 
 	/**
 	 * Setter function
@@ -49,7 +49,7 @@ public:
 	/**
 	 * Check if all the statistics are initialized
 	 */
-	bool statisticsAreInitialized();
+	bool statisticsAreInitialized() const;
 };
 
 #endif

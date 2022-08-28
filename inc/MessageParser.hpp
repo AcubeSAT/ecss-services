@@ -75,7 +75,7 @@ public:
 	 * error. Messages smaller than \p size are padded with zeros. When `size = 0`, there is no size limit.
 	 * @return A String class containing the parsed Message
 	 */
-	static String<CCSDSMaxMessageSize> composeECSS(const Message& message, uint16_t size = 0u); // Ignore-MISRA
+	static String<CCSDSMaxMessageSize> composeECSS(const Message& message, uint16_t size = 0U); // Ignore-MISRA
 
 	/**
 	 * @brief Converts a TC or TM message to a packet string, appending the ECSS and then the CCSDS header

@@ -268,7 +268,7 @@ namespace Time {
 		/**
 		 * @return The time represented in milliseconds elapsed from the epoch
 		 */
-		uint64_t getMs() {
+		uint64_t getMs() const {
 			return elapsed100msTicks * 100;
 		}
 	};

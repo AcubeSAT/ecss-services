@@ -34,7 +34,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 	storeMessage(parameterReport);
 }
 
-void ParameterService::setParameters(Message& newParamValues) {
+void ParameterService::setParameters(Message& newParamValues) const {
 	newParamValues.assertTC(ServiceType, MessageType::SetParameterValues);
 
 	uint16_t numOfIds = newParamValues.readUint16();

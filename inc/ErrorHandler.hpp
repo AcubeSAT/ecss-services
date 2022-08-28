@@ -60,7 +60,6 @@ public:
 		 * Asked a Message type that doesn't exist
 		 */
 		UnknownMessageType = 7,
-
 		/**
 		 * Asked to append unnecessary spare bits
 		 */
@@ -93,6 +92,10 @@ public:
 		 * Invalid TimeStamp parameters at creation
 		 */
 		InvalidTimeStampInput = 15,
+		/**
+		 * A requested element is not found
+		 */
+		ElementNotInArray = 18,
 	};
 
 	/**
@@ -478,7 +481,7 @@ public:
 	 * @return The corresponding ErrorSource
 	 */
 	template <typename ErrorType>
-	inline static ErrorSource findErrorSource(ErrorType error) {
+	inline static ErrorSource findErrorSource(ErrorType) {
 		// Static type checking
 		ErrorSource source = Internal;
 
