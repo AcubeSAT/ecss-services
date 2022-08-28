@@ -44,7 +44,7 @@ void Service::storeMessage(Message& message) {
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
-		long bytesSent = ::sendto(sock, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
+		auto bytesSent = ::sendto(sock, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
 		std::cout << bytesSent << " bytes sent" << std::endl;
 		::close(sock);
 	}
