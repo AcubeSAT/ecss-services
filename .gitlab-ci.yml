@@ -45,7 +45,7 @@ clang-tidy:
   script:
     - cd $CI_PROJECT_DIR
     - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --config-file=$CI_PROJECT_DIR/ci/.clang-tidy `find $CI_PROJECT_DIR/src $CI_PROJECT_DIR/inc -not -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|tpp|c|h)'` | tee clang-tidy-output.log
+    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --config-file=$CI_PROJECT_DIR/ci/.clang-tidy --use-color `find $CI_PROJECT_DIR/src $CI_PROJECT_DIR/inc -not -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|tpp|c|h)'` | tee clang-tidy-output.log
   after_script:
     - sed -e 's/\x1b\[[0-9;]*m//g' -i clang-tidy-output.log
     - mkdir clang-tidy-html-report
