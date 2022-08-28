@@ -1,12 +1,12 @@
-#include <iostream>
-#include <iomanip>
-#include <Logger.hpp>
 #include "Service.hpp"
+#include <Logger.hpp>
+#include <iomanip>
+#include <iostream>
 
-#include <string>
 #include <MessageParser.hpp>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -21,7 +21,7 @@ void Service::storeMessage(Message& message) {
 	ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
 	   << std::hex
 	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
-	   << static_cast<int>(message.messageType) // Ignore-MISRA
+	   << static_cast<int>(message.messageType)        // Ignore-MISRA
 	   << "] message! ";
 
 	for (unsigned int i = 0; i < message.dataSize; i++) {
@@ -29,8 +29,8 @@ void Service::storeMessage(Message& message) {
 	}
 
 
-    // Send data to YAMCS port
-	if(SendToYamcs) {
+	// Send data to YAMCS port
+	if (SendToYamcs) {
 		const char* hostname = "127.0.0.1";
 		uint16_t port = 10015;
 
