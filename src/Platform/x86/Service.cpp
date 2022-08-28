@@ -42,7 +42,7 @@ void Service::storeMessage(Message& message) {
 		destination.sin_port = htons(port);
 		destination.sin_addr.s_addr = inet_addr(hostname.c_str());
 
-		int n_bytes = ::sendto(sock, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
+		long n_bytes = ::sendto(sock, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
 		std::cout << n_bytes << " bytes sent" << std::endl;
 		::close(sock);
 	}
