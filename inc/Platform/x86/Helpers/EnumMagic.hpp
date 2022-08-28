@@ -14,7 +14,7 @@
  *
  * Use with care. NOT intended for a microcontroller.
  *
- * @note This functionality is designed for simple, flag-like enums. Their values should start from 0 and increase 1-by-1 until the end. It will probably
+ * @note This functionality is designed for simple, sequence-like enums. Their values should start from 0 and increase 1-by-1 until the end. It will probably
  * result in slow compilation or incorrect results if used for other, "weirder" enums.
  *
  * This hack aims to be safe from errors by using `constexpr` lavishly. Enum values which are out of bounds (e.g. not defined or beyond
