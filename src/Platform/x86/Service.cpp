@@ -2,14 +2,13 @@
 #include <iomanip>
 #include <Logger.hpp>
 #include "Service.hpp"
-#include <iostream>
+
 #include <string>
 #include <MessageParser.hpp>
-#include <arpa/inet.h> // htons, inet_addr
-#include <netinet/in.h> // sockaddr_in
-#include <sys/types.h> // uint16_t
-#include <sys/socket.h> // socket, sendto
-#include <unistd.h> // close
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 void Service::storeMessage(Message& message) {
 	// appends the remaining bits to complete a byte
