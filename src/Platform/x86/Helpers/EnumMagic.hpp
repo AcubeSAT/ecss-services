@@ -14,6 +14,10 @@
  * @license MIT, Daniil Goncharov
  */
 
+#if !defined(__GNUC__) && !defined(__clang__)
+#define __PRETTY_FUNCTION__ "E V = Sorry, feature not supported!"
+#endif
+
 namespace EnumMagic_ {
 	template <typename E, E V>
 	constexpr std::basic_string_view<char> enum_hack() {
@@ -43,13 +47,13 @@ namespace EnumMagic_ {
 		auto pos = in.find_last_of("::");
 		return in.substr(pos + 1);
 	}
-}
+} // namespace EnumMagic_
 
 template <typename E>
 std::string enum_name(E v) {
 	using namespace EnumMagic_;
 
-	int index = static_cast<int>(v);
+	auto index = static_cast<size_t>(v);
 
 	if (index >= names_v<E>.size()) {
 		return "(Unknown)";
