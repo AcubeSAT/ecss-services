@@ -51,6 +51,7 @@ clang-tidy:
     - clang-tidy-html clang-tidy-output.log
     - mv clang.html clang-tidy-html-report
   artifacts:
+    when: always
     paths:
       - ./clang-tidy-html-report
 
