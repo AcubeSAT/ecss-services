@@ -1,20 +1,97 @@
-#pragma
+#pragma once
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "google-explicit-constructor"
+
+#include <optional>
+
+template <typename T, int Tag>
+struct ValueWrapper {
+	explicit constexpr ValueWrapper(T const& val) noexcept(std::is_nothrow_copy_constructible_v<T>)
+	    : value{val} {}
+
+	explicit constexpr ValueWrapper(T&& val) noexcept(std::is_nothrow_move_constructible_v<T>)
+	    : value{std::forward<T>(val)} {}
+
+	T value;
+};
+
+//TODO void value wrapper
+
+template <typename T>
+struct Ok {
+	explicit constexpr Ok(T const& val) noexcept(std::is_nothrow_copy_constructible_v<T>)
+	    : value{val} {}
+
+	explicit constexpr Ok(T&& val) noexcept(std::is_nothrow_move_constructible_v<T>)
+	    : value{std::forward<T>(val)} {}
+
+//	template<typename OtherType>
+//	constexpr Ok(OtherType const& val) noexcept(std::is_nothrow_copy_constructible_v<OtherType>)
+//	    : value(val) {}
+//
+//	template<typename OtherType>
+//	constexpr Ok(OtherType&& val) noexcept(std::is_nothrow_move_constructible_v<OtherType>)
+//	    : value(std::forward<OtherType>(val)) {}
+
+	T value;
+};
+
+template <typename T>
+struct Err {
+	constexpr Err(T const& val) noexcept(std::is_nothrow_copy_constructible_v<T>)
+	    : value{val} {}
+
+	constexpr Err(T&& val) noexcept(std::is_nothrow_move_constructible_v<T>)
+	    : value{std::forward<T>(val)} {}
+
+	T value;
+};
+
+//template <typename T>
+//using Ok = ValueWrapper<T, 0>;
+//
+//template <typename T>
+//using Err = ValueWrapper<T, 1>;
+
+
+/**
+ * Syntactic sugar to return successful Result
+ * Note: this function is a producer / constructor of type T
+ *
+ * @return type::Ok<T> that can be converted into a successful Result<T, E>
+ */
+template <typename T, typename CleanT = typename std::decay<T>::type>
+inline Ok<CleanT> Ocake(T&& val) {
+	return Ok<CleanT>{std::forward<T>(val)};
+}
+
 
 /**
  * Result class
  * @tparam V Value type
  * @tparam E Error type
  */
-template<typename V, typename E>
+template <typename V, typename E>
 class Result {
 public:
 	/**
 	 * @name Constructors
 	 * @{
 	 */
-	explicit Result(V&& value) noexcept(std::is_nothrow_constructible<V>::value) : success(true), storedValue(std::forward<V>(value)) { }
+	Result(V&& value) noexcept(std::is_nothrow_constructible_v<V>) : success(true), storedValue(std::forward<V>(value)) {}
 
-	explicit Result(E&& error) noexcept(std::is_nothrow_constructible<E>::value) : success(false), storedError(std::forward<E>(error)) {}
+	Result(E&& error) noexcept(std::is_nothrow_constructible_v<E>) : success(false), storedError(std::forward<E>(error)) {}
+
+
+	Result(const Ok<V>& value) noexcept(std::is_nothrow_constructible_v<V>) : success(true), storedValue(value.value) {}
+
+	Result(Ok<V>& value) noexcept(std::is_nothrow_constructible_v<V>) : success(true), storedValue(value.value) {}
+
+	Result(Ok<V>&& value) noexcept(std::is_nothrow_constructible_v<V>) : success(true), storedValue(std::forward<V>(value.value)) {}
+
+	Result(Err<E>&& error) noexcept(std::is_nothrow_constructible_v<V>) : success(false), storedError(std::forward<E>(error.value)) {}
+
+
 	/**
 	 * @}
 	 */
@@ -24,7 +101,7 @@ public:
 	 * @{
 	 */
 
-	constexpr V& operator*() const noexcept {
+	constexpr std::optional<V>& operator*() noexcept {
 		return storedValue;
 	}
 
@@ -96,8 +173,9 @@ public:
 	[[nodiscard]] constexpr bool has_error() const noexcept {
 		return !success;
 	}
+
 private:
-	template<typename DT, typename DE>
+	template <typename DT, typename DE>
 	friend class Result;
 
 	using StoredValue = V;
@@ -109,3 +187,8 @@ private:
 		StoredError storedError;
 	};
 };
+
+//template<typename V, typename E>
+//Result(Ok<V>) -> Result<typename V, typename E>
+
+#pragma clang diagnostic pop
