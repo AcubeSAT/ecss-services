@@ -45,7 +45,7 @@ void Service::storeMessage(Message& message) {
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
 		auto bytesSent = ::sendto(sock, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
-		std::cout << bytesSent << " bytes sent" << std::endl;
+		LOG_DEBUG << bytesSent << " bytes sent";
 		::close(sock);
 	}
 	LOG_DEBUG << ss.str();
