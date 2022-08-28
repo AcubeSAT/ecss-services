@@ -39,7 +39,7 @@ void Service::storeMessage(Message& message) {
 		sockaddr_in destination;
 		destination.sin_family = AF_INET;
 		destination.sin_port = htons(port);
-		destination.sin_addr.s_addr = inet_addr(hostname.c_str());
+		destination.sin_addr.s_addr = inet_addr(hostname);
 
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
