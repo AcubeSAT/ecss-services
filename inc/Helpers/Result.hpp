@@ -4,19 +4,76 @@
 
 #include <functional>
 
-template <typename T, int Tag>
-struct ValueWrapper {
-	explicit constexpr ValueWrapper(T const& val) noexcept(std::is_nothrow_copy_constructible_v<T>)
-	    : value{val} {}
+/**
+ * @defgroup Result Result
+ *
+ * Result class
+ * Blablablabla
+ * Blablabla
+ *
+ * Blablabla
+ *
+ * @section Examples Usage Examples
+ * @code
+ *
+ * // We call a function that may return a normal value, or an error
+ * Result<float, ErrorCode> result = readTemperature();
+ *
+ * if (result) {
+ *     // Using the * operator, we can get the value of the result, if it exists
+ *     Parameters::Temperature::set(*result);
+ * } else {
+ *     LOG_ERROR << "Error while fetching temperature! " << result.error();
+ * }
+ *
+ * // You can create a result in a few different ways
+ * Result<float, ErrorCode> temperature = 30.0f; // Setting a correct value will automatically produce a successful result
+ * Result<float, ErrorCode> error = ErrorCode::Timeout; // An error value will also set the result value
+ *
+ * // There are a lot of convenience functions. Make sure to use them so that your code looks nice and clean!
+ * int price = configuration.readPrice()  // returns a Result
+ * 		.valueOr(99); 					  // The Result::valueOr function will use the default value of '99' if the Result is an error
+ *
+ * // You can chain many functions together, if you have a lot of operations to make!
+ * auto magneticField = gps.getPosition()   // returns a Result
+ * 		.map(std::sort)						  // The Result::map function will apply another function to the result, if it exists.
+ * 		.map([](auto in) { return in[0]; })	  // You can also call user-defined lambdas for convenience
+ * 		.map(algorithm.calculate);			  // The function can return a simple value, or even a Result!
+ *
+ * // We provide some convenience macros for long or not really
+ * Result<void, ErrorCode> function() {
+ *     RETURN_IF_ERROR(peripheral.write(block));
+ *     auto status = RETURN_IF_ERROR(peripheral.readStatus());
+ *     if (status != Status::SUCCESS) return ErrorCode::IncorrectStatus;
+ *     RETURN_IF_ERROR(peripheral.write(block));
+ *     RETURN_IF_ERROR(peripheral.write(sleepmode));
+ * }
+ * @endcode
+ *
+ * @section Handling Handling Results
+ *
+ * @section Creation Creating Results
+ *
+ * @{
+ */
 
-	explicit constexpr ValueWrapper(T&& val) noexcept(std::is_nothrow_move_constructible_v<T>)
-	    : value{std::forward<T>(val)} {}
-
-	T value;
-};
+//template <typename T, int Tag>
+//struct ValueWrapper {
+//	explicit constexpr ValueWrapper(T const& val) noexcept(std::is_nothrow_copy_constructible_v<T>)
+//	    : value{val} {}
+//
+//	explicit constexpr ValueWrapper(T&& val) noexcept(std::is_nothrow_move_constructible_v<T>)
+//	    : value{std::forward<T>(val)} {}
+//
+//	T value;
+//};
 
 //TODO void value wrapper
 
+/**
+ * ok
+ * @tparam T
+ */
 template <typename T>
 struct Ok {
 	explicit constexpr Ok(T const& val) noexcept(std::is_nothrow_copy_constructible_v<T>)
@@ -36,6 +93,10 @@ struct Ok {
 	T value;
 };
 
+/**
+ * errrr
+ * @tparam T
+ */
 template <typename T>
 struct Err {
 	constexpr Err(T const& val) noexcept(std::is_nothrow_copy_constructible_v<T>)
@@ -53,23 +114,13 @@ struct Err {
 //template <typename T>
 //using Err = ValueWrapper<T, 1>;
 
-/**
- * Forward declaration to help
- */
+// Forward declaration to help with templates
 template <typename V, typename E>
 class Result;
 
 /**
- * Syntactic sugar to return successful Result
- * Note: this function is a producer / constructor of type T
- *
- * @return type::Ok<T> that can be converted into a successful Result<T, E>
+ * don't touch this namespace ok?
  */
-template <typename T, typename CleanT = typename std::decay<T>::type>
-inline Ok<CleanT> Ocake(T&& val) {
-	return Ok<CleanT>{std::forward<T>(val)};
-}
-
 namespace Detail {
 	template <class T>
 	struct IsResult : public std::false_type {};
@@ -323,19 +374,42 @@ public:
 	}
 
 private:
+	/**
+	 * @hide
+	 */
 	template <typename DT, typename DE>
 	friend class Result;
 
 	using StoredValue = V;
 	using StoredError = E;
 
+	/**
+	 * Defines the status of this Result.
+	 *
+	 * True if we have a stored value and no error. False if there is an error and no value.
+	 */
 	bool success;
+
+	/**
+	 * This union allows storing only one of StoredValue or StoredError, reducing the needed space in the process.
+	 *
+	 * Note that this class **must** have one of these types initialised. It is not possible to have neither of those set up.
+	 */
 	union {
+		/**
+		 * If `success == True`, stores the value.
+		 */
 		StoredValue storedValue;
+		/**
+		 * If `success == False`, stores the error.
+		 */
 		StoredError storedError;
 	};
 };
 
+/**
+ * @}
+ */
 
 //template<typename V, typename E>
 //Result(Ok<V>) -> Result<typename V, typename E>

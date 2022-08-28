@@ -187,7 +187,7 @@ TEST_CASE("Map") {
 		}
 
 		SECTION("String error") {
-			auto mapped = error.map([](double in) -> Result<int, std::string> { return {"Error!"}; });
+			auto mapped = error.map([](auto in) -> Result<int, std::string> { return {"Error!"}; });
 
 			STATIC_CHECK(std::is_same_v<decltype(mapped)::ValueType, int>);
 			STATIC_CHECK(std::is_same_v<decltype(mapped)::ErrorType, std::string>);
