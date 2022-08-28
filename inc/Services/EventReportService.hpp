@@ -1,15 +1,15 @@
 #ifndef ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 #define ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 
-#include "Service.hpp"
 #include <etl/bitset.h>
+#include "Service.hpp"
 
 /**
  * Implementation of ST[05] event reporting service
  *
  * @ingroup Services
- * @todo: add more enums event IDs
- * @todo: Make sure there isn't an event ID == 0, because there's a confliction with another service
+ * @todo add more enums event IDs
+ * @todo Make sure there isn't an event ID == 0, because there's a confliction with another service
  * Note: enum IDs are these just for test purposes
  *
  */
@@ -20,7 +20,6 @@ private:
 	etl::bitset<numberOfEvents> stateOfEvents;
 
 public:
-
 	inline static const uint8_t ServiceType = 5;
 
 	enum MessageType : uint8_t {
@@ -52,7 +51,7 @@ public:
 
 	EventReportService() {
 		stateOfEvents.set();
-		serviceType = 5;
+		serviceType = ServiceType;
 		lowSeverityReportCount = 0;
 		mediumSeverityReportCount = 0;
 		highSeverityReportCount = 0;

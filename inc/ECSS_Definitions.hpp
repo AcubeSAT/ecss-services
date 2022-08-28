@@ -1,7 +1,7 @@
 #ifndef ECSS_SERVICES_ECSS_DEFINITIONS_H
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
-#include <stdint.h>
+#include <cstdint>
 /**
  * @defgroup ECSSDefinitions ECSS Defined Constants
  *
@@ -25,9 +25,24 @@
 inline const uint16_t ECSSMaxMessageSize = 1024U;
 
 /**
+ * The size of each CCSDS Space packet primary header
+ */
+inline const uint16_t CCSDSPrimaryHeaderSize = 6U;
+
+/**
+ * The size of each ECSS Telemetry packet's secondary header
+ */
+inline const uint16_t ECSSSecondaryTMHeaderSize = 11U;
+
+/**
+ * The size of each ECSS Telecommand packet's secondary header
+ */
+inline const uint16_t ECSSSecondaryTCHeaderSize = 5U;
+
+/**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
  */
-inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + 6u + 6u + 2u;
+inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + CCSDSPrimaryHeaderSize + ECSSSecondaryTMHeaderSize + 2u;
 
 /**
  * The maximum size of a string to be read or appended to a Message, in bytes
@@ -142,7 +157,7 @@ inline const uint16_t LoggerMaxMessageSize = 512;
 /**
  * @brief Size of the map holding references to each Parameter object for the ST[20] parameter service
  */
-inline const uint8_t ECSSParameterCount = 12;
+inline const uint8_t ECSSParameterCount = 250;
 
 /**
  * @brief Defines whether the optional CRC field is included
@@ -160,15 +175,83 @@ inline const uint8_t ECSSMaxStatisticParameters = 4;
 inline const bool SupportsStandardDeviation = true;
 
 /**
+ * @brief the max number of bytes allowed for a packet store to handle in ST[15].
+ */
+inline const uint16_t ECSSMaxPacketStoreSizeInBytes = 1000;
+
+/**
+ * @brief the max number of TM packets that a packet store in ST[15] can store
+ */
+inline const uint16_t ECSSMaxPacketStoreSize = 20;
+
+/**
+ * @brief the max number of packet stores that a packet selection subservice can handle in ST[15]
+ */
+inline const uint16_t ECSSMaxPacketStores = 4;
+
+/**
+ * @brief each packet store's id is an etl::string. So this defines the max size of a packet store ID in ST[15]
+ */
+inline const uint16_t ECSSPacketStoreIdSize = 15;
+/**
  * @brief Defines the max number of housekeeping structs that the housekeeping service can contain
  */
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
+
+/**
+ * The max number of controlled application processes
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxControlledApplicationProcesses = 5;
+
+/**
+ * The max number of report type blocking definitions per service type definition in the application process
+ * configuration
+ * @see RealTimeForwardingControlService
+ * todo: must change when a service with more report types is implemented.
+ */
+inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
+
+/**
+ * The max number of service type definitions per application process type definition in the application process
+ * configuration
+ * @see RealTimeForwardingControlService
+ * todo: must change when all 15 services are implemented.
+ */
+inline const uint8_t ECSSMaxServiceTypeDefinitions = 10;
+
+/**
+ * The number of possible combinations between application processes and service types, i.e. the number of all
+ * possible (applicationID, serviceType) pairs.
+ */
+inline const uint8_t ECSSMaxApplicationsServicesCombinations = ECSSMaxControlledApplicationProcesses *
+                                                               ECSSMaxServiceTypeDefinitions;
+
+/**
+ * The max number of event definition IDs per event report blocking type definition in the event report blocking
+ * configuration
+ * @see RealTimeForwardingControlService
+ */
+inline const uint8_t ECSSMaxEventDefinitionIDs = 15;
+
+/**
+ * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
+ */
+inline struct {
+	uint8_t min = 1;
+	uint8_t max = 10;
+} VirtualChannelLimits;
 
 /**
  * Maximum number of ST[12] Parameter Monitoring Definitions.
  */
 inline const uint8_t ECSSMaxMonitoringDefinitions = 4;
 
-/** @} */
+/**
+ * 6.18.2.2 The applicationId that is assigned on the specific device that runs these Services.
+ * In the ECSS-E-ST-70-41C the application ID is also referred as application process.
+ */
+inline const uint16_t ApplicationId = 1;
 
+/** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

@@ -1,20 +1,14 @@
-#include <iostream>
 #include "Helpers/Statistic.hpp"
+#include <cmath>
 
 void Statistic::updateStatistics(double value) {
-	/*
-	 * TODO:
-	 *      if periodic, just calculate next time without the CUC
-	 *      function.
-	 * */
-
 	if (value > max) {
 		max = value;
-		// TODO: maxTime = as_CUC_timestamp();
+		timeOfMaxValue = TimeGetter::getCurrentTimeCustomCUC();
 	}
 	if (value < min) {
 		min = value;
-		// TODO: minTime = as_CUC_timestamp();
+		timeOfMinValue = TimeGetter::getCurrentTimeCustomCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
@@ -25,9 +19,9 @@ void Statistic::updateStatistics(double value) {
 
 void Statistic::appendStatisticsToMessage(Message& report) {
 	report.appendFloat(static_cast<float>(max));
-	report.appendUint32(maxTime);
+	report.append(timeOfMaxValue);
 	report.appendFloat(static_cast<float>(min));
-	report.appendUint32(minTime);
+	report.append(timeOfMinValue);
 	report.appendFloat(static_cast<float>(mean));
 
 	if (SupportsStandardDeviation) {
@@ -49,14 +43,15 @@ void Statistic::setSelfSamplingInterval(uint16_t samplingInterval) {
 void Statistic::resetStatistics() {
 	max = -std::numeric_limits<double>::infinity();
 	min = std::numeric_limits<double>::infinity();
-	maxTime = 0;
-	minTime = 0;
+	timeOfMaxValue.elapsed100msTicks = 0;
+	timeOfMinValue.elapsed100msTicks = 0;
 	mean = 0;
 	sumOfSquares = 0;
 	sampleCounter = 0;
 }
 
 bool Statistic::statisticsAreInitialized() {
-	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and maxTime == 0 and minTime == 0 and
+	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and
+	        timeOfMaxValue.elapsed100msTicks == 0 and timeOfMinValue.elapsed100msTicks == 0 and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
 }

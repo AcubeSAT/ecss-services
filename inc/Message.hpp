@@ -1,11 +1,11 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
-#include "ECSS_Definitions.hpp"
 #include <cstdint>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
-#include "ErrorHandler.hpp"
+#include "ECSS_Definitions.hpp"
+#include "Time/Time.hpp"
 #include "macros.hpp"
 
 /**
@@ -72,7 +72,7 @@ public:
 
 	enum PacketType {
 		TM = 0, ///< Telemetry
-		TC = 1 ///< Telecommand
+		TC = 1  ///< Telecommand
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
@@ -89,7 +89,7 @@ public:
 	 */
 	uint16_t applicationId;
 
-	// 7.4.3.1b
+	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
 
 	// 7.4.1, as defined in CCSDS 133.0-B-1
@@ -146,6 +146,13 @@ public:
 	 * Appends 4 bytes to the message
 	 */
 	void appendWord(uint32_t value);
+
+	/**
+	 * Appends a type CustomCUC (CUC formatted timestamp) to the message.
+	 */
+	void appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC) {
+		appendUint64(timeCUC.elapsed100msTicks);
+	}
 
 	/**
 	 * Appends a number of bytes to the message
@@ -226,6 +233,7 @@ public:
 
 public:
 	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
+	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message
@@ -337,6 +345,23 @@ public:
 	 */
 	void appendSint32(int32_t value) {
 		return appendWord(reinterpret_cast<uint32_t&>(value));
+	}
+
+
+	/**
+	 * Adds a 8 byte signed integer to the end of the message
+	 *
+	 * PTC = 4, PFC = 16
+	 */
+	void appendSint64(int64_t value) {
+		return appendUint64(reinterpret_cast<uint64_t&>(value));
+	}
+
+	/**
+	 * Adds an 8 byte time Offset to the message
+	 */
+	void appendRelativeTime(Time::RelativeTime value) {
+		return appendSint64(value);
 	}
 
 	/**
@@ -507,6 +532,23 @@ public:
 	}
 
 	/**
+	 * Fetches a 4-byte unsigned integer from the current position in the message
+	 *
+	 * PTC = 4, PFC = 14
+	 */
+	int64_t readSint64() {
+		uint64_t value = readUint64();
+		return reinterpret_cast<int64_t&>(value);
+	}
+
+	/**
+	 * Fetches an 8 byte time Offset from the current position in the message
+	 */
+	Time::RelativeTime readRelativeTime() {
+		return readSint64();
+	};
+
+	/**
 	 * Fetches an 4-byte single-precision floating point number from the current position in the
 	 * message
 	 *
@@ -526,6 +568,16 @@ public:
 
 		uint64_t value = readUint64();
 		return reinterpret_cast<double&>(value);
+	}
+
+	/**
+	 * Fetches a timestamp in a custom CUC format consisting of 8 bytes from the current position in the message
+	 */
+	Time::CustomCUC_t readCustomCUCTimeStamp() {
+		Time::CustomCUC_t customCUC_t;
+
+		customCUC_t.elapsed100msTicks = readUint64();
+		return customCUC_t;
 	}
 
 	/**
@@ -676,6 +728,14 @@ template <>
 inline void Message::append(const double& value) {
 	appendDouble(value);
 }
+template <>
+inline void Message::append(const Time::CustomCUC_t& timeCUC) {
+	appendCustomCUCTimeStamp(timeCUC);
+}
+template <>
+inline void Message::append(const Time::RelativeTime& value) {
+	appendRelativeTime(value);
+}
 
 /**
  * Appends an ETL string to the message. ETL strings are handled as ECSS octet strings, meaning that the string size
@@ -732,6 +792,14 @@ inline float Message::read() {
 template <>
 inline double Message::read() {
 	return readDouble();
+}
+template <>
+inline Time::CustomCUC_t Message::read() {
+	return readCustomCUCTimeStamp();
+}
+template <>
+inline Time::RelativeTime Message::read() {
+	return readRelativeTime();
 }
 
 #endif // ECSS_SERVICES_PACKET_H
