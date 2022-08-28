@@ -363,6 +363,8 @@ int main() {
 
 	LOG_NOTICE << "ECSS Services test complete";
 
+	ErrorHandler::reportInternalError(static_cast<ErrorHandler::InternalErrorType>(254));
+
 	std::cout << UTCTimestamp() << std::endl;
 	return 0;
 }

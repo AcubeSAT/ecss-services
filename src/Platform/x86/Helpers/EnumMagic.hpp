@@ -17,27 +17,17 @@ namespace EnumMagic_ {
 		return {{a[I]...}};
 	}
 
-	template <typename E, std::size_t... I>
-	constexpr auto values(std::index_sequence<I...>) noexcept {
-		static_assert(std::is_enum_v<E>, "magic_enum::detail::values requires enum type.");
+	template <typename E>
+	constexpr auto values() noexcept {
+		static_assert(std::is_enum_v<E>, "values() requires enum type.");
 		constexpr std::size_t count = 256;
 
 		E values[count] = {};
-		for (std::size_t i = 0, v = 0; v < count; ++i) {
-			values[v++] = static_cast<E>(i);
+		for (std::size_t i = 0; i < count; ++i) {
+			values[i] = static_cast<E>(i);
 		}
 
 		return to_array(values, std::make_index_sequence<count>{});
-	}
-
-	template <typename E, typename U = std::underlying_type_t<E>>
-	constexpr auto values() noexcept {
-		static_assert(std::is_enum_v<E>, "magic_enum::detail::values requires enum type.");
-		constexpr auto min = 0;
-		constexpr auto max = 256;
-		constexpr auto range_size = max - min + 1;
-
-		return values<E>(std::make_index_sequence<range_size>{});
 	}
 
 	template <typename E>
@@ -48,6 +38,8 @@ namespace EnumMagic_ {
 
 	template <typename E, E V>
 	constexpr std::basic_string_view<char> enum_hack() {
+		static_assert(std::is_enum_v<E>, "enum_hack() requires enum type.");
+
 		std::string_view function = __PRETTY_FUNCTION__;
 		auto pos = function.find("E V = ");
 		std::string_view output = function.substr(pos + 6);
@@ -60,7 +52,7 @@ namespace EnumMagic_ {
 
 	template <typename E, std::size_t... I>
 	constexpr auto names(std::index_sequence<I...>) noexcept {
-		static_assert(std::is_enum_v<E>, "magic_enum::detail::names requires enum type.");
+		static_assert(std::is_enum_v<E>, "names() requires enum type.");
 
 		return std::array<std::string_view, sizeof...(I)>{{enum_name_v<E, values_v<E>[I]>...}};
 	}
@@ -76,6 +68,13 @@ namespace EnumMagic_ {
 
 template <typename E>
 std::string enum_name(E v) {
+	using namespace EnumMagic_;
+
 	int index = static_cast<int>(v);
-	return std::string(EnumMagic_::remove_namespace(EnumMagic_::names_v<E>[index]));
+
+	if (index >= names_v<E>.size()) {
+		return "(Unknown)";
+	}
+
+	return std::string(remove_namespace(names_v<E>[index]));
 }
