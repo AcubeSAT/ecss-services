@@ -17,18 +17,18 @@ void Service::storeMessage(Message& message) {
 
 	// Create a new stream to display the packet
 	std::ostringstream ss;
+
 	// Just print it to the screen
-    ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
+	ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
+	   << std::hex
 	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
 	   << static_cast<int>(message.messageType) // Ignore-MISRA
 	   << "] message! ";
 
+	for (unsigned int i = 0; i < message.dataSize; i++) {
+		ss << static_cast<int>(message.data[i]) << " "; // Ignore-MISRA
+	}
 
-    // Add ECSS and CCSDS header
-    String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-    for (unsigned int i = 0; i < createdPacket.length(); i++) {
-        ss  << +createdPacket[i] << " "; // Ignore-MISRA
-    }
 
     // Send data to YAMCS port
 	if(SendToYamcs) {
