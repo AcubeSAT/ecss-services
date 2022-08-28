@@ -42,6 +42,9 @@ void Service::storeMessage(Message& message) {
 		destination.sin_port = htons(port);
 		destination.sin_addr.s_addr = inet_addr(hostname.c_str());
 
+		// Add ECSS and CCSDS header
+		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+
 		long bytesSent = ::sendto(sock, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
 		std::cout << bytesSent << " bytes sent" << std::endl;
 		::close(sock);
