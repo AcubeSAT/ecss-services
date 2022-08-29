@@ -1,34 +1,34 @@
 #include "Service.hpp"
 #include <Logger.hpp>
-#include <iomanip>
-#include <iostream>
 #include <MessageParser.hpp>
 #include <arpa/inet.h>
+#include <iomanip>
+#include <iostream>
 #include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
 
-class PacketSender{
+class PacketSender {
 private:
-	const char* hostname ="127.0.0.1";
+	const char* hostname = "127.0.0.1";
 	uint16_t port = 10015;
 	sockaddr_in destination;
 	int socket;
 
 public:
-	PacketSender(){
+	PacketSender() {
 		socket = ::socket(AF_INET, SOCK_DGRAM, 0);
 		destination.sin_family = AF_INET;
 		destination.sin_port = htons(port);
 		destination.sin_addr.s_addr = inet_addr(hostname);
 	};
 
-	~PacketSender(){
+	~PacketSender() {
 		::close(socket);
 	};
 
-	void sendPacketToYamcs(Message& message){
+	void sendPacketToYamcs(Message& message) {
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 		auto bytesSent = ::sendto(socket, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
@@ -62,4 +62,3 @@ void Service::storeMessage(Message& message) {
 	}
 	LOG_DEBUG << ss.str();
 }
-
