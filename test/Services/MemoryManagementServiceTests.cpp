@@ -28,6 +28,8 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	CHECK(pStr[0] == 'h');
 	CHECK(pStr[1] == 'R');
 	CHECK(pStr[2] == 'h');
+
+	free(pStr);
 }
 
 TEST_CASE("TC[6,5]", "[service][st06]") {
