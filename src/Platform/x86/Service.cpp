@@ -60,7 +60,7 @@ void Service::storeMessage(Message& message) {
 
 
 	// Send data to YAMCS port
-	if (SendToYamcs) {
+	if constexpr (SendToYamcs) {
 		PacketSender packetSender;
 		packetSender.sendPacketToYamcs(message);
 	}
