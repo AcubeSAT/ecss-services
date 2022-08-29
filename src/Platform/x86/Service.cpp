@@ -11,8 +11,7 @@
 
 class PacketSender{
 private:
-	const char* hostname ="127.0.0.1";
-	uint16_t port = 10015;
+	const uint16_t port = 10015;
 	sockaddr_in destination;
 	int socket;
 
