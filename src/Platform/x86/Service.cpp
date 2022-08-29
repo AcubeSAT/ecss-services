@@ -36,6 +36,8 @@ public:
 	}
 };
 
+PacketSender packetSender;
+
 void Service::storeMessage(Message& message) {
 	// appends the remaining bits to complete a byte
 	message.finalize();
@@ -57,7 +59,6 @@ void Service::storeMessage(Message& message) {
 
 	// Send data to YAMCS port
 	if constexpr (SendToYamcs) {
-		PacketSender packetSender;
 		packetSender.sendPacketToYamcs(message);
 	}
 	LOG_DEBUG << ss.str();
