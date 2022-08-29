@@ -10,6 +10,33 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+class PacketSender{
+private:
+	const char* hostname ="127.0.0.1";
+	uint16_t port = 10015;
+	sockaddr_in destination;
+	int socket;
+
+public:
+	PacketSender(){
+		socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+		destination.sin_family = AF_INET;
+		destination.sin_port = htons(port);
+		destination.sin_addr.s_addr = inet_addr(hostname);
+	};
+
+	~PacketSender(){
+		::close(socket);
+	};
+
+	void sendPacketToYamcs(Message& message){
+		// Add ECSS and CCSDS header
+		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+		auto bytesSent = ::sendto(socket, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
+		LOG_DEBUG << bytesSent << " bytes sent";
+	}
+};
+
 void Service::storeMessage(Message& message) {
 	// appends the remaining bits to complete a byte
 	message.finalize();
@@ -31,22 +58,9 @@ void Service::storeMessage(Message& message) {
 
 	// Send data to YAMCS port
 	if (SendToYamcs) {
-		const char* hostname = "127.0.0.1";
-		uint16_t port = 10015;
-
-		int sock = ::socket(AF_INET, SOCK_DGRAM, 0);
-
-		sockaddr_in destination;
-		destination.sin_family = AF_INET;
-		destination.sin_port = htons(port);
-		destination.sin_addr.s_addr = inet_addr(hostname);
-
-		// Add ECSS and CCSDS header
-		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-
-		auto bytesSent = ::sendto(sock, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
-		LOG_DEBUG << bytesSent << " bytes sent";
-		::close(sock);
+		PacketSender packetSender;
+		packetSender.sendPacketToYamcs(message);
 	}
 	LOG_DEBUG << ss.str();
 }
+
