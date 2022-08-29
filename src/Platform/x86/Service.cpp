@@ -2,7 +2,6 @@
 #include <Logger.hpp>
 #include <iomanip>
 #include <iostream>
-
 #include <MessageParser.hpp>
 #include <arpa/inet.h>
 #include <netinet/in.h>
