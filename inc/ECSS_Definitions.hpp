@@ -130,7 +130,7 @@ inline const uint8_t ECSSMaxDeltaOfReleaseTime = 60;
 /**
  * The max number of simply commutated parameters per housekeeping structure in ST[03]
  */
-inline const uint16_t ECSSMaxSimplyCommutatedParameters = 10;
+inline const uint16_t ECSSMaxSimplyCommutatedParameters = 15;
 
 /**
  * The number of functions supported by the \ref FunctionManagementService
