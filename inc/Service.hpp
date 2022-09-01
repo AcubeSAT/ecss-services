@@ -11,11 +11,6 @@
  */
 
 /**
- * If set to true, the created messages will be sent to port 10025 on localhost for testing purposes.
- */
-inline const bool SendToYamcs = true;
-
-/**
  * A spacecraft service, as defined in ECSS-E-ST-70-41C
  *
  * A member of the Service class should be used as a singleton, i.e. must be created only once in
