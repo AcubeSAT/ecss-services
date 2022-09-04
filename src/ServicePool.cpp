@@ -1,6 +1,6 @@
 #include "ServicePool.hpp"
 
-ServicePool Services = ServicePool();
+ServicePool Services = ServicePool(); // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 void ServicePool::reset() {
 	// Call the destructor
@@ -10,7 +10,7 @@ void ServicePool::reset() {
 	// Note the usage of "placement new" that replaces the contents of the Services variable.
 	// This is not dangerous usage, since all the memory that will be used for this has been
 	// statically allocated from before.
-	new (this) ServicePool(); // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+	new (this) ServicePool();
 }
 
 uint16_t ServicePool::getAndUpdateMessageTypeCounter(uint8_t serviceType, uint8_t messageType) {

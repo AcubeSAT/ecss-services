@@ -32,7 +32,7 @@
  */
 namespace unit_test {
 	struct Tester;
-}
+} // namespace unit_test
 
 /**
  * @brief An implementation of the ECSS standard ST[11] service
