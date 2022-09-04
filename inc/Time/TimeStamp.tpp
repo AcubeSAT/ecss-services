@@ -1,5 +1,4 @@
 #include <cmath>
-#include "TimeStamp.hpp"
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
@@ -95,7 +94,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& t
 
 	ASSERT_INTERNAL(areSecondsValid(seconds), ErrorHandler::TimeStampOutOfBounds);
 
-	taiCounter = static_cast<TAICounter_t>(seconds) << (8 * FractionBytes);
+	taiCounter = std::chrono::duration_cast<RawDuration>(std::chrono::duration<TAICounter_t>(seconds)).count();
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
@@ -151,53 +150,12 @@ etl::array<uint8_t, Time::CUCTimestampMaximumSize> TimeStamp<BaseBytes, Fraction
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 UTCTimestamp TimeStamp<BaseBytes, FractionBytes, Num, Denom>::toUTCtimestamp() {
-	using namespace Time;
+	UTCTimestamp timestamp(Time::Epoch.year, Time::Epoch.month, Time::Epoch.day, 0, 0, 0);
+	timestamp += RawDuration(taiCounter);
 
-	uint32_t totalSeconds = asTAIseconds();
-
-	uint16_t yearUTC = Epoch.year;
-	uint8_t monthUTC = Epoch.month;
-	uint8_t dayUTC = Epoch.day;
-	uint8_t hour = 0;
-	uint8_t minute = 0;
-	uint8_t second = 0;
-
-	// calculate years
-	while (totalSeconds >= (isLeapYear(yearUTC) ? 366 : 365) * SecondsPerDay) {
-		totalSeconds -= (isLeapYear(yearUTC) ? 366 : 365) * SecondsPerDay;
-		yearUTC++;
-	}
-
-	// calculate months
-	int currentMonth = 0;
-	while (totalSeconds >= (DaysOfMonth[currentMonth] * SecondsPerDay)) {
-		monthUTC++;
-		totalSeconds -= (DaysOfMonth[currentMonth] * SecondsPerDay);
-		currentMonth++;
-		if ((currentMonth == 1U) && isLeapYear(yearUTC)) {
-			if (totalSeconds <= (28 * SecondsPerDay)) {
-				break;
-			}
-			monthUTC++;
-			totalSeconds -= 29 * SecondsPerDay;
-			currentMonth++;
-		}
-	}
-
-	dayUTC = totalSeconds / SecondsPerDay;
-	totalSeconds -= dayUTC * SecondsPerDay;
-	dayUTC++; // add 1 day because we start count from 1 January (and not 0 January!)
-
-	hour = totalSeconds / SecondsPerHour;
-	totalSeconds -= hour * SecondsPerHour;
-
-	minute = totalSeconds / SecondsPerMinute;
-	totalSeconds -= minute * SecondsPerMinute;
-
-	second = totalSeconds;
-
-	return {yearUTC, monthUTC, dayUTC, hour, minute, second};
+	return timestamp;
 }
+
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn, int DenomIn>
 TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input) {

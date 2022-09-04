@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_TIME_HPP
-#define ECSS_SERVICES_TIME_HPP
+#pragma once
 
 #include <algorithm>
 #include <chrono>
@@ -259,5 +258,3 @@ public:
 };
 
 #include "TimeStamp.tpp"
-
-#endif
