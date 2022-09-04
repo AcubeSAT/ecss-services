@@ -132,32 +132,37 @@ TEST_CASE("UTC idempotence") {
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
 		UTCTimestamp timestamp2 = time.toUTCtimestamp();
 		bool cond = (timestamp2 == timestamp1);
-		REQUIRE(cond);
+		CHECK(cond);
 	}
 	{
 		UTCTimestamp timestamp1(2035, 1, 1, 0, 0, 1); // 1 Jan 2035 midnight passed;
 		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(timestamp1);
 		UTCTimestamp timestamp2 = time.toUTCtimestamp();
 		bool cond = (timestamp2 == timestamp1);
-		REQUIRE(cond);
+		CHECK(cond);
 	}
 }
 
 TEST_CASE("UTC conversion to and from seconds timestamps") {
 	{
 		UTCTimestamp utc(2020, 12, 5, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
-		REQUIRE(time.asTAIseconds() == 29289600);
+		TimeStamp<4, 1> time(utc);
+		CHECK(time.asTAIseconds() == 29289600);
 	}
 	{
 		UTCTimestamp utc(2020, 2, 29, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
-		REQUIRE(time.asTAIseconds() == 5097600);
+		TimeStamp<4, 1> time(utc);
+		CHECK(time.asTAIseconds() == 5097600);
 	}
 	{
 		UTCTimestamp utc(2025, 3, 10, 0, 0, 0);
-		TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(utc);
-		REQUIRE(time.asTAIseconds() == 163728000);
+		TimeStamp<4, 1> time(utc);
+		CHECK(time.asTAIseconds() == 163728000);
+	}
+	{
+		UTCTimestamp utc(2025, 3, 10, 0, 0, 0);
+		TimeStamp<4, 1, 2, 3> time(utc);
+		CHECK(time.asTAIseconds() == 163728000);
 	}
 }
 
@@ -166,27 +171,18 @@ TEST_CASE("UTC overflow tests") {
 		UTCTimestamp utc(2999, 3, 11, 0, 0, 0);
 		TimeStamp<2, 1> time(utc);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::TimeStampOutOfBounds));
-		ServiceTests::reset();
 	}
 	SECTION("Seconds too high, small variable") {
 		UTCTimestamp utc(Epoch.year, Epoch.month, Epoch.day, 0, 7, 0);
 		TimeStamp<1, 1> time(utc);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::TimeStampOutOfBounds));
-		ServiceTests::reset();
 	}
 	SECTION("Seconds too high, wide variable") {
 		UTCTimestamp utc(Epoch.year, Epoch.month, Epoch.day, 0, 7, 0);
 		TimeStamp<1, 4> time(utc);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::TimeStampOutOfBounds));
-		ServiceTests::reset();
 	}
 }
-
-// SECTION("Check different templates, should break at compile"){
-//   TimeStamp<1, 2> time1;
-//   TimeStamp<4, 4> time2;
-//   REQUIRE(time1==time2);
-// }
 
 TEST_CASE("Time operators") {
 	SECTION("Same type") {
