@@ -81,14 +81,8 @@ void EventReportService::enableReportGeneration(Message message) {
 	 * @todo: Report an error if length > numberOfEvents
 	 */
 	uint16_t length = message.readUint16();
-	Event eventID[length];
 	for (uint16_t i = 0; i < length; i++) {
-		eventID[i] = static_cast<Event>(message.readEnum16());
-	}
-	if (length <= numberOfEvents) {
-		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[static_cast<uint16_t>(eventID[i])] = true;
-		}
+		stateOfEvents[message.readEnum16()] = true;
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
@@ -101,14 +95,8 @@ void EventReportService::disableReportGeneration(Message message) {
 	 * @todo: Report an error if length > numberOfEvents
 	 */
 	uint16_t length = message.readUint16();
-	Event eventID[length];
 	for (uint16_t i = 0; i < length; i++) {
-		eventID[i] = static_cast<Event>(message.readEnum16());
-	}
-	if (length <= numberOfEvents) {
-		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[static_cast<uint16_t>(eventID[i])] = false;
-		}
+		stateOfEvents[message.readEnum16()] = false;
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
