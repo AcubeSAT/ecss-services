@@ -95,7 +95,11 @@ public:
 		/**
 		 * A requested element is not found
 		 */
-		ElementNotInArray = 18,
+		ElementNotInArray = 16,
+		/**
+		 * Timestamp out of bounds to be stored or converted
+		 */
+		TimeStampOutOfBounds = 17,
 	};
 
 	/**
@@ -347,6 +351,18 @@ public:
 		 * ID is not controlled by the Service (ST[14])
 		 */
 		NotControlledApplication = 50,
+		/**
+		 * Parameter is requested, but the provider of the parameter value does not exist yet
+		 */
+		ParameterValueMissing = 51,
+		/**
+		 * Attempted to write to a read-only parameter
+		 */
+		ParameterReadOnly = 52,
+		/**
+		 * Attempted to read from a write-only parameter
+		 */
+		ParameterWriteOnly = 53,
 	};
 
 	/**

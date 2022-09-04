@@ -27,10 +27,6 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	Services.parameterStatistics.statisticsMap.insert({id2, stat2});
 }
 
-void resetSystem() {
-	Services.parameterStatistics.statisticsMap.clear();
-}
-
 TEST_CASE("Reporting of statistics") {
 	SECTION("Report statistics, with auto statistic reset disabled with TC") {
 		initializeStatistics(6, 7);
@@ -97,9 +93,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 	}
 
-	resetSystem();
 	ServiceTests::reset();
-	Services.reset();
 
 	SECTION("Report statistics, with auto statistic reset disabled without TC") {
 		initializeStatistics(6, 7);
@@ -157,11 +151,7 @@ TEST_CASE("Reporting of statistics") {
 
 		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
-
 	}
-	resetSystem();
-	ServiceTests::reset();
-	Services.reset();
 }
 
 TEST_CASE("Resetting the parameter statistics") {
@@ -178,9 +168,7 @@ TEST_CASE("Resetting the parameter statistics") {
 		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Reset without TC") {
@@ -194,9 +182,7 @@ TEST_CASE("Resetting the parameter statistics") {
 		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
 
@@ -231,9 +217,7 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == false);
 		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 6);
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
 
@@ -248,9 +232,7 @@ TEST_CASE("Disabling the periodic reporting of statistics") {
 		MessageParser::execute(request);
 		REQUIRE(Services.parameterStatistics.getPeriodicReportingStatus() == false);
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
 
@@ -280,9 +262,7 @@ TEST_CASE("Add/Update statistics definitions") {
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
 		CHECK(Services.parameterStatistics.statisticsMap[0].selfSamplingInterval == 1400);
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Add new statistic definition") {
@@ -306,9 +286,7 @@ TEST_CASE("Add/Update statistics definitions") {
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
 		CHECK(Services.parameterStatistics.statisticsMap[1].selfSamplingInterval == 3200);
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("All possible invalid requests combined with add/update") {
@@ -362,9 +340,7 @@ TEST_CASE("Add/Update statistics definitions") {
 		CHECK(Services.parameterStatistics.statisticsMap[0].selfSamplingInterval == 14000);
 		CHECK(Services.parameterStatistics.statisticsMap[1].selfSamplingInterval == 32000);
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
 
@@ -410,12 +386,9 @@ TEST_CASE("Delete statistics definitions") {
 		MessageParser::execute(request);
 
 		CHECK(Services.parameterStatistics.getPeriodicReportingStatus() == false);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		CHECK(Services.parameterStatistics.statisticsMap.empty());
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
 
@@ -441,8 +414,6 @@ TEST_CASE("Parameter statistics definition report") {
 		CHECK(report.readUint16() == 7);
 		CHECK(report.readUint16() == 0);
 
-		resetSystem();
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
