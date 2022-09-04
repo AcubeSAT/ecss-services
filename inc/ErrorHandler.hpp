@@ -481,7 +481,7 @@ public:
 	 * @return The corresponding ErrorSource
 	 */
 	template <typename ErrorType>
-	inline static ErrorSource findErrorSource(ErrorType) {
+	inline static ErrorSource findErrorSource(ErrorType errorType) {
 		// Static type checking
 		ErrorSource source = Internal;
 

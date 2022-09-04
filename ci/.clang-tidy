@@ -1,5 +1,5 @@
 ---
-Checks:          >
+Checks: >
   -clang-diagnostic-error,
   clang-analyzer-*,
   bugprone-*,
@@ -11,7 +11,7 @@ Checks:          >
   fuchsia-statically-constructed-objects,
   hicpp-exception-baseclass,
   hicpp-signed-bitwise,
-  llvm-*,-llvm-include-order,-llvm-header-guard,-llvm-else-after-return,
+  llvm-*,-llvm-include-order,-llvm-header-guard,
   modernize-use-auto,
   modernize-use-equals-default,
   misc-*,
