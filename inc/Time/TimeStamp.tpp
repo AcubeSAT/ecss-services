@@ -1,5 +1,4 @@
 #include <cmath>
-#include "TimeStamp.hpp"
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
@@ -157,41 +156,6 @@ UTCTimestamp TimeStamp<BaseBytes, FractionBytes, Num, Denom>::toUTCtimestamp() {
 	return timestamp;
 }
 
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn, int DenomIn>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input) {
-	if constexpr (std::is_same_v<decltype(*this), decltype(input)>) {
-		taiCounter = input.taiCounter;
-		return;
-	}
-
-	constexpr double InputRatio = static_cast<double>(NumIn) / DenomIn;
-	constexpr double OutputRatio = static_cast<double>(Num) / Denom;
-
-	double inputSeconds = input.taiCounter / static_cast<double>(1 << (8 * FractionBytesIn));
-	inputSeconds *= InputRatio;
-
-	ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
-
-	double output = inputSeconds / OutputRatio * (1UL << (8 * FractionBytes));
-
-	taiCounter = static_cast<TAICounter_t>(round(output));
-}
-
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-template <class Duration>
-Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() {
-	auto duration = RawDuration(taiCounter);
-
-	return std::chrono::duration_cast<Duration>(duration);
-}
-
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-template <class Duration, typename>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Duration duration) {
-	auto outputDuration = std::chrono::duration_cast<RawDuration>(duration);
-	taiCounter = outputDuration.count();
-}
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn, int DenomIn>
 TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input) {
