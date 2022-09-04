@@ -93,6 +93,10 @@ public:
 		 * Invalid TimeStamp parameters at creation
 		 */
 		InvalidTimeStampInput = 15,
+		/**
+		 * Timestamp out of bounds to be stored or converted
+		 */
+		TimeStampOutOfBounds = 16,
 	};
 
 	/**
