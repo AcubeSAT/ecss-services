@@ -12,7 +12,7 @@ MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*th
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
     : mainService(parent) {}
 
-void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& request) {
+void MemoryManagementService::loadRawData(Message& request) {
 	/**
 	 * Bear in mind that there is currently no error checking for invalid parameters.
 	 * A future version will include error checking and the corresponding error report/notification,
@@ -202,7 +202,7 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, uint16_t
 void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case LoadRawMemoryDataAreas:
-			rawDataMemorySubservice.loadRawData(message);
+			loadRawData(message);
 			break;
 		case DumpRawMemoryData:
 			rawDataMemorySubservice.dumpRawData(message);

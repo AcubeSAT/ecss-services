@@ -2,17 +2,16 @@
 #define ECSS_SERVICES_MEMMANGSERVICE_HPP
 
 #include <memory>
-#include "Service.hpp"
-#include "Helpers/CRCHelper.hpp"
 #include "ErrorHandler.hpp"
+#include "Helpers/CRCHelper.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
+#include "Service.hpp"
 
 /**
  * @ingroup Services
  */
 class MemoryManagementService : public Service {
 public:
-
 	inline static const uint8_t ServiceType = 6;
 
 	enum MessageType : uint8_t {
@@ -51,16 +50,6 @@ public:
 		explicit RawDataMemoryManagement(MemoryManagementService& parent);
 
 		/**
-		 * TC[6,2] load raw values to memory
-		 *
-		 * @details This function loads new values to memory data areas
-		 * 			specified in the request
-		 * @param request Provide the received message as a parameter
-		 * @todo Only allow aligned memory address to be start addresses
-		 */
-		void loadRawData(Message& request);
-
-		/**
 		 * TC[6,5] read raw memory values
 		 *
 		 * @details This function reads the raw data from the RAM memory and
@@ -82,8 +71,18 @@ public:
 		 * 		 different memory types
 		 * @todo Only allow aligned memory address to be start addresses
 		 */
-		void checkRawData(Message &request);
+		void checkRawData(Message& request);
 	} rawDataMemorySubservice;
+
+	/**
+	 * TC[6,2] load raw values to memory
+	 *
+	 * @details This function loads new values to memory data areas
+	 * 			specified in the request
+	 * @param request Provide the received message as a parameter
+	 * @todo Only allow aligned memory address to be start addresses
+	 */
+	static void loadRawData(Message& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

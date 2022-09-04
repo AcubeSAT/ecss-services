@@ -2,14 +2,14 @@
 #include <iostream>
 
 void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applicationID) {
-	for (auto& service: AllMessageTypes::MessagesOfService) {
+	for (const auto& service: AllMessageTypes::MessagesOfService) {
 		uint8_t serviceType = service.first;
 		addAllReportsOfService(applicationID, serviceType);
 	}
 }
 
 void RealTimeForwardingControlService::addAllReportsOfService(uint8_t applicationID, uint8_t serviceType) {
-	for (auto& messageType: AllMessageTypes::MessagesOfService.at(serviceType)) {
+	for (const auto& messageType: AllMessageTypes::MessagesOfService.at(serviceType)) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		applicationProcessConfiguration.definitions[appServicePair].push_back(messageType);
 	}
@@ -89,7 +89,7 @@ bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, u
 bool RealTimeForwardingControlService::checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType,
                                                     uint8_t messageType) {
 	return !maxReportTypesReached(request, applicationID, serviceType) and
-	    !reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType);
+	       !reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType);
 }
 
 bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType,

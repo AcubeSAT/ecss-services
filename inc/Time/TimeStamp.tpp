@@ -1,5 +1,4 @@
 #include <cstdint>
-#include "TimeStamp.hpp"
 
 template <uint8_t secondsBytes, uint8_t fractionalBytes>
 constexpr bool TimeStamp<secondsBytes, fractionalBytes>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
