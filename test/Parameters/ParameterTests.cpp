@@ -20,6 +20,16 @@ TEST_CASE("Parameter Append") {
 		CHECK(request.readUint16() == 500);
 		CHECK(request.readUint32() == 70000);
 	}
+
+	SECTION("Append to vector") {
+		etl::vector<uint8_t, 256> vector = {};
+		auto parameter1 = Parameter<uint16_t>(0x4501);
+
+		parameter1.appendToVector(vector);
+
+		uint16_t returnedValue = vector[0] << 8 | vector[1];
+		CHECK(returnedValue == parameter1.getValueAsDouble());
+	}
 }
 
 TEST_CASE("Parameter Set") {

@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_PARAMETER_HPP
 
 #include "etl/String.hpp"
+#include "etl/vector.h"
 #include "Message.hpp"
 #include "ECSS_Definitions.hpp"
 
@@ -87,6 +88,13 @@ public:
 	inline void appendValueToMessage(Message& message) override {
 		message.append<DataType>(currentValue);
 	};
+
+	template <size_t N>
+	inline void appendToVector(etl::vector<uint8_t, N>& vector) {
+		for (int8_t i = sizeof(DataType) - 1; i >= 0; i--) {
+			vector.push_back(currentValue >> (i * 8));
+		}
+	}
 };
 
 #endif // ECSS_SERVICES_PARAMETER_HPP
