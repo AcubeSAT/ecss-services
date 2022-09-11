@@ -21,14 +21,28 @@ TEST_CASE("Parameter Append") {
 		CHECK(request.readUint32() == 70000);
 	}
 
-	SECTION("Append to vector") {
-		etl::vector<uint8_t, 256> vector = {};
-		auto parameter1 = Parameter<uint16_t>(0x4501);
+	SECTION("Append integer to vector") {
+		etl::vector<uint8_t, 16> vector = {};
+		auto parameter = Parameter<uint16_t>(0x4501);
 
-		parameter1.appendToVector(vector);
+		parameter.appendToVector(vector);
 
-		uint16_t returnedValue = vector[0] << 8 | vector[1];
-		CHECK(returnedValue == parameter1.getValueAsDouble());
+		auto returnedValue = Parameter<uint16_t>(0);
+		returnedValue.retrieveFromVector(vector, 0);
+
+		CHECK(returnedValue.getValue() == parameter.getValue());
+	}
+
+	SECTION("Append float to vector") {
+		etl::vector<uint8_t, 16> vector = {};
+		auto parameter = Parameter<float>(3.52f);
+
+		parameter.appendToVector(vector);
+
+		auto returnedValue = Parameter<float>(0);
+		returnedValue.retrieveFromVector(vector, 0);
+
+		CHECK(parameter.getValue() == returnedValue.getValue());
 	}
 }
 

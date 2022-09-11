@@ -89,11 +89,30 @@ public:
 		message.append<DataType>(currentValue);
 	};
 
+	/**
+	 * Append a parameter to the end of an etl::vector.
+	 * @tparam N The maximum capacity of the vector
+	 * @param vector The vector
+	 */
 	template <size_t N>
 	inline void appendToVector(etl::vector<uint8_t, N>& vector) {
-		for (int8_t i = sizeof(DataType) - 1; i >= 0; i--) {
-			vector.push_back(currentValue >> (i * 8));
+		etl::array<uint8_t, 8> array = {};
+		memcpy(array.data(), &currentValue, sizeof(DataType));
+
+		for (uint8_t value: array) {
+			vector.push_back(value);
 		}
+	}
+
+	/**
+	 * Given a vector and a position, set currentValue to the bytes that are in position of vector
+	 * @tparam N The maximum capacity of the vector
+	 * @param vector The vector
+	 * @param position The position to start reading bytes from
+	 */
+	template <size_t N>
+	inline void retrieveFromVector(const etl::vector<uint8_t, N>& vector, size_t position) {
+		memcpy(&currentValue, vector.data() + position, sizeof(DataType));
 	}
 };
 
