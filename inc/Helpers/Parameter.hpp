@@ -96,9 +96,13 @@ public:
 	 */
 	template <size_t N>
 	inline void appendToVector(etl::vector<uint8_t, N>& vector) {
-		etl::array<uint8_t, 8> array = {};
+		static_assert(N >= sizeof(uint64_t), "Appending parameters requires a vector larger than 8 bytes");
+		etl::array<uint8_t, sizeof(uint64_t)> array = {};
 		memcpy(array.data(), &currentValue, sizeof(DataType));
 
+		if(ErrorHandler::assertInternal(sizeof(DataType) >= vector.available(), ErrorHandler::TooManyBitsAppend)){
+			return;
+		}
 		for (uint8_t value: array) {
 			vector.push_back(value);
 		}
