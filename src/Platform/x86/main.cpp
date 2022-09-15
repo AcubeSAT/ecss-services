@@ -27,38 +27,6 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <string>
-HousekeepingService& housekeepingService = Services.housekeeping;
-ParameterService parameterManagement;
-
-
-void initializeHousekeepingStructures() {
-	uint8_t ids[3] = {0, 4, 6};
-	uint32_t interval = 7;
-	etl::vector<uint16_t, 3> simplyCommutatedIds = {0, 1, 2};
-
-	HousekeepingStructure structures[3];
-	int i = 0;
-	for (auto& newStructure: structures) {
-		newStructure.structureId = ids[i];
-		newStructure.collectionInterval = interval;
-		newStructure.periodicGenerationActionStatus = false;
-		for (uint16_t parameterId: simplyCommutatedIds) {
-			newStructure.simplyCommutatedParameterIds.push_back(parameterId);
-		}
-		housekeepingService.housekeepingStructures.insert({ids[i], newStructure});
-		i++;
-	}
-}
-
-
-void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
-	//	Message samples(HousekeepingService::ServiceType,
-	//	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
-
-	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id1)->get()).setValue(33);
-	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id2)->get()).setValue(77);
-	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id3)->get()).setValue(99);
-}
 
 int main() {
 
