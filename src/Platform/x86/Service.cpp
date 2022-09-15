@@ -11,17 +11,42 @@
 
 class PacketSender {
 private:
-	const char* hostname = "127.0.0.1";
 	const uint16_t port = 10015;
 	sockaddr_in destination;
 	int socket;
 
 public:
 	PacketSender() {
-		socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+		//TCP  sending to yamcs Socket creation
+
+		socket = ::socket(AF_INET, SOCK_STREAM, 0);
 		destination.sin_family = AF_INET;
 		destination.sin_port = htons(port);
-		destination.sin_addr.s_addr = inet_addr(hostname);
+		inet_pton(AF_INET, "127.0.0.1", &destination.sin_addr);
+
+		//TCP Socket Binding
+		if (bind(socket, (sockaddr*) &destination, sizeof(destination))<0){
+			printf("\nTCP socket binding failed\n");
+		}
+		else {
+			LOG_DEBUG <<"Binding with 10015 finished successfully";
+		}
+		//TCP Socket Listening
+		if(listen(socket,1) <0){
+			printf("\nTCP socket listening failed\n");
+		}
+		else{
+			LOG_DEBUG <<"Listening";
+		}
+		//TCP Socket Accept
+		int clientSocket = accept(socket,(sockaddr*)&destination, (socklen_t*)&destination);
+		if (clientSocket<0){
+			printf("\nTCP socket acceptance failed\n");
+		}
+		else{
+			LOG_DEBUG <<"Accepted";
+		}
+
 	};
 
 	~PacketSender() {
@@ -31,7 +56,7 @@ public:
 	void sendPacketToYamcs(Message& message) {
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-		auto bytesSent = ::sendto(socket, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
+		auto bytesSent = ::send(socket, createdPacket.c_str(), createdPacket.length(), 0);
 		LOG_DEBUG << bytesSent << " bytes sent";
 	}
 };

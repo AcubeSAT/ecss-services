@@ -20,9 +20,86 @@
 #include "etl/String.hpp"
 #include "ServicePool.hpp"
 #include <ctime>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <string>
+
 
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
+
+	//Receiving from Yamcs
+
+	//TCP Socket creation
+	int listening = socket(AF_INET,SOCK_STREAM,0);
+	if ( listening< 0) {
+		printf("\nTCP socket creation failed");
+			return 1;
+		} else {
+			LOG_DEBUG << "Socket created successfully";
+    }
+	struct sockaddr_in addr;
+	addr.sin_family=AF_INET;
+	addr.sin_port= htons(10025);
+	inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+
+	//TCP Socket Binding
+	if (bind(listening, (sockaddr*) &addr, sizeof(addr))<0){
+		printf("\nTCP socket binding failed\n");
+		return 2;
+	}
+	else {
+		LOG_DEBUG <<"Binding with 10025 finished successfully";
+	}
+
+	//TCP Socket Listening
+	if(listen(listening,1) <0){
+		printf("\nTCP socket listening failed\n");
+		return 1;
+	}
+	else{
+		LOG_DEBUG <<"Listening successfully";
+	}
+
+
+	//TCP Socket Accept
+	int clientSocket = accept(listening,(sockaddr*)&addr, (socklen_t*)&addr);
+	if (clientSocket<0){
+		printf("\nTCP socket acceptance failed\n");
+		return 1;
+	}
+	else{
+		LOG_DEBUG <<"Accepted";
+	}
+
+	//receeiving a message
+	char message[1000];
+	int msglen;
+	int addrlen = sizeof(addr);
+	while(true){
+		std::ostringstream ss;
+		msglen = recvfrom(clientSocket, (char*)message, sizeof(message), 0, (struct sockaddr*) &addr, reinterpret_cast<socklen_t*>(&addrlen));
+		if (msglen < 0) {
+			printf("No messages from YAMCS received\n");
+			continue;
+		}
+		for (int i = 0; i < msglen; i++) {
+			ss << static_cast<int>(message[i]) << " ";
+		}
+			printf("size of message %d", msglen);
+			LOG_NOTICE << ss.str();
+			Message m = MessageParser::parse(reinterpret_cast<uint8_t*>(message), msglen);
+			MessageParser::execute(m);
+	}
+
+	//TCP socket closed
+	close(listening);
+
+
 
 	Message packet = Message(0, 0, Message::TC, 1);
 
@@ -41,6 +118,7 @@ int main() {
 	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
 
 	// ST[17] test
+
 	TestService& testService = Services.testService;
 	Message receivedPacket =
 	    Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
