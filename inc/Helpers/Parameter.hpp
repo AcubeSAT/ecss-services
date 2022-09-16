@@ -100,7 +100,7 @@ public:
 		etl::array<uint8_t, sizeof(uint64_t)> array = {};
 		memcpy(array.data(), &currentValue, sizeof(DataType));
 
-		if(ErrorHandler::assertInternal(sizeof(DataType) >= vector.available(), ErrorHandler::TooManyBitsAppend)){
+		if(not ErrorHandler::assertInternal(sizeof(DataType) <= vector.available(), ErrorHandler::TooManyBitsAppend)){
 			return;
 		}
 		for (uint8_t value: array) {
