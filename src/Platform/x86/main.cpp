@@ -27,8 +27,18 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <string>
+ParameterService parameterManagement;
+void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
+	//	Message samples(HousekeepingService::ServiceType,
+	//	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
+
+	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id1)->get()).setValue(33);
+	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id2)->get()).setValue(77);
+	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id3)->get()).setValue(99);
+}
 
 int main() {
+	storeSamplesToParameters(0, 1, 2);
 
 	LOG_NOTICE << "ECSS Services test application";
 
@@ -95,6 +105,8 @@ int main() {
 			Message m = MessageParser::parse(reinterpret_cast<uint8_t*>(message), msglen);
 			MessageParser::execute(m);
 	}
+	//TCP socket closed
+	close(listening);
 
 
 

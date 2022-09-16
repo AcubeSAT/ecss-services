@@ -50,7 +50,7 @@ public:
 	};
 
 	~PacketSender() {
-		::close(socket);
+		//::close(socket);
 	};
 
 	void sendPacketToYamcs(Message& message) {
