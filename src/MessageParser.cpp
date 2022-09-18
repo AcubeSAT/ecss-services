@@ -154,7 +154,6 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 }
 
 String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
-	uint8_t headerSize = ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize);
 	// Unfortunately to avoid using VLAs, we will create an array with the maximum size.
 	uint8_t header[ECSSSecondaryTMHeaderSize];
 
@@ -181,7 +180,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[10] = (ticks) & 0xffU;
 	}
 
-	String<CCSDSMaxMessageSize> dataString(header, headerSize);
+	String<CCSDSMaxMessageSize> dataString(header, ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize));
 	dataString.append(message.data, message.dataSize);
 
 	// Make sure to reach the requested size
