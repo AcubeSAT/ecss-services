@@ -99,6 +99,7 @@ int main() {
 		}
 		for (int i = 0; i < msglen; i++) {
 			ss << static_cast<int>(message[i]) << " ";
+
 		}
 			printf("size of message %d", msglen);
 			LOG_NOTICE << ss.str();

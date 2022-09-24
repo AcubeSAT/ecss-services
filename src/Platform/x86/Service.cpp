@@ -56,7 +56,7 @@ public:
 	void sendPacketToYamcs(Message& message) {
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-		auto bytesSent = ::send(socket, createdPacket.c_str(), createdPacket.length(), 0);
+		auto bytesSent = ::send(socket, createdPacket.c_str(), createdPacket.length(), MSG_NOSIGNAL);
 		LOG_DEBUG << bytesSent << " bytes sent";
 	}
 };
