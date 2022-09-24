@@ -81,8 +81,10 @@ void EventReportService::enableReportGeneration(Message message) {
 	 * @todo: Report an error if length > numberOfEvents
 	 */
 	uint16_t length = message.readUint16();
-	for (uint16_t i = 0; i < length; i++) {
-		stateOfEvents[message.readEnum16()] = true;
+	if (length <= numberOfEvents) {
+		for (uint16_t i = 0; i < length; i++) {
+			stateOfEvents[message.readEnum16()] = true;
+		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
@@ -95,8 +97,10 @@ void EventReportService::disableReportGeneration(Message message) {
 	 * @todo: Report an error if length > numberOfEvents
 	 */
 	uint16_t length = message.readUint16();
-	for (uint16_t i = 0; i < length; i++) {
-		stateOfEvents[message.readEnum16()] = false;
+	if (length <= numberOfEvents) {
+		for (uint16_t i = 0; i < length; i++) {
+			stateOfEvents[message.readEnum16()] = false;
+		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
