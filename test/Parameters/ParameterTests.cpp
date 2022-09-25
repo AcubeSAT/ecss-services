@@ -1,5 +1,6 @@
-#include "Helpers/Parameter.hpp"
 #include <iostream>
+#include "../Services/ServiceTests.hpp"
+#include "Helpers/Parameter.hpp"
 #include "Message.hpp"
 #include "Services/ParameterService.hpp"
 #include "catch2/catch_all.hpp"
@@ -43,6 +44,18 @@ TEST_CASE("Parameter Append") {
 		returnedValue.retrieveFromVector(vector, 0);
 
 		CHECK(parameter.getValue() == returnedValue.getValue());
+	}
+
+	SECTION("Append to a vector smaller than allowed") {
+		etl::vector<uint8_t, 8> vector = {1, 2, 3, 4, 5, 6};
+		auto parameter = Parameter<uint32_t>(291430);
+
+		parameter.appendToVector(vector);
+
+		auto returnedValue = Parameter<uint32_t>(0);
+		returnedValue.retrieveFromVector(vector, vector.size() - 6);
+
+		CHECK(ServiceTests::thrownError(ErrorHandler::TooManyBitsAppend));
 	}
 }
 
