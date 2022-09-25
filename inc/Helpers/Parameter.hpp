@@ -1,10 +1,10 @@
 #ifndef ECSS_SERVICES_PARAMETER_HPP
 #define ECSS_SERVICES_PARAMETER_HPP
 
+#include "ECSS_Definitions.hpp"
+#include "Message.hpp"
 #include "etl/String.hpp"
 #include "etl/vector.h"
-#include "Message.hpp"
-#include "ECSS_Definitions.hpp"
 
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
@@ -100,7 +100,7 @@ public:
 		etl::array<uint8_t, sizeof(uint64_t)> array = {};
 		memcpy(array.data(), &currentValue, sizeof(DataType));
 
-		if(not ErrorHandler::assertInternal(sizeof(DataType) <= vector.available(), ErrorHandler::TooManyBitsAppend)){
+		if (not ErrorHandler::assertInternal(sizeof(DataType) <= vector.available(), ErrorHandler::TooManyBitsAppend)) {
 			return;
 		}
 		for (uint8_t value: array) {
