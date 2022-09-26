@@ -159,7 +159,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 
 	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
-	auto filledPercentage1 = static_cast<uint16_t>(static_cast<float>(packetStores[packetStoreId].storedTelemetryPackets.size()) * 100 /
+	auto filledPercentage1 = static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f /
 	                                               ECSSMaxPacketStoreSize);
 	report.appendUint16(filledPercentage1);
 
@@ -169,7 +169,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 	    std::end(packetStores[packetStoreId].storedTelemetryPackets), [this, &packetStoreId](auto packet) {
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
 	    });
-	auto filledPercentage2 = static_cast<uint16_t>(static_cast<float>(numOfPacketsToBeTransferred) * 100 / ECSSMaxPacketStoreSize);
+	auto filledPercentage2 = static_cast<uint16_t>(numOfPacketsToBeTransferred * 100.0f / ECSSMaxPacketStoreSize);
 	report.appendUint16(filledPercentage2);
 }
 
@@ -532,7 +532,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		uint16_t numOfPacketStoresToDelete = 0;
-		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[packetStores.size()];
+		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[ECSSMaxPacketStores];
 		for (auto& packetStore: packetStores) {
 			if (packetStore.second.storageStatus) {
 				ErrorHandler::reportError(

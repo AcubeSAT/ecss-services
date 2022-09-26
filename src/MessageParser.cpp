@@ -154,8 +154,8 @@ Message MessageParser::parseECSSTC(uint8_t* data) {
 }
 
 String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
-	uint8_t headerSize = ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize);
-	uint8_t header[headerSize];
+	// Unfortunately to avoid using VLAs, we will create an array with the maximum size.
+	uint8_t header[ECSSSecondaryTMHeaderSize];
 
 	if (message.packetType == Message::TC) {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
@@ -180,7 +180,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[10] = (ticks) & 0xffU;
 	}
 
-	String<CCSDSMaxMessageSize> dataString(header, headerSize);
+	String<CCSDSMaxMessageSize> dataString(header, ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize));
 	dataString.append(message.data, message.dataSize);
 
 	// Make sure to reach the requested size
@@ -213,7 +213,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	packetId |= (1U << 11U);                                              // Secondary header flag
 	packetId |= (message.packetType == Message::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
 	uint16_t packetSequenceControl = message.packetSequenceCount | (3U << 14U);
-	uint16_t packetDataLength = ecssMessage.size();
+	uint16_t packetDataLength = ecssMessage.size() - 1;
 
 	// Compile the header
 	header[0] = packetId >> 8U;
