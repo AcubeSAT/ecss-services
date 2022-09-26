@@ -65,8 +65,8 @@ public:
 			year++;
 		}
 
-		while (seconds >= (daysOfMonth() * SecondsPerDay)) {
-			seconds -= daysOfMonth() * SecondsPerDay;
+		while (seconds >= (daysOfMonth() * uint64_t{SecondsPerDay})) {
+			seconds -= daysOfMonth() * uint64_t{SecondsPerDay};
 		    month++;
 
 			if (month > MonthsPerYear) {
