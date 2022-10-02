@@ -1,7 +1,7 @@
-#include "Services/HousekeepingService.hpp"
 #include <iostream>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
+#include "Services/HousekeepingService.hpp"
 #include "catch2/catch_all.hpp"
 #include "etl/algorithm.h"
 
@@ -532,8 +532,12 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
 
-		uint16_t numOfSimplyCommutatedParams = 13;
-		etl::vector<uint16_t, 13> simplyCommutatedIds = {0, 1, 2, 3, 6, 7, 8, 9, 12, 13, 14, 15, 16};
+		uint16_t numOfSimplyCommutatedParams = 34;
+
+		etl::vector<uint16_t, 34> simplyCommutatedIds;
+		for (uint16_t i = 0; i < 34; i++) {
+			simplyCommutatedIds.push_back(i);
+		}
 
 		request.appendUint8(structId);
 		request.appendUint16(numOfSimplyCommutatedParams);
@@ -546,11 +550,11 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameterIds.size() == 10);
-		CHECK(ServiceTests::count() == 2);
+		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameterIds.size() == 30);
+		CHECK(ServiceTests::count() == 4);
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters) == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter) == 3);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -647,3 +651,42 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
+		CHECK(currentTime == 900);
+		CHECK(ServiceTests::count() == 0);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+		CHECK(currentTime == 1000);
+		CHECK(ServiceTests::count() == 1);
+		currentTime += 6;
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+		CHECK(currentTime == 1800);
+		CHECK(ServiceTests::count() == 2);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+		CHECK(ServiceTests::count() == 3);
+		CHECK(currentTime == 2000);
+		currentTime += 15;
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+		CHECK(ServiceTests::count() == 4);
+		CHECK(currentTime == 2700);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection;
+		CHECK(ServiceTests::count() == 6);
+		CHECK(currentTime == 3000);
+	}
+	SECTION("Collection Intervals set to 0") {
+		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
+			housekeepingStructure.second.periodicGenerationActionStatus = true;
+			housekeepingStructure.second.collectionInterval = 0;
+		}
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		CHECK(nextCollection == 0);
+	}
+}
