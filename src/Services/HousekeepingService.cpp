@@ -116,6 +116,12 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
+
+	HousekeepingStructure housekeepingStructure = housekeepingStructures.at(structureId);
+	if (!housekeepingStructure.periodicGenerationActionStatus) {
+		return;
+	}
+
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
 	housekeepingReport.appendUint8(structureId);
