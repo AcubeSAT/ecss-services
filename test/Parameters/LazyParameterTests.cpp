@@ -66,18 +66,20 @@ TEST_CASE("Lazy Parameter: Messages") {
 }
 
 TEST_CASE("Lazy Parameter: Complex Types") {
-	LazyParameter<Time::CustomCUC_t> parameter({100});
+	using namespace Time;
+
+	LazyParameter<Time::DefaultCUC> parameter(Time::DefaultCUC(100_t));
 
 	SECTION("Default value") {
 		CHECK(parameter.getValue().has_value() == false);
 	}
 
 	SECTION("Set value") {
-		parameter.setGetter([]() -> Time::CustomCUC_t {
-			return {200};
+		parameter.setGetter([]() -> Time::DefaultCUC {
+			return Time::DefaultCUC(200_t);
 		});
 
-		CHECK(parameter.getValue().value() == Time::CustomCUC_t{200});
+		CHECK(parameter.getValue().value() == Time::DefaultCUC{200_t});
 		CHECK(parameter.getValueAsDouble() == 0);
 	}
 }

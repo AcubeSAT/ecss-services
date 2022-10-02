@@ -4,11 +4,11 @@
 void Statistic::updateStatistics(double value) {
 	if (value > max) {
 		max = value;
-		timeOfMaxValue = TimeGetter::getCurrentTimeCustomCUC();
+		timeOfMaxValue = TimeGetter::getCurrentTimeDefaultCUC();
 	}
 	if (value < min) {
 		min = value;
-		timeOfMinValue = TimeGetter::getCurrentTimeCustomCUC();
+		timeOfMinValue = TimeGetter::getCurrentTimeDefaultCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
@@ -43,8 +43,8 @@ void Statistic::setSelfSamplingInterval(uint16_t samplingInterval) {
 void Statistic::resetStatistics() {
 	max = -std::numeric_limits<double>::infinity();
 	min = std::numeric_limits<double>::infinity();
-	timeOfMaxValue.elapsed100msTicks = 0;
-	timeOfMinValue.elapsed100msTicks = 0;
+	timeOfMaxValue = Time::DefaultCUC(0);
+	timeOfMinValue = Time::DefaultCUC(0);
 	mean = 0;
 	sumOfSquares = 0;
 	sampleCounter = 0;
@@ -52,6 +52,6 @@ void Statistic::resetStatistics() {
 
 bool Statistic::statisticsAreInitialized() {
 	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and
-	        timeOfMaxValue.elapsed100msTicks == 0 and timeOfMinValue.elapsed100msTicks == 0 and
+	        timeOfMaxValue == Time::DefaultCUC(0) and timeOfMinValue == Time::DefaultCUC(0) and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
 }

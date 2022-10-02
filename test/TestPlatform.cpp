@@ -18,11 +18,10 @@ UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	return currentTime;
 }
 
-Time::CustomCUC_t TimeGetter::getCurrentTimeCustomCUC() {
+Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 	UTCTimestamp timeUTC = getCurrentTimeUTC();
-	TimeStamp<Time::CUCSecondsBytes, Time::CUCFractionalBytes> timeCUC(timeUTC);
-	Time::CustomCUC_t CUCtime = timeCUC.asCustomCUCTimestamp();
-	return CUCtime;
+	Time::DefaultCUC timeCUC(timeUTC);
+	return timeCUC;
 }
 
 // Explicit template specializations for the logError() function
