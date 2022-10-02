@@ -117,7 +117,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 		return;
 	}
 
-	HousekeepingStructure housekeepingStructure = housekeepingStructures.at(structureId);
+	HousekeepingStructure& housekeepingStructure = housekeepingStructures.at(structureId);
 	if (!housekeepingStructure.periodicGenerationActionStatus) {
 		return;
 	}
