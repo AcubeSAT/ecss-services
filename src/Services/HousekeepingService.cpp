@@ -268,7 +268,7 @@ HousekeepingService::reportPendingStructures(uint32_t currentTime, uint32_t prev
 	uint32_t nextCollection = std::numeric_limits<uint32_t>::max();
 
 	for (auto& housekeepingStructure: housekeepingStructures) {
-		if (housekeepingStructure.second.periodicGenerationActionStatus) {
+		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
 			continue;
 		}
 		if (housekeepingStructure.second.collectionInterval == 0) {

@@ -648,6 +648,10 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
 		housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
 		housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
+		housekeepingService.housekeepingStructures.at(0).periodicGenerationActionStatus = true;
+		housekeepingService.housekeepingStructures.at(4).periodicGenerationActionStatus = true;
+		housekeepingService.housekeepingStructures.at(6).periodicGenerationActionStatus = true;
+
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
