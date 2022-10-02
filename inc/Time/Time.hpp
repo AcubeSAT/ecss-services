@@ -263,58 +263,10 @@ namespace Time {
 		return (year % 400) == 0;
 	}
 
-	struct CustomCUC_t {
-		uint64_t elapsed100msTicks = 0;
-
-		/**
-		 * @return The time represented in milliseconds elapsed from the epoch
-		 */
-		uint64_t getMs() {
-			return elapsed100msTicks * 100;
-		}
-	};
-
 	/**
  	* A time shift for scheduled activities measured in seconds
  	*/
 	typedef int64_t RelativeTime;
-
-	inline Time::CustomCUC_t operator+(const Time::CustomCUC_t time, RelativeTime relativeTime) {
-		return Time::CustomCUC_t{time.elapsed100msTicks + relativeTime * 10};
-	}
-
-	inline Time::CustomCUC_t operator-(const Time::CustomCUC_t time, RelativeTime relativeTime) {
-		return Time::CustomCUC_t{time.elapsed100msTicks - relativeTime * 10};
-	}
-
-	inline Time::CustomCUC_t& operator+=(Time::CustomCUC_t& time, RelativeTime relativeTime) {
-		time.elapsed100msTicks += relativeTime * 10;
-		return time;
-	}
-
-	inline Time::CustomCUC_t operator-(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return Time::CustomCUC_t{time1.elapsed100msTicks - time2.elapsed100msTicks};
-	}
-
-	inline Time::CustomCUC_t operator+(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return Time::CustomCUC_t{time1.elapsed100msTicks + time2.elapsed100msTicks};
-	}
-
-	inline bool operator<(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks < time2.elapsed100msTicks;
-	}
-
-	inline bool operator>(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks > time2.elapsed100msTicks;
-	}
-
-	inline bool operator==(const Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks == time2.elapsed100msTicks;
-	}
-
-	inline bool operator>=(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks >= time2.elapsed100msTicks;
-	}
 
 	/**
 	 * is_duration definition to check if a variable is std::chrono::duration
