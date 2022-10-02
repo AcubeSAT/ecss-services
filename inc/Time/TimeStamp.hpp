@@ -211,12 +211,28 @@ public:
 	 */
 	UTCTimestamp toUTCtimestamp();
 
+	/**
+	 * Get the maximum timestamp that can be represented by this class
+	 *
+	 * Can be used to represent null or infinite amounts of time
+	 */
 	static TimeStamp<BaseBytes, FractionBytes, Num, Denom> max() {
 		TimeStamp<BaseBytes, FractionBytes, Num, Denom> timestamp;
 		timestamp.taiCounter = std::numeric_limits<TAICounter_t>::max();
 		return timestamp;
 	}
 
+	/**
+	 * Adds any arbitrary duration to a timestamp.
+	 *
+	 * You can play with default C++ durations with this function:
+	 * ```cpp
+	 * using namespace std::literals;
+	 *
+	 * timestamp + std::chrono::seconds(5);        // adds 5 seconds
+	 * timestamp + std::chrono::milliseconds(500); // adds 5 milliseconds
+	 * timestamp + 60s; // adds 60 seconds
+	 */
 	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
 	TimeStamp<BaseBytes, FractionBytes, Num, Denom> operator+(const Duration& duration) const {
 		auto output = *this;
@@ -225,7 +241,7 @@ public:
 	}
 
 	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
-	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator+=(const Duration& duration)  {
+	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator+=(const Duration& duration) {
 		if (duration < Duration::zero()) {
 			taiCounter -= std::chrono::duration_cast<RawDuration>(-duration).count();
 		} else {
@@ -243,7 +259,7 @@ public:
 	}
 
 	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
-	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator-=(const Duration& duration)  {
+	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator-=(const Duration& duration) {
 		if (duration < Duration::zero()) {
 			taiCounter += std::chrono::duration_cast<RawDuration>(-duration).count();
 		} else {
@@ -253,7 +269,18 @@ public:
 		return *this;
 	}
 
-	template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1, class Duration = std::chrono::duration<typename std::make_signed<typename RawDuration::rep>::type, typename RawDuration::period>>
+	/**
+	 * Subtraction between two timestamps.
+	 *
+	 * Given 2 absolute moments in time, returns the relative duration between them.
+	 * @tparam Duration The duration returned is equal to the RawDuration of the first timestamp,
+	 * 					but it's signed instead of unsigned, so that negative results can be represented.
+	 */
+	template <
+	    uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1, // Template parameters of the 2nd timestamp
+	    class Duration = std::chrono::duration< // Create a new Duration based on our RawDuration...
+	        typename std::make_signed<typename RawDuration::rep>::type, // the Duration base type is equal to the RawDuration, but converted to signed from unsigned
+	        typename RawDuration::period>>
 	Duration operator-(const TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn>& operand) const {
 		Duration myDuration = asDuration<Duration>();
 		Duration operandDuration = operand.template asDuration<Duration>();
@@ -313,10 +340,9 @@ namespace Time {
 	 *
 	 * The time amount of a "tick" is the period defined by the DefaultCUC::Ratio
 	 */
-	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator ""_t(unsigned long long s)
-	{
+	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator""_t(unsigned long long s) {
 		return std::chrono::duration<uint32_t, DefaultCUC::Ratio>(s);
 	}
-}
+} // namespace Time
 
 #include "TimeStamp.tpp"
