@@ -149,7 +149,7 @@ public:
 	void appendWord(uint32_t value);
 
 	/**
-	 * Appends any CUC timestamp to the message.
+	 * Appends any CUC timestamp to the message, including the header.
 	 */
 	template <class Ts>
 	void appendCUCTimeStamp(const Ts& timestamp) {
@@ -158,8 +158,12 @@ public:
 		appendString(String<Time::CUCTimestampMaximumSize>(text.data(), text.size()));
 	}
 
+	/**
+	 * Appends a default timestamp object to the message, without the header
+	 */
 	void appendDefaultCUCTimeStamp(Time::DefaultCUC timestamp) {
-		appendUint32(timestamp.HACKERS____TODO());
+		static_assert(std::is_same_v<uint32_t, decltype(timestamp.formatAsBytes())>, "The default timestamp should be 4 bytes");
+		appendUint32(timestamp.formatAsBytes());
 	}
 
 	/**

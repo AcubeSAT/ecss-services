@@ -102,7 +102,10 @@ private:
 	/**
 	 * The maximum value of the base type (seconds, larger or smaller) that can fit in @ref taiCounter
 	 */
-	static constexpr uint64_t MaxBase = (BaseBytes == 8) ? std::numeric_limits<uint64_t>::max() : (1UL << 8 * BaseBytes) - 1;
+	static constexpr uint64_t MaxBase =
+	    (BaseBytes == 8)
+	        ? std::numeric_limits<uint64_t>::max()
+	        : (uint64_t{1} << 8 * BaseBytes) - 1;
 
 	/**
 	 * The maximum number of seconds since epoch that can be represented in this class
@@ -297,6 +300,22 @@ public:
 
 namespace Time {
 	using DefaultCUC = TimeStamp<4, 0, 1, 10>;
+
+	/**
+	 * Creates a custom literal to specify timestamp ticks.
+	 *
+	 * For example, this code:
+	 * ```cpp
+	 * Time::DefaultCUC timestamp(1000_t);
+	 * ```
+	 * will define a timestamp 1000 ticks from the epoch.
+	 *
+	 * The time amount of a "tick" is the period defined by the DefaultCUC::Ratio
+	 */
+	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator ""_t(unsigned long long s)
+	{
+		return std::chrono::duration<uint32_t, DefaultCUC::Ratio>(s);
+	}
 }
 
 #include "TimeStamp.tpp"
