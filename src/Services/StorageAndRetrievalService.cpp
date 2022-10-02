@@ -534,7 +534,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		int numOfPacketStoresToDelete = 0;
-		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[packetStores.size()];
+		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[ECSSMaxPacketStores];
 		for (auto& packetStore : packetStores) {
 			if (packetStore.second.storageStatus) {
 				ErrorHandler::reportError(
