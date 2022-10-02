@@ -118,9 +118,6 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	}
 
 	HousekeepingStructure housekeepingStructure = housekeepingStructures.at(structureId);
-	if (!housekeepingStructure.periodicGenerationActionStatus) {
-		return;
-	}
 
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
@@ -272,8 +269,10 @@ HousekeepingService::reportPendingStructures(uint32_t currentTime, uint32_t prev
 
 	for (auto& housekeepingStructure: housekeepingStructures) {
 		if (housekeepingStructure.second.collectionInterval == 0) {
-			housekeepingParametersReport(housekeepingStructure.second.structureId);
-			nextCollection = 0;
+			if (housekeepingStructure.second.periodicGenerationActionStatus) {
+				housekeepingParametersReport(housekeepingStructure.second.structureId);
+				nextCollection = 0;
+			}
 			continue;
 		}
 		if (currentTime != 0 and (currentTime % housekeepingStructure.second.collectionInterval == 0 or

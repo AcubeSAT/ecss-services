@@ -1,7 +1,7 @@
+#include "Services/HousekeepingService.hpp"
 #include <iostream>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
-#include "Services/HousekeepingService.hpp"
 #include "catch2/catch_all.hpp"
 #include "etl/algorithm.h"
 
@@ -36,13 +36,13 @@ void initializeHousekeepingStructures() {
 	uint8_t ids[3] = {0, 4, 6};
 	uint32_t interval = 7;
 	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
-	HousekeepingStructure structures[3];
 
+	HousekeepingStructure structures[3];
 	int i = 0;
 	for (auto& newStructure: structures) {
 		newStructure.structureId = ids[i];
 		newStructure.collectionInterval = interval;
-		newStructure.periodicGenerationActionStatus = true;
+		newStructure.periodicGenerationActionStatus = false;
 		for (uint16_t parameterId: simplyCommutatedIds) {
 			newStructure.simplyCommutatedParameterIds.push_back(parameterId);
 		}
@@ -71,7 +71,7 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 void appendNewParameters(Message& request, uint8_t idToAppend) {
 	uint16_t numOfSimplyCommutatedParams = 7;
 	etl::vector<uint16_t, 7> simplyCommutatedIds = {8, 4, 5, 9, 11, 10, 220};
-	housekeepingService.housekeepingStructures.at(idToAppend).periodicGenerationActionStatus = false;
+
 	request.appendUint8(idToAppend);
 	request.appendUint16(numOfSimplyCommutatedParams);
 	for (auto& id: simplyCommutatedIds) {
@@ -260,11 +260,6 @@ TEST_CASE("Enable the periodic generation of housekeeping structures") {
 		for (auto& id: idsToEnable) {
 			request2.appendUint8(id);
 		}
-
-		housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus = false;
-		housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus = false;
-		housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus = false;
-
 		REQUIRE(not housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus);
 		REQUIRE(not housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus);
 		REQUIRE(not housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus);
@@ -293,7 +288,9 @@ TEST_CASE("Disable the periodic generation of housekeeping structures") {
 		for (auto& id: idsToDisable) {
 			request2.appendUint8(id);
 		}
-
+		housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus = true;
+		housekeepingService.housekeepingStructures[4].periodicGenerationActionStatus = true;
+		housekeepingService.housekeepingStructures[6].periodicGenerationActionStatus = true;
 
 		MessageParser::execute(request2);
 
@@ -330,7 +327,7 @@ TEST_CASE("Reporting of housekeeping structures") {
 
 		uint8_t validId = 4;
 		CHECK(report.readUint8() == validId);
-		CHECK(report.readBoolean());     // periodic status
+		CHECK(not report.readBoolean()); // periodic status
 		CHECK(report.readUint32() == 7); // interval
 		CHECK(report.readUint16() == 3); // number of simply commutated ids
 		CHECK(report.readUint16() == 8);
@@ -353,7 +350,7 @@ TEST_CASE("Reporting of housekeeping structures without a TC message as argument
 
 		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingStructuresReport);
 		CHECK(report.readUint8() == structureId);
-		CHECK(report.readBoolean());
+		CHECK(not report.readBoolean());
 		CHECK(report.readUint32() == 7);
 		CHECK(report.readUint16() == 3);
 		CHECK(report.readUint16() == 8);
@@ -395,25 +392,6 @@ TEST_CASE("Reporting of housekeeping parameters") {
 		housekeepingService.housekeepingParametersReport(structId);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 2);
-
-		ServiceTests::reset();
-		Services.reset();
-	}
-
-	SECTION("Disabled housekeeping structure report generation") {
-		storeSamplesToParameters(8, 4, 5);
-		initializeHousekeepingStructures();
-		uint8_t structId = 6;
-
-		housekeepingService.housekeepingParametersReport(structId);
-
-		CHECK(ServiceTests::count() == 1);
-		Message report = ServiceTests::get(0);
-		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
-		REQUIRE(report.readUint8() == structId);
-		CHECK(report.readUint16() == 33);
-		CHECK(report.readUint8() == 77);
-		CHECK(report.readUint32() == 99);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -552,8 +530,8 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		initializeHousekeepingStructures();
 		uint8_t structId = 6;
 		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, ApplicationId);
-		housekeepingService.housekeepingStructures.at(structId).periodicGenerationActionStatus = false;
+		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
+
 		uint16_t numOfSimplyCommutatedParams = 13;
 		etl::vector<uint16_t, 13> simplyCommutatedIds = {0, 1, 2, 3, 6, 7, 8, 9, 12, 13, 14, 15, 16};
 
@@ -617,7 +595,7 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		for (auto& id: structIds) {
 			request.appendUint8(id);
 		}
-		housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus = false;
+		housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus = true;
 		housekeepingService.housekeepingStructures[4].collectionInterval = 24;
 		housekeepingService.housekeepingStructures[6].collectionInterval = 13;
 
@@ -630,13 +608,13 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		Message report = ServiceTests::get(3);
 		CHECK(report.readUint8() == 3);       // Number of valid ids
 		CHECK(report.readUint8() == 0);       // Id
-		CHECK(report.readBoolean() == false); // Periodic status
+		CHECK(report.readBoolean() == true);  // Periodic status
 		CHECK(report.readUint32() == 7);      // Interval
 		CHECK(report.readUint8() == 4);       // Id
-		CHECK(report.readBoolean() == true);  // Periodic status
+		CHECK(report.readBoolean() == false); // Periodic status
 		CHECK(report.readUint32() == 24);     // Interval
 		CHECK(report.readUint8() == 6);       // Id
-		CHECK(report.readBoolean() == true);  // Periodic status
+		CHECK(report.readBoolean() == false); // Periodic status
 		CHECK(report.readUint32() == 13);     // Interval
 
 		ServiceTests::reset();
@@ -669,41 +647,3 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime += nextCollection;
-		CHECK(currentTime == 900);
-		CHECK(ServiceTests::count() == 0);
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(currentTime == 1000);
-		CHECK(ServiceTests::count() == 1);
-		currentTime += 6;
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(currentTime == 1800);
-		CHECK(ServiceTests::count() == 2);
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(ServiceTests::count() == 3);
-		CHECK(currentTime == 2000);
-		currentTime += 15;
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(ServiceTests::count() == 4);
-		CHECK(currentTime == 2700);
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(ServiceTests::count() == 6);
-		CHECK(currentTime == 3000);
-	}
-	SECTION("Collection Intervals set to 0") {
-		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
-			housekeepingStructure.second.collectionInterval = 0;
-		}
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		CHECK(nextCollection == 0);
-	}
-}
