@@ -164,7 +164,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <class Duration>
-Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() {
+Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() const {
 	auto duration = RawDuration(taiCounter);
 
 	return std::chrono::duration_cast<Duration>(duration);

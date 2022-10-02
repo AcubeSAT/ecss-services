@@ -190,7 +190,7 @@ public:
 	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are compatible so that no overflow occurs.
 	 */
 	template <class Duration = std::chrono::seconds>
-	Duration asDuration();
+	Duration asDuration() const;
 
 	/**
 	 * Get the representation as CUC formatted bytes, including the header (P-field and T-field)
@@ -251,6 +251,14 @@ public:
 		}
 
 		return *this;
+	}
+
+	template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1, class Duration = std::chrono::duration<typename std::make_signed<typename RawDuration::rep>::type, typename RawDuration::period>>
+	Duration operator-(const TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn>& operand) const {
+		Duration myDuration = asDuration<Duration>();
+		Duration operandDuration = operand.template asDuration<Duration>();
+
+		return myDuration - operandDuration;
 	}
 
 	/**

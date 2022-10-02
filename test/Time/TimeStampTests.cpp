@@ -185,7 +185,7 @@ TEST_CASE("UTC overflow tests") {
 	}
 }
 
-TEST_CASE("Time operators") {
+TEST_CASE("Time comparison operators") {
 	SECTION("Same type") {
 		TimeStamp<1, 2> time1;
 		TimeStamp<1, 2> time2;
@@ -237,6 +237,31 @@ TEST_CASE("Time operators") {
 		CHECK(time1 <= time2);
 		CHECK(time2 > time1);
 		CHECK(time2 >= time1);
+	}
+}
+
+TEST_CASE("Finding distance between times") {
+	using namespace std::literals;
+
+	SECTION("Same type") {
+		TimeStamp<1, 2> time1(15);
+		TimeStamp<1, 2> time2(30);
+
+		CHECK(time2 - time1 == 15s);
+		CHECK(time1 - time2 == -15s);
+	}
+
+	SECTION("Different type") {
+		TimeStamp<1, 2> time1(15);
+		TimeStamp<2, 1> time2(30);
+		TimeStamp<1, 0, 1, 1000> time3(300ms);
+		TimeStamp<1, 2> time4(300ms);
+		TimeStamp<1, 3> time5(300ms);
+
+		CHECK(time2 - time1 == 15s);
+		CHECK(time1 - time2 == -15s);
+		CHECK(time3 - time1 == -14700ms);
+		CHECK(time1 - time4 == time1 - time5);
 	}
 }
 
