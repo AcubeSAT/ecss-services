@@ -226,7 +226,6 @@ public:
 
 	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
 	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator+=(const Duration& duration)  {
-		// todo overflow
 		if (duration < Duration::zero()) {
 			taiCounter -= std::chrono::duration_cast<RawDuration>(-duration).count();
 		} else {
@@ -245,7 +244,6 @@ public:
 
 	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
 	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator-=(const Duration& duration)  {
-		// todo overflow
 		if (duration < Duration::zero()) {
 			taiCounter += std::chrono::duration_cast<RawDuration>(-duration).count();
 		} else {
