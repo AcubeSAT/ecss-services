@@ -126,11 +126,6 @@ public:
 	 */
 	TimeStamp() : taiCounter(0){};
 
-	constexpr uint32_t HACKERS____TODO() {
-		static_assert(std::is_same_v<uint32_t, TAICounter_t>);
-		return taiCounter;
-	}
-
 	/**
 	 * Initialize the TimeStamp from a duration from epoch in TAI (leap seconds not accounted)
 	 *

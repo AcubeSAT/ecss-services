@@ -575,7 +575,7 @@ public:
 		return reinterpret_cast<float&>(value);
 	}
 
-	float readDouble() {
+	double readDouble() {
 		static_assert(sizeof(uint64_t) == sizeof(double), "Double numbers must be 64 bits long");
 
 		uint64_t value = readUint64();
@@ -587,8 +587,9 @@ public:
 	 */
 	Time::DefaultCUC readDefaultCUCTimeStamp() {
 		auto time = readUint32();
-		//todo fix
-		return Time::DefaultCUC(std::chrono::milliseconds(100UL * time));
+		std::chrono::duration<uint32_t, Time::DefaultCUC::Ratio> duration(time);
+
+		return Time::DefaultCUC(duration);
 	}
 
 	/**
