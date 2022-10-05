@@ -1,5 +1,5 @@
-#ifndef ECSS_SERVICES_PACKET_H
-#define ECSS_SERVICES_PACKET_H
+#ifndef ECSS_SERVICES_ECSSMESSAGE_H
+#define ECSS_SERVICES_ECSSMESSAGE_H
 
 #include <Time/TimeStamp.hpp>
 #include <cstdint>
@@ -814,4 +814,4 @@ inline Time::RelativeTime ECSSMessage::read() {
 	return readRelativeTime();
 }
 
-#endif // ECSS_SERVICES_PACKET_H
+#endif // ECSS_SERVICES_ECSSMESSAGE_H
