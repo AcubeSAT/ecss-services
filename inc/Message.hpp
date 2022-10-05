@@ -1,0 +1,9 @@
+#ifndef ECSS_SERVICES_MESSAGE_HPP
+#define ECSS_SERVICES_MESSAGE_HPP
+
+
+class Message {
+
+};
+
+#endif //ECSS_SERVICES_MESSAGE_HPP

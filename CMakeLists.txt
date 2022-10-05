@@ -28,6 +28,7 @@ add_library(common OBJECT
         src/Service.cpp
         src/ErrorHandler.cpp
         src/ECSSMessage.cpp
+        src/Message.cpp
         src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp
