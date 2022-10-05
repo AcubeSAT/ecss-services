@@ -1,6 +1,6 @@
 #include <iostream>
+#include "ECSSMessage.hpp"
 #include "ECSS_Definitions.hpp"
-#include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
 #include "catch2/catch_all.hpp"
@@ -17,7 +17,7 @@ uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPro
 uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
-void validReportTypes(Message& request) {
+void validReportTypes(ECSSMessage& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
 	uint8_t numOfMessagesPerService = 2;
@@ -41,7 +41,7 @@ void validReportTypes(Message& request) {
 	}
 }
 
-void duplicateReportTypes(Message& request) {
+void duplicateReportTypes(ECSSMessage& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
 	uint8_t numOfMessagesPerService = 2;
@@ -64,7 +64,7 @@ void duplicateReportTypes(Message& request) {
 	}
 }
 
-void validInvalidReportTypes(Message& request) {
+void validInvalidReportTypes(ECSSMessage& request) {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
 
@@ -90,7 +90,7 @@ void validInvalidReportTypes(Message& request) {
 	}
 }
 
-void validAllReportsOfService(Message& request) {
+void validAllReportsOfService(ECSSMessage& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
 	uint8_t numOfMessagesPerService = 0;
@@ -109,7 +109,7 @@ void validAllReportsOfService(Message& request) {
 	}
 }
 
-void validInvalidAllReportsOfService(Message& request) {
+void validInvalidAllReportsOfService(ECSSMessage& request) {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
 
@@ -138,7 +138,7 @@ void validInvalidAllReportsOfService(Message& request) {
 	}
 }
 
-void validAllReportsOfApp(Message& request) {
+void validAllReportsOfApp(ECSSMessage& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 0;
 
@@ -150,7 +150,7 @@ void validAllReportsOfApp(Message& request) {
 	}
 }
 
-void validInvalidAllReportsOfApp(Message& request) {
+void validInvalidAllReportsOfApp(ECSSMessage& request) {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
 
@@ -187,9 +187,9 @@ void resetAppProcessConfiguration() {
 
 TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Successful addition of report types to the Application Process Configuration") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
@@ -223,9 +223,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Requested Application Process is not controlled by the service") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 
 		uint8_t applicationID = 1;
 		validReportTypes(request);
@@ -242,9 +242,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("All service types already allowed") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
@@ -268,9 +268,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Max service types already reached") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 
 		uint8_t applicationID = 1;
 		uint8_t serviceType1 = services[0]; // st03
@@ -298,9 +298,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("All report types already allowed") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 
 		uint8_t applicationID = 1;
 		uint8_t serviceType = services[0]; // st03
@@ -327,9 +327,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Max report types already reached") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 
 		uint8_t applicationID = 1;
 		uint8_t serviceType1 = services[0]; // st03
@@ -371,9 +371,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Requested addition of duplicate report type definitions") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
@@ -402,9 +402,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Valid and invalid application-related requests combined") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 		uint8_t applicationID1 = 1;
 		uint8_t applicationID2 = 2;
 		uint8_t applicationID3 = 3;
@@ -437,9 +437,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Valid addition of all report types of a specified service type") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 		uint8_t applicationID1 = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		validAllReportsOfService(request);
@@ -459,9 +459,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Addition of all report types of a service type, combined with invalid requests") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 		uint8_t applicationID1 = 1;
 		uint8_t applicationID2 = 2;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
@@ -504,9 +504,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Valid addition of all report types of an application process") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 		uint8_t applicationID1 = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		validAllReportsOfApp(request);
@@ -529,9 +529,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	}
 
 	SECTION("Addition of all report types of an application process, combined with invalid request") {
-		Message request(RealTimeForwardingControlService::ServiceType,
+		ECSSMessage request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                    ECSSMessage::TC, 1);
 		uint8_t applicationID1 = 1;
 		uint8_t applicationID2 = 2;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);

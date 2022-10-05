@@ -73,23 +73,23 @@ private:
 	 *
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
-	bool checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID, uint8_t numOfServices);
+	bool checkApplicationOfAppProcessConfig(ECSSMessage& request, uint8_t applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
-	bool checkAppControlled(Message& request, uint8_t applicationId);
+	bool checkAppControlled(ECSSMessage& request, uint8_t applicationId);
 
 	/**
 	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
 	 * definitions.
 	 */
-	bool allServiceTypesAllowed(Message& request, uint8_t applicationID);
+	bool allServiceTypesAllowed(ECSSMessage& request, uint8_t applicationID);
 
 	/**
 	 * Checks if the maximum number of service type definitions per application process is reached.
 	 */
-	bool maxServiceTypesReached(Message& request, uint8_t applicationID);
+	bool maxServiceTypesReached(ECSSMessage& request, uint8_t applicationID);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -97,12 +97,12 @@ private:
 	 *
 	 * @return True: if the service type is valid and passes all the necessary error checking.
 	 */
-	bool checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages);
+	bool checkService(ECSSMessage& request, uint8_t applicationID, uint8_t numOfMessages);
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
 	 */
-	bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType);
+	bool maxReportTypesReached(ECSSMessage& request, uint8_t applicationID, uint8_t serviceType);
 
 	/**
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
@@ -110,13 +110,13 @@ private:
 	 *
 	 * @return True: if the message type is valid and passes all the necessary error checking.
 	 */
-	bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	bool checkMessage(ECSSMessage& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 public:
 	/**
 	 * TC[14,1] 'Add report types to the application process forward control configuration'.
 	 */
-	void addReportTypesToAppProcessConfiguration(Message& request);
+	void addReportTypesToAppProcessConfiguration(ECSSMessage& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
@@ -125,7 +125,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice.
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif

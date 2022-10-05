@@ -46,16 +46,16 @@ inline const uint16_t ECSSSecondaryTCHeaderSize = 5U;
 inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + CCSDSPrimaryHeaderSize + ECSSSecondaryTMHeaderSize + 2u;
 
 /**
- * The maximum size of a string to be read or appended to a Message, in bytes
+ * The maximum size of a string to be read or appended to a ECSSMessage, in bytes
  *
- * This is used by the Message::appendString() and Message::readString() functions
+ * This is used by the ECSSMessage::appendString() and ECSSMessage::readString() functions
  */
 inline const uint16_t ECSSMaxStringSize = 256U;
 
 /**
  * The maximum size of a string to be used by ST[13] \ref LargePacketTransferService, in bytes
  *
- * This is used by the Message::appendString() and Message::readString() functions
+ * This is used by the ECSSMessage::appendString() and ECSSMessage::readString() functions
  */
 inline const uint16_t ECSSMaxFixedOctetStringSize = 256U;
 

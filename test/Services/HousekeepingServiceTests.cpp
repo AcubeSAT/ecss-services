@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Message.hpp"
+#include "ECSSMessage.hpp"
 #include "ServiceTests.hpp"
 #include "Services/HousekeepingService.hpp"
 #include "catch2/catch_all.hpp"
@@ -10,7 +10,7 @@ HousekeepingService& housekeepingService = Services.housekeeping;
 /**
  * Helper function that forms the message that's going to be sent as request to create a new housekeeping structure.
  */
-void buildRequest(Message& request, uint8_t idToCreate) {
+void buildRequest(ECSSMessage& request, uint8_t idToCreate) {
 	uint32_t interval = 7;
 	uint16_t numOfSimplyCommutatedParams = 3;
 	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
@@ -68,7 +68,7 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 /**
  * Helper function that forms the request to append new parameters to a housekeeping structure
  */
-void appendNewParameters(Message& request, uint8_t idToAppend) {
+void appendNewParameters(ECSSMessage& request, uint8_t idToAppend) {
 	uint16_t numOfSimplyCommutatedParams = 7;
 	etl::vector<uint16_t, 7> simplyCommutatedIds = {8, 4, 5, 9, 11, 10, 220};
 
@@ -81,8 +81,8 @@ void appendNewParameters(Message& request, uint8_t idToAppend) {
 
 TEST_CASE("Create housekeeping structure") {
 	SECTION("Valid structure creation request") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, ECSSMessage::TC, 1);
 		uint8_t idToCreate = 2;
 		uint32_t interval = 7;
 		uint16_t numOfSimplyCommutatedParams = 3;
@@ -110,8 +110,8 @@ TEST_CASE("Create housekeeping structure") {
 	}
 
 	SECTION("Invalid structure creation request") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, ECSSMessage::TC, 1);
 		uint8_t structureId = 9;
 		HousekeepingStructure structure1;
 		structure1.structureId = structureId;
@@ -133,8 +133,8 @@ TEST_CASE("Create housekeeping structure") {
 	}
 
 	SECTION("Exceeding max number of housekeeping structures") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, ECSSMessage::TC, 1);
 
 		uint8_t idsToCreate[16] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
 		uint16_t numOfSimplyCommutatedParams = 3;
@@ -163,8 +163,8 @@ TEST_CASE("Create housekeeping structure") {
 	}
 
 	SECTION("Same simply commutated parameter twice in the request") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, ECSSMessage::TC, 1);
 		uint8_t idToCreate = 2;
 		uint32_t interval = 7;
 		uint16_t numOfSimplyCommutatedParams = 9;
@@ -197,16 +197,16 @@ TEST_CASE("Create housekeeping structure") {
 
 TEST_CASE("Delete housekeeping structure") {
 	SECTION("One valid request, the rest invalid") {
-		Message createStruct(HousekeepingService::ServiceType,
-		                     HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		ECSSMessage createStruct(HousekeepingService::ServiceType,
+		                     HousekeepingService::MessageType::CreateHousekeepingReportStructure, ECSSMessage::TC, 1);
 
 		buildRequest(createStruct, 2);
 		MessageParser::execute(createStruct);
 
 		REQUIRE(housekeepingService.housekeepingStructures.size() == 1);
 		REQUIRE(housekeepingService.housekeepingStructures.find(2) != housekeepingService.housekeepingStructures.end());
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure, ECSSMessage::TC, 1);
 
 		uint8_t numOfStructs = 5;
 		uint8_t ids[5] = {2, 3, 4, 7, 8};
@@ -226,8 +226,8 @@ TEST_CASE("Delete housekeeping structure") {
 	}
 
 	SECTION("Invalid request of periodic structure") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure, ECSSMessage::TC, 1);
 		HousekeepingStructure periodicStruct;
 		periodicStruct.structureId = 4;
 		periodicStruct.periodicGenerationActionStatus = true;
@@ -252,8 +252,8 @@ TEST_CASE("Delete housekeeping structure") {
 TEST_CASE("Enable the periodic generation of housekeeping structures") {
 	SECTION("Both valid and invalid structure IDs in same request") {
 		initializeHousekeepingStructures();
-		Message request2(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, Message::TC, 1);
+		ECSSMessage request2(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, ECSSMessage::TC, 1);
 		uint8_t numOfStructs = 5;
 		uint8_t idsToEnable[5] = {1, 3, 4, 6, 7};
 		request2.appendUint8(numOfStructs);
@@ -280,8 +280,8 @@ TEST_CASE("Enable the periodic generation of housekeeping structures") {
 TEST_CASE("Disable the periodic generation of housekeeping structures") {
 	SECTION("Both valid and invalid structure IDs in request") {
 		initializeHousekeepingStructures();
-		Message request2(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport, Message::TC, 1);
+		ECSSMessage request2(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport, ECSSMessage::TC, 1);
 		uint8_t numOfStructs = 4;
 		uint8_t idsToDisable[4] = {0, 1, 4, 6};
 		request2.appendUint8(numOfStructs);
@@ -309,8 +309,8 @@ TEST_CASE("Disable the periodic generation of housekeeping structures") {
 TEST_CASE("Reporting of housekeeping structures") {
 	SECTION("Both valid and invalid structure IDs in request") {
 		initializeHousekeepingStructures();
-		Message request2(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::ReportHousekeepingStructures, Message::TC, 1);
+		ECSSMessage request2(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::ReportHousekeepingStructures, ECSSMessage::TC, 1);
 		uint8_t numOfStructs = 3;
 		uint8_t idsToReport[3] = {9, 4, 2};
 		request2.appendUint8(numOfStructs);
@@ -323,7 +323,7 @@ TEST_CASE("Reporting of housekeeping structures") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) ==
 		      2);
 
-		Message report = ServiceTests::get(1); // Both 0 and 2 are the error messages because only id=4 was valid.
+		ECSSMessage report = ServiceTests::get(1); // Both 0 and 2 are the error messages because only id=4 was valid.
 
 		uint8_t validId = 4;
 		CHECK(report.readUint8() == validId);
@@ -346,7 +346,7 @@ TEST_CASE("Reporting of housekeeping structures without a TC message as argument
 
 		housekeepingService.housekeepingStructureReport(structureId);
 		CHECK(ServiceTests::count() == 1);
-		Message report = ServiceTests::get(0);
+		ECSSMessage report = ServiceTests::get(0);
 
 		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingStructuresReport);
 		CHECK(report.readUint8() == structureId);
@@ -371,7 +371,7 @@ TEST_CASE("Reporting of housekeeping parameters") {
 		housekeepingService.housekeepingParametersReport(structId);
 
 		CHECK(ServiceTests::count() == 1);
-		Message report = ServiceTests::get(0);
+		ECSSMessage report = ServiceTests::get(0);
 		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
 		REQUIRE(report.readUint8() == structId);
 		CHECK(report.readUint16() == 33);
@@ -406,7 +406,7 @@ TEST_CASE("Reporting of housekeeping parameters without a TC request") {
 
 		housekeepingService.housekeepingParametersReport(structureId);
 		CHECK(ServiceTests::count() == 1);
-		Message report = ServiceTests::get(0);
+		ECSSMessage report = ServiceTests::get(0);
 
 		REQUIRE(report.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
 		REQUIRE(report.readUint8() == structureId);
@@ -423,8 +423,8 @@ TEST_CASE("One-shot housekeeping parameter report generation") {
 	SECTION("Both valid and invalid structure IDs in request") {
 		storeSamplesToParameters(8, 4, 5);
 		initializeHousekeepingStructures();
-		Message request2(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::GenerateOneShotHousekeepingReport, Message::TC, 1);
+		ECSSMessage request2(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::GenerateOneShotHousekeepingReport, ECSSMessage::TC, 1);
 		uint8_t numOfStructs = 5;
 		uint8_t structIds[5] = {0, 4, 7, 8, 11};
 		request2.appendUint8(numOfStructs);
@@ -436,8 +436,8 @@ TEST_CASE("One-shot housekeeping parameter report generation") {
 		CHECK(ServiceTests::count() == 5);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) ==
 		      3);
-		Message report1 = ServiceTests::get(0);
-		Message report2 = ServiceTests::get(1);
+		ECSSMessage report1 = ServiceTests::get(0);
+		ECSSMessage report2 = ServiceTests::get(1);
 
 		REQUIRE(report1.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
 		REQUIRE(report2.messageType == HousekeepingService::MessageType::HousekeepingParametersReport);
@@ -460,8 +460,8 @@ TEST_CASE("One-shot housekeeping parameter report generation") {
 TEST_CASE("Append parameters in housekeeping report structure") {
 	SECTION("Non existing structure") {
 		initializeHousekeepingStructures();
-		Message request1(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
+		ECSSMessage request1(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, ECSSMessage::TC, 1);
 		uint8_t structId = 2;
 		request1.appendUint8(structId);
 		MessageParser::execute(request1);
@@ -474,8 +474,8 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 	}
 
 	SECTION("Enabled structure") {
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, ECSSMessage::TC, 1);
 		// Enable 1 periodic struct with id=0
 		HousekeepingStructure newStruct;
 		newStruct.structureId = 0;
@@ -487,8 +487,8 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		MessageParser::execute(request);
 
 		REQUIRE(housekeepingService.housekeepingStructures.at(0).periodicGenerationActionStatus);
-		Message request2(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
+		ECSSMessage request2(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, ECSSMessage::TC, 1);
 		uint8_t structId = 0;
 		request2.appendUint8(structId);
 		MessageParser::execute(request2);
@@ -503,8 +503,8 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 
 	SECTION("Valid request including both valid and invalid parameters") {
 		initializeHousekeepingStructures();
-		Message request3(HousekeepingService::ServiceType,
-		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
+		ECSSMessage request3(HousekeepingService::ServiceType,
+		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, ECSSMessage::TC, 1);
 		uint8_t structId = 6;
 		appendNewParameters(request3, structId);
 		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameterIds.size() == 3);
@@ -529,8 +529,8 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 	SECTION("Exceeding the maximum number of simply commutated parameters for the specified structure") {
 		initializeHousekeepingStructures();
 		uint8_t structId = 6;
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, ECSSMessage::TC, 1);
 
 		uint16_t numOfSimplyCommutatedParams = 34;
 
@@ -564,8 +564,8 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 TEST_CASE("Modification of housekeeping structures' interval") {
 	SECTION("Both valid and invalid requests") {
 		initializeHousekeepingStructures();
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::ModifyCollectionIntervalOfStructures, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::ModifyCollectionIntervalOfStructures, ECSSMessage::TC, 1);
 		uint8_t numOfStructs = 4;
 		uint8_t structIds[4] = {0, 4, 9, 10};
 		uint32_t intervals[4] = {12, 21, 32, 17};
@@ -591,8 +591,8 @@ TEST_CASE("Modification of housekeeping structures' interval") {
 TEST_CASE("Reporting of housekeeping structure periodic properties") {
 	SECTION("Both valid and invalid structure IDs in request") {
 		initializeHousekeepingStructures();
-		Message request(HousekeepingService::ServiceType,
-		                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TC, 1);
+		ECSSMessage request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, ECSSMessage::TC, 1);
 		uint8_t numOfStructs = 6;
 		uint8_t structIds[6] = {0, 4, 1, 6, 9, 10};
 		request.appendUint8(numOfStructs);
@@ -609,7 +609,7 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) ==
 		      3);
 
-		Message report = ServiceTests::get(3);
+		ECSSMessage report = ServiceTests::get(3);
 		CHECK(report.readUint8() == 3);       // Number of valid ids
 		CHECK(report.readUint8() == 0);       // Id
 		CHECK(report.readBoolean() == true);  // Periodic status

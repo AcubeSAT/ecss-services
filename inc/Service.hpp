@@ -2,7 +2,7 @@
 #define ECSS_SERVICES_SERVICE_HPP
 
 #include <cstdint>
-#include "Message.hpp"
+#include "ECSSMessage.hpp"
 
 /**
  * @defgroup Services Services
@@ -32,10 +32,10 @@ protected:
 	 *
 	 * @param messageType The ID of the message type, as specified in the standard. For example,
 	 *                    the TC[17,3] message has `messageType = 3`.
-	 * @todo See if the Message must be returned by reference
+	 * @todo See if the ECSSMessage must be returned by reference
 	 */
-	Message createTM(uint8_t messageType) {
-		return Message(serviceType, messageType, Message::TM);
+	ECSSMessage createTM(uint8_t messageType) {
+		return ECSSMessage(serviceType, messageType, ECSSMessage::TM);
 	}
 
 	/**
@@ -44,13 +44,13 @@ protected:
 	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
 	 * we just print the message to the screen
 	 */
-	void storeMessage(Message& message);
+	void storeMessage(ECSSMessage& message);
 
 	/**
 	 * This function declared only to remind us that every service must have a function like
 	 * this, but this particular function does actually nothing.
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 
 	/**
 	 * Default protected constructor for this Service

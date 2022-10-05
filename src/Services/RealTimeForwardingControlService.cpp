@@ -31,7 +31,7 @@ uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicat
 	return applicationProcessConfiguration.definitions[appServicePair].size();
 }
 
-bool RealTimeForwardingControlService::checkAppControlled(Message& request, uint8_t applicationId) {
+bool RealTimeForwardingControlService::checkAppControlled(ECSSMessage& request, uint8_t applicationId) {
 	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
 	    controlledApplications.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
@@ -40,7 +40,7 @@ bool RealTimeForwardingControlService::checkAppControlled(Message& request, uint
 	return true;
 }
 
-bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID,
+bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(ECSSMessage& request, uint8_t applicationID,
                                                                           uint8_t numOfServices) {
 	if (not checkAppControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
 		for (uint8_t i = 0; i < numOfServices; i++) {
@@ -53,7 +53,7 @@ bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Messag
 	return true;
 }
 
-bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, uint8_t applicationID) {
+bool RealTimeForwardingControlService::allServiceTypesAllowed(ECSSMessage& request, uint8_t applicationID) {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
 		return true;
@@ -61,7 +61,7 @@ bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, 
 	return false;
 }
 
-bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, uint8_t applicationID) {
+bool RealTimeForwardingControlService::maxServiceTypesReached(ECSSMessage& request, uint8_t applicationID) {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
@@ -69,7 +69,7 @@ bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, 
 	return false;
 }
 
-bool RealTimeForwardingControlService::checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages) {
+bool RealTimeForwardingControlService::checkService(ECSSMessage& request, uint8_t applicationID, uint8_t numOfMessages) {
 	if (maxServiceTypesReached(request, applicationID)) {
 		request.skipBytes(numOfMessages);
 		return false;
@@ -77,7 +77,7 @@ bool RealTimeForwardingControlService::checkService(Message& request, uint8_t ap
 	return true;
 }
 
-bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, uint8_t applicationID,
+bool RealTimeForwardingControlService::maxReportTypesReached(ECSSMessage& request, uint8_t applicationID,
                                                              uint8_t serviceType) {
 	if (countReportsOfService(applicationID, serviceType) >= AllMessageTypes::messagesOfService[serviceType].size()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
@@ -86,7 +86,7 @@ bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, u
 	return false;
 }
 
-bool RealTimeForwardingControlService::checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType,
+bool RealTimeForwardingControlService::checkMessage(ECSSMessage& request, uint8_t applicationID, uint8_t serviceType,
                                                     uint8_t messageType) {
 	if (maxReportTypesReached(request, applicationID, serviceType) or
 	    reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType)) {
@@ -102,7 +102,7 @@ bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uin
 	return std::find(messages.begin(), messages.end(), messageType) != messages.end();
 }
 
-void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {
+void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration);
 	uint8_t numOfApplications = request.readUint8();
 
@@ -146,7 +146,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 	}
 }
 
-void RealTimeForwardingControlService::execute(Message& message) {
+void RealTimeForwardingControlService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case AddReportTypesToAppProcessConfiguration:
 			addReportTypesToAppProcessConfiguration(message);

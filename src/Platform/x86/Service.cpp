@@ -28,7 +28,7 @@ public:
 		::close(socket);
 	};
 
-	void sendPacketToYamcs(Message& message) {
+	void sendPacketToYamcs(ECSSMessage& message) {
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 		auto bytesSent = ::sendto(socket, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
@@ -43,7 +43,7 @@ PacketSender packetSender;
  */
 inline const bool SendToYamcs = true;
 
-void Service::storeMessage(Message& message) {
+void Service::storeMessage(ECSSMessage& message) {
 	// appends the remaining bits to complete a byte
 	message.finalize();
 
@@ -51,7 +51,7 @@ void Service::storeMessage(Message& message) {
 	std::ostringstream ss;
 
 	// Just print it to the screen
-	ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
+	ss << "New " << ((message.packetType == ECSSMessage::TM) ? "TM" : "TC") << "["
 	   << std::hex
 	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
 	   << static_cast<int>(message.messageType)        // Ignore-MISRA

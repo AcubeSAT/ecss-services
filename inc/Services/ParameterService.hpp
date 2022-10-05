@@ -96,7 +96,7 @@ public:
 	 * @param paramId: a TC[20, 1] packet carrying the requested parameter IDs
 	 * @return None (messages are stored using storeMessage())
 	 */
-	void reportParameters(Message& paramIds);
+	void reportParameters(ECSSMessage& paramIds);
 
 	/**
 	 * This function receives a TC[20, 3] message and after checking whether its type is correct,
@@ -105,7 +105,7 @@ public:
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 */
-	void setParameters(Message& newParamValues);
+	void setParameters(ECSSMessage& newParamValues);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
@@ -114,7 +114,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param param Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif // ECSS_SERVICES_PARAMETERSERVICE_HPP

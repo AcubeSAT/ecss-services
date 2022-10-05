@@ -3,23 +3,23 @@
  * just print the error to screen (via stderr).
  */
 
-#include <iostream>
-#include <cxxabi.h>
+#include <ECSSMessage.hpp>
 #include <ErrorHandler.hpp>
-#include <Message.hpp>
 #include <Logger.hpp>
+#include <cxxabi.h>
+#include <iostream>
 #include <type_traits>
 
 // TODO: Find a way to reduce the number of copies of this chunk
-template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionStartErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionProgressErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionCompletionErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::RoutingErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::AcceptanceErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::ExecutionStartErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::ExecutionProgressErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::ExecutionCompletionErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::RoutingErrorType);
 template void ErrorHandler::logError(ErrorHandler::InternalErrorType);
 
 template <typename ErrorType>
-void ErrorHandler::logError(const Message& message, ErrorType errorType) {
+void ErrorHandler::logError(const ECSSMessage& message, ErrorType errorType) {
 	LOG_ERROR
 	    /*
 	     * Gets the error class name from the template

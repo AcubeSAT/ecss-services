@@ -1,12 +1,12 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTACTION
 
-#include "Services/EventActionService.hpp"
-#include "Message.hpp"
+#include "ECSSMessage.hpp"
 #include "MessageParser.hpp"
+#include "Services/EventActionService.hpp"
 
 
-void EventActionService::addEventActionDefinitions(Message& message) {
+void EventActionService::addEventActionDefinitions(ECSSMessage& message) {
 	// TC[19,1]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction);
 	uint16_t applicationID = message.readEnum16();
@@ -44,7 +44,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::deleteEventActionDefinitions(Message& message) {
+void EventActionService::deleteEventActionDefinitions(ECSSMessage& message) {
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	bool definitionIDexists = false;
@@ -73,7 +73,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::deleteAllEventActionDefinitions(Message& message) {
+void EventActionService::deleteAllEventActionDefinitions(ECSSMessage& message) {
 	// TC[19,3]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction);
 
@@ -81,7 +81,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 	eventActionDefinitionMap.clear();
 }
 
-void EventActionService::enableEventActionDefinitions(Message& message) {
+void EventActionService::enableEventActionDefinitions(ECSSMessage& message) {
 	// TC[19,4]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
@@ -114,7 +114,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::disableEventActionDefinitions(Message& message) {
+void EventActionService::disableEventActionDefinitions(ECSSMessage& message) {
 	// TC[19,5]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
@@ -146,7 +146,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::requestEventActionDefinitionStatus(Message& message) {
+void EventActionService::requestEventActionDefinitionStatus(ECSSMessage& message) {
 	// TC[19,6]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::ReportStatusOfEachEventAction);
 
@@ -155,7 +155,7 @@ void EventActionService::requestEventActionDefinitionStatus(Message& message) {
 
 void EventActionService::eventActionStatusReport() {
 	// TM[19,7]
-	Message report = createTM(EventActionStatusReport);
+	ECSSMessage report = createTM(EventActionStatusReport);
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
 	for (const auto& element : eventActionDefinitionMap) {
@@ -167,14 +167,14 @@ void EventActionService::eventActionStatusReport() {
 	storeMessage(report);
 }
 
-void EventActionService::enableEventActionFunction(Message& message) {
+void EventActionService::enableEventActionFunction(ECSSMessage& message) {
 	// TC[19,8]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventActionFunction);
 
 	setEventActionFunctionStatus(true);
 }
 
-void EventActionService::disableEventActionFunction(Message& message) {
+void EventActionService::disableEventActionFunction(ECSSMessage& message) {
 	// TC[19,9]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventActionFunction);
 
@@ -188,14 +188,14 @@ void EventActionService::executeAction(uint16_t eventID) {
 		auto range = eventActionDefinitionMap.equal_range(eventID);
 		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.enabled) {
-				Message message = MessageParser::parseECSSTC(element->second.request);
+				ECSSMessage message = MessageParser::parseECSSTC(element->second.request);
 				MessageParser::execute(message);
 			}
 		}
 	}
 }
 
-void EventActionService::execute(Message& message) {
+void EventActionService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case AddEventAction:
 			addEventActionDefinitions(message);

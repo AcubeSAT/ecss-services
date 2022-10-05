@@ -26,7 +26,7 @@ public:
 	/**
 	 * TC[17,1] perform an are-you-alive connection test
 	 */
-	void areYouAlive(Message& request);
+	void areYouAlive(ECSSMessage& request);
 
 	/**
 	 * TM[17,2] are-you-alive connection test report to show that the MCU is alive and well
@@ -37,7 +37,7 @@ public:
 	 * TC[17,3] perform an on-board connection test
 	 *
 	 */
-	void onBoardConnection(Message& request);
+	void onBoardConnection(ECSSMessage& request);
 
 	/**
 	 * TM[17,4] on-board connection test report to show that the MCU is connected to the on-board
@@ -47,10 +47,10 @@ public:
 	/**
 	 * It is responsible to call the suitable function that execute the proper subservice. The
 	 * way that the subservices are selected is for the time being based on the messageType(class
-	 * member of class Message) of the param message
+	 * member of class ECSSMessage) of the param message
 	 *
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif // ECSS_SERVICES_TESTSERVICE_HPP

@@ -1,6 +1,6 @@
 #include <iostream>
+#include "ECSSMessage.hpp"
 #include "ECSS_Definitions.hpp"
-#include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "catch2/catch_all.hpp"
 
@@ -30,14 +30,14 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 TEST_CASE("Reporting of statistics") {
 	SECTION("Report statistics, with auto statistic reset disabled with TC") {
 		initializeStatistics(6, 7);
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		ECSSMessage request = ECSSMessage(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, ECSSMessage::TC, 1);
 		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 
-		Message report = ServiceTests::get(0);
+		ECSSMessage report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
 		CHECK(report.readUint32() == 86769000); // start time
@@ -67,8 +67,8 @@ TEST_CASE("Reporting of statistics") {
 	}
 
 	SECTION("Report statistics, with auto statistics reset enabled with TC") {
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		ECSSMessage request = ECSSMessage(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, ECSSMessage::TC, 1);
 		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
 		MessageParser::execute(request);
 
@@ -77,8 +77,8 @@ TEST_CASE("Reporting of statistics") {
 	}
 
 	SECTION("Report statistics, with auto statistics reset disabled, but reset is given by TC") {
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+		ECSSMessage request = ECSSMessage(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, ECSSMessage::TC, 1);
 		request.appendBoolean(true);
 		Services.parameterStatistics.statisticsMap[5].mean = 5;
 		Services.parameterStatistics.statisticsMap[7].mean = 3;
@@ -102,7 +102,7 @@ TEST_CASE("Reporting of statistics") {
 
 		CHECK(ServiceTests::count() == 1);
 
-		Message report = ServiceTests::get(0);
+		ECSSMessage report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
 		CHECK(report.readUint32() == 86769000); // start time
@@ -157,8 +157,8 @@ TEST_CASE("Reporting of statistics") {
 TEST_CASE("Resetting the parameter statistics") {
 	SECTION("Reset via TC") {
 		initializeStatistics(6, 7);
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ResetParameterStatistics, Message::TC, 1);
+		ECSSMessage request = ECSSMessage(ParameterStatisticsService::ServiceType,
+		                          ParameterStatisticsService::MessageType::ResetParameterStatistics, ECSSMessage::TC, 1);
 
 		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
@@ -189,9 +189,9 @@ TEST_CASE("Resetting the parameter statistics") {
 TEST_CASE("Enable the periodic reporting of statistics") {
 	SECTION("Valid reporting interval requested") {
 		initializeStatistics(6, 7);
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, ECSSMessage::TC, 1);
 		request.appendUint16(6);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 700);
@@ -204,9 +204,9 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 	}
 
 	SECTION("Invalid reporting interval requested") {
-		Message request2 =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
+		ECSSMessage request2 =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, ECSSMessage::TC, 1);
 		request2.appendUint16(3);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 6);
@@ -224,9 +224,9 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 TEST_CASE("Disabling the periodic reporting of statistics") {
 	SECTION("Successfully disable the periodic reporting") {
 		initializeStatistics(6, 7);
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::DisablePeriodicParameterReporting, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::DisablePeriodicParameterReporting, ECSSMessage::TC, 1);
 		Services.parameterStatistics.setPeriodicReportingStatus(true);
 
 		MessageParser::execute(request);
@@ -243,9 +243,9 @@ TEST_CASE("Add/Update statistics definitions") {
 		newStatistic.setSelfSamplingInterval(0);
 		Services.parameterStatistics.statisticsMap.insert({0, newStatistic});
 
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, ECSSMessage::TC, 1);
 		uint16_t numOfIds = 1;
 		request.appendUint16(numOfIds);
 
@@ -267,9 +267,9 @@ TEST_CASE("Add/Update statistics definitions") {
 
 	SECTION("Add new statistic definition") {
 		initializeStatistics(7, 6);
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, ECSSMessage::TC, 1);
 		uint16_t numOfIds = 1;
 		request.appendUint16(numOfIds);
 
@@ -295,9 +295,9 @@ TEST_CASE("Add/Update statistics definitions") {
 		newStatistic.setSelfSamplingInterval(0);
 		Services.parameterStatistics.statisticsMap.insert({0, newStatistic});
 
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, ECSSMessage::TC, 1);
 		uint16_t numOfIds = 6;
 		request.appendUint16(numOfIds);
 
@@ -358,9 +358,9 @@ TEST_CASE("Delete statistics definitions") {
 		REQUIRE(Services.parameterStatistics.statisticsMap.find(1) != Services.parameterStatistics.statisticsMap.end());
 		REQUIRE(Services.parameterStatistics.statisticsMap.find(2) != Services.parameterStatistics.statisticsMap.end());
 
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, ECSSMessage::TC, 1);
 		uint16_t numIds = 2;
 		uint16_t id1 = 0;
 		uint16_t id2 = 255; // Invalid ID
@@ -377,9 +377,9 @@ TEST_CASE("Delete statistics definitions") {
 	}
 
 	SECTION("Delete all definitions") {
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, ECSSMessage::TC, 1);
 		uint16_t numIds = 0;
 		request.appendUint16(numIds);
 
@@ -399,14 +399,14 @@ TEST_CASE("Parameter statistics definition report") {
 		REQUIRE(Services.parameterStatistics.statisticsMap.find(7) != Services.parameterStatistics.statisticsMap.end());
 		REQUIRE(Services.parameterStatistics.statisticsMap.find(5) != Services.parameterStatistics.statisticsMap.end());
 
-		Message request =
-		    Message(ParameterStatisticsService::ServiceType,
-		            ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterStatisticsService::ServiceType,
+		            ParameterStatisticsService::MessageType::ReportParameterStatisticsDefinitions, ECSSMessage::TC, 1);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
-		Message report = ServiceTests::get(0);
+		ECSSMessage report = ServiceTests::get(0);
 		CHECK(report.readUint16() == 700); // Reporting interval
 		CHECK(report.readUint16() == 2);   // Num of valid Ids
 		CHECK(report.readUint16() == 5);   // Valid parameter ID

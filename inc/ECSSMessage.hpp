@@ -15,29 +15,29 @@
  * @todo Make sure that a message can't be written to or read from at the same time, or make
  *       readable and writable message different classes
  */
-class Message {
+class ECSSMessage {
 public:
-	Message() = default;
+	ECSSMessage() = default;
 
 	/**
 	 * @brief Compare two messages
-	 * @details Check whether two Message objects are of the same type
+	 * @details Check whether two ECSSMessage objects are of the same type
 	 * @param msg1 First message for comparison
 	 * @param msg2 Second message for comparison
 	 * @return A boolean value indicating whether the messages are of the same type
 	 */
-	static bool isSameType(const Message& msg1, const Message& msg2) {
+	static bool isSameType(const ECSSMessage& msg1, const ECSSMessage& msg2) {
 		return (msg1.packetType == msg2.packetType) && (msg1.messageType == msg2.messageType) &&
 		       (msg1.serviceType == msg2.serviceType);
 	}
 
 	/**
 	 * @brief Overload the equality operator to compare messages
-	 * @details Compare two @ref ::Message objects, based on their contents and type
+	 * @details Compare two @ref ::ECSSMessage objects, based on their contents and type
 	 * @param msg The message content to compare against
 	 * @return The result of comparison
 	 */
-	bool operator==(const Message& msg) const {
+	bool operator==(const ECSSMessage& msg) const {
 		if (dataSize != msg.dataSize) {
 			return false;
 		}
@@ -50,7 +50,7 @@ public:
 	}
 
 	/**
-	 * Checks the first \ref Message::dataSize bytes of \p msg for equality
+	 * Checks the first \ref ECSSMessage::dataSize bytes of \p msg for equality
 	 *
 	 * This performs an equality check for the first `[0, this->dataSize)` bytes of two messages. Useful to compare
 	 * two messages that have the same content, but one of which does not know its length.
@@ -59,7 +59,7 @@ public:
 	 * @return False if the messages are not of the same type, if `msg.dataSize < this->dataSize`, or if the first
 	 * `this->dataSize` bytes are not equal between the two messages.
 	 */
-	bool bytesEqualWith(const Message& msg) const {
+	bool bytesEqualWith(const ECSSMessage& msg) const {
 		if (msg.dataSize < dataSize) {
 			return false;
 		}
@@ -104,7 +104,7 @@ public:
 	// handling and storage of messages
 	//
 	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
-	// Message::appendBits() relies on this in order to easily OR the requested bits.
+	// ECSSMessage::appendBits() relies on this in order to easily OR the requested bits.
 	uint8_t data[ECSSMaxMessageSize] = {0};
 
 	// private:
@@ -170,11 +170,11 @@ public:
 	 * Appends a number of bytes to the message
 	 *
 	 * Note that this doesn't append the number of bytes that the string contains. For this, you
-	 * need to use a function like Message::appendOctetString(), or have specified the size of the
+	 * need to use a function like ECSSMessage::appendOctetString(), or have specified the size of the
 	 * string beforehand. Note that the standard does not support null-terminated strings.
 	 *
 	 * This does not append the full size of the string, just its current size. Use
-	 * Message::appendFixedString() to have a constant number of characters added.
+	 * ECSSMessage::appendFixedString() to have a constant number of characters added.
 	 *
 	 * @param string The string to insert
 	 */
@@ -184,11 +184,11 @@ public:
 	 * Appends a number of bytes to the message
 	 *
 	 * Note that this doesn't append the number of bytes that the string contains. For this, you
-	 * need to use a function like Message::appendOctetString(), or have specified the size of the
+	 * need to use a function like ECSSMessage::appendOctetString(), or have specified the size of the
 	 * string beforehand. Note that the standard does not support null-terminated strings.
 	 *
 	 * The number of bytes appended is equal to \p SIZE. To append variable-sized parameters, use
-	 * Message::appendString() instead. Missing bytes are padded with zeros, until the length of SIZE
+	 * ECSSMessage::appendString() instead. Missing bytes are padded with zeros, until the length of SIZE
 	 * is reached.
 	 *
 	 * @param string The string to insert
@@ -244,8 +244,8 @@ public:
 	void readCString(char* string, uint16_t size);
 
 public:
-	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
-	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
+	ECSSMessage(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
+	ECSSMessage(uint8_t serviceType, uint8_t messageType, ECSSMessage::PacketType packetType);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message
@@ -419,15 +419,15 @@ public:
 	void append(const T& value);
 
 	/**
-	 * Adds a nested TC or TM Message within the current Message
+	 * Adds a nested TC or TM ECSSMessage within the current ECSSMessage
 	 *
 	 * As a design decision, nested TC & TM Messages always have a fixed width, specified in \ref ECSSDefinitions. This
-	 * reduces the uncertainty and complexity of having to parse the nested Message itself to see how long it is, at
+	 * reduces the uncertainty and complexity of having to parse the nested ECSSMessage itself to see how long it is, at
 	 * the cost of more data to be transmitted.
 	 * @param message The message to append
 	 * @param size The fixed number of bytes that the message will take up. The empty last bytes are padded with 0s.
 	 */
-	void appendMessage(const Message& message, uint16_t size);
+	void appendMessage(const ECSSMessage& message, uint16_t size);
 
 	/**
 	 * Fetches a single-byte boolean value from the current position in the message
@@ -611,7 +611,7 @@ public:
 	/**
 	 * Fetches an N-byte string from the current position in the message. The string can be at most MAX_SIZE long.
 	 *
-	 * @note This function was not implemented as Message::read() due to an inherent C++ limitation, see
+	 * @note This function was not implemented as ECSSMessage::read() due to an inherent C++ limitation, see
 	 * https://www.fluentcpp.com/2017/08/15/function-templates-partial-specialization-cpp/
 	 * @tparam MAX_SIZE The memory size of the string in bytes, which corresponds to the max string size
 	 */
@@ -665,7 +665,7 @@ public:
 	 *
 	 * @return True if the message is of correct type, false if not
 	 */
-	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType, uint8_t expectedMessageType) {
+	bool assertType(ECSSMessage::PacketType expectedPacketType, uint8_t expectedServiceType, uint8_t expectedMessageType) {
 		bool status = true;
 
 		if ((packetType != expectedPacketType) || (serviceType != expectedServiceType) ||
@@ -678,7 +678,7 @@ public:
 	}
 
 	/**
-	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
+	 * Alias for ECSSMessage::assertType(ECSSMessage::TC, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
 	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) {
@@ -686,7 +686,7 @@ public:
 	}
 
 	/**
-	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
+	 * Alias for ECSSMessage::assertType(ECSSMessage::TM, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
 	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) {
@@ -695,122 +695,122 @@ public:
 };
 
 template <>
-inline void Message::append(const uint8_t& value) {
+inline void ECSSMessage::append(const uint8_t& value) {
 	appendUint8(value);
 }
 template <>
-inline void Message::append(const uint16_t& value) {
+inline void ECSSMessage::append(const uint16_t& value) {
 	appendUint16(value);
 }
 template <>
-inline void Message::append(const uint32_t& value) {
+inline void ECSSMessage::append(const uint32_t& value) {
 	appendUint32(value);
 }
 template <>
-inline void Message::append(const uint64_t& value) {
+inline void ECSSMessage::append(const uint64_t& value) {
 	appendUint64(value);
 }
 
 template <>
-inline void Message::append(const int8_t& value) {
+inline void ECSSMessage::append(const int8_t& value) {
 	appendSint8(value);
 }
 template <>
-inline void Message::append(const int16_t& value) {
+inline void ECSSMessage::append(const int16_t& value) {
 	appendSint16(value);
 }
 template <>
-inline void Message::append(const int32_t& value) {
+inline void ECSSMessage::append(const int32_t& value) {
 	appendSint32(value);
 }
 
 template <>
-inline void Message::append(const bool& value) {
+inline void ECSSMessage::append(const bool& value) {
 	appendBoolean(value);
 }
 template <>
-inline void Message::append(const char& value) {
+inline void ECSSMessage::append(const char& value) {
 	appendByte(value);
 }
 template <>
-inline void Message::append(const float& value) {
+inline void ECSSMessage::append(const float& value) {
 	appendFloat(value);
 }
 template <>
-inline void Message::append(const double& value) {
+inline void ECSSMessage::append(const double& value) {
 	appendDouble(value);
 }
 template <>
-inline void Message::append(const Time::DefaultCUC& timeCUC) {
+inline void ECSSMessage::append(const Time::DefaultCUC& timeCUC) {
 	appendDefaultCUCTimeStamp(timeCUC);
 }
 template <>
-inline void Message::append(const Time::RelativeTime& value) {
+inline void ECSSMessage::append(const Time::RelativeTime& value) {
 	appendRelativeTime(value);
 }
 
 /**
  * Appends an ETL string to the message. ETL strings are handled as ECSS octet strings, meaning that the string size
- * is appended as a byte before the string itself. To append other string sequences, see the Message::appendString()
+ * is appended as a byte before the string itself. To append other string sequences, see the ECSSMessage::appendString()
  * functions
  */
 template <>
-inline void Message::append(const etl::istring& value) {
+inline void ECSSMessage::append(const etl::istring& value) {
 	appendOctetString(value);
 }
 
 template <>
-inline uint8_t Message::read() {
+inline uint8_t ECSSMessage::read() {
 	return readUint8();
 }
 template <>
-inline uint16_t Message::read() {
+inline uint16_t ECSSMessage::read() {
 	return readUint16();
 }
 template <>
-inline uint32_t Message::read() {
+inline uint32_t ECSSMessage::read() {
 	return readUint32();
 }
 template <>
-inline uint64_t Message::read() {
+inline uint64_t ECSSMessage::read() {
 	return readUint64();
 }
 
 template <>
-inline int8_t Message::read() {
+inline int8_t ECSSMessage::read() {
 	return readSint8();
 }
 template <>
-inline int16_t Message::read() {
+inline int16_t ECSSMessage::read() {
 	return readSint16();
 }
 template <>
-inline int32_t Message::read() {
+inline int32_t ECSSMessage::read() {
 	return readSint32();
 }
 
 template <>
-inline bool Message::read<bool>() {
+inline bool ECSSMessage::read<bool>() {
 	return readBoolean();
 }
 template <>
-inline char Message::read() {
+inline char ECSSMessage::read() {
 	return readByte();
 }
 template <>
-inline float Message::read() {
+inline float ECSSMessage::read() {
 	return readFloat();
 }
 template <>
-inline double Message::read() {
+inline double ECSSMessage::read() {
 	return readDouble();
 }
 template <>
-inline Time::DefaultCUC Message::read() {
+inline Time::DefaultCUC ECSSMessage::read() {
 	return readDefaultCUCTimeStamp();
 }
 template <>
-inline Time::RelativeTime Message::read() {
+inline Time::RelativeTime ECSSMessage::read() {
 	return readRelativeTime();
 }
 

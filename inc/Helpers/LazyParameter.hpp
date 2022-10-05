@@ -83,7 +83,7 @@ public:
 		}
 	}
 
-	inline void appendValueToMessage(Message& message) override {
+	inline void appendValueToMessage(ECSSMessage& message) override {
 		if (getter) {
 			message.append<DataType>((*getter)());
 		} else {
@@ -92,7 +92,7 @@ public:
 		}
 	};
 
-	inline void setValueFromMessage(Message& message) override {
+	inline void setValueFromMessage(ECSSMessage& message) override {
 		[[maybe_unused]] auto skippedBytes = message.read<DataType>();
 		ErrorHandler::reportError(message, ErrorHandler::ParameterReadOnly);
 	};

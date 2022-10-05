@@ -28,7 +28,7 @@ class ServicePool {
 	 * A counter for messages
 	 *
 	 * Each key-value pair corresponds to one MessageType within a Service. For the key, the most significant 8 bits are
-	 * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
+	 * the number of the service, while the least significant 8 bits are the number of the ECSSMessage. The value is the
 	 * counter of each MessageType.
 	 */
 	etl::map<uint16_t, uint16_t, ECSSTotalMessageTypes> messageTypeCounter;

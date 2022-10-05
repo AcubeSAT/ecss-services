@@ -1,9 +1,9 @@
 #ifndef ECSS_SERVICES_PARAMETER_HPP
 #define ECSS_SERVICES_PARAMETER_HPP
 
-#include "etl/String.hpp"
-#include "Message.hpp"
+#include "ECSSMessage.hpp"
 #include "ECSS_Definitions.hpp"
+#include "etl/String.hpp"
 
 /**
  * Implementation of a Parameter field, as specified in ECSS-E-ST-70-41C.
@@ -35,12 +35,12 @@ public:
 	/**
 	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that parameter
 	 */
-	virtual void appendValueToMessage(Message& message) = 0;
+	virtual void appendValueToMessage(ECSSMessage& message) = 0;
 
 	/**
-	 * Appends the parameter as an ECSS value to an ECSS Message
+	 * Appends the parameter as an ECSS value to an ECSS ECSSMessage
 	 */
-	virtual void setValueFromMessage(Message& message) = 0;
+	virtual void setValueFromMessage(ECSSMessage& message) = 0;
 
 	/**
 	 * Converts the value of a parameter to a double.
@@ -80,11 +80,11 @@ public:
 		}
 	}
 
-	inline void setValueFromMessage(Message& message) override {
+	inline void setValueFromMessage(ECSSMessage& message) override {
 		currentValue = message.read<DataType>();
 	};
 
-	inline void appendValueToMessage(Message& message) override {
+	inline void appendValueToMessage(ECSSMessage& message) override {
 		message.append<DataType>(currentValue);
 	};
 };

@@ -19,8 +19,8 @@ TEST_CASE("ST[08] - Call Tests") {
 		globalVariable = 10;
 
 		fms.include(String<ECSSFunctionNameLength>("test"), &test);
-		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
-		            Message::TC, 1);
+		ECSSMessage msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
+		                ECSSMessage::TC, 1);
 
 		msg.appendFixedString(String<ECSSFunctionNameLength>("test"));
 		msg.appendByte(199);
@@ -35,7 +35,7 @@ TEST_CASE("ST[08] - Call Tests") {
 		globalVariable = 10;
 
 		fms.include(String<ECSSFunctionNameLength>("test"), &test);
-		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, Message::TC, 1);
+		ECSSMessage msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, ECSSMessage::TC, 1);
 		msg.appendFixedString(String<ECSSFunctionNameLength>("t3st"));
 		MessageParser::execute(msg);
 
@@ -50,7 +50,7 @@ TEST_CASE("ST[08] - Call Tests") {
 		globalVariable = 10;
 
 		fms.include(String<ECSSFunctionNameLength>("test"), &test);
-		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, Message::TC, 1);
+		ECSSMessage msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, ECSSMessage::TC, 1);
 		msg.appendFixedString(String<ECSSFunctionNameLength>("test"));
 		msg.appendString(String<65>("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
 		MessageParser::execute(msg);

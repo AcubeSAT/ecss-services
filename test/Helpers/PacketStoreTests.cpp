@@ -3,7 +3,7 @@
 
 TEST_CASE("Counting a packet store's size in bytes") {
 	SECTION("Correct counting of size in bytes") {
-		Message tm1;
+		ECSSMessage tm1;
 		tm1.appendUint8(4);
 		tm1.appendFloat(5.6);
 
@@ -13,7 +13,7 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 1);
 		REQUIRE(packetStore.calculateSizeInBytes() == 5);
 
-		Message tm2;
+		ECSSMessage tm2;
 		tm2.appendBoolean(true);
 		tm2.appendUint16(45);
 		tm2.appendUint8(3);
@@ -24,7 +24,7 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 2);
 		REQUIRE(packetStore.calculateSizeInBytes() == 13);
 
-		Message tm3;
+		ECSSMessage tm3;
 		tm3.appendUint64(743);
 		tm3.appendUint8(3);
 		tm3.appendUint32(55);

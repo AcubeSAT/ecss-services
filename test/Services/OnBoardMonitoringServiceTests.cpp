@@ -1,4 +1,4 @@
-#include <Message.hpp>
+#include <ECSSMessage.hpp>
 #include <ServicePool.hpp>
 #include <Services/OnBoardMonitoringService.hpp>
 #include <catch2/catch_all.hpp>
@@ -38,9 +38,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 	SECTION("3 valid requests to enable Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
+		ECSSMessage request =
+		    ECSSMessage(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, ECSSMessage::TC, 0);
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
 		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
@@ -64,9 +64,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 	SECTION("2 valid requests to enable Parameter Monitoring Definitions and 1 invalid") {
 		initialiseParameterMonitoringDefinitions();
 
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
+		ECSSMessage request =
+		    ECSSMessage(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, ECSSMessage::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
 		etl::array<uint16_t, 4> PMONIds = {0, 10, 1};
@@ -90,9 +90,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 TEST_CASE("Disable Parameter Monitoring Definitions") {
 	SECTION("3 valid requests to disable Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
+		ECSSMessage request =
+		    ECSSMessage(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, ECSSMessage::TC, 0);
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
 		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
@@ -117,9 +117,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 	}
 	SECTION("3 valid requests to disable Parameter Monitoring Definitions and 1 invalid") {
 		initialiseParameterMonitoringDefinitions();
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
+		ECSSMessage request =
+		    ECSSMessage(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, ECSSMessage::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
 		etl::array<uint16_t, 4> PMONIds = {0, 10, 1, 2};
@@ -147,9 +147,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 
 TEST_CASE("Change Maximum Transition Reporting Delay") {
 	initialiseParameterMonitoringDefinitions();
-	Message request =
-	    Message(OnBoardMonitoringService::ServiceType,
-	            OnBoardMonitoringService::MessageType::ChangeMaximumTransitionReportingDelay, Message::TC, 0);
+	ECSSMessage request =
+	    ECSSMessage(OnBoardMonitoringService::ServiceType,
+	            OnBoardMonitoringService::MessageType::ChangeMaximumTransitionReportingDelay, ECSSMessage::TC, 0);
 	uint16_t newMaximumTransitionReportingDelay = 10;
 	request.appendUint16(newMaximumTransitionReportingDelay);
 	MessageParser::execute(request);
@@ -164,9 +164,9 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 	SECTION("Valid request to delete all Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		onBoardMonitoringService.parameterMonitoringFunctionStatus = false;
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
+		ECSSMessage request =
+		    ECSSMessage(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, ECSSMessage::TC, 0);
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 		CHECK(onBoardMonitoringService.isPMONListEmpty());
@@ -177,9 +177,9 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 	SECTION("Invalid request to delete all Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		onBoardMonitoringService.parameterMonitoringFunctionStatus = true;
-		Message request =
-		    Message(OnBoardMonitoringService::ServiceType,
-		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
+		ECSSMessage request =
+		    ECSSMessage(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, ECSSMessage::TC, 0);
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitions) ==

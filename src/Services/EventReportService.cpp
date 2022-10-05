@@ -1,9 +1,9 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTREPORT
 
-#include <Services/EventReportService.hpp>
 #include <Services/EventActionService.hpp>
-#include "Message.hpp"
+#include <Services/EventReportService.hpp>
+#include "ECSSMessage.hpp"
 
 /**
  * @todo: Add message type in TCs
@@ -12,7 +12,7 @@
 void EventReportService::informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	// TM[5,1]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
-		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
+		ECSSMessage report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.appendEnum16(eventID);
 		report.appendString(data);
 		EventActionService eventActionService;
@@ -28,7 +28,7 @@ EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSSEve
 	// TM[5,2]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
 		lowSeverityReportCount++;
-		Message report = createTM(EventReportService::MessageType::LowSeverityAnomalyReport);
+		ECSSMessage report = createTM(EventReportService::MessageType::LowSeverityAnomalyReport);
 		report.appendEnum16(eventID);
 		report.appendString(data);
 		lastLowSeverityReportID = static_cast<uint16_t>(eventID);
@@ -45,7 +45,7 @@ EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSS
 	// TM[5,3]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
 		mediumSeverityReportCount++;
-		Message report = createTM(EventReportService::MessageType::MediumSeverityAnomalyReport);
+		ECSSMessage report = createTM(EventReportService::MessageType::MediumSeverityAnomalyReport);
 		report.appendEnum16(eventID);
 		report.appendString(data);
 		lastMediumSeverityReportID = static_cast<uint16_t>(eventID);
@@ -62,7 +62,7 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEv
 	// TM[5,4]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
 		highSeverityReportCount++;
-		Message report = createTM(EventReportService::MessageType::HighSeverityAnomalyReport);
+		ECSSMessage report = createTM(EventReportService::MessageType::HighSeverityAnomalyReport);
 		report.appendEnum16(eventID);
 		report.appendString(data);
 		lastHighSeverityReportID = static_cast<uint16_t>(eventID);
@@ -73,7 +73,7 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEv
 	}
 }
 
-void EventReportService::enableReportGeneration(Message message) {
+void EventReportService::enableReportGeneration(ECSSMessage message) {
 	// TC[5,5]
 	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents);
 
@@ -89,7 +89,7 @@ void EventReportService::enableReportGeneration(Message message) {
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
-void EventReportService::disableReportGeneration(Message message) {
+void EventReportService::disableReportGeneration(ECSSMessage message) {
 	// TC[5,6]
 	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents);
 
@@ -105,7 +105,7 @@ void EventReportService::disableReportGeneration(Message message) {
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
-void EventReportService::requestListOfDisabledEvents(Message message) {
+void EventReportService::requestListOfDisabledEvents(ECSSMessage message) {
 	// TC[5,7]
 	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents);
 
@@ -114,7 +114,7 @@ void EventReportService::requestListOfDisabledEvents(Message message) {
 
 void EventReportService::listOfDisabledEventsReport() {
 	// TM[5,8]
-	Message report = createTM(EventReportService::MessageType::DisabledListEventReport);
+	ECSSMessage report = createTM(EventReportService::MessageType::DisabledListEventReport);
 
 	uint16_t numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
 	report.appendHalfword(numberOfDisabledEvents);
@@ -127,7 +127,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	storeMessage(report);
 }
 
-void EventReportService::execute(Message& message) {
+void EventReportService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case EnableReportGenerationOfEvents:
 			enableReportGeneration(message);

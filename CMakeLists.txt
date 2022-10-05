@@ -27,7 +27,7 @@ add_library(common OBJECT
         lib/logger/src/Logger.cpp
         src/Service.cpp
         src/ErrorHandler.cpp
-        src/Message.cpp
+        src/ECSSMessage.cpp
         src/MessageParser.cpp
         src/ServicePool.cpp
         src/Helpers/CRCHelper.cpp

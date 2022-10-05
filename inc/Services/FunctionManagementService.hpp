@@ -1,11 +1,11 @@
 #ifndef ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
 #define ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
 
-#include "etl/map.h"
-#include "etl/String.hpp"
-#include "Message.hpp"
-#include "Service.hpp"
+#include "ECSSMessage.hpp"
 #include "ErrorHandler.hpp"
+#include "Service.hpp"
+#include "etl/String.hpp"
+#include "etl/map.h"
 
 typedef String<ECSSFunctionNameLength> functionName;
 typedef etl::map<functionName, void (*)(String<ECSSFunctionMaxArgLength>), ECSSFunctionMapSize> FunctionMap;
@@ -55,7 +55,7 @@ public:
 	 * int, for testing purposes.
 	 * @param msg A TC[8,1] message
 	 */
-	void call(Message& msg);
+	void call(ECSSMessage& msg);
 
 	/**
 	 * Includes a new function in the pointer map. This enables it to be called by way of a valid
@@ -100,7 +100,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif // ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP

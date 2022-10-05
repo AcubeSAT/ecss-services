@@ -5,10 +5,10 @@
 #include "Services/ParameterService.hpp"
 
 
-void ParameterService::reportParameters(Message& paramIds) {
+void ParameterService::reportParameters(ECSSMessage& paramIds) {
 
 	paramIds.assertTC(ServiceType, ReportParameterValues);
-	Message parameterReport = createTM(ParameterValuesReport);
+	ECSSMessage parameterReport = createTM(ParameterValuesReport);
 
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t numberOfValidIds = 0;
@@ -34,7 +34,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 	storeMessage(parameterReport);
 }
 
-void ParameterService::setParameters(Message& newParamValues) {
+void ParameterService::setParameters(ECSSMessage& newParamValues) {
 	newParamValues.assertTC(ServiceType, MessageType::SetParameterValues);
 
 	uint16_t numOfIds = newParamValues.readUint16();
@@ -50,7 +50,7 @@ void ParameterService::setParameters(Message& newParamValues) {
 	}
 }
 
-void ParameterService::execute(Message& message) {
+void ParameterService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case ReportParameterValues:
 			reportParameters(message);

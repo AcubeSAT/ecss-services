@@ -1,7 +1,7 @@
 #include "Services/HousekeepingService.hpp"
 #include "ServicePool.hpp"
 
-void HousekeepingService::createHousekeepingReportStructure(Message& request) {
+void HousekeepingService::createHousekeepingReportStructure(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure);
 
 	uint8_t idToCreate = request.readUint8();
@@ -32,7 +32,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	housekeepingStructures.insert({idToCreate, newStructure});
 }
 
-void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
+void HousekeepingService::deleteHousekeepingReportStructure(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::DeleteHousekeepingReportStructure);
 	uint8_t numOfStructuresToDelete = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructuresToDelete; i++) {
@@ -50,7 +50,7 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	}
 }
 
-void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& request) {
+void HousekeepingService::enablePeriodicHousekeepingParametersReport(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport);
 
 	uint8_t numOfStructIds = request.readUint8();
@@ -64,7 +64,7 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 	}
 }
 
-void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& request) {
+void HousekeepingService::disablePeriodicHousekeepingParametersReport(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::DisablePeriodicHousekeepingParametersReport);
 
 	uint8_t numOfStructIds = request.readUint8();
@@ -78,7 +78,7 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 	}
 }
 
-void HousekeepingService::reportHousekeepingStructures(Message& request) {
+void HousekeepingService::reportHousekeepingStructures(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::ReportHousekeepingStructures);
 
 	uint8_t numOfStructsToReport = request.readUint8();
@@ -98,7 +98,7 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
-	Message structReport = createTM(MessageType::HousekeepingStructuresReport);
+	ECSSMessage structReport = createTM(MessageType::HousekeepingStructuresReport);
 	structReport.appendUint8(structIdToReport);
 
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
@@ -119,7 +119,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 
 	HousekeepingStructure& housekeepingStructure = housekeepingStructures.at(structureId);
 
-	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
+	ECSSMessage housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
 	housekeepingReport.appendUint8(structureId);
 	for (auto id: housekeepingStructure.simplyCommutatedParameterIds) {
@@ -130,7 +130,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 	storeMessage(housekeepingReport);
 }
 
-void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
+void HousekeepingService::generateOneShotHousekeepingReport(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::GenerateOneShotHousekeepingReport);
 
 	uint8_t numOfStructsToReport = request.readUint8();
@@ -144,7 +144,7 @@ void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 	}
 }
 
-void HousekeepingService::appendParametersToHousekeepingStructure(Message& request) {
+void HousekeepingService::appendParametersToHousekeepingStructure(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure);
 
 	uint8_t targetStructId = request.readUint8();
@@ -178,7 +178,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	}
 }
 
-void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request) {
+void HousekeepingService::modifyCollectionIntervalOfStructures(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::ModifyCollectionIntervalOfStructures);
 
 	uint8_t numOfTargetStructs = request.readUint8();
@@ -193,7 +193,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 	}
 }
 
-void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request) {
+void HousekeepingService::reportHousekeepingPeriodicProperties(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties);
 
 	uint8_t numOfValidIds = 0;
@@ -204,7 +204,7 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 			numOfValidIds++;
 		}
 	}
-	Message periodicPropertiesReport = createTM(MessageType::HousekeepingPeriodicPropertiesReport);
+	ECSSMessage periodicPropertiesReport = createTM(MessageType::HousekeepingPeriodicPropertiesReport);
 	periodicPropertiesReport.appendUint8(numOfValidIds);
 	request.resetRead();
 	request.readUint8();
@@ -220,13 +220,13 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 	storeMessage(periodicPropertiesReport);
 }
 
-void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId) {
+void HousekeepingService::appendPeriodicPropertiesToMessage(ECSSMessage& report, uint8_t structureId) {
 	report.appendUint8(structureId);
 	report.appendBoolean(housekeepingStructures.at(structureId).periodicGenerationActionStatus);
 	report.appendUint32(housekeepingStructures.at(structureId).collectionInterval);
 }
 
-void HousekeepingService::execute(Message& message) {
+void HousekeepingService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case CreateHousekeepingReportStructure:
 			createHousekeepingReportStructure(message);

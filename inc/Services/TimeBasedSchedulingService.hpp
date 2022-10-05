@@ -79,7 +79,7 @@ private:
 	 * @todo If groups are used, then the group ID has to be defined here
 	 */
 	struct ScheduledActivity {
-		Message request;                         ///< Hold the received command request
+		ECSSMessage request;                         ///< Hold the received command request
 		RequestID requestID;                     ///< Request ID, characteristic of the definition
 		Time::DefaultCUC requestReleaseTime{0}; ///< Keep the command release time
 	};
@@ -156,7 +156,7 @@ public:
 	 * @details Enables the time-based command execution scheduling
 	 * @param request Provide the received message as a parameter
 	 */
-	void enableScheduleExecution(Message& request);
+	void enableScheduleExecution(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,2] disable the time-based schedule execution function
@@ -164,7 +164,7 @@ public:
 	 * @details Disables the time-based command execution scheduling
 	 * @param request Provide the received message as a parameter
 	 */
-	void disableScheduleExecution(Message& request);
+	void disableScheduleExecution(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,3] reset the time-based schedule
@@ -173,7 +173,7 @@ public:
 	 * activities.
 	 * @param request Provide the received message as a parameter
 	 */
-	void resetSchedule(Message& request);
+	void resetSchedule(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,4] insert activities into the time based schedule
@@ -190,7 +190,7 @@ public:
 	 * request is less than a set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
 	 * from the current time a @ref ErrorHandler::ExecutionStartErrorType is also issued.
 	 */
-	void insertActivities(Message& request);
+	void insertActivities(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,15] time-shift all scheduled activities
@@ -203,7 +203,7 @@ public:
 	 * set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time an
 	 * @ref ErrorHandler::ExecutionStartErrorType report is issued for that instruction.
 	 */
-	void timeShiftAllActivities(Message& request);
+	void timeShiftAllActivities(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,16] detail-report all activities
@@ -213,7 +213,7 @@ public:
 	 * @param request Provide the received message as a parameter
 	 * @todo Replace the time parsing with the time parser
 	 */
-	void detailReportAllActivities(Message& request);
+	void detailReportAllActivities(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,9] detail-report activities identified by request identifier
@@ -227,7 +227,7 @@ public:
 	 * request identifier is not found in the schedule issue an @ref
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
-	void detailReportActivitiesByID(Message& request);
+	void detailReportActivitiesByID(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,12] summary-report activities identified by request identifier
@@ -240,7 +240,7 @@ public:
 	 * request identifier is not found in the schedule issue an @ref
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
-	void summaryReportActivitiesByID(Message& request);
+	void summaryReportActivitiesByID(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,5] delete time-based scheduled activities identified by a request identifier
@@ -251,7 +251,7 @@ public:
 	 * request identifier is not found in the schedule issue an @ref
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
-	void deleteActivitiesByID(Message& request);
+	void deleteActivitiesByID(ECSSMessage& request);
 
 	/**
 	 * @brief TC[11,7] time-shift scheduled activities identified by a request identifier
@@ -265,7 +265,7 @@ public:
 	 * Also if an activity with a specified request identifier is not found, generate a failed
 	 * start of execution for that specific instruction.
 	 */
-	void timeShiftActivitiesByID(Message& request);
+	void timeShiftActivitiesByID(ECSSMessage& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
@@ -274,7 +274,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif // ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP

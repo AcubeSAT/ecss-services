@@ -23,7 +23,7 @@ private:
 	 * valid. If this function needs to be called from another point of the code, the case of an invalid ID passed as
 	 * argument will lead in undefined behavior.
 	 */
-	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
+	void appendPeriodicPropertiesToMessage(ECSSMessage& report, uint8_t structureId);
 
 	/**
 	 * Returns true if the given parameter ID exists in the parameters contained in the housekeeping structure.
@@ -68,29 +68,29 @@ public:
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
 	 */
-	void createHousekeepingReportStructure(Message& request);
+	void createHousekeepingReportStructure(ECSSMessage& request);
 
 	/**
 	 * Implementation of TC[3,3]. Request to delete a housekeeping parameters report structure.
 	 */
-	void deleteHousekeepingReportStructure(Message& request);
+	void deleteHousekeepingReportStructure(ECSSMessage& request);
 
 	/**
 	 * Implementation of TC[3,5]. Request to enable the periodic housekeeping parameters reporting for a specific
 	 * housekeeping structure.
 	 */
-	void enablePeriodicHousekeepingParametersReport(Message& request);
+	void enablePeriodicHousekeepingParametersReport(ECSSMessage& request);
 
 	/**
 	 * Implementation of TC[3,6]. Request to disable the periodic housekeeping parameters reporting for a specific
 	 * housekeeping structure.
 	 */
-	void disablePeriodicHousekeepingParametersReport(Message& request);
+	void disablePeriodicHousekeepingParametersReport(ECSSMessage& request);
 
 	/**
 	 * This function gets a message type TC[3,9] 'report housekeeping structures'.
 	 */
-	void reportHousekeepingStructures(Message& request);
+	void reportHousekeepingStructures(ECSSMessage& request);
 
 	/**
 	 * This function takes a structure ID as argument and constructs/stores a TM[3,10] housekeeping structure report.
@@ -107,7 +107,7 @@ public:
 	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report' and stores
 	 * TM[3,25] report messages.
 	 */
-	void generateOneShotHousekeepingReport(Message& request);
+	void generateOneShotHousekeepingReport(ECSSMessage& request);
 
 	/**
 	 * This function receives a message type TC[3,29] 'append new parameters to an already existing housekeeping
@@ -117,18 +117,18 @@ public:
 	 * convention was made, saying that it would be more practical to just skip the invalid parameter and continue
 	 * processing the rest of the message.
 	 */
-	void appendParametersToHousekeepingStructure(Message& request);
+	void appendParametersToHousekeepingStructure(ECSSMessage& request);
 
 	/**
 	 * This function receives a message type TC[3,31] 'modify the collection interval of specified structures'.
 	 */
-	void modifyCollectionIntervalOfStructures(Message& request);
+	void modifyCollectionIntervalOfStructures(ECSSMessage& request);
 
 	/**
 	 * This function takes as argument a message type TC[3,33] 'report housekeeping periodic properties' and
 	 * responds with a TM[3,35] 'housekeeping periodic properties report'.
 	 */
-	void reportHousekeepingPeriodicProperties(Message& request);
+	void reportHousekeepingPeriodicProperties(ECSSMessage& request);
 
 	/**
 	 * This function calculates the time needed to pass until the next periodic report for each housekeeping 
@@ -150,7 +150,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif

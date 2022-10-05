@@ -8,7 +8,7 @@ ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(T
 	serviceType = ServiceType;
 }
 
-void ParameterStatisticsService::reportParameterStatistics(Message& request) {
+void ParameterStatisticsService::reportParameterStatistics(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
 	parameterStatisticsReport();
 
@@ -26,7 +26,7 @@ void ParameterStatisticsService::reportParameterStatistics(bool reset) {
 }
 
 void ParameterStatisticsService::parameterStatisticsReport() {
-	Message report = createTM(ParameterStatisticsReport);
+	ECSSMessage report = createTM(ParameterStatisticsReport);
 	report.append(evaluationStartTime);
 	auto evaluationStopTime = TimeGetter::getCurrentTimeDefaultCUC();
 	report.append(evaluationStopTime);
@@ -54,7 +54,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	storeMessage(report);
 }
 
-void ParameterStatisticsService::resetParameterStatistics(Message& request) {
+void ParameterStatisticsService::resetParameterStatistics(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::ResetParameterStatistics);
 	resetParameterStatistics();
 }
@@ -66,7 +66,7 @@ void ParameterStatisticsService::resetParameterStatistics() {
 	evaluationStartTime = TimeGetter::getCurrentTimeDefaultCUC();
 }
 
-void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
+void ParameterStatisticsService::enablePeriodicStatisticsReporting(ECSSMessage& request) {
 	/**
 	 * @todo: The sampling interval of each parameter. the "timeInterval" requested should not exceed it.
 	 * 		  It has to be defined as a constant.
@@ -84,14 +84,14 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	reportingIntervalMs = timeInterval;
 }
 
-void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& request) {
+void ParameterStatisticsService::disablePeriodicStatisticsReporting(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting);
 
 	periodicStatisticsReportingStatus = false;
 	reportingIntervalMs = 0;
 }
 
-void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& request) {
+void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions);
 
 	uint16_t numOfIds = request.readUint16();
@@ -134,7 +134,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 	}
 }
 
-void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
+void ParameterStatisticsService::deleteStatisticsDefinitions(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions);
 
 	uint16_t numOfIds = request.readUint16();
@@ -156,13 +156,13 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	}
 }
 
-void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
+void ParameterStatisticsService::reportStatisticsDefinitions(ECSSMessage& request) {
 	request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions);
 	statisticsDefinitionsReport();
 }
 
 void ParameterStatisticsService::statisticsDefinitionsReport() {
-	Message definitionsReport = createTM(ParameterStatisticsDefinitionsReport);
+	ECSSMessage definitionsReport = createTM(ParameterStatisticsDefinitionsReport);
 
 	uint16_t currentReportingIntervalMs = 0;
 	if (periodicStatisticsReportingStatus) {
@@ -182,7 +182,7 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 	storeMessage(definitionsReport);
 }
 
-void ParameterStatisticsService::execute(Message& message) {
+void ParameterStatisticsService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case ReportParameterStatistics:
 			reportParameterStatistics(message);

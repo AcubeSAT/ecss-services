@@ -12,7 +12,7 @@ MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*th
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
     : mainService(parent) {}
 
-void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& request) {
+void MemoryManagementService::RawDataMemoryManagement::loadRawData(ECSSMessage& request) {
 	/**
 	 * Bear in mind that there is currently no error checking for invalid parameters.
 	 * A future version will include error checking and the corresponding error report/notification,
@@ -63,10 +63,10 @@ void MemoryManagementService::RawDataMemoryManagement::loadRawData(Message& requ
 	}
 }
 
-void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
+void MemoryManagementService::RawDataMemoryManagement::dumpRawData(ECSSMessage& request) {
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData);
 
-	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
+	ECSSMessage report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8();
 
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
@@ -101,10 +101,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	}
 }
 
-void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
+void MemoryManagementService::RawDataMemoryManagement::checkRawData(ECSSMessage& request) {
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData);
 
-	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
+	ECSSMessage report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8();
 
 	if (mainService.memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
@@ -196,7 +196,7 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, uint16_t
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
 
-void MemoryManagementService::execute(Message& message) {
+void MemoryManagementService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case LoadRawMemoryDataAreas:
 			rawDataMemorySubservice.loadRawData(message);

@@ -5,7 +5,7 @@
 #include <type_traits>
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
-class Message;
+class ECSSMessage;
 
 /**
  * A class that handles unexpected software errors, including internal errors or errors due to
@@ -19,10 +19,10 @@ private:
 	 * Log the error to a logging facility. Platform-dependent.
 	 */
 	template <typename ErrorType>
-	static void logError(const Message& message, ErrorType errorType);
+	static void logError(const ECSSMessage& message, ErrorType errorType);
 
 	/**
-	 * Log an error without a Message to a logging facility. Platform-dependent.
+	 * Log an error without a ECSSMessage to a logging facility. Platform-dependent.
 	 */
 	template <typename ErrorType>
 	static void logError(ErrorType errorType);
@@ -57,7 +57,7 @@ public:
 		 */
 		InvalidDate = 6,
 		/**
-		 * Asked a Message type that doesn't exist
+		 * Asked a ECSSMessage type that doesn't exist
 		 */
 		UnknownMessageType = 7,
 
@@ -66,7 +66,7 @@ public:
 		 */
 		InvalidSpareBits = 8,
 		/**
-		 * A function received a Message that was not of the correct type
+		 * A function received a ECSSMessage that was not of the correct type
 		 */
 		OtherMessageType = 9,
 		/**
@@ -74,7 +74,7 @@ public:
 		 */
 		MapFull = 10,
 		/**
-		 * A Message that is included within another message is too large
+		 * A ECSSMessage that is included within another message is too large
 		 */
 		NestedMessageTooLarge = 11,
 		/**
@@ -120,7 +120,7 @@ public:
 		 */
 		StringTooShort = 4,
 		/**
-		 * Cannot parse a Message, because there is an error in its secondary header
+		 * Cannot parse a ECSSMessage, because there is an error in its secondary header
 		 */
 		UnacceptableMessage = 5
 	};
@@ -422,7 +422,7 @@ public:
 	 * @todo See if this needs to include InternalErrorType
 	 */
 	template <typename ErrorType>
-	static void reportError(const Message& message, ErrorType errorCode);
+	static void reportError(const ECSSMessage& message, ErrorType errorCode);
 
 	/**
 	 * Report a failure about the progress of the execution of a request
@@ -437,7 +437,7 @@ public:
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
 	 */
-	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, uint8_t stepID);
+	static void reportProgressError(const ECSSMessage& message, ExecutionProgressErrorType errorCode, uint8_t stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.
@@ -479,7 +479,7 @@ public:
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
 	template <typename ErrorType>
-	static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
+	static bool assertRequest(bool condition, const ECSSMessage& message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
 		}

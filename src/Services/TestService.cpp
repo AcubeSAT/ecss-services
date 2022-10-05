@@ -4,29 +4,29 @@
 #include "ServicePool.hpp"
 #include "Services/TestService.hpp"
 
-void TestService::areYouAlive(Message& request) {
+void TestService::areYouAlive(ECSSMessage& request) {
 	request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest);
 	areYouAliveReport();
 }
 
 void TestService::areYouAliveReport() {
-	Message report = createTM(TestService::MessageType::AreYouAliveTestReport);
+	ECSSMessage report = createTM(TestService::MessageType::AreYouAliveTestReport);
 	storeMessage(report);
 }
 
-void TestService::onBoardConnection(Message& request) {
+void TestService::onBoardConnection(ECSSMessage& request) {
 	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
 	uint16_t applicationProcessId = request.readUint16();
 	onBoardConnectionReport(applicationProcessId);
 }
 
 void TestService::onBoardConnectionReport(uint16_t applicationProcessId) {
-	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
+	ECSSMessage report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
 	report.appendUint16(applicationProcessId);
 	storeMessage(report);
 }
 
-void TestService::execute(Message& message) {
+void TestService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case AreYouAliveTest:
 			areYouAlive(message);

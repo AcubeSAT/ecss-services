@@ -34,7 +34,7 @@ namespace unit_test {
 	};
 } // namespace unit_test
 
-Message testMessage1, testMessage2, testMessage3, testMessage4;
+ECSSMessage testMessage1, testMessage2, testMessage3, testMessage4;
 Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC(); // Get the current system time
 bool messagesPopulated = false;                                        // Indicate whether the test messages are initialized
 
@@ -44,30 +44,30 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 		// Initialize the test messages
 		testMessage1.serviceType = 6;
 		testMessage1.messageType = 5;
-		testMessage1.packetType = Message::TC;
+		testMessage1.packetType = ECSSMessage::TC;
 		testMessage1.applicationId = 8;  // todo: Remove the dummy application ID
 		testMessage1.appendUint16(4253); // Append dummy data
 
 		testMessage2.serviceType = 4;
 		testMessage2.messageType = 5;
-		testMessage2.packetType = Message::TC;
+		testMessage2.packetType = ECSSMessage::TC;
 		testMessage2.applicationId = 4;   // todo: Remove the dummy application ID
 		testMessage2.appendUint16(45667); // Append dummy data
 
 		testMessage3.serviceType = 3;
 		testMessage3.messageType = 2;
-		testMessage3.packetType = Message::TC;
+		testMessage3.packetType = ECSSMessage::TC;
 		testMessage3.appendUint16(456); // Append dummy data
 
 		testMessage4.serviceType = 12;
 		testMessage4.messageType = 3;
-		testMessage4.packetType = Message::TC;
+		testMessage4.packetType = ECSSMessage::TC;
 		testMessage4.appendUint16(934); // Append dummy data
 
 		messagesPopulated = true; // Indicate initialized test messages
 	}
 
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, ECSSMessage::TC, 1);
 	receivedMessage.appendUint16(4); // Total number of requests
 
 	// Test activity 1
@@ -102,9 +102,9 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	auto nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 155643s);
 	REQUIRE(nextActivityExecutionCUCTime == currentTime + 172643s);
 
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, ECSSMessage::TC, 1);
 	timeBasedService.detailReportAllActivities(receivedMessage);
-	Message response = ServiceTests::get(0);
+	ECSSMessage response = ServiceTests::get(0);
 	uint16_t iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 3);
 
@@ -138,7 +138,7 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 	Services.reset();
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, ECSSMessage::TC, 1);
 
 	MessageParser::execute(receivedMessage); //timeService.enableScheduleExecution(receivedMessage);
 	CHECK(unit_test::Tester::executionFunctionStatus(timeBasedService));
@@ -146,7 +146,7 @@ TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 
 TEST_CASE("TC[11,2] Disable Schedule Execution", "[service][st11]") {
 	Services.reset();
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction, ECSSMessage::TC, 1);
 
 	MessageParser::execute(receivedMessage); //timeService.disableScheduleExecution(receivedMessage);
 	CHECK(not unit_test::Tester::executionFunctionStatus(timeBasedService));
@@ -169,7 +169,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 	REQUIRE(testMessage4.bytesEqualWith(scheduledActivities.at(3)->request));
 
 	SECTION("Error throw test") {
-		Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+		ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, ECSSMessage::TC, 1);
 		receivedMessage.appendUint16(1); // Total number of requests
 
 		receivedMessage.appendDefaultCUCTimeStamp(currentTime - 155643s);
@@ -181,7 +181,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 
 TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	Services.reset();
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, ECSSMessage::TC, 1);
 
 	auto scheduledActivities = activityInsertion(timeBasedService);
 	const Time::RelativeTime timeShift = 6789;
@@ -221,7 +221,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 
 TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	Services.reset();
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById, ECSSMessage::TC, 1);
 
 	auto scheduledActivities = activityInsertion(timeBasedService);
 	scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
@@ -284,7 +284,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 
 TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]") {
 	Services.reset();
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById, ECSSMessage::TC, 1);
 
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
@@ -306,7 +306,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		timeBasedService.detailReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::hasOneMessage());
 
-		Message response = ServiceTests::get(0);
+		ECSSMessage response = ServiceTests::get(0);
 		CHECK(response.serviceType == 11);
 		CHECK(response.messageType == 10);
 
@@ -315,7 +315,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		for (uint16_t i = 0; i < iterationCount; i++) {
 			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
 
-			Message receivedTCPacket;
+			ECSSMessage receivedTCPacket;
 			uint8_t receivedDataStr[ECSSTCRequestStringSize];
 			response.readString(receivedDataStr, ECSSTCRequestStringSize);
 			receivedTCPacket = MessageParser::parseECSSTC(receivedDataStr);
@@ -342,7 +342,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 
 TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11]") {
 	Services.reset();
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, ECSSMessage::TC, 1);
 
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
@@ -364,7 +364,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::hasOneMessage());
 
-		Message response = ServiceTests::get(0);
+		ECSSMessage response = ServiceTests::get(0);
 		CHECK(response.serviceType == 11);
 		CHECK(response.messageType == 13);
 
@@ -404,11 +404,11 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 	Services.reset();
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, ECSSMessage::TC, 1);
 	timeBasedService.detailReportAllActivities(receivedMessage);
 	REQUIRE(ServiceTests::hasOneMessage());
 
-	Message response = ServiceTests::get(0);
+	ECSSMessage response = ServiceTests::get(0);
 	CHECK(response.serviceType == 11);
 	CHECK(response.messageType == 10);
 
@@ -418,7 +418,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 	for (uint16_t i = 0; i < iterationCount; i++) {
 		Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
 
-		Message receivedTCPacket;
+		ECSSMessage receivedTCPacket;
 		uint8_t receivedDataStr[ECSSTCRequestStringSize];
 		response.readString(receivedDataStr, ECSSTCRequestStringSize);
 		receivedTCPacket = MessageParser::parseECSSTC(receivedDataStr);
@@ -429,7 +429,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 
 TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 	Services.reset();
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById, ECSSMessage::TC, 1);
 
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
@@ -467,7 +467,7 @@ TEST_CASE("TC[11,3] Reset schedule", "[service][st11]") {
 	Services.reset();
 	activityInsertion(timeBasedService);
 
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule, Message::TC, 1);
+	ECSSMessage receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule, ECSSMessage::TC, 1);
 
 	timeBasedService.resetSchedule(receivedMessage);
 	auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService); // Get the new list

@@ -1,13 +1,13 @@
 #ifndef ECSS_SERVICES_PMONBASE_HPP
 #define ECSS_SERVICES_PMONBASE_HPP
 #include <cstdint>
-#include "Message.hpp"
-#include "etl/array.h"
-#include "Service.hpp"
-#include "Helpers/Parameter.hpp"
-#include "etl/map.h"
+#include "ECSSMessage.hpp"
 #include "ECSS_Definitions.hpp"
+#include "Helpers/Parameter.hpp"
+#include "Service.hpp"
+#include "etl/array.h"
 #include "etl/list.h"
+#include "etl/map.h"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.

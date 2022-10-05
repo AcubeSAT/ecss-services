@@ -53,7 +53,7 @@ public:
 		}
 	}
 
-	inline void setValueFromMessage(Message& message) override {
+	inline void setValueFromMessage(ECSSMessage& message) override {
 		Parent::setValueFromMessage(message);
 
 		if (notifier) {

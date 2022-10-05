@@ -153,21 +153,21 @@ public:
 	 * TC[5,5] request to enable report generation
 	 * Telecommand to enable the report generation of event definitions
 	 */
-	void enableReportGeneration(Message message);
+	void enableReportGeneration(ECSSMessage message);
 
 	/**
 	 * TC[5,6] request to disable report generation
 	 * Telecommand to disable the report generation of event definitions
 	 * @param message
 	 */
-	void disableReportGeneration(Message message);
+	void disableReportGeneration(ECSSMessage message);
 
 	/**
 	 * TC[5,7] request to report the disabled event definitions
 	 * Note: No arguments, according to the standard.
 	 * @param message
 	 */
-	void requestListOfDisabledEvents(Message message);
+	void requestListOfDisabledEvents(ECSSMessage message);
 
 	/**
 	 * TM[5,8] disabled event definitions report
@@ -190,7 +190,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif // ECSS_SERVICES_EVENTREPORTSERVICE_HPP

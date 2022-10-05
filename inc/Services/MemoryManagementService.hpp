@@ -58,7 +58,7 @@ public:
 		 * @param request Provide the received message as a parameter
 		 * @todo Only allow aligned memory address to be start addresses
 		 */
-		void loadRawData(Message& request);
+		void loadRawData(ECSSMessage& request);
 
 		/**
 		 * TC[6,5] read raw memory values
@@ -70,7 +70,7 @@ public:
 		 * 		 different memory types
 		 * @todo Only allow aligned memory address to be start addresses
 		 */
-		void dumpRawData(Message& request);
+		void dumpRawData(ECSSMessage& request);
 
 		/**
 		 * TC[6,9] check raw memory data
@@ -82,7 +82,7 @@ public:
 		 * 		 different memory types
 		 * @todo Only allow aligned memory address to be start addresses
 		 */
-		void checkRawData(Message &request);
+		void checkRawData(ECSSMessage&request);
 	} rawDataMemorySubservice;
 
 	/**
@@ -92,7 +92,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 
 private:
 	/**

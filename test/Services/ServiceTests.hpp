@@ -1,10 +1,10 @@
 #ifndef ECSS_SERVICES_TESTS_SERVICES_SERVICETESTS_HPP
 #define ECSS_SERVICES_TESTS_SERVICES_SERVICETESTS_HPP
 
-#include <vector>
-#include <map>
-#include <Message.hpp>
+#include <ECSSMessage.hpp>
 #include <ServicePool.hpp>
+#include <map>
+#include <vector>
 
 /**
  * Supporting class for tests against ECSS services
@@ -16,10 +16,10 @@ protected:
 	/**
 	 * The list of Messages that have been sent as a result of all the processing.
 	 *
-	 * Whenever a Message is sent from anywhere in the code, it is stored in this array. The
+	 * Whenever a ECSSMessage is sent from anywhere in the code, it is stored in this array. The
 	 * testing code can fetch these Messages using the ServiceTests::get() method.
 	 */
-	static std::vector<Message> queuedMessages;
+	static std::vector<ECSSMessage> queuedMessages;
 
 	/**
 	 * The list of Errors that the ErrorHandler caught.
@@ -36,7 +36,7 @@ protected:
 
 	/**
 	 * Whether an error assertion function was called, indicating that we are expecting to see
-	 * Errors thrown after this Message
+	 * Errors thrown after this ECSSMessage
 	 */
 	static bool expectingErrors;
 
@@ -45,14 +45,14 @@ public:
 	 * Get a message from the list of queued messages to send
 	 * @param number The number of the message, starting from 0 in chronological order
 	 */
-	static Message& get(uint64_t number) {
+	static ECSSMessage& get(uint64_t number) {
 		return queuedMessages.at(number);
 	}
 
 	/**
 	 * Add a message to the queue of messages having been sent
 	 */
-	static void queue(const Message& message) {
+	static void queue(const ECSSMessage& message) {
 		queuedMessages.push_back(message);
 	}
 
@@ -118,7 +118,7 @@ public:
 	}
 
 	/**
-	 * Find the number of thrown errors after the processing of this Message.
+	 * Find the number of thrown errors after the processing of this ECSSMessage.
 	 */
 	static uint64_t countErrors() {
 		expectingErrors = true;

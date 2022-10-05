@@ -1,15 +1,15 @@
-#include <Message.hpp>
+#include <ECSSMessage.hpp>
 #include <ServicePool.hpp>
 #include <catch2/catch_all.hpp>
 #include "Services/EventReportService.hpp"
 #include "etl/String.hpp"
 
-TEST_CASE("Message is usable", "[message]") {
-	Message message(EventReportService::ServiceType, 17, Message::TC, 3);
+TEST_CASE("ECSSMessage is usable", "[message]") {
+	ECSSMessage message(EventReportService::ServiceType, 17, ECSSMessage::TC, 3);
 
 	REQUIRE(message.serviceType == EventReportService::ServiceType);
 	REQUIRE(message.messageType == 17);
-	REQUIRE(message.packetType == Message::TC);
+	REQUIRE(message.packetType == ECSSMessage::TC);
 	REQUIRE(message.applicationId == 3);
 	REQUIRE(message.dataSize == 0);
 
@@ -19,7 +19,7 @@ TEST_CASE("Message is usable", "[message]") {
 }
 
 TEST_CASE("Bit manipulations", "[message]") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 
 	message.appendBits(10, 0x357);
 	message.appendBits(4, 0xb);
@@ -49,7 +49,7 @@ TEST_CASE("Requirement 5.3.1", "[message][ecss]") {
 	SECTION("5.3.1a") {}
 
 	SECTION("5.3.1b") {
-		REQUIRE(sizeof(Message::serviceType) == 1);
+		REQUIRE(sizeof(ECSSMessage::serviceType) == 1);
 	}
 
 	SECTION("5.3.1c") {
@@ -62,7 +62,7 @@ TEST_CASE("Requirement 5.3.1", "[message][ecss]") {
 }
 
 TEST_CASE("Requirement 7.3.2 (Boolean)", "[message][ecss]") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 
 	message.append<bool>(false);
 	message.append<bool>(true);
@@ -74,7 +74,7 @@ TEST_CASE("Requirement 7.3.2 (Boolean)", "[message][ecss]") {
 }
 
 TEST_CASE("Requirement 7.3.3 (Enumerated)", "[message][ecss]") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 
 	message.appendEnum8(230);
 	message.appendEnum16(15933);
@@ -92,7 +92,7 @@ TEST_CASE("Requirement 7.3.3 (Enumerated)", "[message][ecss]") {
 }
 
 TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 
 	message.append<char>(110);
 	message.append<uint8_t>(230);
@@ -121,7 +121,7 @@ TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 }
 
 TEST_CASE("Requirement 7.3.5 (Signed integer)", "[message][ecss]") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 
 	message.append<int8_t>(-16);
 	message.append<int16_t>(-7009);
@@ -146,7 +146,7 @@ TEST_CASE("Requirement 7.3.5 (Signed integer)", "[message][ecss]") {
 }
 
 TEST_CASE("Requirement 7.3.6 (Real)", "[message][ecss]") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 
 	message.append<float>(7.209f);
 	message.append<float>(-9003.53135f);
@@ -158,7 +158,7 @@ TEST_CASE("Requirement 7.3.6 (Real)", "[message][ecss]") {
 }
 
 TEST_CASE("Test appending double") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 	message.append<double>(2.324);
 
 	REQUIRE(message.dataSize == 8);
@@ -167,7 +167,7 @@ TEST_CASE("Test appending double") {
 }
 
 TEST_CASE("Test appending offset") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 	message.append<Time::RelativeTime>(555);
 
 	REQUIRE(message.dataSize == 8);
@@ -182,7 +182,7 @@ TEST_CASE("Test appending a CUC timestamp") {
 		auto timeCUC = TimeGetter::getCurrentTimeDefaultCUC();
 		REQUIRE(timeCUC.formatAsBytes() == 86769000);
 
-		Message message(0, 0, Message::TC, 0);
+		ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 		message.appendDefaultCUCTimeStamp(timeCUC);
 
 		REQUIRE(message.readUint32() == 86769000);
@@ -191,7 +191,7 @@ TEST_CASE("Test appending a CUC timestamp") {
 	SECTION("Test 2") {
 		DefaultCUC timeCUC(34511_t);
 
-		Message message(0, 0, Message::TC, 0);
+		ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 		message.appendDefaultCUCTimeStamp(timeCUC);
 
 		REQUIRE(message.readUint32() == 34511);
@@ -205,7 +205,7 @@ TEST_CASE("Test reading a custom CUC timestamp") {
  	*/
 	DefaultCUC timeCUC(34511_t);
 
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 	message.appendDefaultCUCTimeStamp(timeCUC);
 
 	auto returnTimeCUC = message.readDefaultCUCTimeStamp();
@@ -214,7 +214,7 @@ TEST_CASE("Test reading a custom CUC timestamp") {
 }
 
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
-	Message message(0, 0, Message::TC, 0);
+	ECSSMessage message(0, 0, ECSSMessage::TC, 0);
 
 	message.appendString(String<4>("test"));
 	message.append<etl::istring>(String<4>("gaus"));
@@ -230,15 +230,15 @@ TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
 }
 
 TEST_CASE("Requirement 7.3.13 (Packet)", "[message][ecss]") {
-	Message telemetry(0, 0, Message::TM, 0);
-	Message telecommand(0, 0, Message::TC, 0);
+	ECSSMessage telemetry(0, 0, ECSSMessage::TM, 0);
+	ECSSMessage telecommand(0, 0, ECSSMessage::TC, 0);
 
 	CHECK(static_cast<int>(telemetry.packetType) == 0);
 	CHECK(static_cast<int>(telecommand.packetType) == 1);
 }
 
 TEST_CASE("Spare field", "[message]") {
-	Message message1(0, 0, Message::TM, 0);
+	ECSSMessage message1(0, 0, ECSSMessage::TM, 0);
 
 	message1.appendByte(1);
 	message1.appendHalfword(2);
@@ -248,7 +248,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message1.data[3] == 0b10000000);
 	CHECK(message1.dataSize == 4);
 
-	Message message2(0, 0, Message::TM, 0);
+	ECSSMessage message2(0, 0, ECSSMessage::TM, 0);
 	message2.appendByte(1);
 	message2.appendHalfword(2);
 	message2.appendBits(2, 3);
@@ -257,7 +257,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message2.data[3] == 0b11000000);
 	CHECK(message2.dataSize == 4);
 
-	Message message3(0, 0, Message::TM, 0);
+	ECSSMessage message3(0, 0, ECSSMessage::TM, 0);
 
 	message3.appendByte(1);
 	message3.appendHalfword(2);
@@ -267,7 +267,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message3.data[3] == 0b10100000);
 	CHECK(message3.dataSize == 4);
 
-	Message message4(0, 0, Message::TM, 0);
+	ECSSMessage message4(0, 0, ECSSMessage::TM, 0);
 
 	message4.appendByte(1);
 	message4.appendHalfword(2);
@@ -277,7 +277,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message4.data[3] == 0b01010000);
 	CHECK(message4.dataSize == 4);
 
-	Message message5(0, 0, Message::TM, 0);
+	ECSSMessage message5(0, 0, ECSSMessage::TM, 0);
 
 	message5.appendByte(1);
 	message5.appendHalfword(2);
@@ -287,7 +287,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message5.data[3] == 0b00101000);
 	CHECK(message5.dataSize == 4);
 
-	Message message6(0, 0, Message::TM, 0);
+	ECSSMessage message6(0, 0, ECSSMessage::TM, 0);
 
 	message6.appendByte(1);
 	message6.appendHalfword(2);
@@ -297,7 +297,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message6.data[3] == 0b00010100);
 	CHECK(message6.dataSize == 4);
 
-	Message message7(0, 0, Message::TM, 0);
+	ECSSMessage message7(0, 0, ECSSMessage::TM, 0);
 
 	message7.appendByte(1);
 	message7.appendHalfword(2);
@@ -307,7 +307,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message7.data[3] == 0b00001010);
 	CHECK(message7.dataSize == 4);
 
-	Message message8(0, 0, Message::TM, 0);
+	ECSSMessage message8(0, 0, ECSSMessage::TM, 0);
 
 	message8.appendByte(1);
 	message8.appendHalfword(2);
@@ -317,7 +317,7 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message8.data[3] == 0b00000101);
 	CHECK(message8.dataSize == 4);
 
-	Message message9(0, 0, Message::TM, 0);
+	ECSSMessage message9(0, 0, ECSSMessage::TM, 0);
 
 	message9.appendByte(1);
 	message9.appendHalfword(2);
@@ -327,38 +327,38 @@ TEST_CASE("Spare field", "[message]") {
 	CHECK(message9.dataSize == 3);
 }
 
-TEST_CASE("Message type counter", "[message]") {
-	SECTION("Message counting") {
-		Message message1(0, 0, Message::TM, 0);
+TEST_CASE("ECSSMessage type counter", "[message]") {
+	SECTION("ECSSMessage counting") {
+		ECSSMessage message1(0, 0, ECSSMessage::TM, 0);
 		message1.finalize();
 		CHECK(message1.messageTypeCounter == 0);
 
-		Message message2(0, 0, Message::TM, 0);
+		ECSSMessage message2(0, 0, ECSSMessage::TM, 0);
 		message2.finalize();
 		CHECK(message2.messageTypeCounter == 1);
 	}
 
 	SECTION("Different message types") {
-		Message message1(0, 1, Message::TM, 0);
+		ECSSMessage message1(0, 1, ECSSMessage::TM, 0);
 		message1.finalize();
 		CHECK(message1.messageTypeCounter == 0);
 
-		Message message2(0, 2, Message::TM, 0);
+		ECSSMessage message2(0, 2, ECSSMessage::TM, 0);
 		message2.finalize();
 		CHECK(message2.messageTypeCounter == 0);
 	}
 
-	SECTION("Message counter overflow") {
+	SECTION("ECSSMessage counter overflow") {
 		for (int i = 0; i <= 65534; i++) {
-			Message message(0, 3, Message::TM, 0);
+			ECSSMessage message(0, 3, ECSSMessage::TM, 0);
 			message.finalize();
 		}
 
-		Message message1(0, 3, Message::TM, 0);
+		ECSSMessage message1(0, 3, ECSSMessage::TM, 0);
 		message1.finalize();
 		CHECK(message1.messageTypeCounter == 65535);
 
-		Message message2(0, 3, Message::TM, 0);
+		ECSSMessage message2(0, 3, ECSSMessage::TM, 0);
 		message2.finalize();
 		CHECK(message2.messageTypeCounter == 0);
 	}
@@ -366,16 +366,16 @@ TEST_CASE("Message type counter", "[message]") {
 
 TEST_CASE("Packet sequence counter", "[message]") {
 	SECTION("Packet counting") {
-		Message message1(0, 0, Message::TM, 0);
+		ECSSMessage message1(0, 0, ECSSMessage::TM, 0);
 		message1.finalize();
 		CHECK(message1.packetSequenceCount == 0);
 
-		Message message2(0, 0, Message::TM, 0);
+		ECSSMessage message2(0, 0, ECSSMessage::TM, 0);
 		message2.finalize();
 		CHECK(message2.packetSequenceCount == 1);
 
 		// Different message type check
-		Message message3(1, 2, Message::TM, 0);
+		ECSSMessage message3(1, 2, ECSSMessage::TM, 0);
 		message3.finalize();
 		CHECK(message3.packetSequenceCount == 2);
 	}
@@ -384,15 +384,15 @@ TEST_CASE("Packet sequence counter", "[message]") {
 		Services.reset();
 
 		for (int i = 0; i <= 16382; i++) {
-			Message message(0, 3, Message::TM, 0);
+			ECSSMessage message(0, 3, ECSSMessage::TM, 0);
 			message.finalize();
 		}
 
-		Message message1(0, 3, Message::TM, 0);
+		ECSSMessage message1(0, 3, ECSSMessage::TM, 0);
 		message1.finalize();
 		CHECK(message1.packetSequenceCount == 16383);
 
-		Message message2(0, 3, Message::TM, 0);
+		ECSSMessage message2(0, 3, ECSSMessage::TM, 0);
 		message2.finalize();
 		CHECK(message2.packetSequenceCount == 0);
 	}

@@ -27,11 +27,11 @@ public:
 	}
 
 	/**
-     * Send data as a part of a custom ECSS Message
+     * Send data as a part of a custom ECSS ECSSMessage
      * Creates a TM[128, 128]
      */
 	void logAsECSSMessage(const etl::string<LOGGER_MAX_MESSAGE_SIZE>& data) {
-		Message log = createTM(MessageType::LogString);
+		ECSSMessage log = createTM(MessageType::LogString);
 		log.appendString(data);
 		log.appendString(termination);
 		storeMessage(log);

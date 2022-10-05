@@ -17,7 +17,7 @@ void Statistic::updateStatistics(double value) {
 	sampleCounter++;
 }
 
-void Statistic::appendStatisticsToMessage(Message& report) {
+void Statistic::appendStatisticsToMessage(ECSSMessage& report) {
 	report.appendFloat(static_cast<float>(max));
 	report.append(timeOfMaxValue);
 	report.appendFloat(static_cast<float>(min));

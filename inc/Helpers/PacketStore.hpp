@@ -1,10 +1,10 @@
 #ifndef ECSS_SERVICES_PACKETSTORE_HPP
 #define ECSS_SERVICES_PACKETSTORE_HPP
 
+#include "ECSSMessage.hpp"
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
-#include "Message.hpp"
 
 /**
  * This is the Packet Store class, needed for the Storage-Retrieval Service. The purpose of the packet-store is to
@@ -71,7 +71,7 @@ public:
 	 * 				old packets  <---------->  new packets
 	 * 				[][][][][][][][][][][][][][][][][][][]	<--- deque
 	 */
-	etl::deque<std::pair<uint32_t, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
+	etl::deque<std::pair<uint32_t, ECSSMessage>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
 
 	/**
 	 * Returns the sum of the sizes of the packets stored in this PacketStore, in bytes.

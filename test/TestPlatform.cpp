@@ -1,8 +1,8 @@
 #define CATCH_CONFIG_EXTERNAL_INTERFACES
 
 
+#include <ECSSMessage.hpp>
 #include <Logger.hpp>
-#include <Message.hpp>
 #include <Service.hpp>
 #include <catch2/catch_all.hpp>
 #include <cxxabi.h>
@@ -25,26 +25,26 @@ Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 }
 
 // Explicit template specializations for the logError() function
-template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionStartErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionProgressErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionCompletionErrorType);
-template void ErrorHandler::logError(const Message&, ErrorHandler::RoutingErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::AcceptanceErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::ExecutionStartErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::ExecutionProgressErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::ExecutionCompletionErrorType);
+template void ErrorHandler::logError(const ECSSMessage&, ErrorHandler::RoutingErrorType);
 template void ErrorHandler::logError(ErrorHandler::InternalErrorType);
 
 // Initialisation of ServiceTests properties
-std::vector<Message> ServiceTests::queuedMessages = std::vector<Message>();
+std::vector<ECSSMessage> ServiceTests::queuedMessages = std::vector<ECSSMessage>();
 std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> ServiceTests::thrownErrors =
     std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool>();
 bool ServiceTests::expectingErrors = false;
 
-void Service::storeMessage(Message& message) {
+void Service::storeMessage(ECSSMessage& message) {
 	// Just add the message to the queue
 	ServiceTests::queue(message);
 }
 
 template <typename ErrorType>
-void ErrorHandler::logError(const Message& message, ErrorType errorType) {
+void ErrorHandler::logError(const ECSSMessage& message, ErrorType errorType) {
 	logError(errorType);
 }
 
@@ -71,7 +71,7 @@ struct ServiceTestsListener : Catch::EventListenerBase {
 	void sectionEnded(Catch::SectionStats const& sectionStats) override {
 		// Make sure we don't have any errors
 		if (not ServiceTests::isExpectingErrors()) {
-			// An Error was thrown with this Message. If you expected this to happen, please call a
+			// An Error was thrown with this ECSSMessage. If you expected this to happen, please call a
 			// corresponding assertion function from ServiceTests to silence this message.
 			UNSCOPED_INFO("Found " << ServiceTests::countErrors() << " errors at end of section: ");
 			for (auto error: ServiceTests::getThrownErrors()) {

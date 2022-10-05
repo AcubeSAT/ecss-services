@@ -1,7 +1,7 @@
 #include "../Services/ServiceTests.hpp"
+#include "ECSSMessage.hpp"
 #include "Time/Time.hpp"
 #include "Time/UTCTimestamp.hpp"
-#include "Message.hpp"
 #include "catch2/catch_all.hpp"
 
 TEST_CASE("UTC timestamps") {
@@ -70,7 +70,7 @@ TEST_CASE("CUC Custom Timestamp as Parameter") {
 
 	auto parameter = Parameter<DefaultCUC>(time);
 
-	auto message = Message(0, 0, Message::TC);
+	auto message = ECSSMessage(0, 0, ECSSMessage::TC);
 	parameter.appendValueToMessage(message);
 	CHECK(message.dataSize == 4);
 

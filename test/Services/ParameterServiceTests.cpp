@@ -1,7 +1,7 @@
-#include "Services/ParameterService.hpp"
-#include "Message.hpp"
+#include "ECSSMessage.hpp"
 #include "Parameters/PlatformParameters.hpp"
 #include "ServiceTests.hpp"
+#include "Services/ParameterService.hpp"
 #include "catch2/catch_all.hpp"
 
 static void resetParameterValues() {
@@ -12,8 +12,8 @@ static void resetParameterValues() {
 
 TEST_CASE("Parameter Report Subservice") {
 	SECTION("All requested parameters invalid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
-		                          Message::TC, ApplicationId);
+		ECSSMessage request = ECSSMessage(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                                  ECSSMessage::TC, ApplicationId);
 		request.appendUint16(3);
 		request.appendUint16(54432);
 		request.appendUint16(60000);
@@ -23,7 +23,7 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 3);
 		CHECK(ServiceTests::count() == 4);
 
-		Message report = ServiceTests::get(3);
+		ECSSMessage report = ServiceTests::get(3);
 		CHECK(report.serviceType == ParameterService::ServiceType);
 		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 0); // the message shall be empty
@@ -33,8 +33,8 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Some requested parameters invalid") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
-		                          Message::TC, 1);
+		ECSSMessage request = ECSSMessage(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                                  ECSSMessage::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(1);
 		request.appendUint16(10000);
@@ -44,7 +44,7 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
 		CHECK(ServiceTests::count() == 2);
 
-		Message report = ServiceTests::get(1);
+		ECSSMessage report = ServiceTests::get(1);
 		CHECK(report.serviceType == ParameterService::ServiceType);
 		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 2);
@@ -58,8 +58,8 @@ TEST_CASE("Parameter Report Subservice") {
 	}
 
 	SECTION("Parameters are of different types") {
-		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
-		                          Message::TC, 1);
+		ECSSMessage request = ECSSMessage(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+		                                  ECSSMessage::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint16(1);
@@ -67,7 +67,7 @@ TEST_CASE("Parameter Report Subservice") {
 
 		MessageParser::execute(request);
 
-		Message report = ServiceTests::get(0);
+		ECSSMessage report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterService::ServiceType);
 		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 3);
@@ -85,8 +85,8 @@ TEST_CASE("Parameter Report Subservice") {
 
 TEST_CASE("Parameter Setting Subservice") {
 	SECTION("All parameter IDs are invalid") {
-		Message request =
-		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, ECSSMessage::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(54432);
 		request.appendUint16(1);
@@ -108,8 +108,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("The last parameter ID is invalid") {
-		Message request =
-		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, ECSSMessage::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -133,8 +133,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("The middle parameter ID is invalid") {
-		Message request =
-		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, ECSSMessage::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -158,8 +158,8 @@ TEST_CASE("Parameter Setting Subservice") {
 	}
 
 	SECTION("All IDs are valid") {
-		Message request =
-		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+		ECSSMessage request =
+		    ECSSMessage(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, ECSSMessage::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(0);
 		request.appendUint8(1);
@@ -183,7 +183,7 @@ TEST_CASE("Parameter Setting Subservice") {
 
 TEST_CASE("Wrong Messages") {
 	SECTION("Wrong Service Type Handling Test for Report") {
-		Message falseRequest(62, 1, Message::TM, 1);
+		ECSSMessage falseRequest(62, 1, ECSSMessage::TM, 1);
 
 		MessageParser::execute(falseRequest);
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
@@ -193,7 +193,7 @@ TEST_CASE("Wrong Messages") {
 	}
 
 	SECTION("Wrong Service Type Handling Test for Set") {
-		Message falseRequest(62, 3, Message::TM, 1);
+		ECSSMessage falseRequest(62, 3, ECSSMessage::TM, 1);
 
 		MessageParser::execute(falseRequest);
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));
@@ -202,8 +202,8 @@ TEST_CASE("Wrong Messages") {
 		Services.reset();
 	}
 
-	SECTION("Wrong Message Type") {
-		Message falseRequest(20, 127, Message::TM, 1);
+	SECTION("Wrong ECSSMessage Type") {
+		ECSSMessage falseRequest(20, 127, ECSSMessage::TM, 1);
 
 		MessageParser::execute(falseRequest);
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::OtherMessageType));

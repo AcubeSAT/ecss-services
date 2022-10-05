@@ -1,10 +1,10 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_ONBOARDMONITORING
-#include "Message.hpp"
+#include "ECSSMessage.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
 #include "etl/map.h"
 
-void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
+void OnBoardMonitoringService::enableParameterMonitoringDefinitions(ECSSMessage& message) {
 	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
 
 	uint16_t numberOfPMONDefinitions = message.readUint16();
@@ -21,7 +21,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	}
 }
 
-void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
+void OnBoardMonitoringService::disableParameterMonitoringDefinitions(ECSSMessage& message) {
 	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
 
 	uint16_t numberOfPMONDefinitions = message.readUint16();
@@ -38,12 +38,12 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	}
 }
 
-void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& message) {
+void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(ECSSMessage& message) {
 	message.assertTC(ServiceType, ChangeMaximumTransitionReportingDelay);
 	maximumTransitionReportingDelay = message.readUint16();
 }
 
-void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& message) {
+void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(ECSSMessage& message) {
 	message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions);
 	if (parameterMonitoringFunctionStatus) {
 		ErrorHandler::reportError(
@@ -53,7 +53,7 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& 
 	parameterMonitoringList.clear();
 }
 
-void OnBoardMonitoringService::execute(Message& message) {
+void OnBoardMonitoringService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case EnableParameterMonitoringDefinitions:
 			enableParameterMonitoringDefinitions(message);

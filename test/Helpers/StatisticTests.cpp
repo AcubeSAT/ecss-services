@@ -41,8 +41,8 @@ TEST_CASE("Statistics updating function") {
 
 TEST_CASE("Appending of statistics to message") {
 	SECTION("Successful appending of statistics") {
-		Message report(ParameterStatisticsService::ServiceType,
-		               ParameterStatisticsService::MessageType::ParameterStatisticsReport, Message::TM, 1);
+		ECSSMessage report(ParameterStatisticsService::ServiceType,
+		               ParameterStatisticsService::MessageType::ParameterStatisticsReport, ECSSMessage::TM, 1);
 		double values[10] = {8.3001, 2.3, 6.4, 1.1, 8.35, 3.4, 6, 8.31, 4.7, 1.09};
 		Statistic stat;
 		CHECK(stat.statisticsAreInitialized());

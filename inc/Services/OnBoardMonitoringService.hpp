@@ -1,14 +1,14 @@
 #ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #include <cstdint>
-#include "Message.hpp"
-#include "etl/array.h"
-#include "Service.hpp"
-#include "Helpers/Parameter.hpp"
-#include "etl/map.h"
+#include "ECSSMessage.hpp"
 #include "ECSS_Definitions.hpp"
-#include "etl/list.h"
 #include "Helpers/PMONBase.hpp"
+#include "Helpers/Parameter.hpp"
+#include "Service.hpp"
+#include "etl/array.h"
+#include "etl/list.h"
+#include "etl/map.h"
 
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
@@ -76,26 +76,26 @@ public:
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
-	void enableParameterMonitoringDefinitions(Message& message);
+	void enableParameterMonitoringDefinitions(ECSSMessage& message);
 
 	/**
 	 * Disables the PMON definitions which correspond to the ids in TC[12,2].
 	 */
-	void disableParameterMonitoringDefinitions(Message& message);
+	void disableParameterMonitoringDefinitions(ECSSMessage& message);
 
 	/**
 	 * TC[12,3]
 	 * Changes the maximum time between two transition reports.
 	 */
-	void changeMaximumTransitionReportingDelay(Message& message);
+	void changeMaximumTransitionReportingDelay(ECSSMessage& message);
 
 	/**
 	 * TC[12,4]
 	 * Deletes all the PMON definitions in the PMON list.
 	 */
-	void deleteAllParameterMonitoringDefinitions(Message& message);
+	void deleteAllParameterMonitoringDefinitions(ECSSMessage& message);
 
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif // ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP

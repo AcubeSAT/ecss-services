@@ -9,9 +9,9 @@
 #define ASSERT_INTERNAL(cond, error) (ErrorHandler::assertInternal((cond), (error)))
 
 /**
- * A wrapper for ErrorHandler::assertRequest() that uses `this` as the Message object.
+ * A wrapper for ErrorHandler::assertRequest() that uses `this` as the ECSSMessage object.
  *
- * Only to be used within the Message class.
+ * Only to be used within the ECSSMessage class.
  */
 #define ASSERT_REQUEST(cond, error) (ErrorHandler::assertRequest((cond), *this, (error)))
 

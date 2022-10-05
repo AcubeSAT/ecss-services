@@ -93,7 +93,7 @@ public:
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
 	 */
-	void reportParameterStatistics(Message& request);
+	void reportParameterStatistics(ECSSMessage& request);
 
 	/**
 	 * Report the parameter statistics, by calling parameterStatisticsReport()
@@ -101,7 +101,7 @@ public:
 	 * from within a Platform (MCU, x86...) without needing to create a fake TC and pass through multiple functions.
 	 *
 	 * @param reset indicates whether each Statistic should be reset. Simulates the argument contained in the TC[4,1]
-	 * that calls reportParameterStatistics(Message& request)
+	 * that calls reportParameterStatistics(ECSSMessage& request)
 	 */
 	void reportParameterStatistics(bool reset);
 
@@ -114,7 +114,7 @@ public:
 	 * TC[4,3] reset parameter statistics, clearing all samples and values. This is the function called by TC from
 	 * the GS.
 	 */
-	void resetParameterStatistics(Message& request);
+	void resetParameterStatistics(ECSSMessage& request);
 
 	/**
 	 * This function clears all the samples.
@@ -124,27 +124,27 @@ public:
 	/**
 	 * TC[4,4] enable periodic parameter statistics reporting
 	 */
-	void enablePeriodicStatisticsReporting(Message& request);
+	void enablePeriodicStatisticsReporting(ECSSMessage& request);
 
 	/**
 	 * TC[4,5] disable periodic parameter statistics reporting
 	 */
-	void disablePeriodicStatisticsReporting(Message& request);
+	void disablePeriodicStatisticsReporting(ECSSMessage& request);
 
 	/**
 	 * TC[4,6] add or update parameter statistics definitions
 	 */
-	void addOrUpdateStatisticsDefinitions(Message& request);
+	void addOrUpdateStatisticsDefinitions(ECSSMessage& request);
 
 	/**
 	 * TC[4,7] delete parameter statistics definitions.
 	 */
-	void deleteStatisticsDefinitions(Message& request);
+	void deleteStatisticsDefinitions(ECSSMessage& request);
 
 	/**
 	 * TC[4,8] report the parameter statistics definitions, by calling statisticsDefinitionsReport()
 	 */
-	void reportStatisticsDefinitions(Message& request);
+	void reportStatisticsDefinitions(ECSSMessage& request);
 	/**
 	 * Constructs and stores a TM[4,9] packet containing the parameter statistics definitions report.
 	 */
@@ -157,7 +157,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(ECSSMessage& message);
 };
 
 #endif

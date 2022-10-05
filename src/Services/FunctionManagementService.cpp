@@ -3,9 +3,9 @@
 
 #include "Services/FunctionManagementService.hpp"
 
-void FunctionManagementService::call(Message& msg) {
+void FunctionManagementService::call(ECSSMessage& msg) {
 	msg.resetRead();
-	ErrorHandler::assertRequest(msg.packetType == Message::TC, msg,
+	ErrorHandler::assertRequest(msg.packetType == ECSSMessage::TC, msg,
 	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 	ErrorHandler::assertRequest(msg.messageType == FunctionManagementService::MessageType::PerformFunction, msg,
 		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
@@ -52,7 +52,7 @@ void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,
 	}
 }
 
-void FunctionManagementService::execute(Message& message) {
+void FunctionManagementService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case PerformFunction:
 			call(message); // TC[8,1]

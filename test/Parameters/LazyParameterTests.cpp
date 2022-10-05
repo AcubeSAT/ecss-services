@@ -1,6 +1,6 @@
 #include "../Services/ServiceTests.hpp"
+#include "ECSSMessage.hpp"
 #include "Helpers/LazyParameter.hpp"
-#include "Message.hpp"
 #include "catch2/catch_all.hpp"
 
 TEST_CASE("Lazy Parameter: Getter") {
@@ -33,7 +33,7 @@ TEST_CASE("Lazy Parameter: Messages") {
 	    fallback);
 
 	SECTION("Getter works") {
-		Message message(0, 0, Message::TC);
+		ECSSMessage message(0, 0, ECSSMessage::TC);
 		parameter.appendValueToMessage(message);
 
 		CHECK(message.dataSize == 2);
@@ -44,7 +44,7 @@ TEST_CASE("Lazy Parameter: Messages") {
 	SECTION("Getter broken") {
 		parameter.unsetGetter();
 
-		Message message(0, 0, Message::TC);
+		ECSSMessage message(0, 0, ECSSMessage::TC);
 		parameter.appendValueToMessage(message);
 
 		CHECK(message.dataSize == 2);
@@ -53,7 +53,7 @@ TEST_CASE("Lazy Parameter: Messages") {
 	}
 
 	SECTION("Attempt to write") {
-		Message message(0, 0, Message::TC);
+		ECSSMessage message(0, 0, ECSSMessage::TC);
 		message.appendSint16(99);
 		message.appendSint16(100);
 

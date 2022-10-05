@@ -22,24 +22,24 @@ Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::Defa
 	}
 }
 
-void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
+void TimeBasedSchedulingService::enableScheduleExecution(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
 	executionFunctionStatus = true;
 }
 
-void TimeBasedSchedulingService::disableScheduleExecution(Message& request) {
+void TimeBasedSchedulingService::disableScheduleExecution(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction);
 	executionFunctionStatus = false;
 }
 
-void TimeBasedSchedulingService::resetSchedule(Message& request) {
+void TimeBasedSchedulingService::resetSchedule(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule);
 	executionFunctionStatus = false;
 	scheduledActivities.clear();
 	// todo: Add resetting for sub-schedules and groups, if defined
 }
 
-void TimeBasedSchedulingService::insertActivities(Message& request) {
+void TimeBasedSchedulingService::insertActivities(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities);
 
 	// todo: Get the sub-schedule ID if they are implemented
@@ -55,7 +55,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		} else {
 			uint8_t requestData[ECSSTCRequestStringSize] = {0};
 			request.readString(requestData, ECSSTCRequestStringSize);
-			Message receivedTCPacket = MessageParser::parseECSSTC(requestData);
+			ECSSMessage receivedTCPacket = MessageParser::parseECSSTC(requestData);
 			ScheduledActivity newActivity;
 
 			newActivity.request = receivedTCPacket;
@@ -72,7 +72,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 	notifyNewActivityAddition();
 }
 
-void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
+void TimeBasedSchedulingService::timeShiftAllActivities(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
 
 	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
@@ -93,7 +93,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	}
 }
 
-void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
+void TimeBasedSchedulingService::timeShiftActivitiesByID(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
 
 	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
@@ -125,7 +125,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	sortActivitiesReleaseTime(scheduledActivities);
 }
 
-void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
+void TimeBasedSchedulingService::deleteActivitiesByID(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById);
 
 	uint16_t iterationCount = request.readUint16();
@@ -148,10 +148,10 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 	}
 }
 
-void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
+void TimeBasedSchedulingService::detailReportAllActivities(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
 
-	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
+	ECSSMessage report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(scheduledActivities.size()));
 
 	for (auto& activity: scheduledActivities) {
@@ -163,10 +163,10 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	storeMessage(report);
 }
 
-void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
+void TimeBasedSchedulingService::detailReportActivitiesByID(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
 
-	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
+	ECSSMessage report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16();
@@ -199,10 +199,10 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	storeMessage(report);
 }
 
-void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
+void TimeBasedSchedulingService::summaryReportActivitiesByID(ECSSMessage& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
 
-	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
+	ECSSMessage report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16();
@@ -237,7 +237,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	storeMessage(report);
 }
 
-void TimeBasedSchedulingService::execute(Message& message) {
+void TimeBasedSchedulingService::execute(ECSSMessage& message) {
 	switch (message.messageType) {
 		case EnableTimeBasedScheduleExecutionFunction:
 			enableScheduleExecution(message);

@@ -3,10 +3,10 @@
 
 #include "Services/RequestVerificationService.hpp"
 
-void RequestVerificationService::successAcceptanceVerification(const Message& request) {
+void RequestVerificationService::successAcceptanceVerification(const ECSSMessage& request) {
 	// TM[1,1] successful acceptance verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::SuccessfulAcceptanceReport);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::SuccessfulAcceptanceReport);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -18,11 +18,11 @@ void RequestVerificationService::successAcceptanceVerification(const Message& re
 	storeMessage(report);
 }
 
-void RequestVerificationService::failAcceptanceVerification(const Message& request,
+void RequestVerificationService::failAcceptanceVerification(const ECSSMessage& request,
                                                             ErrorHandler::AcceptanceErrorType errorCode) {
 	// TM[1,2] failed acceptance verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::FailedAcceptanceReport);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::FailedAcceptanceReport);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -35,10 +35,10 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
 	storeMessage(report);
 }
 
-void RequestVerificationService::successStartExecutionVerification(const Message& request) {
+void RequestVerificationService::successStartExecutionVerification(const ECSSMessage& request) {
 	// TM[1,3] successful start of execution verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::SuccessfulStartOfExecution);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::SuccessfulStartOfExecution);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -50,11 +50,11 @@ void RequestVerificationService::successStartExecutionVerification(const Message
 	storeMessage(report);
 }
 
-void RequestVerificationService::failStartExecutionVerification(const Message& request,
+void RequestVerificationService::failStartExecutionVerification(const ECSSMessage& request,
                                                                 ErrorHandler::ExecutionStartErrorType errorCode) {
 	// TM[1,4] failed start of execution verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::FailedStartOfExecution);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::FailedStartOfExecution);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -67,10 +67,10 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 	storeMessage(report);
 }
 
-void RequestVerificationService::successProgressExecutionVerification(const Message& request, uint8_t stepID) {
+void RequestVerificationService::successProgressExecutionVerification(const ECSSMessage& request, uint8_t stepID) {
 	// TM[1,5] successful progress of execution verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -83,12 +83,12 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 	storeMessage(report);
 }
 
-void RequestVerificationService::failProgressExecutionVerification(const Message& request,
+void RequestVerificationService::failProgressExecutionVerification(const ECSSMessage& request,
                                                                    ErrorHandler::ExecutionProgressErrorType errorCode,
                                                                    uint8_t stepID) {
 	// TM[1,6] failed progress of execution verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::FailedProgressOfExecution);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::FailedProgressOfExecution);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -102,10 +102,10 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 	storeMessage(report);
 }
 
-void RequestVerificationService::successCompletionExecutionVerification(const Message& request) {
+void RequestVerificationService::successCompletionExecutionVerification(const ECSSMessage& request) {
 	// TM[1,7] successful completion of execution verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::SuccessfulCompletionOfExecution);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::SuccessfulCompletionOfExecution);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -118,10 +118,10 @@ void RequestVerificationService::successCompletionExecutionVerification(const Me
 }
 
 void RequestVerificationService::failCompletionExecutionVerification(
-    const Message& request, ErrorHandler::ExecutionCompletionErrorType errorCode) {
+    const ECSSMessage& request, ErrorHandler::ExecutionCompletionErrorType errorCode) {
 	// TM[1,8] failed completion of execution verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::FailedCompletionOfExecution);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::FailedCompletionOfExecution);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type
@@ -134,11 +134,11 @@ void RequestVerificationService::failCompletionExecutionVerification(
 	storeMessage(report);
 }
 
-void RequestVerificationService::failRoutingVerification(const Message& request,
+void RequestVerificationService::failRoutingVerification(const ECSSMessage& request,
                                                          ErrorHandler::RoutingErrorType errorCode) {
 	// TM[1,10] failed routing verification report
 
-	Message report = createTM(RequestVerificationService::MessageType::FailedRoutingReport);
+	ECSSMessage report = createTM(RequestVerificationService::MessageType::FailedRoutingReport);
 
 	report.appendEnumerated(3, CCSDSPacketVersion); // packet version number
 	report.appendEnumerated(1, request.packetType); // packet type

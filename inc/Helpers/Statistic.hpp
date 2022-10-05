@@ -36,10 +36,10 @@ public:
 	void resetStatistics();
 
 	/**
-	 * Appends itself to the received Message
+	 * Appends itself to the received ECSSMessage
 	 * message.
 	 */
-	void appendStatisticsToMessage(Message& report);
+	void appendStatisticsToMessage(ECSSMessage& report);
 
 	/**
 	 * Setter function

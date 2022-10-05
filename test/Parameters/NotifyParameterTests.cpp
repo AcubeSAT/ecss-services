@@ -1,5 +1,5 @@
+#include "ECSSMessage.hpp"
 #include "Helpers/NotifyParameter.hpp"
-#include "Message.hpp"
 #include "catch2/catch_all.hpp"
 
 TEST_CASE("Notify Parameter: Notifier") {
@@ -36,7 +36,7 @@ TEST_CASE("Notify Parameter: Messages") {
 		    storage = v;
 	    });
 
-	Message message(0, 0, Message::TC);
+	ECSSMessage message(0, 0, ECSSMessage::TC);
 	message.appendUint32(184);
 
 	parameter.setValueFromMessage(message);

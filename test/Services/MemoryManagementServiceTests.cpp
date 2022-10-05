@@ -1,4 +1,4 @@
-#include <Message.hpp>
+#include <ECSSMessage.hpp>
 #include <Services/MemoryManagementService.hpp>
 #include <catch2/catch_all.hpp>
 #include "Helpers/CRCHelper.hpp"
@@ -14,7 +14,7 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	*(pStr + 2) = '\0';
 	uint8_t data[2] = {'h', 'R'};
 
-	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
+	ECSSMessage receivedPacket = ECSSMessage(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, ECSSMessage::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	receivedPacket.appendUint16(2);                                          // Iteration count
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(pStr));           // Start address
@@ -38,7 +38,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint8_t checkString[ECSSMaxStringSize];
 	uint16_t readSize = 0, checksum = 0;
 
-	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
+	ECSSMessage receivedPacket = ECSSMessage(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, ECSSMessage::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
 	receivedPacket.appendUint16(3);                                              // Iteration count (Equal to 3 test strings)
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1));       // Start address
@@ -52,7 +52,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	MessageParser::execute(receivedPacket);
 	REQUIRE(ServiceTests::hasOneMessage());
 
-	Message response = ServiceTests::get(0);
+	ECSSMessage response = ServiceTests::get(0);
 	CHECK(response.serviceType == MemoryManagementService::ServiceType);
 	CHECK(response.messageType == MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 	REQUIRE(response.dataSize == 55);
@@ -99,7 +99,7 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	uint8_t testString_2[8] = "SecStrT";
 	uint16_t readSize = 0, checksum = 0;
 
-	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
+	ECSSMessage receivedPacket = ECSSMessage(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, ECSSMessage::TC, 1);
 	receivedPacket.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
 	receivedPacket.appendUint16(2);                                              // Iteration count
 	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(testString_1));       // Start address
@@ -110,7 +110,7 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	MessageParser::execute(receivedPacket);
 	REQUIRE(ServiceTests::hasOneMessage());
 
-	Message response = ServiceTests::get(0);
+	ECSSMessage response = ServiceTests::get(0);
 	CHECK(response.serviceType == MemoryManagementService::ServiceType);
 	CHECK(response.messageType == MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	REQUIRE(response.dataSize == 27);
