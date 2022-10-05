@@ -16,7 +16,7 @@
  * @todo Make sure that a message can't be written to or read from at the same time, or make
  *       readable and writable message different classes
  */
-class ECSSMessage : private Message {
+class ECSSMessage : public Message {
 public:
 	ECSSMessage() = default;
 
@@ -96,23 +96,6 @@ public:
 
 	// 7.4.1, as defined in CCSDS 133.0-B-1
 	uint16_t packetSequenceCount = 0;
-
-	// TODO: Find out if we need more than 16 bits for this
-	uint16_t dataSize = 0;
-
-	// Pointer to the contents of the message (excluding the PUS header)
-	// We allocate this data statically, in order to make sure there is predictability in the
-	// handling and storage of messages
-	//
-	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
-	// ECSSMessage::appendBits() relies on this in order to easily OR the requested bits.
-	uint8_t data[ECSSMaxMessageSize] = {0};
-
-	// private:
-	uint8_t currentBit = 0;
-
-	// Next byte to read for read...() functions
-	uint16_t readPosition = 0;
 
 	/**
 	 * Appends the least significant \p numBits from \p data to the message
