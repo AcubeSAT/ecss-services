@@ -6,6 +6,7 @@
 #include <etl/String.hpp>
 #include <etl/wstring.h>
 #include "ECSS_Definitions.hpp"
+#include "Message.hpp"
 #include "Time/Time.hpp"
 #include "macros.hpp"
 
@@ -15,7 +16,7 @@
  * @todo Make sure that a message can't be written to or read from at the same time, or make
  *       readable and writable message different classes
  */
-class ECSSMessage {
+class ECSSMessage : private Message {
 public:
 	ECSSMessage() = default;
 
