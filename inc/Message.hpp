@@ -9,7 +9,7 @@ public:
 	// TODO: Find out if we need more than 16 bits for this
 	uint16_t dataSize = 0;
 
-	uint8_t data = {0};
+	uint8_t data[1] = {0};
 
 	// private:
 	uint8_t currentBit = 0;
