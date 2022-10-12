@@ -18,6 +18,8 @@
  */
 class ECSSMessage : public Message {
 public:
+	static constexpr size_t MaxMessageSize = ECSSMaxMessageSize;
+
 	ECSSMessage() = default;
 
 	/**
@@ -117,28 +119,13 @@ public:
 	 */
 	void finalize();
 
-	/**
-	 * Appends 1 byte to the message
-	 */
-	void appendByte(uint8_t value);
-
 	// Pointer to the contents of the message (excluding the PUS header)
 	// We allocate this data statically, in order to make sure there is predictability in the
 	// handling and storage of messages
 	//
 	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	// ECSSMessage::appendBits() relies on this in order to easily OR the requested bits.
-	uint8_t data[ECSSMaxMessageSize] = {0};
-
-	/**
-	 * Appends 2 bytes to the message
-	 */
-	void appendHalfword(uint16_t value);
-
-	/**
-	 * Appends 4 bytes to the message
-	 */
-	void appendWord(uint32_t value);
+	uint8_t data[MaxMessageSize] = {0};
 
 	/**
 	 * Appends any CUC timestamp to the message, including the header.
@@ -186,29 +173,6 @@ public:
 	 * @param string The string to insert
 	 */
 	void appendFixedString(const etl::istring& string);
-
-	/**
-	 * Reads the next \p numBits bits from the the message in a big-endian format
-	 * @param numBits
-	 * @return A maximum number of 16 bits is returned (in big-endian format)
-	 */
-	uint16_t readBits(uint8_t numBits);
-
-	/**
-	 * Reads the next 1 byte from the message
-	 */
-	uint8_t readByte();
-
-	/**
-	 * Reads the next 2 bytes from the message
-	 */
-	uint16_t readHalfword();
-
-	/**
-	 * Reads the next 4 bytes from the message
-	 */
-	uint32_t readWord();
-
 	/**
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
@@ -240,15 +204,6 @@ public:
 	ECSSMessage(uint8_t serviceType, uint8_t messageType, ECSSMessage::PacketType packetType);
 
 	/**
-	 * Adds a single-byte boolean value to the end of the message
-	 *
-	 * PTC = 1, PFC = 0
-	 */
-	void appendBoolean(bool value) {
-		return appendByte(static_cast<uint8_t>(value));
-	}
-
-	/**
 	 * Adds an enumerated parameter consisting of an arbitrary number of bits to the end of the
 	 * message
 	 *
@@ -261,131 +216,10 @@ public:
 	}
 
 	/**
-	 * Adds an enumerated parameter consisting of 1 byte to the end of the message
-	 *
-	 * PTC = 2, PFC = 8
-	 */
-	void appendEnum8(uint8_t value) {
-		return appendByte(value);
-	};
-
-	/**
-	 * Adds an enumerated parameter consisting of 2 bytes to the end of the message
-	 *
-	 * PTC = 2, PFC = 16
-	 */
-	void appendEnum16(uint16_t value) {
-		return appendHalfword(value);
-	}
-
-	/**
-	 * Adds an enumerated parameter consisting of 4 bytes to the end of the message
-	 *
-	 * PTC = 2, PFC = 32
-	 */
-	void appendEnum32(uint32_t value) {
-		return appendWord(value);
-	}
-
-	/**
-	 * Adds a 1 byte unsigned integer to the end of the message
-	 *
-	 * PTC = 3, PFC = 4
-	 */
-	void appendUint8(uint8_t value) {
-		return appendByte(value);
-	}
-
-	/**
-	 * Adds a 2 byte unsigned integer to the end of the message
-	 *
-	 * PTC = 3, PFC = 8
-	 */
-	void appendUint16(uint16_t value) {
-		return appendHalfword(value);
-	}
-
-	/**
-	 * Adds a 4 byte unsigned integer to the end of the message
-	 *
-	 * PTC = 3, PFC = 14
-	 */
-	void appendUint32(uint32_t value) {
-		return appendWord(value);
-	}
-
-	/**
-	 * Adds an 8 byte unsigned integer to the end of the message
-	 *
-	 * PTC = 3, PFC = 16
-	 */
-	void appendUint64(uint64_t value) {
-		appendWord(static_cast<uint32_t>(value >> 32));
-		appendWord(static_cast<uint32_t>(value));
-	}
-
-	/**
-	 * Adds a 1 byte signed integer to the end of the message
-	 *
-	 * PTC = 4, PFC = 4
-	 */
-	void appendSint8(int8_t value) {
-		return appendByte(reinterpret_cast<uint8_t&>(value));
-	}
-
-	/**
-	 * Adds a 2 byte signed integer to the end of the message
-	 *
-	 * PTC = 4, PFC = 8
-	 */
-	void appendSint16(int16_t value) {
-		return appendHalfword(reinterpret_cast<uint16_t&>(value));
-	}
-
-	/**
-	 * Adds a 4 byte signed integer to the end of the message
-	 *
-	 * PTC = 4, PFC = 14
-	 */
-	void appendSint32(int32_t value) {
-		return appendWord(reinterpret_cast<uint32_t&>(value));
-	}
-
-
-	/**
-	 * Adds a 8 byte signed integer to the end of the message
-	 *
-	 * PTC = 4, PFC = 16
-	 */
-	void appendSint64(int64_t value) {
-		return appendUint64(reinterpret_cast<uint64_t&>(value));
-	}
-
-	/**
 	 * Adds an 8 byte time Offset to the message
 	 */
 	void appendRelativeTime(Time::RelativeTime value) {
 		return appendSint64(value);
-	}
-
-	/**
-	 * Adds a 4-byte single-precision floating point number to the end of the message
-	 *
-	 * PTC = 5, PFC = 1
-	 */
-	void appendFloat(float value) {
-		static_assert(sizeof(uint32_t) == sizeof(value), "Floating point numbers must be 32 bits long");
-
-		return appendWord(reinterpret_cast<uint32_t&>(value));
-	}
-
-	/**
-	 * Adds a double to the end of the message
-	 */
-	void appendDouble(double value) {
-		static_assert(sizeof(uint64_t) == sizeof(value), "Double numbers must be 64 bits long");
-
-		return appendUint64(reinterpret_cast<uint64_t&>(value));
 	}
 
 	/**
@@ -422,157 +256,11 @@ public:
 	void appendMessage(const ECSSMessage& message, uint16_t size);
 
 	/**
-	 * Fetches a single-byte boolean value from the current position in the message
-	 *
-	 * PTC = 1, PFC = 0
-	 */
-	bool readBoolean() {
-		return static_cast<bool>(readByte());
-	}
-
-	/**
-	 * Fetches an enumerated parameter consisting of an arbitrary number of bits from the current
-	 * position in the message
-	 *
-	 * PTC = 2, PFC = \p bits
-	 */
-	uint32_t readEnumerated(uint8_t bits) {
-		return readBits(bits);
-	}
-
-	/**
-	 * Fetches an enumerated parameter consisting of 1 byte from the current position in the message
-	 *
-	 * PTC = 2, PFC = 8
-	 */
-	uint8_t readEnum8() {
-		return readByte();
-	}
-
-	/**
-	 * Fetches an enumerated parameter consisting of 2 bytes from the current position in the
-	 * message
-	 *
-	 * PTC = 2, PFC = 16
-	 */
-	uint16_t readEnum16() {
-		return readHalfword();
-	}
-
-	/**
-	 * Fetches an enumerated parameter consisting of 4 bytes from the current position in the
-	 * message
-	 *
-	 * PTC = 2, PFC = 32
-	 */
-	uint32_t readEnum32() {
-		return readWord();
-	}
-
-	/**
-	 * Fetches an 1-byte unsigned integer from the current position in the message
-	 *
-	 * PTC = 3, PFC = 4
-	 */
-	uint8_t readUint8() {
-		return readByte();
-	}
-
-	/**
-	 * Fetches a 2-byte unsigned integer from the current position in the message
-	 *
-	 * PTC = 3, PFC = 8
-	 */
-	uint16_t readUint16() {
-		return readHalfword();
-	}
-
-	/**
-	 * Fetches a 4-byte unsigned integer from the current position in the message
-	 *
-	 * PTC = 3, PFC = 14
-	 */
-	uint32_t readUint32() {
-		return readWord();
-	}
-
-	/**
-	 * Fetches an 8-byte unsigned integer from the current position in the message
-	 *
-	 * PTC = 3, PFC = 16
-	 */
-	uint64_t readUint64() {
-		return (static_cast<uint64_t>(readWord()) << 32) | static_cast<uint64_t>(readWord());
-	}
-
-	/**
-	 * Fetches an 1-byte signed integer from the current position in the message
-	 *
-	 * PTC = 4, PFC = 4
-	 */
-	int8_t readSint8() {
-		uint8_t value = readByte();
-		return reinterpret_cast<int8_t&>(value);
-	}
-
-	/**
-	 * Fetches a 2-byte unsigned integer from the current position in the message
-	 *
-	 * PTC = 4, PFC = 8
-	 */
-	int16_t readSint16() {
-		uint16_t value = readHalfword();
-		return reinterpret_cast<int16_t&>(value);
-	}
-
-	/**
-	 * Fetches a 4-byte unsigned integer from the current position in the message
-	 *
-	 * PTC = 4, PFC = 14
-	 */
-	int32_t readSint32() {
-		uint32_t value = readWord();
-		return reinterpret_cast<int32_t&>(value);
-	}
-
-	/**
-	 * Fetches a 4-byte unsigned integer from the current position in the message
-	 *
-	 * PTC = 4, PFC = 14
-	 */
-	int64_t readSint64() {
-		uint64_t value = readUint64();
-		return reinterpret_cast<int64_t&>(value);
-	}
-
-	/**
 	 * Fetches an 8 byte time Offset from the current position in the message
 	 */
 	Time::RelativeTime readRelativeTime() {
 		return readSint64();
 	};
-
-	/**
-	 * Fetches an 4-byte single-precision floating point number from the current position in the
-	 * message
-	 *
-	 * @todo Check if endianness matters for this
-	 *
-	 * PTC = 5, PFC = 1
-	 */
-	float readFloat() {
-		static_assert(sizeof(uint32_t) == sizeof(float), "Floating point numbers must be 32 bits long");
-
-		uint32_t value = readWord();
-		return reinterpret_cast<float&>(value);
-	}
-
-	double readDouble() {
-		static_assert(sizeof(uint64_t) == sizeof(double), "Double numbers must be 64 bits long");
-
-		uint64_t value = readUint64();
-		return reinterpret_cast<double&>(value);
-	}
 
 	/**
 	 * Fetches a timestamp in a custom CUC format consisting of 4 bytes from the current position in the message
@@ -635,21 +323,6 @@ public:
 	 */
 	template <typename T>
 	T read();
-
-	/**
-	 * @brief Skip read bytes in the read string
-	 * @details Skips the provided number of bytes, by incrementing the readPosition and this is
-	 * done to avoid accessing the `readPosition` variable directly
-	 * @param numberOfBytes The number of bytes to be skipped
-	 */
-	void skipBytes(uint16_t numberOfBytes) {
-		readPosition += numberOfBytes;
-	}
-
-	/**
-	 * Reset the message reading status, and start reading data from it again
-	 */
-	void resetRead();
 
 	/**
 	 * Compare the message type to an expected one. An unexpected message type will throw an
