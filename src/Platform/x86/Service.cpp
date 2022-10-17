@@ -14,6 +14,7 @@ private:
 	const uint16_t port = 10015;
 	sockaddr_in destination;
 	int socket;
+	int clientSocket;
 
 public:
 	PacketSender() {
@@ -39,7 +40,7 @@ public:
 			LOG_DEBUG <<"Listening";
 		}
 		//TCP Socket Accept
-		int clientSocket = accept(socket,(sockaddr*)&destination, (socklen_t*)&destination);
+		clientSocket = accept(socket,(sockaddr*)&destination, (socklen_t*)&destination);
 		if (clientSocket<0){
 			printf("\nTCP socket acceptance failed\n");
 		}
@@ -56,7 +57,7 @@ public:
 	void sendPacketToYamcs(Message& message) {
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-		auto bytesSent = ::send(socket, createdPacket.c_str(), createdPacket.length(), MSG_NOSIGNAL);
+		auto bytesSent = ::send(clientSocket, createdPacket.c_str(), createdPacket.length(), MSG_NOSIGNAL);
 		LOG_DEBUG << bytesSent << " bytes sent";
 	}
 };
