@@ -51,6 +51,7 @@ clang-tidy:
     - clang-tidy-html clang-tidy-output.log
     - mv clang.html clang-tidy-html-report
   artifacts:
+    when: always
     paths:
       - ./clang-tidy-html-report
 
@@ -85,9 +86,8 @@ ikos:
   script:
     - cd $CI_PROJECT_DIR
     - ikos-scan cmake .
-    - ikos-scan make
+    - ikos-scan make tests
     - ikos tests.bc
-    - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
   after_script:
     - mv ikos-report.txt ikos-report
