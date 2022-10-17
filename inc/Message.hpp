@@ -680,7 +680,7 @@ public:
 	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		return assertType(TC, expectedServiceType, expectedMessageType);
 	}
 
@@ -688,7 +688,7 @@ public:
 	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) {
+	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
