@@ -87,9 +87,8 @@ ikos:
   script:
     - cd $CI_PROJECT_DIR
     - ikos-scan cmake .
-    - ikos-scan make
+    - ikos-scan make tests
     - ikos tests.bc
-    - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
   after_script:
     - mv ikos-report.txt ikos-report
