@@ -89,7 +89,7 @@ public:
 	 */
 	void include(String<ECSSFunctionNameLength> funcName, void (*ptr)(String<ECSSFunctionMaxArgLength>));
 
-	int getMapSize() {
+	size_t getMapSize() {
 		return funcPtrIndex.size();
 	}
 

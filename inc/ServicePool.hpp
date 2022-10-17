@@ -138,6 +138,6 @@ public:
 /**
  * A global variable that defines the basic pool where services can be fetched from
  */
-extern ServicePool Services;
+extern ServicePool Services; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 #endif // ECSS_SERVICES_SERVICEPOOL_HPP

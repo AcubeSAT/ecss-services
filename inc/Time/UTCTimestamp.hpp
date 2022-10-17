@@ -60,13 +60,13 @@ public:
 
 	    uint64_t seconds = duration_cast<duration<uint64_t>>(in).count();
 
-		while (seconds >= (isLeapYear(year) ? 366 : 365) * SecondsPerDay) {
-			seconds -= (isLeapYear(year) ? 366 : 365) * SecondsPerDay;
+		while (seconds >= (isLeapYear(year) ? 366L : 365L) * SecondsPerDay) {
+			seconds -= (isLeapYear(year) ? 366L : 365L) * SecondsPerDay;
 			year++;
 		}
 
-		while (seconds >= (daysOfMonth() * SecondsPerDay)) {
-			seconds -= daysOfMonth() * SecondsPerDay;
+		while (seconds >= (daysOfMonth() * uint64_t{SecondsPerDay})) {
+			seconds -= daysOfMonth() * uint64_t{SecondsPerDay};
 		    month++;
 
 			if (month > MonthsPerYear) {

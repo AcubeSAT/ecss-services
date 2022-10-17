@@ -94,15 +94,13 @@ TEST_CASE("Requirement 7.3.3 (Enumerated)", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.append<char>(110);
 	message.append<uint8_t>(230);
 	message.append<uint16_t>(15933);
 	message.append<uint32_t>(2000001);
 	message.append<uint64_t>(12446744073709551615ULL);
 
-	REQUIRE(message.dataSize == 1 + 1 + 2 + 4 + 8);
+	REQUIRE(message.dataSize == 1 + 2 + 4 + 8);
 
-	CHECK(message.read<char>() == 110);
 	CHECK(message.read<uint8_t>() == 230);
 	CHECK(message.read<uint16_t>() == 15933);
 	CHECK(message.read<uint32_t>() == 2000001);
@@ -115,8 +113,8 @@ TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 		 * processors store data in little endian format. As a result, special care needs to be
 		 * taken for compliance.
 		 */
-		CHECK(message.data[2] == 0x3e);
-		CHECK(message.data[3] == 0x3d);
+		CHECK(message.data[1] == 0x3e);
+		CHECK(message.data[2] == 0x3d);
 	}
 }
 

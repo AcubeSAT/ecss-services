@@ -105,7 +105,7 @@ public:
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 */
-	void setParameters(Message& newParamValues);
+	void setParameters(Message& newParamValues) const;
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
