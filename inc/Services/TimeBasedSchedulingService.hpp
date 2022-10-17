@@ -10,18 +10,20 @@
 // Include platform specific files
 #include "Helpers/TimeGetter.hpp"
 
+
+/**
+ * @def GROUPS_ENABLED
+ * @brief Indicates whether scheduling groups are enabled
+ */
+#define GROUPS_ENABLED 0 // NOLINT(cppcoreguidelines-macro-usage)
+
 /**
  * @def SUB_SCHEDULES_ENABLED
  * @brief Indicates whether sub-schedules are supported
  *
  * @details Sub-schedules are currently not implemented so this has no effect
  */
-/**
- * @def GROUPS_ENABLED
- * @brief Indicates whether scheduling groups are enabled
- */
-#define GROUPS_ENABLED 0
-#define SUB_SCHEDULES_ENABLED 0
+#define SUB_SCHEDULES_ENABLED 0 // NOLINT(cppcoreguidelines-macro-usage)
 
 /**
  * @brief Namespace to access private members during test
@@ -98,7 +100,7 @@ private:
 	 * @details The ECSS standard requires that the activities are sorted in the TM message
 	 * response. Also it is better to have the activities sorted.
 	 */
-	inline void
+	inline static void
 	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& schedActivities) {
 		schedActivities.sort([](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 			// cppcheck-suppress

@@ -17,14 +17,14 @@ void Statistic::updateStatistics(double value) {
 	sampleCounter++;
 }
 
-void Statistic::appendStatisticsToMessage(Message& report) {
+void Statistic::appendStatisticsToMessage(Message& report) const {
 	report.appendFloat(static_cast<float>(max));
 	report.append(timeOfMaxValue);
 	report.appendFloat(static_cast<float>(min));
 	report.append(timeOfMinValue);
 	report.appendFloat(static_cast<float>(mean));
 
-	if (SupportsStandardDeviation) {
+	if constexpr (SupportsStandardDeviation) {
 		double standardDeviation = 0;
 		if (sampleCounter == 0) {
 			standardDeviation = 0;
@@ -50,7 +50,7 @@ void Statistic::resetStatistics() {
 	sampleCounter = 0;
 }
 
-bool Statistic::statisticsAreInitialized() {
+bool Statistic::statisticsAreInitialized() const {
 	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and
 	        timeOfMaxValue == Time::DefaultCUC(0) and timeOfMinValue == Time::DefaultCUC(0) and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());

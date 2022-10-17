@@ -72,7 +72,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	inline bool getPeriodicReportingStatus() {
+	inline bool getPeriodicReportingStatus() const {
 		return periodicStatisticsReportingStatus;
 	}
 
@@ -86,7 +86,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	inline const uint16_t getReportingIntervalMs() {
+	inline uint16_t getReportingIntervalMs() const {
 		return reportingIntervalMs;
 	}
 

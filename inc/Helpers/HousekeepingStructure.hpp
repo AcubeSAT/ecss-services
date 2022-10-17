@@ -12,8 +12,7 @@
  *
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
-class HousekeepingStructure {
-public:
+struct HousekeepingStructure {
     uint8_t structureId;
 
     /**

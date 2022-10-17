@@ -42,7 +42,7 @@
  * @author Konstantinos Kanavouras
  * @see [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf)
  */
-template <uint8_t BaseBytes, uint8_t FractionBytes = 0, int Num = 1, int Denom = 1>
+template <uint8_t BaseBytes = 4, uint8_t FractionBytes = 0, int Num = 1, int Denom = 1>
 class TimeStamp {
 public:
 	/**
@@ -155,7 +155,7 @@ public:
 	 * @note Internally uses double-precision floating point to allow for arbitrary ratios
 	 */
 	template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1>
-	explicit TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn>);
+	explicit TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input);
 
 	/**
 	 * Convert an [std::chrono::duration](https://en.cppreference.com/w/cpp/chrono/duration) representing seconds from @ref Time::Epoch
@@ -278,8 +278,8 @@ public:
 	 */
 	template <
 	    uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1, // Template parameters of the 2nd timestamp
-	    class Duration = std::chrono::duration< // Create a new Duration based on our RawDuration...
-	        typename std::make_signed<typename RawDuration::rep>::type, // the Duration base type is equal to the RawDuration, but converted to signed from unsigned
+	    class Duration = std::chrono::duration<                                       // Create a new Duration based on our RawDuration...
+	        typename std::make_signed<typename RawDuration::rep>::type,               // the Duration base type is equal to the RawDuration, but converted to signed from unsigned
 	        typename RawDuration::period>>
 	Duration operator-(const TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn>& operand) const {
 		Duration myDuration = asDuration<Duration>();
