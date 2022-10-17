@@ -740,7 +740,7 @@ inline void Message::append(const double& value) {
 	appendDouble(value);
 }
 template <>
-inline void Message::append(const Time::DefaultCUC& timeCUC) {
+inline void Message::append(const Time::DefaultCUC& value) {
 	appendDefaultCUCTimeStamp(timeCUC);
 }
 template <>
