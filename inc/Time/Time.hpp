@@ -1,6 +1,7 @@
 #ifndef ECSS_TIMEHPP
 #define ECSS_TIMEHPP
 
+#include <chrono>
 #include <cstdint>
 #include "ErrorHandler.hpp"
 #include "etl/String.hpp"
@@ -74,20 +75,21 @@ namespace Time {
 	inline constexpr uint8_t SecondsPerMinute = 60;
 	inline constexpr uint16_t SecondsPerHour = 3600;
 	inline constexpr uint32_t SecondsPerDay = 86400;
-	static constexpr uint8_t DaysOfMonth[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	inline constexpr uint8_t MonthsPerYear = 12;
+	static constexpr uint8_t DaysOfMonth[MonthsPerYear] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	/**
 	 * Number of bytes used for the basic time units of the CUC header for this mission
 	 */
-	inline constexpr uint8_t CUCSecondsBytes = 2;
+	inline constexpr uint8_t CUCSecondsBytes = 4;
 
 	/**
 	 * Number of bytes used for the fractional time units of the CUC header for this mission
 	 */
-	inline constexpr uint8_t CUCFractionalBytes = 2;
+	inline constexpr uint8_t CUCFractionalBytes = 0;
 
 	/**
-	 * The system epoch (clock measurement starting time)
+	 * The system epoch (clock measurement starting time).
 	 * All timestamps emitted by the ECSS services will show the elapsed time (seconds, days etc.) from this epoch.
  	*/
 	inline constexpr struct {
@@ -238,7 +240,6 @@ namespace Time {
 	 */
 	template <typename T, int secondsBytes, int fractionalBytes>
 	inline constexpr T buildCUCHeader() {
-		// TODO: Gitlab issue #106
 		static_assert((secondsBytes + fractionalBytes) <= 8, "Complete arbitrary precision not supported");
 		// cppcheck-suppress syntaxError
 		// cppcheck-suppress redundantCondition
@@ -262,59 +263,30 @@ namespace Time {
 		return (year % 400) == 0;
 	}
 
-	struct CustomCUC_t {
-		uint64_t elapsed100msTicks = 0;
-
-		/**
-		 * @return The time represented in milliseconds elapsed from the epoch
-		 */
-		uint64_t getMs() {
-			return elapsed100msTicks * 100;
-		}
-	};
-
 	/**
  	* A time shift for scheduled activities measured in seconds
  	*/
 	typedef int64_t RelativeTime;
 
-	inline Time::CustomCUC_t operator+(const Time::CustomCUC_t time, RelativeTime relativeTime) {
-		return Time::CustomCUC_t{time.elapsed100msTicks + relativeTime * 10};
-	}
+	/**
+	 * is_duration definition to check if a variable is std::chrono::duration
+	 */
+	template <typename T>
+	struct is_duration
+	    : std::false_type {};
 
-	inline Time::CustomCUC_t operator-(const Time::CustomCUC_t time, RelativeTime relativeTime) {
-		return Time::CustomCUC_t{time.elapsed100msTicks - relativeTime * 10};
-	}
+	/**
+	 * is_duration definition to check if a variable is std::chrono::duration
+	 */
+	template <typename Rep, typename Period>
+	struct is_duration<std::chrono::duration<Rep, Period>>
+	    : std::true_type {};
 
-	inline Time::CustomCUC_t& operator+=(Time::CustomCUC_t& time, RelativeTime relativeTime) {
-		time.elapsed100msTicks += relativeTime * 10;
-		return time;
-	}
-
-	inline Time::CustomCUC_t operator-(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return Time::CustomCUC_t{time1.elapsed100msTicks - time2.elapsed100msTicks};
-	}
-
-	inline Time::CustomCUC_t operator+(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return Time::CustomCUC_t{time1.elapsed100msTicks + time2.elapsed100msTicks};
-	}
-
-	inline bool operator<(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks < time2.elapsed100msTicks;
-	}
-
-	inline bool operator>(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks > time2.elapsed100msTicks;
-	}
-
-	inline bool operator==(const Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks == time2.elapsed100msTicks;
-	}
-
-	inline bool operator>=(Time::CustomCUC_t time1, Time::CustomCUC_t time2) {
-		return time1.elapsed100msTicks >= time2.elapsed100msTicks;
-	}
-
+	/**
+	 * True if T is std::chrono::duration, false if not
+	 */
+	template <class T>
+	inline constexpr bool is_duration_v = is_duration<T>::value;
 } // namespace Time
 
 #endif

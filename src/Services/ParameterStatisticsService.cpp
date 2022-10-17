@@ -3,7 +3,7 @@
 #include "ServicePool.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 
-ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeCustomCUC()) {
+ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeDefaultCUC()) {
 	initializeStatisticsMap();
 	serviceType = ServiceType;
 }
@@ -28,7 +28,7 @@ void ParameterStatisticsService::reportParameterStatistics(bool reset) {
 void ParameterStatisticsService::parameterStatisticsReport() {
 	Message report = createTM(ParameterStatisticsReport);
 	report.append(evaluationStartTime);
-	auto evaluationStopTime = TimeGetter::getCurrentTimeCustomCUC();
+	auto evaluationStopTime = TimeGetter::getCurrentTimeDefaultCUC();
 	report.append(evaluationStopTime);
 
 	uint16_t numOfValidParameters = 0;
@@ -63,7 +63,7 @@ void ParameterStatisticsService::resetParameterStatistics() {
 	for (auto& it: statisticsMap) {
 		it.second.resetStatistics();
 	}
-	evaluationStartTime = TimeGetter::getCurrentTimeCustomCUC();
+	evaluationStartTime = TimeGetter::getCurrentTimeDefaultCUC();
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {

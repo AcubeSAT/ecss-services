@@ -27,15 +27,52 @@ TEST_CASE("UTC timestamps") {
 	CHECK(ServiceTests::thrownError(ErrorHandler::InvalidDate));
 }
 
-TEST_CASE("CUC Custom Timestamp as Parameter") {
-	Time::CustomCUC_t time;
-	time.elapsed100msTicks = 999;
+TEST_CASE("UTC timestamp addition") {
+	using namespace std::chrono_literals;
 
-	auto parameter = Parameter<Time::CustomCUC_t>(time);
+	UTCTimestamp time1 = UTCTimestamp{2020, 1, 1, 0, 0, 0};
+	UTCTimestamp time2 = UTCTimestamp{2035, 11, 19, 23, 57, 24};
+
+	SECTION("Valid ranges") {
+		auto time = time1;
+		time += -1s;
+		CHECK(ServiceTests::thrownError(ErrorHandler::InvalidTimeStampInput));
+	}
+
+	SECTION("Simple addition") {
+		auto time = time1;
+		time += 10s;
+		CHECK(time == UTCTimestamp{2020, 1, 1, 0, 0, 10});
+
+		time += 25h;
+		CHECK(time == UTCTimestamp{2020, 1, 2, 1, 0, 10});
+	}
+
+	SECTION("Overflow within range") {
+		auto time = time2;
+		time += 1209780s;
+		CHECK(time == UTCTimestamp{2035, 12, 4, 0, 0, 24});
+
+		time += 60 * 24h;
+		CHECK(time == UTCTimestamp{2036, 2, 2, 0, 0, 24});
+	}
+
+	SECTION("Future dates") {
+		auto time = time2;
+		time += 999999h;
+		CHECK(time == UTCTimestamp{2149, 12, 18, 14, 57, 24});
+	}
+}
+
+TEST_CASE("CUC Custom Timestamp as Parameter") {
+	using namespace Time;
+	DefaultCUC time(999_t);
+
+	auto parameter = Parameter<DefaultCUC>(time);
 
 	auto message = Message(0, 0, Message::TC);
 	parameter.appendValueToMessage(message);
-	CHECK(message.dataSize == 8);
+	CHECK(message.dataSize == 4);
 
 	parameter.setValueFromMessage(message);
 	CHECK(time == parameter.getValue());
