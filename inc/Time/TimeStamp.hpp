@@ -42,7 +42,7 @@
  * @author Konstantinos Kanavouras
  * @see [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf)
  */
-template <uint8_t BaseBytes = 4, uint8_t FractionBytes = 0, int Num = 1, int Denom = 10>
+template <uint8_t BaseBytes = 4, uint8_t FractionBytes = 0, int Num = 1, int Denom = 1>
 class TimeStamp {
 public:
 	/**
