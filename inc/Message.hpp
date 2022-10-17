@@ -741,7 +741,7 @@ inline void Message::append(const double& value) {
 }
 template <>
 inline void Message::append(const Time::DefaultCUC& value) {
-	appendDefaultCUCTimeStamp(timeCUC);
+	appendDefaultCUCTimeStamp(value);
 }
 template <>
 inline void Message::append(const Time::RelativeTime& value) {
