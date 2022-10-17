@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PACKET_H
 #define ECSS_SERVICES_PACKET_H
 
+#include <Time/TimeStamp.hpp>
 #include <cstdint>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
@@ -148,10 +149,21 @@ public:
 	void appendWord(uint32_t value);
 
 	/**
-	 * Appends a type CustomCUC (CUC formatted timestamp) to the message.
+	 * Appends any CUC timestamp to the message, including the header.
 	 */
-	void appendCustomCUCTimeStamp(const Time::CustomCUC_t& timeCUC) {
-		appendUint64(timeCUC.elapsed100msTicks);
+	template <class Ts>
+	void appendCUCTimeStamp(const Ts& timestamp) {
+		etl::array<uint8_t, Time::CUCTimestampMaximumSize> text = timestamp.formatAsCUC();
+
+		appendString(String<Time::CUCTimestampMaximumSize>(text.data(), text.size()));
+	}
+
+	/**
+	 * Appends a default timestamp object to the message, without the header
+	 */
+	void appendDefaultCUCTimeStamp(Time::DefaultCUC timestamp) {
+		static_assert(std::is_same_v<uint32_t, decltype(timestamp.formatAsBytes())>, "The default timestamp should be 4 bytes");
+		appendUint32(timestamp.formatAsBytes());
 	}
 
 	/**
@@ -570,13 +582,13 @@ public:
 	}
 
 	/**
-	 * Fetches a timestamp in a custom CUC format consisting of 8 bytes from the current position in the message
+	 * Fetches a timestamp in a custom CUC format consisting of 4 bytes from the current position in the message
 	 */
-	Time::CustomCUC_t readCustomCUCTimeStamp() {
-		Time::CustomCUC_t customCUC_t;
+	Time::DefaultCUC readDefaultCUCTimeStamp() {
+		auto time = readUint32();
+		std::chrono::duration<uint32_t, Time::DefaultCUC::Ratio> duration(time);
 
-		customCUC_t.elapsed100msTicks = readUint64();
-		return customCUC_t;
+		return Time::DefaultCUC(duration);
 	}
 
 	/**
@@ -668,7 +680,7 @@ public:
 	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
+	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) {
 		return assertType(TC, expectedServiceType, expectedMessageType);
 	}
 
@@ -676,7 +688,7 @@ public:
 	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
+	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) {
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
@@ -728,8 +740,8 @@ inline void Message::append(const double& value) {
 	appendDouble(value);
 }
 template <>
-inline void Message::append(const Time::CustomCUC_t& value) {
-	appendCustomCUCTimeStamp(value);
+inline void Message::append(const Time::DefaultCUC& timeCUC) {
+	appendDefaultCUCTimeStamp(timeCUC);
 }
 template <>
 inline void Message::append(const Time::RelativeTime& value) {
@@ -780,17 +792,19 @@ template <>
 inline bool Message::read<bool>() {
 	return readBoolean();
 }
+
 template <>
 inline float Message::read() {
 	return readFloat();
 }
+
 template <>
 inline double Message::read() {
 	return readDouble();
 }
 template <>
-inline Time::CustomCUC_t Message::read() {
-	return readCustomCUCTimeStamp();
+inline Time::DefaultCUC Message::read() {
+	return readDefaultCUCTimeStamp();
 }
 template <>
 inline Time::RelativeTime Message::read() {

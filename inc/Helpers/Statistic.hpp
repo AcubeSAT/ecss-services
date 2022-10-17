@@ -15,8 +15,8 @@ class Statistic {
 public:
 	uint16_t selfSamplingInterval = 0;
 	uint16_t sampleCounter = 0;
-	Time::CustomCUC_t timeOfMaxValue;
-	Time::CustomCUC_t timeOfMinValue;
+	Time::DefaultCUC timeOfMaxValue;
+	Time::DefaultCUC timeOfMinValue;
 	double max = -std::numeric_limits<double>::infinity();
 	double min = std::numeric_limits<double>::infinity();
 	double sumOfSquares = 0;

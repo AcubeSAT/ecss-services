@@ -1,4 +1,5 @@
 #include <cmath>
+#include "TimeStamp.hpp"
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(TimeStamp::TAICounter_t seconds) {
@@ -13,15 +14,6 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFr
 	const auto duration = FromDuration(taiSecondsFromEpoch);
 
 	taiCounter = std::chrono::duration_cast<RawDuration>(duration).count();
-}
-
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Time::CustomCUC_t customCUCTimestamp) {
-	//TODO Remove CustomCUC_t class
-	TimeStamp<8, 0, 1, 10> input;
-	input.taiCounter = customCUCTimestamp.elapsed100msTicks;
-
-	new (this) TimeStamp<BaseBytes, FractionBytes, Num, Denom>(input);
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
@@ -107,13 +99,6 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asTAIseconds() {
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-Time::CustomCUC_t TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asCustomCUCTimestamp() {
-	//TODO: Remove CustomCUC_t class
-	TimeStamp<8, 0, 1, 10> converted(*this);
-	return {converted.taiCounter};
-}
-
-template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <typename T>
 T TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asTAIseconds() {
 	static_assert(std::is_floating_point_v<T>, "TimeStamp::asTAIseconds() only accepts numeric types.");
@@ -179,7 +164,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <class Duration>
-Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() {
+Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() const {
 	auto duration = RawDuration(taiCounter);
 
 	return std::chrono::duration_cast<Duration>(duration);

@@ -5,6 +5,8 @@
 #include <ctime>
 #include <vector>
 
+using namespace std::chrono_literals;
+
 /*
  * A namespace defined explicitly for the purposes of testing. This namespace contains a
  * structure, which has been declared as a friend in the TimeBasedSchedulingService class, so
@@ -33,7 +35,7 @@ namespace unit_test {
 } // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
-Time::CustomCUC_t currentTime = TimeGetter::getCurrentTimeCustomCUC(); // Get the current system time
+Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC(); // Get the current system time
 bool messagesPopulated = false;                                        // Indicate whether the test messages are initialized
 
 // Run this function to set the service up before moving on with further testing
@@ -69,19 +71,19 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 	receivedMessage.appendUint16(4); // Total number of requests
 
 	// Test activity 1
-	receivedMessage.appendCustomCUCTimeStamp(currentTime + 1556435);
+	receivedMessage.appendDefaultCUCTimeStamp(currentTime + 155643s);
 	receivedMessage.appendMessage(testMessage1, ECSSTCRequestStringSize);
 
 	// Test activity 2
-	receivedMessage.appendCustomCUCTimeStamp(currentTime + 1957232);
+	receivedMessage.appendDefaultCUCTimeStamp(currentTime + 195723s);
 	receivedMessage.appendMessage(testMessage2, ECSSTCRequestStringSize);
 
 	// Test activity 3
-	receivedMessage.appendCustomCUCTimeStamp(currentTime + 1726435);
+	receivedMessage.appendDefaultCUCTimeStamp(currentTime + 172643s);
 	receivedMessage.appendMessage(testMessage3, ECSSTCRequestStringSize);
 
 	// Test activity 4
-	receivedMessage.appendCustomCUCTimeStamp(currentTime + 17248435);
+	receivedMessage.appendDefaultCUCTimeStamp(currentTime + 1724843s);
 	receivedMessage.appendMessage(testMessage4, ECSSTCRequestStringSize);
 
 	// Insert activities in the schedule. They have to be inserted sorted
@@ -97,8 +99,8 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	Services.reset();
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
-	auto nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1556435);
-	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
+	auto nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 155643s);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 172643s);
 
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
 	timeBasedService.detailReportAllActivities(receivedMessage);
@@ -106,27 +108,27 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	uint16_t iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 3);
 
-	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 100);
-	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1726435);
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 10s);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 172643s);
 
-	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1726435);
-	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1957232);
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 172643s);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 195723s);
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
 	response = ServiceTests::get(1);
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 2);
 
-	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1957232);
-	REQUIRE(nextActivityExecutionCUCTime == currentTime + 17248435);
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 195723s);
+	REQUIRE(nextActivityExecutionCUCTime == currentTime + 1724843s);
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
 	response = ServiceTests::get(2);
 	iterationCount = response.readUint16();
 	REQUIRE(iterationCount == 1);
 
-	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 17248435);
-	REQUIRE(nextActivityExecutionCUCTime.elapsed100msTicks == std::numeric_limits<decltype(nextActivityExecutionCUCTime.elapsed100msTicks)>::max());
+	nextActivityExecutionCUCTime = timeBasedService.executeScheduledActivity(currentTime + 1724843s);
+	REQUIRE(nextActivityExecutionCUCTime == Time::DefaultCUC::max());
 
 	timeBasedService.detailReportAllActivities(receivedMessage);
 	response = ServiceTests::get(3);
@@ -156,10 +158,10 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 
 	REQUIRE(scheduledActivities.size() == 4);
 
-	REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435);
-	REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435);
-	REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232);
-	REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435);
+	REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 155643s);
+	REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 172643s);
+	REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 195723s);
+	REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 1724843s);
 
 	REQUIRE(testMessage1.bytesEqualWith(scheduledActivities.at(0)->request));
 	REQUIRE(testMessage3.bytesEqualWith(scheduledActivities.at(1)->request));
@@ -170,7 +172,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 		Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 		receivedMessage.appendUint16(1); // Total number of requests
 
-		receivedMessage.appendCustomCUCTimeStamp(currentTime - 1556435);
+		receivedMessage.appendDefaultCUCTimeStamp(currentTime - 155643s);
 		MessageParser::execute(receivedMessage); //timeService.insertActivities(receivedMessage);
 
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
@@ -190,10 +192,10 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 		CHECK(scheduledActivities.size() == 4);
 		MessageParser::execute(receivedMessage); //timeService.timeShiftAllActivities(receivedMessage);
 
-		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 - timeShift);
-		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 - timeShift);
-		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232 - timeShift);
-		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435 - timeShift);
+		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 155643s - std::chrono::seconds(timeShift));
+		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 172643s - std::chrono::seconds(timeShift));
+		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 195723s - std::chrono::seconds(timeShift));
+		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 1724843s - std::chrono::seconds(timeShift));
 	}
 
 	SECTION("Negative Shift") {
@@ -201,10 +203,10 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 
 		CHECK(scheduledActivities.size() == 4);
 		MessageParser::execute(receivedMessage); //timeService.timeShiftAllActivities(receivedMessage);
-		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 1556435 + timeShift);
-		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1726435 + timeShift);
-		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1957232 + timeShift);
-		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 17248435 + timeShift);
+		REQUIRE(scheduledActivities.at(0)->requestReleaseTime == currentTime + 155643s + std::chrono::seconds(timeShift));
+		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 172643s + std::chrono::seconds(timeShift));
+		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 195723s + std::chrono::seconds(timeShift));
+		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 1724843s + std::chrono::seconds(timeShift));
 	}
 
 	SECTION("Error throwing") {
@@ -238,12 +240,12 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
 
 		// Make sure the new value is inserted sorted
-		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 1957232 + timeShift);
+		REQUIRE(scheduledActivities.at(3)->requestReleaseTime == currentTime + 195723s + std::chrono::seconds(timeShift));
 		REQUIRE(testMessage2.bytesEqualWith(scheduledActivities.at(3)->request));
 	}
 
 	SECTION("Negative Shift") {
-		receivedMessage.appendRelativeTime(-250000);              // Time-shift value
+		receivedMessage.appendRelativeTime(-25000);              // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
 		receivedMessage.appendUint8(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
@@ -253,7 +255,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
 
 		// Output should be sorted
-		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 1957232 - 250000);
+		REQUIRE(scheduledActivities.at(1)->requestReleaseTime == currentTime + 195723s - 25000s);
 		REQUIRE(testMessage2.bytesEqualWith(scheduledActivities.at(1)->request));
 	}
 
@@ -311,7 +313,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		uint16_t iterationCount = response.readUint16();
 		CHECK(iterationCount == 2);
 		for (uint16_t i = 0; i < iterationCount; i++) {
-			Time::CustomCUC_t receivedReleaseTime = response.readCustomCUCTimeStamp();
+			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
 
 			Message receivedTCPacket;
 			uint8_t receivedDataStr[ECSSTCRequestStringSize];
@@ -368,7 +370,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 
 		uint16_t iterationCount = response.readUint16();
 		for (uint16_t i = 0; i < iterationCount; i++) {
-			Time::CustomCUC_t receivedReleaseTime = response.readCustomCUCTimeStamp();
+			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
 			uint8_t receivedSourceID = response.readUint8();
 			uint16_t receivedApplicationID = response.readUint16();
 			uint16_t receivedSequenceCount = response.readUint16();
@@ -414,7 +416,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 	REQUIRE(iterationCount == scheduledActivities.size());
 
 	for (uint16_t i = 0; i < iterationCount; i++) {
-		Time::CustomCUC_t receivedReleaseTime = response.readCustomCUCTimeStamp();
+		Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
 
 		Message receivedTCPacket;
 		uint8_t receivedDataStr[ECSSTCRequestStringSize];
@@ -446,7 +448,7 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 		scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
 
 		REQUIRE(scheduledActivities.size() == 3);
-		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 17248435);
+		REQUIRE(scheduledActivities.at(2)->requestReleaseTime == currentTime + 1724843s);
 		REQUIRE(testMessage4.bytesEqualWith(scheduledActivities.at(2)->request));
 	}
 

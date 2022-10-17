@@ -174,40 +174,41 @@ TEST_CASE("Test appending offset") {
 }
 
 TEST_CASE("Test appending a CUC timestamp") {
+	using namespace Time;
+
 	SECTION("Test 1") {
-		auto timeCUC = TimeGetter::getCurrentTimeCustomCUC();
-		REQUIRE(timeCUC.elapsed100msTicks == 86769000);
+		auto timeCUC = TimeGetter::getCurrentTimeDefaultCUC();
+		REQUIRE(timeCUC.formatAsBytes() == 86769000);
 
 		Message message(0, 0, Message::TC, 0);
-		message.appendCustomCUCTimeStamp(timeCUC);
+		message.appendDefaultCUCTimeStamp(timeCUC);
 
-		REQUIRE(message.readUint64() == 86769000);
+		REQUIRE(message.readUint32() == 86769000);
 	}
 
 	SECTION("Test 2") {
-		Time::CustomCUC_t timeCUC;
-		timeCUC.elapsed100msTicks = 34511;
+		DefaultCUC timeCUC(34511_t);
 
 		Message message(0, 0, Message::TC, 0);
-		message.appendCustomCUCTimeStamp(timeCUC);
+		message.appendDefaultCUCTimeStamp(timeCUC);
 
-		REQUIRE(message.readUint64() == 34511);
+		REQUIRE(message.readUint32() == 34511);
 	}
 }
 
 TEST_CASE("Test reading a custom CUC timestamp") {
+	using namespace Time;
 	/**
  	* Append a custom CUC Time Stamp to a message object and check if is it read corretly
  	*/
-	Time::CustomCUC_t timeCUC;
-	timeCUC.elapsed100msTicks = 34511;
+	DefaultCUC timeCUC(34511_t);
 
 	Message message(0, 0, Message::TC, 0);
-	message.appendCustomCUCTimeStamp(timeCUC);
+	message.appendDefaultCUCTimeStamp(timeCUC);
 
-	auto returnTimeCUC = message.readCustomCUCTimeStamp();
+	auto returnTimeCUC = message.readDefaultCUCTimeStamp();
 
-	REQUIRE(returnTimeCUC.elapsed100msTicks == 34511);
+	REQUIRE(returnTimeCUC.formatAsBytes() == 34511);
 }
 
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {

@@ -83,7 +83,7 @@ private:
 	struct ScheduledActivity {
 		Message request;                         ///< Hold the received command request
 		RequestID requestID;                     ///< Request ID, characteristic of the definition
-		Time::CustomCUC_t requestReleaseTime{0}; ///< Keep the command release time
+		Time::DefaultCUC requestReleaseTime{0}; ///< Keep the command release time
 	};
 
 	/**
@@ -150,7 +150,7 @@ public:
 	 * This function executes the next activity and removes it from the list.
 	 * @return the requestReleaseTime of next activity to be executed after this time
 	 */
-	Time::CustomCUC_t executeScheduledActivity(Time::CustomCUC_t currentTime);
+	Time::DefaultCUC executeScheduledActivity(Time::DefaultCUC currentTime);
 
 	/**
 	 * @brief TC[11,1] enable the time-based schedule execution function

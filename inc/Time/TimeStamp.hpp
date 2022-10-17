@@ -42,7 +42,7 @@
  * @author Konstantinos Kanavouras
  * @see [CCSDS 301.0-B-4](https://public.ccsds.org/Pubs/301x0b4e1.pdf)
  */
-template <uint8_t BaseBytes, uint8_t FractionBytes = 0, int Num = 1, int Denom = 1>
+template <uint8_t BaseBytes = 4, uint8_t FractionBytes = 0, int Num = 1, int Denom = 10>
 class TimeStamp {
 public:
 	/**
@@ -102,7 +102,10 @@ private:
 	/**
 	 * The maximum value of the base type (seconds, larger or smaller) that can fit in @ref taiCounter
 	 */
-	static constexpr uint64_t MaxBase = (BaseBytes == 8) ? std::numeric_limits<uint64_t>::max() : (1UL << 8 * BaseBytes) - 1;
+	static constexpr uint64_t MaxBase =
+	    (BaseBytes == 8)
+	        ? std::numeric_limits<uint64_t>::max()
+	        : (uint64_t{1} << 8 * BaseBytes) - 1;
 
 	/**
 	 * The maximum number of seconds since epoch that can be represented in this class
@@ -129,14 +132,6 @@ public:
 	 * @param taiSecondsFromEpoch An integer number of seconds from the custom @ref Time::Epoch
 	 */
 	explicit TimeStamp(uint64_t taiSecondsFromEpoch);
-
-	/**
-	 * Initialize the TimeStamp from a count of 100ms ticks from epoch in TAI (leap seconds not accounted)
-	 *
-	 * @param customCUCTimestamp An struct containing a 64 bit unsigned number of 100ms
-	 * ticks from the custom @ref Time::Epoch
-	 */
-	explicit TimeStamp(Time::CustomCUC_t customCUCTimestamp);
 
 	/**
 	 * Initialize the TimeStamp from the bytes of a CUC time stamp
@@ -180,14 +175,6 @@ public:
 	TAICounter_t asTAIseconds();
 
 	/**
-	 * Get the representation as a struct containing 100ms ticks from epoch in TAI
-	 *
-	 * @return An struct containing a 64 bit unsigned number of 100ms
-	 * ticks from the custom @ref Time::Epoch. This function is explicitly defined.
-	 */
-	Time::CustomCUC_t asCustomCUCTimestamp();
-
-	/**
 	 * Get the representation as seconds from epoch in TAI, for a floating-point representation.
 	 * For an integer result, see the overloaded @ref asTAIseconds function.
 	 *
@@ -203,14 +190,19 @@ public:
 	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are compatible so that no overflow occurs.
 	 */
 	template <class Duration = std::chrono::seconds>
-	Duration asDuration();
+	Duration asDuration() const;
 
 	/**
-	 * Get the representation as CUC formatted bytes
-	 *
-	 * @return The TimeStamp, represented in the CCSDS CUC format
+	 * Get the representation as CUC formatted bytes, including the header (P-field and T-field)
 	 */
 	etl::array<uint8_t, Time::CUCTimestampMaximumSize> formatAsCUC();
+
+	/**
+	 * Get the representation as CUC formatted bytes, without the header (T-field only)
+	 */
+	TAICounter_t formatAsBytes() const {
+		return taiCounter;
+	}
 
 	/**
 	 * Get the representation as a UTC timestamp
@@ -218,6 +210,83 @@ public:
 	 * @return The TimeStamp, represented in the structure that holds UTC timestamps
 	 */
 	UTCTimestamp toUTCtimestamp();
+
+	/**
+	 * Get the maximum timestamp that can be represented by this class
+	 *
+	 * Can be used to represent null or infinite amounts of time
+	 */
+	static TimeStamp<BaseBytes, FractionBytes, Num, Denom> max() {
+		TimeStamp<BaseBytes, FractionBytes, Num, Denom> timestamp;
+		timestamp.taiCounter = std::numeric_limits<TAICounter_t>::max();
+		return timestamp;
+	}
+
+	/**
+	 * Adds any arbitrary duration to a timestamp.
+	 *
+	 * You can play with default C++ durations with this function:
+	 * ```cpp
+	 * using namespace std::literals;
+	 *
+	 * timestamp + std::chrono::seconds(5);        // adds 5 seconds
+	 * timestamp + std::chrono::milliseconds(500); // adds 5 milliseconds
+	 * timestamp + 60s; // adds 60 seconds
+	 */
+	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
+	TimeStamp<BaseBytes, FractionBytes, Num, Denom> operator+(const Duration& duration) const {
+		auto output = *this;
+		output += duration;
+		return output;
+	}
+
+	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
+	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator+=(const Duration& duration) {
+		if (duration < Duration::zero()) {
+			taiCounter -= std::chrono::duration_cast<RawDuration>(-duration).count();
+		} else {
+			taiCounter += std::chrono::duration_cast<RawDuration>(duration).count();
+		}
+
+		return *this;
+	}
+
+	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
+	TimeStamp<BaseBytes, FractionBytes, Num, Denom> operator-(const Duration& duration) const {
+		auto output = *this;
+		output -= duration;
+		return output;
+	}
+
+	template <class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>
+	TimeStamp<BaseBytes, FractionBytes, Num, Denom>& operator-=(const Duration& duration) {
+		if (duration < Duration::zero()) {
+			taiCounter += std::chrono::duration_cast<RawDuration>(-duration).count();
+		} else {
+			taiCounter -= std::chrono::duration_cast<RawDuration>(duration).count();
+		}
+
+		return *this;
+	}
+
+	/**
+	 * Subtraction between two timestamps.
+	 *
+	 * Given 2 absolute moments in time, returns the relative duration between them.
+	 * @tparam Duration The duration returned is equal to the RawDuration of the first timestamp,
+	 * 					but it's signed instead of unsigned, so that negative results can be represented.
+	 */
+	template <
+	    uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn = 1, int DenomIn = 1, // Template parameters of the 2nd timestamp
+	    class Duration = std::chrono::duration<                                       // Create a new Duration based on our RawDuration...
+	        typename std::make_signed<typename RawDuration::rep>::type,               // the Duration base type is equal to the RawDuration, but converted to signed from unsigned
+	        typename RawDuration::period>>
+	Duration operator-(const TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn>& operand) const {
+		Duration myDuration = asDuration<Duration>();
+		Duration operandDuration = operand.template asDuration<Duration>();
+
+		return myDuration - operandDuration;
+	}
 
 	/**
 	 * @name Comparison operators between timestamps
@@ -256,5 +325,24 @@ public:
 	 * @}
 	 */
 };
+
+namespace Time {
+	using DefaultCUC = TimeStamp<4, 0, 1, 10>;
+
+	/**
+	 * Creates a custom literal to specify timestamp ticks.
+	 *
+	 * For example, this code:
+	 * ```cpp
+	 * Time::DefaultCUC timestamp(1000_t);
+	 * ```
+	 * will define a timestamp 1000 ticks from the epoch.
+	 *
+	 * The time amount of a "tick" is the period defined by the DefaultCUC::Ratio
+	 */
+	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator""_t(unsigned long long s) {
+		return std::chrono::duration<uint32_t, DefaultCUC::Ratio>(s);
+	}
+} // namespace Time
 
 #include "TimeStamp.tpp"

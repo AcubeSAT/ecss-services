@@ -21,7 +21,7 @@ private:
 	 * The time at which the evaluation of statistics is initialized. It is basically the time when the statistics
 	 * are reset.
 	 */
-	Time::CustomCUC_t evaluationStartTime;
+	Time::DefaultCUC evaluationStartTime;
 
 	/**
 	 * true means that the periodic statistics reporting is enabled
