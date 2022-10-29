@@ -395,3 +395,64 @@ TEST_CASE("Packet sequence counter", "[message]") {
 		CHECK(message2.packetSequenceCount == 0);
 	}
 }
+
+TEST_CASE("Storing and retrieving enums in Messages") {
+	enum ActiveBus : uint8_t {
+		Main = 0x0,
+		Redundant = 0x1
+	};
+
+	SECTION("Using Enums in parameters") {
+		auto parameter1 = Parameter<ActiveBus>(Redundant);
+		auto parameter2 = Parameter<ActiveBus>(Main);
+		Message message;
+
+		parameter1.appendValueToMessage(message);
+		parameter2.setValueFromMessage(message);
+
+		CHECK(parameter1.getValue() == parameter2.getValue());
+	}
+
+	SECTION("Using Enums in variables") {
+		ActiveBus variable1 = Redundant;
+		ActiveBus variable2 = Main;
+		Message message;
+
+		message.append(variable1);
+		variable2 = message.read<ActiveBus>();
+
+		CHECK(variable1 == variable2);
+	}
+
+	SECTION("Another type of enum") {
+		enum Numbers : uint64_t {
+			First = 1577829600,
+			Second = 1667045679
+		};
+
+		auto parameter1 = Parameter<Numbers>(First);
+		auto parameter2 = Parameter<Numbers>(Second);
+		Message message;
+
+		parameter1.appendValueToMessage(message);
+		parameter2.setValueFromMessage(message);
+
+		CHECK(parameter1.getValue() == parameter2.getValue());
+	}
+
+		SECTION("Another type of enum") {
+		enum MemoryPartitionUsed : bool {
+			first = false,
+			second = true
+		};
+
+		auto parameter3 = Parameter<MemoryPartitionUsed>(first);
+		auto parameter4 = Parameter<MemoryPartitionUsed>(second);
+		Message message;
+
+		parameter3.appendValueToMessage(message);
+		parameter4.setValueFromMessage(message);
+
+		CHECK(parameter3.getValue() == parameter4.getValue());
+	}
+}
