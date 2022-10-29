@@ -439,4 +439,20 @@ TEST_CASE("Storing and retrieving enums in Messages") {
 
 		CHECK(parameter1.getValue() == parameter2.getValue());
 	}
+
+		SECTION("Another type of enum") {
+		enum MemoryPartitionUsed : bool {
+			first = false,
+			second = true
+		};
+
+		auto parameter3 = Parameter<MemoryPartitionUsed>(first);
+		auto parameter4 = Parameter<MemoryPartitionUsed>(second);
+		Message message;
+
+		parameter3.appendValueToMessage(message);
+		parameter4.setValueFromMessage(message);
+
+		CHECK(parameter3.getValue() == parameter4.getValue());
+	}
 }
