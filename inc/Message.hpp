@@ -757,7 +757,14 @@ template <>
 inline void Message::append(const etl::istring& value) {
 	appendOctetString(value);
 }
-
+template <typename T>
+inline void Message::append(const T& value) {
+	append(std::underlying_type_t<T>(value));
+}
+template <typename T>
+inline T Message::read() {
+	return static_cast<T>(read<std::underlying_type_t<T>>());
+}
 template <>
 inline uint8_t Message::read() {
 	return readUint8();

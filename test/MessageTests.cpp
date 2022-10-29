@@ -395,3 +395,32 @@ TEST_CASE("Packet sequence counter", "[message]") {
 		CHECK(message2.packetSequenceCount == 0);
 	}
 }
+
+TEST_CASE("Storing and retrieving enums in Messages") {
+	enum ActiveBus : uint8_t {
+		Main = 0x0,
+		Redundant = 0x1
+	};
+
+	SECTION("Using Enums in parameters") {
+		auto parameter1 = Parameter<ActiveBus>(Redundant);
+		auto parameter2 = Parameter<ActiveBus>(Main);
+		Message message;
+
+		parameter1.appendValueToMessage(message);
+		parameter2.setValueFromMessage(message);
+
+		CHECK(parameter1.getValue() == parameter2.getValue());
+	}
+
+	SECTION("Using Enums in variables") {
+		ActiveBus variable1 = Redundant;
+		ActiveBus variable2 = Main;
+		Message message;
+
+		message.append(variable1);
+		variable2 = message.read<ActiveBus>();
+
+		CHECK(variable1 == variable2);
+	}
+}
