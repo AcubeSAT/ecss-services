@@ -423,4 +423,20 @@ TEST_CASE("Storing and retrieving enums in Messages") {
 
 		CHECK(variable1 == variable2);
 	}
+
+	SECTION("Another type of enum") {
+		enum Numbers : uint64_t {
+			First = 1577829600,
+			Second = 1667045679
+		};
+
+		auto parameter1 = Parameter<Numbers>(First);
+		auto parameter2 = Parameter<Numbers>(Second);
+		Message message;
+
+		parameter1.appendValueToMessage(message);
+		parameter2.setValueFromMessage(message);
+
+		CHECK(parameter1.getValue() == parameter2.getValue());
+	}
 }
