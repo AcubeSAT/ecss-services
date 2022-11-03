@@ -48,10 +48,10 @@ int main() {
 	int listening = socket(AF_INET,SOCK_STREAM,0);
 	if ( listening< 0) {
 		printf("\nTCP socket creation failed");
-			return 1;
-		} else {
-			LOG_DEBUG << "Socket created successfully";
-    }
+		return 1;
+	} else {
+		LOG_DEBUG << "Socket created successfully";
+	}
 	struct sockaddr_in addr;
 	addr.sin_family=AF_INET;
 	addr.sin_port= htons(10025);
@@ -101,10 +101,10 @@ int main() {
 			ss << static_cast<int>(message[i]) << " ";
 
 		}
-			printf("size of message %d", msglen);
-			LOG_NOTICE << ss.str();
-			Message m = MessageParser::parse(reinterpret_cast<uint8_t*>(message), msglen);
-			MessageParser::execute(m);
+		printf("size of message %d", msglen);
+		LOG_NOTICE << ss.str();
+		Message m = MessageParser::parse(reinterpret_cast<uint8_t*>(message), msglen);
+		MessageParser::execute(m);
 	}
 	//TCP socket closed
 	close(listening);

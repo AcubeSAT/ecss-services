@@ -34,34 +34,24 @@ public:
 	};
 
 	// Variables that count the event reports per severity level
-	uint16_t lowSeverityReportCount;
-	uint16_t mediumSeverityReportCount;
-	uint16_t highSeverityReportCount;
+	uint16_t lowSeverityReportCount = 0;
+	uint16_t mediumSeverityReportCount = 0;
+	uint16_t highSeverityReportCount = 0;
 
 	// Variables that count the event occurences per severity level
-	uint16_t lowSeverityEventCount;
-	uint16_t mediumSeverityEventCount;
-	uint16_t highSeverityEventCount;
+	uint16_t lowSeverityEventCount = 0;
+	uint16_t mediumSeverityEventCount = 0;
+	uint16_t highSeverityEventCount = 0;
 
-	uint16_t disabledEventsCount;
+	uint16_t disabledEventsCount = 0;
 
-	uint16_t lastLowSeverityReportID;
-	uint16_t lastMediumSeverityReportID;
-	uint16_t lastHighSeverityReportID;
+	uint16_t lastLowSeverityReportID = 65535;
+	uint16_t lastMediumSeverityReportID = 65535;
+	uint16_t lastHighSeverityReportID = 65535;
 
 	EventReportService() {
 		stateOfEvents.set();
 		serviceType = ServiceType;
-		lowSeverityReportCount = 0;
-		mediumSeverityReportCount = 0;
-		highSeverityReportCount = 0;
-		disabledEventsCount = 0;
-		lowSeverityEventCount = 0;
-		mediumSeverityEventCount = 0;
-		highSeverityEventCount = 0;
-		lastLowSeverityReportID = 65535;
-		lastMediumSeverityReportID = 65535;
-		lastHighSeverityReportID = 65535;
 	}
 
 	/**

@@ -34,7 +34,7 @@ protected:
 	 *                    the TC[17,3] message has `messageType = 3`.
 	 * @todo See if the Message must be returned by reference
 	 */
-	Message createTM(uint8_t messageType) {
+	Message createTM(uint8_t messageType) const {
 		return Message(serviceType, messageType, Message::TM);
 	}
 

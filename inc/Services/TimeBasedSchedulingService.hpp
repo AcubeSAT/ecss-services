@@ -10,18 +10,20 @@
 // Include platform specific files
 #include "Helpers/TimeGetter.hpp"
 
+
+/**
+ * @def GROUPS_ENABLED
+ * @brief Indicates whether scheduling groups are enabled
+ */
+#define GROUPS_ENABLED 0 // NOLINT(cppcoreguidelines-macro-usage)
+
 /**
  * @def SUB_SCHEDULES_ENABLED
  * @brief Indicates whether sub-schedules are supported
  *
  * @details Sub-schedules are currently not implemented so this has no effect
  */
-/**
- * @def GROUPS_ENABLED
- * @brief Indicates whether scheduling groups are enabled
- */
-#define GROUPS_ENABLED 0
-#define SUB_SCHEDULES_ENABLED 0
+#define SUB_SCHEDULES_ENABLED 0 // NOLINT(cppcoreguidelines-macro-usage)
 
 /**
  * @brief Namespace to access private members during test
@@ -81,7 +83,7 @@ private:
 	struct ScheduledActivity {
 		Message request;                         ///< Hold the received command request
 		RequestID requestID;                     ///< Request ID, characteristic of the definition
-		Time::CustomCUC_t requestReleaseTime{0}; ///< Keep the command release time
+		Time::DefaultCUC requestReleaseTime{0}; ///< Keep the command release time
 	};
 
 	/**
@@ -98,7 +100,7 @@ private:
 	 * @details The ECSS standard requires that the activities are sorted in the TM message
 	 * response. Also it is better to have the activities sorted.
 	 */
-	inline void
+	inline static void
 	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& schedActivities) {
 		schedActivities.sort([](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 			// cppcheck-suppress
@@ -148,7 +150,7 @@ public:
 	 * This function executes the next activity and removes it from the list.
 	 * @return the requestReleaseTime of next activity to be executed after this time
 	 */
-	Time::CustomCUC_t executeScheduledActivity(Time::CustomCUC_t currentTime);
+	Time::DefaultCUC executeScheduledActivity(Time::DefaultCUC currentTime);
 
 	/**
 	 * @brief TC[11,1] enable the time-based schedule execution function

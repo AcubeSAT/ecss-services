@@ -40,17 +40,19 @@ cppcheck:
       - ./cppcheck-html-report
 
 clang-tidy:
-  image: spacedot/clang-tools:13.0.0-html-1.3.7
+  image: spacedot/clang-tools:13.0.0-html-1.4.1
   stage: analyze
   script:
     - cd $CI_PROJECT_DIR
     - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --checks=* `find $CI_PROJECT_DIR/src -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` >> clang-tidy-output.log
+    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --config-file=$CI_PROJECT_DIR/ci/.clang-tidy --use-color `find $CI_PROJECT_DIR/src $CI_PROJECT_DIR/inc -not -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` | tee clang-tidy-output.log
   after_script:
+    - sed -e 's/\x1b\[[0-9;]*m//g' -i clang-tidy-output.log
     - mkdir clang-tidy-html-report
     - clang-tidy-html clang-tidy-output.log
     - mv clang.html clang-tidy-html-report
   artifacts:
+    when: always
     paths:
       - ./clang-tidy-html-report
 
@@ -85,9 +87,8 @@ ikos:
   script:
     - cd $CI_PROJECT_DIR
     - ikos-scan cmake .
-    - ikos-scan make
+    - ikos-scan make tests
     - ikos tests.bc
-    - ikos ecss_services.bc
     - ikos-report -o=ikos-report.txt output.db
   after_script:
     - mv ikos-report.txt ikos-report
@@ -126,8 +127,10 @@ pages:
     - find ./.public
     - mv .public public
   after_script:
+    - "echo Artifacts for this build: ${CI_JOB_URL}/artifacts/browse"
     - "echo Base page for this branch: ${CI_PAGES_URL}"
   artifacts:
+    expose_as: 'build artifacts and documentation'
     paths:
       - public # Upload the resulting website
       #  only:

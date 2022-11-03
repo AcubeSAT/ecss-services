@@ -13,7 +13,7 @@ namespace AllMessageTypes {
 	 * Map containing all the message types, per service. The key is the ServiceType and the value,
 	 * an etl vector containing the message types.
 	 */
-	extern etl::map<uint8_t, etl::vector<uint8_t, ECSSMaxReportTypeDefinitions>, ECSSMaxServiceTypeDefinitions> messagesOfService;
+	extern const etl::map<uint8_t, etl::vector<uint8_t, ECSSMaxReportTypeDefinitions>, ECSSMaxServiceTypeDefinitions> MessagesOfService;
 
 } // namespace AllMessageTypes
 

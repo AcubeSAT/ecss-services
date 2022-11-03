@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_ECSS_DEFINITIONS_H
 #define ECSS_SERVICES_ECSS_DEFINITIONS_H
 
+#include <chrono>
 #include <cstdint>
 /**
  * @defgroup ECSSDefinitions ECSS Defined Constants
@@ -42,7 +43,7 @@ inline const uint16_t ECSSSecondaryTCHeaderSize = 5U;
 /**
  * The maximum size of a regular ECSS message, plus its headers and trailing data, in bytes
  */
-inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + CCSDSPrimaryHeaderSize + ECSSSecondaryTMHeaderSize + 2u;
+inline const uint16_t CCSDSMaxMessageSize = ECSSMaxMessageSize + CCSDSPrimaryHeaderSize + ECSSSecondaryTMHeaderSize + 2U;
 
 /**
  * The maximum size of a string to be read or appended to a Message, in bytes
@@ -107,7 +108,7 @@ inline const uint8_t ECSSMaxNumberOfTimeSchedActivities = 10;
  * have in order
  * @see TimeBasedSchedulingService
  */
-inline const uint8_t ECSSTimeMarginForActivation = 60;
+inline constexpr std::chrono::duration<uint8_t> ECSSTimeMarginForActivation(60);
 
 /**
  * @brief Maximum size of an event's auxiliary data
@@ -130,7 +131,7 @@ inline const uint8_t ECSSMaxDeltaOfReleaseTime = 60;
 /**
  * The max number of simply commutated parameters per housekeeping structure in ST[03]
  */
-inline const uint16_t ECSSMaxSimplyCommutatedParameters = 10;
+inline const uint16_t ECSSMaxSimplyCommutatedParameters = 30;
 
 /**
  * The number of functions supported by the \ref FunctionManagementService
@@ -237,7 +238,7 @@ inline const uint8_t ECSSMaxEventDefinitionIDs = 15;
 /**
  * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
  */
-inline struct {
+inline const struct {
 	uint8_t min = 1;
 	uint8_t max = 10;
 } VirtualChannelLimits;

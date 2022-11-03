@@ -23,12 +23,12 @@ public:
 	 * Converts the current UTC time, to a CUC formatted timestamp.
 	 * @note
 	 * The original format of the CUC (etl array of bits), is not used here, because it's easier to append
-	 * a type uint64_t to a message object, rather than a whole array. Thus, we use the custom CUC format.
+	 * a type uint32_t to a message object, rather than a whole array. Thus, we use the custom CUC format.
 	 *
-	 * @return CUC timestamp, formatted as elapsed 100ms ticks.
-	 * @see Time.hpp
+	 * @return CUC timestamp, formatted as elapsed ticks.
+	 * @see Time
 	 */
-	static Time::CustomCUC_t getCurrentTimeCustomCUC();
+	static Time::DefaultCUC getCurrentTimeDefaultCUC();
 };
 
 #endif // ECSS_SERVICES_TIMEGETTER_HPP

@@ -30,7 +30,7 @@ private:
 	/**
 	 * Event-action function status
 	 */
-	bool eventActionFunctionStatus;
+	bool eventActionFunctionStatus = true;
 
 	/**
 	 * Custom function that is called right after an event takes place, to initiate
@@ -69,7 +69,6 @@ public:
 
 	EventActionService() {
 		serviceType = ServiceType;
-		eventActionFunctionStatus = true;
 	}
 
 	/**
@@ -132,7 +131,7 @@ public:
 	 * Getter for event-action function status
 	 * @return eventActionFunctionStatus
 	 */
-	bool getEventActionFunctionStatus() {
+	bool getEventActionFunctionStatus() const {
 		return eventActionFunctionStatus;
 	}
 

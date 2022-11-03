@@ -21,7 +21,7 @@ private:
 	 * The time at which the evaluation of statistics is initialized. It is basically the time when the statistics
 	 * are reset.
 	 */
-	Time::CustomCUC_t evaluationStartTime;
+	Time::DefaultCUC evaluationStartTime;
 
 	/**
 	 * true means that the periodic statistics reporting is enabled
@@ -72,7 +72,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	inline bool getPeriodicReportingStatus() {
+	inline bool getPeriodicReportingStatus() const {
 		return periodicStatisticsReportingStatus;
 	}
 
@@ -86,7 +86,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	inline const uint16_t getReportingIntervalMs() {
+	inline uint16_t getReportingIntervalMs() const {
 		return reportingIntervalMs;
 	}
 

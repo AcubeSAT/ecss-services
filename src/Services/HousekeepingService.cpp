@@ -116,10 +116,13 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
+
+	HousekeepingStructure& housekeepingStructure = housekeepingStructures.at(structureId);
+
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
 	housekeepingReport.appendUint8(structureId);
-	for (auto id: housekeepingStructures.at(structureId).simplyCommutatedParameterIds) {
+	for (auto id: housekeepingStructure.simplyCommutatedParameterIds) {
 		if (auto parameter = Services.parameterManagement.getParameter(id)) {
 			parameter->get().appendValueToMessage(housekeepingReport);
 		}
@@ -265,6 +268,9 @@ HousekeepingService::reportPendingStructures(uint32_t currentTime, uint32_t prev
 	uint32_t nextCollection = std::numeric_limits<uint32_t>::max();
 
 	for (auto& housekeepingStructure: housekeepingStructures) {
+		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
+			continue;
+		}
 		if (housekeepingStructure.second.collectionInterval == 0) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
 			nextCollection = 0;

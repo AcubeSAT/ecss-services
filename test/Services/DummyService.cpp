@@ -13,5 +13,5 @@ TEST_CASE("Log string as message TM[128, 128]", "[service][st128]") {
 	CHECK(report.messageType == DummyService::MessageType::LogString);
 	char logOutput[39];
 	report.readString(logOutput, 39);
-	CHECK(strcmp(logOutput, "An amazing log that is very informative") == 0);
+	CHECK(memcmp(logOutput, "An amazing log that is very informative", 39) == 0);
 }
