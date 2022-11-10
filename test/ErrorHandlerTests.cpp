@@ -15,14 +15,9 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	CHECK(report.serviceType == RequestVerificationService::ServiceType);
 	CHECK(report.messageType == RequestVerificationService::MessageType::FailedAcceptanceReport);
 	CHECK(report.packetType == Message::TM);
-	REQUIRE(report.dataSize == 6);
+	REQUIRE(report.dataSize == 2);
 
 	CHECK(report.readBits(3) == CCSDSPacketVersion);
-	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 1);
-	CHECK(report.readBits(11) == 47);
-	CHECK(report.readBits(2) == ECSSSequenceFlags);
-	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::MessageTooShort);
 }
 
@@ -38,13 +33,9 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 	CHECK(report.serviceType == RequestVerificationService::ServiceType);
 	CHECK(report.messageType == RequestVerificationService::MessageType::FailedStartOfExecution);
 	CHECK(report.packetType == Message::TM);
-	REQUIRE(report.dataSize == 6);
+	REQUIRE(report.dataSize == 2);
 
 	CHECK(report.readBits(3) == CCSDSPacketVersion);
-	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 1);
-	CHECK(report.readBits(11) == 56);
-	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionStartError);
 }
@@ -61,13 +52,9 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	CHECK(report.serviceType == RequestVerificationService::ServiceType);
 	CHECK(report.messageType == RequestVerificationService::MessageType::FailedProgressOfExecution);
 	CHECK(report.packetType == Message::TM);
-	REQUIRE(report.dataSize == 7);
+	REQUIRE(report.dataSize == 3);
 
 	CHECK(report.readBits(3) == CCSDSPacketVersion);
-	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 1);
-	CHECK(report.readBits(11) == 56);
-	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionProgressError);
 	CHECK(report.readByte() == 0); // stepID
@@ -85,13 +72,9 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	CHECK(report.serviceType == RequestVerificationService::ServiceType);
 	CHECK(report.messageType == RequestVerificationService::MessageType::FailedCompletionOfExecution);
 	CHECK(report.packetType == Message::TM);
-	REQUIRE(report.dataSize == 6);
+	REQUIRE(report.dataSize == 2);
 
 	CHECK(report.readBits(3) == CCSDSPacketVersion);
-	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 1);
-	CHECK(report.readBits(11) == 56);
-	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionCompletionError);
 }
@@ -108,13 +91,9 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	CHECK(report.serviceType == RequestVerificationService::ServiceType);
 	CHECK(report.messageType == RequestVerificationService::MessageType::FailedRoutingReport);
 	CHECK(report.packetType == Message::TM);
-	REQUIRE(report.dataSize == 6);
+	REQUIRE(report.dataSize == 2);
 
 	CHECK(report.readBits(3) == CCSDSPacketVersion);
-	CHECK(report.readBits(1) == static_cast<uint16_t>(Message::TC));
-	CHECK(report.readBits(1) == 1);
-	CHECK(report.readBits(11) == 71);
-	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
 	CHECK(report.readEnum16() == ErrorHandler::UnknownRoutingError);
 }
