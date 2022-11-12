@@ -38,7 +38,154 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 }
 
 int main() {
-	storeSamplesToParameters(0, 1, 2);
+	// storeSamplesToParameters(0, 1, 2);
+
+	Message packet = Message(0, 0, Message::TC, 1);
+
+	packet.appendString(String<5>("hello"));
+	packet.appendBits(15, 0x28a8);
+	packet.appendBits(1, 1);
+	packet.appendFloat(5.7);
+	packet.appendSint32(-123456789);
+
+	std::cout << "Hello, World!" << std::endl;
+	std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
+
+	char string[6];
+	packet.readCString(string, 5);
+	std::cout << "Word: " << string << " " << packet.readBits(15) << packet.readBits(1) << std::endl;
+	std::cout << packet.readFloat() << " " << std::dec << packet.readSint32() << std::endl;
+
+	// ST[17] test
+	TestService& testService = Services.testService;
+	Message receivedPacket =
+	    Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
+	testService.areYouAlive(receivedPacket);
+	receivedPacket = Message(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest, Message::TC, 1);
+	receivedPacket.appendUint16(7);
+	testService.onBoardConnection(receivedPacket);
+
+	// ST[20] test
+	ParameterService& paramService = Services.parameterManagement;
+
+	// Test code for reportParameter
+	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+	                             Message::TC, 1); // application id is a dummy number (1)
+	sentPacket.appendUint16(2);                   // number of contained IDs
+	sentPacket.appendUint16(0);                   // first ID
+	sentPacket.appendUint16(1);                   // second ID
+	paramService.reportParameters(sentPacket);
+
+	// Test code for setParameter
+	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
+	                              Message::TC, 1); // application id is a dummy number (1)
+	sentPacket2.appendUint16(2);                   // number of contained IDs
+	sentPacket2.appendUint16(0);                   // first parameter ID
+	sentPacket2.appendUint32(63238);               // settings for first parameter
+	sentPacket2.appendUint16(1);                   // 2nd parameter ID
+	sentPacket2.appendUint32(45823);               // settings for 2nd parameter
+
+	paramService.setParameters(sentPacket2);
+	paramService.reportParameters(sentPacket);
+
+
+	// ST[01] test
+
+	RequestVerificationService& reqVerifService = Services.requestVerification;
+
+	Message receivedMessage =
+	    Message(RequestVerificationService::ServiceType,
+	            RequestVerificationService::MessageType::SuccessfulAcceptanceReport, Message::TC, 3);
+	reqVerifService.successAcceptanceVerification(receivedMessage);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedAcceptanceReport, Message::TC, 3);
+	reqVerifService.failAcceptanceVerification(receivedMessage, ErrorHandler::UnknownAcceptanceError);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::SuccessfulStartOfExecution, Message::TC, 3);
+	reqVerifService.successStartExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedStartOfExecution, Message::TC, 3);
+	reqVerifService.failStartExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionStartError);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::SuccessfulProgressOfExecution, Message::TC, 3);
+	reqVerifService.successProgressExecutionVerification(receivedMessage, 0);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedProgressOfExecution, Message::TC, 3);
+	reqVerifService.failProgressExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionProgressError, 0);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::SuccessfulCompletionOfExecution, Message::TC, 3);
+	reqVerifService.successCompletionExecutionVerification(receivedMessage);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedCompletionOfExecution, Message::TC, 3);
+	reqVerifService.failCompletionExecutionVerification(receivedMessage, ErrorHandler::UnknownExecutionCompletionError);
+
+	receivedMessage = Message(RequestVerificationService::ServiceType,
+	                          RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
+	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
+
+
+	// ErrorHandler test
+	std::cout << std::flush;
+	std::cerr << std::flush;
+	ErrorHandler::reportError(receivedPacket, ErrorHandler::MessageTooShort);
+	ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
+	Message errorMessage(0, 0, Message::TC, 1);
+	errorMessage.appendBits(2, 7);
+	errorMessage.appendByte(15);
+
+
+	// ST[11] test
+	TimeBasedSchedulingService timeBasedSchedulingService;
+	auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
+	std::cout << "\n\nST[11] service is running";
+	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
+
+	Message receivedMsg =
+	    Message(TimeBasedSchedulingService::ServiceType,
+	            TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
+	Message testMessage1(6, 5, Message::TC, 1);
+	Message testMessage2(4, 5, Message::TC, 1);
+	testMessage1.appendUint16(4253);  // Append dummy data
+	testMessage2.appendUint16(45667); // Append dummy data
+
+	timeBasedSchedulingService.enableScheduleExecution(receivedMsg); // Enable the schedule
+
+	// Insert activities in the schedule
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+	receivedMsg.appendUint16(2); // Total number of requests
+
+	receivedMsg.appendUint32(currentTime + 1556435U);
+	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
+
+	receivedMsg.appendUint32(currentTime + 1957232U);
+	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
+	timeBasedSchedulingService.insertActivities(receivedMsg);
+
+	// Time shift activities
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
+	receivedMsg.appendSint32(-6789);
+	timeBasedSchedulingService.timeShiftAllActivities(receivedMsg);
+	std::cout << "Activities should be time shifted by: " << -6789 << " seconds." << std::endl;
+
+	// Report the activities
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities, Message::TC, 1);
+	timeBasedSchedulingService.detailReportAllActivities(receivedMsg);
+
+	// Report the activities by ID
+	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
+	                      TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
+	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
+
 
 	LOG_NOTICE << "ECSS Services test application";
 
