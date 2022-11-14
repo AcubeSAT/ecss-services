@@ -16,9 +16,19 @@
  * directory of their main project.
  */
 namespace PlatformParameters {
-	inline Parameter<uint8_t> parameter1(3);
-	inline Parameter<uint16_t> parameter2(7);
-	inline Parameter<uint32_t> parameter3(10);
+
+	inline Parameter<uint8_t> parameter1(12);
+	inline Parameter<uint8_t> parameter2(34);
+	inline Parameter<uint8_t> parameter3(13);
+	inline Parameter<uint32_t> parameter4(65);
+	inline Parameter<uint32_t> parameter5(67);
+	inline Parameter<uint32_t> parameter6(145);
+
+	inline Parameter<float_t> parameter7(13);
+	inline Parameter<float_t> parameter8(65);
+	inline Parameter<float_t> parameter9(67);
+	inline Parameter<float_t> parameter10(145);
+
 }
 
 #endif

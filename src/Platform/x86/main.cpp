@@ -27,18 +27,73 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <string>
+HousekeepingService& housekeepingService = Services.housekeeping;
 ParameterService parameterManagement;
-void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
+void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3, uint16_t id4, uint16_t id5, uint16_t id6, uint16_t id7, uint16_t id8, uint16_t id9, uint16_t id10) {
 	//	Message samples(HousekeepingService::ServiceType,
 	//	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
 
 	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id1)->get()).setValue(33);
 	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id2)->get()).setValue(77);
 	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id3)->get()).setValue(99);
+	static_cast<Parameter<uint32_t>&>(parameterManagement.getParameter(id4)->get()).setValue(22);
+	static_cast<Parameter<uint32_t>&>(parameterManagement.getParameter(id5)->get()).setValue(43);
+	static_cast<Parameter<uint32_t>&>(parameterManagement.getParameter(id6)->get()).setValue(65);
+
+	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id7)->get()).setValue(2.5);
+	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id8)->get()).setValue(3.89);
+	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id9)->get()).setValue(4.345);
+	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id10)->get()).setValue(5.4);
+
+
+
 }
 
+void initializeHousekeepingStructures() {
+	uint8_t ids[1] = {3};
+	uint32_t interval = 7;
+	etl::vector<uint16_t, 6> simplyCommutatedIds = {1013, 1014, 1015, 1043, 1044, 1045};
+
+	HousekeepingStructure structures[1];
+	int i = 0;
+	for (auto& newStructure: structures) {
+		newStructure.structureId = ids[i];
+		newStructure.collectionInterval = interval;
+		newStructure.periodicGenerationActionStatus = false;
+		for (uint16_t parameterId: simplyCommutatedIds) {
+			newStructure.simplyCommutatedParameterIds.push_back(parameterId);
+		}
+		housekeepingService.housekeepingStructures.insert({ids[i], newStructure});
+		i++;
+	}
+}
+
+void initializeStatistics(uint16_t interval1, uint16_t interval2) {
+	Statistic stat1;
+	Statistic stat2;
+	stat1.selfSamplingInterval = interval1;
+	stat2.selfSamplingInterval = interval2;
+	uint16_t id1 = 5016;
+	uint16_t id2 = 5017;
+
+	int numOfSamples = 3;
+	for (int i = 0; i < numOfSamples; i++) { // Values of stat-1: [ 1, 3, 5 ]
+		stat1.updateStatistics(i * 2 + 1);
+	}
+	numOfSamples = 6;
+	for (int i = 0; i < numOfSamples; i++) { // Values of stat-2: [ 3, 5, 7, 9, 11, 13 ]
+		stat2.updateStatistics(i * 2 + 3);
+	}
+	Services.parameterStatistics.statisticsMap.insert({id1, stat1});
+	Services.parameterStatistics.statisticsMap.insert({id2, stat2});
+}
+
+
 int main() {
-	// storeSamplesToParameters(0, 1, 2);
+	storeSamplesToParameters(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093, 5010);
+	initializeHousekeepingStructures();
+
+	sleep(5);
 
 	Message packet = Message(0, 0, Message::TC, 1);
 
@@ -65,28 +120,56 @@ int main() {
 	receivedPacket.appendUint16(7);
 	testService.onBoardConnection(receivedPacket);
 
+	sleep(5);
+
+	// ST[03] test
+	//[3,25] Housekeeping_ADCS_0.01
+	housekeepingService.housekeepingParametersReport(3);
+	sleep(5);
+
 	// ST[20] test
 	ParameterService& paramService = Services.parameterManagement;
+
 
 	// Test code for reportParameter
 	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 	                             Message::TC, 1); // application id is a dummy number (1)
-	sentPacket.appendUint16(2);                   // number of contained IDs
-	sentPacket.appendUint16(0);                   // first ID
-	sentPacket.appendUint16(1);                   // second ID
+	sentPacket.appendUint16(4);                   // number of contained IDs
+	sentPacket.appendUint16(5000);                   // first ID
+	sentPacket.appendUint16(5001);                   // second ID
+	sentPacket.appendUint16(1092);                   // third ID
+	sentPacket.appendUint16(1093);                   // forth ID
 	paramService.reportParameters(sentPacket);
+
+	sleep(5);
 
 	// Test code for setParameter
 	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
-	                              Message::TC, 1); // application id is a dummy number (1)
-	sentPacket2.appendUint16(2);                   // number of contained IDs
-	sentPacket2.appendUint16(0);                   // first parameter ID
-	sentPacket2.appendUint32(63238);               // settings for first parameter
-	sentPacket2.appendUint16(1);                   // 2nd parameter ID
-	sentPacket2.appendUint32(45823);               // settings for 2nd parameter
+	                             Message::TC, 1); // application id is a dummy number (1)
+	sentPacket2.appendUint16(4);                   // number of contained IDs
+	sentPacket2.appendUint16(5000);                   // first parameter ID
+	sentPacket2.appendFloat(63238);               // settings for first parameter
+	sentPacket2.appendUint16(5001);                   // 2nd parameter ID
+	sentPacket2.appendFloat(45823);               // settings for 2nd parameter
+	sentPacket2.appendUint16(1092);                   // 3rd parameter ID
+	sentPacket2.appendFloat(65);               // settings for 3rd parameter
+	sentPacket2.appendUint16(1093);                   // 4th parameter ID
+	sentPacket2.appendFloat(325);               // settings for 4th parameter
 
 	paramService.setParameters(sentPacket2);
 	paramService.reportParameters(sentPacket);
+
+	sleep(5);
+
+	//ST[04] test
+
+	initializeStatistics(6, 7);
+	Message request = Message(ParameterStatisticsService::ServiceType,
+	                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+	Services.parameterStatistics.hasAutomaticStatisticsReset = false;
+
+	MessageParser::execute(request);
+
 
 
 	// ST[01] test
@@ -130,6 +213,8 @@ int main() {
 	                          RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
 	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
 
+	sleep(5);
+
 
 	// ErrorHandler test
 	std::cout << std::flush;
@@ -139,6 +224,8 @@ int main() {
 	Message errorMessage(0, 0, Message::TC, 1);
 	errorMessage.appendBits(2, 7);
 	errorMessage.appendByte(15);
+
+	sleep(5);
 
 
 	// ST[11] test
