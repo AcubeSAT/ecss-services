@@ -90,7 +90,7 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 
 
 int main() {
-	storeSamplesToParameters(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093, 5010);
+	storeSamplesToParameters(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093);
 	initializeHousekeepingStructures();
 
 	sleep(5);
