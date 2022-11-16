@@ -78,7 +78,7 @@ void initializeHousekeepingStructuresyamcs() {
 void initializeHousekeepingStructures() {
 	uint8_t ids[3] = {0, 4, 6};
 	uint32_t interval = 7;
-	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+	etl::vector<uint16_t, 3> simplyCommutatedIds = {0, 1, 2};
 
 	HousekeepingStructure structures[3];
 	int i = 0;
@@ -116,7 +116,7 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 
 
 int main() {
-	storeSamplesToParameters(8, 4, 5);
+	storeSamplesToParameters(0, 1, 2);
 	initializeHousekeepingStructures();
 
 	sleep(5);
