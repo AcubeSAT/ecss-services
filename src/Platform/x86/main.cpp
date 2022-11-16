@@ -116,7 +116,7 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 
 
 int main() {
-	storeSamplesToParameters(8,4,5);
+	storeSamplesToParameters(8, 4, 5);
 	initializeHousekeepingStructures();
 
 	sleep(5);
@@ -150,7 +150,9 @@ int main() {
 
 	// ST[03] test
 	//[3,25] Housekeeping_ADCS_0.01
-	housekeepingService.housekeepingParametersReport(6);
+	uint8_t structId = 6;
+
+	housekeepingService.housekeepingParametersReport(structId);
 	sleep(5);
 
 	// ST[20] test

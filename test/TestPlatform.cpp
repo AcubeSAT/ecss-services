@@ -94,17 +94,17 @@ struct ServiceTestsListener : Catch::EventListenerBase {
  * The parameters declared below are only used for testing purposes.
  */
 namespace PlatformParameters {
-	//inline Parameter<uint32_t> parameter4(5);
-	//inline Parameter<uint8_t> parameter5(11);
-	//inline Parameter<uint32_t> parameter6(23);
-	//inline Parameter<uint32_t> parameter7(53);
-	//inline Parameter<uint8_t> parameter8(55);
-	//inline Parameter<uint16_t> parameter9(32);
-	//inline Parameter<uint32_t> parameter10(43);
-	//inline Parameter<uint32_t> parameter11(91);
-	//inline Parameter<uint8_t> parameter12(1);
-	//inline Parameter<uint8_t> parameter13(1);
-	//inline Parameter<uint8_t> parameter14(1);
+	inline Parameter<uint32_t> parameter4(5);
+	inline Parameter<uint8_t> parameter5(11);
+	inline Parameter<uint32_t> parameter6(23);
+	inline Parameter<uint32_t> parameter7(53);
+	inline Parameter<uint8_t> parameter8(55);
+	inline Parameter<uint16_t> parameter9(32);
+	inline Parameter<uint32_t> parameter10(43);
+	inline Parameter<uint32_t> parameter11(91);
+	inline Parameter<uint8_t> parameter12(1);
+	inline Parameter<uint8_t> parameter13(1);
+	inline Parameter<uint8_t> parameter14(1);
 	inline Parameter<uint8_t> parameter15(1);
 	inline Parameter<uint8_t> parameter16(1);
 	inline Parameter<uint8_t> parameter17(1);

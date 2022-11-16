@@ -21,7 +21,7 @@ namespace PlatformParameters {
 	inline Parameter<uint16_t> parameter2(7);
 	inline Parameter<uint32_t> parameter3(10);
 
-	inline Parameter<uint8_t> parameter4(12);
+	/*inline Parameter<uint8_t> parameter4(12);
 	inline Parameter<uint8_t> parameter5(34);
 	inline Parameter<uint8_t> parameter6(13);
 	inline Parameter<uint32_t> parameter7(65);
@@ -32,7 +32,7 @@ namespace PlatformParameters {
 	inline Parameter<float_t> parameter11(65);
 	inline Parameter<float_t> parameter12(67);
 	inline Parameter<float_t> parameter13(145);
-	inline Parameter<uint32_t> parameter14(14);
+	inline Parameter<uint32_t> parameter14(14);*/
 
 }
 
