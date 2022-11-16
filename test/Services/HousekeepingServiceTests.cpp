@@ -414,6 +414,7 @@ TEST_CASE("Reporting of housekeeping parameters without a TC request") {
 		CHECK(report.readUint8() == 77);
 		CHECK(report.readUint32() == 99);
 
+
 		ServiceTests::reset();
 		Services.reset();
 	}
