@@ -169,7 +169,7 @@ int main() {
 	sentPacket.appendUint16(1093);                   // forth ID
 	paramService.reportParameters(sentPacket);
 
-	 Message sentPackettime = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+	 Message sentPacketTime = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 								 Message::TC, 1); // application id is a dummy number (1)
 	 sentPackettime.appendUint16(1);                   // number of contained IDs
 	 sentPackettime.appendUint16(5010);                   // first ID
