@@ -123,6 +123,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 
 	housekeepingReport.appendUint8(structureId);
 	for (auto id: housekeepingStructure.simplyCommutatedParameterIds) {
+		//if (auto parameter = Services.parameterManagementYamcs.getParameter(id)) {//to be used instead of line 127 when testing for Yamcs
 		if (auto parameter = Services.parameterManagement.getParameter(id)) {
 			parameter->get().appendValueToMessage(housekeepingReport);
 		}
