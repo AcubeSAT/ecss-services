@@ -32,7 +32,7 @@ HousekeepingService& housekeepingService = Services.housekeeping;
 ParameterService parameterManagement;
 ParameterServiceYamcs parameterManagementYamcs;
 
-void storeSamplesToParametersYamcs(uint16_t id1, uint16_t id2, uint16_t id3, uint16_t id4, uint16_t id5, uint16_t id6, uint16_t id7, uint16_t id8, uint16_t id9, uint16_t id10) {
+void storeSamplesToParametersYamcs(uint16_t id1, uint16_t id2, uint16_t id3, uint16_t id4, uint16_t id5, uint16_t id6, uint16_t id7, uint16_t id8, uint16_t id9, uint16_t id10, uint16_t id11) {
 	//	Message samples(HousekeepingService::ServiceType,
 	//	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
 
@@ -47,6 +47,7 @@ void storeSamplesToParametersYamcs(uint16_t id1, uint16_t id2, uint16_t id3, uin
 	static_cast<Parameter<float_t>&>(parameterManagementYamcs.getParameter(id8)->get()).setValue(3.89);
 	static_cast<Parameter<float_t>&>(parameterManagementYamcs.getParameter(id9)->get()).setValue(4.345);
 	static_cast<Parameter<float_t>&>(parameterManagementYamcs.getParameter(id10)->get()).setValue(5.4);
+	static_cast<Parameter<uint32_t>&>(parameterManagementYamcs.getParameter(id11)->get()).setValue(100);
 }
 
 void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
@@ -150,7 +151,7 @@ int main() {
 	/* To be used instead of lines 157-159 when testing for Yamcs
 	 * You also need to change the line 126 of src/Services/HousekeepingService.cpp file with the one suggested
 
-	storeSamplesToParametersYamcs(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093);
+	storeSamplesToParametersYamcs(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093,5010);
 	initializeHousekeepingStructuresYamcs();
 	uint8_t structId = 3;*/
 
