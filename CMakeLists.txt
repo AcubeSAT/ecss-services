@@ -50,7 +50,7 @@ add_library(common OBJECT
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
         src/Helpers/AllMessageTypes.cpp
-        inc/Platform/x86/Parameters/PlatformParametersYamcs.hpp inc/Services/ParameterServiceYamcs.hpp)
+)
 
 # Specify the .cpp files for the executables
 file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
