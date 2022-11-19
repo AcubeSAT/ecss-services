@@ -58,7 +58,7 @@ file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform
 add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
-        src/Platform/x86/Services/ParameterServiceYamcs.cpp)
+        )
 
 # Logs all levels of messages. This command can be added by other users of this
 # library to override the respective log level.
