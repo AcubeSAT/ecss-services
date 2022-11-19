@@ -148,10 +148,10 @@ int main() {
 	// ST[03] test
 
 	//[3,25] Housekeeping_ADCS_0.01
-	/* To be used instead of lines 157-159 when testing for Yamcs
-	 * You also need to change the line 126 of src/Services/HousekeepingService.cpp file with the one suggested
+	/* To be used instead of lines 158-160 when testing for Yamcs
+	* You also need to change the line 126 of src/Services/HousekeepingService.cpp file with the one suggested*/
 
-	storeSamplesToParametersYamcs(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093,5010);
+	/*storeSamplesToParametersYamcs(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093,5010);
 	initializeHousekeepingStructuresYamcs();
 	uint8_t structId = 3;*/
 
@@ -168,7 +168,7 @@ int main() {
 
 	// Test code for reportParameter
 	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
-	                            Message::TC, 1); // application id is a dummy number (1)
+	                             Message::TC, 1); // application id is a dummy number (1)
 	sentPacket.appendUint16(4);                   // number of contained IDs
 	sentPacket.appendUint16(5000);                   // first ID
 	sentPacket.appendUint16(5001);                   // second ID
@@ -176,17 +176,17 @@ int main() {
 	sentPacket.appendUint16(1093);                   // forth ID
 	paramService.reportParameters(sentPacket);
 
-	 Message sentPacketTime = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
-								 Message::TC, 1); // application id is a dummy number (1)
-	 sentPacketTime.appendUint16(1);                   // number of contained IDs
-	 sentPacketTime.appendUint16(5010);                   // first ID
-	 paramService.reportParameters(sentPacketTime);
+	Message sentPacketTime = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+	                                 Message::TC, 1); // application id is a dummy number (1)
+	sentPacketTime.appendUint16(1);                   // number of contained IDs
+	sentPacketTime.appendUint16(5010);                   // first ID
+	paramService.reportParameters(sentPacketTime);
 
 	sleep(5);
 
 	// Test code for setParameter
 	//Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
-	                         //    Message::TC, 1); // application id is a dummy number (1)
+	//    Message::TC, 1); // application id is a dummy number (1)
 	//sentPacket2.appendUint16(4);                   // number of contained IDs
 	//sentPacket2.appendUint16(5000);                   // first parameter ID
 	//sentPacket2.appendFloat(63238);               // settings for first parameter
@@ -313,6 +313,8 @@ int main() {
 	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
 	                      TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
+
+
 
 
 	LOG_NOTICE << "ECSS Services test application";

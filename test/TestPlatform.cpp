@@ -9,7 +9,9 @@
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
+#include "Parameters/PlatformParametersYamcs.hpp"
 #include "Services/ParameterService.hpp"
+#include "Services/ParameterServiceYamcs.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
 
@@ -127,6 +129,29 @@ namespace PlatformParameters {
 	inline Parameter<uint8_t> parameter34(1);
 
 } // namespace PlatformParameters
+
+namespace PlatformParametersYamcs {
+
+
+}
+
+void ParameterServiceYamcs::initializeParameterMapYamcs(){
+	parametersYamcs = {{uint16_t{0}, PlatformParametersYamcs::parameter1},
+	                   {uint16_t{1}, PlatformParametersYamcs::parameter2},
+	                   {uint16_t{2}, PlatformParametersYamcs::parameter3},
+	                   {uint16_t{1013}, PlatformParametersYamcs::parameter4},
+	                   {uint16_t{1014}, PlatformParametersYamcs::parameter5},
+	                   {uint16_t{1015}, PlatformParametersYamcs::parameter6},
+	                   {uint16_t{1043}, PlatformParametersYamcs::parameter7},
+	                   {uint16_t{1044}, PlatformParametersYamcs::parameter8},
+	                   {uint16_t{1045}, PlatformParametersYamcs::parameter9},
+	                   {uint16_t{5000}, PlatformParametersYamcs::parameter10},
+	                   {uint16_t{5001}, PlatformParametersYamcs::parameter11},
+	                   {uint16_t{5002}, PlatformParametersYamcs::parameter12},
+	                   {uint16_t{1093}, PlatformParametersYamcs::parameter13},
+	                   {uint16_t{5010}, PlatformParametersYamcs::parameter14} };
+}
+
 
 /**
  * Specific definition for \ref ParameterService's initialize function, for testing purposes.
