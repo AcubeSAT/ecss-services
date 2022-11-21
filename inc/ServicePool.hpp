@@ -11,6 +11,7 @@
 #include "Services/MemoryManagementService.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
 #include "Services/ParameterService.hpp"
+#include "Services/ParameterServiceYamcs.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
 #include "Services/RequestVerificationService.hpp"
@@ -73,6 +74,10 @@ public:
 
 #ifdef SERVICE_PARAMETER
 	ParameterService parameterManagement;
+#endif
+
+#ifdef SERVICE_PARAMETER
+	ParameterServiceYamcs parameterManagementYamcs;
 #endif
 
 #ifdef SERVICE_REALTIMEFORWARDINGCONTROL
