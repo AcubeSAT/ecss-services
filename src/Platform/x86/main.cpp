@@ -5,6 +5,7 @@
 #include "Helpers/CRCHelper.hpp"
 #include "Services/TestService.hpp"
 #include "Services/ParameterService.hpp"
+#include "Services/ParameterServiceYamcs.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/MemoryManagementService.hpp"
 #include "Services/EventReportService.hpp"
@@ -29,32 +30,57 @@
 #include <string>
 HousekeepingService& housekeepingService = Services.housekeeping;
 ParameterService parameterManagement;
-void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3, uint16_t id4, uint16_t id5, uint16_t id6, uint16_t id7, uint16_t id8, uint16_t id9, uint16_t id10) {
+ParameterServiceYamcs parameterManagementYamcs;
+
+void storeSamplesToParametersYamcs(uint16_t id1, uint16_t id2, uint16_t id3, uint16_t id4, uint16_t id5, uint16_t id6, uint16_t id7, uint16_t id8, uint16_t id9, uint16_t id10, uint16_t id11) {
 	//	Message samples(HousekeepingService::ServiceType,
 	//	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
 
-	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id1)->get()).setValue(33);
-	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id2)->get()).setValue(77);
-	static_cast<Parameter<uint8_t>&>(parameterManagement.getParameter(id3)->get()).setValue(99);
-	static_cast<Parameter<uint32_t>&>(parameterManagement.getParameter(id4)->get()).setValue(22);
-	static_cast<Parameter<uint32_t>&>(parameterManagement.getParameter(id5)->get()).setValue(43);
-	static_cast<Parameter<uint32_t>&>(parameterManagement.getParameter(id6)->get()).setValue(65);
+	static_cast<Parameter<uint8_t>&>(parameterManagementYamcs.getParameter(id1)->get()).setValue(33);
+	static_cast<Parameter<uint8_t>&>(parameterManagementYamcs.getParameter(id2)->get()).setValue(77);
+	static_cast<Parameter<uint8_t>&>(parameterManagementYamcs.getParameter(id3)->get()).setValue(99);
+	static_cast<Parameter<uint32_t>&>(parameterManagementYamcs.getParameter(id4)->get()).setValue(22);
+	static_cast<Parameter<uint32_t>&>(parameterManagementYamcs.getParameter(id5)->get()).setValue(43);
+	static_cast<Parameter<uint32_t>&>(parameterManagementYamcs.getParameter(id6)->get()).setValue(65);
 
-	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id7)->get()).setValue(2.5);
-	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id8)->get()).setValue(3.89);
-	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id9)->get()).setValue(4.345);
-	static_cast<Parameter<float_t>&>(parameterManagement.getParameter(id10)->get()).setValue(5.4);
-
-
-
+	static_cast<Parameter<float_t>&>(parameterManagementYamcs.getParameter(id7)->get()).setValue(2.5);
+	static_cast<Parameter<float_t>&>(parameterManagementYamcs.getParameter(id8)->get()).setValue(3.89);
+	static_cast<Parameter<float_t>&>(parameterManagementYamcs.getParameter(id9)->get()).setValue(4.345);
+	static_cast<Parameter<float_t>&>(parameterManagementYamcs.getParameter(id10)->get()).setValue(5.4);
+	static_cast<Parameter<uint32_t>&>(parameterManagementYamcs.getParameter(id11)->get()).setValue(100);
 }
 
-void initializeHousekeepingStructures() {
+void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
+	static_cast<Parameter<uint16_t>&>(Services.parameterManagement.getParameter(id1)->get()).setValue(33);
+	static_cast<Parameter<uint8_t>&>(Services.parameterManagement.getParameter(id2)->get()).setValue(77);
+	static_cast<Parameter<uint32_t>&>(Services.parameterManagement.getParameter(id3)->get()).setValue(99);
+}
+
+void initializeHousekeepingStructuresYamcs() {
 	uint8_t ids[1] = {3};
 	uint32_t interval = 7;
 	etl::vector<uint16_t, 6> simplyCommutatedIds = {1013, 1014, 1015, 1043, 1044, 1045};
 
 	HousekeepingStructure structures[1];
+	int i = 0;
+	for (auto& newStructure: structures) {
+		newStructure.structureId = ids[i];
+		newStructure.collectionInterval = interval;
+		newStructure.periodicGenerationActionStatus = false;
+		for (uint16_t parameterId: simplyCommutatedIds) {
+			newStructure.simplyCommutatedParameterIds.push_back(parameterId);
+		}
+		housekeepingService.housekeepingStructures.insert({ids[i], newStructure});
+		i++;
+	}
+}
+
+void initializeHousekeepingStructures() {
+	uint8_t ids[3] = {0, 4, 6};
+	uint32_t interval = 7;
+	etl::vector<uint16_t, 3> simplyCommutatedIds = {0, 1, 2};
+
+	HousekeepingStructure structures[3];
 	int i = 0;
 	for (auto& newStructure: structures) {
 		newStructure.structureId = ids[i];
@@ -90,9 +116,6 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 
 
 int main() {
-	storeSamplesToParameters(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093);
-	initializeHousekeepingStructures();
-
 	sleep(5);
 
 	Message packet = Message(0, 0, Message::TC, 1);
@@ -123,8 +146,20 @@ int main() {
 	sleep(5);
 
 	// ST[03] test
+
 	//[3,25] Housekeeping_ADCS_0.01
-	housekeepingService.housekeepingParametersReport(3);
+	/* To be used instead of lines 158-160 when testing for Yamcs
+	* You also need to change the line 126 of src/Services/HousekeepingService.cpp file with the one suggested*/
+
+	/*storeSamplesToParametersYamcs(1013, 1014, 1015, 1043, 1044, 1045,5000,5001,1092,1093,5010);
+	initializeHousekeepingStructuresYamcs();
+	uint8_t structId = 3;*/
+
+	storeSamplesToParameters(0, 1, 2);
+	initializeHousekeepingStructures();
+	uint8_t structId = 6;
+
+	housekeepingService.housekeepingParametersReport(structId);
 	sleep(5);
 
 	// ST[20] test
@@ -141,25 +176,31 @@ int main() {
 	sentPacket.appendUint16(1093);                   // forth ID
 	paramService.reportParameters(sentPacket);
 
+	Message sentPacketTime = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
+	                                 Message::TC, 1); // application id is a dummy number (1)
+	sentPacketTime.appendUint16(1);                   // number of contained IDs
+	sentPacketTime.appendUint16(5010);                   // first ID
+	paramService.reportParameters(sentPacketTime);
+
 	sleep(5);
 
 	// Test code for setParameter
-	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
-	                             Message::TC, 1); // application id is a dummy number (1)
-	sentPacket2.appendUint16(4);                   // number of contained IDs
-	sentPacket2.appendUint16(5000);                   // first parameter ID
-	sentPacket2.appendFloat(63238);               // settings for first parameter
-	sentPacket2.appendUint16(5001);                   // 2nd parameter ID
-	sentPacket2.appendFloat(45823);               // settings for 2nd parameter
-	sentPacket2.appendUint16(1092);                   // 3rd parameter ID
-	sentPacket2.appendFloat(65);               // settings for 3rd parameter
-	sentPacket2.appendUint16(1093);                   // 4th parameter ID
-	sentPacket2.appendFloat(325);               // settings for 4th parameter
+	//Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
+	//    Message::TC, 1); // application id is a dummy number (1)
+	//sentPacket2.appendUint16(4);                   // number of contained IDs
+	//sentPacket2.appendUint16(5000);                   // first parameter ID
+	//sentPacket2.appendFloat(63238);               // settings for first parameter
+	//sentPacket2.appendUint16(5001);                   // 2nd parameter ID
+	//sentPacket2.appendFloat(45823);               // settings for 2nd parameter
+	//sentPacket2.appendUint16(1092);                   // 3rd parameter ID
+	//sentPacket2.appendFloat(65);               // settings for 3rd parameter
+	//sentPacket2.appendUint16(1093);                   // 4th parameter ID
+	//sentPacket2.appendFloat(325);               // settings for 4th parameter
 
-	paramService.setParameters(sentPacket2);
-	paramService.reportParameters(sentPacket);
+	//paramService.setParameters(sentPacket2);
+	//paramService.reportParameters(sentPacket);
 
-	sleep(5);
+	//sleep(5);
 
 	//ST[04] test
 
@@ -272,6 +313,8 @@ int main() {
 	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
 	                      TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
+
+
 
 
 	LOG_NOTICE << "ECSS Services test application";

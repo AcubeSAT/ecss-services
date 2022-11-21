@@ -52,6 +52,7 @@ add_library(common OBJECT
         src/Helpers/AllMessageTypes.cpp
         )
 
+
 # Specify the .cpp files for the executables
 file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
 
@@ -77,3 +78,4 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             )
     target_link_libraries(tests Catch2::Catch2WithMain)
 ENDIF ()
+
