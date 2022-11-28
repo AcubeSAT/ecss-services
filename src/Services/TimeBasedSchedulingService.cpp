@@ -151,6 +151,10 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
 
+	TimeBasedSchedulingService::detailReportAllActivitiesHandleTM();
+}
+
+void TimeBasedSchedulingService::detailReportAllActivitiesHandleTM() {
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(scheduledActivities.size()));
 
@@ -163,10 +167,10 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	storeMessage(report);
 }
 
+
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
 
-	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16();
@@ -190,6 +194,12 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 
 	sortActivitiesReleaseTime(matchedActivities);
 
+	detailReportActivitiesByIDHandleTM(matchedActivities);
+}
+
+void TimeBasedSchedulingService::detailReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities) {
+	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
+
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
 	for (auto& match: matchedActivities) {
@@ -202,7 +212,6 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
 
-	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
 	uint16_t iterationCount = request.readUint16();
@@ -224,6 +233,12 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 		}
 	}
 	sortActivitiesReleaseTime(matchedActivities);
+
+
+}
+
+void TimeBasedSchedulingService::summaryReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities) {
+	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
