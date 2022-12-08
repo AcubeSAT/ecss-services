@@ -218,6 +218,11 @@ public:
 	void detailReportAllActivities(Message& request);
 
 	/**
+	 * @brief Handle TM creation for [11,16]
+	 */
+	void detailReportAllActivitiesHandleTM();
+
+	/**
 	 * @brief TC[11,9] detail-report activities identified by request identifier
 	 *
 	 * @details Send a detailed report about the status of the requested activities, based on the
@@ -232,6 +237,13 @@ public:
 	void detailReportActivitiesByID(Message& request);
 
 	/**
+	 * @brief Handle TM creation for [11,9]
+	 *
+	 * @param matchedActivities List of the matched activities
+	 */
+	void detailReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities);
+
+	/**
 	 * @brief TC[11,12] summary-report activities identified by request identifier
 	 *
 	 * @details Send a summary report about the status of the requested activities. Generates a
@@ -243,6 +255,13 @@ public:
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
 	void summaryReportActivitiesByID(Message& request);
+
+	/**
+	 * @brief Handle TM creation for [11,12]
+	 *
+	 * @param matchedActivities List of the matched activities
+	 */
+	void summaryReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities);
 
 	/**
 	 * @brief TC[11,5] delete time-based scheduled activities identified by a request identifier
@@ -278,9 +297,7 @@ public:
 	 */
 	void execute(Message& message);
 
-	void detailReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities);
-	void detailReportAllActivitiesHandleTM();
-	void summaryReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities);
+
 };
 
 #endif // ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
