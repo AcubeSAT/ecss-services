@@ -151,7 +151,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
 
-	TimeBasedSchedulingService::detailReportAllActivitiesHandleTM();
+	detailReportAllActivitiesHandleTM();
 }
 
 void TimeBasedSchedulingService::detailReportAllActivitiesHandleTM() {

@@ -340,7 +340,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 	}
 }
 
-TEST_CASE("TC[11,9] Detail report TM creation", "[service][st11]") {
+TEST_CASE("TC[11,9] Detail report TM creation test", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById, Message::TC, 1);
 
@@ -448,7 +448,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 	}
 }
 
-TEST_CASE("TC[11,12] Summary report TM creation", "[service][st11]") {
+TEST_CASE("TC[11,12] Summary report TM creation test", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
 
@@ -525,7 +525,7 @@ TEST_CASE("TC[11,16] Detail report all scheduled activities", "[service][st11]")
 	}
 }
 
-TEST_CASE("TC[11,16] Detail report all scheduled activities TM test", "[service][st11]") {
+TEST_CASE("TC[11,16] Detail report all scheduled activities TM creation test", "[service][st11]") {
 	Services.reset();
 	auto scheduledActivities = activityInsertion(timeBasedService);
 
