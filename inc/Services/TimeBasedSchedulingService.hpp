@@ -296,8 +296,6 @@ public:
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
-
-
 };
 
 #endif // ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
