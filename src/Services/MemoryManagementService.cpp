@@ -32,13 +32,13 @@ void MemoryManagementService::loadRawData(Message& request) {
 	uint8_t readData[ECSSMaxStringSize];
 	uint16_t iterationCount = request.readUint16();
 
-		if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
-			// TODO: Define FLASH specific access code when we transfer to embedded
-		} else {
-			for (std::size_t j = 0; j < iterationCount; j++) {
-				uint64_t startAddress = request.readUint64();
-				uint16_t dataLength = request.readOctetString(readData);
-				uint16_t checksum = request.readBits(16);
+	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
+		// TODO: Define FLASH specific access code when we transfer to embedded
+	} else {
+		for (std::size_t j = 0; j < iterationCount; j++) {
+			uint64_t startAddress = request.readUint64();
+			uint16_t dataLength = request.readOctetString(readData);
+			uint16_t checksum = request.readBits(16);
 
 			if (!dataValidator(readData, checksum, dataLength)) {
 				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
