@@ -66,20 +66,20 @@ public:
 	 * TC[13,9] Function that handles the first part of the uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSSMaxFixedOctetStringSize> firstUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
+	static String<ECSSMaxFixedOctetStringSize> firstUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * TC[13,10] Function that handles the n-2 parts of the n-part uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSSMaxFixedOctetStringSize>
+	static String<ECSSMaxFixedOctetStringSize>
 	intermediateUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * TC[13,11] Function that handles the last part of the uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSSMaxFixedOctetStringSize> lastUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
+	static String<ECSSMaxFixedOctetStringSize> lastUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * Function that splits large messages

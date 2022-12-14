@@ -65,14 +65,14 @@ TEST_CASE("UTC timestamp addition") {
 }
 
 TEST_CASE("CUC Custom Timestamp as Parameter") {
-	Time::CustomCUC_t time;
-	time.elapsed100msTicks = 999;
+	using namespace Time;
+	DefaultCUC time(999_t);
 
-	auto parameter = Parameter<Time::CustomCUC_t>(time);
+	auto parameter = Parameter<DefaultCUC>(time);
 
 	auto message = Message(0, 0, Message::TC);
 	parameter.appendValueToMessage(message);
-	CHECK(message.dataSize == 8);
+	CHECK(message.dataSize == 4);
 
 	parameter.setValueFromMessage(message);
 	CHECK(time == parameter.getValue());

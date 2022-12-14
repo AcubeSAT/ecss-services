@@ -6,6 +6,7 @@
  *
  * @todo Actually hold program execution or throw an exception here
  */
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ASSERT_INTERNAL(cond, error) (ErrorHandler::assertInternal((cond), (error)))
 
 /**
@@ -13,6 +14,7 @@
  *
  * Only to be used within the Message class.
  */
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ASSERT_REQUEST(cond, error) (ErrorHandler::assertRequest((cond), *this, (error)))
 
 #endif // ECSS_SERVICES_MACROS_HPP

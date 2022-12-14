@@ -7,7 +7,7 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
-Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::CustomCUC_t currentTime) {
+Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::DefaultCUC currentTime) {
 	if (currentTime >= scheduledActivities.front().requestReleaseTime && !scheduledActivities.empty()) {
 		if (scheduledActivities.front().requestID.applicationID == ApplicationId) {
 			MessageParser::execute(scheduledActivities.front().request);
@@ -18,9 +18,7 @@ Time::CustomCUC_t TimeBasedSchedulingService::executeScheduledActivity(Time::Cus
 	if (!scheduledActivities.empty()) {
 		return scheduledActivities.front().requestReleaseTime;
 	} else {
-		Time::CustomCUC_t infinity;
-		infinity.elapsed100msTicks = std::numeric_limits<decltype(infinity.elapsed100msTicks)>::max();
-		return infinity;
+		return Time::DefaultCUC::max();
 	}
 }
 
@@ -48,9 +46,9 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		// todo: Get the group ID first, if groups are used
-		Time::CustomCUC_t currentTime = TimeGetter::getCurrentTimeCustomCUC();
+		Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
 
-		Time::CustomCUC_t releaseTime = request.readCustomCUCTimeStamp();
+		Time::DefaultCUC releaseTime = request.readDefaultCUCTimeStamp();
 		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.skipBytes(ECSSTCRequestStringSize);
@@ -77,7 +75,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
 
-	Time::CustomCUC_t current_time = TimeGetter::getCurrentTimeCustomCUC();
+	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
 	const auto releaseTimes =
 	    etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end(),
@@ -86,11 +84,11 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	                        });
 	// todo: Define what the time format is going to be
 	Time::RelativeTime relativeOffset = request.readRelativeTime();
-	if ((releaseTimes.first->requestReleaseTime + relativeOffset) < (current_time + ECSSTimeMarginForActivation)) {
+	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	} else {
 		for (auto& activity: scheduledActivities) {
-			activity.requestReleaseTime += relativeOffset;
+			activity.requestReleaseTime += std::chrono::seconds(relativeOffset);
 		}
 	}
 }
@@ -98,9 +96,9 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
 
-	Time::CustomCUC_t current_time = TimeGetter::getCurrentTimeCustomCUC();
+	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
-	Time::RelativeTime relativeOffset = request.readRelativeTime();
+	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
@@ -159,7 +157,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	for (auto& activity: scheduledActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 
-		report.appendCustomCUCTimeStamp(activity.requestReleaseTime);
+		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime);
 		report.appendString(MessageParser::composeECSS(activity.request));
 	}
 	storeMessage(report);
@@ -195,7 +193,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
 	for (auto& match: matchedActivities) {
-		report.appendCustomCUCTimeStamp(match.requestReleaseTime); // todo: Replace with the time parser
+		report.appendDefaultCUCTimeStamp(match.requestReleaseTime); // todo: Replace with the time parser
 		report.appendString(MessageParser::composeECSS(match.request));
 	}
 	storeMessage(report);
@@ -231,7 +229,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
 	for (auto& match: matchedActivities) {
 		// todo: append sub-schedule and group ID if they are defined
-		report.appendCustomCUCTimeStamp(match.requestReleaseTime);
+		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
 		report.appendUint8(match.requestID.sourceID);
 		report.appendUint16(match.requestID.applicationID);
 		report.appendUint16(match.requestID.sequenceCount);
