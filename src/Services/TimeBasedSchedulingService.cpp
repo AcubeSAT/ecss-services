@@ -151,17 +151,16 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
 
-	detailReportAllActivitiesHandleTM();
+	timeBasedScheduleDetailReport(scheduledActivities);
 }
 
-void TimeBasedSchedulingService::detailReportAllActivitiesHandleTM() {
+void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
+	// todo: append sub-schedule and group ID if they are defined
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
-	report.appendUint16(static_cast<uint16_t>(scheduledActivities.size()));
+	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
 
-	for (auto& activity: scheduledActivities) {
-		// todo: append sub-schedule and group ID if they are defined
-
-		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime);
+	for (const auto& activity: listOfActivities) {
+		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime); // todo: Replace with the time parser
 		report.appendString(MessageParser::composeECSS(activity.request));
 	}
 	storeMessage(report);
@@ -193,20 +192,9 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 
 	sortActivitiesReleaseTime(matchedActivities);
 
-	detailReportActivitiesByIDHandleTM(matchedActivities);
+	timeBasedScheduleDetailReport(matchedActivities);
 }
 
-void TimeBasedSchedulingService::detailReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities) {
-	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
-
-	// todo: append sub-schedule and group ID if they are defined
-	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
-	for (const auto& match: matchedActivities) {
-		report.appendDefaultCUCTimeStamp(match.requestReleaseTime); // todo: Replace with the time parser
-		report.appendString(MessageParser::composeECSS(match.request));
-	}
-	storeMessage(report);
-}
 
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
@@ -233,15 +221,15 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	}
 	sortActivitiesReleaseTime(matchedActivities);
 
-	summaryReportActivitiesByIDHandleTM(matchedActivities);
+	timeBasedScheduleSummaryReport(matchedActivities);
 }
 
-void TimeBasedSchedulingService::summaryReportActivitiesByIDHandleTM(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& matchedActivities) {
+void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 
 	// todo: append sub-schedule and group ID if they are defined
-	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
-	for (const auto& match: matchedActivities) {
+	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
+	for (const auto& match: listOfActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
 		report.appendUint8(match.requestID.sourceID);
