@@ -66,6 +66,13 @@ public:
 	};
 
 	/**
+	 * Checks if the structure exists in the map.
+	 * @param id
+	 * @return boolean
+	 */
+	bool nonExistingStruct(uint8_t id);
+
+	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
 	 */
 	void createHousekeepingReportStructure(Message& request);
