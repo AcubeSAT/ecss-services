@@ -195,7 +195,6 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	timeBasedScheduleDetailReport(matchedActivities);
 }
 
-
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
 
