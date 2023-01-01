@@ -340,6 +340,54 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 	}
 }
 
+TEST_CASE("TM[11,10] time-based schedule detail report", "[service][st11]") {
+	Services.reset();
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById, Message::TC, 1);
+
+	auto scheduledActivities = activityInsertion(timeBasedService);
+
+	SECTION("Detailed activity report") {
+		// Verify that everything is in place
+		CHECK(scheduledActivities.size() == 4);
+		scheduledActivities.at(0)->requestID.applicationID = 8; // Append a dummy application ID
+		scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
+
+		receivedMessage.appendUint16(2);                          // Two instructions in the request
+		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
+		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
+
+		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
+		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
+
+		timeBasedService.detailReportActivitiesByID(receivedMessage);
+		REQUIRE(ServiceTests::hasOneMessage());
+
+		Message response = ServiceTests::get(0);
+		CHECK(response.serviceType == 11);
+		CHECK(response.messageType == 10);
+
+		uint16_t iterationCount = response.readUint16();
+		CHECK(iterationCount == 2);
+		for (uint16_t i = 0; i < iterationCount; i++) {
+			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
+
+			Message receivedTCPacket;
+			uint8_t receivedDataStr[ECSSTCRequestStringSize];
+			response.readString(receivedDataStr, ECSSTCRequestStringSize);
+			receivedTCPacket = MessageParser::parseECSSTC(receivedDataStr);
+			if (i == 0) {
+				REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
+				REQUIRE(receivedTCPacket == scheduledActivities.at(0)->request);
+			} else {
+				REQUIRE(receivedReleaseTime == scheduledActivities.at(2)->requestReleaseTime);
+				REQUIRE(receivedTCPacket == scheduledActivities.at(2)->request);
+			}
+		}
+	}
+}
+
 TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
@@ -397,6 +445,56 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
+	}
+}
+
+TEST_CASE("TM[11,13] time-based schedule summary report", "[service][st11]") {
+	Services.reset();
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
+
+	auto scheduledActivities = activityInsertion(timeBasedService);
+
+	SECTION("Summary report") {
+		// Verify that everything is in place
+		CHECK(scheduledActivities.size() == 4);
+		scheduledActivities.at(0)->requestID.applicationID = 8; // Append a dummy application ID
+		scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
+
+		receivedMessage.appendUint16(2);                          // Two instructions in the request
+		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
+		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
+
+		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
+		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
+
+		timeBasedService.summaryReportActivitiesByID(receivedMessage);
+		REQUIRE(ServiceTests::hasOneMessage());
+
+		Message response = ServiceTests::get(0);
+		CHECK(response.serviceType == 11);
+		CHECK(response.messageType == 13);
+
+		uint16_t iterationCount = response.readUint16();
+		for (uint16_t i = 0; i < iterationCount; i++) {
+			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
+			uint8_t receivedSourceID = response.readUint8();
+			uint16_t receivedApplicationID = response.readUint16();
+			uint16_t receivedSequenceCount = response.readUint16();
+
+			if (i == 0) {
+				REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
+				REQUIRE(receivedSourceID == scheduledActivities.at(0)->requestID.sourceID);
+				REQUIRE(receivedApplicationID == scheduledActivities.at(0)->requestID.applicationID);
+				REQUIRE(receivedSequenceCount == scheduledActivities.at(0)->requestID.sequenceCount);
+			} else {
+				REQUIRE(receivedReleaseTime == scheduledActivities.at(2)->requestReleaseTime);
+				REQUIRE(receivedSourceID == scheduledActivities.at(2)->requestID.sourceID);
+				REQUIRE(receivedApplicationID == scheduledActivities.at(2)->requestID.applicationID);
+				REQUIRE(receivedSequenceCount == scheduledActivities.at(2)->requestID.sequenceCount);
+			}
+		}
 	}
 }
 
