@@ -65,6 +65,30 @@ public:
 		initializeHousekeepingStructures();
 	};
 
+	/// GETTERS
+	/**
+	 * Returns the periodic generation action status of the structure in position of "id" in the vector.
+	 */
+	bool periodicGenerationActionStatusGetter(uint8_t id);
+	/**
+	 * Returns a reference to the structure at position of "id" in the vector.
+	 */
+	HousekeepingStructure& structGetter(uint8_t id);
+	/**
+	 * Returns the collection interval (how often data is collected) of the structure at position of "id" in the vector.
+	 */
+	uint32_t collectionIntervalGetter(uint8_t id);
+
+	///SETTERS
+	/**
+	 * Sets the periodic generation action status of the structure in position of "id" in the vector.
+	 */
+	void periodicGenerationActionStatusSetter(uint8_t id, bool b);
+	/**
+	 * Sets the collection interval of the structure at position of "id" in the vector.
+	 */
+	void collectionIntervalSetter(uint8_t id, uint32_t i);
+
 	/**
 	 * Checks if the structure exists in the map.
 	 * @param id
