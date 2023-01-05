@@ -1,6 +1,27 @@
 #include "Services/HousekeepingService.hpp"
 #include "ServicePool.hpp"
 
+
+bool HousekeepingService::periodicGenerationActionStatusGetter(uint8_t id){
+	return housekeepingStructures.at(id).periodicGenerationActionStatus;
+}
+
+HousekeepingStructure& HousekeepingService::structGetter(uint8_t id){
+	return housekeepingStructures.at(id);
+}
+
+uint32_t HousekeepingService::collectionIntervalGetter(uint8_t id){
+	return housekeepingStructures.at(id).collectionInterval;
+}
+
+void HousekeepingService::periodicGenerationActionStatusSetter(uint8_t id, bool b){
+	housekeepingStructures.at(id).periodicGenerationActionStatus = b;
+}
+
+void HousekeepingService::collectionIntervalSetter(uint8_t id, uint32_t i){
+	housekeepingStructures.at(id).collectionInterval;
+}
+
 bool HousekeepingService::nonExistingStruct(uint8_t id){
 	return (housekeepingStructures.find(id) == housekeepingStructures.end());
 }
@@ -45,7 +66,7 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 			continue;
 		}
-		if (housekeepingStructures.at(structureId).periodicGenerationActionStatus) {
+		if (periodicGenerationActionStatusGetter(structureId)) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfEnabledHousekeeping);
 			continue;
@@ -64,7 +85,7 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
 			continue;
 		}
-		housekeepingStructures.at(structIdToEnable).periodicGenerationActionStatus = true;
+		periodicGenerationActionStatusSetter(structIdToEnable,true);
 	}
 }
 
@@ -78,7 +99,7 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
 			continue;
 		}
-		housekeepingStructures.at(structIdToDisable).periodicGenerationActionStatus = false;
+		periodicGenerationActionStatusSetter(structIdToDisable, false);
 	}
 }
 
@@ -121,7 +142,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 		return;
 	}
 
-	HousekeepingStructure& housekeepingStructure = housekeepingStructures.at(structureId);
+	HousekeepingStructure& housekeepingStructure = structGetter(structureId);
 
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
@@ -156,7 +177,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		return;
 	}
-	auto& housekeepingStructure = housekeepingStructures.at(targetStructId);
+	auto& housekeepingStructure = structGetter(targetStructId);
 	if (housekeepingStructure.periodicGenerationActionStatus) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
 		return;
@@ -193,7 +214,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 			continue;
 		}
-		housekeepingStructures.at(targetStructId).collectionInterval = newCollectionInterval;
+		collectionIntervalSetter(targetStructId, newCollectionInterval);
 	}
 }
 
@@ -226,8 +247,8 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 
 void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId) {
 	report.appendUint8(structureId);
-	report.appendBoolean(housekeepingStructures.at(structureId).periodicGenerationActionStatus);
-	report.appendUint32(housekeepingStructures.at(structureId).collectionInterval);
+	report.appendBoolean(periodicGenerationActionStatusGetter(structureId));
+	report.appendUint32(collectionIntervalGetter(structureId));
 }
 
 void HousekeepingService::execute(Message& message) {
