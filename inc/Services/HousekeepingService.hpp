@@ -65,32 +65,33 @@ public:
 		initializeHousekeepingStructures();
 	};
 
-	/// GETTERS
 	/**
 	 * Returns the periodic generation action status of the structure in position of "id" in the map.
 	 */
-	bool periodicGenerationActionStatusGetter(uint8_t id);
+	bool getPeriodicGenerationActionStatus(uint8_t id);
+
 	/**
 	 * Returns a reference to the structure at position of "id" in the map.
 	 */
-	HousekeepingStructure& structGetter(uint8_t id);
+	HousekeepingStructure& getStruct(uint8_t id);
+
 	/**
 	 * Returns the collection interval (how often data is collected) of the structure at position of "id" in the map.
 	 */
-	uint32_t collectionIntervalGetter(uint8_t id);
+	uint32_t getCollectionInterval(uint8_t id);
 
-	///SETTERS
 	/**
 	 * Sets the periodic generation action status of the structure in position of "id" in the map.
 	 */
-	void periodicGenerationActionStatusSetter(uint8_t id, bool b);
+	void setPeriodicGenerationActionStatus(uint8_t id, bool b);
+
 	/**
 	 * Sets the collection interval of the structure at position of "id" in the map.
 	 */
-	void collectionIntervalSetter(uint8_t id, uint32_t i);
+	void setCollectionInterval(uint8_t id, uint32_t i);
 
 	/**
-	 * Checks if the structure exists in the map.
+	 * Checks if the structure doesn't exists in the map.
 	 * @param id
 	 * @return boolean
 	 */

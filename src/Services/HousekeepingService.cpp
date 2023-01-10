@@ -2,23 +2,23 @@
 #include "ServicePool.hpp"
 
 
-bool HousekeepingService::periodicGenerationActionStatusGetter(uint8_t id){
+bool HousekeepingService::getPeriodicGenerationActionStatus(uint8_t id){
 	return housekeepingStructures.at(id).periodicGenerationActionStatus;
 }
 
-HousekeepingStructure& HousekeepingService::structGetter(uint8_t id){
+HousekeepingStructure& HousekeepingService::getStruct(uint8_t id){
 	return housekeepingStructures.at(id);
 }
 
-uint32_t HousekeepingService::collectionIntervalGetter(uint8_t id){
+uint32_t HousekeepingService::getCollectionInterval(uint8_t id){
 	return housekeepingStructures.at(id).collectionInterval;
 }
 
-void HousekeepingService::periodicGenerationActionStatusSetter(uint8_t id, bool b){
+void HousekeepingService::setPeriodicGenerationActionStatus(uint8_t id, bool b){
 	housekeepingStructures.at(id).periodicGenerationActionStatus = b;
 }
 
-void HousekeepingService::collectionIntervalSetter(uint8_t id, uint32_t i){
+void HousekeepingService::setCollectionInterval(uint8_t id, uint32_t i){
 	housekeepingStructures.at(id).collectionInterval = i;
 }
 
@@ -66,7 +66,7 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 			continue;
 		}
-		if (periodicGenerationActionStatusGetter(structureId)) {
+		if (getPeriodicGenerationActionStatus(structureId)) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfEnabledHousekeeping);
 			continue;
@@ -85,7 +85,7 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
 			continue;
 		}
-		periodicGenerationActionStatusSetter(structIdToEnable,true);
+		setPeriodicGenerationActionStatus(structIdToEnable,true);
 	}
 }
 
@@ -99,7 +99,7 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
 			continue;
 		}
-		periodicGenerationActionStatusSetter(structIdToDisable, false);
+		setPeriodicGenerationActionStatus(structIdToDisable, false);
 	}
 }
 
@@ -142,7 +142,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 		return;
 	}
 
-	HousekeepingStructure& housekeepingStructure = structGetter(structureId);
+	HousekeepingStructure& housekeepingStructure = getStruct(structureId);
 
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
@@ -177,7 +177,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 		return;
 	}
-	auto& housekeepingStructure = structGetter(targetStructId);
+	auto& housekeepingStructure = getStruct(targetStructId);
 	if (housekeepingStructure.periodicGenerationActionStatus) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
 		return;
@@ -214,7 +214,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
 			continue;
 		}
-		collectionIntervalSetter(targetStructId, newCollectionInterval);
+		setCollectionInterval(targetStructId, newCollectionInterval);
 	}
 }
 
@@ -247,8 +247,8 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 
 void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId) {
 	report.appendUint8(structureId);
-	report.appendBoolean(periodicGenerationActionStatusGetter(structureId));
-	report.appendUint32(collectionIntervalGetter(structureId));
+	report.appendBoolean(getPeriodicGenerationActionStatus(structureId));
+	report.appendUint32(getCollectionInterval(structureId));
 }
 
 void HousekeepingService::execute(Message& message) {
