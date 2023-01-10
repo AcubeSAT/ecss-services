@@ -19,7 +19,7 @@ void HousekeepingService::periodicGenerationActionStatusSetter(uint8_t id, bool 
 }
 
 void HousekeepingService::collectionIntervalSetter(uint8_t id, uint32_t i){
-	housekeepingStructures.at(id).collectionInterval;
+	housekeepingStructures.at(id).collectionInterval = i;
 }
 
 bool HousekeepingService::nonExistingStruct(uint8_t id){
