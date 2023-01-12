@@ -22,15 +22,23 @@ void HousekeepingService::setCollectionInterval(uint8_t id, uint32_t i){
 	housekeepingStructures.at(id).collectionInterval = i;
 }
 
-bool HousekeepingService::nonExistingStruct(uint8_t id){
+bool HousekeepingService::nonExistingStructCheck(uint8_t id) {
 	return (housekeepingStructures.find(id) == housekeepingStructures.end());
+}
+
+bool HousekeepingService::nonExistingStructCheckAndError(uint8_t id, Message& req){
+	if (nonExistingStructCheck(id)) {
+		ErrorHandler::reportError(req,ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		return true;
+	}
+	return false;
 }
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure);
 
 	uint8_t idToCreate = request.readUint8();
-	if (!nonExistingStruct(idToCreate)) {
+	if (!nonExistingStructCheck(idToCreate)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure);
 		return;
 	}
@@ -62,10 +70,9 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	uint8_t numOfStructuresToDelete = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructuresToDelete; i++) {
 		uint8_t structureId = request.readUint8();
-		if (nonExistingStruct(structureId)) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		if (nonExistingStructCheckAndError(structureId,request))
 			continue;
-		}
+
 		if (getPeriodicGenerationActionStatus(structureId)) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfEnabledHousekeeping);
@@ -81,7 +88,7 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 	uint8_t numOfStructIds = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		uint8_t structIdToEnable = request.readUint8();
-		if (nonExistingStruct(structIdToEnable)) {
+		if (nonExistingStructCheck(structIdToEnable)) {
 			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
 			continue;
 		}
@@ -95,7 +102,7 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 	uint8_t numOfStructIds = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		uint8_t structIdToDisable = request.readUint8();
-		if (nonExistingStruct(structIdToDisable)) {
+		if (nonExistingStructCheck(structIdToDisable)) {
 			ErrorHandler::reportError(request, ErrorHandler::RequestedNonExistingStructure);
 			continue;
 		}
@@ -109,10 +116,9 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 	uint8_t numOfStructsToReport = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructsToReport; i++) {
 		uint8_t structureId = request.readUint8();
-		if (nonExistingStruct(structureId)) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		if (nonExistingStructCheckAndError(structureId,request))
 			continue;
-		}
+
 		housekeepingStructureReport(structureId);
 	}
 }
@@ -137,7 +143,7 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 }
 
 void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
-	if (nonExistingStruct(structureId)) {
+	if (nonExistingStructCheck(structureId)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::NonExistentHousekeeping);
 		return;
 	}
@@ -161,10 +167,9 @@ void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 	uint8_t numOfStructsToReport = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructsToReport; i++) {
 		uint8_t structureId = request.readUint8();
-		if (nonExistingStruct(structureId)) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		if (nonExistingStructCheckAndError(structureId,request))
 			continue;
-		}
+
 		housekeepingParametersReport(structureId);
 	}
 }
@@ -173,10 +178,8 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	request.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure);
 
 	uint8_t targetStructId = request.readUint8();
-	if (nonExistingStruct(targetStructId)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+	if (nonExistingStructCheckAndError(targetStructId,request))
 		return;
-	}
 	auto& housekeepingStructure = getStruct(targetStructId);
 	if (housekeepingStructure.periodicGenerationActionStatus) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
@@ -210,10 +213,8 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 	for (uint8_t i = 0; i < numOfTargetStructs; i++) {
 		uint8_t targetStructId = request.readUint8();
 		uint32_t newCollectionInterval = request.readUint32();
-		if (nonExistingStruct(targetStructId)) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		if (nonExistingStructCheckAndError(targetStructId,request))
 			continue;
-		}
 		setCollectionInterval(targetStructId, newCollectionInterval);
 	}
 }
@@ -225,7 +226,7 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 	uint8_t numOfStructIds = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		uint8_t structIdToReport = request.readUint8();
-		if (!nonExistingStruct(structIdToReport)) {
+		if (!nonExistingStructCheck(structIdToReport)) {
 			numOfValidIds++;
 		}
 	}
@@ -236,10 +237,8 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 
 	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		uint8_t structIdToReport = request.readUint8();
-		if (nonExistingStruct(structIdToReport)) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure);
+		if (nonExistingStructCheckAndError(structIdToReport,request))
 			continue;
-		}
 		appendPeriodicPropertiesToMessage(periodicPropertiesReport, structIdToReport);
 	}
 	storeMessage(periodicPropertiesReport);
