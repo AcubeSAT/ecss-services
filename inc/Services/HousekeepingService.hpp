@@ -95,7 +95,14 @@ public:
 	 * @param id
 	 * @return boolean
 	 */
-	bool nonExistingStruct(uint8_t id);
+	bool nonExistingStructCheck(uint8_t id);
+
+	/**
+	 * Checks if the structure doesn't exists in the map and then accordingly reports execution start error.
+	 * @param id,req
+	 * @return boolean
+	 */
+	bool nonExistingStructCheckAndError(uint8_t id, Message& req);
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
