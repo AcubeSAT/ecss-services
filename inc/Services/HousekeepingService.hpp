@@ -102,7 +102,21 @@ public:
 	 * @param id,req
 	 * @return boolean
 	 */
+	bool nonExistingStructCheckAndExecutionError(uint8_t id, Message& req);
+
+	/**
+	 * Checks if the structure doesn't exists in the map and then accordingly reports error.
+	 * @param id,req
+	 * @return boolean
+	 */
 	bool nonExistingStructCheckAndError(uint8_t id, Message& req);
+
+	/**
+	 * Checks if the structure doesn't exists in the map and then accordingly reports internal error.
+	 * @param id
+	 * @return boolean
+	 */
+	bool nonExistingStructCheckAndInternalError(uint8_t id);
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
