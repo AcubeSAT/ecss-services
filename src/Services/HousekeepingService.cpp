@@ -13,7 +13,7 @@ bool HousekeepingService::getPeriodicGenerationActionStatus(uint8_t id){
 HousekeepingStructure& HousekeepingService::getStruct(uint8_t id){
 	HousekeepingStructure newStructure{};
 	if(nonExistingStructCheckAndInternalError(id)){
-		return newStructure;
+		return std::ref(newStructure);
 	}
 	return housekeepingStructures.at(id);
 }
