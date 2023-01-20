@@ -10,10 +10,9 @@ bool HousekeepingService::getPeriodicGenerationActionStatus(uint8_t id){
 	return housekeepingStructures.at(id).periodicGenerationActionStatus;
 }
 
-HousekeepingStructure& HousekeepingService::getStruct(uint8_t id){
-	HousekeepingStructure newStructure{};
+std::optional<std::reference_wrapper<HousekeepingStructure>> HousekeepingService::getStruct(uint8_t id){
 	if(nonExistingStructCheckAndInternalError(id)){
-		return std::ref(newStructure);
+		return {};
 	}
 	return housekeepingStructures.at(id);
 }
@@ -180,7 +179,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 		return;
 	}
 	
-	HousekeepingStructure& housekeepingStructure = getStruct(structureId);
+	HousekeepingStructure& housekeepingStructure = *getStruct(structureId);
 
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
@@ -214,7 +213,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	if (nonExistingStructCheckAndExecutionError(targetStructId,request)){
 		return;
 	}
-	auto& housekeepingStructure = getStruct(targetStructId);
+	HousekeepingStructure& housekeepingStructure = *getStruct(targetStructId);
 	if (housekeepingStructure.periodicGenerationActionStatus) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping);
 		return;
