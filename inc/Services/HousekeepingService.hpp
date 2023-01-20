@@ -120,6 +120,15 @@ public:
 	bool nonExistingStructCheckAndInternalError(uint8_t id);
 
 	/**
+	 *Checks if the parameter exists in the vector and if it does it reports an error.
+	 * @param id
+	 * @param housekeepingStruct
+	 * @param req
+	 * @return
+	 */
+	bool alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id,Message& req);
+
+	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
 	 */
 	void createHousekeepingReportStructure(Message& request);
