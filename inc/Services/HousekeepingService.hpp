@@ -6,6 +6,7 @@
 #include "Helpers/HousekeepingStructure.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
+#include <optional>
 
 /**
  * Implementation of the ST[03] Housekeeping Reporting Service. The job of the Housekeeping Service is to store
@@ -73,7 +74,7 @@ public:
 	/**
 	 * Returns a reference to the structure at position of "id" in the map.
 	 */
-	HousekeepingStructure& getStruct(uint8_t id);
+	std::optional<std::reference_wrapper<HousekeepingStructure>> getStruct(uint8_t id) ;
 
 	/**
 	 * Returns the collection interval (how often data is collected) of the structure at position of "id" in the map.
