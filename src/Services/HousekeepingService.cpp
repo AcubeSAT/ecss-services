@@ -66,6 +66,13 @@ bool HousekeepingService::nonExistingStructCheckAndInternalError(uint8_t id){
 	}
 	return false;
 }
+bool HousekeepingService::alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id ,Message& req){
+if (existsInVector(housekeepingStruct.simplyCommutatedParameterIds, id)) {
+	ErrorHandler::reportError(req, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+	return true;
+}
+return false;
+}
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure);
@@ -89,8 +96,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		uint16_t newParamId = request.readUint16();
-		if (existsInVector(newStructure.simplyCommutatedParameterIds, newParamId)) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+		if (alreadyExistingParameterError(newStructure , newParamId , request)) {
 			continue;
 		}
 		newStructure.simplyCommutatedParameterIds.push_back(newParamId);
@@ -231,8 +237,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			continue;
 		}
-		if (existsInVector(housekeepingStructure.simplyCommutatedParameterIds, newParamId)) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+		if (alreadyExistingParameterError(housekeepingStructure, newParamId,request)) {
 			continue;
 		}
 		housekeepingStructure.simplyCommutatedParameterIds.push_back(newParamId);
