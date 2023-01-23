@@ -67,11 +67,11 @@ bool HousekeepingService::nonExistingStructCheckAndInternalError(uint8_t id){
 	return false;
 }
 bool HousekeepingService::alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id ,Message& req){
-if (existsInVector(housekeepingStruct.simplyCommutatedParameterIds, id)) {
-	ErrorHandler::reportError(req, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
-	return true;
-}
-return false;
+	if (existsInVector(housekeepingStruct.simplyCommutatedParameterIds, id)) {
+		ErrorHandler::reportError(req, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
+		return true;
+	}
+	return false;
 }
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {

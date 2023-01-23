@@ -126,7 +126,7 @@ public:
 	 * @param req
 	 * @return
 	 */
-	bool alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id,Message& req);
+	static bool alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id,Message& req);
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
