@@ -124,9 +124,48 @@ public:
 	 * @param id
 	 * @param housekeepingStruct
 	 * @param req
-	 * @return
+	 * @return boolean
 	 */
 	static bool alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id,Message& req);
+
+	/**
+	 * Checks if the struct requested exists and if it exists reports execution error.
+	 * @param id
+	 * @param req
+	 * @return boolean
+	 */
+	 bool alreadyExistingStructError(uint8_t id,Message& req);
+
+	/**
+	 * Reports execution error if the max number of housekeeping structures is exceeded.
+	 * @param req
+	 * @return boolean
+	 */
+	 bool exceededMaxNumOfHousekeepingStructsError(Message& req);
+
+	/**
+	 * Reports execution error if it's attempted to append a new parameter id to a housekeeping structure, but the periodic generation status is enabled.
+	 * @param housekeepingStruct
+	 * @param req
+	 * @return boolean
+	 */
+	static  bool requestedAppendToEnabledHousekeepingError( HousekeepingStructure& housekeepingStruct,Message& req);
+
+	/**
+	 * Reports execution error if it's attempted to delete structure which has the periodic reporting status enabled.
+	 * @param id
+	 * @param req
+	 * @return  boolean
+	 */
+	 bool requestedDeletionOfEnabledHousekeepingError(uint8_t id,Message& req);
+
+	/**
+	 * Reports execution error if the max number of simply commutated parameters is exceeded.
+	 * @param housekeepingStruct
+	 * @param req
+	 * @return boolean
+	 */
+	static  bool exceededMaxNumOfSimplyCommutatedParamsError(HousekeepingStructure& housekeepingStruct,Message& req);
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
