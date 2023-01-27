@@ -68,102 +68,114 @@ public:
 
 	/**
 	 * Returns the periodic generation action status of the structure in position of "id" in the map.
+	 * @param id Housekeeping structure ID
+	 * @return boolean True if periodic generation of housekeeping reports is enabled, false otherwise
 	 */
 	bool getPeriodicGenerationActionStatus(uint8_t id);
 
 	/**
 	 * Returns a reference to the structure at position of "id" in the map.
+	 * @param id Housekeeping structure ID
+	 * @return optional<std::reference_wrapper<HousekeepingStructure>> Reference to Housekeeping Structure
 	 */
 	std::optional<std::reference_wrapper<HousekeepingStructure>> getStruct(uint8_t id) ;
 
 	/**
 	 * Returns the collection interval (how often data is collected) of the structure at position of "id" in the map.
+	 * @param id Housekeeping structure ID
+	 * @return uint32_t Integer multiples of the minimum sampling interval
 	 */
 	uint32_t getCollectionInterval(uint8_t id);
 
 	/**
 	 * Sets the periodic generation action status of the structure in position of "id" in the map.
+	 * @param id Housekeeping structure ID
+	 * @param status Periodic generation status of housekeeping reports
 	 */
-	void setPeriodicGenerationActionStatus(uint8_t id, bool b);
+	void setPeriodicGenerationActionStatus(uint8_t id, bool status);
 
 	/**
 	 * Sets the collection interval of the structure at position of "id" in the map.
+	 * @param id Housekeeping structure ID
+	 * @param interval Integer multiples of the minimum sampling interval
 	 */
-	void setCollectionInterval(uint8_t id, uint32_t i);
+	void setCollectionInterval(uint8_t id, uint32_t interval);
 
 	/**
 	 * Checks if the structure doesn't exists in the map.
-	 * @param id
-	 * @return boolean
+	 * @param id Housekeeping structure ID
+	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
 	bool nonExistingStructCheck(uint8_t id);
 
 	/**
 	 * Checks if the structure doesn't exists in the map and then accordingly reports execution start error.
-	 * @param id,req
-	 * @return boolean
+	 * @param id Housekeeping structure ID
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
 	bool nonExistingStructCheckAndExecutionError(uint8_t id, Message& req);
 
 	/**
 	 * Checks if the structure doesn't exists in the map and then accordingly reports error.
-	 * @param id,req
-	 * @return boolean
+	 * @param id Housekeeping structure ID
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
 	bool nonExistingStructCheckAndError(uint8_t id, Message& req);
 
 	/**
 	 * Checks if the structure doesn't exists in the map and then accordingly reports internal error.
-	 * @param id
-	 * @return boolean
+	 * @param id Housekeeping structure ID
+	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
 	bool nonExistingStructCheckAndInternalError(uint8_t id);
 
 	/**
-	 *Checks if the parameter exists in the vector and if it does it reports an error.
-	 * @param id
-	 * @param housekeepingStruct
-	 * @param req
-	 * @return boolean
+	 * Checks if the parameter exists in the vector and if it does it reports an error.
+	 * @param id Parameter ID
+	 * @param housekeepingStruct Housekkeping Structure
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if the parameter exists, false otherwise
 	 */
 	static bool alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id,Message& req);
 
 	/**
 	 * Checks if the struct requested exists and if it exists reports execution error.
-	 * @param id
-	 * @param req
-	 * @return boolean
+	 * @param id Housekeeping structure ID
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if the structure exists, false otherwise
 	 */
 	 bool alreadyExistingStructError(uint8_t id,Message& req);
 
 	/**
 	 * Reports execution error if the max number of housekeeping structures is exceeded.
-	 * @param req
-	 * @return boolean
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if max number of housekeeping structures is exceeded, false otherwise
 	 */
 	 bool exceededMaxNumOfHousekeepingStructsError(Message& req);
 
 	/**
 	 * Reports execution error if it's attempted to append a new parameter id to a housekeeping structure, but the periodic generation status is enabled.
-	 * @param housekeepingStruct
-	 * @param req
-	 * @return boolean
+	 * @param housekeepingStruct Housekkeping Structure
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if periodic generation status is enabled, false otherwise
 	 */
 	static  bool requestedAppendToEnabledHousekeepingError( HousekeepingStructure& housekeepingStruct,Message& req);
 
 	/**
 	 * Reports execution error if it's attempted to delete structure which has the periodic reporting status enabled.
-	 * @param id
-	 * @param req
-	 * @return  boolean
+	 * @param id Housekeeping structure ID
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if periodic reporting status is enabled, false otherwise
 	 */
 	 bool requestedDeletionOfEnabledHousekeepingError(uint8_t id,Message& req);
 
 	/**
 	 * Reports execution error if the max number of simply commutated parameters is exceeded.
-	 * @param housekeepingStruct
-	 * @param req
-	 * @return boolean
+	 * @param housekeepingStruct Housekkeping Structure
+	 * @param req Telemetry (TM) or telecommand (TC) message
+	 * @return boolean True if max number of simply commutated parameters is exceeded, false otherwise
 	 */
 	static  bool exceededMaxNumOfSimplyCommutatedParamsError(HousekeepingStructure& housekeepingStruct,Message& req);
 
