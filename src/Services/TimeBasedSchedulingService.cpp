@@ -61,7 +61,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			newActivity.request = receivedTCPacket;
 			newActivity.requestReleaseTime = releaseTime;
 
-			// todo: When implemented save the source ID
+			newActivity.requestID.sourceID = request.sourceId;
 			newActivity.requestID.applicationID = request.applicationId;
 			newActivity.requestID.sequenceCount = request.packetSequenceCount;
 
@@ -102,7 +102,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.sourceID = request.readUint16();
 		receivedRequestID.applicationID = request.readUint16();
 		receivedRequestID.sequenceCount = request.readUint16();
 
@@ -131,7 +131,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.sourceID = request.readUint16();
 		receivedRequestID.applicationID = request.readUint16();
 		receivedRequestID.sequenceCount = request.readUint16();
 
@@ -174,7 +174,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.sourceID = request.readUint16();
 		receivedRequestID.applicationID = request.readUint16();
 		receivedRequestID.sequenceCount = request.readUint16();
 
@@ -203,7 +203,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.sourceID = request.readUint16();
 		receivedRequestID.applicationID = request.readUint16();
 		receivedRequestID.sequenceCount = request.readUint16();
 
@@ -231,7 +231,7 @@ void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<
 	for (const auto& match: listOfActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
-		report.appendUint8(match.requestID.sourceID);
+		report.appendUint16(match.requestID.sourceID);
 		report.appendUint16(match.requestID.applicationID);
 		report.appendUint16(match.requestID.sequenceCount);
 	}
