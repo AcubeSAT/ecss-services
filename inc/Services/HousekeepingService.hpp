@@ -1,12 +1,12 @@
 #ifndef ECSS_SERVICES_HOUSEKEEPINGSERVICE_HPP
 #define ECSS_SERVICES_HOUSEKEEPINGSERVICE_HPP
 
+#include <optional>
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/HousekeepingStructure.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
-#include <optional>
 
 /**
  * Implementation of the ST[03] Housekeeping Reporting Service. The job of the Housekeeping Service is to store
@@ -78,7 +78,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return optional<std::reference_wrapper<HousekeepingStructure>> Reference to Housekeeping Structure
 	 */
-	std::optional<std::reference_wrapper<HousekeepingStructure>> getStruct(uint8_t id) ;
+	std::optional<std::reference_wrapper<HousekeepingStructure>> getStruct(uint8_t id);
 
 	/**
 	 * Returns the collection interval (how often data is collected) of the structure at position of "id" in the map.
@@ -138,7 +138,7 @@ public:
 	 * @param req Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the parameter exists, false otherwise
 	 */
-	static bool alreadyExistingParameterError( HousekeepingStructure& housekeepingStruct,uint8_t id,Message& req);
+	static bool alreadyExistingParameterError(HousekeepingStructure& housekeepingStruct, uint8_t id, Message& req);
 
 	/**
 	 * Checks if the struct requested exists and if it exists reports execution error.
@@ -146,14 +146,14 @@ public:
 	 * @param req Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the structure exists, false otherwise
 	 */
-	 bool alreadyExistingStructError(uint8_t id,Message& req);
+	bool alreadyExistingStructError(uint8_t id, Message& req);
 
 	/**
 	 * Reports execution error if the max number of housekeeping structures is exceeded.
 	 * @param req Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if max number of housekeeping structures is exceeded, false otherwise
 	 */
-	 bool exceededMaxNumOfHousekeepingStructsError(Message& req);
+	bool exceededMaxNumOfHousekeepingStructsError(Message& req);
 
 	/**
 	 * Reports execution error if it's attempted to append a new parameter id to a housekeeping structure, but the periodic generation status is enabled.
@@ -161,7 +161,7 @@ public:
 	 * @param req Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if periodic generation status is enabled, false otherwise
 	 */
-	static  bool requestedAppendToEnabledHousekeepingError( HousekeepingStructure& housekeepingStruct,Message& req);
+	static bool requestedAppendToEnabledHousekeepingError(HousekeepingStructure& housekeepingStruct, Message& req);
 
 	/**
 	 * Reports execution error if it's attempted to delete structure which has the periodic reporting status enabled.
@@ -169,7 +169,7 @@ public:
 	 * @param req Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if periodic reporting status is enabled, false otherwise
 	 */
-	 bool requestedDeletionOfEnabledHousekeepingError(uint8_t id,Message& req);
+	bool requestedDeletionOfEnabledHousekeepingError(uint8_t id, Message& req);
 
 	/**
 	 * Reports execution error if the max number of simply commutated parameters is exceeded.
@@ -177,7 +177,7 @@ public:
 	 * @param req Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if max number of simply commutated parameters is exceeded, false otherwise
 	 */
-	static  bool exceededMaxNumOfSimplyCommutatedParamsError(HousekeepingStructure& housekeepingStruct,Message& req);
+	static bool exceededMaxNumOfSimplyCommutatedParamsError(HousekeepingStructure& housekeepingStruct, Message& req);
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.
