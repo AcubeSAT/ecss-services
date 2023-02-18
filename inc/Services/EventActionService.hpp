@@ -51,12 +51,11 @@ public:
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationID = 0;
 		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
-		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
+//		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
-		EventActionDefinition (uint16_t applicationID, uint16_t eventDefinitionID,
-		                      uint16_t eventActionDefinitionID, Message& message);
+		EventActionDefinition (uint16_t applicationID, uint16_t eventDefinitionID, Message& message);
 	};
 
 	friend EventReportService;
@@ -68,6 +67,14 @@ public:
 		serviceType = 19;
 		eventActionFunctionStatus = true;
 	}
+
+	/**
+	 *
+	 * @param element
+	 * @param eventDefinitionID
+	 * @return
+	 */
+	bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID);
 
 	/**
 	 * TC[19,1] add event-action definitions

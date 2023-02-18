@@ -127,7 +127,7 @@ public:
 		UnknownExecutionStartError = 0,
 		/**
 		 * In the Event Action Service, in the addEventActionDefinition function an attempt was
-		 * made to add an event Action Definition with an eventActionDefinitionID that exists
+		 * made to add an event Action Definition with an eventDefinitionID that exists
 		 */
 		EventActionDefinitionIDExistsError = 1,
 		/**
@@ -142,7 +142,7 @@ public:
 		EventActionUnknownEventDefinitionError = 3,
 		/**
 		 * EventAction refers to the service, EventActionIDefinitionID refers to the variable
-		 * In the Event Action Service, an access attempt was made to an unknown eventActionDefinitionID
+		 * In the Event Action Service, an access attempt was made to an unknown eventDefinitionID
 		 */
 		EventActionUnknownEventActionDefinitionIDError = 4,
 		SubServiceExecutionStartError = 5,
