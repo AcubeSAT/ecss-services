@@ -1,10 +1,10 @@
 #ifndef ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP
 #define ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP
 
-#include "Service.hpp"
-#include "Message.hpp"
-#include "ErrorHandler.hpp"
 #include "ECSS_Definitions.hpp"
+#include "ErrorHandler.hpp"
+#include "Message.hpp"
+#include "Service.hpp"
 
 /**
  * Implementation of the ST[01] request verification service
@@ -20,7 +20,6 @@
  */
 class RequestVerificationService : public Service {
 public:
-
 	inline static const uint8_t ServiceType = 1;
 
 	enum MessageType : uint8_t {
@@ -36,7 +35,7 @@ public:
 	};
 
 	RequestVerificationService() {
-		serviceType = 1;
+		serviceType = ServiceType;
 	}
 
 	/**
@@ -133,7 +132,7 @@ public:
 	 * telecommand packet that failed the routing
 	 * @param errorCode The cause of creating this type of report
  	 */
-	void failRoutingVerification(const Message &request, ErrorHandler::RoutingErrorType errorCode);
+	void failRoutingVerification(const Message& request, ErrorHandler::RoutingErrorType errorCode);
 };
 
 #endif // ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP

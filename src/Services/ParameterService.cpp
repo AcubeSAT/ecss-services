@@ -1,21 +1,14 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
 
-#include "Services/ParameterService.hpp"
 #include "Helpers/Parameter.hpp"
+#include "Services/ParameterService.hpp"
 
 
 void ParameterService::reportParameters(Message& paramIds) {
-	// TM[20,2]
-	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport,
-	                        Message::TM, 1);
 
-	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.messageType == ParameterService::MessageType::ReportParameterValues, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.serviceType == ParameterService::ServiceType, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	paramIds.assertTC(ServiceType, ReportParameterValues);
+	Message parameterReport = createTM(ParameterValuesReport);
 
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t numberOfValidIds = 0;
@@ -41,13 +34,8 @@ void ParameterService::reportParameters(Message& paramIds) {
 	storeMessage(parameterReport);
 }
 
-void ParameterService::setParameters(Message& newParamValues) {
-	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues,
-	                            newParamValues, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.serviceType == ParameterService::ServiceType, newParamValues,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+void ParameterService::setParameters(Message& newParamValues) const {
+	newParamValues.assertTC(ServiceType, MessageType::SetParameterValues);
 
 	uint16_t numOfIds = newParamValues.readUint16();
 

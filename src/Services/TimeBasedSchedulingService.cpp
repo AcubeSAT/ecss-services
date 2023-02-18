@@ -7,55 +7,57 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
-void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
+Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::DefaultCUC currentTime) {
+	if (currentTime >= scheduledActivities.front().requestReleaseTime && !scheduledActivities.empty()) {
+		if (scheduledActivities.front().requestID.applicationID == ApplicationId) {
+			MessageParser::execute(scheduledActivities.front().request);
+		}
+		scheduledActivities.pop_front();
+	}
 
-	executionFunctionStatus = true; // Enable the service
+	if (!scheduledActivities.empty()) {
+		return scheduledActivities.front().requestReleaseTime;
+	} else {
+		return Time::DefaultCUC::max();
+	}
+}
+
+void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
+	executionFunctionStatus = true;
 }
 
 void TimeBasedSchedulingService::disableScheduleExecution(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction);
-
-	executionFunctionStatus = false; // Disable the service
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction);
+	executionFunctionStatus = false;
 }
 
 void TimeBasedSchedulingService::resetSchedule(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule);
-
-	executionFunctionStatus = false; // Disable the service
-	scheduledActivities.clear(); // Delete all scheduled activities
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule);
+	executionFunctionStatus = false;
+	scheduledActivities.clear();
 	// todo: Add resetting for sub-schedules and groups, if defined
 }
 
 void TimeBasedSchedulingService::insertActivities(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::InsertActivities);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities);
 
 	// todo: Get the sub-schedule ID if they are implemented
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		// todo: Get the group ID first, if groups are used
-		uint32_t currentTime = TimeGetter::getSeconds(); // Get the current system time
+		Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
 
-		uint32_t releaseTime = request.readUint32(); // Get the specified release time
+		Time::DefaultCUC releaseTime = request.readDefaultCUCTimeStamp();
 		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.skipBytes(ECSSTCRequestStringSize);
 		} else {
-			// Get the TC packet request
 			uint8_t requestData[ECSSTCRequestStringSize] = {0};
 			request.readString(requestData, ECSSTCRequestStringSize);
 			Message receivedTCPacket = MessageParser::parseECSSTC(requestData);
-			ScheduledActivity newActivity; // Create the new activity
+			ScheduledActivity newActivity;
 
-			// Assign the attributes to the newly created activity
 			newActivity.request = receivedTCPacket;
 			newActivity.requestReleaseTime = releaseTime;
 
@@ -63,95 +65,83 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			newActivity.requestID.applicationID = request.applicationId;
 			newActivity.requestID.sequenceCount = request.packetSequenceCount;
 
-			scheduledActivities.push_back(newActivity); // Insert the new activities
+			scheduledActivities.push_back(newActivity);
 		}
 	}
-	sortActivitiesReleaseTime(scheduledActivities); // Sort activities by their release time
+	sortActivitiesReleaseTime(scheduledActivities);
+	notifyNewActivityAddition();
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
 
-	uint32_t current_time = TimeGetter::getSeconds(); // Get the current system time
+	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
-	// Find the earliest release time. It will be the first element of the iterator pair
 	const auto releaseTimes =
 	    etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end(),
 	                        [](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 		                        return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 	                        });
 	// todo: Define what the time format is going to be
-	int32_t relativeOffset = request.readSint32(); // Get the relative offset
-	if ((releaseTimes.first->requestReleaseTime + relativeOffset) < (current_time + ECSSTimeMarginForActivation)) {
-		// Report the error
+	Time::RelativeTime relativeOffset = request.readRelativeTime();
+	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 	} else {
-		for (auto& activity : scheduledActivities) {
-			activity.requestReleaseTime += relativeOffset; // Time shift each activity
+		for (auto& activity: scheduledActivities) {
+			activity.requestReleaseTime += std::chrono::seconds(relativeOffset);
 		}
 	}
 }
 
 void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
 
-	uint32_t current_time = TimeGetter::getSeconds(); // Get the current system time
+	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
-	int32_t relativeOffset = request.readSint32(); // Get the offset first
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
-		// Parse the request ID
-		RequestID receivedRequestID; // Save the received request ID
-		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
-		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
-		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+		RequestID receivedRequestID;
+		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sequenceCount = request.readUint16();
 
-		// Try to find the activity with the requested request ID
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                       return receivedRequestID != currentElement.requestID;
 		                                       });
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			// If the relative offset does not meet the restrictions issue an error
 			if ((requestIDMatch->requestReleaseTime + relativeOffset) <
 			    (current_time + ECSSTimeMarginForActivation)) {
 				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			} else {
-				requestIDMatch->requestReleaseTime += relativeOffset; // Add the time offset
+				requestIDMatch->requestReleaseTime += relativeOffset;
 			}
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
-	sortActivitiesReleaseTime(scheduledActivities); // Sort activities by their release time
+	sortActivitiesReleaseTime(scheduledActivities);
 }
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::DeleteActivitiesById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById);
 
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
-		// Parse the request ID
-		RequestID receivedRequestID; // Save the received request ID
-		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
-		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
-		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+		RequestID receivedRequestID;
+		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sequenceCount = request.readUint16();
 
-		// Try to find the activity with the requested request ID
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                             return receivedRequestID != currentElement.requestID;
 		                                             });
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			scheduledActivities.erase(requestIDMatch); // Delete activity from the schedule
+			scheduledActivities.erase(requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
@@ -159,82 +149,69 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
 
-	// Create the report message object of telemetry message subtype 10 for each activity
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(scheduledActivities.size()));
 
-	for (auto& activity : scheduledActivities) {
+	for (auto& activity: scheduledActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 
-		report.appendUint32(activity.requestReleaseTime);
+		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime);
 		report.appendString(MessageParser::composeECSS(activity.request));
 	}
-	storeMessage(report); // Save the report
+	storeMessage(report);
 }
 
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
 
-	// Create the report message object of telemetry message subtype 10 for each activity
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
-		// Parse the request ID
-		RequestID receivedRequestID; // Save the received request ID
-		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
-		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
-		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+		RequestID receivedRequestID;
+		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sequenceCount = request.readUint16();
 
-		// Try to find the activity with the requested request ID
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                             return receivedRequestID != currentElement.requestID;
 		                                             });
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			matchedActivities.push_back(*requestIDMatch); // Save the matched activity
+			matchedActivities.push_back(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
 
-	sortActivitiesReleaseTime(matchedActivities); // Sort activities by their release time
+	sortActivitiesReleaseTime(matchedActivities);
 
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
-	for (auto& match : matchedActivities) {
-		report.appendUint32(match.requestReleaseTime); // todo: Replace with the time parser
+	for (auto& match: matchedActivities) {
+		report.appendDefaultCUCTimeStamp(match.requestReleaseTime); // todo: Replace with the time parser
 		report.appendString(MessageParser::composeECSS(match.request));
 	}
-	storeMessage(report); // Save the report
+	storeMessage(report);
 }
 
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
-	// Check if the correct packet is being processed
-	assert(request.serviceType == TimeBasedSchedulingService::ServiceType);
-	assert(request.messageType == TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
+	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
 
-	// Create the report message object of telemetry message subtype 13 for each activity
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
-	uint16_t iterationCount = request.readUint16(); // Get the iteration count, (N)
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
-		// Parse the request ID
-		RequestID receivedRequestID; // Save the received request ID
-		receivedRequestID.sourceID = request.readUint8(); // Get the source ID
-		receivedRequestID.applicationID = request.readUint16(); // Get the application ID
-		receivedRequestID.sequenceCount = request.readUint16(); // Get the sequence count
+		RequestID receivedRequestID;
+		receivedRequestID.sourceID = request.readUint8();
+		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sequenceCount = request.readUint16();
 
-		// Try to find the activity with the requested request ID
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                       return receivedRequestID != currentElement.requestID;
@@ -246,18 +223,18 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
-	sortActivitiesReleaseTime(matchedActivities); // Sort activities by their release time
+	sortActivitiesReleaseTime(matchedActivities);
 
 	// todo: append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(matchedActivities.size()));
-	for (auto& match : matchedActivities) {
+	for (auto& match: matchedActivities) {
 		// todo: append sub-schedule and group ID if they are defined
-		report.appendUint32(match.requestReleaseTime);
+		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
 		report.appendUint8(match.requestID.sourceID);
 		report.appendUint16(match.requestID.applicationID);
 		report.appendUint16(match.requestID.sequenceCount);
 	}
-	storeMessage(report); // Save the report
+	storeMessage(report);
 }
 
 void TimeBasedSchedulingService::execute(Message& message) {

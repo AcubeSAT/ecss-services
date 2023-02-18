@@ -28,14 +28,13 @@ void FunctionManagementService::call(Message& msg) {
 	// locate the appropriate function pointer
 	String<ECSSFunctionNameLength> name(funcName);
 	FunctionMap::iterator iter = funcPtrIndex.find(name);
-	void (*selected)(String<ECSSFunctionMaxArgLength>);
 
-	if (iter != funcPtrIndex.end()) {
-		selected = *iter->second;
-	} else {
+	if (iter == funcPtrIndex.end()) {
 		ErrorHandler::reportError(msg, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 		return;
 	}
+
+	auto selected = *iter->second;
 
 	// execute the function if there are no obvious flaws (defined in the standard, pg.158)
 	selected(funcArgs);

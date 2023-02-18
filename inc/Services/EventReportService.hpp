@@ -1,15 +1,15 @@
 #ifndef ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 #define ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 
-#include "Service.hpp"
 #include <etl/bitset.h>
+#include "Service.hpp"
 
 /**
  * Implementation of ST[05] event reporting service
  *
  * @ingroup Services
- * @todo: add more enums event IDs
- * @todo: Make sure there isn't an event ID == 0, because there's a confliction with another service
+ * @todo add more enums event IDs
+ * @todo Make sure there isn't an event ID == 0, because there's a confliction with another service
  * Note: enum IDs are these just for test purposes
  *
  */
@@ -20,7 +20,6 @@ private:
 	etl::bitset<numberOfEvents> stateOfEvents;
 
 public:
-
 	inline static const uint8_t ServiceType = 5;
 
 	enum MessageType : uint8_t {
@@ -35,34 +34,24 @@ public:
 	};
 
 	// Variables that count the event reports per severity level
-	uint16_t lowSeverityReportCount;
-	uint16_t mediumSeverityReportCount;
-	uint16_t highSeverityReportCount;
+	uint16_t lowSeverityReportCount = 0;
+	uint16_t mediumSeverityReportCount = 0;
+	uint16_t highSeverityReportCount = 0;
 
 	// Variables that count the event occurences per severity level
-	uint16_t lowSeverityEventCount;
-	uint16_t mediumSeverityEventCount;
-	uint16_t highSeverityEventCount;
+	uint16_t lowSeverityEventCount = 0;
+	uint16_t mediumSeverityEventCount = 0;
+	uint16_t highSeverityEventCount = 0;
 
-	uint16_t disabledEventsCount;
+	uint16_t disabledEventsCount = 0;
 
-	uint16_t lastLowSeverityReportID;
-	uint16_t lastMediumSeverityReportID;
-	uint16_t lastHighSeverityReportID;
+	uint16_t lastLowSeverityReportID = 65535;
+	uint16_t lastMediumSeverityReportID = 65535;
+	uint16_t lastHighSeverityReportID = 65535;
 
 	EventReportService() {
 		stateOfEvents.set();
-		serviceType = 5;
-		lowSeverityReportCount = 0;
-		mediumSeverityReportCount = 0;
-		highSeverityReportCount = 0;
-		disabledEventsCount = 0;
-		lowSeverityEventCount = 0;
-		mediumSeverityEventCount = 0;
-		highSeverityEventCount = 0;
-		lastLowSeverityReportID = 65535;
-		lastMediumSeverityReportID = 65535;
-		lastHighSeverityReportID = 65535;
+		serviceType = ServiceType;
 	}
 
 	/**
