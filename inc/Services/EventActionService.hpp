@@ -74,7 +74,9 @@ public:
 	 * @param eventDefinitionID
 	 * @return
 	 */
-	bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID);
+	inline bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID){
+		return (element->second.eventDefinitionID == eventDefinitionID);
+	}
 
 	/**
 	 * TC[19,1] add event-action definitions

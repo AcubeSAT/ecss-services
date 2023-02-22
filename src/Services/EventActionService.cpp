@@ -17,14 +17,18 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	while (numberOfEventActionDefinitions-- != 0) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
+		String<ECSSTCRequestStringSize> data = message.data;
 //		uint16_t eventActionDefinitionID = message.readEnum16();
 		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element ;
 
 		for (element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 			if (actionDefinitionExists(element , eventDefinitionID)) {
 				//shouldn't there be an error if it is enabled?
-				//replace previously specified action of the existing event-action definition by the action specified
-				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError); //an mporoume na prosthesoume ki allo action sto idio event tote auto prepei na allaxtei
+				break;
+			}
+			else if (element->second.enabled) {
+				ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
 				break;
 			}
 		}
@@ -217,10 +221,6 @@ void EventActionService::execute(Message& message) {
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
-}
-
-bool EventActionService::actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID) {
-	return (element->second.eventDefinitionID == eventDefinitionID);
 }
 
 #endif
