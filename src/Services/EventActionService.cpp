@@ -22,13 +22,12 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element ;
 
 		for (element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
-			if (actionDefinitionExists(element , eventDefinitionID)) {
-				//shouldn't there be an error if it is enabled?
-				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError); //an mporoume na prosthesoume ki allo action sto idio event tote auto prepei na allaxtei
-				break;
-			}
-			else if (element->second.enabled) {
-				ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
+			if (actionDefinitionExists(element , eventDefinitionID)) { //replace event action definition
+				ErrorHandler::reportError(message, ErrorHandler::EventDefinitionIDExistsError);
+				if (element->second.enabled) {
+					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
+					break;
+				}
 				break;
 			}
 		}

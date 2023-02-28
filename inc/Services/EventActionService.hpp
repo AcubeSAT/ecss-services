@@ -22,7 +22,7 @@
  * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
  * multiple instances are accessed, should I find a more efficient way to access them?
  * @todo: check if eventActionFunctionStatus should be private or not
- * @todo: check if eventAction map of definitions should be private or not
+ * @todo: check if eventAction map of definitions should be private or not //probably private
  */
 class EventActionService : public Service {
 private:
