@@ -141,7 +141,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	if (hasNonExistingStructExecutionError(targetStructId, request)) {
 		return;
 	}
-	HousekeepingStructure& housekeepingStructure = *getStruct(targetStructId);
+	auto& housekeepingStructure = getStruct(targetStructId)->get();
 	if (hasRequestedAppendToEnabledHousekeepingError(housekeepingStructure, request)) {
 		return;
 	}

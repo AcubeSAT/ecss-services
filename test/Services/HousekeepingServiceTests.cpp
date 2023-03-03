@@ -694,3 +694,232 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		CHECK(nextCollection == 0);
 	}
 }
+
+TEST_CASE("Check getPeriodicGenerationActionStatus function") {
+	SECTION("Returns periodic generation status") {
+		initializeHousekeepingStructures();
+
+		CHECK(housekeepingService.getPeriodicGenerationActionStatus(0) == false);
+	}
+
+	SECTION("Invalid structure ID in request") {
+		initializeHousekeepingStructures();
+
+		housekeepingService.getPeriodicGenerationActionStatus(1);
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check getStruct function") {
+	SECTION("Returns periodic generation status") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		uint8_t idToCreate = 2;
+		uint32_t interval = 7;
+		uint16_t numOfSimplyCommutatedParams = 3;
+		etl::array<uint16_t, 3> simplyCommutatedIds = {4, 5, 8};
+
+		request.appendUint8(idToCreate);
+		request.appendUint32(interval);
+		request.appendUint16(numOfSimplyCommutatedParams);
+		for (auto& id: simplyCommutatedIds) {
+			request.appendUint16(id);
+		}
+
+		MessageParser::execute(request);
+		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
+		std::reference_wrapper<HousekeepingStructure> newStructAddress = housekeepingService.housekeepingStructures.at(0);
+
+		//CHECK(newStructAddress == housekeepingService.getStruct(0)->get() );
+	}
+
+	SECTION("Invalid structure ID in request") {
+		initializeHousekeepingStructures();
+
+		housekeepingService.getStruct(1);
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check getCollectionInterval function") {
+	SECTION("Returns Collection Interval") {
+		initializeHousekeepingStructures();
+
+		CHECK(housekeepingService.getCollectionInterval(0) == 7);
+	}
+
+	SECTION("Invalid structure ID in request") {
+		initializeHousekeepingStructures();
+
+		housekeepingService.getCollectionInterval(1);
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check setPeriodicGenerationActionStatus function") {
+	SECTION("Set Periodic Generation Action Status") {
+		initializeHousekeepingStructures();
+
+		housekeepingService.setPeriodicGenerationActionStatus( 0 , true );
+
+		CHECK(housekeepingService.housekeepingStructures.at(0 ).periodicGenerationActionStatus == true);
+	}
+
+	SECTION("Invalid structure ID in request") {
+		initializeHousekeepingStructures();
+
+		housekeepingService.setPeriodicGenerationActionStatus( 1 , true );
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check setCollectionInterval function") {
+	SECTION("Sets Collection Interval") {
+		initializeHousekeepingStructures();
+
+		housekeepingService.setCollectionInterval(0 , 8 );
+
+		CHECK(housekeepingService.housekeepingStructures.at(0 ).collectionInterval == 8 );
+	}
+
+	SECTION("Invalid structure ID in request") {
+		initializeHousekeepingStructures();
+
+		housekeepingService.setCollectionInterval(1 , 8 );
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check structExists function") {
+	SECTION("Returns correct boolean") {
+		initializeHousekeepingStructures();
+
+		CHECK( housekeepingService.structExists( 0 ) == true);
+		CHECK( housekeepingService.structExists( 1 ) == false);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check hasNonExistingStructExecutionError function") {
+	SECTION("Returns correct boolean") {
+		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		initializeHousekeepingStructures();
+
+		CHECK( housekeepingService.hasNonExistingStructExecutionError( 1 , request ) == true);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedNonExistingStructure) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check hasNonExistingStructError function") {
+	SECTION("Returns correct boolean") {
+		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		initializeHousekeepingStructures();
+
+		CHECK( housekeepingService.hasNonExistingStructError( 1 , request ) == true);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::RequestedNonExistingStructure) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check hasAlreadyExistingParameterError function") {
+	SECTION("Returns correct boolean") {
+		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		uint8_t idToCreate = 2;
+		uint32_t interval = 7;
+		uint16_t numOfSimplyCommutatedParams = 3;
+		etl::array<uint16_t, 3> simplyCommutatedIds = {4, 5, 8};
+
+		request.appendUint8(idToCreate);
+		request.appendUint32(interval);
+		request.appendUint16(numOfSimplyCommutatedParams);
+		for (auto& id: simplyCommutatedIds) {
+			request.appendUint16(id);
+		}
+
+		MessageParser::execute(request);
+		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
+
+		auto& housekeepingStructure = housekeepingService.getStruct(idToCreate)->get();
+
+		CHECK( housekeepingService.hasAlreadyExistingParameterError(housekeepingStructure , 5 , request) == true);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check hasAlreadyExistingStructError function") {
+	SECTION("Returns correct boolean") {
+		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		initializeHousekeepingStructures();
+
+		CHECK( housekeepingService.hasAlreadyExistingStructError( 0 , request ) == true);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedAlreadyExistingStructure) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Check hasExceededMaxNumOfHousekeepingStructsError function") {
+	SECTION("Returns correct boolean") {
+		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		uint8_t idsToCreate[16] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14};
+		uint16_t numOfSimplyCommutatedParams = 3;
+		etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+		uint32_t interval = 12;
+
+		REQUIRE(housekeepingService.housekeepingStructures.size() == 0);
+
+		for (auto& structId: idsToCreate) {
+			request.appendUint8(structId);
+			request.appendUint32(interval);
+			request.appendUint16(numOfSimplyCommutatedParams);
+			for (auto& parameterId: simplyCommutatedIds) {
+				request.appendUint16(parameterId);
+			}
+			MessageParser::execute(request);
+
+			if(housekeepingService.housekeepingStructures.size() == 5){
+				CHECK( housekeepingService.hasExceededMaxNumOfHousekeepingStructsError( request ) == false);
+			}
+		}
+
+		REQUIRE(housekeepingService.housekeepingStructures.size() == 10);
+
+		CHECK( housekeepingService.hasExceededMaxNumOfHousekeepingStructsError( request ) == true);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfHousekeepingStructures) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
