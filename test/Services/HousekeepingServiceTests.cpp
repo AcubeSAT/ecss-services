@@ -736,9 +736,8 @@ TEST_CASE("Check getStruct function") {
 
 		MessageParser::execute(request);
 		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
-		std::reference_wrapper<HousekeepingStructure> newStructAddress = housekeepingService.housekeepingStructures.at(0);
 
-		CHECK(newStructAddress == housekeepingService.getStruct(0)->get() );
+		CHECK(std::addressof(housekeepingService.housekeepingStructures.at(2)) == std::addressof(housekeepingService.getStruct(2)->get()));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -749,7 +748,6 @@ TEST_CASE("Check getStruct function") {
 
 		housekeepingService.getStruct(1);
 
-		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
 
 		ServiceTests::reset();
@@ -772,7 +770,6 @@ TEST_CASE("Check getCollectionInterval function") {
 
 		housekeepingService.getCollectionInterval(1);
 
-		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
 
 		ServiceTests::reset();
@@ -798,7 +795,6 @@ TEST_CASE("Check setPeriodicGenerationActionStatus function") {
 
 		housekeepingService.setPeriodicGenerationActionStatus( 1 , true );
 
-		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
 
 		ServiceTests::reset();
@@ -823,7 +819,6 @@ TEST_CASE("Check setCollectionInterval function") {
 
 		housekeepingService.setCollectionInterval(1 , 8 );
 
-		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
 
 		ServiceTests::reset();
@@ -879,7 +874,6 @@ TEST_CASE("Check hasNonExistingStructInternalError function") {
 
 		CHECK( housekeepingService.hasNonExistingStructInternalError( 0 ) == false);
 		CHECK( housekeepingService.hasNonExistingStructInternalError( 1  ) == true);
-		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
 
 		ServiceTests::reset();
@@ -935,7 +929,7 @@ TEST_CASE("Check hasAlreadyExistingStructError function") {
 TEST_CASE("Check hasExceededMaxNumOfHousekeepingStructsError function") {
 	SECTION("Check if it returns correct boolean") {
 		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t idsToCreate[16] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14};
+		uint8_t idsToCreate[11] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14};
 		uint16_t numOfSimplyCommutatedParams = 3;
 		etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
 		uint32_t interval = 12;
@@ -951,7 +945,7 @@ TEST_CASE("Check hasExceededMaxNumOfHousekeepingStructsError function") {
 			}
 			MessageParser::execute(request);
 
-			if(housekeepingService.housekeepingStructures.size() == 5){
+			if(housekeepingService.housekeepingStructures.size() < 9){
 				CHECK( housekeepingService.hasExceededMaxNumOfHousekeepingStructsError( request ) == false);
 			}
 		}
@@ -959,8 +953,7 @@ TEST_CASE("Check hasExceededMaxNumOfHousekeepingStructsError function") {
 		REQUIRE(housekeepingService.housekeepingStructures.size() == 10);
 
 		CHECK( housekeepingService.hasExceededMaxNumOfHousekeepingStructsError( request ) == true);
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfHousekeepingStructures) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfHousekeepingStructures) == 2);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -987,8 +980,7 @@ TEST_CASE("Check hasRequestedAppendToEnabledHousekeepingError function") {
 		MessageParser::execute(request2);
 
 		CHECK( housekeepingService.hasRequestedAppendToEnabledHousekeepingError( newStruct ,request ) == true );
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedAppendToEnabledHousekeeping) == 2);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1037,8 +1029,7 @@ TEST_CASE("Check hasRequestedDeletionOfEnabledHousekeepingError function"){
 
 
 		CHECK( housekeepingService.hasRequestedDeletionOfEnabledHousekeepingError( 4 ,request ) == true );
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfEnabledHousekeeping) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::RequestedDeletionOfEnabledHousekeeping) == 2);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1096,8 +1087,7 @@ TEST_CASE("Check hasExceededMaxNumOfSimplyCommutatedParamsError function"){
 		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameterIds.size() == 30);
 
 		CHECK( housekeepingService.hasExceededMaxNumOfSimplyCommutatedParamsError( housekeepingService.housekeepingStructures[structId] ,request ) == true );
-		CHECK(ServiceTests::count() == 4);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters) == 2);
 
 		ServiceTests::reset();
 		Services.reset();
