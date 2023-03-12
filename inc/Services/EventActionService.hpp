@@ -69,10 +69,10 @@ public:
 	}
 
 	/**
-	 *
+	 * Checks if the given Event Definition ID already exists
 	 * @param element
 	 * @param eventDefinitionID
-	 * @return
+	 * @return boolean
 	 */
 	inline bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID){
 		return (element->second.eventDefinitionID == eventDefinitionID);
