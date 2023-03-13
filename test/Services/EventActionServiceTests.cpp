@@ -2,7 +2,6 @@
 #include <ServicePool.hpp>
 #include <Services/EventActionService.hpp>
 #include <catch2/catch_all.hpp>
-//#include <catch2/catch.hpp>
 #include <cstring>
 #include <etl/String.hpp>
 #include "ServiceTests.hpp"
