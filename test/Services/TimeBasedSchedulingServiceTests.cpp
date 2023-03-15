@@ -46,26 +46,22 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 		testMessage1.messageType = 5;
 		testMessage1.packetType = Message::TC;
 		testMessage1.applicationId = 8;  // todo: Remove the dummy application ID
-		testMessage1.sourceId = 0;
 		testMessage1.appendUint16(4253); // Append dummy data
 
 		testMessage2.serviceType = 4;
 		testMessage2.messageType = 5;
 		testMessage2.packetType = Message::TC;
 		testMessage2.applicationId = 4;   // todo: Remove the dummy application ID
-		testMessage2.sourceId = 0;
 		testMessage2.appendUint16(45667); // Append dummy data
 
 		testMessage3.serviceType = 3;
 		testMessage3.messageType = 2;
 		testMessage3.packetType = Message::TC;
-		testMessage3.sourceId = 0;
 		testMessage3.appendUint16(456); // Append dummy data
 
 		testMessage4.serviceType = 12;
 		testMessage4.messageType = 3;
 		testMessage4.packetType = Message::TC;
-		testMessage4.sourceId = 0;
 		testMessage4.appendUint16(934); // Append dummy data
 
 		messagesPopulated = true; // Indicate initialized test messages
@@ -73,6 +69,7 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 	receivedMessage.appendUint16(4); // Total number of requests
+	receivedMessage.sourceId = 0; // todo: proper handling of sourceID when globally integrated
 
 	// Test activity 1
 	receivedMessage.appendDefaultCUCTimeStamp(currentTime + 155643s);
