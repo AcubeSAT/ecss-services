@@ -46,22 +46,26 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 		testMessage1.messageType = 5;
 		testMessage1.packetType = Message::TC;
 		testMessage1.applicationId = 8;  // todo: Remove the dummy application ID
+		testMessage1.sourceId = 0;
 		testMessage1.appendUint16(4253); // Append dummy data
 
 		testMessage2.serviceType = 4;
 		testMessage2.messageType = 5;
 		testMessage2.packetType = Message::TC;
 		testMessage2.applicationId = 4;   // todo: Remove the dummy application ID
+		testMessage2.sourceId = 0;
 		testMessage2.appendUint16(45667); // Append dummy data
 
 		testMessage3.serviceType = 3;
 		testMessage3.messageType = 2;
 		testMessage3.packetType = Message::TC;
+		testMessage3.sourceId = 0;
 		testMessage3.appendUint16(456); // Append dummy data
 
 		testMessage4.serviceType = 12;
 		testMessage4.messageType = 3;
 		testMessage4.packetType = Message::TC;
+		testMessage4.sourceId = 0;
 		testMessage4.appendUint16(934); // Append dummy data
 
 		messagesPopulated = true; // Indicate initialized test messages
@@ -232,7 +236,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	SECTION("Positive Shift") {
 		receivedMessage.appendRelativeTime(timeShift);            // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -247,7 +251,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	SECTION("Negative Shift") {
 		receivedMessage.appendRelativeTime(-25000);              // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -262,7 +266,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	SECTION("Error throw on wrong request ID") {
 		receivedMessage.appendRelativeTime(-250000); // Time-shift value
 		receivedMessage.appendUint16(1);             // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);              // Dummy source ID
+		receivedMessage.appendUint16(0);              // Dummy source ID
 		receivedMessage.appendUint16(80);            // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0);             // Dummy sequence count
 
@@ -273,7 +277,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	SECTION("Error throw on wrong time offset") {
 		receivedMessage.appendRelativeTime(-6789000);             // Time-shift value
 		receivedMessage.appendUint16(1);                          // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -295,11 +299,11 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 
 		receivedMessage.appendUint16(2);                          // Two instructions in the request
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -331,7 +335,7 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 
 	SECTION("Error throw on wrong request ID") {
 		receivedMessage.appendUint16(1);  // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);   // Dummy source ID
+		receivedMessage.appendUint16(0);   // Dummy source ID
 		receivedMessage.appendUint16(80); // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0);  // Dummy sequence count
 
@@ -353,11 +357,11 @@ TEST_CASE("TM[11,10] time-based schedule detail report", "[service][st11]") {
 		scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 
 		receivedMessage.appendUint16(2);                          // Two instructions in the request
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -401,11 +405,11 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 
 		receivedMessage.appendUint16(2);                          // Two instructions in the request
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -419,7 +423,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		uint16_t iterationCount = response.readUint16();
 		for (uint16_t i = 0; i < iterationCount; i++) {
 			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
-			uint8_t receivedSourceID = response.readUint8();
+			uint16_t receivedSourceID = response.readUint16();
 			uint16_t receivedApplicationID = response.readUint16();
 			uint16_t receivedSequenceCount = response.readUint16();
 
@@ -439,7 +443,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 
 	SECTION("Error throw on wrong request ID") {
 		receivedMessage.appendUint16(1);  // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);   // Dummy source ID
+		receivedMessage.appendUint16(0);   // Dummy source ID
 		receivedMessage.appendUint16(80); // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0);  // Dummy sequence count
 
@@ -461,11 +465,11 @@ TEST_CASE("TM[11,13] time-based schedule summary report", "[service][st11]") {
 		scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 
 		receivedMessage.appendUint16(2);                          // Two instructions in the request
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage1.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -479,7 +483,7 @@ TEST_CASE("TM[11,13] time-based schedule summary report", "[service][st11]") {
 		uint16_t iterationCount = response.readUint16();
 		for (uint16_t i = 0; i < iterationCount; i++) {
 			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
-			uint8_t receivedSourceID = response.readUint8();
+			uint16_t receivedSourceID = response.readUint16();
 			uint16_t receivedApplicationID = response.readUint16();
 			uint16_t receivedSequenceCount = response.readUint16();
 
@@ -537,7 +541,7 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 		scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 
 		receivedMessage.appendUint16(1);                          // Just one instruction to delete an activity
-		receivedMessage.appendUint8(0);                           // Source ID is not implemented
+		receivedMessage.appendUint16(0);                           // Source ID is not implemented
 		receivedMessage.appendUint16(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.appendUint16(0);                          // todo: Remove the dummy sequence count
 
@@ -552,7 +556,7 @@ TEST_CASE("TC[11,5] Activity deletion by ID", "[service][st11]") {
 
 	SECTION("Error throw on wrong request ID") {
 		receivedMessage.appendUint16(1);  // Just one instruction to time-shift an activity
-		receivedMessage.appendUint8(0);   // Dummy source ID
+		receivedMessage.appendUint16(0);   // Dummy source ID
 		receivedMessage.appendUint16(80); // Dummy application ID to throw an error
 		receivedMessage.appendUint16(0);  // Dummy sequence count
 
