@@ -18,27 +18,22 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
 		String<ECSSTCRequestStringSize> data = message.data;
-//		uint16_t eventActionDefinitionID = message.readEnum16();
-		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element ;
+		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 		for (element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 
-			if (actionDefinitionExists(element , eventDefinitionID)) {
+			if (actionDefinitionExists(element, eventDefinitionID)) {
 				if (element->second.enabled) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
-				}
-				else if(not element->second.enabled){
-					element->second.applicationID = applicationID ;
-					element->second.eventDefinitionID = eventDefinitionID ;
-					element->second.request = data ;
-//					EventActionDefinition temp(applicationID, eventDefinitionID, message);
-//					EventActionDefinition temp2(element->second.applicationID, element->second.eventDefinitionID, element->second.request);
-//					std::pair::swap(std::make_pair(eventDefinitionID, temp), std::make_pair(element->second.eventDefinitionID, temp2));
+				} else if (not element->second.enabled) {
+					element->second.applicationID = applicationID;
+					element->second.eventDefinitionID = eventDefinitionID;
+					element->second.request = data;
 				}
 				break;
 			}
 		}
-		if (not actionDefinitionExists(element , eventDefinitionID)) {
+		if (not actionDefinitionExists(element, eventDefinitionID)) {
 			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
 			} else {
@@ -54,25 +49,23 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction);
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
-//		message.skipBytes(2);
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
-//		uint16_t eventActionDefinitionID = message.readEnum16();
-		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element ;
+		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 		for (element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
-			if (actionDefinitionExists(element,eventDefinitionID)) {
+			if (actionDefinitionExists(element, eventDefinitionID)) {
 				if ((element->second.applicationID != applicationID)) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 				} else if (element->second.enabled) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
-			    } else {
-				    eventActionDefinitionMap.erase(element);
-			    }
+				} else {
+					eventActionDefinitionMap.erase(element);
+				}
 				break;
 			}
 		}
-		if (not actionDefinitionExists(element,eventDefinitionID)) {
+		if (not actionDefinitionExists(element, eventDefinitionID)) {
 			ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 		}
 	}
@@ -92,14 +85,12 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-//			message.skipBytes(2); // Skips reading the application ID
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-//			uint16_t eventActionDefinitionID = message.readEnum16();
-			etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element ;
+			etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 			for (element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
-				if (actionDefinitionExists(element,eventDefinitionID)) {
+				if (actionDefinitionExists(element, eventDefinitionID)) {
 					if (element->second.applicationID != applicationID) {
 						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 					} else {
@@ -108,7 +99,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 					break;
 				}
 			}
-			if (not actionDefinitionExists(element,eventDefinitionID)) {
+			if (not actionDefinitionExists(element, eventDefinitionID)) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 			}
 		}
@@ -125,11 +116,9 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-//			message.skipBytes(2); // Skips reading applicationID
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
-//			uint16_t eventActionDefinitionID = message.readEnum16();
-			etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element ;
+			etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 			for (element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 				if (actionDefinitionExists(element, eventDefinitionID)) {
@@ -141,7 +130,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 					break;
 				}
 			}
-			if (not actionDefinitionExists(element,eventDefinitionID)) {
+			if (not actionDefinitionExists(element, eventDefinitionID)) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
 			}
 		}
@@ -167,7 +156,6 @@ void EventActionService::eventActionStatusReport() {
 	for (const auto& element: eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationID);
 		report.appendEnum16(element.second.eventDefinitionID);
-//		report.appendEnum16(element.second.eventActionDefinitionID);
 		report.appendBoolean(element.second.enabled);
 	}
 	storeMessage(report);

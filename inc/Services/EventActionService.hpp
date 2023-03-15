@@ -2,8 +2,8 @@
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
 #include "Service.hpp"
-#include "etl/String.hpp"
 #include "Services/EventReportService.hpp"
+#include "etl/String.hpp"
 #include "etl/multimap.h"
 
 /**
@@ -32,7 +32,6 @@ private:
 	bool eventActionFunctionStatus;
 
 public:
-
 	inline static const uint8_t ServiceType = 19;
 
 	enum MessageType : uint8_t {
@@ -51,17 +50,17 @@ public:
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationID = 0;
 		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
-//		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
+		                                    //		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
-		EventActionDefinition (uint16_t applicationID, uint16_t eventDefinitionID, Message& message);
+		EventActionDefinition(uint16_t applicationID, uint16_t eventDefinitionID, Message& message);
 	};
 
 	friend EventReportService;
 
 	etl::multimap<uint16_t, EventActionDefinition, ECSSEventActionStructMapSize>
-		eventActionDefinitionMap;
+	    eventActionDefinitionMap;
 
 	EventActionService() {
 		serviceType = 19;
@@ -74,7 +73,7 @@ public:
 	 * @param eventDefinitionID
 	 * @return boolean
 	 */
-	inline bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID){
+	inline bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID) {
 		return (element->second.eventDefinitionID == eventDefinitionID);
 	}
 
