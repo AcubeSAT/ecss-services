@@ -3,6 +3,7 @@
 
 #include "ECSS_Configuration.hpp"
 #include "Services/DummyService.hpp"
+#include "Services/EnvironmentalTestingService.hpp"
 #include "Services/EventActionService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Services/FunctionManagementService.hpp"
@@ -41,6 +42,10 @@ class ServicePool {
 public:
 #ifdef SERVICE_DUMMY
 	DummyService dummyService;
+#endif
+
+#ifdef SERVICE_ENVIRONMENTALTESTINGSERVICE
+    EnvironmentalTestingService environmentalTestingService;
 #endif
 
 #ifdef SERVICE_EVENTACTION

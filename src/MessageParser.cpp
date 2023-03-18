@@ -80,6 +80,12 @@ void MessageParser::execute(Message& message) {
 			break;
 #endif
 
+#ifdef SERVICE_ENVIRONMENTALTESTINGSERVICE
+        case EnvironmentalTestingService::ServiceType:
+            Services.environmentalTestingService.executeBusSwitch(message);
+            break;
+#endif
+
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
