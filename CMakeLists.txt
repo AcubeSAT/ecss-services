@@ -19,7 +19,6 @@ set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
         "The include directory for the platform-specific ECSS configuration headers"
         )
 include_directories(${ECSS_CONFIGURATION})
-include_directories("../../")
 add_compile_options(-Wvla)
 
 # Specify the .cpp files common across all targets
