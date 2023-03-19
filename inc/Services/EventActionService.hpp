@@ -29,7 +29,7 @@ private:
 	/**
 	 * Event-action function status
 	 */
-	bool eventActionFunctionStatus;
+	bool eventActionFunctionStatus = true;
 
 public:
 	inline static const uint8_t ServiceType = 19;
@@ -49,8 +49,7 @@ public:
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationID = 0;
-		uint16_t eventDefinitionID = 65535; // The ID of the event that might take place
-		                                    //		uint16_t eventActionDefinitionID = 0; // The ID of the event-action
+		uint16_t eventDefinitionID = 65535;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
@@ -67,15 +66,15 @@ public:
 		eventActionFunctionStatus = true;
 	}
 
-	/**
-	 * Checks if the given Event Definition ID already exists
-	 * @param element
-	 * @param eventDefinitionID
-	 * @return boolean
-	 */
-	inline bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID) {
-		return (element->second.eventDefinitionID == eventDefinitionID);
-	}
+//	/**
+//	 * Checks if the given Event Definition ID already exists
+//	 * @param element
+//	 * @param eventDefinitionID
+//	 * @return boolean True if the action Definition exists, else False
+//	 */
+//	inline bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID) {
+//		return (element->first == eventDefinitionID);
+//	}
 
 	/**
 	 * TC[19,1] add event-action definitions
@@ -141,7 +140,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction(uint16_t eventID);
+	void executeAction(uint16_t eventDefinitionID);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
