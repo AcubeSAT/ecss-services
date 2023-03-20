@@ -156,7 +156,7 @@ public:
 		 * In the Event Action Service, an access attempt was made to an unknown event
 		 * action definition
 		 */
-		EventActionUnknownEventDefinitionError = 4,
+		EventActionUnknownEventActionDefinitionError = 4,
 		/**
 		 * EventAction refers to the service, EventActionIDefinitionID refers to the variable
 		 * In the Event Action Service, an access attempt was made to an unknown eventDefinitionID

@@ -34,7 +34,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 				break;
 			}
 		}
-		if (not canBeAdded) {
+		if (canBeAdded) {
 			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
 			} else {
@@ -59,7 +59,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 			if (element->first == eventDefinitionID) {
 				actionDefinitionExists = true;
 				if (element->second.applicationID != applicationID) {
-					ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
+					ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 				} else if (element->second.enabled) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
 				} else {
@@ -69,7 +69,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 			}
 		}
 		if (not actionDefinitionExists) {
-			ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
+			ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 		}
 	}
 }
@@ -97,7 +97,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 				if (element->first == eventDefinitionID) {
 					actionDefinitionExists = true;
 					if (element->second.applicationID != applicationID) {
-						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
+						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 					} else {
 						element->second.enabled = true;
 					}
@@ -105,7 +105,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 				}
 			}
 			if (not actionDefinitionExists) {
-				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 			}
 		}
 	} else {
@@ -130,7 +130,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 				if (element->first == eventDefinitionID) {
 					actionDefinitionExists = true;
 					if (element->second.applicationID != applicationID) {
-						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
+						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 					} else {
 						element->second.enabled = false;
 					}
@@ -138,7 +138,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 				}
 			}
 			if (not actionDefinitionExists) {
-				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventDefinitionError);
+				ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 			}
 		}
 	} else {
