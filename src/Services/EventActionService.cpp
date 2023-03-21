@@ -17,9 +17,8 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	while (numberOfEventActionDefinitions-- != 0) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
-		String<ECSSTCRequestStringSize> data = message.data;
+		//		String<ECSSTCRequestStringSize> data = message.data;
 		bool canBeAdded = true;
-		//		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 		for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 			if (element->first == eventDefinitionID) {
@@ -28,8 +27,9 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
 				} else if (not element->second.enabled) {
 					element->second.applicationID = applicationID;
-					element->second.eventDefinitionID = eventDefinitionID;
-					element->second.request = data;
+					//					element->second.request = message.data + message.readPosition;
+					//					EventActionDefinition temp(applicationID, eventDefinitionID, message);
+					//					eventActionDefinitionMap.insert(element,std::make_pair(eventDefinitionID, temp));
 				}
 				break;
 			}
@@ -53,7 +53,6 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
 		bool actionDefinitionExists = false;
-//		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 		for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 			if (element->first == eventDefinitionID) {
@@ -91,7 +90,6 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
-//			etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 			for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 				if (element->first == eventDefinitionID) {
@@ -124,7 +122,6 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 			uint16_t applicationID = message.readEnum16();
 			uint16_t eventDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
-//			etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator element;
 
 			for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
 				if (element->first == eventDefinitionID) {

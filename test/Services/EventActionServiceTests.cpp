@@ -54,9 +54,9 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		ServiceTests::reset();
 	}
 
-	SECTION("Add an event definition ID that already exists in the same message and a different one") {
+	SECTION("Add an event definition ID that already exists in the same message") {
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-		addDefinitions.appendUint8(3);
+		addDefinitions.appendUint8(2);
 		addDefinitions.appendEnum16(1);
 		addDefinitions.appendEnum16(3);
 		String<ECSSTCRequestStringSize> data = "123";
@@ -65,17 +65,16 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		addDefinitions.appendEnum16(3);
 		data = "123";
 		addDefinitions.appendFixedString(data);
-//		addDefinitions.appendEnum16(2);
-//		addDefinitions.appendEnum16(3);
-//		data = "234";
-//		addDefinitions.appendFixedString(data);
+		//		addDefinitions.appendEnum16(3);
+		//		addDefinitions.appendEnum16(3);
+		//		data = "234";
+		//		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
 
 		auto element = eventActionService.eventActionDefinitionMap.find(3);
 		CHECK(element->second.applicationID == 6);
-//		for (auto i = 0; i < data.size(); ++i) {
-//			CHECK(data[i] == element->second.request[i]);
-//		}
+		CHECK(element->second.request.substr(0, 3) == data);
+
 
 		eventActionService.eventActionDefinitionMap.clear();
 		ServiceTests::reset();

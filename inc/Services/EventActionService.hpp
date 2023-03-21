@@ -29,7 +29,7 @@ private:
 	/**
 	 * Event-action function status
 	 */
-	bool eventActionFunctionStatus = true;
+	bool eventActionFunctionStatus;
 
 public:
 	inline static const uint8_t ServiceType = 19;
@@ -61,20 +61,9 @@ public:
 	etl::multimap<uint16_t, EventActionDefinition, ECSSEventActionStructMapSize>
 	    eventActionDefinitionMap;
 
-	EventActionService() {
+	EventActionService() : eventActionFunctionStatus(true) {
 		serviceType = 19;
-		eventActionFunctionStatus = true;
 	}
-
-//	/**
-//	 * Checks if the given Event Definition ID already exists
-//	 * @param element
-//	 * @param eventDefinitionID
-//	 * @return boolean True if the action Definition exists, else False
-//	 */
-//	inline bool static actionDefinitionExists(const etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256>::iterator& element, uint16_t eventDefinitionID) {
-//		return (element->first == eventDefinitionID);
-//	}
 
 	/**
 	 * TC[19,1] add event-action definitions
