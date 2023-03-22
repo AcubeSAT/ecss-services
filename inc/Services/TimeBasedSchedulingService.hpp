@@ -63,7 +63,7 @@ private:
 	struct RequestID {
 		uint16_t applicationID = 0; ///< Application process ID
 		uint16_t sequenceCount = 0; ///< Packet sequence count
-		uint8_t sourceID = 0;       ///< Packet source ID
+		uint16_t sourceID = 0;       ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or

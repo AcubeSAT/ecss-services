@@ -131,6 +131,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t pusVersion = data[0] >> 4;
 	uint8_t serviceType = data[1];
 	uint8_t messageType = data[2];
+	uint16_t sourceId = (data[3] << 8) + data[4];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
@@ -140,6 +141,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	// Copy the data to the message
 	message.serviceType = serviceType;
 	message.messageType = messageType;
+	message.sourceId = sourceId;
 	std::copy(data + ECSSSecondaryTCHeaderSize, data + ECSSSecondaryTCHeaderSize + length, message.data);
 	message.dataSize = length;
 }
