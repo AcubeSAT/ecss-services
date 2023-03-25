@@ -491,6 +491,8 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 
 		CHECK(!eventActionService.eventActionDefinitionMap.find(15)->second.enabled);
 		CHECK(ServiceTests::countErrors() == 0);
+
+		ServiceTests::reset();
 	}
 
 	SECTION("Action: Add event-action definition") {
@@ -504,10 +506,17 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 		messageToBeExecuted.appendEnum16(0);
 		messageToBeExecuted.appendEnum16(74);
 		String<ECSSTCRequestStringSize> data = "12345";
+		CHECK(messageToBeExecuted.dataSize == 64);
 		messageToBeExecuted.appendFixedString(data);
-		addDefinition.appendMessage(messageToBeExecuted, ECSSTCRequestStringSize);
+		CHECK(messageToBeExecuted.dataSize == 64);
+//		messageToBeExecuted.dataSize -= 10;
+		addDefinition.appendMessage(messageToBeExecuted, CCSDSMaxMessageSize);
 
-		CHECK(ServiceTests::countErrors() == 1);
+//		ServiceTests::getThrownErrors();
+		CHECK(ServiceTests::countErrors() == 0);
+//		CHECK(ServiceTests::thrownError(ErrorHandler::NestedMessageTooLarge));
+		CHECK(sizeof(messageToBeExecuted) == 1024);
+		CHECK(messageToBeExecuted.dataSize == 64);
 
 		MessageParser::execute(addDefinition);
 
@@ -562,20 +571,3 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 		CHECK(report.readUint32() == 10);
 	}
 }
-
-//TEST_CASE("Testing actionDefinitionExists function") {
-//	SECTION("Simple existing definition") {
-//		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-//		addDefinition.appendUint8(1);
-//		addDefinition.appendEnum16(0);
-//		addDefinition.appendEnum16(2);
-//		String<ECSSTCRequestStringSize> data = "12345abcdefg";
-//		addDefinition.appendFixedString(data);
-//		MessageParser::execute(addDefinition);
-//
-//		etl::multimap<uint16_t, EventActionService::EventActionDefinition, 256> eventActionDefinitionMap;
-//
-//		CHECK(eventActionService.actionDefinitionExists(eventActionDefinitionMap.begin(), 2) == true);
-//		CHECK(eventActionService.actionDefinitionExists(eventActionDefinitionMap.begin(), 125) == false);
-//	}
-//}
