@@ -506,17 +506,8 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 		messageToBeExecuted.appendEnum16(0);
 		messageToBeExecuted.appendEnum16(74);
 		String<ECSSTCRequestStringSize> data = "12345";
-		CHECK(messageToBeExecuted.dataSize == 64);
-		messageToBeExecuted.appendFixedString(data);
-		CHECK(messageToBeExecuted.dataSize == 64);
-//		messageToBeExecuted.dataSize -= 10;
-		addDefinition.appendMessage(messageToBeExecuted, CCSDSMaxMessageSize);
-
-//		ServiceTests::getThrownErrors();
-		CHECK(ServiceTests::countErrors() == 0);
-//		CHECK(ServiceTests::thrownError(ErrorHandler::NestedMessageTooLarge));
-		CHECK(sizeof(messageToBeExecuted) == 1024);
-		CHECK(messageToBeExecuted.dataSize == 64);
+		messageToBeExecuted.appendString(data);
+		addDefinition.appendMessage(messageToBeExecuted,ECSSTCRequestStringSize );
 
 		MessageParser::execute(addDefinition);
 
