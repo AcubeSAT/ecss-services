@@ -65,14 +65,17 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		addDefinitions.appendEnum16(3);
 		data = "123";
 		addDefinitions.appendFixedString(data);
-		//		addDefinitions.appendEnum16(3);
-		//		addDefinitions.appendEnum16(3);
-		//		data = "234";
-		//		addDefinitions.appendFixedString(data);
+		MessageParser::execute(addDefinitions);
+
+		addDefinitions.appendUint8(1);
+		addDefinitions.appendEnum16(3);
+		addDefinitions.appendEnum16(3);
+		data = "234";
+		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
 
 		auto element = eventActionService.eventActionDefinitionMap.find(3);
-		CHECK(element->second.applicationID == 6);
+		CHECK(element->second.applicationID ==3);
 		CHECK(element->second.request.substr(0, 3) == data);
 
 

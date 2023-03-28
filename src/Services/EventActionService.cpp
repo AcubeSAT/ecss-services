@@ -27,9 +27,10 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
 				} else if (not element->second.enabled) {
 					element->second.applicationID = applicationID;
-					//					element->second.request = message.data + message.readPosition;
-					//					EventActionDefinition temp(applicationID, eventDefinitionID, message);
-					//					eventActionDefinitionMap.insert(element,std::make_pair(eventDefinitionID, temp));
+					element->second.request = message.data + message.readPosition;
+					EventActionDefinition temp1(applicationID, eventDefinitionID, message);
+					element = eventActionDefinitionMap.erase(element);
+					eventActionDefinitionMap.insert(element,std::make_pair(eventDefinitionID, temp1));
 				}
 				break;
 			}
