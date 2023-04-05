@@ -12,17 +12,10 @@
  * ECSS 8.19 && 6.19
  *
  * @ingroup Services
- * @note: A third variable was added, the eventActionDefinitionID. This was added for the purpose of identifying
- * various eventActionDefinitions that correspond to the same eventDefinitionID. The goal is to have multiple actions
- * be executed when one event takes place. This defies the standard.
+ *
  * @note: The application ID was decided to be abolished as an identifier of the event-action
  * definition
  * @attention: Every event action definition ID should be different, regardless of the application ID
- *
- * @todo: Since there are multiple actions per event and in delete/enable/disable functions are
- * multiple instances are accessed, should I find a more efficient way to access them?
- * @todo: check if eventActionFunctionStatus should be private or not
- * @todo: check if eventAction map of definitions should be private or not //probably private
  */
 class EventActionService : public Service {
 private:

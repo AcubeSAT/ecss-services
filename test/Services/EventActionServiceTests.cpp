@@ -2,7 +2,6 @@
 #include <ServicePool.hpp>
 #include <Services/EventActionService.hpp>
 #include <catch2/catch_all.hpp>
-#include <cstring>
 #include <etl/String.hpp>
 #include "ServiceTests.hpp"
 
@@ -75,7 +74,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		MessageParser::execute(addDefinitions);
 
 		auto element = eventActionService.eventActionDefinitionMap.find(3);
-		CHECK(element->second.applicationID ==3);
+		CHECK(element->second.applicationID == 3);
 		CHECK(element->second.request.substr(0, 3) == data);
 
 
@@ -510,7 +509,7 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 		messageToBeExecuted.appendEnum16(74);
 		String<ECSSTCRequestStringSize> data = "12345";
 		messageToBeExecuted.appendString(data);
-		addDefinition.appendMessage(messageToBeExecuted,ECSSTCRequestStringSize );
+		addDefinition.appendMessage(messageToBeExecuted, ECSSTCRequestStringSize);
 
 		MessageParser::execute(addDefinition);
 

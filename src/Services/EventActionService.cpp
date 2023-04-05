@@ -17,20 +17,19 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	while (numberOfEventActionDefinitions-- != 0) {
 		uint16_t applicationID = message.readEnum16();
 		uint16_t eventDefinitionID = message.readEnum16();
-		//		String<ECSSTCRequestStringSize> data = message.data;
 		bool canBeAdded = true;
 
-		for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
-			if (element->first == eventDefinitionID) {
+		for (auto& element: eventActionDefinitionMap) {
+			if (element.first == eventDefinitionID) {
 				canBeAdded = false;
-				if (element->second.enabled) {
+				if (element.second.enabled) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
-				} else if (not element->second.enabled) {
-					element->second.applicationID = applicationID;
-					element->second.request = message.data + message.readPosition;
-					EventActionDefinition temp1(applicationID, eventDefinitionID, message);
-					element = eventActionDefinitionMap.erase(element);
-					eventActionDefinitionMap.insert(element,std::make_pair(eventDefinitionID, temp1));
+				} else if (not element.second.enabled) {
+					element.second.applicationID = applicationID;
+					element.second.request = message.data + message.readPosition;
+					EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
+					auto mapPosition = eventActionDefinitionMap.erase(eventActionDefinitionMap.find(eventDefinitionID));
+					eventActionDefinitionMap.insert(mapPosition, std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
 				}
 				break;
 			}
@@ -39,8 +38,8 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
 			} else {
-				EventActionDefinition temp(applicationID, eventDefinitionID, message);
-				eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
+				EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
+				eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
 			}
 		}
 	}
@@ -55,15 +54,15 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 		uint16_t eventDefinitionID = message.readEnum16();
 		bool actionDefinitionExists = false;
 
-		for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
-			if (element->first == eventDefinitionID) {
+		for (auto& element: eventActionDefinitionMap) {
+			if (element.first == eventDefinitionID) {
 				actionDefinitionExists = true;
-				if (element->second.applicationID != applicationID) {
+				if (element.second.applicationID != applicationID) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
-				} else if (element->second.enabled) {
+				} else if (element.second.enabled) {
 					ErrorHandler::reportError(message, ErrorHandler::EventActionDeleteEnabledDefinitionError);
 				} else {
-					eventActionDefinitionMap.erase(element);
+					eventActionDefinitionMap.erase(eventActionDefinitionMap.find(eventDefinitionID));
 				}
 				break;
 			}
@@ -92,13 +91,13 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 			uint16_t eventDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
 
-			for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
-				if (element->first == eventDefinitionID) {
+			for (auto& element: eventActionDefinitionMap) {
+				if (element.first == eventDefinitionID) {
 					actionDefinitionExists = true;
-					if (element->second.applicationID != applicationID) {
+					if (element.second.applicationID != applicationID) {
 						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 					} else {
-						element->second.enabled = true;
+						element.second.enabled = true;
 					}
 					break;
 				}
@@ -124,13 +123,13 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 			uint16_t eventDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
 
-			for (auto element = eventActionDefinitionMap.begin(); element != eventActionDefinitionMap.end(); ++element) {
-				if (element->first == eventDefinitionID) {
+			for (auto& element: eventActionDefinitionMap) {
+				if (element.first == eventDefinitionID) {
 					actionDefinitionExists = true;
-					if (element->second.applicationID != applicationID) {
+					if (element.second.applicationID != applicationID) {
 						ErrorHandler::reportError(message, ErrorHandler::EventActionUnknownEventActionDefinitionError);
 					} else {
-						element->second.enabled = false;
+						element.second.enabled = false;
 					}
 					break;
 				}
@@ -180,7 +179,6 @@ void EventActionService::disableEventActionFunction(Message& message) {
 	setEventActionFunctionStatus(false);
 }
 
-// TODO: Should I use applicationID too?
 void EventActionService::executeAction(uint16_t eventDefinitionID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
