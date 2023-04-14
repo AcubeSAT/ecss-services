@@ -21,15 +21,11 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 
 		for (auto& element: eventActionDefinitionMap) {
 			if (element.first == eventDefinitionID) {
-				canBeAdded = false;
 				if (element.second.enabled) {
+					canBeAdded = false;
 					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
 				} else if (not element.second.enabled) {
-					element.second.applicationID = applicationID;
-					element.second.request = message.data + message.readPosition;
-					EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
-					auto mapPosition = eventActionDefinitionMap.erase(eventActionDefinitionMap.find(eventDefinitionID));
-					eventActionDefinitionMap.insert(mapPosition, std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
+					eventActionDefinitionMap.erase(eventDefinitionID);
 				}
 				break;
 			}

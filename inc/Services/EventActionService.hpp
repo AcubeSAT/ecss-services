@@ -13,16 +13,16 @@
  *
  * @ingroup Services
  *
- * @note: The application ID was decided to be abolished as an identifier of the event-action
+ * @note The application ID was decided to be abolished as an identifier of the event-action
  * definition
- * @attention: Every event action definition ID should be different, regardless of the application ID
+ * @attention Every event action definition ID should be different, regardless of the application ID
  */
 class EventActionService : public Service {
 private:
 	/**
 	 * Event-action function status
 	 */
-	bool eventActionFunctionStatus;
+	bool eventActionFunctionStatus = false;
 
 public:
 	inline static const uint8_t ServiceType = 19;
@@ -55,7 +55,7 @@ public:
 	    eventActionDefinitionMap;
 
 	EventActionService() : eventActionFunctionStatus(true) {
-		serviceType = 19;
+		serviceType = ServiceType;
 	}
 
 	/**
