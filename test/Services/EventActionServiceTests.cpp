@@ -7,6 +7,29 @@
 
 EventActionService& eventActionService = Services.eventAction;
 
+/**
+ * Initializes 9 Event Action Definitions with eventDefinitionIDs = {0, 4, 2, 12, 1, 5, 8, 23, 3}
+ */
+void initializeEventActionDefinitions() {
+	Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
+	uint8_t numberOfEventActionDefinitions = 9;
+	uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
+	uint16_t eventDefinitionIDs[] = {0, 4, 2, 12, 1, 5, 8, 23, 3};
+	String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
+	addDefinitions.appendUint8(numberOfEventActionDefinitions);
+	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
+		addDefinitions.appendEnum16(applicationIDs[i]);
+		addDefinitions.appendEnum16(eventDefinitionIDs[i]);
+		addDefinitions.appendFixedString(data[i]);
+	}
+	MessageParser::execute(addDefinitions);
+
+	REQUIRE(eventActionService.eventActionDefinitionMap.size() == 9);
+	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
+		REQUIRE(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i]) != eventActionService.eventActionDefinitionMap.end());
+	}
+}
+
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	SECTION("Add an event-action definition to check if the values are inserted correctly") {
 		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
@@ -53,7 +76,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		ServiceTests::reset();
 	}
 
-	SECTION("Add an event definition ID that already exists in the same message") {
+	SECTION("Add an event definition ID that already exists") {
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
 		addDefinitions.appendEnum16(1);
@@ -141,18 +164,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 
 TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 	SECTION("Simple enable some event-action definitions") {
-		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-		uint8_t numberOfEventActionDefinitions = 6;
-		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2};
-		uint16_t eventDefinitionIDs[] = {0, 4, 2, 6, 1, 5};
-		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5"};
-		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
-			addDefinitions.appendEnum16(applicationIDs[i]);
-			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
-			addDefinitions.appendFixedString(data[i]);
-		}
-		MessageParser::execute(addDefinitions);
+		initializeEventActionDefinitions();
 
 		auto element = eventActionService.eventActionDefinitionMap.find(4);
 		REQUIRE(!element->second.enabled);
@@ -199,18 +211,7 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 	}
 
 	SECTION("Enable all event action definitions") {
-		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-		uint8_t numberOfEventActionDefinitions = 8;
-		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1};
-		uint16_t eventDefinitionIDs[] = {0, 4, 2, 6, 1, 5, 1, 23};
-		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7"};
-		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
-			addDefinitions.appendEnum16(applicationIDs[i]);
-			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
-			addDefinitions.appendFixedString(data[i]);
-		}
-		MessageParser::execute(addDefinitions);
+		initializeEventActionDefinitions();
 
 		Message enableAllDefinitions(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableAllDefinitions.appendUint8(0);
@@ -226,31 +227,20 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 
 TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	SECTION("Delete an event-action definition") {
-		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-		uint8_t numberOfEventActionDefinitions = 7;
-		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 0, 2};
-		uint16_t eventDefinitionIDs[] = {0, 4, 2, 6, 1, 7, 5};
-		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6"};
-		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
-			addDefinitions.appendEnum16(applicationIDs[i]);
-			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
-			addDefinitions.appendFixedString(data[i]);
-		}
-		MessageParser::execute(addDefinitions);
+		initializeEventActionDefinitions();
 
 		Message deleteDefinition(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
 		deleteDefinition.appendUint8(2);
 		deleteDefinition.appendEnum16(1);
 		deleteDefinition.appendEnum16(2);
-		deleteDefinition.appendEnum16(0);
-		deleteDefinition.appendEnum16(7);
+		deleteDefinition.appendEnum16(2);
+		deleteDefinition.appendEnum16(5);
 		MessageParser::execute(deleteDefinition);
 
 		REQUIRE(eventActionService.eventActionDefinitionMap.count(0) == 1);
 		REQUIRE(eventActionService.eventActionDefinitionMap.count(2) == 0);
 		REQUIRE(eventActionService.eventActionDefinitionMap.count(1) == 1);
-		REQUIRE(eventActionService.eventActionDefinitionMap.count(7) == 0);
+		REQUIRE(eventActionService.eventActionDefinitionMap.count(5) == 0);
 	}
 
 	SECTION("Trying to delete an enabled event-action definition") {
@@ -298,20 +288,9 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 }
 
 TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
-	Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-	uint8_t numberOfEventActionDefinitions = 5;
-	uint16_t applicationIDs[] = {1, 1, 1, 1, 1};
-	uint16_t eventDefinitionIDs[] = {0, 1, 2, 3, 4};
-	String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4"};
-	addDefinition.appendUint8(numberOfEventActionDefinitions);
-	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
-		addDefinition.appendEnum16(applicationIDs[i]);
-		addDefinition.appendEnum16(eventDefinitionIDs[i]);
-		addDefinition.appendFixedString(data[i]);
-	}
-	MessageParser::execute(addDefinition);
+	initializeEventActionDefinitions();
 
-	REQUIRE(eventActionService.eventActionDefinitionMap.size() == 5);
+	REQUIRE(eventActionService.eventActionDefinitionMap.size() == 9);
 
 	Message deleteAllDefinitions(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction, Message::TC, 0);
 	MessageParser::execute(deleteAllDefinitions);
@@ -321,18 +300,7 @@ TEST_CASE("Delete all event-action definitions TC[19,3]", "[service][st19]") {
 
 TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 	SECTION("Simple disable some event-action definitions") {
-		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
-		uint8_t numberOfEventActionDefinitions = 9;
-		uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
-		uint16_t eventDefinitionIDs[] = {0, 4, 2, 12, 1, 5, 8, 23, 3};
-		String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
-		addDefinitions.appendUint8(numberOfEventActionDefinitions);
-		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
-			addDefinitions.appendEnum16(applicationIDs[i]);
-			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
-			addDefinitions.appendFixedString(data[i]);
-		}
-		MessageParser::execute(addDefinitions);
+		initializeEventActionDefinitions();
 
 		Message enableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinitions.appendUint8(4);
