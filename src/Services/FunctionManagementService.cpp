@@ -5,12 +5,9 @@
 
 void FunctionManagementService::call(Message& msg) {
 	msg.resetRead();
-	ErrorHandler::assertRequest(msg.packetType == Message::TC, msg,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.messageType == FunctionManagementService::MessageType::PerformFunction, msg,
-		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.serviceType == FunctionManagementService::ServiceType, msg,
-		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+
+	if(!msg.assertTC(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction))
+		return;
 
 	uint8_t funcName[ECSSFunctionNameLength] = { 0 }; // the function's name
 	uint8_t funcArgs[ECSSFunctionMaxArgLength] = { 0 }; // arguments for the function
