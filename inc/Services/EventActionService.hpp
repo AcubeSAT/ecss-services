@@ -42,7 +42,8 @@ public:
 	struct EventActionDefinition {
 		// TODO: APID = 0 is the Ground Station APID. This should be changed
 		uint16_t applicationID = 0;
-		uint16_t eventDefinitionID = 65535;
+		inline static const uint16_t MaxDefinitionID = 65535;
+		uint16_t eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 

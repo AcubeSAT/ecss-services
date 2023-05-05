@@ -15,7 +15,7 @@ void initializeEventActionDefinitions() {
 	uint8_t numberOfEventActionDefinitions = 9;
 	uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
 	uint16_t eventDefinitionIDs[] = {0, 4, 2, 12, 1, 5, 8, 23, 3};
-	String<ECSSTCRequestStringSize> data[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8"};
+	String<ECSSTCRequestStringSize> data[] = {"\0", "1", "\0", "3", "4", "5", "6", "7", "8"};
 	addDefinitions.appendUint8(numberOfEventActionDefinitions);
 	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
 		addDefinitions.appendEnum16(applicationIDs[i]);
