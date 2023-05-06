@@ -8,7 +8,9 @@
 
 void EventActionService::addEventActionDefinitions(Message& message) {
 	// TC[19,1]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction);
+	if(!message.assertTC(ServiceType, MessageType::AddEventAction))
+		return;
+
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
 	uint16_t eventActionDefinitionID = message.readEnum16();
