@@ -14,36 +14,35 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
 	uint16_t eventActionDefinitionID = message.readEnum16();
-	bool canBeAdded = true;
 	if (eventActionDefinitionMap.find(eventDefinitionID) != eventActionDefinitionMap.end()) {
 		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
 		for (auto& element = range.first; element != range.second; ++element) {
 			if (element->second.eventActionDefinitionID == eventActionDefinitionID) {
-				canBeAdded = false;
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionIDExistsError);
+				return;
 			}
 		}
 	}
 
 	if ((message.dataSize - 6) > ECSSTCRequestStringSize) {
-		canBeAdded = false;
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
+		return;
 	}
-	if (canBeAdded) {
-		char data[ECSSTCRequestStringSize] = { 0 };
-		message.readString(data, message.dataSize - 6);
-		EventActionDefinition temp;
-		temp.enabled = false;
-		temp.applicationId = applicationID;
-		temp.eventDefinitionID = eventDefinitionID;
-		temp.eventActionDefinitionID = eventActionDefinitionID;
-		temp.request = String<ECSSTCRequestStringSize>(data);
-		if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
-			ErrorHandler::reportError(message,ErrorHandler::EventActionDefinitionsMapIsFull);
-			return;
-		}
-		eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
+
+	if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
+		ErrorHandler::reportError(message,ErrorHandler::EventActionDefinitionsMapIsFull);
+		return;
 	}
+
+	char data[ECSSTCRequestStringSize] = { 0 };
+	message.readString(data, message.dataSize - 6);
+	EventActionDefinition temp;
+	temp.enabled = false;
+	temp.applicationId = applicationID;
+	temp.eventDefinitionID = eventDefinitionID;
+	temp.eventActionDefinitionID = eventActionDefinitionID;
+	temp.request = String<ECSSTCRequestStringSize>(data);
+	eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 }
 
 void EventActionService::deleteEventActionDefinitions(Message& message) {
