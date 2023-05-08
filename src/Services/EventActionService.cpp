@@ -46,7 +46,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::deleteEventActionDefinitions(Message& message) {
-	if(!message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction)) {
+	if(!message.assertTC(ServiceType,MessageType::DeleteEventAction)) {
 		return;
 	}
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
@@ -78,7 +78,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 
 void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 	// TC[19,3]
-	if(!message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction)) {
+	if(!message.assertTC(ServiceType, MessageType::DeleteAllEventAction)) {
 		return;
 	}
 	setEventActionFunctionStatus(false);
@@ -87,7 +87,7 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 
 void EventActionService::enableEventActionDefinitions(Message& message) {
 	// TC[19,4]
-	if(!message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction)) {
+	if(!message.assertTC(ServiceType, MessageType::EnableEventAction)) {
 		return;
 	}
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
@@ -122,7 +122,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 
 void EventActionService::disableEventActionDefinitions(Message& message) {
 	// TC[19,5]
-	if(!message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction)) {
+	if(!message.assertTC(ServiceType, MessageType::DisableEventAction)) {
 		return;
 	}
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
@@ -156,7 +156,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 
 void EventActionService::requestEventActionDefinitionStatus(Message& message) {
 	// TC[19,6]
-	if(!message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::ReportStatusOfEachEventAction)) {
+	if(!message.assertTC(ServiceType, MessageType::ReportStatusOfEachEventAction)) {
 		return;
 	}
 	eventActionStatusReport();
@@ -178,7 +178,7 @@ void EventActionService::eventActionStatusReport() {
 
 void EventActionService::enableEventActionFunction(Message& message) {
 	// TC[19,8]
-	if(!message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventActionFunction)) {
+	if(!message.assertTC(ServiceType, MessageType::EnableEventActionFunction)) {
 		return;
 	}
 	setEventActionFunctionStatus(true);
@@ -186,7 +186,7 @@ void EventActionService::enableEventActionFunction(Message& message) {
 
 void EventActionService::disableEventActionFunction(Message& message) {
 	// TC[19,9]
-	if(!message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventActionFunction)) {
+	if(!message.assertTC(ServiceType, MessageType::DisableEventActionFunction)) {
 		return;
 	}
 	setEventActionFunctionStatus(false);
