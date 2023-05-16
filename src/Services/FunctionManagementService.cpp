@@ -6,8 +6,9 @@
 void FunctionManagementService::call(Message& msg) {
 	msg.resetRead();
 
-	if(!msg.assertTC(ServiceType, MessageType::PerformFunction))
+	if(!msg.assertTC(ServiceType, MessageType::PerformFunction)) {
 		return;
+	}
 
 	uint8_t funcName[ECSSFunctionNameLength] = { 0 }; // the function's name
 	uint8_t funcArgs[ECSSFunctionMaxArgLength] = { 0 }; // arguments for the function
