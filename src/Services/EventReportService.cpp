@@ -75,7 +75,9 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEv
 
 void EventReportService::enableReportGeneration(Message message) {
 	// TC[5,5]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents);
+	if(!message.assertTC(ServiceType, MessageType::EnableReportGenerationOfEvents)){
+		return;
+	}
 
 	/**
 	 * @todo: Report an error if length > numberOfEvents
@@ -91,7 +93,9 @@ void EventReportService::enableReportGeneration(Message message) {
 
 void EventReportService::disableReportGeneration(Message message) {
 	// TC[5,6]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents);
+	if(!message.assertTC(ServiceType, MessageType::DisableReportGenerationOfEvents)){
+		return;
+	}
 
 	/**
 	 * @todo: Report an error if length > numberOfEvents
@@ -107,7 +111,9 @@ void EventReportService::disableReportGeneration(Message message) {
 
 void EventReportService::requestListOfDisabledEvents(Message message) {
 	// TC[5,7]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents);
+	if(!message.assertTC(ServiceType, MessageType::ReportListOfDisabledEvents)){
+		return;
+	}
 
 	listOfDisabledEventsReport();
 }
