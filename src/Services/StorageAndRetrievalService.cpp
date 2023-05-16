@@ -247,19 +247,25 @@ void StorageAndRetrievalService::executeOnPacketStores(Message& request,
 }
 
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
-	request.assertTC(ServiceType, MessageType::EnableStorageInPacketStores);
+	if(!request.assertTC(ServiceType, MessageType::EnableStorageInPacketStores)){
+		return;
+	}
 
 	executeOnPacketStores(request, [](PacketStore& p) { p.storageStatus = true; });
 }
 
 void StorageAndRetrievalService::disableStorageFunction(Message& request) {
-	request.assertTC(ServiceType, MessageType::DisableStorageInPacketStores);
+	if(!request.assertTC(ServiceType, MessageType::DisableStorageInPacketStores)){
+		return;
+	}
 
 	executeOnPacketStores(request, [](PacketStore& p) { p.storageStatus = false; });
 }
 
 void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
-	request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval);
+	if(!request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval)){
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	bool errorFlag = false;
@@ -288,7 +294,9 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 }
 
 void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeletePacketStoreContent);
+	if(!request.assertTC(ServiceType, MessageType::DeletePacketStoreContent)){
+		return;
+	}
 
 	uint32_t timeLimit = request.readUint32(); // todo: decide the time-format
 	uint16_t numOfPacketStores = request.readUint16();
@@ -330,7 +338,9 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores);
+	if(!request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores)){
+		return;
+	}
 
 	Message report = createTM(PacketStoreContentSummaryReport);
 	uint16_t numOfPacketStores = request.readUint16();
@@ -369,7 +379,9 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 }
 
 void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime);
+	if(!request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime)){
+		return;
+	}
 
 	uint32_t newStartTimeTag = request.readUint32();
 	/**
@@ -404,7 +416,9 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 }
 
 void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::ResumeOpenRetrievalOfPacketStores);
+	if(!request.assertTC(ServiceType, MessageType::ResumeOpenRetrievalOfPacketStores)){
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
@@ -435,7 +449,9 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 }
 
 void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::SuspendOpenRetrievalOfPacketStores);
+	if(!request.assertTC(ServiceType, MessageType::SuspendOpenRetrievalOfPacketStores)){
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
@@ -455,7 +471,9 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 }
 
 void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
-	request.assertTC(ServiceType, MessageType::AbortByTimeRangeRetrieval);
+	if(!request.assertTC(ServiceType, MessageType::AbortByTimeRangeRetrieval)){
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
@@ -475,7 +493,9 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportStatusOfPacketStores);
+	if(!request.assertTC(ServiceType, MessageType::ReportStatusOfPacketStores)){
+		return;
+	}
 
 	Message report = createTM(PacketStoresStatusReport);
 	report.appendUint16(packetStores.size());
@@ -490,7 +510,9 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 }
 
 void StorageAndRetrievalService::createPacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::CreatePacketStores);
+	if(!request.assertTC(ServiceType, MessageType::CreatePacketStores)){
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	for (uint16_t i = 0; i < numOfPacketStores; i++) {
@@ -527,7 +549,9 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::deletePacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeletePacketStores);
+	if(!request.assertTC(ServiceType, MessageType::DeletePacketStores)){
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
@@ -590,7 +614,9 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportConfigurationOfPacketStores);
+	if(!request.assertTC(ServiceType, MessageType::ReportConfigurationOfPacketStores)){
+		return;
+	}
 	Message report = createTM(PacketStoreConfigurationReport);
 
 	report.appendUint16(packetStores.size());
@@ -606,7 +632,9 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 }
 
 void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
-	request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow);
+	if(!request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow)){
+		return;
+	}
 
 	uint8_t typeOfTimeWindow = request.readEnum8();
 	switch (typeOfTimeWindow) {
@@ -626,7 +654,9 @@ void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
 }
 
 void StorageAndRetrievalService::resizePacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::ResizePacketStores);
+	if(!request.assertTC(ServiceType, MessageType::ResizePacketStores)){
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	for (uint16_t i = 0; i < numOfPacketStores; i++) {
@@ -662,7 +692,9 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeTypeToCircular);
+	if(!request.assertTC(ServiceType, MessageType::ChangeTypeToCircular)){
+		return;
+	}
 
 	auto idToChange = readPacketStoreId(request);
 	if (packetStores.find(idToChange) == packetStores.end()) {
@@ -690,7 +722,9 @@ void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
 }
 
 void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeTypeToBounded);
+	if(!request.assertTC(ServiceType, MessageType::ChangeTypeToBounded)){
+		return;
+	}
 
 	auto idToChange = readPacketStoreId(request);
 	if (packetStores.find(idToChange) == packetStores.end()) {
@@ -718,7 +752,9 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 }
 
 void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeVirtualChannel);
+	if(!request.assertTC(ServiceType, MessageType::ChangeVirtualChannel)){
+		return;
+	}
 
 	auto idToChange = readPacketStoreId(request);
 	uint8_t virtualChannel = request.readUint8();
