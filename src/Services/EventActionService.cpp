@@ -1,13 +1,12 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTACTION
 
-#include "Services/EventActionService.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
+#include "Services/EventActionService.hpp"
 
 
 void EventActionService::addEventActionDefinitions(Message& message) {
-	// TC[19,1]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction);
 	uint16_t applicationID = message.readEnum16();
 	uint16_t eventDefinitionID = message.readEnum16();
@@ -28,7 +27,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		ErrorHandler::reportInternalError(ErrorHandler::MessageTooLarge);
 	}
 	if (canBeAdded) {
-		char data[ECSSTCRequestStringSize] = { 0 };
+		char data[ECSSTCRequestStringSize] = {0};
 		message.readString(data, message.dataSize - 6);
 		EventActionDefinition temp;
 		temp.enabled = false;
@@ -37,7 +36,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		temp.eventActionDefinitionID = eventActionDefinitionID;
 		temp.request = String<ECSSTCRequestStringSize>(data);
 		if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
-			ErrorHandler::reportError(message,ErrorHandler::EventActionDefinitionsMapIsFull);
+			ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
 		} else {
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 		}
@@ -74,7 +73,6 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::deleteAllEventActionDefinitions(Message& message) {
-	// TC[19,3]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction);
 
 	setEventActionFunctionStatus(false);
@@ -82,7 +80,6 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::enableEventActionDefinitions(Message& message) {
-	// TC[19,4]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0U) {
@@ -108,14 +105,13 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 			}
 		}
 	} else {
-		for (auto& element : eventActionDefinitionMap) {
+		for (auto& element: eventActionDefinitionMap) {
 			element.second.enabled = true;
 		}
 	}
 }
 
 void EventActionService::disableEventActionDefinitions(Message& message) {
-	// TC[19,5]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction);
 	uint16_t numberOfEventActionDefinitions = message.readUint16();
 	if (numberOfEventActionDefinitions != 0U) {
@@ -140,25 +136,23 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 			}
 		}
 	} else {
-		for (auto& element : eventActionDefinitionMap) {
+		for (auto& element: eventActionDefinitionMap) {
 			element.second.enabled = false;
 		}
 	}
 }
 
 void EventActionService::requestEventActionDefinitionStatus(Message& message) {
-	// TC[19,6]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::ReportStatusOfEachEventAction);
 
 	eventActionStatusReport();
 }
 
 void EventActionService::eventActionStatusReport() {
-	// TM[19,7]
 	Message report = createTM(EventActionStatusReport);
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
-	for (const auto& element : eventActionDefinitionMap) {
+	for (const auto& element: eventActionDefinitionMap) {
 		report.appendEnum16(element.second.applicationId);
 		report.appendEnum16(element.second.eventDefinitionID);
 		report.appendEnum16(element.second.eventActionDefinitionID);
@@ -168,14 +162,12 @@ void EventActionService::eventActionStatusReport() {
 }
 
 void EventActionService::enableEventActionFunction(Message& message) {
-	// TC[19,8]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventActionFunction);
 
 	setEventActionFunctionStatus(true);
 }
 
 void EventActionService::disableEventActionFunction(Message& message) {
-	// TC[19,9]
 	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventActionFunction);
 
 	setEventActionFunctionStatus(false);
@@ -215,7 +207,7 @@ void EventActionService::execute(Message& message) {
 		case ReportStatusOfEachEventAction:
 			requestEventActionDefinitionStatus(message);
 			break;
-		case EnableEventActionFunction :
+		case EnableEventActionFunction:
 			enableEventActionFunction(message);
 			break;
 		case DisableEventActionFunction:
