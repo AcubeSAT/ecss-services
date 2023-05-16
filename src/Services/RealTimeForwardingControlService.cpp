@@ -100,7 +100,7 @@ bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(uin
 }
 
 void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration)){
+	if (!request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration)) {
 		return;
 	}
 	uint8_t numOfApplications = request.readUint8();

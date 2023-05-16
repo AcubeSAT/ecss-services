@@ -5,7 +5,7 @@
 #include "Services/TestService.hpp"
 
 void TestService::areYouAlive(Message& request) {
-	if(!request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest)){
+	if (!request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest)) {
 		return;
 	}
 	areYouAliveReport();
@@ -17,7 +17,7 @@ void TestService::areYouAliveReport() {
 }
 
 void TestService::onBoardConnection(Message& request) {
-	if(!request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest)){
+	if (!request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest)) {
 		return;
 	}
 	uint16_t applicationProcessId = request.readUint16();

@@ -2,7 +2,7 @@
 #include "ServicePool.hpp"
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure)){
+	if (!request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure)) {
 		return;
 	}
 
@@ -31,7 +31,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 }
 
 void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DeleteHousekeepingReportStructure)){
+	if (!request.assertTC(ServiceType, MessageType::DeleteHousekeepingReportStructure)) {
 		return;
 	}
 	uint8_t numOfStructuresToDelete = request.readUint8();
@@ -49,7 +49,7 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 }
 
 void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport)){
+	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport)) {
 		return;
 	}
 
@@ -64,7 +64,7 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 }
 
 void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DisablePeriodicHousekeepingParametersReport)){
+	if (!request.assertTC(ServiceType, MessageType::DisablePeriodicHousekeepingParametersReport)) {
 		return;
 	}
 
@@ -79,7 +79,7 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 }
 
 void HousekeepingService::reportHousekeepingStructures(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ReportHousekeepingStructures)){
+	if (!request.assertTC(ServiceType, MessageType::ReportHousekeepingStructures)) {
 		return;
 	}
 
@@ -131,7 +131,7 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 }
 
 void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::GenerateOneShotHousekeepingReport)){
+	if (!request.assertTC(ServiceType, MessageType::GenerateOneShotHousekeepingReport)) {
 		return;
 	}
 
@@ -147,7 +147,7 @@ void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 }
 
 void HousekeepingService::appendParametersToHousekeepingStructure(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure)){
+	if (!request.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure)) {
 		return;
 	}
 
@@ -178,7 +178,7 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 }
 
 void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ModifyCollectionIntervalOfStructures)){
+	if (!request.assertTC(ServiceType, MessageType::ModifyCollectionIntervalOfStructures)) {
 		return;
 	}
 
@@ -194,7 +194,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 }
 
 void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties)){
+	if (!request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties)) {
 		return;
 	}
 

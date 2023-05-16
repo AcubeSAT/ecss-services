@@ -6,12 +6,12 @@
 void FunctionManagementService::call(Message& msg) {
 	msg.resetRead();
 
-	if(!msg.assertTC(ServiceType, MessageType::PerformFunction)) {
+	if (!msg.assertTC(ServiceType, MessageType::PerformFunction)) {
 		return;
 	}
 
-	uint8_t funcName[ECSSFunctionNameLength] = { 0 }; // the function's name
-	uint8_t funcArgs[ECSSFunctionMaxArgLength] = { 0 }; // arguments for the function
+	uint8_t funcName[ECSSFunctionNameLength] = {0};   // the function's name
+	uint8_t funcArgs[ECSSFunctionMaxArgLength] = {0}; // arguments for the function
 
 	msg.readString(funcName, ECSSFunctionNameLength);
 	msg.readString(funcArgs, ECSSFunctionMaxArgLength);
@@ -39,7 +39,7 @@ void FunctionManagementService::call(Message& msg) {
 }
 
 void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,
-	void (* ptr)(String<ECSSFunctionMaxArgLength>)) {
+                                        void (*ptr)(String<ECSSFunctionMaxArgLength>)) {
 	if (not funcPtrIndex.full()) { // CAUTION: etl::map won't check by itself if it's full
 		// before attempting to insert a key-value pair, causing segmentation faults. Check first!
 		funcName.append(ECSSFunctionNameLength - funcName.length(), 0);

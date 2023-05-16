@@ -23,21 +23,21 @@ Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::Defa
 }
 
 void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::EnableTimeBasedScheduleExecutionFunction)){
+	if (!request.assertTC(ServiceType, MessageType::EnableTimeBasedScheduleExecutionFunction)) {
 		return;
 	}
 	executionFunctionStatus = true;
 }
 
 void TimeBasedSchedulingService::disableScheduleExecution(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DisableTimeBasedScheduleExecutionFunction)){
+	if (!request.assertTC(ServiceType, MessageType::DisableTimeBasedScheduleExecutionFunction)) {
 		return;
 	}
 	executionFunctionStatus = false;
 }
 
 void TimeBasedSchedulingService::resetSchedule(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ResetTimeBasedSchedule)){
+	if (!request.assertTC(ServiceType, MessageType::ResetTimeBasedSchedule)) {
 		return;
 	}
 	executionFunctionStatus = false;
@@ -46,7 +46,7 @@ void TimeBasedSchedulingService::resetSchedule(Message& request) {
 }
 
 void TimeBasedSchedulingService::insertActivities(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::InsertActivities)){
+	if (!request.assertTC(ServiceType, MessageType::InsertActivities)) {
 		return;
 	}
 
@@ -81,7 +81,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::TimeShiftALlScheduledActivities)){
+	if (!request.assertTC(ServiceType, MessageType::TimeShiftALlScheduledActivities)) {
 		return;
 	}
 
@@ -104,7 +104,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 }
 
 void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::TimeShiftActivitiesById)){
+	if (!request.assertTC(ServiceType, MessageType::TimeShiftActivitiesById)) {
 		return;
 	}
 
@@ -138,7 +138,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DeleteActivitiesById)){
+	if (!request.assertTC(ServiceType, MessageType::DeleteActivitiesById)) {
 		return;
 	}
 
@@ -163,7 +163,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
-	if(!request.assertTC(ServiceType,   MessageType::DetailReportAllScheduledActivities)){
+	if (!request.assertTC(ServiceType, MessageType::DetailReportAllScheduledActivities)) {
 		return;
 	}
 
@@ -183,7 +183,7 @@ void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<S
 }
 
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DetailReportActivitiesById)){
+	if (!request.assertTC(ServiceType, MessageType::DetailReportActivitiesById)) {
 		return;
 	}
 
@@ -214,7 +214,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ActivitiesSummaryReportById)){
+	if (!request.assertTC(ServiceType, MessageType::ActivitiesSummaryReportById)) {
 		return;
 	}
 

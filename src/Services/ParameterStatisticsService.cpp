@@ -9,7 +9,7 @@ ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(T
 }
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ReportParameterStatistics)){
+	if (!request.assertTC(ServiceType, MessageType::ReportParameterStatistics)) {
 		return;
 	}
 	parameterStatisticsReport();
@@ -57,7 +57,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 }
 
 void ParameterStatisticsService::resetParameterStatistics(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ResetParameterStatistics)){
+	if (!request.assertTC(ServiceType, MessageType::ResetParameterStatistics)) {
 		return;
 	}
 	resetParameterStatistics();
@@ -77,7 +77,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	 */
 	uint16_t SAMPLING_PARAMETER_INTERVAL = 5;
 
-	if(!request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting)){
+	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting)) {
 		return;
 	}
 
@@ -91,7 +91,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 }
 
 void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting)){
+	if (!request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting)) {
 		return;
 	}
 
@@ -100,7 +100,7 @@ void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& req
 }
 
 void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions)){
+	if (!request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions)) {
 		return;
 	}
 
@@ -145,7 +145,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 }
 
 void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions)){
+	if (!request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions)) {
 		return;
 	}
 
@@ -169,7 +169,7 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 }
 
 void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions)){
+	if (!request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions)) {
 		return;
 	}
 	statisticsDefinitionsReport();

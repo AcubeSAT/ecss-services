@@ -247,7 +247,7 @@ void StorageAndRetrievalService::executeOnPacketStores(Message& request,
 }
 
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::EnableStorageInPacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::EnableStorageInPacketStores)) {
 		return;
 	}
 
@@ -255,7 +255,7 @@ void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 }
 
 void StorageAndRetrievalService::disableStorageFunction(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DisableStorageInPacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::DisableStorageInPacketStores)) {
 		return;
 	}
 
@@ -263,7 +263,7 @@ void StorageAndRetrievalService::disableStorageFunction(Message& request) {
 }
 
 void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval)){
+	if (!request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval)) {
 		return;
 	}
 
@@ -294,7 +294,7 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 }
 
 void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DeletePacketStoreContent)){
+	if (!request.assertTC(ServiceType, MessageType::DeletePacketStoreContent)) {
 		return;
 	}
 
@@ -338,7 +338,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores)) {
 		return;
 	}
 
@@ -379,7 +379,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 }
 
 void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime)){
+	if (!request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime)) {
 		return;
 	}
 
@@ -416,7 +416,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 }
 
 void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ResumeOpenRetrievalOfPacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::ResumeOpenRetrievalOfPacketStores)) {
 		return;
 	}
 
@@ -449,7 +449,7 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 }
 
 void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::SuspendOpenRetrievalOfPacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::SuspendOpenRetrievalOfPacketStores)) {
 		return;
 	}
 
@@ -471,7 +471,7 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 }
 
 void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::AbortByTimeRangeRetrieval)){
+	if (!request.assertTC(ServiceType, MessageType::AbortByTimeRangeRetrieval)) {
 		return;
 	}
 
@@ -493,7 +493,7 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ReportStatusOfPacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::ReportStatusOfPacketStores)) {
 		return;
 	}
 
@@ -510,7 +510,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 }
 
 void StorageAndRetrievalService::createPacketStores(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::CreatePacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::CreatePacketStores)) {
 		return;
 	}
 
@@ -549,7 +549,7 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::deletePacketStores(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::DeletePacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::DeletePacketStores)) {
 		return;
 	}
 
@@ -614,7 +614,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ReportConfigurationOfPacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::ReportConfigurationOfPacketStores)) {
 		return;
 	}
 	Message report = createTM(PacketStoreConfigurationReport);
@@ -632,7 +632,7 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 }
 
 void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow)){
+	if (!request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow)) {
 		return;
 	}
 
@@ -654,7 +654,7 @@ void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
 }
 
 void StorageAndRetrievalService::resizePacketStores(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ResizePacketStores)){
+	if (!request.assertTC(ServiceType, MessageType::ResizePacketStores)) {
 		return;
 	}
 
@@ -692,7 +692,7 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ChangeTypeToCircular)){
+	if (!request.assertTC(ServiceType, MessageType::ChangeTypeToCircular)) {
 		return;
 	}
 
@@ -722,7 +722,7 @@ void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
 }
 
 void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ChangeTypeToBounded)){
+	if (!request.assertTC(ServiceType, MessageType::ChangeTypeToBounded)) {
 		return;
 	}
 
@@ -752,7 +752,7 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 }
 
 void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::ChangeVirtualChannel)){
+	if (!request.assertTC(ServiceType, MessageType::ChangeVirtualChannel)) {
 		return;
 	}
 
