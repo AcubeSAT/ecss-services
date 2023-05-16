@@ -7,7 +7,9 @@
 
 void ParameterService::reportParameters(Message& paramIds) {
 
-	paramIds.assertTC(ServiceType, ReportParameterValues);
+	if(!paramIds.assertTC(ServiceType, ReportParameterValues)){
+		return;
+	}
 	Message parameterReport = createTM(ParameterValuesReport);
 
 	uint16_t numOfIds = paramIds.readUint16();
@@ -23,30 +25,33 @@ void ParameterService::reportParameters(Message& paramIds) {
 	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		if (auto parameter = getParameter(currId)) {
-			parameterReport.appendUint16(currId);
-			parameter->get().appendValueToMessage(parameterReport);
-		} else {
+		auto parameter = getParameter(currId);
+		if(!parameter){
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+			continue;
 		}
+		parameterReport.appendUint16(currId);
+		parameter->get().appendValueToMessage(parameterReport);
 	}
 
 	storeMessage(parameterReport);
 }
 
 void ParameterService::setParameters(Message& newParamValues) const {
-	newParamValues.assertTC(ServiceType, MessageType::SetParameterValues);
+	if(!newParamValues.assertTC(ServiceType, MessageType::SetParameterValues)){
+		return;
+	}
 
 	uint16_t numOfIds = newParamValues.readUint16();
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		if (auto parameter = getParameter(currId)) {
-			parameter->get().setValueFromMessage(newParamValues);
-		} else {
+		auto parameter = getParameter(currId);
+		if(!parameter){
 			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);
 			break; // Setting next parameters is impossible, since the size of value to be read is unknown
 		}
+		parameter->get().setValueFromMessage(newParamValues);
 	}
 }
 
