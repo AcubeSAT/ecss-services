@@ -7,7 +7,6 @@
 
 
 void EventActionService::addEventActionDefinitions(Message& message) {
-	// TC[19,1]
 	if (!message.assertTC(ServiceType, MessageType::AddEventAction)) {
 		return;
 	}
@@ -77,7 +76,6 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::deleteAllEventActionDefinitions(Message& message) {
-	// TC[19,3]
 	if (!message.assertTC(ServiceType, MessageType::DeleteAllEventAction)) {
 		return;
 	}
@@ -86,7 +84,6 @@ void EventActionService::deleteAllEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::enableEventActionDefinitions(Message& message) {
-	// TC[19,4]
 	if (!message.assertTC(ServiceType, MessageType::EnableEventAction)) {
 		return;
 	}
@@ -121,7 +118,6 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::disableEventActionDefinitions(Message& message) {
-	// TC[19,5]
 	if (!message.assertTC(ServiceType, MessageType::DisableEventAction)) {
 		return;
 	}
@@ -155,7 +151,6 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::requestEventActionDefinitionStatus(Message& message) {
-	// TC[19,6]
 	if (!message.assertTC(ServiceType, MessageType::ReportStatusOfEachEventAction)) {
 		return;
 	}
@@ -163,7 +158,6 @@ void EventActionService::requestEventActionDefinitionStatus(Message& message) {
 }
 
 void EventActionService::eventActionStatusReport() {
-	// TM[19,7]
 	Message report = createTM(EventActionStatusReport);
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
@@ -177,7 +171,6 @@ void EventActionService::eventActionStatusReport() {
 }
 
 void EventActionService::enableEventActionFunction(Message& message) {
-	// TC[19,8]
 	if (!message.assertTC(ServiceType, MessageType::EnableEventActionFunction)) {
 		return;
 	}
@@ -185,7 +178,6 @@ void EventActionService::enableEventActionFunction(Message& message) {
 }
 
 void EventActionService::disableEventActionFunction(Message& message) {
-	// TC[19,9]
 	if (!message.assertTC(ServiceType, MessageType::DisableEventActionFunction)) {
 		return;
 	}
