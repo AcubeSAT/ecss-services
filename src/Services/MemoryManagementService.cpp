@@ -107,7 +107,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 }
 
 void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
-	if(!request.assertTC(ServiceType, MessageType::CheckRawMemoryData);=){
+	if(!request.assertTC(ServiceType, MessageType::CheckRawMemoryData)){
 		return;
 	}
 
