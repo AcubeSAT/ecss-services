@@ -120,7 +120,7 @@ inline const uint8_t ECSSEventDataAuxiliaryMaxSize = 64;
  * @brief Size of the multimap that holds every event-action definition
  * @see EventActionService
  */
-inline const uint16_t ECSSEventActionStructMapSize = 256;
+inline const uint16_t ECSSEventActionStructMapSize = 100;
 
 /**
  * The maximum delta between the specified release time and the actual release time
@@ -183,7 +183,7 @@ inline const uint16_t ECSSMaxPacketStoreSizeInBytes = 1000;
 /**
  * @brief the max number of TM packets that a packet store in ST[15] can store
  */
-inline const uint16_t ECSSMaxPacketStoreSize = 20;
+inline const uint16_t ECSSMaxPacketStoreSize = 10;
 
 /**
  * @brief the max number of packet stores that a packet selection subservice can handle in ST[15]
