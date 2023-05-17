@@ -218,6 +218,15 @@ public:
 	void detailReportAllActivities(Message& request);
 
 	/**
+	 * @brief TM[11,10] time-based schedule detail report
+	 *
+	 * @details Send a detailed report about the status of the activities listed
+	 * on the provided list. Generates a TM[11,10] response.
+	 * @param listOfActivities Provide the list of activities that need to be reported on
+	 */
+	void timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities);
+
+	/**
 	 * @brief TC[11,9] detail-report activities identified by request identifier
 	 *
 	 * @details Send a detailed report about the status of the requested activities, based on the
@@ -243,6 +252,15 @@ public:
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
 	 */
 	void summaryReportActivitiesByID(Message& request);
+
+	/**
+	 * @brief TM[11,13] time-based schedule summary report
+	 *
+	 * @details Send a summary report about the status of the activities listed
+	 * on the provided list. Generates a TM[11,13] response.
+	 * @param listOfActivities Provide the list of activities that need to be reported on
+	 */
+	void timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities);
 
 	/**
 	 * @brief TC[11,5] delete time-based scheduled activities identified by a request identifier
