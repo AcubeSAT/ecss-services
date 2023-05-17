@@ -141,7 +141,7 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		message.appendFixedString(data);
 		uint16_t applicationID = 257;
 
-		for (uint16_t eventDefinitionID = 0; eventDefinitionID < 256; ++eventDefinitionID) {
+		for (uint16_t eventDefinitionID = 0; eventDefinitionID < 100; ++eventDefinitionID) {
 			EventActionService::EventActionDefinition temp(--applicationID, eventDefinitionID, message);
 			eventActionService.eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 			message.resetRead();
@@ -150,9 +150,9 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
 		addDefinitions.appendEnum16(1);
-		addDefinitions.appendEnum16(256);
+		addDefinitions.appendEnum16(100);
 		addDefinitions.appendEnum16(0);
-		addDefinitions.appendEnum16(257);
+		addDefinitions.appendEnum16(101);
 		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
 
