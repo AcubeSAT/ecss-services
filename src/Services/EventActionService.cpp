@@ -25,7 +25,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 				if (element.second.enabled) {
 					canBeAdded = false;
 					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
-				} else if (not element.second.enabled) {
+				} else {
 					eventActionDefinitionMap.erase(eventDefinitionID);
 				}
 				break;
@@ -34,10 +34,10 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		if (canBeAdded) {
 			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
-			} else {
-				EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
-				eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
+				continue;
 			}
+			EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
+			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
 		}
 	}
 }
