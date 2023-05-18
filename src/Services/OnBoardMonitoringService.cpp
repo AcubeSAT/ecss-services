@@ -5,7 +5,9 @@
 #include "etl/map.h"
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, EnableParameterMonitoringDefinitions);
+	if (!message.assertTC(ServiceType, EnableParameterMonitoringDefinitions)) {
+		return;
+	}
 
 	uint16_t numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
@@ -22,7 +24,9 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 }
 
 void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, DisableParameterMonitoringDefinitions);
+	if (!message.assertTC(ServiceType, DisableParameterMonitoringDefinitions)) {
+		return;
+	}
 
 	uint16_t numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
@@ -39,12 +43,16 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 }
 
 void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& message) {
-	message.assertTC(ServiceType, ChangeMaximumTransitionReportingDelay);
+	if (!message.assertTC(ServiceType, ChangeMaximumTransitionReportingDelay)) {
+		return;
+	}
 	maximumTransitionReportingDelay = message.readUint16();
 }
 
 void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions);
+	if (!message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions)) {
+		return;
+	}
 	if (parameterMonitoringFunctionStatus) {
 		ErrorHandler::reportError(
 		    message, ErrorHandler::ExecutionStartErrorType::InvalidRequestToDeleteAllParameterMonitoringDefinitions);

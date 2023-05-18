@@ -5,15 +5,13 @@
 
 void FunctionManagementService::call(Message& msg) {
 	msg.resetRead();
-	ErrorHandler::assertRequest(msg.packetType == Message::TC, msg,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.messageType == FunctionManagementService::MessageType::PerformFunction, msg,
-		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(msg.serviceType == FunctionManagementService::ServiceType, msg,
-		ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
 
-	uint8_t funcName[ECSSFunctionNameLength] = { 0 }; // the function's name
-	uint8_t funcArgs[ECSSFunctionMaxArgLength] = { 0 }; // arguments for the function
+	if (!msg.assertTC(ServiceType, MessageType::PerformFunction)) {
+		return;
+	}
+
+	uint8_t funcName[ECSSFunctionNameLength] = {0};   // the function's name
+	uint8_t funcArgs[ECSSFunctionMaxArgLength] = {0}; // arguments for the function
 
 	msg.readString(funcName, ECSSFunctionNameLength);
 	msg.readString(funcArgs, ECSSFunctionMaxArgLength);
@@ -41,7 +39,7 @@ void FunctionManagementService::call(Message& msg) {
 }
 
 void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,
-	void (* ptr)(String<ECSSFunctionMaxArgLength>)) {
+                                        void (*ptr)(String<ECSSFunctionMaxArgLength>)) {
 	if (not funcPtrIndex.full()) { // CAUTION: etl::map won't check by itself if it's full
 		// before attempting to insert a key-value pair, causing segmentation faults. Check first!
 		funcName.append(ECSSFunctionNameLength - funcName.length(), 0);
