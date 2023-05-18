@@ -2,7 +2,9 @@
 #include "ServicePool.hpp"
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
-	request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure);
+	if (!request.assertTC(ServiceType, MessageType::CreateHousekeepingReportStructure)) {
+		return;
+	}
 
 	uint8_t idToCreate = request.readUint8();
 	if (hasAlreadyExistingStructError(idToCreate, request)) {
@@ -29,7 +31,9 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 }
 
 void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeleteHousekeepingReportStructure);
+	if (!request.assertTC(ServiceType, MessageType::DeleteHousekeepingReportStructure)) {
+		return;
+	}
 	uint8_t numOfStructuresToDelete = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructuresToDelete; i++) {
 		uint8_t structureId = request.readUint8();
@@ -45,7 +49,9 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 }
 
 void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport);
+	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicHousekeepingParametersReport)) {
+		return;
+	}
 
 	uint8_t numOfStructIds = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructIds; i++) {
@@ -58,7 +64,9 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 }
 
 void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::DisablePeriodicHousekeepingParametersReport);
+	if (!request.assertTC(ServiceType, MessageType::DisablePeriodicHousekeepingParametersReport)) {
+		return;
+	}
 
 	uint8_t numOfStructIds = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructIds; i++) {
@@ -71,7 +79,9 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 }
 
 void HousekeepingService::reportHousekeepingStructures(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportHousekeepingStructures);
+	if (!request.assertTC(ServiceType, MessageType::ReportHousekeepingStructures)) {
+		return;
+	}
 
 	uint8_t numOfStructsToReport = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructsToReport; i++) {
@@ -121,7 +131,9 @@ void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
 }
 
 void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::GenerateOneShotHousekeepingReport);
+	if (!request.assertTC(ServiceType, MessageType::GenerateOneShotHousekeepingReport)) {
+		return;
+	}
 
 	uint8_t numOfStructsToReport = request.readUint8();
 	for (uint8_t i = 0; i < numOfStructsToReport; i++) {
@@ -135,7 +147,9 @@ void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 }
 
 void HousekeepingService::appendParametersToHousekeepingStructure(Message& request) {
-	request.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure);
+	if (!request.assertTC(ServiceType, MessageType::AppendParametersToHousekeepingStructure)) {
+		return;
+	}
 
 	uint8_t targetStructId = request.readUint8();
 	if (hasNonExistingStructExecutionError(targetStructId, request)) {
@@ -164,7 +178,9 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 }
 
 void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request) {
-	request.assertTC(ServiceType, MessageType::ModifyCollectionIntervalOfStructures);
+	if (!request.assertTC(ServiceType, MessageType::ModifyCollectionIntervalOfStructures)) {
+		return;
+	}
 
 	uint8_t numOfTargetStructs = request.readUint8();
 	for (uint8_t i = 0; i < numOfTargetStructs; i++) {
@@ -178,7 +194,9 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 }
 
 void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties);
+	if (!request.assertTC(ServiceType, MessageType::ReportHousekeepingPeriodicProperties)) {
+		return;
+	}
 
 	uint8_t numOfValidIds = 0;
 	uint8_t numOfStructIds = request.readUint8();

@@ -11,8 +11,9 @@ EventActionService::EventActionDefinition::EventActionDefinition(uint16_t applic
 }
 
 void EventActionService::addEventActionDefinitions(Message& message) {
-	// TC[19,1]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction);
+	if (!message.assertTC(ServiceType, MessageType::AddEventAction)) {
+		return;
+	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
 		uint16_t applicationID = message.readEnum16();
@@ -24,7 +25,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 				if (element.second.enabled) {
 					canBeAdded = false;
 					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
-				} else if (not element.second.enabled) {
+				} else {
 					eventActionDefinitionMap.erase(eventDefinitionID);
 				}
 				break;
@@ -33,17 +34,18 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		if (canBeAdded) {
 			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
-			} else {
-				EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
-				eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
+				continue;
 			}
+			EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
+			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
 		}
 	}
 }
 
 void EventActionService::deleteEventActionDefinitions(Message& message) {
-	// TC[19,2]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction);
+	if (!message.assertTC(ServiceType, MessageType::DeleteEventAction)) {
+		return;
+	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
 		uint16_t applicationID = message.readEnum16();
@@ -70,16 +72,17 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::deleteAllEventActionDefinitions(Message& message) {
-	// TC[19,3]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction);
-
+	if (!message.assertTC(ServiceType, MessageType::DeleteAllEventAction)) {
+		return;
+	}
 	setEventActionFunctionStatus(false);
 	eventActionDefinitionMap.clear();
 }
 
 void EventActionService::enableEventActionDefinitions(Message& message) {
-	// TC[19,4]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction);
+	if (!message.assertTC(ServiceType, MessageType::EnableEventAction)) {
+		return;
+	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
@@ -110,8 +113,9 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::disableEventActionDefinitions(Message& message) {
-	// TC[19,5]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction);
+	if (!message.assertTC(ServiceType, MessageType::DisableEventAction)) {
+		return;
+	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
@@ -142,14 +146,13 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 }
 
 void EventActionService::requestEventActionDefinitionStatus(Message& message) {
-	// TC[19,6]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::ReportStatusOfEachEventAction);
-
+	if (!message.assertTC(ServiceType, MessageType::ReportStatusOfEachEventAction)) {
+		return;
+	}
 	eventActionStatusReport();
 }
 
 void EventActionService::eventActionStatusReport() {
-	// TM[19,7]
 	Message report = createTM(EventActionStatusReport);
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
@@ -162,16 +165,16 @@ void EventActionService::eventActionStatusReport() {
 }
 
 void EventActionService::enableEventActionFunction(Message& message) {
-	// TC[19,8]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::EnableEventActionFunction);
-
+	if (!message.assertTC(ServiceType, MessageType::EnableEventActionFunction)) {
+		return;
+	}
 	setEventActionFunctionStatus(true);
 }
 
 void EventActionService::disableEventActionFunction(Message& message) {
-	// TC[19,9]
-	message.assertTC(EventActionService::ServiceType, EventActionService::MessageType::DisableEventActionFunction);
-
+	if (!message.assertTC(ServiceType, MessageType::DisableEventActionFunction)) {
+		return;
+	}
 	setEventActionFunctionStatus(false);
 }
 
