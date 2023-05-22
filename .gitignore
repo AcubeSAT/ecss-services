@@ -78,3 +78,4 @@ __pycache__
 
 # IDEs
 .vscode
+.DS_Store

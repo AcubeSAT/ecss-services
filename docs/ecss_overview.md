@@ -63,6 +63,8 @@ Each service is further divided into some **subservices** that are logical group
 large space mission may split every subservice into different parts of the hardware. However, this implementation _makes
 no distinction between subservices_.
 
+### Standard's Services
+
 <b>`ST[01]`: Request verification</b>
 
 Provides acknowledgement or failure reports for executed commands. This service essentially informs the operators about
@@ -182,7 +184,11 @@ Provides the capability of executing TCs when the spacecraft reaches a specific 
 Provides the capability of managing on-board file systems, with functions such as *copy*, *move*, *delete*, or *create
 directory*.
 
-The capability also exists to define _custom_ services and message types, if needed for each mission.
+### Custom Services
+
+<b>`ST[128]`: Dummy Service</b>
+
+Provides the capability of storing log strings as ECSS Messages.
 
 ## Trivia
 - Version C of the standard contains 656 pages, often filled with verbose requirements and difficult definitions. Every

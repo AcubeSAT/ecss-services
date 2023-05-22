@@ -4,8 +4,6 @@
 #include <cstdint>
 #include "Message.hpp"
 
-class ServicePool;
-
 /**
  * @defgroup Services Services
  * ECSS Services implementations, as defined in ECSS-E-ST-70-41C. These services receive TC Messages, and output TM
@@ -35,10 +33,9 @@ protected:
 	 * @param messageType The ID of the message type, as specified in the standard. For example,
 	 *                    the TC[17,3] message has `messageType = 3`.
 	 * @todo See if the Message must be returned by reference
-	 * @todo Set the application ID to the current application
 	 */
-	Message createTM(uint8_t messageType) {
-		return Message(serviceType, messageType, Message::TM, 0);
+	Message createTM(uint8_t messageType) const {
+		return Message(serviceType, messageType, Message::TM);
 	}
 
 	/**

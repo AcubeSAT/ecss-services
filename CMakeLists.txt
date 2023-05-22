@@ -20,6 +20,8 @@ set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
         )
 include_directories(${ECSS_CONFIGURATION})
 
+add_compile_options(-Wvla)
+
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
         lib/logger/src/Logger.cpp
@@ -73,5 +75,5 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
             ${test_main_SRC}
             ${test_SRC}
             )
-    target_link_libraries(tests Catch2::Catch2)
+    target_link_libraries(tests Catch2::Catch2WithMain)
 ENDIF ()
