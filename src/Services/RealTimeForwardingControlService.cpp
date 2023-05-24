@@ -224,7 +224,9 @@ void RealTimeForwardingControlService::deleteReportRecursive(uint8_t application
 }
 
 void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfiguration(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeleteReportTypesFromAppProcessConfiguration);
+	if(!request.assertTC(ServiceType, MessageType::DeleteReportTypesFromAppProcessConfiguration)){
+		return;
+	}
 
 	uint8_t numOfApplications = request.readUint8();
 	if (numOfApplications == 0) {
