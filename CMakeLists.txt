@@ -4,9 +4,13 @@ project(ecss_services)
 # Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
 
+# This is used to find the etl packages from conan
+set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/cmake-build-debug")
+
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include"
-        "${PROJECT_SOURCE_DIR}/lib/logger/inc")
+include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/logger/inc")
+
+find_package(ETL REQUIRED)
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -24,7 +28,6 @@ add_compile_options(-Wvla)
 
 # Specify the .cpp files common across all targets
 add_library(common OBJECT
-        lib/logger/src/Logger.cpp
         src/Service.cpp
         src/ErrorHandler.cpp
         src/Message.cpp
@@ -50,6 +53,7 @@ add_library(common OBJECT
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
         src/Helpers/AllMessageTypes.cpp
+        lib/logger/src/Logger.cpp
         )
 
 # Specify the .cpp files for the executables
@@ -59,6 +63,7 @@ add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )
+target_link_libraries(${PROJECT_NAME} ETL)
 
 # Logs all levels of messages. This command can be added by other users of this
 # library to override the respective log level.
