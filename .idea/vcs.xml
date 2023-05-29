@@ -3,7 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/ci/page_style/doxygen_dark_theme" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/lib/Catch2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib/logger" vcs="Git" />
   </component>
 </project>
