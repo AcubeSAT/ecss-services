@@ -33,6 +33,12 @@ public:
 		FailedCompletionOfExecution = 8,
 		FailedRoutingReport = 10,
 	};
+	const uint8_t CCSDSPacketVersionBits = 3;  //enumerated (3 bits)
+	const uint8_t packetTypeBits = 1;  //enumerated (1 bit)
+	const uint8_t secondaryHeaderFlagBits = 1 ;  //Boolean (1bit)
+	const uint8_t applicationIdBits = 11; //enumerated (11 bits)
+	const uint8_t ECSSSequenceFlagsBits = 2;  //enumerated (2 bits)
+	const uint8_t packetSequenceCountBits = 14; //unsigned integer (14 bits)
 
 	RequestVerificationService() {
 		serviceType = ServiceType;
