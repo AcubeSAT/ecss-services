@@ -1,16 +1,16 @@
-cmake_minimum_required(VERSION 3.7)
-project(ecss_services)
+cmake_minimum_required(VERSION 3.25)
+project(ecss_services CXX)
 
 # Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
 
 # This is used to find the etl packages from conan
 set(CMAKE_PREFIX_PATH "${PROJECT_SOURCE_DIR}/cmake-build-debug")
+find_package(etl REQUIRED)
 
 # Specify the directories for #includes
 include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/logger/inc")
 
-find_package(ETL REQUIRED)
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -26,8 +26,10 @@ include_directories(${ECSS_CONFIGURATION})
 
 add_compile_options(-Wvla)
 
-# Specify the .cpp files common across all targets
-add_library(common OBJECT
+# Specify the .cpp files for the executables
+file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
+
+add_executable(ecss_services
         src/Service.cpp
         src/ErrorHandler.cpp
         src/Message.cpp
@@ -54,16 +56,9 @@ add_library(common OBJECT
         src/Helpers/PMONBase.cpp
         src/Helpers/AllMessageTypes.cpp
         lib/logger/src/Logger.cpp
-        )
-
-# Specify the .cpp files for the executables
-file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
-
-add_executable(ecss_services
-        $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )
-target_link_libraries(${PROJECT_NAME} ETL)
+target_link_libraries(${PROJECT_NAME} etl)
 
 # Logs all levels of messages. This command can be added by other users of this
 # library to override the respective log level.
@@ -76,7 +71,7 @@ IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
 
     add_subdirectory(lib/Catch2)
     add_executable(tests
-            $<TARGET_OBJECTS:common>
+            ecss_services
             ${test_main_SRC}
             ${test_SRC}
             )
