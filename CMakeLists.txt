@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
 project(ecss_services CXX)
-
 # Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
 
@@ -68,52 +67,13 @@ target_link_libraries(ecss_services PRIVATE etl)
 # library to override the respective log level.
 target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
 
-IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
-    # Gather all the .cpp files corresponding to tests
-    file(GLOB test_main_SRC "test/*.cpp")
-    file(GLOB test_SRC "test/**/*.cpp")
-
-    add_subdirectory(lib/Catch2)
-    add_executable(tests
-            $<TARGET_OBJECTS:common>
-            ${test_main_SRC}
-            ${test_SRC}
-            )
-    target_link_libraries(tests PRIVATE etl)
-    target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
-ENDIF ()
-find_package(Catch2 REQUIRED)
 file(GLOB test_main_SRC "test/*.cpp")
 file(GLOB test_SRC "test/**/*.cpp")
-file(GLOB_RECURSE SOURCES "src/*.cpp" "lib/logger/src/*.cpp")
+find_package(Catch2 CONFIG REQUIRED)
 add_executable(tests
-        src/Service.cpp
-        src/ErrorHandler.cpp
-        src/Message.cpp
-        src/MessageParser.cpp
-        src/ServicePool.cpp
-        src/Helpers/CRCHelper.cpp
-        src/Helpers/PacketStore.cpp
-        src/Time/UTCTimestamp.cpp
-        src/Services/EventReportService.cpp
-        src/Services/MemoryManagementService.cpp
-        src/Services/ParameterService.cpp
-        src/Services/RequestVerificationService.cpp
-        src/Services/TestService.cpp
-        src/Services/LargePacketTransferService.cpp
-        src/Services/EventActionService.cpp
-        src/Services/TimeBasedSchedulingService.cpp
-        src/Services/FunctionManagementService.cpp
-        src/Services/StorageAndRetrievalService.cpp
-        src/Services/HousekeepingService.cpp
-        src/Services/ParameterStatisticsService.cpp
-        src/Services/OnBoardMonitoringService.cpp
-        src/Helpers/Statistic.cpp
-        src/Services/RealTimeForwardingControlService.cpp
-        src/Helpers/PMONBase.cpp
-        src/Helpers/AllMessageTypes.cpp
-        lib/logger/src/Logger.cpp
+        $<TARGET_OBJECTS:common>
         ${test_main_SRC}
         ${test_SRC}
         )
-target_link_libraries(tests Catch2::Catch2WithMain)
+target_link_libraries(tests PRIVATE etl)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
