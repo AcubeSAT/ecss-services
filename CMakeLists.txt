@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(ecss_services CXX)
+project(ecss_services)
 # Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
 
