@@ -96,6 +96,8 @@ ikos:
   script:
     - cd $CI_PROJECT_DIR
     - conan profile detect --force
+    - echo "compiler=ikos-scan" >> $HOME/.conan2/profiles/default
+    - cat $HOME/.conan2/profiles/default
     - mkdir conan-build
     - conan install . --output-folder conan-build --build=missing
     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
