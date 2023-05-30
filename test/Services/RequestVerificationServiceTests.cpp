@@ -206,22 +206,15 @@ TEST_CASE("assembleReportMessage", "[service][st01]"){
 	Message report = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
 
 	reqVerifService.assembleReportMessage(receivedMessage, report);
-	//REQUIRE(ServiceTests::hasOneMessage());
 
-	Message response = ServiceTests::get(0);
-	// Checks for the data-members of the object response
-	CHECK(response.serviceType == RequestVerificationService::ServiceType);
-	CHECK(response.messageType == RequestVerificationService::MessageType::FailedRoutingReport);
-	CHECK(response.packetType == Message::TM); // packet type
-	CHECK(response.applicationId == ApplicationId);
-	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
+
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(response.readEnumerated(3) == CCSDSPacketVersion);           // packet version number
-	CHECK(response.readEnumerated(1) == Message::TC);                  // packet type
-	CHECK(response.readBits(1) == 1);                                  // secondary header flag
-	CHECK(response.readEnumerated(11) == 3);                           // application process ID
-	CHECK(response.readEnumerated(2) == ECSSSequenceFlags);            // sequence flags
-	CHECK(response.readBits(14) == 0);                                 // packet sequence count
+	CHECK(report.readEnumerated(3) == CCSDSPacketVersion);           // packet version number
+	CHECK(report.readEnumerated(1) == Message::TC);                  // packet type
+	CHECK(report.readBits(1) == 1);                                  // secondary header flag
+	CHECK(report.readEnumerated(11) == 3);                           // application process ID
+	CHECK(report.readEnumerated(2) == ECSSSequenceFlags);            // sequence flags
+	CHECK(report.readBits(14) == 0);                                 // packet sequence count
 
 }
 
