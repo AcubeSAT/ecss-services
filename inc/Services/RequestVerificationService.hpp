@@ -33,12 +33,17 @@ public:
 		FailedCompletionOfExecution = 8,
 		FailedRoutingReport = 10,
 	};
-	const uint8_t CCSDSPacketVersionBits = 3;  //enumerated (3 bits)
-	const uint8_t packetTypeBits = 1;  //enumerated (1 bit)
-	const uint8_t secondaryHeaderFlagBits = 1 ;  //Boolean (1bit)
-	const uint8_t applicationIdBits = 11; //enumerated (11 bits)
-	const uint8_t ECSSSequenceFlagsBits = 2;  //enumerated (2 bits)
-	const uint8_t packetSequenceCountBits = 14; //unsigned integer (14 bits)
+	/**
+	 * Length of bits that represent the packetType
+	 * **/
+	const uint8_t CCSDSPacketVersionBits = 3;
+	const uint8_t packetTypeBits = 1;
+	const uint8_t secondaryHeaderFlagBits = 1 ;
+	const uint8_t applicationIdBits = 11;
+	const uint8_t ECSSSequenceFlagsBits = 2;
+	const uint8_t packetSequenceCountBits = 14;
+
+	const uint8_t secondaryHeaderFlag = 1;
 
 	RequestVerificationService() {
 		serviceType = ServiceType;
@@ -139,6 +144,14 @@ public:
 	 * @param errorCode The cause of creating this type of report
  	 */
 	void failRoutingVerification(const Message& request, ErrorHandler::RoutingErrorType errorCode);
-};
 
+
+	/**
+	 * Helper function to append the bits on the report message
+	 * @param request Contains the necessary data to send the report.
+	 * The data is actually some data members of Message that contain the basic info of the
+	 * @param report Contains the appended bits to be stored
+	 */
+	void AssembleReportMessage(const Message& request, Message& report) const;
+};
 #endif // ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP

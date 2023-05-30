@@ -4,20 +4,23 @@
 #include "Services/RequestVerificationService.hpp"
 
 
+	void RequestVerificationService::AssembleReportMessage(const Message& request, Message& report) const{
 
+	    report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);  // packet version number
+	    report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
+	    report.appendBits(secondaryHeaderFlagBits, secondaryHeaderFlag);                // secondary header flag
+	    report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
+	    report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);  // sequence flags
+	    report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+
+    }
 
     void RequestVerificationService::successAcceptanceVerification(const Message& request) {
 	// TM[1,1] successful acceptance verification report
 
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulAcceptanceReport);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);  // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);                // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);  // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
-
+	AssembleReportMessage(request, report);
 	storeMessage(report);
 }
 
@@ -27,12 +30,7 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedAcceptanceReport);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);              // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);    // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
 	report.appendEnum16(errorCode);                     // error code
 
 	storeMessage(report);
@@ -43,12 +41,7 @@ void RequestVerificationService::successStartExecutionVerification(const Message
 
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulStartOfExecution);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);               // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);      // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
 
 	storeMessage(report);
 }
@@ -59,12 +52,8 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedStartOfExecution);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);               // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);      // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
+
 	report.appendEnum16(errorCode);                     // error code
 
 	storeMessage(report);
@@ -75,12 +64,7 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);               // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);      // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
 	report.appendByte(stepID);                          // step ID
 
 	storeMessage(report);
@@ -93,12 +77,7 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedProgressOfExecution);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);                // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);      // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
 	report.appendByte(stepID);                          // step ID
 	report.appendEnum16(errorCode);                     // error code
 
@@ -110,12 +89,7 @@ void RequestVerificationService::successCompletionExecutionVerification(const Me
 
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulCompletionOfExecution);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);                // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);      // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
 
 	storeMessage(report);
 }
@@ -126,12 +100,7 @@ void RequestVerificationService::failCompletionExecutionVerification(
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedCompletionOfExecution);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);               // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);      // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
 	report.appendEnum16(errorCode);                     // error code
 
 	storeMessage(report);
@@ -143,12 +112,7 @@ void RequestVerificationService::failRoutingVerification(const Message& request,
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedRoutingReport);
 
-	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);     // packet version number
-	report.appendEnumerated(packetTypeBits, request.packetType);     // packet type
-	report.appendBits(secondaryHeaderFlagBits, 1);                // secondary header flag
-	report.appendEnumerated(applicationIdBits, request.applicationId); // application process ID
-	report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);      // sequence flags
-	report.appendBits(packetSequenceCountBits, request.packetSequenceCount); // packet sequence count
+	AssembleReportMessage(request, report);
 	report.appendEnum16(errorCode);                     // error code
 
 	storeMessage(report);
