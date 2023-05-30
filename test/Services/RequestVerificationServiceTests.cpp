@@ -3,6 +3,7 @@
 #include <catch2/catch_all.hpp>
 #include "ServiceTests.hpp"
 
+
 RequestVerificationService& reqVerifService = Services.requestVerification;
 
 TEST_CASE("TM[1,1]", "[service][st01]") {
@@ -199,3 +200,28 @@ TEST_CASE("TM[1,10]", "[service][st01]") {
 	CHECK(response.readBits(14) == 0);                                 // packet sequence count
 	CHECK(response.readEnum16() == ErrorHandler::UnknownRoutingError); // error code
 }
+
+TEST_CASE("assembleReportMessage", "[service][st01]"){
+	Message receivedMessage = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
+	Message report = Message(RequestVerificationService::ServiceType, RequestVerificationService::MessageType::FailedRoutingReport, Message::TC, 3);
+
+	reqVerifService.assembleReportMessage(receivedMessage, report);
+	//REQUIRE(ServiceTests::hasOneMessage());
+
+	Message response = ServiceTests::get(0);
+	// Checks for the data-members of the object response
+	CHECK(response.serviceType == RequestVerificationService::ServiceType);
+	CHECK(response.messageType == RequestVerificationService::MessageType::FailedRoutingReport);
+	CHECK(response.packetType == Message::TM); // packet type
+	CHECK(response.applicationId == ApplicationId);
+	REQUIRE(response.dataSize == 6); // dataSize is the number of bytes of data array
+	// Check for the value that is stored in <<data>> array(data-member of object response)
+	CHECK(response.readEnumerated(3) == CCSDSPacketVersion);           // packet version number
+	CHECK(response.readEnumerated(1) == Message::TC);                  // packet type
+	CHECK(response.readBits(1) == 1);                                  // secondary header flag
+	CHECK(response.readEnumerated(11) == 3);                           // application process ID
+	CHECK(response.readEnumerated(2) == ECSSSequenceFlags);            // sequence flags
+	CHECK(response.readBits(14) == 0);                                 // packet sequence count
+
+}
+
