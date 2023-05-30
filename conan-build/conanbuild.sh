@@ -1,1 +1,0 @@
-. "/home/athanasios/CLionProjects/ecss-services/conan-build/conanbuildenv-release-x86_64.sh"
