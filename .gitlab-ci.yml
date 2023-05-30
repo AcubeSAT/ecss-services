@@ -98,7 +98,7 @@ ikos:
     - conan profile detect --force
     - cp conan-profile /root/.conan2/profiles/
     - mkdir conan-build
-    - conan install . --output-folder conan-build --build=missing -pr conan-profile
+    - conan install . --output-folder conan-build --build=missing -pr conan-profile-ikos
     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - ikos-scan make tests
     - ikos tests.bc
