@@ -99,7 +99,8 @@ ikos:
     - cp conan-profile /root/.conan2/profiles/
     - mkdir conan-build
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
-    - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
+    - cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
+      ikos-scan cmake .
     - ikos-scan make tests
     - ikos tests.bc
     - ikos-report -o=ikos-report.txt output.db
