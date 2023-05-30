@@ -1,0 +1,1 @@
+. "/home/athanasios/CLionProjects/ecss-services/conan-build/deactivate_conanbuildenv-release-x86_64.sh"
