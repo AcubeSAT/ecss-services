@@ -29,7 +29,7 @@
  * You can convert between different types of timestamp, either by using constructors, or conversion functions
  * defined in each timestamp class.
  *
- * Note that you should try sticking to the default @ref TimeStamp class unless needed, as it provides the best
+ * Note that you should try sticking to the conan-profile @ref TimeStamp class unless needed, as it provides the best
  * precision and performance for the least amount of memory, and is directly compatible with internal timestamps
  * used, without loss of precision.
  *

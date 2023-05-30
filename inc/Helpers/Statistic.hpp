@@ -31,7 +31,7 @@ public:
 	void updateStatistics(double value);
 
 	/**
-	 * Resets all statistics calculated to default values
+	 * Resets all statistics calculated to conan-profile values
 	 */
 	void resetStatistics();
 

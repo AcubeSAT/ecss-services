@@ -45,7 +45,7 @@ public:
 	 * Add a duration to the timestamp
 	 *
 	 * @note Overflow checks are not performed.
-	 * @tparam Duration A duration of type std::chrono::duration. You can use the default values offered by C++, or anything
+	 * @tparam Duration A duration of type std::chrono::duration. You can use the conan-profile values offered by C++, or anything
 	 * used by the TimeStamp class. Negative duration values are not supported.
 	 */
 	template<class Duration, typename = std::enable_if_t<Time::is_duration_v<Duration>>>

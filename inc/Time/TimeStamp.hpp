@@ -20,7 +20,7 @@
  * The timestamp is defined in relation to a user-defined epoch, set in @ref Time::Epoch.
  *
  * @section baseunit Setting the base time unit
- * By default, this class measures time in the order of **seconds**. Binary fractions of a second can be specified by increasing the FractionBytes.
+ * By conan-profile, this class measures time in the order of **seconds**. Binary fractions of a second can be specified by increasing the FractionBytes.
  * However, the user can change the base time unit by setting the @p Num and @p Denom template parameters.
  *
  * The base time unit (or period) is then represented by the following:
@@ -225,7 +225,7 @@ public:
 	/**
 	 * Adds any arbitrary duration to a timestamp.
 	 *
-	 * You can play with default C++ durations with this function:
+	 * You can play with conan-profile C++ durations with this function:
 	 * ```cpp
 	 * using namespace std::literals;
 	 *

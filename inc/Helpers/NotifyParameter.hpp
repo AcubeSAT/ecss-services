@@ -28,7 +28,7 @@ public:
 	explicit NotifyParameter(DataType initialValue) : Parent(initialValue) {}
 
 	/**
-	 * Constructor with a default notifier function.
+	 * Constructor with a conan-profile notifier function.
 	 */
 	NotifyParameter(DataType initialValue, const Notifier& notifier) : Parent(initialValue), notifier(notifier) {}
 
