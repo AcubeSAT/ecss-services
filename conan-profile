@@ -5,4 +5,5 @@ compiler=gcc
 compiler.cppstd=gnu17
 compiler.libcxx=libstdc++11
 compiler.version=12
+build_type=Debug
 os=Linux
