@@ -16,7 +16,6 @@ check-build:
     CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
   script:
     - conan profile detect --force
-    - mkdir conan-build
     - conan install . --output-folder conan-build --build=missing
     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - make -j$(nproc)
