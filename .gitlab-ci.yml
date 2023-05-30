@@ -104,6 +104,7 @@ ikos:
     - ikos tests.bc
     - ikos-report -o=ikos-report.txt output.db
   after_script:
+    - cat tests.bc
     - mv ikos-report.txt ikos-report
     - mv output.db ikos-report
   artifacts:
