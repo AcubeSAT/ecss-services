@@ -101,7 +101,7 @@ public:
 
 
 	/**
-	 * The conan-profile ServicePool constructor
+	 * The default ServicePool constructor
 	 */
 	ServicePool() = default;
 

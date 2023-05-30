@@ -43,7 +43,7 @@ public:
 
 	/**
 	 * Constructs the function pointer index with all the necessary functions at initialization time
-	 * These functions need to be in scope. Un-conan-profile when needed.
+	 * These functions need to be in scope. Un-default when needed.
 	 */
 	FunctionManagementService() {
 		serviceType = ServiceType;
