@@ -34,15 +34,24 @@ public:
 		FailedRoutingReport = 10,
 	};
 	/**
-	 * Length of bits that represent the packetType
-	 * **/
+	 * Length of bits that represent the CCSDS packet version
+	 */
 	const uint8_t CCSDSPacketVersionBits = 3;
+	/**
+	 * Length of bits that represent the packet type
+	 */
 	const uint8_t packetTypeBits = 1;
+	/**
+	 * Length of bits that represent the secondary header flag
+	 */
 	const uint8_t secondaryHeaderFlagBits = 1 ;
+
 	const uint8_t applicationIdBits = 11;
 	const uint8_t ECSSSequenceFlagsBits = 2;
 	const uint8_t packetSequenceCountBits = 14;
-
+	/**
+	 * The second header flag
+	 * */
 	const uint8_t secondaryHeaderFlag = 1;
 
 	RequestVerificationService() {
@@ -147,11 +156,13 @@ public:
 
 
 	/**
-	 * Helper function to append the bits on the report message
+	 * Helper function to append the bits on the report message.
+	 *
 	 * @param request Contains the necessary data to send the report.
 	 * The data is actually some data members of Message that contain the basic info of the
+	 * telecommand packet that failed the routing.
 	 * @param report Contains the appended bits to be stored
 	 */
-	void AssembleReportMessage(const Message& request, Message& report) const;
+	void assembleReportMessage(const Message& request, Message& report) const;
 };
 #endif // ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP
