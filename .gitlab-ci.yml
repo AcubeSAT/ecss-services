@@ -96,7 +96,7 @@ ikos:
     - cd $CI_PROJECT_DIR
     - conan profile detect --force
     - cp conan-profile /root/.conan2/profiles/
-    - mkdir conan-build
+#    - mkdir conan-build
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - ikos-scan make tests --entry-points /builds/acubesat/obc/ecss-services/src/Platform/x86/main.cpp
