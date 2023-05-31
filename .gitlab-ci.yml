@@ -101,7 +101,7 @@ ikos:
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
     - cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
     - ikos-scan cmake .
-    - ikos-scan make -e tests
+    - ikos-scan make -e
     - ikos tests.bc
     - ikos-report -o=ikos-report.txt output.db
   after_script:
