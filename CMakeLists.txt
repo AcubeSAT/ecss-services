@@ -67,13 +67,15 @@ target_link_libraries(ecss_services PRIVATE etl)
 # library to override the respective log level.
 target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
 
-file(GLOB test_main_SRC "test/*.cpp")
-file(GLOB test_SRC "test/**/*.cpp")
-find_package(Catch2 CONFIG REQUIRED)
-add_executable(tests
-        $<TARGET_OBJECTS:common>
-        ${test_main_SRC}
-        ${test_SRC}
-        )
-target_link_libraries(tests PRIVATE etl)
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+find_package(Catch2 CONFIG)
+IF(Catch2_FOUND)
+    file(GLOB test_main_SRC "test/*.cpp")
+    file(GLOB test_SRC "test/**/*.cpp")
+    add_executable(tests
+            $<TARGET_OBJECTS:common>
+            ${test_main_SRC}
+            ${test_SRC}
+            )
+    target_link_libraries(tests PRIVATE etl)
+    target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+ENDIF()
