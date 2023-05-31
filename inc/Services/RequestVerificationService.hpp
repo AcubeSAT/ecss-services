@@ -45,9 +45,17 @@ public:
 	 * Length of bits that represent the secondary header flag
 	 */
 	const uint8_t secondaryHeaderFlagBits = 1 ;
-
+	/**
+	 * Length of bits that represent the application Id
+	 */
 	const uint8_t applicationIdBits = 11;
+	/**
+	 * Length of bits that represent the ECSSSequence Flags
+	 */
 	const uint8_t ECSSSequenceFlagsBits = 2;
+	/**
+	 * Length of bits that represent the packet sequence count
+	 */
 	const uint8_t packetSequenceCountBits = 14;
 	/**
 	 * The second header flag
