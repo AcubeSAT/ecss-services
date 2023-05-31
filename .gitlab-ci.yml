@@ -138,7 +138,7 @@ pages:
   script:
     - mkdir .public
     - cp -r ./docs/html ./.public/docs
-    - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
+    - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/ # TODO: USE THIS WHEN CLANG AND GCOVR HAVE BEEN FIXED
     - ls ./.public
     - find ./.public
     - mv .public public

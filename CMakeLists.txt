@@ -56,7 +56,7 @@ add_library(common OBJECT
 target_link_libraries(common PRIVATE etl)
 # Specify the .cpp files for the executables
 file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
-list(REMOVE_ITEM x86_main_SRC "src/Platform/x86/ErrorHandler.cpp")
+
 add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
