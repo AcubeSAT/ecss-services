@@ -46,11 +46,11 @@ public:
 	 */
 	const uint8_t secondaryHeaderFlagBits = 1 ;
 	/**
-	 * Length of bits that represent the application Id
+	 * Length of bits that represent the application id
 	 */
 	const uint8_t applicationIdBits = 11;
 	/**
-	 * Length of bits that represent the ECSSSequence Flags
+	 * Length of bits that represent the ECSS sequence flags
 	 */
 	const uint8_t ECSSSequenceFlagsBits = 2;
 	/**
