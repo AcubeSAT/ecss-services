@@ -51,7 +51,7 @@ public:
 	const uint8_t packetSequenceCountBits = 14;
 	/**
 	 * The second header flag
-	 * */
+	 */
 	const uint8_t secondaryHeaderFlag = 1;
 
 	RequestVerificationService() {
