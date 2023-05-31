@@ -79,3 +79,6 @@ __pycache__
 # IDEs
 .vscode
 .DS_Store
+
+# Conan generated files
+CMakeUserPresets.json
