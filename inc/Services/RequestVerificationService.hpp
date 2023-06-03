@@ -36,31 +36,31 @@ public:
 	/**
 	 * Length of bits that represent the CCSDS packet version
 	 */
-	const uint8_t CCSDSPacketVersionBits = 3;
+	inline static const uint8_t CCSDSPacketVersionBits = 3;
 	/**
 	 * Length of bits that represent the packet type
 	 */
-	const uint8_t packetTypeBits = 1;
+	inline static const uint8_t PacketTypeBits = 1;
 	/**
 	 * Length of bits that represent the secondary header flag
 	 */
-	const uint8_t secondaryHeaderFlagBits = 1 ;
+	inline static const uint8_t SecondaryHeaderFlagBits = 1 ;
 	/**
 	 * Length of bits that represent the application id
 	 */
-	const uint8_t applicationIdBits = 11;
+	inline static const uint8_t ApplicationIdBits = 11;
 	/**
 	 * Length of bits that represent the ECSS sequence flags
 	 */
-	const uint8_t ECSSSequenceFlagsBits = 2;
+	inline static const uint8_t ECSSSequenceFlagsBits = 2;
 	/**
 	 * Length of bits that represent the packet sequence count
 	 */
-	const uint8_t packetSequenceCountBits = 14;
+	inline static const uint8_t PacketSequenceCountBits = 14;
 	/**
 	 * The second header flag
 	 */
-	const uint8_t secondaryHeaderFlag = 1;
+	inline static const uint8_t SecondaryHeaderFlag = 1;
 
 	RequestVerificationService() {
 		serviceType = ServiceType;

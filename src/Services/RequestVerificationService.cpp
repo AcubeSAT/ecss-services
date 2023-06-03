@@ -7,11 +7,11 @@
 	void RequestVerificationService::assembleReportMessage(const Message& request, Message& report) const{
 
 	    report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);
-	    report.appendEnumerated(packetTypeBits, request.packetType);
-	    report.appendBits(secondaryHeaderFlagBits, secondaryHeaderFlag);
-	    report.appendEnumerated(applicationIdBits, request.applicationId);
+	    report.appendEnumerated(PacketTypeBits, request.packetType);
+	    report.appendBits(SecondaryHeaderFlagBits, SecondaryHeaderFlag);
+	    report.appendEnumerated(ApplicationIdBits, request.applicationId);
 	    report.appendEnumerated(ECSSSequenceFlagsBits, ECSSSequenceFlags);
-	    report.appendBits(packetSequenceCountBits, request.packetSequenceCount);
+	    report.appendBits(PacketSequenceCountBits, request.packetSequenceCount);
 
     }
 
