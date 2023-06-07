@@ -41,8 +41,6 @@ system](https://cmake.org/). If you are using CMake in your project, you can eas
 # ecss-services include directories
 include_directories(lib/ecss-services/inc)
 include_directories(lib/ecss-services/inc/Platform/x86)
-include_directories(lib/ecss-services/lib/etl/include)
-include_directories(lib/ecss-services/lib/logger/inc)
 
 # Build ecss-services and link it to the project
 add_subdirectory(lib/ecss-services EXCLUDE_FROM_ALL)
