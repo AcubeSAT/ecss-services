@@ -2,7 +2,7 @@
 #define ECSS_SERVICES_ETL_STRING_HPP
 
 #include <cstddef>
-#include <etl/cstring.h>
+#include <etl/string.h>
 
 /**
  * A fixed-size string

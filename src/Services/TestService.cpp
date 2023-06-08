@@ -1,23 +1,32 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_TEST
 
+#include "ServicePool.hpp"
 #include "Services/TestService.hpp"
 
 void TestService::areYouAlive(Message& request) {
-	request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest);
-	// TM[17,2] are-you-alive connection test report
-	Message report = createTM(TestService::MessageType::AreYouAliveTestReport);
+	if (!request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest)) {
+		return;
+	}
+	areYouAliveReport();
+}
 
+void TestService::areYouAliveReport() {
+	Message report = createTM(TestService::MessageType::AreYouAliveTestReport);
 	storeMessage(report);
 }
 
 void TestService::onBoardConnection(Message& request) {
-	request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest);
-	// TM[17,4] on-board connection test report
-	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
+	if (!request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest)) {
+		return;
+	}
+	uint16_t applicationProcessId = request.readUint16();
+	onBoardConnectionReport(applicationProcessId);
+}
 
-	report.appendUint16(request.readUint16());
-	// just print it on the screen
+void TestService::onBoardConnectionReport(uint16_t applicationProcessId) {
+	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
+	report.appendUint16(applicationProcessId);
 	storeMessage(report);
 }
 

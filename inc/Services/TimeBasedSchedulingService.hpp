@@ -1,14 +1,21 @@
 #ifndef ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 #define ECSS_SERVICES_TIMEBASEDSCHEDULINGSERVICE_HPP
 
-#include "etl/list.h"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
-#include "MessageParser.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "MessageParser.hpp"
+#include "Service.hpp"
+#include "etl/list.h"
 
 // Include platform specific files
-#include "Platform/x86/TimeGetter.hpp"
+#include "Helpers/TimeGetter.hpp"
+
+
+/**
+ * @def GROUPS_ENABLED
+ * @brief Indicates whether scheduling groups are enabled
+ */
+#define GROUPS_ENABLED 0 // NOLINT(cppcoreguidelines-macro-usage)
 
 /**
  * @def SUB_SCHEDULES_ENABLED
@@ -16,21 +23,15 @@
  *
  * @details Sub-schedules are currently not implemented so this has no effect
  */
-/**
- * @def GROUPS_ENABLED
- * @brief Indicates whether scheduling groups are enabled
- */
-#define GROUPS_ENABLED 0
-#define SUB_SCHEDULES_ENABLED 0
+#define SUB_SCHEDULES_ENABLED 0 // NOLINT(cppcoreguidelines-macro-usage)
 
 /**
  * @brief Namespace to access private members during test
  *
  * @details Define a namespace for the access of the private members to avoid conflicts
  */
-namespace unit_test
-{
-struct Tester;
+namespace unit_test {
+	struct Tester;
 } // namespace unit_test
 
 /**
@@ -47,11 +48,11 @@ class TimeBasedSchedulingService : public Service {
 private:
 	/**
 	 * @brief Indicator of the schedule execution
-	 *
+	 * True indicates "enabled" and False "disabled" state
 	 * @details The schedule execution indicator will be updated by the process that is running
 	 * the time scheduling service.
 	 */
-	bool executionFunctionStatus = false; // True indicates "enabled" and False "disabled" state
+	bool executionFunctionStatus = false;
 
 	/**
 	 * @brief Request identifier of the received packet
@@ -62,7 +63,7 @@ private:
 	struct RequestID {
 		uint16_t applicationID = 0; ///< Application process ID
 		uint16_t sequenceCount = 0; ///< Packet sequence count
-		uint8_t sourceID = 0; ///< Packet source ID
+		uint8_t sourceID = 0;       ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or
@@ -80,9 +81,9 @@ private:
 	 * @todo If groups are used, then the group ID has to be defined here
 	 */
 	struct ScheduledActivity {
-		Message request; ///< Hold the received command request
-		RequestID requestID; ///< Request ID, characteristic of the definition
-		uint32_t requestReleaseTime = 0; ///< Keep the command release time
+		Message request;                         ///< Hold the received command request
+		RequestID requestID;                     ///< Request ID, characteristic of the definition
+		Time::DefaultCUC requestReleaseTime{0}; ///< Keep the command release time
 	};
 
 	/**
@@ -99,7 +100,7 @@ private:
 	 * @details The ECSS standard requires that the activities are sorted in the TM message
 	 * response. Also it is better to have the activities sorted.
 	 */
-	inline void
+	inline static void
 	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& schedActivities) {
 		schedActivities.sort([](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 			// cppcheck-suppress
@@ -116,12 +117,12 @@ private:
 	 */
 	friend struct ::unit_test::Tester;
 
+	/**
+     * Notifies the timeBasedSchedulingTask after the insertion of activities to scheduleActivity list.
+     */
+	void notifyNewActivityAddition();
+
 public:
-
-	/*
-* ST[11] TimeBased Scheduling Service and Sub-Service Macros, for readability purpose
-*/
-
 	inline static const uint8_t ServiceType = 11;
 
 	enum MessageType : uint8_t {
@@ -144,6 +145,12 @@ public:
 	 * @details Initializes the serviceType
 	 */
 	TimeBasedSchedulingService();
+
+	/**
+	 * This function executes the next activity and removes it from the list.
+	 * @return the requestReleaseTime of next activity to be executed after this time
+	 */
+	Time::DefaultCUC executeScheduledActivity(Time::DefaultCUC currentTime);
 
 	/**
 	 * @brief TC[11,1] enable the time-based schedule execution function
@@ -211,6 +218,15 @@ public:
 	void detailReportAllActivities(Message& request);
 
 	/**
+	 * @brief TM[11,10] time-based schedule detail report
+	 *
+	 * @details Send a detailed report about the status of the activities listed
+	 * on the provided list. Generates a TM[11,10] response.
+	 * @param listOfActivities Provide the list of activities that need to be reported on
+	 */
+	void timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities);
+
+	/**
 	 * @brief TC[11,9] detail-report activities identified by request identifier
 	 *
 	 * @details Send a detailed report about the status of the requested activities, based on the
@@ -238,6 +254,15 @@ public:
 	void summaryReportActivitiesByID(Message& request);
 
 	/**
+	 * @brief TM[11,13] time-based schedule summary report
+	 *
+	 * @details Send a summary report about the status of the activities listed
+	 * on the provided list. Generates a TM[11,13] response.
+	 * @param listOfActivities Provide the list of activities that need to be reported on
+	 */
+	void timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities);
+
+	/**
 	 * @brief TC[11,5] delete time-based scheduled activities identified by a request identifier
 	 *
 	 * @details Delete certain activities by using the unique request identifier.
@@ -260,7 +285,7 @@ public:
 	 * Also if an activity with a specified request identifier is not found, generate a failed
 	 * start of execution for that specific instruction.
 	 */
-	void timeShiftActivitiesByID(Message &request);
+	void timeShiftActivitiesByID(Message& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

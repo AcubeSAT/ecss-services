@@ -2,18 +2,21 @@
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
 #include "ECSS_Configuration.hpp"
-#include "Services/TimeBasedSchedulingService.hpp"
-#include "Services/LargePacketTransferService.hpp"
-#include "Services/RequestVerificationService.hpp"
-#include "Services/EventReportService.hpp"
+#include "Services/DummyService.hpp"
 #include "Services/EventActionService.hpp"
-#include "Services/ParameterService.hpp"
-#include "Services/TestService.hpp"
-#include "Services/MemoryManagementService.hpp"
+#include "Services/EventReportService.hpp"
 #include "Services/FunctionManagementService.hpp"
 #include "Services/HousekeepingService.hpp"
-#include "Services/ParameterStatisticsService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/MemoryManagementService.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
+#include "Services/ParameterService.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+#include "Services/RealTimeForwardingControlService.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Services/StorageAndRetrievalService.hpp"
+#include "Services/TestService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 #include "Services/FileManagementService.hpp"
 
 /**
@@ -38,6 +41,10 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
+#ifdef SERVICE_DUMMY
+	DummyService dummyService;
+#endif
+
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
@@ -70,12 +77,20 @@ public:
 	ParameterService parameterManagement;
 #endif
 
+#ifdef SERVICE_REALTIMEFORWARDINGCONTROL
+	RealTimeForwardingControlService realTimeForwarding;
+#endif
+
 #ifdef SERVICE_PARAMETERSTATISTICS
 	ParameterStatisticsService parameterStatistics;
 #endif
 
 #ifdef SERVICE_REQUESTVERIFICATION
 	RequestVerificationService requestVerification;
+#endif
+
+#ifdef SERVICE_STORAGEANDRETRIEVAL
+	StorageAndRetrievalService storageAndRetrieval;
 #endif
 
 #ifdef SERVICE_TEST
@@ -128,6 +143,6 @@ public:
 /**
  * A global variable that defines the basic pool where services can be fetched from
  */
-extern ServicePool Services;
+extern ServicePool Services; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 #endif // ECSS_SERVICES_SERVICEPOOL_HPP

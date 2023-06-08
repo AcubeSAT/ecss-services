@@ -1,0 +1,14 @@
+[submodule "ci/page_style/doxygen_dark_theme"]
+    path = ci/page_style/doxygen_dark_theme
+    url = https://github.com/MaJerle/doxygen_dark_theme.git
+[submodule "lib/logger"]
+<<<<<<< HEAD
+	path = lib/logger
+	url = https://gitlab.com/acubesat/obc/logger.git
+[submodule "lib/littlefs"]
+	path = lib/littlefs
+	url = https://github.com/littlefs-project/littlefs
+=======
+    path = lib/logger
+    url = https://gitlab.com/acubesat/obc/logger.git
+>>>>>>> 57bf9343d5175c322d337aba8d469e293e4d6779

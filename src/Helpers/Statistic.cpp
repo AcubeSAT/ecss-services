@@ -1,20 +1,14 @@
-#include <iostream>
 #include "Helpers/Statistic.hpp"
+#include <cmath>
 
 void Statistic::updateStatistics(double value) {
-	/*
-	 * TODO:
-	 *      if periodic, just calculate next time without the CUC
-	 *      function.
-	 * */
-
 	if (value > max) {
 		max = value;
-		// TODO: maxTime = as_CUC_timestamp();
+		timeOfMaxValue = TimeGetter::getCurrentTimeDefaultCUC();
 	}
 	if (value < min) {
 		min = value;
-		// TODO: minTime = as_CUC_timestamp();
+		timeOfMinValue = TimeGetter::getCurrentTimeDefaultCUC();
 	}
 	if (sampleCounter + 1 > 0) {
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
@@ -23,14 +17,14 @@ void Statistic::updateStatistics(double value) {
 	sampleCounter++;
 }
 
-void Statistic::appendStatisticsToMessage(Message& report) {
+void Statistic::appendStatisticsToMessage(Message& report) const {
 	report.appendFloat(static_cast<float>(max));
-	report.appendUint32(maxTime);
+	report.append(timeOfMaxValue);
 	report.appendFloat(static_cast<float>(min));
-	report.appendUint32(minTime);
+	report.append(timeOfMinValue);
 	report.appendFloat(static_cast<float>(mean));
 
-	if (SupportsStandardDeviation) {
+	if constexpr (SupportsStandardDeviation) {
 		double standardDeviation = 0;
 		if (sampleCounter == 0) {
 			standardDeviation = 0;
@@ -49,14 +43,15 @@ void Statistic::setSelfSamplingInterval(uint16_t samplingInterval) {
 void Statistic::resetStatistics() {
 	max = -std::numeric_limits<double>::infinity();
 	min = std::numeric_limits<double>::infinity();
-	maxTime = 0;
-	minTime = 0;
+	timeOfMaxValue = Time::DefaultCUC(0);
+	timeOfMinValue = Time::DefaultCUC(0);
 	mean = 0;
 	sumOfSquares = 0;
 	sampleCounter = 0;
 }
 
-bool Statistic::statisticsAreInitialized() {
-	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and maxTime == 0 and minTime == 0 and
+bool Statistic::statisticsAreInitialized() const {
+	return (sampleCounter == 0 and mean == 0 and sumOfSquares == 0 and
+	        timeOfMaxValue == Time::DefaultCUC(0) and timeOfMinValue == Time::DefaultCUC(0) and
 	        max == -std::numeric_limits<double>::infinity() and min == std::numeric_limits<double>::infinity());
 }

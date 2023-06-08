@@ -1,23 +1,25 @@
-#include <iostream>
 #include <Logger.hpp>
+#include <Platform/x86/Helpers/UTCTimestamp.hpp>
+#include <Time/UTCTimestamp.hpp>
+#include <ctime>
+#include <iostream>
+#include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
-#include "Services/TestService.hpp"
-#include "Services/ParameterService.hpp"
-#include "Services/RequestVerificationService.hpp"
-#include "Services/MemoryManagementService.hpp"
-#include "Services/EventReportService.hpp"
-#include "Services/FunctionManagementService.hpp"
-#include "Services/EventActionService.hpp"
-#include "Services/LargePacketTransferService.hpp"
-#include "Services/TimeBasedSchedulingService.hpp"
-#include "Services/ParameterStatisticsService.hpp"
 #include "Helpers/Statistic.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
-#include "ErrorHandler.hpp"
-#include "etl/String.hpp"
 #include "ServicePool.hpp"
-#include <ctime>
+#include "Services/EventActionService.hpp"
+#include "Services/EventReportService.hpp"
+#include "Services/FunctionManagementService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/MemoryManagementService.hpp"
+#include "Services/ParameterService.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Services/TestService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
+#include "etl/String.hpp"
 
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
@@ -53,19 +55,19 @@ int main() {
 	// Test code for reportParameter
 	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 	                             Message::TC, 1); // application id is a dummy number (1)
-	sentPacket.appendUint16(2); // number of contained IDs
-	sentPacket.appendUint16(0); // first ID
-	sentPacket.appendUint16(1); // second ID
+	sentPacket.appendUint16(2);                   // number of contained IDs
+	sentPacket.appendUint16(0);                   // first ID
+	sentPacket.appendUint16(1);                   // second ID
 	paramService.reportParameters(sentPacket);
 
 	// Test code for setParameter
 	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
 	                              Message::TC, 1); // application id is a dummy number (1)
-	sentPacket2.appendUint16(2); // number of contained IDs
-	sentPacket2.appendUint16(0); // first parameter ID
-	sentPacket2.appendUint32(63238); // settings for first parameter
-	sentPacket2.appendUint16(1); // 2nd parameter ID
-	sentPacket2.appendUint32(45823); // settings for 2nd parameter
+	sentPacket2.appendUint16(2);                   // number of contained IDs
+	sentPacket2.appendUint16(0);                   // first parameter ID
+	sentPacket2.appendUint32(63238);               // settings for first parameter
+	sentPacket2.appendUint16(1);                   // 2nd parameter ID
+	sentPacket2.appendUint32(45823);               // settings for 2nd parameter
 
 	paramService.setParameters(sentPacket2);
 	paramService.reportParameters(sentPacket);
@@ -82,9 +84,9 @@ int main() {
 	Message rcvPack = Message(MemoryManagementService::ServiceType,
 	                          MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	rcvPack.appendUint16(3); // Iteration count
-	rcvPack.appendUint64(reinterpret_cast<uint64_t>(string)); // Start address
-	rcvPack.appendUint16(sizeof(string) / sizeof(string[0])); // Data read length
+	rcvPack.appendUint16(3);                                          // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t>(string));         // Start address
+	rcvPack.appendUint16(sizeof(string) / sizeof(string[0]));         // Data read length
 
 	rcvPack.appendUint64(reinterpret_cast<uint64_t>(anotherStr));
 	rcvPack.appendUint16(sizeof(anotherStr) / sizeof(anotherStr[0]));
@@ -98,21 +100,21 @@ int main() {
 
 	uint8_t data[2] = {'h', 'R'};
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	rcvPack.appendUint16(2); // Iteration count
-	rcvPack.appendUint64(reinterpret_cast<uint64_t>(pStr)); // Start address
+	rcvPack.appendUint16(2);                                          // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t>(pStr));           // Start address
 	rcvPack.appendOctetString(String<2>(data, 2));
-	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2)); // Append the CRC value
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2));   // Append the CRC value
 	rcvPack.appendUint64(reinterpret_cast<uint64_t>(pStr + 1)); // Start address
 	rcvPack.appendOctetString(String<1>(data, 1));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
-	memMangService.rawDataMemorySubservice.loadRawData(rcvPack);
+	memMangService.loadRawData(rcvPack);
 
 	rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData,
 	                  Message::TC, 1);
 
 	rcvPack.appendEnum8(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	rcvPack.appendUint16(2); // Iteration count
-	rcvPack.appendUint64(reinterpret_cast<uint64_t>(data)); // Start address
+	rcvPack.appendUint16(2);                                          // Iteration count
+	rcvPack.appendUint64(reinterpret_cast<uint64_t>(data));           // Start address
 	rcvPack.appendUint16(2);
 	rcvPack.appendUint64(reinterpret_cast<uint64_t>(data + 1)); // Start address
 	rcvPack.appendUint16(1);
@@ -243,7 +245,7 @@ int main() {
 	eventActionService.addEventActionDefinitions(eventActionDefinition7);
 
 	std::cout << "Status should be 000:";
-	for (auto& element : eventActionService.eventActionDefinitionMap) {
+	for (auto& element: eventActionService.eventActionDefinitionMap) {
 		std::cout << element.second.enabled;
 	}
 
@@ -262,7 +264,7 @@ int main() {
 
 	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
 	std::cout << "\nStatus should be 111:";
-	for (auto& element : eventActionService.eventActionDefinitionMap) {
+	for (auto& element: eventActionService.eventActionDefinitionMap) {
 		std::cout << element.second.enabled;
 	}
 
@@ -280,7 +282,7 @@ int main() {
 	eventActionDefinition3.appendUint16(4);
 	eventActionService.disableEventActionDefinitions(eventActionDefinition3);
 	std::cout << "Status should be 000:";
-	for (auto& element : eventActionService.eventActionDefinitionMap) {
+	for (auto& element: eventActionService.eventActionDefinitionMap) {
 		std::cout << element.second.enabled;
 	}
 
@@ -325,7 +327,7 @@ int main() {
 	            TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
 	Message testMessage1(6, 5, Message::TC, 1);
 	Message testMessage2(4, 5, Message::TC, 1);
-	testMessage1.appendUint16(4253); // Append dummy data
+	testMessage1.appendUint16(4253);  // Append dummy data
 	testMessage2.appendUint16(45667); // Append dummy data
 
 	timeBasedSchedulingService.enableScheduleExecution(receivedMsg); // Enable the schedule
@@ -360,5 +362,9 @@ int main() {
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 	LOG_NOTICE << "ECSS Services test complete";
+
+	ErrorHandler::reportInternalError(static_cast<ErrorHandler::InternalErrorType>(254));
+
+	std::cout << UTCTimestamp() << std::endl;
 	return 0;
 }
