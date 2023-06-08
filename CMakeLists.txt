@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories("${PROJECT_SOURCE_DIR}/inc")
 
 find_package(etl CONFIG REQUIRED)
-find_package(logger REQUIRED)
+find_package(logger CONFIG REQUIRED log_common)
 add_custom_target(check
         COMMAND ./cppcheck.sh
         COMMAND ./clang-tidy.sh
