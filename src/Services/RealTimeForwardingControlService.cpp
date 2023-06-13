@@ -1,6 +1,15 @@
 #include "Services/RealTimeForwardingControlService.hpp"
 #include <iostream>
 
+bool RealTimeForwardingControlService::addAppControlled(const uint8_t applicationID){
+	if(controlledApplicationsMapToArray.count(applicationID)){
+		return false;
+	}else{
+		controlledApplicationsMapToArray[applicationID] = numberOfControlledApplications++;
+		return true;
+	}
+}
+
 void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applicationID) {
 	for (const auto& service: AllMessageTypes::MessagesOfService) {
 		uint8_t serviceType = service.first;
@@ -32,8 +41,7 @@ uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicat
 }
 
 bool RealTimeForwardingControlService::checkAppControlled(Message& request, uint8_t applicationId) {
-	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
-	    controlledApplications.end()) {
+	if (not controlledApplicationsMapToArray.count(applicationId)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
 		return false;
 	}

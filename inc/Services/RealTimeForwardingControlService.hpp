@@ -36,6 +36,10 @@ public:
 	 */
 	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
+	uint8_t numberOfControlledApplications = 0;
+
+	etl::map<uint8_t, uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplicationsMapToArray;
+
 	/**
 	 * The Application Process configuration, containing all the application process, service type and message type
 	 * definitions.
@@ -182,6 +186,8 @@ public:
 	 * @param message Contains the necessary parameters to call the suitable subservice.
 	 */
 	void execute(Message& message);
+
+	bool addAppControlled(uint8_t applicationID);
 };
 
 #endif

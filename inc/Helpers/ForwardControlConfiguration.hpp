@@ -6,6 +6,8 @@
 #include "Helpers/Parameter.hpp"
 #include "etl/map.h"
 #include "etl/vector.h"
+#include "etl/multi_array.h"
+#include "bitset3D.hpp"
 
 /**
  * The Application Process configuration. It's basically a map, storing a vector of report type definitions for each
@@ -40,6 +42,15 @@ public:
 	 * to the appID and service type.
 	 */
 	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
+
+	etl::multi_array<bool,  ECSSMaxControlledApplicationProcesses,
+	                        ECSSMaxServiceTypeDefinitions,
+	                        ECSSMaxReportTypeDefinitions>           isDefined;
+
+	bitset3D<ECSSMaxControlledApplicationProcesses,
+	         ECSSMaxServiceTypeDefinitions,
+	         ECSSMaxReportTypeDefinitions>           isDefined2;
+
 
 	ApplicationProcessConfiguration() = default;
 };
