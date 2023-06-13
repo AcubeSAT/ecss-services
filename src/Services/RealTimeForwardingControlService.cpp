@@ -152,3 +152,12 @@ void RealTimeForwardingControlService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+bool RealTimeForwardingControlService::addAppControlled(const uint8_t applicationID){
+	if(controlledApplicationsMapToArray.count(applicationID)){
+		return false;
+	}else{
+		controlledApplicationsMapToArray[applicationID] = numberOfControlledApplications++;
+		return true;
+	}
+}

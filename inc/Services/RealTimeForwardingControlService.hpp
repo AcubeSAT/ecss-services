@@ -35,6 +35,16 @@ public:
 	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
 	/**
+	 * the number of controlled applications at the time of the addition of another
+	 */
+	uint8_t numberOfControlledApplications = 0;
+
+	/**
+	 * This maps the applicationIDs that have been added to an index in the definition bitarray
+	 */
+	etl::map<uint8_t, uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplicationsMapToArray;
+
+	/**
 	 * The Application Process configuration, containing all the application process, service type and message type
 	 * definitions.
 	 */
@@ -126,6 +136,14 @@ public:
 	 * @param message Contains the necessary parameters to call the suitable subservice.
 	 */
 	void execute(Message& message);
+
+	/**
+	 * Add an application ID to the ones controlled by the service. Increases numberOfControlledApplications
+	 * by 1 for the next addition.
+	 * @param applicationID
+	 * @return True if the addition was successful, false if it already existed
+	 */
+	bool addAppControlled(uint8_t applicationID);
 };
 
 #endif
