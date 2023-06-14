@@ -124,6 +124,7 @@ tests:
     - conan profile detect --force
     - mkdir conan-build
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+    
     - conan install . --output-folder conan-build --build=missing
     - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && make tests -j$(nproc)
     - lcov -q --capture --initial --directory . -o coverage_base

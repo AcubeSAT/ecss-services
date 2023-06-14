@@ -47,7 +47,22 @@ CMake Options) this `-DCMAKE_TOOLCHAIN_FILE=cmake-build-debug/build/Release/gene
 If you just cmake from cli, just add the same flags in your command.
 
 ### Conan
+This repository uses [conan 2.0](https://conan.io/) to manage dependencies.
 
+#### AcubeSAT Conan Packages
+One of the packages ([logger](https://gitlab.com/acubesat/obc/logger)) is hosted on a private repository, so you 
+need to:
+- have access to the [repository](https://artifacotry.spacedot.gr) (if you're already on GitLab, it's the same 
+  credentials, and you should login at least once) and add the 
+  remote to your conan remotes. 
+  To do 
+  that 
+  run the following two commands
+`conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan` and 
+`conan remote login -r conan $YOUR_USERNAME`, which will prompt you to add your password.
+- or, clone the repo on your own, and package it locally use `conan create . --build=missing` in the root of the repo.
+- or, clone the repo on your own and add it as a submodule in the `lib` folderr, and make the necessary CMakeLists.
+  txt changes to include it in the build.
 To build, you first have run `conan profile detect --force`, which generates default profile detecting GCC. Then run
 `conan install . --output-folder=cmake-build-debug --build=missing`.
 If you're using CLion and don't see `cmake-build-debug`, you have to `Reload CMake project` to have it generated.
