@@ -64,7 +64,7 @@ need to:
 - or, clone the repo on your own and add it as a submodule in the `lib` folderr, and make the necessary CMakeLists.
   txt changes to include it in the build.
 To build, you first have run `conan profile detect --force`, which generates default profile detecting GCC. Then run
-`conan install . --output-folder=cmake-build-debug --build=missing`.
+`conan install . --output-folder=cmake-build-debug --build=missing -u`.
 If you're using CLion and don't see `cmake-build-debug`, you have to `Reload CMake project` to have it generated.
 After you've run `conan install...` you can `Reload CMake project` and build as per usual.
 
