@@ -19,12 +19,12 @@ add_custom_target(check
 set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
         "The include directory for the platform-specific ECSS configuration headers"
         )
-include_directories(${ECSS_CONFIGURATION})
+#include_directories(${ECSS_CONFIGURATION})
 
 add_compile_options(-Wvla)
 
 add_library(common STATIC)
-target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/" ${ECSS_CONFIGURATION})
+target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/" "${ECSS_CONFIGURATION}")
 target_sources(common PRIVATE
         src/Service.cpp
         src/ErrorHandler.cpp
