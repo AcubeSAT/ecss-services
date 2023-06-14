@@ -13,7 +13,7 @@ class ECSSServicesRecipe(ConanFile):
     license = "MIT"
     author = "SpaceDot - AcubeSAT, acubesat.obc@spacedot.gr"
     url = "gitlab.com/acubesat/obc/ecss-services"
-    description = "A logger library for the AcubeSAT nanosatellite"
+    description = "ECSS Services implementation for the AcubeSAT nanosatellite"
     topics = ("satellite", "acubesat", "ecss", "ecss-services")
 
     # Binary configuration
