@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/logger/inc")
+include_directories("${PROJECT_SOURCE_DIR}/inc")
 
 find_package(etl CONFIG REQUIRED)
-
+find_package(logger CONFIG REQUIRED COMPONENTS log_common log_x86)
 add_custom_target(check
         COMMAND ./cppcheck.sh
         COMMAND ./clang-tidy.sh
@@ -50,18 +50,17 @@ add_library(common OBJECT
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
         src/Helpers/AllMessageTypes.cpp
-        lib/logger/src/Logger.cpp
         )
 
-target_link_libraries(common PRIVATE etl)
+target_link_libraries(common PRIVATE etl log_x86 log_x86)
 # Specify the .cpp files for the executables
-file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
+file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
 
 add_executable(ecss_services
         $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )
-target_link_libraries(ecss_services PRIVATE etl)
+target_link_libraries(ecss_services PRIVATE etl log_common log_x86)
 
 # Logs all levels of messages. This command can be added by other users of this
 # library to override the respective log level.
@@ -76,6 +75,6 @@ IF(Catch2_FOUND)
             ${test_main_SRC}
             ${test_SRC}
             )
-    target_link_libraries(tests PRIVATE etl)
+    target_link_libraries(tests PRIVATE etl log_common log_x86)
     target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 ENDIF()
