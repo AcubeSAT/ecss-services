@@ -24,7 +24,9 @@ set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
 add_compile_options(-Wvla)
 
 add_library(common STATIC)
-target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/" "${ECSS_CONFIGURATION}")
+target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/" "${ECSS_CONFIGURATION}"
+        "${PROJECT_SOURCE_DIR}/inc/etl" "${PROJECT_SOURCE_DIR}/inc/Helpers" "${PROJECT_SOURCE_DIR}/inc/Services"
+        "${PROJECT_SOURCE_DIR}/inc/Platform/x86")
 target_sources(common PRIVATE
         src/Service.cpp
         src/ErrorHandler.cpp
