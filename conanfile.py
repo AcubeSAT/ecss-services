@@ -50,9 +50,6 @@ class ECSSServicesRecipe(ConanFile):
         self.cpp_info.components["common"].libs = ["common"]
         self.cpp_info.components["common"].set_property("cmake_target_name", "common")
 
-        self.cpp_info.components["ecss_services"].libs = ["ecss_services"]
-        self.cpp_info.components["ecss_services"].set_property("cmake_target_name", "ecss_services")
-
         self.cpp_info.components["common"].libdirs = ["lib"]
         self.cpp_info.components["common"].includedirs = ["inc"]
 
