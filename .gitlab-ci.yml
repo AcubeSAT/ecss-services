@@ -17,6 +17,7 @@ check-build:
   script:
     - conan profile detect --force
     - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan install . --output-folder conan-build --build=missing
     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - make -j$(nproc)
@@ -50,6 +51,7 @@ cppcheck:
 #    - conan profile detect --force
 #    - mkdir conan-build
 #    - conan install . --output-folder conan-build --build=missing
+#    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
 #    - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
 #    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --config-file=$CI_PROJECT_DIR/ci/.clang-tidy --use-color `find $CI_PROJECT_DIR/src $CI_PROJECT_DIR/inc -not -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` | tee clang-tidy-output.log
 #  after_script:
@@ -71,6 +73,7 @@ cppcheck:
 #    - cd $CI_PROJECT_DIR
 #    - conan profile detect --force
 #    - mkdir conan-build
+#    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
 #    - conan install . --output-folder conan-build --build=missing
 #    - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
 #    - scan-build -o ./scan-build-html-report make
@@ -98,6 +101,7 @@ ikos:
     - conan profile detect --force
     - cp conan-profile /root/.conan2/profiles/
     - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - ikos-scan make ecss_services
@@ -119,6 +123,7 @@ tests:
     - cd $CI_PROJECT_DIR
     - conan profile detect --force
     - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan install . --output-folder conan-build --build=missing
     - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && make tests -j$(nproc)
     - lcov -q --capture --initial --directory . -o coverage_base
@@ -164,5 +169,5 @@ conan:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan upload ecss-services/1.0 -r conan
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
