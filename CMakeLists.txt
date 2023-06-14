@@ -67,7 +67,7 @@ target_link_libraries(ecss_services PRIVATE etl log_common log_x86 common)
 target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
 
 find_package(Catch2 CONFIG)
-IF(Catch2_FOUND)
+IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
     file(GLOB test_main_SRC "test/*.cpp")
     file(GLOB test_SRC "test/**/*.cpp")
     add_executable(tests
