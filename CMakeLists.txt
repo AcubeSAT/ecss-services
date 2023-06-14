@@ -5,10 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 
 # Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc")
 
 find_package(etl CONFIG REQUIRED)
 find_package(logger CONFIG REQUIRED COMPONENTS log_common log_x86)
+
 add_custom_target(check
         COMMAND ./cppcheck.sh
         COMMAND ./clang-tidy.sh
@@ -23,8 +23,9 @@ include_directories(${ECSS_CONFIGURATION})
 
 add_compile_options(-Wvla)
 
-# Specify the .cpp files common across all targets
-add_library(common OBJECT
+add_library(common STATIC)
+target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
+target_sources(common PRIVATE
         src/Service.cpp
         src/ErrorHandler.cpp
         src/Message.cpp
@@ -52,15 +53,14 @@ add_library(common OBJECT
         src/Helpers/AllMessageTypes.cpp
         )
 
-target_link_libraries(common PRIVATE etl log_x86 log_x86)
+target_link_libraries(common PRIVATE etl log_common log_x86)
 # Specify the .cpp files for the executables
 file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
 
 add_executable(ecss_services
-        $<TARGET_OBJECTS:common>
         ${x86_main_SRC}
         )
-target_link_libraries(ecss_services PRIVATE etl log_common log_x86)
+target_link_libraries(ecss_services PRIVATE etl log_common log_x86 common)
 
 # Logs all levels of messages. This command can be added by other users of this
 # library to override the respective log level.
@@ -71,10 +71,10 @@ IF(Catch2_FOUND)
     file(GLOB test_main_SRC "test/*.cpp")
     file(GLOB test_SRC "test/**/*.cpp")
     add_executable(tests
-            $<TARGET_OBJECTS:common>
             ${test_main_SRC}
             ${test_SRC}
             )
-    target_link_libraries(tests PRIVATE etl log_common log_x86)
-    target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+    target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
 ENDIF()
+
+install(TARGETS common ecss_services)
