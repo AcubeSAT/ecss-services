@@ -50,12 +50,14 @@ class ECSSServicesRecipe(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.components["common"].libs = ["common"]
-        self.cpp_info.components["common"].set_property("cmake_target_name", "common")
+        # self.cpp_info.components["common"].libs = ["common"]
+        # self.cpp_info.components["common"].set_property("cmake_target_name", "common")
 
-        self.cpp_info.components["common"].libdirs = ["lib"]
-        self.cpp_info.components["common"].includedirs = ["inc"]
+        # self.cpp_info.components["common"].libdirs = ["lib"]
+        # self.cpp_info.components["common"].includedirs = ["inc"]
 
+        self.cpp_info.libdirs = ["lib"]
+        self.cpp_info.includedirs = ["inc"]
 
     def requirements(self):
         self.requires("etl/20.32.1")
