@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <etl/String.hpp>
 #include "Time.hpp"
+#include "Logger_Definitions.hpp"
+#include "Logger.hpp"
 
 /**
  * A class that represents a UTC time and date according to ISO 8601
@@ -131,3 +133,6 @@ private:
 		return daysOfMonth;
 	}
 };
+
+template <>
+void createMessage(String<LOGGER_MAX_MESSAGE_SIZE> message, const UTCTimestamp& value);
