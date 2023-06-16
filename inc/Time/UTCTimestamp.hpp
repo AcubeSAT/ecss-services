@@ -135,4 +135,4 @@ private:
 };
 
 template <>
-void createMessage(String<LOGGER_MAX_MESSAGE_SIZE> message, const UTCTimestamp& value);
+void createMessage(String<LOGGER_MAX_MESSAGE_SIZE> message, const UTCTimestamp value);
