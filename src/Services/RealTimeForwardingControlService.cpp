@@ -21,6 +21,7 @@ uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t app
 		for(uint8_t j =0; j < ECSSMaxReportTypeDefinitions; j++) {
 			if(applicationProcessConfiguration.isDefined(applicationID,i,j)) {
 				serviceCounter++;
+				break;
 			}
 		}
 	}
