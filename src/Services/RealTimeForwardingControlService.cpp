@@ -17,10 +17,11 @@ void RealTimeForwardingControlService::addAllReportsOfService(uint8_t applicatio
 
 uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t applicationID) {
 	uint8_t serviceCounter = 0;
-	for (auto& definition: applicationProcessConfiguration.definitions) {
-		const auto& pair = definition.first;
-		if (pair.first == applicationID) {
-			serviceCounter++;
+	for (uint8_t i = 0; i < ECSSMaxServiceTypeDefinitions; i++) {
+		for(uint8_t j =0; j < ECSSMaxReportTypeDefinitions; j++) {
+			if(applicationProcessConfiguration.isDefined(applicationID,i,j)) {
+				serviceCounter++;
+			}
 		}
 	}
 	return serviceCounter;
