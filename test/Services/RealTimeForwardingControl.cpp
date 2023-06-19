@@ -192,29 +192,24 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                Message::TC, 1);
 
 		uint8_t applicationID = 1;
-		realTimeForwarding.controlledApplications.push_back(applicationID);
 		realTimeForwarding.addAppControlled(applicationID);
 		fillRequestWithValidReportTypes(request);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
-		REQUIRE(applicationProcesses.size() == 2);
+		auto& applicationProcessesBit = realTimeForwarding.applicationProcessConfiguration.isDefined;
 		REQUIRE(realTimeForwarding.countServicesOfApplication(applicationID) == 2);
 
 		for (auto appID: applications) {
 			for (uint8_t j = 0; j < 2; j++) {
 				uint8_t serviceType = services[j];
 				auto appServicePair = std::make_pair(appID, serviceType);
-				REQUIRE(applicationProcesses.find(appServicePair) != applicationProcesses.end());
-				REQUIRE(applicationProcesses[appServicePair].size() == 2);
+				REQUIRE(realTimeForwarding.countReportsOfService(appID,serviceType) == 2);
 				uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 				for (uint8_t k = 0; k < 2; k++) {
-					REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
-					                  applicationProcesses[appServicePair].end(),
-					                  messages[k]) != applicationProcesses[appServicePair].end());
+					REQUIRE(applicationProcessesBit(appID,serviceType,messages[k]) == true);
 				}
 			}
 		}
