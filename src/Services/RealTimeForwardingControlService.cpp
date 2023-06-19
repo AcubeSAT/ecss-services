@@ -9,9 +9,8 @@ void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applic
 }
 
 void RealTimeForwardingControlService::addAllReportsOfService(uint8_t applicationID, uint8_t serviceType) {
-	for (const auto& messageType: AllMessageTypes::MessagesOfService.at(serviceType)) {
-		auto appServicePair = std::make_pair(applicationID, serviceType);
-		applicationProcessConfiguration.definitions[appServicePair].push_back(messageType);
+	for (const uint8_t & messageType: AllMessageTypes::MessagesOfService.at(serviceType)) {
+		applicationProcessConfiguration.isDefined.set(applicationID,serviceType,messageType);
 	}
 }
 
