@@ -32,8 +32,7 @@ uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicat
 }
 
 bool RealTimeForwardingControlService::checkAppControlled(Message& request, uint8_t applicationId) {
-	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
-	    controlledApplications.end()) {
+	if (not controlledApplicationsMapToArray.count(applicationId)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
 		return false;
 	}
