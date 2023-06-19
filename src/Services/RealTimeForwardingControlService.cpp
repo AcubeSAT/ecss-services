@@ -28,8 +28,13 @@ uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t app
 }
 
 uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicationID, uint8_t serviceType) {
-	auto appServicePair = std::make_pair(applicationID, serviceType);
-	return applicationProcessConfiguration.definitions[appServicePair].size();
+	uint8_t reportCount = 0;
+	for(uint8_t i = 0; i < ECSSMaxReportTypeDefinitions; i++) {
+		if(applicationProcessConfiguration.isDefined(applicationID,serviceType,i)) {
+			reportCount++;
+		}
+	}
+	return reportCount;
 }
 
 bool RealTimeForwardingControlService::checkAppControlled(Message& request, uint8_t applicationId) {
@@ -135,9 +140,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 				if (not checkMessage(request, applicationID, serviceType, messageType)) {
 					continue;
 				}
-				auto key = std::make_pair(applicationID, serviceType);
-				applicationProcessConfiguration.definitions[key].push_back(
-				    messageType);
+				applicationProcessConfiguration.isDefined.set(applicationID,serviceType,messageType);
 			}
 		}
 	}
