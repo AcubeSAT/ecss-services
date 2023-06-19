@@ -17,7 +17,7 @@ uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPro
 uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
-void validReportTypes(Message& request) {
+void fillRequestWithValidReportTypes(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
 	uint8_t numOfMessagesPerService = 2;
@@ -193,13 +193,15 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
-		validReportTypes(request);
+		realTimeForwarding.addAppControlled(applicationID);
+		fillRequestWithValidReportTypes(request);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 		REQUIRE(applicationProcesses.size() == 2);
+		REQUIRE(realTimeForwarding.countServicesOfApplication(applicationID) == 2);
 
 		for (auto appID: applications) {
 			for (uint8_t j = 0; j < 2; j++) {
@@ -228,7 +230,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                Message::TC, 1);
 
 		uint8_t applicationID = 1;
-		validReportTypes(request);
+		fillRequestWithValidReportTypes(request);
 
 		MessageParser::execute(request);
 
@@ -248,7 +250,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
-		validReportTypes(request);
+		fillRequestWithValidReportTypes(request);
 
 		for (uint8_t i = 1; i < ECSSMaxServiceTypeDefinitions + 1; i++) {
 			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, i)];
@@ -277,7 +279,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		uint8_t serviceType2 = services[1]; // st05
 
 		realTimeForwarding.controlledApplications.push_back(applicationID);
-		validReportTypes(request);
+		fillRequestWithValidReportTypes(request);
 
 		auto& applicationProcessConfig = realTimeForwarding.applicationProcessConfiguration.definitions;
 
@@ -305,7 +307,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		uint8_t applicationID = 1;
 		uint8_t serviceType = services[0]; // st03
 		realTimeForwarding.controlledApplications.push_back(applicationID);
-		validReportTypes(request);
+		fillRequestWithValidReportTypes(request);
 
 		for (auto& message: AllMessageTypes::MessagesOfService.at(serviceType)) {
 			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
@@ -336,7 +338,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		uint8_t serviceType2 = services[1]; // st05
 
 		realTimeForwarding.controlledApplications.push_back(applicationID);
-		validReportTypes(request);
+		fillRequestWithValidReportTypes(request);
 
 		auto& applicationProcessConfig = realTimeForwarding.applicationProcessConfiguration;
 

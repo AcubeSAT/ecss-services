@@ -35,11 +35,6 @@ public:
 	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
 	/**
-	 * the number of controlled applications at the time of the addition of another
-	 */
-	uint8_t numberOfControlledApplications = 0;
-
-	/**
 	 * This maps the applicationIDs that have been added to an index in the definition bitarray
 	 */
 	etl::map<uint8_t, uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplicationsMapToArray;
@@ -52,6 +47,11 @@ public:
 
 private:
 	/**
+	 * the number of controlled applications at the time of the addition of another
+	 */
+	uint8_t numberOfControlledApplications = 0;
+
+	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
 	 */
 	void addAllReportsOfApplication(uint8_t applicationID);
@@ -60,16 +60,6 @@ private:
 	 * Adds all report types of the specified service type, to the application process configuration.
 	 */
 	void addAllReportsOfService(uint8_t applicationID, uint8_t serviceType);
-
-	/**
-	 * Counts the number of service types, stored for the specified application process.
-	 */
-	uint8_t countServicesOfApplication(uint8_t applicationID);
-
-	/**
-	 * Counts the number of report types, stored for the specified service type.
-	 */
-	uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
@@ -144,6 +134,16 @@ public:
 	 * @return True if the addition was successful, false if it already existed
 	 */
 	bool addAppControlled(uint8_t applicationID);
+
+	/**
+	 * Counts the number of service types, stored for the specified application process.
+	 */
+	uint8_t countServicesOfApplication(uint8_t applicationID);
+
+	/**
+	 * Counts the number of report types, stored for the specified service type.
+	 */
+	uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
 };
 
 #endif
