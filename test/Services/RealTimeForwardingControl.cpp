@@ -231,7 +231,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
-		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
+		REQUIRE(realTimeForwarding.applicationProcessConfiguration.isDefined.none());
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();

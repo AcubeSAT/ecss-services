@@ -33,8 +33,9 @@ public:
 	unsigned long count() const {return m_bits.count();}
 	unsigned long size() const {return m_bits.size();}
 	unsigned long test(size_t m, size_t n, size_t o) const {m_bits.test(m*N*O + n*O + o); return *this;}
-	unsigned long any() const {return m_bits.any();}
-	unsigned long none() const {return m_bits.none();}
+	bool any() const {return m_bits.any();}
+	bool none() const {return m_bits.none();}
+	bool all() const {return m_bits.all();}
 
 private:
 	etl::bitset<M*N*O> m_bits;
