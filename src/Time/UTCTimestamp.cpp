@@ -161,3 +161,18 @@ void UTCTimestamp::repair() {
 		year++;
 	}
 }
+
+template <>
+void createMessage(String<LOGGER_MAX_MESSAGE_SIZE> message, const UTCTimestamp value) {
+    etl::to_string(value.hour, message, true);
+    message += "-";
+    etl::to_string(value.minute, message, true);
+    message += "-";
+    etl::to_string(value.second, message, true);
+    message += " -- ";
+    etl::to_string(value.day, message, true);
+    message += "/";
+    etl::to_string(value.month, message, true);
+    message += "/";
+    etl::to_string(value.year, message, true);
+}
