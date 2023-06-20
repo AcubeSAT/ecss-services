@@ -163,7 +163,7 @@ void UTCTimestamp::repair() {
 }
 
 template <>
-void createMessage(String<LOGGER_MAX_MESSAGE_SIZE>& message, const UTCTimestamp value) {
+void createMessage(String<LOGGER_MAX_MESSAGE_SIZE>& message, const UTCTimestamp& value) {
     etl::to_string(value.hour, message, true);
     message += "-";
     etl::to_string(value.minute, message, true);
