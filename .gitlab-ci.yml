@@ -108,8 +108,8 @@ ikos:
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-    - ikos-scan make ecss_services
-    - ikos ecss_services.bc
+    - ikos-scan make x86_services
+    - ikos x86_services.bc
     - ikos-report -o=ikos-report.txt output.db
   after_script:
     - mv ikos-report.txt ikos-report
