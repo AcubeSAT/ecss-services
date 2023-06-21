@@ -71,4 +71,4 @@ IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
     target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
 ENDIF()
 
-install(TARGETS ecss_services)
+install(TARGETS common)
