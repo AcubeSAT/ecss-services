@@ -52,7 +52,7 @@ This repository uses [conan 2.0](https://conan.io/) to manage dependencies.
 #### AcubeSAT Conan Packages
 One of the packages ([logger](https://gitlab.com/acubesat/obc/logger)) is hosted on a private repository, so you 
 need to:
-- have access to the [repository](https://artifacotry.spacedot.gr) (if you're already on GitLab, it's the same 
+- have access to the [repository](https://artifactory.spacedot.gr) (if you're already on GitLab, it's the same 
   credentials, and you should login at least once) and add the 
   remote to your conan remotes. 
   To do 
