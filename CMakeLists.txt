@@ -49,16 +49,16 @@ target_sources(common PRIVATE
 
 target_link_libraries(common PRIVATE etl log_common log_x86)
 # Specify the .cpp files for the executables
-#file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
-#
-#add_executable(ecss_services
-#        ${x86_main_SRC}
-#        )
-#target_link_libraries(ecss_services PRIVATE etl log_common log_x86 common)
-#
-## Logs all levels of messages. This command can be added by other users of this
-## library to override the respective log level.
-#target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
+file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
+
+add_executable(x86_services
+        ${x86_main_SRC}
+        )
+target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
+
+# Logs all levels of messages. This command can be added by other users of this
+# library to override the respective log level.
+target_compile_definitions(x86_services PUBLIC LOGLEVEL_TRACE)
 
 find_package(Catch2 CONFIG)
 IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
