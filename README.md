@@ -42,7 +42,7 @@ definitions.
 ## Build
 
 If you're using CLion, you need to add in CMake options (File -> Settings -> Build, Execution, Deployment -> CMake ->
-CMake Options) this `-DCMAKE_TOOLCHAIN_FILE=cmake-build-debug/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release`.
+CMake Options) this `-DCMAKE_TOOLCHAIN_FILE=cmake-build-debug/build/Debug/generators/conan_toolchain.cmake `.
 
 If you just cmake from cli, just add the same flags in your command.
 

@@ -107,7 +107,7 @@ ikos:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
-    - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
     - ikos-scan make x86_services
     - ikos x86_services.bc
     - ikos-report -o=ikos-report.txt output.db
@@ -130,7 +130,7 @@ tests:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing
-    - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && make tests -j$(nproc)
+    - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug && make tests -j$(nproc)
     - lcov -q --capture --initial --directory . -o coverage_base
     - ./tests --colour-mode ansi
     - lcov -q --capture --directory . -o coverage_tests
