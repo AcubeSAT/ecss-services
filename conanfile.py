@@ -61,5 +61,6 @@ class ECSSServicesRecipe(ConanFile):
 
     def requirements(self):
         self.requires("etl/20.32.1")
-        self.requires("catch2/3.3.1")
         self.requires("logger/1.0")
+        if self.settings.arch != 'archv7':
+            self.requires("catch2/3.3.1")
