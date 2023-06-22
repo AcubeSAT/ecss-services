@@ -49,26 +49,28 @@ target_sources(common PRIVATE
 
 target_link_libraries(common PRIVATE etl log_common log_x86)
 # Specify the .cpp files for the executables
-file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
+IF (X86_BUILD)
+    file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
 
-add_executable(x86_services
-        ${x86_main_SRC}
-        )
-target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
-
-# Logs all levels of messages. This command can be added by other users of this
-# library to override the respective log level.
-target_compile_definitions(x86_services PUBLIC LOGLEVEL_TRACE)
-
-find_package(Catch2 CONFIG)
-IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
-    file(GLOB test_main_SRC "test/*.cpp")
-    file(GLOB test_SRC "test/**/*.cpp")
-    add_executable(tests
-            ${test_main_SRC}
-            ${test_SRC}
+    add_executable(x86_services
+            ${x86_main_SRC}
             )
-    target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
+    target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
+
+    # Logs all levels of messages. This command can be added by other users of this
+    # library to override the respective log level.
+    target_compile_definitions(x86_services PUBLIC LOGLEVEL_TRACE)
+
+    find_package(Catch2 CONFIG)
+    IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
+        file(GLOB test_main_SRC "test/*.cpp")
+        file(GLOB test_SRC "test/**/*.cpp")
+        add_executable(tests
+                ${test_main_SRC}
+                ${test_SRC}
+                )
+        target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
+    ENDIF()
 ENDIF()
 
 install(TARGETS common)
