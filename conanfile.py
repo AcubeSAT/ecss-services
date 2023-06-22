@@ -34,10 +34,11 @@ class ECSSServicesRecipe(ConanFile):
 
     def generate(self):
         tc = CMakeToolchain(self)
+        if self.settings.arch != 'armv7':
+            tc.variables["X86_BUILD"] = True
         tc.generate()
 
     def build(self):
-        print("building")
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
