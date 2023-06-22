@@ -37,6 +37,7 @@ class ECSSServicesRecipe(ConanFile):
         tc.generate()
 
     def build(self):
+        print("building")
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
