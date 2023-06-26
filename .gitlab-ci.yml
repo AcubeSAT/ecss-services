@@ -95,7 +95,7 @@ doxygen:
       - ./docs/html
 
 ikos:
-  image: spacedot/ikos:3.0
+  image: spacedot/ikos:3.1
   stage: analyze
   before_script:
     - mkdir ikos-report
