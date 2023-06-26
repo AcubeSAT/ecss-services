@@ -137,4 +137,4 @@ private:
  * Specifying the convertValueToString function to UTCTimestamp type of value -- definition in "Logger.hpp"
  */
 template<>
-void LoggerUtils::convertValueToString(String<LOGGER_MAX_MESSAGE_SIZE> &message, UTCTimestamp &value);
+void LoggerUtils::convertValueToString<UTCTimestamp &>(String<LOGGER_MAX_MESSAGE_SIZE> &message, UTCTimestamp &value);
