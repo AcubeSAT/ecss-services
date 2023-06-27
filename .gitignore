@@ -88,3 +88,5 @@ CMakeUserPresets.json
 # before conan allows us to upload the package. So, we ignore them.
 cppcheck-html-report/
 ikos-report/
+clang-tidy-html-report/
+gcovr/
