@@ -8,158 +8,158 @@ stages:
   - deploy
 
 
-# check-build:
-#   image: spacedot/build-base # TODO: push build-base
-#   stage: build
-#   variables:
-#     GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
-#     CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
-#   script:
-#     - conan profile detect --force
-#     - mkdir conan-build
-#     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
-#     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
-#     - conan install . --output-folder conan-build --build=missing
-#     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-#     - make -j$(nproc)
+check-build:
+  image: spacedot/build-base # TODO: push build-base
+  stage: build
+  variables:
+    GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
+    CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
+  script:
+    - conan profile detect --force
+    - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - conan install . --output-folder conan-build --build=missing
+    - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    - make -j$(nproc)
 
-# cppcheck:
-#   image: spacedot/cppcheck:2.8
-#   stage: analyze
-#   before_script:
-#     - cppcheck --version
-#   allow_failure: true
-#   script:
-#     - cd $CI_PROJECT_DIR
-#     - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
-#       --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
-#       --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
-#       --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
-#       --xml --xml-version=2 2>report.xml -I ./inc ./src
-#   after_script:
-#     - mkdir cppcheck-html-report
-#     - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
-#   artifacts:
-#     when: on_failure
-#     paths:
-#       - ./cppcheck-html-report
+cppcheck:
+  image: spacedot/cppcheck:2.8
+  stage: analyze
+  before_script:
+    - cppcheck --version
+  allow_failure: true
+  script:
+    - cd $CI_PROJECT_DIR
+    - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
+      --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
+      --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
+      --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
+      --xml --xml-version=2 2>report.xml -I ./inc ./src
+  after_script:
+    - mkdir cppcheck-html-report
+    - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
+  artifacts:
+    when: on_failure
+    paths:
+      - ./cppcheck-html-report
 
-# clang-tidy:
-#   image: spacedot/clang-tools:13.0.0-html-1.4.1
-#   stage: analyze
-#   script:
-#     - cd $CI_PROJECT_DIR
-#     - conan profile detect --force
-#     - mkdir conan-build
-#     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
-#     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
-#     - conan install . --output-folder conan-build --build=missing
-#     - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-#     - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --config-file=$CI_PROJECT_DIR/ci/.clang-tidy --use-color `find $CI_PROJECT_DIR/src $CI_PROJECT_DIR/inc -not -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` | tee clang-tidy-output.log
-#   after_script:
-#     - sed -e 's/\x1b\[[0-9;]*m//g' -i clang-tidy-output.log
-#     - mkdir clang-tidy-html-report
-#     - clang-tidy-html clang-tidy-output.log
-#     - mv clang.html clang-tidy-html-report
-#   artifacts:
-#     when: always
-#     paths:
-#       - ./clang-tidy-html-report
+clang-tidy:
+  image: spacedot/clang-tools:13.0.0-html-1.4.1
+  stage: analyze
+  script:
+    - cd $CI_PROJECT_DIR
+    - conan profile detect --force
+    - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - conan install . --output-folder conan-build --build=missing
+    - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --config-file=$CI_PROJECT_DIR/ci/.clang-tidy --use-color `find $CI_PROJECT_DIR/src $CI_PROJECT_DIR/inc -not -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` | tee clang-tidy-output.log
+  after_script:
+    - sed -e 's/\x1b\[[0-9;]*m//g' -i clang-tidy-output.log
+    - mkdir clang-tidy-html-report
+    - clang-tidy-html clang-tidy-output.log
+    - mv clang.html clang-tidy-html-report
+  artifacts:
+    when: always
+    paths:
+      - ./clang-tidy-html-report
 
-# clang-analyzer:
-#    image: spacedot/clang-tools:13.0.0-html-1.4.1
-#    stage: analyze
-#    before_script:
-#      - mkdir scan-build-html-report
-#    script:
-#      - cd $CI_PROJECT_DIR
-#      - conan profile detect --force
-#      - mkdir conan-build
-#      - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
-#      - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
-#      - conan install . --output-folder conan-build --build=missing
-#      - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-#      - scan-build -o ./scan-build-html-report make
-#    artifacts:
-#      paths:
-#        - ./scan-build-html-report
-# doxygen:
-#   image: spacedot/doxygen:1.9.4-4-awesomecss-1.6.0
-#   stage: analyze
-#   script:
-#     - cd $CI_PROJECT_DIR
-#     - doxygen
-#   artifacts:
-#     paths:
-#       - ./docs/html
-# ikos:
-#   image: spacedot/ikos:3.0
-#   stage: analyze
-#   before_script:
-#     - mkdir ikos-report
-#   script:
-#     - cd $CI_PROJECT_DIR
-#     - conan profile detect --force
-#     - cp conan-profile /root/.conan2/profiles/
-#     - mkdir conan-build
-#     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
-#     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
-#     - conan install . --output-folder conan-build --build=missing -pr conan-profile
-#     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
-#     - ikos-scan make x86_services
-#     - ikos x86_services.bc
-#     - ikos-report -o=ikos-report.txt output.db
-#   after_script:
-#     - mv ikos-report.txt ikos-report
-#     - mv output.db ikos-report
-#   artifacts:
-#     paths:
-#       - ./ikos-report
-# tests:
-#   image: spacedot/coverage:gcovr-6.0-lcov-1.15.5a0
-#   stage: test
-#   when: always
-#   before_script:
-#     - mkdir gcovr
-#   script:
-#     - cd $CI_PROJECT_DIR
-#     - conan profile detect --force
-#     - mkdir conan-build
-#     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
-#     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
-#     - conan install . --output-folder conan-build --build=missing
-#     - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && make tests -j$(nproc)
-#     - lcov -q --capture --initial --directory . -o coverage_base
-#     - ./tests --colour-mode ansi
-#     - lcov -q --capture --directory . -o coverage_tests
-#     - lcov -q -a coverage_base -a coverage_tests -o coverage_total_unfiltered
-#     - lcov -q --remove coverage_total_unfiltered "${PWD}/lib/*" "${PWD}/CMakeFiles/*" "${PWD}/test/*" "${PWD}/src/main.cpp" -o coverage_total_filtered
-#     - gcovr -s -p -e "^.*(test|lib|main.cpp|CMakeFiles)" --html --html-details --html-title "Code coverage ${CI_PROJECT_NAME}/${CI_COMMIT_REF_NAME}" -o ./gcovr/gcovr.html
-#     - gcovr -e "^.*(test|lib|main.cpp|CMakeFiles)"
-#     - genhtml --demangle-cpp -t "${CI_COMMIT_REF_NAME}" --html-epilog ci/page_style/epilog.html -o ./gcovr coverage_total_filtered
-#   artifacts:
-#     paths:
-#       - ./gcovr
-# pages:
-#   image: spacedot/build-base:latest # TODO: Latest tag is temporary
-#   stage: deploy
-#   script:
-#     - mkdir .public
-#     - cp -r ./docs/html ./.public/docs
-#     - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/ # TODO: USE THIS WHEN CLANG AND GCOVR HAVE BEEN FIXED
-#     - cp -r ./{gcovr,ikos-report,cppcheck-html-report} ./.public/
-#     - ls ./.public
-#     - find ./.public
-#     - mv .public public
-#   after_script:
-#     - "echo Artifacts for this build: ${CI_JOB_URL}/artifacts/browse"
-#     - "echo Base page for this branch: ${CI_PAGES_URL}"
-#   artifacts:
-#     expose_as: 'build artifacts and documentation'
-#     paths:
-#       - public # Upload the resulting website
-#       #  only:
-#       #    - branches # Deploy on all branches
+clang-analyzer:
+   image: spacedot/clang-tools:13.0.0-html-1.4.1
+   stage: analyze
+   before_script:
+     - mkdir scan-build-html-report
+   script:
+     - cd $CI_PROJECT_DIR
+     - conan profile detect --force
+     - mkdir conan-build
+     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+     - conan install . --output-folder conan-build --build=missing
+     - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+     - scan-build -o ./scan-build-html-report make
+   artifacts:
+     paths:
+       - ./scan-build-html-report
+doxygen:
+  image: spacedot/doxygen:1.9.4-4-awesomecss-1.6.0
+  stage: analyze
+  script:
+    - cd $CI_PROJECT_DIR
+    - doxygen
+  artifacts:
+    paths:
+      - ./docs/html
+ikos:
+  image: spacedot/ikos:3.0
+  stage: analyze
+  before_script:
+    - mkdir ikos-report
+  script:
+    - cd $CI_PROJECT_DIR
+    - conan profile detect --force
+    - cp conan-profile /root/.conan2/profiles/
+    - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - conan install . --output-folder conan-build --build=missing -pr conan-profile
+    - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
+    - ikos-scan make x86_services
+    - ikos x86_services.bc
+    - ikos-report -o=ikos-report.txt output.db
+  after_script:
+    - mv ikos-report.txt ikos-report
+    - mv output.db ikos-report
+  artifacts:
+    paths:
+      - ./ikos-report
+tests:
+  image: spacedot/coverage:gcovr-6.0-lcov-1.15.5a0
+  stage: test
+  when: always
+  before_script:
+    - mkdir gcovr
+  script:
+    - cd $CI_PROJECT_DIR
+    - conan profile detect --force
+    - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - conan install . --output-folder conan-build --build=missing
+    - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && make tests -j$(nproc)
+    - lcov -q --capture --initial --directory . -o coverage_base
+    - ./tests --colour-mode ansi
+    - lcov -q --capture --directory . -o coverage_tests
+    - lcov -q -a coverage_base -a coverage_tests -o coverage_total_unfiltered
+    - lcov -q --remove coverage_total_unfiltered "${PWD}/lib/*" "${PWD}/CMakeFiles/*" "${PWD}/test/*" "${PWD}/src/main.cpp" -o coverage_total_filtered
+    - gcovr -s -p -e "^.*(test|lib|main.cpp|CMakeFiles)" --html --html-details --html-title "Code coverage ${CI_PROJECT_NAME}/${CI_COMMIT_REF_NAME}" -o ./gcovr/gcovr.html
+    - gcovr -e "^.*(test|lib|main.cpp|CMakeFiles)"
+    - genhtml --demangle-cpp -t "${CI_COMMIT_REF_NAME}" --html-epilog ci/page_style/epilog.html -o ./gcovr coverage_total_filtered
+  artifacts:
+    paths:
+      - ./gcovr
+pages:
+  image: spacedot/build-base:latest # TODO: Latest tag is temporary
+  stage: deploy
+  script:
+    - mkdir .public
+    - cp -r ./docs/html ./.public/docs
+    - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/ # TODO: USE THIS WHEN CLANG AND GCOVR HAVE BEEN FIXED
+    - cp -r ./{gcovr,ikos-report,cppcheck-html-report} ./.public/
+    - ls ./.public
+    - find ./.public
+    - mv .public public
+  after_script:
+    - "echo Artifacts for this build: ${CI_JOB_URL}/artifacts/browse"
+    - "echo Base page for this branch: ${CI_PAGES_URL}"
+  artifacts:
+    expose_as: 'build artifacts and documentation'
+    paths:
+      - public # Upload the resulting website
+      #  only:
+      #    - branches # Deploy on all branches
 
 
 conan:
