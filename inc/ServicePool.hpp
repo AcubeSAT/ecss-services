@@ -17,6 +17,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
+#include "Services/FileManagementService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -31,6 +32,7 @@ class ServicePool {
 	 * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
 	 * counter of each MessageType.
 	 */
+
 	etl::map<uint16_t, uint16_t, ECSSTotalMessageTypes> messageTypeCounter;
 
 	/**
@@ -99,6 +101,9 @@ public:
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
 
+#ifdef SERVICE_FILE_MANAGEMENT
+    FileManagementService fileManagement;
+#endif
 
 	/**
 	 * The default ServicePool constructor

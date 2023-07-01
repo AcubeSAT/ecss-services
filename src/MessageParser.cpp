@@ -1,10 +1,9 @@
-#include "MessageParser.hpp"
 #include <ServicePool.hpp>
-#include <iostream>
 #include "ErrorHandler.hpp"
-#include "Helpers/CRCHelper.hpp"
-#include "Services/RequestVerificationService.hpp"
+#include "MessageParser.hpp"
 #include "macros.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Helpers/CRCHelper.hpp"
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
@@ -80,6 +79,11 @@ void MessageParser::execute(Message& message) {
 			break;
 #endif
 
+#ifdef SERVICE_FILE_MANAGEMENT
+        case FileManagementService::ServiceType:
+            Services.fileManagement.execute(message); // ST[23]
+            break;
+#endif
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
