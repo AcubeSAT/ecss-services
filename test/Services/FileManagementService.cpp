@@ -1,7 +1,7 @@
 #include <Message.hpp>
 #include <ServicePool.hpp>
 #include <Services/FileManagementService.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <cstring>
 #include <etl/String.hpp>
 #include "ServiceTests.hpp"
