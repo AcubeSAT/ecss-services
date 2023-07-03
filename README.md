@@ -63,6 +63,7 @@ need to:
 - or, clone the repo on your own, and package it locally use `conan create . --build=missing` in the root of the repo.
 - or, clone the repo on your own and add it as a submodule in the `lib` folder, and make the necessary CMakeLists.
   txt changes to include it in the build.
+  
 To build, you first have run `conan profile detect --force`, which generates default profile detecting GCC. You 
   should find where conan stores the profiles, usually it's at `~/.conan/profiles/`. Then, you need to run `cp 
   conan-profile $PROFILE_PATH`, where `$PROFILE_PATH` is the path to the directory that conan stores profiles.
