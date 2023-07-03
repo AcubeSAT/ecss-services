@@ -75,7 +75,6 @@ After you've run `conan install...` you can `Reload CMake project` and build as 
 <summary>Getting conan</summary>
 
 You can install [conan](https://conan.io/) following the instructions from
-[here](https://docs.conan.io/en/latest/installation.html). Just to be safe, you can follow the standard procedure from
-[here](https://docs.conan.io/en/latest/getting_started.html):
+[here](https://docs.conan.io/2/installation.html).
 
 </details>
