@@ -200,10 +200,6 @@ inline const uint16_t ECSSPacketStoreIdSize = 15;
 inline const uint8_t ECSSMaxHousekeepingStructures = 10;
 
 /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> master
  * The max number of controlled application processes
  * @see RealTimeForwardingControlService
  */
