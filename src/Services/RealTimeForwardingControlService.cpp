@@ -105,7 +105,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 	}
 	uint8_t numOfApplications = request.readUint8();
 
-	for (uint8_t i = 0; i < numOfApplications; i++) {
+	for (uint8_t currentApplicationNumber = 0; currentApplicationNumber < numOfApplications; currentApplicationNumber++) {
 		uint8_t applicationID = request.readUint8();
 		uint8_t numOfServices = request.readUint8();
 
@@ -118,7 +118,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			continue;
 		}
 
-		for (uint8_t j = 0; j < numOfServices; j++) {
+		for (uint8_t currentServiceNumber = 0; currentServiceNumber < numOfServices; currentServiceNumber++) {
 			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
 
@@ -131,7 +131,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 				continue;
 			}
 
-			for (uint8_t k = 0; k < numOfMessages; k++) {
+			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
 				uint8_t messageType = request.readUint8();
 
 				if (not checkMessage(request, applicationID, serviceType, messageType)) {
@@ -234,7 +234,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 		return;
 	}
 
-	for (uint8_t i = 0; i < numOfApplications; i++) {
+	for (uint8_t currentApplicationNumber = 0; currentApplicationNumber < numOfApplications; currentApplicationNumber++) {
 		uint8_t applicationID = request.readUint8();
 		uint8_t numOfServices = request.readUint8();
 
@@ -246,7 +246,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 			continue;
 		}
 
-		for (uint8_t j = 0; j < numOfServices; j++) {
+		for (uint8_t currentServiceNumber = 0; currentServiceNumber < numOfServices; currentServiceNumber++) {
 			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
 
@@ -258,7 +258,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 				continue;
 			}
 
-			for (uint8_t k = 0; k < numOfMessages; k++) {
+			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
 				uint8_t messageType = request.readUint8();
 
 				if (not reportTypeExists(request, applicationID, serviceType, messageType)) {
