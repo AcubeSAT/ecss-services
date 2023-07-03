@@ -14,7 +14,7 @@ void RealTimeForwardingControlService::addAllReportsOfService(uint8_t applicatio
 	}
 }
 
-uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t applicationID) {
+uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t applicationID) const {
 	uint8_t serviceCounter = 0;
 	for (uint8_t i = 0; i < ECSSMaxServiceTypeDefinitions; i++) {
 		for(uint8_t j =0; j < ECSSMaxReportTypeDefinitions; j++) {
@@ -27,7 +27,7 @@ uint8_t RealTimeForwardingControlService::countServicesOfApplication(uint8_t app
 	return serviceCounter;
 }
 
-uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicationID, uint8_t serviceType) {
+uint8_t RealTimeForwardingControlService::countReportsOfService(uint8_t applicationID, uint8_t serviceType) const {
 	uint8_t reportCount = 0;
 	for(uint8_t i = 0; i < ECSSMaxReportTypeDefinitions; i++) {
 		if(applicationProcessConfiguration.isDefined(applicationID,serviceType,i)) {
@@ -58,7 +58,7 @@ bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Messag
 	return true;
 }
 
-bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, uint8_t applicationID) {
+bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, uint8_t applicationID) const {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
 		return true;
@@ -66,7 +66,7 @@ bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, 
 	return false;
 }
 
-bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, uint8_t applicationID) {
+bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, uint8_t applicationID) const {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
@@ -83,7 +83,7 @@ bool RealTimeForwardingControlService::checkService(Message& request, uint8_t ap
 }
 
 bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, uint8_t applicationID,
-                                                             uint8_t serviceType) {
+                                                             uint8_t serviceType) const {
 	if (countReportsOfService(applicationID, serviceType) >= AllMessageTypes::MessagesOfService.at(serviceType).size()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
 		return true;

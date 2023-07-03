@@ -84,12 +84,12 @@ private:
 	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
 	 * definitions.
 	 */
-	bool allServiceTypesAllowed(Message& request, uint8_t applicationID);
+	bool allServiceTypesAllowed(Message& request, uint8_t applicationID) const;
 
 	/**
 	 * Checks if the maximum number of service type definitions per application process is reached.
 	 */
-	bool maxServiceTypesReached(Message& request, uint8_t applicationID);
+	bool maxServiceTypesReached(Message& request, uint8_t applicationID) const;
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -102,7 +102,7 @@ private:
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
 	 */
-	bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType);
+	bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType) const;
 
 	/**
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
@@ -138,12 +138,12 @@ public:
 	/**
 	 * Counts the number of service types, stored for the specified application process.
 	 */
-	uint8_t countServicesOfApplication(uint8_t applicationID);
+	uint8_t countServicesOfApplication(uint8_t applicationID) const;
 
 	/**
 	 * Counts the number of report types, stored for the specified service type.
 	 */
-	uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
+	uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType) const;
 };
 
 #endif

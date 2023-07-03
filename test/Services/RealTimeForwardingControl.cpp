@@ -183,6 +183,8 @@ void validInvalidAllReportsOfApp(Message& request) {
 void resetAppProcessConfiguration() {
 	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
 	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
+	realTimeForwarding.applicationProcessConfiguration.isDefined.reset();
+	REQUIRE(realTimeForwarding.applicationProcessConfiguration.isDefined.none());
 }
 
 TEST_CASE("Add report types to the Application Process Configuration") {
@@ -244,20 +246,20 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                Message::TC, 1);
 
 		uint8_t applicationID = 1;
-		realTimeForwarding.controlledApplications.push_back(applicationID);
+		realTimeForwarding.addAppControlled(applicationID);
 		fillRequestWithValidReportTypes(request);
 
-		for (uint8_t i = 1; i < ECSSMaxServiceTypeDefinitions + 1; i++) {
-			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, i)];
+		for (uint8_t i = 0; i < ECSSMaxServiceTypeDefinitions ; i++) {
+			realTimeForwarding.applicationProcessConfiguration.isDefined.set(applicationID,i,0);
 		}
-		CHECK(realTimeForwarding.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
+		CHECK(realTimeForwarding.countServicesOfApplication(applicationID) == ECSSMaxServiceTypeDefinitions);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed) ==
 		      1);
-		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
+		REQUIRE(realTimeForwarding.countServicesOfApplication(applicationID) == ECSSMaxServiceTypeDefinitions);
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
