@@ -63,6 +63,7 @@ need to:
 - or, clone the repo on your own, and package it locally use `conan create . --build=missing` in the root of the repo.
 - or, clone the repo on your own and add it as a submodule in the `lib` folder, and make the necessary CMakeLists.
   txt changes to include it in the build.
+  
 To build, you first have run `conan profile detect --force`, which generates default profile detecting GCC. You 
   should find where conan stores the profiles, usually it's at `~/.conan/profiles/`. Then, you need to run `cp 
   conan-profile $PROFILE_PATH`, where `$PROFILE_PATH` is the path to the directory that conan stores profiles.
@@ -74,7 +75,6 @@ After you've run `conan install...` you can `Reload CMake project` and build as 
 <summary>Getting conan</summary>
 
 You can install [conan](https://conan.io/) following the instructions from
-[here](https://docs.conan.io/en/latest/installation.html). Just to be safe, you can follow the standard procedure from
-[here](https://docs.conan.io/en/latest/getting_started.html):
+[here](https://docs.conan.io/2/installation.html).
 
 </details>
