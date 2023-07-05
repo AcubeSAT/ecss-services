@@ -117,18 +117,18 @@ private:
 	/**
 	 * Returns true, if the defined application exists in the application process configuration map.
 	 */
-	bool findApplication(uint8_t targetAppID);
+	bool isApplicationEnabled(uint8_t targetAppID);
 
 	/**
 	 * Returns true, if the defined service type exists in the application process configuration map.
 	 */
-	bool findServiceType(uint8_t applicationID, uint8_t targetService);
+	bool isServiceTypeEnabled(uint8_t applicationID, uint8_t targetService);
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool findReportType(uint8_t target, uint8_t applicationID, uint8_t serviceType);
+	bool isReportTypeEnabled(uint8_t target, uint8_t applicationID, uint8_t serviceType);
 
 	/**
 	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
@@ -137,16 +137,19 @@ private:
 
 	/**
 	 * Checks whether the requested application is present in the application process configuration.
+	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
 	bool applicationExists(Message& request, uint8_t applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks whether the requested service type is present in the application process configuration.
+	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
 	bool serviceTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
 
 	/**
 	 * Checks whether the requested report type is present in the application process configuration.
+	 * Reports an error if one exist.
 	 */
 	bool reportTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 

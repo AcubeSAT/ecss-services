@@ -17,6 +17,10 @@ uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPro
 uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
+/**
+ * Fill the input message with a predefined sequence of valid report definitions.
+ * @param request
+ */
 void validReportTypes(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -41,6 +45,10 @@ void validReportTypes(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of duplicate report definitions.
+ * @param request
+ */
 void duplicateReportTypes(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -64,6 +72,10 @@ void duplicateReportTypes(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of both valid and invalid report definitions.
+ * @param request
+ */
 void validInvalidReportTypes(Message& request) {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
@@ -90,6 +102,10 @@ void validInvalidReportTypes(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of valid service report definitions.
+ * @param request
+ */
 void validAllReportsOfService(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -109,6 +125,11 @@ void validAllReportsOfService(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of both valid
+ * and invalid service report definitions.
+ * @param request
+ */
 void validInvalidAllReportsOfService(Message& request) {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
@@ -138,6 +159,10 @@ void validInvalidAllReportsOfService(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of valid application process report definitions.
+ * @param request
+ */
 void validAllReportsOfApp(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 0;
@@ -150,6 +175,11 @@ void validAllReportsOfApp(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of both valid
+ * and invalid application process report definitions.
+ * @param request
+ */
 void validInvalidAllReportsOfApp(Message& request) {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
@@ -180,6 +210,9 @@ void validInvalidAllReportsOfApp(Message& request) {
 	}
 }
 
+/**
+ * Reset the map containing the report definitions to an empty state.
+ */
 void resetAppProcessConfiguration() {
 	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
 	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
@@ -562,26 +595,34 @@ uint8_t messagesToFill1[] = {HousekeepingService::MessageType::HousekeepingPerio
 uint8_t messagesToFill2[] = {EventReportService::MessageType::InformativeEventReport,
                         EventReportService::MessageType::DisabledListEventReport};
 
-bool findApplication(uint8_t targetAppID) {
+/**
+ * Returns true, if the defined application exists in the application process configuration map.
+ */
+bool isApplicationEnabled(uint8_t targetAppID) {
 	auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
 	return std::any_of(std::begin(definitions), std::end(definitions), [targetAppID](auto definition) { return targetAppID == definition.first.first; });
 }
 
-bool findServiceType(uint8_t applicationID, uint8_t targetService) {
+/**
+ * Returns true, if the defined service type exists in the application process configuration map.
+ */
+bool isServiceTypeEnabled(uint8_t applicationID, uint8_t targetService) {
 	auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
 	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](auto definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
 }
 
+/**
+ * Check if configuration is initialized properly for testing
+ */
 void checkAppProcessConfig() {
 	auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 
-	// Check if configuration is initialized properly
 	for (auto appID: applicationsToFill) {
-		REQUIRE(findApplication(appID));
+		REQUIRE(isApplicationEnabled(appID));
 
 		for (auto serviceType: services) {
 			auto appServicePair = std::make_pair(appID, serviceType);
-			REQUIRE(findServiceType(appID, serviceType));
+			REQUIRE(isServiceTypeEnabled(appID, serviceType));
 			REQUIRE(applicationProcesses[appServicePair].size() == 2);
 
 			for (auto messageType: messagesToFill1) {
@@ -593,11 +634,10 @@ void checkAppProcessConfig() {
 	}
 }
 
+/**
+ * Initialize the configuration for testing
+ */
 void initializeAppProcessConfig() {
-	//	uint8_t numOfApplications = 1;
-	//	uint8_t numOfServicesPerApp = 2;
-	//	uint8_t numOfMessagesPerService = 2;
-
 	for (auto appID: applicationsToFill) {
 		for (auto serviceType: services) {
 			auto appServicePair = std::make_pair(appID, serviceType);
@@ -610,6 +650,9 @@ void initializeAppProcessConfig() {
 	checkAppProcessConfig();
 }
 
+/**
+ * Check if configuration is initialized properly for testing with a 2nd sequence of data
+ */
 void checkAppProcessConfig2() {
 	auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 	uint8_t applications2[] = {1, 2, 3};
@@ -617,10 +660,9 @@ void checkAppProcessConfig2() {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
 
-	// Check if configuration is initialized properly
 	for (uint8_t i = 0; i < numOfApplications; i++) {
 		uint8_t appID = applications2[i];
-		REQUIRE(findApplication(appID));
+		REQUIRE(isApplicationEnabled(appID));
 
 		uint8_t numOfServices = (i == 2) ? 15 : 2;
 		uint8_t* serviceTypes = (i == 2) ? allServicesToFill : servicesToFill;
@@ -629,7 +671,7 @@ void checkAppProcessConfig2() {
 			uint8_t serviceType = serviceTypes[j];
 			uint8_t* messages = (i == 2) ? messagesToFill2 : messagesToFill1;
 
-			REQUIRE(findServiceType(appID, serviceType));
+			REQUIRE(isServiceTypeEnabled(appID, serviceType));
 			auto appServicePair = std::make_pair(appID, serviceType);
 			REQUIRE(applicationProcesses[appServicePair].size() == 2);
 
@@ -643,6 +685,9 @@ void checkAppProcessConfig2() {
 	}
 }
 
+/**
+ * Initialize the configuration for testing with a 2nd sequence of data
+ */
 void initializeAppProcessConfig2() {
 	uint8_t numOfApplications = 3;
 	uint8_t numOfMessagesPerService = 2;
@@ -668,6 +713,11 @@ void initializeAppProcessConfig2() {
 	checkAppProcessConfig2();
 }
 
+/**
+ * Fill the input message with a predefined sequence of report definitions where the
+ * requested service type is not present in the application process configuration
+ * @param request
+ */
 void serviceNotInApplication(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -692,6 +742,11 @@ void serviceNotInApplication(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of report definitions where the
+ * requested message type is not present in the application process configuration
+ * @param request
+ */
 void messageNotInApplication(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -717,6 +772,11 @@ void messageNotInApplication(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of valid report definitions that
+ * need to be deleted.
+ * @param request
+ */
 void deleteValidReportTypes(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -740,6 +800,11 @@ void deleteValidReportTypes(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of report definitions that
+ * once deleted result in an empty service report definition.
+ * @param request
+ */
 void deleteReportEmptyService(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 1;
@@ -763,6 +828,11 @@ void deleteReportEmptyService(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of message report definitions that
+ * once deleted result in an empty application process report definition.
+ * @param request
+ */
 void deleteReportEmptyApplication(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -786,6 +856,11 @@ void deleteReportEmptyApplication(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of application process report definitions that
+ * need to be deleted.
+ * @param request
+ */
 void deleteApplicationProcess(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 0;
@@ -795,6 +870,11 @@ void deleteApplicationProcess(Message& request) {
 	request.appendUint8(numOfServicesPerApp);
 }
 
+/**
+ * Fill the input message with a predefined sequence of service report definitions that
+ * need to be deleted.
+ * @param request
+ */
 void deleteService(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 1;
@@ -813,6 +893,11 @@ void deleteService(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of service report definitions that
+ * once deleted result in an empty application process report definition.
+ * @param request
+ */
 void deleteServiceEmptyApplication(Message& request) {
 	uint8_t numOfApplications = 1;
 	uint8_t numOfServicesPerApp = 2;
@@ -831,6 +916,11 @@ void deleteServiceEmptyApplication(Message& request) {
 	}
 }
 
+/**
+ * Fill the input message with a predefined sequence of both valid and invalid report definitions
+ * that need to be deleted.
+ * @param request
+ */
 void deleteValidInvalidReportTypes(Message& request) {
 	uint8_t numOfApplications = 4;
 	uint8_t numOfServices = 2;
@@ -894,7 +984,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistingApplication) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentApplicationProcess) == 1);
 		checkAppProcessConfig();
 
 		resetAppProcessConfiguration();
@@ -913,7 +1003,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(
-		          ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinition) == 2);
+		          ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition) == 2);
 		checkAppProcessConfig();
 
 		resetAppProcessConfiguration();
@@ -931,7 +1021,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 4);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinition) ==
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentReportTypeDefinition) ==
 		      4);
 		checkAppProcessConfig();
 
@@ -977,7 +1067,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 
 		CHECK(ServiceTests::count() == 0);
 		REQUIRE(applicationProcesses.size() == 1);
-		REQUIRE(findServiceType(applicationID, servicesToFill[1]));
+		REQUIRE(isServiceTypeEnabled(applicationID, servicesToFill[1]));
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
@@ -1037,7 +1127,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 
 		REQUIRE(applicationProcesses.size() == 1);
-		REQUIRE(not findServiceType(applicationID, servicesToFill[0]));
+		REQUIRE(not isServiceTypeEnabled(applicationID, servicesToFill[0]));
 
 		resetAppProcessConfiguration();
 		ServiceTests::reset();
@@ -1077,24 +1167,24 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 4);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistingApplication) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentApplicationProcess) == 1);
 		CHECK(ServiceTests::countThrownErrors(
-		          ErrorHandler::ExecutionStartErrorType::NonExistingServiceTypeDefinition) == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistingReportTypeDefinition) ==
+		          ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentReportTypeDefinition) ==
 		      2);
 
 		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
 
 		REQUIRE(definitions.size() == 16);
 		for (auto appID: remainingApps) {
-			REQUIRE(findApplication(appID));
+			REQUIRE(isApplicationEnabled(appID));
 		}
 		REQUIRE(std::count_if(std::begin(definitions), std::end(definitions), [&remainingApps](auto& definition) { return std::find(std::begin(remainingApps), std::end(remainingApps), definition.first.first) != std::end(remainingApps); }) == 16);
 
 		// Check for appID = 1
 		uint8_t appID1 = remainingApps[0];
 		REQUIRE(std::count_if(std::begin(definitions), std::end(definitions), [appID1](auto& definition) { return appID1 == definition.first.first; }) == 1);
-		REQUIRE(not findServiceType(appID1, servicesToFill[0]));
+		REQUIRE(not isServiceTypeEnabled(appID1, servicesToFill[0]));
 		auto appServicePair = std::make_pair(appID1, servicesToFill[1]);
 		REQUIRE(definitions[appServicePair].size() == 2);
 
