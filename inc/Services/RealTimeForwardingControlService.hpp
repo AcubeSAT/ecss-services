@@ -131,7 +131,7 @@ private:
 	bool findReportType(uint8_t target, uint8_t applicationID, uint8_t serviceType);
 
 	/**
-	 * Deletes every pair containing the requested application process ID, from the application process configuration.
+	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
 	 */
 	void deleteApplicationProcess(uint8_t applicationID);
 
