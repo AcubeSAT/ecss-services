@@ -165,14 +165,14 @@ void UTCTimestamp::repair() {
 template <>
 void convertValueToString(String<LOGGER_MAX_MESSAGE_SIZE>& message, UTCTimestamp& value){
 	etl::to_string(value.hour, message, true);
-    message += "-";
-    etl::to_string(value.minute, message, true);
-    message += "-";
-    etl::to_string(value.second, message, true);
-    message += " -- ";
-    etl::to_string(value.day, message, true);
-    message += "/";
-    etl::to_string(value.month, message, true);
-    message += "/";
-    etl::to_string(value.year, message, true);
+	message += "-";
+	etl::to_string(value.minute, message, true);
+	message += "-";
+	etl::to_string(value.second, message, true);
+	message += " -- ";
+	etl::to_string(value.day, message, true);
+	message += "/";
+	etl::to_string(value.month, message, true);
+	message += "/";
+	etl::to_string(value.year, message, true);
 }
