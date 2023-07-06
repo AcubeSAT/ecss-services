@@ -250,9 +250,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 			}
 		}
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Requested Application Process is not controlled by the service") {
@@ -269,9 +267,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("All service types already allowed") {
@@ -295,9 +291,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		      1);
 		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Max service types already reached") {
@@ -325,9 +319,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 1);
 		REQUIRE(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions);
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("All report types already allowed") {
@@ -354,9 +346,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		    realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
 		        .size() == AllMessageTypes::MessagesOfService.at(serviceType).size());
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Max report types already reached") {
@@ -398,9 +388,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		REQUIRE(applicationProcessConfig.definitions[appServicePair1].size() == numOfMessages1);
 		REQUIRE(applicationProcessConfig.definitions[appServicePair2].size() == numOfMessages2);
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Requested addition of duplicate report type definitions") {
@@ -429,9 +417,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 			}
 		}
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Valid and invalid application-related requests combined") {
@@ -464,9 +450,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
 		}
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Valid addition of all report types of a specified service type") {
@@ -486,9 +470,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 			        AllMessageTypes::MessagesOfService.at(serviceType).size());
 		}
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Addition of all report types of a service type, combined with invalid requests") {
@@ -531,9 +513,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 			        AllMessageTypes::MessagesOfService.at(serviceType).size());
 		}
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Valid addition of all report types of an application process") {
@@ -556,9 +536,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 			                   AllMessageTypes::MessagesOfService.at(serviceType).begin()));
 		}
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Addition of all report types of an application process, combined with invalid request") {
@@ -579,9 +557,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
 
@@ -966,9 +942,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		CHECK(ServiceTests::count() == 0);
 		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Requested application, is not present in the application process configuration") {
@@ -987,9 +961,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentApplicationProcess) == 1);
 		checkAppProcessConfig();
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Requested service type, not present in the application process configuration") {
@@ -1006,9 +978,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		          ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition) == 2);
 		checkAppProcessConfig();
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Requested report type, not present in the application process configuration") {
@@ -1025,9 +995,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		      4);
 		checkAppProcessConfig();
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Valid deletion of report types from the application process configuration") {
@@ -1047,9 +1015,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		REQUIRE(applicationProcesses[std::make_pair(applicationID, servicesToFill[0])].size() == 1);
 		REQUIRE(applicationProcesses[std::make_pair(applicationID, servicesToFill[1])].size() == 1);
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Report type deletion, results in empty service type") {
@@ -1069,9 +1035,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		REQUIRE(applicationProcesses.size() == 1);
 		REQUIRE(isServiceTypeEnabled(applicationID, servicesToFill[1]));
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Report type deletion, results in empty application process definition") {
@@ -1089,9 +1053,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 
 		REQUIRE(applicationProcesses.empty());
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Delete an application process, from the application process configuration") {
@@ -1108,9 +1070,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 
 		REQUIRE(applicationProcesses.empty());
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Delete a service type, from the application process configuration") {
@@ -1129,9 +1089,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		REQUIRE(applicationProcesses.size() == 1);
 		REQUIRE(not isServiceTypeEnabled(applicationID, servicesToFill[0]));
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Service type deletion, results in empty application process") {
@@ -1149,9 +1107,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		CHECK(ServiceTests::count() == 0);
 		REQUIRE(applicationProcesses.empty());
 
-		resetAppProcessConfiguration();
 		ServiceTests::reset();
-		Services.reset();
 	}
 
 	SECTION("Valid and invalid requests to delete report types, combined") {
@@ -1214,8 +1170,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 				                  messages[j]) != definitions[appServicePair1].end());
 			}
 		}
-		resetAppProcessConfiguration();
+
 		ServiceTests::reset();
-		Services.reset();
 	}
 }
