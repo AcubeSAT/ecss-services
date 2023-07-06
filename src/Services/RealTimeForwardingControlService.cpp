@@ -175,7 +175,7 @@ void RealTimeForwardingControlService::deleteApplicationProcess(uint8_t applicat
 	}
 }
 
-bool RealTimeForwardingControlService::applicationExists(Message& request, uint8_t applicationID,
+bool RealTimeForwardingControlService::isApplicationInConfiguration(Message& request, uint8_t applicationID,
                                                          uint8_t numOfServices) {
 	if (not isApplicationEnabled(applicationID)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentApplicationProcess);
@@ -189,7 +189,7 @@ bool RealTimeForwardingControlService::applicationExists(Message& request, uint8
 	return true;
 }
 
-bool RealTimeForwardingControlService::serviceTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType,
+bool RealTimeForwardingControlService::isServiceTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType,
                                                          uint8_t numOfMessages) {
 	if (not isServiceTypeEnabled(applicationID, serviceType)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition);
@@ -199,7 +199,7 @@ bool RealTimeForwardingControlService::serviceTypeExists(Message& request, uint8
 	return true;
 }
 
-bool RealTimeForwardingControlService::reportTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType,
+bool RealTimeForwardingControlService::isReportTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType,
                                                         uint8_t messageType) {
 	if (not isReportTypeEnabled(messageType, applicationID, serviceType)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentReportTypeDefinition);
@@ -242,7 +242,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 		uint8_t applicationID = request.readUint8();
 		uint8_t numOfServices = request.readUint8();
 
-		if (not applicationExists(request, applicationID, numOfServices)) {
+		if (not isApplicationInConfiguration(request, applicationID, numOfServices)) {
 			continue;
 		}
 		if (numOfServices == 0) {
@@ -254,7 +254,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 			uint8_t serviceType = request.readUint8();
 			uint8_t numOfMessages = request.readUint8();
 
-			if (not serviceTypeExists(request, applicationID, serviceType, numOfMessages)) {
+			if (not isServiceTypeInConfiguration(request, applicationID, serviceType, numOfMessages)) {
 				continue;
 			}
 			if (numOfMessages == 0) {
@@ -265,7 +265,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
 				uint8_t messageType = request.readUint8();
 
-				if (not reportTypeExists(request, applicationID, serviceType, messageType)) {
+				if (not isReportTypeInConfiguration(request, applicationID, serviceType, messageType)) {
 					continue;
 				}
 				deleteReportRecursive(applicationID, serviceType, messageType);

@@ -139,19 +139,19 @@ private:
 	 * Checks whether the requested application is present in the application process configuration.
 	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
-	bool applicationExists(Message& request, uint8_t applicationID, uint8_t numOfServices);
+	bool isApplicationInConfiguration(Message& request, uint8_t applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks whether the requested service type is present in the application process configuration.
 	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
-	bool serviceTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
+	bool isServiceTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
 
 	/**
 	 * Checks whether the requested report type is present in the application process configuration.
 	 * Reports an error if one exist.
 	 */
-	bool reportTypeExists(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	bool isReportTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 	/**
 	 * Deletes the requested service type from the application process configuration. If the deletion results in an
