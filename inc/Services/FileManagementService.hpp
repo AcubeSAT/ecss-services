@@ -185,7 +185,7 @@ public:
 	/**
 	 * The maximum possible size of a file, in bytes.
 	 */
-	inline static constexpr uint16_t MaxFileSizeBytes = 4096;
+	inline static constexpr size_t MaxFileSizeBytes = 4096;
 
 	enum MessageType : uint8_t {
 		CreateFile = 1,
