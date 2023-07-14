@@ -226,7 +226,7 @@ void FileManagementService::createFile(Message& message) {
 
 	uint16_t fileSizeBytes = message.readUint32();
 
-	if (fileSizeBytes > maxFileSizeBytes) {
+	if (fileSizeBytes > MaxFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
 		return;
 	}
