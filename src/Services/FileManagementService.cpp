@@ -9,32 +9,48 @@
 
 void FileManagementService::createFile(Message& message) {
 	using namespace FilepathValidators;
-	using namespace Filesystem;
 
 	message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile);
 
-	String<ECSSMaxStringSize> repositoryPathString("");
-	String<ECSSMaxStringSize> fileNameString("");
+	Filesystem::Path repositoryPath("");
+	Filesystem::Path fileName("");
 
 	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
 	if (not repositoryPathIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	repositoryPathString = repositoryPathIsValid.value();
+	repositoryPath = repositoryPathIsValid.value();
 
 	auto fileNameIsValid = getStringUntilZeroTerminator(message);
 	if (not fileNameIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	fileNameString = fileNameIsValid.value();
+	fileName = fileNameIsValid.value();
 
 	// ?????
 	uint16_t fileSizeBytes = message.readUint32();
 
 	if (fileSizeBytes > MaxFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
+		return;
+	}
+
+	if (findWildcardPosition(repositoryPath).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	if (not repositoryType) {
+		ErrorHandler::reportError(message,
+		                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+		return;
+	}
+
+	if (repositoryType.value() == Filesystem::NodeType::File) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
 		return;
 	}
 
