@@ -67,7 +67,7 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	message4.appendString(nullString);
 	message4.appendString(file4);
 	message4.appendString(nullString);
-	message4.appendUint32(maxFileSizeBytes + 10);
+	message4.appendUint32(FileManagementService::MaxFileSizeBytes + 10);
 
 	MessageParser::execute(message4);
 	CHECK(ServiceTests::countErrors() == 3);
