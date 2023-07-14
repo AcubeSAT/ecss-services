@@ -1,20 +1,7 @@
 #ifndef ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 #define ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 
-#include <Service.hpp>
-
-extern "C" {
-#include "Helpers/lfs_stub.h"
-};
-
-constexpr uint16_t maxFileSizeBytes = 4096;
-
-#define WILDCARD_FOUND -1
-#define NO_WILDCARD_FOUND -2
-
-#define OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE -2
-#define OBJECT_TYPE_IS_INVALID -3
-
+#include "Service.hpp"
 
 /**
  * Implementation of ST[23] file management service
@@ -40,8 +27,6 @@ constexpr uint16_t maxFileSizeBytes = 4096;
  * @ingroup services
  *
  */
-
-
 class FileManagementService : public Service {
 private:
 	bool lockFileSupport = false;
@@ -185,17 +170,22 @@ private:
 	                           lfs_info* infoStruct);
 
 public:
-	inline static const uint8_t ServiceType = 23;
+	inline static constexpr uint8_t ServiceType = 23;
 
 	/**
      * The wildcard character accepted by the service
      */
-	static const char wildcard = '*';
+	inline static constexpr char Wildcard = '*';
 
 	/**
      * Character which denotes the end of a string and the beginning of the next (if there is any)
      */
-	static const char variableStringTerminator = '@';
+	inline static constexpr char VariableStringTerminator = '@';
+
+	/**
+	 * The maximum possible size of a file, in bytes.
+	 */
+	inline static constexpr uint16_t MaxFileSizeBytes = 4096;
 
 	enum MessageType : uint8_t {
 		CreateFile = 1,
@@ -264,7 +254,7 @@ public:
 	                         uint32_t fileSize);
 
 	/**
-	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * It is responsible to call the suitable function that executes a tele-command packet. The source of that packet
 	 * is the ground station.
 	 *
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
@@ -272,6 +262,5 @@ public:
 	 */
 	void execute(Message& message);
 };
-
 
 #endif //ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
