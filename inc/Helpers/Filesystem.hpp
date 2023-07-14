@@ -7,7 +7,7 @@ namespace Filesystem {
 	typedef String<ECSSMaxStringSize> Path;
 
 	struct Attributes {
-		bool is_locked: 1;
+		bool is_locked;
 	};
 
 	enum NodeType: uint8_t {
