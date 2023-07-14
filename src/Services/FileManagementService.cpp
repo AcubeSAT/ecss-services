@@ -229,76 +229,67 @@ void FileManagementService::createFile(Message& message) {
 	if (fileSizeBytes > maxFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
 		return;
-	} else {
+	}
 
-		switch (pathIsValidForCreation(repositoryPathString)) {
-			case LFS_TYPE_DIR: {
-
-				lfs_file_t file;
-				int32_t createFileStatus = littleFsCreateFile(&onBoardFileSystemObject,
-				                                              &file,
-				                                              repositoryPathString,
-				                                              fileNameString,
-				                                              LFS_O_CREAT);
-				if (createFileStatus >= LFS_ERR_OK) {
-					if (lfs_file_close(&onBoardFileSystemObject, &file) >= LFS_ERR_OK) {
-						return;
-					} else {
-						ErrorHandler::reportError(message,
-						                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileCloseFailed);
-						return;
-					}
-				}
-
-				if (createFileStatus == OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE) {
+	switch (pathIsValidForCreation(repositoryPathString)) {
+		case LFS_TYPE_DIR: {
+			lfs_file_t file;
+			int32_t createFileStatus = littleFsCreateFile(&onBoardFileSystemObject,
+			                                              &file,
+			                                              repositoryPathString,
+			                                              fileNameString,
+			                                              LFS_O_CREAT);
+			if (createFileStatus >= LFS_ERR_OK) {
+				if (lfs_file_close(&onBoardFileSystemObject, &file) >= LFS_ERR_OK) {
+					return;
+				} else {
 					ErrorHandler::reportError(message,
-					                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+					                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileCloseFailed);
 					return;
 				}
-
-				if (createFileStatus == WILDCARD_FOUND) {
-					ErrorHandler::reportError(message,
-					                          ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-					return;
-				}
-
-				if (createFileStatus == LFS_ERR_EXIST) {
-					ErrorHandler::reportError(message,
-					                          ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
-					return;
-				}
-
-				if (createFileStatus < LFS_ERR_OK) {
-					ErrorHandler::reportError(message,
-					                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileOpenFailed);
-					return;
-				}
-				break;
 			}
 
-			case LFS_TYPE_REG:
-
+			if (createFileStatus == OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE) {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
-				break;
+				                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+				return;
+			}
 
-			case (WILDCARD_FOUND):
-
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-				break;
-
-			case (OBJECT_TYPE_IS_INVALID):
-
+			if (createFileStatus == WILDCARD_FOUND) {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-				break;
+				                          ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+				return;
+			}
 
-			default:
-
+			if (createFileStatus == LFS_ERR_EXIST) {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
-				break;
+				                          ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
+				return;
+			}
+
+			if (createFileStatus < LFS_ERR_OK) {
+				ErrorHandler::reportError(message,
+				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileOpenFailed);
+				return;
+			}
+			break;
 		}
+
+		case LFS_TYPE_REG:
+			ErrorHandler::reportError(message,
+			                          ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
+			break;
+		case (WILDCARD_FOUND):
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+			break;
+		case (OBJECT_TYPE_IS_INVALID):
+			ErrorHandler::reportError(message,
+			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+			break;
+		default:
+			ErrorHandler::reportError(message,
+			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
+			break;
 	}
 }
 
@@ -317,51 +308,43 @@ void FileManagementService::deleteFile(Message& message) {
 	if (getStringUntilZeroTerminator(message, fileNameString) != stringTerminatorFound) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
-	} else {
+	}
 
-		switch (pathIsValidForDeletion(repositoryPathString, fileNameString)) {
-
-			case LFS_TYPE_REG: {
-
-				if (littleFsDeleteFile(&onBoardFileSystemObject, repositoryPathString, fileNameString) >= LFS_ERR_OK) {
-					return;
-				} else {
-					ErrorHandler::reportError(message,
-					                          ErrorHandler::ExecutionCompletionErrorType::LittleFsRemoveFailed);
-					return;
-				}
-				break;
+	switch (pathIsValidForDeletion(repositoryPathString, fileNameString)) {
+		case LFS_TYPE_REG: {
+			if (littleFsDeleteFile(&onBoardFileSystemObject, repositoryPathString, fileNameString) >= LFS_ERR_OK) {
+				return;
+			} else {
+				ErrorHandler::reportError(message,
+				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsRemoveFailed);
+				return;
 			}
-
-			case LFS_TYPE_DIR:
-
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-				break;
-
-			case (WILDCARD_FOUND):
-
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-				break;
-
-			case (OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE):
-
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-				break;
-
-			case (OBJECT_TYPE_IS_INVALID):
-
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-				break;
-
-			default:
-
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
-				break;
+			break;
 		}
+
+		case LFS_TYPE_DIR:
+			ErrorHandler::reportError(message,
+			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+			break;
+
+		case (WILDCARD_FOUND):
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+			break;
+
+		case (OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE):
+			ErrorHandler::reportError(message,
+			                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+			break;
+
+		case (OBJECT_TYPE_IS_INVALID):
+			ErrorHandler::reportError(message,
+			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+			break;
+
+		default:
+			ErrorHandler::reportError(message,
+			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
+			break;
 	}
 }
 
@@ -425,7 +408,6 @@ void FileManagementService::reportAttributes(Message& message) {
 void FileManagementService::fileAttributeReport(const String<ECSSMaxStringSize>& repositoryString,
                                                 const String<ECSSMaxStringSize>& fileNameString,
                                                 uint32_t fileSize) {
-
 	Message report = createTM(MessageType::CreateAttributesReport);
 
 	report.appendString(repositoryString);
@@ -437,20 +419,16 @@ void FileManagementService::fileAttributeReport(const String<ECSSMaxStringSize>&
 }
 
 void FileManagementService::execute(Message& message) {
-
 	switch (message.messageType) {
 		case CreateFile:
 			createFile(message);
 			break;
-
 		case DeleteFile:
 			deleteFile(message);
 			break;
-
 		case ReportAttributes:
 			reportAttributes(message);
 			break;
-
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
