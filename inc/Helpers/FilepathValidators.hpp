@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <etl/optional.h>
+#include "Helpers/Filesystem.hpp"
 #include "ECSS_Definitions.hpp"
 #include "Services/FileManagementService.hpp"
 #include "etl/String.hpp"
@@ -24,16 +25,12 @@ namespace FilepathValidators {
 	};
 
 	/**
-     * Checks if there is a wildcard in a given string
-     * It scans every character of the sting, until the String.size() is reached. If a wildcard is encountered,
-     * then it return its position in the string (starting from 0).
-     * @param messageString : The message passed as a String
-     * @return status of execution
-     *  NO_WILDCARD_FOUND : Message does not contain any wildcards,
-     *  Else : Message contains at least one wildcard
+     * If a wildcard is encountered, then it returns its position in the string (starting from 0).
+     * @param path : The path passed as a String.
+     * @return An optional that either contains the position of the wildcard, or no value.
      */
-	etl::optional<size_t> findWildcardPosition(const String<ECSSMaxStringSize>& messageString) {
-		size_t wildcardPosition = messageString.find(FileManagementService::Wildcard, 0);
+	etl::optional<size_t> findWildcardPosition(const Filesystem::Path& path) {
+		size_t wildcardPosition = path.find(FileManagementService::Wildcard, 0);
 
 		if (wildcardPosition == -1) {
 			return {};
@@ -46,14 +43,14 @@ namespace FilepathValidators {
      * The purpose of this function is to take care of the extraction process for the object path variable
      * Parses the message until a '@' is found. Then returns the actual string, excluding the '@' char
      * @param message : The message that we want to parse
-     * @param extractedString : pointer to a String<ECSSMaxStringSize> that will house the extracted string
+     * @param extractedString : pointer to a Filesystem::Path that will house the extracted string
      * @return status of execution
      *  stringTerminatorFound: Successful completion,
      *  stringTerminatorNotFound: Error occurred
      */
-	etl::optional<String<ECSSMaxStringSize>> getStringUntilZeroTerminator(Message& message) {
+	etl::optional<Filesystem::Path> getStringUntilZeroTerminator(Message& message) {
 		uint8_t charCounter = 0;
-		String<ECSSMaxStringSize> extractedString = "";
+		Filesystem::Path extractedString = "";
 		char currentChar = static_cast<char>(message.readByte());
 
 		while (currentChar != FileManagementService::VariableStringTerminator) {
@@ -81,10 +78,10 @@ namespace FilepathValidators {
      *  OBJECT_TYPE_IS_INVALID: Invalid type of object,
      *  Negative LittleFS error code: lfs_stat() returned an error code
      */
-	int32_t pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString) {
+	int32_t pathIsValidForCreation(Filesystem::Path repositoryString) {
 		lfs_info infoStruct;
 
-		if (findWildcardPosition(repositoryString).has_value()) {
+		if () {
 			return WILDCARD_FOUND;
 		}
 
@@ -125,7 +122,7 @@ namespace FilepathValidators {
      * @param fileNameString : String with the file name
      * @return -
      */
-	void checkForSlashesAndCompensate(String<ECSSMaxStringSize>& objectPathString, uint8_t*& fileNameChar) {
+	void checkForSlashesAndCompensate(Filesystem::Path& objectPathString, uint8_t*& fileNameChar) {
 
 		char lastPathCharacter = objectPathString.back();
 		char firstFileCharacter = *fileNameChar;
@@ -157,19 +154,19 @@ namespace FilepathValidators {
      *  OBJECT_TYPE_IS_INVALID: Invalid object type
      *  Other negative code: lfs_stat returned error code
      */
-	int32_t pathIsValidForDeletion(String<ECSSMaxStringSize> repositoryString,
-	                               String<ECSSMaxStringSize> fileNameString) {
+	int32_t pathIsValidForDeletion(Filesystem::Path repositoryString,
+	                               Filesystem::Path fileNameString) {
 
-		if (FileManagementService::findWildcardPosition(repositoryString) != NO_WILDCARD_FOUND) {
+		if (findWildcardPosition(repositoryString)) {
 			return WILDCARD_FOUND;
 		}
 
-		if (FileManagementService::findWildcardPosition(fileNameString) != NO_WILDCARD_FOUND) {
+		if (findWildcardPosition(fileNameString)) {
 			return WILDCARD_FOUND;
 		}
 
 		const char* repositoryPathChar = repositoryString.data();
-		String<ECSSMaxStringSize> objectPathString = "";
+		Filesystem::Path objectPathString = "";
 		objectPathString.append(repositoryPathChar);
 
 		auto* fileNameChar = reinterpret_cast<uint8_t*>(fileNameString.data());
@@ -218,8 +215,8 @@ namespace FilepathValidators {
      */
 	int32_t littleFsCreateFile(lfs_t* fileSystem,
 	                           lfs_file_t* file,
-	                           String<ECSSMaxStringSize> repositoryPath,
-	                           String<ECSSMaxStringSize> fileName,
+	                           Filesystem::Path repositoryPath,
+	                           Filesystem::Path fileName,
 	                           const int32_t flags) {
 
 		if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
@@ -231,7 +228,7 @@ namespace FilepathValidators {
 		}
 
 		char* const repositoryPathChar = repositoryPath.data();
-		String<ECSSMaxStringSize> objectPathString = "";
+		Filesystem::Path objectPathString = "";
 		objectPathString.append(repositoryPathChar);
 
 		auto* fileNameChar = reinterpret_cast<uint8_t*>(fileName.data());
@@ -251,10 +248,10 @@ namespace FilepathValidators {
      * @param fileName : The file name
      * @return lfs_remove status of execution
      */
-	int32_t littleFsDeleteFile(lfs_t* fs, String<ECSSMaxStringSize>& repositoryPath, const String<ECSSMaxStringSize>& fileName) {
+	int32_t littleFsDeleteFile(lfs_t* fs, Filesystem::Path& repositoryPath, const Filesystem::Path& fileName) {
 
 		const char* repositoryPathChar = repositoryPath.data();
-		String<ECSSMaxStringSize> objectPathString = "";
+		Filesystem::Path objectPathString = "";
 		objectPathString.append(repositoryPathChar);
 
 		auto* fileNameChar = reinterpret_cast<uint8_t*>(repositoryPath.data());
@@ -278,12 +275,12 @@ namespace FilepathValidators {
      *   LFS_TYPE_DIR: Object is a directory
      *   Any error code that lfs_stat might return)
      */
-	int32_t littleFsReportFile(String<ECSSMaxStringSize> repositoryString,
-	                           String<ECSSMaxStringSize> fileNameString,
+	int32_t littleFsReportFile(Filesystem::Path repositoryString,
+	                           Filesystem::Path fileNameString,
 	                           lfs_info* infoStruct) {
 
 		const char* repositoryPathChar = repositoryString.data();
-		String<ECSSMaxStringSize> objectPathString = "";
+		Filesystem::Path objectPathString = "";
 		objectPathString.append(repositoryPathChar);
 
 		auto* fileNameChar = reinterpret_cast<uint8_t*>(fileNameString.data());
