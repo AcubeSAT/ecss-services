@@ -1,5 +1,5 @@
 #include "Services/FileManagementService.hpp"
-#include <stdint.h>
+#include <cstdint>
 #include "ErrorHandler.hpp"
 #include "Helpers/lfs_stub.h"
 #include "Message.hpp"
