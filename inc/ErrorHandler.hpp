@@ -1,8 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
+#include <cstdint>
 #include <type_traits>
-#include <stdint.h> // for the uint_8t stepID
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
@@ -371,9 +371,9 @@ public:
 		 */
 		ParameterWriteOnly = 54,
 		/**
-         	 * Size of file is bigger than allowed
-         	 */
-        	SizeOfFileIsOutOfBounds = 55,
+         * Size of file is bigger than allowed
+         */
+		SizeOfFileIsOutOfBounds = 55,
 		/**
 		 * Object path is invalid
 		 */
@@ -422,32 +422,31 @@ public:
 		 * Address of a memory is out of the defined range for the type of memory
 		 */
 		AddressOutOfRange = 2,
-        /**
+		/**
          * File already exists, thus can't be created again
          */
-        FileAlreadyExists = 3,
-        /**
+		FileAlreadyExists = 3,
+		/**
          * LittleFs lfs_file_close function generic error
          */
-        LittleFsFileCloseFailed = 4,
-        /**
+		LittleFsFileCloseFailed = 4,
+		/**
          * LittleFs lfs_file_open function generic error
          */
-        LittleFsFileOpenFailed = 5,
-        /**
+		LittleFsFileOpenFailed = 5,
+		/**
          * Invalid object type returned from littleFs
          */
-        LittleFsInvalidObjectType = 6,
-        /**
+		LittleFsInvalidObjectType = 6,
+		/**
          * LittleFs lfs_remove function generic error
          */
-        LittleFsRemoveFailed = 7,
-        /**
+		LittleFsRemoveFailed = 7,
+		/**
          * LittleFs lfs_stat function generic error
          */
-        LittleFsStatFailed = 8,
-
-    };
+		LittleFsStatFailed = 8,
+	};
 
 	/**
 	 * The error code for failed routing reports, as specified in ECSS 6.1.3.3d
