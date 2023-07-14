@@ -45,9 +45,7 @@ target_sources(common PRIVATE
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
         src/Helpers/AllMessageTypes.cpp
-        src/Services/FileManagementService.cpp
-        src/Helpers/lfs_stub.c
-        src/Helpers/lfs_util_stub.c)
+        src/Services/FileManagementService.cpp)
 
 target_link_libraries(common PRIVATE etl log_common log_x86)
 # Specify the .cpp files for the executables
