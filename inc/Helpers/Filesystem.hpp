@@ -2,6 +2,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "etl/String.hpp"
+#include "etl/optional.h"
 
 namespace Filesystem {
 	typedef String<ECSSMaxStringSize> Path;
@@ -27,7 +28,7 @@ namespace Filesystem {
 
 	void writeFileAttributes(Path path, Attributes attributes);
 
-	NodeType getNodeType(Path path);
+	etl::optional<NodeType> getNodeType(Path path);
 
 	void lockFile();
 
