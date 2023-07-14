@@ -1,229 +1,36 @@
 #include "Services/FileManagementService.hpp"
 #include <cstdint>
 #include "ErrorHandler.hpp"
-#include "Helpers/lfs_stub.h"
+#include "Helpers/FilepathValidators.hpp"
+#include "Helpers/Filesystem.hpp"
 #include "Message.hpp"
 #include "MessageParser.hpp"
 #include "etl/vector.h"
 
-int16_t FileManagementService::findWildcardPosition(String<ECSSMaxStringSize> messageString) {
-
-	int16_t wildcardPosition = messageString.find(wildcard, 0);
-
-	if (wildcardPosition == -1) {
-		return NO_WILDCARD_FOUND;
-	} else {
-		return wildcardPosition;
-	}
-}
-
-FileManagementService::StringTerminatorStatus FileManagementService::getStringUntilZeroTerminator(Message& message,
-                                                                                                  String<ECSSMaxStringSize>& extractedString) {
-	uint8_t charCounter = 0;
-	char currentChar = static_cast<char>(message.readByte());
-
-	while (currentChar != FileManagementService::variableStringTerminator) {
-
-		if (charCounter == ECSSMaxStringSize - 1) {
-			return stringTerminatorNotFound;
-		}
-
-		extractedString.append(1, currentChar);
-		charCounter++;
-		currentChar = message.readByte();
-	}
-
-	return stringTerminatorFound;
-}
-
-int32_t FileManagementService::pathIsValidForCreation(String<ECSSMaxStringSize> repositoryString) {
-	lfs_info infoStruct;
-
-	if (FileManagementService::findWildcardPosition(repositoryString) != NO_WILDCARD_FOUND) {
-		return WILDCARD_FOUND;
-	}
-
-	const char* repositoryStringChar = repositoryString.data();
-	int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject,
-	                                        repositoryStringChar,
-	                                        &infoStruct);
-
-	if (infoStructFillStatus >= LFS_ERR_OK) {
-		switch (infoStruct.type) {
-			case LFS_TYPE_DIR:
-				return LFS_TYPE_DIR;
-				break;
-
-			case LFS_TYPE_REG:
-				return LFS_TYPE_REG;
-				break;
-
-			default:
-				return OBJECT_TYPE_IS_INVALID;
-				break;
-		}
-	} else {
-		return infoStructFillStatus;
-	}
-}
-
-void FileManagementService::checkForSlashesAndCompensate(String<ECSSMaxStringSize>& objectPathString, uint8_t*& fileNameChar) {
-
-	char lastPathCharacter = objectPathString.back();
-	char firstFileCharacter = *fileNameChar;
-
-	if (lastPathCharacter == '/') {
-		if (firstFileCharacter == '/') {
-			fileNameChar = fileNameChar + 1;
-		} else {
-		}
-	} else {
-		if (firstFileCharacter == '/') {
-		} else {
-			objectPathString.append(1, '/');
-		}
-	}
-}
-
-int32_t FileManagementService::littleFsCreateFile(lfs_t* fileSystem,
-                                                  lfs_file_t* file,
-                                                  String<ECSSMaxStringSize> repositoryPath,
-                                                  String<ECSSMaxStringSize> fileName,
-                                                  const int32_t flags) {
-
-	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
-		return OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE;
-	}
-
-	if (FileManagementService::findWildcardPosition(fileName) != NO_WILDCARD_FOUND) {
-		return WILDCARD_FOUND;
-	}
-
-	char* const repositoryPathChar = repositoryPath.data();
-	String<ECSSMaxStringSize> objectPathString = "";
-	objectPathString.append(repositoryPathChar);
-
-	auto* fileNameChar = reinterpret_cast<uint8_t*>(fileName.data());
-	checkForSlashesAndCompensate(objectPathString, fileNameChar);
-
-	objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
-
-	int32_t lfsCreateFileStatus = lfs_file_open(fileSystem, file, const_cast<const char*>(objectPathString.data()), flags);
-	return lfsCreateFileStatus;
-}
-
-int32_t FileManagementService::pathIsValidForDeletion(String<ECSSMaxStringSize> repositoryString,
-                                                      String<ECSSMaxStringSize> fileNameString) {
-
-	if (FileManagementService::findWildcardPosition(repositoryString) != NO_WILDCARD_FOUND) {
-		return WILDCARD_FOUND;
-	}
-
-	if (FileManagementService::findWildcardPosition(fileNameString) != NO_WILDCARD_FOUND) {
-		return WILDCARD_FOUND;
-	}
-
-	const char* repositoryPathChar = repositoryString.data();
-	String<ECSSMaxStringSize> objectPathString = "";
-	objectPathString.append(repositoryPathChar);
-
-	auto* fileNameChar = reinterpret_cast<uint8_t*>(fileNameString.data());
-	checkForSlashesAndCompensate(objectPathString, fileNameChar);
-	objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
-
-	if (objectPathString.size() > ECSSMaxStringSize) {
-		return OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE;
-	}
-
-	lfs_info infoStruct;
-	int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), &infoStruct);
-
-	if (infoStructFillStatus >= LFS_ERR_OK) {
-		switch (infoStruct.type) {
-			case (LFS_TYPE_REG):
-
-				return LFS_TYPE_REG;
-				break;
-
-			case (LFS_TYPE_DIR):
-
-				return LFS_TYPE_DIR;
-				break;
-
-			default:
-
-				return OBJECT_TYPE_IS_INVALID;
-		}
-	} else {
-		return infoStructFillStatus;
-	}
-}
-
-int32_t FileManagementService::littleFsDeleteFile(lfs_t* fs,
-                                                  String<ECSSMaxStringSize> repositoryPath,
-                                                  String<ECSSMaxStringSize> fileName) {
-
-	const char* repositoryPathChar = repositoryPath.data();
-	String<ECSSMaxStringSize> objectPathString = "";
-	objectPathString.append(repositoryPathChar);
-
-	auto* fileNameChar = reinterpret_cast<uint8_t*>(repositoryPath.data());
-	checkForSlashesAndCompensate(objectPathString, fileNameChar);
-	objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
-
-	int32_t lfsDeleteFileStatus = lfs_remove(fs, objectPathString.data());
-	return lfsDeleteFileStatus;
-}
-
-int32_t FileManagementService::littleFsReportFile(String<ECSSMaxStringSize> repositoryString,
-                                                  String<ECSSMaxStringSize> fileNameString,
-                                                  lfs_info* infoStruct) {
-
-	const char* repositoryPathChar = repositoryString.data();
-	String<ECSSMaxStringSize> objectPathString = "";
-	objectPathString.append(repositoryPathChar);
-
-	auto* fileNameChar = reinterpret_cast<uint8_t*>(fileNameString.data());
-	checkForSlashesAndCompensate(objectPathString, fileNameChar);
-	objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
-
-	int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), infoStruct);
-	if (infoStructFillStatus >= LFS_ERR_OK) {
-		switch (infoStruct->type) {
-			case (LFS_TYPE_REG):
-
-				return LFS_TYPE_REG;
-
-			case (LFS_TYPE_DIR):
-
-				return LFS_TYPE_DIR;
-
-			default:
-
-				return OBJECT_TYPE_IS_INVALID;
-		}
-	} else {
-		return infoStructFillStatus;
-	}
-}
-
 void FileManagementService::createFile(Message& message) {
+	using namespace FilepathValidators;
+	using namespace Filesystem;
 
-	message.assertTC(FileManagementService::ServiceType,
-	                 FileManagementService::MessageType::CreateFile);
+	message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile);
 
 	String<ECSSMaxStringSize> repositoryPathString("");
 	String<ECSSMaxStringSize> fileNameString("");
 
-	if (getStringUntilZeroTerminator(message, repositoryPathString) != stringTerminatorFound) {
+	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
+	if (not repositoryPathIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	if (getStringUntilZeroTerminator(message, fileNameString) != stringTerminatorFound) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
+	repositoryPathString = repositoryPathIsValid.value();
 
+	auto fileNameIsValid = getStringUntilZeroTerminator(message);
+	if (not fileNameIsValid) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+		return;
+	}
+	fileNameString = fileNameIsValid.value();
+
+	// ?????
 	uint16_t fileSizeBytes = message.readUint32();
 
 	if (fileSizeBytes > MaxFileSizeBytes) {
@@ -294,6 +101,7 @@ void FileManagementService::createFile(Message& message) {
 }
 
 void FileManagementService::deleteFile(Message& message) {
+	using namespace FilepathValidators;
 
 	message.assertTC(FileManagementService::ServiceType,
 	                 FileManagementService::MessageType::DeleteFile);
@@ -301,14 +109,19 @@ void FileManagementService::deleteFile(Message& message) {
 	String<ECSSMaxStringSize> repositoryPathString("");
 	String<ECSSMaxStringSize> fileNameString("");
 
-	if (getStringUntilZeroTerminator(message, repositoryPathString) != stringTerminatorFound) {
+	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
+	if (not repositoryPathIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	if (getStringUntilZeroTerminator(message, fileNameString) != stringTerminatorFound) {
+	repositoryPathString = repositoryPathIsValid.value();
+
+	auto fileNameIsValid = getStringUntilZeroTerminator(message);
+	if (not fileNameIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
+	fileNameString = fileNameIsValid.value();
 
 	switch (pathIsValidForDeletion(repositoryPathString, fileNameString)) {
 		case LFS_TYPE_REG: {
@@ -349,25 +162,32 @@ void FileManagementService::deleteFile(Message& message) {
 }
 
 void FileManagementService::reportAttributes(Message& message) {
+	using namespace FilepathValidators;
 
 	message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes);
 
 	String<ECSSMaxStringSize> repositoryPathString("");
 	String<ECSSMaxStringSize> fileNameString("");
 
-	if (getStringUntilZeroTerminator(message, repositoryPathString) != stringTerminatorFound) {
+	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
+	if (not repositoryPathIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	if (getStringUntilZeroTerminator(message, fileNameString) != stringTerminatorFound) {
+	repositoryPathString = repositoryPathIsValid.value();
+
+	auto fileNameIsValid = getStringUntilZeroTerminator(message);
+	if (not fileNameIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	if (findWildcardPosition(repositoryPathString) != NO_WILDCARD_FOUND) {
+	fileNameString = fileNameIsValid.value();
+
+	if (findWildcardPosition(repositoryPathString)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
-	if (findWildcardPosition(fileNameString) != NO_WILDCARD_FOUND) {
+	if (findWildcardPosition(fileNameString)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
