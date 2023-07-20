@@ -25,7 +25,7 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 		return;
 	}
 
-	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
+	for (auto& packet: packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
 		}
@@ -46,7 +46,7 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 		return;
 	}
 
-	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
+	for (auto& packet: packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first < startTime) {
 			continue;
 		}
@@ -64,7 +64,7 @@ void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
 		return;
 	}
 
-	for (auto& packet : packetStores[fromPacketStoreId].storedTelemetryPackets) {
+	for (auto& packet: packetStores[fromPacketStoreId].storedTelemetryPackets) {
 		if (packet.first > endTime) {
 			break;
 		}
@@ -159,7 +159,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 
 	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
-	auto filledPercentage1 = static_cast<uint16_t>(packetStores[packetStoreId].storedTelemetryPackets.size() * 100.0f /
+	auto filledPercentage1 = static_cast<uint16_t>(static_cast<float>(packetStores[packetStoreId].storedTelemetryPackets.size()) * 100 /
 	                                               ECSSMaxPacketStoreSize);
 	report.appendUint16(filledPercentage1);
 
@@ -169,7 +169,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 	    std::end(packetStores[packetStoreId].storedTelemetryPackets), [this, &packetStoreId](auto packet) {
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
 	    });
-	auto filledPercentage2 = static_cast<uint16_t>(numOfPacketsToBeTransferred * 100.0f / ECSSMaxPacketStoreSize);
+	auto filledPercentage2 = static_cast<uint16_t>(static_cast<float>(numOfPacketsToBeTransferred) * 100 / ECSSMaxPacketStoreSize);
 	report.appendUint16(filledPercentage2);
 }
 
@@ -217,9 +217,7 @@ uint16_t StorageAndRetrievalService::currentNumberOfPacketStores() {
 
 PacketStore& StorageAndRetrievalService::getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId) {
 	auto packetStore = packetStores.find(packetStoreId);
-	if (packetStore == packetStores.end()) {
-		assert(ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
-	}
+	ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray);
 	return packetStore->second;
 }
 
@@ -231,7 +229,7 @@ void StorageAndRetrievalService::executeOnPacketStores(Message& request,
                                                        const std::function<void(PacketStore&)>& function) {
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			function(packetStore.second);
 		}
 		return;
@@ -249,19 +247,25 @@ void StorageAndRetrievalService::executeOnPacketStores(Message& request,
 }
 
 void StorageAndRetrievalService::enableStorageFunction(Message& request) {
-	request.assertTC(ServiceType, MessageType::EnableStorageInPacketStores);
+	if (!request.assertTC(ServiceType, MessageType::EnableStorageInPacketStores)) {
+		return;
+	}
 
 	executeOnPacketStores(request, [](PacketStore& p) { p.storageStatus = true; });
 }
 
 void StorageAndRetrievalService::disableStorageFunction(Message& request) {
-	request.assertTC(ServiceType, MessageType::DisableStorageInPacketStores);
+	if (!request.assertTC(ServiceType, MessageType::DisableStorageInPacketStores)) {
+		return;
+	}
 
 	executeOnPacketStores(request, [](PacketStore& p) { p.storageStatus = false; });
 }
 
 void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
-	request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval);
+	if (!request.assertTC(ServiceType, MessageType::StartByTimeRangeRetrieval)) {
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	bool errorFlag = false;
@@ -290,13 +294,15 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 }
 
 void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeletePacketStoreContent);
+	if (!request.assertTC(ServiceType, MessageType::DeletePacketStoreContent)) {
+		return;
+	}
 
 	uint32_t timeLimit = request.readUint32(); // todo: decide the time-format
 	uint16_t numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.byTimeRangeRetrievalStatus) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
@@ -332,14 +338,16 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores);
+	if (!request.assertTC(ServiceType, MessageType::ReportContentSummaryOfPacketStores)) {
+		return;
+	}
 
-	Message report(ServiceType, MessageType::PacketStoreContentSummaryReport, Message::TM, 1);
+	Message report = createTM(PacketStoreContentSummaryReport);
 	uint16_t numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
 		report.appendUint16(packetStores.size());
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			auto packetStoreId = packetStore.first;
 			report.appendString(packetStoreId);
 			createContentSummary(report, packetStoreId);
@@ -371,7 +379,9 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 }
 
 void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime);
+	if (!request.assertTC(ServiceType, MessageType::ChangeOpenRetrievalStartingTime)) {
+		return;
+	}
 
 	uint32_t newStartTimeTag = request.readUint32();
 	/**
@@ -379,7 +389,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 	 */
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.openRetrievalStatus == PacketStore::InProgress) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithOpenRetrievalInProgress);
@@ -406,11 +416,13 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 }
 
 void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::ResumeOpenRetrievalOfPacketStores);
+	if (!request.assertTC(ServiceType, MessageType::ResumeOpenRetrievalOfPacketStores)) {
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.byTimeRangeRetrievalStatus) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
@@ -437,11 +449,13 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 }
 
 void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::SuspendOpenRetrievalOfPacketStores);
+	if (!request.assertTC(ServiceType, MessageType::SuspendOpenRetrievalOfPacketStores)) {
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			packetStore.second.openRetrievalStatus = PacketStore::Suspended;
 		}
 		return;
@@ -457,11 +471,13 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 }
 
 void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
-	request.assertTC(ServiceType, MessageType::AbortByTimeRangeRetrieval);
+	if (!request.assertTC(ServiceType, MessageType::AbortByTimeRangeRetrieval)) {
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		for (auto& packetStore : packetStores) {
+		for (auto& packetStore: packetStores) {
 			packetStore.second.byTimeRangeRetrievalStatus = false;
 		}
 		return;
@@ -477,11 +493,13 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportStatusOfPacketStores);
+	if (!request.assertTC(ServiceType, MessageType::ReportStatusOfPacketStores)) {
+		return;
+	}
 
-	Message report(ServiceType, MessageType::PacketStoresStatusReport, Message::TM, 1);
+	Message report = createTM(PacketStoresStatusReport);
 	report.appendUint16(packetStores.size());
-	for (auto& packetStore : packetStores) {
+	for (auto& packetStore: packetStores) {
 		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageStatus);
@@ -492,7 +510,9 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 }
 
 void StorageAndRetrievalService::createPacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::CreatePacketStores);
+	if (!request.assertTC(ServiceType, MessageType::CreatePacketStores)) {
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	for (uint16_t i = 0; i < numOfPacketStores; i++) {
@@ -529,13 +549,15 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::deletePacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeletePacketStores);
+	if (!request.assertTC(ServiceType, MessageType::DeletePacketStores)) {
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		int numOfPacketStoresToDelete = 0;
-		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[packetStores.size()];
-		for (auto& packetStore : packetStores) {
+		uint16_t numOfPacketStoresToDelete = 0;
+		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[ECSSMaxPacketStores];
+		for (auto& packetStore: packetStores) {
 			if (packetStore.second.storageStatus) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
@@ -592,11 +614,13 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportConfigurationOfPacketStores);
+	if (!request.assertTC(ServiceType, MessageType::ReportConfigurationOfPacketStores)) {
+		return;
+	}
+	Message report = createTM(PacketStoreConfigurationReport);
 
-	Message report(ServiceType, MessageType::PacketStoreConfigurationReport, Message::TM, 1);
 	report.appendUint16(packetStores.size());
-	for (auto& packetStore : packetStores) {
+	for (auto& packetStore: packetStores) {
 		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendUint16(packetStore.second.sizeInBytes);
@@ -608,7 +632,9 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 }
 
 void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
-	request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow);
+	if (!request.assertTC(ServiceType, MessageType::CopyPacketsInTimeWindow)) {
+		return;
+	}
 
 	uint8_t typeOfTimeWindow = request.readEnum8();
 	switch (typeOfTimeWindow) {
@@ -628,7 +654,9 @@ void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {
 }
 
 void StorageAndRetrievalService::resizePacketStores(Message& request) {
-	request.assertTC(ServiceType, MessageType::ResizePacketStores);
+	if (!request.assertTC(ServiceType, MessageType::ResizePacketStores)) {
+		return;
+	}
 
 	uint16_t numOfPacketStores = request.readUint16();
 	for (uint16_t i = 0; i < numOfPacketStores; i++) {
@@ -664,7 +692,9 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 }
 
 void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeTypeToCircular);
+	if (!request.assertTC(ServiceType, MessageType::ChangeTypeToCircular)) {
+		return;
+	}
 
 	auto idToChange = readPacketStoreId(request);
 	if (packetStores.find(idToChange) == packetStores.end()) {
@@ -692,7 +722,9 @@ void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
 }
 
 void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeTypeToBounded);
+	if (!request.assertTC(ServiceType, MessageType::ChangeTypeToBounded)) {
+		return;
+	}
 
 	auto idToChange = readPacketStoreId(request);
 	if (packetStores.find(idToChange) == packetStores.end()) {
@@ -720,7 +752,9 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 }
 
 void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
-	request.assertTC(ServiceType, MessageType::ChangeVirtualChannel);
+	if (!request.assertTC(ServiceType, MessageType::ChangeVirtualChannel)) {
+		return;
+	}
 
 	auto idToChange = readPacketStoreId(request);
 	uint8_t virtualChannel = request.readUint8();

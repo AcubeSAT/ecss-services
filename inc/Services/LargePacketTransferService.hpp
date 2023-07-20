@@ -1,8 +1,8 @@
 #ifndef ECSS_SERVICES_LARGEPACKETTRANSFERSERVICE_HPP
 #define ECSS_SERVICES_LARGEPACKETTRANSFERSERVICE_HPP
 
-#include "Service.hpp"
 #include <etl/String.hpp>
+#include "Service.hpp"
 
 /**
  * Implementation of the ST[13] large packet transfer service
@@ -16,7 +16,6 @@
 
 class LargePacketTransferService : public Service {
 public:
-
 	inline static const uint8_t ServiceType = 13;
 
 
@@ -30,11 +29,11 @@ public:
 	 * Default constructor since only functions will be used.
 	 */
 	LargePacketTransferService() {
-		serviceType = 13;
+		serviceType = ServiceType;
 	}
 
 	/**
-	 * Function that handles the first part of the download report
+	 * TM[13,1] Function that handles the first part of the download report
 	 * @param largeMessageTransactionIdentifier The identifier of the large packet
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
@@ -43,7 +42,7 @@ public:
 	                             const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
-	 * Function that handles the n-2 parts of tbe n-part download report
+	 * TM[13,2] Function that handles the n-2 parts of tbe n-part download report
 	 * @param largeMessageTransactionIdentifier The identifier of the large packet
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
@@ -52,7 +51,7 @@ public:
 	                                    const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
-	 * Function that handles the last part of the download report
+	 * TM[13,3] Function that handles the last part of the download report
 	 * @param largeMessageTransactionIdentifier The identifier of the large packet
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
@@ -64,23 +63,23 @@ public:
 	// a composeECSS function ready, I just return the given string.
 	// @TODO: Modify these functions properly
 	/**
-	 * Function that handles the first part of the uplink request
+	 * TC[13,9] Function that handles the first part of the uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSSMaxFixedOctetStringSize> firstUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
+	static String<ECSSMaxFixedOctetStringSize> firstUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
-	 * Function that handles the n-2 parts of tbe n-part uplink request
+	 * TC[13,10] Function that handles the n-2 parts of the n-part uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSSMaxFixedOctetStringSize>
+	static String<ECSSMaxFixedOctetStringSize>
 	intermediateUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
-	 * Function that handles the last part of the uplink request
+	 * TC[13,11] Function that handles the last part of the uplink request
 	 * @param string This will change when these function will be modified
 	 */
-	String<ECSSMaxFixedOctetStringSize> lastUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
+	static String<ECSSMaxFixedOctetStringSize> lastUplinkPart(const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
 	 * Function that splits large messages

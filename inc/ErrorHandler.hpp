@@ -1,6 +1,7 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
+#include <type_traits>
 #include <stdint.h> // for the uint_8t stepID
 #include <type_traits>
 
@@ -60,7 +61,6 @@ public:
 		 * Asked a Message type that doesn't exist
 		 */
 		UnknownMessageType = 7,
-
 		/**
 		 * Asked to append unnecessary spare bits
 		 */
@@ -93,6 +93,14 @@ public:
 		 * Invalid TimeStamp parameters at creation
 		 */
 		InvalidTimeStampInput = 15,
+		/**
+		 * A requested element is not found
+		 */
+		ElementNotInArray = 16,
+		/**
+		 * Timestamp out of bounds to be stored or converted
+		 */
+		TimeStampOutOfBounds = 17,
 	};
 
 	/**
@@ -131,204 +139,205 @@ public:
 		UnknownExecutionStartError = 0,
 		/**
 		 * In the Event Action Service, in the addEventActionDefinition function an attempt was
-		 * made to add an event Action Definition with an eventActionDefinitionID that exists
+		 * made to add an event Action Definition with an eventDefinitionID that exists
 		 */
-		EventActionDefinitionIDExistsError = 1,
+		EventDefinitionIDExistsError = 1,
+
+		/**
+		 *In the Event Action Service, in the addEventActionDefinition function an attempt was
+		 * made to add an event Action Definition that is already enabled
+		 */
+		EventActionEnabledError = 2,
 		/**
 		 * In the Event Action Service, in the deleteEventActionDefinition function, an attempt
 		 * was made to delete an event action definition that was enabled
 		 */
-		EventActionDeleteEnabledDefinitionError = 2,
+		EventActionDeleteEnabledDefinitionError = 3,
 		/**
 		 * In the Event Action Service, an access attempt was made to an unknown event
 		 * action definition
 		 */
-		EventActionUnknownEventDefinitionError = 3,
+		EventActionUnknownEventActionDefinitionError = 4,
 		/**
 		 * EventAction refers to the service, EventActionIDefinitionID refers to the variable
-		 * In the Event Action Service, an access attempt was made to an unknown eventActionDefinitionID
+		 * In the Event Action Service, an access attempt was made to an unknown eventDefinitionID
 		 */
-		EventActionUnknownEventActionDefinitionIDError = 4,
-		SubServiceExecutionStartError = 5,
-		InstructionExecutionStartError = 6,
+		EventActionUnknownEventActionDefinitionIDError = 5,
+		SubServiceExecutionStartError = 6,
+		InstructionExecutionStartError = 7,
 		/**
 		 * Attempt to change the value of a non existing parameter (ST[20])
 		 */
-		SetNonExistingParameter = 7,
+		SetNonExistingParameter = 8,
 		/**
 		 * Attempt to access a non existing parameter (ST[20])
 		 */
-		GetNonExistingParameter = 8,
+		GetNonExistingParameter = 9,
 		/**
 		 * Attempt to access a packet store that does not exist (ST[15])
 		 */
-		NonExistingPacketStore = 9,
+		NonExistingPacketStore = 10,
 		/**
 		 * Attempt to change the start time tag of a packet store, whose open retrieval status is in progress (ST[15])
 		 */
-		SetPacketStoreWithOpenRetrievalInProgress = 10,
+		SetPacketStoreWithOpenRetrievalInProgress = 11,
 		/**
 		 * Attempt to resume open retrieval of a packet store, whose by-time-range retrieval is enabled (ST[15])
 		 */
-		SetPacketStoreWithByTimeRangeRetrieval = 11,
+		SetPacketStoreWithByTimeRangeRetrieval = 12,
 		/**
 		 * Attempt to access a packet with by-time range retrieval enabled (ST[15])
 		 */
-		GetPacketStoreWithByTimeRangeRetrieval = 12,
+		GetPacketStoreWithByTimeRangeRetrieval = 13,
 		/**
 		 * Attempt to start the by-time-range retrieval of packet store, whose open retrieval is in progress (ST[15])
 		 */
-		GetPacketStoreWithOpenRetrievalInProgress = 13,
+		GetPacketStoreWithOpenRetrievalInProgress = 14,
 		/**
 		 * Attempt to start by-time-range retrieval when its already enabled (ST[15])
 		 */
-		ByTimeRangeRetrievalAlreadyEnabled = 14,
+		ByTimeRangeRetrievalAlreadyEnabled = 15,
 		/**
 		 * Attempt to create packet store, whose ID already exists (ST[15])
 		 */
-		AlreadyExistingPacketStore = 15,
+		AlreadyExistingPacketStore = 16,
 		/**
 		 * Attempt to create packet store, when the max number of packet stores is already reached (ST[15])
 		 */
-		MaxNumberOfPacketStoresReached = 16,
+		MaxNumberOfPacketStoresReached = 17,
 		/**
 		 * Attempt to access a packet store with the storage status enabled (ST[15])
 		 */
-		GetPacketStoreWithStorageStatusEnabled = 17,
+		GetPacketStoreWithStorageStatusEnabled = 18,
 		/**
 		 * Attempt to delete a packet whose by time range retrieval status is enabled (ST[15])
 		 */
-		DeletionOfPacketWithByTimeRangeRetrieval = 18,
+		DeletionOfPacketWithByTimeRangeRetrieval = 19,
 		/**
 		 * Attempt to delete a packet whose open retrieval status is in progress (ST[15])
 		 */
-		DeletionOfPacketWithOpenRetrievalInProgress = 19,
+		DeletionOfPacketWithOpenRetrievalInProgress = 20,
 		/**
 		 * Requested a time window where the start time is larger than the end time (ST[15])
 		 */
-		InvalidTimeWindow = 20,
+		InvalidTimeWindow = 21,
 		/**
 		 * Attempt to copy a packet store to a destination packet store that is not empty (ST[15])
 		 */
-		DestinationPacketStoreNotEmtpy = 21,
+		DestinationPacketStoreNotEmtpy = 22,
 		/**
 		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
 		 * ST[04]
 		 */
-		InvalidReportingRateError = 22,
+		InvalidReportingRateError = 23,
 		/**
 		 * Attempt to add definition to the struct map but its already full.(ST[19])
 		 */
-		EventActionDefinitionsMapIsFull = 23,
+		EventActionDefinitionsMapIsFull = 24,
 		/**
 		 * Attempt to report/delete non existing housekeeping structure (ST[03])
 		 */
-		RequestedNonExistingStructure = 24,
+		RequestedNonExistingStructure = 25,
 		/**
 		 * Attempt to create already created structure (ST[03])
 		 */
-		RequestedAlreadyExistingStructure = 25,
+		RequestedAlreadyExistingStructure = 26,
 		/**
 		 * Attempt to delete structure which has the periodic reporting status enabled (ST[03]) as per 6.3.3.5.2(d-2)
 		 */
-		RequestedDeletionOfEnabledHousekeeping = 26,
+		RequestedDeletionOfEnabledHousekeeping = 27,
 		/**
 		 * Attempt to append a new parameter ID to a housekeeping structure, but the ID is already in the structure
 		 * (ST[03])
 		 */
-		AlreadyExistingParameter = 27,
+		AlreadyExistingParameter = 28,
 		/**
 		 * Attempt to append a new parameter id to a housekeeping structure, but the periodic generation status is
 		 * enabled (ST[03])
 		 */
-		RequestedAppendToEnabledHousekeeping = 28,
+		RequestedAppendToEnabledHousekeeping = 29,
 		/**
 		 * Attempt to create a new housekeeping structure in Housekeeping Service, when the maximum number of
 		 * housekeeping structures is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfHousekeepingStructures = 29,
+		ExceededMaxNumberOfHousekeepingStructures = 30,
 		/**
 		 * Attempt to add a new simply commutated parameter in a specific housekeeping structure, but the maximum
 		 * number of simply commutated parameters for this structure is already reached (ST[03])
 		 */
-		ExceededMaxNumberOfSimplyCommutatedParameters = 30,
+		ExceededMaxNumberOfSimplyCommutatedParameters = 31,
 		/**
 		 * Attempt to set a reporting rate which is smaller than the parameter sampling rate.
 		 * ST[04]
 		 */
-		InvalidSamplingRateError = 31,
+		InvalidSamplingRateError = 32,
 		/**
 		 * Attempt to add new statistic definition but the maximum number is already reached (ST[04])
 		 */
-		MaxStatisticDefinitionsReached = 32,
+		MaxStatisticDefinitionsReached = 33,
 		/**
 		 * Attempt to set the virtual channel of a packet store to a invalid value (ST[15])
 		 */
-		InvalidVirtualChannel = 33,
+		InvalidVirtualChannel = 34,
 		/**
 		 * Attempt to delete a packet store, whose storage status is enabled (ST[15])
 		 */
-		DeletionOfPacketStoreWithStorageStatusEnabled = 34,
+		DeletionOfPacketStoreWithStorageStatusEnabled = 35,
 		/**
 		 * Attempt to copy packets from a packet store to another, but either no packet timestamp falls inside the
 		 * specified timestamp, or more than one boolean argument were given as true in the 'copyPacketsTo' function
 		 * (ST[15])
 		 */
-		CopyOfPacketsFailed = 35,
+		CopyOfPacketsFailed = 36,
 		/**
 		 * Attempt to set a packet store size to a value that the available memory cannot handle (ST[15]).
 		 */
-		UnableToHandlePacketStoreSize = 36,
+		UnableToHandlePacketStoreSize = 37,
 		/**
 		 * Attempt to delete all parameter monitoring definitions but the Parameter Monitoring Function Status is
 		 * enabled.
 		 */
-		InvalidRequestToDeleteAllParameterMonitoringDefinitions = 37,
+		InvalidRequestToDeleteAllParameterMonitoringDefinitions = 38,
 		/**
 		 * Attempt to delete one parameter monitoring definition but its Parameter Monitoring Status is
 		 * enabled.
 		 */
-		InvalidRequestToDeleteParameterMonitoringDefinition = 38,
+		InvalidRequestToDeleteParameterMonitoringDefinition = 39,
 		/**
 		 * Attempt to add a parameter that already exists to the Parameter Monitoring List.
 		 */
-		AddAlreadyExistingParameter = 39,
+		AddAlreadyExistingParameter = 40,
 		/**
 		 * Attempt to add a parameter in the Parameter Monitoring List but it's full
 		 */
-		ParameterMonitoringListIsFull = 40,
+		ParameterMonitoringListIsFull = 41,
 		/**
 		 * Attempt to add or modify a limit check parameter monitoring definition, but the high limit is lower than
 		 * the low limit.
 		 */
-		HighLimitIsLowerThanLowLimit = 41,
+		HighLimitIsLowerThanLowLimit = 42,
 		/**
 		 * Attempt to add or modify a delta check parameter monitoring definition, but the high threshold is lower than
 		 * the low threshold.
 		 */
-		HighThresholdIsLowerThanLowThreshold = 42,
+		HighThresholdIsLowerThanLowThreshold = 43,
 		/**
 		 * Attempt to modify a non existent Parameter Monitoring definition.
 		 */
-		ModifyParameterNotInTheParameterMonitoringList = 43,
+		ModifyParameterNotInTheParameterMonitoringList = 44,
 		/**
 		 * Attempt to modify a parameter monitoring definition, but the instruction refers to a monitored parameter
 		 * that is not the one used in that parameter monitoring definition.
 		 */
-		DifferentParameterMonitoringDefinitionAndMonitoredParameter = 44,
+		DifferentParameterMonitoringDefinitionAndMonitoredParameter = 45,
 		/**
 		 * Attempt to get a parameter monitoring definition that does not exist.
 		 */
-		GetNonExistingParameterMonitoringDefinition = 45,
+		GetNonExistingParameterMonitoringDefinition = 46,
 		/**
 		 * Request to report a non existent parameter monitoring definition.
 		 */
-		ReportParameterNotInTheParameterMonitoringList = 46,
-		/**
-		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
-		 * Application Process configuration (ST[14])
-		 */
-		AllReportTypesAlreadyAllowed = 47,
+		ReportParameterNotInTheParameterMonitoringList = 47,
 		/**
 		 * Attempt to add a new service type, when the addition of all service types is already enabled in the
 		 * Application Process configuration (ST[14])
@@ -350,18 +359,35 @@ public:
 		 */
 		NotControlledApplication = 51,
 		/**
+		 * Parameter is requested, but the provider of the parameter value does not exist yet
+		 */
+		ParameterValueMissing = 52,
+		/**
+		 * Attempted to write to a read-only parameter
+		 */
+		ParameterReadOnly = 53,
+		/**
+		 * Attempted to read from a write-only parameter
+		 */
+		ParameterWriteOnly = 54,
+		/**
+		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
+		 * Application Process configuration (ST[14])
+		 */
+		AllReportTypesAlreadyAllowed = 55,
+		/**
 		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
 		 */
-		NonExistingReportTypeDefinition = 52,
+		NonExistingReportTypeDefinition = 56,
 		/**
 		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
 		 */
-		NonExistingServiceTypeDefinition = 53,
+		NonExistingServiceTypeDefinition = 57,
 		/**
 		 * Attempt to access a non-existing application process definition, from the application process
 		 * configuration (ST[14])
 		 */
-		NonExistingApplication = 54,
+		NonExistingApplication = 58,
 	};
 
 	/**
@@ -496,7 +522,7 @@ public:
 	 * @return The corresponding ErrorSource
 	 */
 	template <typename ErrorType>
-	inline static ErrorSource findErrorSource(ErrorType error) {
+	inline static ErrorSource findErrorSource(ErrorType errorType) {
 		// Static type checking
 		ErrorSource source = Internal;
 

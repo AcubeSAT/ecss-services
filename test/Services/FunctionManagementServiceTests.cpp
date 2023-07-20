@@ -1,9 +1,9 @@
-#include "catch2/catch.hpp"
 #include "Services/FunctionManagementService.hpp"
-#include "Services/RequestVerificationService.hpp"
+#include <iostream>
 #include "ServicePool.hpp"
 #include "ServiceTests.hpp"
-#include <iostream>
+#include "Services/RequestVerificationService.hpp"
+#include "catch2/catch_all.hpp"
 
 FunctionManagementService& fms = Services.functionManagement;
 
@@ -20,7 +20,7 @@ TEST_CASE("ST[08] - Call Tests") {
 
 		fms.include(String<ECSSFunctionNameLength>("test"), &test);
 		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
-			Message::TC, 1);
+		            Message::TC, 1);
 
 		msg.appendFixedString(String<ECSSFunctionNameLength>("test"));
 		msg.appendByte(199);
@@ -52,8 +52,7 @@ TEST_CASE("ST[08] - Call Tests") {
 		fms.include(String<ECSSFunctionNameLength>("test"), &test);
 		Message msg(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction, Message::TC, 1);
 		msg.appendFixedString(String<ECSSFunctionNameLength>("test"));
-		msg.appendString(String<65>
-		    ("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
+		msg.appendString(String<65>("eqrhjweghjhwqgthjkrghthjkdsfhgsdfhjsdjsfdhgkjdfsghfjdgkdfsgdfgsgd"));
 		MessageParser::execute(msg);
 
 		CHECK(ServiceTests::get(0).messageType == RequestVerificationService::MessageType::FailedStartOfExecution);

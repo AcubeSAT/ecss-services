@@ -2,20 +2,21 @@
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
 #include "ECSS_Configuration.hpp"
-#include "Services/TimeBasedSchedulingService.hpp"
-#include "Services/LargePacketTransferService.hpp"
-#include "Services/RequestVerificationService.hpp"
-#include "Services/EventReportService.hpp"
+#include "Services/DummyService.hpp"
 #include "Services/EventActionService.hpp"
-#include "Services/ParameterService.hpp"
-#include "Services/TestService.hpp"
-#include "Services/MemoryManagementService.hpp"
+#include "Services/EventReportService.hpp"
 #include "Services/FunctionManagementService.hpp"
-#include "Services/StorageAndRetrievalService.hpp"
 #include "Services/HousekeepingService.hpp"
+#include "Services/LargePacketTransferService.hpp"
+#include "Services/MemoryManagementService.hpp"
+#include "Services/OnBoardMonitoringService.hpp"
+#include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
-#include "Services/OnBoardMonitoringService.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Services/StorageAndRetrievalService.hpp"
+#include "Services/TestService.hpp"
+#include "Services/TimeBasedSchedulingService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -30,7 +31,6 @@ class ServicePool {
 	 * the number of the service, while the least significant 8 bits are the number of the Message. The value is the
 	 * counter of each MessageType.
 	 */
-
 	etl::map<uint16_t, uint16_t, ECSSTotalMessageTypes> messageTypeCounter;
 
 	/**
@@ -39,6 +39,10 @@ class ServicePool {
 	uint16_t packetSequenceCounter = 0;
 
 public:
+#ifdef SERVICE_DUMMY
+	DummyService dummyService;
+#endif
+
 #ifdef SERVICE_EVENTACTION
 	EventActionService eventAction;
 #endif
@@ -95,6 +99,7 @@ public:
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
 
+
 	/**
 	 * The default ServicePool constructor
 	 */
@@ -133,6 +138,6 @@ public:
 /**
  * A global variable that defines the basic pool where services can be fetched from
  */
-extern ServicePool Services;
+extern ServicePool Services; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 #endif // ECSS_SERVICES_SERVICEPOOL_HPP

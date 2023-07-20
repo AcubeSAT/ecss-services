@@ -1,6 +1,6 @@
 #include "ServicePool.hpp"
 
-ServicePool Services = ServicePool();
+ServicePool Services = ServicePool(); // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 void ServicePool::reset() {
 	// Call the destructor
@@ -15,7 +15,7 @@ void ServicePool::reset() {
 
 uint16_t ServicePool::getAndUpdateMessageTypeCounter(uint8_t serviceType, uint8_t messageType) {
 	uint16_t key = (serviceType << 8U) | messageType; // Create the key of the map
-	return (messageTypeCounter[key])++; // Fetch and increase the value
+	return (messageTypeCounter[key])++;               // Fetch and increase the value
 }
 
 uint16_t ServicePool::getAndUpdatePacketSequenceCounter() {
