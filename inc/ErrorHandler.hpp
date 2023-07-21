@@ -3,7 +3,6 @@
 
 #include <type_traits>
 #include <stdint.h> // for the uint_8t stepID
-#include <type_traits>
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
