@@ -146,7 +146,9 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 }
 
 void RealTimeForwardingControlService::reportAppProcessConfigurationContent(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportAppProcessConfigurationContent);
+	if (!request.assertTC(ServiceType, MessageType::ReportAppProcessConfigurationContent)) {
+		return;
+	}
 	appProcessConfigurationContentReport();
 }
 
@@ -157,34 +159,33 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 	uint8_t numOfApplications = 0;
 	uint8_t previousAppID = std::numeric_limits<uint8_t>::max();
 
-	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> numOfServicesPerApp(ECSSMaxControlledApplicationProcesses, 1);
+	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> numOfServicesPerApp(ECSSMaxControlledApplicationProcesses, 0);
 
-	for (auto& definition: applicationProcessConfiguration.definitions) {
-		const auto& pair = definition.first;
-		auto applicationID = pair.first;
+	for (auto& definition: definitions) {
+		const auto& appAndServiceIdPair = definition.first;
+		auto applicationID = appAndServiceIdPair.first;
 		if (applicationID != previousAppID) {
 			previousAppID = applicationID;
 			numOfApplications++;
-		} else {
-			numOfServicesPerApp[numOfApplications - 1]++;
 		}
+		numOfServicesPerApp[numOfApplications - 1]++;
 	}
 
 	report.appendUint8(numOfApplications);
 	previousAppID = std::numeric_limits<uint8_t>::max();
-	uint8_t index = 0;
+	uint8_t appIdIndex = 0;
 
 	// C++ sorts the maps by default, based on key. So keys with the same appID are accessed all-together.
-	for (auto& definition: applicationProcessConfiguration.definitions) {
-		const auto& pair = definition.first;
-		auto applicationID = pair.first;
+	for (auto& definition: definitions) {
+		const auto& appAndServiceIdPair = definition.first;
+		auto applicationID = appAndServiceIdPair.first;
 		if (applicationID != previousAppID) {
 			previousAppID = applicationID;
 			report.appendUint8(applicationID);
-			report.appendUint8(numOfServicesPerApp[index]);
-			index++;
+			report.appendUint8(numOfServicesPerApp[appIdIndex]);
+			appIdIndex++;
 		}
-		auto serviceType = pair.second;
+		auto serviceType = appAndServiceIdPair.second;
 		auto numOfMessages = definition.second.size();
 		report.appendUint8(serviceType);
 		report.appendUint8(numOfMessages);
