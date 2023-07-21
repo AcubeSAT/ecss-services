@@ -160,7 +160,7 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> numOfServicesPerApp(ECSSMaxControlledApplicationProcesses, 1);
 
 	for (auto& definition: applicationProcessConfiguration.definitions) {
-		auto& pair = definition.first;
+		const auto& pair = definition.first;
 		auto applicationID = pair.first;
 		if (applicationID != previousAppID) {
 			previousAppID = applicationID;
@@ -176,7 +176,7 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 
 	// C++ sorts the maps by default, based on key. So keys with the same appID are accessed all-together.
 	for (auto& definition: applicationProcessConfiguration.definitions) {
-		auto& pair = definition.first;
+		const auto& pair = definition.first;
 		auto applicationID = pair.first;
 		if (applicationID != previousAppID) {
 			previousAppID = applicationID;
