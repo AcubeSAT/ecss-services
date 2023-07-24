@@ -2,7 +2,7 @@
 #define PROJECT_ERRORHANDLER_HPP
 
 #include <type_traits>
-#include <stdint.h> // for the uint_8t stepID
+#include <cstdint>
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
