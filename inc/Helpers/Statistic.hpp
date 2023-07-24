@@ -6,6 +6,7 @@
 #include "Service.hpp"
 #include "TimeGetter.hpp"
 #include "etl/vector.h"
+#include "Helpers/TypedefDefinitions.hpp"
 
 /**
  * Class containing all the statistics for every parameter. Includes functions that calculate and append the
@@ -14,7 +15,7 @@
 class Statistic {
 public:
 	uint16_t selfSamplingInterval = 0;
-	uint16_t sampleCounter = 0;
+	SamplesSize sampleCounter = 0;
 	Time::DefaultCUC timeOfMaxValue;
 	Time::DefaultCUC timeOfMinValue;
 	double max = -std::numeric_limits<double>::infinity();

@@ -1,4 +1,5 @@
 #include "ECSS_Configuration.hpp"
+#include "TypedefDefinitions"
 #ifdef SERVICE_REQUESTVERIFICATION
 
 #include "Services/RequestVerificationService.hpp"
@@ -58,7 +59,7 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 	storeMessage(report);
 }
 
-void RequestVerificationService::successProgressExecutionVerification(const Message& request, uint8_t stepID) {
+void RequestVerificationService::successProgressExecutionVerification(const Message& request, StedIdsize stepID) {
 	// TM[1,5] successful progress of execution verification report
 
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
@@ -71,7 +72,7 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 
 void RequestVerificationService::failProgressExecutionVerification(const Message& request,
                                                                    ErrorHandler::ExecutionProgressErrorType errorCode,
-                                                                   uint8_t stepID) {
+                                                                   StedIdsize stepID) {
 	// TM[1,6] failed progress of execution verification report
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedProgressOfExecution);

@@ -5,6 +5,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/HousekeepingStructure.hpp"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
 
@@ -24,13 +25,13 @@ private:
 	 * valid. If this function needs to be called from another point of the code, the case of an invalid ID passed as
 	 * argument will lead in undefined behavior.
 	 */
-	void appendPeriodicPropertiesToMessage(Message& report, uint8_t structureId);
+	void appendPeriodicPropertiesToMessage(Message& report, StructureIdSize structureId);
 
 	/**
 	 * Returns true if the given parameter ID exists in the parameters contained in the housekeeping structure.
 	 */
 	static bool existsInVector(const etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters>& ids,
-	                           uint16_t parameterId);
+	                           ParameterIdSize parameterId);
 
 	/**
      * Initializes Housekeeping Structures with the Parameters found in the obc-software.
@@ -71,7 +72,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return boolean True if periodic generation of housekeeping reports is enabled, false otherwise
 	 */
-	inline bool getPeriodicGenerationActionStatus(uint8_t id) {
+	inline bool getPeriodicGenerationActionStatus(StructureIdSize id) {
 		HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
 			return newStructure.periodicGenerationActionStatus;
@@ -84,7 +85,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return optional<std::reference_wrapper<HousekeepingStructure>> Reference to Housekeeping Structure
 	 */
-	inline std::optional<std::reference_wrapper<HousekeepingStructure>> getStruct(uint8_t id) {
+	inline std::optional<std::reference_wrapper<HousekeepingStructure>> getStruct(StructureIdSize id) {
 		if (hasNonExistingStructInternalError(id)) {
 			return {};
 		}
@@ -96,7 +97,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return uint32_t Integer multiples of the minimum sampling interval
 	 */
-	inline uint32_t getCollectionInterval(uint8_t id) {
+	inline uint32_t getCollectionInterval(StructureIdSize id) {
 		HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
 			return newStructure.collectionInterval;
@@ -109,7 +110,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @param status Periodic generation status of housekeeping reports
 	 */
-	inline void setPeriodicGenerationActionStatus(uint8_t id, bool status) {
+	inline void setPeriodicGenerationActionStatus(StructureIdSize id, bool status) {
 		if (hasNonExistingStructInternalError(id)) {
 			return;
 		}
@@ -121,7 +122,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @param interval Integer multiples of the minimum sampling interval
 	 */
-	inline void setCollectionInterval(uint8_t id, uint32_t interval) {
+	inline void setCollectionInterval(StructureIdSize id, uint32_t interval) {
 		if (hasNonExistingStructInternalError(id)) {
 			return;
 		}
@@ -133,7 +134,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return boolean True if the structure exists, false otherwise
 	 */
-	inline bool structExists(uint8_t id) {
+	inline bool structExists(StructureIdSize id) {
 		return (housekeepingStructures.find(id) != housekeepingStructures.end());
 	}
 
@@ -143,7 +144,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
-	bool hasNonExistingStructExecutionError(uint8_t id, Message& request);
+	bool hasNonExistingStructExecutionError(StructureIdSize id, Message& request);
 
 	/**
 	 * Checks if the structure doesn't exist in the map and then accordingly reports error.
@@ -151,14 +152,14 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
-	bool hasNonExistingStructError(uint8_t id, Message& request);
+	bool hasNonExistingStructError(StructureIdSize id, Message& request);
 
 	/**
 	 * Checks if the structure doesn't exist in the map and then accordingly reports internal error.
 	 * @param id Housekeeping structure ID
 	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
-	bool hasNonExistingStructInternalError(uint8_t id);
+	bool hasNonExistingStructInternalError(StructureIdSize id);
 
 	/**
 	 * Checks if the parameter exists in the vector and if it does it reports an error.
@@ -167,7 +168,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the parameter exists, false otherwise
 	 */
-	static bool hasAlreadyExistingParameterError(HousekeepingStructure& housekeepingStruct, uint8_t id, Message& request);
+	static bool hasAlreadyExistingParameterError(HousekeepingStructure& housekeepingStruct,StructureIdSize id, Message& request);
 
 	/**
 	 * Checks if the struct requested exists and if it exists reports execution error.
@@ -175,7 +176,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the structure exists, false otherwise
 	 */
-	bool hasAlreadyExistingStructError(uint8_t id, Message& request);
+	bool hasAlreadyExistingStructError(StructureIdSize id, Message& request);
 
 	/**
 	 * Reports execution error if the max number of housekeeping structures is exceeded.
@@ -198,7 +199,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if periodic reporting status is enabled, false otherwise
 	 */
-	bool hasRequestedDeletionOfEnabledHousekeepingError(uint8_t id, Message& request);
+	bool hasRequestedDeletionOfEnabledHousekeepingError(StructureIdSize id, Message& request);
 
 	/**
 	 * Reports execution error if the max number of simply commutated parameters is exceeded.
@@ -238,13 +239,13 @@ public:
 	/**
 	 * This function takes a structure ID as argument and constructs/stores a TM[3,10] housekeeping structure report.
 	 */
-	void housekeepingStructureReport(uint8_t structIdToReport);
+	void housekeepingStructureReport(StructureIdSize structIdToReport);
 
 	/**
 	 * This function gets a housekeeping structure ID and stores a TM[3,25] 'housekeeping
 	 * parameter report' message.
 	 */
-	void housekeepingParametersReport(uint8_t structureId);
+	void housekeepingParametersReport(StructureIdSize structureId);
 
 	/**
 	 * This function takes as argument a message type TC[3,27] 'generate one shot housekeeping report' and stores

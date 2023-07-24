@@ -3,6 +3,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
 
@@ -115,7 +116,7 @@ public:
 	 * @todo Each value,that the stepID is assigned, should be documented.
 	 * @todo error handling for undocumented assigned values to stepID
 	 */
-	void successProgressExecutionVerification(const Message& request, uint8_t stepID);
+	void successProgressExecutionVerification(const Message& request, StepIdSize stepID);
 
 	/**
 	 * TM[1,6] failed progress of execution verification report
@@ -130,7 +131,7 @@ public:
 	 * @todo error handling for undocumented assigned values to stepID
 	 */
 	void failProgressExecutionVerification(const Message& request, ErrorHandler::ExecutionProgressErrorType errorCode,
-	                                       uint8_t stepID);
+	                                       StepIdSize stepID);
 
 	/**
 	 * TM[1,7] successful completion of execution verification report
