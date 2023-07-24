@@ -18,16 +18,17 @@
  * todo: needs to be updated after the implementation of the remaining ecss services.
  */
 namespace AllMessageTypes {
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st01Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st03Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st04Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st05Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st06Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st11Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st13Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st17Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st19Messages;
-	extern etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> st20Messages;
+	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> serviceDefinitionsVector;
+	extern serviceDefinitionsVector st01Messages;
+	extern serviceDefinitionsVector st03Messages;
+	extern serviceDefinitionsVector st04Messages;
+	extern serviceDefinitionsVector st05Messages;
+	extern serviceDefinitionsVector st06Messages;
+	extern serviceDefinitionsVector st11Messages;
+	extern serviceDefinitionsVector st13Messages;
+	extern serviceDefinitionsVector st17Messages;
+	extern serviceDefinitionsVector st19Messages;
+	extern serviceDefinitionsVector st20Messages;
 
 	/**
 	 * Map containing all the message types, per service. The key is the ServiceType and the value,
