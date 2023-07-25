@@ -23,8 +23,10 @@ public:
 
 	enum MessageType : uint8_t {
 		AddReportTypesToAppProcessConfiguration = 1,
+		DeleteReportTypesFromAppProcessConfiguration = 2,
 		ReportAppProcessConfigurationContent = 3,
 		AppProcessConfigurationContentReport = 4,
+		EventReportConfigurationContentReport = 16,
 	};
 
 	RealTimeForwardingControlService() {
@@ -124,11 +126,68 @@ private:
 	 */
 	bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
+	/**
+	 * Returns true, if the defined application exists in the application process configuration map.
+	 */
+	bool isApplicationEnabled(uint8_t targetAppID);
+
+	/**
+	 * Returns true, if the defined service type exists in the application process configuration map.
+	 */
+	bool isServiceTypeEnabled(uint8_t applicationID, uint8_t targetService);
+
+	/**
+	 * Checks whether the specified message type already exists in the specified application process and service
+	 * type definition.
+	 */
+	bool isReportTypeEnabled(uint8_t target, uint8_t applicationID, uint8_t serviceType);
+
+	/**
+	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
+	 */
+	void deleteApplicationProcess(uint8_t applicationID);
+
+	/**
+	 * Checks whether the requested application is present in the application process configuration.
+	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
+	 */
+	bool isApplicationInConfiguration(Message& request, uint8_t applicationID, uint8_t numOfServices);
+
+	/**
+	 * Checks whether the requested service type is present in the application process configuration.
+	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
+	 */
+	bool isServiceTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
+
+	/**
+	 * Checks whether the requested report type is present in the application process configuration.
+	 * Reports an error if one exist.
+	 */
+	bool isReportTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+
+	/**
+	 * Deletes the requested service type from the application process configuration. If the deletion results in an
+	 * empty application process, it deletes the corresponding application process definition as well.
+	 */
+	void deleteServiceRecursive(uint8_t applicationID, uint8_t serviceType);
+
+	/**
+	 * Deletes the requested report type from the application process configuration. If the deletion results in an
+	 * empty service, it deletes the corresponding service. If the deletion of the service, results in an empty
+	 * application process, it deletes the corresponding application process definition as well.
+	 */
+	void deleteReportRecursive(uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+
 public:
 	/**
 	 * TC[14,1] 'Add report types to the application process forward control configuration'.
 	 */
 	void addReportTypesToAppProcessConfiguration(Message& request);
+
+	/**
+	 * TC[14,2] 'Delete report types from the application process forward control configuration'.
+	 */
+	void deleteReportTypesFromAppProcessConfiguration(Message& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet
