@@ -377,16 +377,16 @@ public:
 		/**
 		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
 		 */
-		NonExistingReportTypeDefinition = 56,
+		NonExistentReportTypeDefinition = 56,
 		/**
 		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
 		 */
-		NonExistingServiceTypeDefinition = 57,
+		NonExistentServiceTypeDefinition = 57,
 		/**
 		 * Attempt to access a non-existing application process definition, from the application process
 		 * configuration (ST[14])
 		 */
-		NonExistingApplication = 58,
+		NonExistentApplicationProcess = 58,
 	};
 
 	/**
