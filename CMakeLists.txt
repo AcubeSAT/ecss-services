@@ -68,7 +68,7 @@ IF (X86_BUILD)
         add_executable(tests
                 ${test_main_SRC}
                 ${test_SRC}
-                )
+                test/Services/RealTimeForwardingControlTests.cpp)
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()

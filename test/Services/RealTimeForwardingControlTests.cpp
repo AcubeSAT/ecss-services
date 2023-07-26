@@ -626,6 +626,20 @@ void initializeAppProcessConfig() {
 	checkAppProcessConfig();
 }
 
+void initializeAppProcessConfigForTC14_3() {
+	uint8_t applications2[] = {1, 2, 3};
+	for (auto appID: applications2) {
+		for (auto serviceType: services) {
+			auto appServicePair = std::make_pair(appID, serviceType);
+			for (auto messageType: messages1) {
+				realTimeForwarding.applicationProcessConfiguration.definitions[appServicePair].push_back(
+				    messageType);
+			}
+		}
+	}
+	checkAppProcessConfig();
+}
+
 /**
  * Check if configuration is initialized properly for testing with a 2nd sequence of data
  */
@@ -1172,5 +1186,97 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		}
 
 		ServiceTests::reset();
+	}
+}
+
+TEST_CASE("Report the the Application Process Configuration content") {
+	SECTION("Valid reporting of the application process configuration content") {
+		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, 1);
+		initializeAppProcessConfigForTC14_3();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		REQUIRE(report.serviceType == RealTimeForwardingControlService::ServiceType);
+		REQUIRE(report.messageType == RealTimeForwardingControlService::MessageType::AppProcessConfigurationContentReport);
+		REQUIRE(report.readUint8() == 3);            // num of applications
+
+		// Application 1
+		REQUIRE(report.readUint8() == 1);            // applicationID
+		REQUIRE(report.readUint8() == 2);            // num of services
+		REQUIRE(report.readUint8() == 3);            // service 1
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 2
+		REQUIRE(report.readUint8() == 5);            // service 2
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 1
+
+		// Application 2
+		REQUIRE(report.readUint8() == 2);            // applicationID
+		REQUIRE(report.readUint8() == 2);            // num of services
+		REQUIRE(report.readUint8() == 3);            // service 1
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 2
+		REQUIRE(report.readUint8() == 5);            // service 2
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 1
+
+		// Application 3
+		REQUIRE(report.readUint8() == 3);            // applicationID
+		REQUIRE(report.readUint8() == 2);            // num of services
+		REQUIRE(report.readUint8() == 3);            // service 1
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 2
+		REQUIRE(report.readUint8() == 5);            // service 2
+		REQUIRE(report.readUint8() == 2);            // num of messages
+		REQUIRE(report.readUint8() == messages1[0]); // message 1
+		REQUIRE(report.readUint8() == messages1[1]); // message 1
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid reporting of the application process configuration content 2") {
+		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, 1);
+
+		for (auto appID: applications) {
+			for (auto serviceType: allServices) {
+				auto appServicePair = std::make_pair(appID, serviceType);
+				for (auto& message: AllMessageTypes::MessagesOfService.at(serviceType)) {
+					realTimeForwarding.applicationProcessConfiguration.definitions[appServicePair].push_back(message);
+				}
+			}
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		REQUIRE(report.serviceType == RealTimeForwardingControlService::ServiceType);
+		REQUIRE(report.messageType == RealTimeForwardingControlService::MessageType::AppProcessConfigurationContentReport);
+		REQUIRE(report.readUint8() == 1);
+
+		uint8_t numOfServices = sizeof(allServices)/sizeof(uint8_t);
+		for (auto appID: applications) {
+			REQUIRE(report.readUint8() == appID);
+			REQUIRE(report.readUint8() == numOfServices);
+
+			for (auto serviceType: allServices) {
+				REQUIRE(report.readUint8() == serviceType);
+				REQUIRE(report.readUint8() == AllMessageTypes::MessagesOfService.at(serviceType).size());
+				for (auto& message: AllMessageTypes::MessagesOfService.at(serviceType)) {
+					REQUIRE(report.readUint8() == message);
+				}
+			}
+		}
+
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
