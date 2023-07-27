@@ -18,7 +18,7 @@
  * @{
  */
 
-#define SERVICE_ALL                       ///< Enables compilation of all the ECSS services
+#define SERVICE_ALL                       ///<  Enables compilation of all the ECSS services
 #define SERVICE_DUMMY                     ///<  Compile ST[128] dummy service
 #define SERVICE_ENVIRONMENTALTESTINGSERVICE ///<  Compile ST[129] environmental campaign testing service
 #define SERVICE_EVENTACTION               ///<  Compile ST[19] event-action

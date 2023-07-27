@@ -1,12 +1,9 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.18)
 project(ecss_services)
-
-# Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
 
-# Specify the directories for #includes
-include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include"
-        "${PROJECT_SOURCE_DIR}/lib/logger/inc")
+find_package(etl CONFIG REQUIRED)
+find_package(logger CONFIG REQUIRED COMPONENTS log_common log_x86)
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -18,12 +15,11 @@ add_custom_target(check
 set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
         "The include directory for the platform-specific ECSS configuration headers"
         )
-include_directories(${ECSS_CONFIGURATION})
 add_compile_options(-Wvla)
-
-# Specify the .cpp files common across all targets
-add_library(common OBJECT
-        lib/logger/src/Logger.cpp
+include_directories(${ECSS_CONFIGURATION})
+add_library(common STATIC)
+target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
+target_sources(common PRIVATE
         src/Service.cpp
         src/ErrorHandler.cpp
         src/Message.cpp
@@ -51,28 +47,30 @@ add_library(common OBJECT
         src/Helpers/AllMessageTypes.cpp
         )
 
+target_link_libraries(common PRIVATE etl log_common log_x86)
 # Specify the .cpp files for the executables
-file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
+IF (X86_BUILD)
+    file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
 
-add_executable(ecss_services
-        $<TARGET_OBJECTS:common>
-        ${x86_main_SRC}
-        )
-
-# Logs all levels of messages. This command can be added by other users of this
-# library to override the respective log level.
-target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
-
-IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
-    # Gather all the .cpp files corresponding to tests
-    file(GLOB test_main_SRC "test/*.cpp")
-    file(GLOB test_SRC "test/**/*.cpp")
-
-    add_subdirectory(lib/Catch2)
-    add_executable(tests
-            $<TARGET_OBJECTS:common>
-            ${test_main_SRC}
-            ${test_SRC}
+    add_executable(x86_services
+            ${x86_main_SRC}
             )
-    target_link_libraries(tests Catch2::Catch2WithMain)
-ENDIF ()
+    target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
+
+    # Logs all levels of messages. This command can be added by other users of this
+    # library to override the respective log level.
+    target_compile_definitions(x86_services PUBLIC LOGLEVEL_TRACE)
+
+    find_package(Catch2 CONFIG)
+    IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
+        file(GLOB test_main_SRC "test/*.cpp")
+        file(GLOB test_SRC "test/**/*.cpp")
+        add_executable(tests
+                ${test_main_SRC}
+                ${test_SRC}
+                )
+        target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
+    ENDIF()
+ENDIF()
+
+install(TARGETS common)

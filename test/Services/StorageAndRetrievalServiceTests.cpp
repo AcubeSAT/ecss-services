@@ -1,7 +1,7 @@
-#include "Services/StorageAndRetrievalService.hpp"
 #include <iostream>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
+#include "Services/StorageAndRetrievalService.hpp"
 #include "catch2/catch_all.hpp"
 
 StorageAndRetrievalService& storageAndRetrieval = Services.storageAndRetrieval;
@@ -1728,16 +1728,16 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 30);
-		CHECK(report.readUint16() == 20);
+		CHECK(report.readUint16() == 60);
+		CHECK(report.readUint16() == 40);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 25);
-		CHECK(report.readUint16() == 10);
+		CHECK(report.readUint16() == 50);
+		CHECK(report.readUint16() == 20);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1782,7 +1782,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 30);
+		CHECK(report.readUint16() == 60);
 		CHECK(report.readUint16() == 0);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
@@ -1790,23 +1790,23 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 25);
-		CHECK(report.readUint16() == 10);
+		CHECK(report.readUint16() == 50);
+		CHECK(report.readUint16() == 20);
 		// Packet store 3
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
 		CHECK(report.readUint32() == timestamps4[0]);
 		CHECK(report.readUint32() == timestamps4[7]);
 		CHECK(report.readUint32() == 20);
-		CHECK(report.readUint16() == 40);
-		CHECK(report.readUint16() == 30);
+		CHECK(report.readUint16() == 80);
+		CHECK(report.readUint16() == 60);
 		// Packet store 4
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
 		CHECK(report.readUint32() == timestamps3[0]);
 		CHECK(report.readUint32() == timestamps3[3]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 20);
+		CHECK(report.readUint16() == 40);
 		CHECK(report.readUint16() == 0);
 
 		ServiceTests::reset();
@@ -1854,8 +1854,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 30);
-		CHECK(report.readUint16() == 20);
+		CHECK(report.readUint16() == 60);
+		CHECK(report.readUint16() == 40);
 
 		ServiceTests::reset();
 		Services.reset();
