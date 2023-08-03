@@ -85,6 +85,11 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 		timeInterval = nearestLowerMultiple;
 	}
 
+	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
+		return;
+	}
+
 	periodicStatisticsReportingStatus = true;
 	reportingIntervalMs = timeInterval;
 }
