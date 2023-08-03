@@ -71,21 +71,20 @@ void ParameterStatisticsService::resetParameterStatistics() {
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
-	/**
-	 * @todo: The sampling interval of each parameter. the "timeInterval" requested should not exceed it.
-	 * 		  It has to be defined as a constant.
-	 */
-	uint16_t SAMPLING_PARAMETER_INTERVAL = 5;
+	const uint16_t SAMPLING_PARAMETER_INTERVAL = 5;
 
 	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting)) {
 		return;
 	}
 
 	uint16_t timeInterval = request.readUint16();
-	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
-		return;
+
+	uint16_t nearestLowerMultiple = (timeInterval / SAMPLING_PARAMETER_INTERVAL) * SAMPLING_PARAMETER_INTERVAL;
+
+	if (timeInterval != nearestLowerMultiple) {
+		timeInterval = nearestLowerMultiple;
 	}
+
 	periodicStatisticsReportingStatus = true;
 	reportingIntervalMs = timeInterval;
 }
