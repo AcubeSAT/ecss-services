@@ -79,12 +79,6 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 
 	uint16_t timeInterval = request.readUint16();
 
-	uint16_t nearestLowerMultiple = (timeInterval / SAMPLING_PARAMETER_INTERVAL) * SAMPLING_PARAMETER_INTERVAL;
-
-	if (timeInterval != nearestLowerMultiple) {
-		timeInterval = nearestLowerMultiple;
-	}
-
 	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 		return;
