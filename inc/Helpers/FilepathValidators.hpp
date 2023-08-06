@@ -114,48 +114,48 @@ namespace FilepathValidators {
 	int32_t pathIsValidForDeletion(Filesystem::Path repositoryString,
 	                               Filesystem::Path fileNameString) {
 
-		if (findWildcardPosition(repositoryString)) {
-			return WILDCARD_FOUND;
-		}
-
-		if (findWildcardPosition(fileNameString)) {
-			return WILDCARD_FOUND;
-		}
-
-		const char* repositoryPathChar = repositoryString.data();
-		Filesystem::Path objectPathString = "";
-		objectPathString.append(repositoryPathChar);
-
-		auto* fileNameChar = reinterpret_cast<uint8_t*>(fileNameString.data());
-		checkForSlashesAndCompensate(objectPathString, fileNameChar);
-		objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
-
-		if (objectPathString.size() > ECSSMaxStringSize) {
-			return OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE;
-		}
-
-		lfs_info infoStruct;
-		int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), &infoStruct);
-
-		if (infoStructFillStatus >= LFS_ERR_OK) {
-			switch (infoStruct.type) {
-				case (LFS_TYPE_REG):
-
-					return LFS_TYPE_REG;
-					break;
-
-				case (LFS_TYPE_DIR):
-
-					return LFS_TYPE_DIR;
-					break;
-
-				default:
-
-					return OBJECT_TYPE_IS_INVALID;
-			}
-		} else {
-			return infoStructFillStatus;
-		}
+//		if (findWildcardPosition(repositoryString)) {
+//			return WILDCARD_FOUND;
+//		}
+//
+//		if (findWildcardPosition(fileNameString)) {
+//			return WILDCARD_FOUND;
+//		}
+//
+//		const char* repositoryPathChar = repositoryString.data();
+//		Filesystem::Path objectPathString = "";
+//		objectPathString.append(repositoryPathChar);
+//
+//		auto* fileNameChar = reinterpret_cast<uint8_t*>(fileNameString.data());
+//		checkForSlashesAndCompensate(objectPathString, fileNameChar);
+//		objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
+//
+//		if (objectPathString.size() > ECSSMaxStringSize) {
+//			return OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE;
+//		}
+//
+//		lfs_info infoStruct;
+//		int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), &infoStruct);
+//
+//		if (infoStructFillStatus >= LFS_ERR_OK) {
+//			switch (infoStruct.type) {
+//				case (LFS_TYPE_REG):
+//
+//					return LFS_TYPE_REG;
+//					break;
+//
+//				case (LFS_TYPE_DIR):
+//
+//					return LFS_TYPE_DIR;
+//					break;
+//
+//				default:
+//
+//					return OBJECT_TYPE_IS_INVALID;
+//			}
+//		} else {
+//			return infoStructFillStatus;
+//		}
 	}
 
 	/**
@@ -170,31 +170,31 @@ namespace FilepathValidators {
      *  WILDCARD_FOUND: there is a wildcard in the repository's path string,
      *  lfs_open_file status: Status of the lfs function that creates a file
      */
-	int32_t littleFsCreateFile(lfs_t* fileSystem,
-	                           lfs_file_t* file,
+	int32_t littleFsCreateFile(void* fileSystem,
+	                           void* file,
 	                           Filesystem::Path repositoryPath,
 	                           Filesystem::Path fileName,
 	                           const int32_t flags) {
 
-		if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
-			return OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE;
-		}
-
-		if (FileManagementService::findWildcardPosition(fileName) != NO_WILDCARD_FOUND) {
-			return WILDCARD_FOUND;
-		}
-
-		char* const repositoryPathChar = repositoryPath.data();
-		Filesystem::Path objectPathString = "";
-		objectPathString.append(repositoryPathChar);
-
-		auto* fileNameChar = reinterpret_cast<uint8_t*>(fileName.data());
-		checkForSlashesAndCompensate(objectPathString, fileNameChar);
-
-		objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
-
-		int32_t lfsCreateFileStatus = lfs_file_open(fileSystem, file, const_cast<const char*>(objectPathString.data()), flags);
-		return lfsCreateFileStatus;
+//		if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
+//			return OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE;
+//		}
+//
+//		if (FileManagementService::findWildcardPosition(fileName) != NO_WILDCARD_FOUND) {
+//			return WILDCARD_FOUND;
+//		}
+//
+//		char* const repositoryPathChar = repositoryPath.data();
+//		Filesystem::Path objectPathString = "";
+//		objectPathString.append(repositoryPathChar);
+//
+//		auto* fileNameChar = reinterpret_cast<uint8_t*>(fileName.data());
+//		checkForSlashesAndCompensate(objectPathString, fileNameChar);
+//
+//		objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
+//
+//		int32_t lfsCreateFileStatus = lfs_file_open(fileSystem, file, const_cast<const char*>(objectPathString.data()), flags);
+//		return lfsCreateFileStatus;
 	}
 
 	/**
@@ -205,7 +205,7 @@ namespace FilepathValidators {
      * @param fileName : The file name
      * @return lfs_remove status of execution
      */
-	int32_t littleFsDeleteFile(lfs_t* fs, Filesystem::Path& repositoryPath, const Filesystem::Path& fileName) {
+	int32_t littleFsDeleteFile(void* fs, Filesystem::Path& repositoryPath, const Filesystem::Path& fileName) {
 
 		const char* repositoryPathChar = repositoryPath.data();
 		Filesystem::Path objectPathString = "";
@@ -215,8 +215,8 @@ namespace FilepathValidators {
 		checkForSlashesAndCompensate(objectPathString, fileNameChar);
 		objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
 
-		int32_t lfsDeleteFileStatus = lfs_remove(fs, objectPathString.data());
-		return lfsDeleteFileStatus;
+//		int32_t lfsDeleteFileStatus = lfs_remove(fs, objectPathString.data());
+//		return lfsDeleteFileStatus;
 	}
 
 	/**
@@ -234,7 +234,7 @@ namespace FilepathValidators {
      */
 	int32_t littleFsReportFile(Filesystem::Path repositoryString,
 	                           Filesystem::Path fileNameString,
-	                           lfs_info* infoStruct) {
+	                           void* infoStruct) {
 
 		const char* repositoryPathChar = repositoryString.data();
 		Filesystem::Path objectPathString = "";
@@ -244,24 +244,24 @@ namespace FilepathValidators {
 		checkForSlashesAndCompensate(objectPathString, fileNameChar);
 		objectPathString.append(reinterpret_cast<const char*>(fileNameChar));
 
-		int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), infoStruct);
-		if (infoStructFillStatus >= LFS_ERR_OK) {
-			switch (infoStruct->type) {
-				case (LFS_TYPE_REG):
-
-					return LFS_TYPE_REG;
-
-				case (LFS_TYPE_DIR):
-
-					return LFS_TYPE_DIR;
-
-				default:
-
-					return OBJECT_TYPE_IS_INVALID;
-			}
-		} else {
-			return infoStructFillStatus;
-		}
+//		int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject, objectPathString.data(), infoStruct);
+//		if (infoStructFillStatus >= LFS_ERR_OK) {
+//			switch (infoStruct->type) {
+//				case (LFS_TYPE_REG):
+//
+//					return LFS_TYPE_REG;
+//
+//				case (LFS_TYPE_DIR):
+//
+//					return LFS_TYPE_DIR;
+//
+//				default:
+//
+//					return OBJECT_TYPE_IS_INVALID;
+//			}
+//		} else {
+//			return infoStructFillStatus;
+//		}
 	}
 
 } //namespace FilepathValidators
