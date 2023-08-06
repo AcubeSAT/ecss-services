@@ -67,49 +67,6 @@ namespace FilepathValidators {
 	}
 
 	/**
-     * The purpose of this function is to check if the object path is valid for creation
-     * First it checks for wildcards in the string and then
-     * checks if there is an object at this path and returns its type.
-     * @param repositoryString : Pointer to the repository path
-     * @return status of execution
-     *  LFS_TYPE_DIR: Object is a directory,
-     *  LFS_TYPE_REG: Object is a file,
-     *  WILDCARD_FOUND: Repository path contains a wildcard
-     *  OBJECT_TYPE_IS_INVALID: Invalid type of object,
-     *  Negative LittleFS error code: lfs_stat() returned an error code
-     */
-	int32_t pathIsValidForCreation(Filesystem::Path repositoryString) {
-		lfs_info infoStruct;
-
-		if () {
-			return WILDCARD_FOUND;
-		}
-
-		const char* repositoryStringChar = repositoryString.data();
-		int32_t infoStructFillStatus = lfs_stat(&onBoardFileSystemObject,
-		                                        repositoryStringChar,
-		                                        &infoStruct);
-
-		if (infoStructFillStatus >= LFS_ERR_OK) {
-			switch (infoStruct.type) {
-				case LFS_TYPE_DIR:
-					return LFS_TYPE_DIR;
-					break;
-
-				case LFS_TYPE_REG:
-					return LFS_TYPE_REG;
-					break;
-
-				default:
-					return OBJECT_TYPE_IS_INVALID;
-					break;
-			}
-		} else {
-			return infoStructFillStatus;
-		}
-	}
-
-	/**
      * The purpose of this function is to check if the the strings that compose the object path (repository string and
      * file name string) are seperated with a slash "/" between them. If they are not seperated by one and only one
      * slash, then it modifies the object path accordingly.
