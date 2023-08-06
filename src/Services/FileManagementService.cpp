@@ -97,42 +97,42 @@ void FileManagementService::deleteFile(Message& message) {
 	}
 	fileName = fileNameIsValid.value();
 
-	switch (pathIsValidForDeletion(repositoryPath, fileName)) {
-		case LFS_TYPE_REG: {
-			if (littleFsDeleteFile(&onBoardFileSystemObject, repositoryPath, fileName) >= LFS_ERR_OK) {
-				return;
-			} else {
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsRemoveFailed);
-				return;
-			}
-			break;
-		}
-
-		case LFS_TYPE_DIR:
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-			break;
-
-		case (WILDCARD_FOUND):
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-			break;
-
-		case (OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE):
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-			break;
-
-		case (OBJECT_TYPE_IS_INVALID):
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-			break;
-
-		default:
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
-			break;
-	}
+	//	switch (pathIsValidForDeletion(repositoryPath, fileName)) {
+	//		case LFS_TYPE_REG: {
+	//			if (littleFsDeleteFile(&onBoardFileSystemObject, repositoryPath, fileName) >= LFS_ERR_OK) {
+	//				return;
+	//			} else {
+	//				ErrorHandler::reportError(message,
+	//				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsRemoveFailed);
+	//				return;
+	//			}
+	//			break;
+	//		}
+	//
+	//		case LFS_TYPE_DIR:
+	//			ErrorHandler::reportError(message,
+	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+	//			break;
+	//
+	//		case (WILDCARD_FOUND):
+	//			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+	//			break;
+	//
+	//		case (OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE):
+	//			ErrorHandler::reportError(message,
+	//			                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+	//			break;
+	//
+	//		case (OBJECT_TYPE_IS_INVALID):
+	//			ErrorHandler::reportError(message,
+	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+	//			break;
+	//
+	//		default:
+	//			ErrorHandler::reportError(message,
+	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
+	//			break;
+	//	}
 }
 
 void FileManagementService::reportAttributes(Message& message) {
@@ -170,33 +170,33 @@ void FileManagementService::reportAttributes(Message& message) {
 		return;
 	}
 
-	lfs_info infoStruct;
-
-	switch (littleFsReportFile(repositoryPath, fileName, &infoStruct)) {
-
-		case (OBJECT_TYPE_IS_INVALID):
-
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-			break;
-
-		case (LFS_TYPE_REG):
-
-			fileAttributeReport(repositoryPath, fileName, infoStruct.size);
-			break;
-
-		case (LFS_TYPE_DIR):
-
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-			break;
-
-		default:
-
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
-			break;
-	}
+	//	lfs_info infoStruct;
+	//
+	//	switch (littleFsReportFile(repositoryPath, fileName, &infoStruct)) {
+	//
+	//		case (OBJECT_TYPE_IS_INVALID):
+	//
+	//			ErrorHandler::reportError(message,
+	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+	//			break;
+	//
+	//		case (LFS_TYPE_REG):
+	//
+	//			fileAttributeReport(repositoryPath, fileName, infoStruct.size);
+	//			break;
+	//
+	//		case (LFS_TYPE_DIR):
+	//
+	//			ErrorHandler::reportError(message,
+	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+	//			break;
+	//
+	//		default:
+	//
+	//			ErrorHandler::reportError(message,
+	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
+	//			break;
+	//	}
 }
 
 void FileManagementService::fileAttributeReport(const String<ECSSMaxStringSize>& repositoryPath,
