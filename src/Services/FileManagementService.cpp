@@ -29,10 +29,9 @@ void FileManagementService::createFile(Message& message) {
 	}
 	fileName = fileNameIsValid.value();
 
-	// ?????
-	uint16_t fileSizeBytes = message.readUint32();
+	uint32_t maxFileSizeBytes = message.readUint32();
 
-	if (fileSizeBytes > MaxFileSizeBytes) {
+	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
 		return;
 	}
