@@ -55,7 +55,7 @@ namespace FilepathValidators {
 
 		while (currentChar != FileManagementService::VariableStringTerminator) {
 			if (charCounter == ECSSMaxStringSize - 1) {
-				return {};
+				return etl::nullopt;
 			}
 
 			extractedString.append(1, currentChar);
