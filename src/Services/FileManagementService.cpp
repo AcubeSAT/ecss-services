@@ -53,65 +53,24 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
-	switch (pathIsValidForCreation(repositoryPath)) {
-		case LFS_TYPE_DIR: {
-			lfs_file_t file;
-			int32_t createFileStatus = littleFsCreateFile(&onBoardFileSystemObject,
-			                                              &file,
-			                                              repositoryPath,
-			                                              fileName,
-			                                              LFS_O_CREAT);
-			if (createFileStatus >= LFS_ERR_OK) {
-				if (lfs_file_close(&onBoardFileSystemObject, &file) >= LFS_ERR_OK) {
-					return;
-				} else {
-					ErrorHandler::reportError(message,
-					                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileCloseFailed);
-					return;
-				}
-			}
+	auto fullPath = repositoryPath;
+	fullPath.append(fileName);
 
-			if (createFileStatus == OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE) {
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-				return;
-			}
-
-			if (createFileStatus == WILDCARD_FOUND) {
-				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-				return;
-			}
-
-			if (createFileStatus == LFS_ERR_EXIST) {
+	etl::optional<Filesystem::FileCreationError> fileCreationStatus = Filesystem::createFile(fullPath);
+	if (fileCreationStatus.has_value()) {
+		switch (fileCreationStatus.value()) {
+			case Filesystem::FileCreationError::FileAlreadyExists: {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
-				return;
+				break;
 			}
-
-			if (createFileStatus < LFS_ERR_OK) {
+			case Filesystem::FileCreationError::UnknownError: {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsFileOpenFailed);
-				return;
+				                          ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+				break;
 			}
-			break;
 		}
-
-		case LFS_TYPE_REG:
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
-			break;
-		case (WILDCARD_FOUND):
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-			break;
-		case (OBJECT_TYPE_IS_INVALID):
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-			break;
-		default:
-			ErrorHandler::reportError(message,
-			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
-			break;
+		return;
 	}
 }
 
