@@ -2,13 +2,9 @@
 #include <ServicePool.hpp>
 #include <Services/FileManagementService.hpp>
 #include <catch2/catch_all.hpp>
-#include <cstring>
 #include <etl/String.hpp>
 #include "ServiceTests.hpp"
 
-
-//EventActionService& eventActionService = Services.eventAction;
-FileManagementService& fileManagementService = Services.fileManagement;
 
 TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 
