@@ -9,7 +9,9 @@ ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(T
 }
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
+	if (!request.assertTC(ServiceType, MessageType::ReportParameterStatistics)) {
+		return;
+	}
 	parameterStatisticsReport();
 
 	if (hasAutomaticStatisticsReset or request.readBoolean()) {
@@ -55,7 +57,9 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 }
 
 void ParameterStatisticsService::resetParameterStatistics(Message& request) {
-	request.assertTC(ServiceType, MessageType::ResetParameterStatistics);
+	if (!request.assertTC(ServiceType, MessageType::ResetParameterStatistics)) {
+		return;
+	}
 	resetParameterStatistics();
 }
 
@@ -73,7 +77,9 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	 */
 	uint16_t SAMPLING_PARAMETER_INTERVAL = 5;
 
-	request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting);
+	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting)) {
+		return;
+	}
 
 	uint16_t timeInterval = request.readUint16();
 	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
@@ -85,14 +91,18 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 }
 
 void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& request) {
-	request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting);
+	if (!request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting)) {
+		return;
+	}
 
 	periodicStatisticsReportingStatus = false;
 	reportingIntervalMs = 0;
 }
 
 void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& request) {
-	request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions);
+	if (!request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions)) {
+		return;
+	}
 
 	uint16_t numOfIds = request.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
@@ -135,7 +145,9 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 }
 
 void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions);
+	if (!request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions)) {
+		return;
+	}
 
 	uint16_t numOfIds = request.readUint16();
 	if (numOfIds == 0) {
@@ -157,7 +169,9 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 }
 
 void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions);
+	if (!request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions)) {
+		return;
+	}
 	statisticsDefinitionsReport();
 }
 

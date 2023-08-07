@@ -23,24 +23,32 @@ Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::Defa
 }
 
 void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction);
+	if (!request.assertTC(ServiceType, MessageType::EnableTimeBasedScheduleExecutionFunction)) {
+		return;
+	}
 	executionFunctionStatus = true;
 }
 
 void TimeBasedSchedulingService::disableScheduleExecution(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DisableTimeBasedScheduleExecutionFunction);
+	if (!request.assertTC(ServiceType, MessageType::DisableTimeBasedScheduleExecutionFunction)) {
+		return;
+	}
 	executionFunctionStatus = false;
 }
 
 void TimeBasedSchedulingService::resetSchedule(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule);
+	if (!request.assertTC(ServiceType, MessageType::ResetTimeBasedSchedule)) {
+		return;
+	}
 	executionFunctionStatus = false;
 	scheduledActivities.clear();
 	// todo: Add resetting for sub-schedules and groups, if defined
 }
 
 void TimeBasedSchedulingService::insertActivities(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities);
+	if (!request.assertTC(ServiceType, MessageType::InsertActivities)) {
+		return;
+	}
 
 	// todo: Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16();
@@ -73,7 +81,9 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities);
+	if (!request.assertTC(ServiceType, MessageType::TimeShiftALlScheduledActivities)) {
+		return;
+	}
 
 	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
@@ -86,15 +96,17 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	Time::RelativeTime relativeOffset = request.readRelativeTime();
 	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
-	} else {
-		for (auto& activity: scheduledActivities) {
-			activity.requestReleaseTime += std::chrono::seconds(relativeOffset);
-		}
+		return;
+	}
+	for (auto& activity: scheduledActivities) {
+		activity.requestReleaseTime += std::chrono::seconds(relativeOffset);
 	}
 }
 
 void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById);
+	if (!request.assertTC(ServiceType, MessageType::TimeShiftActivitiesById)) {
+		return;
+	}
 
 	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
@@ -126,7 +138,9 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById);
+	if (!request.assertTC(ServiceType, MessageType::DeleteActivitiesById)) {
+		return;
+	}
 
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
@@ -149,7 +163,9 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportAllScheduledActivities);
+	if (!request.assertTC(ServiceType, MessageType::DetailReportAllScheduledActivities)) {
+		return;
+	}
 
 	timeBasedScheduleDetailReport(scheduledActivities);
 }
@@ -167,7 +183,9 @@ void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<S
 }
 
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DetailReportActivitiesById);
+	if (!request.assertTC(ServiceType, MessageType::DetailReportActivitiesById)) {
+		return;
+	}
 
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
@@ -196,7 +214,9 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 }
 
 void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
-	request.assertTC(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById);
+	if (!request.assertTC(ServiceType, MessageType::ActivitiesSummaryReportById)) {
+		return;
+	}
 
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 

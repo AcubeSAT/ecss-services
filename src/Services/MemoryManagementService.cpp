@@ -67,7 +67,9 @@ void MemoryManagementService::loadRawData(Message& request) {
 }
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
-	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData);
+	if (!request.assertTC(ServiceType, MessageType::DumpRawMemoryData)) {
+		return;
+	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8();
@@ -105,7 +107,9 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 }
 
 void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
-	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData);
+	if (!request.assertTC(ServiceType, MessageType::CheckRawMemoryData)) {
+		return;
+	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	uint8_t memoryID = request.readEnum8();
