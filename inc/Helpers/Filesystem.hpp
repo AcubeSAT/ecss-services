@@ -17,6 +17,11 @@ namespace Filesystem {
 		File = 1
 	};
 
+	enum class FileCreationError: uint8_t {
+		FileAlreadyExists = 0,
+		UnknownError = 1
+	};
+
 	enum class FileDeletionError: uint8_t {
 		FileDoesNotExist = 0,
 		PathLeadsToDirectory = 1,
@@ -24,9 +29,15 @@ namespace Filesystem {
 		UnknownError = 3
 	};
 
-	enum class FileCreationError: uint8_t {
-		FileAlreadyExists = 0,
+	enum class DirectoryCreationError: uint8_t {
+		DirectoryAlreadyExists = 0,
 		UnknownError = 1
+	};
+
+	enum class DirectoryDeletionError: uint8_t {
+		DirectoryDoesNotExist = 0,
+		DirectoryIsNotEmpty = 1,
+		UnknownError = 2
 	};
 
 	enum class FileLockStatus: uint8_t {
@@ -34,13 +45,13 @@ namespace Filesystem {
 		Unlocked = 1
 	};
 
-	etl::optional<Filesystem::FileCreationError> createFile(const Path& path);
+	etl::optional<FileCreationError> createFile(const Path& path);
 
 	etl::optional<FileDeletionError> deleteFile(const Path& path);
 
-	void createDirectory(const Path& path);
+	etl::optional<DirectoryCreationError> createDirectory(const Path& path);
 
-	etl::optional<FileDeletionError> deleteDirectory(const Path& path);
+	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
 
 	Attributes getFileAttributes(const Path& path);
 
