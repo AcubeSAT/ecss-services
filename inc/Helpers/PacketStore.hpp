@@ -4,6 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "Message.hpp"
 
 /**
@@ -21,15 +22,15 @@ public:
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
 	 */
-	uint32_t openRetrievalStartTimeTag = 0;
+	TimeSize openRetrievalStartTimeTag = 0;
 	/**
 	 * The start time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	uint32_t retrievalStartTime = 0;
+	TimeSize retrievalStartTime = 0;
 	/**
 	 * The end time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	uint32_t retrievalEndTime = 0;
+	TimeSize retrievalEndTime = 0;
 	/**
 	 * The maximum size of the packet store, in bytes.
 	 *

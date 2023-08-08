@@ -51,7 +51,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 	}
 
 	// todo: Get the sub-schedule ID if they are implemented
-	uint16_t iterationCount = request.readUint16();
+	IterationTimeSize iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		// todo: Get the group ID first, if groups are used
 		Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
@@ -111,7 +111,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
 	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
-	uint16_t iterationCount = request.readUint16();
+	IterationTimeSize iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.readUint8();
@@ -142,7 +142,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 		return;
 	}
 
-	uint16_t iterationCount = request.readUint16();
+	IterationTimeSize iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.readUint8();
@@ -189,7 +189,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
-	uint16_t iterationCount = request.readUint16();
+	IterationTimeSize iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.readUint8();
@@ -220,7 +220,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
-	uint16_t iterationCount = request.readUint16();
+	IterationTimeSize iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.readUint8();

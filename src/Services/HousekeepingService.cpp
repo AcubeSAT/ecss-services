@@ -185,7 +185,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 	StructureIdSize numOfTargetStructs = request.readUint8();
 	for (StructureIdSize i = 0; i < numOfTargetStructs; i++) {
 		StructureIdSize targetStructId = request.readUint8();
-		uint32_t newCollectionInterval = request.readUint32();
+		TimeSize newCollectionInterval = request.readUint32();
 		if (hasNonExistingStructExecutionError(targetStructId, request)) {
 			continue;
 		}
@@ -264,8 +264,8 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 	return std::find(std::begin(ids), std::end(ids), parameterId) != std::end(ids);
 }
 
-uint32_t
-HousekeepingService::reportPendingStructures(uint32_t currentTime, uint32_t previousTime, uint32_t expectedDelay) {
+TimeSize
+HousekeepingService::reportPendingStructures(TimeSize currentTime, TimeSize previousTime, TimeSize expectedDelay) {
 	uint32_t nextCollection = std::numeric_limits<uint32_t>::max();
 
 	for (auto& housekeepingStructure: housekeepingStructures) {

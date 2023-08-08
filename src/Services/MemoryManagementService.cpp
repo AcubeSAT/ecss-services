@@ -29,16 +29,16 @@ void MemoryManagementService::loadRawData(Message& request) {
 		return;
 	}
 
-	uint8_t readData[ECSSMaxStringSize];
-	uint16_t iterationCount = request.readUint16();
+	ReadDataSize readData[ECSSMaxStringSize];
+	IterationSize iterationCount = request.readUint16();
 
 	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
 		// TODO: Define FLASH specific access code when we transfer to embedded
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			uint64_t startAddress = request.readUint64();
-			uint16_t dataLength = request.readOctetString(readData);
-			uint16_t checksum = request.readBits(16);
+			StartAddressSize startAddress = request.readUint64();
+			LengthSize dataLength = request.readOctetString(readData);
+			ChecksumSize checksum = request.readBits(16);
 
 			if (!dataValidator(readData, checksum, dataLength)) {
 				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
@@ -72,18 +72,18 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
-	uint8_t memoryID = request.readEnum8();
+	MemoryIdSize memoryID = request.readEnum8();
 
 	if (memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		uint8_t readData[ECSSMaxStringSize];
-		uint16_t iterationCount = request.readUint16();
+		ReadDataSize readData[ECSSMaxStringSize];
+		IterationSize iterationCount = request.readUint16();
 
 		report.appendEnum8(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			uint64_t startAddress = request.readUint64();
-			uint16_t readLength = request.readUint16();
+			StartAddressSize startAddress = request.readUint64();
+			LengthSize readLength = request.readUint16();
 
 			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
 			    addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
@@ -112,18 +112,18 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
-	uint8_t memoryID = request.readEnum8();
+	MemoryIdSize memoryID = request.readEnum8();
 
 	if (memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		uint8_t readData[ECSSMaxStringSize];
-		uint16_t iterationCount = request.readUint16();
+		ReadDataSize readData[ECSSMaxStringSize];
+		IterationSize iterationCount = request.readUint16();
 
 		report.appendEnum8(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			uint64_t startAddress = request.readUint64();
-			uint16_t readLength = request.readUint16();
+			StartAddressSize startAddress = request.readUint64();
+			LengthSize readLength = request.readUint16();
 
 			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
 			    addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
@@ -199,7 +199,7 @@ inline bool MemoryManagementService::memoryIdValidator(MemoryManagementService::
 	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
 }
 
-inline bool MemoryManagementService::dataValidator(const uint8_t* data, uint16_t checksum, uint16_t length) {
+inline bool MemoryManagementService::dataValidator(const uint8_t* data, ChecksumSize checksum, LengthSize length) {
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
 

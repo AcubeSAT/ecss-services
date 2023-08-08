@@ -227,7 +227,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
 
-		uint8_t applicationID = 1;
+		ApplicationIdSize applicationID = 1;
 		validReportTypes(request);
 
 		MessageParser::execute(request);
@@ -246,7 +246,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
 
-		uint8_t applicationID = 1;
+		ApplicationIdSize applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypes(request);
 
@@ -272,7 +272,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
 
-		uint8_t applicationID = 1;
+		ApplicationIdSize applicationID = 1;
 		uint8_t serviceType1 = services[0]; // st03
 		uint8_t serviceType2 = services[1]; // st05
 
@@ -302,7 +302,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
 
-		uint8_t applicationID = 1;
+		ApplicationIdSize applicationID = 1;
 		uint8_t serviceType = services[0]; // st03
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypes(request);
@@ -331,7 +331,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
 
-		uint8_t applicationID = 1;
+		ApplicationIdSize applicationID = 1;
 		uint8_t serviceType1 = services[0]; // st03
 		uint8_t serviceType2 = services[1]; // st05
 
@@ -375,7 +375,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
 
-		uint8_t applicationID = 1;
+		ApplicationIdSize applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		duplicateReportTypes(request);
 
@@ -405,9 +405,9 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
-		uint8_t applicationID1 = 1;
-		uint8_t applicationID2 = 2;
-		uint8_t applicationID3 = 3;
+		ApplicationIdSize applicationID1 = 1;
+		ApplicationIdSize applicationID2 = 2;
+		ApplicationIdSize applicationID3 = 3;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		realTimeForwarding.controlledApplications.push_back(applicationID3);
 		validInvalidReportTypes(request);
@@ -440,7 +440,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
-		uint8_t applicationID1 = 1;
+		ApplicationIdSize applicationID1 = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		validAllReportsOfService(request);
 
@@ -462,8 +462,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
-		uint8_t applicationID1 = 1;
-		uint8_t applicationID2 = 2;
+		ApplicationIdSize applicationID1 = 1;
+		ApplicationIdSize applicationID2 = 2;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		realTimeForwarding.controlledApplications.push_back(applicationID2);
 		validInvalidAllReportsOfService(request);
@@ -507,7 +507,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
-		uint8_t applicationID1 = 1;
+		ApplicationIdSize applicationID1 = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		validAllReportsOfApp(request);
 
@@ -532,8 +532,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
-		uint8_t applicationID1 = 1;
-		uint8_t applicationID2 = 2;
+		ApplicationIdSize applicationID1 = 1;
+		ApplicationIdSize applicationID2 = 2;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		realTimeForwarding.controlledApplications.push_back(applicationID2);
 		validInvalidAllReportsOfApp(request);

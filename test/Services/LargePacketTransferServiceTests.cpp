@@ -73,7 +73,7 @@ TEST_CASE("Split function", "[no][service]") {
 	for (uint16_t i = 0; i < 800; i++) {
 		message.appendUint8(UINT8_MAX);
 	}
-	uint16_t largeMessageTransactionIdentifier = 1;
+	LargeMessageTransactionIdSize largeMessageTransactionIdentifier = 1;
 	lPT.split(message, largeMessageTransactionIdentifier);
 	Message message5(13, 0, Message::TC, 0);
 

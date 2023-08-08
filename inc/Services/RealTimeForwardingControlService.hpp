@@ -5,6 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "Helpers/AllMessageTypes.hpp"
 #include "Helpers/ForwardControlConfiguration.hpp"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 #include "etl/vector.h"
 
@@ -44,28 +45,28 @@ private:
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
 	 */
-	void addAllReportsOfApplication(uint8_t applicationID);
+	void addAllReportsOfApplication(ApplicationIdSize applicationID);
 
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
 	 */
-	void addAllReportsOfService(uint8_t applicationID, uint8_t serviceType);
+	void addAllReportsOfService(ApplicationIdSize applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Counts the number of service types, stored for the specified application process.
 	 */
-	uint8_t countServicesOfApplication(uint8_t applicationID);
+	uint8_t countServicesOfApplication(ApplicationIdSize applicationID);
 
 	/**
 	 * Counts the number of report types, stored for the specified service type.
 	 */
-	uint8_t countReportsOfService(uint8_t applicationID, uint8_t serviceType);
+	uint8_t countReportsOfService(ApplicationIdSize applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool reportExistsInAppProcessConfiguration(uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	bool reportExistsInAppProcessConfiguration(ApplicationIdSize applicationID, ServiceTypeSize serviceType, uint8_t messageType);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
@@ -73,23 +74,23 @@ private:
 	 *
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
-	bool checkApplicationOfAppProcessConfig(Message& request, uint8_t applicationID, uint8_t numOfServices);
+	bool checkApplicationOfAppProcessConfig(Message& request, ApplicationIdSize applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
-	bool checkAppControlled(Message& request, uint8_t applicationId);
+	bool checkAppControlled(Message& request, ApplicationIdSize applicationId);
 
 	/**
 	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
 	 * definitions.
 	 */
-	bool allServiceTypesAllowed(Message& request, uint8_t applicationID);
+	bool allServiceTypesAllowed(Message& request, ApplicationIdSize applicationID);
 
 	/**
 	 * Checks if the maximum number of service type definitions per application process is reached.
 	 */
-	bool maxServiceTypesReached(Message& request, uint8_t applicationID);
+	bool maxServiceTypesReached(Message& request, ApplicationIdSize applicationID);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -97,12 +98,12 @@ private:
 	 *
 	 * @return True: if the service type is valid and passes all the necessary error checking.
 	 */
-	bool checkService(Message& request, uint8_t applicationID, uint8_t numOfMessages);
+	bool checkService(Message& request, ApplicationIdSize applicationID, uint8_t numOfMessages);
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
 	 */
-	bool maxReportTypesReached(Message& request, uint8_t applicationID, uint8_t serviceType);
+	bool maxReportTypesReached(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
@@ -110,7 +111,7 @@ private:
 	 *
 	 * @return True: if the message type is valid and passes all the necessary error checking.
 	 */
-	bool checkMessage(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	bool checkMessage(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, uint8_t messageType);
 
 public:
 	/**

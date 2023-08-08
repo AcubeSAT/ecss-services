@@ -5,6 +5,7 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/PacketStore.hpp"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "etl/map.h"
 
 /**
@@ -53,7 +54,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
+	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeSize timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -95,7 +96,7 @@ private:
 	 *
 	 * @param request used to raise errors.
 	 */
-	static bool checkTimeWindow(uint32_t startTime, uint32_t endTime, Message& request);
+	static bool checkTimeWindow(TimeSize startTime, TimeSize endTime, Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -116,8 +117,8 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, uint32_t startTime,
-	                             uint32_t endTime, Message& request);
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeSize startTime,
+	                             TimeSize endTime, Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
@@ -127,7 +128,7 @@ private:
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeSize timeTag,
 	                             Message& request, bool isAfterTimeTag);
 
 	/**
@@ -139,8 +140,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
-	                        uint32_t endTime, Message& request);
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeSize startTime,
+	                        TimeSize endTime, Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
@@ -151,7 +152,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeSize startTime,
 	                        Message& request);
 
 	/**
@@ -163,7 +164,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t endTime,
+	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeSize endTime,
 	                         Message& request);
 
 	/**
@@ -218,7 +219,7 @@ public:
 	/**
 	 * Adds telemetry to the specified packet store and timestamps it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, uint32_t timestamp);
+	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeSize timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.
@@ -228,7 +229,7 @@ public:
 	/**
 	 * Returns the number of existing packet stores.
 	 */
-	uint16_t currentNumberOfPacketStores();
+	NumOfPacketStoresSize currentNumberOfPacketStores();
 
 	/**
 	 * Returns the packet store with the specified packet store ID.

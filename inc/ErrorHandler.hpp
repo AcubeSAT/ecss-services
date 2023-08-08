@@ -1,6 +1,7 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
+#include "Helpers/TypedefDefinitions.hpp"
 #include <stdint.h> // for the uint_8t stepID
 #include <type_traits>
 
@@ -446,7 +447,7 @@ public:
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
 	 */
-	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, uint8_t stepID);
+	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepIdSize stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.

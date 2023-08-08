@@ -4,6 +4,7 @@
 #include <memory>
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 #include "Service.hpp"
 
@@ -100,7 +101,7 @@ private:
 	 * @param memId The ID of the memory to check is passed
 	 * @param address Takes the address to be checked for validity
 	 */
-	static bool addressValidator(MemoryManagementService::MemoryID memId, uint64_t address);
+	static bool addressValidator(MemoryManagementService::MemoryID memId, StartAddressSize address);
 
 	/**
 	 * Check if the provided memory ID is valid
@@ -113,7 +114,7 @@ private:
 	 * Validate the data according to checksum calculation
 	 *
 	 */
-	static bool dataValidator(const uint8_t* data, uint16_t checksum, uint16_t length);
+	static bool dataValidator(const uint8_t* data, ChecksumSize checksum, LengthSize length);
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

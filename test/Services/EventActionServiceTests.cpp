@@ -1,4 +1,5 @@
 #include <Message.hpp>
+#include <Helpers/TypedefDefinitions.hpp>
 #include <ServicePool.hpp>
 #include <Services/EventActionService.hpp>
 #include <catch2/catch_all.hpp>
@@ -13,8 +14,8 @@ EventActionService& eventActionService = Services.eventAction;
 void initializeEventActionDefinitions() {
 	Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 	uint8_t numberOfEventActionDefinitions = 9;
-	uint16_t applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
-	uint16_t eventDefinitionIDs[] = {0, 4, 2, 12, 1, 5, 8, 23, 3};
+	ApplicationIdSize2 applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
+	EventDefinitionIdSize eventDefinitionIDs[] = {0, 4, 2, 12, 1, 5, 8, 23, 3};
 	String<ECSSTCRequestStringSize> data[] = {"\0", "1", "\0", "3", "4", "5", "6", "7", "8"};
 	addDefinitions.appendUint8(numberOfEventActionDefinitions);
 	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
@@ -139,9 +140,9 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		Message message(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		String<ECSSTCRequestStringSize> data = "123";
 		message.appendFixedString(data);
-		uint16_t applicationID = 257;
+		ApplicationIdSize2 applicationID = 257;
 
-		for (uint16_t eventDefinitionID = 0; eventDefinitionID < 100; ++eventDefinitionID) {
+		for (EventDefinitionIdSize eventDefinitionID = 0; eventDefinitionID < 100; ++eventDefinitionID) {
 			EventActionService::EventActionDefinition temp(--applicationID, eventDefinitionID, message);
 			eventActionService.eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 			message.resetRead();

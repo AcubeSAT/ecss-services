@@ -9,9 +9,9 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 		return;
 	}
 
-	uint16_t numberOfPMONDefinitions = message.readUint16();
-	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
-		uint16_t currentId = message.readEnum16();
+	NumOfPMONDefSize numberOfPMONDefinitions = message.readUint16();
+	for (NumOfPMONDefSize i = 0; i < numberOfPMONDefinitions; i++) {
+		PMONIdSize currentId = message.readEnum16();
 		auto definition = parameterMonitoringList.find(currentId);
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
@@ -28,9 +28,9 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 		return;
 	}
 
-	uint16_t numberOfPMONDefinitions = message.readUint16();
-	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
-		uint16_t currentId = message.readEnum16();
+	NumOfPMONDefSize numberOfPMONDefinitions = message.readUint16();
+	for (NumOfPMONDefSize i = 0; i < numberOfPMONDefinitions; i++) {
+		PMONIdSize currentId = message.readEnum16();
 		auto definition = parameterMonitoringList.find(currentId);
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(

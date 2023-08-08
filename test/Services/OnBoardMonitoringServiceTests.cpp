@@ -41,9 +41,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
-		uint16_t numberOfIds = 3;
+		PMONIdSize numberOfIds = 3;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
+		etl::array<PMONIdSize, 3> PMONIds = {0, 1, 2};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
@@ -67,9 +67,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
-		uint16_t numberOfIds = 4;
+		PMONIdSize numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 10, 1};
+		etl::array<PMONIdSize, 4> PMONIds = {0, 10, 1};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
@@ -93,9 +93,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
-		uint16_t numberOfIds = 3;
+		PMONIdSize numberOfIds = 3;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 3> PMONIds = {0, 1, 2};
+		etl::array<PMONIdSize, 3> PMONIds = {0, 1, 2};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
@@ -120,9 +120,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
-		uint16_t numberOfIds = 4;
+		PMONIdSize numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 10, 1, 2};
+		etl::array<PMONIdSize, 4> PMONIds = {0, 10, 1, 2};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);

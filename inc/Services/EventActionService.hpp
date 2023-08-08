@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
+#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 #include "Services/EventReportService.hpp"
 #include "etl/String.hpp"
@@ -25,7 +26,7 @@ private:
 	bool eventActionFunctionStatus = false;
 
 public:
-	inline static const uint8_t ServiceType = 19;
+	inline static const ServiceTypeSize ServiceType = 19;
 
 	enum MessageType : uint8_t {
 		AddEventAction = 1,
@@ -40,13 +41,13 @@ public:
 	};
 
 	struct EventActionDefinition {
-		uint16_t applicationID = 0;
-		inline static const uint16_t MaxDefinitionID = 65535;
-		uint16_t eventDefinitionID = MaxDefinitionID;
+		ApplicationIdSize2 applicationID = 0;
+		inline static const ApplicationIdSize2 MaxDefinitionID = 65535;
+		EventDefinitionIdSize eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
-		EventActionDefinition(uint16_t applicationID, uint16_t eventDefinitionID, Message& message);
+		EventActionDefinition(ApplicationIdSize2 applicationID, EventDefinitionIdSize eventDefinitionID, Message& message);
 	};
 
 	friend EventReportService;
@@ -122,7 +123,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction(uint16_t eventDefinitionID);
+	void executeAction(EventDefinitionIdSize eventDefinitionID);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

@@ -10,10 +10,10 @@ HousekeepingService& housekeepingService = Services.housekeeping;
 /**
  * Helper function that forms the message that's going to be sent as request to create a new housekeeping structure.
  */
-void buildRequest(Message& request, uint8_t idToCreate) {
+void buildRequest(Message& request, StructureIdSize idToCreate) {
 	uint32_t interval = 7;
-	uint16_t numOfSimplyCommutatedParams = 3;
-	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+	ParameterIdSize numOfSimplyCommutatedParams = 3;
+	etl::vector<ParameterIdSize, 3> simplyCommutatedIds = {8, 4, 5};
 
 	request.appendUint8(idToCreate);
 	request.appendUint32(interval);
@@ -33,9 +33,9 @@ void HousekeepingService::initializeHousekeepingStructures() {
  * Initializes 3 housekeeping structures with IDs = {0, 4, 6}
  */
 void initializeHousekeepingStructures() {
-	uint8_t ids[3] = {0, 4, 6};
+	StructureIdSize ids[3] = {0, 4, 6};
 	uint32_t interval = 7;
-	etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+	etl::vector<ParameterIdSize, 3> simplyCommutatedIds = {8, 4, 5};
 
 	HousekeepingStructure structures[3];
 	int i = 0;
@@ -43,7 +43,7 @@ void initializeHousekeepingStructures() {
 		newStructure.structureId = ids[i];
 		newStructure.collectionInterval = interval;
 		newStructure.periodicGenerationActionStatus = false;
-		for (uint16_t parameterId: simplyCommutatedIds) {
+		for (ParameterIdSize parameterId: simplyCommutatedIds) {
 			newStructure.simplyCommutatedParameterIds.push_back(parameterId);
 		}
 		housekeepingService.housekeepingStructures.insert({ids[i], newStructure});
@@ -59,7 +59,7 @@ void initializeHousekeepingStructures() {
 /**
  * Helper function that stores samples into simply commutated parameters of different data type each.
  */
-void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
+void storeSamplesToParameters(ParameterIdSize id1, ParameterIdSize id2, ParameterIdSize id3) {
 	static_cast<Parameter<uint16_t>&>(Services.parameterManagement.getParameter(id1)->get()).setValue(33);
 	static_cast<Parameter<uint8_t>&>(Services.parameterManagement.getParameter(id2)->get()).setValue(77);
 	static_cast<Parameter<uint32_t>&>(Services.parameterManagement.getParameter(id3)->get()).setValue(99);
@@ -68,9 +68,9 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 /**
  * Helper function that forms the request to append new parameters to a housekeeping structure
  */
-void appendNewParameters(Message& request, uint8_t idToAppend) {
-	uint16_t numOfSimplyCommutatedParams = 7;
-	etl::vector<uint16_t, 7> simplyCommutatedIds = {8, 4, 5, 9, 11, 10, 220};
+void appendNewParameters(Message& request, StructureIdSize idToAppend) {
+	ParameterIdSize numOfSimplyCommutatedParams = 7;
+	etl::vector<ParameterIdSize, 7> simplyCommutatedIds = {8, 4, 5, 9, 11, 10, 220};
 
 	request.appendUint8(idToAppend);
 	request.appendUint16(numOfSimplyCommutatedParams);
@@ -83,10 +83,10 @@ TEST_CASE("Create housekeeping structure") {
 	SECTION("Valid structure creation request") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t idToCreate = 2;
+		StructureIdSize idToCreate = 2;
 		uint32_t interval = 7;
-		uint16_t numOfSimplyCommutatedParams = 3;
-		etl::array<uint16_t, 3> simplyCommutatedIds = {4, 5, 8};
+		ParameterIdSize numOfSimplyCommutatedParams = 3;
+		etl::array<ParameterIdSize, 3> simplyCommutatedIds = {4, 5, 8};
 
 		request.appendUint8(idToCreate);
 		request.appendUint32(interval);
@@ -112,12 +112,12 @@ TEST_CASE("Create housekeeping structure") {
 	SECTION("Invalid structure creation request") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t structureId = 9;
+		StructureIdSize structureId = 9;
 		HousekeepingStructure structure1;
 		structure1.structureId = structureId;
 		housekeepingService.housekeepingStructures.insert({structureId, structure1});
 
-		uint8_t idToCreate = 9;
+		StructureIdSize idToCreate = 9;
 		request.appendUint8(idToCreate);
 
 		MessageParser::execute(request);
@@ -136,9 +136,9 @@ TEST_CASE("Create housekeeping structure") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
 
-		uint8_t idsToCreate[16] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-		uint16_t numOfSimplyCommutatedParams = 3;
-		etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+		StructureIdSize idsToCreate[16] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+		ParameterIdSize numOfSimplyCommutatedParams = 3;
+		etl::vector<ParameterIdSize, 3> simplyCommutatedIds = {8, 4, 5};
 		uint32_t interval = 12;
 
 		REQUIRE(housekeepingService.housekeepingStructures.size() == 0);
@@ -165,10 +165,10 @@ TEST_CASE("Create housekeeping structure") {
 	SECTION("Same simply commutated parameter twice in the request") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t idToCreate = 2;
+		StructureIdSize idToCreate = 2;
 		uint32_t interval = 7;
-		uint16_t numOfSimplyCommutatedParams = 9;
-		etl::vector<uint16_t, 9> simplyCommutatedIds = {8, 4, 5, 4, 8, 8, 5, 4, 11};
+		ParameterIdSize numOfSimplyCommutatedParams = 9;
+		etl::vector<ParameterIdSize, 9> simplyCommutatedIds = {8, 4, 5, 4, 8, 8, 5, 4, 11};
 
 		request.appendUint8(idToCreate);
 		request.appendUint32(interval);
@@ -184,7 +184,7 @@ TEST_CASE("Create housekeeping structure") {
 		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
 
 		REQUIRE(newStruct.simplyCommutatedParameterIds.size() == 4);
-		uint16_t existingParameterIds[4] = {8, 4, 5, 11};
+		ParameterIdSize existingParameterIds[4] = {8, 4, 5, 11};
 		for (auto parameterId: newStruct.simplyCommutatedParameterIds) {
 			CHECK(std::find(std::begin(existingParameterIds), std::end(existingParameterIds), parameterId) !=
 			      std::end(existingParameterIds));
@@ -208,8 +208,8 @@ TEST_CASE("Delete housekeeping structure") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::DeleteHousekeepingReportStructure, Message::TC, 1);
 
-		uint8_t numOfStructs = 5;
-		uint8_t ids[5] = {2, 3, 4, 7, 8};
+		StructureIdSize numOfStructs = 5;
+		StructureIdSize ids[5] = {2, 3, 4, 7, 8};
 		request.appendUint8(numOfStructs);
 		for (auto& id: ids) {
 			request.appendUint8(id);
@@ -234,7 +234,7 @@ TEST_CASE("Delete housekeeping structure") {
 		housekeepingService.housekeepingStructures.insert({4, periodicStruct});
 
 		uint8_t numOfStructs = 1;
-		uint8_t structureId = 4;
+		StructureIdSize structureId = 4;
 		request.appendUint8(numOfStructs);
 		request.appendUint8(structureId);
 
@@ -254,7 +254,7 @@ TEST_CASE("Enable the periodic generation of housekeeping structures") {
 		initializeHousekeepingStructures();
 		Message request2(HousekeepingService::ServiceType, HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport, Message::TC, 1);
 		uint8_t numOfStructs = 5;
-		uint8_t idsToEnable[5] = {1, 3, 4, 6, 7};
+		StructureIdSize idsToEnable[5] = {1, 3, 4, 6, 7};
 		request2.appendUint8(numOfStructs);
 		for (auto& id: idsToEnable) {
 			request2.appendUint8(id);
@@ -282,7 +282,7 @@ TEST_CASE("Disable the periodic generation of housekeeping structures") {
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport, Message::TC, 1);
 		uint8_t numOfStructs = 4;
-		uint8_t idsToDisable[4] = {0, 1, 4, 6};
+		StructureIdSize idsToDisable[4] = {0, 1, 4, 6};
 		request2.appendUint8(numOfStructs);
 		for (auto& id: idsToDisable) {
 			request2.appendUint8(id);
@@ -311,7 +311,7 @@ TEST_CASE("Reporting of housekeeping structures") {
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::ReportHousekeepingStructures, Message::TC, 1);
 		uint8_t numOfStructs = 3;
-		uint8_t idsToReport[3] = {9, 4, 2};
+		StructureIdSize idsToReport[3] = {9, 4, 2};
 		request2.appendUint8(numOfStructs);
 		for (auto& id: idsToReport) {
 			request2.appendUint8(id);
@@ -324,7 +324,7 @@ TEST_CASE("Reporting of housekeeping structures") {
 
 		Message report = ServiceTests::get(1); // Both 0 and 2 are the error messages because only id=4 was valid.
 
-		uint8_t validId = 4;
+		StructureIdSize validId = 4;
 		CHECK(report.readUint8() == validId);
 		CHECK(not report.readBoolean()); // periodic status
 		CHECK(report.readUint32() == 7); // interval
@@ -341,7 +341,7 @@ TEST_CASE("Reporting of housekeeping structures") {
 TEST_CASE("Reporting of housekeeping structures without a TC message as argument") {
 	SECTION("Check the report message generated by the non-TC function") {
 		initializeHousekeepingStructures();
-		uint8_t structureId = 4;
+		StructureIdSize structureId = 4;
 
 		housekeepingService.housekeepingStructureReport(structureId);
 		CHECK(ServiceTests::count() == 1);
@@ -365,7 +365,7 @@ TEST_CASE("Reporting of housekeeping parameters") {
 	SECTION("Valid structure request") {
 		storeSamplesToParameters(8, 4, 5);
 		initializeHousekeepingStructures();
-		uint8_t structId = 6;
+		StructureIdSize structId = 6;
 
 		housekeepingService.housekeepingParametersReport(structId);
 
@@ -382,7 +382,7 @@ TEST_CASE("Reporting of housekeeping parameters") {
 	}
 
 	SECTION("Invalid structure request") {
-		uint8_t structId = 8;
+		StructureIdSize structId = 8;
 		housekeepingService.housekeepingParametersReport(structId);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::NonExistentHousekeeping) == 1);
@@ -401,7 +401,7 @@ TEST_CASE("Reporting of housekeeping parameters without a TC request") {
 	SECTION("Check the report message generated by the non-TC function") {
 		storeSamplesToParameters(8, 4, 5);
 		initializeHousekeepingStructures();
-		uint8_t structureId = 6;
+		StructureIdSize structureId = 6;
 
 		housekeepingService.housekeepingParametersReport(structureId);
 		CHECK(ServiceTests::count() == 1);
@@ -425,7 +425,7 @@ TEST_CASE("One-shot housekeeping parameter report generation") {
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::GenerateOneShotHousekeepingReport, Message::TC, 1);
 		uint8_t numOfStructs = 5;
-		uint8_t structIds[5] = {0, 4, 7, 8, 11};
+		StructureIdSize structIds[5] = {0, 4, 7, 8, 11};
 		request2.appendUint8(numOfStructs);
 		for (auto& id: structIds) {
 			request2.appendUint8(id);
@@ -461,7 +461,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		initializeHousekeepingStructures();
 		Message request1(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
-		uint8_t structId = 2;
+		StructureIdSize structId = 2;
 		request1.appendUint8(structId);
 		MessageParser::execute(request1);
 		CHECK(ServiceTests::count() == 1);
@@ -488,7 +488,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		REQUIRE(housekeepingService.housekeepingStructures.at(0).periodicGenerationActionStatus);
 		Message request2(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
-		uint8_t structId = 0;
+		StructureIdSize structId = 0;
 		request2.appendUint8(structId);
 		MessageParser::execute(request2);
 
@@ -504,7 +504,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		initializeHousekeepingStructures();
 		Message request3(HousekeepingService::ServiceType,
 		                 HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
-		uint8_t structId = 6;
+		StructureIdSize structId = 6;
 		appendNewParameters(request3, structId);
 		REQUIRE(housekeepingService.housekeepingStructures[structId].simplyCommutatedParameterIds.size() == 3);
 
@@ -513,7 +513,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter) == 1);
 
-		uint16_t currentlyExistingParameters[] = {8, 4, 5, 9, 10, 11};
+		ParameterIdSize currentlyExistingParameters[] = {8, 4, 5, 9, 10, 11};
 		HousekeepingStructure structToCheck = housekeepingService.housekeepingStructures[structId];
 		REQUIRE(structToCheck.simplyCommutatedParameterIds.size() == 6);
 		for (auto& existingParameter: currentlyExistingParameters) {
@@ -527,14 +527,14 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 
 	SECTION("Exceeding the maximum number of simply commutated parameters for the specified structure") {
 		initializeHousekeepingStructures();
-		uint8_t structId = 6;
+		StructureIdSize structId = 6;
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
 
-		uint16_t numOfSimplyCommutatedParams = 34;
+		ParameterIdSize numOfSimplyCommutatedParams = 34;
 
-		etl::vector<uint16_t, 34> simplyCommutatedIds;
-		for (uint16_t i = 0; i < 34; i++) {
+		etl::vector<ParameterIdSize, 34> simplyCommutatedIds;
+		for (ParameterIdSize i = 0; i < 34; i++) {
 			simplyCommutatedIds.push_back(i);
 		}
 
@@ -565,8 +565,8 @@ TEST_CASE("Modification of housekeeping structures' interval") {
 		initializeHousekeepingStructures();
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::ModifyCollectionIntervalOfStructures, Message::TC, 1);
-		uint8_t numOfStructs = 4;
-		uint8_t structIds[4] = {0, 4, 9, 10};
+		StructureIdSize numOfStructs = 4;
+		StructureIdSize structIds[4] = {0, 4, 9, 10};
 		uint32_t intervals[4] = {12, 21, 32, 17};
 		request.appendUint8(numOfStructs);
 		int i = 0;
@@ -593,7 +593,7 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TC, 1);
 		uint8_t numOfStructs = 6;
-		uint8_t structIds[6] = {0, 4, 1, 6, 9, 10};
+		StructureIdSize structIds[6] = {0, 4, 1, 6, 9, 10};
 		request.appendUint8(numOfStructs);
 		for (auto& id: structIds) {
 			request.appendUint8(id);
@@ -722,10 +722,10 @@ TEST_CASE("Check getStruct function") {
 	SECTION("Returns periodic generation status") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t idToCreate = 2;
+		StructureIdSize idToCreate = 2;
 		uint32_t interval = 7;
-		uint16_t numOfSimplyCommutatedParams = 3;
-		etl::array<uint16_t, 3> simplyCommutatedIds = {4, 5, 8};
+		ParameterIdSize numOfSimplyCommutatedParams = 3;
+		etl::array<ParameterIdSize, 3> simplyCommutatedIds = {4, 5, 8};
 
 		request.appendUint8(idToCreate);
 		request.appendUint32(interval);
@@ -884,10 +884,10 @@ TEST_CASE("Check hasNonExistingStructInternalError function") {
 TEST_CASE("Check hasAlreadyExistingParameterError function") {
 	SECTION("Check if it returns correct boolean") {
 		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t idToCreate = 2;
+		StructureIdSize idToCreate = 2;
 		uint32_t interval = 7;
-		uint16_t numOfSimplyCommutatedParams = 3;
-		etl::array<uint16_t, 3> simplyCommutatedIds = {4, 5, 8};
+		ParameterIdSize numOfSimplyCommutatedParams = 3;
+		etl::array<ParameterIdSize, 3> simplyCommutatedIds = {4, 5, 8};
 
 		request.appendUint8(idToCreate);
 		request.appendUint32(interval);
@@ -929,9 +929,9 @@ TEST_CASE("Check hasAlreadyExistingStructError function") {
 TEST_CASE("Check hasExceededMaxNumOfHousekeepingStructsError function") {
 	SECTION("Check if it returns correct boolean") {
 		Message request(HousekeepingService::ServiceType, HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
-		uint8_t idsToCreate[11] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14};
-		uint16_t numOfSimplyCommutatedParams = 3;
-		etl::vector<uint16_t, 3> simplyCommutatedIds = {8, 4, 5};
+		StructureIdSize idsToCreate[11] = {1, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14};
+		ParameterIdSize numOfSimplyCommutatedParams = 3;
+		etl::vector<ParameterIdSize, 3> simplyCommutatedIds = {8, 4, 5};
 		uint32_t interval = 12;
 
 		REQUIRE(housekeepingService.housekeepingStructures.size() == 0);
@@ -975,7 +975,7 @@ TEST_CASE("Check hasRequestedAppendToEnabledHousekeepingError function") {
 
 		REQUIRE(housekeepingService.housekeepingStructures.at(0).periodicGenerationActionStatus);
 		Message request2(HousekeepingService::ServiceType, HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
-		uint8_t structId = 0;
+		StructureIdSize structId = 0;
 		request2.appendUint8(structId);
 		MessageParser::execute(request2);
 
@@ -1000,7 +1000,7 @@ TEST_CASE("Check hasRequestedAppendToEnabledHousekeepingError function") {
 
 		REQUIRE(housekeepingService.housekeepingStructures.at(0).periodicGenerationActionStatus);
 		Message request2(HousekeepingService::ServiceType, HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
-		uint8_t structId = 0;
+		StructureIdSize structId = 0;
 		request2.appendUint8(structId);
 		MessageParser::execute(request2);
 
@@ -1021,7 +1021,7 @@ TEST_CASE("Check hasRequestedDeletionOfEnabledHousekeepingError function") {
 		housekeepingService.housekeepingStructures.insert({4, periodicStruct});
 
 		uint8_t numOfStructs = 1;
-		uint8_t structureId = 4;
+		StructureIdSize structureId = 4;
 		request.appendUint8(numOfStructs);
 		request.appendUint8(structureId);
 
@@ -1042,7 +1042,7 @@ TEST_CASE("Check hasRequestedDeletionOfEnabledHousekeepingError function") {
 		housekeepingService.housekeepingStructures.insert({4, periodicStruct});
 
 		uint8_t numOfStructs = 1;
-		uint8_t structureId = 4;
+		StructureIdSize structureId = 4;
 		request.appendUint8(numOfStructs);
 		request.appendUint8(structureId);
 
@@ -1059,14 +1059,14 @@ TEST_CASE("Check hasRequestedDeletionOfEnabledHousekeepingError function") {
 TEST_CASE("Check hasExceededMaxNumOfSimplyCommutatedParamsError function") {
 	SECTION("Check if it returns correct boolean") {
 		initializeHousekeepingStructures();
-		uint8_t structId = 6;
+		StructureIdSize structId = 6;
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::AppendParametersToHousekeepingStructure, Message::TC, 1);
 
-		uint16_t numOfSimplyCommutatedParams = 34;
+		ParameterIdSize numOfSimplyCommutatedParams = 34;
 
-		etl::vector<uint16_t, 34> simplyCommutatedIds;
-		for (uint16_t i = 0; i < 34; i++) {
+		etl::vector<ParameterIdSize, 34> simplyCommutatedIds;
+		for (ParameterIdSize i = 0; i < 34; i++) {
 			simplyCommutatedIds.push_back(i);
 		}
 

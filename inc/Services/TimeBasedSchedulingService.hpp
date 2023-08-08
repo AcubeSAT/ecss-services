@@ -3,6 +3,7 @@
 
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "MessageParser.hpp"
 #include "Service.hpp"
 #include "etl/list.h"
@@ -61,7 +62,7 @@ private:
 	 * sequence count and the source ID, all defined in the ECSS standard.
 	 */
 	struct RequestID {
-		uint16_t applicationID = 0; ///< Application process ID
+		ApplicationIdSize2 applicationID = 0; ///< Application process ID
 		uint16_t sequenceCount = 0; ///< Packet sequence count
 		uint8_t sourceID = 0;       ///< Packet source ID
 

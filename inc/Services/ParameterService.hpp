@@ -5,6 +5,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
+#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
 
@@ -68,7 +69,7 @@ public:
 	 * @param parameterId the given ID
 	 * @return True if there is a reference to a parameter with the given ID, False otherwise
 	 */
-	bool parameterExists(uint16_t parameterId) const {
+	bool parameterExists(ParameterIdSize parameterId) const {
 		return parameters.find(parameterId) != parameters.end();
 	}
 
@@ -78,7 +79,7 @@ public:
 	 *
 	 * @param parameterId the id of the parameter, whose reference is to be returned.
 	 */
-	std::optional<std::reference_wrapper<ParameterBase>> getParameter(uint16_t parameterId) const {
+	std::optional<std::reference_wrapper<ParameterBase>> getParameter(ParameterIdSize parameterId) const {
 		auto parameter = parameters.find(parameterId);
 
 		if (parameter != parameters.end()) {
