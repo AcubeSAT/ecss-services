@@ -201,8 +201,10 @@ void ParameterStatisticsService::execute(Message& message) {
 			break;
 		case ResetParameterStatistics:
 			resetParameterStatistics(message);
+			TimeGetter::getCurrentTimeDefaultCUC();
 			break;
 		case EnablePeriodicParameterReporting:
+			TimeGetter::getCurrentTimeDefaultCUC();
 			enablePeriodicStatisticsReporting(message);
 			break;
 		case DisablePeriodicParameterReporting:
@@ -215,6 +217,7 @@ void ParameterStatisticsService::execute(Message& message) {
 			deleteStatisticsDefinitions(message);
 			break;
 		case ReportParameterStatisticsDefinitions:
+			TimeGetter::getCurrentTimeDefaultCUC();
 			reportStatisticsDefinitions(message);
 			break;
 		default:
