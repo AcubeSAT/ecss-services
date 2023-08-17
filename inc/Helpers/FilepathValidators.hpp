@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <etl/algorithm.h>
 #include <etl/optional.h>
 #include "Helpers/Filesystem.hpp"
 #include "ECSS_Definitions.hpp"
@@ -8,22 +9,6 @@
 #include "etl/String.hpp"
 
 namespace FilepathValidators {
-	/**
-	 * Whether there is a wildcard in the path
-	 */
-	enum class WildcardStatus : bool {
-		Found = true,
-		NotFound = false
-	};
-
-	/**
-	 * Whether there is a string terminator found in the path
-	 */
-	enum class StringTerminatorStatus : bool {
-		Found = true,
-		NotFound = false
-	};
-
 	/**
      * If a wildcard is encountered, then it returns its position in the string (starting from 0).
      * @param path : The path passed as a String.
@@ -48,7 +33,7 @@ namespace FilepathValidators {
      *  stringTerminatorFound: Successful completion,
      *  stringTerminatorNotFound: Error occurred
      */
-	etl::optional<Filesystem::Path> getStringUntilZeroTerminator(Message& message) {
+	etl::optional<Filesystem::Path> getStringUntilTerminator(Message& message) {
 		uint8_t charCounter = 0;
 		Filesystem::Path extractedString = "";
 		char currentChar = static_cast<char>(message.readByte());
@@ -79,8 +64,10 @@ namespace FilepathValidators {
      * @param fileNameString : String with the file name
      * @return -
      */
-	void checkForSlashesAndCompensate(Filesystem::Path& objectPathString, uint8_t*& fileNameChar) {
-
+	void checkForSlashesAndCompensate(Filesystem::Path& objectPathString, uint8_t*& fileNameChar, Filesystem::Path& fullPath) {
+		while (fullPath.find("//") != Filesystem::Path::npos) {
+			fullPath.replace("//", '/');
+		}
 		char lastPathCharacter = objectPathString.back();
 		char firstFileCharacter = *fileNameChar;
 
