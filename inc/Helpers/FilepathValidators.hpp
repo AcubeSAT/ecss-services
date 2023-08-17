@@ -65,9 +65,6 @@ namespace FilepathValidators {
      * @return -
      */
 	void checkForSlashesAndCompensate(Filesystem::Path& objectPathString, uint8_t*& fileNameChar, Filesystem::Path& fullPath) {
-		while (fullPath.find("//") != Filesystem::Path::npos) {
-			fullPath.replace("//", '/');
-		}
 		char lastPathCharacter = objectPathString.back();
 		char firstFileCharacter = *fileNameChar;
 
