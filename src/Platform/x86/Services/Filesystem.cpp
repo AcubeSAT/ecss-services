@@ -80,11 +80,20 @@ void Filesystem::unlockFile(const Path& path) {
 	fs::status(path.data()).permissions(newPermissions);
 }
 
-Filesystem::Attributes Filesystem::getFileAttributes(const Path& path) {
+etl::optional<Filesystem::Attributes> Filesystem::getFileAttributes(const Path& path) {
 	Filesystem::Attributes attributes{};
 
+	auto nodeType = getNodeType(path);
+	if (not nodeType.has_value()) {
+		return etl::nullopt;
+	}
+
+	if (nodeType.value() != NodeType::File) {
+		return etl::nullopt;
+	}
+
 	attributes.sizeInBytes = fs::file_size(path.data());
-	attributes.is_locked = getFileLockStatus(path) == Filesystem::FileLockStatus::Locked;
+	attributes.isLocked = getFileLockStatus(path) == Filesystem::FileLockStatus::Locked;
 
 	return attributes;
 }

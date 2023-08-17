@@ -53,7 +53,7 @@ namespace Filesystem {
 
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
 
-	Attributes getFileAttributes(const Path& path);
+	etl::optional<Attributes> getFileAttributes(const Path& path);
 
 	etl::optional<NodeType> getNodeType(const Path& path);
 
