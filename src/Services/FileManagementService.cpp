@@ -152,7 +152,7 @@ void FileManagementService::reportAttributes(Message& message) {
 	}
 	repositoryPath = repositoryPathIsValid.value();
 
-	auto fileNameIsValid = getStringUntilZeroTerminator(message);
+	String<ECSSMaxStringSize> fileName("");
 	auto fileNameIsValid = getStringUntilTerminator(message);
 	if (not fileNameIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
@@ -160,46 +160,22 @@ void FileManagementService::reportAttributes(Message& message) {
 	}
 	fileName = fileNameIsValid.value();
 
-	if (findWildcardPosition(repositoryPath)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-		return;
-	}
-	if (findWildcardPosition(fileName)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-		return;
-	}
 	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
 
-	//	lfs_info infoStruct;
-	//
-	//	switch (littleFsReportFile(repositoryPath, fileName, &infoStruct)) {
-	//
-	//		case (OBJECT_TYPE_IS_INVALID):
-	//
-	//			ErrorHandler::reportError(message,
-	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-	//			break;
-	//
-	//		case (LFS_TYPE_REG):
-	//
-	//			fileAttributeReport(repositoryPath, fileName, infoStruct.size);
-	//			break;
-	//
-	//		case (LFS_TYPE_DIR):
-	//
-	//			ErrorHandler::reportError(message,
-	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-	//			break;
-	//
-	//		default:
-	//
-	//			ErrorHandler::reportError(message,
-	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
-	//			break;
-	//	}
+	auto fullPath = repositoryPath;
+	fullPath.append(fileName);
+
+	if (findWildcardPosition(fullPath).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+	auto fileAttributeResult = Filesystem::getFileAttributes(fullPath);
+	if (fileAttributeResult.has_value()) {
+		fileAttributeReport(repositoryPath, fileName, fileAttributeResult.value());
+	}
 }
 
 void FileManagementService::fileAttributeReport(const String<ECSSMaxStringSize>& repositoryPath,
