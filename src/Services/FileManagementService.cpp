@@ -10,7 +10,6 @@ void FileManagementService::createFile(Message& message) {
 	message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile);
 
 	Filesystem::Path repositoryPath("");
-	Filesystem::Path fileName("");
 
 	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
 	if (not repositoryPathIsValid) {
@@ -18,25 +17,6 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 	repositoryPath = repositoryPathIsValid.value();
-
-	auto fileNameIsValid = getStringUntilZeroTerminator(message);
-	if (not fileNameIsValid) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-	fileName = fileNameIsValid.value();
-
-	uint32_t maxFileSizeBytes = message.readUint32();
-
-	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
-		return;
-	}
-
-	if (findWildcardPosition(repositoryPath).has_value()) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-		return;
-	}
 
 	auto repositoryType = Filesystem::getNodeType(repositoryPath);
 	if (not repositoryType) {
@@ -50,12 +30,38 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
+	Filesystem::Path fileName("");
+	auto fileNameIsValid = getStringUntilTerminator(message);
+	if (not fileNameIsValid) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+		return;
+	}
+	fileName = fileNameIsValid.value();
+
+	uint32_t maxFileSizeBytes = message.readUint32();
+
+	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
+		return;
+	}
+
+	bool isFileLocked = message.readBoolean();
+
+	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+		return;
+	}
 	auto fullPath = repositoryPath;
 	fullPath.append(fileName);
 
-	etl::optional<Filesystem::FileCreationError> fileCreationStatus = Filesystem::createFile(fullPath);
-	if (fileCreationStatus.has_value()) {
-		switch (fileCreationStatus.value()) {
+	if (findWildcardPosition(fullPath).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	etl::optional<Filesystem::FileCreationError> fileCreationError = Filesystem::createFile(fullPath);
+	if (fileCreationError.has_value()) {
+		switch (fileCreationError.value()) {
 			case Filesystem::FileCreationError::FileAlreadyExists: {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
@@ -78,7 +84,6 @@ void FileManagementService::deleteFile(Message& message) {
 	                 FileManagementService::MessageType::DeleteFile);
 
 	Filesystem::Path repositoryPath("");
-	Filesystem::Path fileName("");
 
 	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
 	if (not repositoryPathIsValid) {
@@ -87,49 +92,49 @@ void FileManagementService::deleteFile(Message& message) {
 	}
 	repositoryPath = repositoryPathIsValid.value();
 
-	auto fileNameIsValid = getStringUntilZeroTerminator(message);
+	if (findWildcardPosition(repositoryPath).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	Filesystem::Path fileName("");
+	auto fileNameIsValid = getStringUntilTerminator(message);
 	if (not fileNameIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
 	fileName = fileNameIsValid.value();
 
-	//	switch (pathIsValidForDeletion(repositoryPath, fileName)) {
-	//		case LFS_TYPE_REG: {
-	//			if (littleFsDeleteFile(&onBoardFileSystemObject, repositoryPath, fileName) >= LFS_ERR_OK) {
-	//				return;
-	//			} else {
-	//				ErrorHandler::reportError(message,
-	//				                          ErrorHandler::ExecutionCompletionErrorType::LittleFsRemoveFailed);
-	//				return;
-	//			}
-	//			break;
-	//		}
-	//
-	//		case LFS_TYPE_DIR:
-	//			ErrorHandler::reportError(message,
-	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-	//			break;
-	//
-	//		case (WILDCARD_FOUND):
-	//			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-	//			break;
-	//
-	//		case (OBJECT_PATH_LARGER_THAN_ECSS_MAX_STRING_SIZE):
-	//			ErrorHandler::reportError(message,
-	//			                          ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-	//			break;
-	//
-	//		case (OBJECT_TYPE_IS_INVALID):
-	//			ErrorHandler::reportError(message,
-	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
-	//			break;
-	//
-	//		default:
-	//			ErrorHandler::reportError(message,
-	//			                          ErrorHandler::ExecutionCompletionErrorType::LittleFsStatFailed);
-	//			break;
-	//	}
+	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
+		return;
+	}
+	auto fullPath = repositoryPath;
+	fullPath.append(fileName);
+
+	if (findWildcardPosition(fullPath).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	auto fileDeletionError = Filesystem::deleteFile(fullPath);
+	if (fileDeletionError.has_value()) {
+		using Filesystem::FileDeletionError;
+		switch (fileDeletionError.value()) {
+			case FileDeletionError::FileDoesNotExist:
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnMissingFile);
+				break;
+			case FileDeletionError::PathLeadsToDirectory:
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnDirectory);
+				break;
+			case FileDeletionError::FileIsLocked:
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnLockedFile);
+				break;
+			case FileDeletionError::UnknownError:
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownFileDeleteError);
+				break;
+		}
+	}
 }
 
 void FileManagementService::reportAttributes(Message& message) {
