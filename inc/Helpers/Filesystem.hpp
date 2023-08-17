@@ -9,7 +9,7 @@ namespace Filesystem {
 
 	struct Attributes {
 		size_t sizeInBytes;
-		bool is_locked;
+		bool isLocked;
 	};
 
 	enum class NodeType: uint8_t {
