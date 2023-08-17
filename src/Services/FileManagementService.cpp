@@ -203,13 +203,14 @@ void FileManagementService::reportAttributes(Message& message) {
 
 void FileManagementService::fileAttributeReport(const String<ECSSMaxStringSize>& repositoryPath,
                                                 const String<ECSSMaxStringSize>& fileName,
-                                                uint32_t fileSize) {
+                                                const Filesystem::Attributes& attributes) {
 	Message report = createTM(MessageType::CreateAttributesReport);
 
 	report.appendString(repositoryPath);
 	report.appendUint8('@');
 	report.appendString(fileName);
-	report.appendUint32(fileSize);
+	report.appendUint32(attributes.sizeInBytes);
+	report.appendBoolean(attributes.isLocked);
 
 	storeMessage(report);
 }

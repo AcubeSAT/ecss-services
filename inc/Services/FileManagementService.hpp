@@ -122,7 +122,7 @@ public:
      */
 	void fileAttributeReport(const String<ECSSMaxStringSize>& repositoryString,
 	                         const String<ECSSMaxStringSize>& fileNameString,
-	                         uint32_t fileSize);
+	                         const Filesystem::Attributes& attributes);
 
 	/**
 	 * It is responsible to call the suitable function that executes a tele-command packet. The source of that packet
