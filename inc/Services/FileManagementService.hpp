@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 #define ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 
+#include "Helpers/Filesystem.hpp"
 #include "Service.hpp"
 
 /**
