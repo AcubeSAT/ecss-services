@@ -11,7 +11,7 @@ void FileManagementService::createFile(Message& message) {
 
 	Filesystem::Path repositoryPath("");
 
-	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
+	auto repositoryPathIsValid = getStringUntilTerminator(message);
 	if (not repositoryPathIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
@@ -39,7 +39,6 @@ void FileManagementService::createFile(Message& message) {
 	fileName = fileNameIsValid.value();
 
 	uint32_t maxFileSizeBytes = message.readUint32();
-
 	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
 		return;
@@ -85,7 +84,7 @@ void FileManagementService::deleteFile(Message& message) {
 
 	Filesystem::Path repositoryPath("");
 
-	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
+	auto repositoryPathIsValid = getStringUntilTerminator(message);
 	if (not repositoryPathIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
@@ -143,9 +142,7 @@ void FileManagementService::reportAttributes(Message& message) {
 	message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes);
 
 	String<ECSSMaxStringSize> repositoryPath("");
-	String<ECSSMaxStringSize> fileName("");
-
-	auto repositoryPathIsValid = getStringUntilZeroTerminator(message);
+	auto repositoryPathIsValid = getStringUntilTerminator(message);
 	if (not repositoryPathIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
@@ -153,6 +150,7 @@ void FileManagementService::reportAttributes(Message& message) {
 	repositoryPath = repositoryPathIsValid.value();
 
 	auto fileNameIsValid = getStringUntilZeroTerminator(message);
+	auto fileNameIsValid = getStringUntilTerminator(message);
 	if (not fileNameIsValid) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
