@@ -446,6 +446,10 @@ public:
          * LittleFs lfs_stat function generic error
          */
 		LittleFsStatFailed = 8,
+		AttemptedDeleteOnLockedFile = 9,
+		AttemptedDeleteOnMissingFile = 10,
+		AttemptedDeleteOnDirectory = 11,
+		UnknownFileDeleteError = 12,
 	};
 
 	/**
