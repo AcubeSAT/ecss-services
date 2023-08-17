@@ -72,7 +72,10 @@ void FileManagementService::createFile(Message& message) {
 				break;
 			}
 		}
-		return;
+	}
+
+	if (isFileLocked) {
+		Filesystem::lockFile(fullPath);
 	}
 }
 
