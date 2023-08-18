@@ -10,7 +10,7 @@
  */
 class TestService : public Service {
 public:
-	inline static const uint8_t ServiceType = 17;
+	inline static const ServiceTypeSize ServiceType = 17;
 
 	enum MessageType : uint8_t {
 		AreYouAliveTest = 1,

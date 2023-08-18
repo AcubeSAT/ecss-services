@@ -12,9 +12,9 @@ void ParameterService::reportParameters(Message& paramIds) {
 	}
 	Message parameterReport = createTM(ParameterValuesReport);
 
-	ParameterIdSize numOfIds = paramIds.readUint16();
-	ParameterIdSize numberOfValidIds = 0;
-	for (ParameterIdSize i = 0; i < numOfIds; i++) {
+	uint16_t numOfIds = paramIds.readUint16();
+	uint16_t numberOfValidIds = 0;
+	for (uint16_t i = 0; i < numOfIds; i++) {
 		if (parameterExists(paramIds.readUint16())) {
 			numberOfValidIds++;
 		}
@@ -23,7 +23,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 	paramIds.resetRead();
 
 	numOfIds = paramIds.readUint16();
-	for (ParameterIdSize i = 0; i < numOfIds; i++) {
+	for (uint16_t i = 0; i < numOfIds; i++) {
 		ParameterIdSize currId = paramIds.readUint16();
 		auto parameter = getParameter(currId);
 		if (!parameter) {
@@ -42,9 +42,9 @@ void ParameterService::setParameters(Message& newParamValues) const {
 		return;
 	}
 
-	ParameterIdSize numOfIds = newParamValues.readUint16();
+	uint16_t numOfIds = newParamValues.readUint16();
 
-	for (ParameterIdSize i = 0; i < numOfIds; i++) {
+	for (uint16_t i = 0; i < numOfIds; i++) {
 		ParameterIdSize currId = newParamValues.readUint16();
 		auto parameter = getParameter(currId);
 		if (!parameter) {

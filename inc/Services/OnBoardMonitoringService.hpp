@@ -23,7 +23,7 @@ private:
 	etl::map<uint16_t, std::reference_wrapper<PMONBase>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 public:
-	inline static const uint8_t ServiceType = 12;
+	inline static const ServiceTypeSize ServiceType = 12;
 	enum MessageType : uint8_t {
 		EnableParameterMonitoringDefinitions = 1,
 		DisableParameterMonitoringDefinitions = 2,

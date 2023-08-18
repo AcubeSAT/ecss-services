@@ -41,13 +41,13 @@ public:
 	};
 
 	struct EventActionDefinition {
-		ApplicationIdSize2 applicationID = 0;
-		inline static const ApplicationIdSize2 MaxDefinitionID = 65535;
+		ApplicationIdSize applicationID = 0;
+		inline static const ApplicationIdSize MaxDefinitionID = 65535;
 		EventDefinitionIdSize eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
-		EventActionDefinition(ApplicationIdSize2 applicationID, EventDefinitionIdSize eventDefinitionID, Message& message);
+		EventActionDefinition(ApplicationIdSize applicationID, EventDefinitionIdSize eventDefinitionID, Message& message);
 	};
 
 	friend EventReportService;

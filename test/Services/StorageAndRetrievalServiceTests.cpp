@@ -123,7 +123,7 @@ void padWithZeros(etl::array<String<ECSSPacketStoreIdSize>, 4>& packetStoreIds) 
 	uint8_t offsets[] = {3, 4, 5, 6};
 	int index = 0;
 	// Padding every empty position with zeros, to avoid memory garbage collection, which leads to a faulty result.
-	for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+	for (auto& packetStoreId: packetStoreIds) {
 		uint8_t startingPosition = offsets[index++];
 		for (uint8_t i = startingPosition; i < ECSSPacketStoreIdSize; i++) {
 			packetStoreId[i] = 0;
@@ -132,7 +132,7 @@ void padWithZeros(etl::array<String<ECSSPacketStoreIdSize>, 4>& packetStoreIds) 
 }
 
 void addTelemetryPacketsInPacketStores() {
-	PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+	auto packetStoreIds = validPacketStoreIds();
 
 	for (auto& timestamp: timestamps1) {
 		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[0], timestamp);
@@ -164,7 +164,7 @@ TEST_CASE("Creating packet stores") {
 		CHECK(ServiceTests::count() == 0);
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
 
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		CHECK(storageAndRetrieval.getPacketStore(packetStoreIds[0]).sizeInBytes == 100);
@@ -234,7 +234,7 @@ TEST_CASE("Deleting packet stores") {
 	SECTION("Valid deletion of specified packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -242,7 +242,7 @@ TEST_CASE("Deleting packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -262,7 +262,7 @@ TEST_CASE("Deleting packet stores") {
 	SECTION("Valid deletion of all packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -270,7 +270,7 @@ TEST_CASE("Deleting packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -289,7 +289,7 @@ TEST_CASE("Deleting packet stores") {
 	SECTION("Invalid deletion of specified packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -297,7 +297,7 @@ TEST_CASE("Deleting packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -325,14 +325,14 @@ TEST_CASE("Deleting packet stores") {
 	SECTION("Invalid deletion request of non existing packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = invalidPacketStoreIds();
+		auto packetStoreIds = invalidPacketStoreIds();
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStores, Message::TC, 1);
 		NumOfPacketStoresSize numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -350,7 +350,7 @@ TEST_CASE("Deleting packet stores") {
 	SECTION("Invalid deletion of all packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -358,7 +358,7 @@ TEST_CASE("Deleting packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -385,8 +385,8 @@ TEST_CASE("Deleting packet stores") {
 	SECTION("Both valid and invalid deletion requests") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -394,7 +394,7 @@ TEST_CASE("Deleting packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 8;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -402,7 +402,7 @@ TEST_CASE("Deleting packet stores") {
 			request.appendString(packetStoreId);
 		}
 
-		for (PacketStoreIdSize& packetStoreId: wrongPacketStoreIds) {
+		for (auto& packetStoreId: wrongPacketStoreIds) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -429,7 +429,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 	SECTION("Valid enabling of storage") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -460,7 +460,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 	SECTION("Invalid enabling of storage") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = invalidPacketStoreIds();
+		auto packetStoreIds = invalidPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -484,7 +484,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 
 	SECTION("Enabling the storage of all packet stores") {
 		initializePacketStores();
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
@@ -498,7 +498,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageStatus == true);
 		}
 
@@ -511,7 +511,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 	SECTION("Valid disabling of storage") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -541,7 +541,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 	SECTION("Invalid disabling of storage") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = invalidPacketStoreIds();
+		auto packetStoreIds = invalidPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -565,7 +565,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 
 	SECTION("Enabling the storage of all packet stores") {
 		initializePacketStores();
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
 
@@ -578,7 +578,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageStatus == false);
 		}
 
@@ -591,7 +591,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 	SECTION("Successful change of the start-time-tag") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -602,7 +602,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		request.appendUint32(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
@@ -623,8 +623,8 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 	SECTION("Failed change of the start-time-tag") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -636,14 +636,14 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = correctPacketStoreIds[i];
+			auto packetStoreId = correctPacketStoreIds[i];
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
 			request.appendString(packetStoreId);
 		}
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = wrongPacketStoreIds[i];
+			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -666,7 +666,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 	SECTION("Both successful and failed attempts to change the start-time-tag of all packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -677,7 +677,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		request.appendUint32(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -703,7 +703,7 @@ TEST_CASE("Resuming the open retrieval process") {
 	SECTION("Successful resuming of the open retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -711,7 +711,7 @@ TEST_CASE("Resuming the open retrieval process") {
 
 		NumOfPacketStoresSize numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
@@ -732,8 +732,8 @@ TEST_CASE("Resuming the open retrieval process") {
 	SECTION("Failed resuming of the open retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -743,7 +743,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = correctPacketStoreIds[i];
+			auto packetStoreId = correctPacketStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
@@ -751,7 +751,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).openRetrievalStatus = PacketStore::Suspended;
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = wrongPacketStoreIds[i];
+			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -778,7 +778,7 @@ TEST_CASE("Resuming the open retrieval process") {
 	SECTION("Both successful and failed attempts to resume the open retrieval of all packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -787,7 +787,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		NumOfPacketStoresSize numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -813,7 +813,7 @@ TEST_CASE("Suspending the open retrieval process") {
 	SECTION("Successful suspension of the open retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -821,7 +821,7 @@ TEST_CASE("Suspending the open retrieval process") {
 
 		NumOfPacketStoresSize numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
 			request.appendString(packetStoreId);
 		}
@@ -841,8 +841,8 @@ TEST_CASE("Suspending the open retrieval process") {
 	SECTION("Failed suspension of the open retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -852,14 +852,14 @@ TEST_CASE("Suspending the open retrieval process") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = correctPacketStoreIds[i];
+			auto packetStoreId = correctPacketStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
 			request.appendString(packetStoreId);
 		}
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).openRetrievalStatus = PacketStore::InProgress;
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = wrongPacketStoreIds[i];
+			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -885,7 +885,7 @@ TEST_CASE("Suspending the open retrieval process") {
 	SECTION("Successful attempt to suspend the open retrieval of all packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -894,7 +894,7 @@ TEST_CASE("Suspending the open retrieval process") {
 		NumOfPacketStoresSize numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.packetStoreExists(packetStoreId));
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
 		}
@@ -917,7 +917,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 	SECTION("Successful starting of the by-time-range retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -930,7 +930,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		TimeSize timeTags2[4] = {60, 70, 80, 90};
 
 		int index = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
@@ -961,8 +961,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 	SECTION("Failed starting of the by-time-range retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -972,7 +972,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = correctPacketStoreIds[i];
+			auto packetStoreId = correctPacketStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (i % 2 == 0) ? PacketStore::Suspended : PacketStore::InProgress;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
@@ -986,7 +986,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus = false;
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
-			PacketStoreIdSize packetStoreId = wrongPacketStoreIds[i];
+			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 			TimeSize timeTag1 = 20;
@@ -1018,7 +1018,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 	SECTION("Invalid window requested") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1027,7 +1027,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
@@ -1047,7 +1047,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).byTimeRangeRetrievalStatus == false);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).byTimeRangeRetrievalStatus == false);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).retrievalStartTime == 0);
 		}
 
@@ -1060,7 +1060,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 	SECTION("Successful aborting of the by-time-range retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1069,7 +1069,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 			request.appendString(packetStoreId);
@@ -1090,8 +1090,8 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 	SECTION("Failed aborting of the by-time-range retrieval") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1100,12 +1100,12 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 		}
 
 		for (int i = 0; i < numOfPacketStores; i++) {
-			PacketStoreIdSize packetStoreId = wrongPacketStoreIds[i];
+			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
 		}
@@ -1114,7 +1114,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 
 		CHECK(ServiceTests::count() == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 		}
 
@@ -1125,7 +1125,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 	SECTION("Successful abort of the by-time-range retrieval of all packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1134,7 +1134,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = true;
 		}
 
@@ -1156,7 +1156,7 @@ TEST_CASE("Reporting the status of packet stores") {
 	SECTION("Valid reporting of the packet store status") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
@@ -1165,7 +1165,7 @@ TEST_CASE("Reporting the status of packet stores") {
 		uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
 		int count = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = (count % 2 == 0);
 			packetStore.byTimeRangeRetrievalStatus = (count % 2 != 0);
@@ -1219,7 +1219,7 @@ TEST_CASE("Reporting the configuration of packet stores") {
 	SECTION("Valid reporting of the configuration") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
@@ -1228,7 +1228,7 @@ TEST_CASE("Reporting the configuration of packet stores") {
 		uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
 		int count = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType =
 			    (count % 2 == 0) ? PacketStore::Circular : PacketStore::Bounded;
 			count++;
@@ -1280,7 +1280,7 @@ TEST_CASE("Resizing the packet stores") {
 	SECTION("Successful resizing of packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		uint16_t newSizes[4] = {11, 22, 33, 44};
@@ -1291,7 +1291,7 @@ TEST_CASE("Resizing the packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
@@ -1317,7 +1317,7 @@ TEST_CASE("Resizing the packet stores") {
 	SECTION("Failed resizing of packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		uint16_t oldSizes[4] = {100, 200, 550, 340};
@@ -1328,7 +1328,7 @@ TEST_CASE("Resizing the packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = (index % 2 == 0);
 			packetStore.byTimeRangeRetrievalStatus = (index == 1);
@@ -1347,7 +1347,7 @@ TEST_CASE("Resizing the packet stores") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithByTimeRangeRetrieval) == 1);
 		int i = 0;
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).sizeInBytes == oldSizes[i++]);
 		}
 
@@ -1358,7 +1358,7 @@ TEST_CASE("Resizing the packet stores") {
 	SECTION("Memory unable to handle the requested size") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		uint16_t newSizes[4] = {1000, 2000, 3400, 5500};
@@ -1369,7 +1369,7 @@ TEST_CASE("Resizing the packet stores") {
 		NumOfPacketStoresSize numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.storageStatus = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
@@ -1391,8 +1391,8 @@ TEST_CASE("Resizing the packet stores") {
 	SECTION("Request to resize non existing packet stores") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		uint16_t oldSizes[4] = {100, 200, 550, 340};
@@ -1402,7 +1402,7 @@ TEST_CASE("Resizing the packet stores") {
 
 		NumOfPacketStoresSize numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
-		for (PacketStoreIdSize& packetStoreId: wrongPacketStoreIds) {
+		for (auto& packetStoreId: wrongPacketStoreIds) {
 			request.appendString(packetStoreId);
 			request.appendUint16(35);
 		}
@@ -1412,7 +1412,7 @@ TEST_CASE("Resizing the packet stores") {
 		CHECK(ServiceTests::count() == 4);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 4);
 		int i = 0;
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).sizeInBytes == oldSizes[i++]);
 		}
 
@@ -1425,10 +1425,10 @@ TEST_CASE("Changing the packet store type to circular") {
 	SECTION("Successful changing of type to circular") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.packetStoreType = PacketStore::Bounded;
 			packetStore.storageStatus = false;
@@ -1467,12 +1467,12 @@ TEST_CASE("Changing the packet store type to circular") {
 	SECTION("Failed changing of type to circular") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		int count = 0;
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.packetStoreType = PacketStore::Bounded;
 			packetStore.storageStatus = (count == 0);
@@ -1514,10 +1514,10 @@ TEST_CASE("Changing the packet store type to bounded") {
 	SECTION("Successful changing of type to bounded") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType = PacketStore::Circular;
 			storageAndRetrieval.getPacketStore(packetStoreId).storageStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
@@ -1555,12 +1555,12 @@ TEST_CASE("Changing the packet store type to bounded") {
 	SECTION("Failed changing of type to bounded") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		int count = 0;
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType = PacketStore::Circular;
 			storageAndRetrieval.getPacketStore(packetStoreId).storageStatus = (count == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (count == 1);
@@ -1602,12 +1602,12 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 	SECTION("Successful change of virtual channel") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		uint8_t virtualChannels[2] = {1, 5};
 
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -1647,14 +1647,14 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 	SECTION("Failed change of virtual channel") {
 		initializePacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		uint8_t oldVirtualChannels[4] = {4, 6, 1, 2};
 
 		int count = 0;
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (count == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (count == 1) ? PacketStore::InProgress : PacketStore::Suspended;
@@ -1682,7 +1682,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		}
 
 		int index = 0;
-		for (PacketStoreIdSize& packetStoreId: correctPacketStoreIds) {
+		for (auto& packetStoreId: correctPacketStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).virtualChannel == oldVirtualChannels[index]);
 			index++;
 		}
@@ -1698,7 +1698,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1748,11 +1748,11 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		int count = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag = (count == 3) ? 20 : 15;
 			count++;
 		}
@@ -1818,8 +1818,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		String<ECSSPacketStoreIdSize> finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
@@ -1868,7 +1868,7 @@ TEST_CASE("Deleting packet store content") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1880,7 +1880,7 @@ TEST_CASE("Deleting packet store content") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores; i++) {
-			PacketStoreIdSize packetStoreId = packetStoreIds[i];
+			auto packetStoreId = packetStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
@@ -1920,7 +1920,7 @@ TEST_CASE("Deleting packet store content") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1932,7 +1932,7 @@ TEST_CASE("Deleting packet store content") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
-			PacketStoreIdSize packetStoreId = packetStoreIds[i];
+			auto packetStoreId = packetStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
@@ -1972,7 +1972,7 @@ TEST_CASE("Deleting packet store content") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -1984,7 +1984,7 @@ TEST_CASE("Deleting packet store content") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
-			PacketStoreIdSize packetStoreId = packetStoreIds[i];
+			auto packetStoreId = packetStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
@@ -2007,7 +2007,7 @@ TEST_CASE("Deleting packet store content") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		Message request(StorageAndRetrievalService::ServiceType,
@@ -2019,7 +2019,7 @@ TEST_CASE("Deleting packet store content") {
 		request.appendUint16(numOfPacketStores);
 
 		int count = 0;
-		for (PacketStoreIdSize& packetStoreId: packetStoreIds) {
+		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (count == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (count == 1) ? PacketStore::InProgress : PacketStore::Suspended;
@@ -2078,8 +2078,8 @@ TEST_CASE("Deleting packet store content") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		String<ECSSPacketStoreIdSize> finalIds[7] = {
@@ -2095,12 +2095,12 @@ TEST_CASE("Deleting packet store content") {
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < 3; i++) {
-			PacketStoreIdSize packetStoreId = finalIds[i];
+			auto packetStoreId = finalIds[i];
 			request.appendString(packetStoreId);
 		}
 
 		for (int i = 3; i < 7; i++) {
-			PacketStoreIdSize packetStoreId = finalIds[i];
+			auto packetStoreId = finalIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (i == 4 || i == 6);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (i == 3 || i == 5) ? PacketStore::InProgress : PacketStore::Suspended;
@@ -2141,7 +2141,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2154,8 +2154,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 0;
 		TimeSize timeTag2 = 1;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2185,7 +2185,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2198,8 +2198,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 0;
 		TimeSize timeTag2 = 4;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2232,7 +2232,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2245,8 +2245,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 35;
 		TimeSize timeTag2 = 52;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[3];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[3];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2279,7 +2279,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2292,8 +2292,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 3;
 		TimeSize timeTag2 = 27;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[1];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[1];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2326,7 +2326,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2339,8 +2339,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 12;
 		TimeSize timeTag2 = 14;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2364,8 +2364,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize correctPacketStoreIds = validPacketStoreIds();
-		PacketStoreIdSize wrongPacketStoreIds = invalidPacketStoreIds();
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2378,8 +2378,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 3;
 		TimeSize timeTag2 = 27;
-		PacketStoreIdSize fromPacketStoreId = wrongPacketStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = correctPacketStoreIds[2];
+		auto fromPacketStoreId = wrongPacketStoreIds[0];
+		auto toPacketStoreId = correctPacketStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2402,7 +2402,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2415,8 +2415,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 26;
 		TimeSize timeTag2 = 17;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2439,7 +2439,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		REQUIRE(not storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets.empty());
@@ -2450,8 +2450,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 3;
 		TimeSize timeTag2 = 7;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2473,7 +2473,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2486,8 +2486,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
 		TimeSize timeTag1 = 0;
 		TimeSize timeTag2 = 3;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[3];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[3];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2512,7 +2512,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2524,8 +2524,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
 		TimeSize timeTag1 = 6;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2556,7 +2556,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2568,8 +2568,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
 		TimeSize timeTag1 = 1;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2598,7 +2598,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2610,8 +2610,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
 		TimeSize timeTag1 = 25;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag1);
@@ -2636,7 +2636,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2648,8 +2648,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
 		TimeSize timeTag2 = 6;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
@@ -2680,7 +2680,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2692,8 +2692,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
 		TimeSize timeTag2 = 56;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);
@@ -2722,7 +2722,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		addTelemetryPacketsInPacketStores();
 
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-		PacketStoreIdSize packetStoreIds = validPacketStoreIds();
+		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
 		// Empty the target packet store, so the copy can occur
@@ -2734,8 +2734,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
 		TimeSize timeTag2 = 1;
-		PacketStoreIdSize fromPacketStoreId = packetStoreIds[0];
-		PacketStoreIdSize toPacketStoreId = packetStoreIds[2];
+		auto fromPacketStoreId = packetStoreIds[0];
+		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
 		request.appendUint32(timeTag2);

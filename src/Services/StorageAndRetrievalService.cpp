@@ -18,8 +18,8 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 	TimeSize startTime = request.readUint32();
 	TimeSize endTime = request.readUint32();
 
-	PacketStoreIdSize fromPacketStoreId = readPacketStoreId(request);
-	PacketStoreIdSize toPacketStoreId = readPacketStoreId(request);
+	auto fromPacketStoreId = readPacketStoreId(request);
+	auto toPacketStoreId = readPacketStoreId(request);
 
 	if (failedFromTagToTag(fromPacketStoreId, toPacketStoreId, startTime, endTime, request)) {
 		return;
@@ -39,8 +39,8 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 	TimeSize startTime = request.readUint32();
 
-	PacketStoreIdSize fromPacketStoreId = readPacketStoreId(request);
-	PacketStoreIdSize toPacketStoreId = readPacketStoreId(request);
+	auto fromPacketStoreId = readPacketStoreId(request);
+	auto toPacketStoreId = readPacketStoreId(request);
 
 	if (failedAfterTimeTag(fromPacketStoreId, toPacketStoreId, startTime, request)) {
 		return;
@@ -57,8 +57,8 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
 	TimeSize endTime = request.readUint32();
 
-	PacketStoreIdSize fromPacketStoreId = readPacketStoreId(request);
-	PacketStoreIdSize toPacketStoreId = readPacketStoreId(request);
+	auto fromPacketStoreId = readPacketStoreId(request);
+	auto toPacketStoreId = readPacketStoreId(request);
 
 	if (failedBeforeTimeTag(fromPacketStoreId, toPacketStoreId, endTime, request)) {
 		return;
@@ -236,7 +236,7 @@ void StorageAndRetrievalService::executeOnPacketStores(Message& request,
 	}
 
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		auto packetStore = packetStores.find(packetStoreId);
 		if (packetStore == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -271,7 +271,7 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 	bool errorFlag = false;
 
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (failedStartOfByTimeRangeRetrieval(packetStoreId, request)) {
 			continue;
 		}
@@ -318,7 +318,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 		return;
 	}
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -348,7 +348,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	if (numOfPacketStores == 0) {
 		report.appendUint16(packetStores.size());
 		for (auto& packetStore: packetStores) {
-			PacketStoreIdSize packetStoreId = packetStore.first;
+			auto packetStoreId = packetStore.first;
 			report.appendString(packetStoreId);
 			createContentSummary(report, packetStoreId);
 		}
@@ -357,7 +357,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	}
 	NumOfPacketStoresSize numOfValidPacketStores = 0;
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) != packetStores.end()) {
 			numOfValidPacketStores++;
 		}
@@ -367,7 +367,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	numOfPacketStores = request.readUint16();
 
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -401,7 +401,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 	}
 
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -433,7 +433,7 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 		return;
 	}
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -461,7 +461,7 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 		return;
 	}
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -483,7 +483,7 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 		return;
 	}
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -500,7 +500,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(Message& request) {
 	Message report = createTM(PacketStoresStatusReport);
 	report.appendUint16(packetStores.size());
 	for (auto& packetStore: packetStores) {
-		PacketStoreIdSize packetStoreId = packetStore.first;
+		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageStatus);
 		report.appendEnum8(packetStore.second.openRetrievalStatus);
@@ -520,7 +520,7 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxNumberOfPacketStoresReached);
 			return;
 		}
-		PacketStoreIdSize idToCreate = readPacketStoreId(request);
+		auto idToCreate = readPacketStoreId(request);
 
 		if (packetStores.find(idToCreate) != packetStores.end()) {
 			uint16_t numberOfBytesToSkip = 4;
@@ -587,7 +587,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 	}
 
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize idToDelete = readPacketStoreId(request);
+		auto idToDelete = readPacketStoreId(request);
 		if (packetStores.find(idToDelete) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -621,7 +621,7 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 
 	report.appendUint16(packetStores.size());
 	for (auto& packetStore: packetStores) {
-		PacketStoreIdSize packetStoreId = packetStore.first;
+		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendUint16(packetStore.second.sizeInBytes);
 		uint8_t typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
@@ -660,7 +660,7 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 
 	NumOfPacketStoresSize numOfPacketStores = request.readUint16();
 	for (NumOfPacketStoresSize i = 0; i < numOfPacketStores; i++) {
-		PacketStoreIdSize packetStoreId = readPacketStoreId(request);
+		auto packetStoreId = readPacketStoreId(request);
 		uint16_t packetStoreSize = request.readUint16(); // In bytes
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -696,7 +696,7 @@ void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
 		return;
 	}
 
-	PacketStoreIdSize idToChange = readPacketStoreId(request);
+	auto idToChange = readPacketStoreId(request);
 	if (packetStores.find(idToChange) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
@@ -726,7 +726,7 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 		return;
 	}
 
-	PacketStoreIdSize idToChange = readPacketStoreId(request);
+	auto idToChange = readPacketStoreId(request);
 	if (packetStores.find(idToChange) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
@@ -756,7 +756,7 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 		return;
 	}
 
-	PacketStoreIdSize idToChange = readPacketStoreId(request);
+	auto idToChange = readPacketStoreId(request);
 	uint8_t virtualChannel = request.readUint8();
 	if (packetStores.find(idToChange) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);

@@ -181,7 +181,7 @@ private:
 	void createContentSummary(Message& report, const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 public:
-	inline static const uint8_t ServiceType = 15;
+	inline static const ServiceTypeSize ServiceType = 15;
 
 	enum MessageType : uint8_t {
 		EnableStorageInPacketStores = 1,

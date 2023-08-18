@@ -420,7 +420,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		for (uint16_t i = 0; i < iterationCount; i++) {
 			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
 			SourceIdSize receivedSourceID = response.readUint8();
-			ApplicationIdSize2 receivedApplicationID = response.readUint16();
+			ApplicationIdSize receivedApplicationID = response.readUint16();
 			uint16_t receivedSequenceCount = response.readUint16();
 
 			if (i == 0) {
@@ -480,7 +480,7 @@ TEST_CASE("TM[11,13] time-based schedule summary report", "[service][st11]") {
 		for (uint16_t i = 0; i < iterationCount; i++) {
 			Time::DefaultCUC receivedReleaseTime = response.readDefaultCUCTimeStamp();
 			SourceIdSize receivedSourceID = response.readUint8();
-			ApplicationIdSize2 receivedApplicationID = response.readUint16();
+			ApplicationIdSize receivedApplicationID = response.readUint16();
 			uint16_t receivedSequenceCount = response.readUint16();
 
 			if (i == 0) {

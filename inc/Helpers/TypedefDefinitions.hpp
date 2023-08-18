@@ -1,14 +1,17 @@
-#ifndef ECSS_SERVICES_TYPEDEFDEFINITIONS_HPP
-#define ECSS_SERVICES_TYPEDEFDEFINITIONS_HPP
+#pragma once
 
-typedef uint8_t StructureIdSize;
-
-typedef uint16_t EventIdSize;
+#include <etl/String.hpp>
+#include "ECSS_Definitions.hpp"
 
 typedef uint8_t StepIdSize;
 
+typedef uint8_t StructureIdSize;
+typedef uint32_t TimeSize;
+
+typedef uint16_t EventIdSize;
+
 typedef uint16_t ParameterIdSize;
-typedef uint16_t SamplesSize;
+typedef uint16_t SampleSize;
 typedef uint16_t IntervalSize;
 
 typedef uint64_t StartAddressSize;
@@ -25,23 +28,12 @@ typedef uint16_t PMONIdSize;
 
 typedef uint16_t LargeMessageTransactionIdSize;
 typedef uint16_t PartSequenceNumSize;
-typedef uint16_t DataSizeSize;
 
----------
-
-typedef uint8_t ApplicationIdSize;
-typedef uint8_t ServiceTypeSize;
-
----------
 typedef uint16_t NumOfPacketStoresSize;
-typedef auto PacketStoreIdSize;
-typedef uint32_t TimeSize;
 
 typedef uint16_t EventDefinitionIdSize;
-typedef uint16_t ApplicationIdSize2;
+typedef uint16_t ApplicationIdSize;
 
-typedef uint8_t MessageTypeSize;
 typedef uint8_t ServiceTypeSize;
 
 typedef uint8_t SourceIdSize;
-#endif //ECSS_SERVICES_TYPEDEFDEFINITIONS_HPP

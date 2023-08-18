@@ -29,7 +29,7 @@ struct HousekeepingStructure {
     /**
      * Vector containing the IDs of the simply commutated parameters, contained in the housekeeping structure.
      */
-    etl::vector<uint16_t, ECSSMaxSimplyCommutatedParameters> simplyCommutatedParameterIds;
+    etl::vector<ParameterIdSize, ECSSMaxSimplyCommutatedParameters> simplyCommutatedParameterIds;
 
 	HousekeepingStructure() = default;
 };

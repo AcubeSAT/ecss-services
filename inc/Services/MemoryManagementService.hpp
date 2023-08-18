@@ -13,7 +13,7 @@
  */
 class MemoryManagementService : public Service {
 public:
-	inline static const uint8_t ServiceType = 6;
+	inline static const ServiceTypeSize ServiceType = 6;
 
 	enum MessageType : uint8_t {
 		LoadRawMemoryDataAreas = 2,

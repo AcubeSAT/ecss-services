@@ -89,7 +89,7 @@ public:
 	 *
 	 * Maximum value of 2047 (5.4.2.1c)
 	 */
-	ApplicationIdSize2 applicationId;
+	ApplicationIdSize applicationId;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
@@ -98,7 +98,7 @@ public:
 	uint16_t packetSequenceCount = 0;
 
 	// TODO: Find out if we need more than 16 bits for this
-	DataSizeSize dataSize = 0;
+	uint16_t dataSize = 0;
 
 	// Pointer to the contents of the message (excluding the PUS header)
 	// We allocate this data statically, in order to make sure there is predictability in the

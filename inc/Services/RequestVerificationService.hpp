@@ -21,7 +21,7 @@
  */
 class RequestVerificationService : public Service {
 public:
-	inline static const uint8_t ServiceType = 1;
+	inline static const ServiceTypeSize ServiceType = 1;
 
 	enum MessageType : uint8_t {
 		SuccessfulAcceptanceReport = 1,

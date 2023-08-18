@@ -41,7 +41,7 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
-		PMONIdSize numberOfIds = 3;
+		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONIdSize, 3> PMONIds = {0, 1, 2};
 		request.appendEnum16(PMONIds[0]);
@@ -67,7 +67,7 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
-		PMONIdSize numberOfIds = 4;
+		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONIdSize, 4> PMONIds = {0, 10, 1};
 		request.appendEnum16(PMONIds[0]);
@@ -93,7 +93,7 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
-		PMONIdSize numberOfIds = 3;
+		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONIdSize, 3> PMONIds = {0, 1, 2};
 		request.appendEnum16(PMONIds[0]);
@@ -120,7 +120,7 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
-		PMONIdSize numberOfIds = 4;
+		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONIdSize, 4> PMONIds = {0, 10, 1, 2};
 		request.appendEnum16(PMONIds[0]);

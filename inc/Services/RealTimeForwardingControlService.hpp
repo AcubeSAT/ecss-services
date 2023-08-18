@@ -20,7 +20,7 @@
  */
 class RealTimeForwardingControlService : Service {
 public:
-	inline static const uint8_t ServiceType = 14;
+	inline static const ServiceTypeSize ServiceType = 14;
 
 	enum MessageType : uint8_t {
 		AddReportTypesToAppProcessConfiguration = 1,
@@ -33,7 +33,7 @@ public:
 	/**
 	 * Contains the Application IDs, controlled by the Service.
 	 */
-	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
+	etl::vector<ApplicationIdSize, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
 	/**
 	 * The Application Process configuration, containing all the application process, service type and message type

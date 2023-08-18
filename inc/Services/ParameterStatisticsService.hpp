@@ -39,7 +39,7 @@ private:
 	void initializeStatisticsMap();
 
 public:
-	inline static const uint8_t ServiceType = 4;
+	inline static const ServiceTypeSize ServiceType = 4;
 
 	enum MessageType : uint8_t {
 		ReportParameterStatistics = 1,
@@ -58,7 +58,7 @@ public:
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
-	etl::map<uint16_t, Statistic, ECSSMaxStatisticParameters> statisticsMap;
+	etl::map<ParameterIdSize, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
 	 * If true, after every report reset the parameter statistics.

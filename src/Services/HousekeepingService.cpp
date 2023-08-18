@@ -18,9 +18,9 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	newStructure.collectionInterval = request.readUint32();
 	newStructure.periodicGenerationActionStatus = false;
 
-	ParameterIdSize numOfSimplyCommutatedParams = request.readUint16();
+	uint16_t numOfSimplyCommutatedParams = request.readUint16();
 
-	for (ParameterIdSize i = 0; i < numOfSimplyCommutatedParams; i++) {
+	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		ParameterIdSize newParamId = request.readUint16();
 		if (hasAlreadyExistingParameterError(newStructure, newParamId, request)) {
 			continue;
@@ -34,8 +34,8 @@ void HousekeepingService::deleteHousekeepingReportStructure(Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::DeleteHousekeepingReportStructure)) {
 		return;
 	}
-	StructureIdSize numOfStructuresToDelete = request.readUint8();
-	for (StructureIdSize i = 0; i < numOfStructuresToDelete; i++) {
+	uint8_t numOfStructuresToDelete = request.readUint8();
+	for (uint8_t i = 0; i < numOfStructuresToDelete; i++) {
 		StructureIdSize structureId = request.readUint8();
 		if (hasNonExistingStructExecutionError(structureId, request)) {
 			continue;
@@ -53,8 +53,8 @@ void HousekeepingService::enablePeriodicHousekeepingParametersReport(Message& re
 		return;
 	}
 
-	StructureIdSize numOfStructIds = request.readUint8();
-	for (StructureIdSize i = 0; i < numOfStructIds; i++) {
+	uint8_t numOfStructIds = request.readUint8();
+	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		StructureIdSize structIdToEnable = request.readUint8();
 		if (hasNonExistingStructError(structIdToEnable, request)) {
 			continue;
@@ -68,8 +68,8 @@ void HousekeepingService::disablePeriodicHousekeepingParametersReport(Message& r
 		return;
 	}
 
-	StructureIdSize numOfStructIds = request.readUint8();
-	for (StructureIdSize i = 0; i < numOfStructIds; i++) {
+	uint8_t numOfStructIds = request.readUint8();
+	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		StructureIdSize structIdToDisable = request.readUint8();
 		if (hasNonExistingStructError(structIdToDisable, request)) {
 			continue;
@@ -83,8 +83,8 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 		return;
 	}
 
-	StructureIdSize numOfStructsToReport = request.readUint8();
-	for (StructureIdSize i = 0; i < numOfStructsToReport; i++) {
+	uint8_t numOfStructsToReport = request.readUint8();
+	for (uint8_t i = 0; i < numOfStructsToReport; i++) {
 		StructureIdSize structureId = request.readUint8();
 		if (hasNonExistingStructExecutionError(structureId, request)) {
 			continue;
@@ -94,7 +94,7 @@ void HousekeepingService::reportHousekeepingStructures(Message& request) {
 	}
 }
 
-void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) {
+void HousekeepingService::housekeepingStructureReport(StructureIdSize structIdToReport) {
 	auto housekeepingStructure = housekeepingStructures.find(structIdToReport);
 	if (hasNonExistingStructInternalError(structIdToReport)) {
 		return;
@@ -112,7 +112,7 @@ void HousekeepingService::housekeepingStructureReport(uint8_t structIdToReport) 
 	storeMessage(structReport);
 }
 
-void HousekeepingService::housekeepingParametersReport(uint8_t structureId) {
+void HousekeepingService::housekeepingParametersReport(StructureIdSize structureId) {
 	if (hasNonExistingStructInternalError(structureId)) {
 		return;
 	}
@@ -135,8 +135,8 @@ void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
 		return;
 	}
 
-	StructureIdSize numOfStructsToReport = request.readUint8();
-	for (StructureIdSize i = 0; i < numOfStructsToReport; i++) {
+	uint8_t numOfStructsToReport = request.readUint8();
+	for (uint8_t i = 0; i < numOfStructsToReport; i++) {
 		StructureIdSize structureId = request.readUint8();
 		if (hasNonExistingStructExecutionError(structureId, request)) {
 			continue;
@@ -159,9 +159,9 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 	if (hasRequestedAppendToEnabledHousekeepingError(housekeepingStructure, request)) {
 		return;
 	}
-	ParameterIdSize numOfSimplyCommutatedParameters = request.readUint16();
+	uint16_t numOfSimplyCommutatedParameters = request.readUint16();
 
-	for (ParameterIdSize i = 0; i < numOfSimplyCommutatedParameters; i++) {
+	for (uint16_t i = 0; i < numOfSimplyCommutatedParameters; i++) {
 		if (hasExceededMaxNumOfSimplyCommutatedParamsError(housekeepingStructure, request)) {
 			return;
 		}
@@ -182,8 +182,8 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 		return;
 	}
 
-	StructureIdSize numOfTargetStructs = request.readUint8();
-	for (StructureIdSize i = 0; i < numOfTargetStructs; i++) {
+	uint8_t numOfTargetStructs = request.readUint8();
+	for (uint8_t i = 0; i < numOfTargetStructs; i++) {
 		StructureIdSize targetStructId = request.readUint8();
 		TimeSize newCollectionInterval = request.readUint32();
 		if (hasNonExistingStructExecutionError(targetStructId, request)) {
@@ -198,9 +198,9 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 		return;
 	}
 
-	StructureIdSize numOfValidIds = 0;
-	StructureIdSize numOfStructIds = request.readUint8();
-	for (StructureIdSize i = 0; i < numOfStructIds; i++) {
+	uint8_t numOfValidIds = 0;
+	uint8_t numOfStructIds = request.readUint8();
+	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		StructureIdSize structIdToReport = request.readUint8();
 		if (structExists(structIdToReport)) {
 			numOfValidIds++;
@@ -211,7 +211,7 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 	request.resetRead();
 	request.readUint8();
 
-	for (StructureIdSize i = 0; i < numOfStructIds; i++) {
+	for (uint8_t i = 0; i < numOfStructIds; i++) {
 		StructureIdSize structIdToReport = request.readUint8();
 		if (hasNonExistingStructExecutionError(structIdToReport, request)) {
 			continue;
@@ -266,7 +266,7 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 
 TimeSize
 HousekeepingService::reportPendingStructures(TimeSize currentTime, TimeSize previousTime, TimeSize expectedDelay) {
-	uint32_t nextCollection = std::numeric_limits<uint32_t>::max();
+	TimeSize nextCollection = std::numeric_limits<uint32_t>::max();
 
 	for (auto& housekeepingStructure: housekeepingStructures) {
 		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
@@ -282,7 +282,7 @@ HousekeepingService::reportPendingStructures(TimeSize currentTime, TimeSize prev
 		                              0)) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
 		}
-		uint32_t structureTimeToCollection = housekeepingStructure.second.collectionInterval -
+		TimeSize structureTimeToCollection = housekeepingStructure.second.collectionInterval -
 		                                     currentTime % housekeepingStructure.second.collectionInterval;
 		if (nextCollection > structureTimeToCollection) {
 			nextCollection = structureTimeToCollection;

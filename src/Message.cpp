@@ -6,7 +6,7 @@
 #include "macros.hpp"
 
 
-Message::Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, ApplicationIdSize2 applicationId)
+Message::Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, ApplicationIdSize applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
 
 Message::Message(uint8_t serviceType, uint8_t messageType, PacketType packetType)

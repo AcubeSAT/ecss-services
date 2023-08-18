@@ -53,7 +53,7 @@ LargePacketTransferService::lastUplinkPart(const String<ECSSMaxFixedOctetStringS
 
 void LargePacketTransferService::split(Message& message, LargeMessageTransactionIdSize largeMessageTransactionIdentifier) {
 	//TODO: Should this be uint32?
-	DataSizeSize size = message.dataSize;
+	uint16_t size = message.dataSize;
 	uint16_t positionCounter = 0;
 	uint16_t parts = (size / ECSSMaxFixedOctetStringSize) + 1;
 	String<ECSSMaxFixedOctetStringSize> stringPart("");

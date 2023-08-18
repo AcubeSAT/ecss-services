@@ -40,12 +40,12 @@ private:
 	void initializeHousekeepingStructures();
 
 public:
-	inline static const uint8_t ServiceType = 3;
+	inline static const ServiceTypeSize ServiceType = 3;
 
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains the housekeeping structure with ID = i.
 	 */
-	etl::map<uint8_t, HousekeepingStructure, ECSSMaxHousekeepingStructures> housekeepingStructures;
+	etl::map<StructureIdSize, HousekeepingStructure, ECSSMaxHousekeepingStructures> housekeepingStructures;
 
 	enum MessageType : uint8_t {
 		CreateHousekeepingReportStructure = 1,
@@ -97,7 +97,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return uint32_t Integer multiples of the minimum sampling interval
 	 */
-	inline uint32_t getCollectionInterval(StructureIdSize id) {
+	inline TimeSize getCollectionInterval(StructureIdSize id) {
 		HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
 			return newStructure.collectionInterval;
@@ -122,7 +122,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @param interval Integer multiples of the minimum sampling interval
 	 */
-	inline void setCollectionInterval(StructureIdSize id, uint32_t interval) {
+	inline void setCollectionInterval(StructureIdSize id, TimeSize interval) {
 		if (hasNonExistingStructInternalError(id)) {
 			return;
 		}

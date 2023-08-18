@@ -106,7 +106,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 	uint8_t numOfApplications = request.readUint8();
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
-		ApplicationIdSize applicationID = request.readUint8();
+		ApplicationIdSize applicationID = request.readUint16();
 		uint8_t numOfServices = request.readUint8();
 
 		if (not checkApplicationOfAppProcessConfig(request, applicationID, numOfServices)) {

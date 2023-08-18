@@ -5,7 +5,7 @@
 #include "MessageParser.hpp"
 #include "Services/EventActionService.hpp"
 
-EventActionService::EventActionDefinition::EventActionDefinition(ApplicationIdSize2 applicationID, EventDefinitionIdSize eventDefinitionID, Message& message)
+EventActionService::EventActionDefinition::EventActionDefinition(ApplicationIdSize applicationID, EventDefinitionIdSize eventDefinitionID, Message& message)
     : applicationID(applicationID), eventDefinitionID(eventDefinitionID), request(message.data + message.readPosition) {
 	message.readPosition += ECSSTCRequestStringSize;
 }
@@ -16,7 +16,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
-		ApplicationIdSize2 applicationID = message.readEnum16();
+		ApplicationIdSize applicationID = message.readEnum16();
 		EventDefinitionIdSize eventDefinitionID = message.readEnum16();
 		bool canBeAdded = true;
 
@@ -48,7 +48,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
-		ApplicationIdSize2 applicationID = message.readEnum16();
+		ApplicationIdSize applicationID = message.readEnum16();
 		EventDefinitionIdSize eventDefinitionID = message.readEnum16();
 		bool actionDefinitionExists = false;
 
@@ -86,7 +86,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-			ApplicationIdSize2 applicationID = message.readEnum16();
+			ApplicationIdSize applicationID = message.readEnum16();
 			EventDefinitionIdSize eventDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
 
@@ -119,7 +119,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-			ApplicationIdSize2 applicationID = message.readEnum16();
+			ApplicationIdSize applicationID = message.readEnum16();
 			EventDefinitionIdSize eventDefinitionID = message.readEnum16();
 			bool actionDefinitionExists = false;
 
