@@ -71,7 +71,7 @@ void ParameterStatisticsService::resetParameterStatistics() {
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
-	const uint16_t SAMPLING_PARAMETER_INTERVAL = 5;
+	const uint16_t SamplingParameterInterval = 5;
 
 	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting)) {
 		return;
