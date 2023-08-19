@@ -3,7 +3,6 @@
 
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "MessageParser.hpp"
 #include "Service.hpp"
 #include "etl/list.h"

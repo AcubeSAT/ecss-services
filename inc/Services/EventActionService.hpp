@@ -1,7 +1,6 @@
 #ifndef ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 #define ECSS_SERVICES_EVENTACTIONSERVICE_HPP
 
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 #include "Services/EventReportService.hpp"
 #include "etl/String.hpp"

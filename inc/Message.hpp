@@ -6,7 +6,6 @@
 #include <etl/String.hpp>
 #include <etl/wstring.h>
 #include "ECSS_Definitions.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Time/Time.hpp"
 #include "macros.hpp"
 

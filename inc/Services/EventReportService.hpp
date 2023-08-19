@@ -2,7 +2,6 @@
 #define ECSS_SERVICES_EVENTREPORTSERVICE_HPP
 
 #include <etl/bitset.h>
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 
 /**

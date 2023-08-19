@@ -4,7 +4,6 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Message.hpp"
 
 /**

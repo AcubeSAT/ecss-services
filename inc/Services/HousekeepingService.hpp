@@ -5,7 +5,6 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/HousekeepingStructure.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
 

@@ -3,7 +3,6 @@
 #include <cstdint>
 #include "ECSS_Definitions.hpp"
 #include "Helpers/Parameter.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
 #include "etl/array.h"

@@ -4,7 +4,6 @@
 #include <vector>
 #include <map>
 #include <Message.hpp>
-#include <Helpers/TypedefDefinitions.hpp>
 #include <ServicePool.hpp>
 
 /**

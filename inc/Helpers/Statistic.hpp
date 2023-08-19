@@ -6,7 +6,6 @@
 #include "Service.hpp"
 #include "TimeGetter.hpp"
 #include "etl/vector.h"
-#include "Helpers/TypedefDefinitions.hpp"
 
 /**
  * Class containing all the statistics for every parameter. Includes functions that calculate and append the

@@ -3,7 +3,6 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
 

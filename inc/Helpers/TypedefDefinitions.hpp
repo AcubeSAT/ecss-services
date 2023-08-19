@@ -1,8 +1,5 @@
 #pragma once
 
-#include <etl/String.hpp>
-#include "ECSS_Definitions.hpp"
-
 typedef uint8_t StepIdSize;
 
 typedef uint8_t StructureIdSize;

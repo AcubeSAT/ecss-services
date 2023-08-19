@@ -4,7 +4,6 @@
 #include <memory>
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 #include "Service.hpp"
 

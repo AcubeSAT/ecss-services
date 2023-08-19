@@ -5,7 +5,6 @@
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/PacketStore.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "etl/map.h"
 
 /**

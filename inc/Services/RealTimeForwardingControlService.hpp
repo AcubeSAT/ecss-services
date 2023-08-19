@@ -5,7 +5,6 @@
 #include "ErrorHandler.hpp"
 #include "Helpers/AllMessageTypes.hpp"
 #include "Helpers/ForwardControlConfiguration.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 #include "Service.hpp"
 #include "etl/vector.h"
 

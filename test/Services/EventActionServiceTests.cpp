@@ -1,5 +1,4 @@
 #include <Message.hpp>
-#include <Helpers/TypedefDefinitions.hpp>
 #include <ServicePool.hpp>
 #include <Services/EventActionService.hpp>
 #include <catch2/catch_all.hpp>

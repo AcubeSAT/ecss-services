@@ -5,7 +5,6 @@
 #include "ErrorHandler.hpp"
 #include "etl/vector.h"
 #include "Helpers/Parameter.hpp"
-#include "Helpers/TypedefDefinitions.hpp"
 
 /**
  * Implementation of the Housekeeping report structure used by the Housekeeping Reporting Subservice (ST[03]). The
