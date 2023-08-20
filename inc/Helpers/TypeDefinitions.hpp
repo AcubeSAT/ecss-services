@@ -1,4 +1,5 @@
 #pragma once
+#include "ECSS_Definitions.hpp"
 
 typedef uint8_t StepIdSize;
 

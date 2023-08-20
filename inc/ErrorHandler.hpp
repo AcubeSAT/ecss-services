@@ -3,7 +3,7 @@
 
 #include <stdint.h> // for the uint_8t stepID
 #include <type_traits>
-#include "Helpers/TypedefDefinitions.hpp"
+#include "Helpers/TypeDefinitions.hpp"
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;

@@ -17,7 +17,7 @@ set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
         )
 add_compile_options(-Wvla)
 include_directories(${ECSS_CONFIGURATION})
-add_library(common STATIC inc/Helpers/TypedefDefinitions.hpp)
+add_library(common STATIC)
 target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
 target_sources(common PRIVATE
         src/Service.cpp
