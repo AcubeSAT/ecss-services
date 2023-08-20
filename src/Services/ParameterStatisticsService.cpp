@@ -195,16 +195,17 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 }
 
 void ParameterStatisticsService::execute(Message& message) {
+	TimeStamp<4, 0, 1, 10> currentTime;
 	switch (message.messageType) {
 		case ReportParameterStatistics:
 			reportParameterStatistics(message);
 			break;
 		case ResetParameterStatistics:
 			resetParameterStatistics(message);
-			TimeGetter::getCurrentTimeDefaultCUC();
+			currentTime = getCurrentTime();
 			break;
 		case EnablePeriodicParameterReporting:
-			TimeGetter::getCurrentTimeDefaultCUC();
+			currentTime = getCurrentTime();
 			enablePeriodicStatisticsReporting(message);
 			break;
 		case DisablePeriodicParameterReporting:
@@ -217,12 +218,16 @@ void ParameterStatisticsService::execute(Message& message) {
 			deleteStatisticsDefinitions(message);
 			break;
 		case ReportParameterStatisticsDefinitions:
-			TimeGetter::getCurrentTimeDefaultCUC();
+			currentTime = getCurrentTime();
 			reportStatisticsDefinitions(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
+}
+
+TimeStamp<4, 0, 1, 10> ParameterStatisticsService::getCurrentTime() {
+	return TimeGetter::getCurrentTimeDefaultCUC();
 }
 
 #endif

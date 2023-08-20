@@ -158,6 +158,8 @@ public:
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
+
+	TimeStamp<4, 0, 1, 10> getCurrentTime();
 };
 
 #endif
