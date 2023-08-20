@@ -79,7 +79,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 
 	uint16_t timeInterval = request.readUint16();
 
-	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
+	if (timeInterval < SamplingParameterInterval) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 		return;
 	}
