@@ -162,10 +162,7 @@ public:
 	/**
 	 * Get the current time as a TimeStamp object.
 	 *
-	 * @tparam BaseBytes The number of bytes used to represent the base value of the timestamp.
-	 * @tparam FractionBytes The number of bytes used to represent the fractional part of the timestamp.
-	 * @tparam Num Numerator for defining the fraction (used in conjunction with Denom).
-	 * @tparam Denom Denominator for defining the fraction (used in conjunction with Num).
+	 * BaseBytes: 4 bytes, FractionBytes: 0 bytes, Num: 1, Denom: 10.
 	 */
 	TimeStamp<4, 0, 1, 10> getCurrentTime();
 };
