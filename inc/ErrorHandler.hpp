@@ -339,7 +339,7 @@ public:
 		 */
 		ReportParameterNotInTheParameterMonitoringList = 47,
 		/**
-		 * Attempt to add a new service type, when the addition of all service types is already enabled in the
+		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
 		AllServiceTypesAlreadyAllowed = 48,
@@ -370,6 +370,19 @@ public:
 		 * Attempted to read from a write-only parameter
 		 */
 		ParameterWriteOnly = 54,
+		/**
+		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
+		 */
+		NonExistentReportTypeDefinition = 55,
+		/**
+		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
+		 */
+		NonExistentServiceTypeDefinition = 56,
+		/**
+		 * Attempt to access a non-existing application process definition, from the application process
+		 * configuration (ST[14])
+		 */
+		NonExistentApplicationProcess = 57,
 	};
 
 	/**

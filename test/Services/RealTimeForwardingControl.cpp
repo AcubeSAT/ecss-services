@@ -7,14 +7,14 @@
 
 static RealTimeForwardingControlService& realTimeForwarding = Services.realTimeForwarding;
 
-uint8_t applications[] = {1};
+ApplicationIdSize applications[] = {1};
 uint8_t services[] = {3, 5};
 uint8_t allServices[] = {1, 3, 4, 5, 6, 11, 13, 17, 19, 20};
 uint8_t redundantServices[] = {1, 3, 4, 5, 6, 11, 13, 17, 19, 20, 1, 3};
-uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
+MessageTypeSize messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
                        HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport};
 
-uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
+MessageTypeSize messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
 void validReportTypes(Message& request) {
@@ -273,8 +273,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                Message::TC, 1);
 
 		ApplicationIdSize applicationID = 1;
-		uint8_t serviceType1 = services[0]; // st03
-		uint8_t serviceType2 = services[1]; // st05
+		ServiceTypeSize serviceType1 = services[0]; // st03
+		ServiceTypeSize serviceType2 = services[1]; // st05
 
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypes(request);
@@ -332,8 +332,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                Message::TC, 1);
 
 		ApplicationIdSize applicationID = 1;
-		uint8_t serviceType1 = services[0]; // st03
-		uint8_t serviceType2 = services[1]; // st05
+		ServiceTypeSize serviceType1 = services[0]; // st03
+		ServiceTypeSize serviceType2 = services[1]; // st05
 
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypes(request);
