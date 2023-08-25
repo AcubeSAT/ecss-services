@@ -67,8 +67,7 @@ IF (X86_BUILD)
         file(GLOB test_SRC "test/**/*.cpp")
         add_executable(tests
                 ${test_main_SRC}
-                ${test_SRC}
-                test/Services/RealTimeForwardingControlTests.cpp)
+                ${test_SRC})
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()
