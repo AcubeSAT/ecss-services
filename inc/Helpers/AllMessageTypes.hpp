@@ -19,16 +19,16 @@
  */
 namespace AllMessageTypes {
 	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> serviceDefinitionsVector;
-	extern serviceDefinitionsVector st01Messages;
-	extern serviceDefinitionsVector st03Messages;
-	extern serviceDefinitionsVector st04Messages;
-	extern serviceDefinitionsVector st05Messages;
-	extern serviceDefinitionsVector st06Messages;
-	extern serviceDefinitionsVector st11Messages;
-	extern serviceDefinitionsVector st13Messages;
-	extern serviceDefinitionsVector st17Messages;
-	extern serviceDefinitionsVector st19Messages;
-	extern serviceDefinitionsVector st20Messages;
+	const extern serviceDefinitionsVector st01Messages;
+	const extern serviceDefinitionsVector st03Messages;
+	const extern serviceDefinitionsVector st04Messages;
+	const extern serviceDefinitionsVector st05Messages;
+	const extern serviceDefinitionsVector st06Messages;
+	const extern serviceDefinitionsVector st11Messages;
+	const extern serviceDefinitionsVector st13Messages;
+	const extern serviceDefinitionsVector st17Messages;
+	const extern serviceDefinitionsVector st19Messages;
+	const extern serviceDefinitionsVector st20Messages;
 
 	/**
 	 * Map containing all the message types, per service. The key is the ServiceType and the value,
