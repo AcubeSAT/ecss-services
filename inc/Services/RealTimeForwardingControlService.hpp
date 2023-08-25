@@ -67,7 +67,7 @@ private:
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool reportExistsInAppProcessConfiguration(ApplicationIdSize applicationID, ServiceTypeSize serviceType, uint8_t messageType);
+	bool reportExistsInAppProcessConfiguration(ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
@@ -112,59 +112,59 @@ private:
 	 *
 	 * @return True: if the message type is valid and passes all the necessary error checking.
 	 */
-	bool checkMessage(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, uint8_t messageType);
+	bool checkMessage(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 	/**
 	 * Returns true, if the defined application exists in the application process configuration map.
 	 */
-	bool isApplicationEnabled(uint8_t targetAppID);
+	bool isApplicationEnabled(ApplicationIdSize targetAppID);
 
 	/**
 	 * Returns true, if the defined service type exists in the application process configuration map.
 	 */
-	bool isServiceTypeEnabled(uint8_t applicationID, uint8_t targetService);
+	bool isServiceTypeEnabled(ApplicationIdSize applicationID, ServiceTypeSize targetService);
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool isReportTypeEnabled(uint8_t target, uint8_t applicationID, uint8_t serviceType);
+	bool isReportTypeEnabled(uint8_t target, ApplicationIdSize applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
 	 */
-	void deleteApplicationProcess(uint8_t applicationID);
+	void deleteApplicationProcess(ApplicationIdSize applicationID);
 
 	/**
 	 * Checks whether the requested application is present in the application process configuration.
 	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
-	bool isApplicationInConfiguration(Message& request, uint8_t applicationID, uint8_t numOfServices);
+	bool isApplicationInConfiguration(Message& request, ApplicationIdSize applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks whether the requested service type is present in the application process configuration.
 	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
-	bool isServiceTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t numOfMessages);
+	bool isServiceTypeInConfiguration(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, uint8_t numOfMessages);
 
 	/**
 	 * Checks whether the requested report type is present in the application process configuration.
 	 * Reports an error if one exist.
 	 */
-	bool isReportTypeInConfiguration(Message& request, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	bool isReportTypeInConfiguration(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 	/**
 	 * Deletes the requested service type from the application process configuration. If the deletion results in an
 	 * empty application process, it deletes the corresponding application process definition as well.
 	 */
-	void deleteServiceRecursive(uint8_t applicationID, uint8_t serviceType);
+	void deleteServiceRecursive(ApplicationIdSize applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Deletes the requested report type from the application process configuration. If the deletion results in an
 	 * empty service, it deletes the corresponding service. If the deletion of the service, results in an empty
 	 * application process, it deletes the corresponding application process definition as well.
 	 */
-	void deleteReportRecursive(uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	void deleteReportRecursive(ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 public:
 	/**

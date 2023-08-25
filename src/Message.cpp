@@ -6,10 +6,10 @@
 #include "macros.hpp"
 
 
-Message::Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, ApplicationIdSize applicationId)
+Message::Message(ServiceTypeSize serviceType, MessageTypeSize messageType, PacketType packetType, ApplicationIdSize applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
 
-Message::Message(uint8_t serviceType, uint8_t messageType, PacketType packetType)
+Message::Message(ServiceTypeSize serviceType, MessageTypeSize messageType, PacketType packetType)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(ApplicationId) {}
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {

@@ -77,8 +77,8 @@ public:
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
-	uint8_t serviceType;
-	uint8_t messageType;
+	ServiceTypeSize serviceType;
+	MessageTypeSize messageType;
 
 	// As specified in CCSDS 133.0-B-1 (TM or TC)
 	PacketType packetType;
@@ -90,7 +90,7 @@ public:
 	 */
 	ApplicationIdSize applicationId;
 
-	uint16_t sourceId;
+	SourceIdSize sourceId;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
@@ -245,8 +245,8 @@ public:
 	 */
 	void readCString(char* string, uint16_t size);
 
-	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
-	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
+	Message(ServiceTypeSize serviceType, MessageTypeSize messageType, PacketType packetType, ApplicationIdSize applicationId);
+	Message(ServiceTypeSize serviceType, MessageTypeSize messageType, Message::PacketType packetType);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message
@@ -666,7 +666,7 @@ public:
 	 *
 	 * @return True if the message is of correct type, false if not
 	 */
-	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType, uint8_t expectedMessageType) const {
+	bool assertType(Message::PacketType expectedPacketType, ServiceTypeSize expectedServiceType, MessageTypeSize expectedMessageType) const {
 		bool status = true;
 
 		if ((packetType != expectedPacketType) || (serviceType != expectedServiceType) ||
@@ -682,7 +682,7 @@ public:
 	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
+	bool assertTC(ServiceTypeSize expectedServiceType, MessageTypeSize expectedMessageType) const {
 		return assertType(TC, expectedServiceType, expectedMessageType);
 	}
 
@@ -690,7 +690,7 @@ public:
 	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
+	bool assertTM(ServiceTypeSize expectedServiceType, MessageTypeSize expectedMessageType) const {
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };

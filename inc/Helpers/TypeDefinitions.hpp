@@ -1,37 +1,38 @@
 #pragma once
-#include "ECSS_Definitions.hpp"
+#include <cstdint>
 
-typedef uint8_t StepIdSize;
+using StepIdSize = uint8_t;
 
-typedef uint8_t StructureIdSize;
-typedef uint32_t TimeSize;
+using StructureIdSize = uint8_t;
+using TimeSize = uint32_t;
 
-typedef uint16_t EventIdSize;
+using EventIdSize = uint16_t;
 
-typedef uint16_t ParameterIdSize;
-typedef uint16_t SampleSize;
-typedef uint16_t IntervalSize;
+using ParameterIdSize = uint16_t;
+using SampleSize = uint16_t;
+using IntervalSize = uint16_t;
 
-typedef uint64_t StartAddressSize;
-typedef uint8_t MemoryIdSize;
-typedef uint8_t ReadDataSize;
-typedef uint16_t IterationSize;
-typedef uint16_t ChecksumSize;
-typedef uint16_t LengthSize;
+using StartAddressSize = uint64_t;
+using MemoryIdSize = uint8_t;
+using ReadDataSize = uint8_t;
+using IterationSize = uint16_t;
+using ChecksumSize = uint16_t;
+using LengthSize = uint16_t;
 
-typedef uint16_t IterationTimeSize;
+using IterationTimeSize = uint16_t;
 
-typedef uint16_t NumOfPMONDefSize;
-typedef uint16_t PMONIdSize;
+using NumOfPMONDefSize = uint16_t;
+using PMONIdSize = uint16_t;
 
-typedef uint16_t LargeMessageTransactionIdSize;
-typedef uint16_t PartSequenceNumSize;
+using LargeMessageTransactionIdSize = uint16_t;
+using PartSequenceNumSize = uint16_t;
 
-typedef uint16_t NumOfPacketStoresSize;
+using NumOfPacketStoresSize = uint16_t;
 
-typedef uint16_t EventDefinitionIdSize;
-typedef uint16_t ApplicationIdSize;
+using EventDefinitionIdSize = uint16_t;
+using ApplicationIdSize = uint16_t;
 
-typedef uint8_t ServiceTypeSize;
+using ServiceTypeSize = uint8_t;
+using MessageTypeSize = uint8_t;
 
-typedef uint8_t SourceIdSize;
+using SourceIdSize = uint16_t;
