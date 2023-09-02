@@ -88,9 +88,9 @@ public:
 	 *
 	 * Maximum value of 2047 (5.4.2.1c)
 	 */
-	ApplicationIdSize applicationId;
+	ApplicationProcessId applicationId;
 
-	SourceIdSize sourceId;
+	SourceId sourceId;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
@@ -245,7 +245,7 @@ public:
 	 */
 	void readCString(char* string, uint16_t size);
 
-	Message(ServiceTypeSize serviceType, MessageTypeSize messageType, PacketType packetType, ApplicationIdSize applicationId);
+	Message(ServiceTypeSize serviceType, MessageTypeSize messageType, PacketType packetType, ApplicationProcessId applicationId);
 	Message(ServiceTypeSize serviceType, MessageTypeSize messageType, Message::PacketType packetType);
 
 	/**

@@ -34,7 +34,7 @@ public:
 	/**
 	 * Contains the Application IDs, controlled by the Service.
 	 */
-	etl::vector<ApplicationIdSize, ECSSMaxControlledApplicationProcesses> controlledApplications;
+	etl::vector<ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
 	/**
 	 * The Application Process configuration, containing all the application process, service type and message type
@@ -46,28 +46,28 @@ private:
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
 	 */
-	void addAllReportsOfApplication(ApplicationIdSize applicationID);
+	void addAllReportsOfApplication(ApplicationProcessId applicationID);
 
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
 	 */
-	void addAllReportsOfService(ApplicationIdSize applicationID, ServiceTypeSize serviceType);
+	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Counts the number of service types, stored for the specified application process.
 	 */
-	uint8_t countServicesOfApplication(ApplicationIdSize applicationID);
+	uint8_t countServicesOfApplication(ApplicationProcessId applicationID);
 
 	/**
 	 * Counts the number of report types, stored for the specified service type.
 	 */
-	uint8_t countReportsOfService(ApplicationIdSize applicationID, ServiceTypeSize serviceType);
+	uint8_t countReportsOfService(ApplicationProcessId applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool reportExistsInAppProcessConfiguration(ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
+	bool reportExistsInAppProcessConfiguration(ApplicationProcessId applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
@@ -75,23 +75,23 @@ private:
 	 *
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
-	bool checkApplicationOfAppProcessConfig(Message& request, ApplicationIdSize applicationID, uint8_t numOfServices);
+	bool checkApplicationOfAppProcessConfig(Message& request, ApplicationProcessId applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
-	bool checkAppControlled(Message& request, ApplicationIdSize applicationId);
+	bool checkAppControlled(Message& request, ApplicationProcessId applicationId);
 
 	/**
 	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
 	 * definitions.
 	 */
-	bool allServiceTypesAllowed(Message& request, ApplicationIdSize applicationID);
+	bool allServiceTypesAllowed(Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Checks if the maximum number of service type definitions per application process is reached.
 	 */
-	bool maxServiceTypesReached(Message& request, ApplicationIdSize applicationID);
+	bool maxServiceTypesReached(Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -99,12 +99,12 @@ private:
 	 *
 	 * @return True: if the service type is valid and passes all the necessary error checking.
 	 */
-	bool checkService(Message& request, ApplicationIdSize applicationID, uint8_t numOfMessages);
+	bool checkService(Message& request, ApplicationProcessId applicationID, uint8_t numOfMessages);
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
 	 */
-	bool maxReportTypesReached(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType);
+	bool maxReportTypesReached(Message& request, ApplicationProcessId applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
@@ -112,59 +112,59 @@ private:
 	 *
 	 * @return True: if the message type is valid and passes all the necessary error checking.
 	 */
-	bool checkMessage(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
+	bool checkMessage(Message& request, ApplicationProcessId applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 	/**
 	 * Returns true, if the defined application exists in the application process configuration map.
 	 */
-	bool isApplicationEnabled(ApplicationIdSize targetAppID);
+	bool isApplicationEnabled(ApplicationProcessId targetAppID);
 
 	/**
 	 * Returns true, if the defined service type exists in the application process configuration map.
 	 */
-	bool isServiceTypeEnabled(ApplicationIdSize applicationID, ServiceTypeSize targetService);
+	bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeSize targetService);
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool isReportTypeEnabled(uint8_t target, ApplicationIdSize applicationID, ServiceTypeSize serviceType);
+	bool isReportTypeEnabled(uint8_t target, ApplicationProcessId applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
 	 */
-	void deleteApplicationProcess(ApplicationIdSize applicationID);
+	void deleteApplicationProcess(ApplicationProcessId applicationID);
 
 	/**
 	 * Checks whether the requested application is present in the application process configuration.
 	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
-	bool isApplicationInConfiguration(Message& request, ApplicationIdSize applicationID, uint8_t numOfServices);
+	bool isApplicationInConfiguration(Message& request, ApplicationProcessId applicationID, uint8_t numOfServices);
 
 	/**
 	 * Checks whether the requested service type is present in the application process configuration.
 	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
 	 */
-	bool isServiceTypeInConfiguration(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, uint8_t numOfMessages);
+	bool isServiceTypeInConfiguration(Message& request, ApplicationProcessId applicationID, ServiceTypeSize serviceType, uint8_t numOfMessages);
 
 	/**
 	 * Checks whether the requested report type is present in the application process configuration.
 	 * Reports an error if one exist.
 	 */
-	bool isReportTypeInConfiguration(Message& request, ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
+	bool isReportTypeInConfiguration(Message& request, ApplicationProcessId applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 	/**
 	 * Deletes the requested service type from the application process configuration. If the deletion results in an
 	 * empty application process, it deletes the corresponding application process definition as well.
 	 */
-	void deleteServiceRecursive(ApplicationIdSize applicationID, ServiceTypeSize serviceType);
+	void deleteServiceRecursive(ApplicationProcessId applicationID, ServiceTypeSize serviceType);
 
 	/**
 	 * Deletes the requested report type from the application process configuration. If the deletion results in an
 	 * empty service, it deletes the corresponding service. If the deletion of the service, results in an empty
 	 * application process, it deletes the corresponding application process definition as well.
 	 */
-	void deleteReportRecursive(ApplicationIdSize applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
+	void deleteReportRecursive(ApplicationProcessId applicationID, ServiceTypeSize serviceType, MessageTypeSize messageType);
 
 public:
 	/**

@@ -40,13 +40,13 @@ public:
 	};
 
 	struct EventActionDefinition {
-		ApplicationIdSize applicationID = 0;
-		inline static const ApplicationIdSize MaxDefinitionID = 65535;
-		EventDefinitionIdSize eventDefinitionID = MaxDefinitionID;
+		ApplicationProcessId applicationID = 0;
+		inline static const ApplicationProcessId MaxDefinitionID = 65535;
+		EventDefinitionId eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
-		EventActionDefinition(ApplicationIdSize applicationID, EventDefinitionIdSize eventDefinitionID, Message& message);
+		EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message& message);
 	};
 
 	friend EventReportService;
@@ -122,7 +122,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction(EventDefinitionIdSize eventDefinitionID);
+	void executeAction(EventDefinitionId eventDefinitionID);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

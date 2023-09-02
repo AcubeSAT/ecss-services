@@ -68,7 +68,7 @@ public:
 	 * @param parameterId the given ID
 	 * @return True if there is a reference to a parameter with the given ID, False otherwise
 	 */
-	bool parameterExists(ParameterIdSize parameterId) const {
+	bool parameterExists(ParameterId parameterId) const {
 		return parameters.find(parameterId) != parameters.end();
 	}
 
@@ -78,7 +78,7 @@ public:
 	 *
 	 * @param parameterId the id of the parameter, whose reference is to be returned.
 	 */
-	std::optional<std::reference_wrapper<ParameterBase>> getParameter(ParameterIdSize parameterId) const {
+	std::optional<std::reference_wrapper<ParameterBase>> getParameter(ParameterId parameterId) const {
 		auto parameter = parameters.find(parameterId);
 
 		if (parameter != parameters.end()) {

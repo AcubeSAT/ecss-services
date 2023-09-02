@@ -13,8 +13,8 @@ EventActionService& eventActionService = Services.eventAction;
 void initializeEventActionDefinitions() {
 	Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 	uint8_t numberOfEventActionDefinitions = 9;
-	ApplicationIdSize applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
-	EventDefinitionIdSize eventDefinitionIDs[] = {0, 4, 2, 12, 1, 5, 8, 23, 3};
+	ApplicationProcessId applicationIDs[] = {1, 0, 1, 0, 0, 2, 0, 1, 0};
+	EventDefinitionId eventDefinitionIDs[] = {0, 4, 2, 12, 1, 5, 8, 23, 3};
 	String<ECSSTCRequestStringSize> data[] = {"\0", "1", "\0", "3", "4", "5", "6", "7", "8"};
 	addDefinitions.appendUint8(numberOfEventActionDefinitions);
 	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
@@ -52,8 +52,8 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	SECTION("Adding multiple event-action definitions for different events") {
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		uint8_t numberOfEventActionDefinitions = 3;
-		ApplicationIdSize applicationIDs[] = {0, 1, 2};
-		EventDefinitionIdSize eventDefinitionIDs[] = {3, 5, 4};
+		ApplicationProcessId applicationIDs[] = {0, 1, 2};
+		EventDefinitionId eventDefinitionIDs[] = {3, 5, 4};
 		String<ECSSTCRequestStringSize> dataArray[] = {"123", "456", "789"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
 		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
@@ -139,9 +139,9 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		Message message(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		String<ECSSTCRequestStringSize> data = "123";
 		message.appendFixedString(data);
-		ApplicationIdSize applicationID = 257;
+		ApplicationProcessId applicationID = 257;
 
-		for (EventDefinitionIdSize eventDefinitionID = 0; eventDefinitionID < 100; ++eventDefinitionID) {
+		for (EventDefinitionId eventDefinitionID = 0; eventDefinitionID < 100; ++eventDefinitionID) {
 			EventActionService::EventActionDefinition temp(--applicationID, eventDefinitionID, message);
 			eventActionService.eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temp));
 			message.resetRead();

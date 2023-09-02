@@ -61,9 +61,9 @@ private:
 	 * sequence count and the source ID, all defined in the ECSS standard.
 	 */
 	struct RequestID {
-		ApplicationIdSize applicationID = 0; ///< Application process ID
+		ApplicationProcessId applicationID = 0; ///< Application process ID
 		uint16_t sequenceCount = 0; ///< Packet sequence count
-		SourceIdSize sourceID = 0;       ///< Packet source ID
+		SourceId sourceID = 0;       ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or

@@ -12,8 +12,8 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	Statistic stat2;
 	stat1.selfSamplingInterval = interval1;
 	stat2.selfSamplingInterval = interval2;
-	ParameterIdSize id1 = 7;
-	ParameterIdSize id2 = 5;
+	ParameterId id1 = 7;
+	ParameterId id2 = 5;
 
 	int numOfSamples = 3;
 	for (int i = 0; i < numOfSamples; i++) { // Values of stat-1: [ 1, 3, 5 ]
@@ -44,7 +44,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readUint32() == 86769000); // end time
 		CHECK(report.readUint16() == 2);        // number of parameters reported
 		// Parameter B
-		CHECK(report.readUint16() == 5);        // ID-2
+		CHECK(report.read<ParameterId>() == 5);        // ID-2
 		CHECK(report.readUint16() == 6);        // number of samples
 		CHECK(report.readFloat() == 13);        // max value
 		CHECK(report.readUint32() == 86769000); // max time
@@ -53,7 +53,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readFloat() == 8);         // mean
 		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
-		CHECK(report.readUint16() == 7);                  // ID-1
+		CHECK(report.read<ParameterId>() == 7);                  // ID-1
 		CHECK(report.readUint16() == 3);                  // number of samples
 		CHECK(report.readFloat() == 5);                   // max value
 		CHECK(report.readUint32() == 86769000);           // max time
@@ -118,7 +118,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readFloat() == 8);         // mean
 		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
-		CHECK(report.readUint16() == 7);                  // ID-1
+		CHECK(report.read<ParameterId>() == 7);                  // ID-1
 		CHECK(report.readUint16() == 3);                  // number of samples
 		CHECK(report.readFloat() == 5);                   // max value
 		CHECK(report.readUint32() == 86769000);           // max time
@@ -246,10 +246,10 @@ TEST_CASE("Add/Update statistics definitions") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
-		ParameterIdSize numOfIds = 1;
+		ParameterId numOfIds = 1;
 		request.appendUint16(numOfIds);
 
-		ParameterIdSize paramId1 = 0;
+		ParameterId paramId1 = 0;
 		uint16_t interval1 = 1400;
 		request.appendUint16(paramId1);
 		request.appendUint16(interval1);
@@ -270,10 +270,10 @@ TEST_CASE("Add/Update statistics definitions") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
-		ParameterIdSize numOfIds = 1;
+		ParameterId numOfIds = 1;
 		request.appendUint16(numOfIds);
 
-		ParameterIdSize paramId1 = 1;
+		ParameterId paramId1 = 1;
 		uint16_t interval1 = 3200;
 		request.appendUint16(paramId1);
 		request.appendUint16(interval1);
@@ -298,15 +298,15 @@ TEST_CASE("Add/Update statistics definitions") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::AddOrUpdateParameterStatisticsDefinitions, Message::TC, 1);
-		ParameterIdSize numOfIds = 6;
+		ParameterId numOfIds = 6;
 		request.appendUint16(numOfIds);
 
-		ParameterIdSize paramId1 = 0;
-		ParameterIdSize paramId2 = 1;
-		ParameterIdSize paramId3 = 2;
-		ParameterIdSize paramId4 = ECSSParameterCount + 24;
-		ParameterIdSize paramId5 = ECSSParameterCount + 1;
-		ParameterIdSize paramId6 = 3;
+		ParameterId paramId1 = 0;
+		ParameterId paramId2 = 1;
+		ParameterId paramId3 = 2;
+		ParameterId paramId4 = ECSSParameterCount + 24;
+		ParameterId paramId5 = ECSSParameterCount + 1;
+		ParameterId paramId6 = 3;
 
 		uint16_t interval1 = 14000;
 		uint16_t interval2 = 32000;
@@ -361,9 +361,9 @@ TEST_CASE("Delete statistics definitions") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, Message::TC, 1);
-		ParameterIdSize numIds = 2;
-		ParameterIdSize id1 = 0;
-		ParameterIdSize id2 = 255; // Invalid ID
+		ParameterId numIds = 2;
+		ParameterId id1 = 0;
+		ParameterId id2 = 255; // Invalid ID
 		request.appendUint16(numIds);
 		request.appendUint16(id1);
 		request.appendUint16(id2);
@@ -380,7 +380,7 @@ TEST_CASE("Delete statistics definitions") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::DeleteParameterStatisticsDefinitions, Message::TC, 1);
-		ParameterIdSize numIds = 0;
+		ParameterId numIds = 0;
 		request.appendUint16(numIds);
 
 		MessageParser::execute(request);
@@ -409,8 +409,8 @@ TEST_CASE("Parameter statistics definition report") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.readUint16() == 700); // Reporting interval
 		CHECK(report.readUint16() == 2);   // Num of valid Ids
-		CHECK(report.readUint16() == 5);   // Valid parameter ID
-		CHECK(report.readUint16() == 12);  // Sampling interval
+		CHECK(report.read<ParameterId>() == 5);   // Valid parameter ID
+		CHECK(report.read<SamplingInterval>() == 12);  // Sampling interval
 		CHECK(report.readUint16() == 7);
 		CHECK(report.readUint16() == 0);
 

@@ -21,7 +21,7 @@ void ErrorHandler::reportError(const Message& message, ExecutionStartErrorType e
 	logError(message, errorCode);
 }
 
-void ErrorHandler::reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepIdSize stepID) {
+void ErrorHandler::reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepId stepID) {
 #ifdef SERVICE_REQUESTVERIFICATION
 	Services.requestVerification.failProgressExecutionVerification(message, errorCode, stepID);
 #endif

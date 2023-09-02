@@ -5,8 +5,8 @@
 #include <etl/String.hpp>
 #include "Message.hpp"
 
-void LargePacketTransferService::firstDownlinkPartReport(LargeMessageTransactionIdSize largeMessageTransactionIdentifier,
-                                                         PartSequenceNumSize partSequenceNumber,
+void LargePacketTransferService::firstDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier,
+                                                         PartSequenceNum partSequenceNumber,
                                                          const String<ECSSMaxFixedOctetStringSize>& string) {
 	Message report = createTM(LargePacketTransferService::MessageType::FirstDownlinkPartReport);
 	report.appendUint16(largeMessageTransactionIdentifier); // large message transaction identifier
@@ -16,7 +16,7 @@ void LargePacketTransferService::firstDownlinkPartReport(LargeMessageTransaction
 }
 
 void LargePacketTransferService::intermediateDownlinkPartReport(
-    LargeMessageTransactionIdSize largeMessageTransactionIdentifier, PartSequenceNumSize partSequenceNumber,
+    LargeMessageTransactionId largeMessageTransactionIdentifier, PartSequenceNum partSequenceNumber,
     const String<ECSSMaxFixedOctetStringSize>& string) {
 
 	Message report = createTM(LargePacketTransferService::MessageType::InternalDownlinkPartReport);
@@ -26,8 +26,8 @@ void LargePacketTransferService::intermediateDownlinkPartReport(
 	storeMessage(report);
 }
 
-void LargePacketTransferService::lastDownlinkPartReport(LargeMessageTransactionIdSize largeMessageTransactionIdentifier,
-                                                        PartSequenceNumSize partSequenceNumber,
+void LargePacketTransferService::lastDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier,
+                                                        PartSequenceNum partSequenceNumber,
                                                         const String<ECSSMaxFixedOctetStringSize>& string) {
 	Message report = createTM(LargePacketTransferService::MessageType::LastDownlinkPartReport);
 	report.appendUint16(largeMessageTransactionIdentifier); // large message transaction identifier
@@ -51,7 +51,7 @@ LargePacketTransferService::lastUplinkPart(const String<ECSSMaxFixedOctetStringS
 	return string;
 }
 
-void LargePacketTransferService::split(Message& message, LargeMessageTransactionIdSize largeMessageTransactionIdentifier) {
+void LargePacketTransferService::split(Message& message, LargeMessageTransactionId largeMessageTransactionIdentifier) {
 	//TODO: Should this be uint32?
 	uint16_t size = message.dataSize;
 	uint16_t positionCounter = 0;

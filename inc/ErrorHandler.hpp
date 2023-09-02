@@ -460,7 +460,7 @@ public:
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
 	 */
-	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepIdSize stepID);
+	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepId stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.

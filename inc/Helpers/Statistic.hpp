@@ -14,7 +14,7 @@
 class Statistic {
 public:
 	uint16_t selfSamplingInterval = 0;
-	SampleSize sampleCounter = 0;
+	ParameterSampleCount sampleCounter = 0;
 	Time::DefaultCUC timeOfMaxValue;
 	Time::DefaultCUC timeOfMinValue;
 	double max = -std::numeric_limits<double>::infinity();

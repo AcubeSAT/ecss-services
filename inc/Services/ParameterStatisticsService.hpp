@@ -58,7 +58,7 @@ public:
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
-	etl::map<ParameterIdSize, Statistic, ECSSMaxStatisticParameters> statisticsMap;
+	etl::map<ParameterId, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
 	 * If true, after every report reset the parameter statistics.

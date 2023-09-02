@@ -13,7 +13,7 @@
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
 struct HousekeepingStructure {
-	StructureIdSize structureId;
+	ParameterReportStructureId structureId;
 
     /**
      * Defined as integer multiples of the minimum sampling interval as per 6.3.3.2.c.5 #NOTE-2.
@@ -28,7 +28,7 @@ struct HousekeepingStructure {
     /**
      * Vector containing the IDs of the simply commutated parameters, contained in the housekeeping structure.
      */
-    etl::vector<ParameterIdSize, ECSSMaxSimplyCommutatedParameters> simplyCommutatedParameterIds;
+    etl::vector<ParameterId, ECSSMaxSimplyCommutatedParameters> simplyCommutatedParameterIds;
 
 	HousekeepingStructure() = default;
 };

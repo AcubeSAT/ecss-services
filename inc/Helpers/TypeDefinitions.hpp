@@ -1,38 +1,41 @@
 #pragma once
 #include <cstdint>
 
-using StepIdSize = uint8_t;
+using StepId = uint8_t;
 
-using StructureIdSize = uint8_t;
-using TimeSize = uint32_t;
+using ParameterReportStructureId = uint8_t;
+/**
+ * \deprecated Ought to be changed to use proper timestamps.
+ */
+using TimeInt = uint32_t;
 
-using EventIdSize = uint16_t;
+using EventDefinitionId = uint16_t;
 
-using ParameterIdSize = uint16_t;
-using SampleSize = uint16_t;
-using IntervalSize = uint16_t;
+using ParameterId = uint16_t;
+using ParameterSampleCount = uint16_t;
+using SamplingInterval = uint16_t;
 
-using StartAddressSize = uint64_t;
-using MemoryIdSize = uint8_t;
-using ReadDataSize = uint8_t;
-using IterationSize = uint16_t;
-using ChecksumSize = uint16_t;
-using LengthSize = uint16_t;
+using StartAddress = uint64_t;
+using MemoryId = uint8_t;
+using ReadData = uint8_t;
+using MemoryManagementChecksum = uint16_t;
+/**
+ * Length of the written, loaded or dumped data used in the Memory Management Service.
+ */
+using DataLength = uint16_t;
 
-using IterationTimeSize = uint16_t;
+using PMONId = uint16_t;
 
-using NumOfPMONDefSize = uint16_t;
-using PMONIdSize = uint16_t;
+using LargeMessageTransactionId = uint16_t;
+using PartSequenceNum = uint16_t;
 
-using LargeMessageTransactionIdSize = uint16_t;
-using PartSequenceNumSize = uint16_t;
+using NumOfPacketStores = uint16_t;
 
-using NumOfPacketStoresSize = uint16_t;
-
-using EventDefinitionIdSize = uint16_t;
-using ApplicationIdSize = uint16_t;
+using ApplicationProcessId = uint16_t;
 
 using ServiceTypeSize = uint8_t;
+static_assert(sizeof(ServiceTypeSize) == 1);
 using MessageTypeSize = uint8_t;
+static_assert(sizeof(MessageTypeSize) == 1);
 
-using SourceIdSize = uint16_t;
+using SourceId = uint16_t;

@@ -51,7 +51,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 	}
 
 	// todo: Get the sub-schedule ID if they are implemented
-	IterationTimeSize iterationCount = request.readUint16();
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		// todo: Get the group ID first, if groups are used
 		Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
@@ -111,11 +111,11 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
 	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
-	IterationTimeSize iterationCount = request.readUint16();
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint16();
-		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.readUint16();
 
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
@@ -142,11 +142,11 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 		return;
 	}
 
-	IterationTimeSize iterationCount = request.readUint16();
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint16();
-		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.readUint16();
 
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
@@ -189,11 +189,11 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
-	IterationTimeSize iterationCount = request.readUint16();
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint16();
-		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.readUint16();
 
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
@@ -220,11 +220,11 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
 
-	IterationTimeSize iterationCount = request.readUint16();
+	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint16();
-		receivedRequestID.applicationID = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.readUint16();
 
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),

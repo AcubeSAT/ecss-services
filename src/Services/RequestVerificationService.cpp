@@ -58,26 +58,26 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 	storeMessage(report);
 }
 
-void RequestVerificationService::successProgressExecutionVerification(const Message& request, StepIdSize stepID) {
+void RequestVerificationService::successProgressExecutionVerification(const Message& request, StepId stepID) {
 	// TM[1,5] successful progress of execution verification report
 
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
 
 	assembleReportMessage(request, report);
-	report.appendByte(stepID); // step ID
+	report.append<StepId>(stepID); // step ID
 
 	storeMessage(report);
 }
 
 void RequestVerificationService::failProgressExecutionVerification(const Message& request,
                                                                    ErrorHandler::ExecutionProgressErrorType errorCode,
-                                                                   StepIdSize stepID) {
+                                                                   StepId stepID) {
 	// TM[1,6] failed progress of execution verification report
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedProgressOfExecution);
 
 	assembleReportMessage(request, report);
-	report.appendByte(stepID);      // step ID
+	report.append(stepID);      // step ID
 	report.appendEnum16(errorCode); // error code
 
 	storeMessage(report);

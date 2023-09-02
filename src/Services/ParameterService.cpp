@@ -15,7 +15,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t numberOfValidIds = 0;
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		if (parameterExists(paramIds.readUint16())) {
+		if (parameterExists(paramIds.read<ParameterId>())) {
 			numberOfValidIds++;
 		}
 	}
@@ -24,7 +24,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 
 	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		ParameterIdSize currId = paramIds.readUint16();
+		ParameterId currId = paramIds.read<ParameterId>();
 		auto parameter = getParameter(currId);
 		if (!parameter) {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
@@ -45,7 +45,7 @@ void ParameterService::setParameters(Message& newParamValues) const {
 	uint16_t numOfIds = newParamValues.readUint16();
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		ParameterIdSize currId = newParamValues.readUint16();
+		ParameterId currId = newParamValues.read<ParameterId>();
 		auto parameter = getParameter(currId);
 		if (!parameter) {
 			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);

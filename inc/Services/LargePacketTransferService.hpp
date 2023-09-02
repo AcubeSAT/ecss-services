@@ -38,7 +38,7 @@ public:
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
 	 */
-	void firstDownlinkPartReport(LargeMessageTransactionIdSize largeMessageTransactionIdentifier, PartSequenceNumSize partSequenceNumber,
+	void firstDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier, PartSequenceNum partSequenceNumber,
 	                             const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
@@ -47,7 +47,7 @@ public:
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
 	 */
-	void intermediateDownlinkPartReport(LargeMessageTransactionIdSize largeMessageTransactionIdentifier, PartSequenceNumSize partSequenceNumber,
+	void intermediateDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier, PartSequenceNum partSequenceNumber,
 	                                    const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
@@ -56,7 +56,7 @@ public:
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
 	 */
-	void lastDownlinkPartReport(LargeMessageTransactionIdSize largeMessageTransactionIdentifier, PartSequenceNumSize partSequenceNumber,
+	void lastDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier, PartSequenceNum partSequenceNumber,
 	                            const String<ECSSMaxFixedOctetStringSize>& string);
 
 	// The three uplink functions should handle a TC request to "upload" data. Since there is not
@@ -86,7 +86,7 @@ public:
 	 * @param message that is exceeds the standards and has to be split down
 	 * @param largeMessageTransactionIdentifier that is a value we assign to this splitting of the large message
 	 */
-	void split(Message& message, LargeMessageTransactionIdSize largeMessageTransactionIdentifier);
+	void split(Message& message, LargeMessageTransactionId largeMessageTransactionIdentifier);
 };
 
 #endif // ECSS_SERVICES_LARGEPACKETTRANSFERSERVICE_HPP
