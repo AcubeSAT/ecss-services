@@ -8,7 +8,6 @@
 #include "etl/vector.h"
 
 /**
- * @author Konstantinos Petridis <petridkon@gmail.com>
  *
  * The Application Process configuration. It's basically a map, storing a vector of report type definitions for each
  * pair of (applicationID, serviceType). It contains definitions, which indicate whether a telemetry message, produced

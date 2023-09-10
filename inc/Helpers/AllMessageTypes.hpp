@@ -15,7 +15,6 @@
 
 /**
  * Namespace containing all the message types for every service type.
- * todo: needs to be updated after the implementation of the remaining ecss services.
  */
 namespace AllMessageTypes {
 	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> serviceDefinitionsVector;
