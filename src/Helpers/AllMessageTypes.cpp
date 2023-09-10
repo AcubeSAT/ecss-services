@@ -12,7 +12,7 @@
 #include "Services/TimeBasedSchedulingService.hpp"
 
 namespace AllMessageTypes {
-	const serviceDefinitionsVector ST01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,
+	const ServiceDefinitionsVector ST01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,
 		                                                                     RequestVerificationService::MessageType::FailedCompletionOfExecution,
 		                                                                     RequestVerificationService::MessageType::FailedProgressOfExecution,
 		                                                                     RequestVerificationService::MessageType::FailedRoutingReport,
@@ -22,7 +22,7 @@ namespace AllMessageTypes {
 		                                                                     RequestVerificationService::MessageType::SuccessfulProgressOfExecution,
 		                                                                     RequestVerificationService::MessageType::SuccessfulStartOfExecution};
 
-	const serviceDefinitionsVector ST03Messages = {
+	const ServiceDefinitionsVector ST03Messages = {
 	    HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport,
 	    HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport,
 	    HousekeepingService::MessageType::GenerateOneShotHousekeepingReport,
@@ -30,34 +30,34 @@ namespace AllMessageTypes {
 	    HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
 	    HousekeepingService::MessageType::HousekeepingStructuresReport};
 
-	const serviceDefinitionsVector ST04Messages = {
+	const ServiceDefinitionsVector ST04Messages = {
 	    ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport,
 	    ParameterStatisticsService::MessageType::ParameterStatisticsReport,
 	};
 
-	const serviceDefinitionsVector ST05Messages = {EventReportService::MessageType::HighSeverityAnomalyReport,
+	const ServiceDefinitionsVector ST05Messages = {EventReportService::MessageType::HighSeverityAnomalyReport,
 	                                                                         EventReportService::MessageType::DisabledListEventReport,
 	                                                                         EventReportService::MessageType::InformativeEventReport,
 	                                                                         EventReportService::MessageType::LowSeverityAnomalyReport,
 	                                                                         EventReportService::MessageType::MediumSeverityAnomalyReport};
 
-	const serviceDefinitionsVector ST06Messages = {MemoryManagementService::MessageType::CheckRawMemoryDataReport,
+	const ServiceDefinitionsVector ST06Messages = {MemoryManagementService::MessageType::CheckRawMemoryDataReport,
 	                                                                         MemoryManagementService::MessageType::DumpRawMemoryDataReport};
 
-	const serviceDefinitionsVector ST11Messages = {TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
+	const ServiceDefinitionsVector ST11Messages = {TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
 
-	const serviceDefinitionsVector ST13Messages = {LargePacketTransferService::MessageType::FirstDownlinkPartReport,
+	const ServiceDefinitionsVector ST13Messages = {LargePacketTransferService::MessageType::FirstDownlinkPartReport,
 	                                                                         LargePacketTransferService::MessageType::InternalDownlinkPartReport,
 	                                                                         LargePacketTransferService::MessageType::LastDownlinkPartReport};
 
-	const serviceDefinitionsVector ST17Messages = {TestService::MessageType::AreYouAliveTestReport,
+	const ServiceDefinitionsVector ST17Messages = {TestService::MessageType::AreYouAliveTestReport,
 	                                                                         TestService::MessageType::OnBoardConnectionTestReport};
 
-	const serviceDefinitionsVector ST19Messages = {EventActionService::MessageType::EventActionStatusReport};
+	const ServiceDefinitionsVector ST19Messages = {EventActionService::MessageType::EventActionStatusReport};
 
-	const serviceDefinitionsVector ST20Messages = {ParameterService::MessageType::ParameterValuesReport};
+	const ServiceDefinitionsVector ST20Messages = {ParameterService::MessageType::ParameterValuesReport};
 
-	const etl::map<uint8_t, serviceDefinitionsVector, ECSSMaxServiceTypeDefinitions> MessagesOfService = {
+	const etl::map<uint8_t, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions> MessagesOfService = {
 	    {RequestVerificationService::ServiceType, ST01Messages},
 	    {HousekeepingService::ServiceType, ST03Messages},
 	    {ParameterStatisticsService::ServiceType, ST04Messages},
