@@ -282,7 +282,7 @@ void RealTimeForwardingControlService::reportAppProcessConfigurationContent(Mess
 }
 
 void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
-	Message report(ServiceType, MessageType::AppProcessConfigurationContentReport, Message::TM, 1);
+	Message report(ServiceType, MessageType::AppProcessConfigurationContentReport, Message::TM, ApplicationId);
 
 	auto& definitions = applicationProcessConfiguration.definitions;
 	uint8_t numOfApplications = 0;
