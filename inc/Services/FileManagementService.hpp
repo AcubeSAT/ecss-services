@@ -50,7 +50,7 @@ public:
 	/**
      * Character which denotes the end of a string and the beginning of the next (if there is any)
      */
-	inline static constexpr char VariableStringTerminator = '@';
+	inline static constexpr char VariableStringTerminator = '\0';
 
 	/**
 	 * The maximum possible size of a file, in bytes.
