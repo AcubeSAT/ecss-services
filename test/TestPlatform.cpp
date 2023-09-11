@@ -178,6 +178,8 @@ void ParameterStatisticsService::initializeStatisticsMap() {
 }
 
 namespace Filesystem {
+	namespace fs = std::filesystem;
+
 	etl::optional<FileCreationError> createFile(const Path& path) {
 		etl::optional<NodeType> nodeType = getNodeType(path);
 		if (nodeType.has_value()) {
@@ -195,10 +197,7 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 
-
 	etl::optional<FileDeletionError> deleteFile(const Path& path) {
-		namespace fs = std::filesystem;
-
 		etl::optional<NodeType> nodeType = getNodeType(path);
 		if (not nodeType.has_value()) {
 			return FileDeletionError::FileDoesNotExist;
@@ -223,8 +222,6 @@ namespace Filesystem {
 	}
 
 	etl::optional<NodeType> getNodeType(const Path& path) {
-		namespace fs = std::filesystem;
-
 		fs::file_type type = fs::status(path.data()).type();
 		switch (type) {
 			case fs::file_type::regular:
@@ -237,8 +234,6 @@ namespace Filesystem {
 	}
 
 	FileLockStatus getFileLockStatus(const Path& path) {
-		namespace fs = std::filesystem;
-
 		fs::perms permissions = fs::status(path.data()).permissions();
 
 		if ((permissions & fs::perms::owner_write) == fs::perms::none) {
@@ -249,8 +244,6 @@ namespace Filesystem {
 	}
 
 	void lockFile(const Path& path) {
-		namespace fs = std::filesystem;
-
 		fs::perms permissions = fs::status(path.data()).permissions();
 
 		auto newPermissions = permissions & ~fs::perms::owner_write;
@@ -259,8 +252,6 @@ namespace Filesystem {
 	}
 
 	void unlockFile(const Path& path) {
-		namespace fs = std::filesystem;
-
 		fs::perms permissions = fs::status(path.data()).permissions();
 
 		auto newPermissions = permissions & fs::perms::owner_write;
@@ -269,8 +260,6 @@ namespace Filesystem {
 	}
 
 	etl::optional<Attributes> getFileAttributes(const Path& path) {
-		namespace fs = std::filesystem;
-
 		Attributes attributes{};
 
 		auto nodeType = getNodeType(path);
@@ -289,8 +278,6 @@ namespace Filesystem {
 	}
 
 	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
-		namespace fs = std::filesystem;
-
 		if (auto nodeType = getNodeType(path)) {
 			return DirectoryCreationError::DirectoryAlreadyExists;
 		}
@@ -308,6 +295,6 @@ namespace Filesystem {
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
 		return etl::nullopt;
 	}
-}
+} // namespace Filesystem
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
