@@ -181,7 +181,7 @@ void FileManagementService::fileAttributeReport(const String<ECSSMaxStringSize>&
 	Message report = createTM(MessageType::CreateAttributesReport);
 
 	report.appendString(repositoryPath);
-	report.appendUint8('@');
+	report.appendUint8(VariableStringTerminator);
 	report.appendString(fileName);
 	report.appendUint32(attributes.sizeInBytes);
 	report.appendBoolean(attributes.isLocked);
