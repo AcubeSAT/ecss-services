@@ -7,7 +7,7 @@
 void FileManagementService::createFile(Message& message) {
 	using namespace FilepathValidators;
 
-	message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile);
+	message.assertTC(ServiceType,  MessageType::CreateFile);
 
 	Filesystem::Path repositoryPath("");
 
@@ -82,8 +82,7 @@ void FileManagementService::createFile(Message& message) {
 void FileManagementService::deleteFile(Message& message) {
 	using namespace FilepathValidators;
 
-	message.assertTC(FileManagementService::ServiceType,
-	                 FileManagementService::MessageType::DeleteFile);
+	message.assertTC(ServiceType, MessageType::DeleteFile);
 
 	Filesystem::Path repositoryPath("");
 
@@ -142,7 +141,7 @@ void FileManagementService::deleteFile(Message& message) {
 void FileManagementService::reportAttributes(Message& message) {
 	using namespace FilepathValidators;
 
-	message.assertTC(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes);
+	message.assertTC(ServiceType, MessageType::ReportAttributes);
 
 	String<ECSSMaxStringSize> repositoryPath("");
 	auto repositoryPathIsValid = getStringUntilTerminator(message);
