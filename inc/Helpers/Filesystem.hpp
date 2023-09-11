@@ -5,7 +5,7 @@
 #include "etl/optional.h"
 
 namespace Filesystem {
-	typedef String<ECSSMaxStringSize> Path;
+	using Path = String<ECSSMaxStringSize>;
 
 	struct Attributes {
 		size_t sizeInBytes;
