@@ -177,134 +177,137 @@ void ParameterStatisticsService::initializeStatisticsMap() {
 	statisticsMap = {};
 }
 
-etl::optional<Filesystem::FileCreationError> Filesystem::createFile(const Path& path) {
-	etl::optional<NodeType> nodeType = getNodeType(path);
-	if (nodeType.has_value()) {
-		return FileCreationError::FileAlreadyExists;
-	}
+namespace Filesystem {
+	etl::optional<FileCreationError> createFile(const Path& path) {
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (nodeType.has_value()) {
+			return FileCreationError::FileAlreadyExists;
+		}
 
-	Path fullPath = "/tmp/";
-	fullPath.append(path);
+		Path fullPath = "/tmp/";
+		fullPath.append(path);
 
-	std::ofstream file(path.data());
+		std::ofstream file(path.data());
 
-	file.flush();
-	file.close();
+		file.flush();
+		file.close();
 
-	return etl::nullopt;
-}
-
-etl::optional<Filesystem::FileDeletionError> Filesystem::deleteFile(const Filesystem::Path& path) {
-	namespace fs = std::filesystem;
-
-	etl::optional<NodeType> nodeType = getNodeType(path);
-	if (not nodeType.has_value()) {
-		return FileDeletionError::FileDoesNotExist;
-	}
-
-	if (nodeType.value() != NodeType::File) {
-		return FileDeletionError::PathLeadsToDirectory;
-	}
-
-	auto fileLockStatus = getFileLockStatus(path);
-	if (fileLockStatus == FileLockStatus::Locked) {
-		return FileDeletionError::FileIsLocked;
-	}
-
-	bool successfulFileDeletion = fs::remove(path.data());
-
-	if (successfulFileDeletion) {
 		return etl::nullopt;
-	} else {
-		return FileDeletionError::UnknownError;
 	}
-}
 
-etl::optional<Filesystem::NodeType> Filesystem::getNodeType(const Filesystem::Path& path) {
-	namespace fs = std::filesystem;
 
-	fs::file_type type = fs::status(path.data()).type();
-	switch (type) {
-		case fs::file_type::regular:
-			return Filesystem::NodeType::File;
-		case fs::file_type::directory:
-			return Filesystem::NodeType::Directory;
-		default:
+	etl::optional<FileDeletionError> deleteFile(const Path& path) {
+		namespace fs = std::filesystem;
+
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (not nodeType.has_value()) {
+			return FileDeletionError::FileDoesNotExist;
+		}
+
+		if (nodeType.value() != NodeType::File) {
+			return FileDeletionError::PathLeadsToDirectory;
+		}
+
+		auto fileLockStatus = getFileLockStatus(path);
+		if (fileLockStatus == FileLockStatus::Locked) {
+			return FileDeletionError::FileIsLocked;
+		}
+
+		bool successfulFileDeletion = fs::remove(path.data());
+
+		if (successfulFileDeletion) {
 			return etl::nullopt;
-	}
-}
-
-Filesystem::FileLockStatus Filesystem::getFileLockStatus(const Filesystem::Path& path) {
-	namespace fs = std::filesystem;
-
-	fs::perms permissions = fs::status(path.data()).permissions();
-
-	if ((permissions & fs::perms::owner_write) == fs::perms::none) {
-		return Filesystem::FileLockStatus::Locked;
+		} else {
+			return FileDeletionError::UnknownError;
+		}
 	}
 
-	return Filesystem::FileLockStatus::Unlocked;
-}
+	etl::optional<NodeType> getNodeType(const Path& path) {
+		namespace fs = std::filesystem;
 
-void Filesystem::lockFile(const Path& path) {
-	namespace fs = std::filesystem;
+		fs::file_type type = fs::status(path.data()).type();
+		switch (type) {
+			case fs::file_type::regular:
+				return NodeType::File;
+			case fs::file_type::directory:
+				return NodeType::Directory;
+			default:
+				return etl::nullopt;
+		}
+	}
 
-	fs::perms permissions = fs::status(path.data()).permissions();
+	FileLockStatus getFileLockStatus(const Path& path) {
+		namespace fs = std::filesystem;
 
-	auto newPermissions = permissions & ~fs::perms::owner_write;
+		fs::perms permissions = fs::status(path.data()).permissions();
 
-	fs::status(path.data()).permissions(newPermissions);
-}
+		if ((permissions & fs::perms::owner_write) == fs::perms::none) {
+			return FileLockStatus::Locked;
+		}
 
-void Filesystem::unlockFile(const Path& path) {
-	namespace fs = std::filesystem;
+		return FileLockStatus::Unlocked;
+	}
 
-	fs::perms permissions = fs::status(path.data()).permissions();
+	void lockFile(const Path& path) {
+		namespace fs = std::filesystem;
 
-	auto newPermissions = permissions & fs::perms::owner_write;
+		fs::perms permissions = fs::status(path.data()).permissions();
 
-	fs::status(path.data()).permissions(newPermissions);
-}
+		auto newPermissions = permissions & ~fs::perms::owner_write;
 
-etl::optional<Filesystem::Attributes> Filesystem::getFileAttributes(const Path& path) {
-	namespace fs = std::filesystem;
+		fs::status(path.data()).permissions(newPermissions);
+	}
 
-	Filesystem::Attributes attributes{};
+	void unlockFile(const Path& path) {
+		namespace fs = std::filesystem;
 
-	auto nodeType = getNodeType(path);
-	if (not nodeType.has_value()) {
+		fs::perms permissions = fs::status(path.data()).permissions();
+
+		auto newPermissions = permissions & fs::perms::owner_write;
+
+		fs::status(path.data()).permissions(newPermissions);
+	}
+
+	etl::optional<Attributes> getFileAttributes(const Path& path) {
+		namespace fs = std::filesystem;
+
+		Attributes attributes{};
+
+		auto nodeType = getNodeType(path);
+		if (not nodeType.has_value()) {
+			return etl::nullopt;
+		}
+
+		if (nodeType.value() != NodeType::File) {
+			return etl::nullopt;
+		}
+
+		attributes.sizeInBytes = fs::file_size(path.data());
+		attributes.isLocked = getFileLockStatus(path) == FileLockStatus::Locked;
+
+		return attributes;
+	}
+
+	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
+		namespace fs = std::filesystem;
+
+		if (auto nodeType = getNodeType(path)) {
+			return DirectoryCreationError::DirectoryAlreadyExists;
+		}
+
+		std::error_code errorCode{};
+		fs::create_directory(path.data(), errorCode);
+
+		if (errorCode) {
+			return DirectoryCreationError::UnknownError;
+		}
+
 		return etl::nullopt;
 	}
 
-	if (nodeType.value() != NodeType::File) {
+	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
 		return etl::nullopt;
 	}
-
-	attributes.sizeInBytes = fs::file_size(path.data());
-	attributes.isLocked = getFileLockStatus(path) == Filesystem::FileLockStatus::Locked;
-
-	return attributes;
-}
-
-etl::optional<Filesystem::DirectoryCreationError> Filesystem::createDirectory(const Path& path) {
-	namespace fs = std::filesystem;
-
-	if (auto nodeType = getNodeType(path)) {
-		return DirectoryCreationError::DirectoryAlreadyExists;
-	}
-
-	std::error_code errorCode{};
-	fs::create_directory(path.data(), errorCode);
-
-	if (errorCode) {
-		return DirectoryCreationError::UnknownError;
-	}
-
-	return etl::nullopt;
-}
-
-etl::optional<Filesystem::DirectoryDeletionError> Filesystem::deleteDirectory(const Path& path) {
-	return etl::nullopt;
 }
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
