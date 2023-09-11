@@ -7,14 +7,13 @@
 /**
  * Implementation of ST[23] file management service
  *
- * @author Christos Ioannidis <xristosioan@gmail.com>
- *
  * ECSS 6.23 & 8.23
+ *
+ * @ingroup Services
  *
  * The filesystem of the satellite will be structured, meaning files are stored in within directories. For more info
  * check DDJF_OBSW.
  * @todo define the number of filesystems (obc, su, ?)
- * @todo specify the set of file attributes (atleast the size in bytes of any file)
  * @todo define the MAX_SIZE_OF_SILE_BYTE
  * @todo define the locking status
  * @todo define the summary report support
@@ -22,8 +21,7 @@
  * @todo do we need all these operation handling (suspend, abort, report, periodic report)
  * @todo define max number of file copy operations (what is the meaning of having one ?)
  * @note The wildcard character is set to be '*'.
- * @note The "null terminator" between two variables with dynamic length is '@'
- * @note LittleFS permits only the deletion of empty directories
+ * @note The "null terminator" between two variables with dynamic length is '0'
  *
  * @ingroup services
  *
