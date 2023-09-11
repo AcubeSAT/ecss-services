@@ -44,7 +44,7 @@ target_sources(common PRIVATE
         src/Helpers/Statistic.cpp
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
-        src/Helpers/AllMessageTypes.cpp
+        src/Helpers/AllReportTypes.cpp
         )
 
 target_link_libraries(common PRIVATE etl log_common log_x86)
