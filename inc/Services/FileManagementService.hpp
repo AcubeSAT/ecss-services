@@ -27,18 +27,6 @@
  *
  */
 class FileManagementService : public Service {
-private:
-	bool lockFileSupport = false;
-	bool searchFileSupport = false;
-	bool summaryReportSupport = false;
-	bool moveFileSupport = true;
-	bool suspendFileCopyOperationSupport = false;
-	bool suspendAllFileCopyOperationSupport = false;
-	bool abortFileCopyOperationSupport = false;
-	bool abortAllFileCopyOperationSupport = false;
-	bool reportProgressOfCopyOperationsSupport = false;
-	bool enablePeriodicReportingOfFileCopyStatusSupport = false;
-
 public:
 	inline static constexpr uint8_t ServiceType = 23;
 
@@ -131,6 +119,18 @@ public:
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
+
+private:
+	inline static constexpr bool LockFileSupport = false;
+	inline static constexpr bool SearchFileSupport = false;
+	inline static constexpr bool SummaryReportSupport = false;
+	inline static constexpr bool MoveFileSupport = true;
+	inline static constexpr bool SuspendFileCopyOperationSupport = false;
+	inline static constexpr bool SuspendAllFileCopyOperationSupport = false;
+	inline static constexpr bool AbortFileCopyOperationSupport = false;
+	inline static constexpr bool AbortAllFileCopyOperationSupport = false;
+	inline static constexpr bool ReportProgressOfCopyOperationsSupport = false;
+	inline static constexpr bool EnablePeriodicReportingOfFileCopyStatusSupport = false;
 };
 
 #endif //ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
