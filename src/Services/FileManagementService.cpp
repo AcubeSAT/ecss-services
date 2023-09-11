@@ -58,8 +58,7 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
-	etl::optional<Filesystem::FileCreationError> fileCreationError = Filesystem::createFile(fullPath);
-	if (fileCreationError.has_value()) {
+	if (auto fileCreationError = Filesystem::createFile(fullPath)) {
 		switch (fileCreationError.value()) {
 			case Filesystem::FileCreationError::FileAlreadyExists: {
 				ErrorHandler::reportError(message,
@@ -118,8 +117,7 @@ void FileManagementService::deleteFile(Message& message) {
 		return;
 	}
 
-	auto fileDeletionError = Filesystem::deleteFile(fullPath);
-	if (fileDeletionError.has_value()) {
+	if (auto fileDeletionError = Filesystem::deleteFile(fullPath)) {
 		using Filesystem::FileDeletionError;
 		switch (fileDeletionError.value()) {
 			case FileDeletionError::FileDoesNotExist:
@@ -171,8 +169,8 @@ void FileManagementService::reportAttributes(Message& message) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
-	auto fileAttributeResult = Filesystem::getFileAttributes(fullPath);
-	if (fileAttributeResult.has_value()) {
+
+	if (auto fileAttributeResult = Filesystem::getFileAttributes(fullPath)) {
 		fileAttributeReport(repositoryPath, fileName, fileAttributeResult.value());
 	}
 }
