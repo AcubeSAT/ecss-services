@@ -231,6 +231,12 @@ void FileManagementService::execute(Message& message) {
 		case ReportAttributes:
 			reportAttributes(message);
 			break;
+		case CreateDirectory:
+			createDirectory(message);
+			break;
+		case DeleteDirectory:
+			deleteDirectory(message);
+			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}

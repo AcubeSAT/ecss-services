@@ -112,6 +112,16 @@ public:
 	                         const Filesystem::Attributes& attributes);
 
 	/**
+     * TC[23,9] Create a directory on the filesystem
+     */
+	void createDirectory(Message& message){};
+
+	/**
+     * TC[23,10] Delete a directory from the filesystem
+     */
+	void deleteDirectory(Message& message){};
+
+	/**
 	 * It is responsible to call the suitable function that executes a tele-command packet. The source of that packet
 	 * is the ground station.
 	 *
