@@ -88,8 +88,6 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	message5.appendString(repo5);
 	message5.append(FileManagementService::VariableStringTerminator);
 	message5.appendString(file5);
-	message5.appendString(nullString);
-	message5.appendUint32(1000);
 	message5.append(FileManagementService::VariableStringTerminator);
 	message5.appendUint32(maxFileSizeBytes);
 	message5.appendBoolean(isFileLocked);
