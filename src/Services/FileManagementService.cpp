@@ -26,7 +26,7 @@ void FileManagementService::createFile(Message& message) {
 	auto repositoryType = Filesystem::getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
-		                          ErrorHandler::ExecutionCompletionErrorType::LittleFsInvalidObjectType);
+		                          ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 		return;
 	}
 

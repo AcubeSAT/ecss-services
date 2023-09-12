@@ -437,7 +437,7 @@ public:
 		/**
          * Invalid object type returned from littleFs
          */
-		LittleFsInvalidObjectType = 6,
+		ObjectDoesNotExist = 6,
 		/**
          * LittleFs lfs_remove function generic error
          */
