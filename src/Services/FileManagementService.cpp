@@ -174,8 +174,23 @@ void FileManagementService::reportAttributes(Message& message) {
 		return;
 	}
 
-	if (auto fileAttributeResult = Filesystem::getFileAttributes(fullPath)) {
+	using namespace Filesystem;
+	auto fileAttributeResult = getFileAttributes(fullPath);
+	if (fileAttributeResult.is_value()) {
 		fileAttributeReport(repositoryPath, fileName, fileAttributeResult.value());
+		return;
+	}
+
+	switch (fileAttributeResult.error()) {
+		case FileAttributeError::PathLeadsToDirectory:
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedReportAttributesOnDirectory);
+			break;
+		case FileAttributeError::FileDoesNotExist:
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
+			break;
+		default:
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+			break;
 	}
 }
 

@@ -259,16 +259,16 @@ namespace Filesystem {
 		fs::status(path.data()).permissions(newPermissions);
 	}
 
-	etl::optional<Attributes> getFileAttributes(const Path& path) {
+	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
 		Attributes attributes{};
 
 		auto nodeType = getNodeType(path);
 		if (not nodeType.has_value()) {
-			return etl::nullopt;
+			return FileAttributeError::FileDoesNotExist;
 		}
 
 		if (nodeType.value() != NodeType::File) {
-			return etl::nullopt;
+			return FileAttributeError::PathLeadsToDirectory;
 		}
 
 		attributes.sizeInBytes = fs::file_size(path.data());
