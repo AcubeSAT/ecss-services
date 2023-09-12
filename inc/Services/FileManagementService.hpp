@@ -131,6 +131,16 @@ private:
 	inline static constexpr bool AbortAllFileCopyOperationSupport = false;
 	inline static constexpr bool ReportProgressOfCopyOperationsSupport = false;
 	inline static constexpr bool EnablePeriodicReportingOfFileCopyStatusSupport = false;
+
+	using Path = Filesystem::Path;
+
+	inline static Path getFullPath(const Path& repositoryPath, const Path& filePath) {
+		Path fullPath = repositoryPath;
+		fullPath.append("/");
+		fullPath.append(filePath);
+
+		return fullPath;
+	}
 };
 
 #endif //ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP

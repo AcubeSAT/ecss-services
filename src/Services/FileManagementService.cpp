@@ -60,13 +60,8 @@ void FileManagementService::createFile(Message& message) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	auto fullPath = repositoryPath;
-	fullPath.append(fileName);
 
-	if (findWildcardPosition(fullPath).has_value()) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-		return;
-	}
+	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (auto fileCreationError = Filesystem::createFile(fullPath)) {
 		switch (fileCreationError.value()) {
@@ -119,8 +114,8 @@ void FileManagementService::deleteFile(Message& message) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
-	auto fullPath = repositoryPath;
-	fullPath.append(fileName);
+
+	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath).has_value()) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -172,8 +167,7 @@ void FileManagementService::reportAttributes(Message& message) {
 		return;
 	}
 
-	auto fullPath = repositoryPath;
-	fullPath.append(fileName);
+	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath).has_value()) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
