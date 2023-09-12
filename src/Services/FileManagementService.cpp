@@ -18,6 +18,11 @@ void FileManagementService::createFile(Message& message) {
 	}
 	repositoryPath = repositoryPathIsValid.value();
 
+	if (findWildcardPosition(repositoryPath).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
 	auto repositoryType = Filesystem::getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
@@ -37,6 +42,11 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 	fileName = fileNameIsValid.value();
+
+	if (findWildcardPosition(fileName).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
 
 	uint32_t maxFileSizeBytes = message.readUint32();
 	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
