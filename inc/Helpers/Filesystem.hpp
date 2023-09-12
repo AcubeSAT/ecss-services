@@ -3,6 +3,7 @@
 #include "ECSS_Definitions.hpp"
 #include "etl/String.hpp"
 #include "etl/optional.h"
+#include "etl/result.h"
 
 namespace Filesystem {
 	using Path = String<ECSSMaxStringSize>;
@@ -45,6 +46,11 @@ namespace Filesystem {
 		Unlocked = 1
 	};
 
+	enum class FileAttributeError : uint8_t {
+		PathLeadsToDirectory = 0,
+		FileDoesNotExist = 1
+	};
+
 	etl::optional<FileCreationError> createFile(const Path& path);
 
 	etl::optional<FileDeletionError> deleteFile(const Path& path);
@@ -53,7 +59,7 @@ namespace Filesystem {
 
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
 
-	etl::optional<Attributes> getFileAttributes(const Path& path);
+	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path);
 
 	etl::optional<NodeType> getNodeType(const Path& path);
 

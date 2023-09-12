@@ -450,6 +450,7 @@ public:
 		AttemptedDeleteOnMissingFile = 10,
 		AttemptedDeleteOnDirectory = 11,
 		UnknownFileDeleteError = 12,
+		AttemptedReportAttributesOnDirectory = 13,
 	};
 
 	/**
