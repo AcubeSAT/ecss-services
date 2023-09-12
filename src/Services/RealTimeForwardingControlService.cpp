@@ -305,7 +305,7 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 	uint8_t appIdIndex = 0;
 
 	// C++ sorts the maps based on key by default. So keys with the same appID are accessed all-together.
-	for (auto& definition: definitions) {
+	for (const auto& definition: definitions) {
 		const auto& appAndServiceIdPair = definition.first;
 		auto applicationID = appAndServiceIdPair.first;
 		if (applicationID != previousAppID) {
