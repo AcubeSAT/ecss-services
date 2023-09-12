@@ -102,6 +102,18 @@ void FileManagementService::deleteFile(Message& message) {
 		return;
 	}
 
+	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	if (not repositoryType) {
+		ErrorHandler::reportError(message,
+		                          ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+		return;
+	}
+
+	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
+		return;
+	}
+
 	Filesystem::Path fileName("");
 	auto fileNameIsValid = getStringUntilTerminator(message);
 	if (not fileNameIsValid) {
@@ -110,17 +122,17 @@ void FileManagementService::deleteFile(Message& message) {
 	}
 	fileName = fileNameIsValid.value();
 
+	if (findWildcardPosition(fileName).has_value()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
 	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
 
 	auto fullPath = getFullPath(repositoryPath, fileName);
-
-	if (findWildcardPosition(fullPath).has_value()) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-		return;
-	}
 
 	if (auto fileDeletionError = Filesystem::deleteFile(fullPath)) {
 		using Filesystem::FileDeletionError;
