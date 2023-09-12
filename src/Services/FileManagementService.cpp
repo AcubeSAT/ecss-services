@@ -7,7 +7,7 @@
 void FileManagementService::createFile(Message& message) {
 	using namespace FilepathValidators;
 
-	message.assertTC(ServiceType,  MessageType::CreateFile);
+	message.assertTC(ServiceType, CreateFile);
 
 	Filesystem::Path repositoryPath("");
 
@@ -86,7 +86,7 @@ void FileManagementService::createFile(Message& message) {
 void FileManagementService::deleteFile(Message& message) {
 	using namespace FilepathValidators;
 
-	message.assertTC(ServiceType, MessageType::DeleteFile);
+	message.assertTC(ServiceType, DeleteFile);
 
 	Filesystem::Path repositoryPath("");
 
