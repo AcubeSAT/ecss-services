@@ -206,9 +206,7 @@ void FileManagementService::reportAttributes(Message& message) {
 	}
 }
 
-void FileManagementService::fileAttributeReport(const String<ECSSMaxStringSize>& repositoryPath,
-                                                const String<ECSSMaxStringSize>& fileName,
-                                                const Filesystem::Attributes& attributes) {
+void FileManagementService::fileAttributeReport(const Path& repositoryPath, const Path& fileName, const Filesystem::Attributes& attributes) {
 	Message report = createTM(MessageType::CreateAttributesReport);
 
 	report.appendString(repositoryPath);

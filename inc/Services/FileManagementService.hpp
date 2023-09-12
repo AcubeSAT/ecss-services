@@ -107,9 +107,7 @@ public:
 	/**
      * TM[23,4] Create a report with the attributes from a file at the provided object path
      */
-	void fileAttributeReport(const String<ECSSMaxStringSize>& repositoryString,
-	                         const String<ECSSMaxStringSize>& fileNameString,
-	                         const Filesystem::Attributes& attributes);
+	void fileAttributeReport(const Filesystem::Path& repositoryPath, const Filesystem::Path& fileName, const Filesystem::Attributes& attributes);
 
 	/**
      * TC[23,9] Create a directory on the filesystem
