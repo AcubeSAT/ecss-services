@@ -82,7 +82,7 @@ void EventReportService::enableReportGeneration(Message message) {
 	uint16_t length = message.readUint16();
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[message.readEnum16()] = true;
+			stateOfEvents[message.read<EventDefinitionId>()] = true;
 		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
@@ -100,7 +100,7 @@ void EventReportService::disableReportGeneration(Message message) {
 	uint16_t length = message.readUint16();
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[message.readEnum16()] = false;
+			stateOfEvents[message.read<EventDefinitionId>()] = false;
 		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();

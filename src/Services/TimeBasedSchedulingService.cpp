@@ -251,8 +251,8 @@ void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<
 	for (const auto& match: listOfActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
-		report.appendUint16(match.requestID.sourceID);
-		report.appendUint16(match.requestID.applicationID);
+		report.append(match.requestID.sourceID);
+		report.append(match.requestID.applicationID);
 		report.appendUint16(match.requestID.sequenceCount);
 	}
 	storeMessage(report);

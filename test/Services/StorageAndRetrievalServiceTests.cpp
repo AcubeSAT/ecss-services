@@ -38,9 +38,9 @@ void validPacketStoreCreationRequest(Message& request) {
 	request.appendUint16(numOfPacketStores);
 	uint8_t concatenatedPacketStoreNames[] = "ps2ps25ps799ps5555";
 	uint16_t offsets[5] = {0, 3, 7, 12, 18};
-	uint16_t sizes[4] = {100, 200, 550, 340};
-	uint8_t virtualChannels[4] = {4, 6, 1, 2};
-	uint8_t packetStoreTypeCode[2] = {0, 1};
+	PacketStoreSize sizes[4] = {100, 200, 550, 340};
+	VirtualChannel virtualChannels[4] = {4, 6, 1, 2};
+	PacketStoreType packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSPacketStoreIdSize];
@@ -50,13 +50,13 @@ void validPacketStoreCreationRequest(Message& request) {
 
 		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
-		request.appendUint16(sizes[i]);
+		request.append(sizes[i]);
 		if ((i % 2) == 0) {
-			request.appendUint8(packetStoreTypeCode[0]);
+			request.append(packetStoreTypeCode[0]);
 		} else {
-			request.appendUint8(packetStoreTypeCode[1]);
+			request.append(packetStoreTypeCode[1]);
 		}
-		request.appendUint8(virtualChannels[i]);
+		request.append(virtualChannels[i]);
 	}
 }
 
@@ -65,11 +65,11 @@ void invalidPacketStoreCreationRequest(Message& request) {
 	request.appendUint16(numOfPacketStores);
 	uint8_t concatenatedPacketStoreNames[] = "ps2ps1ps2ps44ps0000";
 	uint16_t offsets[6] = {0, 3, 6, 9, 13, 19};
-	uint16_t sizes[5] = {33, 55, 66, 77, 99};
-	uint8_t invalidChannel1 = VirtualChannelLimits.min - 1;
-	uint8_t invalidChannel2 = VirtualChannelLimits.max + 1;
-	uint8_t virtualChannels[5] = {5, invalidChannel1, 1, invalidChannel2, 2};
-	uint8_t packetStoreTypeCode[2] = {0, 1};
+	PacketStoreSize sizes[5] = {33, 55, 66, 77, 99};
+	VirtualChannel invalidChannel1 = VirtualChannelLimits.min - 1;
+	VirtualChannel invalidChannel2 = VirtualChannelLimits.max + 1;
+	VirtualChannel virtualChannels[5] = {5, invalidChannel1, 1, invalidChannel2, 2};
+	PacketStoreType packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSPacketStoreIdSize];
@@ -79,13 +79,13 @@ void invalidPacketStoreCreationRequest(Message& request) {
 
 		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
-		request.appendUint16(sizes[i]);
+		request.append(sizes[i]);
 		if ((i % 2) == 0) {
-			request.appendUint8(packetStoreTypeCode[0]);
+			request.append(packetStoreTypeCode[0]);
 		} else {
-			request.appendUint8(packetStoreTypeCode[1]);
+			request.append(packetStoreTypeCode[1]);
 		}
-		request.appendUint8(virtualChannels[i]);
+		request.append(virtualChannels[i]);
 	}
 }
 
@@ -1249,27 +1249,27 @@ TEST_CASE("Reporting the configuration of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData)));
-		CHECK(report.readUint16() == 100);
-		CHECK(report.readUint8() == 0);
-		CHECK(report.readUint8() == 4);
+		CHECK(report.read<PacketStoreSize>() == 100);
+		CHECK(report.read<PacketStoreType>() == 0);
+		CHECK(report.read<VirtualChannel>() == 4);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData2)));
-		CHECK(report.readUint16() == 200);
-		CHECK(report.readUint8() == 1);
-		CHECK(report.readUint8() == 6);
+		CHECK(report.read<PacketStoreSize>() == 200);
+		CHECK(report.read<PacketStoreType>() == 1);
+		CHECK(report.read<VirtualChannel>() == 6);
 		// Packet store 3
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData4)));
-		CHECK(report.readUint16() == 340);
-		CHECK(report.readUint8() == 1);
-		CHECK(report.readUint8() == 2);
+		CHECK(report.read<PacketStoreSize>() == 340);
+		CHECK(report.read<PacketStoreType>() == 1);
+		CHECK(report.read<VirtualChannel>() == 2);
 		// Packet store 4
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData3)));
-		CHECK(report.readUint16() == 550);
-		CHECK(report.readUint8() == 0);
-		CHECK(report.readUint8() == 1);
+		CHECK(report.read<PacketStoreSize>() == 550);
+		CHECK(report.read<PacketStoreType>() == 0);
+		CHECK(report.read<VirtualChannel>() == 1);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1616,7 +1616,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
 		request.appendString(packetStoreIds[0]);
-		request.appendUint8(virtualChannels[0]);
+		request.append(virtualChannels[0]);
 
 		MessageParser::execute(request);
 
@@ -1630,7 +1630,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		                 StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
 		request2.appendString(packetStoreIds[3]);
-		request2.appendUint8(virtualChannels[1]);
+		request2.append(virtualChannels[1]);
 
 		MessageParser::execute(request2);
 
@@ -1728,16 +1728,16 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 60);
-		CHECK(report.readUint16() == 40);
+		CHECK(report.read<Percentages>() == 60);
+		CHECK(report.read<Percentages>() == 40);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 50);
-		CHECK(report.readUint16() == 20);
+		CHECK(report.read<Percentages>() == 50);
+		CHECK(report.read<Percentages>() == 20);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1782,32 +1782,32 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 60);
-		CHECK(report.readUint16() == 0);
+		CHECK(report.read<Percentages>() == 60);
+		CHECK(report.read<Percentages>() == 0);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.readUint32() == timestamps2[0]);
 		CHECK(report.readUint32() == timestamps2[4]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 50);
-		CHECK(report.readUint16() == 20);
+		CHECK(report.read<Percentages>() == 50);
+		CHECK(report.read<Percentages>() == 20);
 		// Packet store 3
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
 		CHECK(report.readUint32() == timestamps4[0]);
 		CHECK(report.readUint32() == timestamps4[7]);
 		CHECK(report.readUint32() == 20);
-		CHECK(report.readUint16() == 80);
-		CHECK(report.readUint16() == 60);
+		CHECK(report.read<Percentages>() == 80);
+		CHECK(report.read<Percentages>() == 60);
 		// Packet store 4
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
 		CHECK(report.readUint32() == timestamps3[0]);
 		CHECK(report.readUint32() == timestamps3[3]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 40);
-		CHECK(report.readUint16() == 0);
+		CHECK(report.read<Percentages>() == 40);
+		CHECK(report.read<Percentages>() == 0);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1854,8 +1854,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 60);
-		CHECK(report.readUint16() == 40);
+		CHECK(report.read<Percentages>() == 60);
+		CHECK(report.read<Percentages>() == 40);
 
 		ServiceTests::reset();
 		Services.reset();

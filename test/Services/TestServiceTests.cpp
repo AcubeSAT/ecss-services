@@ -35,7 +35,7 @@ TEST_CASE("TC[17,3]", "[service][st17]") {
 	CHECK(response.serviceType == TestService::ServiceType);
 	CHECK(response.messageType == TestService::MessageType::OnBoardConnectionTestReport);
 	REQUIRE(response.dataSize == 2);
-	CHECK(response.readEnum16() == ApplicationId);
+	CHECK(response.read<ApplicationProcessId>() == ApplicationId);
 }
 
 TEST_CASE("TM[17,4]", "[service][st17]") {
@@ -45,5 +45,5 @@ TEST_CASE("TM[17,4]", "[service][st17]") {
 	CHECK(response.serviceType == TestService::ServiceType);
 	CHECK(response.messageType == TestService::MessageType::OnBoardConnectionTestReport);
 	REQUIRE(response.dataSize == 2);
-	CHECK(response.readEnum16() == 40);
+	CHECK(response.read<ApplicationProcessId>() == 40);
 }

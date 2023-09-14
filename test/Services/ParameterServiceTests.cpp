@@ -15,9 +15,9 @@ TEST_CASE("Parameter Report Subservice") {
 		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 		                          Message::TC, ApplicationId);
 		request.appendUint16(3);
-		request.appendUint16(54432);
-		request.appendUint16(60000);
-		request.appendUint16(65535);
+		request.append(54432);
+		request.append(60000);
+		request.append(65535);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 3);
@@ -26,7 +26,7 @@ TEST_CASE("Parameter Report Subservice") {
 		Message report = ServiceTests::get(3);
 		CHECK(report.serviceType == ParameterService::ServiceType);
 		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
-		CHECK(report.readUint16() == 0); // the message shall be empty
+		CHECK(report.read<ParameterId>() == 0); // the message shall be empty
 
 		ServiceTests::reset();
 		Services.reset();
@@ -36,9 +36,9 @@ TEST_CASE("Parameter Report Subservice") {
 		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 		                          Message::TC, 1);
 		request.appendUint16(3);
-		request.appendUint16(1);
-		request.appendUint16(10000);
-		request.appendUint16(2);
+		request.append(1);
+		request.append(10000);
+		request.append(2);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
@@ -48,9 +48,9 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(report.serviceType == ParameterService::ServiceType);
 		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 2);
-		CHECK(report.readUint16() == 1);
+		CHECK(report.read<ParameterId>() == 1);
 		CHECK(report.readUint16() == 7);
-		CHECK(report.readUint16() == 2);
+		CHECK(report.read<ParameterId>() == 2);
 		CHECK(report.readUint32() == 10);
 
 		ServiceTests::reset();
@@ -71,11 +71,11 @@ TEST_CASE("Parameter Report Subservice") {
 		CHECK(report.serviceType == ParameterService::ServiceType);
 		CHECK(report.messageType == ParameterService::MessageType::ParameterValuesReport);
 		CHECK(report.readUint16() == 3);
-		CHECK(report.readUint16() == 0);
+		CHECK(report.read<ParameterId>() == 0);
 		CHECK(report.readUint8() == 3);
-		CHECK(report.readUint16() == 1);
+		CHECK(report.read<ParameterId>() == 1);
 		CHECK(report.readUint16() == 7);
-		CHECK(report.readUint16() == 2);
+		CHECK(report.read<ParameterId>() == 2);
 		CHECK(report.readUint32() == 10);
 
 		ServiceTests::reset();
@@ -111,11 +111,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message request =
 		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
-		request.appendUint16(0);
+		request.append(0);
 		request.appendUint8(1);
-		request.appendUint16(1);
+		request.append(1);
 		request.appendUint16(2);
-		request.appendUint16(65534);
+		request.append(65534);
 		request.appendUint16(1);
 
 		MessageParser::execute(request);
@@ -136,11 +136,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message request =
 		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
-		request.appendUint16(0);
+		request.append(0);
 		request.appendUint8(1);
-		request.appendUint16(65534);
+		request.append(65534);
 		request.appendUint16(1);
-		request.appendUint16(2);
+		request.append(2);
 		request.appendUint16(3);
 
 		MessageParser::execute(request);
@@ -161,11 +161,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message request =
 		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
-		request.appendUint16(0);
+		request.append(0);
 		request.appendUint8(1);
-		request.appendUint16(1);
+		request.append(1);
 		request.appendUint16(2);
-		request.appendUint16(2);
+		request.append(2);
 		request.appendUint32(3);
 
 		MessageParser::execute(request);

@@ -109,7 +109,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readUint32() == 86769000); // end time
 		CHECK(report.readUint16() == 2);        // number of parameters reported
 		// Parameter B
-		CHECK(report.readUint16() == 5);        // ID-2
+		CHECK(report.read<ParameterId>() == 5);        // ID-2
 		CHECK(report.readUint16() == 6);        // number of samples
 		CHECK(report.readFloat() == 13);        // max value
 		CHECK(report.readUint32() == 86769000); // max time
@@ -192,7 +192,7 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-		request.appendUint16(6);
+		request.append(6);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 700);
 
@@ -207,7 +207,7 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		Message request2 =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-		request2.appendUint16(3);
+		request2.append(3);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 6);
 
@@ -251,8 +251,8 @@ TEST_CASE("Add/Update statistics definitions") {
 
 		ParameterId paramId1 = 0;
 		uint16_t interval1 = 1400;
-		request.appendUint16(paramId1);
-		request.appendUint16(interval1);
+		request.append(paramId1);
+		request.append(interval1);
 
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
 
@@ -275,8 +275,8 @@ TEST_CASE("Add/Update statistics definitions") {
 
 		ParameterId paramId1 = 1;
 		uint16_t interval1 = 3200;
-		request.appendUint16(paramId1);
-		request.appendUint16(interval1);
+		request.append(paramId1);
+		request.append(interval1);
 
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 2);
 
@@ -315,18 +315,18 @@ TEST_CASE("Add/Update statistics definitions") {
 		uint16_t interval5 = 8000;
 		uint16_t interval6 = 9000;
 
-		request.appendUint16(paramId1);
-		request.appendUint16(interval1);
-		request.appendUint16(paramId2);
-		request.appendUint16(interval2);
-		request.appendUint16(paramId3);
-		request.appendUint16(interval3);
-		request.appendUint16(paramId4);
-		request.appendUint16(interval4);
-		request.appendUint16(paramId5);
-		request.appendUint16(interval5);
-		request.appendUint16(paramId6);
-		request.appendUint16(interval6);
+		request.append(paramId1);
+		request.append(interval1);
+		request.append(paramId2);
+		request.append(interval2);
+		request.append(paramId3);
+		request.append(interval3);
+		request.append(paramId4);
+		request.append(interval4);
+		request.append(paramId5);
+		request.append(interval5);
+		request.append(paramId6);
+		request.append(interval6);
 
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
 
@@ -365,8 +365,8 @@ TEST_CASE("Delete statistics definitions") {
 		ParameterId id1 = 0;
 		ParameterId id2 = 255; // Invalid ID
 		request.appendUint16(numIds);
-		request.appendUint16(id1);
-		request.appendUint16(id2);
+		request.append(id1);
+		request.append(id2);
 
 		Services.parameterStatistics.setPeriodicReportingStatus(true);
 		MessageParser::execute(request);
@@ -407,12 +407,12 @@ TEST_CASE("Parameter statistics definition report") {
 
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
-		CHECK(report.readUint16() == 700); // Reporting interval
+		CHECK(report.read<SamplingInterval>() == 700); // Reporting interval
 		CHECK(report.readUint16() == 2);   // Num of valid Ids
 		CHECK(report.read<ParameterId>() == 5);   // Valid parameter ID
 		CHECK(report.read<SamplingInterval>() == 12);  // Sampling interval
-		CHECK(report.readUint16() == 7);
-		CHECK(report.readUint16() == 0);
+		CHECK(report.read<ParameterId>() == 7);
+		CHECK(report.read<SamplingInterval>() == 0);
 
 		ServiceTests::reset();
 	}

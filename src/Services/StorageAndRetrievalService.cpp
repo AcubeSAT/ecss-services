@@ -161,7 +161,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 
 	auto filledPercentage1 = static_cast<uint16_t>(static_cast<float>(packetStores[packetStoreId].storedTelemetryPackets.size()) * 100 /
 	                                               ECSSMaxPacketStoreSize);
-	report.appendUint16(filledPercentage1);
+	report.append(filledPercentage1);
 
 	uint16_t numOfPacketsToBeTransferred = 0;
 	numOfPacketsToBeTransferred = std::count_if(
@@ -170,7 +170,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
 	    });
 	auto filledPercentage2 = static_cast<uint16_t>(static_cast<float>(numOfPacketsToBeTransferred) * 100 / ECSSMaxPacketStoreSize);
-	report.appendUint16(filledPercentage2);
+	report.append(filledPercentage2);
 }
 
 bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
@@ -528,10 +528,10 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingPacketStore);
 			continue;
 		}
-		NumOfPacketStores packetStoreSize = request.readUint16();
-		uint8_t typeCode = request.readUint8();
+		PacketStoreSize packetStoreSize = request.read<PacketStoreSize>();
+		PacketStoreType typeCode = request.read<PacketStoreType>();
 		PacketStore::PacketStoreType packetStoreType = (typeCode == 0) ? PacketStore::Circular : PacketStore::Bounded;
-		uint8_t virtualChannel = request.readUint8();
+		VirtualChannel virtualChannel = request.read<VirtualChannel>();
 
 		if (virtualChannel < VirtualChannelLimits.min or virtualChannel > VirtualChannelLimits.max) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel);
@@ -624,9 +624,9 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendUint16(packetStore.second.sizeInBytes);
-		uint8_t typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
-		report.appendUint8(typeCode);
-		report.appendUint8(packetStore.second.virtualChannel);
+		PacketStoreType typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
+		report.append<PacketStoreType>(typeCode);
+		report.append<VirtualChannel>(packetStore.second.virtualChannel);
 	}
 	storeMessage(report);
 }
@@ -661,7 +661,7 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 	NumOfPacketStores numOfPacketStores = request.readUint16();
 	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
-		uint16_t packetStoreSize = request.readUint16(); // In bytes
+		PacketStoreSize packetStoreSize = request.read<PacketStoreSize>(); // In bytes
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -757,7 +757,7 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 	}
 
 	auto idToChange = readPacketStoreId(request);
-	uint8_t virtualChannel = request.readUint8();
+	VirtualChannel virtualChannel = request.read<VirtualChannel>();
 	if (packetStores.find(idToChange) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;

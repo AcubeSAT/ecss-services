@@ -29,6 +29,12 @@ using PMONId = uint16_t;
 using LargeMessageTransactionId = uint16_t;
 using PartSequenceNum = uint16_t;
 
+using PacketStoreSize = uint16_t;
+using PacketStoreType = uint8_t;
+/**
+ * Virtual channel used in the Storage and Retrieval Service.
+ */
+using VirtualChannel = uint8_t;
 using NumOfPacketStores = uint16_t;
 
 using ApplicationProcessId = uint16_t;
@@ -39,3 +45,6 @@ using MessageTypeSize = uint8_t;
 static_assert(sizeof(MessageTypeSize) == 1);
 
 using SourceId = uint16_t;
+
+using Percentages = uint16_t;
+using CollectionInterval = uint32_t;

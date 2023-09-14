@@ -15,7 +15,7 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	}
 	HousekeepingStructure newStructure;
 	newStructure.structureId = idToCreate;
-	newStructure.collectionInterval = request.readUint32();
+	newStructure.collectionInterval = request.read<CollectionInterval>();
 	newStructure.periodicGenerationActionStatus = false;
 
 	uint16_t numOfSimplyCommutatedParams = request.readUint16();
@@ -100,14 +100,14 @@ void HousekeepingService::housekeepingStructureReport(ParameterReportStructureId
 		return;
 	}
 	Message structReport = createTM(MessageType::HousekeepingStructuresReport);
-	structReport.appendUint8(structIdToReport);
+	structReport.append(structIdToReport);
 
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
-	structReport.appendUint32(housekeepingStructure->second.collectionInterval);
+	structReport.append(housekeepingStructure->second.collectionInterval);
 	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameterIds.size());
 
 	for (auto parameterId: housekeepingStructure->second.simplyCommutatedParameterIds) {
-		structReport.appendUint16(parameterId);
+		structReport.append(parameterId);
 	}
 	storeMessage(structReport);
 }
@@ -121,7 +121,7 @@ void HousekeepingService::housekeepingParametersReport(ParameterReportStructureI
 
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
-	housekeepingReport.appendUint8(structureId);
+	housekeepingReport.append(structureId);
 	for (auto id: housekeepingStructure.simplyCommutatedParameterIds) {
 		if (auto parameter = Services.parameterManagement.getParameter(id)) {
 			parameter->get().appendValueToMessage(housekeepingReport);
@@ -185,7 +185,7 @@ void HousekeepingService::modifyCollectionIntervalOfStructures(Message& request)
 	uint8_t numOfTargetStructs = request.readUint8();
 	for (uint8_t i = 0; i < numOfTargetStructs; i++) {
 		ParameterReportStructureId targetStructId = request.read<ParameterReportStructureId>();
-		TimeInt newCollectionInterval = request.readUint32();
+		CollectionInterval newCollectionInterval = request.read<CollectionInterval>();
 		if (hasNonExistingStructExecutionError(targetStructId, request)) {
 			continue;
 		}
@@ -222,9 +222,9 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 }
 
 void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, ParameterReportStructureId structureId) {
-	report.appendUint8(structureId);
+	report.append(structureId);
 	report.appendBoolean(getPeriodicGenerationActionStatus(structureId));
-	report.appendUint32(getCollectionInterval(structureId));
+	report.append(getCollectionInterval(structureId));
 }
 
 void HousekeepingService::execute(Message& message) {

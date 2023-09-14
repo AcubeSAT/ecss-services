@@ -16,8 +16,8 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
-		ApplicationProcessId applicationID = message.readEnum16();
-		EventDefinitionId eventDefinitionID = message.readEnum16();
+		ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 		bool canBeAdded = true;
 
 		for (auto& element: eventActionDefinitionMap) {
@@ -48,8 +48,8 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
-		ApplicationProcessId applicationID = message.readEnum16();
-		EventDefinitionId eventDefinitionID = message.readEnum16();
+		ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 		bool actionDefinitionExists = false;
 
 		for (auto& element: eventActionDefinitionMap) {
@@ -86,8 +86,8 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-			ApplicationProcessId applicationID = message.readEnum16();
-			EventDefinitionId eventDefinitionID = message.readEnum16();
+			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+			EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 			bool actionDefinitionExists = false;
 
 			for (auto& element: eventActionDefinitionMap) {
@@ -119,8 +119,8 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-			ApplicationProcessId applicationID = message.readEnum16();
-			EventDefinitionId eventDefinitionID = message.readEnum16();
+			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+			EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 			bool actionDefinitionExists = false;
 
 			for (auto& element: eventActionDefinitionMap) {

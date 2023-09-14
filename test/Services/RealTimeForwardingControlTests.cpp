@@ -34,12 +34,12 @@ void validReportTypes(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 			uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages[k]);
+				request.append(messages[k]);
 			}
 		}
 	}
@@ -62,11 +62,11 @@ void duplicateReportTypes(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages1[0]);
+				request.append(messages1[0]);
 			}
 		}
 	}
@@ -91,12 +91,12 @@ void validInvalidReportTypes(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = servicesToPick[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 			uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages[k]);
+				request.append(messages[k]);
 			}
 		}
 	}
@@ -119,7 +119,7 @@ void validAllReportsOfService(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 		}
 	}
@@ -145,14 +145,14 @@ void validInvalidAllReportsOfService(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = servicesToPick[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			uint8_t numOfMessages = (i < 2) ? 0 : numOfMessagesPerService;
 			request.appendUint8(numOfMessages);
 			if (i >= 2) {
 				uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-					request.appendUint8(messages[k]);
+					request.append(messages[k]);
 				}
 			}
 		}
@@ -196,14 +196,14 @@ void validInvalidAllReportsOfApp(Message& request) {
 		if (i >= 2) {
 			for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 				ServiceTypeSize serviceType = servicesToPick[j];
-				request.appendUint8(serviceType);
+				request.append(serviceType);
 				uint8_t numOfMessages = (i == 0 or i == 1) ? 0 : numOfMessagesPerService;
 				request.appendUint8(numOfMessages);
 
 				uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-					request.appendUint8(messages[k]);
+					request.append(messages[k]);
 				}
 			}
 		}
@@ -582,7 +582,7 @@ bool isApplicationEnabled(ApplicationProcessId targetAppID) {
 /**
  * Returns true, if the defined service type exists in the application process configuration map.
  */
-bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceType targetService) {
+bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeSize targetService) {
 	auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
 	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](auto definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
 }
@@ -712,7 +712,7 @@ void serviceNotInApplication(Message& request) {
 			uint8_t* messages = (j == 0) ? messagesToFill1 : messagesToFill2;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messages[k]);
+				request.append(messages[k]);
 			}
 		}
 	}
@@ -736,7 +736,7 @@ void messageNotInApplication(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
@@ -766,11 +766,11 @@ void deleteValidReportTypes(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messagesToFill1[k]);
+				request.append(messagesToFill1[k]);
 			}
 		}
 	}
@@ -794,11 +794,11 @@ void deleteReportEmptyService(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messagesToFill1[k]);
+				request.append(messagesToFill1[k]);
 			}
 		}
 	}
@@ -822,11 +822,11 @@ void deleteReportEmptyApplication(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = servicesToFill[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.appendUint8(messagesToFill1[k]);
+				request.append(messagesToFill1[k]);
 			}
 		}
 	}
@@ -842,8 +842,8 @@ void deleteApplicationProcess(Message& request) {
 	uint8_t numOfServicesPerApp = 0;
 
 	request.appendUint8(numOfApplications);
-	request.appendUint8(applicationsToFill[0]);
-	request.appendUint8(numOfServicesPerApp);
+	request.append(applicationsToFill[0]);
+	request.append(numOfServicesPerApp);
 }
 
 /**
@@ -863,7 +863,7 @@ void deleteService(Message& request) {
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 		}
 	}

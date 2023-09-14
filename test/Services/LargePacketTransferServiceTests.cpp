@@ -15,8 +15,8 @@ TEST_CASE("First Downlink Part Report TM[13,1]", "[service][st13]") {
 	Message report = ServiceTests::get(0);
 	CHECK(report.messageType == LargePacketTransferService::MessageType::FirstDownlinkPartReport);
 	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
-	CHECK(report.readUint16() == 1);
-	CHECK(report.readUint16() == 1);
+	CHECK(report.read<LargeMessageTransactionId>() == 1);
+	CHECK(report.read<PartSequenceNum>() == 1);
 	uint8_t string2[ECSSMaxFixedOctetStringSize];
 	report.readOctetString(string2);
 	auto a = String<ECSSMaxFixedOctetStringSize>(string2, 8);
@@ -30,8 +30,8 @@ TEST_CASE("Intermediate Downlink Part Report TM[13,2]", "[service][st13]") {
 	Message report = ServiceTests::get(0);
 	CHECK(report.messageType == LargePacketTransferService::MessageType::InternalDownlinkPartReport);
 	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
-	CHECK(report.readUint16() == 1);
-	CHECK(report.readUint16() == 1);
+	CHECK(report.read<LargeMessageTransactionId>() == 1);
+	CHECK(report.read<PartSequenceNum>() == 1);
 	uint8_t string2[ECSSMaxFixedOctetStringSize];
 	report.readOctetString(string2);
 	auto a = String<ECSSMaxFixedOctetStringSize>(string2, 8);
@@ -45,8 +45,8 @@ TEST_CASE("Last Downlink Part Report TM[13,3]", "[service][st13]") {
 	Message report = ServiceTests::get(0);
 	CHECK(report.messageType == LargePacketTransferService::MessageType::LastDownlinkPartReport);
 	CHECK(report.serviceType == LargePacketTransferService::ServiceType);
-	CHECK(report.readUint16() == 1);
-	CHECK(report.readUint16() == 1);
+	CHECK(report.read<LargeMessageTransactionId>() == 1);
+	CHECK(report.read<PartSequenceNum>() == 1);
 	uint8_t string2[ECSSMaxFixedOctetStringSize];
 	report.readOctetString(string2);
 	auto a = String<ECSSMaxFixedOctetStringSize>(string2, 8);
@@ -78,12 +78,12 @@ TEST_CASE("Split function", "[no][service]") {
 	Message message5(13, 0, Message::TC, 0);
 
 	for (int i = 0; i < 4; i++) {
-		uint16_t partSequenceNumber = i;
-		CHECK(largeMessageTransactionIdentifier == ServiceTests::get(i).readUint16());
-		CHECK(partSequenceNumber == ServiceTests::get(i).readUint16());
+		PartSequenceNum partSequenceNumber = i;
+		CHECK(largeMessageTransactionIdentifier == ServiceTests::get(i).read<LargeMessageTransactionId>());
+		CHECK(partSequenceNumber == ServiceTests::get(i).read<PartSequenceNum>());
 		CHECK(ECSSMaxFixedOctetStringSize == ServiceTests::get(i).readUint16());
 		for (int j = 0; j < 256; j++) {
-			message5.appendUint8(ServiceTests::get(i).readUint8());
+			message5.append(ServiceTests::get(i).read<LargeMessageTransactionId>());
 		}
 	}
 

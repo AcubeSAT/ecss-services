@@ -49,7 +49,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 		if (numOfSamples == 0) {
 			continue;
 		}
-		report.appendUint16(currentId);
+		report.append(currentId);
 		report.appendUint16(numOfSamples);
 		currentStatistic.second.appendStatisticsToMessage(report);
 	}
@@ -182,15 +182,15 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 	if (periodicStatisticsReportingStatus) {
 		currentReportingIntervalMs = reportingIntervalMs;
 	}
-	definitionsReport.appendUint16(currentReportingIntervalMs);
+	definitionsReport.append(currentReportingIntervalMs);
 	definitionsReport.appendUint16(statisticsMap.size());
 
 	for (auto& currentParam: statisticsMap) {
 		ParameterId currentId = currentParam.first;
 		SamplingInterval samplingInterval = currentParam.second.selfSamplingInterval;
-		definitionsReport.appendUint16(currentId);
+		definitionsReport.append(currentId);
 		if (supportsSamplingInterval) {
-			definitionsReport.appendUint16(samplingInterval);
+			definitionsReport.append(samplingInterval);
 		}
 	}
 	storeMessage(definitionsReport);

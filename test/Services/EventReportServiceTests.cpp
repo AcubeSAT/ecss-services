@@ -19,7 +19,7 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 0);
+	CHECK(report.read<EventDefinitionId>() == 0);
 	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
@@ -37,7 +37,7 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 4);
+	CHECK(report.read<EventDefinitionId>() == 4);
 	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
@@ -55,7 +55,7 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 5);
+	CHECK(report.read<EventDefinitionId>() == 5);
 	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
@@ -73,7 +73,7 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
 	REQUIRE(report.dataSize == 12);
 	// Check for the value that is stored in <<data>> array(data-member of object response)
-	CHECK(report.readEnum16() == 6);
+	CHECK(report.read<EventDefinitionId>() == 6);
 	report.readCString(checkString, 10);
 	CHECK(strcmp(checkString, eventReportData) == 0);
 }
@@ -84,8 +84,8 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	                                       EventReportService::LowSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
-	message.appendEnum16(eventID[0]);
-	message.appendEnum16(eventID[1]);
+	message.append(eventID[0]);
+	message.append(eventID[1]);
 	MessageParser::execute(message);
 	CHECK(eventReportService.getStateOfEvents()[2] == 1);
 	CHECK(eventReportService.getStateOfEvents()[4] == 1);
@@ -96,8 +96,8 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	                                       EventReportService::MediumSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
-	message.appendEnum16(eventID[0]);
-	message.appendEnum16(eventID[1]);
+	message.append(eventID[0]);
+	message.append(eventID[1]);
 	MessageParser::execute(message);
 	CHECK(eventReportService.getStateOfEvents()[0] == 0);
 	CHECK(eventReportService.getStateOfEvents()[5] == 0);
@@ -122,8 +122,8 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::MCUStart, EventReportService::HighSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
-	message.appendEnum16(eventID[0]);
-	message.appendEnum16(eventID[1]);
+	message.append(eventID[0]);
+	message.append(eventID[1]);
 	// Disable 3rd and 6th
 	MessageParser::execute(message);
 	eventReportService.listOfDisabledEventsReport();
@@ -137,15 +137,15 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	REQUIRE(report.dataSize == 6);
 	// Check for the information stored in report
 	CHECK(report.readHalfword() == 2);
-	CHECK(report.readEnum16() == 3);
-	CHECK(report.readEnum16() == 6);
+	CHECK(report.read<EventDefinitionId>() == 3);
+	CHECK(report.read<EventDefinitionId>() == 6);
 }
 
 TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(1);
-	message.appendEnum16(eventID[0]);
+	message.append(eventID[0]);
 	MessageParser::execute(message);
 
 	const String<64> eventReportData = "HelloWorld";
