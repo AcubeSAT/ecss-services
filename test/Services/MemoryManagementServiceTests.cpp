@@ -20,7 +20,7 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	receivedPacket.append(reinterpret_cast<StartAddress>(pStr));           // Start address
 	receivedPacket.appendOctetString(String<2>(data));
 	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 2));   // Append CRC
-	receivedPacket.append(reinterpret_cast<>(pStr + 2)); // Start address
+	receivedPacket.append(reinterpret_cast<StartAddress>(pStr + 2)); // Start address
 	receivedPacket.appendOctetString(String<1>(data));                 // Append CRC
 	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 1));
 	MessageParser::execute(receivedPacket);
