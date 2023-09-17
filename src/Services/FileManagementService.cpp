@@ -56,7 +56,7 @@ void FileManagementService::createFile(Message& message) {
 
 	bool isFileLocked = message.readBoolean();
 
-	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
+	if ((repositoryPath.size() + 1 + fileName.size()) > ECSSMaxStringSize) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
@@ -127,7 +127,7 @@ void FileManagementService::deleteFile(Message& message) {
 		return;
 	}
 
-	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
+	if ((repositoryPath.size() + 1 + fileName.size()) > ECSSMaxStringSize) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
@@ -174,7 +174,7 @@ void FileManagementService::reportAttributes(Message& message) {
 	}
 	fileName = fileNameIsValid.value();
 
-	if ((repositoryPath.size() + fileName.size()) > ECSSMaxStringSize) {
+	if ((repositoryPath.size() + 1 + fileName.size()) > ECSSMaxStringSize) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
 		return;
 	}
