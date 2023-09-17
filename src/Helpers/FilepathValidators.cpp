@@ -15,7 +15,7 @@ namespace FilepathValidators {
 		uint8_t charCounter = 0;
 		Filesystem::Path extractedString = "";
 
-		static_assert(sizeof(char) == sizeof(uint8_t));
+		static_assert(std::is_same<unsigned char, uint8_t>::value);
 		char currentChar = static_cast<char>(message.readByte());
 
 		while (currentChar != FileManagementService::VariableStringTerminator) {
