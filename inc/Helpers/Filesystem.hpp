@@ -20,25 +20,25 @@ namespace Filesystem {
 
 	enum class FileCreationError : uint8_t {
 		FileAlreadyExists = 0,
-		UnknownError = 1
+		UnknownError = 255
 	};
 
 	enum class FileDeletionError : uint8_t {
 		FileDoesNotExist = 0,
 		PathLeadsToDirectory = 1,
 		FileIsLocked = 2,
-		UnknownError = 3
+		UnknownError = 255
 	};
 
 	enum class DirectoryCreationError : uint8_t {
 		DirectoryAlreadyExists = 0,
-		UnknownError = 1
+		UnknownError = 255
 	};
 
 	enum class DirectoryDeletionError : uint8_t {
 		DirectoryDoesNotExist = 0,
 		DirectoryIsNotEmpty = 1,
-		UnknownError = 2
+		UnknownError = 255
 	};
 
 	enum class FileLockStatus : uint8_t {
