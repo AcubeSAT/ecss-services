@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 
 #include "Helpers/Filesystem.hpp"
+#include "etl/string_utilities.h"
 #include "Service.hpp"
 
 /**
@@ -146,7 +147,8 @@ private:
 		Path fullPath = repositoryPath;
 		fullPath.append("/");
 		fullPath.append(filePath);
-
+		etl::trim_from_left(fullPath, "/");
+		etl::trim_from_right(fullPath, "/");
 		return fullPath;
 	}
 };
