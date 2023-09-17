@@ -181,8 +181,7 @@ namespace Filesystem {
 	namespace fs = std::filesystem;
 
 	etl::optional<FileCreationError> createFile(const Path& path) {
-		etl::optional<NodeType> nodeType = getNodeType(path);
-		if (nodeType.has_value()) {
+		if (getNodeType(path)) {
 			return FileCreationError::FileAlreadyExists;
 		}
 
@@ -199,7 +198,7 @@ namespace Filesystem {
 
 	etl::optional<FileDeletionError> deleteFile(const Path& path) {
 		etl::optional<NodeType> nodeType = getNodeType(path);
-		if (not nodeType.has_value()) {
+		if (not nodeType) {
 			return FileDeletionError::FileDoesNotExist;
 		}
 
@@ -207,8 +206,7 @@ namespace Filesystem {
 			return FileDeletionError::PathLeadsToDirectory;
 		}
 
-		auto fileLockStatus = getFileLockStatus(path);
-		if (fileLockStatus == FileLockStatus::Locked) {
+		if (getFileLockStatus(path) == FileLockStatus::Locked) {
 			return FileDeletionError::FileIsLocked;
 		}
 
@@ -222,8 +220,7 @@ namespace Filesystem {
 	}
 
 	etl::optional<NodeType> getNodeType(const Path& path) {
-		fs::file_type type = fs::status(path.data()).type();
-		switch (type) {
+		switch (fs::status(path.data()).type()) {
 			case fs::file_type::regular:
 				return NodeType::File;
 			case fs::file_type::directory:
@@ -263,7 +260,7 @@ namespace Filesystem {
 		Attributes attributes{};
 
 		auto nodeType = getNodeType(path);
-		if (not nodeType.has_value()) {
+		if (not nodeType) {
 			return FileAttributeError::FileDoesNotExist;
 		}
 
@@ -278,7 +275,7 @@ namespace Filesystem {
 	}
 
 	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
-		if (auto nodeType = getNodeType(path)) {
+		if (getNodeType(path)) {
 			return DirectoryCreationError::DirectoryAlreadyExists;
 		}
 
