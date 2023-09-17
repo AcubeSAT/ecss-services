@@ -433,6 +433,7 @@ TEST_CASE("File attributes report TM[23,4]", "[service][st23]") {
 	CHECK(report.readByte() == 'o');
 	CHECK(report.readByte() == 'r');
 	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == FileManagementService::VariableStringTerminator);
 	CHECK(report.readSint32() == fileContents.size());
 	CHECK(report.readBoolean() == false);
 

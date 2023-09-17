@@ -18,7 +18,7 @@ void FileManagementService::createFile(Message& message) {
 	}
 	repositoryPath = repositoryPathIsValid.value();
 
-	if (findWildcardPosition(repositoryPath).has_value()) {
+	if (findWildcardPosition(repositoryPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
@@ -43,7 +43,7 @@ void FileManagementService::createFile(Message& message) {
 	}
 	fileName = fileNameIsValid.value();
 
-	if (findWildcardPosition(fileName).has_value()) {
+	if (findWildcardPosition(fileName)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
@@ -97,7 +97,7 @@ void FileManagementService::deleteFile(Message& message) {
 	}
 	repositoryPath = repositoryPathIsValid.value();
 
-	if (findWildcardPosition(repositoryPath).has_value()) {
+	if (findWildcardPosition(repositoryPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
@@ -122,7 +122,7 @@ void FileManagementService::deleteFile(Message& message) {
 	}
 	fileName = fileNameIsValid.value();
 
-	if (findWildcardPosition(fileName).has_value()) {
+	if (findWildcardPosition(fileName)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
@@ -181,7 +181,7 @@ void FileManagementService::reportAttributes(Message& message) {
 
 	auto fullPath = getFullPath(repositoryPath, fileName);
 
-	if (findWildcardPosition(fullPath).has_value()) {
+	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
@@ -212,6 +212,7 @@ void FileManagementService::fileAttributeReport(const Path& repositoryPath, cons
 	report.appendString(repositoryPath);
 	report.appendUint8(VariableStringTerminator);
 	report.appendString(fileName);
+	report.appendUint8(VariableStringTerminator);
 	report.appendUint32(attributes.sizeInBytes);
 	report.appendBoolean(attributes.isLocked);
 
