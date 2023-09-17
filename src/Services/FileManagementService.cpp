@@ -30,7 +30,7 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
-	if (repositoryType.value() == Filesystem::NodeType::File) {
+	if (repositoryType.value() != Filesystem::NodeType::Directory) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
 		return;
 	}
