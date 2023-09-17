@@ -275,17 +275,6 @@ namespace Filesystem {
 	}
 
 	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
-		if (getNodeType(path)) {
-			return DirectoryCreationError::DirectoryAlreadyExists;
-		}
-
-		std::error_code errorCode{};
-		fs::create_directory(path.data(), errorCode);
-
-		if (errorCode) {
-			return DirectoryCreationError::UnknownError;
-		}
-
 		return etl::nullopt;
 	}
 
