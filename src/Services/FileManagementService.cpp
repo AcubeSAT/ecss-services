@@ -68,12 +68,12 @@ void FileManagementService::createFile(Message& message) {
 			case Filesystem::FileCreationError::FileAlreadyExists: {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
-				break;
+				return;
 			}
-			case Filesystem::FileCreationError::UnknownError: {
+			default: {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
-				break;
+				return;
 			}
 		}
 	}
@@ -146,7 +146,7 @@ void FileManagementService::deleteFile(Message& message) {
 			case FileDeletionError::FileIsLocked:
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnLockedFile);
 				break;
-			case FileDeletionError::UnknownError:
+			default:
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownFileDeleteError);
 				break;
 		}
