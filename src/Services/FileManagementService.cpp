@@ -156,7 +156,7 @@ void FileManagementService::deleteFile(Message& message) {
 void FileManagementService::reportAttributes(Message& message) {
 	using namespace FilepathValidators;
 
-	message.assertTC(ServiceType, MessageType::ReportAttributes);
+	message.assertTC(ServiceType, ReportAttributes);
 
 	String<ECSSMaxStringSize> repositoryPath("");
 	auto repositoryPathIsValid = getStringUntilTerminator(message);
