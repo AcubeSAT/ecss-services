@@ -383,17 +383,13 @@ public:
 		 */
 		SizeOfStringIsOutOfBounds = 57,
 		/**
-		 * A wildcard found where it shouldn't be present
+		 * A wildcard was found where it shouldn't be present
 	 	 */
 		UnexpectedWildcard = 58,
 		/**
-		 * A file type that in not LFS_TYPE_REG nor LFS_TYPE_DIR
+		 * A file type that was expected to be a directory is a file instead
 		 */
-		UnexpectedFileType = 559,
-		/**
-		 * A file type that was expected to by LFS_TYPE_DIR is LFS_TYPE_REG instead
-		 */
-		RepositoryPathLeadsToFile = 60,
+		RepositoryPathLeadsToFile = 59,
 	};
 
 	/**
@@ -427,30 +423,25 @@ public:
          */
 		FileAlreadyExists = 3,
 		/**
-         * LittleFs lfs_file_close function generic error
+         * The requested object does not exist
          */
-		LittleFsFileCloseFailed = 4,
+		ObjectDoesNotExist = 4,
 		/**
-         * LittleFs lfs_file_open function generic error
-         */
-		LittleFsFileOpenFailed = 5,
+		 * A delete file command was requested on a file that is locked
+		 */
+		AttemptedDeleteOnLockedFile = 5,
 		/**
-         * Invalid object type returned from littleFs
-         */
-		ObjectDoesNotExist = 6,
+		 * A delete file command was requested on a directory
+		 */
+		AttemptedDeleteOnDirectory = 6,
 		/**
-         * LittleFs lfs_remove function generic error
-         */
-		LittleFsRemoveFailed = 7,
+		 * The filesystem reported an error during file deletion
+		 */
+		UnknownFileDeleteError = 7,
 		/**
-         * LittleFs lfs_stat function generic error
-         */
-		LittleFsStatFailed = 8,
-		AttemptedDeleteOnLockedFile = 9,
-		AttemptedDeleteOnMissingFile = 10,
-		AttemptedDeleteOnDirectory = 11,
-		UnknownFileDeleteError = 12,
-		AttemptedReportAttributesOnDirectory = 13,
+		 * A report file attributes command was requested on a directory
+		 */
+		AttemptedReportAttributesOnDirectory = 8,
 	};
 
 	/**

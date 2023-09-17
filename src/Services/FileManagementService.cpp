@@ -138,7 +138,7 @@ void FileManagementService::deleteFile(Message& message) {
 		using Filesystem::FileDeletionError;
 		switch (fileDeletionError.value()) {
 			case FileDeletionError::FileDoesNotExist:
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnMissingFile);
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 				break;
 			case FileDeletionError::PathLeadsToDirectory:
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnDirectory);
