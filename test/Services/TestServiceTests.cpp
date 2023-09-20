@@ -27,7 +27,7 @@ TEST_CASE("TM[17,2]", "[service][st17]") {
 
 TEST_CASE("TC[17,3]", "[service][st17]") {
 	Message receivedPacket = Message(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest, Message::TC, 1);
-	receivedPacket.appendEnum16(ApplicationId);
+	receivedPacket.append<ApplicationProcessId>(ApplicationId);
 	MessageParser::execute(receivedPacket);
 	REQUIRE(ServiceTests::hasOneMessage());
 

@@ -18,7 +18,7 @@ struct HousekeepingStructure {
     /**
      * Defined as integer multiples of the minimum sampling interval as per 6.3.3.2.c.5 #NOTE-2.
      */
-    uint32_t collectionInterval = 0;
+    CollectionInterval collectionInterval = 0;
 
     /**
      * Indicates whether the periodic generation of housekeeping reports is enabled.

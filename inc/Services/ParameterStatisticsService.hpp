@@ -31,7 +31,7 @@ private:
 	/**
 	 * The parameter statistics reporting interval
 	 */
-	uint16_t reportingIntervalMs = 700;
+	SamplingInterval reportingIntervalMs = 700;
 
 	/**
 	 * Initializer of the statistics map, so that its content can be accessed by FreeRTOS tasks.
@@ -86,7 +86,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	inline uint16_t getReportingIntervalMs() const {
+	inline SamplingInterval getReportingIntervalMs() const {
 		return reportingIntervalMs;
 	}
 

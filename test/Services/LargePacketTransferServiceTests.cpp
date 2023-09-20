@@ -83,7 +83,7 @@ TEST_CASE("Split function", "[no][service]") {
 		CHECK(partSequenceNumber == ServiceTests::get(i).read<PartSequenceNum>());
 		CHECK(ECSSMaxFixedOctetStringSize == ServiceTests::get(i).readUint16());
 		for (int j = 0; j < 256; j++) {
-			message5.append(ServiceTests::get(i).read<LargeMessageTransactionId>());
+			message5.appendUint8(ServiceTests::get(i).readUint8());
 		}
 	}
 

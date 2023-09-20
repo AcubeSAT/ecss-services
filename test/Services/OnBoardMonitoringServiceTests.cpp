@@ -44,9 +44,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONId, 3> PMONIds = {0, 1, 2};
-		request.appendEnum16(PMONIds[0]);
-		request.appendEnum16(PMONIds[1]);
-		request.appendEnum16(PMONIds[2]);
+		request.append<PMONId>(PMONIds[0]);
+		request.append<PMONId>(PMONIds[1]);
+		request.append<PMONId>(PMONIds[2]);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
@@ -70,9 +70,9 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONId, 4> PMONIds = {0, 10, 1};
-		request.appendEnum16(PMONIds[0]);
-		request.appendEnum16(PMONIds[1]);
-		request.appendEnum16(PMONIds[2]);
+		request.append<PMONId>(PMONIds[0]);
+		request.append<PMONId>(PMONIds[1]);
+		request.append<PMONId>(PMONIds[2]);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -96,9 +96,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONId, 3> PMONIds = {0, 1, 2};
-		request.appendEnum16(PMONIds[0]);
-		request.appendEnum16(PMONIds[1]);
-		request.appendEnum16(PMONIds[2]);
+		request.append<PMONId>(PMONIds[0]);
+		request.append<PMONId>(PMONIds[1]);
+		request.append<PMONId>(PMONIds[2]);
 		onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled = true;
@@ -123,10 +123,10 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
 		etl::array<PMONId, 4> PMONIds = {0, 10, 1, 2};
-		request.appendEnum16(PMONIds[0]);
-		request.appendEnum16(PMONIds[1]);
-		request.appendEnum16(PMONIds[2]);
-		request.appendEnum16(PMONIds[3]);
+		request.append<PMONId>(PMONIds[0]);
+		request.append<PMONId>(PMONIds[1]);
+		request.append<PMONId>(PMONIds[2]);
+		request.append<PMONId>(PMONIds[3]);
 		onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled = true;

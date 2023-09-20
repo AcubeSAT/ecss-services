@@ -45,6 +45,9 @@ using MessageTypeSize = uint8_t;
 static_assert(sizeof(MessageTypeSize) == 1);
 
 using SourceId = uint16_t;
+using SequenceCount = uint16_t;
 
 using Percentages = uint16_t;
 using CollectionInterval = uint32_t;
+
+using ErrorCode = uint16_t;

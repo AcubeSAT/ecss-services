@@ -9,8 +9,8 @@ void LargePacketTransferService::firstDownlinkPartReport(LargeMessageTransaction
                                                          PartSequenceNum partSequenceNumber,
                                                          const String<ECSSMaxFixedOctetStringSize>& string) {
 	Message report = createTM(LargePacketTransferService::MessageType::FirstDownlinkPartReport);
-	report.append(largeMessageTransactionIdentifier); // large message transaction identifier
-	report.append(partSequenceNumber);                // part sequence number
+	report.append<LargeMessageTransactionId>(largeMessageTransactionIdentifier); // large message transaction identifier
+	report.append<PartSequenceNum>(partSequenceNumber);                // part sequence number
 	report.appendOctetString(string);                       // fixed octet-string
 	storeMessage(report);
 }
@@ -20,8 +20,8 @@ void LargePacketTransferService::intermediateDownlinkPartReport(
     const String<ECSSMaxFixedOctetStringSize>& string) {
 
 	Message report = createTM(LargePacketTransferService::MessageType::InternalDownlinkPartReport);
-	report.append(largeMessageTransactionIdentifier); // large message transaction identifier
-	report.append(partSequenceNumber);                // part sequence number
+	report.append<LargeMessageTransactionId>(largeMessageTransactionIdentifier); // large message transaction identifier
+	report.append<PartSequenceNum>(partSequenceNumber);                // part sequence number
 	report.appendOctetString(string);                       // fixed octet-string
 	storeMessage(report);
 }
@@ -30,8 +30,8 @@ void LargePacketTransferService::lastDownlinkPartReport(LargeMessageTransactionI
                                                         PartSequenceNum partSequenceNumber,
                                                         const String<ECSSMaxFixedOctetStringSize>& string) {
 	Message report = createTM(LargePacketTransferService::MessageType::LastDownlinkPartReport);
-	report.append(largeMessageTransactionIdentifier); // large message transaction identifier
-	report.append(partSequenceNumber);                // part sequence number
+	report.append<LargeMessageTransactionId>(largeMessageTransactionIdentifier); // large message transaction identifier
+	report.append<PartSequenceNum>(partSequenceNumber);                // part sequence number
 	report.appendOctetString(string);                       // fixed octet-string
 	storeMessage(report);
 }

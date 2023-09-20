@@ -84,8 +84,8 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	                                       EventReportService::LowSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
-	message.append(eventID[0]);
-	message.append(eventID[1]);
+	message.append<EventDefinitionId>(eventID[0]);
+	message.append<EventDefinitionId>(eventID[1]);
 	MessageParser::execute(message);
 	CHECK(eventReportService.getStateOfEvents()[2] == 1);
 	CHECK(eventReportService.getStateOfEvents()[4] == 1);
@@ -96,8 +96,8 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	                                       EventReportService::MediumSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
-	message.append(eventID[0]);
-	message.append(eventID[1]);
+	message.append<EventDefinitionId>(eventID[0]);
+	message.append<EventDefinitionId>(eventID[1]);
 	MessageParser::execute(message);
 	CHECK(eventReportService.getStateOfEvents()[0] == 0);
 	CHECK(eventReportService.getStateOfEvents()[5] == 0);
@@ -122,8 +122,8 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::MCUStart, EventReportService::HighSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
-	message.append(eventID[0]);
-	message.append(eventID[1]);
+	message.append<EventDefinitionId>(eventID[0]);
+	message.append<EventDefinitionId>(eventID[1]);
 	// Disable 3rd and 6th
 	MessageParser::execute(message);
 	eventReportService.listOfDisabledEventsReport();
@@ -145,7 +145,7 @@ TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(1);
-	message.append(eventID[0]);
+	message.append<EventDefinitionId>(eventID[0]);
 	MessageParser::execute(message);
 
 	const String<64> eventReportData = "HelloWorld";

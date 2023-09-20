@@ -30,7 +30,7 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
 	Message report = createTM(RequestVerificationService::MessageType::FailedAcceptanceReport);
 
 	assembleReportMessage(request, report);
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
@@ -53,7 +53,7 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 
 	assembleReportMessage(request, report);
 
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
@@ -77,8 +77,8 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 	Message report = createTM(RequestVerificationService::MessageType::FailedProgressOfExecution);
 
 	assembleReportMessage(request, report);
-	report.append(stepID);      // step ID
-	report.appendEnum16(errorCode); // error code
+	report.append<StepId>(stepID);      // step ID
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
@@ -100,7 +100,7 @@ void RequestVerificationService::failCompletionExecutionVerification(
 	Message report = createTM(RequestVerificationService::MessageType::FailedCompletionOfExecution);
 
 	assembleReportMessage(request, report);
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
@@ -112,7 +112,7 @@ void RequestVerificationService::failRoutingVerification(const Message& request,
 	Message report = createTM(RequestVerificationService::MessageType::FailedRoutingReport);
 
 	assembleReportMessage(request, report);
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }

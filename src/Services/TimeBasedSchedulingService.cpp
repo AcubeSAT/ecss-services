@@ -116,7 +116,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.read<SourceId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -147,7 +147,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.read<SourceId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -194,7 +194,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.read<SourceId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -225,7 +225,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 		RequestID receivedRequestID;
 		receivedRequestID.sourceID = request.read<SourceId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -251,9 +251,9 @@ void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<
 	for (const auto& match: listOfActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
-		report.append(match.requestID.sourceID);
-		report.append(match.requestID.applicationID);
-		report.appendUint16(match.requestID.sequenceCount);
+		report.append<SourceId>(match.requestID.sourceID);
+		report.append<ApplicationProcessId>(match.requestID.applicationID);
+		report.append<SequenceCount>(match.requestID.sequenceCount);
 	}
 	storeMessage(report);
 }

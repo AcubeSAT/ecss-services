@@ -18,8 +18,8 @@ void initializeEventActionDefinitions() {
 	String<ECSSTCRequestStringSize> data[] = {"\0", "1", "\0", "3", "4", "5", "6", "7", "8"};
 	addDefinitions.appendUint8(numberOfEventActionDefinitions);
 	for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
-		addDefinitions.append(applicationIDs[i]);
-		addDefinitions.append(eventDefinitionIDs[i]);
+		addDefinitions.append<ApplicationProcessId>(applicationIDs[i]);
+		addDefinitions.append<EventDefinitionId>(eventDefinitionIDs[i]);
 		addDefinitions.appendFixedString(data[i]);
 	}
 	MessageParser::execute(addDefinitions);
@@ -34,8 +34,8 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	SECTION("Add an event-action definition to check if the values are inserted correctly") {
 		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinition.appendUint8(1);
-		addDefinition.append(0);
-		addDefinition.append(2);
+		addDefinition.append<ApplicationProcessId >(0);
+		addDefinition.append<EventDefinitionId>(2);
 		String<ECSSTCRequestStringSize> data = "12345abcdefg";
 		addDefinition.appendFixedString(data);
 		MessageParser::execute(addDefinition);
@@ -57,8 +57,8 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		String<ECSSTCRequestStringSize> dataArray[] = {"123", "456", "789"};
 		addDefinitions.appendUint8(numberOfEventActionDefinitions);
 		for (auto i = 0; i < numberOfEventActionDefinitions; i++) {
-			addDefinitions.appendEnum16(applicationIDs[i]);
-			addDefinitions.appendEnum16(eventDefinitionIDs[i]);
+			addDefinitions.append<ApplicationProcessId>(applicationIDs[i]);
+			addDefinitions.append<EventDefinitionId>(eventDefinitionIDs[i]);
 			addDefinitions.appendFixedString(dataArray[i]);
 		}
 		MessageParser::execute(addDefinitions);
@@ -79,19 +79,19 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	SECTION("Add an event definition ID that already exists") {
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
-		addDefinitions.append(1);
-		addDefinitions.append(3);
+		addDefinitions.append<ApplicationProcessId>(1);
+		addDefinitions.append<EventDefinitionId>(3);
 		String<ECSSTCRequestStringSize> data = "123";
 		addDefinitions.appendFixedString(data);
-		addDefinitions.append(6);
-		addDefinitions.append(3);
+		addDefinitions.append<ApplicationProcessId>(6);
+		addDefinitions.append<EventDefinitionId>(3);
 		data = "123";
 		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
 
 		addDefinitions.appendUint8(1);
-		addDefinitions.append(3);
-		addDefinitions.append(3);
+		addDefinitions.append<ApplicationProcessId>(3);
+		addDefinitions.append<EventDefinitionId>(3);
 		data = "234";
 		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
@@ -108,8 +108,8 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	SECTION("Add an event action definition that is already enabled") {
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(1);
-		addDefinitions.append(0);
-		addDefinitions.append(3);
+		addDefinitions.append<ApplicationProcessId>(0);
+		addDefinitions.append<EventDefinitionId>(3);
 		String<ECSSTCRequestStringSize> data = "456";
 		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
@@ -117,13 +117,13 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 		Message enableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 
 		enableDefinitions.appendUint8(1);
-		enableDefinitions.append(0);
-		enableDefinitions.append(3);
+		enableDefinitions.append<ApplicationProcessId>(0);
+		enableDefinitions.append<EventDefinitionId>(3);
 		MessageParser::execute(enableDefinitions);
 
 		addDefinitions.appendUint8(1);
-		addDefinitions.append(5);
-		addDefinitions.append(3);
+		addDefinitions.append<ApplicationProcessId>(5);
+		addDefinitions.append<EventDefinitionId>(3);
 		data = "456";
 		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
@@ -149,10 +149,10 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
-		addDefinitions.append(1);
-		addDefinitions.append(100);
-		addDefinitions.append(0);
-		addDefinitions.append(101);
+		addDefinitions.append<ApplicationProcessId>(1);
+		addDefinitions.append<EventDefinitionId>(100);
+		addDefinitions.append<ApplicationProcessId>(0);
+		addDefinitions.append<EventDefinitionId>(101);
 		addDefinitions.appendFixedString(data);
 		MessageParser::execute(addDefinitions);
 
@@ -172,12 +172,12 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 
 		Message enableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinitions.appendUint8(3);
-		enableDefinitions.append(0);
-		enableDefinitions.append(4);
-		enableDefinitions.append(1);
-		enableDefinitions.append(2);
-		enableDefinitions.append(0);
-		enableDefinitions.append(1);
+		enableDefinitions.append<ApplicationProcessId>(0);
+		enableDefinitions.append<EventDefinitionId>(4);
+		enableDefinitions.append<ApplicationProcessId>(1);
+		enableDefinitions.append<EventDefinitionId>(2);
+		enableDefinitions.append<ApplicationProcessId>(0);
+		enableDefinitions.append<EventDefinitionId>(1);
 		MessageParser::execute(enableDefinitions);
 
 		CHECK(element->second.enabled);
@@ -187,8 +187,8 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 	SECTION("Trying to enable an unknown definition") {
 		Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinition.appendUint8(1);
-		enableDefinition.append(1);
-		enableDefinition.append(7);
+		enableDefinition.append<ApplicationProcessId>(1);
+		enableDefinition.append<EventDefinitionId>(7);
 		MessageParser::execute(enableDefinition);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionError));
@@ -198,10 +198,10 @@ TEST_CASE("Enable event-action definitions TC[19,4]", "[service][st19]") {
 	SECTION("Trying to enable an existing event-action definition with the wrong event definition ID") {
 		Message enableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinitions.appendUint8(2);
-		enableDefinitions.append(1);
-		enableDefinitions.append(4);
-		enableDefinitions.append(1);
-		enableDefinitions.append(3);
+		enableDefinitions.append<ApplicationProcessId>(1);
+		enableDefinitions.append<EventDefinitionId>(4);
+		enableDefinitions.append<ApplicationProcessId>(1);
+		enableDefinitions.append<EventDefinitionId>(3);
 		MessageParser::execute(enableDefinitions);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionError));
@@ -231,10 +231,10 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 
 		Message deleteDefinition(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
 		deleteDefinition.appendUint8(2);
-		deleteDefinition.append(1);
-		deleteDefinition.append(2);
-		deleteDefinition.append(2);
-		deleteDefinition.append(5);
+		deleteDefinition.append<ApplicationProcessId>(1);
+		deleteDefinition.append<EventDefinitionId>(2);
+		deleteDefinition.append<ApplicationProcessId>(2);
+		deleteDefinition.append<EventDefinitionId>(5);
 		MessageParser::execute(deleteDefinition);
 
 		REQUIRE(eventActionService.eventActionDefinitionMap.count(0) == 1);
@@ -246,14 +246,14 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	SECTION("Trying to delete an enabled event-action definition") {
 		Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinition.appendUint8(1);
-		enableDefinition.append(0);
-		enableDefinition.append(1);
+		enableDefinition.append<ApplicationProcessId>(0);
+		enableDefinition.append<EventDefinitionId>(1);
 		MessageParser::execute(enableDefinition);
 
 		Message deleteDefinition(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
 		deleteDefinition.appendUint8(1);
-		deleteDefinition.append(0);
-		deleteDefinition.append(1);
+		deleteDefinition.append<ApplicationProcessId>(0);
+		deleteDefinition.append<EventDefinitionId>(1);
 		MessageParser::execute(deleteDefinition);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionDeleteEnabledDefinitionError));
@@ -263,8 +263,8 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	SECTION("Trying to delete an unknown event-action definition") {
 		Message deleteDefinition(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
 		deleteDefinition.appendUint8(1);
-		deleteDefinition.append(1);
-		deleteDefinition.append(8);
+		deleteDefinition.append<ApplicationProcessId>(1);
+		deleteDefinition.append<EventDefinitionId>(8);
 		MessageParser::execute(deleteDefinition);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionError));
@@ -274,10 +274,10 @@ TEST_CASE("Delete event-action definitions TC[19,2]", "[service][st19]") {
 	SECTION("Trying to delete an existing event-action definition with the wrong event definition ID") {
 		Message deleteDefinition(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
 		deleteDefinition.appendUint8(2);
-		deleteDefinition.append(0);
-		deleteDefinition.append(0);
-		deleteDefinition.append(0);
-		deleteDefinition.append(5);
+		deleteDefinition.append<ApplicationProcessId>(0);
+		deleteDefinition.append<EventDefinitionId>(0);
+		deleteDefinition.append<ApplicationProcessId>(0);
+		deleteDefinition.append<EventDefinitionId>(5);
 		MessageParser::execute(deleteDefinition);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionError));
@@ -304,14 +304,14 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 
 		Message enableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinitions.appendUint8(4);
-		enableDefinitions.append(0);
-		enableDefinitions.append(4);
-		enableDefinitions.append(1);
-		enableDefinitions.append(2);
-		enableDefinitions.append(0);
-		enableDefinitions.append(1);
-		enableDefinitions.append(1);
-		enableDefinitions.append(23);
+		enableDefinitions.append<ApplicationProcessId>(0);
+		enableDefinitions.append<EventDefinitionId>(4);
+		enableDefinitions.append<ApplicationProcessId>(1);
+		enableDefinitions.append<EventDefinitionId>(2);
+		enableDefinitions.append<ApplicationProcessId>(0);
+		enableDefinitions.append<EventDefinitionId>(1);
+		enableDefinitions.append<ApplicationProcessId>(1);
+		enableDefinitions.append<EventDefinitionId>(23);
 		MessageParser::execute(enableDefinitions);
 
 		auto range = eventActionService.eventActionDefinitionMap.find(4);
@@ -320,14 +320,14 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 
 		Message disableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
 		disableDefinitions.appendUint8(4);
-		disableDefinitions.append(0);
-		disableDefinitions.append(4);
-		disableDefinitions.append(2);
-		disableDefinitions.append(5);
-		disableDefinitions.append(1);
-		disableDefinitions.append(2);
-		disableDefinitions.append(0);
-		disableDefinitions.append(1);
+		disableDefinitions.append<ApplicationProcessId>(0);
+		disableDefinitions.append<EventDefinitionId>(4);
+		disableDefinitions.append<ApplicationProcessId>(2);
+		disableDefinitions.append<EventDefinitionId>(5);
+		disableDefinitions.append<ApplicationProcessId>(1);
+		disableDefinitions.append<EventDefinitionId>(2);
+		disableDefinitions.append<ApplicationProcessId>(0);
+		disableDefinitions.append<EventDefinitionId>(1);
 		MessageParser::execute(disableDefinitions);
 
 		CHECK(!range->second.enabled);
@@ -338,10 +338,10 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 	SECTION("Trying to disable unknown definitions") {
 		Message disableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
 		disableDefinitions.appendUint8(2);
-		disableDefinitions.append(1);
-		disableDefinitions.append(6);
-		disableDefinitions.append(0);
-		disableDefinitions.append(13);
+		disableDefinitions.append<ApplicationProcessId>(1);
+		disableDefinitions.append<EventDefinitionId>(6);
+		disableDefinitions.append<ApplicationProcessId>(0);
+		disableDefinitions.append<EventDefinitionId>(13);
 		MessageParser::execute(disableDefinitions);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionError));
@@ -351,10 +351,10 @@ TEST_CASE("Disable event-action definitions TC[19,5]", "[service][st19]") {
 	SECTION("Trying to disable an existing event-action definition with the wrong event definition ID") {
 		Message disableDefinitions(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
 		disableDefinitions.appendUint8(2);
-		disableDefinitions.append(1);
-		disableDefinitions.append(5);
-		disableDefinitions.append(0);
-		disableDefinitions.append(5);
+		disableDefinitions.append<ApplicationProcessId>(1);
+		disableDefinitions.append<EventDefinitionId>(5);
+		disableDefinitions.append<ApplicationProcessId>(0);
+		disableDefinitions.append<EventDefinitionId>(5);
 		MessageParser::execute(disableDefinitions);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionUnknownEventActionDefinitionError));
@@ -390,12 +390,12 @@ TEST_CASE("Request event-action definition status TC[19,6]", "[service][st19]") 
 TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 	addDefinitions.appendUint8(2);
-	addDefinitions.append(1);
-	addDefinitions.append(0);
+	addDefinitions.append<ApplicationProcessId>(1);
+	addDefinitions.append<EventDefinitionId>(0);
 	String<ECSSTCRequestStringSize> data = "0";
 	addDefinitions.appendFixedString(data);
-	addDefinitions.append(1);
-	addDefinitions.append(2);
+	addDefinitions.append<ApplicationProcessId>(1);
+	addDefinitions.append<EventDefinitionId>(2);
 	data = "2";
 	addDefinitions.appendFixedString(data);
 	MessageParser::execute(addDefinitions);
@@ -403,8 +403,8 @@ TEST_CASE("Event-action status report TM[19,7]", "[service][st19]") {
 	Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC,
 	                         0);
 	enableDefinition.appendUint8(1);
-	enableDefinition.append(1);
-	enableDefinition.append(0);
+	enableDefinition.append<ApplicationProcessId>(1);
+	enableDefinition.append<EventDefinitionId>(0);
 	MessageParser::execute(enableDefinition);
 
 	eventActionService.eventActionStatusReport();
@@ -436,20 +436,20 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 	SECTION("Action: Disable event-action definition") {
 		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinition.appendUint8(1);
-		addDefinition.append(0);
-		addDefinition.append(15);
+		addDefinition.append<ApplicationProcessId>(0);
+		addDefinition.append<EventDefinitionId>(15);
 
 		Message messageToBeExecuted(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction, Message::TC, 0);
 		messageToBeExecuted.appendUint8(1);
-		messageToBeExecuted.append(0);
-		messageToBeExecuted.append(15);
+		messageToBeExecuted.append<ApplicationProcessId>(0);
+		messageToBeExecuted.append<EventDefinitionId>(15);
 		addDefinition.appendMessage(messageToBeExecuted, ECSSTCRequestStringSize);
 		MessageParser::execute(addDefinition);
 
 		Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinition.appendUint8(1);
-		enableDefinition.append(0);
-		enableDefinition.append(15);
+		enableDefinition.append<ApplicationProcessId>(0);
+		enableDefinition.append<EventDefinitionId>(15);
 		MessageParser::execute(enableDefinition);
 		CHECK(eventActionService.eventActionDefinitionMap.find(15)->second.enabled);
 
@@ -468,13 +468,13 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 	SECTION("Action: Add event-action definition") {
 		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinition.appendUint8(1);
-		addDefinition.append(0);
-		addDefinition.append(9);
+		addDefinition.append<ApplicationProcessId>(0);
+		addDefinition.append<EventDefinitionId>(9);
 
 		Message messageToBeExecuted(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		messageToBeExecuted.appendUint8(1);
-		messageToBeExecuted.append(0);
-		messageToBeExecuted.append(74);
+		messageToBeExecuted.append<ApplicationProcessId>(0);
+		messageToBeExecuted.append<EventDefinitionId>(74);
 		String<ECSSTCRequestStringSize> data = "12345";
 		messageToBeExecuted.appendString(data);
 		addDefinition.appendMessage(messageToBeExecuted, ECSSTCRequestStringSize);
@@ -483,8 +483,8 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 
 		Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinition.appendUint8(1);
-		enableDefinition.append(0);
-		enableDefinition.append(9);
+		enableDefinition.append<ApplicationProcessId>(0);
+		enableDefinition.append<EventDefinitionId>(9);
 		MessageParser::execute(enableDefinition);
 
 		eventActionService.executeAction(9);
@@ -499,23 +499,23 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 	SECTION("Action: ParameterService::ReportParameterValues") {
 		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinition.appendUint8(1);
-		addDefinition.append(0);
-		addDefinition.append(10);
+		addDefinition.append<ApplicationProcessId>(0);
+		addDefinition.append<EventDefinitionId>(10);
 
 		Message TCToBeExecuted = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 		                                 Message::TC, 1);
 		TCToBeExecuted.appendUint16(3);
-		TCToBeExecuted.append(0);
-		TCToBeExecuted.append(1);
-		TCToBeExecuted.append(2);
+		TCToBeExecuted.append<ParameterId>(0);
+		TCToBeExecuted.append<ParameterId>(1);
+		TCToBeExecuted.append<ParameterId>(2);
 		addDefinition.appendMessage(TCToBeExecuted, ECSSTCRequestStringSize);
 
 		MessageParser::execute(addDefinition);
 
 		Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 		enableDefinition.appendUint8(1);
-		enableDefinition.append(0);
-		enableDefinition.append(10);
+		enableDefinition.append<ApplicationProcessId>(0);
+		enableDefinition.append<EventDefinitionId>(10);
 		MessageParser::execute(enableDefinition);
 
 		eventActionService.executeAction(10);

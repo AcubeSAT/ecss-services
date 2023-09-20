@@ -45,7 +45,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readUint16() == 2);        // number of parameters reported
 		// Parameter B
 		CHECK(report.read<ParameterId>() == 5);        // ID-2
-		CHECK(report.readUint16() == 6);        // number of samples
+		CHECK(report.read<ParameterSampleCount>() == 6);        // number of samples
 		CHECK(report.readFloat() == 13);        // max value
 		CHECK(report.readUint32() == 86769000); // max time
 		CHECK(report.readFloat() == 3);         // min value
@@ -54,7 +54,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
 		CHECK(report.read<ParameterId>() == 7);                  // ID-1
-		CHECK(report.readUint16() == 3);                  // number of samples
+		CHECK(report.read<ParameterSampleCount>() == 3);                  // number of samples
 		CHECK(report.readFloat() == 5);                   // max value
 		CHECK(report.readUint32() == 86769000);           // max time
 		CHECK(report.readFloat() == 1);                   // min value
@@ -110,7 +110,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readUint16() == 2);        // number of parameters reported
 		// Parameter B
 		CHECK(report.read<ParameterId>() == 5);        // ID-2
-		CHECK(report.readUint16() == 6);        // number of samples
+		CHECK(report.read<ParameterSampleCount>() == 6);        // number of samples
 		CHECK(report.readFloat() == 13);        // max value
 		CHECK(report.readUint32() == 86769000); // max time
 		CHECK(report.readFloat() == 3);         // min value
@@ -119,7 +119,7 @@ TEST_CASE("Reporting of statistics") {
 		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
 		CHECK(report.read<ParameterId>() == 7);                  // ID-1
-		CHECK(report.readUint16() == 3);                  // number of samples
+		CHECK(report.read<ParameterSampleCount>() == 3);                  // number of samples
 		CHECK(report.readFloat() == 5);                   // max value
 		CHECK(report.readUint32() == 86769000);           // max time
 		CHECK(report.readFloat() == 1);                   // min value
@@ -192,7 +192,7 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		Message request =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-		request.append(6);
+		request.append<SamplingInterval>(6);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 700);
 
@@ -207,7 +207,7 @@ TEST_CASE("Enable the periodic reporting of statistics") {
 		Message request2 =
 		    Message(ParameterStatisticsService::ServiceType,
 		            ParameterStatisticsService::MessageType::EnablePeriodicParameterReporting, Message::TC, 1);
-		request2.append(3);
+		request2.append<SamplingInterval>(3);
 		Services.parameterStatistics.setPeriodicReportingStatus(false);
 		CHECK(Services.parameterStatistics.getReportingIntervalMs() == 6);
 
@@ -250,9 +250,9 @@ TEST_CASE("Add/Update statistics definitions") {
 		request.appendUint16(numOfIds);
 
 		ParameterId paramId1 = 0;
-		uint16_t interval1 = 1400;
-		request.append(paramId1);
-		request.append(interval1);
+		SamplingInterval interval1 = 1400;
+		request.append<ParameterId>(paramId1);
+		request.append<SamplingInterval>(interval1);
 
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
 
@@ -274,9 +274,9 @@ TEST_CASE("Add/Update statistics definitions") {
 		request.appendUint16(numOfIds);
 
 		ParameterId paramId1 = 1;
-		uint16_t interval1 = 3200;
-		request.append(paramId1);
-		request.append(interval1);
+		SamplingInterval interval1 = 3200;
+		request.append<ParameterId>(paramId1);
+		request.append<SamplingInterval>(interval1);
 
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 2);
 
@@ -308,25 +308,25 @@ TEST_CASE("Add/Update statistics definitions") {
 		ParameterId paramId5 = ECSSParameterCount + 1;
 		ParameterId paramId6 = 3;
 
-		uint16_t interval1 = 14000;
-		uint16_t interval2 = 32000;
-		uint16_t interval3 = 20;
-		uint16_t interval4 = 7000;
-		uint16_t interval5 = 8000;
-		uint16_t interval6 = 9000;
+		SamplingInterval interval1 = 14000;
+		SamplingInterval interval2 = 32000;
+		SamplingInterval interval3 = 20;
+		SamplingInterval interval4 = 7000;
+		SamplingInterval interval5 = 8000;
+		SamplingInterval interval6 = 9000;
 
-		request.append(paramId1);
-		request.append(interval1);
-		request.append(paramId2);
-		request.append(interval2);
-		request.append(paramId3);
-		request.append(interval3);
-		request.append(paramId4);
-		request.append(interval4);
-		request.append(paramId5);
-		request.append(interval5);
-		request.append(paramId6);
-		request.append(interval6);
+		request.append<ParameterId>(paramId1);
+		request.append<SamplingInterval>(interval1);
+		request.append<ParameterId>(paramId2);
+		request.append<SamplingInterval>(interval2);
+		request.append<ParameterId>(paramId3);
+		request.append<SamplingInterval>(interval3);
+		request.append<ParameterId>(paramId4);
+		request.append<SamplingInterval>(interval4);
+		request.append<ParameterId>(paramId5);
+		request.append<SamplingInterval>(interval5);
+		request.append<ParameterId>(paramId6);
+		request.append<SamplingInterval>(interval6);
 
 		CHECK(Services.parameterStatistics.statisticsMap.size() == 3);
 
@@ -365,8 +365,8 @@ TEST_CASE("Delete statistics definitions") {
 		ParameterId id1 = 0;
 		ParameterId id2 = 255; // Invalid ID
 		request.appendUint16(numIds);
-		request.append(id1);
-		request.append(id2);
+		request.append<ParameterId>(id1);
+		request.append<ParameterId>(id2);
 
 		Services.parameterStatistics.setPeriodicReportingStatus(true);
 		MessageParser::execute(request);

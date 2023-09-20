@@ -124,7 +124,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	// Individual fields of the TC header
 	uint8_t pusVersion = data[0] >> 4;
 	ServiceTypeSize serviceType = data[1];
-	uint8_t messageType = data[2];
+	MessageTypeSize messageType = data[2];
 	SourceId sourceId = (data[3] << 8) + data[4];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
@@ -245,7 +245,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	// Individual fields of the TM header
 	uint8_t pusVersion = data[0] >> 4;
 	ServiceTypeSize serviceType = data[1];
-	uint8_t messageType = data[2];
+	MessageTypeSize messageType = data[2];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 

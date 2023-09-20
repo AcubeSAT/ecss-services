@@ -15,8 +15,8 @@ void initializePacketStores() {
 	NumOfPacketStores numOfPacketStores = 4;
 	uint8_t concatenatedPacketStoreNames[] = "ps2ps25ps799ps5555";
 	uint16_t offsets[5] = {0, 3, 7, 12, 18};
-	uint16_t sizes[4] = {100, 200, 550, 340};
-	uint8_t virtualChannels[4] = {4, 6, 1, 2};
+	PacketStoreSize sizes[4] = {100, 200, 550, 340};
+	VirtualChannel virtualChannels[4] = {4, 6, 1, 2};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSPacketStoreIdSize];
@@ -50,13 +50,13 @@ void validPacketStoreCreationRequest(Message& request) {
 
 		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
-		request.append(sizes[i]);
+		request.append<PacketStoreSize>(sizes[i]);
 		if ((i % 2) == 0) {
-			request.append(packetStoreTypeCode[0]);
+			request.append<PacketStoreType>(packetStoreTypeCode[0]);
 		} else {
-			request.append(packetStoreTypeCode[1]);
+			request.append<PacketStoreType>(packetStoreTypeCode[1]);
 		}
-		request.append(virtualChannels[i]);
+		request.append<VirtualChannel>(virtualChannels[i]);
 	}
 }
 
@@ -79,13 +79,13 @@ void invalidPacketStoreCreationRequest(Message& request) {
 
 		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
-		request.append(sizes[i]);
+		request.append<PacketStoreSize>(sizes[i]);
 		if ((i % 2) == 0) {
-			request.append(packetStoreTypeCode[0]);
+			request.append<PacketStoreType>(packetStoreTypeCode[0]);
 		} else {
-			request.append(packetStoreTypeCode[1]);
+			request.append<PacketStoreType>(packetStoreTypeCode[1]);
 		}
-		request.append(virtualChannels[i]);
+		request.append<VirtualChannel>(virtualChannels[i]);
 	}
 }
 
@@ -1283,7 +1283,7 @@ TEST_CASE("Resizing the packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint16_t newSizes[4] = {11, 22, 33, 44};
+		PacketStoreSize newSizes[4] = {11, 22, 33, 44};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
@@ -1298,7 +1298,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.byTimeRangeRetrievalStatus = false;
 
 			request.appendString(packetStoreId);
-			request.appendUint16(newSizes[index]);
+			request.append<PacketStoreSize>(newSizes[index]);
 			index++;
 		}
 
@@ -1320,7 +1320,7 @@ TEST_CASE("Resizing the packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint16_t oldSizes[4] = {100, 200, 550, 340};
+		PacketStoreSize oldSizes[4] = {100, 200, 550, 340};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
@@ -1335,7 +1335,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.openRetrievalStatus = (index == 3) ? PacketStore::InProgress : PacketStore::Suspended;
 
 			request.appendString(packetStoreId);
-			request.appendUint16(35);
+			request.append<PacketStoreSize>(35);
 			index++;
 		}
 
@@ -1361,7 +1361,7 @@ TEST_CASE("Resizing the packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint16_t newSizes[4] = {1000, 2000, 3400, 5500};
+		PacketStoreSize newSizes[4] = {1000, 2000, 3400, 5500};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
@@ -1376,7 +1376,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 
 			request.appendString(packetStoreId);
-			request.appendUint16(newSizes[index++]);
+			request.append<PacketStoreSize>(newSizes[index++]);
 		}
 
 		MessageParser::execute(request);
@@ -1395,7 +1395,7 @@ TEST_CASE("Resizing the packet stores") {
 		auto correctPacketStoreIds = validPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		uint16_t oldSizes[4] = {100, 200, 550, 340};
+		PacketStoreSize oldSizes[4] = {100, 200, 550, 340};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
@@ -1404,7 +1404,7 @@ TEST_CASE("Resizing the packet stores") {
 		request.appendUint16(numOfPacketStores);
 		for (auto& packetStoreId: wrongPacketStoreIds) {
 			request.appendString(packetStoreId);
-			request.appendUint16(35);
+			request.append<PacketStoreSize>(35);
 		}
 
 		MessageParser::execute(request);
@@ -1616,7 +1616,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
 		request.appendString(packetStoreIds[0]);
-		request.append(virtualChannels[0]);
+		request.append<VirtualChannel>(virtualChannels[0]);
 
 		MessageParser::execute(request);
 
@@ -1630,7 +1630,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		                 StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
 		request2.appendString(packetStoreIds[3]);
-		request2.append(virtualChannels[1]);
+		request2.append<VirtualChannel>(virtualChannels[1]);
 
 		MessageParser::execute(request2);
 
@@ -1651,7 +1651,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		uint8_t oldVirtualChannels[4] = {4, 6, 1, 2};
+		VirtualChannel oldVirtualChannels[4] = {4, 6, 1, 2};
 
 		int count = 0;
 		for (auto& packetStoreId: correctPacketStoreIds) {

@@ -26,7 +26,7 @@ void TestService::onBoardConnection(Message& request) {
 
 void TestService::onBoardConnectionReport(ApplicationProcessId applicationProcessId) {
 	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
-	report.append(applicationProcessId);
+	report.append<ApplicationProcessId>(applicationProcessId);
 	storeMessage(report);
 }
 

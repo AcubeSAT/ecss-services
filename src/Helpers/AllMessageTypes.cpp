@@ -12,7 +12,7 @@
 #include "Services/TimeBasedSchedulingService.hpp"
 
 namespace AllMessageTypes {
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST01Messages = {RequestVerificationService::MessageType::FailedAcceptanceReport,
 		                                                                     RequestVerificationService::MessageType::FailedCompletionOfExecution,
 		                                                                     RequestVerificationService::MessageType::FailedProgressOfExecution,
 		                                                                     RequestVerificationService::MessageType::FailedRoutingReport,
@@ -22,7 +22,7 @@ namespace AllMessageTypes {
 		                                                                     RequestVerificationService::MessageType::SuccessfulProgressOfExecution,
 		                                                                     RequestVerificationService::MessageType::SuccessfulStartOfExecution};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST03Messages = {
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST03Messages = {
 	    HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport,
 	    HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport,
 	    HousekeepingService::MessageType::GenerateOneShotHousekeepingReport,
@@ -30,34 +30,34 @@ namespace AllMessageTypes {
 	    HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
 	    HousekeepingService::MessageType::HousekeepingStructuresReport};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST04Messages = {
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST04Messages = {
 	    ParameterStatisticsService::MessageType::ParameterStatisticsDefinitionsReport,
 	    ParameterStatisticsService::MessageType::ParameterStatisticsReport,
 	};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST05Messages = {EventReportService::MessageType::HighSeverityAnomalyReport,
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST05Messages = {EventReportService::MessageType::HighSeverityAnomalyReport,
 	                                                                         EventReportService::MessageType::DisabledListEventReport,
 	                                                                         EventReportService::MessageType::InformativeEventReport,
 	                                                                         EventReportService::MessageType::LowSeverityAnomalyReport,
 	                                                                         EventReportService::MessageType::MediumSeverityAnomalyReport};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST06Messages = {MemoryManagementService::MessageType::CheckRawMemoryDataReport,
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST06Messages = {MemoryManagementService::MessageType::CheckRawMemoryDataReport,
 	                                                                         MemoryManagementService::MessageType::DumpRawMemoryDataReport};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST11Messages = {TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST11Messages = {TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST13Messages = {LargePacketTransferService::MessageType::FirstDownlinkPartReport,
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST13Messages = {LargePacketTransferService::MessageType::FirstDownlinkPartReport,
 	                                                                         LargePacketTransferService::MessageType::InternalDownlinkPartReport,
 	                                                                         LargePacketTransferService::MessageType::LastDownlinkPartReport};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST17Messages = {TestService::MessageType::AreYouAliveTestReport,
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST17Messages = {TestService::MessageType::AreYouAliveTestReport,
 	                                                                         TestService::MessageType::OnBoardConnectionTestReport};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST19Messages = {EventActionService::MessageType::EventActionStatusReport};
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST19Messages = {EventActionService::MessageType::EventActionStatusReport};
 
-	const etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ST20Messages = {ParameterService::MessageType::ParameterValuesReport};
+	const etl::vector<MessageTypeSize, ECSSMaxReportTypeDefinitions> ST20Messages = {ParameterService::MessageType::ParameterValuesReport};
 
-	const etl::map<uint8_t, etl::vector<uint8_t, ECSSMaxReportTypeDefinitions>, ECSSMaxServiceTypeDefinitions> MessagesOfService = {
+	const etl::map<MessageTypeSize, etl::vector<uint8_t, ECSSMaxReportTypeDefinitions>, ECSSMaxServiceTypeDefinitions> MessagesOfService = {
 	    {RequestVerificationService::ServiceType, ST01Messages},
 	    {HousekeepingService::ServiceType, ST03Messages},
 	    {ParameterStatisticsService::ServiceType, ST04Messages},

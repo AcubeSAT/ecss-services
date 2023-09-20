@@ -46,7 +46,7 @@ int main() {
 	    Message(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
 	testService.areYouAlive(receivedPacket);
 	receivedPacket = Message(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest, Message::TC, 1);
-	receivedPacket.append(7);
+	receivedPacket.append<ApplicationProcessId>(7);
 	testService.onBoardConnection(receivedPacket);
 
 	// ST[20] test
@@ -56,17 +56,17 @@ int main() {
 	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 	                             Message::TC, 1); // application id is a dummy number (1)
 	sentPacket.appendUint16(2);                   // number of contained IDs
-	sentPacket.append(0);                   // first ID
-	sentPacket.append(1);                   // second ID
+	sentPacket.append<ParameterId>(0);                   // first ID
+	sentPacket.append<ParameterId>(1);                   // second ID
 	paramService.reportParameters(sentPacket);
 
 	// Test code for setParameter
 	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
 	                              Message::TC, 1); // application id is a dummy number (1)
 	sentPacket2.appendUint16(2);                   // number of contained IDs
-	sentPacket2.append(0);                   // first parameter ID
+	sentPacket2.append<ParameterId>(0);                   // first parameter ID
 	sentPacket2.appendUint32(63238);               // settings for first parameter
-	sentPacket2.append(1);                   // 2nd parameter ID
+	sentPacket2.append<ParameterId>(1);                   // 2nd parameter ID
 	sentPacket2.appendUint32(45823);               // settings for 2nd parameter
 
 	paramService.setParameters(sentPacket2);
@@ -83,28 +83,28 @@ int main() {
 	MemoryManagementService& memMangService = Services.memoryManagement;
 	Message rcvPack = Message(MemoryManagementService::ServiceType,
 	                          MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
-	rcvPack.append(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3);                                          // Iteration count
-	rcvPack.append(reinterpret_cast<StartAddress>(string));         // Start address
-	rcvPack.append(sizeof(string) / sizeof(string[0]));         // Data read length
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(string));         // Start address
+	rcvPack.append<DataLength>(sizeof(string) / sizeof(string[0]));         // Data read length
 
-	rcvPack.append(reinterpret_cast<StartAddress>(anotherStr));
-	rcvPack.append(sizeof(anotherStr) / sizeof(anotherStr[0]));
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(anotherStr));
+	rcvPack.append<DataLength>(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
-	rcvPack.append(reinterpret_cast<StartAddress>(yetAnotherStr));
-	rcvPack.append(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(yetAnotherStr));
+	rcvPack.append<DataLength>(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(MemoryManagementService::ServiceType,
 	                  MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
-	rcvPack.append(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2);                                          // Iteration count
-	rcvPack.append(reinterpret_cast<StartAddress>(pStr));           // Start address
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));           // Start address
 	rcvPack.appendOctetString(String<2>(data, 2));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2));   // Append the CRC value
-	rcvPack.append(reinterpret_cast<StartAddress>(pStr + 1)); // Start address
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr + 1)); // Start address
 	rcvPack.appendOctetString(String<1>(data, 1));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.loadRawData(rcvPack);
@@ -112,12 +112,12 @@ int main() {
 	rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData,
 	                  Message::TC, 1);
 
-	rcvPack.append(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2);                                          // Iteration count
-	rcvPack.append(reinterpret_cast<StartAddress>(data));           // Start address
-	rcvPack.append(2);
-	rcvPack.append(reinterpret_cast<StartAddress>(data + 1)); // Start address
-	rcvPack.append(1);
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data));           // Start address
+	rcvPack.append<DataLength>(2);
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data + 1)); // Start address
+	rcvPack.append<DataLength>(1);
 	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
 	// ST[01] test
@@ -188,13 +188,13 @@ int main() {
 	Message eventMessage(EventReportService::ServiceType,
 	                     EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	eventMessage.appendUint16(2);
-	eventMessage.append(eventIDs[0]);
-	eventMessage.append(eventIDs[1]);
+	eventMessage.append<EventDefinitionId>(eventIDs[0]);
+	eventMessage.append<EventDefinitionId>(eventIDs[1]);
 
 	Message eventMessage2(EventReportService::ServiceType,
 	                      EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
 	eventMessage2.appendUint16(1);
-	eventMessage2.append(eventIDs2[0]);
+	eventMessage2.append<EventDefinitionId>(eventIDs2[0]);
 
 	Message eventMessage3(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents,
 	                      Message::TC, 1);
@@ -210,8 +210,8 @@ int main() {
 	Message eventActionDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
 	                              Message::TC, 1);
 	eventActionDefinition.appendEnum16(0);
-	eventActionDefinition.appendEnum16(2);
-	eventActionDefinition.appendEnum16(1);
+	eventActionDefinition.append<ApplicationProcessId>(2);
+	eventActionDefinition.append<EventDefinitionId>(1);
 	String<64> TCdata = "0123456789123456789123456789123456789123456789123456789123456789";
 	eventActionDefinition.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition);
@@ -219,8 +219,8 @@ int main() {
 	Message eventActionDefinition1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
 	                               Message::TC, 1);
 	eventActionDefinition1.appendEnum16(0);
-	eventActionDefinition1.appendEnum16(2);
-	eventActionDefinition1.appendEnum16(1);
+	eventActionDefinition1.append<ApplicationProcessId>(2);
+	eventActionDefinition1.append<EventDefinitionId>(1);
 	TCdata = "hi1";
 	eventActionDefinition1.appendString(TCdata);
 	std::cout << "After this message there should be a failed start of execution error \n";
@@ -229,8 +229,8 @@ int main() {
 	Message eventActionDefinition2(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
 	                               Message::TC, 1);
 	eventActionDefinition2.appendEnum16(0);
-	eventActionDefinition2.appendEnum16(4);
-	eventActionDefinition2.appendEnum16(2);
+	eventActionDefinition2.append<ApplicationProcessId>(4);
+	eventActionDefinition2.append<EventDefinitionId>(2);
 	TCdata = "hi2";
 	eventActionDefinition2.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition2);
@@ -238,8 +238,8 @@ int main() {
 	Message eventActionDefinition7(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
 	                               Message::TC, 1);
 	eventActionDefinition7.appendEnum16(0);
-	eventActionDefinition7.appendEnum16(4);
-	eventActionDefinition7.appendEnum16(4);
+	eventActionDefinition7.append<ApplicationProcessId>(4);
+	eventActionDefinition7.append<EventDefinitionId>(4);
 	TCdata = "hi2";
 	eventActionDefinition7.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition7);
@@ -252,15 +252,15 @@ int main() {
 	Message eventActionDefinition5(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction,
 	                               Message::TC, 1);
 	eventActionDefinition5.appendUint16(3);
-	eventActionDefinition5.append(0);
-	eventActionDefinition5.append(2);
-	eventActionDefinition5.append(1);
-	eventActionDefinition5.append(0);
-	eventActionDefinition5.append(4);
-	eventActionDefinition5.append(2);
-	eventActionDefinition5.append(0);
-	eventActionDefinition5.append(4);
-	eventActionDefinition5.append(4);
+	eventActionDefinition5.appendUint16(0);
+	eventActionDefinition5.append<ApplicationProcessId>(2);
+	eventActionDefinition5.append<EventDefinitionId>(1);
+	eventActionDefinition5.appendUint16(0);
+	eventActionDefinition5.append<ApplicationProcessId>(4);
+	eventActionDefinition5.append<EventDefinitionId>(2);
+	eventActionDefinition5.appendUint16(0);
+	eventActionDefinition5.append<ApplicationProcessId>(4);
+	eventActionDefinition5.append<EventDefinitionId>(4);
 
 	eventActionService.enableEventActionDefinitions(eventActionDefinition5);
 	std::cout << "\nStatus should be 111:";
@@ -271,15 +271,15 @@ int main() {
 	Message eventActionDefinition3(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
 	                               Message::TC, 1);
 	eventActionDefinition3.appendUint16(3);
-	eventActionDefinition3.append(0);
-	eventActionDefinition3.append(2);
-	eventActionDefinition3.append(1);
-	eventActionDefinition3.append(0);
-	eventActionDefinition3.append(4);
-	eventActionDefinition3.append(2);
-	eventActionDefinition3.append(0);
-	eventActionDefinition3.append(4);
-	eventActionDefinition3.append(4);
+	eventActionDefinition3.appendUint16(0);
+	eventActionDefinition3.append<ApplicationProcessId>(2);
+	eventActionDefinition3.append<EventDefinitionId>(1);
+	eventActionDefinition3.appendUint16(0);
+	eventActionDefinition3.append<ApplicationProcessId>(4);
+	eventActionDefinition3.append<EventDefinitionId>(2);
+	eventActionDefinition3.appendUint16(0);
+	eventActionDefinition3.append<ApplicationProcessId>(4);
+	eventActionDefinition3.append<EventDefinitionId>(4);
 	eventActionService.disableEventActionDefinitions(eventActionDefinition3);
 	std::cout << "Status should be 000:";
 	for (auto& element: eventActionService.eventActionDefinitionMap) {
@@ -291,9 +291,9 @@ int main() {
 	Message eventActionDefinition4(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction,
 	                               Message::TC, 1);
 	eventActionDefinition4.appendUint16(1);
-	eventActionDefinition4.append(0);
-	eventActionDefinition4.append(2);
-	eventActionDefinition4.append(1);
+	eventActionDefinition4.appendUint16(0);
+	eventActionDefinition4.append<ApplicationProcessId>(2);
+	eventActionDefinition4.append<EventDefinitionId>(1);
 
 	std::cout << "After this message there should be a failed start of execution error \n";
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
@@ -301,9 +301,9 @@ int main() {
 	Message eventActionDefinition6(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
 	                               Message::TC, 1);
 	eventActionDefinition6.appendUint16(1);
-	eventActionDefinition6.append(0);
-	eventActionDefinition6.append(2);
-	eventActionDefinition6.append(1);
+	eventActionDefinition6.appendUint16(0);
+	eventActionDefinition6.append<ApplicationProcessId>(2);
+	eventActionDefinition6.append<EventDefinitionId>(1);
 	eventActionService.disableEventActionDefinitions(eventActionDefinition6);
 	std::cout << "After this message there should NOT be a failed start of execution error \n";
 	eventActionService.deleteEventActionDefinitions(eventActionDefinition4);
@@ -327,8 +327,8 @@ int main() {
 	            TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
 	Message testMessage1(6, 5, Message::TC, 1);
 	Message testMessage2(4, 5, Message::TC, 1);
-	testMessage1.append(4253);  // Append dummy data
-	testMessage2.append(45667); // Append dummy data
+	testMessage1.appendUint16(4253);  // Append dummy data
+	testMessage2.appendUint16(45667); // Append dummy data
 
 	timeBasedSchedulingService.enableScheduleExecution(receivedMsg); // Enable the schedule
 

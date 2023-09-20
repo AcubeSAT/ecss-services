@@ -404,7 +404,7 @@ public:
 	enum ExecutionCompletionErrorType {
 		UnknownExecutionCompletionError = 0,
 		/**
-		 * Checksum comparison failed
+		 * MemoryManagementChecksum comparison failed
 		 */
 		ChecksumFailed = 1,
 		/**

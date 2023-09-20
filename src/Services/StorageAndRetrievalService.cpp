@@ -161,7 +161,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 
 	auto filledPercentage1 = static_cast<uint16_t>(static_cast<float>(packetStores[packetStoreId].storedTelemetryPackets.size()) * 100 /
 	                                               ECSSMaxPacketStoreSize);
-	report.append(filledPercentage1);
+	report.append<Percentages>(filledPercentage1);
 
 	uint16_t numOfPacketsToBeTransferred = 0;
 	numOfPacketsToBeTransferred = std::count_if(
@@ -170,7 +170,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
 	    });
 	auto filledPercentage2 = static_cast<uint16_t>(static_cast<float>(numOfPacketsToBeTransferred) * 100 / ECSSMaxPacketStoreSize);
-	report.append(filledPercentage2);
+	report.append<Percentages>(filledPercentage2);
 }
 
 bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(

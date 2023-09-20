@@ -15,9 +15,9 @@ TEST_CASE("Parameter Report Subservice") {
 		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 		                          Message::TC, ApplicationId);
 		request.appendUint16(3);
-		request.append(54432);
-		request.append(60000);
-		request.append(65535);
+		request.append<ParameterId>(54432);
+		request.append<ParameterId>(60000);
+		request.append<ParameterId>(65535);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 3);
@@ -36,9 +36,9 @@ TEST_CASE("Parameter Report Subservice") {
 		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 		                          Message::TC, 1);
 		request.appendUint16(3);
-		request.append(1);
-		request.append(10000);
-		request.append(2);
+		request.append<ParameterId>(1);
+		request.append<ParameterId>(10000);
+		request.append<ParameterId>(2);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
@@ -61,9 +61,9 @@ TEST_CASE("Parameter Report Subservice") {
 		Message request = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 		                          Message::TC, 1);
 		request.appendUint16(3);
-		request.appendUint16(0);
-		request.appendUint16(1);
-		request.appendUint16(2);
+		request.append<ParameterId>(0);
+		request.append<ParameterId>(1);
+		request.append<ParameterId>(2);
 
 		MessageParser::execute(request);
 
@@ -89,11 +89,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
 		request.appendUint16(54432);
-		request.appendUint16(1);
+		request.append<ParameterId>(1);
 		request.appendUint16(60000);
-		request.appendUint16(1);
+		request.append<ParameterId>(1);
 		request.appendUint16(65534);
-		request.appendUint16(1);
+		request.append<ParameterId>(1);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetNonExistingParameter) == 1);
@@ -111,11 +111,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message request =
 		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
-		request.append(0);
+		request.append<ParameterId>(0);
 		request.appendUint8(1);
-		request.append(1);
+		request.append<ParameterId>(1);
 		request.appendUint16(2);
-		request.append(65534);
+		request.append<ParameterId>(65534);
 		request.appendUint16(1);
 
 		MessageParser::execute(request);
@@ -136,11 +136,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message request =
 		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
-		request.append(0);
+		request.append<ParameterId>(0);
 		request.appendUint8(1);
-		request.append(65534);
+		request.append<ParameterId>(65534);
 		request.appendUint16(1);
-		request.append(2);
+		request.append<ParameterId>(2);
 		request.appendUint16(3);
 
 		MessageParser::execute(request);
@@ -161,11 +161,11 @@ TEST_CASE("Parameter Setting Subservice") {
 		Message request =
 		    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 		request.appendUint16(3);
-		request.append(0);
+		request.append<ParameterId>(0);
 		request.appendUint8(1);
-		request.append(1);
+		request.append<ParameterId>(1);
 		request.appendUint16(2);
-		request.append(2);
+		request.append<ParameterId>(2);
 		request.appendUint32(3);
 
 		MessageParser::execute(request);

@@ -30,7 +30,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
 			continue;
 		}
-		parameterReport.append(currId);
+		parameterReport.append<ParameterId>(currId);
 		parameter->get().appendValueToMessage(parameterReport);
 	}
 

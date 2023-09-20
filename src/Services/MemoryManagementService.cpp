@@ -78,7 +78,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		ReadData readData[ECSSMaxStringSize];
 		uint16_t iterationCount = request.readUint16();
 
-		report.append(memoryID);
+		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
@@ -91,7 +91,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
-				report.append(startAddress);
+				report.append<StartAddress>(startAddress);
 				report.appendOctetString(String<1024>(readData, readLength));
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
@@ -118,7 +118,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		ReadData readData[ECSSMaxStringSize];
 		uint16_t iterationCount = request.readUint16();
 
-		report.append(memoryID);
+		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
@@ -131,8 +131,8 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
-				report.append(startAddress);
-				report.append(readLength);
+				report.append<StartAddress>(startAddress);
+				report.append<DataLength>(readLength);
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);

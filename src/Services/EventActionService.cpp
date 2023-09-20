@@ -157,8 +157,8 @@ void EventActionService::eventActionStatusReport() {
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
 	for (const auto& element: eventActionDefinitionMap) {
-		report.appendEnum16(element.second.applicationID);
-		report.appendEnum16(element.second.eventDefinitionID);
+		report.append<ApplicationProcessId>(element.second.applicationID);
+		report.append<EventDefinitionId>(element.second.eventDefinitionID);
 		report.appendBoolean(element.second.enabled);
 	}
 	storeMessage(report);

@@ -100,14 +100,14 @@ void HousekeepingService::housekeepingStructureReport(ParameterReportStructureId
 		return;
 	}
 	Message structReport = createTM(MessageType::HousekeepingStructuresReport);
-	structReport.append(structIdToReport);
+	structReport.append<ParameterReportStructureId>(structIdToReport);
 
 	structReport.appendBoolean(housekeepingStructure->second.periodicGenerationActionStatus);
-	structReport.append(housekeepingStructure->second.collectionInterval);
+	structReport.append<CollectionInterval>(housekeepingStructure->second.collectionInterval);
 	structReport.appendUint16(housekeepingStructure->second.simplyCommutatedParameterIds.size());
 
 	for (auto parameterId: housekeepingStructure->second.simplyCommutatedParameterIds) {
-		structReport.append(parameterId);
+		structReport.append<ParameterId>(parameterId);
 	}
 	storeMessage(structReport);
 }
@@ -121,7 +121,7 @@ void HousekeepingService::housekeepingParametersReport(ParameterReportStructureI
 
 	Message housekeepingReport = createTM(MessageType::HousekeepingParametersReport);
 
-	housekeepingReport.append(structureId);
+	housekeepingReport.append<ParameterReportStructureId>(structureId);
 	for (auto id: housekeepingStructure.simplyCommutatedParameterIds) {
 		if (auto parameter = Services.parameterManagement.getParameter(id)) {
 			parameter->get().appendValueToMessage(housekeepingReport);
@@ -222,9 +222,9 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 }
 
 void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, ParameterReportStructureId structureId) {
-	report.append(structureId);
+	report.append<ParameterReportStructureId>(structureId);
 	report.appendBoolean(getPeriodicGenerationActionStatus(structureId));
-	report.append(getCollectionInterval(structureId));
+	report.append<CollectionInterval>(getCollectionInterval(structureId));
 }
 
 void HousekeepingService::execute(Message& message) {

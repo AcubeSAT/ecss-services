@@ -11,10 +11,10 @@ ApplicationProcessId applications[] = {1};
 ServiceTypeSize services[] = {3, 5};
 ServiceTypeSize allServices[] = {1, 3, 4, 5, 6, 11, 13, 17, 19, 20};
 ServiceTypeSize redundantServices[] = {1, 3, 4, 5, 6, 11, 13, 17, 19, 20, 1, 3};
-uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
+MessageTypeSize messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
                        HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport};
 
-uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
+MessageTypeSize messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
 /**
@@ -29,17 +29,17 @@ void validReportTypes(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 			uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.append(messages[k]);
+				request.append<MessageTypeSize>(messages[k]);
 			}
 		}
 	}
@@ -57,16 +57,16 @@ void duplicateReportTypes(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.append(messages1[0]);
+				request.append<MessageTypeSize>(messages1[0]);
 			}
 		}
 	}
@@ -84,19 +84,19 @@ void validInvalidReportTypes(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
-		request.appendUint16(applications2[i]);
+		request.append<ApplicationProcessId>(applications2[i]);
 		uint8_t numOfServicesPerApp = (i == 0) ? 12 : 2;
 		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = servicesToPick[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 			uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.append(messages[k]);
+				request.append<MessageTypeSize>(messages[k]);
 			}
 		}
 	}
@@ -114,12 +114,12 @@ void validAllReportsOfService(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 		}
 	}
@@ -138,21 +138,21 @@ void validInvalidAllReportsOfService(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
-		request.appendUint16(applications2[i]);
+		request.append<ApplicationProcessId>(applications2[i]);
 		uint8_t numOfServicesPerApp = (i == 0) ? 12 : 2;
 		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = servicesToPick[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			uint8_t numOfMessages = (i < 2) ? 0 : numOfMessagesPerService;
 			request.appendUint8(numOfMessages);
 			if (i >= 2) {
 				uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-					request.append(messages[k]);
+					request.append<MessageTypeSize>(messages[k]);
 				}
 			}
 		}
@@ -170,7 +170,7 @@ void validAllReportsOfApp(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applications) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 	}
 }
@@ -188,7 +188,7 @@ void validInvalidAllReportsOfApp(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (uint8_t i = 0; i < numOfApplications; i++) {
-		request.appendUint16(applications2[i]);
+		request.append<ApplicationProcessId>(applications2[i]);
 		uint8_t numOfServicesPerApp = (i == 0 or i == 1) ? 0 : 2;
 		uint8_t* servicesToPick = (i == 0) ? redundantServices : services;
 		request.appendUint8(numOfServicesPerApp);
@@ -196,14 +196,14 @@ void validInvalidAllReportsOfApp(Message& request) {
 		if (i >= 2) {
 			for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 				ServiceTypeSize serviceType = servicesToPick[j];
-				request.append(serviceType);
+				request.append<ServiceTypeSize>(serviceType);
 				uint8_t numOfMessages = (i == 0 or i == 1) ? 0 : numOfMessagesPerService;
 				request.appendUint8(numOfMessages);
 
 				uint8_t* messages = (j == 0) ? messages1 : messages2;
 
 				for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-					request.append(messages[k]);
+					request.append<MessageTypeSize>(messages[k]);
 				}
 			}
 		}
@@ -357,7 +357,6 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		ApplicationProcessId applicationID = 1;
 		ServiceTypeSize serviceType1 = services[0]; // st03
 		ServiceTypeSize serviceType2 = services[1]; // st05
-
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypes(request);
 
@@ -652,7 +651,7 @@ void checkAppProcessConfig2() {
 			REQUIRE(applicationProcesses[appServicePair].size() == 2);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				ServiceTypeSize messageType = messages[k];
+				MessageTypeSize messageType = messages[k];
 				REQUIRE(std::find(applicationProcesses[appServicePair].begin(),
 				                  applicationProcesses[appServicePair].end(),
 				                  messageType) != applicationProcesses[appServicePair].end());
@@ -680,7 +679,7 @@ void initializeAppProcessConfig2() {
 			uint8_t* messages = (i == 2) ? messagesToFill2 : messagesToFill1;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				ServiceTypeSize messageType = messages[k];
+				MessageTypeSize messageType = messages[k];
 				realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(appID, serviceType)].push_back(
 				    messageType);
 			}
@@ -702,7 +701,7 @@ void serviceNotInApplication(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applicationsToFill) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
@@ -712,7 +711,7 @@ void serviceNotInApplication(Message& request) {
 			uint8_t* messages = (j == 0) ? messagesToFill1 : messagesToFill2;
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.append(messages[k]);
+				request.append<MessageTypeSize>(messages[k]);
 			}
 		}
 	}
@@ -731,12 +730,12 @@ void messageNotInApplication(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applicationsToFill) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
@@ -761,16 +760,16 @@ void deleteValidReportTypes(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applicationsToFill) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.append(messagesToFill1[k]);
+				request.append<MessageTypeSize>(messagesToFill1[k]);
 			}
 		}
 	}
@@ -789,16 +788,16 @@ void deleteReportEmptyService(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applicationsToFill) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.append(messagesToFill1[k]);
+				request.append<MessageTypeSize>(messagesToFill1[k]);
 			}
 		}
 	}
@@ -817,16 +816,16 @@ void deleteReportEmptyApplication(Message& request) {
 	request.appendUint8(numOfApplications);
 
 	for (auto appID: applicationsToFill) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = servicesToFill[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 
 			for (uint8_t k = 0; k < numOfMessagesPerService; k++) {
-				request.append(messagesToFill1[k]);
+				request.append<MessageTypeSize>(messagesToFill1[k]);
 			}
 		}
 	}
@@ -842,7 +841,7 @@ void deleteApplicationProcess(Message& request) {
 	uint8_t numOfServicesPerApp = 0;
 
 	request.appendUint8(numOfApplications);
-	request.append(applicationsToFill[0]);
+	request.append<ApplicationProcessId >(applicationsToFill[0]);
 	request.append(numOfServicesPerApp);
 }
 
@@ -858,12 +857,12 @@ void deleteService(Message& request) {
 
 	request.appendUint8(numOfApplications);
 	for (auto appID: applicationsToFill) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.append(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 		}
 	}
@@ -881,12 +880,12 @@ void deleteServiceEmptyApplication(Message& request) {
 
 	request.appendUint8(numOfApplications);
 	for (auto appID: applicationsToFill) {
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServicesPerApp);
 
 		for (uint8_t j = 0; j < numOfServicesPerApp; j++) {
 			ServiceTypeSize serviceType = services[j];
-			request.appendUint8(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessagesPerService);
 		}
 	}
@@ -910,19 +909,19 @@ void deleteValidInvalidReportTypes(Message& request) {
 	for (uint8_t i = 0; i < numOfApplications; i++) {
 		ApplicationProcessId appID = validInvalidApplications[i];
 
-		request.appendUint16(appID);
+		request.append<ApplicationProcessId>(appID);
 		request.appendUint8(numOfServices);
 
 		for (uint8_t j = 0; j < numOfServices; j++) {
 			ServiceTypeSize serviceType = validInvalidServices[i][j];
 			uint8_t* messages = (i == 2) ? validInvalidMessages : messagesToFill1;
 
-			request.appendUint8(serviceType);
+			request.append<ServiceTypeSize>(serviceType);
 			request.appendUint8(numOfMessages);
 
 			for (uint8_t k = 0; k < numOfMessages; k++) {
 				MessageTypeSize messageType = messages[k];
-				request.appendUint8(messageType);
+				request.append<MessageTypeSize>(messageType);
 			}
 		}
 	}
@@ -952,7 +951,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		uint8_t numOfApplications = 1;
 		ApplicationProcessId applicationID = 2;
 		request.appendUint8(numOfApplications);
-		request.appendUint8(applicationID);
+		request.append<ApplicationProcessId>(applicationID);
 		initializeAppProcessConfig();
 
 		MessageParser::execute(request);

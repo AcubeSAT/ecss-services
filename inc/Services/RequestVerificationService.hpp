@@ -34,27 +34,27 @@ public:
 		FailedRoutingReport = 10,
 	};
 	/**
-	 * Length of bits that represent the CCSDS packet version
+	 * DataLength of bits that represent the CCSDS packet version
 	 */
 	inline static const uint8_t CCSDSPacketVersionBits = 3;
 	/**
-	 * Length of bits that represent the packet type
+	 * DataLength of bits that represent the packet type
 	 */
 	inline static const uint8_t PacketTypeBits = 1;
 	/**
-	 * Length of bits that represent the secondary header flag
+	 * DataLength of bits that represent the secondary header flag
 	 */
 	inline static const uint8_t SecondaryHeaderFlagBits = 1 ;
 	/**
-	 * Length of bits that represent the application id
+	 * DataLength of bits that represent the application id
 	 */
 	inline static const uint8_t ApplicationIdBits = 11;
 	/**
-	 * Length of bits that represent the ECSS sequence flags
+	 * DataLength of bits that represent the ECSS sequence flags
 	 */
 	inline static const uint8_t ECSSSequenceFlagsBits = 2;
 	/**
-	 * Length of bits that represent the packet sequence count
+	 * DataLength of bits that represent the packet sequence count
 	 */
 	inline static const uint8_t PacketSequenceCountBits = 14;
 	/**

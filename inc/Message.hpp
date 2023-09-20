@@ -96,7 +96,7 @@ public:
 	uint16_t messageTypeCounter = 0;
 
 	// 7.4.1, as defined in CCSDS 133.0-B-1
-	uint16_t packetSequenceCount = 0;
+	SequenceCount packetSequenceCount = 0;
 
 	// TODO: Find out if we need more than 16 bits for this
 	uint16_t dataSize = 0;

@@ -49,8 +49,8 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 		if (numOfSamples == 0) {
 			continue;
 		}
-		report.append(currentId);
-		report.appendUint16(numOfSamples);
+		report.append<ParameterId>(currentId);
+		report.append<ParameterSampleCount>(numOfSamples);
 		currentStatistic.second.appendStatisticsToMessage(report);
 	}
 	storeMessage(report);
@@ -182,15 +182,15 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 	if (periodicStatisticsReportingStatus) {
 		currentReportingIntervalMs = reportingIntervalMs;
 	}
-	definitionsReport.append(currentReportingIntervalMs);
+	definitionsReport.append<SamplingInterval>(currentReportingIntervalMs);
 	definitionsReport.appendUint16(statisticsMap.size());
 
 	for (auto& currentParam: statisticsMap) {
 		ParameterId currentId = currentParam.first;
 		SamplingInterval samplingInterval = currentParam.second.selfSamplingInterval;
-		definitionsReport.append(currentId);
+		definitionsReport.append<ParameterId>(currentId);
 		if (supportsSamplingInterval) {
-			definitionsReport.append(samplingInterval);
+			definitionsReport.append<SamplingInterval>(samplingInterval);
 		}
 	}
 	storeMessage(definitionsReport);

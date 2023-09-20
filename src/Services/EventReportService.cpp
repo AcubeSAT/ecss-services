@@ -13,7 +13,7 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 	// TM[5,1]
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		EventActionService eventActionService;
 		eventActionService.executeAction(eventID);
@@ -28,7 +28,7 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		lowSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::LowSeverityAnomalyReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
 
@@ -44,7 +44,7 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		mediumSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::MediumSeverityAnomalyReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
 
@@ -60,7 +60,7 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		highSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::HighSeverityAnomalyReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
 
@@ -123,7 +123,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	report.appendHalfword(numberOfDisabledEvents);
 	for (size_t i = 0; i < stateOfEvents.size(); i++) {
 		if (not stateOfEvents[i]) {
-			report.appendEnum16(i);
+			report.append<EventDefinitionId>(i);
 		}
 	}
 
