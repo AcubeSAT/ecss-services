@@ -226,7 +226,7 @@ void ParameterStatisticsService::execute(Message& message) {
 	}
 }
 
-TimeStamp<4, 0, 1, 10> ParameterStatisticsService::getCurrentTime() {
+DefaultTimestamp ParameterStatisticsService::getCurrentTime() {
 	return TimeGetter::getCurrentTimeDefaultCUC();
 }
 
