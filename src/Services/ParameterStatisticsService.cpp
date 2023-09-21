@@ -195,7 +195,7 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 }
 
 void ParameterStatisticsService::execute(Message& message) {
-	TimeStamp<4, 0, 1, 10> currentTime;
+	DefaultTimestamp currentTime;
 	switch (message.messageType) {
 		case ReportParameterStatistics:
 			reportParameterStatistics(message);
