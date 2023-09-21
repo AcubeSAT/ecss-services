@@ -160,12 +160,14 @@ public:
 	void execute(Message& message);
 
 	/**
-	 * Get the current time as a TimeStamp object.
-	 *
 	 * BaseBytes: 4 bytes, FractionBytes: 0 bytes, Num: 1, Denom: 10.
 	 */
 	using DefaultTimestamp = TimeStamp<4, 0, 1, 10>;
-	TimeStamp<4, 0, 1, 10> getCurrentTime();
+
+	/**
+	 * Get the current time as a TimeStamp object.
+	 */
+	DefaultTimestamp getCurrentTime();
 };
 
 #endif
