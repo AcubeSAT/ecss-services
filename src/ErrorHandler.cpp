@@ -1,6 +1,6 @@
 #include <ErrorHandler.hpp>
 #include <ServicePool.hpp>
-#include "ECSS_Configurations.hpp"
+#include "ECSS_Configuration.hpp"
 #include "Services/RequestVerificationService.hpp"
 
 template <>

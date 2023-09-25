@@ -1,3 +1,5 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_HOUSEKEEPING
 #include "Services/HousekeepingService.hpp"
 #include "ServicePool.hpp"
 
@@ -362,3 +364,5 @@ bool HousekeepingService::hasExceededMaxNumOfSimplyCommutatedParamsError(Houseke
 	}
 	return false;
 }
+
+#endif

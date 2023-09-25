@@ -1,3 +1,5 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_STORAGEANDRETRIEVAL
 #include "Services/StorageAndRetrievalService.hpp"
 
 String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
@@ -842,3 +844,5 @@ void StorageAndRetrievalService::execute(Message& request) {
 			break;
 	}
 }
+
+#endif
