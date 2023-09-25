@@ -1,4 +1,4 @@
-#include "ECSS_Configuration.hpp"
+#include "ECSS_Configurations.hpp"
 #ifdef SERVICE_ONBOARDMONITORING
 #include "Message.hpp"
 #include "Services/OnBoardMonitoringService.hpp"

@@ -1,7 +1,7 @@
 #ifndef ECSS_SERVICES_SERVICEPOOL_HPP
 #define ECSS_SERVICES_SERVICEPOOL_HPP
 
-#include "ECSS_Configuration.hpp"
+#include "ECSS_Configurations.hpp"
 #include "Services/DummyService.hpp"
 #include "Services/EventActionService.hpp"
 #include "Services/EventReportService.hpp"
