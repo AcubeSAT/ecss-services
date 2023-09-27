@@ -1093,5 +1093,3 @@ TEST_CASE("Check hasExceededMaxNumOfSimplyCommutatedParamsError function") {
 		Services.reset();
 	}
 }
-
-#endif
