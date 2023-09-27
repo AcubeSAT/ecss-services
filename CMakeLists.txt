@@ -73,9 +73,4 @@ IF (X86_BUILD)
     ENDIF()
 ENDIF()
 
-# Add the subdirectories for platform-specific files and exclude them as needed
-if(NOT X86_BUILD)
-    add_subdirectory(src/Platform)
-endif()
-
 install(TARGETS common)
