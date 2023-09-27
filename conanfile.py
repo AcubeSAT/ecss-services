@@ -51,10 +51,6 @@ class ECSSServicesRecipe(ConanFile):
         cmake = CMake(self)
         cmake.install()
 
-        if self.settings.arch == 'x86':
-            self.copy(pattern="*.ecss", src=join(self.package_folder, "inc"), dst="inc",
-                    excludes=["inc/Platform/x86/*"], keep_path=True)
-
     def package_info(self):
         self.cpp_info.libs = ["common"]
         self.cpp_info.set_property("cmake_target_name", "common")
