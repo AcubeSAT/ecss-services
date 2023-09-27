@@ -54,7 +54,7 @@ IF (X86_BUILD)
 
     add_executable(x86_services
             ${x86_main_SRC}
-            )
+        )
     target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
 
     # Logs all levels of messages. This command can be added by other users of this
@@ -68,9 +68,14 @@ IF (X86_BUILD)
         add_executable(tests
                 ${test_main_SRC}
                 ${test_SRC}
-                )
+        )
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()
+
+# Add the subdirectories for platform-specific files and exclude them as needed
+if(NOT X86_BUILD)
+    add_subdirectory(src/Platform)
+endif()
 
 install(TARGETS common)
