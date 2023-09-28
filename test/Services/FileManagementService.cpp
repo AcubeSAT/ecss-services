@@ -178,6 +178,7 @@ TEST_CASE("Delete a file TC[23,2]", "[service][st23]") {
 
 	MessageParser::execute(message);
 	CHECK(ServiceTests::countErrors() == 0);
+	CHECK(fs::exists("st23/file_to_remove_1") == false);
 
 	// Repository path string is too large
 	Message message2(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC,
