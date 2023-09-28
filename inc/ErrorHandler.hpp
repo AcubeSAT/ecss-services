@@ -60,7 +60,6 @@ public:
 		 * Asked a Message type that doesn't exist
 		 */
 		UnknownMessageType = 7,
-
 		/**
 		 * Asked to append unnecessary spare bits
 		 */

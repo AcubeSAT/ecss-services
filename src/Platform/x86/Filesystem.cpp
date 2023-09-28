@@ -1,7 +1,7 @@
 #include "Helpers/Filesystem.hpp"
 
 /**
- * These functions are built on the x86_services target and should never be ran.
+ * These functions are built on the x86_services target and will never run.
  * To combat undefined function errors, they are defined here.
  * Each function returns the minimum viable option without errors.
  */
