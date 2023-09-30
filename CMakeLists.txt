@@ -47,10 +47,10 @@ target_sources(common PRIVATE
         )
 message(${ECSS_CONFIGURATION})
 target_link_libraries(common PRIVATE etl log_common log_x86)
+include_directories(${ECSS_CONFIGURATION})
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
     file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
-    include_directories(${ECSS_CONFIGURATION})
 
     add_executable(x86_services
             ${x86_main_SRC}
