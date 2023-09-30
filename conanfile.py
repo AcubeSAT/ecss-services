@@ -45,9 +45,9 @@ class ECSSServicesRecipe(ConanFile):
 
     def package(self):
         copy(self, pattern="*.hpp", src=join(self.source_folder, "inc"), dst=join(self.package_folder, "inc"),
-             keep_path=True)
+             excludes='Platform/', keep_path=True)
         copy(self, pattern="*.tpp", src=join(self.source_folder, "inc"), dst=join(self.package_folder, "inc"),
-             keep_path=True)
+             excludes='Platform/', keep_path=True)
         cmake = CMake(self)
         cmake.install()
 

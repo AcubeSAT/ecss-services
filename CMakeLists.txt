@@ -16,7 +16,7 @@ set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
         "The include directory for the platform-specific ECSS configuration headers"
         )
 add_compile_options(-Wvla)
-include_directories(${ECSS_CONFIGURATION})
+#include_directories(${ECSS_CONFIGURATION})
 add_library(common STATIC)
 target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
 target_sources(common PRIVATE
