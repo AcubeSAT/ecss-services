@@ -11,10 +11,6 @@ add_custom_target(check
         COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
-# Allow the user to set the ECSS Configuration directory using the -DECSS_CONFIGURATION=... command line argument
-set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
-        "The include directory for the platform-specific ECSS configuration headers"
-        )
 add_compile_options(-Wvla)
 include_directories(${ECSS_CONFIGURATION})
 add_library(common STATIC)
@@ -48,6 +44,7 @@ target_sources(common PRIVATE
         )
 
 target_link_libraries(common PRIVATE etl log_common log_x86)
+
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
     file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
