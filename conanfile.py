@@ -38,7 +38,7 @@ class ECSSServicesRecipe(ConanFile):
             tc.variables["X86_BUILD"] = True
             tc.variables["ECSS_CONFIGURATION"]="inc/Platform/x86/"
         else:
-            tc.variables["ECSS_CONFIGURATION"]="/home/athanasios/CLionProjects/obc-software/inc/Platform/"
+            tc.variables["ECSS_CONFIGURATION"]=self.options.ecss_config_file_path
         tc.generate()
 
     def build(self):
