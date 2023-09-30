@@ -45,9 +45,10 @@ target_sources(common PRIVATE
         src/Helpers/PMONBase.cpp
         src/Helpers/AllMessageTypes.cpp
         )
-message(${ECSS_CONFIGURATION})
+
 target_link_libraries(common PRIVATE etl log_common log_x86)
 include_directories(${ECSS_CONFIGURATION})
+
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
     file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
