@@ -56,7 +56,7 @@ IF (X86_BUILD)
             ${x86_main_SRC}
             )
     target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
-    message(${ECSS_CONFIGURATION})
+
     # Logs all levels of messages. This command can be added by other users of this
     # library to override the respective log level.
     target_compile_definitions(x86_services PUBLIC LOGLEVEL_TRACE)
