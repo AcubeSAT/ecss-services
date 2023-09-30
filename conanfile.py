@@ -36,6 +36,7 @@ class ECSSServicesRecipe(ConanFile):
         tc = CMakeToolchain(self)
         if self.settings.arch != 'armv7':
             tc.variables["X86_BUILD"] = True
+            tc.variables["ECSS_CONFIGURATION"]="inc/Platform/x86/"
         tc.generate()
 
     def build(self):
@@ -45,9 +46,9 @@ class ECSSServicesRecipe(ConanFile):
 
     def package(self):
         copy(self, pattern="*.hpp", src=join(self.source_folder, "inc"), dst=join(self.package_folder, "inc"),
-             excludes='Platform/', keep_path=True)
+             keep_path=True)
         copy(self, pattern="*.tpp", src=join(self.source_folder, "inc"), dst=join(self.package_folder, "inc"),
-             excludes='Platform/', keep_path=True)
+             keep_path=True)
         cmake = CMake(self)
         cmake.install()
 

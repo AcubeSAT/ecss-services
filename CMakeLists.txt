@@ -12,11 +12,10 @@ add_custom_target(check
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
 # Allow the user to set the ECSS Configuration directory using the -DECSS_CONFIGURATION=... command line argument
-set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
-        "The include directory for the platform-specific ECSS configuration headers"
-        )
+#set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
+#        "The include directory for the platform-specific ECSS configuration headers"
+#        )
 add_compile_options(-Wvla)
-#include_directories(${ECSS_CONFIGURATION})
 add_library(common STATIC)
 target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
 target_sources(common PRIVATE
@@ -46,17 +45,18 @@ target_sources(common PRIVATE
         src/Helpers/PMONBase.cpp
         src/Helpers/AllMessageTypes.cpp
         )
-
+message(${ECSS_CONFIGURATION})
 target_link_libraries(common PRIVATE etl log_common log_x86)
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
     file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
+    include_directories(${ECSS_CONFIGURATION})
 
     add_executable(x86_services
             ${x86_main_SRC}
             )
     target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
-
+    message(${ECSS_CONFIGURATION})
     # Logs all levels of messages. This command can be added by other users of this
     # library to override the respective log level.
     target_compile_definitions(x86_services PUBLIC LOGLEVEL_TRACE)
