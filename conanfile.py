@@ -36,8 +36,9 @@ class ECSSServicesRecipe(ConanFile):
         tc = CMakeToolchain(self)
         if self.settings.arch != 'armv7':
             tc.variables["X86_BUILD"] = True
-            #tc.variables["ECSS_CONFIGURATION"]="inc/Platform/x86/"
-        tc.variables["ECSS_CONFIGURATION"]=self.options.ecss_config_file_path
+            tc.variables["ECSS_CONFIGURATION"]="inc/Platform/x86/"
+        else:
+            tc.variables["ECSS_CONFIGURATION"]="/home/athanasios/CLionProjects/obc-software/inc/Platform/"
         tc.generate()
 
     def build(self):
