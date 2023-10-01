@@ -53,10 +53,12 @@ public:
 	/**
 	 * If true, parameter monitoring is enabled
 	 */
+
 	bool parameterMonitoringFunctionStatus = false;
 	/*
 	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
 	 */
+
 	void addPMONDefinition(uint16_t PMONId, std::reference_wrapper<PMONBase> PMONDefinition) {
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
 	}
@@ -64,35 +66,42 @@ public:
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */
+
 	std::reference_wrapper<PMONBase> getPMONDefinition(uint16_t PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
 	/**
 	 * @return true if PMONList is empty.
 	 */
+
 	bool isPMONListEmpty() {
 		return parameterMonitoringList.empty();
 	}
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
+
 	void enableParameterMonitoringDefinitions(Message& message);
 
 	/**
+	 *
 	 * Disables the PMON definitions which correspond to the ids in TC[12,2].
 	 */
+
 	void disableParameterMonitoringDefinitions(Message& message);
 
 	/**
 	 * TC[12,3]
 	 * Changes the maximum time between two transition reports.
 	 */
+
 	void changeMaximumTransitionReportingDelay(Message& message);
 
 	/**
 	 * TC[12,4]
 	 * Deletes all the PMON definitions in the PMON list.
 	 */
+
 	void deleteAllParameterMonitoringDefinitions(Message& message);
 
 	void execute(Message& message);
