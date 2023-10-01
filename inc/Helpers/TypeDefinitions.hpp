@@ -4,8 +4,9 @@
 using StepId = uint8_t;
 
 using ParameterReportStructureId = uint8_t;
+
 /**
- * \deprecated Ought to be changed to use proper timestamps.
+ * @deprecated Ought to be changed to use our custom class.
  */
 using TimeInt = uint32_t;
 
