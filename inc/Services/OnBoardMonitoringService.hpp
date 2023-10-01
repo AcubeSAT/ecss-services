@@ -55,7 +55,7 @@ public:
 	 */
 
 	bool parameterMonitoringFunctionStatus = false;
-	/*
+	/**
 	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
 	 */
 
