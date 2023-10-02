@@ -34,7 +34,7 @@ namespace AllReportTypes {
 	 * Map containing all the report types, per service. The key is the ServiceType and the value,
 	 * an etl vector containing the report types.
 	 */
-	extern const etl::map<uint8_t, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions> MessagesOfService;
+	extern const etl::map<uint8_t, const ServiceDefinitionsVector&, ECSSMaxServiceTypeDefinitions> MessagesOfService;
 
 } // namespace AllReportTypes
 
