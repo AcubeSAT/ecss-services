@@ -39,7 +39,7 @@ private:
 	void initializeHousekeepingStructures();
 
 public:
-	inline static const ServiceTypeSize ServiceType = 3;
+	inline static const ServiceTypeNum ServiceType = 3;
 
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains the housekeeping structure with ID = i.
@@ -96,7 +96,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return uint32_t Integer multiples of the minimum sampling interval
 	 */
-	inline TimeInt getCollectionInterval(ParameterReportStructureId id) {
+	inline TimeStamps getCollectionInterval(ParameterReportStructureId id) {
 		HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
 			return newStructure.collectionInterval;
@@ -121,7 +121,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @param interval Integer multiples of the minimum sampling interval
 	 */
-	inline void setCollectionInterval(ParameterReportStructureId id, TimeInt interval) {
+	inline void setCollectionInterval(ParameterReportStructureId id, TimeStamps interval) {
 		if (hasNonExistingStructInternalError(id)) {
 			return;
 		}
@@ -284,7 +284,7 @@ public:
 	 * @param expectedDelay The output of this function after its last execution.
 	 * @return uint32_t The minimum amount of time until the next periodic housekeeping report, in milliseconds.
 	 */
-	TimeInt reportPendingStructures(TimeInt currentTime, TimeInt previousTime, TimeInt expectedDelay);
+	TimeStamps reportPendingStructures(TimeStamps currentTime, TimeStamps previousTime, TimeStamps expectedDelay);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

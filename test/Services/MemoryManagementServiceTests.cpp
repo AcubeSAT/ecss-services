@@ -44,13 +44,13 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	receivedPacket.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
 	receivedPacket.appendUint16(3);                                              // Iteration count (Equal to 3 test strings)
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
-	receivedPacket.append<DataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
+	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
 
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_2));
-	receivedPacket.append<DataLength>(sizeof(testString_2) / sizeof(testString_2[0]));
+	receivedPacket.append<MemoryDataLength>(sizeof(testString_2) / sizeof(testString_2[0]));
 
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_3));
-	receivedPacket.append<DataLength>(sizeof(testString_3) / sizeof(testString_3[0]));
+	receivedPacket.append<MemoryDataLength>(sizeof(testString_3) / sizeof(testString_3[0]));
 	MessageParser::execute(receivedPacket);
 	REQUIRE(ServiceTests::hasOneMessage());
 
@@ -105,10 +105,10 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	receivedPacket.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
 	receivedPacket.appendUint16(2);                                              // Iteration count
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
-	receivedPacket.append<DataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
+	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
 
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_2));
-	receivedPacket.append<DataLength>(sizeof(testString_2) / sizeof(testString_2[0]));
+	receivedPacket.append<MemoryDataLength>(sizeof(testString_2) / sizeof(testString_2[0]));
 	MessageParser::execute(receivedPacket);
 	REQUIRE(ServiceTests::hasOneMessage());
 

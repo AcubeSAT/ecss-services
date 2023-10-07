@@ -86,13 +86,13 @@ int main() {
 	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(3);                                          // Iteration count
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(string));         // Start address
-	rcvPack.append<DataLength>(sizeof(string) / sizeof(string[0]));         // Data read length
+	rcvPack.append<MemoryDataLength>(sizeof(string) / sizeof(string[0]));         // Data read length
 
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(anotherStr));
-	rcvPack.append<DataLength>(sizeof(anotherStr) / sizeof(anotherStr[0]));
+	rcvPack.append<MemoryDataLength>(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(yetAnotherStr));
-	rcvPack.append<DataLength>(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
+	rcvPack.append<MemoryDataLength>(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
 	rcvPack = Message(MemoryManagementService::ServiceType,
@@ -115,9 +115,9 @@ int main() {
 	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
 	rcvPack.appendUint16(2);                                          // Iteration count
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data));           // Start address
-	rcvPack.append<DataLength>(2);
+	rcvPack.append<MemoryDataLength>(2);
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data + 1)); // Start address
-	rcvPack.append<DataLength>(1);
+	rcvPack.append<MemoryDataLength>(1);
 	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
 	// ST[01] test

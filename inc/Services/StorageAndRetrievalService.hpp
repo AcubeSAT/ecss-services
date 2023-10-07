@@ -53,7 +53,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeInt timeLimit);
+	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeStamps timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -95,7 +95,7 @@ private:
 	 *
 	 * @param request used to raise errors.
 	 */
-	static bool checkTimeWindow(TimeInt startTime, TimeInt endTime, Message& request);
+	static bool checkTimeWindow(TimeStamps startTime, TimeStamps endTime, Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -116,8 +116,8 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeInt startTime,
-	                             TimeInt endTime, Message& request);
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeStamps startTime,
+	                             TimeStamps endTime, Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
@@ -127,7 +127,7 @@ private:
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeInt timeTag,
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeStamps timeTag,
 	                             Message& request, bool isAfterTimeTag);
 
 	/**
@@ -139,8 +139,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeInt startTime,
-	                        TimeInt endTime, Message& request);
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps startTime,
+	                        TimeStamps endTime, Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
@@ -151,7 +151,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeInt startTime,
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps startTime,
 	                        Message& request);
 
 	/**
@@ -163,7 +163,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeInt endTime,
+	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps endTime,
 	                         Message& request);
 
 	/**
@@ -180,7 +180,7 @@ private:
 	void createContentSummary(Message& report, const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 public:
-	inline static const ServiceTypeSize ServiceType = 15;
+	inline static const ServiceTypeNum ServiceType = 15;
 
 	enum MessageType : uint8_t {
 		EnableStorageInPacketStores = 1,
@@ -218,7 +218,7 @@ public:
 	/**
 	 * Adds telemetry to the specified packet store and timestamps it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeInt timestamp);
+	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeStamps timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.

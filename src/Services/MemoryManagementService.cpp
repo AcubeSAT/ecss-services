@@ -37,7 +37,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			StartAddress startAddress = request.read<StartAddress>();
-			DataLength dataLength = request.readOctetString(readData);
+			MemoryDataLength dataLength = request.readOctetString(readData);
 			MemoryManagementChecksum checksum = request.readBits(8*sizeof(MemoryManagementChecksum));
 
 			if (!dataValidator(readData, checksum, dataLength)) {
@@ -83,7 +83,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			StartAddress startAddress = request.read<StartAddress>();
-			DataLength readLength = request.read<DataLength>();
+			MemoryDataLength readLength = request.read<MemoryDataLength>();
 
 			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
 			    addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
@@ -123,7 +123,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			StartAddress startAddress = request.read<StartAddress>();
-			DataLength readLength = request.read<DataLength>();
+			MemoryDataLength readLength = request.read<MemoryDataLength>();
 
 			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
 			    addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
@@ -132,7 +132,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 				}
 
 				report.append<StartAddress>(startAddress);
-				report.append<DataLength>(readLength);
+				report.append<MemoryDataLength>(readLength);
 				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
@@ -199,7 +199,7 @@ inline bool MemoryManagementService::memoryIdValidator(MemoryManagementService::
 	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
 }
 
-inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, DataLength length) {
+inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length) {
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
 

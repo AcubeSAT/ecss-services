@@ -110,7 +110,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 		if (!Services.parameterManagement.parameterExists(currentId)) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
 			if (supportsSamplingInterval) {
-				request.skipBytes(2);
+				request.skipBytes(sizeof(SamplingInterval));
 			}
 			continue;
 		}

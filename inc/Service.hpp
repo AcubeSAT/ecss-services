@@ -26,7 +26,7 @@ protected:
 	 * The service type of this Service. For example, ST[12]'s serviceType is `12`.
 	 * Specify this value in the constructor of your service.
 	 */
-	ServiceTypeSize serviceType{};
+	ServiceTypeNum serviceType{};
 
 	/**
 	 * Creates a new empty telemetry package originating from this service
@@ -35,7 +35,7 @@ protected:
 	 *                    the TC[17,3] message has `messageType = 3`.
 	 * @todo See if the Message must be returned by reference
 	 */
-	Message createTM(MessageTypeSize messageType) const {
+	Message createTM(MessageTypeNum messageType) const {
 		return Message(serviceType, messageType, Message::TM);
 	}
 

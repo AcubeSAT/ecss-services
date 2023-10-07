@@ -25,7 +25,7 @@ private:
 	bool eventActionFunctionStatus = false;
 
 public:
-	inline static const ServiceTypeSize ServiceType = 19;
+	inline static const ServiceTypeNum ServiceType = 19;
 
 	enum MessageType : uint8_t {
 		AddEventAction = 1,

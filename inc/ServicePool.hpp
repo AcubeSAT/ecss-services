@@ -123,7 +123,7 @@ public:
 	 * @param messageType The message type ID
 	 * @return The message type count
 	 */
-	uint16_t getAndUpdateMessageTypeCounter(ServiceTypeSize serviceType, MessageTypeSize messageType);
+	uint16_t getAndUpdateMessageTypeCounter(ServiceTypeNum serviceType, MessageTypeNum messageType);
 
 	/**
 	 * Get and increase the "packet sequence count" for the next message

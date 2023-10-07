@@ -12,7 +12,7 @@
  */
 class MemoryManagementService : public Service {
 public:
-	inline static const ServiceTypeSize ServiceType = 6;
+	inline static const ServiceTypeNum ServiceType = 6;
 
 	enum MessageType : uint8_t {
 		LoadRawMemoryDataAreas = 2,
@@ -113,7 +113,7 @@ private:
 	 * Validate the data according to checksum calculation
 	 *
 	 */
-	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, DataLength length);
+	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

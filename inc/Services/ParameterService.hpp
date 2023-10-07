@@ -44,7 +44,7 @@ private:
 	void initializeParameterMap();
 
 public:
-	inline static const ServiceTypeSize ServiceType = 20;
+	inline static const ServiceTypeNum ServiceType = 20;
 
 	enum MessageType : uint8_t {
 		ReportParameterValues = 1,

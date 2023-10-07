@@ -13,7 +13,7 @@ void ServicePool::reset() {
 	new (this) ServicePool();
 }
 
-uint16_t ServicePool::getAndUpdateMessageTypeCounter(ServiceTypeSize serviceType, MessageTypeSize messageType) {
+uint16_t ServicePool::getAndUpdateMessageTypeCounter(ServiceTypeNum serviceType, MessageTypeNum messageType) {
 	uint16_t key = (serviceType << 8U) | messageType; // Create the key of the map
 	return (messageTypeCounter[key])++;               // Fetch and increase the value
 }

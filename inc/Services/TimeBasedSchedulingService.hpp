@@ -62,7 +62,7 @@ private:
 	 */
 	struct RequestID {
 		ApplicationProcessId applicationID = 0; ///< Application process ID
-		uint16_t sequenceCount = 0; ///< Packet sequence count
+		SequenceCount sequenceCount = 0; ///< Packet sequence count
 		SourceId sourceID = 0;       ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
@@ -123,7 +123,7 @@ private:
 	void notifyNewActivityAddition();
 
 public:
-	inline static const ServiceTypeSize ServiceType = 11;
+	inline static const ServiceTypeNum ServiceType = 11;
 
 	enum MessageType : uint8_t {
 		EnableTimeBasedScheduleExecutionFunction = 1,
