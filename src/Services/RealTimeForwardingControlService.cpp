@@ -1,5 +1,7 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_REALTIMEFORWARDINGCONTROL
+
 #include "Services/RealTimeForwardingControlService.hpp"
-#include <iostream>
 
 void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applicationID) {
 	for (const auto& service: AllReportTypes::MessagesOfService) {
@@ -340,3 +342,5 @@ void RealTimeForwardingControlService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif

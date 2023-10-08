@@ -1,6 +1,4 @@
-#ifndef ECSS_SERVICES_ALLREPORTTYPES_HPP
-#define ECSS_SERVICES_ALLREPORTTYPES_HPP
-
+#pragma once
 #include "Services/EventActionService.hpp"
 #include "Services/EventReportService.hpp"
 #include "Services/HousekeepingService.hpp"
@@ -18,7 +16,11 @@
  * For use in ST[14] and ST[15]
  */
 namespace AllReportTypes {
-	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ServiceDefinitionsVector;
+	typedef uint8_t ReportId;
+	/**
+	 * Vector to contain all report types defined for a service
+	 */
+	using ServiceDefinitionsVector = etl::vector<ReportId, ECSSMaxReportTypeDefinitions>;
 	const extern ServiceDefinitionsVector ST01Reports;
 	const extern ServiceDefinitionsVector ST03Reports;
 	const extern ServiceDefinitionsVector ST04Reports;
@@ -37,5 +39,3 @@ namespace AllReportTypes {
 	extern const etl::map<uint8_t, const ServiceDefinitionsVector&, ECSSMaxServiceTypeDefinitions> MessagesOfService;
 
 } // namespace AllReportTypes
-
-#endif
