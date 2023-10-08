@@ -17,8 +17,6 @@ uint8_t messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPro
 uint8_t messages2[] = {EventReportService::MessageType::InformativeEventReport,
                        EventReportService::MessageType::DisabledListEventReport};
 
-void initializeAppProcessConfigForTC14_3();
-
 /**
  * Fill the input message with a predefined sequence of valid report definitions.
  * @param request
@@ -628,7 +626,7 @@ void initializeAppProcessConfig() {
 	checkAppProcessConfig();
 }
 
-void initializeAppProcessConfigForTC14_3() {
+void initializeAppProcessForwardControlConfiguration() {
 	uint8_t applications2[] = {1, 2, 3};
 	for (auto appID: applications2) {
 		for (auto serviceType: services) {
@@ -1194,7 +1192,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 TEST_CASE("Report the Application Process Configuration content") {
 	SECTION("Valid reporting of the application process configuration content") {
 		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, ApplicationId);
-		initializeAppProcessConfigForTC14_3();
+		initializeAppProcessForwardControlConfiguration();
 
 		MessageParser::execute(request);
 
