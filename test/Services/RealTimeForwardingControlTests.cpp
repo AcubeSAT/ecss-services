@@ -224,7 +224,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Successful addition of report types to the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
@@ -258,7 +258,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Requested Application Process is not controlled by the service") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 
 		uint8_t applicationID = 1;
 		validReportTypes(request);
@@ -275,7 +275,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("All service types already allowed") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
@@ -299,7 +299,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Max service types already reached") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 
 		uint8_t applicationID = 1;
 		uint8_t serviceType1 = services[0]; // st03
@@ -327,7 +327,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("All report types already allowed") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 
 		uint8_t applicationID = 1;
 		uint8_t serviceType = services[0]; // st03
@@ -354,7 +354,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Max report types already reached") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 
 		uint8_t applicationID = 1;
 		uint8_t serviceType1 = services[0]; // st03
@@ -396,7 +396,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Requested addition of duplicate report type definitions") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 
 		uint8_t applicationID = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID);
@@ -425,7 +425,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Valid and invalid application-related requests combined") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID1 = 1;
 		uint8_t applicationID2 = 2;
 		uint8_t applicationID3 = 3;
@@ -458,7 +458,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Valid addition of all report types of a specified service type") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID1 = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		validAllReportsOfService(request);
@@ -478,7 +478,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Addition of all report types of a service type, combined with invalid requests") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID1 = 1;
 		uint8_t applicationID2 = 2;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
@@ -521,7 +521,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Valid addition of all report types of an application process") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID1 = 1;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		validAllReportsOfApp(request);
@@ -544,7 +544,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Addition of all report types of an application process, combined with invalid request") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID1 = 1;
 		uint8_t applicationID2 = 2;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
@@ -948,7 +948,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Empty the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t numOfApplications = 0;
 		request.appendUint8(numOfApplications);
 		initializeAppProcessConfig();
@@ -964,7 +964,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Requested application, is not present in the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t numOfApplications = 1;
 		uint8_t applicationID = 2;
 		request.appendUint8(numOfApplications);
@@ -983,7 +983,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Requested service type, not present in the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		serviceNotInApplication(request);
 		initializeAppProcessConfig();
 
@@ -1000,7 +1000,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Requested report type, not present in the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		messageNotInApplication(request);
 		initializeAppProcessConfig();
 
@@ -1017,7 +1017,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Valid deletion of report types from the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID = 1;
 		deleteValidReportTypes(request);
 		initializeAppProcessConfig();
@@ -1037,7 +1037,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Report type deletion, results in empty service type") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID = 1;
 		deleteReportEmptyService(request);
 		initializeAppProcessConfig();
@@ -1057,7 +1057,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Report type deletion, results in empty application process definition") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID = 1;
 		deleteReportEmptyApplication(request);
 		initializeAppProcessConfig();
@@ -1075,7 +1075,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Delete an application process, from the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		deleteApplicationProcess(request);
 		initializeAppProcessConfig();
 
@@ -1092,7 +1092,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Delete a service type, from the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID = 1;
 		deleteService(request);
 		initializeAppProcessConfig();
@@ -1111,7 +1111,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Service type deletion, results in empty application process") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t applicationID = 1;
 		deleteServiceEmptyApplication(request);
 		initializeAppProcessConfig();
@@ -1129,7 +1129,7 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 	SECTION("Valid and invalid requests to delete report types, combined") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
-		                Message::TC, 1);
+		                Message::TC, ApplicationId);
 		uint8_t remainingApps[] = {1, 3};
 		uint8_t remainingMessage[] = {EventReportService::MessageType::InformativeEventReport};
 
@@ -1245,7 +1245,7 @@ TEST_CASE("Report the Application Process Configuration content") {
 	}
 
 	SECTION("Valid reporting of the application process configuration content 2") {
-		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, 1);
+		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, ApplicationId);
 
 		for (auto appID: applications) {
 			for (auto serviceType: allServices) {
