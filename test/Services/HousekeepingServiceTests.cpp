@@ -608,16 +608,16 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		      3);
 
 		Message report = ServiceTests::get(3);
-		CHECK(report.readUint8() == 3); // Number of valid ids
+		CHECK(report.readUint8() == 3);                        // Number of valid ids
 		CHECK(report.read<ParameterReportStructureId>() == 0); // Id
-		CHECK(report.readBoolean() == true); // Periodic status
-		CHECK(report.read<CollectionInterval>() == 7); // Interval
+		CHECK(report.readBoolean() == true);                   // Periodic status
+		CHECK(report.read<CollectionInterval>() == 7);         // Interval
 		CHECK(report.read<ParameterReportStructureId>() == 4); // Id
-		CHECK(report.readBoolean() == false); // Periodic status
-		CHECK(report.read<CollectionInterval>() == 24); // Interval
+		CHECK(report.readBoolean() == false);                  // Periodic status
+		CHECK(report.read<CollectionInterval>() == 24);        // Interval
 		CHECK(report.read<ParameterReportStructureId>() == 6); // Id
-		CHECK(report.readBoolean() == false); // Periodic status
-		CHECK(report.read<CollectionInterval>() == 13); // Interval
+		CHECK(report.readBoolean() == false);                  // Periodic status
+		CHECK(report.read<CollectionInterval>() == 13);        // Interval
 
 		ServiceTests::reset();
 		Services.reset();

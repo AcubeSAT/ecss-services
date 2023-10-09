@@ -71,21 +71,19 @@ void ParameterStatisticsService::resetParameterStatistics() {
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
-	/**
-	 * @todo: The sampling interval of each parameter. the "timeInterval" requested should not exceed it.
-	 * 		  It has to be defined as a constant.
-	 */
-	SamplingInterval SAMPLING_PARAMETER_INTERVAL = 5;
+	Time::RelativeTime constexpr SamplingParameterInterval = 5;
 
 	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting)) {
 		return;
 	}
 
-	SamplingInterval timeInterval = request.read<SamplingInterval>();
-	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
+	SamplingInterval timeInterval = request.readUint16();
+
+	if (timeInterval < SamplingParameterInterval) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 		return;
 	}
+
 	periodicStatisticsReportingStatus = true;
 	reportingIntervalMs = timeInterval;
 }
@@ -197,14 +195,17 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 }
 
 void ParameterStatisticsService::execute(Message& message) {
+	DefaultTimestamp currentTime;
 	switch (message.messageType) {
 		case ReportParameterStatistics:
 			reportParameterStatistics(message);
 			break;
 		case ResetParameterStatistics:
 			resetParameterStatistics(message);
+			currentTime = getCurrentTime();
 			break;
 		case EnablePeriodicParameterReporting:
+			currentTime = getCurrentTime();
 			enablePeriodicStatisticsReporting(message);
 			break;
 		case DisablePeriodicParameterReporting:
@@ -217,11 +218,16 @@ void ParameterStatisticsService::execute(Message& message) {
 			deleteStatisticsDefinitions(message);
 			break;
 		case ReportParameterStatisticsDefinitions:
+			currentTime = getCurrentTime();
 			reportStatisticsDefinitions(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
+}
+
+ParameterStatisticsService::DefaultTimestamp ParameterStatisticsService::getCurrentTime() {
+	return TimeGetter::getCurrentTimeDefaultCUC();
 }
 
 #endif
