@@ -40,7 +40,7 @@ target_sources(common PRIVATE
         src/Helpers/Statistic.cpp
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
-        src/Helpers/AllMessageTypes.cpp
+        src/Helpers/AllReportTypes.cpp
         )
 
 target_link_libraries(common PRIVATE etl log_common log_x86)
@@ -64,8 +64,7 @@ IF (X86_BUILD)
         file(GLOB test_SRC "test/**/*.cpp")
         add_executable(tests
                 ${test_main_SRC}
-                ${test_SRC}
-                )
+                ${test_SRC})
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()

@@ -3,7 +3,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/AllMessageTypes.hpp"
+#include "Helpers/AllReportTypes.hpp"
 #include "Helpers/ForwardControlConfiguration.hpp"
 #include "Service.hpp"
 #include "etl/vector.h"
@@ -24,6 +24,8 @@ public:
 	enum MessageType : uint8_t {
 		AddReportTypesToAppProcessConfiguration = 1,
 		DeleteReportTypesFromAppProcessConfiguration = 2,
+		ReportAppProcessConfigurationContent = 3,
+		AppProcessConfigurationContentReport = 4,
 		EventReportConfigurationContentReport = 16,
 	};
 
@@ -42,6 +44,16 @@ public:
 	 */
 	ApplicationProcessConfiguration applicationProcessConfiguration;
 
+	/**
+	 * Receives a TC[14,3] 'Report the application process forward control configuration content' message and
+	 * performs the necessary error checking.
+	 */
+	void reportAppProcessConfigurationContent(Message& request);
+
+	/**
+	 * Creates and stores a TM[14,4] 'Application process forward control configuration content report' message.
+	 */
+	void appProcessConfigurationContentReport();
 private:
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.

@@ -1,15 +1,17 @@
+#include "ECSS_Configuration.hpp"
+#ifdef SERVICE_REALTIMEFORWARDINGCONTROL
+
 #include "Services/RealTimeForwardingControlService.hpp"
-#include <iostream>
 
 void RealTimeForwardingControlService::addAllReportsOfApplication(uint8_t applicationID) {
-	for (const auto& service: AllMessageTypes::MessagesOfService) {
+	for (const auto& service: AllReportTypes::MessagesOfService) {
 		uint8_t serviceType = service.first;
 		addAllReportsOfService(applicationID, serviceType);
 	}
 }
 
 void RealTimeForwardingControlService::addAllReportsOfService(uint8_t applicationID, uint8_t serviceType) {
-	for (const auto& messageType: AllMessageTypes::MessagesOfService.at(serviceType)) {
+	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		applicationProcessConfiguration.definitions[appServicePair].push_back(messageType);
 	}
@@ -79,7 +81,7 @@ bool RealTimeForwardingControlService::checkService(Message& request, uint8_t ap
 
 bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, uint8_t applicationID,
                                                              uint8_t serviceType) {
-	if (countReportsOfService(applicationID, serviceType) >= AllMessageTypes::MessagesOfService.at(serviceType).size()) {
+	if (countReportsOfService(applicationID, serviceType) >= AllReportTypes::MessagesOfService.at(serviceType).size()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
 		return true;
 	}
@@ -274,6 +276,57 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 	}
 }
 
+void RealTimeForwardingControlService::reportAppProcessConfigurationContent(Message& request) {
+	if (!request.assertTC(ServiceType, MessageType::ReportAppProcessConfigurationContent)) {
+		return;
+	}
+	appProcessConfigurationContentReport();
+}
+
+void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
+	Message report(ServiceType, MessageType::AppProcessConfigurationContentReport, Message::TM, ApplicationId);
+
+	const auto& definitions = applicationProcessConfiguration.definitions;
+	uint8_t numOfApplications = 0;
+	uint8_t previousAppID = std::numeric_limits<uint8_t>::max();
+
+	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> numOfServicesPerApp(ECSSMaxControlledApplicationProcesses, 0);
+
+	for (const auto& definition: definitions) {
+		const auto& appAndServiceIdPair = definition.first;
+		auto applicationID = appAndServiceIdPair.first;
+		if (applicationID != previousAppID) {
+			previousAppID = applicationID;
+			numOfApplications++;
+		}
+		numOfServicesPerApp[numOfApplications - 1]++;
+	}
+
+	report.appendUint8(numOfApplications);
+	previousAppID = std::numeric_limits<uint8_t>::max();
+	uint8_t appIdIndex = 0;
+
+	// C++ sorts the maps based on key by default. So keys with the same appID are accessed all-together.
+	for (const auto& definition: definitions) {
+		const auto& appAndServiceIdPair = definition.first;
+		auto applicationID = appAndServiceIdPair.first;
+		if (applicationID != previousAppID) {
+			previousAppID = applicationID;
+			report.appendUint8(applicationID);
+			report.appendUint8(numOfServicesPerApp[appIdIndex]);
+			appIdIndex++;
+		}
+		auto serviceType = appAndServiceIdPair.second;
+		auto numOfMessages = definition.second.size();
+		report.appendUint8(serviceType);
+		report.appendUint8(numOfMessages);
+		for (auto messageType: definition.second) {
+			report.appendUint8(messageType);
+		}
+	}
+	storeMessage(report);
+}
+
 void RealTimeForwardingControlService::execute(Message& message) {
 	switch (message.messageType) {
 		case AddReportTypesToAppProcessConfiguration:
@@ -282,8 +335,12 @@ void RealTimeForwardingControlService::execute(Message& message) {
 		case DeleteReportTypesFromAppProcessConfiguration:
 			deleteReportTypesFromAppProcessConfiguration(message);
 			break;
-
+		case ReportAppProcessConfigurationContent:
+			reportAppProcessConfigurationContent(message);
+			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
+
+#endif
