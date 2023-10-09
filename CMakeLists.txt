@@ -44,6 +44,7 @@ target_sources(common PRIVATE
         )
 
 target_link_libraries(common PRIVATE etl log_common log_x86)
+
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
     file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
