@@ -1,8 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
-#include <stdint.h> // for the uint_8t stepID
 #include <type_traits>
+#include <cstdint>
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
@@ -370,18 +370,23 @@ public:
 		 */
 		ParameterWriteOnly = 54,
 		/**
+		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
+		 * Application Process configuration (ST[14])
+		 */
+		AllReportTypesAlreadyAllowed = 55,
+		/**
 		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
 		 */
-		NonExistentReportTypeDefinition = 55,
+		NonExistentReportTypeDefinition = 56,
 		/**
 		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
 		 */
-		NonExistentServiceTypeDefinition = 56,
+		NonExistentServiceTypeDefinition = 57,
 		/**
 		 * Attempt to access a non-existing application process definition, from the application process
 		 * configuration (ST[14])
 		 */
-		NonExistentApplicationProcess = 57,
+		NonExistentApplicationProcess = 58,
 	};
 
 	/**
