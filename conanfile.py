@@ -18,8 +18,8 @@ class ECSSServicesRecipe(ConanFile):
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {"shared": False, "fPIC": True}
+    options = {"shared": [True, False], "fPIC": [True, False], "ecss_config_file_path": ["ANY"]}
+    default_options = {"shared": False, "fPIC": True, "ecss_config_file_path":"inc/Platform/x86/"}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "src/*", "inc/*"

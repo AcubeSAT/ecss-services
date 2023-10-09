@@ -128,7 +128,7 @@ private:
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool isReportTypeEnabled(uint8_t target, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
+	bool isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
 	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.

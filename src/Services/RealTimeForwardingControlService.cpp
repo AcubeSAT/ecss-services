@@ -155,7 +155,7 @@ bool RealTimeForwardingControlService::isServiceTypeEnabled(ApplicationProcessId
 	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](auto& definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
 }
 
-bool RealTimeForwardingControlService::isReportTypeEnabled(uint8_t target, ApplicationProcessId applicationID,
+bool RealTimeForwardingControlService::isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID,
                                                            ServiceTypeNum serviceType) {
 	auto appServicePair = std::make_pair(applicationID, serviceType);
 	auto serviceTypes = applicationProcessConfiguration.definitions.find(appServicePair);

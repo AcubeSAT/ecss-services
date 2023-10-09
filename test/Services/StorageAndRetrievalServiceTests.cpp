@@ -599,7 +599,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 
 		TimeStamps startTimeTag = 200;
 		NumOfPacketStores numOfPacketStores = 2;
-		request.appendUint32(startTimeTag);
+		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -632,7 +632,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 
 		TimeStamps startTimeTag = 200;
 		NumOfPacketStores numOfPacketStores = 6;
-		request.appendUint32(startTimeTag);
+		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
@@ -674,7 +674,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 
 		TimeStamps startTimeTag = 200;
 		NumOfPacketStores numOfPacketStores = 0;
-		request.appendUint32(startTimeTag);
+		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -936,8 +936,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			request.appendString(packetStoreId);
 			TimeStamps timeTag1 = timeTags1[index];
 			TimeStamps timeTag2 = timeTags2[index++];
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -980,8 +980,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			request.appendString(packetStoreId);
 			TimeStamps timeTag1 = 20;
 			TimeStamps timeTag2 = 40;
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus = false;
 
@@ -991,8 +991,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			request.appendString(packetStoreId);
 			TimeStamps timeTag1 = 20;
 			TimeStamps timeTag2 = 40;
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -1033,8 +1033,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			request.appendString(packetStoreId);
 			TimeStamps timeTag1 = 90;
 			TimeStamps timeTag2 = 20;
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -1725,16 +1725,16 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0]);
-		CHECK(report.readUint32() == timestamps1[5]);
+		CHECK(report.read<TimeStamps>() == timestamps1[0]);
+		CHECK(report.read<TimeStamps>() == timestamps1[5]);
 		CHECK(report.readUint32() == 5);
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 40);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.readUint32() == timestamps2[0]);
-		CHECK(report.readUint32() == timestamps2[4]);
+		CHECK(report.read<TimeStamps>() == timestamps2[0]);
+		CHECK(report.read<TimeStamps>() == timestamps2[4]);
 		CHECK(report.readUint32() == 5);
 		CHECK(report.read<PercentageFilled>() == 50);
 		CHECK(report.read<PercentageFilled>() == 20);
@@ -1779,32 +1779,32 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0]);
-		CHECK(report.readUint32() == timestamps1[5]);
+		CHECK(report.read<TimeStamps>() == timestamps1[0]);
+		CHECK(report.read<TimeStamps>() == timestamps1[5]);
 		CHECK(report.readUint32() == 15);
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 0);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.readUint32() == timestamps2[0]);
-		CHECK(report.readUint32() == timestamps2[4]);
+		CHECK(report.read<TimeStamps>() == timestamps2[0]);
+		CHECK(report.read<TimeStamps>() == timestamps2[4]);
 		CHECK(report.readUint32() == 15);
 		CHECK(report.read<PercentageFilled>() == 50);
 		CHECK(report.read<PercentageFilled>() == 20);
 		// Packet store 3
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
-		CHECK(report.readUint32() == timestamps4[0]);
-		CHECK(report.readUint32() == timestamps4[7]);
+		CHECK(report.read<TimeStamps>() == timestamps4[0]);
+		CHECK(report.read<TimeStamps>() == timestamps4[7]);
 		CHECK(report.readUint32() == 20);
 		CHECK(report.read<PercentageFilled>() == 80);
 		CHECK(report.read<PercentageFilled>() == 60);
 		// Packet store 4
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
-		CHECK(report.readUint32() == timestamps3[0]);
-		CHECK(report.readUint32() == timestamps3[3]);
+		CHECK(report.read<TimeStamps>() == timestamps3[0]);
+		CHECK(report.read<TimeStamps>() == timestamps3[3]);
 		CHECK(report.readUint32() == 15);
 		CHECK(report.read<PercentageFilled>() == 40);
 		CHECK(report.read<PercentageFilled>() == 0);
@@ -1876,7 +1876,7 @@ TEST_CASE("Deleting packet store content") {
 
 		TimeStamps storageTime = 5;
 		NumOfPacketStores numOfPacketStores = 2;
-		request.appendUint32(storageTime);
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores; i++) {
@@ -1928,7 +1928,7 @@ TEST_CASE("Deleting packet store content") {
 
 		TimeStamps storageTime = 3;
 		NumOfPacketStores numOfPacketStores = 2;
-		request.appendUint32(storageTime);
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
@@ -1980,7 +1980,7 @@ TEST_CASE("Deleting packet store content") {
 
 		TimeStamps storageTime = 59;
 		NumOfPacketStores numOfPacketStores = 2;
-		request.appendUint32(storageTime);
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
@@ -2015,7 +2015,7 @@ TEST_CASE("Deleting packet store content") {
 
 		TimeStamps storageTime = 15;
 		NumOfPacketStores numOfPacketStores = 0;
-		request.appendUint32(storageTime);
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		int count = 0;
@@ -2091,7 +2091,7 @@ TEST_CASE("Deleting packet store content") {
 
 		TimeStamps storageTime = 59;
 		NumOfPacketStores numOfPacketStores = 7;
-		request.appendUint32(storageTime);
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < 3; i++) {
@@ -2158,8 +2158,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2202,8 +2202,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2249,8 +2249,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2296,8 +2296,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2343,8 +2343,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2382,8 +2382,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = correctPacketStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2419,8 +2419,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2454,8 +2454,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2490,8 +2490,8 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2528,7 +2528,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
+		request.append<TimeStamps>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2572,7 +2572,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
+		request.append<TimeStamps>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2614,7 +2614,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
+		request.append<TimeStamps>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2652,7 +2652,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2696,7 +2696,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2738,7 +2738,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 

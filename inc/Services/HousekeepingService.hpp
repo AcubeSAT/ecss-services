@@ -96,7 +96,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @return uint32_t Integer multiples of the minimum sampling interval
 	 */
-	inline TimeStamps getCollectionInterval(ParameterReportStructureId id) {
+	inline CollectionInterval getCollectionInterval(ParameterReportStructureId id) {
 		HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
 			return newStructure.collectionInterval;
@@ -121,7 +121,7 @@ public:
 	 * @param id Housekeeping structure ID
 	 * @param interval Integer multiples of the minimum sampling interval
 	 */
-	inline void setCollectionInterval(ParameterReportStructureId id, TimeStamps interval) {
+	inline void setCollectionInterval(ParameterReportStructureId id, CollectionInterval interval) {
 		if (hasNonExistingStructInternalError(id)) {
 			return;
 		}

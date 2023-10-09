@@ -16,7 +16,7 @@ public:
 	 * The virtual channel used to transmit the packet store to the ground station. There is an upper and a lower
 	 * bound for the virtual channels, defined in 'ECSSDefinitions' file.
 	 */
-	uint8_t virtualChannel;
+	VirtualChannel virtualChannel;
 	/**
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.

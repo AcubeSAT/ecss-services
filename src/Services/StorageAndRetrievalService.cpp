@@ -15,8 +15,8 @@ void StorageAndRetrievalService::deleteContentUntil(const String<ECSSPacketStore
 }
 
 void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
-	TimeStamps startTime = request.readUint32();
-	TimeStamps endTime = request.readUint32();
+	TimeStamps startTime = request.read<TimeStamps>();
+	TimeStamps endTime = request.read<TimeStamps>();
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -37,7 +37,7 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 }
 
 void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
-	TimeStamps startTime = request.readUint32();
+	TimeStamps startTime = request.read<TimeStamps>();
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -55,7 +55,7 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 }
 
 void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
-	TimeStamps endTime = request.readUint32();
+	TimeStamps endTime = request.read<TimeStamps>();
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -152,12 +152,12 @@ bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSPacketStor
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSPacketStoreIdSize>& packetStoreId) {
 	TimeStamps oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
-	report.appendUint32(oldestStoredPacketTime);
+	report.append<TimeStamps>(oldestStoredPacketTime);
 
 	TimeStamps newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
-	report.appendUint32(newestStoredPacketTime);
+	report.append<TimeStamps>(newestStoredPacketTime);
 
-	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
+	report.append<TimeStamps>(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
 	auto filledPercentage1 = static_cast<uint16_t>(static_cast<float>(packetStores[packetStoreId].storedTelemetryPackets.size()) * 100 /
 	                                               ECSSMaxPacketStoreSize);
@@ -275,8 +275,8 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		if (failedStartOfByTimeRangeRetrieval(packetStoreId, request)) {
 			continue;
 		}
-		TimeStamps retrievalStartTime = request.readUint32();
-		TimeStamps retrievalEndTime = request.readUint32();
+		TimeStamps retrievalStartTime = request.read<TimeStamps>();
+		TimeStamps retrievalEndTime = request.read<TimeStamps>();
 
 		if (retrievalStartTime >= retrievalEndTime) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
@@ -298,7 +298,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 		return;
 	}
 
-	TimeStamps timeLimit = request.readUint32(); // todo: decide the time-format
+	TimeStamps timeLimit = request.read<TimeStamps>(); // todo: decide the time-format
 	NumOfPacketStores numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
@@ -383,7 +383,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 		return;
 	}
 
-	TimeStamps newStartTimeTag = request.readUint32();
+	TimeStamps newStartTimeTag = request.read<TimeStamps>();
 	/**
 	 * @todo: check if newStartTimeTag is in the future
 	 */

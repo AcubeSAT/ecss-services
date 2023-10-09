@@ -337,10 +337,10 @@ int main() {
 	                      TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
-	receivedMsg.appendUint32(currentTime + 1556435U);
+	receivedMsg.append<TimeStamps>(currentTime + 1556435U);
 	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
 
-	receivedMsg.appendUint32(currentTime + 1957232U);
+	receivedMsg.append<TimeStamps>(currentTime + 1957232U);
 	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 

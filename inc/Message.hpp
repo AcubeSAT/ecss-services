@@ -77,8 +77,8 @@ public:
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
-	ServiceTypeNum serviceType;
-	MessageTypeNum messageType;
+	uint8_t serviceType;
+	uint8_t messageType;
 
 	// As specified in CCSDS 133.0-B-1 (TM or TC)
 	PacketType packetType;
@@ -88,15 +88,15 @@ public:
 	 *
 	 * Maximum value of 2047 (5.4.2.1c)
 	 */
-	ApplicationProcessId applicationId;
+	uint16_t applicationId;
 
-	SourceId sourceId;
+	uint16_t sourceId;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
 
 	// 7.4.1, as defined in CCSDS 133.0-B-1
-	SequenceCount packetSequenceCount = 0;
+	uint16_t packetSequenceCount = 0;
 
 	// TODO: Find out if we need more than 16 bits for this
 	uint16_t dataSize = 0;
@@ -245,8 +245,8 @@ public:
 	 */
 	void readCString(char* string, uint16_t size);
 
-	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId);
-	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, Message::PacketType packetType);
+	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
+	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message
@@ -666,7 +666,7 @@ public:
 	 *
 	 * @return True if the message is of correct type, false if not
 	 */
-	bool assertType(Message::PacketType expectedPacketType, ServiceTypeNum expectedServiceType, MessageTypeNum expectedMessageType) const {
+	bool assertType(Message::PacketType expectedPacketType, uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		bool status = true;
 
 		if ((packetType != expectedPacketType) || (serviceType != expectedServiceType) ||
@@ -682,7 +682,7 @@ public:
 	 * Alias for Message::assertType(Message::TC, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTC(ServiceTypeNum expectedServiceType, MessageTypeNum expectedMessageType) const {
+	bool assertTC(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		return assertType(TC, expectedServiceType, expectedMessageType);
 	}
 
@@ -690,7 +690,7 @@ public:
 	 * Alias for Message::assertType(Message::TM, \p expectedServiceType, \p
 	 * expectedMessageType)
 	 */
-	bool assertTM(ServiceTypeNum expectedServiceType, MessageTypeNum expectedMessageType) const {
+	bool assertTM(uint8_t expectedServiceType, uint8_t expectedMessageType) const {
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
@@ -821,3 +821,4 @@ inline Time::RelativeTime Message::read() {
 }
 
 #endif // ECSS_SERVICES_PACKET_H
+
