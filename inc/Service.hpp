@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_SERVICE_HPP
 
 #include <cstdint>
+#include "Helpers/TypeDefinitions.hpp"
 #include "Message.hpp"
 
 /**
@@ -25,7 +26,7 @@ protected:
 	 * The service type of this Service. For example, ST[12]'s serviceType is `12`.
 	 * Specify this value in the constructor of your service.
 	 */
-	uint8_t serviceType{};
+	ServiceTypeNum serviceType{};
 
 	/**
 	 * Creates a new empty telemetry package originating from this service
@@ -34,7 +35,7 @@ protected:
 	 *                    the TC[17,3] message has `messageType = 3`.
 	 * @todo See if the Message must be returned by reference
 	 */
-	Message createTM(uint8_t messageType) const {
+	Message createTM(MessageTypeNum messageType) const {
 		return Message(serviceType, messageType, Message::TM);
 	}
 

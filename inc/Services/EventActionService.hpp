@@ -25,7 +25,7 @@ private:
 	bool eventActionFunctionStatus = false;
 
 public:
-	inline static const uint8_t ServiceType = 19;
+	inline static const ServiceTypeNum ServiceType = 19;
 
 	enum MessageType : uint8_t {
 		AddEventAction = 1,
@@ -40,13 +40,13 @@ public:
 	};
 
 	struct EventActionDefinition {
-		uint16_t applicationID = 0;
-		inline static const uint16_t MaxDefinitionID = 65535;
-		uint16_t eventDefinitionID = MaxDefinitionID;
+		ApplicationProcessId applicationID = 0;
+		inline static const ApplicationProcessId MaxDefinitionID = 65535;
+		EventDefinitionId eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
-		EventActionDefinition(uint16_t applicationID, uint16_t eventDefinitionID, Message& message);
+		EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message& message);
 	};
 
 	friend EventReportService;
@@ -122,7 +122,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction(uint16_t eventDefinitionID);
+	void executeAction(EventDefinitionId eventDefinitionID);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

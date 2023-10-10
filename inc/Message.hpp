@@ -821,3 +821,4 @@ inline Time::RelativeTime Message::read() {
 }
 
 #endif // ECSS_SERVICES_PACKET_H
+

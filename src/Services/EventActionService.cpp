@@ -5,7 +5,7 @@
 #include "MessageParser.hpp"
 #include "Services/EventActionService.hpp"
 
-EventActionService::EventActionDefinition::EventActionDefinition(uint16_t applicationID, uint16_t eventDefinitionID, Message& message)
+EventActionService::EventActionDefinition::EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message& message)
     : applicationID(applicationID), eventDefinitionID(eventDefinitionID), request(message.data + message.readPosition) {
 	message.readPosition += ECSSTCRequestStringSize;
 }
@@ -16,8 +16,8 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
-		uint16_t applicationID = message.readEnum16();
-		uint16_t eventDefinitionID = message.readEnum16();
+		ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 		bool canBeAdded = true;
 
 		for (auto& element: eventActionDefinitionMap) {
@@ -48,8 +48,8 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
-		uint16_t applicationID = message.readEnum16();
-		uint16_t eventDefinitionID = message.readEnum16();
+		ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 		bool actionDefinitionExists = false;
 
 		for (auto& element: eventActionDefinitionMap) {
@@ -86,8 +86,8 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-			uint16_t applicationID = message.readEnum16();
-			uint16_t eventDefinitionID = message.readEnum16();
+			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+			EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 			bool actionDefinitionExists = false;
 
 			for (auto& element: eventActionDefinitionMap) {
@@ -119,8 +119,8 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
-			uint16_t applicationID = message.readEnum16();
-			uint16_t eventDefinitionID = message.readEnum16();
+			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
+			EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 			bool actionDefinitionExists = false;
 
 			for (auto& element: eventActionDefinitionMap) {
@@ -157,8 +157,8 @@ void EventActionService::eventActionStatusReport() {
 	uint16_t count = eventActionDefinitionMap.size();
 	report.appendUint16(count);
 	for (const auto& element: eventActionDefinitionMap) {
-		report.appendEnum16(element.second.applicationID);
-		report.appendEnum16(element.second.eventDefinitionID);
+		report.append<ApplicationProcessId>(element.second.applicationID);
+		report.append<EventDefinitionId>(element.second.eventDefinitionID);
 		report.appendBoolean(element.second.enabled);
 	}
 	storeMessage(report);
@@ -178,7 +178,7 @@ void EventActionService::disableEventActionFunction(Message& message) {
 	setEventActionFunctionStatus(false);
 }
 
-void EventActionService::executeAction(uint16_t eventDefinitionID) {
+void EventActionService::executeAction(EventDefinitionId eventDefinitionID) {
 	// Custom function
 	if (eventActionFunctionStatus) {
 		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);

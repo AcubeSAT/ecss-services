@@ -2,7 +2,7 @@
 #define PROJECT_ERRORHANDLER_HPP
 
 #include <type_traits>
-#include <cstdint>
+#include "Helpers/TypeDefinitions.hpp"
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
@@ -408,7 +408,7 @@ public:
 	enum ExecutionCompletionErrorType {
 		UnknownExecutionCompletionError = 0,
 		/**
-		 * Checksum comparison failed
+		 * MemoryManagementChecksum comparison failed
 		 */
 		ChecksumFailed = 1,
 		/**
@@ -464,7 +464,7 @@ public:
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
 	 */
-	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, uint8_t stepID);
+	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepId stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.
