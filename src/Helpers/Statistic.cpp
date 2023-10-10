@@ -36,7 +36,7 @@ void Statistic::appendStatisticsToMessage(Message& report) const {
 	}
 }
 
-void Statistic::setSelfSamplingInterval(uint16_t samplingInterval) {
+void Statistic::setSelfSamplingInterval(SamplingInterval samplingInterval) {
 	this->selfSamplingInterval = samplingInterval;
 }
 

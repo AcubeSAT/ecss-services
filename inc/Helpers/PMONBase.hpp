@@ -27,7 +27,7 @@ public:
 		AboveHighThreshold = 10
 	};
 
-	uint16_t monitoredParameterId;
+	PMONId monitoredParameterId;
 
 	std::reference_wrapper<ParameterBase> monitoredParameter;
 	/**
@@ -46,7 +46,7 @@ protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
-	PMONBase(uint16_t monitoredParameterId, uint16_t repetitionNumber);
+	PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber);
 };
 
 /**
@@ -58,7 +58,7 @@ public:
 	uint64_t mask;
 	uint16_t unexpectedValueEvent;
 
-	explicit PMONExpectedValueCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double expectedValue,
+	explicit PMONExpectedValueCheck(PMONId monitoredParameterId, uint16_t repetitionNumber, double expectedValue,
 	                                uint64_t mask, uint16_t unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
 	      PMONBase(monitoredParameterId, repetitionNumber){};
@@ -74,7 +74,7 @@ public:
 	double highLimit;
 	uint16_t aboveHighLimitEvent;
 
-	explicit PMONLimitCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double lowLimit,
+	explicit PMONLimitCheck(PMONId monitoredParameterId, uint16_t repetitionNumber, double lowLimit,
 	                        uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber){};
@@ -91,7 +91,7 @@ public:
 	double highDeltaThreshold;
 	uint16_t aboveHighThresholdEvent;
 
-	explicit PMONDeltaCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber,
+	explicit PMONDeltaCheck(PMONId monitoredParameterId, uint16_t repetitionNumber,
 	                        uint16_t numberOfConsecutiveDeltaChecks, double lowDeltaThreshold,
 	                        uint16_t belowLowThresholdEvent, double highDeltaThreshold,
 	                        uint16_t aboveHighThresholdEvent)
