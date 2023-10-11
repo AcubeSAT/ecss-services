@@ -23,7 +23,7 @@ TEST_CASE("Error: Failed Acceptance", "[errors]") {
 	CHECK(report.readBits(11) == 47);
 	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::MessageTooShort);
+	CHECK(report.read<ErrorCode>() == ErrorHandler::MessageTooShort);
 }
 
 TEST_CASE("Error: Failed Execution Start", "[errors]") {
@@ -46,7 +46,7 @@ TEST_CASE("Error: Failed Execution Start", "[errors]") {
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionStartError);
+	CHECK(report.read<ErrorCode>() == ErrorHandler::UnknownExecutionStartError);
 }
 
 TEST_CASE("Error: Failed Execution Progress", "[errors]") {
@@ -69,8 +69,8 @@ TEST_CASE("Error: Failed Execution Progress", "[errors]") {
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionProgressError);
-	CHECK(report.readByte() == 0); // stepID
+	CHECK(report.read<ErrorCode>() == ErrorHandler::UnknownExecutionProgressError);
+	CHECK(report.read<StepId>() == 0); // stepID
 }
 
 TEST_CASE("Error: Failed Execution Completion", "[errors]") {
@@ -93,7 +93,7 @@ TEST_CASE("Error: Failed Execution Completion", "[errors]") {
 	CHECK(report.readBits(11) == 56);
 	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::UnknownExecutionCompletionError);
+	CHECK(report.read<ErrorCode>() == ErrorHandler::UnknownExecutionCompletionError);
 }
 
 TEST_CASE("Error: Failed Routing", "[errors]") {
@@ -116,5 +116,5 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	CHECK(report.readBits(11) == 71);
 	CHECK(report.readBits(2) == ECSSSequenceFlags);
 	CHECK(report.readBits(14) == failedMessage.packetSequenceCount);
-	CHECK(report.readEnum16() == ErrorHandler::UnknownRoutingError);
+	CHECK(report.read<ErrorCode>() == ErrorHandler::UnknownRoutingError);
 }

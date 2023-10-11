@@ -31,7 +31,7 @@ private:
 	/**
 	 * The parameter statistics reporting interval
 	 */
-	uint16_t reportingIntervalMs = 700;
+	SamplingInterval reportingIntervalMs = 700;
 
 	/**
 	 * Initializer of the statistics map, so that its content can be accessed by FreeRTOS tasks.
@@ -39,7 +39,7 @@ private:
 	void initializeStatisticsMap();
 
 public:
-	inline static const uint8_t ServiceType = 4;
+	inline static const ServiceTypeNum ServiceType = 4;
 
 	enum MessageType : uint8_t {
 		ReportParameterStatistics = 1,
@@ -58,7 +58,7 @@ public:
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
-	etl::map<uint16_t, Statistic, ECSSMaxStatisticParameters> statisticsMap;
+	etl::map<ParameterId, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
 	 * If true, after every report reset the parameter statistics.
@@ -86,7 +86,7 @@ public:
 	/**
 	 * Returns the periodic statistics reporting status
 	 */
-	inline uint16_t getReportingIntervalMs() const {
+	inline SamplingInterval getReportingIntervalMs() const {
 		return reportingIntervalMs;
 	}
 

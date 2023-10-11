@@ -20,7 +20,7 @@ private:
 	etl::bitset<numberOfEvents> stateOfEvents;
 
 public:
-	inline static const uint8_t ServiceType = 5;
+	inline static const ServiceTypeNum ServiceType = 5;
 
 	enum MessageType : uint8_t {
 		InformativeEventReport = 1,

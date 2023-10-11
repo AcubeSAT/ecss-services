@@ -16,20 +16,20 @@ public:
 	 * The virtual channel used to transmit the packet store to the ground station. There is an upper and a lower
 	 * bound for the virtual channels, defined in 'ECSSDefinitions' file.
 	 */
-	uint8_t virtualChannel;
+	VirtualChannel virtualChannel;
 	/**
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
 	 */
-	uint32_t openRetrievalStartTimeTag = 0;
+	TimeStamps openRetrievalStartTimeTag = 0;
 	/**
 	 * The start time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	uint32_t retrievalStartTime = 0;
+	TimeStamps retrievalStartTime = 0;
 	/**
 	 * The end time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	uint32_t retrievalEndTime = 0;
+	TimeStamps retrievalEndTime = 0;
 	/**
 	 * The maximum size of the packet store, in bytes.
 	 *
