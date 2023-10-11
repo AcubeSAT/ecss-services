@@ -12,6 +12,7 @@
 #include "Services/OnBoardMonitoringService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
+#include "Services/RequestVerificationService.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
@@ -123,7 +124,7 @@ public:
 	 * @param messageType The message type ID
 	 * @return The message type count
 	 */
-	uint16_t getAndUpdateMessageTypeCounter(ServiceTypeNum serviceType, MessageTypeNum messageType);
+	uint16_t getAndUpdateMessageTypeCounter(uint8_t serviceType, uint8_t messageType);
 
 	/**
 	 * Get and increase the "packet sequence count" for the next message
