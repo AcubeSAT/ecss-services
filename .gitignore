@@ -1,7 +1,10 @@
 # Build files
 build
 cmake-build-debug
-docs
+
+# Documentation output
+/docs/html
+/docs/latex
 
 # Dump and continuous integration files
 *.dump
@@ -75,3 +78,15 @@ __pycache__
 
 # IDEs
 .vscode
+.DS_Store
+
+# Conan generated files
+CMakeUserPresets.json
+
+# CI generated folders. We ignore these because we add the git commit as the
+# conan package revision, and when the CI creates these folders, a new commit is needed
+# before conan allows us to upload the package. So, we ignore them.
+cppcheck-html-report/
+ikos-report/
+clang-tidy-html-report/
+gcovr/

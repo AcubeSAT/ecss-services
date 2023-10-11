@@ -2,11 +2,10 @@
 #define ECSS_SERVICES_STATISTIC_HPP
 
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
+#include "Service.hpp"
+#include "TimeGetter.hpp"
 #include "etl/vector.h"
-#include <cmath>
-#include <cfloat>
 
 /**
  * Class containing all the statistics for every parameter. Includes functions that calculate and append the
@@ -16,8 +15,8 @@ class Statistic {
 public:
 	uint16_t selfSamplingInterval = 0;
 	uint16_t sampleCounter = 0;
-	uint32_t maxTime = 0;
-	uint32_t minTime = 0; // TODO: CUC Format timestamp
+	Time::DefaultCUC timeOfMaxValue;
+	Time::DefaultCUC timeOfMinValue;
 	double max = -std::numeric_limits<double>::infinity();
 	double min = std::numeric_limits<double>::infinity();
 	double sumOfSquares = 0;
@@ -40,7 +39,7 @@ public:
 	 * Appends itself to the received Message
 	 * message.
 	 */
-	void appendStatisticsToMessage(Message& report);
+	void appendStatisticsToMessage(Message& report) const;
 
 	/**
 	 * Setter function
@@ -50,7 +49,7 @@ public:
 	/**
 	 * Check if all the statistics are initialized
 	 */
-	bool statisticsAreInitialized();
+	bool statisticsAreInitialized() const;
 };
 
 #endif

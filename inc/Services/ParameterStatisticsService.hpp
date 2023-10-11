@@ -2,17 +2,42 @@
 #define ECSS_SERVICES_PARAMETERSTATISTICSSERVICE_HPP
 
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Statistic.hpp"
+#include "Helpers/TimeGetter.hpp"
+#include "Service.hpp"
 #include "etl/deque.h"
 #include "etl/map.h"
 
 /**
  * Implementation of the ST[04] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
+ *
+ * @ingroup Services
  * @author Konstantinos Petridis <petridkon@gmail.com>
  */
 class ParameterStatisticsService : public Service {
+private:
+	/**
+	 * The time at which the evaluation of statistics is initialized. It is basically the time when the statistics
+	 * are reset.
+	 */
+	Time::DefaultCUC evaluationStartTime;
+
+	/**
+	 * true means that the periodic statistics reporting is enabled
+	 */
+	bool periodicStatisticsReportingStatus = true;
+
+	/**
+	 * The parameter statistics reporting interval
+	 */
+	uint16_t reportingIntervalMs = 700;
+
+	/**
+	 * Initializer of the statistics map, so that its content can be accessed by FreeRTOS tasks.
+	 */
+	void initializeStatisticsMap();
+
 public:
 	inline static const uint8_t ServiceType = 4;
 
@@ -28,15 +53,13 @@ public:
 		ParameterStatisticsDefinitionsReport = 9,
 	};
 
+	ParameterStatisticsService();
+
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
 	etl::map<uint16_t, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
-	/**
-	 * true means that the periodic statistics reporting is enabled
-	 */
-	bool periodicStatisticsReportingStatus = false;
 	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
@@ -45,15 +68,42 @@ public:
 	 * Indicates whether to append/read the sampling interval to/from message
 	 */
 	const bool supportsSamplingInterval = true;
+
 	/**
-	 * The parameter statistics reporting interval
+	 * Returns the periodic statistics reporting status
 	 */
-	uint16_t reportingInterval = 5; // TODO: Must define units. Same as parameter sampling rates
+	inline bool getPeriodicReportingStatus() const {
+		return periodicStatisticsReportingStatus;
+	}
+
+	/**
+	 * Sets the value of the periodic statistics reporting status
+	 */
+	inline void setPeriodicReportingStatus(bool status) {
+		periodicStatisticsReportingStatus = status;
+	}
+
+	/**
+	 * Returns the periodic statistics reporting status
+	 */
+	inline uint16_t getReportingIntervalMs() const {
+		return reportingIntervalMs;
+	}
 
 	/**
 	 * TC[4,1] report the parameter statistics, by calling parameterStatisticsReport()
 	 */
 	void reportParameterStatistics(Message& request);
+
+	/**
+	 * Report the parameter statistics, by calling parameterStatisticsReport()
+	 * This is **NOT** the function called by TC. It was created so that this function could be called
+	 * from within a Platform (MCU, x86...) without needing to create a fake TC and pass through multiple functions.
+	 *
+	 * @param reset indicates whether each Statistic should be reset. Simulates the argument contained in the TC[4,1]
+	 * that calls reportParameterStatistics(Message& request)
+	 */
+	void reportParameterStatistics(bool reset);
 
 	/**
 	 * Constructs and stores a TM[4,2] packet containing the parameter statistics report.
@@ -108,6 +158,16 @@ public:
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
 	void execute(Message& message);
+
+	/**
+	 * BaseBytes: 4 bytes, FractionBytes: 0 bytes, Num: 1, Denom: 10.
+	 */
+	using DefaultTimestamp = TimeStamp<4, 0, 1, 10>;
+
+	/**
+	 * Get the current time as a TimeStamp object.
+	 */
+	DefaultTimestamp getCurrentTime();
 };
 
 #endif

@@ -1,21 +1,16 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
 
-#include "Services/ParameterService.hpp"
 #include "Helpers/Parameter.hpp"
+#include "Services/ParameterService.hpp"
 
 
 void ParameterService::reportParameters(Message& paramIds) {
-	// TM[20,2]
-	Message parameterReport(ParameterService::ServiceType, ParameterService::MessageType::ParameterValuesReport,
-	                        Message::TM, 1);
 
-	ErrorHandler::assertRequest(paramIds.packetType == Message::TC, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.messageType == ParameterService::MessageType::ReportParameterValues, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(paramIds.serviceType == ParameterService::ServiceType, paramIds,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+	if (!paramIds.assertTC(ServiceType, ReportParameterValues)) {
+		return;
+	}
+	Message parameterReport = createTM(ParameterValuesReport);
 
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t numberOfValidIds = 0;
@@ -30,35 +25,33 @@ void ParameterService::reportParameters(Message& paramIds) {
 	numOfIds = paramIds.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = paramIds.readUint16();
-		if (auto parameter = getParameter(currId)) {
-			parameterReport.appendUint16(currId);
-			parameter->get().appendValueToMessage(parameterReport);
-		} else {
+		auto parameter = getParameter(currId);
+		if (!parameter) {
 			ErrorHandler::reportError(paramIds, ErrorHandler::GetNonExistingParameter);
+			continue;
 		}
+		parameterReport.appendUint16(currId);
+		parameter->get().appendValueToMessage(parameterReport);
 	}
 
 	storeMessage(parameterReport);
 }
 
-void ParameterService::setParameters(Message& newParamValues) {
-	ErrorHandler::assertRequest(newParamValues.packetType == Message::TC, newParamValues,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.messageType == ParameterService::MessageType::SetParameterValues,
-	                            newParamValues, ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
-	ErrorHandler::assertRequest(newParamValues.serviceType == ParameterService::ServiceType, newParamValues,
-	                            ErrorHandler::AcceptanceErrorType::UnacceptableMessage);
+void ParameterService::setParameters(Message& newParamValues) const {
+	if (!newParamValues.assertTC(ServiceType, MessageType::SetParameterValues)) {
+		return;
+	}
 
 	uint16_t numOfIds = newParamValues.readUint16();
 
 	for (uint16_t i = 0; i < numOfIds; i++) {
 		uint16_t currId = newParamValues.readUint16();
-		if (auto parameter = getParameter(currId)) {
-			parameter->get().setValueFromMessage(newParamValues);
-		} else {
+		auto parameter = getParameter(currId);
+		if (!parameter) {
 			ErrorHandler::reportError(newParamValues, ErrorHandler::SetNonExistingParameter);
 			break; // Setting next parameters is impossible, since the size of value to be read is unknown
 		}
+		parameter->get().setValueFromMessage(newParamValues);
 	}
 }
 

@@ -3,25 +3,24 @@
 
 #include <optional>
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
+#include "Service.hpp"
 #include "etl/map.h"
 
 /**
  * Implementation of the ST[20] parameter management service,
  * as defined in ECSS-E-ST-70-41C
  *
- * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
- * @author Athanasios Theocharis <athatheoc@gmail.com>
- */
-
-/**
  * Parameter manager - ST[20]
  *
  * The purpose of this class is to handle functions regarding the access and modification
  * of the various parameters of the CubeSat.
  * The parameters to be managed are initialized and kept in \ref SystemParameters.
+ *
+ * @ingroup Services
+ * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
+ * @author Athanasios Theocharis <athatheoc@gmail.com>
  */
 class ParameterService : public Service {
 private:
@@ -58,6 +57,7 @@ public:
 	 * by calling \fn initializeParametersArray
 	 */
 	ParameterService() {
+		serviceType = ServiceType;
 		initializeParameterMap();
 	}
 
@@ -105,7 +105,7 @@ public:
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 */
-	void setParameters(Message& newParamValues);
+	void setParameters(Message& newParamValues) const;
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

@@ -1,32 +1,40 @@
-#include <iostream>
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
-#include "Services/ParameterStatisticsService.hpp"
 #include "ServicePool.hpp"
+#include "Services/ParameterStatisticsService.hpp"
+
+ParameterStatisticsService::ParameterStatisticsService() : evaluationStartTime(TimeGetter::getCurrentTimeDefaultCUC()) {
+	initializeStatisticsMap();
+	serviceType = ServiceType;
+}
 
 void ParameterStatisticsService::reportParameterStatistics(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportParameterStatistics);
+	if (!request.assertTC(ServiceType, MessageType::ReportParameterStatistics)) {
+		return;
+	}
 	parameterStatisticsReport();
 
-	// TODO: append start time and end time to the report
-
-	if (hasAutomaticStatisticsReset) {
+	if (hasAutomaticStatisticsReset or request.readBoolean()) {
 		resetParameterStatistics();
-	} else {
-		bool resetFlagValue = request.readBoolean();
-		if (resetFlagValue) {
-			resetParameterStatistics();
-		}
+	}
+}
+
+void ParameterStatisticsService::reportParameterStatistics(bool reset) {
+	parameterStatisticsReport();
+
+	if (hasAutomaticStatisticsReset or reset) {
+		resetParameterStatistics();
 	}
 }
 
 void ParameterStatisticsService::parameterStatisticsReport() {
-	Message report(ServiceType, MessageType::ParameterStatisticsReport, Message::TM, 1);
-	report.appendUint16(1); // Dummy value for start and end time, will change in the end
-	report.appendUint16(1);
-	uint16_t numOfValidParameters = 0;
+	Message report = createTM(ParameterStatisticsReport);
+	report.append(evaluationStartTime);
+	auto evaluationStopTime = TimeGetter::getCurrentTimeDefaultCUC();
+	report.append(evaluationStopTime);
 
-	for (auto& currentStatistic : statisticsMap) {
+	uint16_t numOfValidParameters = 0;
+	for (auto& currentStatistic: statisticsMap) {
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
@@ -35,7 +43,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	}
 	report.appendUint16(numOfValidParameters);
 
-	for (auto& currentStatistic : statisticsMap) {
+	for (auto& currentStatistic: statisticsMap) {
 		uint16_t currentId = currentStatistic.first;
 		uint16_t numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
@@ -49,45 +57,50 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 }
 
 void ParameterStatisticsService::resetParameterStatistics(Message& request) {
-	request.assertTC(ServiceType, MessageType::ResetParameterStatistics);
+	if (!request.assertTC(ServiceType, MessageType::ResetParameterStatistics)) {
+		return;
+	}
 	resetParameterStatistics();
 }
 
 void ParameterStatisticsService::resetParameterStatistics() {
-	// TODO: Stop the evaluation of parameter statistics
-	for (auto& it : statisticsMap) {
+	for (auto& it: statisticsMap) {
 		it.second.resetStatistics();
 	}
-	// TODO: Restart the evaluation of parameter statistics
+	evaluationStartTime = TimeGetter::getCurrentTimeDefaultCUC();
 }
 
 void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& request) {
-	/**
-	 * @todo: The sampling interval of each parameter. the "timeInterval" requested should not exceed it.
-	 * 		  It has to be defined as a constant.
-	 */
-	uint16_t SAMPLING_PARAMETER_INTERVAL = 5;
+	Time::RelativeTime constexpr SamplingParameterInterval = 5;
 
-	request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting);
+	if (!request.assertTC(ServiceType, MessageType::EnablePeriodicParameterReporting)) {
+		return;
+	}
 
 	uint16_t timeInterval = request.readUint16();
-	if (timeInterval < SAMPLING_PARAMETER_INTERVAL) {
+
+	if (timeInterval < SamplingParameterInterval) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 		return;
 	}
+
 	periodicStatisticsReportingStatus = true;
-	reportingInterval = timeInterval;
+	reportingIntervalMs = timeInterval;
 }
 
 void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& request) {
-	request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting);
+	if (!request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting)) {
+		return;
+	}
 
 	periodicStatisticsReportingStatus = false;
-	reportingInterval = 0;
+	reportingIntervalMs = 0;
 }
 
 void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& request) {
-	request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions);
+	if (!request.assertTC(ServiceType, MessageType::AddOrUpdateParameterStatisticsDefinitions)) {
+		return;
+	}
 
 	uint16_t numOfIds = request.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
@@ -103,7 +116,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 		uint16_t interval = 0;
 		if (supportsSamplingInterval) {
 			interval = request.readUint16();
-			if (interval < reportingInterval) {
+			if (interval < reportingIntervalMs) {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
 				continue;
 			}
@@ -130,7 +143,9 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 }
 
 void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
-	request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions);
+	if (!request.assertTC(ServiceType, MessageType::DeleteParameterStatisticsDefinitions)) {
+		return;
+	}
 
 	uint16_t numOfIds = request.readUint16();
 	if (numOfIds == 0) {
@@ -152,21 +167,23 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 }
 
 void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
-	request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions);
+	if (!request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions)) {
+		return;
+	}
 	statisticsDefinitionsReport();
 }
 
 void ParameterStatisticsService::statisticsDefinitionsReport() {
-	Message definitionsReport(ServiceType, MessageType::ParameterStatisticsDefinitionsReport, Message::TM, 1);
+	Message definitionsReport = createTM(ParameterStatisticsDefinitionsReport);
 
-	uint16_t currentReportingInterval = 0;
+	uint16_t currentReportingIntervalMs = 0;
 	if (periodicStatisticsReportingStatus) {
-		currentReportingInterval = reportingInterval;
+		currentReportingIntervalMs = reportingIntervalMs;
 	}
-	definitionsReport.appendUint16(currentReportingInterval);
+	definitionsReport.appendUint16(currentReportingIntervalMs);
 	definitionsReport.appendUint16(statisticsMap.size());
 
-	for (auto& currentParam : statisticsMap) {
+	for (auto& currentParam: statisticsMap) {
 		uint16_t currentId = currentParam.first;
 		uint16_t samplingInterval = currentParam.second.selfSamplingInterval;
 		definitionsReport.appendUint16(currentId);
@@ -178,14 +195,17 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 }
 
 void ParameterStatisticsService::execute(Message& message) {
+	DefaultTimestamp currentTime;
 	switch (message.messageType) {
 		case ReportParameterStatistics:
 			reportParameterStatistics(message);
 			break;
 		case ResetParameterStatistics:
 			resetParameterStatistics(message);
+			currentTime = getCurrentTime();
 			break;
 		case EnablePeriodicParameterReporting:
+			currentTime = getCurrentTime();
 			enablePeriodicStatisticsReporting(message);
 			break;
 		case DisablePeriodicParameterReporting:
@@ -198,11 +218,16 @@ void ParameterStatisticsService::execute(Message& message) {
 			deleteStatisticsDefinitions(message);
 			break;
 		case ReportParameterStatisticsDefinitions:
+			currentTime = getCurrentTime();
 			reportStatisticsDefinitions(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
+}
+
+ParameterStatisticsService::DefaultTimestamp ParameterStatisticsService::getCurrentTime() {
+	return TimeGetter::getCurrentTimeDefaultCUC();
 }
 
 #endif
