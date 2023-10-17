@@ -29,7 +29,7 @@ void initializeEventActionDefinitions() {
 		REQUIRE(eventActionService.eventActionDefinitionMap.find(eventDefinitionIDs[i]) != eventActionService.eventActionDefinitionMap.end());
 	}
 }
-
+git pu
 TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	SECTION("Add an event-action definition to check if the values are inserted correctly") {
 		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
