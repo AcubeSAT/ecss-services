@@ -240,6 +240,12 @@ namespace Filesystem {
 		return FileLockStatus::Unlocked;
 	}
 
+	/**
+	 * Locks a file using POSIX permission operations.
+	 * @param path The path to the file
+	 * @warning If a file is locked, a chmod +w ./file operation will allow the
+	 * current user to modify the file again.
+	 */
 	void lockFile(const Path& path) {
 		fs::perms permissions = fs::status(path.data()).permissions();
 
@@ -248,6 +254,12 @@ namespace Filesystem {
 		fs::status(path.data()).permissions(newPermissions);
 	}
 
+	/**
+	 * Unlocks a file using POSIX permission operations.
+	 * @param path The path to the file
+	 * @warning If a file is unlocked, a chmod -w ./file operation will stop the
+	 * current user from modifying the file again.
+	 */
 	void unlockFile(const Path& path) {
 		fs::perms permissions = fs::status(path.data()).permissions();
 
