@@ -71,8 +71,8 @@ namespace Filesystem {
 	 * The current file lock status
 	 */
 	enum class FileLockStatus : uint8_t {
-		Locked = 0,
-		Unlocked = 1
+		Unlocked = 0,
+		Locked = 1,
 	};
 
 	/**
