@@ -90,6 +90,8 @@ public:
 	 */
 	uint16_t applicationId;
 
+	uint16_t sourceId;
+
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
 
@@ -819,3 +821,4 @@ inline Time::RelativeTime Message::read() {
 }
 
 #endif // ECSS_SERVICES_PACKET_H
+

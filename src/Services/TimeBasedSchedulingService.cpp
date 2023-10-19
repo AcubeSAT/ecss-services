@@ -69,7 +69,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			newActivity.request = receivedTCPacket;
 			newActivity.requestReleaseTime = releaseTime;
 
-			// todo: When implemented save the source ID
+			newActivity.requestID.sourceID = request.sourceId;
 			newActivity.requestID.applicationID = request.applicationId;
 			newActivity.requestID.sequenceCount = request.packetSequenceCount;
 
@@ -114,9 +114,9 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
-		receivedRequestID.applicationID = request.readUint16();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -145,9 +145,9 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
-		receivedRequestID.applicationID = request.readUint16();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -192,9 +192,9 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
-		receivedRequestID.applicationID = request.readUint16();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -223,9 +223,9 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.readUint8();
-		receivedRequestID.applicationID = request.readUint16();
-		receivedRequestID.sequenceCount = request.readUint16();
+		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
+		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
@@ -251,9 +251,9 @@ void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<
 	for (const auto& match: listOfActivities) {
 		// todo: append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
-		report.appendUint8(match.requestID.sourceID);
-		report.appendUint16(match.requestID.applicationID);
-		report.appendUint16(match.requestID.sequenceCount);
+		report.append<SourceId>(match.requestID.sourceID);
+		report.append<ApplicationProcessId>(match.requestID.applicationID);
+		report.append<SequenceCount>(match.requestID.sequenceCount);
 	}
 	storeMessage(report);
 }

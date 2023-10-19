@@ -61,9 +61,9 @@ private:
 	 * sequence count and the source ID, all defined in the ECSS standard.
 	 */
 	struct RequestID {
-		uint16_t applicationID = 0; ///< Application process ID
-		uint16_t sequenceCount = 0; ///< Packet sequence count
-		uint8_t sourceID = 0;       ///< Packet source ID
+		ApplicationProcessId applicationID = 0; ///< Application process ID
+		SequenceCount sequenceCount = 0; ///< Packet sequence count
+		SourceId sourceID = 0;       ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or
@@ -123,7 +123,7 @@ private:
 	void notifyNewActivityAddition();
 
 public:
-	inline static const uint8_t ServiceType = 11;
+	inline static const ServiceTypeNum ServiceType = 11;
 
 	enum MessageType : uint8_t {
 		EnableTimeBasedScheduleExecutionFunction = 1,

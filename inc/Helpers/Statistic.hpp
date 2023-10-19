@@ -13,8 +13,8 @@
  */
 class Statistic {
 public:
-	uint16_t selfSamplingInterval = 0;
-	uint16_t sampleCounter = 0;
+	SamplingInterval selfSamplingInterval = 0;
+	ParameterSampleCount sampleCounter = 0;
 	Time::DefaultCUC timeOfMaxValue;
 	Time::DefaultCUC timeOfMinValue;
 	double max = -std::numeric_limits<double>::infinity();
@@ -44,7 +44,7 @@ public:
 	/**
 	 * Setter function
 	 */
-	void setSelfSamplingInterval(uint16_t samplingInterval);
+	void setSelfSamplingInterval(SamplingInterval samplingInterval);
 
 	/**
 	 * Check if all the statistics are initialized

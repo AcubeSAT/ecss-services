@@ -20,7 +20,7 @@
  */
 class RequestVerificationService : public Service {
 public:
-	inline static const uint8_t ServiceType = 1;
+	inline static const ServiceTypeNum ServiceType = 1;
 
 	enum MessageType : uint8_t {
 		SuccessfulAcceptanceReport = 1,
@@ -34,27 +34,27 @@ public:
 		FailedRoutingReport = 10,
 	};
 	/**
-	 * Length of bits that represent the CCSDS packet version
+	 * MemoryDataLength of bits that represent the CCSDS packet version
 	 */
 	inline static const uint8_t CCSDSPacketVersionBits = 3;
 	/**
-	 * Length of bits that represent the packet type
+	 * MemoryDataLength of bits that represent the packet type
 	 */
 	inline static const uint8_t PacketTypeBits = 1;
 	/**
-	 * Length of bits that represent the secondary header flag
+	 * MemoryDataLength of bits that represent the secondary header flag
 	 */
 	inline static const uint8_t SecondaryHeaderFlagBits = 1 ;
 	/**
-	 * Length of bits that represent the application id
+	 * MemoryDataLength of bits that represent the application id
 	 */
 	inline static const uint8_t ApplicationIdBits = 11;
 	/**
-	 * Length of bits that represent the ECSS sequence flags
+	 * MemoryDataLength of bits that represent the ECSS sequence flags
 	 */
 	inline static const uint8_t ECSSSequenceFlagsBits = 2;
 	/**
-	 * Length of bits that represent the packet sequence count
+	 * MemoryDataLength of bits that represent the packet sequence count
 	 */
 	inline static const uint8_t PacketSequenceCountBits = 14;
 	/**
@@ -115,7 +115,7 @@ public:
 	 * @todo Each value,that the stepID is assigned, should be documented.
 	 * @todo error handling for undocumented assigned values to stepID
 	 */
-	void successProgressExecutionVerification(const Message& request, uint8_t stepID);
+	void successProgressExecutionVerification(const Message& request, StepId stepID);
 
 	/**
 	 * TM[1,6] failed progress of execution verification report
@@ -130,7 +130,7 @@ public:
 	 * @todo error handling for undocumented assigned values to stepID
 	 */
 	void failProgressExecutionVerification(const Message& request, ErrorHandler::ExecutionProgressErrorType errorCode,
-	                                       uint8_t stepID);
+	                                       StepId stepID);
 
 	/**
 	 * TM[1,7] successful completion of execution verification report

@@ -1,8 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
-#include <cstdint>
 #include <type_traits>
+#include "Helpers/TypeDefinitions.hpp"
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
@@ -338,7 +338,7 @@ public:
 		 */
 		ReportParameterNotInTheParameterMonitoringList = 47,
 		/**
-		 * Attempt to add a new service type, when the addition of all service types is already enabled in the
+		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
 		 * Application Process configuration (ST[14])
 		 */
 		AllServiceTypesAlreadyAllowed = 48,
@@ -370,25 +370,43 @@ public:
 		 */
 		ParameterWriteOnly = 54,
 		/**
+		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
+		 * Application Process configuration (ST[14])
+		 */
+		AllReportTypesAlreadyAllowed = 55,
+		/**
+		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
+		 */
+		NonExistentReportTypeDefinition = 56,
+		/**
+		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
+		 */
+		NonExistentServiceTypeDefinition = 57,
+		/**
+		 * Attempt to access a non-existing application process definition, from the application process
+		 * configuration (ST[14])
+		 */
+		NonExistentApplicationProcess = 58,
+		/**
          * Size of file is bigger than allowed
          */
-		SizeOfFileIsOutOfBounds = 55,
+		SizeOfFileIsOutOfBounds = 59,
 		/**
 		 * Object path is invalid
 		 */
-		ObjectPathIsInvalid = 56,
+		ObjectPathIsInvalid = 60,
 		/**
 		 * Size of string is bigger than allowed
 		 */
-		SizeOfStringIsOutOfBounds = 57,
+		SizeOfStringIsOutOfBounds = 61,
 		/**
 		 * A wildcard was found where it shouldn't be present
 	 	 */
-		UnexpectedWildcard = 58,
+		UnexpectedWildcard = 62,
 		/**
 		 * A file type that was expected to be a directory is a file instead
 		 */
-		RepositoryPathLeadsToFile = 59,
+		RepositoryPathLeadsToFile = 63,
 	};
 
 	/**
@@ -410,7 +428,7 @@ public:
 	enum ExecutionCompletionErrorType {
 		UnknownExecutionCompletionError = 0,
 		/**
-		 * Checksum comparison failed
+		 * MemoryManagementChecksum comparison failed
 		 */
 		ChecksumFailed = 1,
 		/**
@@ -490,7 +508,7 @@ public:
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
 	 */
-	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, uint8_t stepID);
+	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepId stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.

@@ -18,8 +18,8 @@ class ECSSServicesRecipe(ConanFile):
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = {"shared": False, "fPIC": True}
+    options = {"shared": [True, False], "fPIC": [True, False], "ecss_config_file_path": ["ANY"]}
+    default_options = {"shared": False, "fPIC": True, "ecss_config_file_path":"inc/Platform/x86/"}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "src/*", "inc/*"
@@ -36,6 +36,9 @@ class ECSSServicesRecipe(ConanFile):
         tc = CMakeToolchain(self)
         if self.settings.arch != 'armv7':
             tc.variables["X86_BUILD"] = True
+            tc.variables["ECSS_CONFIGURATION"]="inc/Platform/x86/"
+        else:
+            tc.variables["ECSS_CONFIGURATION"]=self.options.ecss_config_file_path
         tc.generate()
 
     def build(self):
@@ -58,7 +61,7 @@ class ECSSServicesRecipe(ConanFile):
         self.cpp_info.includedirs = ["inc"]
 
     def requirements(self):
-        self.requires("etl/20.32.1")
+        self.requires("etl/20.37.2")
         self.requires("logger/1.0")
         if self.settings.arch != 'armv7':
             self.requires("catch2/3.3.1")
