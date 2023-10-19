@@ -396,17 +396,13 @@ public:
 		 */
 		ObjectPathIsInvalid = 60,
 		/**
-		 * Size of string is bigger than allowed
-		 */
-		SizeOfStringIsOutOfBounds = 61,
-		/**
 		 * A wildcard was found where it shouldn't be present
 	 	 */
-		UnexpectedWildcard = 62,
+		UnexpectedWildcard = 61,
 		/**
 		 * A file type that was expected to be a directory is a file instead
 		 */
-		RepositoryPathLeadsToFile = 63,
+		RepositoryPathLeadsToFile = 62,
 	};
 
 	/**
