@@ -4,8 +4,9 @@
 #include "Helpers/Filesystem.hpp"
 #include "Message.hpp"
 
+using namespace FilepathValidators;
+
 void FileManagementService::createFile(Message& message) {
-	using namespace FilepathValidators;
 
 	message.assertTC(ServiceType, CreateFile);
 
@@ -59,8 +60,6 @@ void FileManagementService::createFile(Message& message) {
 }
 
 void FileManagementService::deleteFile(Message& message) {
-	using namespace FilepathValidators;
-
 	message.assertTC(ServiceType, DeleteFile);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -104,8 +103,6 @@ void FileManagementService::deleteFile(Message& message) {
 }
 
 void FileManagementService::reportAttributes(Message& message) {
-	using namespace FilepathValidators;
-
 	message.assertTC(ServiceType, ReportAttributes);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
