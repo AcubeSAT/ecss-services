@@ -9,16 +9,11 @@ void FileManagementService::createFile(Message& message) {
 
 	message.assertTC(ServiceType, CreateFile);
 
-	Filesystem::Path repositoryPath("");
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, fileName);
 
-	auto repositoryPathIsValid = getStringUntilTerminator(message);
-	if (not repositoryPathIsValid) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-	repositoryPath = repositoryPathIsValid.value();
-
-	if (findWildcardPosition(repositoryPath)) {
+	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
@@ -35,19 +30,6 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
-	Filesystem::Path fileName("");
-	auto fileNameIsValid = getStringUntilTerminator(message);
-	if (not fileNameIsValid) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-	fileName = fileNameIsValid.value();
-
-	if (findWildcardPosition(fileName)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-		return;
-	}
-
 	uint32_t maxFileSizeBytes = message.readUint32();
 	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
@@ -55,13 +37,6 @@ void FileManagementService::createFile(Message& message) {
 	}
 
 	bool isFileLocked = message.readBoolean();
-
-	if ((repositoryPath.size() + 1 + fileName.size()) > ECSSMaxStringSize) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-
-	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (auto fileCreationError = Filesystem::createFile(fullPath)) {
 		switch (fileCreationError.value()) {
@@ -88,16 +63,11 @@ void FileManagementService::deleteFile(Message& message) {
 
 	message.assertTC(ServiceType, DeleteFile);
 
-	Filesystem::Path repositoryPath("");
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, fileName);
 
-	auto repositoryPathIsValid = getStringUntilTerminator(message);
-	if (not repositoryPathIsValid) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-	repositoryPath = repositoryPathIsValid.value();
-
-	if (findWildcardPosition(repositoryPath)) {
+	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
@@ -113,26 +83,6 @@ void FileManagementService::deleteFile(Message& message) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
 		return;
 	}
-
-	Filesystem::Path fileName("");
-	auto fileNameIsValid = getStringUntilTerminator(message);
-	if (not fileNameIsValid) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-	fileName = fileNameIsValid.value();
-
-	if (findWildcardPosition(fileName)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
-		return;
-	}
-
-	if ((repositoryPath.size() + 1 + fileName.size()) > ECSSMaxStringSize) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-
-	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (auto fileDeletionError = Filesystem::deleteFile(fullPath)) {
 		using Filesystem::FileDeletionError;
@@ -158,27 +108,8 @@ void FileManagementService::reportAttributes(Message& message) {
 
 	message.assertTC(ServiceType, ReportAttributes);
 
-	String<ECSSMaxStringSize> repositoryPath("");
-	auto repositoryPathIsValid = getStringUntilTerminator(message);
-	if (not repositoryPathIsValid) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-	repositoryPath = repositoryPathIsValid.value();
-
-	String<ECSSMaxStringSize> fileName("");
-	auto fileNameIsValid = getStringUntilTerminator(message);
-	if (not fileNameIsValid) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-	fileName = fileNameIsValid.value();
-
-	if ((repositoryPath.size() + 1 + fileName.size()) > ECSSMaxStringSize) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfStringIsOutOfBounds);
-		return;
-	}
-
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath)) {
@@ -206,13 +137,11 @@ void FileManagementService::reportAttributes(Message& message) {
 	}
 }
 
-void FileManagementService::fileAttributeReport(const Path& repositoryPath, const Path& fileName, const Filesystem::Attributes& attributes) {
+void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath, const ObjectPath& fileName, const Filesystem::Attributes& attributes) {
 	Message report = createTM(MessageType::CreateAttributesReport);
 
-	report.appendString(repositoryPath);
-	report.appendUint8(VariableStringTerminator);
-	report.appendString(fileName);
-	report.appendUint8(VariableStringTerminator);
+	report.appendOctetString(repositoryPath);
+	report.appendOctetString(fileName);
 	report.appendUint32(attributes.sizeInBytes);
 	report.appendBoolean(attributes.isLocked);
 

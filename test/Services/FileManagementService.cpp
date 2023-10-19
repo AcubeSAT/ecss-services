@@ -9,6 +9,9 @@
 
 namespace fs = std::filesystem;
 
+// @TODO: Add more tests covering cases where the repository and/or the object path is too long.
+// For more information check https://gitlab.com/acubesat/obc/ecss-services/-/merge_requests/80#note_1610840164
+
 TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	fs::current_path(fs::temp_directory_path());
 	fs::create_directories("st23");
@@ -17,10 +20,9 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
 	String<64> repo1 = "st23";
 	String<64> file1 = "create_file_1";
-	message.appendString(repo1);
-	message.append(FileManagementService::VariableStringTerminator);
-	message.appendString(file1);
-	message.append(FileManagementService::VariableStringTerminator);
+	message.appendOctetString(repo1);
+	message.appendOctetString(file1);
+
 	uint32_t maxFileSizeBytes = 100;
 	message.appendUint32(maxFileSizeBytes);
 	bool isFileLocked = false;
@@ -30,52 +32,19 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	CHECK(ServiceTests::countErrors() == 0);
 	CHECK(fs::exists("st23/create_file_1"));
 
-	// Repository path string is too large
-	Message message2(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC,
-	                 0);
-	String<1024> repo2 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	String<64> file2 = "test2";
-	message2.appendString(repo2);
-	message2.append(FileManagementService::VariableStringTerminator);
-	message2.appendString(file2);
-	message2.append(FileManagementService::VariableStringTerminator);
-	message2.appendUint32(maxFileSizeBytes);
-	message2.appendBoolean(isFileLocked);
-
-	MessageParser::execute(message2);
-	CHECK(ServiceTests::countErrors() == 1);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
-
-	// File name string is too large
-	Message message3(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC,
-	                 0);
-	String<64> repo3 = "test2";
-	String<1024> file3 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	message3.appendString(repo3);
-	message3.append(FileManagementService::VariableStringTerminator);
-	message3.appendString(file3);
-	message3.append(FileManagementService::VariableStringTerminator);
-	message3.appendUint32(maxFileSizeBytes);
-	message3.appendBoolean(isFileLocked);
-
-	MessageParser::execute(message3);
-	CHECK(ServiceTests::countErrors() == 2);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
-
 	// Max file size is too big
 	Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC,
 	                 0);
 	String<64> repo4 = "st23";
 	String<64> file4 = "file2";
-	message4.appendString(repo4);
-	message4.append(FileManagementService::VariableStringTerminator);
-	message4.appendString(file4);
-	message4.append(FileManagementService::VariableStringTerminator);
+	message4.appendOctetString(repo4);
+	message4.appendOctetString(file4);
+
 	message4.appendUint32(FileManagementService::MaxPossibleFileSizeBytes + 10);
 	message4.appendBoolean(isFileLocked);
 
 	MessageParser::execute(message4);
-	CHECK(ServiceTests::countErrors() == 3);
+	CHECK(ServiceTests::countErrors() == 1);
 	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfFileIsOutOfBounds));
 
 	// Repository name has a wildcard
@@ -83,15 +52,14 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	                 0);
 	String<64> repo5 = "test1*";
 	String<64> file5 = "test2";
-	message5.appendString(repo5);
-	message5.append(FileManagementService::VariableStringTerminator);
-	message5.appendString(file5);
-	message5.append(FileManagementService::VariableStringTerminator);
+	message5.appendOctetString(repo5);
+	message5.appendOctetString(file5);
+
 	message5.appendUint32(maxFileSizeBytes);
 	message5.appendBoolean(isFileLocked);
 
 	MessageParser::execute(message5);
-	CHECK(ServiceTests::countErrors() == 4);
+	CHECK(ServiceTests::countErrors() == 2);
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
 
 	// The repository path leads to a file instead of a directory
@@ -101,45 +69,27 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	                 0);
 	String<64> repo6 = "st23/create_file_2";
 	String<64> file6 = "test3";
-	message6.appendString(repo6);
-	message6.append(FileManagementService::VariableStringTerminator);
-	message6.appendString(file6);
-	message6.append(FileManagementService::VariableStringTerminator);
+	message6.appendOctetString(repo6);
+	message6.appendOctetString(file6);
+
 	message6.appendUint32(maxFileSizeBytes);
 	message6.appendBoolean(isFileLocked);
 
 	MessageParser::execute(message6);
-	CHECK(ServiceTests::countErrors() == 5);
+	CHECK(ServiceTests::countErrors() == 3);
 	CHECK(ServiceTests::thrownError(ErrorHandler::RepositoryPathLeadsToFile));
-
-	// Object path string size is too large
-	Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC,
-	                 0);
-	String<1024> repo9 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	String<1024> file9 = "test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2";
-	message9.appendString(repo9);
-	message9.append(FileManagementService::VariableStringTerminator);
-	message9.appendString(file9);
-	message9.append(FileManagementService::VariableStringTerminator);
-	message9.appendUint32(1000);
-
-	MessageParser::execute(message9);
-	CHECK(ServiceTests::countErrors() == 6);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
 
 	// File name has a wildcard
 	Message message10(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC,
 	                  0);
 	String<1024> repo10 = "test1";
 	String<1024> file10 = "test2*";
-	message10.appendString(repo10);
-	message10.append(FileManagementService::VariableStringTerminator);
-	message10.appendString(file10);
-	message10.append(FileManagementService::VariableStringTerminator);
-	message10.appendUint32(1000);
+	message10.appendOctetString(repo10);
+	message10.appendOctetString(file10);
+	message10.appendUint32(maxFileSizeBytes);
 
 	MessageParser::execute(message10);
-	CHECK(ServiceTests::countErrors() == 7);
+	CHECK(ServiceTests::countErrors() == 4);
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
 
 	// File already exists
@@ -147,14 +97,12 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	                  0);
 	String<1024> repo11 = "st23";
 	String<1024> file11 = "create_file_1";
-	message11.appendString(repo11);
-	message11.append(FileManagementService::VariableStringTerminator);
-	message11.appendString(file11);
-	message11.append(FileManagementService::VariableStringTerminator);
-	message11.appendUint32(1000);
+	message11.appendOctetString(repo11);
+	message11.appendOctetString(file11);
+	message11.appendUint32(maxFileSizeBytes);
 
 	MessageParser::execute(message11);
-	CHECK(ServiceTests::countErrors() == 8);
+	CHECK(ServiceTests::countErrors() == 5);
 	CHECK(ServiceTests::thrownError(ErrorHandler::FileAlreadyExists));
 
 	fs::remove_all(fs::temp_directory_path() / "st23");
@@ -170,59 +118,23 @@ TEST_CASE("Delete a file TC[23,2]", "[service][st23]") {
 	Message message(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
 	String<64> repo1 = "st23";
 	String<64> file1 = "file_to_remove_1";
-	message.appendString(repo1);
-	message.append(FileManagementService::VariableStringTerminator);
-	message.appendString(file1);
-	message.append(FileManagementService::VariableStringTerminator);
-	message.appendUint32(100);
+	message.appendOctetString(repo1);
+	message.appendOctetString(file1);
 
 	MessageParser::execute(message);
 	CHECK(ServiceTests::countErrors() == 0);
 	CHECK(fs::exists("st23/file_to_remove_1") == false);
-
-	// Repository path string is too large
-	Message message2(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC,
-	                 0);
-	String<1024> repo2 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	String<64> file2 = "test2";
-	message2.appendString(repo2);
-	message2.append(FileManagementService::VariableStringTerminator);
-	message2.appendString(file2);
-	message2.append(FileManagementService::VariableStringTerminator);
-	message2.appendUint32(100);
-
-	MessageParser::execute(message2);
-	CHECK(ServiceTests::countErrors() == 1);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
-
-	// File name string is too large
-	Message message3(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC,
-	                 0);
-	String<1024> file3 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	String<64> repo3 = "test2";
-	message3.appendString(repo3);
-	message3.append(FileManagementService::VariableStringTerminator);
-	message3.appendString(file3);
-	message3.append(FileManagementService::VariableStringTerminator);
-	message3.appendUint32(100);
-
-	MessageParser::execute(message3);
-	CHECK(ServiceTests::countErrors() == 2);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
 
 	// Repository name has a wildcard
 	Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC,
 	                 0);
 	String<64> repo4 = "test1*";
 	String<64> file4 = "test2";
-	message4.appendString(repo4);
-	message4.append(FileManagementService::VariableStringTerminator);
-	message4.appendString(file4);
-	message4.append(FileManagementService::VariableStringTerminator);
-	message4.appendUint32(1000);
+	message4.appendOctetString(repo4);
+	message4.appendOctetString(file4);
 
 	MessageParser::execute(message4);
-	CHECK(ServiceTests::countErrors() == 3);
+	CHECK(ServiceTests::countErrors() == 1);
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
 
 	// File name has a wildcard
@@ -230,30 +142,12 @@ TEST_CASE("Delete a file TC[23,2]", "[service][st23]") {
 	                 0);
 	String<1024> repo5 = "test1";
 	String<1024> file5 = "test2*";
-	message5.appendString(repo5);
-	message5.append(FileManagementService::VariableStringTerminator);
-	message5.appendString(file5);
-	message5.append(FileManagementService::VariableStringTerminator);
-	message5.appendUint32(1000);
+	message5.appendOctetString(repo5);
+	message5.appendOctetString(file5);
 
 	MessageParser::execute(message5);
-	CHECK(ServiceTests::countErrors() == 4);
+	CHECK(ServiceTests::countErrors() == 2);
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
-
-	// Object path string size is too large
-	Message message6(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC,
-	                 0);
-	String<1024> repo6 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	String<1024> file6 = "test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2";
-	message6.appendString(repo6);
-	message6.append(FileManagementService::VariableStringTerminator);
-	message6.appendString(file6);
-	message6.append(FileManagementService::VariableStringTerminator);
-	message6.appendUint32(1000);
-
-	MessageParser::execute(message6);
-	CHECK(ServiceTests::countErrors() == 5);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
 
 	std::ofstream fileAsRepository(fs::temp_directory_path() / "st23/file_to_remove_2");
 	fileAsRepository.close();
@@ -262,14 +156,11 @@ TEST_CASE("Delete a file TC[23,2]", "[service][st23]") {
 	                 0);
 	String<64> repo9 = "st23/file_to_remove_2";
 	String<64> file9 = "test4";
-	message9.appendString(repo9);
-	message9.append(FileManagementService::VariableStringTerminator);
-	message9.appendString(file9);
-	message9.append(FileManagementService::VariableStringTerminator);
-	message9.appendUint32(1000);
+	message9.appendOctetString(repo9);
+	message9.appendOctetString(file9);
 
 	MessageParser::execute(message9);
-	CHECK(ServiceTests::countErrors() == 6);
+	CHECK(ServiceTests::countErrors() == 3);
 	CHECK(ServiceTests::thrownError(ErrorHandler::RepositoryPathLeadsToFile));
 
 	fs::remove_all(fs::temp_directory_path() / "st23");
@@ -289,54 +180,22 @@ TEST_CASE("Report attributes of a file TC[23,3]", "[service][st23]") {
 	                Message::TC, 0);
 	String<64> repo1 = "st23";
 	String<64> file1 = "file_attribute_1";
-	message.appendString(repo1);
-	message.append(FileManagementService::VariableStringTerminator);
-	message.appendString(file1);
-	message.append(FileManagementService::VariableStringTerminator);
+	message.appendOctetString(repo1);
+	message.appendOctetString(file1);
 
 	MessageParser::execute(message);
 	CHECK(ServiceTests::countErrors() == 0);
-
-	// Repository path string is too large
-	Message message2(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes,
-	                 Message::TC, 0);
-	String<1024> repo2 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	String<64> file2 = "test2";
-	message2.appendString(repo2);
-	message2.append(FileManagementService::VariableStringTerminator);
-	message2.appendString(file2);
-	message2.append(FileManagementService::VariableStringTerminator);
-
-	MessageParser::execute(message2);
-	CHECK(ServiceTests::countErrors() == 1);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
-
-	// File name string is too large
-	Message message3(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes,
-	                 Message::TC, 0);
-	String<64> repo3 = "test2";
-	String<1024> file3 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	message3.appendString(repo3);
-	message3.append(FileManagementService::VariableStringTerminator);
-	message3.appendString(file3);
-	message3.append(FileManagementService::VariableStringTerminator);
-
-	MessageParser::execute(message3);
-	CHECK(ServiceTests::countErrors() == 2);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
 
 	// Repository name has a wildcard
 	Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes,
 	                 Message::TC, 0);
 	String<64> repo4 = "test1*";
 	String<64> file4 = "test2";
-	message4.appendString(repo4);
-	message4.append(FileManagementService::VariableStringTerminator);
-	message4.appendString(file4);
-	message4.append(FileManagementService::VariableStringTerminator);
+	message4.appendOctetString(repo4);
+	message4.appendOctetString(file4);
 
 	MessageParser::execute(message4);
-	CHECK(ServiceTests::countErrors() == 3);
+	CHECK(ServiceTests::countErrors() == 1);
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
 
 	// File name has a wildcard
@@ -344,41 +203,23 @@ TEST_CASE("Report attributes of a file TC[23,3]", "[service][st23]") {
 	                 Message::TC, 0);
 	String<1024> repo5 = "test1";
 	String<1024> file5 = "test2*";
-	message5.appendString(repo5);
-	message5.append(FileManagementService::VariableStringTerminator);
-	message5.appendString(file5);
-	message5.append(FileManagementService::VariableStringTerminator);
+	message5.appendOctetString(repo5);
+	message5.appendOctetString(file5);
 
 	MessageParser::execute(message5);
-	CHECK(ServiceTests::countErrors() == 4);
+	CHECK(ServiceTests::countErrors() == 2);
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
-
-	// Object path string size is too large
-	Message message6(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes,
-	                 Message::TC, 0);
-	String<1024> repo6 = "test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1";
-	String<1024> file6 = "test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2test2";
-	message6.appendString(repo6);
-	message6.append(FileManagementService::VariableStringTerminator);
-	message6.appendString(file6);
-	message6.append(FileManagementService::VariableStringTerminator);
-
-	MessageParser::execute(message6);
-	CHECK(ServiceTests::countErrors() == 5);
-	CHECK(ServiceTests::thrownError(ErrorHandler::SizeOfStringIsOutOfBounds));
 
 	// The object is not existent
 	Message message7(FileManagementService::ServiceType, FileManagementService::MessageType::ReportAttributes,
 	                 Message::TC, 0);
 	String<64> repo7 = "st23";
 	String<64> file7 = "missing_file_1";
-	message7.appendString(repo7);
-	message7.append(FileManagementService::VariableStringTerminator);
-	message7.appendString(file7);
-	message7.append(FileManagementService::VariableStringTerminator);
+	message7.appendOctetString(repo7);
+	message7.appendOctetString(file7);
 
 	MessageParser::execute(message7);
-	CHECK(ServiceTests::countErrors() == 6);
+	CHECK(ServiceTests::countErrors() == 3);
 	CHECK(ServiceTests::thrownError(ErrorHandler::ObjectDoesNotExist));
 
 	// The object's type a directory, not a file
@@ -387,13 +228,11 @@ TEST_CASE("Report attributes of a file TC[23,3]", "[service][st23]") {
 	                 Message::TC, 0);
 	String<64> repo8 = "st23";
 	String<64> file8 = "directory_1";
-	message8.appendString(repo8);
-	message8.append(FileManagementService::VariableStringTerminator);
-	message8.appendString(file8);
-	message8.append(FileManagementService::VariableStringTerminator);
+	message8.appendOctetString(repo8);
+	message8.appendOctetString(file8);
 
 	MessageParser::execute(message8);
-	CHECK(ServiceTests::countErrors() == 7);
+	CHECK(ServiceTests::countErrors() == 4);
 	CHECK(ServiceTests::thrownError(ErrorHandler::AttemptedReportAttributesOnDirectory));
 
 	fs::remove_all(fs::temp_directory_path() / "st23");
@@ -411,10 +250,8 @@ TEST_CASE("File attributes report TM[23,4]", "[service][st23]") {
 	                Message::TC, 0);
 	String<64> repo1 = "st23";
 	String<64> file1 = "report";
-	message.appendString(repo1);
-	message.append(FileManagementService::VariableStringTerminator);
-	message.appendString(file1);
-	message.append(FileManagementService::VariableStringTerminator);
+	message.appendOctetString(repo1);
+	message.appendOctetString(file1);
 
 	MessageParser::execute(message);
 	CHECK(ServiceTests::countErrors() == 0);
@@ -423,18 +260,18 @@ TEST_CASE("File attributes report TM[23,4]", "[service][st23]") {
 	// Checking the contents of the report
 	Message report = ServiceTests::get(0);
 
+	CHECK(report.readUint16() == 4);
 	CHECK(report.readByte() == 's');
 	CHECK(report.readByte() == 't');
 	CHECK(report.readByte() == '2');
 	CHECK(report.readByte() == '3');
-	CHECK(report.readByte() == FileManagementService::VariableStringTerminator);
+	CHECK(report.readUint16() == 6);
 	CHECK(report.readByte() == 'r');
 	CHECK(report.readByte() == 'e');
 	CHECK(report.readByte() == 'p');
 	CHECK(report.readByte() == 'o');
 	CHECK(report.readByte() == 'r');
 	CHECK(report.readByte() == 't');
-	CHECK(report.readByte() == FileManagementService::VariableStringTerminator);
 	CHECK(report.readSint32() == fileContents.size());
 	CHECK(report.readBoolean() == false);
 

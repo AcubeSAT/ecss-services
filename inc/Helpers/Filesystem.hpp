@@ -6,7 +6,15 @@
 #include "etl/result.h"
 
 namespace Filesystem {
-	using Path = String<ECSSMaxStringSize>;
+	constexpr size_t FullPathSize = ECSSMaxStringSize;
+	using Path = String<FullPathSize>;
+
+	/**
+	 * ObjectPathSize is half the maximum size, minus one character for the '/' delimiter between the
+	 * repository and file paths.
+	 */
+	constexpr size_t ObjectPathSize = (FullPathSize / 2) - 1;
+	using ObjectPath = String<ObjectPathSize>;
 
 	/**
 	 * The available metadata for a file
@@ -116,6 +124,16 @@ namespace Filesystem {
 	 * @return A NodeType value
 	 */
 	etl::optional<NodeType> getNodeType(const Path& path);
+
+	/**
+	 * An overloaded function providing support for getNodeType on repository objects.
+	 * @param objectPath A String representing a path on the filesystem
+	 * @return A NodeType value
+	 */
+	inline etl::optional<NodeType> getNodeType(const ObjectPath& objectPath) {
+		Path path = objectPath.data();
+		return getNodeType(path);
+	}
 
 	/**
 	 * Locks a file using the filesystem functions.

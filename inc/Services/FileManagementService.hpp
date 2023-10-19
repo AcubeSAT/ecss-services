@@ -2,8 +2,8 @@
 #define ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
 
 #include "Helpers/Filesystem.hpp"
-#include "etl/string_utilities.h"
 #include "Service.hpp"
+#include "etl/string_utilities.h"
 
 /**
  * Implementation of ST[23] file management service
@@ -28,11 +28,6 @@ public:
      * The wildcard character accepted by the service
      */
 	inline static constexpr char Wildcard = '*';
-
-	/**
-     * Character which denotes the end of a string and the beginning of the next (if there is any)
-     */
-	inline static constexpr char VariableStringTerminator = '\0';
 
 	/**
 	 * The maximum possible size of a file, in bytes.
@@ -101,7 +96,7 @@ public:
 	/**
      * TM[23,4] Create a report with the attributes from a file at the provided object path
      */
-	void fileAttributeReport(const Filesystem::Path& repositoryPath, const Filesystem::Path& fileName, const Filesystem::Attributes& attributes);
+	void fileAttributeReport(const Filesystem::ObjectPath& repositoryPath, const Filesystem::ObjectPath& fileName, const Filesystem::Attributes& attributes);
 
 	/**
      * TC[23,9] Create a directory on the filesystem
@@ -123,17 +118,7 @@ public:
 	void execute(Message& message);
 
 private:
-	inline static constexpr bool LockFileSupport = false;
-	inline static constexpr bool SearchFileSupport = false;
-	inline static constexpr bool SummaryReportSupport = false;
-	inline static constexpr bool MoveFileSupport = true;
-	inline static constexpr bool SuspendFileCopyOperationSupport = false;
-	inline static constexpr bool SuspendAllFileCopyOperationSupport = false;
-	inline static constexpr bool AbortFileCopyOperationSupport = false;
-	inline static constexpr bool AbortAllFileCopyOperationSupport = false;
-	inline static constexpr bool ReportProgressOfCopyOperationsSupport = false;
-	inline static constexpr bool EnablePeriodicReportingOfFileCopyStatusSupport = false;
-
+	using ObjectPath = Filesystem::ObjectPath;
 	using Path = Filesystem::Path;
 
 	/**
@@ -144,13 +129,15 @@ private:
 	 *
 	 * @note All leading and trailing slashes are removed from the repositoryPath and filePath objects.
 	 */
-	inline static Path getFullPath(Path& repositoryPath, Path& filePath) {
+	inline static Path getFullPath(ObjectPath& repositoryPath, ObjectPath& filePath) {
 		etl::trim_from_left(repositoryPath, "/");
 		etl::trim_from_right(repositoryPath, "/");
+
 		etl::trim_from_left(filePath, "/");
 		etl::trim_from_right(filePath, "/");
 
-		Path fullPath = repositoryPath;
+		Path fullPath = ("");
+		fullPath.append(repositoryPath);
 		fullPath.append("/");
 		fullPath.append(filePath);
 		return fullPath;
