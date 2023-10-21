@@ -65,7 +65,7 @@ need to:
   txt changes to include it in the build.
   
 To build, you first have run `conan profile detect --force`, which generates default profile detecting GCC. You 
-  should find where conan stores the profiles, usually it's at `~/.conan/profiles/`. Then, you need to run `cp 
+  should find where conan stores the profiles, usually it's at `~/.conan2/profiles/`. Then, you need to run `cp 
   conan-profile $PROFILE_PATH`, where `$PROFILE_PATH` is the path to the directory that conan stores profiles.
 `conan install . --output-folder=cmake-build-debug --build=missing -u -pr conan-profile`.
 If you're using CLion and don't see `cmake-build-debug`, you have to `Reload CMake project` to have it generated.
