@@ -17,6 +17,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
+#include "Services/FileManagementService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -99,6 +100,9 @@ public:
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
 
+#ifdef SERVICE_FILE_MANAGEMENT
+    FileManagementService fileManagement;
+#endif
 
 	/**
 	 * The default ServicePool constructor
