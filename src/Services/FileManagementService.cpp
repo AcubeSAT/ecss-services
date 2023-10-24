@@ -7,7 +7,6 @@
 using namespace FilepathValidators;
 
 void FileManagementService::createFile(Message& message) {
-
 	message.assertTC(ServiceType, CreateFile);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();

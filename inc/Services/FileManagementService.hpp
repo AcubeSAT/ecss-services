@@ -63,19 +63,21 @@ public:
 
 	/**
      * TC[23,1] Create a file at the provided repository path, give it the provided file name and file size
-     * Checks done prior to creating a file :
+     * Checks done prior to creating a file:
      * - The size of the file is below the maximum allowed file size
      * - The path is valid, meaning it leads to an existing repository
      * - The repository's path and file's name do not contain a wildcard
      * - The file does not already exist
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_DIR)
      * - The object path size is less than ECSSMaxStringSize
+     *
+     * @note Apart from the above checks, the _maximum file size_ telecommand argument is currently ignored.
      */
 	void createFile(Message& message);
 
 	/**
      * TC[23,2] Delete the file at the provided repository path, with the provided file name
-     * Checks done prior to deleting a file :
+     * Checks done prior to deleting a file:
      * - The path is valid, meaning it leads to an existing file
      * - The repository's path and file's name do not contain a wildcard
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
@@ -85,7 +87,7 @@ public:
 
 	/**
      * TC[23,3] Report attributes of a file at the provided repository path and file name
-     * Checks done prior to reporting a file :
+     * Checks done prior to reporting a file:
      * - The path is valid, meaning it leads to an existing file
      * - The repository's path and file's name do not contain a wildcard
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
