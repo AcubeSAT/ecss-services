@@ -121,7 +121,7 @@ namespace Filesystem {
 	/**
 	 * Gets the type of node in the filesystem
 	 * @param path A String representing the path on the filesystem
-	 * @return A NodeType value
+	 * @return A NodeType value, or nothing if the file can't be accessed
 	 */
 	etl::optional<NodeType> getNodeType(const Path& path);
 
