@@ -185,9 +185,6 @@ namespace Filesystem {
 			return FileCreationError::FileAlreadyExists;
 		}
 
-		Path fullPath = "/tmp/";
-		fullPath.append(path);
-
 		std::ofstream file(path.data());
 
 		file.flush();
