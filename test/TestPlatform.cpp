@@ -6,6 +6,8 @@
 #include <Service.hpp>
 #include <catch2/catch_all.hpp>
 #include <cxxabi.h>
+#include <filesystem>
+#include <fstream>
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
@@ -174,5 +176,120 @@ void TimeBasedSchedulingService::notifyNewActivityAddition() {}
 void ParameterStatisticsService::initializeStatisticsMap() {
 	statisticsMap = {};
 }
+
+namespace Filesystem {
+	namespace fs = std::filesystem;
+
+	etl::optional<FileCreationError> createFile(const Path& path) {
+		if (getNodeType(path)) {
+			return FileCreationError::FileAlreadyExists;
+		}
+
+		std::ofstream file(path.data());
+
+		file.flush();
+		file.close();
+
+		return etl::nullopt;
+	}
+
+	etl::optional<FileDeletionError> deleteFile(const Path& path) {
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (not nodeType) {
+			return FileDeletionError::FileDoesNotExist;
+		}
+
+		if (nodeType.value() != NodeType::File) {
+			return FileDeletionError::PathLeadsToDirectory;
+		}
+
+		if (getFileLockStatus(path) == FileLockStatus::Locked) {
+			return FileDeletionError::FileIsLocked;
+		}
+
+		bool successfulFileDeletion = fs::remove(path.data());
+
+		if (successfulFileDeletion) {
+			return etl::nullopt;
+		} else {
+			return FileDeletionError::UnknownError;
+		}
+	}
+
+	etl::optional<NodeType> getNodeType(const Path& path) {
+		switch (fs::status(path.data()).type()) {
+			case fs::file_type::regular:
+				return NodeType::File;
+			case fs::file_type::directory:
+				return NodeType::Directory;
+			default:
+				return etl::nullopt;
+		}
+	}
+
+	FileLockStatus getFileLockStatus(const Path& path) {
+		fs::perms permissions = fs::status(path.data()).permissions();
+
+		if ((permissions & fs::perms::owner_write) == fs::perms::none) {
+			return FileLockStatus::Locked;
+		}
+
+		return FileLockStatus::Unlocked;
+	}
+
+	/**
+	 * Locks a file using POSIX permission operations.
+	 * @param path The path to the file
+	 * @warning If a file is locked, a chmod +w ./file operation will allow the
+	 * current user to modify the file again.
+	 */
+	void lockFile(const Path& path) {
+		fs::perms permissions = fs::status(path.data()).permissions();
+
+		auto newPermissions = permissions & ~fs::perms::owner_write;
+
+		fs::status(path.data()).permissions(newPermissions);
+	}
+
+	/**
+	 * Unlocks a file using POSIX permission operations.
+	 * @param path The path to the file
+	 * @warning If a file is unlocked, a chmod -w ./file operation will stop the
+	 * current user from modifying the file again.
+	 */
+	void unlockFile(const Path& path) {
+		fs::perms permissions = fs::status(path.data()).permissions();
+
+		auto newPermissions = permissions & fs::perms::owner_write;
+
+		fs::status(path.data()).permissions(newPermissions);
+	}
+
+	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
+		Attributes attributes{};
+
+		auto nodeType = getNodeType(path);
+		if (not nodeType) {
+			return FileAttributeError::FileDoesNotExist;
+		}
+
+		if (nodeType.value() != NodeType::File) {
+			return FileAttributeError::PathLeadsToDirectory;
+		}
+
+		attributes.sizeInBytes = fs::file_size(path.data());
+		attributes.isLocked = getFileLockStatus(path) == FileLockStatus::Locked;
+
+		return attributes;
+	}
+
+	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
+		return etl::nullopt;
+	}
+
+	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
+		return etl::nullopt;
+	}
+} // namespace Filesystem
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

@@ -41,6 +41,8 @@ target_sources(common PRIVATE
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMONBase.cpp
         src/Helpers/AllReportTypes.cpp
+        src/Helpers/FilepathValidators.cpp
+        src/Services/FileManagementService.cpp
         )
 
 target_link_libraries(common PRIVATE etl log_common log_x86)

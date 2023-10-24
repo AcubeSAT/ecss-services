@@ -387,6 +387,22 @@ public:
 		 * configuration (ST[14])
 		 */
 		NonExistentApplicationProcess = 58,
+		/**
+         * Size of file is bigger than allowed
+         */
+		SizeOfFileIsOutOfBounds = 59,
+		/**
+		 * Object path is invalid
+		 */
+		ObjectPathIsInvalid = 60,
+		/**
+		 * A wildcard was found where it shouldn't be present
+	 	 */
+		UnexpectedWildcard = 61,
+		/**
+		 * A file type that was expected to be a directory is a file instead
+		 */
+		RepositoryPathLeadsToFile = 62,
 	};
 
 	/**
@@ -415,6 +431,30 @@ public:
 		 * Address of a memory is out of the defined range for the type of memory
 		 */
 		AddressOutOfRange = 2,
+		/**
+         * File already exists, thus can't be created again
+         */
+		FileAlreadyExists = 3,
+		/**
+         * The requested object does not exist
+         */
+		ObjectDoesNotExist = 4,
+		/**
+		 * A delete file command was requested on a file that is locked
+		 */
+		AttemptedDeleteOnLockedFile = 5,
+		/**
+		 * A delete file command was requested on a directory
+		 */
+		AttemptedDeleteOnDirectory = 6,
+		/**
+		 * The filesystem reported an error during file deletion
+		 */
+		UnknownFileDeleteError = 7,
+		/**
+		 * A report file attributes command was requested on a directory
+		 */
+		AttemptedReportAttributesOnDirectory = 8,
 	};
 
 	/**
