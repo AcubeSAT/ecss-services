@@ -5,6 +5,8 @@
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeGetter.hpp"
 
+#define ECSS_CRC_INCLUDED 1
+
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
@@ -15,12 +17,13 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 5);
 	CHECK(message.serviceType == 129);
 	CHECK(message.messageType == 31);
+	CHECK(message.sourceId == 0);
 	CHECK(memcmp(message.data, "hello", 5) == 0);
 }
 
 TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
-	uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81,
-	                          0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+	uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 
+							  0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
 	Message message;
 	message.packetType = Message::TC;
@@ -28,6 +31,7 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.serviceType = 129;
 	message.messageType = 31;
 	message.packetSequenceCount = 8199;
+	message.sourceId = 0;
 	String<5> sourceString = "hello";
 	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
 	message.dataSize = 5;
@@ -64,6 +68,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 7);
 	CHECK(message.serviceType == 22);
 	CHECK(message.messageType == 17);
+	CHECK(message.sourceId == 0);
 	CHECK(memcmp(message.data, "hellohi", 7) == 0);
 
 	// Add ECSS and CCSDS header
@@ -74,8 +79,8 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 }
 
 TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
-	uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
-	                          0x11,0x00, 0x00,0x00, 0x02,0x00, 0x00,0x00,
+	uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x12, 0x20, 0x16,
+	                          0x11,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00,
 	                          0x00, 0x68,0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
 	TimeStamps time = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
 	wantedPacket[13] = (time >> 24) & 0xFF;
@@ -89,6 +94,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 77;
 	message.serviceType = 22;
 	message.messageType = 17;
+	message.sourceId = 0;
 	String<7> sourceString = "hellohi";
 	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
 	message.dataSize = 7;
