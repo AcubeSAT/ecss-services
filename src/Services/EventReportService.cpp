@@ -1,8 +1,8 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTREPORT
 
-#include <Services/EventReportService.hpp>
 #include <Services/EventActionService.hpp>
+#include <Services/EventReportService.hpp>
 #include "Message.hpp"
 
 /**
@@ -22,8 +22,7 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 	}
 }
 
-void
-EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	lowSeverityEventCount++;
 	// TM[5,2]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -39,8 +38,7 @@ EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSSEve
 	}
 }
 
-void
-EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	mediumSeverityEventCount++;
 	// TM[5,3]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -56,8 +54,7 @@ EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSS
 	}
 }
 
-void
-EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+void EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	highSeverityEventCount++;
 	// TM[5,4]
 	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
@@ -75,19 +72,17 @@ EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEv
 
 void EventReportService::enableReportGeneration(Message message) {
 	// TC[5,5]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents);
+	if (!message.assertTC(ServiceType, MessageType::EnableReportGenerationOfEvents)) {
+		return;
+	}
 
 	/**
 	 * @todo: Report an error if length > numberOfEvents
 	 */
 	uint16_t length = message.readUint16();
-	Event eventID[length];
-	for (uint16_t i = 0; i < length; i++) {
-		eventID[i] = static_cast<Event>(message.readEnum16());
-	}
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[static_cast<uint16_t>(eventID[i])] = true;
+			stateOfEvents[message.readEnum16()] = true;
 		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
@@ -95,19 +90,17 @@ void EventReportService::enableReportGeneration(Message message) {
 
 void EventReportService::disableReportGeneration(Message message) {
 	// TC[5,6]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents);
+	if (!message.assertTC(ServiceType, MessageType::DisableReportGenerationOfEvents)) {
+		return;
+	}
 
 	/**
 	 * @todo: Report an error if length > numberOfEvents
 	 */
 	uint16_t length = message.readUint16();
-	Event eventID[length];
-	for (uint16_t i = 0; i < length; i++) {
-		eventID[i] = static_cast<Event>(message.readEnum16());
-	}
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[static_cast<uint16_t>(eventID[i])] = false;
+			stateOfEvents[message.readEnum16()] = false;
 		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
@@ -115,7 +108,9 @@ void EventReportService::disableReportGeneration(Message message) {
 
 void EventReportService::requestListOfDisabledEvents(Message message) {
 	// TC[5,7]
-	message.assertTC(EventReportService::ServiceType, EventReportService::MessageType::ReportListOfDisabledEvents);
+	if (!message.assertTC(ServiceType, MessageType::ReportListOfDisabledEvents)) {
+		return;
+	}
 
 	listOfDisabledEventsReport();
 }

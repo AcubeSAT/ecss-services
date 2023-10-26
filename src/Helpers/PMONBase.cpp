@@ -3,7 +3,5 @@
 
 
 PMONBase::PMONBase(uint16_t monitoredParameterId, uint16_t repetitionNumber)
-    : monitoredParameter(monitoredParameter), monitoredParameterId(monitoredParameterId),
-      repetitionNumber(repetitionNumber) {
-	monitoredParameter = Services.parameterManagement.getParameter(monitoredParameterId)->get();
-}
+    : monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId)->get()), monitoredParameterId(monitoredParameterId),
+      repetitionNumber(repetitionNumber) {}

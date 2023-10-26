@@ -212,7 +212,9 @@ public:
 		ChangeVirtualChannel = 28
 	};
 
-	StorageAndRetrievalService() = default;
+	StorageAndRetrievalService() {
+		serviceType = ServiceType;
+	}
 
 	/**
 	 * The packet selection sub-service of the Storage and Retrieval service.

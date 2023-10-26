@@ -40,6 +40,11 @@ public:
 		ReportStatusOfParameterMonitoringDefinition = 13,
 		ParameterMonitoringDefinitionStatusReport = 14
 	};
+
+	OnBoardMonitoringService() {
+		serviceType = ServiceType;
+	}
+
 	/**
 	 * The maximum time between two transition reports.
 	 * Measured in "on-board parameter minimum sampling interval" units (see 5.4.3.2c in ECSS-E-ST-70-41C).

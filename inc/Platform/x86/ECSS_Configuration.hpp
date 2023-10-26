@@ -10,7 +10,7 @@
  */
 
 /**
- * @defgroup ServiceDefinitions Service compilation switches
+ * @name ServiceDefinitions Service compilation switches
  * These preprocessor defines control whether the compilation of each ECSS service is enabled. By not defining one of
  * those, the service will not be compiled, and no RAM or ROM will be spent storing it.
  *
@@ -18,7 +18,8 @@
  * @{
  */
 
-#define SERVICE_ALL                       ///< Enables compilation of all the ECSS services
+#define SERVICE_ALL                       ///<  Enables compilation of all the ECSS services
+#define SERVICE_DUMMY                     ///<  Compile ST[128] dummy service
 #define SERVICE_EVENTACTION               ///<  Compile ST[19] event-action
 #define SERVICE_EVENTREPORT               ///<  Compile ST[05] event reporting
 #define SERVICE_FUNCTION                  ///<  Compile ST[08] function management

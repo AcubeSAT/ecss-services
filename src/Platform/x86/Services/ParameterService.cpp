@@ -1,8 +1,8 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_PARAMETER
 
-#include "Services/ParameterService.hpp"
 #include "Parameters/PlatformParameters.hpp"
+#include "Services/ParameterService.hpp"
 
 void ParameterService::initializeParameterMap() {
 	parameters = {{static_cast<uint16_t>(0), PlatformParameters::parameter1},

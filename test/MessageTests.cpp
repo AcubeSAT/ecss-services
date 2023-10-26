@@ -94,15 +94,13 @@ TEST_CASE("Requirement 7.3.3 (Enumerated)", "[message][ecss]") {
 TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 	Message message(0, 0, Message::TC, 0);
 
-	message.append<char>(110);
 	message.append<uint8_t>(230);
 	message.append<uint16_t>(15933);
 	message.append<uint32_t>(2000001);
 	message.append<uint64_t>(12446744073709551615ULL);
 
-	REQUIRE(message.dataSize == 1 + 1 + 2 + 4 + 8);
+	REQUIRE(message.dataSize == 1 + 2 + 4 + 8);
 
-	CHECK(message.read<char>() == 110);
 	CHECK(message.read<uint8_t>() == 230);
 	CHECK(message.read<uint16_t>() == 15933);
 	CHECK(message.read<uint32_t>() == 2000001);
@@ -115,8 +113,8 @@ TEST_CASE("Requirement 7.3.4 (Unsigned integer)", "[message][ecss]") {
 		 * processors store data in little endian format. As a result, special care needs to be
 		 * taken for compliance.
 		 */
-		CHECK(message.data[2] == 0x3e);
-		CHECK(message.data[3] == 0x3d);
+		CHECK(message.data[1] == 0x3e);
+		CHECK(message.data[2] == 0x3d);
 	}
 }
 
@@ -164,6 +162,53 @@ TEST_CASE("Test appending double") {
 	REQUIRE(message.dataSize == 8);
 
 	CHECK(message.read<double>() == Catch::Approx(2.324).epsilon(0.0001));
+}
+
+TEST_CASE("Test appending offset") {
+	Message message(0, 0, Message::TC, 0);
+	message.append<Time::RelativeTime>(555);
+
+	REQUIRE(message.dataSize == 8);
+
+	CHECK(message.read<Time::RelativeTime>() == 555);
+}
+
+TEST_CASE("Test appending a CUC timestamp") {
+	using namespace Time;
+
+	SECTION("Test 1") {
+		auto timeCUC = TimeGetter::getCurrentTimeDefaultCUC();
+		REQUIRE(timeCUC.formatAsBytes() == 86769000);
+
+		Message message(0, 0, Message::TC, 0);
+		message.appendDefaultCUCTimeStamp(timeCUC);
+
+		REQUIRE(message.readUint32() == 86769000);
+	}
+
+	SECTION("Test 2") {
+		DefaultCUC timeCUC(34511_t);
+
+		Message message(0, 0, Message::TC, 0);
+		message.appendDefaultCUCTimeStamp(timeCUC);
+
+		REQUIRE(message.readUint32() == 34511);
+	}
+}
+
+TEST_CASE("Test reading a custom CUC timestamp") {
+	using namespace Time;
+	/**
+ 	* Append a custom CUC Time Stamp to a message object and check if is it read corretly
+ 	*/
+	DefaultCUC timeCUC(34511_t);
+
+	Message message(0, 0, Message::TC, 0);
+	message.appendDefaultCUCTimeStamp(timeCUC);
+
+	auto returnTimeCUC = message.readDefaultCUCTimeStamp();
+
+	REQUIRE(returnTimeCUC.formatAsBytes() == 34511);
 }
 
 TEST_CASE("Requirement 7.3.8 (Octet-string)", "[message][ecss]") {
@@ -348,5 +393,66 @@ TEST_CASE("Packet sequence counter", "[message]") {
 		Message message2(0, 3, Message::TM, 0);
 		message2.finalize();
 		CHECK(message2.packetSequenceCount == 0);
+	}
+}
+
+TEST_CASE("Storing and retrieving enums in Messages") {
+	enum ActiveBus : uint8_t {
+		Main = 0x0,
+		Redundant = 0x1
+	};
+
+	SECTION("Using Enums in parameters") {
+		auto parameter1 = Parameter<ActiveBus>(Redundant);
+		auto parameter2 = Parameter<ActiveBus>(Main);
+		Message message;
+
+		parameter1.appendValueToMessage(message);
+		parameter2.setValueFromMessage(message);
+
+		CHECK(parameter1.getValue() == parameter2.getValue());
+	}
+
+	SECTION("Using Enums in variables") {
+		ActiveBus variable1 = Redundant;
+		ActiveBus variable2 = Main;
+		Message message;
+
+		message.append(variable1);
+		variable2 = message.read<ActiveBus>();
+
+		CHECK(variable1 == variable2);
+	}
+
+	SECTION("Another type of enum") {
+		enum Numbers : uint64_t {
+			First = 1577829600,
+			Second = 1667045679
+		};
+
+		auto parameter1 = Parameter<Numbers>(First);
+		auto parameter2 = Parameter<Numbers>(Second);
+		Message message;
+
+		parameter1.appendValueToMessage(message);
+		parameter2.setValueFromMessage(message);
+
+		CHECK(parameter1.getValue() == parameter2.getValue());
+	}
+
+		SECTION("Another type of enum") {
+		enum MemoryPartitionUsed : bool {
+			first = false,
+			second = true
+		};
+
+		auto parameter3 = Parameter<MemoryPartitionUsed>(first);
+		auto parameter4 = Parameter<MemoryPartitionUsed>(second);
+		Message message;
+
+		parameter3.appendValueToMessage(message);
+		parameter4.setValueFromMessage(message);
+
+		CHECK(parameter3.getValue() == parameter4.getValue());
 	}
 }

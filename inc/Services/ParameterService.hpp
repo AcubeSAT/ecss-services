@@ -3,9 +3,9 @@
 
 #include <optional>
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
+#include "Service.hpp"
 #include "etl/map.h"
 
 /**
@@ -57,6 +57,7 @@ public:
 	 * by calling \fn initializeParametersArray
 	 */
 	ParameterService() {
+		serviceType = ServiceType;
 		initializeParameterMap();
 	}
 
@@ -104,7 +105,7 @@ public:
 	 *
 	 * @param newParamValues: a valid TC[20, 3] message carrying parameter ID and replacement value
 	 */
-	void setParameters(Message& newParamValues);
+	void setParameters(Message& newParamValues) const;
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

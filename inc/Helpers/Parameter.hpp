@@ -32,8 +32,22 @@
  */
 class ParameterBase {
 public:
+	/**
+	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that parameter
+	 */
 	virtual void appendValueToMessage(Message& message) = 0;
+
+	/**
+	 * Appends the parameter as an ECSS value to an ECSS Message
+	 */
 	virtual void setValueFromMessage(Message& message) = 0;
+
+	/**
+	 * Converts the value of a parameter to a double.
+	 *
+	 * Some precision may be lost in the process. If the value is not arithmetic,
+	 * then usually 0 is returned.
+	 */
 	virtual double getValueAsDouble() = 0;
 };
 
@@ -44,7 +58,7 @@ public:
  */
 template <typename DataType>
 class Parameter : public ParameterBase {
-private:
+protected:
 	DataType currentValue;
 
 public:
@@ -59,19 +73,17 @@ public:
 	}
 
 	inline double getValueAsDouble() override {
-		return static_cast<double>(currentValue);
+		if constexpr (std::is_arithmetic_v<DataType>) {
+			return static_cast<double>(currentValue);
+		} else {
+			return 0;
+		}
 	}
 
-	/**
-	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that paremeter
-	 */
 	inline void setValueFromMessage(Message& message) override {
 		currentValue = message.read<DataType>();
 	};
 
-	/**
-	 * Appends the parameter as an ECSS value to an ECSS Message
-	 */
 	inline void appendValueToMessage(Message& message) override {
 		message.append<DataType>(currentValue);
 	};

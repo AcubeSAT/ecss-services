@@ -131,3 +131,48 @@ bool UTCTimestamp::operator<=(const UTCTimestamp& Date) const {
 bool UTCTimestamp::operator>=(const UTCTimestamp& Date) const {
 	return ((*this > Date) || (*this == Date));
 }
+void UTCTimestamp::repair() {
+	using namespace Time;
+
+	if (second > Time::SecondsPerMinute) {
+		second -= Time::SecondsPerMinute;
+		minute++;
+	}
+
+	const auto MinutesPerHour = SecondsPerHour / SecondsPerMinute;
+	if (minute >= MinutesPerHour) {
+		minute -= MinutesPerHour;
+		hour++;
+	}
+
+	const auto HoursPerDay = SecondsPerDay / SecondsPerHour;
+	if (hour >= HoursPerDay) {
+		hour -= HoursPerDay;
+		day++;
+	}
+
+	if (day > daysOfMonth()) {
+		day -= daysOfMonth();
+		month++;
+	}
+
+	if (month > MonthsPerYear) {
+		month -= MonthsPerYear;
+		year++;
+	}
+}
+
+template <>
+void convertValueToString(String<LOGGER_MAX_MESSAGE_SIZE>& message, UTCTimestamp& value){
+	etl::to_string(value.hour, message, true);
+	message += "-";
+	etl::to_string(value.minute, message, true);
+	message += "-";
+	etl::to_string(value.second, message, true);
+	message += " -- ";
+	etl::to_string(value.day, message, true);
+	message += "/";
+	etl::to_string(value.month, message, true);
+	message += "/";
+	etl::to_string(value.year, message, true);
+}
