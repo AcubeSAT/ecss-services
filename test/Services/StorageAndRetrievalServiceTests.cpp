@@ -6,17 +6,17 @@
 
 StorageAndRetrievalService& storageAndRetrieval = Services.storageAndRetrieval;
 
-uint32_t timestamps1[6] = {2, 4, 5, 7, 9, 11};
-uint32_t timestamps2[5] = {0, 1, 4, 15, 22};
-uint32_t timestamps3[4] = {4, 7, 9, 14};
-uint32_t timestamps4[8] = {4, 6, 34, 40, 44, 51, 52, 58};
+TimeStamps timestamps1[6] = {2, 4, 5, 7, 9, 11};
+TimeStamps timestamps2[5] = {0, 1, 4, 15, 22};
+TimeStamps timestamps3[4] = {4, 7, 9, 14};
+TimeStamps timestamps4[8] = {4, 6, 34, 40, 44, 51, 52, 58};
 
 void initializePacketStores() {
-	uint16_t numOfPacketStores = 4;
+	NumOfPacketStores numOfPacketStores = 4;
 	uint8_t concatenatedPacketStoreNames[] = "ps2ps25ps799ps5555";
 	uint16_t offsets[5] = {0, 3, 7, 12, 18};
-	uint16_t sizes[4] = {100, 200, 550, 340};
-	uint8_t virtualChannels[4] = {4, 6, 1, 2};
+	PacketStoreSize sizes[4] = {100, 200, 550, 340};
+	VirtualChannel virtualChannels[4] = {4, 6, 1, 2};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSPacketStoreIdSize];
@@ -34,13 +34,13 @@ void initializePacketStores() {
 }
 
 void validPacketStoreCreationRequest(Message& request) {
-	uint16_t numOfPacketStores = 4;
+	NumOfPacketStores numOfPacketStores = 4;
 	request.appendUint16(numOfPacketStores);
 	uint8_t concatenatedPacketStoreNames[] = "ps2ps25ps799ps5555";
 	uint16_t offsets[5] = {0, 3, 7, 12, 18};
-	uint16_t sizes[4] = {100, 200, 550, 340};
-	uint8_t virtualChannels[4] = {4, 6, 1, 2};
-	uint8_t packetStoreTypeCode[2] = {0, 1};
+	PacketStoreSize sizes[4] = {100, 200, 550, 340};
+	VirtualChannel virtualChannels[4] = {4, 6, 1, 2};
+	PacketStoreType packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSPacketStoreIdSize];
@@ -50,26 +50,26 @@ void validPacketStoreCreationRequest(Message& request) {
 
 		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
-		request.appendUint16(sizes[i]);
+		request.append<PacketStoreSize>(sizes[i]);
 		if ((i % 2) == 0) {
-			request.appendUint8(packetStoreTypeCode[0]);
+			request.append<PacketStoreType>(packetStoreTypeCode[0]);
 		} else {
-			request.appendUint8(packetStoreTypeCode[1]);
+			request.append<PacketStoreType>(packetStoreTypeCode[1]);
 		}
-		request.appendUint8(virtualChannels[i]);
+		request.append<VirtualChannel>(virtualChannels[i]);
 	}
 }
 
 void invalidPacketStoreCreationRequest(Message& request) {
-	uint16_t numOfPacketStores = 5;
+	NumOfPacketStores numOfPacketStores = 5;
 	request.appendUint16(numOfPacketStores);
 	uint8_t concatenatedPacketStoreNames[] = "ps2ps1ps2ps44ps0000";
 	uint16_t offsets[6] = {0, 3, 6, 9, 13, 19};
-	uint16_t sizes[5] = {33, 55, 66, 77, 99};
-	uint8_t invalidChannel1 = VirtualChannelLimits.min - 1;
-	uint8_t invalidChannel2 = VirtualChannelLimits.max + 1;
-	uint8_t virtualChannels[5] = {5, invalidChannel1, 1, invalidChannel2, 2};
-	uint8_t packetStoreTypeCode[2] = {0, 1};
+	PacketStoreSize sizes[5] = {33, 55, 66, 77, 99};
+	VirtualChannel invalidChannel1 = VirtualChannelLimits.min - 1;
+	VirtualChannel invalidChannel2 = VirtualChannelLimits.max + 1;
+	VirtualChannel virtualChannels[5] = {5, invalidChannel1, 1, invalidChannel2, 2};
+	PacketStoreType packetStoreTypeCode[2] = {0, 1};
 
 	for (int i = 0; i < numOfPacketStores; i++) {
 		uint8_t packetStoreData[ECSSPacketStoreIdSize];
@@ -79,13 +79,13 @@ void invalidPacketStoreCreationRequest(Message& request) {
 
 		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
-		request.appendUint16(sizes[i]);
+		request.append<PacketStoreSize>(sizes[i]);
 		if ((i % 2) == 0) {
-			request.appendUint8(packetStoreTypeCode[0]);
+			request.append<PacketStoreType>(packetStoreTypeCode[0]);
 		} else {
-			request.appendUint8(packetStoreTypeCode[1]);
+			request.append<PacketStoreType>(packetStoreTypeCode[1]);
 		}
-		request.appendUint8(virtualChannels[i]);
+		request.append<VirtualChannel>(virtualChannels[i]);
 	}
 }
 
@@ -239,7 +239,7 @@ TEST_CASE("Deleting packet stores") {
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStores, Message::TC, 1);
-		uint16_t numOfPacketStores = 4;
+		NumOfPacketStores numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -267,7 +267,7 @@ TEST_CASE("Deleting packet stores") {
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStores, Message::TC, 1);
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -294,7 +294,7 @@ TEST_CASE("Deleting packet stores") {
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStores, Message::TC, 1);
-		uint16_t numOfPacketStores = 4;
+		NumOfPacketStores numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -329,7 +329,7 @@ TEST_CASE("Deleting packet stores") {
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStores, Message::TC, 1);
-		uint16_t numOfPacketStores = 4;
+		NumOfPacketStores numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -355,7 +355,7 @@ TEST_CASE("Deleting packet stores") {
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStores, Message::TC, 1);
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -391,7 +391,7 @@ TEST_CASE("Deleting packet stores") {
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStores, Message::TC, 1);
-		uint16_t numOfPacketStores = 8;
+		NumOfPacketStores numOfPacketStores = 8;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: correctPacketStoreIds) {
@@ -435,7 +435,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::EnableStorageInPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 2;
+		NumOfPacketStores numOfPacketStores = 2;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			REQUIRE(storageAndRetrieval.packetStoreExists(packetStoreIds[i]));
@@ -466,7 +466,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::EnableStorageInPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreIds[i]));
@@ -492,7 +492,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::EnableStorageInPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		MessageParser::execute(request);
@@ -517,7 +517,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DisableStorageInPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 2;
+		NumOfPacketStores numOfPacketStores = 2;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			storageAndRetrieval.getPacketStore(packetStoreIds[i]).storageStatus = true;
@@ -547,7 +547,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DisableStorageInPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreIds[i]));
@@ -572,7 +572,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DisableStorageInPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		MessageParser::execute(request);
@@ -597,9 +597,9 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		uint32_t startTimeTag = 200;
-		uint16_t numOfPacketStores = 2;
-		request.appendUint32(startTimeTag);
+		TimeStamps startTimeTag = 200;
+		NumOfPacketStores numOfPacketStores = 2;
+		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -630,9 +630,9 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		uint32_t startTimeTag = 200;
-		uint16_t numOfPacketStores = 6;
-		request.appendUint32(startTimeTag);
+		TimeStamps startTimeTag = 200;
+		NumOfPacketStores numOfPacketStores = 6;
+		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
@@ -672,9 +672,9 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		uint32_t startTimeTag = 200;
-		uint16_t numOfPacketStores = 0;
-		request.appendUint32(startTimeTag);
+		TimeStamps startTimeTag = 200;
+		NumOfPacketStores numOfPacketStores = 0;
+		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -709,7 +709,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
@@ -739,7 +739,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 6;
+		NumOfPacketStores numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
@@ -784,7 +784,7 @@ TEST_CASE("Resuming the open retrieval process") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -819,7 +819,7 @@ TEST_CASE("Suspending the open retrieval process") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
@@ -848,7 +848,7 @@ TEST_CASE("Suspending the open retrieval process") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 6;
+		NumOfPacketStores numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
@@ -891,7 +891,7 @@ TEST_CASE("Suspending the open retrieval process") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -923,21 +923,21 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		uint32_t timeTags1[4] = {20, 30, 40, 50};
-		uint32_t timeTags2[4] = {60, 70, 80, 90};
+		TimeStamps timeTags1[4] = {20, 30, 40, 50};
+		TimeStamps timeTags2[4] = {60, 70, 80, 90};
 
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
-			uint32_t timeTag1 = timeTags1[index];
-			uint32_t timeTag2 = timeTags2[index++];
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			TimeStamps timeTag1 = timeTags1[index];
+			TimeStamps timeTag2 = timeTags2[index++];
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -968,7 +968,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 6;
+		NumOfPacketStores numOfPacketStores = 6;
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
@@ -978,10 +978,10 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
 
 			request.appendString(packetStoreId);
-			uint32_t timeTag1 = 20;
-			uint32_t timeTag2 = 40;
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			TimeStamps timeTag1 = 20;
+			TimeStamps timeTag2 = 40;
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus = false;
 
@@ -989,10 +989,10 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
-			uint32_t timeTag1 = 20;
-			uint32_t timeTag2 = 40;
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			TimeStamps timeTag1 = 20;
+			TimeStamps timeTag2 = 40;
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -1024,17 +1024,17 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
-			uint32_t timeTag1 = 90;
-			uint32_t timeTag2 = 20;
-			request.appendUint32(timeTag1);
-			request.appendUint32(timeTag2);
+			TimeStamps timeTag1 = 90;
+			TimeStamps timeTag2 = 20;
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -1066,7 +1066,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::AbortByTimeRangeRetrieval, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -1097,7 +1097,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::AbortByTimeRangeRetrieval, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: correctPacketStoreIds) {
@@ -1131,7 +1131,7 @@ TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::AbortByTimeRangeRetrieval, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
@@ -1249,27 +1249,27 @@ TEST_CASE("Reporting the configuration of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData)));
-		CHECK(report.readUint16() == 100);
-		CHECK(report.readUint8() == 0);
-		CHECK(report.readUint8() == 4);
+		CHECK(report.read<PacketStoreSize>() == 100);
+		CHECK(report.read<PacketStoreType>() == 0);
+		CHECK(report.read<VirtualChannel>() == 4);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData2)));
-		CHECK(report.readUint16() == 200);
-		CHECK(report.readUint8() == 1);
-		CHECK(report.readUint8() == 6);
+		CHECK(report.read<PacketStoreSize>() == 200);
+		CHECK(report.read<PacketStoreType>() == 1);
+		CHECK(report.read<VirtualChannel>() == 6);
 		// Packet store 3
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData4)));
-		CHECK(report.readUint16() == 340);
-		CHECK(report.readUint8() == 1);
-		CHECK(report.readUint8() == 2);
+		CHECK(report.read<PacketStoreSize>() == 340);
+		CHECK(report.read<PacketStoreType>() == 1);
+		CHECK(report.read<VirtualChannel>() == 2);
 		// Packet store 4
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(data), std::end(data), std::begin(packetStoreData3)));
-		CHECK(report.readUint16() == 550);
-		CHECK(report.readUint8() == 0);
-		CHECK(report.readUint8() == 1);
+		CHECK(report.read<PacketStoreSize>() == 550);
+		CHECK(report.read<PacketStoreType>() == 0);
+		CHECK(report.read<VirtualChannel>() == 1);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1283,12 +1283,12 @@ TEST_CASE("Resizing the packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint16_t newSizes[4] = {11, 22, 33, 44};
+		PacketStoreSize newSizes[4] = {11, 22, 33, 44};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
@@ -1298,7 +1298,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.byTimeRangeRetrievalStatus = false;
 
 			request.appendString(packetStoreId);
-			request.appendUint16(newSizes[index]);
+			request.append<PacketStoreSize>(newSizes[index]);
 			index++;
 		}
 
@@ -1320,12 +1320,12 @@ TEST_CASE("Resizing the packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint16_t oldSizes[4] = {100, 200, 550, 340};
+		PacketStoreSize oldSizes[4] = {100, 200, 550, 340};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 4;
+		NumOfPacketStores numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
@@ -1335,7 +1335,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.openRetrievalStatus = (index == 3) ? PacketStore::InProgress : PacketStore::Suspended;
 
 			request.appendString(packetStoreId);
-			request.appendUint16(35);
+			request.append<PacketStoreSize>(35);
 			index++;
 		}
 
@@ -1361,12 +1361,12 @@ TEST_CASE("Resizing the packet stores") {
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
 
-		uint16_t newSizes[4] = {1000, 2000, 3400, 5500};
+		PacketStoreSize newSizes[4] = {1000, 2000, 3400, 5500};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 4;
+		NumOfPacketStores numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
@@ -1376,7 +1376,7 @@ TEST_CASE("Resizing the packet stores") {
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 
 			request.appendString(packetStoreId);
-			request.appendUint16(newSizes[index++]);
+			request.append<PacketStoreSize>(newSizes[index++]);
 		}
 
 		MessageParser::execute(request);
@@ -1395,16 +1395,16 @@ TEST_CASE("Resizing the packet stores") {
 		auto correctPacketStoreIds = validPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		uint16_t oldSizes[4] = {100, 200, 550, 340};
+		PacketStoreSize oldSizes[4] = {100, 200, 550, 340};
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResizePacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 4;
+		NumOfPacketStores numOfPacketStores = 4;
 		request.appendUint16(numOfPacketStores);
 		for (auto& packetStoreId: wrongPacketStoreIds) {
 			request.appendString(packetStoreId);
-			request.appendUint16(35);
+			request.append<PacketStoreSize>(35);
 		}
 
 		MessageParser::execute(request);
@@ -1616,7 +1616,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		                StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
 		request.appendString(packetStoreIds[0]);
-		request.appendUint8(virtualChannels[0]);
+		request.append<VirtualChannel>(virtualChannels[0]);
 
 		MessageParser::execute(request);
 
@@ -1630,7 +1630,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		                 StorageAndRetrievalService::MessageType::ChangeVirtualChannel, Message::TC, 1);
 
 		request2.appendString(packetStoreIds[3]);
-		request2.appendUint8(virtualChannels[1]);
+		request2.append<VirtualChannel>(virtualChannels[1]);
 
 		MessageParser::execute(request2);
 
@@ -1651,7 +1651,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		uint8_t oldVirtualChannels[4] = {4, 6, 1, 2};
+		VirtualChannel oldVirtualChannels[4] = {4, 6, 1, 2};
 
 		int count = 0;
 		for (auto& packetStoreId: correctPacketStoreIds) {
@@ -1704,7 +1704,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 2;
+		NumOfPacketStores numOfPacketStores = 2;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			storageAndRetrieval.getPacketStore(packetStoreIds[i]).openRetrievalStartTimeTag = 5;
@@ -1725,19 +1725,19 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0]);
-		CHECK(report.readUint32() == timestamps1[5]);
+		CHECK(report.read<TimeStamps>() == timestamps1[0]);
+		CHECK(report.read<TimeStamps>() == timestamps1[5]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 60);
-		CHECK(report.readUint16() == 40);
+		CHECK(report.read<PercentageFilled>() == 60);
+		CHECK(report.read<PercentageFilled>() == 40);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.readUint32() == timestamps2[0]);
-		CHECK(report.readUint32() == timestamps2[4]);
+		CHECK(report.read<TimeStamps>() == timestamps2[0]);
+		CHECK(report.read<TimeStamps>() == timestamps2[4]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 50);
-		CHECK(report.readUint16() == 20);
+		CHECK(report.read<PercentageFilled>() == 50);
+		CHECK(report.read<PercentageFilled>() == 20);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1765,7 +1765,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 0;
+		NumOfPacketStores numOfPacketStores = 0;
 		request.appendUint16(numOfPacketStores);
 
 		MessageParser::execute(request);
@@ -1779,35 +1779,35 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0]);
-		CHECK(report.readUint32() == timestamps1[5]);
+		CHECK(report.read<TimeStamps>() == timestamps1[0]);
+		CHECK(report.read<TimeStamps>() == timestamps1[5]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 60);
-		CHECK(report.readUint16() == 0);
+		CHECK(report.read<PercentageFilled>() == 60);
+		CHECK(report.read<PercentageFilled>() == 0);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.readUint32() == timestamps2[0]);
-		CHECK(report.readUint32() == timestamps2[4]);
+		CHECK(report.read<TimeStamps>() == timestamps2[0]);
+		CHECK(report.read<TimeStamps>() == timestamps2[4]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 50);
-		CHECK(report.readUint16() == 20);
+		CHECK(report.read<PercentageFilled>() == 50);
+		CHECK(report.read<PercentageFilled>() == 20);
 		// Packet store 3
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
-		CHECK(report.readUint32() == timestamps4[0]);
-		CHECK(report.readUint32() == timestamps4[7]);
+		CHECK(report.read<TimeStamps>() == timestamps4[0]);
+		CHECK(report.read<TimeStamps>() == timestamps4[7]);
 		CHECK(report.readUint32() == 20);
-		CHECK(report.readUint16() == 80);
-		CHECK(report.readUint16() == 60);
+		CHECK(report.read<PercentageFilled>() == 80);
+		CHECK(report.read<PercentageFilled>() == 60);
 		// Packet store 4
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
-		CHECK(report.readUint32() == timestamps3[0]);
-		CHECK(report.readUint32() == timestamps3[3]);
+		CHECK(report.read<TimeStamps>() == timestamps3[0]);
+		CHECK(report.read<TimeStamps>() == timestamps3[3]);
 		CHECK(report.readUint32() == 15);
-		CHECK(report.readUint16() == 40);
-		CHECK(report.readUint16() == 0);
+		CHECK(report.read<PercentageFilled>() == 40);
+		CHECK(report.read<PercentageFilled>() == 0);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1830,7 +1830,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
 
-		uint16_t numOfPacketStores = 3;
+		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			request.appendString(finalIds[i]);
@@ -1854,8 +1854,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(report.readUint32() == timestamps1[0]);
 		CHECK(report.readUint32() == timestamps1[5]);
 		CHECK(report.readUint32() == 5);
-		CHECK(report.readUint16() == 60);
-		CHECK(report.readUint16() == 40);
+		CHECK(report.read<PercentageFilled>() == 60);
+		CHECK(report.read<PercentageFilled>() == 40);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1874,9 +1874,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		uint32_t storageTime = 5;
-		uint16_t numOfPacketStores = 2;
-		request.appendUint32(storageTime);
+		TimeStamps storageTime = 5;
+		NumOfPacketStores numOfPacketStores = 2;
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores; i++) {
@@ -1891,10 +1891,10 @@ TEST_CASE("Deleting packet store content") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		uint32_t expectedTimeStamps1[3] = {7, 9, 11};
-		uint32_t expectedTimeStamps2[2] = {15, 22};
-		uint32_t leftTimeStamps1[3];
-		uint32_t leftTimeStamps2[2];
+		TimeStamps expectedTimeStamps1[3] = {7, 9, 11};
+		TimeStamps expectedTimeStamps2[2] = {15, 22};
+		TimeStamps leftTimeStamps1[3];
+		TimeStamps leftTimeStamps2[2];
 
 		int count = 0;
 		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
@@ -1926,9 +1926,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		uint32_t storageTime = 3;
-		uint16_t numOfPacketStores = 2;
-		request.appendUint32(storageTime);
+		TimeStamps storageTime = 3;
+		NumOfPacketStores numOfPacketStores = 2;
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
@@ -1943,10 +1943,10 @@ TEST_CASE("Deleting packet store content") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		uint32_t expectedTimeStamps1[4] = {4, 7, 9, 14};
-		uint32_t expectedTimeStamps2[8] = {4, 6, 34, 40, 44, 51, 52, 58};
-		uint32_t leftTimeStamps1[4];
-		uint32_t leftTimeStamps2[8];
+		TimeStamps expectedTimeStamps1[4] = {4, 7, 9, 14};
+		TimeStamps expectedTimeStamps2[8] = {4, 6, 34, 40, 44, 51, 52, 58};
+		TimeStamps leftTimeStamps1[4];
+		TimeStamps leftTimeStamps2[8];
 
 		int count = 0;
 		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets) {
@@ -1978,9 +1978,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		uint32_t storageTime = 59;
-		uint16_t numOfPacketStores = 2;
-		request.appendUint32(storageTime);
+		TimeStamps storageTime = 59;
+		NumOfPacketStores numOfPacketStores = 2;
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
@@ -2013,9 +2013,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		uint32_t storageTime = 15;
-		uint16_t numOfPacketStores = 0;
-		request.appendUint32(storageTime);
+		TimeStamps storageTime = 15;
+		NumOfPacketStores numOfPacketStores = 0;
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		int count = 0;
@@ -2041,13 +2041,13 @@ TEST_CASE("Deleting packet store content") {
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets.empty());
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets.size() == 6);
 
-		uint32_t expectedTimeStamps1[6] = {2, 4, 5, 7, 9, 11};
-		uint32_t expectedTimeStamps2[5] = {0, 1, 4, 15, 22};
-		uint32_t expectedTimeStamps4[6] = {34, 40, 44, 51, 52, 58};
+		TimeStamps expectedTimeStamps1[6] = {2, 4, 5, 7, 9, 11};
+		TimeStamps expectedTimeStamps2[5] = {0, 1, 4, 15, 22};
+		TimeStamps expectedTimeStamps4[6] = {34, 40, 44, 51, 52, 58};
 
-		uint32_t leftTimeStamps1[6];
-		uint32_t leftTimeStamps2[5];
-		uint32_t leftTimeStamps4[6];
+		TimeStamps leftTimeStamps1[6];
+		TimeStamps leftTimeStamps2[5];
+		TimeStamps leftTimeStamps4[6];
 
 		count = 0;
 		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
@@ -2089,9 +2089,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		uint32_t storageTime = 59;
-		uint16_t numOfPacketStores = 7;
-		request.appendUint32(storageTime);
+		TimeStamps storageTime = 59;
+		NumOfPacketStores numOfPacketStores = 7;
+		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < 3; i++) {
@@ -2152,14 +2152,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 0;
-		uint32_t timeTag2 = 1;
+		TimeStamps timeTag1 = 0;
+		TimeStamps timeTag2 = 1;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2196,14 +2196,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 0;
-		uint32_t timeTag2 = 4;
+		TimeStamps timeTag1 = 0;
+		TimeStamps timeTag2 = 4;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2243,14 +2243,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 35;
-		uint32_t timeTag2 = 52;
+		TimeStamps timeTag1 = 35;
+		TimeStamps timeTag2 = 52;
 		auto fromPacketStoreId = packetStoreIds[3];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2290,14 +2290,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 3;
-		uint32_t timeTag2 = 27;
+		TimeStamps timeTag1 = 3;
+		TimeStamps timeTag2 = 27;
 		auto fromPacketStoreId = packetStoreIds[1];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2337,14 +2337,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 12;
-		uint32_t timeTag2 = 14;
+		TimeStamps timeTag1 = 12;
+		TimeStamps timeTag2 = 14;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2376,14 +2376,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 3;
-		uint32_t timeTag2 = 27;
+		TimeStamps timeTag1 = 3;
+		TimeStamps timeTag2 = 27;
 		auto fromPacketStoreId = wrongPacketStoreIds[0];
 		auto toPacketStoreId = correctPacketStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2413,14 +2413,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 26;
-		uint32_t timeTag2 = 17;
+		TimeStamps timeTag1 = 26;
+		TimeStamps timeTag2 = 17;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2448,14 +2448,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 3;
-		uint32_t timeTag2 = 7;
+		TimeStamps timeTag1 = 3;
+		TimeStamps timeTag2 = 7;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2484,14 +2484,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		uint32_t timeTag1 = 0;
-		uint32_t timeTag2 = 3;
+		TimeStamps timeTag1 = 0;
+		TimeStamps timeTag2 = 3;
 		auto fromPacketStoreId = packetStoreIds[3];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag1);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2523,12 +2523,12 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
-		uint32_t timeTag1 = 6;
+		TimeStamps timeTag1 = 6;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
+		request.append<TimeStamps>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2537,8 +2537,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		uint32_t expectedTimestamps[3] = {7, 9, 11};
-		uint32_t existingTimestamps[3];
+		TimeStamps expectedTimestamps[3] = {7, 9, 11};
+		TimeStamps existingTimestamps[3];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2567,12 +2567,12 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
-		uint32_t timeTag1 = 1;
+		TimeStamps timeTag1 = 1;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
+		request.append<TimeStamps>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2581,7 +2581,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 6);
-		uint32_t existingTimestamps[6];
+		TimeStamps existingTimestamps[6];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2609,12 +2609,12 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
-		uint32_t timeTag1 = 25;
+		TimeStamps timeTag1 = 25;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag1);
+		request.append<TimeStamps>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2647,12 +2647,12 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
-		uint32_t timeTag2 = 6;
+		TimeStamps timeTag2 = 6;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2661,8 +2661,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		uint32_t expectedTimestamps[3] = {2, 4, 5};
-		uint32_t existingTimestamps[3];
+		TimeStamps expectedTimestamps[3] = {2, 4, 5};
+		TimeStamps existingTimestamps[3];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2691,12 +2691,12 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
-		uint32_t timeTag2 = 56;
+		TimeStamps timeTag2 = 56;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2705,7 +2705,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 6);
-		uint32_t existingTimestamps[6];
+		TimeStamps existingTimestamps[6];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2733,12 +2733,12 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
-		uint32_t timeTag2 = 1;
+		TimeStamps timeTag2 = 1;
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.appendUint32(timeTag2);
+		request.append<TimeStamps>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 

@@ -18,6 +18,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
+#include "Services/FileManagementService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -100,6 +101,9 @@ public:
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
 
+#ifdef SERVICE_FILE_MANAGEMENT
+    FileManagementService fileManagement;
+#endif
 
 	/**
 	 * The default ServicePool constructor
@@ -124,7 +128,7 @@ public:
 	 * @param messageType The message type ID
 	 * @return The message type count
 	 */
-	uint16_t getAndUpdateMessageTypeCounter(uint8_t serviceType, uint8_t messageType);
+	uint16_t getAndUpdateMessageTypeCounter(ServiceTypeNum serviceType, MessageTypeNum messageType);
 
 	/**
 	 * Get and increase the "packet sequence count" for the next message

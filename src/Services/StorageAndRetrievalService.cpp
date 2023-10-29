@@ -7,7 +7,7 @@ String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Mess
 }
 
 void StorageAndRetrievalService::deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId,
-                                                    uint32_t timeLimit) {
+                                                    TimeStamps timeLimit) {
 	auto& telemetryPackets = packetStores[packetStoreId].storedTelemetryPackets;
 	while (not telemetryPackets.empty() and telemetryPackets.front().first <= timeLimit) {
 		telemetryPackets.pop_front();
@@ -15,8 +15,8 @@ void StorageAndRetrievalService::deleteContentUntil(const String<ECSSPacketStore
 }
 
 void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
-	uint32_t startTime = request.readUint32();
-	uint32_t endTime = request.readUint32();
+	TimeStamps startTime = request.read<TimeStamps>();
+	TimeStamps endTime = request.read<TimeStamps>();
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -37,7 +37,7 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 }
 
 void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
-	uint32_t startTime = request.readUint32();
+	TimeStamps startTime = request.read<TimeStamps>();
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -55,7 +55,7 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 }
 
 void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
-	uint32_t endTime = request.readUint32();
+	TimeStamps endTime = request.read<TimeStamps>();
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -83,7 +83,7 @@ bool StorageAndRetrievalService::checkPacketStores(const String<ECSSPacketStoreI
 	return true;
 }
 
-bool StorageAndRetrievalService::checkTimeWindow(uint32_t startTime, uint32_t endTime, Message& request) {
+bool StorageAndRetrievalService::checkTimeWindow(TimeStamps startTime, TimeStamps endTime, Message& request) {
 	if (startTime >= endTime) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 		return true;
@@ -101,7 +101,7 @@ bool StorageAndRetrievalService::checkDestinationPacketStore(const String<ECSSPa
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-                                                         uint32_t startTime, uint32_t endTime, Message& request) {
+                                                         TimeStamps startTime, TimeStamps endTime, Message& request) {
 	if (endTime < packetStores[fromPacketStoreId].storedTelemetryPackets.front().first ||
 	    startTime > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -111,7 +111,7 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacket
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-                                                         uint32_t timeTag, Message& request, bool isAfterTimeTag) {
+                                                         TimeStamps timeTag, Message& request, bool isAfterTimeTag) {
 	if (isAfterTimeTag) {
 		if (timeTag > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -127,7 +127,7 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacket
 
 bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSPacketStoreIdSize>& toPacketStoreId,
-                                                    uint32_t startTime, uint32_t endTime, Message& request) {
+                                                    TimeStamps startTime, TimeStamps endTime, Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkTimeWindow(startTime, endTime, request) or checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, endTime, request));
@@ -135,7 +135,7 @@ bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSPacketStore
 
 bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSPacketStoreIdSize>& toPacketStoreId,
-                                                    uint32_t startTime, Message& request) {
+                                                    TimeStamps startTime, Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, request, true));
@@ -143,7 +143,7 @@ bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSPacketStore
 
 bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
                                                      const String<ECSSPacketStoreIdSize>& toPacketStoreId,
-                                                     uint32_t endTime, Message& request) {
+                                                     TimeStamps endTime, Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, endTime, request, false));
@@ -151,17 +151,17 @@ bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSPacketStor
 
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSPacketStoreIdSize>& packetStoreId) {
-	uint32_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
-	report.appendUint32(oldestStoredPacketTime);
+	TimeStamps oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
+	report.append<TimeStamps>(oldestStoredPacketTime);
 
-	uint32_t newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
-	report.appendUint32(newestStoredPacketTime);
+	TimeStamps newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
+	report.append<TimeStamps>(newestStoredPacketTime);
 
-	report.appendUint32(packetStores[packetStoreId].openRetrievalStartTimeTag);
+	report.append<TimeStamps>(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
 	auto filledPercentage1 = static_cast<uint16_t>(static_cast<float>(packetStores[packetStoreId].storedTelemetryPackets.size()) * 100 /
 	                                               ECSSMaxPacketStoreSize);
-	report.appendUint16(filledPercentage1);
+	report.append<PercentageFilled>(filledPercentage1);
 
 	uint16_t numOfPacketsToBeTransferred = 0;
 	numOfPacketsToBeTransferred = std::count_if(
@@ -170,7 +170,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
 	    });
 	auto filledPercentage2 = static_cast<uint16_t>(static_cast<float>(numOfPacketsToBeTransferred) * 100 / ECSSMaxPacketStoreSize);
-	report.appendUint16(filledPercentage2);
+	report.append<PercentageFilled>(filledPercentage2);
 }
 
 bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
@@ -202,7 +202,7 @@ void StorageAndRetrievalService::addPacketStore(const String<ECSSPacketStoreIdSi
 }
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
-                                                           uint32_t timestamp) {
+                                                           TimeStamps timestamp) {
 	Message tmPacket;
 	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, tmPacket});
 }
@@ -211,7 +211,7 @@ void StorageAndRetrievalService::resetPacketStores() {
 	packetStores.clear();
 }
 
-uint16_t StorageAndRetrievalService::currentNumberOfPacketStores() {
+NumOfPacketStores StorageAndRetrievalService::currentNumberOfPacketStores() {
 	return packetStores.size();
 }
 
@@ -227,7 +227,7 @@ bool StorageAndRetrievalService::packetStoreExists(const String<ECSSPacketStoreI
 
 void StorageAndRetrievalService::executeOnPacketStores(Message& request,
                                                        const std::function<void(PacketStore&)>& function) {
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
 			function(packetStore.second);
@@ -235,7 +235,7 @@ void StorageAndRetrievalService::executeOnPacketStores(Message& request,
 		return;
 	}
 
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		auto packetStore = packetStores.find(packetStoreId);
 		if (packetStore == packetStores.end()) {
@@ -267,16 +267,16 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		return;
 	}
 
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 	bool errorFlag = false;
 
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (failedStartOfByTimeRangeRetrieval(packetStoreId, request)) {
 			continue;
 		}
-		uint32_t retrievalStartTime = request.readUint32();
-		uint32_t retrievalEndTime = request.readUint32();
+		TimeStamps retrievalStartTime = request.read<TimeStamps>();
+		TimeStamps retrievalEndTime = request.read<TimeStamps>();
 
 		if (retrievalStartTime >= retrievalEndTime) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
@@ -298,8 +298,8 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 		return;
 	}
 
-	uint32_t timeLimit = request.readUint32(); // todo: decide the time-format
-	uint16_t numOfPacketStores = request.readUint16();
+	TimeStamps timeLimit = request.read<TimeStamps>(); // todo: decide the time-format
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
@@ -317,7 +317,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 		}
 		return;
 	}
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -343,7 +343,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	}
 
 	Message report = createTM(PacketStoreContentSummaryReport);
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
 		report.appendUint16(packetStores.size());
@@ -355,8 +355,8 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 		storeMessage(report);
 		return;
 	}
-	uint16_t numOfValidPacketStores = 0;
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	NumOfPacketStores numOfValidPacketStores = 0;
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) != packetStores.end()) {
 			numOfValidPacketStores++;
@@ -366,7 +366,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 	request.resetRead();
 	numOfPacketStores = request.readUint16();
 
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -383,11 +383,11 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 		return;
 	}
 
-	uint32_t newStartTimeTag = request.readUint32();
+	TimeStamps newStartTimeTag = request.read<TimeStamps>();
 	/**
 	 * @todo: check if newStartTimeTag is in the future
 	 */
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
 			if (packetStore.second.openRetrievalStatus == PacketStore::InProgress) {
@@ -400,7 +400,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 		return;
 	}
 
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -420,7 +420,7 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 		return;
 	}
 
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
 			if (packetStore.second.byTimeRangeRetrievalStatus) {
@@ -432,7 +432,7 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 		}
 		return;
 	}
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -453,14 +453,14 @@ void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& req
 		return;
 	}
 
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
 			packetStore.second.openRetrievalStatus = PacketStore::Suspended;
 		}
 		return;
 	}
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -475,14 +475,14 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 		return;
 	}
 
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
 			packetStore.second.byTimeRangeRetrievalStatus = false;
 		}
 		return;
 	}
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -514,8 +514,8 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 		return;
 	}
 
-	uint16_t numOfPacketStores = request.readUint16();
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	NumOfPacketStores numOfPacketStores = request.readUint16();
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		if (packetStores.size() >= ECSSMaxPacketStores) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxNumberOfPacketStoresReached);
 			return;
@@ -528,10 +528,10 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingPacketStore);
 			continue;
 		}
-		uint16_t packetStoreSize = request.readUint16();
-		uint8_t typeCode = request.readUint8();
+		PacketStoreSize packetStoreSize = request.read<PacketStoreSize>();
+		PacketStoreType typeCode = request.read<PacketStoreType>();
 		PacketStore::PacketStoreType packetStoreType = (typeCode == 0) ? PacketStore::Circular : PacketStore::Bounded;
-		uint8_t virtualChannel = request.readUint8();
+		VirtualChannel virtualChannel = request.read<VirtualChannel>();
 
 		if (virtualChannel < VirtualChannelLimits.min or virtualChannel > VirtualChannelLimits.max) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel);
@@ -553,9 +553,9 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 		return;
 	}
 
-	uint16_t numOfPacketStores = request.readUint16();
+	NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		uint16_t numOfPacketStoresToDelete = 0;
+		NumOfPacketStores numOfPacketStoresToDelete = 0;
 		etl::string<ECSSPacketStoreIdSize> packetStoresToDelete[ECSSMaxPacketStores];
 		for (auto& packetStore: packetStores) {
 			if (packetStore.second.storageStatus) {
@@ -576,7 +576,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			packetStoresToDelete[numOfPacketStoresToDelete] = packetStore.first;
 			numOfPacketStoresToDelete++;
 		}
-		for (uint16_t l = 0; l < numOfPacketStoresToDelete; l++) {
+		for (NumOfPacketStores l = 0; l < numOfPacketStoresToDelete; l++) {
 			uint8_t data[ECSSPacketStoreIdSize];
 			etl::string<ECSSPacketStoreIdSize> idToDelete = packetStoresToDelete[l];
 			std::copy(idToDelete.begin(), idToDelete.end(), data);
@@ -586,7 +586,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 		return;
 	}
 
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto idToDelete = readPacketStoreId(request);
 		if (packetStores.find(idToDelete) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
@@ -624,9 +624,9 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(Message& request
 		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
 		report.appendUint16(packetStore.second.sizeInBytes);
-		uint8_t typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
-		report.appendUint8(typeCode);
-		report.appendUint8(packetStore.second.virtualChannel);
+		PacketStoreType typeCode = (packetStore.second.packetStoreType == PacketStore::Circular) ? 0 : 1;
+		report.append<PacketStoreType>(typeCode);
+		report.append<VirtualChannel>(packetStore.second.virtualChannel);
 	}
 	storeMessage(report);
 }
@@ -658,10 +658,10 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 		return;
 	}
 
-	uint16_t numOfPacketStores = request.readUint16();
-	for (uint16_t i = 0; i < numOfPacketStores; i++) {
+	NumOfPacketStores numOfPacketStores = request.readUint16();
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
 		auto packetStoreId = readPacketStoreId(request);
-		uint16_t packetStoreSize = request.readUint16(); // In bytes
+		PacketStoreSize packetStoreSize = request.read<PacketStoreSize>(); // In bytes
 		if (packetStores.find(packetStoreId) == packetStores.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
@@ -757,7 +757,7 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 	}
 
 	auto idToChange = readPacketStoreId(request);
-	uint8_t virtualChannel = request.readUint8();
+	VirtualChannel virtualChannel = request.read<VirtualChannel>();
 	if (packetStores.find(idToChange) == packetStores.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;

@@ -1,8 +1,8 @@
 #ifndef PROJECT_ERRORHANDLER_HPP
 #define PROJECT_ERRORHANDLER_HPP
 
-#include <stdint.h> // for the uint_8t stepID
 #include <type_traits>
+#include "Helpers/TypeDefinitions.hpp"
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
@@ -370,18 +370,39 @@ public:
 		 */
 		ParameterWriteOnly = 54,
 		/**
+		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
+		 * Application Process configuration (ST[14])
+		 */
+		AllReportTypesAlreadyAllowed = 55,
+		/**
 		 * Attempt to access a non-existing report type definition, from the application process configuration (ST[14])
 		 */
-		NonExistentReportTypeDefinition = 55,
+		NonExistentReportTypeDefinition = 56,
 		/**
 		 * Attempt to access a non-existing service type definition, from the application process configuration (ST[14])
 		 */
-		NonExistentServiceTypeDefinition = 56,
+		NonExistentServiceTypeDefinition = 57,
 		/**
 		 * Attempt to access a non-existing application process definition, from the application process
 		 * configuration (ST[14])
 		 */
-		NonExistentApplicationProcess = 57,
+		NonExistentApplicationProcess = 58,
+		/**
+         * Size of file is bigger than allowed
+         */
+		SizeOfFileIsOutOfBounds = 59,
+		/**
+		 * Object path is invalid
+		 */
+		ObjectPathIsInvalid = 60,
+		/**
+		 * A wildcard was found where it shouldn't be present
+	 	 */
+		UnexpectedWildcard = 61,
+		/**
+		 * A file type that was expected to be a directory is a file instead
+		 */
+		RepositoryPathLeadsToFile = 62,
 	};
 
 	/**
@@ -403,13 +424,37 @@ public:
 	enum ExecutionCompletionErrorType {
 		UnknownExecutionCompletionError = 0,
 		/**
-		 * Checksum comparison failed
+		 * MemoryManagementChecksum comparison failed
 		 */
 		ChecksumFailed = 1,
 		/**
 		 * Address of a memory is out of the defined range for the type of memory
 		 */
 		AddressOutOfRange = 2,
+		/**
+         * File already exists, thus can't be created again
+         */
+		FileAlreadyExists = 3,
+		/**
+         * The requested object does not exist
+         */
+		ObjectDoesNotExist = 4,
+		/**
+		 * A delete file command was requested on a file that is locked
+		 */
+		AttemptedDeleteOnLockedFile = 5,
+		/**
+		 * A delete file command was requested on a directory
+		 */
+		AttemptedDeleteOnDirectory = 6,
+		/**
+		 * The filesystem reported an error during file deletion
+		 */
+		UnknownFileDeleteError = 7,
+		/**
+		 * A report file attributes command was requested on a directory
+		 */
+		AttemptedReportAttributesOnDirectory = 8,
 	};
 
 	/**
@@ -459,7 +504,7 @@ public:
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
 	 */
-	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, uint8_t stepID);
+	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepId stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.

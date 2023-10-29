@@ -11,9 +11,9 @@
  */
 void EventReportService::informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	// TM[5,1]
-	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
+	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		EventActionService eventActionService;
 		eventActionService.executeAction(eventID);
@@ -25,12 +25,12 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	lowSeverityEventCount++;
 	// TM[5,2]
-	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
+	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		lowSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::LowSeverityAnomalyReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
-		lastLowSeverityReportID = static_cast<uint16_t>(eventID);
+		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
 
 		storeMessage(report);
 		EventActionService eventActionService;
@@ -41,12 +41,12 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	mediumSeverityEventCount++;
 	// TM[5,3]
-	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
+	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		mediumSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::MediumSeverityAnomalyReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
-		lastMediumSeverityReportID = static_cast<uint16_t>(eventID);
+		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
 
 		storeMessage(report);
 		EventActionService eventActionService;
@@ -57,12 +57,12 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 void EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	highSeverityEventCount++;
 	// TM[5,4]
-	if (stateOfEvents[static_cast<uint16_t>(eventID)]) {
+	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		highSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::HighSeverityAnomalyReport);
-		report.appendEnum16(eventID);
+		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
-		lastHighSeverityReportID = static_cast<uint16_t>(eventID);
+		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
 
 		storeMessage(report);
 		EventActionService eventActionService;
@@ -82,7 +82,7 @@ void EventReportService::enableReportGeneration(Message message) {
 	uint16_t length = message.readUint16();
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[message.readEnum16()] = true;
+			stateOfEvents[message.read<EventDefinitionId>()] = true;
 		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
@@ -100,7 +100,7 @@ void EventReportService::disableReportGeneration(Message message) {
 	uint16_t length = message.readUint16();
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {
-			stateOfEvents[message.readEnum16()] = false;
+			stateOfEvents[message.read<EventDefinitionId>()] = false;
 		}
 	}
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
@@ -123,7 +123,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	report.appendHalfword(numberOfDisabledEvents);
 	for (size_t i = 0; i < stateOfEvents.size(); i++) {
 		if (not stateOfEvents[i]) {
-			report.appendEnum16(i);
+			report.append<EventDefinitionId>(i);
 		}
 	}
 

@@ -1,10 +1,12 @@
-#include "MessageParser.hpp"
 #include <ServicePool.hpp>
-#include <iostream>
 #include "ErrorHandler.hpp"
-#include "Helpers/CRCHelper.hpp"
-#include "Services/RequestVerificationService.hpp"
+#include "MessageParser.hpp"
 #include "macros.hpp"
+#include "Services/RequestVerificationService.hpp"
+#include "Helpers/CRCHelper.hpp"
+
+static_assert(sizeof(ServiceTypeNum) == 1);
+static_assert(sizeof(MessageTypeNum) == 1);
 
 void MessageParser::execute(Message& message) {
 	switch (message.serviceType) {
@@ -80,6 +82,11 @@ void MessageParser::execute(Message& message) {
 			break;
 #endif
 
+#ifdef SERVICE_FILE_MANAGEMENT
+        case FileManagementService::ServiceType:
+            Services.fileManagement.execute(message); // ST[23]
+            break;
+#endif
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
@@ -96,9 +103,9 @@ Message MessageParser::parse(uint8_t* data, uint32_t length) {
 	uint8_t versionNumber = data[0] >> 5;
 	Message::PacketType packetType = ((data[0] & 0x10) == 0) ? Message::TM : Message::TC;
 	bool secondaryHeaderFlag = (data[0] & 0x08U) != 0U;
-	uint16_t APID = packetHeaderIdentification & static_cast<uint16_t>(0x07ff);
+	ApplicationProcessId APID = packetHeaderIdentification & static_cast<ApplicationProcessId>(0x07ff);
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
-	uint16_t packetSequenceCount = packetSequenceControl & (~0xc000U); // keep last 14 bits
+	SequenceCount packetSequenceCount = packetSequenceControl & (~0xc000U); // keep last 14 bits
 
 	// Returning an internal error, since the Message is not available yet
 	ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket);
@@ -123,9 +130,9 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 
 	// Individual fields of the TC header
 	uint8_t pusVersion = data[0] >> 4;
-	uint8_t serviceType = data[1];
-	uint8_t messageType = data[2];
-	uint16_t sourceId = (data[3] << 8) + data[4];
+	ServiceTypeNum serviceType = data[1];
+	MessageTypeNum messageType = data[2];
+	SourceId sourceId = (data[3] << 8) + data[4];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
@@ -211,10 +218,10 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	ASSERT_INTERNAL((ecssMessage.size() + CCSDSPrimaryHeaderSize) <= CCSDSMaxMessageSize, ErrorHandler::StringTooLarge);
 
 	// Parts of the header
-	uint16_t packetId = message.applicationId;
+	ApplicationProcessId packetId = message.applicationId;
 	packetId |= (1U << 11U);                                              // Secondary header flag
 	packetId |= (message.packetType == Message::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
-	uint16_t packetSequenceControl = message.packetSequenceCount | (3U << 14U);
+	SequenceCount packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
 	// Compile the header
@@ -244,8 +251,8 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 
 	// Individual fields of the TM header
 	uint8_t pusVersion = data[0] >> 4;
-	uint8_t serviceType = data[1];
-	uint8_t messageType = data[2];
+	ServiceTypeNum serviceType = data[1];
+	MessageTypeNum messageType = data[2];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
