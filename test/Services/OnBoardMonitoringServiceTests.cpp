@@ -285,7 +285,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		uint16_t PMONId = 0;
 		uint16_t monitoredParameterId = 0;
 		uint16_t repetitionNumber = 5;
-		uint64_t expetedValueCheckMask = 2;
+		uint64_t expectedValueCheckMask = 2;
 		double expectedValue = 10;
 		uint16_t unexpectedValueEvent = 5;
 		double lowLimit = 3;
