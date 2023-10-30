@@ -311,7 +311,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 0);
 
 		CHECK(onBoardMonitoringService.getCount(PMONId) == 1);
-
+		auto definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getRepetitionCounter() == 0);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getRepetitionNumber() == repetitionNumber);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().isMonitoringEnabled() == false);
@@ -321,7 +321,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 //		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getMask() == expetedValueCheckMask);
 //		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getUnexpectedValueEvent() == unexpectedValueEvent);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckType() == PMONBase::LimitCheck);
-		auto definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckingStatus() == PMONBase::Unchecked);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getLowLimit() == lowLimit);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getBelowLowLimitEvent() == belowLowLimitEvent);

@@ -14,7 +14,6 @@
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"
-#include "Services/RequestVerificationService.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"

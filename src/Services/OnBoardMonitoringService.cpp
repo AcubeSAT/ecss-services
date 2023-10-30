@@ -257,7 +257,8 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		}
 		parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
 		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().monitoredParameterId);
-		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().monitoringEnabled);
+//		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().monitoringEnabled);
+		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().monitoringEnabled ? 1 : 0);
 		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().repetitionNumber);
 		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().checkType);
 		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::LimitCheck) {
