@@ -4,7 +4,7 @@
 #include "ServicePool.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
 #include "etl/map.h"
-#include <array>
+#include "etl/vector.h"
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, EnableParameterMonitoringDefinitions)) {
@@ -73,10 +73,10 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	uint16_t currentPMONRepetitionNumber = message.readUint16();
 	uint16_t currentCheckType = message.readEnum8();
 
-	// Create arrays for each check type
-	std::vector<PMONLimitCheck> limitChecks;
-	std::vector<PMONExpectedValueCheck> expectedValueChecks;
-	std::vector<PMONDeltaCheck> deltaChecks;
+	// Create vectors for each check type
+	etl::vector<PMONLimitCheck, 12> limitChecks; // 12 for now
+	etl::vector<PMONExpectedValueCheck, 12> expectedValueChecks;
+	etl::vector<PMONDeltaCheck, 12> deltaChecks;
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		if (parameterMonitoringList.find(currentPMONId) != parameterMonitoringList.end()) {

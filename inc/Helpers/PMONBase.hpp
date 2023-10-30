@@ -47,19 +47,19 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
 
-	uint16_t getRepetitionCounter() {
+	uint16_t getRepetitionCounter() const {
 		return repetitionCounter;
 	}
-	uint16_t getRepetitionNumber() {
+	uint16_t getRepetitionNumber() const {
 		return repetitionNumber;
 	}
-	bool isMonitoringEnabled() {
+	bool isMonitoringEnabled() const {
 		return monitoringEnabled;
 	}
-	CheckType getCheckType() {
+	CheckType getCheckType() const {
 		return checkType;
 	}
-	CheckingStatus getCheckingStatus() {
+	CheckingStatus getCheckingStatus() const {
 		return checkingStatus;
 	}
 
