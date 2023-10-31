@@ -68,9 +68,9 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	message.assertTC(ServiceType, AddParameterMonitoringDefinitions);
 
 	uint16_t numberOfIds = message.readUint16();
-	uint16_t currentPMONId;
-	uint16_t currentMonitoredParameterId;
-	uint16_t currentPMONRepetitionNumber;
+	uint16_t currentPMONId = message.readEnum16();
+	uint16_t currentMonitoredParameterId = message.readEnum16();
+	uint16_t currentPMONRepetitionNumber = message.readUint16();
 	uint16_t currentCheckType;
 
 	// Create vectors for each check type
