@@ -5,8 +5,6 @@
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeGetter.hpp"
 
-#define ECSS_CRC_INCLUDED 1
-
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
@@ -37,17 +35,18 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.dataSize = 5;
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-#if ECSS_CRC_INCLUDED
-	CHECK(createdPacket.size() == 18);
-	CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
+	if constexpr (CRCHelper::enableCRC) {
+		CHECK(createdPacket.size() == 18);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
 
-	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-	uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
-	CHECK(crc_verification == 0);
-#else
-	CHECK(createdPacket.size() == 16);
-	CHECK((createdPacket == String<16>(wantedPacket)));
-#endif
+		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+		uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
+		CHECK(crc_verification == 0);
+	}
+	else {
+		CHECK(createdPacket.size() == 16);
+		CHECK((createdPacket == String<16>(wantedPacket)));
+	}
 
 }
 
@@ -100,15 +99,16 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.dataSize = 7;
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
-#if ECSS_CRC_INCLUDED
-	CHECK(createdPacket.size() == 26);
-	CHECK(memcmp(createdPacket.data(), wantedPacket, 24) == 0);
+	if constexpr (CRCHelper::enableCRC) {
+		CHECK(createdPacket.size() == 26);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, 24) == 0);
 
-	const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-	uint8_t crc_verification = CRCHelper::validateCRC(packet, 26);
-	CHECK(crc_verification == 0);
-#else
-	CHECK(createdPacket.size() == 24);
-	CHECK((createdPacket == String<24>(wantedPacket)));
-#endif
+		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
+		uint8_t crc_verification = CRCHelper::validateCRC(packet, 26);
+		CHECK(crc_verification == 0);
+	}
+	else {
+		CHECK(createdPacket.size() == 24);
+		CHECK((createdPacket == String<24>(wantedPacket)));
+	}
 }

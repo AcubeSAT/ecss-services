@@ -5,7 +5,6 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
 
-#define ECSS_CRC_INCLUDED 1
 
 static_assert(sizeof(ServiceTypeNum) == 1);
 static_assert(sizeof(MessageTypeNum) == 1);
@@ -238,12 +237,12 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	String<CCSDSMaxMessageSize> ccsdsMessage(header, CCSDSPrimaryHeaderSize);
 	ccsdsMessage.append(ecssMessage);
 
-#if ECSS_CRC_INCLUDED
-	// Append CRC field
-	uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 + packetDataLength);
-	ccsdsMessage.push_back(static_cast<uint8_t>(crcField >> 8U));
-	ccsdsMessage.push_back(static_cast<uint8_t>(crcField & 0xFF));
-#endif
+    if constexpr (CRCHelper::enableCRC) {
+		// Append CRC field
+		uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 + packetDataLength);
+		ccsdsMessage.push_back(static_cast<char8_t>(crcField >> 8U));
+		ccsdsMessage.push_back(static_cast<char8_t>(crcField & 0xFF));
+	}
 
 	return ccsdsMessage;
 }
