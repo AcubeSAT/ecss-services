@@ -71,7 +71,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	uint16_t currentPMONId = message.readEnum16();
 	uint16_t currentMonitoredParameterId = message.readEnum16();
 	uint16_t currentPMONRepetitionNumber = message.readUint16();
-	uint16_t currentCheckType;
+	uint16_t currentCheckType= message.readEnum8();
 
 	// Create vectors for each check type
 	etl::vector<PMONLimitCheck, 12> limitChecks; // 12 for now
