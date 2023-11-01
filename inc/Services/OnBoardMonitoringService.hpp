@@ -22,6 +22,13 @@ private:
 	 */
 	etl::map<uint16_t, std::reference_wrapper<PMONBase>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
+	/**
+	 * Maximum number of checks for each check type.
+     * This value is chosen based on the specific requirements of the system.
+     * It should be adjusted accordingly.
+     */
+	static constexpr uint8_t MaximumNumberOfChecks = 12;
+
 public:
 	inline static const ServiceTypeNum ServiceType = 12;
 	enum MessageType : uint8_t {

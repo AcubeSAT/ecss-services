@@ -70,9 +70,9 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	uint16_t numberOfIds = message.readUint16();
 
 	// Create vectors for each check type
-	etl::vector<PMONLimitCheck, 12> limitChecks; // 12 for now, will be changed
-	etl::vector<PMONExpectedValueCheck, 12> expectedValueChecks;
-	etl::vector<PMONDeltaCheck, 12> deltaChecks;
+	etl::vector<PMONLimitCheck, MaximumNumberOfChecks> limitChecks; // 12 for now, will be changed
+	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecks> expectedValueChecks;
+	etl::vector<PMONDeltaCheck, MaximumNumberOfChecks> deltaChecks;
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 
