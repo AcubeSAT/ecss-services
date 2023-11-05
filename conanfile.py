@@ -30,15 +30,13 @@ class ECSSServicesRecipe(ConanFile):
             del self.options.fPIC
 
     def layout(self):
-        cmake_layout(self)
+        cmake_layout(self, build_folder=".")
 
     def generate(self):
         tc = CMakeToolchain(self)
         if self.settings.arch != 'armv7':
             tc.variables["X86_BUILD"] = True
-            tc.variables["ECSS_CONFIGURATION"]="inc/Platform/x86/"
-        else:
-            tc.variables["ECSS_CONFIGURATION"]=self.options.ecss_config_file_path
+        tc.variables["ECSS_CONFIGURATION"] = self.options.ecss_config_file_path
         tc.generate()
 
     def build(self):
