@@ -57,7 +57,7 @@ For more detailed installation instructions, including how to integrate with a m
    <details>
    <summary>Getting conan</summary>
 
-    You can install [conan](https://conan.io/) following the instructions [from here](https://docs.conan.io/2/installation.html).
+   You can install [conan](https://conan.io/) following the instructions [from here](https://docs.conan.io/2/installation.html).
    </details>
 2. Clone the repository and enter the directory:
    ```shell
@@ -68,33 +68,15 @@ For more detailed installation instructions, including how to integrate with a m
    ```shell
    conan profile detect
    ```
-4. Resolve all dependencies through conan:
+4. Download all dependencies and build the project through conan:
    ```shell
-   conan install . --output-folder=build --build=missing --update --setings=build_type=Debug
+   conan build . --output-folder=build --build=missing --update --setings=build_type=Debug
    ```
-5. Prepare the CMake project:
-    ```shell
-    cmake --preset=conan-debug
-    ```
-    <details>
-    <summary>For older CMake</summary>
-
-    If you're running a CMake version older than 3.23, you might get an error if you try to work with the above preset.
-    In that case, the `conan install` command should give you better instructions on what you need to run, which should look
-    something like this:
-    ```shell
-    cmake <path> -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=build/Debug/generators/conan_toolchain.cmake -DCMAKE_POLICY_DEFAULT_CMP0091=NEW -DCMAKE_BUILD_TYPE=Debug
-    ```
-    </details>
-6. Build the project:
+5. Run the tests or the produced executable:
    ```shell
-   cmake --build build/Debug -- -j$(nproc)
+   build/Debug/tests
+   build/Debug/x86_services
    ```
-7. Run the tests or the produced executable:
-    ```shell
-    build/Debug/tests
-    build/Debug/x86_services
-    ```
 
 ### From CLion
 
@@ -107,11 +89,10 @@ will quickly fail. Follow these steps to set up the conan project:
    ```
 2. Resolve all dependencies through conan:
    ```shell
-    conan install . --output-folder=cmake-build-debug --build=missing --update --setings=build_type=Debug
-    ```
+   conan install . --output-folder=cmake-build-debug --build=missing --update --setings=build_type=Debug
+   ```
 3. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
-    ```shell
-    --preset=conan-debug
-    ```
+   ```shell
+   --preset=conan-debug
+   ```
 4. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
-
