@@ -23,11 +23,39 @@ private:
 	etl::map<uint16_t, std::reference_wrapper<PMONBase>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
-	 * Maximum number of checks for each check type.
-     * This value is chosen based on the specific requirements of the system.
-     * It should be adjusted accordingly.
+	 * Maximum number of checks for each check type is calculated individually
+	 * based on figure 8-114 on page 509 of the ECSS Standard and the existing code.
+	 * For the calculation each 16-bit enumeration is 2 bytes in size, a 16-bit unsigned integer is 2 bytes as well
+	 * and a double precision floating-point number is 8 bytes in size.
+	 * The maximum data size for an ECSS Message is currently 1024 bytes.
      */
-	static constexpr uint8_t MaximumNumberOfChecks = 12;
+
+	/**
+	 * For Limit Check Messages there are 5 16-bit enumerations (PMON ID, currentMonitoredParameterId, check type, belowLowLimitEventId, aboveHighLimitEventId),
+	 * 2 16-bit unsigned integers (N, currentPMONRepetitionNumber)
+	 * and 2 double precision floating-point numbers (lowLimit, highLimit).
+	 * The total is 5*2+2*2+2*8=30 bytes per Limit Check.
+	 * For the maximum number : 1024/30=34.13, so 34 is the maximum number of checks.
+	 */
+	static constexpr uint8_t MaximumNumberOfChecksLimitCheck = 34;
+
+	/**
+	 * For Expected Value Check Messages there are 4 16-bit enumerations (PMON ID, currentMonitoredParameterId, check type, unExpectedValueEvent),
+	 * 2 16-bit unsigned integers (N, currentPMONRepetitionNumber)
+	 * and 2 double precision floating-point numbers (expectedValue, mask).
+	 * The total is 4*2+2*2+2*8=28 bytes per Expected Value Check.
+	 * For the maximum number : 1024/28=36.57, so 36 is the maximum number of checks.
+	 */
+	static constexpr uint8_t MaximumNumberOfChecksExpectedValueCheck = 36;
+
+	/**
+	 * For Delta Check Messages there are 5 16-bit enumerations (PMON ID, currentMonitoredParameterId, check type, belowLowThresholdEventId, aboveHighThresholdEventId),
+	 * 3 16-bit unsigned integers (N, currentPMONRepetitionNumber, numberOfConsecutiveDeltaChecks)
+	 * and 2 double precision floating-point numbers (lowDeltaThreshold, highDeltaThreshold).
+	 * The total is 5*2+3*2+2*8=32 bytes per Expected Value Check.
+	 * For the maximum number : 1024/32=32, so 32 is the maximum number of checks.
+	 */
+	static constexpr uint8_t MaximumNumberOfChecksDeltaCheck = 32;
 
 public:
 	inline static const ServiceTypeNum ServiceType = 12;
