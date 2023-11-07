@@ -31,6 +31,7 @@ class ECSSServicesRecipe(ConanFile):
 
     def layout(self):
         cmake_layout(self, build_folder=".")
+        self.cpp.source.includedirs = ["inc"]
 
     def generate(self):
         tc = CMakeToolchain(self)

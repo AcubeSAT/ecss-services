@@ -190,6 +190,35 @@ find_package(ecss-services CONFIG REQUIRED COMPONENTS common)
 target_link_libraries(my_target common)
 ```
 
+### Concurrent Developing
+
+If you want to develop both a parent project and it dependency at the same time, you should use [Conan editable 
+packages](https://docs.conan.io/2/tutorial/developing_packages/editable_packages.html). These allow your repository 
+to build directly from the source code, instead of downloading a pre-made package.
+
+First, you will need to download `ecss-services` independently from your project (e.g. through Git).
+Then, you need to mark it as an editable package:
+```bash
+conan editable add /path/to/ecss-services --output-folder /path/to/ecss-services/build
+```
+
+Make sure that you have built `ecss-services` before moving on:
+```bash
+conan build /path/to/ecss-services --output-folder=build --build=missing --setings=build_type=Debug
+```
+
+Then, your project should be compileable directly:
+```bash
+conan build /path/to/my/project --build=missing --setings=build_type=Debug # And any other settings you prefer
+```
+
+@note The build type between the two builds from the two projects must be the same.
+
+After you have finished developing, you can remove the editable package:
+```bash
+conan editable remove /path/to/ecss-services
+```
+
 ## Other tasks {#other}
 
 Apart from compiling the services, you can also generate other outputs if you want.
