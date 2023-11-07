@@ -147,6 +147,48 @@ If you are using an IDE that manages CMake, it should be enough to add the follo
 We do not recommend using Conan plugins for your IDE, as they might work in mysterious ways and override our custom
 configuration. We cannot provide support for such plugins as your team is mainly using Conan from the command line.
 
+## Integrating as a library
+
+While `ecss-services` can run as a standalone executable, it is built to be used mainly as a library. Follow these 
+instructions to integrate it with your own code.
+
+@remark ecss-services is free software. You must make sure to follow the licensing restrictions from the LICENSE 
+file for any usage.
+
+The services are best used as a Conan package, since they themselves depend on other Conan packages.
+
+### Step 0: Prepare your environment
+
+Make sure you have your Conan profile and the project's Artifactory remote set up
+```bash
+conan profile detect
+conan remote add spacedot https://artifactory.spacedot.gr/artifactory/api/conan/conan
+```
+
+See the [official Conan guide](https://docs.conan.io/2/tutorial/consuming_packages/build_simple_cmake_project.html) 
+on how to set up a project whose dependencies are managed by Conan.
+
+### Step 1: Add the package to your dependencies
+
+Edit your `conanfile.txt` or `conanfile.py` files to add the following dependency:
+```
+[requires]
+ecss-services/1.0
+```
+
+You can see more information about the available versions of the package at
+https://artifactory.spacedot.gr/ui/packages/conan:%2F%2Fecss-services.
+
+### Step 2: Integrate with CMake
+
+Include and link the `common` library in your CMake project. This should include and link the required files with 
+your executable.
+
+```
+find_package(ecss-services CONFIG REQUIRED COMPONENTS common)
+# ...
+target_link_libraries(my_target common)
+```
 
 ## Other tasks {#other}
 

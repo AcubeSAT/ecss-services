@@ -6,7 +6,7 @@ from conan.tools.files import copy
 
 class ECSSServicesRecipe(ConanFile):
     name = "ecss-services"
-    version = "1.0"
+    version = "1.1"
     revision_mode = "scm"
 
     # Optional metadata
@@ -64,7 +64,7 @@ class ECSSServicesRecipe(ConanFile):
         self.cpp_info.includedirs = ["inc"]
 
     def requirements(self):
-        self.requires("etl/20.37.2")
-        self.requires("logger/1.0")
+        self.requires("etl/20.37.2", transitive_headers=True)
+        self.requires("logger/1.0", transitive_headers=True)
         if self.settings.arch != 'armv7':
             self.requires("catch2/3.3.1")
