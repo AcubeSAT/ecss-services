@@ -68,11 +68,15 @@ For more detailed installation instructions, including how to integrate with a m
    ```shell
    conan profile detect
    ```
-4. Download all dependencies and build the project through conan:
+4. (If you haven't already) add the SpaceDot repository to conan:
    ```shell
-   conan build . --output-folder=build --build=missing --update --setings=build_type=Debug
+   conan remote add spacedot https://artifactory.spacedot.gr/artifactory/api/conan/conan
    ```
-5. Run the tests or the produced executable:
+5. Download all dependencies and build the project through conan:
+   ```shell
+   conan build . --output-folder=build --build=missing --update --settings=build_type=Debug
+   ```
+6. Run the tests or the produced executable:
    ```shell
    build/Debug/tests
    build/Debug/x86_services
@@ -87,12 +91,19 @@ will quickly fail. Follow these steps to set up the conan project:
    ```shell
    conan profile detect
    ```
-2. Resolve all dependencies through conan:
+2. (If you haven't already) add the SpaceDot repository to conan:
+   ```shell
+   conan remote add spacedot https://artifactory.spacedot.gr/artifactory/api/conan/conan
+   ```
+3. Resolve all dependencies through conan:
    ```shell
    conan install . --output-folder=cmake-build-debug --build=missing --update --setings=build_type=Debug
    ```
-3. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
+4. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
    ```shell
-   --preset=conan-debug
+   --preset=cmake-build-debug-debug
    ```
-4. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
+5. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
+
+We do not recommend using a Conan plugin for your IDE, as it may tamper with the default configuration for this
+repository.

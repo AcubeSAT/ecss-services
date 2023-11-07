@@ -2,8 +2,8 @@
 
 @tableofcontents
 
-The ECSS Services library was is developed and tested on Linux. It is possible to use Mac OS or Windows, if the relevant
-tools are installed.
+The ECSS Services library is developed and tested on Linux. It is possible to use Mac OS or Windows, if the relevant
+tools are installed. WSL is also supported out of the box.
 
 ## Required software {#required-software}
 Before getting started, you will need to make sure that you have the required compilation tools installed. We use the
@@ -53,12 +53,34 @@ conan profile detect
 This will create a conan file for your system, specifying a compiler and an architecture for the build.
 You can edit it if you prefer to cross-compile for a different architecture.
 
-### Step 3: Download dependencies
+### Step 3: Add the SpaceDot repository
+
+SpaceDot-specific packages are hosted on a public artifactory repository. You will need to add it to conan before you
+can download our packages:
+```bash
+conan remote add spacedot https://artifactory.spacedot.gr/artifactory/api/conan/conan
+```
+
+@parblock
+@note
+If you need to download a private package or upload a new release, you may need to log in with your personal details:
+```bash
+conan remote login spacedot $YOUR_USERNAME # You will be prompted for a password
+```
+@endparblock
+
+@parblock
+@note
+If, for some reason, you do not have access to our public artifactory instance, you can build our internal packages on
+your own, by cloning the respective repositories, and running `conan create . --build=missing` inside them.
+
+### Step 4: Download dependencies
 
 The following command will download all the dependencies through conan:
 ```bash
 conan install . --output-folder=build --build=missing --setings=build_type=Debug
 ```
+@endparblock
 
 You can change the `output-folder` based on your preference, or if you want to have multiple different builds.
 This will prepare the output folder for the build outputs.
@@ -67,37 +89,22 @@ The `build_type` can be one of conan's build types, i.e. `Debug`, `Release`, `Re
 
 You can specify add the `--update` flag to update the dependencies to the latest version.
 
-@note
-    `conan install` will only download the dependencies, without building anything. You can use `conan build`
-    instead to automatically build the entire project, completing the next two steps as well.
+@note `conan install` will only download the dependencies, without building anything. You can use `conan build` 
+instead to automatically build the entire project, completing the next two steps as well.
 
-
-@note
-    If you need to download a private package, you may need to log in with your details in the private conan
-    repository:
-    ```bash
-    conan remote add artifactory https://artifactory.spacedot.gr/artifactory/api/conan/conan
-    conan remote login conan $YOUR_USERNAME
-    ```
-
-
-@note
-    If you not have access to our private artifactory, you can clone the dependencies on your own, and package them
-    by running `conan create . --build=missing`
-
-### Step 4: Prepare the CMake project
+### Step 5: Prepare the CMake project
 
 Conan will create a `CMakeUserPresets.json` that contains a link to a `conan_toolchain.cmake`.
 This file prepares the CMake project to use the compiler and dependencies defined by conan.
 
 To use it, you can either select a CMake build preset (Cmake >= 3.23):
 ```bash
-cmake -B build --preset=conan-debug
+cmake -B build/Debug --preset=build-debug
 ```
 
 Or, you can use the `conan_toolchain.cmake` directly:
 ```bash
-cmake -B build -DCMAKE_TOOLCHAIN_FILE=build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
+cmake -B build/Debug -DCMAKE_TOOLCHAIN_FILE=generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
 ```
 
 Make sure to change `debug` to the appropriate option for your desired build type.
@@ -105,11 +112,14 @@ Make sure to change `debug` to the appropriate option for your desired build typ
 You can specify any other options you wish to CMake through this step, for example
 `-DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic"` to show more warnings.
 
-### Step 5: Build the project
+@note The name of the appropriate CMake preset you need to use will be shown as the output of
+the `conan install` command.
+
+### Step 6: Build the project
 
 ecss-services uses Unix Makefiles by default, so you can build the project by running:
 ```bash
-cd build && make -j8
+cd build/Debug && make -j8
 ```
 
 The number `8` specifies the number of concurrently running jobs, usually the number of CPU cores.
@@ -117,14 +127,25 @@ You can use `nproc` to get the number of processing units on your system.
 
 CMake can also run all the necessary steps to build the project for you, by running:
 ```bash
-cmake --build build
+cmake --build build/Debug -- -j8
 ```
 
-### Step 6: Execute and test
+### Step 7: Execute and test
 
 CMake will place the completed outputs in the `build/{build_type}` directory. You can run the
 executables and libraries generated in there.
 
+
+### Using an IDE?
+
+If you are using an IDE that manages CMake, it should be enough to add the following option to the CMake command:
+```bash
+--preset=cmake-build-debug-debug # or a different configuration (e.g. build-release)
+```
+
+@note
+We do not recommend using Conan plugins for your IDE, as they might work in mysterious ways and override our custom
+configuration. We cannot provide support for such plugins as your team is mainly using Conan from the command line.
 
 
 ## Other tasks {#other}

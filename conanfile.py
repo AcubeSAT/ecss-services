@@ -37,6 +37,11 @@ class ECSSServicesRecipe(ConanFile):
         if self.settings.arch != 'armv7':
             tc.variables["X86_BUILD"] = True
         tc.variables["ECSS_CONFIGURATION"] = self.options.ecss_config_file_path
+
+        # Instead of prefixing all cmake presets with "conan", we prefix them with the selected build directory by the
+        # user, in case they are working with multiple build folders.
+        tc.presets_prefix = self.build_path.parent.name
+
         tc.generate()
 
     def build(self):
