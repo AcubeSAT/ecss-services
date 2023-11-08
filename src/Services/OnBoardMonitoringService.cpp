@@ -253,46 +253,46 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 
 void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& message) {
 	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
-	Message parameterMonitoringDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport,
+	Message report(ServiceType, MessageType::ParameterMonitoringDefinitionReport,
 	                                            Message::TM, 0);
 	// TODO: Check if maximum transition reporting delay is needed.
-	parameterMonitoringDefinitionReport.appendUint16(maximumTransitionReportingDelay);
+	report.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();
-	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
+	report.appendUint16(numberOfIds);
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		auto currentPMONId = message.readEnum16();
 		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(message, ErrorHandler::ReportParameterNotInTheParameterMonitoringList);
 			continue;
 		}
-		parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
+		report.appendEnum16(currentPMONId);
 
 		auto pmonDefinition = getPMONDefinition(currentPMONId).get();
 
-		parameterMonitoringDefinitionReport.appendEnum16(pmonDefinition.monitoredParameterId);
-//		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().monitoringEnabled);
-		parameterMonitoringDefinitionReport.appendEnum8(pmonDefinition.monitoringEnabled ? 1 : 0);
-		parameterMonitoringDefinitionReport.appendEnum16(pmonDefinition.repetitionNumber);
-		parameterMonitoringDefinitionReport.appendEnum8(pmonDefinition.checkType);
+		report.appendEnum16(pmonDefinition.monitoredParameterId);
+//		report.appendEnum8(getPMONDefinition(currentPMONId).get().monitoringEnabled);
+		report.appendEnum8(pmonDefinition.monitoringEnabled ? 1 : 0);
+		report.appendEnum16(pmonDefinition.repetitionNumber);
+		report.appendEnum8(pmonDefinition.checkType);
 		if (pmonDefinition.checkType == PMONBase::LimitCheck) {
-			parameterMonitoringDefinitionReport.appendDouble(pmonDefinition.getLowLimit());
-			parameterMonitoringDefinitionReport.appendEnum16(pmonDefinition.getBelowLowLimitEvent());
-			parameterMonitoringDefinitionReport.appendDouble(pmonDefinition.getHighLimit());
-			parameterMonitoringDefinitionReport.appendEnum16(pmonDefinition.getAboveHighLimitEvent());
+			report.appendDouble(pmonDefinition.getLowLimit());
+			report.appendEnum16(pmonDefinition.getBelowLowLimitEvent());
+			report.appendDouble(pmonDefinition.getHighLimit());
+			report.appendEnum16(pmonDefinition.getAboveHighLimitEvent());
 		} else if (pmonDefinition.checkType == PMONBase::ExpectedValueCheck) {
-			parameterMonitoringDefinitionReport.appendUint64(pmonDefinition.getMask());
-			parameterMonitoringDefinitionReport.appendDouble(
+			report.appendUint64(pmonDefinition.getMask());
+			report.appendDouble(
 			    pmonDefinition.getExpectedValue());
-			parameterMonitoringDefinitionReport.appendEnum16(pmonDefinition.getUnexpectedValueEvent());
+			report.appendEnum16(pmonDefinition.getUnexpectedValueEvent());
 		} else if (pmonDefinition.checkType == PMONBase::DeltaCheck) {
-			parameterMonitoringDefinitionReport.appendDouble(pmonDefinition.getLowDeltaThreshold());
-			parameterMonitoringDefinitionReport.appendEnum16(pmonDefinition.getBelowLowThresholdEvent());
-			parameterMonitoringDefinitionReport.appendDouble(pmonDefinition.getHighDeltaThreshold());
-			parameterMonitoringDefinitionReport.appendEnum16(pmonDefinition.getAboveHighThresholdEvent());
-			parameterMonitoringDefinitionReport.appendUint16(pmonDefinition.getNumberOfConsecutiveDeltaChecks());
+			report.appendDouble(pmonDefinition.getLowDeltaThreshold());
+			report.appendEnum16(pmonDefinition.getBelowLowThresholdEvent());
+			report.appendDouble(pmonDefinition.getHighDeltaThreshold());
+			report.appendEnum16(pmonDefinition.getAboveHighThresholdEvent());
+			report.appendUint16(pmonDefinition.getNumberOfConsecutiveDeltaChecks());
 		}
 	}
-	storeMessage(parameterMonitoringDefinitionReport);
+	storeMessage(report);
 }
 
 void OnBoardMonitoringService::execute(Message& message) {
