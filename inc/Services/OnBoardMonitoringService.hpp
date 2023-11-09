@@ -28,9 +28,6 @@ private:
 	 * For the calculation each 16-bit enumeration is 2 bytes in size, a 16-bit unsigned integer is 2 bytes as well
 	 * and a double precision floating-point number is 8 bytes in size.
 	 * The maximum data size for an ECSS Message is currently 1024 bytes.
-     */
-
-	/**
 	 * For Limit Check Messages there are 5 16-bit enumerations (PMON ID, currentMonitoredParameterId, check type, belowLowLimitEventId, aboveHighLimitEventId),
 	 * 2 16-bit unsigned integers (N, currentPMONRepetitionNumber)
 	 * and 2 double precision floating-point numbers (lowLimit, highLimit).
