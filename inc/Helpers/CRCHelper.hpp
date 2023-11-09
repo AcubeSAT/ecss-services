@@ -37,7 +37,6 @@ public:
 	 */
 	static uint16_t validateCRC(const uint8_t* message, uint32_t length);
 
-
 	/**
 	 * Config bool to enable or disable CRC
 	 */
