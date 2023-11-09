@@ -69,7 +69,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 
 	uint16_t numberOfIds = message.readUint16();
 
-	// Create vectors for each check type
 	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
 	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
 	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
@@ -270,8 +269,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		auto pmonDefinition = getPMONDefinition(currentPMONId).get();
 
 		report.appendEnum16(pmonDefinition.monitoredParameterId);
-//		report.appendEnum8(getPMONDefinition(currentPMONId).get().monitoringEnabled);
-		report.appendEnum8(pmonDefinition.monitoringEnabled ? 1 : 0);
+		report.appendEnum8(pmonDefinition.monitoringEnabled);
 		report.appendEnum16(pmonDefinition.repetitionNumber);
 		report.appendEnum8(pmonDefinition.checkType);
 		if (pmonDefinition.checkType == PMONBase::LimitCheck) {
