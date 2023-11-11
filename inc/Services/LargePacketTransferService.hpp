@@ -86,7 +86,7 @@ public:
 	 * @param message that is exceeds the standards and has to be split down
 	 * @param largeMessageTransactionIdentifier that is a value we assign to this splitting of the large message
 	 */
-	void split(Message& message, LargeMessageTransactionId largeMessageTransactionIdentifier);
+	void split(const Message& message, LargeMessageTransactionId largeMessageTransactionIdentifier);
 };
 
 #endif // ECSS_SERVICES_LARGEPACKETTRANSFERSERVICE_HPP

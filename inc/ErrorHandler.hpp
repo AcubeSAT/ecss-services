@@ -100,6 +100,10 @@ public:
 		 * Timestamp out of bounds to be stored or converted
 		 */
 		TimeStampOutOfBounds = 17,
+		/**
+		 * PMON base couldn't be initialized with the given parameter ID
+		 */
+		InvalidParameterId = 18,
 	};
 
 	/**

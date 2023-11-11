@@ -22,53 +22,53 @@ public:
 	/**
 	 * @brief Compare two messages
 	 * @details Check whether two Message objects are of the same type
-	 * @param msg1 First message for comparison
-	 * @param msg2 Second message for comparison
+	 * @param message1 First message for comparison
+	 * @param message2 Second message for comparison
 	 * @return A boolean value indicating whether the messages are of the same type
 	 */
-	static bool isSameType(const Message& msg1, const Message& msg2) {
-		return (msg1.packetType == msg2.packetType) && (msg1.messageType == msg2.messageType) &&
-		       (msg1.serviceType == msg2.serviceType);
+	static bool isSameType(const Message& message1, const Message& message2) {
+		return (message1.packetType == message2.packetType) && (message1.messageType == message2.messageType) &&
+		       (message1.serviceType == message2.serviceType);
 	}
 
 	/**
 	 * @brief Overload the equality operator to compare messages
 	 * @details Compare two @ref ::Message objects, based on their contents and type
-	 * @param msg The message content to compare against
+	 * @param message The message content to compare against
 	 * @return The result of comparison
 	 */
-	bool operator==(const Message& msg) const {
-		if (dataSize != msg.dataSize) {
+	bool operator==(const Message& message) const {
+		if (dataSize != message.dataSize) {
 			return false;
 		}
 
-		if (not isSameType(*this, msg)) {
+		if (not isSameType(*this, message)) {
 			return false;
 		}
 
-		return std::equal(data, data + dataSize, msg.data);
+		return data == message.data;
 	}
 
 	/**
-	 * Checks the first \ref Message::dataSize bytes of \p msg for equality
+	 * Checks the first \ref Message::dataSize bytes of \p message for equality
 	 *
 	 * This performs an equality check for the first `[0, this->dataSize)` bytes of two messages. Useful to compare
 	 * two messages that have the same content, but one of which does not know its length.
 	 *
-	 * @param msg The message to check. Its `dataSize` must be smaller than the object calling the function
-	 * @return False if the messages are not of the same type, if `msg.dataSize < this->dataSize`, or if the first
+	 * @param message The message to check. Its `dataSize` must be smaller than the object calling the function
+	 * @return False if the messages are not of the same type, if `message.dataSize < this->dataSize`, or if the first
 	 * `this->dataSize` bytes are not equal between the two messages.
 	 */
-	bool bytesEqualWith(const Message& msg) const {
-		if (msg.dataSize < dataSize) {
+	bool bytesEqualWith(const Message& message) const {
+		if (message.dataSize < dataSize) {
 			return false;
 		}
 
-		if (not isSameType(*this, msg)) {
+		if (not isSameType(*this, message)) {
 			return false;
 		}
 
-		return std::equal(data, data + dataSize, msg.data);
+		return data == message.data;
 	}
 
 	enum PacketType {
@@ -77,8 +77,8 @@ public:
 	};
 
 	// The service and message IDs are 8 bits (5.3.1b, 5.3.3.1d)
-	uint8_t serviceType;
-	uint8_t messageType;
+	uint8_t serviceType = 0;
+	uint8_t messageType = 0;
 
 	// As specified in CCSDS 133.0-B-1 (TM or TC)
 	PacketType packetType;
@@ -88,31 +88,33 @@ public:
 	 *
 	 * Maximum value of 2047 (5.4.2.1c)
 	 */
-	uint16_t applicationId;
+	uint16_t applicationId = ApplicationId;
 
-	uint16_t sourceId;
+	uint16_t sourceId = 0;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
 
-	// 7.4.1, as defined in CCSDS 133.0-B-1
+	//> 7.4.1, as defined in CCSDS 133.0-B-1
 	uint16_t packetSequenceCount = 0;
 
-	// TODO: Find out if we need more than 16 bits for this
+	// TODO (#205): Find out if we need more than 16 bits for this
 	uint16_t dataSize = 0;
 
-	// Pointer to the contents of the message (excluding the PUS header)
-	// We allocate this data statically, in order to make sure there is predictability in the
-	// handling and storage of messages
-	//
-	// @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
-	// Message::appendBits() relies on this in order to easily OR the requested bits.
-	uint8_t data[ECSSMaxMessageSize] = {0};
 
-	// private:
+	/**
+	 * 	Pointer to the contents of the message (excluding the PUS header)
+	 * We allocate this data statically, in order to make sure there is predictability in the
+	 * handling and storage of messages
+	 *
+	 * @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
+	 * Message::appendBits() relies on this in order to easily OR the requested bits.
+	 */
+	etl::array<uint8_t, ECSSMaxMessageSize> data = {0};
+
 	uint8_t currentBit = 0;
 
-	// Next byte to read for read...() functions
+	//> Next byte to read for read...() functions
 	uint16_t readPosition = 0;
 
 	/**
@@ -264,8 +266,6 @@ public:
 	 * PTC = 2, PFC = \p bits
 	 */
 	void appendEnumerated(uint8_t bits, uint32_t value) {
-		// TODO: Implement 32-bit enums, if needed
-
 		return appendBits(bits, value);
 	}
 
@@ -329,7 +329,7 @@ public:
 	 * PTC = 3, PFC = 16
 	 */
 	void appendUint64(uint64_t value) {
-		appendWord(static_cast<uint32_t>(value >> 32));
+		appendWord(static_cast<uint32_t>(value >> 32)); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 		appendWord(static_cast<uint32_t>(value));
 	}
 
@@ -511,7 +511,7 @@ public:
 	 * PTC = 3, PFC = 16
 	 */
 	uint64_t readUint64() {
-		return (static_cast<uint64_t>(readWord()) << 32) | static_cast<uint64_t>(readWord());
+		return (static_cast<uint64_t>(readWord()) << 32) | static_cast<uint64_t>(readWord()); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	}
 
 	/**
@@ -588,7 +588,7 @@ public:
 	 */
 	Time::DefaultCUC readDefaultCUCTimeStamp() {
 		auto time = readUint32();
-		std::chrono::duration<uint32_t, Time::DefaultCUC::Ratio> duration(time);
+		const std::chrono::duration<uint32_t, Time::DefaultCUC::Ratio> duration(time);
 
 		return Time::DefaultCUC(duration);
 	}
@@ -624,10 +624,10 @@ public:
 		ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort);
 		ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
-		string.append(data + readPosition, length);
+		string.append(data.begin() + readPosition, length);
 		readPosition += length;
 
-		return std::move(string);
+		return string;
 	}
 
 	/**
@@ -761,7 +761,7 @@ inline void Message::append(const etl::istring& value) {
 }
 template <typename T>
 inline void Message::append(const T& value) {
-	append(std::underlying_type_t<T>(value));
+	append(std::underlying_type_t<T>(value)); //cppcheck-suppress misra-c2012-17.2
 }
 template <typename T>
 inline T Message::read() {

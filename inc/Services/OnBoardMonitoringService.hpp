@@ -93,7 +93,7 @@ public:
 	 * TC[12,4]
 	 * Deletes all the PMON definitions in the PMON list.
 	 */
-	void deleteAllParameterMonitoringDefinitions(Message& message);
+	void deleteAllParameterMonitoringDefinitions(const Message& message);
 
 	void execute(Message& message);
 };

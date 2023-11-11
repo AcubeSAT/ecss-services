@@ -171,6 +171,6 @@ public:
 	 * telecommand packet that failed the routing.
 	 * @param report Contains the appended bits to be stored
 	 */
-	void assembleReportMessage(const Message& request, Message& report) const;
+	static void assembleReportMessage(const Message& request, Message& report);
 };
 #endif // ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP

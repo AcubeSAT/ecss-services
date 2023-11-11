@@ -61,8 +61,8 @@ public:
 
 	    uint64_t seconds = duration_cast<duration<uint64_t>>(in).count();
 
-		while (seconds >= (isLeapYear(year) ? 366L : 365L) * SecondsPerDay) {
-			seconds -= (isLeapYear(year) ? 366L : 365L) * SecondsPerDay;
+		while (seconds >= (isLeapYear(year) ? 366L : 365L) * SecondsPerDay) {  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+			seconds -= (isLeapYear(year) ? 366L : 365L) * SecondsPerDay;  // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 			year++;
 		}
 
@@ -106,6 +106,10 @@ public:
 	 */
 
 private:
+	/**
+	 * The year of the Unix epoch
+	 */
+	inline static const uint16_t UNIXEpochYear = 1970;
 	/**
 	 * Makes sure that all time fields are within their bounds
 	 *

@@ -15,7 +15,7 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 5);
 	CHECK(message.serviceType == 129);
 	CHECK(message.messageType == 31);
-	CHECK(memcmp(message.data, "hello", 5) == 0);
+	CHECK(memcmp(message.data.begin(), "hello", 5) == 0);
 }
 
 TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
@@ -29,7 +29,7 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.messageType = 31;
 	message.packetSequenceCount = 8199;
 	String<5> sourceString = "hello";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
 	message.dataSize = 5;
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
@@ -64,7 +64,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 7);
 	CHECK(message.serviceType == 22);
 	CHECK(message.messageType == 17);
-	CHECK(memcmp(message.data, "hellohi", 7) == 0);
+	CHECK(memcmp(message.data.begin(), "hellohi", 7) == 0);
 
 	// Add ECSS and CCSDS header
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
@@ -90,7 +90,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.serviceType = 22;
 	message.messageType = 17;
 	String<7> sourceString = "hellohi";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
 	message.dataSize = 7;
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 

@@ -5,7 +5,7 @@
 
 void RealTimeForwardingControlService::addAllReportsOfApplication(ApplicationProcessId applicationID) {
 	for (const auto& service: AllReportTypes::MessagesOfService) {
-		uint8_t serviceType = service.first;
+		uint8_t const serviceType = service.first;
 		addAllReportsOfService(applicationID, serviceType);
 	}
 }
@@ -19,7 +19,7 @@ void RealTimeForwardingControlService::addAllReportsOfService(ApplicationProcess
 
 uint8_t RealTimeForwardingControlService::countServicesOfApplication(ApplicationProcessId applicationID) {
 	uint8_t serviceCounter = 0;
-	for (auto& definition: applicationProcessConfiguration.definitions) {
+	for (const auto& definition: applicationProcessConfiguration.definitions) {
 		const auto& pair = definition.first;
 		if (pair.first == applicationID) {
 			serviceCounter++;
@@ -33,7 +33,7 @@ uint8_t RealTimeForwardingControlService::countReportsOfService(ApplicationProce
 	return applicationProcessConfiguration.definitions[appServicePair].size();
 }
 
-bool RealTimeForwardingControlService::checkAppControlled(Message& request, ApplicationProcessId applicationId) {
+bool RealTimeForwardingControlService::checkAppControlled(const Message& request, ApplicationProcessId applicationId) {
 	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
 	    controlledApplications.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
@@ -47,7 +47,7 @@ bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Messag
 	if (not checkAppControlled(request, applicationID) or allServiceTypesAllowed(request, applicationID)) {
 		for (uint8_t i = 0; i < numOfServices; i++) {
 			request.skipBytes(sizeof(ServiceTypeNum));
-			uint8_t numOfMessages = request.readUint8();
+			uint8_t const numOfMessages = request.readUint8();
 			request.skipBytes(numOfMessages);
 		}
 		return false;
@@ -55,7 +55,7 @@ bool RealTimeForwardingControlService::checkApplicationOfAppProcessConfig(Messag
 	return true;
 }
 
-bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, ApplicationProcessId applicationID) {
+bool RealTimeForwardingControlService::allServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID) {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
 		return true;
@@ -63,7 +63,7 @@ bool RealTimeForwardingControlService::allServiceTypesAllowed(Message& request, 
 	return false;
 }
 
-bool RealTimeForwardingControlService::maxServiceTypesReached(Message& request, ApplicationProcessId applicationID) {
+bool RealTimeForwardingControlService::maxServiceTypesReached(const Message& request, ApplicationProcessId applicationID) {
 	if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
@@ -79,7 +79,7 @@ bool RealTimeForwardingControlService::checkService(Message& request, Applicatio
 	return true;
 }
 
-bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, ApplicationProcessId applicationID,
+bool RealTimeForwardingControlService::maxReportTypesReached(const Message& request, ApplicationProcessId applicationID,
                                                              ServiceTypeNum serviceType) {
 	if (countReportsOfService(applicationID, serviceType) >= AllReportTypes::MessagesOfService.at(serviceType).size()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
@@ -88,7 +88,7 @@ bool RealTimeForwardingControlService::maxReportTypesReached(Message& request, A
 	return false;
 }
 
-bool RealTimeForwardingControlService::checkMessage(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
+bool RealTimeForwardingControlService::checkMessage(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
                                                     MessageTypeNum messageType) {
 	return !maxReportTypesReached(request, applicationID, serviceType) and
 	       !reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType);
@@ -105,11 +105,11 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 	if (!request.assertTC(ServiceType, MessageType::AddReportTypesToAppProcessConfiguration)) {
 		return;
 	}
-	uint8_t numOfApplications = request.readUint8();
+	uint8_t const numOfApplications = request.readUint8();
 
 	for (uint8_t currentApplicationNumber = 0; currentApplicationNumber < numOfApplications; currentApplicationNumber++) {
-		ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
-		uint8_t numOfServices = request.readUint8();
+		const ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
+		uint8_t const numOfServices = request.readUint8();
 
 		if (not checkApplicationOfAppProcessConfig(request, applicationID, numOfServices)) {
 			continue;
@@ -121,8 +121,8 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 		}
 
 		for (uint8_t currentServiceNumber = 0; currentServiceNumber < numOfServices; currentServiceNumber++) {
-			ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
-			uint8_t numOfMessages = request.readUint8();
+			const ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
+			uint8_t const numOfMessages = request.readUint8();
 
 			if (not checkService(request, applicationID, numOfMessages)) {
 				continue;
@@ -134,7 +134,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			}
 
 			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
-				MessageTypeNum messageType = request.read<MessageTypeNum>();
+				MessageTypeNum const messageType = request.read<MessageTypeNum>();
 
 				if (not checkMessage(request, applicationID, serviceType, messageType)) {
 					continue;

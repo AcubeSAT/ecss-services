@@ -18,6 +18,7 @@ class EventReportService : public Service {
 private:
 	static const uint16_t numberOfEvents = 7;
 	etl::bitset<numberOfEvents> stateOfEvents;
+	static constexpr uint16_t LastElementID = 65535;
 
 public:
 	inline static const ServiceTypeNum ServiceType = 5;
@@ -38,16 +39,16 @@ public:
 	uint16_t mediumSeverityReportCount = 0;
 	uint16_t highSeverityReportCount = 0;
 
-	// Variables that count the event occurences per severity level
+	// Variables that count the event occurrences per severity level
 	uint16_t lowSeverityEventCount = 0;
 	uint16_t mediumSeverityEventCount = 0;
 	uint16_t highSeverityEventCount = 0;
 
 	uint16_t disabledEventsCount = 0;
 
-	uint16_t lastLowSeverityReportID = 65535;
-	uint16_t lastMediumSeverityReportID = 65535;
-	uint16_t lastHighSeverityReportID = 65535;
+	uint16_t lastLowSeverityReportID = LastElementID;
+	uint16_t lastMediumSeverityReportID = LastElementID;
+	uint16_t lastHighSeverityReportID = LastElementID;
 
 	EventReportService() {
 		stateOfEvents.set();
@@ -157,7 +158,7 @@ public:
 	 * Note: No arguments, according to the standard.
 	 * @param message
 	 */
-	void requestListOfDisabledEvents(Message message);
+	void requestListOfDisabledEvents(const Message& message);
 
 	/**
 	 * TM[5,8] disabled event definitions report
@@ -180,7 +181,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(const Message& message);
 };
 
 #endif // ECSS_SERVICES_EVENTREPORTSERVICE_HPP

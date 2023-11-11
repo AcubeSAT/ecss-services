@@ -32,7 +32,7 @@ public:
 	 *
 	 * @param data The array of uint8_t data
 	 */
-	String(const uint8_t* data) // NOLINTNEXTLINE(google-explicit-constructor)
+	String(const uint8_t* data) // NOLINT(google-explicit-constructor)
 	    : etl::string<MAX_SIZE>(reinterpret_cast<const char*>(data), MAX_SIZE) {}
 
 	/**
@@ -54,11 +54,10 @@ public:
 	 * @param text The pointer to a null terminated string
 	 *
 	 */
-	String(const char* text) // NOLINTNEXTLINE(google-explicit-constructor)
+	String(const char* text) // NOLINT(google-explicit-constructor)
 	    : etl::string<MAX_SIZE>(text) {}
 
-	using etl::istring::append; // Use the append function from the parent
-
+	using etl::istring::append; //cppcheck-suppress misra-c2012-2.3 //Use the append function from the parent. Suppressing misra 2.3 mentions unused type, however this is used.
     /**
      * Append a specified number of bytes from a uint8_t array to the String
      * @details The array does NOT need to be null-terminated

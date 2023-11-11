@@ -8,7 +8,7 @@
 #include "etl/array.h"
 #include "etl/list.h"
 #include "etl/map.h"
-
+#include "Parameter.hpp"
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
  */
@@ -27,13 +27,15 @@ public:
 		AboveHighThreshold = 10
 	};
 
-	PMONId monitoredParameterId;
+	PMONId monitoredParameterId = 0;
+	Parameter<uint8_t> invalidParam = Parameter<uint8_t>(0);
 
-	std::reference_wrapper<ParameterBase> monitoredParameter;
+	std::reference_wrapper<ParameterBase> monitoredParameter = invalidParam;
+
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
-	uint16_t repetitionNumber;
+	uint16_t repetitionNumber = 0;
 	/**
 	 * The number of checks that have been conducted so far.
 	 */

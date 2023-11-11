@@ -239,9 +239,9 @@ inline const uint8_t ECSSMaxEventDefinitionIDs = 15;
  * Limits noting the minimum and maximum valid Virtual Channels used by the Storage and Retrieval subservice
  */
 inline const struct {
-	uint8_t min = 1;
-	uint8_t max = 10;
-} VirtualChannelLimits;
+	uint8_t min;
+	uint8_t max;
+} VirtualChannelLimits = {1, 10};
 
 /**
  * Maximum number of ST[12] Parameter Monitoring Definitions.

@@ -52,7 +52,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, T
 		taiCounter += timestamp[headerSize + i];
 	}
 	// pad rightmost bytes to full length
-	taiCounter = taiCounter << 8 * (FractionBytes - inputFractionBytes);
+	taiCounter = taiCounter << 8 * (FractionBytes - inputFractionBytes);  //cppcheck-suppress misra-c2012-2.2
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
@@ -125,8 +125,8 @@ etl::array<uint8_t, Time::CUCTimestampMaximumSize> TimeStamp<BaseBytes, Fraction
 		returnArray[0] = static_cast<uint8_t>(CUCHeader >> 8);
 	}
 
-	for (auto byte = 0; byte < BaseBytes + FractionBytes; byte++) {
-		uint8_t taiCounterIndex = 8 * (BaseBytes + FractionBytes - byte - 1);
+	for (auto byte = 0; byte < BaseBytes + FractionBytes; byte++) {  //cppcheck-suppress misra-c2012-2.2
+		uint8_t taiCounterIndex = 8 * (BaseBytes + FractionBytes - byte - 1);  //cppcheck-suppress misra-c2012-2.2
 		returnArray[headerBytes + byte] = taiCounter >> taiCounterIndex;
 	}
 
@@ -157,7 +157,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 
 	ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
 
-	double output = inputSeconds / OutputRatio * (1UL << (8 * FractionBytes));
+	double output = inputSeconds / OutputRatio * (1UL << (8 * FractionBytes));  //cppcheck-suppress misra-c2012-2.2
 
 	taiCounter = static_cast<TAICounter_t>(round(output));
 }

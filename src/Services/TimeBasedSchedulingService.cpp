@@ -17,26 +17,25 @@ Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::Defa
 
 	if (!scheduledActivities.empty()) {
 		return scheduledActivities.front().requestReleaseTime;
-	} else {
-		return Time::DefaultCUC::max();
 	}
+	return Time::DefaultCUC::max();
 }
 
-void TimeBasedSchedulingService::enableScheduleExecution(Message& request) {
+void TimeBasedSchedulingService::enableScheduleExecution(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::EnableTimeBasedScheduleExecutionFunction)) {
 		return;
 	}
 	executionFunctionStatus = true;
 }
 
-void TimeBasedSchedulingService::disableScheduleExecution(Message& request) {
+void TimeBasedSchedulingService::disableScheduleExecution(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::DisableTimeBasedScheduleExecutionFunction)) {
 		return;
 	}
 	executionFunctionStatus = false;
 }
 
-void TimeBasedSchedulingService::resetSchedule(Message& request) {
+void TimeBasedSchedulingService::resetSchedule(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::ResetTimeBasedSchedule)) {
 		return;
 	}
@@ -54,16 +53,16 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		// todo: Get the group ID first, if groups are used
-		Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
+		const Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
 
-		Time::DefaultCUC releaseTime = request.readDefaultCUCTimeStamp();
+		const Time::DefaultCUC releaseTime = request.readDefaultCUCTimeStamp();
 		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.skipBytes(ECSSTCRequestStringSize);
 		} else {
-			uint8_t requestData[ECSSTCRequestStringSize] = {0};
-			request.readString(requestData, ECSSTCRequestStringSize);
-			Message receivedTCPacket = MessageParser::parseECSSTC(requestData);
+			etl::array<uint8_t, ECSSTCRequestStringSize> requestData = {0};
+			request.readString(requestData.data(), ECSSTCRequestStringSize);
+			const Message receivedTCPacket = MessageParser::parseECSSTC(requestData.data());
 			ScheduledActivity newActivity;
 
 			newActivity.request = receivedTCPacket;
@@ -85,7 +84,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 		return;
 	}
 
-	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
+	const Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
 	const auto releaseTimes =
 	    etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end(),
@@ -93,7 +92,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 		                        return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 	                        });
 	// todo: Define what the time format is going to be
-	Time::RelativeTime relativeOffset = request.readRelativeTime();
+	const Time::RelativeTime relativeOffset = request.readRelativeTime();
 	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 		return;
@@ -108,7 +107,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 		return;
 	}
 
-	Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
+	const Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
 
 	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
 	uint16_t iterationCount = request.readUint16();
@@ -162,7 +161,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 	}
 }
 
-void TimeBasedSchedulingService::detailReportAllActivities(Message& request) {
+void TimeBasedSchedulingService::detailReportAllActivities(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::DetailReportAllScheduledActivities)) {
 		return;
 	}

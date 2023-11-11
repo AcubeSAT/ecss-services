@@ -4,26 +4,25 @@ Checks: >
   clang-analyzer-*,
   bugprone-*,
   cert-*,
-  cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-virtual-class-destructor
-  misc-*,-misc-non-private-member-variables-in-classes,
+  cppcoreguidelines-*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-avoid-c-arrays  misc-*,-misc-non-private-member-variables-in-classes,
   fuchsia-multiple-inheritance,
-  google-*,-google-readability-todo,-google-build-using-namespace,-google-runtime-int,-google-readability-casting,-google-explicit-constructor,
+  google-*,-google-build-using-namespace,
   fuchsia-statically-constructed-objects,
   hicpp-exception-baseclass,
   hicpp-signed-bitwise,
-  llvm-*,-llvm-include-order,-llvm-header-guard,-llvm-else-after-return,
+  llvm-*,-llvm-include-order,-llvm-header-guard,
   modernize-use-auto,
   modernize-use-equals-default,
   misc-*,-misc-non-private-member-variables-in-classes,
   performance-*,
   readability-*,-readability-magic-numbers,-readability-else-after-return,-readability-convert-member-functions-to-static
   zircon-*
-WarningsAsErrors: '*,-bugprone-easily-swappable-parameters,-misc-unused-parameters,-llvm-header-guard,
+WarningsAsErrors: '*,-bugprone-easily-swappable-parameters,-misc-unused-parameters,
 -cppcoreguidelines-pro-type-member-init,-cppcoreguidelines-non-private-member-variables-in-classes,
 -google-runtime-references,-clang-diagnostic-tautological-constant-out-of-range-compare,
 -readability-redundant-declaration,-modernize-use-equals-default,-fuchsia-statically-constructed-objects,
 -hicpp-signed-bitwise,-cert-err58-cpp,-clang-diagnostic-error,-misc-noexcept-move-constructor,
--performance-no-int-to-ptr,-readability-identifier-length,-cppcoreguidelines-virtual-class-destructor,-readability-convert-member-functions-to-static'
+-performance-no-int-to-ptr,-readability-identifier-length,-cppcoreguidelines-virtual-class-destructor
 #HeaderFilterRegex: '^ecss-services\/((?!lib\/).)*$'
 #HeaderFilterRegex: '^((?!/lib/).)*$'
 AnalyzeTemporaryDtors: false

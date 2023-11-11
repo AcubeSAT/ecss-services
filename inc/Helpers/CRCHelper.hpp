@@ -17,8 +17,27 @@ class CRCHelper {
 	 * @author (CRC explanation) http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html
 	 * @author (class code & dox) Grigoris Pavlakis <grigpavl@ece.auth.gr>
 	 */
+private:
+	/**
+	 * shift register contains all 1's initially (ECSS-E-ST-70-41C, Annex B - CRC and ISO checksum)
+	 */
+	inline static const uint16_t InitialShiftRegisterValue = 0xFFFFU;
+	// TODO (#204): Change this to hardware implementation or a trusted software one
+	/**
+	 * CRC16-CCITT generator polynomial (as specified in standard)
+	 */
+	inline static const uint16_t Polynomial = 0x1021U;
+	/**
+	 * MSB mask (for shifting)
+	 * if the MSB is set, the bitwise AND gives 1
+	 */
+	inline static const uint16_t MSBMask = 0x8000U;
 
-	// TODO: Change this to hardware implementation or a trusted software one
+	/**
+	* Number of bits in a byte
+	 */
+	inline static const uint16_t BitNumber = 8U;
+
 public:
 	/**
 	 * Actual CRC calculation function.

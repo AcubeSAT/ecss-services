@@ -10,7 +10,7 @@ void Statistic::updateStatistics(double value) {
 		min = value;
 		timeOfMinValue = TimeGetter::getCurrentTimeDefaultCUC();
 	}
-	if (sampleCounter + 1 > 0) {
+	if (sampleCounter + 1 > 0) {  //cppcheck-suppress knownConditionTrueFalse
 		mean = (mean * sampleCounter + value) / (sampleCounter + 1);
 	}
 	sumOfSquares += pow(value, 2);
@@ -29,7 +29,7 @@ void Statistic::appendStatisticsToMessage(Message& report) const {
 		if (sampleCounter == 0) {
 			standardDeviation = 0;
 		} else {
-			double meanOfSquares = sumOfSquares / sampleCounter;
+			const double meanOfSquares = sumOfSquares / sampleCounter;
 			standardDeviation = sqrt(abs(meanOfSquares - pow(mean, 2)));
 		}
 		report.appendFloat(static_cast<float>(standardDeviation));

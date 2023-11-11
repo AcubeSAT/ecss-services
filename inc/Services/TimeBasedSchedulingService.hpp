@@ -158,7 +158,7 @@ public:
 	 * @details Enables the time-based command execution scheduling
 	 * @param request Provide the received message as a parameter
 	 */
-	void enableScheduleExecution(Message& request);
+	void enableScheduleExecution(const Message& request);
 
 	/**
 	 * @brief TC[11,2] disable the time-based schedule execution function
@@ -166,7 +166,7 @@ public:
 	 * @details Disables the time-based command execution scheduling
 	 * @param request Provide the received message as a parameter
 	 */
-	void disableScheduleExecution(Message& request);
+	void disableScheduleExecution(const Message& request);
 
 	/**
 	 * @brief TC[11,3] reset the time-based schedule
@@ -175,7 +175,7 @@ public:
 	 * activities.
 	 * @param request Provide the received message as a parameter
 	 */
-	void resetSchedule(Message& request);
+	void resetSchedule(const Message& request);
 
 	/**
 	 * @brief TC[11,4] insert activities into the time based schedule
@@ -215,7 +215,7 @@ public:
 	 * @param request Provide the received message as a parameter
 	 * @todo Replace the time parsing with the time parser
 	 */
-	void detailReportAllActivities(Message& request);
+	void detailReportAllActivities(const Message& request);
 
 	/**
 	 * @brief TM[11,10] time-based schedule detail report

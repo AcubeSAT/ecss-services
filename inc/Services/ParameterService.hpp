@@ -83,9 +83,8 @@ public:
 
 		if (parameter != parameters.end()) {
 			return parameter->second;
-		} else {
-			return {};
 		}
+		return {};
 	}
 
 	/**

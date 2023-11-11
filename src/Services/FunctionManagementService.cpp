@@ -10,22 +10,22 @@ void FunctionManagementService::call(Message& msg) {
 		return;
 	}
 
-	uint8_t funcName[ECSSFunctionNameLength] = {0};   // the function's name
-	uint8_t funcArgs[ECSSFunctionMaxArgLength] = {0}; // arguments for the function
+	etl::array<uint8_t, ECSSFunctionNameLength> funcName = {0};
+	etl::array<uint8_t, ECSSFunctionMaxArgLength> funcArgs = {0};
 
-	msg.readString(funcName, ECSSFunctionNameLength);
-	msg.readString(funcArgs, ECSSFunctionMaxArgLength);
+	msg.readString(funcName.data(), ECSSFunctionNameLength);
+	msg.readString(funcArgs.data(), ECSSFunctionMaxArgLength);
 
 	if (msg.dataSize > (ECSSFunctionNameLength + ECSSFunctionMaxArgLength)) {
 		ErrorHandler::reportError(msg,
-		                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError); // report failed
+		                          ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
 		// start of execution as requested by the standard
 		return;
 	}
 
 	// locate the appropriate function pointer
-	String<ECSSFunctionNameLength> name(funcName);
-	FunctionMap::iterator iter = funcPtrIndex.find(name);
+	String<ECSSFunctionNameLength> const name(funcName.data());
+	FunctionMap::iterator const iter = funcPtrIndex.find(name);
 
 	if (iter == funcPtrIndex.end()) {
 		ErrorHandler::reportError(msg, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);
@@ -35,7 +35,7 @@ void FunctionManagementService::call(Message& msg) {
 	auto selected = *iter->second;
 
 	// execute the function if there are no obvious flaws (defined in the standard, pg.158)
-	selected(funcArgs);
+	selected(funcArgs.data());
 }
 
 void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,

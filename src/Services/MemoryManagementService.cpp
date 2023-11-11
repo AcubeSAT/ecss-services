@@ -22,25 +22,25 @@ void MemoryManagementService::loadRawData(Message& request) {
 	 * @todo Add failure reporting
 	 */
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
-	auto memoryID = MemoryManagementService::MemoryID(request.read<MemoryId>());
+	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
 
-	if (!memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		// TODO: Send a failed start of execution
+	if (!memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
+		// TODO(grxeno): Send a failed start of execution
 		return;
 	}
 
-	ReadData readData[ECSSMaxStringSize];
+	etl::array<ReadData , ECSSMaxStringSize> readData = {};
 	uint16_t iterationCount = request.readUint16();
 
 	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
-		// TODO: Define FLASH specific access code when we transfer to embedded
+		// TODO(athanasios): Define FLASH specific access code when we transfer to embedded
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			StartAddress startAddress = request.read<StartAddress>();
-			MemoryDataLength dataLength = request.readOctetString(readData);
-			MemoryManagementChecksum checksum = request.readBits(8*sizeof(MemoryManagementChecksum));
+			const StartAddress startAddress = request.read<StartAddress>();
+			const MemoryDataLength dataLength = request.readOctetString(readData.data());
+			const MemoryManagementChecksum checksum = request.readBits(8*sizeof(MemoryManagementChecksum));
 
-			if (!dataValidator(readData, checksum, dataLength)) {
+			if (!dataValidator(readData.data(), checksum, dataLength)) {
 				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 				continue;
 			}
@@ -59,7 +59,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 				readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 			}
 
-			if (checksum != CRCHelper::calculateCRC(readData, dataLength)) {
+			if (checksum != CRCHelper::calculateCRC(readData.data(), dataLength)) {
 				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 			}
 		}
@@ -72,18 +72,18 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
-	MemoryId memoryID = request.read<MemoryId>();
+	const MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		ReadData readData[ECSSMaxStringSize];
+	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
+		etl::array<ReadData , ECSSMaxStringSize> readData = {};
 		uint16_t iterationCount = request.readUint16();
 
 		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			StartAddress startAddress = request.read<StartAddress>();
-			MemoryDataLength readLength = request.read<MemoryDataLength>();
+			const StartAddress startAddress = request.read<StartAddress>();
+			const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
 			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
 			    addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
@@ -92,8 +92,8 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 				}
 
 				report.append<StartAddress>(startAddress);
-				report.appendOctetString(String<1024>(readData, readLength));
-				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
+				report.appendOctetString(String<1024>(readData.data(), readLength));
+				report.appendBits(16, CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
@@ -102,7 +102,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-		// TODO: Send a failed start of execution
+		// TODO(athanasios): Send a failed start of execution
 	}
 }
 
@@ -112,28 +112,28 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
-	MemoryId memoryID = request.read<MemoryId>();
+	const MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(MemoryManagementService::MemoryID(memoryID))) {
-		ReadData readData[ECSSMaxStringSize];
-		uint16_t iterationCount = request.readUint16();
+	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
+		etl::array<ReadData , ECSSMaxStringSize> readData = {};
+		uint16_t const iterationCount = request.readUint16();
 
 		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			StartAddress startAddress = request.read<StartAddress>();
-			MemoryDataLength readLength = request.read<MemoryDataLength>();
+			const StartAddress startAddress = request.read<StartAddress>();
+			const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
-			    addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
+			if (addressValidator(static_cast<MemoryManagementService::MemoryID>(memoryID), startAddress) &&
+			    addressValidator(static_cast<MemoryManagementService::MemoryID>(memoryID), startAddress + readLength)) {
 				for (std::size_t i = 0; i < readLength; i++) {
 					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
 				report.append<StartAddress>(startAddress);
 				report.append<MemoryDataLength>(readLength);
-				report.appendBits(16, CRCHelper::calculateCRC(readData, readLength));
+				report.appendBits(16, CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
@@ -142,7 +142,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-		// TODO: Send a failed start of execution report
+		// TODO(athanasios): Send a failed start of execution report
 	}
 }
 
@@ -156,7 +156,7 @@ bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID
 			}
 			break;
 		case MemoryManagementService::MemoryID::ITCMRAM:
-			if ((address >= ITCMRAMLowerLim) && (address <= ITCMRAMUpperLim)) {
+			if ((address >= ITCMRAMLowerLim) && (address <= ITCMRAMUpperLim)) { //cppcheck-suppress unsignedPositive
 				validIndicator = true;
 			}
 			break;
@@ -182,7 +182,7 @@ bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID
 			break;
 
 		default:
-			validIndicator = true; // TODO: Implemented so addresses from PC can be read. Remove.
+			validIndicator = true; // TODO(athanasios): Implemented so addresses from PC can be read. Remove.
 			break;
 	}
 
