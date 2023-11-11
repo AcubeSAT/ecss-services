@@ -23,8 +23,7 @@ WarningsAsErrors: '*,-bugprone-easily-swappable-parameters,-misc-unused-paramete
 -readability-redundant-declaration,-modernize-use-equals-default,-fuchsia-statically-constructed-objects,
 -hicpp-signed-bitwise,-cert-err58-cpp,-clang-diagnostic-error,-misc-noexcept-move-constructor,
 -performance-no-int-to-ptr,-readability-identifier-length,-cppcoreguidelines-virtual-class-destructor
-#HeaderFilterRegex: '^ecss-services\/((?!lib\/).)*$'
-#HeaderFilterRegex: '^((?!/lib/).)*$'
+#HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 ...
 
