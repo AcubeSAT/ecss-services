@@ -10,7 +10,7 @@ EventActionService::EventActionDefinition::EventActionDefinition(ApplicationProc
 	message.readPosition += ECSSTCRequestStringSize;
 }
 
-void EventActionService::addEventActionDefinitions(Message& message) {
+void EventActionService::addEventActionDefinitions(const Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::AddEventAction)) {
 		return;
 	}
@@ -43,7 +43,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::deleteEventActionDefinitions(Message& message) {
+void EventActionService::deleteEventActionDefinitions(const Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::DeleteEventAction)) {
 		return;
 	}
@@ -82,7 +82,7 @@ void EventActionService::deleteAllEventActionDefinitions(const Message& message)
 	eventActionDefinitionMap.clear();
 }
 
-void EventActionService::enableEventActionDefinitions(Message& message) {
+void EventActionService::enableEventActionDefinitions(const Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::EnableEventAction)) {
 		return;
 	}
@@ -116,7 +116,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::disableEventActionDefinitions(Message& message) {
+void EventActionService::disableEventActionDefinitions(const Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::DisableEventAction)) {
 		return;
 	}
@@ -195,7 +195,7 @@ void EventActionService::executeAction(EventDefinitionId eventDefinitionID) {
 	}
 }
 
-void EventActionService::execute(Message& message) {
+void EventActionService::execute(const Message& message) {
 	switch (message.messageType) {
 		case AddEventAction:
 			addEventActionDefinitions(message);

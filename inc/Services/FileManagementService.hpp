@@ -73,7 +73,7 @@ public:
      *
      * @note Apart from the above checks, the _maximum file size_ telecommand argument is currently ignored.
      */
-	void createFile(Message& message);
+	void createFile(const Message& message);
 
 	/**
      * TC[23,2] Delete the file at the provided repository path, with the provided file name
@@ -83,7 +83,7 @@ public:
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
      * - The object path size is less than ECSSMaxStringSize
      */
-	void deleteFile(Message& message);
+	void deleteFile(const Message& message);
 
 	/**
      * TC[23,3] Report attributes of a file at the provided repository path and file name
@@ -93,7 +93,7 @@ public:
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
      * - The object path size is less than ECSSMaxStringSize
      */
-	void reportAttributes(Message& message);
+	void reportAttributes(const Message& message);
 
 	/**
      * TM[23,4] Create a report with the attributes from a file at the provided object path
@@ -103,12 +103,12 @@ public:
 	/**
      * TC[23,9] Create a directory on the filesystem
      */
-	void createDirectory(Message& message){};
+	void createDirectory(const Message& message){};
 
 	/**
      * TC[23,10] Delete a directory from the filesystem
      */
-	void deleteDirectory(Message& message){};
+	void deleteDirectory(const Message& message){};
 
 	/**
 	 * It is responsible to call the suitable function that executes a tele-command packet. The source of that packet
@@ -117,7 +117,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(const Message& message);
 
 private:
 	using ObjectPath = Filesystem::ObjectPath;

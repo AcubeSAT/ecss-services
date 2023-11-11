@@ -35,12 +35,12 @@ public:
 	/**
 	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that parameter
 	 */
-	virtual void appendValueToMessage(Message& message) = 0;
+	virtual void appendValueToMessage(const Message& message) = 0;
 
 	/**
 	 * Appends the parameter as an ECSS value to an ECSS Message
 	 */
-	virtual void setValueFromMessage(Message& message) = 0;
+	virtual void setValueFromMessage(const Message& message) = 0;
 
 	/**
 	 * Converts the value of a parameter to a double.
@@ -80,11 +80,11 @@ public:
 		}
 	}
 
-	inline void setValueFromMessage(Message& message) override {
+	inline void setValueFromMessage(const Message& message) override {
 		currentValue = message.read<DataType>();
 	};
 
-	inline void appendValueToMessage(Message& message) override {
+	inline void appendValueToMessage(const Message& message) override {
 		message.append<DataType>(currentValue);
 	};
 };

@@ -45,13 +45,13 @@ protected:
 	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
 	 * we just print the message to the screen
 	 */
-	void storeMessage(Message& message);
+	void storeMessage(const Message& message);
 
 	/**
 	 * This function declared only to remind us that every service must have a function like
 	 * this, but this particular function does actually nothing.
 	 */
-	void execute(Message& message);
+	void execute(const Message& message);
 
 	/**
 	 * Default protected constructor for this Service

@@ -227,7 +227,7 @@ void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, Par
 	report.append<CollectionInterval>(getCollectionInterval(structureId));
 }
 
-void HousekeepingService::execute(Message& message) {
+void HousekeepingService::execute(const Message& message) {
 	switch (message.messageType) {
 		case CreateHousekeepingReportStructure:
 			createHousekeepingReportStructure(message);

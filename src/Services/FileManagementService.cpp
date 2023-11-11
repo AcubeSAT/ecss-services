@@ -6,7 +6,7 @@
 
 using namespace FilepathValidators;
 
-void FileManagementService::createFile(Message& message) {
+void FileManagementService::createFile(const Message& message) {
 	message.assertTC(ServiceType, CreateFile);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -58,7 +58,7 @@ void FileManagementService::createFile(Message& message) {
 	}
 }
 
-void FileManagementService::deleteFile(Message& message) {
+void FileManagementService::deleteFile(const Message& message) {
 	message.assertTC(ServiceType, DeleteFile);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -101,7 +101,7 @@ void FileManagementService::deleteFile(Message& message) {
 	}
 }
 
-void FileManagementService::reportAttributes(Message& message) {
+void FileManagementService::reportAttributes(const Message& message) {
 	message.assertTC(ServiceType, ReportAttributes);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -144,7 +144,7 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 	storeMessage(report);
 }
 
-void FileManagementService::execute(Message& message) {
+void FileManagementService::execute(const Message& message) {
 	switch (message.messageType) {
 		case CreateFile:
 			createFile(message);

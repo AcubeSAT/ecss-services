@@ -61,12 +61,12 @@ public:
 	/**
 	 * TC[19,1] add event-action definitions
 	 */
-	void addEventActionDefinitions(Message& message);
+	void addEventActionDefinitions(const Message& message);
 
 	/**
 	 * TC[19,2] delete event-action definitions
 	 */
-	void deleteEventActionDefinitions(Message& message);
+	void deleteEventActionDefinitions(const Message& message);
 
 	/**
 	 * TC[19,3] delete all event-action definitions
@@ -76,12 +76,12 @@ public:
 	/**
 	 * TC[19,4] enable event-action definitions
 	 */
-	void enableEventActionDefinitions(Message& message);
+	void enableEventActionDefinitions(const Message& message);
 
 	/**
 	 * TC[19,5] disable event-action definitions
 	 */
-	void disableEventActionDefinitions(Message& message);
+	void disableEventActionDefinitions(const Message& message);
 
 	/**
 	 * TC[19,6] report the status of each event-action definition
@@ -131,7 +131,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	void execute(const Message& message);
 };
 
 #endif // ECSS_SERVICES_EVENTACTIONSERVICE_HPP

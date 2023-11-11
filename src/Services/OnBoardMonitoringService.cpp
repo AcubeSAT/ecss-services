@@ -4,7 +4,7 @@
 #include "Services/OnBoardMonitoringService.hpp"
 #include "etl/map.h"
 
-void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
+void OnBoardMonitoringService::enableParameterMonitoringDefinitions(const Message& message) {
 	if (!message.assertTC(ServiceType, EnableParameterMonitoringDefinitions)) {
 		return;
 	}
@@ -23,7 +23,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 	}
 }
 
-void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& message) {
+void OnBoardMonitoringService::disableParameterMonitoringDefinitions(const Message& message) {
 	if (!message.assertTC(ServiceType, DisableParameterMonitoringDefinitions)) {
 		return;
 	}
@@ -42,7 +42,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 	}
 }
 
-void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& message) {
+void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(const Message& message) {
 	if (!message.assertTC(ServiceType, ChangeMaximumTransitionReportingDelay)) {
 		return;
 	}
@@ -61,7 +61,7 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Mes
 	parameterMonitoringList.clear();
 }
 
-void OnBoardMonitoringService::execute(Message& message) {
+void OnBoardMonitoringService::execute(const Message& message) {
 	switch (message.messageType) {
 		case EnableParameterMonitoringDefinitions:
 			enableParameterMonitoringDefinitions(message);

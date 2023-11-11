@@ -55,7 +55,7 @@ void ParameterService::setParameters(Message& newParamValues) const {
 	}
 }
 
-void ParameterService::execute(Message& message) {
+void ParameterService::execute(const Message& message) {
 	switch (message.messageType) {
 		case ReportParameterValues:
 			reportParameters(message);

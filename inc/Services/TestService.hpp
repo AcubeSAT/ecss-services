@@ -50,7 +50,7 @@ public:
 	 * member of class Message) of the param message
 	 *
 	 */
-	void execute(Message& message);
+	void execute(const Message& message);
 };
 
 #endif // ECSS_SERVICES_TESTSERVICE_HPP

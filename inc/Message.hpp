@@ -81,7 +81,7 @@ public:
 	uint8_t messageType = 0;
 
 	// As specified in CCSDS 133.0-B-1 (TM or TC)
-	PacketType packetType;
+	PacketType packetType = PacketType::TM;
 
 	/**
 	 * The destination APID of the message

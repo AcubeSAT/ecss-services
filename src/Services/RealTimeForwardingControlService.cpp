@@ -147,14 +147,14 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 	}
 }
 
-bool RealTimeForwardingControlService::isApplicationEnabled(ApplicationProcessId targetAppID) {
-	auto& definitions = applicationProcessConfiguration.definitions;
-	return std::any_of(std::begin(definitions), std::end(definitions), [targetAppID](auto& definition) { return targetAppID == definition.first.first; });
+bool RealTimeForwardingControlService::isApplicationEnabled(ApplicationProcessId targetAppID) const {
+	const auto& definitions = applicationProcessConfiguration.definitions;
+	return std::any_of(std::begin(definitions), std::end(definitions), [targetAppID](const auto& definition) { return targetAppID == definition.first.first; });
 }
 
-bool RealTimeForwardingControlService::isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService) {
-	auto& definitions = applicationProcessConfiguration.definitions;
-	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](auto& definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
+bool RealTimeForwardingControlService::isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService) const {
+	const auto& definitions = applicationProcessConfiguration.definitions;
+	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](const auto& definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
 }
 
 bool RealTimeForwardingControlService::isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID,
@@ -172,7 +172,7 @@ void RealTimeForwardingControlService::deleteApplicationProcess(ApplicationProce
 	auto iter = std::begin(definitions);
 	while (iter != definitions.end()) {
 		iter = std::find_if(
-		    std::begin(definitions), std::end(definitions), [applicationID](auto& definition) { return applicationID == definition.first.first; });
+		    std::begin(definitions), std::end(definitions), [applicationID](const auto& definition) { return applicationID == definition.first.first; });
 		definitions.erase(iter);
 	}
 }
@@ -201,8 +201,8 @@ bool RealTimeForwardingControlService::isServiceTypeInConfiguration(Message& req
 	return true;
 }
 
-bool RealTimeForwardingControlService::isReportTypeInConfiguration(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-                                                                   MessageTypeNum messageType) {
+bool RealTimeForwardingControlService::isReportTypeInConfiguration(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
+                                                                   MessageTypeNum messageType) const {
 	if (not isReportTypeEnabled(messageType, applicationID, serviceType)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentReportTypeDefinition);
 		return false;
@@ -276,7 +276,7 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 	}
 }
 
-void RealTimeForwardingControlService::reportAppProcessConfigurationContent(Message& request) {
+void RealTimeForwardingControlService::reportAppProcessConfigurationContent(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::ReportAppProcessConfigurationContent)) {
 		return;
 	}
@@ -327,7 +327,7 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 	storeMessage(report);
 }
 
-void RealTimeForwardingControlService::execute(Message& message) {
+void RealTimeForwardingControlService::execute(const Message& message) {
 	switch (message.messageType) {
 		case AddReportTypesToAppProcessConfiguration:
 			addReportTypesToAppProcessConfiguration(message);

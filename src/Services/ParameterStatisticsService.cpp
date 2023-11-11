@@ -194,7 +194,7 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 	storeMessage(definitionsReport);
 }
 
-void ParameterStatisticsService::execute(Message& message) {
+void ParameterStatisticsService::execute(const Message& message) {
 	DefaultTimestamp currentTime;
 	switch (message.messageType) {
 		case ReportParameterStatistics:

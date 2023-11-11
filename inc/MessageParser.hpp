@@ -38,7 +38,7 @@ public:
 	 *
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	static void execute(Message& message);
+	static void execute(const Message& message);
 
 	/**
 	 * Parse a message that contains the CCSDS and ECSS packet headers, as well as the data
@@ -49,7 +49,7 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	static Message parse(uint8_t* data, uint32_t length);
+	static Message parse(const uint8_t* data, uint32_t length);
 
 	/**
 	 * Parse data that contains the ECSS packet header, without the CCSDS space packet header
@@ -65,7 +65,7 @@ public:
 	 * @param data A uint8_t array of the TC packet data
 	 * @return Parsed message
 	 */
-	static Message parseECSSTC(uint8_t* data);
+	static Message parseECSSTC(const uint8_t* data);
 
 	/**
 	 * @brief Converts a TC or TM message to a message string, appending just the ECSS header

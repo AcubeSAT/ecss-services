@@ -1,6 +1,6 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
-String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
+String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(const Message& message) {
 	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId = {};
 	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
 	return packetStoreId.data();
@@ -277,7 +277,7 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		const TimeStamps retrievalStartTime = request.read<TimeStamps>();
 		const TimeStamps retrievalEndTime = request.read<TimeStamps>();
 
-		if (retrievalStartTime >= retrievalEndTime) {
+		if (retrievalStartTime >= retrievalEndTime) { //cppcheck-suppress knownConditionTrueFalse
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 			continue;
 		}

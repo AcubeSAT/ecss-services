@@ -48,7 +48,7 @@ public:
 	 * Receives a TC[14,3] 'Report the application process forward control configuration content' message and
 	 * performs the necessary error checking.
 	 */
-	void reportAppProcessConfigurationContent(Message& request);
+	void reportAppProcessConfigurationContent(const Message& request);
 
 	/**
 	 * Creates and stores a TM[14,4] 'Application process forward control configuration content report' message.
@@ -129,12 +129,12 @@ private:
 	/**
 	 * Returns true, if the defined application exists in the application process configuration map.
 	 */
-	bool isApplicationEnabled(ApplicationProcessId targetAppID);
+	bool isApplicationEnabled(ApplicationProcessId targetAppID) const;
 
 	/**
 	 * Returns true, if the defined service type exists in the application process configuration map.
 	 */
-	bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService);
+	bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService) const;
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
@@ -163,7 +163,7 @@ private:
 	 * Checks whether the requested report type is present in the application process configuration.
 	 * Reports an error if one exist.
 	 */
-	bool isReportTypeInConfiguration(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
+	bool isReportTypeInConfiguration(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType) const;
 
 	/**
 	 * Deletes the requested service type from the application process configuration. If the deletion results in an
@@ -196,7 +196,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice.
 	 */
-	void execute(Message& message);
+	void execute(const Message& message);
 };
 
 #endif

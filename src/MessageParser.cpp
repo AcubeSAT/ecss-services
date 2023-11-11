@@ -8,7 +8,7 @@
 static_assert(sizeof(ServiceTypeNum) == 1);
 static_assert(sizeof(MessageTypeNum) == 1);
 
-void MessageParser::execute(Message& message) { //cppcheck-suppress constParameter
+void MessageParser::execute(const Message& message) { //cppcheck-suppress constParameter
 	switch (message.serviceType) {
 
 #ifdef SERVICE_HOUSEKEEPING
@@ -93,7 +93,7 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress constParamet
 }
 
 // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
-Message MessageParser::parse(uint8_t* data, uint32_t length) {
+Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket);
 
 	uint16_t const packetHeaderIdentification = (data[0] << 8) | data[1];
@@ -153,13 +153,13 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 
 Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
 	Message message;
-	auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
+	const auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
 	message.packetType = Message::TC;
 	parseECSSTCHeader(dataInt, ECSSTCRequestStringSize, message);
 	return message;
 }
 
-Message MessageParser::parseECSSTC(uint8_t* data) {
+Message MessageParser::parseECSSTC(const uint8_t* data) {
 	Message message;
 	message.packetType = Message::TC;
 	parseECSSTCHeader(data, ECSSTCRequestStringSize, message);

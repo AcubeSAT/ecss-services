@@ -203,7 +203,7 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryMa
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
 
-void MemoryManagementService::execute(Message& message) {
+void MemoryManagementService::execute(const Message& message) {
 	switch (message.messageType) {
 		case LoadRawMemoryDataAreas:
 			loadRawData(message);

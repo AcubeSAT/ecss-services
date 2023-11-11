@@ -90,3 +90,5 @@ cppcheck-html-report/
 ikos-report/
 clang-tidy-html-report/
 gcovr/
+
+report.xml
