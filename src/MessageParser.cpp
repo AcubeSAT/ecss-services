@@ -5,7 +5,6 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
 
-
 static_assert(sizeof(ServiceTypeNum) == 1);
 static_assert(sizeof(MessageTypeNum) == 1);
 
@@ -223,7 +222,8 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	packetId |= (1U << 11U);                                              // Secondary header flag
 	packetId |= (message.packetType == Message::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
 	SequenceCount packetSequenceControl = message.packetSequenceCount | (3U << 14U);
-	uint16_t packetDataLength = ecssMessage.size();
+	// The removal of one octet adheres to the standard specified in ECSS 7.4.1.
+	uint16_t packetDataLength = ecssMessage.size() - 1;
 
 	// Compile the header
 	header[0] = packetId >> 8U;
@@ -239,7 +239,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 
     if constexpr (CRCHelper::EnableCRC) {
 		// Append CRC field
-		uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 + packetDataLength);
+		uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
 		ccsdsMessage.push_back(static_cast<char8_t>(crcField >> 8U));
 		ccsdsMessage.push_back(static_cast<char8_t>(crcField & 0xFF));
 	}
