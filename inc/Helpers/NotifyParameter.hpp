@@ -53,7 +53,7 @@ public:
 		}
 	}
 
-	inline void setValueFromMessage(const Message& message) override {
+	inline void setValueFromMessage(Message& message) override {
 		Parent::setValueFromMessage(message);
 
 		if (notifier) {

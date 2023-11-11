@@ -1,8 +1,9 @@
 #include "Helpers/CRCHelper.hpp"
+#include "Helpers/TypeDefinitions.hpp"
 
 uint16_t CRCHelper::calculateCRC(const uint8_t* message, uint32_t length) {
 	// shift register contains all 1's initially (ECSS-E-ST-70-41C, Annex B - CRC and ISO checksum)
-	uint16_t shiftReg = InitialShiftRegisterValue;
+	ShiftRegister shiftReg = InitialShiftRegisterValue;
 
 	for (uint32_t i = 0; i < length; i++) {
 		// "copy" (XOR w/ existing contents) the current msg bits into the MSB of the shift register

@@ -82,7 +82,7 @@ public:
 		}
 	}
 
-	inline void appendValueToMessage(const Message& message) override {
+	inline void appendValueToMessage(Message& message) override {
 		if (getter) {
 			message.append<DataType>((*getter)());
 		} else {
@@ -91,7 +91,7 @@ public:
 		}
 	};
 
-	inline void setValueFromMessage(const Message& message) override {
+	inline void setValueFromMessage(Message& message) override {
 		[[maybe_unused]] auto skippedBytes = message.read<DataType>();
 		ErrorHandler::reportError(message, ErrorHandler::ParameterReadOnly);
 	};

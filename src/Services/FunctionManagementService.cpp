@@ -49,7 +49,7 @@ void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,
 	}
 }
 
-void FunctionManagementService::execute(const Message& message) {
+void FunctionManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case PerformFunction:
 			call(message); // TC[8,1]

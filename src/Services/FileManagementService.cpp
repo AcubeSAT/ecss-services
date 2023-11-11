@@ -6,7 +6,7 @@
 
 using namespace FilepathValidators;
 
-void FileManagementService::createFile(const Message& message) {
+void FileManagementService::createFile(Message& message) {
 	message.assertTC(ServiceType, CreateFile);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -30,13 +30,13 @@ void FileManagementService::createFile(const Message& message) {
 		return;
 	}
 
-	uint32_t maxFileSizeBytes = message.readUint32();
+	uint32_t const maxFileSizeBytes = message.readUint32();
 	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
 		return;
 	}
 
-	bool isFileLocked = message.readBoolean();
+	bool const isFileLocked = message.readBoolean();
 
 	if (auto fileCreationError = Filesystem::createFile(fullPath)) {
 		switch (fileCreationError.value()) {
@@ -58,7 +58,7 @@ void FileManagementService::createFile(const Message& message) {
 	}
 }
 
-void FileManagementService::deleteFile(const Message& message) {
+void FileManagementService::deleteFile(Message& message) {
 	message.assertTC(ServiceType, DeleteFile);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -101,7 +101,7 @@ void FileManagementService::deleteFile(const Message& message) {
 	}
 }
 
-void FileManagementService::reportAttributes(const Message& message) {
+void FileManagementService::reportAttributes(Message& message) {
 	message.assertTC(ServiceType, ReportAttributes);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -144,7 +144,7 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 	storeMessage(report);
 }
 
-void FileManagementService::execute(const Message& message) {
+void FileManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case CreateFile:
 			createFile(message);

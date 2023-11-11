@@ -38,7 +38,7 @@ public:
 	 *
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	static void execute(const Message& message);
+	static void execute(Message& message);
 
 	/**
 	 * Parse a message that contains the CCSDS and ECSS packet headers, as well as the data

@@ -76,18 +76,18 @@ public:
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
-	void enableParameterMonitoringDefinitions(const Message& message);
+	void enableParameterMonitoringDefinitions(Message& message);
 
 	/**
 	 * Disables the PMON definitions which correspond to the ids in TC[12,2].
 	 */
-	void disableParameterMonitoringDefinitions(const Message& message);
+	void disableParameterMonitoringDefinitions(Message& message);
 
 	/**
 	 * TC[12,3]
 	 * Changes the maximum time between two transition reports.
 	 */
-	void changeMaximumTransitionReportingDelay(const Message& message);
+	void changeMaximumTransitionReportingDelay(Message& message);
 
 	/**
 	 * TC[12,4]
@@ -95,7 +95,7 @@ public:
 	 */
 	void deleteAllParameterMonitoringDefinitions(const Message& message);
 
-	void execute(const Message& message);
+	void execute(Message& message);
 };
 
 #endif // ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP

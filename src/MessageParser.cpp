@@ -6,9 +6,10 @@
 #include "Helpers/CRCHelper.hpp"
 
 static_assert(sizeof(ServiceTypeNum) == 1);
+
 static_assert(sizeof(MessageTypeNum) == 1);
 
-void MessageParser::execute(const Message& message) { //cppcheck-suppress constParameter
+void MessageParser::execute(Message& message) { //cppcheck-suppress[constParameter,constParameterReference]
 	switch (message.serviceType) {
 
 #ifdef SERVICE_HOUSEKEEPING

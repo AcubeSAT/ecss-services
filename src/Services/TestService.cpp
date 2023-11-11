@@ -30,7 +30,7 @@ void TestService::onBoardConnectionReport(ApplicationProcessId applicationProces
 	storeMessage(report);
 }
 
-void TestService::execute(const Message& message) {
+void TestService::execute(Message& message) {
 	switch (message.messageType) {
 		case AreYouAliveTest:
 			areYouAlive(message);

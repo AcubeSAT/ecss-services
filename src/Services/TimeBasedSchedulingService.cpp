@@ -257,7 +257,7 @@ void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<
 	storeMessage(report);
 }
 
-void TimeBasedSchedulingService::execute(const Message& message) {
+void TimeBasedSchedulingService::execute(Message& message) {
 	switch (message.messageType) {
 		case EnableTimeBasedScheduleExecutionFunction:
 			enableScheduleExecution(message);

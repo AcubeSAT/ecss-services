@@ -44,7 +44,7 @@ public:
 	 */
 	class RawDataMemoryManagement {
 	private:
-		MemoryManagementService& mainService; // Used to access main class's members
+		MemoryManagementService& mainService; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) // Used to access main class's members
 
 	public:
 		explicit RawDataMemoryManagement(MemoryManagementService& parent);
@@ -91,7 +91,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(const Message& message);
+	void execute(Message& message);
 
 private:
 	/**

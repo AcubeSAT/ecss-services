@@ -258,8 +258,8 @@ namespace Time {
 		if ((year % 4) != 0) {
 			return false;
 		}
-		if ((year % 100) != 0) {
-			return true; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
+		if ((year % 100) != 0) { //NOLINT(cppcoreguidelines-avoid-magic-numbers)
+			return true;
 		}
 		return (year % 400) == 0; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	}

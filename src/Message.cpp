@@ -114,7 +114,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 uint8_t Message::readByte() {
 	ASSERT_REQUEST(readPosition < ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
-	uint8_t value = data[readPosition];
+	uint8_t const value = data[readPosition];
 	readPosition++;
 
 	return value;
@@ -123,7 +123,7 @@ uint8_t Message::readByte() {
 uint16_t Message::readHalfword() {
 	ASSERT_REQUEST((readPosition + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
-	uint16_t value = (data[readPosition] << 8) | data[readPosition + 1]; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+	uint16_t const value = (data[readPosition] << 8) | data[readPosition + 1]; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	readPosition += 2;
 
 	return value;
@@ -132,7 +132,7 @@ uint16_t Message::readHalfword() {
 uint32_t Message::readWord() {
 	ASSERT_REQUEST((readPosition + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
-	uint32_t value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) | (data[readPosition + 2] << 8) | // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+	uint32_t const value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) | (data[readPosition + 2] << 8) | // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	                 data[readPosition + 3];
 	readPosition += 4;
 

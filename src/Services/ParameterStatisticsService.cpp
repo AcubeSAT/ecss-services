@@ -107,14 +107,14 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 		const ParameterId currentId = request.read<ParameterId>();
 		if (!Services.parameterManagement.parameterExists(currentId)) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
-			if (supportsSamplingInterval) {
+			if (SupportsSamplingInterval) {
 				request.skipBytes(sizeof(SamplingInterval));
 			}
 			continue;
 		}
 		bool const exists = statisticsMap.find(currentId) != statisticsMap.end();
 		SamplingInterval interval = 0;
-		if (supportsSamplingInterval) {
+		if (SupportsSamplingInterval) {
 			interval = request.read<SamplingInterval>();
 			if (interval < reportingIntervalMs) {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
@@ -128,13 +128,13 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 				return;
 			}
 			Statistic newStatistic;
-			if (supportsSamplingInterval) {
+			if (SupportsSamplingInterval) {
 				newStatistic.setSelfSamplingInterval(interval);
 			}
 			statisticsMap.insert({currentId, newStatistic});
 			// TODO(athanasios): start the evaluation of statistics for this parameter.
 		} else {
-			if (supportsSamplingInterval) {
+			if (SupportsSamplingInterval) {
 				statisticsMap.at(currentId).setSelfSamplingInterval(interval);
 			}
 			statisticsMap.at(currentId).resetStatistics();
@@ -187,14 +187,14 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 		const ParameterId currentId = currentParam.first;
 		const SamplingInterval samplingInterval = currentParam.second.selfSamplingInterval;
 		definitionsReport.append<ParameterId>(currentId);
-		if (supportsSamplingInterval) {
+		if (SupportsSamplingInterval) {
 			definitionsReport.append<SamplingInterval>(samplingInterval);
 		}
 	}
 	storeMessage(definitionsReport);
 }
 
-void ParameterStatisticsService::execute(const Message& message) {
+void ParameterStatisticsService::execute(Message& message) {
 	DefaultTimestamp currentTime;
 	switch (message.messageType) {
 		case ReportParameterStatistics:

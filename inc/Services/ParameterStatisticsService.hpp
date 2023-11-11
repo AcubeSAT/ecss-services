@@ -71,7 +71,7 @@ public:
 	/**
 	 * Indicates whether to append/read the sampling interval to/from message
 	 */
-	const bool supportsSamplingInterval = true;
+	inline static constexpr bool SupportsSamplingInterval = true;
 
 	/**
 	 * Returns the periodic statistics reporting status
@@ -161,12 +161,12 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(const Message& message);
+	void execute(Message& message);
 
 	/**
 	 * BaseBytes: 4 bytes, FractionBytes: 0 bytes, Num: 1, Denom: 10.
 	 */
-	using DefaultTimestamp = TimeStamp<4, 0, 1, 10>;
+	using DefaultTimestamp = TimeStamp<4, 0, 1, 10>; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
 	/**
 	 * Get the current time as a TimeStamp object.

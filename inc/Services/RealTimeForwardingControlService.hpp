@@ -140,7 +140,7 @@ private:
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
+	bool isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType) const;
 
 	/**
 	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
@@ -196,7 +196,7 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice.
 	 */
-	void execute(const Message& message);
+	void execute(Message& message);
 };
 
 #endif

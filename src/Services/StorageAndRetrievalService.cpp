@@ -1,6 +1,6 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
-String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(const Message& message) {
+String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
 	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId = {};
 	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
 	return packetStoreId.data();
@@ -117,7 +117,6 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacket
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
 			return true;
 		}
-		return false;
 	} else if (timeTag < packetStores[fromPacketStoreId].storedTelemetryPackets.front().first) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
 		return true;
@@ -203,7 +202,7 @@ void StorageAndRetrievalService::addPacketStore(const String<ECSSPacketStoreIdSi
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
                                                            TimeStamps timestamp) {
-	Message tmPacket;
+	Message tmPacket; // NOLINT(misc-const-correctness) as we might need to change
 	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, tmPacket});
 }
 
@@ -527,7 +526,7 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingPacketStore);
 			continue;
 		}
-		PacketStoreSize packetStoreSize = request.read<PacketStoreSize>();
+		const PacketStoreSize packetStoreSize = request.read<PacketStoreSize>();
 		const PacketStoreType typeCode = request.read<PacketStoreType>();
 		const PacketStore::PacketStoreType packetStoreType = (typeCode == 0) ? PacketStore::Circular : PacketStore::Bounded;
 		const VirtualChannel virtualChannel = request.read<VirtualChannel>();

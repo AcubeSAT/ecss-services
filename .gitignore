@@ -92,3 +92,4 @@ clang-tidy-html-report/
 gcovr/
 
 report.xml
+clang-tidy-output.log

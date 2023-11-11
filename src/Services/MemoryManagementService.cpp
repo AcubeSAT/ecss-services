@@ -30,7 +30,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	}
 
 	etl::array<ReadData , ECSSMaxStringSize> readData = {};
-	uint16_t iterationCount = request.readUint16();
+	uint16_t const iterationCount = request.readUint16();
 
 	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
 		// TODO(athanasios): Define FLASH specific access code when we transfer to embedded
@@ -76,7 +76,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
 		etl::array<ReadData , ECSSMaxStringSize> readData = {};
-		uint16_t iterationCount = request.readUint16();
+		uint16_t const iterationCount = request.readUint16();
 
 		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
@@ -85,15 +85,15 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 			const StartAddress startAddress = request.read<StartAddress>();
 			const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-			if (addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress) &&
-			    addressValidator(MemoryManagementService::MemoryID(memoryID), startAddress + readLength)) {
+			if (addressValidator(static_cast<MemoryManagementService::MemoryID>(memoryID), startAddress) &&
+			    addressValidator(static_cast<MemoryManagementService::MemoryID>(memoryID), startAddress + readLength)) {
 				for (std::size_t i = 0; i < readLength; i++) {
 					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
 				report.append<StartAddress>(startAddress);
-				report.appendOctetString(String<1024>(readData.data(), readLength));
-				report.appendBits(16, CRCHelper::calculateCRC(readData.data(), readLength));
+				report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
+				report.append<ShiftRegister>(CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
@@ -133,7 +133,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 
 				report.append<StartAddress>(startAddress);
 				report.append<MemoryDataLength>(readLength);
-				report.appendBits(16, CRCHelper::calculateCRC(readData.data(), readLength));
+				report.append<ShiftRegister>(CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
@@ -203,7 +203,7 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryMa
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
 
-void MemoryManagementService::execute(const Message& message) {
+void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case LoadRawMemoryDataAreas:
 			loadRawData(message);

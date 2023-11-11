@@ -43,7 +43,7 @@ PacketSender packetSender;
  */
 inline const bool SendToYamcs = true;
 
-void Service::storeMessage(const Message& message) {
+void Service::storeMessage(Message& message) {
 	// appends the remaining bits to complete a byte
 	message.finalize();
 

@@ -603,7 +603,7 @@ public:
 	 * PTC = 7, PFC = 0
 	 */
 	uint16_t readOctetString(uint8_t* byteString) {
-		uint16_t size = readUint16(); // Get the data length from the message
+		uint16_t const size = readUint16(); // Get the data length from the message
 		readString(byteString, size); // Read the string data
 
 		return size; // Return the string size

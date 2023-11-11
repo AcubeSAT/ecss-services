@@ -31,7 +31,7 @@ public:
 	/**
 	 * The type of timestamps that the subservice sets to each incoming telemetry packet.
 	 */
-	const TimeStampType timeStamping = PacketBased;
+	TimeStampType timeStamping = PacketBased;
 
 private:
 	typedef String<ECSSPacketStoreIdSize> packetStoreId;
@@ -44,7 +44,7 @@ private:
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
 	 */
-	static inline String<ECSSPacketStoreIdSize> readPacketStoreId(const Message& message);
+	static inline String<ECSSPacketStoreIdSize> readPacketStoreId(Message& message);
 
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the

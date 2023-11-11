@@ -66,7 +66,7 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 	}
 }
 
-void EventReportService::enableReportGeneration(Message message) {
+void EventReportService::enableReportGeneration(Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::EnableReportGenerationOfEvents)) {
 		return;
 	}
@@ -74,7 +74,7 @@ void EventReportService::enableReportGeneration(Message message) {
 	/**
 	 * @todo: Report an error if length > numberOfEvents
 	 */
-	uint16_t length = message.readUint16();
+	uint16_t const length = message.readUint16();
 	if (length <= numberOfEvents) {
 		for (uint16_t i = 0; i < length; i++) {
 			stateOfEvents[message.read<EventDefinitionId>()] = true;
@@ -83,7 +83,7 @@ void EventReportService::enableReportGeneration(Message message) {
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
-void EventReportService::disableReportGeneration(Message message) {
+void EventReportService::disableReportGeneration(Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::DisableReportGenerationOfEvents)) {
 		return;
 	}
@@ -122,7 +122,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	storeMessage(report);
 }
 
-void EventReportService::execute(const Message& message) {
+void EventReportService::execute(Message& message) {
 	switch (message.messageType) {
 		case EnableReportGenerationOfEvents:
 			enableReportGeneration(message);

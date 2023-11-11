@@ -151,11 +151,11 @@ void HousekeepingService::appendParametersToHousekeepingStructure(Message& reque
 		return;
 	}
 
-	ParameterReportStructureId targetStructId = request.read<ParameterReportStructureId>();
+	const ParameterReportStructureId targetStructId = request.read<ParameterReportStructureId>();
 	if (hasNonExistingStructExecutionError(targetStructId, request)) {
 		return;
 	}
-	auto& housekeepingStructure = getStruct(targetStructId)->get();
+	auto& housekeepingStructure = getStruct(targetStructId)->get(); // NOLINT(bugprone-unchecked-optional-access) // nolint as we check next line
 	if (hasRequestedAppendToEnabledHousekeepingError(housekeepingStructure, request)) {
 		return;
 	}
@@ -227,7 +227,7 @@ void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, Par
 	report.append<CollectionInterval>(getCollectionInterval(structureId));
 }
 
-void HousekeepingService::execute(const Message& message) {
+void HousekeepingService::execute(Message& message) {
 	switch (message.messageType) {
 		case CreateHousekeepingReportStructure:
 			createHousekeepingReportStructure(message);
