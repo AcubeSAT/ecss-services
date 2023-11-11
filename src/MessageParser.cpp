@@ -172,8 +172,8 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[0] |= 0x00;                //ack flags
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
-		header[3] = message.sourceId >> 8U;
-		header[4] = message.sourceId;
+		header[3] = message.applicationId >> 8U;
+		header[4] = message.applicationId;
 	} else {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
 		header[0] |= 0x00;                // Spacecraft time reference status
@@ -181,8 +181,8 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
-		header[5] = message.sourceId >> 8U; // DestinationID
-		header[6] = message.sourceId;
+		header[5] = message.applicationId >> 8U; // DestinationID
+		header[6] = message.applicationId;
 		uint32_t ticks = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
 		header[7] = (ticks >> 24) & 0xffU;
 		header[8] = (ticks >> 16) & 0xffU;
