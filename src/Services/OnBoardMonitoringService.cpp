@@ -92,7 +92,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		}
 
 		if (auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
-			if (currentCheckType == PMONBase::LimitCheck) {
+			if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Limit) {
 				double lowLimit = message.readDouble();
 				uint16_t belowLowLimitEventId = message.readEnum16();
 				double highLimit = message.readDouble();
@@ -106,7 +106,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
 				limitChecks.push_back(limitCheck);
 				addPMONDefinition(currentPMONId, limitCheck);
-			} else if (currentCheckType == PMONBase::ExpectedValueCheck) {
+			} else if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::ExpectedValue) {
 				uint64_t mask = message.readUint64();
 				double expectedValue = message.readDouble();
 				uint16_t unExpectedValueEvent = message.readEnum16();
@@ -114,7 +114,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				                                          expectedValue, mask, unExpectedValueEvent);
 				expectedValueChecks.push_back(expectedValueCheck);
 				addPMONDefinition(currentPMONId, expectedValueCheck);
-			} else if (currentCheckType == PMONBase::DeltaCheck) {
+			} else if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Delta) {
 				double lowDeltaThreshold = message.readDouble();
 				uint16_t belowLowThresholdEventId = message.readEnum16();
 				double highDeltaThreshold = message.readDouble();
@@ -179,8 +179,8 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		//TODO: Implement a parameterExists() function.
 		if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
 
-			switch (currentCheckType) {
-				case PMONBase::LimitCheck: {
+			switch (static_cast<PMONBase::CheckType>(currentCheckType)) {
+				case PMONBase::CheckType::Limit: {
 					double lowLimit = message.readDouble();
 					uint16_t belowLowLimitEventId = message.readEnum16();
 					double highLimit = message.readDouble();
@@ -201,7 +201,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					break;
 				}
 
-				case PMONBase::ExpectedValueCheck: {
+				case PMONBase::PMONBase::CheckType::ExpectedValue: {
 					uint64_t mask = message.readUint64();
 					double expectedValue = message.readDouble();
 					uint16_t unExpectedValueEvent = message.readEnum16();
@@ -215,7 +215,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					break;
 				}
 
-				case PMONBase::DeltaCheck: {
+				case PMONBase::CheckType::Delta: {
 					double lowDeltaThreshold = message.readDouble();
 					uint16_t belowLowThresholdEventId = message.readEnum16();
 					double highDeltaThreshold = message.readDouble();
@@ -272,18 +272,18 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().monitoredParameterId);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().monitoringEnabled));
 		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().repetitionNumber);
-		parameterMonitoringDefinitionReport.appendEnum8(getPMONDefinition(currentPMONId).get().checkType);
-		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::LimitCheck) {
+		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().checkType));
+		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Limit) {
 			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getLowLimit());
 			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getBelowLowLimitEvent());
 			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getHighLimit());
 			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getAboveHighLimitEvent());
-		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::ExpectedValueCheck) {
+		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::ExpectedValue) {
 			parameterMonitoringDefinitionReport.appendUint64(getPMONDefinition(currentPMONId).get().getMask());
 			parameterMonitoringDefinitionReport.appendDouble(
 			    getPMONDefinition(currentPMONId).get().getExpectedValue());
 			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getUnexpectedValueEvent());
-		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::DeltaCheck) {
+		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Delta) {
 			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getLowDeltaThreshold());
 			parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().getBelowLowThresholdEvent());
 			parameterMonitoringDefinitionReport.appendDouble(getPMONDefinition(currentPMONId).get().getHighDeltaThreshold());

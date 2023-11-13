@@ -27,9 +27,10 @@ public:
 		AboveHighThreshold = 10
 	};
 
-	enum CheckType : uint8_t { LimitCheck = 1,
-		                       ExpectedValueCheck = 2,
-		                       DeltaCheck = 3 };
+	enum class CheckType : uint8_t { Limit = 1,
+		                             ExpectedValue = 2,
+		                             Delta = 3 };
+
 
 	uint16_t monitoredParameterId;
 
@@ -108,7 +109,7 @@ public:
 	                                uint64_t mask, uint16_t unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
 	      PMONBase(monitoredParameterId, repetitionNumber) {
-		checkType = ExpectedValueCheck;
+		checkType = CheckType::ExpectedValue;
 	};
 
 	double getExpectedValue() override {
@@ -138,7 +139,7 @@ public:
 	                        uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
-		checkType = LimitCheck;
+		checkType = CheckType::Limit;
 	};
 
 	double getLowLimit() override {
@@ -176,7 +177,7 @@ public:
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
 	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber) {
-		checkType = DeltaCheck;
+		checkType = CheckType::Delta;
 	};
 
 	uint16_t getNumberOfConsecutiveDeltaChecks() override {
