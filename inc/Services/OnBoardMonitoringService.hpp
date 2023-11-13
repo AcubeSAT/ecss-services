@@ -105,7 +105,7 @@ public:
 	bool isPMONListEmpty() {
 		return parameterMonitoringList.empty();
 	}
-	uint16_t getCount(uint16_t key) const{
+	uint16_t getCount(uint16_t key) const {
 		return parameterMonitoringList.count(key);
 	}
 	/**
