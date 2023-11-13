@@ -3,6 +3,7 @@
 #include "Message.hpp"
 #include "ServicePool.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
+#include "ECSS_Definitions.hpp"
 #include "etl/map.h"
 #include "etl/vector.h"
 
@@ -253,7 +254,7 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& message) {
 	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
 	Message parameterMonitoringDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport,
-	                                            Message::TM, 0);
+	                                            Message::TM, ApplicationId);
 	// TODO: Check if maximum transition reporting delay is needed.
 	parameterMonitoringDefinitionReport.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();
