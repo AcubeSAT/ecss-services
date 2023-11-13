@@ -319,9 +319,6 @@ void OnBoardMonitoringService::execute(Message& message) {
 		case ReportParameterMonitoringDefinitions:
 			reportParameterMonitoringDefinitions(message);
 			break;
-		case ParameterMonitoringDefinitionReport:
-			parameterMonitoringDefinitionReport(message);
-			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
