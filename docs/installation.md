@@ -145,7 +145,7 @@ If you are using an IDE that manages CMake, it should be enough to add the follo
 
 @note
 We do not recommend using Conan plugins for your IDE, as they might work in mysterious ways and override our custom
-configuration. We cannot provide support for such plugins as your team is mainly using Conan from the command line.
+configuration. We cannot provide support for such plugins as our team is mainly using Conan from the command line.
 
 ## Integrating as a library
 
