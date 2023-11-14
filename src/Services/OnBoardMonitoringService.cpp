@@ -167,80 +167,79 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
-			continue;
+			return;
 		}
 
 		if (getPMONDefinition(currentPMONId).get().monitoredParameterId != currentMonitoredParameterId) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
 			                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
-			continue;
+			return;
 		}
 
 		//TODO: Implement a parameterExists() function.
-		if (auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
+		auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId);
+		if (not parameterToBeModified) {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			return;
+		}
 
-			switch (static_cast<PMONBase::CheckType>(currentCheckType)) {
-				case PMONBase::CheckType::Limit: {
-					double lowLimit = message.readDouble();
-					uint16_t belowLowLimitEventId = message.readEnum16();
-					double highLimit = message.readDouble();
-					uint16_t aboveHighLimitEventId = message.readEnum16();
 
-					if (highLimit <= lowLimit) {
-						ErrorHandler::reportError(
-						    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
-						continue;
-					}
+		switch (static_cast<PMONBase::CheckType>(currentCheckType)) {
+			case PMONBase::CheckType::Limit: {
+				double lowLimit = message.readDouble();
+				uint16_t belowLowLimitEventId = message.readEnum16();
+				double highLimit = message.readDouble();
+				uint16_t aboveHighLimitEventId = message.readEnum16();
 
-					getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
-					getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-					getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
-					parameterMonitoringList.erase(currentPMONId);
-					auto monitoringDefinition = PMONLimitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
-					addPMONDefinition(currentPMONId, monitoringDefinition);
-					break;
-				}
-
-				case PMONBase::PMONBase::CheckType::ExpectedValue: {
-					uint64_t mask = message.readUint64();
-					double expectedValue = message.readDouble();
-					uint16_t unExpectedValueEvent = message.readEnum16();
-
-					getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
-					getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-					getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
-					parameterMonitoringList.erase(currentPMONId);
-					auto monitoringDefinition = PMONExpectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, expectedValue, mask, unExpectedValueEvent);
-					addPMONDefinition(currentPMONId, monitoringDefinition);
-					break;
-				}
-
-				case PMONBase::CheckType::Delta: {
-					double lowDeltaThreshold = message.readDouble();
-					uint16_t belowLowThresholdEventId = message.readEnum16();
-					double highDeltaThreshold = message.readDouble();
-					uint16_t aboveHighThresholdEventId = message.readEnum16();
-					uint16_t numberOfConsecutiveDeltaChecks = message.readUint16();
-
-					if (highDeltaThreshold <= lowDeltaThreshold) {
-						ErrorHandler::reportError(
-						    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
-						continue;
-					}
-
-					getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
-					getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-					getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
-					parameterMonitoringList.erase(currentPMONId);
-					auto monitoringDefinition = PMONDeltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
-					addPMONDefinition(currentPMONId, monitoringDefinition);
-					break;
-				}
-
-				default:
+				if (highLimit <= lowLimit) {
 					ErrorHandler::reportError(
-					    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+					    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
 					continue;
+				}
+
+				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
+				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				parameterMonitoringList.erase(currentPMONId);
+				auto monitoringDefinition = PMONLimitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
+				addPMONDefinition(currentPMONId, monitoringDefinition);
+				break;
+			}
+
+			case PMONBase::PMONBase::CheckType::ExpectedValue: {
+				uint64_t mask = message.readUint64();
+				double expectedValue = message.readDouble();
+				uint16_t unExpectedValueEvent = message.readEnum16();
+
+				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
+				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				parameterMonitoringList.erase(currentPMONId);
+				auto monitoringDefinition = PMONExpectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, expectedValue, mask, unExpectedValueEvent);
+				addPMONDefinition(currentPMONId, monitoringDefinition);
+				break;
+			}
+
+			case PMONBase::CheckType::Delta: {
+				double lowDeltaThreshold = message.readDouble();
+				uint16_t belowLowThresholdEventId = message.readEnum16();
+				double highDeltaThreshold = message.readDouble();
+				uint16_t aboveHighThresholdEventId = message.readEnum16();
+				uint16_t numberOfConsecutiveDeltaChecks = message.readUint16();
+
+				if (highDeltaThreshold <= lowDeltaThreshold) {
+					ErrorHandler::reportError(
+					    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
+					continue;
+				}
+
+				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
+				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				parameterMonitoringList.erase(currentPMONId);
+				auto monitoringDefinition = PMONDeltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
+				addPMONDefinition(currentPMONId, monitoringDefinition);
+				break;
 			}
 		}
 	}
