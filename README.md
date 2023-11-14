@@ -48,7 +48,7 @@ The dependencies of this repository are managed through the [conan](https://cona
 from [ConanCenter](https://conan.io/center/) and [SpaceDot's packages](https://artifactory.spacedot.gr).
 
 For more detailed installation instructions, including how to integrate with a microcontroller, visit the
-[corresponding documentation page](https://acubesat.gitlab.io/obc/ecss-services/docs/installation.html).
+[corresponding documentation page](https://acubesat.gitlab.io/obc/ecss-services/docs/md_docs_installation.html).
 
 ### From the Command Line (CLI)
 

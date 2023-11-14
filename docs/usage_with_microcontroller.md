@@ -194,7 +194,7 @@ statistics for parameters of selected IDs. An example is provided below. Let's a
 parameter IDs, and we use a data structure to store the statistics. Our initialization function, based on such
 structure should look like this:
 
-```c++
+``cpp
 namespace PlatformParameters {
     enum ParameterIDs : uint16_t {
         OnBoardMinute = 0,

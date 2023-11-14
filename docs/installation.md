@@ -97,7 +97,7 @@ instead to automatically build the entire project, completing the next two steps
 Conan will create a `CMakeUserPresets.json` that contains a link to a `conan_toolchain.cmake`.
 This file prepares the CMake project to use the compiler and dependencies defined by conan.
 
-To use it, you can either select a CMake build preset (Cmake >= 3.23):
+To use it, you can either select a CMake build preset (CMake >= 3.23):
 ```bash
 cmake -B build/Debug --preset=build-debug
 ```
@@ -140,7 +140,8 @@ executables and libraries generated in there.
 
 If you are using an IDE that manages CMake, it should be enough to add the following option to the CMake command:
 ```bash
---preset=cmake-build-debug-debug # or a different configuration (e.g. build-release)
+--preset=cmake-build-debug-debug
+# or a different configuration (e.g. build-release)
 ```
 
 @note
@@ -159,7 +160,7 @@ The services are best used as a Conan package, since they themselves depend on o
 
 ### Step 0: Prepare your environment
 
-Make sure you have your Conan profile and the project's Artifactory remote set up
+Make sure you have your Conan profile and the project's Artifactory remote set up:
 ```bash
 conan profile detect
 conan remote add spacedot https://artifactory.spacedot.gr/artifactory/api/conan/conan
@@ -173,11 +174,11 @@ on how to set up a project whose dependencies are managed by Conan.
 Edit your `conanfile.txt` or `conanfile.py` files to add the following dependency:
 ```
 [requires]
-ecss-services/1.0
+ecss-services/1.1
 ```
 
 You can see more information about the available versions of the package at
-https://artifactory.spacedot.gr/ui/packages/conan:%2F%2Fecss-services.
+https://artifactory.spacedot.gr/ui/packages/?name=ecss-services&type=packages.
 
 ### Step 2: Integrate with CMake
 
@@ -192,7 +193,7 @@ target_link_libraries(my_target common)
 
 ### Concurrent Developing
 
-If you want to develop both a parent project and it dependency at the same time, you should use [Conan editable 
+If you want to develop both a parent project and its dependency at the same time, you should use [Conan editable 
 packages](https://docs.conan.io/2/tutorial/developing_packages/editable_packages.html). These allow your repository 
 to build directly from the source code, instead of downloading a pre-made package.
 
