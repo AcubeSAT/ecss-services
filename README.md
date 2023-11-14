@@ -87,23 +87,11 @@ For more detailed installation instructions, including how to integrate with a m
 CLion will automatically try to set up a CMake project for you. However, without the conan packages installed, this
 will quickly fail. Follow these steps to set up the conan project:
 
-1. (If you haven't already) create a conan profile for your system:
-   ```shell
-   conan profile detect
-   ```
-2. (If you haven't already) add the SpaceDot repository to conan:
-   ```shell
-   conan remote add spacedot https://artifactory.spacedot.gr/artifactory/api/conan/conan
-   ```
-3. Resolve all dependencies through conan:
-   ```shell
-   conan install . --output-folder=cmake-build-debug --build=missing --update --setings=build_type=Debug
-   ```
-4. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
+1. Follow steps 1-4 from the CLI instructions above.
+2. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
    ```shell
    --preset=cmake-build-debug-debug
    ```
-5. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
+3. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
 
-We do not recommend using a Conan plugin for your IDE, as it may tamper with the default configuration for this
-repository.
+We do not recommend using a Conan plugin for your IDE, as it may tamper with the default configuration for this repository.
