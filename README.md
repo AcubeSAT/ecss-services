@@ -78,3 +78,16 @@ You can install [conan](https://conan.io/) following the instructions from
 [here](https://docs.conan.io/2/installation.html).
 
 </details>
+
+
+## Static Analysis
+Before pushing online, you can run the static analysis tools locally to avoid waiting for the CI jobs to finish.
+You can do so by running `.ci/clang-tidy.sh` and `.ci/cppcheck.sh` from the root of the repository.
+This will create two output files, `clang-tidy-output.log` and `report.xml`, which you can inspect to see the results.
+You have to search for errors in `clang-tidy-output.log`, as it includes warnings and notes.
+The `report.xml` is a cppcheck report, which you can convert to HTML with `cppcheck-htmlreport`, or open locally.
+Any item in that file will cause failure of the pipeline.
+
+## Tests
+Before pushing online, you can run the tests locally to avoid waiting for the CI jobs to finish.
+You can d
