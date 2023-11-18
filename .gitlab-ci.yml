@@ -36,7 +36,7 @@ cppcheck:
     - mkdir cppcheck-html-report
     - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
   artifacts:
-    when: on_failure
+    when: always
     paths:
       - ./cppcheck-html-report
 
