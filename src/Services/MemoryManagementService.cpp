@@ -18,14 +18,14 @@ void MemoryManagementService::loadRawData(Message& request) {
 	 * A future version will include error checking and the corresponding error report/notification,
 	 * as the manual implies.
 	 *
-	 * @todo Add error checking and reporting for the parameters
-	 * @todo Add failure reporting
+	 * @todo (#255): Add error checking and reporting for the parameters
+	 * @todo (#256): Add failure reporting
 	 */
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
 	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
 
 	if (!memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
-		// TODO(grxeno): Send a failed start of execution
+	// TODO(#257): Send a failed start of execution
 		return;
 	}
 
@@ -33,7 +33,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	uint16_t const iterationCount = request.readUint16();
 
 	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
-		// TODO(athanasios): Define FLASH specific access code when we transfer to embedded
+	// TODO(#258): Define FLASH specific access code when we transfer to embedded
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			const StartAddress startAddress = request.read<StartAddress>();
@@ -102,7 +102,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-		// TODO(athanasios): Send a failed start of execution
+	// TODO(#257): Send a failed start of execution
 	}
 }
 
@@ -142,7 +142,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-		// TODO(athanasios): Send a failed start of execution report
+	// TODO(#257): Send a failed start of execution report
 	}
 }
 
@@ -182,7 +182,7 @@ bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID
 			break;
 
 		default:
-			validIndicator = true; // TODO(athanasios): Implemented so addresses from PC can be read. Remove.
+			validIndicator = true; // TODO(#259): Implemented so addresses from PC can be read. Remove.
 			break;
 	}
 

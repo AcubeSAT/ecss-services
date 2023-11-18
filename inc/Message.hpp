@@ -12,7 +12,7 @@
 /**
  * A telemetry (TM) or telecommand (TC) message (request/report), as specified in ECSS-E-ST-70-41C
  *
- * @todo Make sure that a message can't be written to or read from at the same time, or make
+ * @todo (#243) Make sure that a message can't be written to or read from at the same time, or make
  *       readable and writable message different classes
  */
 class Message {
@@ -130,9 +130,9 @@ public:
 	 *
 	 * @note Actually we should append the bits so the total length of the packets is an integer
 	 * multiple of the padding word size declared for the application process
-	 * @todo Confirm that the overall packet size is an integer multiple of the padding word size
+	 * @todo (#244) Confirm that the overall packet size is an integer multiple of the padding word size
 	 * declared for every application process
-	 * @todo check if we need to define the spare field for the telemetry and telecommand
+	 * @todo (#245) check if we need to define the spare field for the telemetry and telecommand
 	 * secondary headers
 	 */
 	void finalize();
@@ -234,7 +234,7 @@ public:
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
 	 * ECSSMaxStringSize. This function does NOT place a \0 at the end of the created string
-	 * @todo Is uint16_t size too much or not enough? It has to be defined
+	 * @todo (#246) Is uint16_t size too much or not enough? It has to be defined
 	 */
 	void readString(uint8_t* string, uint16_t size);
 
@@ -565,7 +565,7 @@ public:
 	 * Fetches an 4-byte single-precision floating point number from the current position in the
 	 * message
 	 *
-	 * @todo Check if endianness matters for this
+	 * @todo (#247) Check if endianness matters for this
 	 *
 	 * PTC = 5, PFC = 1
 	 */
@@ -598,7 +598,7 @@ public:
 	 *
 	 * In the current implementation we assume that a preallocated array of sufficient size
 	 * is provided as the argument. This does NOT append a trailing `\0` to \p byteString.
-	 * @todo Specify if the provided array size is too small or too large
+	 * @todo (#248) Specify if the provided array size is too small or too large
 	 *
 	 * PTC = 7, PFC = 0
 	 */

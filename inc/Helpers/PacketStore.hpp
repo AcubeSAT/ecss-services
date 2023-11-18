@@ -34,7 +34,7 @@ public:
 	/**
 	 * The maximum size of the packet store, in bytes.
 	 *
-	 * @todo: add a way of defining each packets store's size in bytes
+	 * @todo (#217): add a way of defining each packets store's size in bytes
 	 */
 	uint64_t sizeInBytes = 0;
 

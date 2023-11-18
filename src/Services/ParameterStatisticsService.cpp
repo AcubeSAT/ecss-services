@@ -132,7 +132,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 				newStatistic.setSelfSamplingInterval(interval);
 			}
 			statisticsMap.insert({currentId, newStatistic});
-			// TODO(athanasios): start the evaluation of statistics for this parameter.
+			// TODO(#260): start the evaluation of statistics for this parameter.
 		} else {
 			if (SupportsSamplingInterval) {
 				statisticsMap.at(currentId).setSelfSamplingInterval(interval);

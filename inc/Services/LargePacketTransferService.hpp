@@ -61,7 +61,7 @@ public:
 
 	// The three uplink functions should handle a TC request to "upload" data. Since there is not
 	// a composeECSS function ready, I just return the given string.
-	// @TODO: Modify these functions properly
+	// @TODO (#220): Modify these functions properly
 	/**
 	 * TC[13,9] Function that handles the first part of the uplink request
 	 * @param string This will change when these function will be modified

@@ -4,7 +4,7 @@
 /**
  * Perform an assertion that, if failed, throws an ErrorHandler::Internal error
  *
- * @todo Actually hold program execution or throw an exception here
+ * @todo (#242) Actually hold program execution or throw an exception here
  */
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define ASSERT_INTERNAL(cond, error) (ErrorHandler::assertInternal((cond), (error)))

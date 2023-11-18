@@ -9,7 +9,7 @@
  * This file contains constant definitions that are used throughout the ECSS services. They often refer to maximum
  * values and upper limits for the storage of data in the services.
  *
- * @todo All these constants need to be redefined and revised after the design and the requirements are finalized.
+ * @todo (#237) All these constants need to be redefined and revised after the design and the requirements are finalized.
  *
  * @{
  */
@@ -209,7 +209,7 @@ inline const uint8_t ECSSMaxControlledApplicationProcesses = 5;
  * The max number of report type blocking definitions per service type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
- * todo: must change when a service with more report types is implemented.
+ * todo: (#238) must change when a service with more report types is implemented.
  */
 inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
 
@@ -217,7 +217,7 @@ inline const uint8_t ECSSMaxReportTypeDefinitions = 20;
  * The max number of service type definitions per application process type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
- * todo: must change when all 15 services are implemented.
+ * todo: (#239) must change when all 15 services are implemented.
  */
 inline const uint8_t ECSSMaxServiceTypeDefinitions = 10;
 

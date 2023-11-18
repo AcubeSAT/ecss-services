@@ -41,7 +41,7 @@ void TimeBasedSchedulingService::resetSchedule(const Message& request) {
 	}
 	executionFunctionStatus = false;
 	scheduledActivities.clear();
-	// todo: Add resetting for sub-schedules and groups, if defined
+// todo (#264): Add resetting for sub-schedules and groups, if defined
 }
 
 void TimeBasedSchedulingService::insertActivities(Message& request) {
@@ -49,10 +49,10 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		return;
 	}
 
-	// todo: Get the sub-schedule ID if they are implemented
+// todo (#265): Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
-		// todo: Get the group ID first, if groups are used
+		// todo (#266): Get the group ID first, if groups are used
 		const Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
 
 		const Time::DefaultCUC releaseTime = request.readDefaultCUCTimeStamp();
@@ -91,7 +91,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 	                        [](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 		                        return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 	                        });
-	// todo: Define what the time format is going to be
+// todo (#267): Define what the time format is going to be
 	const Time::RelativeTime relativeOffset = request.readRelativeTime();
 	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
@@ -170,12 +170,12 @@ void TimeBasedSchedulingService::detailReportAllActivities(const Message& reques
 }
 
 void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
-	// todo: append sub-schedule and group ID if they are defined
+// todo (#269): append sub-schedule and group ID if they are defined
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
 
 	for (const auto& activity: listOfActivities) {
-		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime); // todo: Replace with the time parser
+		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime); // todo (#268): Replace with the time parser
 		report.appendString(MessageParser::composeECSS(activity.request));
 	}
 	storeMessage(report);
@@ -245,10 +245,10 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 
-	// todo: append sub-schedule and group ID if they are defined
+// todo (#270): append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
 	for (const auto& match: listOfActivities) {
-		// todo: append sub-schedule and group ID if they are defined
+// todo (#270): append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
 		report.append<SourceId>(match.requestID.sourceID);
 		report.append<ApplicationProcessId>(match.requestID.applicationID);

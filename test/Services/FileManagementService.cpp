@@ -9,7 +9,7 @@
 
 namespace fs = std::filesystem;
 
-// @TODO: Add more tests covering cases where the repository and/or the object path is too long.
+// @TODO(#277): Add more tests covering cases where the repository and/or the object path is too long.
 // For more information check https://gitlab.com/acubesat/obc/ecss-services/-/merge_requests/80#note_1610840164
 
 TEST_CASE("Create a file TC[23,1]", "[service][st23]") {

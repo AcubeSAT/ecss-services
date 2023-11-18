@@ -31,8 +31,8 @@ public:
 	UTCTimestamp();
 
 	/**
-	 * @todo Add support for leap seconds
-	 * @todo Implement leap seconds as ST[20] parameter
+	 * @todo (#235) Add support for leap seconds
+	 * @todo (#236) Implement leap seconds as ST[20] parameter
 	 * @param year the year as it used in Gregorian calendar
 	 * @param month the month as it used in Gregorian calendar (1-12 inclusive)
 	 * @param day the day as it used in Gregorian calendar (1-31 inclusive)

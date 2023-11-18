@@ -281,13 +281,13 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 			continue;
 		}
 
-		// todo: 6.15.3.5.2.d(4), actually count the current time
+		// todo (#261): 6.15.3.5.2.d(4), actually count the current time
 
 		auto& packetStore = packetStores[packetStoreId];
 		packetStore.byTimeRangeRetrievalStatus = true;
 		packetStore.retrievalStartTime = retrievalStartTime;
 		packetStore.retrievalEndTime = retrievalEndTime;
-		// todo: start the by-time-range retrieval process according to the priority policy
+		// todo (#262): start the by-time-range retrieval process according to the priority policy
 	}
 }
 
@@ -383,7 +383,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 
 	const TimeStamps newStartTimeTag = request.read<TimeStamps>();
 	/**
-	 * @todo: check if newStartTimeTag is in the future
+	 * @todo (#263): check if newStartTimeTag is in the future
 	 */
 	const NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {

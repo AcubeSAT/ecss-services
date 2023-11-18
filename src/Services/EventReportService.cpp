@@ -6,8 +6,8 @@
 #include "Message.hpp"
 
 /**
- * @todo: Add message type in TCs
- * @todo: this code is error prone, depending on parameters given, add fail safes (probably?)
+ * @todo (#252): Add message type in TCs
+ * @todo (#253): this code is error prone, depending on parameters given, add fail safes (probably?)
  */
 void EventReportService::informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
@@ -72,7 +72,7 @@ void EventReportService::enableReportGeneration(Message& message) {
 	}
 
 	/**
-	 * @todo: Report an error if length > numberOfEvents
+	 * @todo (#254): Report an error if length > numberOfEvents
 	 */
 	uint16_t const length = message.readUint16();
 	if (length <= numberOfEvents) {
@@ -89,7 +89,7 @@ void EventReportService::disableReportGeneration(Message& message) {
 	}
 
 	/**
-	 * @todo: Report an error if length > numberOfEvents
+	 * @todo: (#254) Report an error if length > numberOfEvents
 	 */
 	uint16_t const length = message.readUint16();
 	if (length <= numberOfEvents) {

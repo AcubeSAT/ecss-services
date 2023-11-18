@@ -67,7 +67,7 @@ public:
 	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
-	bool hasAutomaticStatisticsReset = false; // todo: do const
+	bool hasAutomaticStatisticsReset = false; // todo (#223): do const
 	/**
 	 * Indicates whether to append/read the sampling interval to/from message
 	 */

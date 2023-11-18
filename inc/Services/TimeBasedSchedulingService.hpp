@@ -39,7 +39,7 @@ namespace unit_test {
  *
  * @details This service is taking care of the timed release of a received TC packet from the
  * ground.
- * @todo Define whether the parsed absolute release time is saved in the scheduled activity as an
+ * @todo (#227) Define whether the parsed absolute release time is saved in the scheduled activity as an
  * uint32_t or in the time format specified by the time management service.
  *
  * @ingroup Services
@@ -77,8 +77,8 @@ private:
 	 * @details All scheduled activities must contain the request they exist for, their release
 	 * time and the corresponding request identifier.
 	 *
-	 * @todo If we decide to use sub-schedules, the ID of that has to be defined
-	 * @todo If groups are used, then the group ID has to be defined here
+	 * @todo (#228) If we decide to use sub-schedules, the ID of that has to be defined
+	 * @todo (#229) If groups are used, then the group ID has to be defined here
 	 */
 	struct ScheduledActivity {
 		Message request;                         ///< Hold the received command request
@@ -185,7 +185,7 @@ public:
 	 * execution of the schedule and also to make things easier whenever a release time sorted
 	 * report is requested by he corresponding service.
 	 * @param request Provide the received message as a parameter
-	 * @todo Definition of the time format is required
+	 * @todo (#230) Definition of the time format is required
 	 * @throws ExecutionStartError If there is request to be inserted and the maximum
 	 * number of activities in the current schedule has been reached, then an @ref
 	 * ErrorHandler::ExecutionStartErrorType is being issued.  Also if the release time of the
@@ -200,7 +200,7 @@ public:
 	 * @details All scheduled activities are shifted per user request. The relative time offset
 	 * received and tested against the current time.
 	 * @param request Provide the received message as a parameter
-	 * @todo Definition of the time format is required for the relative time format
+	 * @todo (#231) Definition of the time format is required for the relative time format
 	 * @throws ExecutionStartError If the release time of the request is less than a
 	 * set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION, from the current time an
 	 * @ref ErrorHandler::ExecutionStartErrorType report is issued for that instruction.
@@ -213,7 +213,7 @@ public:
 	 * @details Send a detailed report about the status of all the activities
 	 * on the current schedule. Generates a TM[11,10] response.
 	 * @param request Provide the received message as a parameter
-	 * @todo Replace the time parsing with the time parser
+	 * @todo (#232) Replace the time parsing with the time parser
 	 */
 	void detailReportAllActivities(const Message& request);
 
@@ -233,7 +233,7 @@ public:
 	 * provided request identifier. Generates a TM[11,10] response. The matched activities are
 	 * contained in the report, in an ascending order based on their release time.
 	 * @param request Provide the received message as a parameter
-	 * @todo Replace time parsing with the time parser
+	 * @todo (#233) Replace time parsing with the time parser
 	 * @throws ExecutionStartError If a requested activity, identified by the provided
 	 * request identifier is not found in the schedule issue an @ref
 	 * ErrorHandler::ExecutionStartErrorType for that instruction.
@@ -278,7 +278,7 @@ public:
 	 *
 	 * @details Time-shift certain activities by using the unique request identifier
 	 * @param request Provide the received message as a parameter
-	 * @todo Definition of the time format is required
+	 * @todo (#234) Definition of the time format is required
 	 * @throws ExecutionStartError If the requested time offset is less than the earliest
 	 * time from the currently scheduled activities plus the @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
 	 * then the request is rejected and an @ref ErrorHandler::ExecutionStartErrorType is issued.

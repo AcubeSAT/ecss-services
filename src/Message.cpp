@@ -13,7 +13,7 @@ Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketT
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(ApplicationId) {}
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
-	// TODO(athanasios): Add assertion that data does not contain 1s outside of numBits bits
+	// TODO(#271): Add assertion that data does not contain 1s outside of numBits bits
 	ASSERT_INTERNAL(numBits <= 16, ErrorHandler::TooManyBitsAppend);
 
 	while (numBits > 0) { // For every sequence of 8 bits...
@@ -169,7 +169,7 @@ void Message::appendMessage(const Message& message, uint16_t size) {
 
 void Message::appendString(const etl::istring& string) {
 	ASSERT_INTERNAL(dataSize + string.size() <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
-	// TODO(athanasios): Do we need to keep this check? How does etl::string handle it?
+	// TODO(#272): Do we need to keep this check? How does etl::string handle it?
 	ASSERT_INTERNAL(string.size() <= string.capacity(), ErrorHandler::StringTooLarge);
 	std::copy(string.data(), string.data() + string.size(), data.begin() + dataSize);
 	dataSize += string.size();

@@ -55,9 +55,9 @@ public:
 		 * @details This function reads the raw data from the RAM memory and
 		 * 			triggers a TM[6,6] report
 		 * @param request Provide the received message as a parameter
-		 * @todo In later embedded version, implement error checking for address validity for
+		 * @todo (#221) In later embedded version, implement error checking for address validity for
 		 * 		 different memory types
-		 * @todo Only allow aligned memory address to be start addresses
+		 * @todo (#222) Only allow aligned memory address to be start addresses
 		 */
 		void dumpRawData(Message& request);
 
@@ -67,9 +67,9 @@ public:
 		 * @details This function reads the raw data from the specified memory and
 		 * 			triggers a TM[6,10] report
 		 * @param request Provide the received message as a parameter
-		 * @todo In later embedded version, implement error checking for address validity for
+		 * @todo (#221) In later embedded version, implement error checking for address validity for
 		 * 		 different memory types
-		 * @todo Only allow aligned memory address to be start addresses
+		 * @todo (#222) Only allow aligned memory address to be start addresses
 		 */
 		void checkRawData(Message& request);
 	} rawDataMemorySubservice;
@@ -80,7 +80,7 @@ public:
 	 * @details This function loads new values to memory data areas
 	 * 			specified in the request
 	 * @param request Provide the received message as a parameter
-	 * @todo Only allow aligned memory address to be start addresses
+	 * @todo (#222) Only allow aligned memory address to be start addresses
 	 */
 	static void loadRawData(Message& request);
 
