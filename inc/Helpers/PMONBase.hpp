@@ -32,13 +32,13 @@ public:
 		                             Delta = 3 };
 
 
-	uint16_t monitoredParameterId;
+	MonitoredParameterId monitoredParameterId;
 
 	std::reference_wrapper<ParameterBase> monitoredParameter;
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
-	uint16_t repetitionNumber;
+	RepetitionNumber repetitionNumber;
 	/**
 	 * The number of checks that have been conducted so far.
 	 */
@@ -48,10 +48,10 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
 
-	uint16_t getRepetitionCounter() const {
+	RepetitionCounter getRepetitionCounter() const {
 		return repetitionCounter;
 	}
-	uint16_t getRepetitionNumber() const {
+	RepetitionNumber getRepetitionNumber() const {
 		return repetitionNumber;
 	}
 	bool isMonitoringEnabled() const {
@@ -93,7 +93,7 @@ protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
-	PMONBase(uint16_t monitoredParameterId, uint16_t repetitionNumber);
+	PMONBase(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber);
 };
 
 /**
@@ -101,26 +101,26 @@ protected:
  */
 class PMONExpectedValueCheck : public PMONBase {
 public:
-	double expectedValue;
-	uint64_t mask;
-	uint16_t unexpectedValueEvent;
+	Expected_Value expectedValue;
+	Mask mask;
+	UnexpectedValueEvent unexpectedValueEvent;
 
-	explicit PMONExpectedValueCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double expectedValue,
-	                                uint64_t mask, uint16_t unexpectedValueEvent)
+	explicit PMONExpectedValueCheck(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber, Expected_Value expectedValue,
+	                                Mask mask, UnexpectedValueEvent unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
 	      PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::ExpectedValue;
 	};
 
-	double getExpectedValue() override {
+	Expected_Value getExpectedValue() override {
 		return expectedValue;
 	}
 
-	uint64_t getMask() override {
+	Mask getMask() override {
 		return mask;
 	}
 
-	uint16_t getUnexpectedValueEvent() override {
+	UnexpectedValueEvent getUnexpectedValueEvent() override {
 		return unexpectedValueEvent;
 	}
 };
@@ -130,31 +130,31 @@ public:
  */
 class PMONLimitCheck : public PMONBase {
 public:
-	double lowLimit;
-	uint16_t belowLowLimitEvent;
-	double highLimit;
-	uint16_t aboveHighLimitEvent;
+	LowLimit lowLimit;
+	BelowLowLimitEvent belowLowLimitEvent;
+	HighLimit highLimit;
+	AboveHighLimitEvent aboveHighLimitEvent;
 
-	explicit PMONLimitCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber, double lowLimit,
-	                        uint16_t belowLowLimitEvent, double highLimit, uint16_t aboveHighLimitEvent)
+	explicit PMONLimitCheck(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber, LowLimit lowLimit,
+	                        BelowLowLimitEvent belowLowLimitEvent, HighLimit highLimit, AboveHighLimitEvent aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Limit;
 	};
 
-	double getLowLimit() override {
+	LowLimit getLowLimit() override {
 		return lowLimit;
 	}
 
-	uint16_t getBelowLowLimitEvent() override {
+	BelowLowLimitEvent getBelowLowLimitEvent() override {
 		return belowLowLimitEvent;
 	}
 
-	double getHighLimit() override {
+	HighLimit getHighLimit() override {
 		return highLimit;
 	}
 
-	uint16_t getAboveHighLimitEvent() override {
+	AboveHighLimitEvent getAboveHighLimitEvent() override {
 		return aboveHighLimitEvent;
 	}
 };
@@ -164,39 +164,39 @@ public:
  */
 class PMONDeltaCheck : public PMONBase {
 public:
-	uint16_t numberOfConsecutiveDeltaChecks;
-	double lowDeltaThreshold;
-	uint16_t belowLowThresholdEvent;
-	double highDeltaThreshold;
-	uint16_t aboveHighThresholdEvent;
+	NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks;
+	LowDeltaThreshold lowDeltaThreshold;
+	BelowLowThresholdEvent belowLowThresholdEvent;
+	HighDeltaThreshold highDeltaThreshold;
+	AboveHighThresholdEvent aboveHighThresholdEvent;
 
-	explicit PMONDeltaCheck(uint16_t monitoredParameterId, uint16_t repetitionNumber,
-	                        uint16_t numberOfConsecutiveDeltaChecks, double lowDeltaThreshold,
-	                        uint16_t belowLowThresholdEvent, double highDeltaThreshold,
-	                        uint16_t aboveHighThresholdEvent)
+	explicit PMONDeltaCheck(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber,
+	                        NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks, LowDeltaThreshold lowDeltaThreshold,
+	                        BelowLowThresholdEvent belowLowThresholdEvent, HighDeltaThreshold highDeltaThreshold,
+	                        AboveHighThresholdEvent aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
 	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Delta;
 	};
 
-	uint16_t getNumberOfConsecutiveDeltaChecks() override {
+	NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() override {
 		return numberOfConsecutiveDeltaChecks;
 	}
 
-	double getLowDeltaThreshold() override {
+	LowDeltaThreshold getLowDeltaThreshold() override {
 		return lowDeltaThreshold;
 	}
 
-	uint16_t getBelowLowThresholdEvent() override {
+	BelowLowThresholdEvent getBelowLowThresholdEvent() override {
 		return belowLowThresholdEvent;
 	}
 
-	double getHighDeltaThreshold() override {
+	HighDeltaThreshold getHighDeltaThreshold() override {
 		return highDeltaThreshold;
 	}
 
-	uint16_t getAboveHighThresholdEvent() override {
+	AboveHighThresholdEvent getAboveHighThresholdEvent() override {
 		return aboveHighThresholdEvent;
 	}
 };

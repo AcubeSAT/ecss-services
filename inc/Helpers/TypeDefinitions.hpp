@@ -54,11 +54,14 @@ using ErrorCode = uint16_t;
 /**
  * The types used for the three Check Types and their parameters in OnBoardMonitoringService.
  */
+ using MonitoredParameterId = uint16_t;
+ using RepetitionNumber = uint16_t;
+ using RepetitionCounter = uint16_t;
  using LowLimit = double;
  using BelowLowLimitEvent = uint16_t;
  using HighLimit = double;
  using AboveHighLimitEvent = uint16_t;
- using ExpectedValue = double;
+ using Expected_Value = double;
  using Mask = uint64_t;
  using UnexpectedValueEvent = uint16_t;
  using NumberOfConsecutiveDeltaChecks = uint16_t;
