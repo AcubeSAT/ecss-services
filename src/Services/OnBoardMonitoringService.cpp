@@ -148,9 +148,8 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 			continue;
 		}
 		parameterMonitoringList.erase(currentPMONId);
+		}
 	}
-
-}
 
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
@@ -181,7 +180,6 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
 			return;
 		}
-
 
 		switch (static_cast<PMONBase::CheckType>(currentCheckType)) {
 			case PMONBase::CheckType::Limit: {
