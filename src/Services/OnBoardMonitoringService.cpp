@@ -81,17 +81,22 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		uint16_t currentPMONRepetitionNumber = message.readUint16();
 		uint16_t currentCheckType = message.readEnum8();
 
+		if (!Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			return;
+		}
+
 		if (parameterMonitoringList.find(currentPMONId) != parameterMonitoringList.end()) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::AddAlreadyExistingParameter);
-			continue;
+			return;
 		}
 
 		if (parameterMonitoringList.full()) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
-			continue;
+			return;
 		}
 
-		if (auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId)) {
+		auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId);
 			if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Limit) {
 				double lowLimit = message.readDouble();
 				uint16_t belowLowLimitEventId = message.readEnum16();
@@ -130,11 +135,9 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				deltaChecks.push_back(deltaCheck);
 				addPMONDefinition(currentPMONId, deltaCheck);
 			}
-		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+
 		}
 	}
-}
 
 
 void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& message) {
