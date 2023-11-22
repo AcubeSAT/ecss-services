@@ -64,29 +64,29 @@ public:
 		return checkingStatus;
 	}
 
-	virtual double getExpectedValue() {
+	virtual Expected_Value getExpectedValue() {
 		return 0.0; }
-	virtual uint64_t getMask() {
+	virtual Mask getMask() {
 		return 0; }
-	virtual uint16_t getUnexpectedValueEvent() {
+	virtual UnexpectedValueEvent getUnexpectedValueEvent() {
 		return 0; }
-	virtual double getLowLimit() {
+	virtual LowLimit getLowLimit() {
 		return 0.0; }
-	virtual uint16_t getBelowLowLimitEvent() {
+	virtual BelowLowLimitEvent getBelowLowLimitEvent() {
 		return 0; }
-	virtual double getHighLimit() {
+	virtual HighLimit getHighLimit() {
 		return 0.0; }
-	virtual uint16_t getAboveHighLimitEvent() {
+	virtual AboveHighLimitEvent getAboveHighLimitEvent() {
 		return 0; }
-	virtual uint16_t getNumberOfConsecutiveDeltaChecks() {
+	virtual NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() {
 		return 0; }
-	virtual double getLowDeltaThreshold() {
+	virtual LowDeltaThreshold getLowDeltaThreshold() {
 		return 0.0; }
-	virtual uint16_t getBelowLowThresholdEvent() {
+	virtual BelowLowThresholdEvent getBelowLowThresholdEvent() {
 		return 0; }
-	virtual double getHighDeltaThreshold() {
+	virtual HighDeltaThreshold getHighDeltaThreshold() {
 		return 0.0; }
-	virtual uint16_t getAboveHighThresholdEvent() {
+	virtual AboveHighThresholdEvent getAboveHighThresholdEvent() {
 		return 0; }
 
 protected:
