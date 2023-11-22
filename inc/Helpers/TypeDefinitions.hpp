@@ -51,3 +51,18 @@ using PercentageFilled = uint16_t;
  */
 using CollectionInterval = uint32_t;
 using ErrorCode = uint16_t;
+/**
+ * The types used for the three Check Types and their parameters in OnBoardMonitoringService.
+ */
+ using LowLimit = double;
+ using BelowLowLimitEvent = uint16_t;
+ using HighLimit = double;
+ using AboveHighLimitEvent = uint16_t;
+ using ExpectedValue = double;
+ using Mask = uint64_t;
+ using UnexpectedValueEvent = uint16_t;
+ using NumberOfConsecutiveDeltaChecks = uint16_t;
+ using LowDeltaThreshold = double;
+ using BelowLowThresholdEvent = uint16_t;
+ using HighDeltaThreshold = double;
+ using AboveHighThresholdEvent = uint16_t;
