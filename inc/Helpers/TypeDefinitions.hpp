@@ -52,7 +52,7 @@ using PercentageFilled = uint16_t;
 using CollectionInterval = uint32_t;
 using ErrorCode = uint16_t;
 /**
- * The types used for the three Check Types and their parameters in OnBoardMonitoringService.
+ * The types used for the three Check Types and their variables in OnBoardMonitoringService.
  */
  using MonitoredParameterId = uint16_t;
  using RepetitionNumber = uint16_t;
