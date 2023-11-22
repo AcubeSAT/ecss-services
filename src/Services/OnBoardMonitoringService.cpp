@@ -176,7 +176,6 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			return;
 		}
 
-		//TODO: Implement a parameterExists() function.
 		auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId);
 		if (not parameterToBeModified) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
@@ -254,7 +253,6 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
 	Message parameterMonitoringDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport,
 	                                            Message::TM, ApplicationId);
-	// TODO: Check if maximum transition reporting delay is needed.
 	parameterMonitoringDefinitionReport.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();
 	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
@@ -265,9 +263,6 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			continue;
 		}
 		parameterMonitoringDefinitionReport.appendEnum16(currentPMONId);
-
-//		auto pmonDefinition = getPMONDefinition(currentPMONId).get();
-
 		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().monitoredParameterId);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().monitoringEnabled));
 		parameterMonitoringDefinitionReport.appendEnum16(getPMONDefinition(currentPMONId).get().repetitionNumber);
