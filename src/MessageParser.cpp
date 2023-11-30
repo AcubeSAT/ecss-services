@@ -239,9 +239,10 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 
     if constexpr (CRCHelper::EnableCRC) {
 		// Append CRC field
-		uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
-		ccsdsMessage.push_back(static_cast<char8_t>(crcField >> 8U));
-		ccsdsMessage.push_back(static_cast<char8_t>(crcField & 0xFF));
+		const uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
+		uint8_t crcMessage[2] = { static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>(crcField & 0xFF)};
+		String<CCSDSMaxMessageSize> crcString(crcMessage, 2);
+		ccsdsMessage.append(crcString);
 	}
 
 	return ccsdsMessage;
