@@ -222,6 +222,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	packetId |= (1U << 11U);                                              // Secondary header flag
 	packetId |= (message.packetType == Message::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
 	SequenceCount packetSequenceControl = message.packetSequenceCount | (3U << 14U);
+	// The removal of one octet adheres to the standard specified in ECSS 7.4.1.
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
 	// Compile the header
@@ -236,12 +237,13 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	String<CCSDSMaxMessageSize> ccsdsMessage(header, CCSDSPrimaryHeaderSize);
 	ccsdsMessage.append(ecssMessage);
 
-#if ECSS_CRC_INCLUDED
-	// Append CRC field
-	uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), 6 + packetDataLength);
-	ccsdsMessage.push_back(static_cast<uint8_t>(crcField >> 8U));
-	ccsdsMessage.push_back(static_cast<uint8_t>(crcField & 0xFF));
-#endif
+    if constexpr (CRCHelper::EnableCRC) {
+		// Append CRC field
+		const uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
+		uint8_t crcMessage[2] = { static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>(crcField & 0xFF)};
+		String<CCSDSMaxMessageSize> crcString(crcMessage, 2);
+		ccsdsMessage.append(crcString);
+	}
 
 	return ccsdsMessage;
 }

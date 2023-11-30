@@ -36,6 +36,11 @@ public:
 	 * @return 0 when the data is valid, a nonzero uint16 when the data is corrupted
 	 */
 	static uint16_t validateCRC(const uint8_t* message, uint32_t length);
+
+	/**
+	 * Config bool to enable or disable CRC
+	 */
+	static constexpr bool EnableCRC = true;
 };
 
 #endif // ECSS_SERVICES_CRCHELPER_HPP
