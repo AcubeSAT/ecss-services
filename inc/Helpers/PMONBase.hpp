@@ -32,7 +32,7 @@ public:
 		                             Delta = 3 };
 
 
-	MonitoredParameterId monitoredParameterId;
+	ParameterId monitoredParameterId;
 
 	std::reference_wrapper<ParameterBase> monitoredParameter;
 	/**
@@ -48,9 +48,6 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
 
-	RepetitionCounter getRepetitionCounter() const {
-		return repetitionCounter;
-	}
 	RepetitionNumber getRepetitionNumber() const {
 		return repetitionNumber;
 	}
@@ -68,32 +65,32 @@ public:
 		return 0.0; }
 	virtual Mask getMask() {
 		return 0; }
-	virtual UnexpectedValueEvent getUnexpectedValueEvent() {
+	virtual EventDefinitionId getUnexpectedValueEvent() {
 		return 0; }
-	virtual LowLimit getLowLimit() {
+	virtual Limit getLowLimit() {
 		return 0.0; }
-	virtual BelowLowLimitEvent getBelowLowLimitEvent() {
+	virtual EventDefinitionId getBelowLowLimitEvent() {
 		return 0; }
-	virtual HighLimit getHighLimit() {
+	virtual Limit getHighLimit() {
 		return 0.0; }
-	virtual AboveHighLimitEvent getAboveHighLimitEvent() {
+	virtual EventDefinitionId getAboveHighLimitEvent() {
 		return 0; }
 	virtual NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() {
 		return 0; }
-	virtual LowDeltaThreshold getLowDeltaThreshold() {
+	virtual DeltaThreshold getLowDeltaThreshold() {
 		return 0.0; }
-	virtual BelowLowThresholdEvent getBelowLowThresholdEvent() {
+	virtual EventDefinitionId getBelowLowThresholdEvent() {
 		return 0; }
-	virtual HighDeltaThreshold getHighDeltaThreshold() {
+	virtual DeltaThreshold getHighDeltaThreshold() {
 		return 0.0; }
-	virtual AboveHighThresholdEvent getAboveHighThresholdEvent() {
+	virtual EventDefinitionId getAboveHighThresholdEvent() {
 		return 0; }
 
 protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
-	PMONBase(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber);
+	PMONBase(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber);
 };
 
 /**
@@ -103,10 +100,10 @@ class PMONExpectedValueCheck : public PMONBase {
 public:
 	Expected_Value expectedValue;
 	Mask mask;
-	UnexpectedValueEvent unexpectedValueEvent;
+	EventDefinitionId unexpectedValueEvent;
 
-	explicit PMONExpectedValueCheck(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber, Expected_Value expectedValue,
-	                                Mask mask, UnexpectedValueEvent unexpectedValueEvent)
+	explicit PMONExpectedValueCheck(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber, Expected_Value expectedValue,
+	                                Mask mask, EventDefinitionId unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
 	      PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::ExpectedValue;
@@ -120,7 +117,7 @@ public:
 		return mask;
 	}
 
-	UnexpectedValueEvent getUnexpectedValueEvent() override {
+	EventDefinitionId getUnexpectedValueEvent() override {
 		return unexpectedValueEvent;
 	}
 };
@@ -130,31 +127,31 @@ public:
  */
 class PMONLimitCheck : public PMONBase {
 public:
-	LowLimit lowLimit;
-	BelowLowLimitEvent belowLowLimitEvent;
-	HighLimit highLimit;
-	AboveHighLimitEvent aboveHighLimitEvent;
+	Limit lowLimit;
+	EventDefinitionId belowLowLimitEvent;
+	Limit highLimit;
+	EventDefinitionId aboveHighLimitEvent;
 
-	explicit PMONLimitCheck(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber, LowLimit lowLimit,
-	                        BelowLowLimitEvent belowLowLimitEvent, HighLimit highLimit, AboveHighLimitEvent aboveHighLimitEvent)
+	explicit PMONLimitCheck(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber, Limit lowLimit,
+	                        EventDefinitionId belowLowLimitEvent, Limit highLimit, EventDefinitionId aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Limit;
 	};
 
-	LowLimit getLowLimit() override {
+	Limit getLowLimit() override {
 		return lowLimit;
 	}
 
-	BelowLowLimitEvent getBelowLowLimitEvent() override {
+	EventDefinitionId getBelowLowLimitEvent() override {
 		return belowLowLimitEvent;
 	}
 
-	HighLimit getHighLimit() override {
+	Limit getHighLimit() override {
 		return highLimit;
 	}
 
-	AboveHighLimitEvent getAboveHighLimitEvent() override {
+	EventDefinitionId getAboveHighLimitEvent() override {
 		return aboveHighLimitEvent;
 	}
 };
@@ -165,15 +162,15 @@ public:
 class PMONDeltaCheck : public PMONBase {
 public:
 	NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks;
-	LowDeltaThreshold lowDeltaThreshold;
-	BelowLowThresholdEvent belowLowThresholdEvent;
-	HighDeltaThreshold highDeltaThreshold;
-	AboveHighThresholdEvent aboveHighThresholdEvent;
+	DeltaThreshold lowDeltaThreshold;
+	EventDefinitionId belowLowThresholdEvent;
+	DeltaThreshold highDeltaThreshold;
+	EventDefinitionId aboveHighThresholdEvent;
 
-	explicit PMONDeltaCheck(MonitoredParameterId monitoredParameterId, RepetitionNumber repetitionNumber,
-	                        NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks, LowDeltaThreshold lowDeltaThreshold,
-	                        BelowLowThresholdEvent belowLowThresholdEvent, HighDeltaThreshold highDeltaThreshold,
-	                        AboveHighThresholdEvent aboveHighThresholdEvent)
+	explicit PMONDeltaCheck(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber,
+	                        NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks, DeltaThreshold lowDeltaThreshold,
+	                        EventDefinitionId belowLowThresholdEvent, DeltaThreshold highDeltaThreshold,
+	                        EventDefinitionId aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
 	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber) {
@@ -184,19 +181,19 @@ public:
 		return numberOfConsecutiveDeltaChecks;
 	}
 
-	LowDeltaThreshold getLowDeltaThreshold() override {
+	DeltaThreshold getLowDeltaThreshold() override {
 		return lowDeltaThreshold;
 	}
 
-	BelowLowThresholdEvent getBelowLowThresholdEvent() override {
+	EventDefinitionId getBelowLowThresholdEvent() override {
 		return belowLowThresholdEvent;
 	}
 
-	HighDeltaThreshold getHighDeltaThreshold() override {
+	DeltaThreshold getHighDeltaThreshold() override {
 		return highDeltaThreshold;
 	}
 
-	AboveHighThresholdEvent getAboveHighThresholdEvent() override {
+	EventDefinitionId getAboveHighThresholdEvent() override {
 		return aboveHighThresholdEvent;
 	}
 };

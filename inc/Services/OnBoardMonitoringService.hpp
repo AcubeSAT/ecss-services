@@ -14,7 +14,7 @@
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
  * @ingroup Services
  * @author Konstantinos Michopoulos <konstantinos.michopoulos@gmail.com> and Thomas Pravinos <tompravi99@gmail.com>
- * */
+ */
 class OnBoardMonitoringService : public Service {
 private:
 	/**

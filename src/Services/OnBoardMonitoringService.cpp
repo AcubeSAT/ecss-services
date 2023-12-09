@@ -77,7 +77,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 
 		PMONId currentPMONId = message.read<PMONId>();
-		MonitoredParameterId currentMonitoredParameterId = message.read<MonitoredParameterId>();
+		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		RepetitionNumber currentPMONRepetitionNumber = message.read<RepetitionNumber>();
 		uint16_t currentCheckType = message.readEnum8();
 
@@ -98,10 +98,10 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		}
 
 		if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Limit) {
-			LowLimit lowLimit = message.read<LowLimit>();
-			BelowLowLimitEvent belowLowLimitEventId = message.read<BelowLowLimitEvent>();
-			HighLimit highLimit = message.read<HighLimit>();
-			AboveHighLimitEvent aboveHighLimitEventId = message.read<AboveHighLimitEvent>();
+			Limit lowLimit = message.read<Limit>();
+			EventDefinitionId belowLowLimitEventId = message.read<EventDefinitionId>();
+			Limit highLimit = message.read<Limit>();
+			EventDefinitionId aboveHighLimitEventId = message.read<EventDefinitionId>();
 			if (highLimit <= lowLimit) {
 				ErrorHandler::reportError(
 				    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
@@ -114,16 +114,16 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		} else if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::ExpectedValue) {
 			Mask mask = message.read<Mask>();
 			Expected_Value expectedValue = message.read<Expected_Value>();
-			UnexpectedValueEvent unExpectedValueEvent = message.read<UnexpectedValueEvent>();
+			EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
 			PMONExpectedValueCheck expectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 			                                          expectedValue, mask, unExpectedValueEvent);
 			expectedValueChecks.push_back(expectedValueCheck);
 			addPMONDefinition(currentPMONId, expectedValueCheck);
 		} else if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Delta) {
-			LowDeltaThreshold lowDeltaThreshold = message.read<LowDeltaThreshold>();
-			BelowLowThresholdEvent belowLowThresholdEventId = message.read<BelowLowThresholdEvent>();
-			HighDeltaThreshold highDeltaThreshold = message.read<HighDeltaThreshold>();
-			AboveHighThresholdEvent aboveHighThresholdEventId = message.read<AboveHighThresholdEvent>();
+			DeltaThreshold lowDeltaThreshold = message.read<DeltaThreshold>();
+			EventDefinitionId belowLowThresholdEventId = message.read<EventDefinitionId>();
+			DeltaThreshold highDeltaThreshold = message.read<DeltaThreshold>();
+			EventDefinitionId aboveHighThresholdEventId = message.read<EventDefinitionId>();
 			NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks = message.read<NumberOfConsecutiveDeltaChecks>();
 			if (highDeltaThreshold <= lowDeltaThreshold) {
 				ErrorHandler::reportError(
@@ -161,7 +161,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 
 		PMONId currentPMONId = message.read<PMONId>();
-		MonitoredParameterId currentMonitoredParameterId = message.read<MonitoredParameterId>();
+		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		RepetitionNumber currentPMONRepetitionNumber = message.read<RepetitionNumber>();
 		uint16_t currentCheckType = message.readEnum8();
 
@@ -185,10 +185,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 		switch (static_cast<PMONBase::CheckType>(currentCheckType)) {
 			case PMONBase::CheckType::Limit: {
-				LowLimit lowLimit = message.read<LowLimit>();
-				BelowLowLimitEvent belowLowLimitEventId = message.read<BelowLowLimitEvent>();
-				HighLimit highLimit = message.read<HighLimit>();
-				AboveHighLimitEvent aboveHighLimitEventId = message.read<AboveHighLimitEvent>();
+				Limit lowLimit = message.read<Limit>();
+				EventDefinitionId belowLowLimitEventId = message.read<EventDefinitionId>();
+				Limit highLimit = message.read<Limit>();
+				EventDefinitionId aboveHighLimitEventId = message.read<EventDefinitionId>();
 
 				if (highLimit <= lowLimit) {
 					ErrorHandler::reportError(
@@ -208,7 +208,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			case PMONBase::PMONBase::CheckType::ExpectedValue: {
 				Mask mask = message.read<Mask>();
 				Expected_Value expectedValue = message.read<Expected_Value>();
-				UnexpectedValueEvent unExpectedValueEvent = message.read<UnexpectedValueEvent>();
+				EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
 
 				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
 				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
@@ -220,10 +220,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			}
 
 			case PMONBase::CheckType::Delta: {
-				LowDeltaThreshold lowDeltaThreshold = message.read<LowDeltaThreshold>();
-				BelowLowThresholdEvent belowLowThresholdEventId = message.read<BelowLowThresholdEvent>();
-				HighDeltaThreshold highDeltaThreshold = message.read<HighDeltaThreshold>();
-				AboveHighThresholdEvent aboveHighThresholdEventId = message.read<AboveHighThresholdEvent>();
+				DeltaThreshold lowDeltaThreshold = message.read<DeltaThreshold>();
+				EventDefinitionId belowLowThresholdEventId = message.read<EventDefinitionId>();
+				DeltaThreshold highDeltaThreshold = message.read<DeltaThreshold>();
+				EventDefinitionId aboveHighThresholdEventId = message.read<EventDefinitionId>();
 				NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks = message.read<NumberOfConsecutiveDeltaChecks>();
 
 				if (highDeltaThreshold <= lowDeltaThreshold) {
@@ -263,24 +263,24 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			continue;
 		}
 		parameterMonitoringDefinitionReport.append<PMONId>(currentPMONId);
-		parameterMonitoringDefinitionReport.append<MonitoredParameterId>(getPMONDefinition(currentPMONId).get().monitoredParameterId);
+		parameterMonitoringDefinitionReport.append<ParameterId>(getPMONDefinition(currentPMONId).get().monitoredParameterId);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().monitoringEnabled));
 		parameterMonitoringDefinitionReport.append<RepetitionNumber>(getPMONDefinition(currentPMONId).get().repetitionNumber);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().checkType));
 		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Limit) {
-			parameterMonitoringDefinitionReport.append<LowLimit>(getPMONDefinition(currentPMONId).get().getLowLimit());
-			parameterMonitoringDefinitionReport.append<BelowLowLimitEvent>(getPMONDefinition(currentPMONId).get().getBelowLowLimitEvent());
-			parameterMonitoringDefinitionReport.append<HighLimit>(getPMONDefinition(currentPMONId).get().getHighLimit());
-			parameterMonitoringDefinitionReport.append<AboveHighLimitEvent>(getPMONDefinition(currentPMONId).get().getAboveHighLimitEvent());
+			parameterMonitoringDefinitionReport.append<Limit>(getPMONDefinition(currentPMONId).get().getLowLimit());
+			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getBelowLowLimitEvent());
+			parameterMonitoringDefinitionReport.append<Limit>(getPMONDefinition(currentPMONId).get().getHighLimit());
+			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getAboveHighLimitEvent());
 		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::ExpectedValue) {
 			parameterMonitoringDefinitionReport.append<Mask>(getPMONDefinition(currentPMONId).get().getMask());
 			parameterMonitoringDefinitionReport.append<Expected_Value>(getPMONDefinition(currentPMONId).get().getExpectedValue());
-			parameterMonitoringDefinitionReport.append<UnexpectedValueEvent>(getPMONDefinition(currentPMONId).get().getUnexpectedValueEvent());
+			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getUnexpectedValueEvent());
 		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Delta) {
-			parameterMonitoringDefinitionReport.append<LowDeltaThreshold>(getPMONDefinition(currentPMONId).get().getLowDeltaThreshold());
-			parameterMonitoringDefinitionReport.append<BelowLowThresholdEvent>(getPMONDefinition(currentPMONId).get().getBelowLowThresholdEvent());
-			parameterMonitoringDefinitionReport.append<HighDeltaThreshold>(getPMONDefinition(currentPMONId).get().getHighDeltaThreshold());
-			parameterMonitoringDefinitionReport.append<AboveHighThresholdEvent>(getPMONDefinition(currentPMONId).get().getAboveHighThresholdEvent());
+			parameterMonitoringDefinitionReport.append<DeltaThreshold>(getPMONDefinition(currentPMONId).get().getLowDeltaThreshold());
+			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getBelowLowThresholdEvent());
+			parameterMonitoringDefinitionReport.append<DeltaThreshold>(getPMONDefinition(currentPMONId).get().getHighDeltaThreshold());
+			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getAboveHighThresholdEvent());
 			parameterMonitoringDefinitionReport.append<NumberOfConsecutiveDeltaChecks>(getPMONDefinition(currentPMONId).get().getNumberOfConsecutiveDeltaChecks());
 		}
 	}
