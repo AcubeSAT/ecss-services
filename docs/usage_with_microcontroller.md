@@ -28,30 +28,12 @@ ecss-services declares some basic functions, but does not implement them. You, t
 code for these functions that will make them work on your platform.
 
 The `inc/Platform` and `src/Platform` directories contain some platform-specific code that has already been prepared.
-The **`x86`** subdirectory includes all the code necessary to run on a Linux platform, i.e. your computer. This code is
+The **x86** subdirectory includes all the code necessary to run on a Linux platform, i.e. your computer. This code is
 only used when building for a desktop environment, and is not compiled when building for a microcontroller.
 
-## Integration with CMake
-
-While `ecss-services` is a typical C++ project, it is built and based around the [CMake build
-system](https://cmake.org/). If you are using CMake in your project, you can easily integrate `ecss-services` in your
-`CMakeLists.txt` file, just by adding these lines:
-
-```cmake
-# ecss-services include directories
-include_directories(lib/ecss-services/inc)
-include_directories(lib/ecss-services/inc/Platform/x86)
-include_directories(lib/ecss-services/lib/etl/include)
-include_directories(lib/ecss-services/lib/logger/inc)
-
-# Build ecss-services and link it to the project
-add_subdirectory(lib/ecss-services EXCLUDE_FROM_ALL)
-target_link_libraries(<project_name> common)
-```
-
-Assuming your project is called `<project_name>` and the library is installed in `lib/ecss-services`, the above lines
-will automatically compile ecss-services for you using the compiler applicable to your application, and link them to
-your project.
+## Configuration
+You will need to create an `ECSS_Configuration.hpp` file in an included directory to define which services should be
+built. See `inc/Platform/x86/ECSS_Configuration.hpp` for an example.
 
 ## Functions to implement
 
@@ -216,7 +198,7 @@ statistics for parameters of selected IDs. An example is provided below. Let's a
 parameter IDs, and we use a data structure to store the statistics. Our initialization function, based on such
 structure should look like this:
 
-```c++
+```cpp
 namespace PlatformParameters {
     enum ParameterIDs : uint16_t {
         OnBoardMinute = 0,

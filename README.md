@@ -41,44 +41,60 @@ definitions.
 
 ## Build
 
-If you're using CLion, you need to add in CMake options (File -> Settings -> Build, Execution, Deployment -> CMake ->
-CMake Options) this `-DCMAKE_TOOLCHAIN_FILE=cmake-build-debug/build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug`.
+The `ecss-services` repository can be built and tested without any access to specialised hardware. We provide build
+instructions for Linux (or WSL) command-line, and the CLion IDE.
 
-If you just cmake from cli, just add the same flags in your command.
+The dependencies of this repository are managed through the [conan](https://conan.io/) package manager, with repositories
+from [ConanCenter](https://conan.io/center/) and [SpaceDot's packages](https://artifactory.spacedot.gr).
 
-### Conan
-This repository uses [conan 2.0](https://conan.io/) to manage dependencies.
+For more detailed installation instructions, including how to integrate with a microcontroller, visit the
+[corresponding documentation page](https://acubesat.gitlab.io/obc/ecss-services/docs/md_docs_installation.html).
 
-#### AcubeSAT Conan Packages
-One of the packages ([logger](https://gitlab.com/acubesat/obc/logger)) is hosted on a private repository, so you 
-need to:
-- have access to the [repository](https://artifactory.spacedot.gr) (if you're already on GitLab, it's the same 
-  credentials, and you should login at least once) and add the 
-  remote to your conan remotes. 
-  To do 
-  that 
-  run the following two commands
-`conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan` and 
-`conan remote login conan $YOUR_USERNAME`, which will prompt you to add your password.
-- or, clone the repo on your own, and package it locally use `conan create . --build=missing` in the root of the repo.
-- or, clone the repo on your own and add it as a submodule in the `lib` folder, and make the necessary CMakeLists.
-  txt changes to include it in the build.
-  
-To build, you first have run `conan profile detect --force`, which generates default profile detecting GCC. You 
-  should find where conan stores the profiles, usually it's at `~/.conan2/profiles/`. Then, you need to run `cp 
-  conan-profile $PROFILE_PATH`, where `$PROFILE_PATH` is the path to the directory that conan stores profiles.
-`conan install . --output-folder=cmake-build-debug --build=missing -u -pr conan-profile`.
-If you're using CLion and don't see `cmake-build-debug`, you have to `Reload CMake project` to have it generated.
-After you've run `conan install...` you can `Reload CMake project` and build as per usual.
+### From the Command Line (CLI)
 
-<details>
-<summary>Getting conan</summary>
+1. Install a modern C++ compiler, CMake, and Conan.  
+   CMake >= 3.23 and Conan >= 2.0 are recommended.
+   <details>
+   <summary>Getting conan</summary>
 
-You can install [conan](https://conan.io/) following the instructions from
-[here](https://docs.conan.io/2/installation.html).
+   You can install [conan](https://conan.io/) following the instructions [from here](https://docs.conan.io/2/installation.html).
+   </details>
+2. Clone the repository and enter the directory:
+   ```shell
+   git clone https://gitlab.com/acubesat/obc/ecss-services.git
+   cd ecss-services
+   ```
+3. (If you haven't already) create a conan profile for your system:
+   ```shell
+   conan profile detect
+   ```
+4. (If you haven't already) add the SpaceDot repository to conan:
+   ```shell
+   conan remote add spacedot https://artifactory.spacedot.gr/artifactory/api/conan/conan
+   ```
+5. Download all dependencies and build the project through conan:
+   ```shell
+   conan build . --output-folder=build --build=missing --update --settings=build_type=Debug
+   ```
+6. Run the tests or the produced executable:
+   ```shell
+   build/Debug/tests
+   build/Debug/x86_services
+   ```
 
-</details>
+### From CLion
 
+CLion will automatically try to set up a CMake project for you. However, without the conan packages installed, this
+will quickly fail. Follow these steps to set up the conan project:
+
+1. Follow steps 1-4 from the CLI instructions above.
+2. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
+   ```shell
+   --preset=cmake-build-debug-debug
+   ```
+3. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
+
+We do not recommend using a Conan plugin for your IDE, as it may tamper with the default configuration for this repository.
 
 ## Static Analysis
 Before pushing online, you can run the static analysis tools locally to avoid waiting for the CI jobs to finish.
