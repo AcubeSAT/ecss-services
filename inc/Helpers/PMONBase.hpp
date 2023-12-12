@@ -47,16 +47,27 @@ public:
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 	CheckType checkType;
-
+	/**
+	 * * Returns the number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
+	 */
 	RepetitionNumber getRepetitionNumber() const {
 		return repetitionNumber;
 	}
+	/**
+	 * * Returns True if Monitoring is enabled, False otherwise.
+	 */
 	bool isMonitoringEnabled() const {
 		return monitoringEnabled;
 	}
+	/**
+	 * * Returns the current Check Type.
+	 */
 	CheckType getCheckType() const {
 		return checkType;
 	}
+	/**
+	 * * Returns the current Checking Status.
+	 */
 	CheckingStatus getCheckingStatus() const {
 		return checkingStatus;
 	}
@@ -108,15 +119,21 @@ public:
 	      PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::ExpectedValue;
 	};
-
-	Expected_Value getExpectedValue() override {
-		return expectedValue;
-	}
-
+	/**
+	 * * Returns the value of the bit mask used in an Expected Value Check.
+	 */
 	Mask getMask() override {
 		return mask;
 	}
-
+	/**
+	 * * Returns the value resulting from applying the bit mask.
+	 */
+	Expected_Value getExpectedValue() override {
+		return expectedValue;
+	}
+	/**
+	 * * Returns the Id of an Unexpected Value Event.
+	 */
 	EventDefinitionId getUnexpectedValueEvent() override {
 		return unexpectedValueEvent;
 	}
@@ -138,19 +155,27 @@ public:
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Limit;
 	};
-
+	/**
+	 * * Returns the value of the Low Limit used on a Limit Check.
+	 */
 	Limit getLowLimit() override {
 		return lowLimit;
 	}
-
+	/**
+	 * * Returns the Id of a Below LowLimit Event.
+	 */
 	EventDefinitionId getBelowLowLimitEvent() override {
 		return belowLowLimitEvent;
 	}
-
+	/**
+	 * * Returns the value of the High Limit used on a Limit Check.
+	 */
 	Limit getHighLimit() override {
 		return highLimit;
 	}
-
+	/**
+	 * * Returns the Id of a High Limit Event.
+	 */
 	EventDefinitionId getAboveHighLimitEvent() override {
 		return aboveHighLimitEvent;
 	}
@@ -176,23 +201,33 @@ public:
 	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Delta;
 	};
-
+	/**
+	 * * Returns the number of consecutive Delta Checks.
+	 */
 	NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() override {
 		return numberOfConsecutiveDeltaChecks;
 	}
-
+	/**
+	 * * Returns the value of the Low Threshold used on a Delta Check.
+	 */
 	DeltaThreshold getLowDeltaThreshold() override {
 		return lowDeltaThreshold;
 	}
-
+	/**
+	 * * Returns the Id of a Below Low Threshold Event.
+	 */
 	EventDefinitionId getBelowLowThresholdEvent() override {
 		return belowLowThresholdEvent;
 	}
-
+	/**
+	 * * Returns the value of the High Threshold used on a Delta Check.
+	 */
 	DeltaThreshold getHighDeltaThreshold() override {
 		return highDeltaThreshold;
 	}
-
+	/**
+	 * * Returns the Id of an Above High Threshold Event.
+	 */
 	EventDefinitionId getAboveHighThresholdEvent() override {
 		return aboveHighThresholdEvent;
 	}
