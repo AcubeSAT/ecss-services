@@ -38,7 +38,7 @@ public:
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
-	RepetitionNumber repetitionNumber;
+	PMONRepetitionNumber repetitionNumber;
 	/**
 	 * The number of checks that have been conducted so far.
 	 */
@@ -50,7 +50,7 @@ public:
 	/**
 	 * * Returns the number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
-	RepetitionNumber getRepetitionNumber() const {
+	PMONRepetitionNumber getRepetitionNumber() const {
 		return repetitionNumber;
 	}
 	/**
@@ -72,9 +72,9 @@ public:
 		return checkingStatus;
 	}
 
-	virtual Expected_Value getExpectedValue() {
+	virtual PMONExpectedValue getExpectedValue() {
 		return 0.0; }
-	virtual Mask getMask() {
+	virtual PMONBitMask getMask() {
 		return 0; }
 	virtual EventDefinitionId getUnexpectedValueEvent() {
 		return 0; }
@@ -101,7 +101,7 @@ protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
-	PMONBase(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber);
+	PMONBase(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber);
 };
 
 /**
@@ -109,12 +109,12 @@ protected:
  */
 class PMONExpectedValueCheck : public PMONBase {
 public:
-	Expected_Value expectedValue;
-	Mask mask;
+	PMONExpectedValue expectedValue;
+	PMONBitMask mask;
 	EventDefinitionId unexpectedValueEvent;
 
-	explicit PMONExpectedValueCheck(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber, Expected_Value expectedValue,
-	                                Mask mask, EventDefinitionId unexpectedValueEvent)
+	explicit PMONExpectedValueCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONExpectedValue expectedValue,
+	                                PMONBitMask mask, EventDefinitionId unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
 	      PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::ExpectedValue;
@@ -122,13 +122,13 @@ public:
 	/**
 	 * * Returns the value of the bit mask used in an Expected Value Check.
 	 */
-	Mask getMask() override {
+	PMONBitMask getMask() override {
 		return mask;
 	}
 	/**
 	 * * Returns the value resulting from applying the bit mask.
 	 */
-	Expected_Value getExpectedValue() override {
+	PMONExpectedValue getExpectedValue() override {
 		return expectedValue;
 	}
 	/**
@@ -149,7 +149,7 @@ public:
 	Limit highLimit;
 	EventDefinitionId aboveHighLimitEvent;
 
-	explicit PMONLimitCheck(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber, Limit lowLimit,
+	explicit PMONLimitCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, Limit lowLimit,
 	                        EventDefinitionId belowLowLimitEvent, Limit highLimit, EventDefinitionId aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
@@ -192,7 +192,7 @@ public:
 	DeltaThreshold highDeltaThreshold;
 	EventDefinitionId aboveHighThresholdEvent;
 
-	explicit PMONDeltaCheck(ParameterId monitoredParameterId, RepetitionNumber repetitionNumber,
+	explicit PMONDeltaCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber,
 	                        NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks, DeltaThreshold lowDeltaThreshold,
 	                        EventDefinitionId belowLowThresholdEvent, DeltaThreshold highDeltaThreshold,
 	                        EventDefinitionId aboveHighThresholdEvent)

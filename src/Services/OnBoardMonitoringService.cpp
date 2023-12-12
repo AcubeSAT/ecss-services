@@ -78,7 +78,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 
 		PMONId currentPMONId = message.read<PMONId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
-		RepetitionNumber currentPMONRepetitionNumber = message.read<RepetitionNumber>();
+		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		uint16_t currentCheckType = message.readEnum8();
 
 		auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId);
@@ -112,8 +112,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			limitChecks.push_back(limitCheck);
 			addPMONDefinition(currentPMONId, limitCheck);
 		} else if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::ExpectedValue) {
-			Mask mask = message.read<Mask>();
-			Expected_Value expectedValue = message.read<Expected_Value>();
+			PMONBitMask mask = message.read<PMONBitMask>();
+			PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 			EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
 			PMONExpectedValueCheck expectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 			                                          expectedValue, mask, unExpectedValueEvent);
@@ -162,7 +162,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 		PMONId currentPMONId = message.read<PMONId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
-		RepetitionNumber currentPMONRepetitionNumber = message.read<RepetitionNumber>();
+		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		uint16_t currentCheckType = message.readEnum8();
 
 		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
@@ -206,8 +206,8 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			}
 
 			case PMONBase::PMONBase::CheckType::ExpectedValue: {
-				Mask mask = message.read<Mask>();
-				Expected_Value expectedValue = message.read<Expected_Value>();
+				PMONBitMask mask = message.read<PMONBitMask>();
+				PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 				EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
 
 				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
@@ -265,7 +265,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		parameterMonitoringDefinitionReport.append<PMONId>(currentPMONId);
 		parameterMonitoringDefinitionReport.append<ParameterId>(getPMONDefinition(currentPMONId).get().monitoredParameterId);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().monitoringEnabled));
-		parameterMonitoringDefinitionReport.append<RepetitionNumber>(getPMONDefinition(currentPMONId).get().repetitionNumber);
+		parameterMonitoringDefinitionReport.append<PMONRepetitionNumber>(getPMONDefinition(currentPMONId).get().repetitionNumber);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().checkType));
 		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Limit) {
 			parameterMonitoringDefinitionReport.append<Limit>(getPMONDefinition(currentPMONId).get().getLowLimit());
@@ -273,8 +273,8 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			parameterMonitoringDefinitionReport.append<Limit>(getPMONDefinition(currentPMONId).get().getHighLimit());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getAboveHighLimitEvent());
 		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::ExpectedValue) {
-			parameterMonitoringDefinitionReport.append<Mask>(getPMONDefinition(currentPMONId).get().getMask());
-			parameterMonitoringDefinitionReport.append<Expected_Value>(getPMONDefinition(currentPMONId).get().getExpectedValue());
+			parameterMonitoringDefinitionReport.append<PMONBitMask>(getPMONDefinition(currentPMONId).get().getMask());
+			parameterMonitoringDefinitionReport.append<PMONExpectedValue>(getPMONDefinition(currentPMONId).get().getExpectedValue());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getUnexpectedValueEvent());
 		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Delta) {
 			parameterMonitoringDefinitionReport.append<DeltaThreshold>(getPMONDefinition(currentPMONId).get().getLowDeltaThreshold());
