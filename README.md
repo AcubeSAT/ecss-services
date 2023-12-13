@@ -88,10 +88,14 @@ CLion will automatically try to set up a CMake project for you. However, without
 will quickly fail. Follow these steps to set up the conan project:
 
 1. Follow steps 1-4 from the CLI instructions above.
-2. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
+2. Run the following command to install relevant packages and create the CMakePreset.json files
+```shell
+conan install . --output-folder=cmake-build-debug -u --build="*" -pr conan-profile --settings=build-type=Debug
+```
+3. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
    ```shell
    --preset=cmake-build-debug-debug
    ```
-3. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
+4. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
 
 We do not recommend using a Conan plugin for your IDE, as it may tamper with the default configuration for this repository.
