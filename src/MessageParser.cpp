@@ -93,7 +93,7 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress[constParamet
 	}
 }
 
-Message MessageParser::parse(uint8_t* data, uint32_t length) {
+Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket);
 
 	uint16_t packetHeaderIdentification = (data[0] << 8) | data[1];
@@ -144,7 +144,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	message.serviceType = serviceType;
 	message.messageType = messageType;
 	message.sourceId = sourceId;
-	std::copy(data + ECSSSecondaryTCHeaderSize, data + ECSSSecondaryTCHeaderSize + length, message.data);
+	std::copy(data + ECSSSecondaryTCHeaderSize, data + ECSSSecondaryTCHeaderSize + length, message.data.begin());
 	message.dataSize = length;
 }
 
@@ -156,7 +156,7 @@ Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
 	return message;
 }
 
-Message MessageParser::parseECSSTC(uint8_t* data) {
+Message MessageParser::parseECSSTC(const uint8_t* data) {
 	Message message;
 	message.packetType = Message::TC;
 	parseECSSTCHeader(data, ECSSTCRequestStringSize, message);
@@ -191,7 +191,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 	}
 
 	String<CCSDSMaxMessageSize> dataString(header, ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize));
-	dataString.append(message.data, message.dataSize);
+	dataString.append(message.data.begin(), message.dataSize);
 
 	// Make sure to reach the requested size
 	if (size != 0) {
@@ -263,6 +263,6 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	// Copy the data to the message
 	message.serviceType = serviceType;
 	message.messageType = messageType;
-	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data);
+	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data.begin());
 	message.dataSize = length;
 }

@@ -1,0 +1,1 @@
+{"summary": "MisraTypedefInfo", "data": [{"name": "append", "file": "inc/etl/String.hpp", "line": 60, "column": 0, "used": false}, {"name": "RelativeTime", "file": "inc/Time/Time.hpp", "line": 270, "column": 18, "used": true}]}

@@ -106,4 +106,14 @@ Any item in that file will cause failure of the pipeline.
 
 ## Tests
 Before pushing online, you can run the tests locally to avoid waiting for the CI jobs to finish.
-You can d
+You can do this by running:
+
+```bash
+./ci/cppcheck.sh
+```
+
+```bash
+./ci/clang-tidy.sh
+```
+
+and check the output files for errors.
