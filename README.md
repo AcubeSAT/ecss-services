@@ -92,7 +92,7 @@ will quickly fail. Follow these steps to set up the conan project:
 ```shell
 conan install . --output-folder=cmake-build-debug -u --build="*" -pr conan-profile --settings=build-type=Debug
 ```
-2. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
+3. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
    ```shell
    --preset=cmake-build-debug-debug
    ```
