@@ -7,6 +7,13 @@
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 #include "Service.hpp"
 
+
+/**
+ * Number of Bits in Memory Management Checksum
+ * 
+ */
+inline const size_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
+
 /**
  * @ingroup Services
  */
@@ -114,6 +121,28 @@ private:
 	 *
 	 */
 	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
+
+
+	/**
+	 * Helper struct to define upper and lower limits of different memories
+	 * 
+	 */
+	struct MemoryLimits {
+		uint32_t lowerLim;
+		uint32_t upperLim;
+	};
+
+	/**
+	 * Map containing all the different types of memory limits
+	 * 
+	 */
+	static const std::unordered_map<MemoryID, MemoryLimits> memoryLimitsMap;
+
+	/**
+	 * Data structure containing all the valid memory IDs
+	 * 
+	 */
+	static const std::vector<MemoryID> validMemoryIds;
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

@@ -5,6 +5,23 @@
 #include <etl/String.hpp>
 #include "Services/MemoryManagementService.hpp"
 
+const std::unordered_map<MemoryManagementService::MemoryID, MemoryManagementService::MemoryLimits> MemoryManagementService::memoryLimitsMap = {
+    {MemoryManagementService::MemoryID::DTCMRAM, {DTCMRAMLowerLim, DTCMRAMUpperLim}},
+    {MemoryManagementService::MemoryID::ITCMRAM, {ITCMRAMLowerLim, ITCMRAMUpperLim}},
+    {MemoryManagementService::MemoryID::RAM_D1, {RAMD1LowerLim, RAMD1UpperLim}},
+    {MemoryManagementService::MemoryID::RAM_D2, {RAMD2LowerLim, RAMD2UpperLim}},
+    {MemoryManagementService::MemoryID::RAM_D3, {RAMD3LowerLim, RAMD3UpperLim}},
+    {MemoryManagementService::MemoryID::FLASH_MEMORY, {FlashLowerLim, FlashUpperLim}}};
+
+const std::vector<MemoryManagementService::MemoryID> MemoryManagementService::validMemoryIds = {
+    MemoryManagementService::MemoryID::RAM_D1,
+    MemoryManagementService::MemoryID::RAM_D2,
+    MemoryManagementService::MemoryID::RAM_D3,
+    MemoryManagementService::MemoryID::DTCMRAM,
+    MemoryManagementService::MemoryID::ITCMRAM,
+    MemoryManagementService::MemoryID::FLASH_MEMORY,
+    MemoryManagementService::MemoryID::EXTERNAL};
+
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
 	serviceType = MemoryManagementService::ServiceType;
 }
@@ -38,7 +55,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			const StartAddress startAddress = request.read<StartAddress>();
 			const MemoryDataLength dataLength = request.readOctetString(readData.data()); // NOLINT(cppcoreguidelines-init-variables)
-			const MemoryManagementChecksum checksum = request.readBits(8*sizeof(MemoryManagementChecksum));
+			const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
 
 			if (!dataValidator(readData.data(), checksum, dataLength)) {
 				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
@@ -147,56 +164,21 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 }
 
 bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID memId, uint64_t address) {
-	bool validIndicator = false;
-
-	switch (memId) {
-		case MemoryManagementService::MemoryID::DTCMRAM:
-			if ((address >= DTCMRAMLowerLim) && (address <= DTCMRAMUpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::ITCMRAM:
-			if ((address >= ITCMRAMLowerLim) && (address <= ITCMRAMUpperLim)) { //cppcheck-suppress unsignedPositive
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::RAM_D1:
-			if ((address >= RAMD1LowerLim) && (address <= RAMD1UpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::RAM_D2:
-			if ((address >= RAMD2LowerLim) && (address <= RAMD2UpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::RAM_D3:
-			if ((address >= RAMD3LowerLim) && (address <= RAMD3UpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::FLASH_MEMORY:
-			if ((address >= FlashLowerLim) && (address <= FlashUpperLim)) {
-				validIndicator = true;
-			}
-			break;
-
-		default:
-			validIndicator = true; // TODO(#259): Implemented so addresses from PC can be read. Remove.
-			break;
+	bool validIndicator = true;
+	auto it = MemoryManagementService::memoryLimitsMap.find(memId);
+	if (it != MemoryManagementService::memoryLimitsMap.end()) {
+		const auto& limits = it->second;
+		validIndicator = (address >= limits.lowerLim) && (address <= limits.upperLim);
+	} else {
+		// Default case (unknown MemoryID)
+		validIndicator = true;
+		// TODO: Implemented so addresses from PC can be read. Remove.
 	}
-
 	return validIndicator;
 }
 
 inline bool MemoryManagementService::memoryIdValidator(MemoryManagementService::MemoryID memId) {
-	return (memId == MemoryManagementService::MemoryID::RAM_D1) ||
-	       (memId == MemoryManagementService::MemoryID::RAM_D2) ||
-	       (memId == MemoryManagementService::MemoryID::RAM_D3) ||
-	       (memId == MemoryManagementService::MemoryID::DTCMRAM) ||
-	       (memId == MemoryManagementService::MemoryID::ITCMRAM) ||
-	       (memId == MemoryManagementService::MemoryID::FLASH_MEMORY) ||
-	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
+	return std::find(MemoryManagementService::validMemoryIds.begin(), MemoryManagementService::validMemoryIds.end(), memId) != MemoryManagementService::validMemoryIds.end();
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length) {
