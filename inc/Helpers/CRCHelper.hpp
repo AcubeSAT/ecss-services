@@ -3,7 +3,6 @@
 
 #include <cstdint>
 
-
 class CRCHelper {
 	/**
 	 * CRC16 calculation helper class

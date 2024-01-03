@@ -5,23 +5,6 @@
 #include <etl/String.hpp>
 #include "Services/MemoryManagementService.hpp"
 
-const std::unordered_map<MemoryManagementService::MemoryID, MemoryManagementService::MemoryLimits> MemoryManagementService::memoryLimitsMap = {
-    {MemoryManagementService::MemoryID::DTCMRAM, {DTCMRAMLowerLim, DTCMRAMUpperLim}},
-    {MemoryManagementService::MemoryID::ITCMRAM, {ITCMRAMLowerLim, ITCMRAMUpperLim}},
-    {MemoryManagementService::MemoryID::RAM_D1, {RAMD1LowerLim, RAMD1UpperLim}},
-    {MemoryManagementService::MemoryID::RAM_D2, {RAMD2LowerLim, RAMD2UpperLim}},
-    {MemoryManagementService::MemoryID::RAM_D3, {RAMD3LowerLim, RAMD3UpperLim}},
-    {MemoryManagementService::MemoryID::FLASH_MEMORY, {FlashLowerLim, FlashUpperLim}}};
-
-const std::vector<MemoryManagementService::MemoryID> MemoryManagementService::validMemoryIds = {
-    MemoryManagementService::MemoryID::RAM_D1,
-    MemoryManagementService::MemoryID::RAM_D2,
-    MemoryManagementService::MemoryID::RAM_D3,
-    MemoryManagementService::MemoryID::DTCMRAM,
-    MemoryManagementService::MemoryID::ITCMRAM,
-    MemoryManagementService::MemoryID::FLASH_MEMORY,
-    MemoryManagementService::MemoryID::EXTERNAL};
-
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
 	serviceType = MemoryManagementService::ServiceType;
 }
@@ -42,15 +25,15 @@ void MemoryManagementService::loadRawData(Message& request) {
 	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
 
 	if (!memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
-	// TODO(#257): Send a failed start of execution
+		// TODO(#257): Send a failed start of execution
 		return;
 	}
 
-	etl::array<ReadData , ECSSMaxStringSize> readData = {};
+	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();
 
 	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
-	// TODO(#258): Define FLASH specific access code when we transfer to embedded
+		// TODO(#258): Define FLASH specific access code when we transfer to embedded
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			const StartAddress startAddress = request.read<StartAddress>();
@@ -92,7 +75,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	const MemoryId memoryID = request.read<MemoryId>();
 
 	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
-		etl::array<ReadData , ECSSMaxStringSize> readData = {};
+		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
 		report.append<MemoryId>(memoryID);
@@ -119,7 +102,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-	// TODO(#257): Send a failed start of execution
+		// TODO(#257): Send a failed start of execution
 	}
 }
 
@@ -132,7 +115,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	const MemoryId memoryID = request.read<MemoryId>();
 
 	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
-		etl::array<ReadData , ECSSMaxStringSize> readData = {};
+		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
 		report.append<MemoryId>(memoryID);
@@ -159,7 +142,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-	// TODO(#257): Send a failed start of execution report
+		// TODO(#257): Send a failed start of execution report
 	}
 }
 
@@ -172,13 +155,14 @@ bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID
 	} else {
 		// Default case (unknown MemoryID)
 		validIndicator = true;
-		// TODO: Implemented so addresses from PC can be read. Remove.
+		// TODO(#259): Implemented so addresses from PC can be read. Remove.
 	}
 	return validIndicator;
 }
 
 inline bool MemoryManagementService::memoryIdValidator(MemoryManagementService::MemoryID memId) {
-	return std::find(MemoryManagementService::validMemoryIds.begin(), MemoryManagementService::validMemoryIds.end(), memId) != MemoryManagementService::validMemoryIds.end();
+	return etl::find(MemoryManagementService::validMemoryIds.begin(), MemoryManagementService::validMemoryIds.end(),
+	                 memId) != MemoryManagementService::validMemoryIds.end();
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length) {

@@ -6,13 +6,23 @@
 #include "Helpers/CRCHelper.hpp"
 #include "Platform/STM32F7/MemoryAddressLimits.hpp"
 #include "Service.hpp"
-
+#include "etl/unordered_map.h"
+#include "etl/unordered_set.h"
 
 /**
  * Number of Bits in Memory Management Checksum
- * 
  */
-inline const size_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
+inline constexpr size_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
+
+/**
+ * Maximum number of entries in Memory Limits Map
+ */
+inline constexpr size_t MaxMemoryLimitsMapSize = 8;
+
+/**
+ * Maximum number of entries in Valid Memory IDs set
+ */
+inline constexpr size_t MaxValidMemoryIdsSize = 8;
 
 /**
  * @ingroup Services
@@ -102,6 +112,37 @@ public:
 
 private:
 	/**
+	 * Helper struct to define upper and lower limits of different memories
+	 */
+	struct MemoryLimits {
+		uint32_t lowerLim;
+		uint32_t upperLim;
+	};
+
+	/**
+	 * Map containing all the different types of memory limits
+	 */
+	inline static const etl::unordered_map<MemoryID, MemoryLimits, MaxMemoryLimitsMapSize> memoryLimitsMap = {
+	    {MemoryManagementService::MemoryID::DTCMRAM, {DTCMRAMLowerLim, DTCMRAMUpperLim}},
+	    {MemoryManagementService::MemoryID::ITCMRAM, {ITCMRAMLowerLim, ITCMRAMUpperLim}},
+	    {MemoryManagementService::MemoryID::RAM_D1, {RAMD1LowerLim, RAMD1UpperLim}},
+	    {MemoryManagementService::MemoryID::RAM_D2, {RAMD2LowerLim, RAMD2UpperLim}},
+	    {MemoryManagementService::MemoryID::RAM_D3, {RAMD3LowerLim, RAMD3UpperLim}},
+	    {MemoryManagementService::MemoryID::FLASH_MEMORY, {FlashLowerLim, FlashUpperLim}}};
+
+	/**
+	 * Data structure containing all the valid memory IDs
+	 */
+	inline static const etl::unordered_set<MemoryID, MaxValidMemoryIdsSize> validMemoryIds = {
+	    MemoryManagementService::MemoryID::RAM_D1,
+	    MemoryManagementService::MemoryID::RAM_D2,
+	    MemoryManagementService::MemoryID::RAM_D3,
+	    MemoryManagementService::MemoryID::DTCMRAM,
+	    MemoryManagementService::MemoryID::ITCMRAM,
+	    MemoryManagementService::MemoryID::FLASH_MEMORY,
+	    MemoryManagementService::MemoryID::EXTERNAL};
+
+	/**
 	 * Check whether the provided address is valid or not, based on the defined limit values
 	 *
 	 * @param memId The ID of the memory to check is passed
@@ -118,31 +159,8 @@ private:
 
 	/**
 	 * Validate the data according to checksum calculation
-	 *
 	 */
 	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
-
-
-	/**
-	 * Helper struct to define upper and lower limits of different memories
-	 * 
-	 */
-	struct MemoryLimits {
-		uint32_t lowerLim;
-		uint32_t upperLim;
-	};
-
-	/**
-	 * Map containing all the different types of memory limits
-	 * 
-	 */
-	static const std::unordered_map<MemoryID, MemoryLimits> memoryLimitsMap;
-
-	/**
-	 * Data structure containing all the valid memory IDs
-	 * 
-	 */
-	static const std::vector<MemoryID> validMemoryIds;
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP
