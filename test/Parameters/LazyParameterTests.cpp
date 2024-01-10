@@ -23,8 +23,8 @@ TEST_CASE("Lazy Parameter: Getter") {
 }
 
 TEST_CASE("Lazy Parameter: Messages") {
-	const int16_t fallback = -1;
-	const int16_t value = 42;
+	constexpr int16_t fallback = -1;
+	constexpr int16_t value = 42;
 
 	LazyParameter<int16_t> parameter(
 	    []() -> auto{

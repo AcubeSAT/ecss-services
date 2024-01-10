@@ -123,7 +123,7 @@ private:
 	void notifyNewActivityAddition();
 
 public:
-	inline static const ServiceTypeNum ServiceType = 11;
+	inline static constexpr ServiceTypeNum ServiceType = 11;
 
 	enum MessageType : uint8_t {
 		EnableTimeBasedScheduleExecutionFunction = 1,
