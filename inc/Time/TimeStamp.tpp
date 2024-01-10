@@ -92,7 +92,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& t
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 typename TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TAICounter_t
 TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asTAIseconds() {
-	constexpr auto duration = RawDuration(taiCounter);
+	const auto duration = RawDuration(taiCounter);
 	using ToDuration = std::chrono::duration<TAICounter_t>;
 
 	return std::chrono::duration_cast<ToDuration>(duration).count();
