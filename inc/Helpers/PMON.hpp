@@ -31,7 +31,6 @@ public:
 		                             ExpectedValue = 2,
 		                             Delta = 3 };
 
-
 	ParameterId monitoredParameterId;
 
 	std::reference_wrapper<ParameterBase> monitoredParameter;
