@@ -98,9 +98,9 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		}
 
 		if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Limit) {
-			Limit lowLimit = message.read<Limit>();
+			PMONLimit lowLimit = message.read<PMONLimit>();
 			EventDefinitionId belowLowLimitEventId = message.read<EventDefinitionId>();
-			Limit highLimit = message.read<Limit>();
+			PMONLimit highLimit = message.read<PMONLimit>();
 			EventDefinitionId aboveHighLimitEventId = message.read<EventDefinitionId>();
 			if (highLimit <= lowLimit) {
 				ErrorHandler::reportError(
@@ -185,9 +185,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 		switch (static_cast<PMONBase::CheckType>(currentCheckType)) {
 			case PMONBase::CheckType::Limit: {
-				Limit lowLimit = message.read<Limit>();
+				PMONLimit lowLimit = message.read<PMONLimit>();
 				EventDefinitionId belowLowLimitEventId = message.read<EventDefinitionId>();
-				Limit highLimit = message.read<Limit>();
+				PMONLimit highLimit = message.read<PMONLimit>();
 				EventDefinitionId aboveHighLimitEventId = message.read<EventDefinitionId>();
 
 				if (highLimit <= lowLimit) {
@@ -268,9 +268,9 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		parameterMonitoringDefinitionReport.append<PMONRepetitionNumber>(getPMONDefinition(currentPMONId).get().repetitionNumber);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().checkType));
 		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Limit) {
-			parameterMonitoringDefinitionReport.append<Limit>(getPMONDefinition(currentPMONId).get().getLowLimit());
+			parameterMonitoringDefinitionReport.append<PMONLimit>(getPMONDefinition(currentPMONId).get().getLowLimit());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getBelowLowLimitEvent());
-			parameterMonitoringDefinitionReport.append<Limit>(getPMONDefinition(currentPMONId).get().getHighLimit());
+			parameterMonitoringDefinitionReport.append<PMONLimit>(getPMONDefinition(currentPMONId).get().getHighLimit());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getAboveHighLimitEvent());
 		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::ExpectedValue) {
 			parameterMonitoringDefinitionReport.append<PMONBitMask>(getPMONDefinition(currentPMONId).get().getMask());

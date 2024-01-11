@@ -55,7 +55,7 @@ using ErrorCode = uint16_t;
  * The types used for the three Check Types and their variables in OnBoardMonitoringService.
  */
  using PMONRepetitionNumber = uint16_t;
- using Limit = double;
+ using PMONLimit = double;
  using PMONExpectedValue = double;
  using PMONBitMask = uint64_t;
  using NumberOfConsecutiveDeltaChecks = uint16_t;

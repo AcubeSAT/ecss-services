@@ -82,11 +82,11 @@ public:
 		return 0; }
 	virtual EventDefinitionId getUnexpectedValueEvent() {
 		return 0; }
-	virtual Limit getLowLimit() {
+	virtual PMONLimit getLowLimit() {
 		return 0.0; }
 	virtual EventDefinitionId getBelowLowLimitEvent() {
 		return 0; }
-	virtual Limit getHighLimit() {
+	virtual PMONLimit getHighLimit() {
 		return 0.0; }
 	virtual EventDefinitionId getAboveHighLimitEvent() {
 		return 0; }
@@ -151,41 +151,41 @@ public:
  */
 class PMONLimitCheck : public PMONBase {
 public:
-	Limit lowLimit;
+	PMONLimit lowLimit;
 	EventDefinitionId belowLowLimitEvent;
-	Limit highLimit;
+	PMONLimit highLimit;
 	EventDefinitionId aboveHighLimitEvent;
 
-	explicit PMONLimitCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, Limit lowLimit,
-	                        EventDefinitionId belowLowLimitEvent, Limit highLimit, EventDefinitionId aboveHighLimitEvent)
+	explicit PMONLimitCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONLimit lowLimit,
+	                        EventDefinitionId belowLowLimitEvent, PMONLimit highLimit, EventDefinitionId aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
 	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Limit;
 	};
 
 	/**
-	 * Returns the value of the Low Limit used on a Limit Check.
+	 * Returns the value of the Low PMONLimit used on a PMONLimit Check.
 	 */
-	Limit getLowLimit() override {
+	PMONLimit getLowLimit() override {
 		return lowLimit;
 	}
 
 	/**
-	 * Returns the Id of a Below Low Limit Event.
+	 * Returns the Id of a Below Low PMONLimit Event.
 	 */
 	EventDefinitionId getBelowLowLimitEvent() override {
 		return belowLowLimitEvent;
 	}
 
 	/**
-	 * Returns the value of the High Limit used on a Limit Check.
+	 * Returns the value of the High PMONLimit used on a PMONLimit Check.
 	 */
-	Limit getHighLimit() override {
+	PMONLimit getHighLimit() override {
 		return highLimit;
 	}
 
 	/**
-	 * Returns the Id of a High Limit Event.
+	 * Returns the Id of a High PMONLimit Event.
 	 */
 	EventDefinitionId getAboveHighLimitEvent() override {
 		return aboveHighLimitEvent;

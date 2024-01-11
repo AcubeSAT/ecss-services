@@ -28,10 +28,10 @@ private:
 	 * For the calculation each 16-bit enumeration is 2 bytes in size, a 16-bit unsigned integer is 2 bytes as well
 	 * and a double precision floating-point number is 8 bytes in size.
 	 * The maximum data size for an ECSS Message is currently 1024 bytes.
-	 * For Limit Check Messages there are 5 16-bit enumerations (PMON ID, currentMonitoredParameterId, check type, belowLowLimitEventId, aboveHighLimitEventId),
+	 * For PMONLimit Check Messages there are 5 16-bit enumerations (PMON ID, currentMonitoredParameterId, check type, belowLowLimitEventId, aboveHighLimitEventId),
 	 * 2 16-bit unsigned integers (N, currentPMONRepetitionNumber)
 	 * and 2 double precision floating-point numbers (lowLimit, highLimit).
-	 * The total is 5*2+2*2+2*8=30 bytes per Limit Check.
+	 * The total is 5*2+2*2+2*8=30 bytes per PMONLimit Check.
 	 * For the maximum number : 1024/30=34.13, so 34 is the maximum number of checks.
 	 */
 	static constexpr uint8_t MaximumNumberOfChecksLimitCheck = 34;
