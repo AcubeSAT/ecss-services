@@ -82,16 +82,19 @@ public:
 	 * Measured in "on-board parameter minimum sampling interval" units (see 5.4.3.2c in ECSS-E-ST-70-41C).
 	 */
 	uint16_t maximumTransitionReportingDelay = 0;
+
 	/**
 	 * If true, parameter monitoring is enabled
 	 */
 	bool parameterMonitoringFunctionStatus = false;
-	/*
+
+	/**
 	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
 	 */
 	void addPMONDefinition(PMONId PMONId, std::reference_wrapper<PMONBase> PMONDefinition) {
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
 	}
+
 	/**
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
@@ -99,15 +102,21 @@ public:
 	std::reference_wrapper<PMONBase> getPMONDefinition(PMONId PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
+
 	/**
 	 * @return true if PMONList is empty.
 	 */
 	bool isPMONListEmpty() {
 		return parameterMonitoringList.empty();
 	}
+
+	/**
+	 * @return The number of occurrences of the specified key in the parameter monitoring list.
+	 */
 	uint16_t getCount(uint16_t key) const {
 		return parameterMonitoringList.count(key);
 	}
+
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
