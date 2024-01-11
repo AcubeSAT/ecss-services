@@ -3,7 +3,6 @@
 #include "Message.hpp"
 #include "ServicePool.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
-#include "etl/map.h"
 #include "etl/vector.h"
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
