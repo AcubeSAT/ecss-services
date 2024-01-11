@@ -74,7 +74,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-
 		PMONId currentPMONId = message.read<PMONId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
