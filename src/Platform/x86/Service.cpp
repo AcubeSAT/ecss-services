@@ -41,7 +41,7 @@ PacketSender packetSender;
 /**
  * If set to true, the created messages will be sent to port 10025 on localhost for testing purposes.
  */
-inline const bool SendToYamcs = true;
+inline constexpr bool SendToYamcs = true;
 
 void Service::storeMessage(Message& message) {
 	// appends the remaining bits to complete a byte

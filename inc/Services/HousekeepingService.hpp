@@ -39,7 +39,7 @@ private:
 	void initializeHousekeepingStructures();
 
 public:
-	inline static const ServiceTypeNum ServiceType = 3;
+	inline static constexpr ServiceTypeNum ServiceType = 3;
 
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains the housekeeping structure with ID = i.
