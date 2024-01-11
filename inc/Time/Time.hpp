@@ -119,9 +119,9 @@ namespace Time {
 	 */
 	inline constexpr uint8_t CUCTimestampMaximumSize = 9;
 
-	inline constexpr uint16_t NotSureWhy2019 = 2019;
+	inline constexpr uint16_t AcubeSATEpoch = 2019;
 
-	static_assert(Epoch.year >= NotSureWhy2019);
+	static_assert(Epoch.year >= AcubeSATEpoch);
 	static_assert(Epoch.month < 11 && Epoch.month >= 0); //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	static_assert(Epoch.day < DaysOfMonth[Epoch.month]);
 

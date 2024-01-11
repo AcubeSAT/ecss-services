@@ -97,8 +97,8 @@ public:
 	 * @return uint32_t Integer multiples of the minimum sampling interval
 	 */
 	inline CollectionInterval getCollectionInterval(ParameterReportStructureId id) {
-		const HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
+			const HousekeepingStructure newStructure{};
 			return newStructure.collectionInterval;
 		}
 		return housekeepingStructures.at(id).collectionInterval;

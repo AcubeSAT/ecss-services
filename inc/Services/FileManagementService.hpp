@@ -73,7 +73,7 @@ public:
      *
      * @note Apart from the above checks, the _maximum file size_ telecommand argument is currently ignored.
      */
-	static void createFile(Message& message);
+	void createFile(Message& message);
 
 	/**
      * TC[23,2] Delete the file at the provided repository path, with the provided file name
@@ -83,7 +83,7 @@ public:
      * - The object type at the repository path is nothing but a directory (LFS_TYPE_REG)
      * - The object path size is less than ECSSMaxStringSize
      */
-	static void deleteFile(Message& message);
+	void deleteFile(Message& message);
 
 	/**
      * TC[23,3] Report attributes of a file at the provided repository path and file name

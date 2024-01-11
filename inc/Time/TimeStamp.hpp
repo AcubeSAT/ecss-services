@@ -346,9 +346,8 @@ namespace Time {
 	 * will define a timestamp 1000 ticks from the epoch.
 	 *
 	 * The time amount of a "tick" is the period defined by the DefaultCUC::Ratio
-	 * @note The literal is only defined for unsigned long long, so that it can be used with the chrono literals.
 	 */
-	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator""_t(unsigned long long s) { // NOLINT(google-runtime-int)
+	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator""_t(unsigned long long s) { // NOLINT(google-runtime-int) The literal is only defined for unsigned long long, so that it can be used with the chrono literals.
 		return std::chrono::duration<uint32_t, DefaultCUC::Ratio>(s);
 	}
 } // namespace Time

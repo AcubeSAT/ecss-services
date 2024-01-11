@@ -8,8 +8,9 @@ PMONBase::PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber)
 {
 	auto paramOpt = Services.parameterManagement.getParameter(monitoredParameterId);
 	if (paramOpt.has_value()) {
-		monitoredParameter = paramOpt->get();
+		monitoredParameter = paramOpt->get(); // Assuming get() returns a reference
 	} else {
 		ErrorHandler::reportInternalError(ErrorHandler::InvalidParameterId);
+		monitoredParameter = invalidParam;
 	}
 }

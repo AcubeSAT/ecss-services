@@ -18,7 +18,7 @@ class EventReportService : public Service {
 private:
 	static const uint16_t numberOfEvents = 7;
 	etl::bitset<numberOfEvents> stateOfEvents;
-	static constexpr uint16_t LastElementID = 65535;
+	static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
 
 public:
 	inline static const ServiceTypeNum ServiceType = 5;
