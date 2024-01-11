@@ -108,9 +108,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled == false);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkingStatus == PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMON::Unchecked);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -136,9 +136,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled == false);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMONBase::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkingStatus == PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkingStatus == PMON::Unchecked);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -218,7 +218,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		//		request.appendEnum16(PMONIds[0]);
 		//		request.appendEnum16(monitoredParameterIds[0]);
 		//		request.appendUint16(repetitionNumbers[0]);
-		//		request.appendEnum8(PMONBase::ExpectedValueCheck);
+		//		request.appendEnum8(PMON::ExpectedValueCheck);
 		//		request.appendUint64(expetedValueCheckMask);
 		//		request.appendDouble(expectedValue);
 		//		request.appendEnum16(unexpectedValueEvent);
@@ -226,7 +226,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		//		request.appendEnum16(PMONIds[1]);
 		//		request.appendEnum16(monitoredParameterIds[1]);
 		//		request.appendUint16(repetitionNumbers[1]);
-		//		request.appendEnum8(PMONBase::CheckType::PMONLimit);
+		//		request.appendEnum8(PMON::CheckType::PMONLimit);
 		//		request.appendDouble(lowLimit);
 		//		request.appendEnum16(belowLowLimitEvent);
 		//		request.appendDouble(highLimit);
@@ -235,7 +235,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		//		request.appendEnum16(PMONIds[2]);
 		//		request.appendEnum16(monitoredParameterIds[2]);
 		//		request.appendUint16(repetitionNumbers[2]);
-		//		request.appendEnum8(PMONBase::DeltaCheck);
+		//		request.appendEnum8(PMON::DeltaCheck);
 		//		request.appendDouble(lowDeltaThreshold);
 		//		request.appendEnum16(belowLowThresholdEvent);
 		//		request.appendDouble(highDeltaThreshold);
@@ -257,12 +257,12 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().isMonitoringEnabled() == false);
 		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().isMonitoringEnabled() == false);
 		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().isMonitoringEnabled() == false);
-		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getCheckType() == PMONBase::ExpectedValueCheck);
-		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getCheckType() == PMONBase::CheckType::PMONLimit);
-		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getCheckType() == PMONBase::DeltaCheck);
-		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getCheckingStatus() == PMONBase::Unchecked);
-		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getCheckingStatus() == PMONBase::Unchecked);
-		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getCheckingStatus() == PMONBase::Unchecked);
+		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getCheckType() == PMON::ExpectedValueCheck);
+		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getCheckType() == PMON::CheckType::PMONLimit);
+		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getCheckType() == PMON::DeltaCheck);
+		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getCheckingStatus() == PMON::Unchecked);
+		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getCheckingStatus() == PMON::Unchecked);
+		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getCheckingStatus() == PMON::Unchecked);
 		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getExpectedValue() == expectedValue);
 		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getMask() == expetedValueCheckMask);
 		//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getUnexpectedValueEvent() == unexpectedValueEvent);
@@ -296,12 +296,12 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendEnum16(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMONBase::CheckType::Limit));
+		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
 		request.append<EventDefinitionId>(aboveHighLimitEvent);
-//		request.appendEnum8(PMONBase::ExpectedValueCheck);
+//		request.appendEnum8(PMON::ExpectedValueCheck);
 //		request.appendUint64(expetedValueCheckMask);
 //		request.appendDouble(expectedValue);
 //		request.appendEnum16(unexpectedValueEvent);
@@ -314,13 +314,13 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		auto definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getRepetitionNumber() == repetitionNumber);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().isMonitoringEnabled() == false);
-//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckType() == PMONBase::ExpectedValueCheck);
-//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckingStatus() == PMONBase::Unchecked);
+//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckType() == PMON::ExpectedValueCheck);
+//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckingStatus() == PMON::Unchecked);
 //		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getExpectedValue() == expectedValue);
 //		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getMask() == expetedValueCheckMask);
 //		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getUnexpectedValueEvent() == unexpectedValueEvent);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckType() == PMONBase::CheckType::Limit);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckingStatus() == PMONBase::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckType() == PMON::CheckType::Limit);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckingStatus() == PMON::Unchecked);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getLowLimit() == lowLimit);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getBelowLowLimitEvent() == belowLowLimitEvent);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getHighLimit() == highLimit);

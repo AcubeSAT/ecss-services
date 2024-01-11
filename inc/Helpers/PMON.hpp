@@ -1,5 +1,5 @@
-#ifndef ECSS_SERVICES_PMONBASE_HPP
-#define ECSS_SERVICES_PMONBASE_HPP
+#ifndef ECSS_SERVICES_PMON_HPP
+#define ECSS_SERVICES_PMON_HPP
 #include <cstdint>
 #include "ECSS_Definitions.hpp"
 #include "Helpers/Parameter.hpp"
@@ -12,7 +12,7 @@
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
  */
-class PMONBase {
+class PMON {
 public:
 	enum CheckingStatus : uint8_t {
 		Unchecked = 1,
@@ -105,13 +105,13 @@ protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
-	PMONBase(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber);
+	PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber);
 };
 
 /**
  * Contains the variables specific to Parameter Monitoring definitions of expected value check type.
  */
-class PMONExpectedValueCheck : public PMONBase {
+class PMONExpectedValueCheck : public PMON {
 public:
 	PMONExpectedValue expectedValue;
 	PMONBitMask mask;
@@ -120,7 +120,7 @@ public:
 	explicit PMONExpectedValueCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONExpectedValue expectedValue,
 	                                PMONBitMask mask, EventDefinitionId unexpectedValueEvent)
 	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
-	      PMONBase(monitoredParameterId, repetitionNumber) {
+	      PMON(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::ExpectedValue;
 	};
 
@@ -149,7 +149,7 @@ public:
 /**
  * Contains the variables specific to Parameter Monitoring definitions of limit check type.
  */
-class PMONLimitCheck : public PMONBase {
+class PMONLimitCheck : public PMON {
 public:
 	PMONLimit lowLimit;
 	EventDefinitionId belowLowLimitEvent;
@@ -159,7 +159,7 @@ public:
 	explicit PMONLimitCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONLimit lowLimit,
 	                        EventDefinitionId belowLowLimitEvent, PMONLimit highLimit, EventDefinitionId aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
-	      aboveHighLimitEvent(aboveHighLimitEvent), PMONBase(monitoredParameterId, repetitionNumber) {
+	      aboveHighLimitEvent(aboveHighLimitEvent), PMON(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Limit;
 	};
 
@@ -195,7 +195,7 @@ public:
 /**
  * Contains the variables specific to Parameter Monitoring definitions of delta check type.
  */
-class PMONDeltaCheck : public PMONBase {
+class PMONDeltaCheck : public PMON {
 public:
 	NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks;
 	DeltaThreshold lowDeltaThreshold;
@@ -209,7 +209,7 @@ public:
 	                        EventDefinitionId aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
-	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMONBase(monitoredParameterId, repetitionNumber) {
+	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber) {
 		checkType = CheckType::Delta;
 	};
 
@@ -248,5 +248,4 @@ public:
 		return aboveHighThresholdEvent;
 	}
 };
-#endif // ECSS_SERVICES_PMONBASE_HPP
-
+#endif // ECSS_SERVICES_PMON_HPP

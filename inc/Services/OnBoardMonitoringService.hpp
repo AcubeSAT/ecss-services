@@ -2,7 +2,7 @@
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #include <cstdint>
 #include "ECSS_Definitions.hpp"
-#include "Helpers/PMONBase.hpp"
+#include "Helpers/PMON.hpp"
 #include "Helpers/Parameter.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
@@ -20,7 +20,7 @@ private:
 	/**
 	 * Map storing the parameter monitoring definitions.
 	 */
-	etl::map<uint16_t, std::reference_wrapper<PMONBase>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
+	etl::map<uint16_t, std::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
 	 * Maximum number of checks for each check type is calculated individually
@@ -91,7 +91,7 @@ public:
 	/**
 	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
 	 */
-	void addPMONDefinition(PMONId PMONId, std::reference_wrapper<PMONBase> PMONDefinition) {
+	void addPMONDefinition(PMONId PMONId, std::reference_wrapper<PMON> PMONDefinition) {
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
 	}
 
@@ -99,7 +99,7 @@ public:
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */
-	std::reference_wrapper<PMONBase> getPMONDefinition(PMONId PMONId) {
+	std::reference_wrapper<PMON> getPMONDefinition(PMONId PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
 

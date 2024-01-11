@@ -1,7 +1,7 @@
-#include "Helpers/PMONBase.hpp"
+#include "Helpers/PMON.hpp"
 #include "ServicePool.hpp"
 
 
-PMONBase::PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber)
+PMON::PMON(PMONId monitoredParameterId, uint16_t repetitionNumber)
     : monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId)->get()), monitoredParameterId(monitoredParameterId),
       repetitionNumber(repetitionNumber) {}

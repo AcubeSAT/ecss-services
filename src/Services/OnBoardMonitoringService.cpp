@@ -41,7 +41,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 			continue;
 		}
 		definition->second.get().monitoringEnabled = false;
-		definition->second.get().checkingStatus = PMONBase::Unchecked;
+		definition->second.get().checkingStatus = PMON::Unchecked;
 	}
 }
 
@@ -97,7 +97,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			continue;
 		}
 
-		if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Limit) {
+		if (static_cast<PMON::CheckType>(currentCheckType) == PMON::CheckType::Limit) {
 			PMONLimit lowLimit = message.read<PMONLimit>();
 			EventDefinitionId belowLowLimitEventId = message.read<EventDefinitionId>();
 			PMONLimit highLimit = message.read<PMONLimit>();
@@ -111,7 +111,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
 			limitChecks.push_back(limitCheck);
 			addPMONDefinition(currentPMONId, limitCheck);
-		} else if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::ExpectedValue) {
+		} else if (static_cast<PMON::CheckType>(currentCheckType) == PMON::CheckType::ExpectedValue) {
 			PMONBitMask mask = message.read<PMONBitMask>();
 			PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 			EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
@@ -119,7 +119,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			                                          expectedValue, mask, unExpectedValueEvent);
 			expectedValueChecks.push_back(expectedValueCheck);
 			addPMONDefinition(currentPMONId, expectedValueCheck);
-		} else if (static_cast<PMONBase::CheckType>(currentCheckType) == PMONBase::CheckType::Delta) {
+		} else if (static_cast<PMON::CheckType>(currentCheckType) == PMON::CheckType::Delta) {
 			DeltaThreshold lowDeltaThreshold = message.read<DeltaThreshold>();
 			EventDefinitionId belowLowThresholdEventId = message.read<EventDefinitionId>();
 			DeltaThreshold highDeltaThreshold = message.read<DeltaThreshold>();
@@ -183,8 +183,8 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			return;
 		}
 
-		switch (static_cast<PMONBase::CheckType>(currentCheckType)) {
-			case PMONBase::CheckType::Limit: {
+		switch (static_cast<PMON::CheckType>(currentCheckType)) {
+			case PMON::CheckType::Limit: {
 				PMONLimit lowLimit = message.read<PMONLimit>();
 				EventDefinitionId belowLowLimitEventId = message.read<EventDefinitionId>();
 				PMONLimit highLimit = message.read<PMONLimit>();
@@ -198,28 +198,28 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
 				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
 				auto monitoringDefinition = PMONLimitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
 				addPMONDefinition(currentPMONId, monitoringDefinition);
 				break;
 			}
 
-			case PMONBase::PMONBase::CheckType::ExpectedValue: {
+			case PMON::PMON::CheckType::ExpectedValue: {
 				PMONBitMask mask = message.read<PMONBitMask>();
 				PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 				EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
 
 				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
 				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
 				auto monitoringDefinition = PMONExpectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, expectedValue, mask, unExpectedValueEvent);
 				addPMONDefinition(currentPMONId, monitoringDefinition);
 				break;
 			}
 
-			case PMONBase::CheckType::Delta: {
+			case PMON::CheckType::Delta: {
 				DeltaThreshold lowDeltaThreshold = message.read<DeltaThreshold>();
 				EventDefinitionId belowLowThresholdEventId = message.read<EventDefinitionId>();
 				DeltaThreshold highDeltaThreshold = message.read<DeltaThreshold>();
@@ -234,7 +234,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
 				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-				getPMONDefinition(currentPMONId).get().checkingStatus = PMONBase::Unchecked;
+				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
 				auto monitoringDefinition = PMONDeltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
 				addPMONDefinition(currentPMONId, monitoringDefinition);
@@ -267,16 +267,16 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().monitoringEnabled));
 		parameterMonitoringDefinitionReport.append<PMONRepetitionNumber>(getPMONDefinition(currentPMONId).get().repetitionNumber);
 		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().checkType));
-		if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Limit) {
+		if (getPMONDefinition(currentPMONId).get().checkType == PMON::CheckType::Limit) {
 			parameterMonitoringDefinitionReport.append<PMONLimit>(getPMONDefinition(currentPMONId).get().getLowLimit());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getBelowLowLimitEvent());
 			parameterMonitoringDefinitionReport.append<PMONLimit>(getPMONDefinition(currentPMONId).get().getHighLimit());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getAboveHighLimitEvent());
-		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::ExpectedValue) {
+		} else if (getPMONDefinition(currentPMONId).get().checkType == PMON::CheckType::ExpectedValue) {
 			parameterMonitoringDefinitionReport.append<PMONBitMask>(getPMONDefinition(currentPMONId).get().getMask());
 			parameterMonitoringDefinitionReport.append<PMONExpectedValue>(getPMONDefinition(currentPMONId).get().getExpectedValue());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getUnexpectedValueEvent());
-		} else if (getPMONDefinition(currentPMONId).get().checkType == PMONBase::CheckType::Delta) {
+		} else if (getPMONDefinition(currentPMONId).get().checkType == PMON::CheckType::Delta) {
 			parameterMonitoringDefinitionReport.append<DeltaThreshold>(getPMONDefinition(currentPMONId).get().getLowDeltaThreshold());
 			parameterMonitoringDefinitionReport.append<EventDefinitionId>(getPMONDefinition(currentPMONId).get().getBelowLowThresholdEvent());
 			parameterMonitoringDefinitionReport.append<DeltaThreshold>(getPMONDefinition(currentPMONId).get().getHighDeltaThreshold());
