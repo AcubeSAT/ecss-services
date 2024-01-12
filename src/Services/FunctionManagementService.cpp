@@ -25,7 +25,7 @@ void FunctionManagementService::call(Message& msg) {
 
 	// locate the appropriate function pointer
 	String<ECSSFunctionNameLength> const name(funcName.data());
-	FunctionMap::iterator const iter = funcPtrIndex.find(name);
+	FunctionMap::iterator const iter = funcPtrIndex.find(name); // NOLINT(cppcoreguidelines-init-variables)
 
 	if (iter == funcPtrIndex.end()) {
 		ErrorHandler::reportError(msg, ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError);

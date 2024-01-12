@@ -15,7 +15,8 @@ Checks: >
   modernize-use-equals-default,
   misc-*,-misc-non-private-member-variables-in-classes,
   performance-*,
-  readability-*,-readability-magic-numbers,-readability-else-after-return,-readability-convert-member-functions-to-static
+  readability-*,-readability-magic-numbers,-readability-else-after-return,
+  -readability-convert-member-functions-to-static,
   zircon-*
 WarningsAsErrors: '*,-bugprone-easily-swappable-parameters,-misc-unused-parameters,
 -cppcoreguidelines-pro-type-member-init,-cppcoreguidelines-non-private-member-variables-in-classes,

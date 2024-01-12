@@ -3,7 +3,7 @@
 
 #include <Services/EventActionService.hpp>
 #include "Message.hpp"
-
+#include "etl/array.h"
 /**
  * A generic class responsible for the execution and the parsing of the incoming telemetry and telecommand
  * packets
@@ -85,6 +85,10 @@ public:
 	static String<CCSDSMaxMessageSize> compose(const Message& message);
 
 private:
+	/**
+	 * The number of bytes in the CRC field
+	 */
+	inline static constexpr uint8_t CRCField = 2U;
 	/**
 	 * Parse the ECSS Telecommand packet secondary header
 	 *

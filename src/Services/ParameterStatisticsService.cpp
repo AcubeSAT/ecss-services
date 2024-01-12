@@ -33,7 +33,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	auto evaluationStopTime = TimeGetter::getCurrentTimeDefaultCUC();
 	report.append(evaluationStopTime);
 
-	uint16_t numOfValidParameters = 0;
+	uint16_t numOfValidParameters = 0; // NOLINT(misc-const-correctness)
 	for (const auto& currentStatistic: statisticsMap) {
 		const ParameterSampleCount numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
@@ -112,7 +112,7 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 			}
 			continue;
 		}
-		bool const exists = statisticsMap.find(currentId) != statisticsMap.end();
+		bool const exists = statisticsMap.find(currentId) != statisticsMap.end(); // NOLINT(cppcoreguidelines-init-variables)
 		SamplingInterval interval = 0;
 		if (SupportsSamplingInterval) {
 			interval = request.read<SamplingInterval>();

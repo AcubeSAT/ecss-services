@@ -37,7 +37,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			const StartAddress startAddress = request.read<StartAddress>();
-			const MemoryDataLength dataLength = request.readOctetString(readData.data());
+			const MemoryDataLength dataLength = request.readOctetString(readData.data()); // NOLINT(cppcoreguidelines-init-variables)
 			const MemoryManagementChecksum checksum = request.readBits(8*sizeof(MemoryManagementChecksum));
 
 			if (!dataValidator(readData.data(), checksum, dataLength)) {

@@ -111,7 +111,7 @@ void EventReportService::requestListOfDisabledEvents(const Message& message) {
 void EventReportService::listOfDisabledEventsReport() {
 	Message report = createTM(EventReportService::MessageType::DisabledListEventReport);
 
-	uint16_t const numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count();
+	uint16_t const numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count(); // NOLINT(cppcoreguidelines-init-variables)
 	report.appendHalfword(numberOfDisabledEvents);
 	for (size_t i = 0; i < stateOfEvents.size(); i++) {
 		if (not stateOfEvents[i]) {

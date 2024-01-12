@@ -18,7 +18,7 @@ void RealTimeForwardingControlService::addAllReportsOfService(ApplicationProcess
 }
 
 uint8_t RealTimeForwardingControlService::countServicesOfApplication(ApplicationProcessId applicationID) {
-	uint8_t serviceCounter = 0;
+	uint8_t serviceCounter = 0; // NOLINT(misc-const-correctness)
 	for (const auto& definition: applicationProcessConfiguration.definitions) {
 		const auto& pair = definition.first;
 		if (pair.first == applicationID) {
@@ -287,7 +287,7 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 	Message report(ServiceType, MessageType::AppProcessConfigurationContentReport, Message::TM, ApplicationId);
 
 	const auto& definitions = applicationProcessConfiguration.definitions;
-	uint8_t numOfApplications = 0;
+	uint8_t numOfApplications = 0; // NOLINT(misc-const-correctness)
 	uint8_t previousAppID = std::numeric_limits<uint8_t>::max();
 
 	etl::vector<uint8_t, ECSSMaxControlledApplicationProcesses> numOfServicesPerApp(ECSSMaxControlledApplicationProcesses, 0);
@@ -304,7 +304,7 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 
 	report.appendUint8(numOfApplications);
 	previousAppID = std::numeric_limits<uint8_t>::max();
-	uint8_t appIdIndex = 0;
+	uint8_t appIdIndex = 0; // NOLINT(misc-const-correctness)
 
 	// C++ sorts the maps based on key by default. So keys with the same appID are accessed all-together.
 	for (const auto& definition: definitions) {

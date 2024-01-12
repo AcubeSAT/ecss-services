@@ -30,7 +30,7 @@ void Statistic::appendStatisticsToMessage(Message& report) const {
 			standardDeviation = 0;
 		} else {
 			const double meanOfSquares = sumOfSquares / sampleCounter;
-			standardDeviation = sqrt(abs(meanOfSquares - pow(mean, 2)));
+			standardDeviation = sqrt(abs(meanOfSquares - pow(mean, 2))); // NOLINT(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions
 		}
 		report.appendFloat(static_cast<float>(standardDeviation));
 	}

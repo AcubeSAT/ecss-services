@@ -18,7 +18,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	while (numberOfEventActionDefinitions-- != 0) {
 		const ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
-		bool canBeAdded = true;
+		bool canBeAdded = true; // NOLINT(misc-const-correctness)
 
 		auto it = std::find_if(eventActionDefinitionMap.begin(), eventActionDefinitionMap.end(), [&](const auto& element) {
 			if (element.first == eventDefinitionID) {
@@ -51,7 +51,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	while (numberOfEventActionDefinitions-- != 0) {
 		ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
-		bool actionDefinitionExists = false;
+		bool actionDefinitionExists = false; // NOLINT(misc-const-correctness)
 
 
 		auto it = std::find_if(eventActionDefinitionMap.begin(), eventActionDefinitionMap.end(), [&](const auto& element) {
@@ -91,7 +91,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 		while (numberOfEventActionDefinitions-- != 0) {
 			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 			EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
-			bool actionDefinitionExists = false;
+			bool actionDefinitionExists = false; // NOLINT(misc-const-correctness)
 
 			auto it = std::find_if(eventActionDefinitionMap.begin(), eventActionDefinitionMap.end(), [&](auto& element) {
 				if (element.first == eventDefinitionID) {
@@ -125,7 +125,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 		while (numberOfEventActionDefinitions-- != 0) {
 			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 			EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
-			bool actionDefinitionExists = false;
+			bool actionDefinitionExists = false; // NOLINT(misc-const-correctness)
 
 			auto it = std::find_if(eventActionDefinitionMap.begin(), eventActionDefinitionMap.end(), [&](auto& element) {
 				if (element.first == eventDefinitionID) {
@@ -159,7 +159,7 @@ void EventActionService::requestEventActionDefinitionStatus(const Message& messa
 
 void EventActionService::eventActionStatusReport() {
 	Message report = createTM(EventActionStatusReport);
-	const uint16_t count = eventActionDefinitionMap.size();
+	const uint16_t count = eventActionDefinitionMap.size(); // NOLINT(cppcoreguidelines-init-variables)
 	report.appendUint16(count);
 	for (const auto& element: eventActionDefinitionMap) {
 		report.append<ApplicationProcessId>(element.second.applicationID);
@@ -183,7 +183,7 @@ void EventActionService::disableEventActionFunction(const Message& message) {
 	setEventActionFunctionStatus(false);
 }
 
-void EventActionService::executeAction(EventDefinitionId eventDefinitionID) {
+void EventActionService::executeAction(EventDefinitionId eventDefinitionID) { // NOLINT (readability-make-member-function-const)
 	if (eventActionFunctionStatus) {
 		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
 		for (auto& element = range.first; element != range.second; ++element) {

@@ -150,10 +150,10 @@ bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSPacketStor
 
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSPacketStoreIdSize>& packetStoreId) {
-	const TimeStamps oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
+	const TimeStamps oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first; // NOLINT(cppcoreguidelines-init-variables)
 	report.append<TimeStamps>(oldestStoredPacketTime);
 
-	const TimeStamps newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
+	const TimeStamps newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first; // NOLINT(cppcoreguidelines-init-variables)
 	report.append<TimeStamps>(newestStoredPacketTime);
 
 	report.append<TimeStamps>(packetStores[packetStoreId].openRetrievalStartTimeTag);
@@ -162,8 +162,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 	                                               ECSSMaxPacketStoreSize);
 	report.append<PercentageFilled>(filledPercentage1);
 
-	uint16_t numOfPacketsToBeTransferred = 0;
-	numOfPacketsToBeTransferred = std::count_if(
+	const uint16_t numOfPacketsToBeTransferred = std::count_if( // NOLINT(cppcoreguidelines-init-variables)
 	    std::begin(packetStores[packetStoreId].storedTelemetryPackets),
 	    std::end(packetStores[packetStoreId].storedTelemetryPackets), [this, &packetStoreId](auto packet) {
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
@@ -553,7 +552,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 
 	const NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
-		NumOfPacketStores numOfPacketStoresToDelete = 0;
+		NumOfPacketStores numOfPacketStoresToDelete = 0; // NOLINT(misc-const-correctness)
 		etl::array<etl::string<ECSSPacketStoreIdSize>, ECSSMaxPacketStores> packetStoresToDelete = {};
 		for (const auto& packetStore: packetStores) {
 			if (packetStore.second.storageStatus) {

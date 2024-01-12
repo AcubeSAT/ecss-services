@@ -49,7 +49,7 @@ void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& me
 	maximumTransitionReportingDelay = message.readUint16();
 }
 
-void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Message& message) {
+void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Message& message) { // NOLINT (readability-convert-member-functions-to-const)
 	if (!message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions)) {
 		return;
 	}

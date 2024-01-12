@@ -95,7 +95,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
 			uint8_t const mask = ((1U << bitsToAddNow) - 1U);
-			uint8_t const maskedData = data[readPosition] & mask;
+			uint8_t const maskedData = data[readPosition] & mask; // NOLINT (cppcoreguidelines-init-variables)
 			value |= maskedData << (numBits - bitsToAddNow);
 
 			numBits -= bitsToAddNow;
@@ -114,7 +114,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 uint8_t Message::readByte() {
 	ASSERT_REQUEST(readPosition < ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
-	uint8_t const value = data[readPosition];
+	uint8_t const value = data[readPosition]; // NOLINT(cppcoreguidelines-init-variables)
 	readPosition++;
 
 	return value;
@@ -123,7 +123,7 @@ uint8_t Message::readByte() {
 uint16_t Message::readHalfword() {
 	ASSERT_REQUEST((readPosition + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
-	uint16_t const value = (data[readPosition] << 8) | data[readPosition + 1]; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+	uint16_t const value = (data[readPosition] << 8) | data[readPosition + 1]; // NOLINT (cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables)
 	readPosition += 2;
 
 	return value;
@@ -132,7 +132,7 @@ uint16_t Message::readHalfword() {
 uint32_t Message::readWord() {
 	ASSERT_REQUEST((readPosition + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
-	uint32_t const value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) | (data[readPosition + 2] << 8) | // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+	uint32_t const value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) | (data[readPosition + 2] << 8) | // NOLINT(cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables)
 	                 data[readPosition + 3];
 	readPosition += 4;
 
