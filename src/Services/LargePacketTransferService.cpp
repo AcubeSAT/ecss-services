@@ -51,19 +51,18 @@ LargePacketTransferService::lastUplinkPart(const String<ECSSMaxFixedOctetStringS
 	return string;
 }
 
-void LargePacketTransferService::split(Message& message, LargeMessageTransactionId largeMessageTransactionIdentifier) {
-	//TODO: Should this be uint32?
-	uint16_t size = message.dataSize;
+void LargePacketTransferService::split(const Message& message, LargeMessageTransactionId largeMessageTransactionIdentifier) {
+	uint16_t const size = message.dataSize;
 	uint16_t positionCounter = 0;
-	uint16_t parts = (size / ECSSMaxFixedOctetStringSize) + 1;
+	uint16_t const parts = (size / ECSSMaxFixedOctetStringSize) + 1;
 	String<ECSSMaxFixedOctetStringSize> stringPart("");
-	uint8_t dataPart[ECSSMaxFixedOctetStringSize];
+	etl::array<uint8_t, ECSSMaxFixedOctetStringSize> dataPart = {};
 
 	for (uint16_t i = 0; i < ECSSMaxFixedOctetStringSize; i++) {
 		dataPart[i] = message.data[positionCounter];
 		positionCounter++;
 	}
-	stringPart = dataPart;
+	stringPart = dataPart.data();
 	firstDownlinkPartReport(largeMessageTransactionIdentifier, 0, stringPart);
 
 	for (uint16_t part = 1; part < (parts - 1U); part++) {
@@ -71,7 +70,7 @@ void LargePacketTransferService::split(Message& message, LargeMessageTransaction
 			dataPart[i] = message.data[positionCounter];
 			positionCounter++;
 		}
-		stringPart = dataPart;
+		stringPart = dataPart.data();
 		intermediateDownlinkPartReport(largeMessageTransactionIdentifier, part, stringPart);
 	}
 
@@ -82,7 +81,7 @@ void LargePacketTransferService::split(Message& message, LargeMessageTransaction
 		dataPart[i] = message.data[positionCounter];
 		positionCounter++;
 	}
-	stringPart = dataPart;
+	stringPart = dataPart.data();
 	lastDownlinkPartReport(largeMessageTransactionIdentifier, (parts - 1U), stringPart);
 }
 

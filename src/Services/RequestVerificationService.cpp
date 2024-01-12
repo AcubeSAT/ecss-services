@@ -4,7 +4,7 @@
 #include "Services/RequestVerificationService.hpp"
 
 
-void RequestVerificationService::assembleReportMessage(const Message& request, Message& report) const {
+void RequestVerificationService::assembleReportMessage(const Message& request, Message& report) {
 
 	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);
 	report.appendEnumerated(PacketTypeBits, request.packetType);

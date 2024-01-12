@@ -70,9 +70,8 @@ public:
 	etl::optional<DataType> getValue() {
 		if (getter) {
 			return (*getter)();
-		} else {
-			return {};
 		}
+		return {};
 	}
 
 	inline double getValueAsDouble() override {

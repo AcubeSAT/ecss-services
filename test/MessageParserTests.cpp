@@ -15,13 +15,13 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 5);
 	CHECK(message.serviceType == 129);
 	CHECK(message.messageType == 31);
-	CHECK(message.sourceId == 0);
-	CHECK(memcmp(message.data, "hello", 5) == 0);
+        CHECK(message.sourceId == 0);
+	CHECK(memcmp(message.data.begin(), "hello", 5) == 0);
 }
 
 TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81,
-							  0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+	                          0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
 	Message message;
 	message.packetType = Message::TC;
@@ -31,7 +31,7 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 8199;
 	message.sourceId = 0;
 	String<5> sourceString = "hello";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
 	message.dataSize = 5;
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
@@ -67,8 +67,8 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 7);
 	CHECK(message.serviceType == 22);
 	CHECK(message.messageType == 17);
-	CHECK(message.sourceId == 0);
-	CHECK(memcmp(message.data, "hellohi", 7) == 0);
+        CHECK(message.sourceId == 0);
+	CHECK(memcmp(message.data.begin(), "hellohi", 7) == 0);
 
 	// Add ECSS and CCSDS header
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
@@ -95,7 +95,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.messageType = 17;
 	message.sourceId = 0;
 	String<7> sourceString = "hellohi";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data);
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
 	message.dataSize = 7;
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 

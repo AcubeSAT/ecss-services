@@ -3,7 +3,7 @@
 
 #include <Services/EventActionService.hpp>
 #include "Message.hpp"
-
+#include "etl/array.h"
 /**
  * A generic class responsible for the execution and the parsing of the incoming telemetry and telecommand
  * packets
@@ -49,7 +49,7 @@ public:
 	 * @param length The size of the message
 	 * @return A new object that represents the parsed message
 	 */
-	static Message parse(uint8_t* data, uint32_t length);
+	static Message parse(const uint8_t* data, uint32_t length);
 
 	/**
 	 * Parse data that contains the ECSS packet header, without the CCSDS space packet header
@@ -65,11 +65,11 @@ public:
 	 * @param data A uint8_t array of the TC packet data
 	 * @return Parsed message
 	 */
-	static Message parseECSSTC(uint8_t* data);
+	static Message parseECSSTC(const uint8_t* data);
 
 	/**
 	 * @brief Converts a TC or TM message to a message string, appending just the ECSS header
-	 * @todo Add time reference, as soon as it is available and the format has been specified
+	 * @todo (#249) Add time reference, as soon as it is available and the format has been specified
 	 * @param message The Message object to be parsed to a String
 	 * @param size The wanted size of the message (including the headers). Messages larger than \p size display an
 	 * error. Messages smaller than \p size are padded with zeros. When `size = 0`, there is no size limit.
@@ -85,6 +85,10 @@ public:
 	static String<CCSDSMaxMessageSize> compose(const Message& message);
 
 private:
+	/**
+	 * The number of bytes in the CRC field
+	 */
+	inline static constexpr uint8_t CRCField = 2U;
 	/**
 	 * Parse the ECSS Telecommand packet secondary header
 	 *
