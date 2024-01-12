@@ -1,0 +1,17 @@
+unmatchedSuppression
+unusedFunction
+noExplicitConstructor
+missingInclude
+missingIncludeSystem
+duplInheritedMember
+misra-c2012-3.1
+misra-c2012-5.1
+misra-c2012-5.2
+misra-c2012-5.3
+misra-c2012-12.3
+misra-c2012-13.4
+misra-c2012-14.4
+misra-c2012-15.5
+misra-c2012-16.3
+misra-c2012-18.4
+misra-c2012-18.8

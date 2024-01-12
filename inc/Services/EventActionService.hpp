@@ -71,7 +71,7 @@ public:
 	/**
 	 * TC[19,3] delete all event-action definitions
 	 */
-	void deleteAllEventActionDefinitions(Message& message);
+	void deleteAllEventActionDefinitions(const Message& message);
 
 	/**
 	 * TC[19,4] enable event-action definitions
@@ -86,7 +86,7 @@ public:
 	/**
 	 * TC[19,6] report the status of each event-action definition
 	 */
-	void requestEventActionDefinitionStatus(Message& message);
+	void requestEventActionDefinitionStatus(const Message& message);
 
 	/**
 	 * TM[19,7] event-action status report
@@ -96,12 +96,12 @@ public:
 	/**
 	 * TC[19,8] enable the event-action function
 	 */
-	void enableEventActionFunction(Message& message);
+	void enableEventActionFunction(const Message& message);
 
 	/**
 	 * TC[19,9] disable the event-action function
 	 */
-	void disableEventActionFunction(Message& message);
+	void disableEventActionFunction(const Message& message);
 
 	/**
 	 * Setter for event-action function status

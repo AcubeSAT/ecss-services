@@ -11,7 +11,7 @@ class Message;
  * A class that handles unexpected software errors, including internal errors or errors due to
  * invalid & incorrect input data.
  *
- * @todo Add auxiliary data field to errors
+ * @todo (#28) Add auxiliary data field to errors
  */
 class ErrorHandler {
 private:
@@ -100,6 +100,10 @@ public:
 		 * Timestamp out of bounds to be stored or converted
 		 */
 		TimeStampOutOfBounds = 17,
+		/**
+		 * PMON base couldn't be initialized with the given parameter ID
+		 */
+		InvalidParameterId = 18,
 	};
 
 	/**
@@ -486,7 +490,7 @@ public:
 	 * StartExecutionErrorType,CompletionExecutionErrorType,  or RoutingErrorType.
 	 * @param message The incoming message that prompted the failure
 	 * @param errorCode The error's code, as defined in ErrorHandler
-	 * @todo See if this needs to include InternalErrorType
+	 * @todo (#241) See if this needs to include InternalErrorType
 	 */
 	template <typename ErrorType>
 	static void reportError(const Message& message, ErrorType errorCode);

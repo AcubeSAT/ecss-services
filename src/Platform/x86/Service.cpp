@@ -28,7 +28,7 @@ public:
 		::close(socket);
 	};
 
-	void sendPacketToYamcs(Message& message) {
+	void sendPacketToYamcs(const Message& message) {
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 		auto bytesSent = ::sendto(socket, createdPacket.c_str(), createdPacket.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));

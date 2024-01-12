@@ -30,13 +30,13 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
-	uint32_t maxFileSizeBytes = message.readUint32();
+	uint32_t const maxFileSizeBytes = message.readUint32();
 	if (maxFileSizeBytes > MaxPossibleFileSizeBytes) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::SizeOfFileIsOutOfBounds);
 		return;
 	}
 
-	bool isFileLocked = message.readBoolean();
+	bool const isFileLocked = message.readBoolean();
 
 	if (auto fileCreationError = Filesystem::createFile(fullPath)) {
 		switch (fileCreationError.value()) {
