@@ -5,6 +5,7 @@
 #include "Services/RequestVerificationService.hpp"
 #include "Helpers/CRCHelper.hpp"
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers) The reason is that we do a lof bit shifts
 static_assert(sizeof(ServiceTypeNum) == 1);
 
 static_assert(sizeof(MessageTypeNum) == 1);
@@ -150,7 +151,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 
 Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
 	Message message;
-	auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
+	const auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
 	message.packetType = Message::TC;
 	parseECSSTCHeader(dataInt, ECSSTCRequestStringSize, message);
 	return message;
@@ -266,3 +267,4 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data.begin());
 	message.dataSize = length;
 }
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

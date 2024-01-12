@@ -2,7 +2,7 @@
 #include "ServicePool.hpp"
 
 
-PMONBase::PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber, )
+PMONBase::PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber)
     : monitoredParameterId(monitoredParameterId),
       repetitionNumber(repetitionNumber)
 {
@@ -11,6 +11,5 @@ PMONBase::PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber, )
 		monitoredParameter = paramOpt->get(); // Assuming get() returns a reference
 	} else {
 		ErrorHandler::reportInternalError(ErrorHandler::InvalidParameterId);
-		monitoredParameter = invalidParam;
 	}
 }

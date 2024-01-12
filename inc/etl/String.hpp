@@ -57,7 +57,7 @@ public:
 	String(const char* text) // NOLINT(google-explicit-constructor)
 	    : etl::string<MAX_SIZE>(text) {}
 
-	using etl::istring::append; //cppcheck-suppress misra-c2012-2.3 //Use the append function from the parent. Suppressing misra 2.3 mentions unused type, however this is used.
+	using etl::istring::append; //cppcheck-suppress misra-c2012-2.3 // Use the append function from the parent. Suppressing misra 2.3 mentions unused type, however this is used.
     /**
      * Append a specified number of bytes from a uint8_t array to the String
      * @details The array does NOT need to be null-terminated

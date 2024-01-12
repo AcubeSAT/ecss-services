@@ -16,7 +16,7 @@ using StartAddress = uint64_t;
 using MemoryId = uint8_t;
 using ReadData = uint8_t;
 using MemoryManagementChecksum = uint16_t;
-using ShiftRegister = uint16_t;
+using CRCSize = uint16_t;
 /**
  * Length of the written, loaded or dumped data used in the Memory Management Service.
  */

@@ -8,7 +8,7 @@
  * Implementation of ST[05] event reporting service
  *
  * @ingroup Services
- * @todo (#218) add more enums event IDs
+ * @todo (#27) add more enums event IDs
  * @todo (#219) make sure there isn't an event ID == 0, because there's a confliction with another service
  * Note: enum IDs are these just for test purposes
  *

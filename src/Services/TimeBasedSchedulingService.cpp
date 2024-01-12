@@ -49,10 +49,10 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		return;
 	}
 
-// todo (#265): Get the sub-schedule ID if they are implemented
+// todo (#228): Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
-		// todo (#266): Get the group ID first, if groups are used
+		// todo (#229): Get the group ID first, if groups are used
 		const Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
 
 		const Time::DefaultCUC releaseTime = request.readDefaultCUCTimeStamp();
@@ -170,12 +170,12 @@ void TimeBasedSchedulingService::detailReportAllActivities(const Message& reques
 }
 
 void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
-// todo (#269): append sub-schedule and group ID if they are defined
+// todo (#228): (#229) append sub-schedule and group ID if they are defined
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
 
 	for (const auto& activity: listOfActivities) {
-		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime); // todo (#268): Replace with the time parser
+		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime); // todo (#267): Replace with the time parser
 		report.appendString(MessageParser::composeECSS(activity.request));
 	}
 	storeMessage(report);
@@ -245,10 +245,10 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 
-// todo (#270): append sub-schedule and group ID if they are defined
+// todo (#228): append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
 	for (const auto& match: listOfActivities) {
-// todo (#270): append sub-schedule and group ID if they are defined
+// todo (#229): append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
 		report.append<SourceId>(match.requestID.sourceID);
 		report.append<ApplicationProcessId>(match.requestID.applicationID);

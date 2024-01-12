@@ -11,7 +11,7 @@ class Message;
  * A class that handles unexpected software errors, including internal errors or errors due to
  * invalid & incorrect input data.
  *
- * @todo (#240) Add auxiliary data field to errors
+ * @todo (#28) Add auxiliary data field to errors
  */
 class ErrorHandler {
 private:

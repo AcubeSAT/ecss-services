@@ -93,7 +93,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 				report.append<StartAddress>(startAddress);
 				report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
-				report.append<ShiftRegister>(CRCHelper::calculateCRC(readData.data(), readLength));
+				report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
@@ -133,7 +133,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 
 				report.append<StartAddress>(startAddress);
 				report.append<MemoryDataLength>(readLength);
-				report.append<ShiftRegister>(CRCHelper::calculateCRC(readData.data(), readLength));
+				report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}

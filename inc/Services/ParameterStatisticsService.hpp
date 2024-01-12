@@ -171,7 +171,7 @@ public:
 	/**
 	 * Get the current time as a TimeStamp object.
 	 */
-	static DefaultTimestamp getCurrentTime();
+	DefaultTimestamp getCurrentTime();
 };
 
 #endif

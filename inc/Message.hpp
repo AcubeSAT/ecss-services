@@ -103,7 +103,7 @@ public:
 
 
 	/**
-	 * 	Pointer to the contents of the message (excluding the PUS header)
+	 * Pointer to the contents of the message (excluding the PUS header)
 	 * We allocate this data statically, in order to make sure there is predictability in the
 	 * handling and storage of messages
 	 *
