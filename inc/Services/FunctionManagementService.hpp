@@ -35,7 +35,7 @@ class FunctionManagementService : public Service {
 
 public:
 
-	inline static const ServiceTypeNum ServiceType = 8;
+	inline static constexpr ServiceTypeNum ServiceType = 8;
 
 	enum MessageType : uint8_t {
 		PerformFunction = 1,

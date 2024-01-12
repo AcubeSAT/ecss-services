@@ -188,7 +188,7 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
 
 	auto scheduledActivities = activityInsertion(timeBasedService);
-	const Time::RelativeTime timeShift = 6789;
+	constexpr Time::RelativeTime timeShift = 6789;
 
 	SECTION("Positive Shift") {
 		receivedMessage.appendRelativeTime(-timeShift);
@@ -231,7 +231,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	scheduledActivities.at(2)->requestID.applicationID = 4; // Append a dummy application ID
 	CHECK(scheduledActivities.size() == 4);
 
-	const Time::RelativeTime timeShift = 67890000; // Relative time-shift value
+	constexpr Time::RelativeTime timeShift = 67890000; // Relative time-shift value
 
 	SECTION("Positive Shift") {
 		receivedMessage.appendRelativeTime(timeShift);            // Time-shift value

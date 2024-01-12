@@ -19,7 +19,7 @@
  */
 class RealTimeForwardingControlService : Service {
 public:
-	inline static const ServiceTypeNum ServiceType = 14;
+	inline static constexpr ServiceTypeNum ServiceType = 14;
 
 	enum MessageType : uint8_t {
 		AddReportTypesToAppProcessConfiguration = 1,

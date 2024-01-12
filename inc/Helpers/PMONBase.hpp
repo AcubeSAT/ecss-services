@@ -30,7 +30,7 @@ public:
 	PMONId monitoredParameterId;
 	Parameter<uint8_t> invalidParam = Parameter<uint8_t>(0);
 
-	std::reference_wrapper<ParameterBase> monitoredParameter;// = invalidParam;
+	std::reference_wrapper<ParameterBase> monitoredParameter;
 
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.

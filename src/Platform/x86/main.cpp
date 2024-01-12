@@ -162,7 +162,7 @@ int main() {
 	reqVerifService.failRoutingVerification(receivedMessage, ErrorHandler::UnknownRoutingError);
 
 	// ST[05] (5,1 to 5,4) test [works]
-	const char eventReportData[12] = "Hello World";
+	constexpr char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
 	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent, eventReportData);
 	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent, eventReportData);

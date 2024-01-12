@@ -2,7 +2,7 @@
 #include "ServicePool.hpp"
 
 
-PMONBase::PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber)
+PMONBase::PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber, )
     : monitoredParameterId(monitoredParameterId),
       repetitionNumber(repetitionNumber)
 {

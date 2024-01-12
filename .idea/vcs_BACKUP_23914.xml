@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+<<<<<<< HEAD
+=======
+    <mapping directory="$PROJECT_DIR$/ci/page_style/doxygen-awesome-css" vcs="Git" />
+>>>>>>> 3dd4c3b8de5d5a5acec081b83e3638e8e2c3de79
+  </component>
+</project>

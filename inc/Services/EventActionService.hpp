@@ -25,7 +25,7 @@ private:
 	bool eventActionFunctionStatus = false;
 
 public:
-	inline static const ServiceTypeNum ServiceType = 19;
+	inline static constexpr ServiceTypeNum ServiceType = 19;
 
 	enum MessageType : uint8_t {
 		AddEventAction = 1,
@@ -41,7 +41,7 @@ public:
 
 	struct EventActionDefinition {
 		ApplicationProcessId applicationID = 0;
-		inline static const ApplicationProcessId MaxDefinitionID = 65535;
+		inline static constexpr ApplicationProcessId MaxDefinitionID = 65535;
 		EventDefinitionId eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;

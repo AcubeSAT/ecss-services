@@ -17,7 +17,7 @@ private:
 	etl::string<1> termination = "\n";
 
 public:
-	inline static const ServiceTypeNum ServiceType = 128;
+	inline static constexpr ServiceTypeNum ServiceType = 128;
 	enum MessageType : uint8_t {
 		LogString = 128,
 	};

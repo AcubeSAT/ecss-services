@@ -16,12 +16,12 @@
 
 class EventReportService : public Service {
 private:
-	static const uint16_t numberOfEvents = 7;
+	static constexpr uint16_t numberOfEvents = 7;
 	etl::bitset<numberOfEvents> stateOfEvents;
 	static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
 
 public:
-	inline static const ServiceTypeNum ServiceType = 5;
+	inline static constexpr ServiceTypeNum ServiceType = 5;
 
 	enum MessageType : uint8_t {
 		InformativeEventReport = 1,

@@ -16,7 +16,7 @@
 
 class LargePacketTransferService : public Service {
 public:
-	inline static const ServiceTypeNum ServiceType = 13;
+	inline static constexpr ServiceTypeNum ServiceType = 13;
 
 
 	enum MessageType : uint8_t {

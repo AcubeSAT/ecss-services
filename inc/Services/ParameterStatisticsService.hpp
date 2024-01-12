@@ -43,7 +43,7 @@ private:
 	void initializeStatisticsMap();
 
 public:
-	inline static const ServiceTypeNum ServiceType = 4;
+	inline static constexpr ServiceTypeNum ServiceType = 4;
 
 	enum MessageType : uint8_t {
 		ReportParameterStatistics = 1,

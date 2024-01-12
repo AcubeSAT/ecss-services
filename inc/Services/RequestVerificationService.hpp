@@ -20,7 +20,7 @@
  */
 class RequestVerificationService : public Service {
 public:
-	inline static const ServiceTypeNum ServiceType = 1;
+	inline static constexpr ServiceTypeNum ServiceType = 1;
 
 	enum MessageType : uint8_t {
 		SuccessfulAcceptanceReport = 1,
@@ -36,31 +36,31 @@ public:
 	/**
 	 * MemoryDataLength of bits that represent the CCSDS packet version
 	 */
-	inline static const uint8_t CCSDSPacketVersionBits = 3;
+	inline static constexpr uint8_t CCSDSPacketVersionBits = 3;
 	/**
 	 * MemoryDataLength of bits that represent the packet type
 	 */
-	inline static const uint8_t PacketTypeBits = 1;
+	inline static constexpr uint8_t PacketTypeBits = 1;
 	/**
 	 * MemoryDataLength of bits that represent the secondary header flag
 	 */
-	inline static const uint8_t SecondaryHeaderFlagBits = 1 ;
+	inline static constexpr uint8_t SecondaryHeaderFlagBits = 1 ;
 	/**
 	 * MemoryDataLength of bits that represent the application id
 	 */
-	inline static const uint8_t ApplicationIdBits = 11;
+	inline static constexpr uint8_t ApplicationIdBits = 11;
 	/**
 	 * MemoryDataLength of bits that represent the ECSS sequence flags
 	 */
-	inline static const uint8_t ECSSSequenceFlagsBits = 2;
+	inline static constexpr uint8_t ECSSSequenceFlagsBits = 2;
 	/**
 	 * MemoryDataLength of bits that represent the packet sequence count
 	 */
-	inline static const uint8_t PacketSequenceCountBits = 14;
+	inline static constexpr uint8_t PacketSequenceCountBits = 14;
 	/**
 	 * The second header flag
 	 */
-	inline static const uint8_t SecondaryHeaderFlag = 1;
+	inline static constexpr uint8_t SecondaryHeaderFlag = 1;
 
 	RequestVerificationService() {
 		serviceType = ServiceType;
