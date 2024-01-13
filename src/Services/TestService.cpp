@@ -4,7 +4,7 @@
 #include "ServicePool.hpp"
 #include "Services/TestService.hpp"
 
-void TestService::areYouAlive(Message& request) {
+void TestService::areYouAlive(const Message& request) {
 	if (!request.assertTC(TestService::ServiceType, TestService::MessageType::AreYouAliveTest)) {
 		return;
 	}
@@ -20,7 +20,7 @@ void TestService::onBoardConnection(Message& request) {
 	if (!request.assertTC(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest)) {
 		return;
 	}
-	ApplicationProcessId applicationProcessId = request.read<ApplicationProcessId>();
+	const ApplicationProcessId applicationProcessId = request.read<ApplicationProcessId>();
 	onBoardConnectionReport(applicationProcessId);
 }
 

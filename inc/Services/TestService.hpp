@@ -10,7 +10,7 @@
  */
 class TestService : public Service {
 public:
-	inline static const ServiceTypeNum ServiceType = 17;
+	inline static constexpr ServiceTypeNum ServiceType = 17;
 
 	enum MessageType : uint8_t {
 		AreYouAliveTest = 1,
@@ -26,7 +26,7 @@ public:
 	/**
 	 * TC[17,1] perform an are-you-alive connection test
 	 */
-	void areYouAlive(Message& request);
+	void areYouAlive(const Message& request);
 
 	/**
 	 * TM[17,2] are-you-alive connection test report to show that the MCU is alive and well

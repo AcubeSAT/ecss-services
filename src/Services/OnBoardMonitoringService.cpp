@@ -10,9 +10,9 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 		return;
 	}
 
-	uint16_t numberOfPMONDefinitions = message.readUint16();
+	uint16_t const numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
-		PMONId currentId = message.read<PMONId>();
+		const PMONId currentId = message.read<PMONId>();
 		auto definition = parameterMonitoringList.find(currentId);
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
@@ -29,9 +29,9 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 		return;
 	}
 
-	uint16_t numberOfPMONDefinitions = message.readUint16();
+	uint16_t const numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
-		PMONId currentId = message.read<PMONId>();
+		const PMONId currentId = message.read<PMONId>();
 		auto definition = parameterMonitoringList.find(currentId);
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
@@ -50,7 +50,7 @@ void OnBoardMonitoringService::changeMaximumTransitionReportingDelay(Message& me
 	maximumTransitionReportingDelay = message.readUint16();
 }
 
-void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(Message& message) {
+void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Message& message) { // NOLINT (readability-convert-member-functions-to-const)
 	if (!message.assertTC(ServiceType, DeleteAllParameterMonitoringDefinitions)) {
 		return;
 	}

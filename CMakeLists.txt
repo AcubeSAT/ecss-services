@@ -45,7 +45,10 @@ target_sources(common PRIVATE
         src/Services/FileManagementService.cpp
         )
 
-target_link_libraries(common PRIVATE etl log_common log_x86)
+target_link_libraries(common
+        PUBLIC etl log_common
+        PRIVATE log_x86
+)
 
 # Specify the .cpp files for the executables
 IF (X86_BUILD)

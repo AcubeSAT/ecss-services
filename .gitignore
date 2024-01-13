@@ -82,6 +82,7 @@ __pycache__
 
 # Conan generated files
 CMakeUserPresets.json
+conan_provider.cmake
 
 # CI generated folders. We ignore these because we add the git commit as the
 # conan package revision, and when the CI creates these folders, a new commit is needed
@@ -90,3 +91,6 @@ cppcheck-html-report/
 ikos-report/
 clang-tidy-html-report/
 gcovr/
+
+report.xml
+clang-tidy-output.log

@@ -39,6 +39,14 @@ class ServicePool {
 	 */
 	uint16_t packetSequenceCounter = 0;
 
+	/**
+	 * Maximum counter value for the packet sequence counter is 2^14 - 1. In `getAndUpdatePacketSequenceCounter
+	 * ()`, the counter is increased by 1 and if it reaches the maximum value, it is reset to 0. There is a comparison
+	 * that shifts 1 to the left by 14 bits to compare, and then reset.
+	 * For more info, see: ECSS-E-ST-70-41C, Figure 7-6, the CCSDS packet overview
+	 */
+	inline static const uint8_t MaxPacketSequenceCounterBit = 14U;
+
 public:
 #ifdef SERVICE_DUMMY
 	DummyService dummyService;

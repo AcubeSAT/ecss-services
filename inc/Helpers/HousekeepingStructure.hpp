@@ -13,7 +13,7 @@
  * @author Petridis Konstantinos <petridkon@gmail.com>
  */
 struct HousekeepingStructure {
-	ParameterReportStructureId structureId;
+	ParameterReportStructureId structureId = 0;
 
     /**
      * Defined as integer multiples of the minimum sampling interval as per 6.3.3.2.c.5 #NOTE-2.

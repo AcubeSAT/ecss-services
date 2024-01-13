@@ -18,6 +18,10 @@
 class ParameterStatisticsService : public Service {
 private:
 	/**
+	 * Interval of reporting in milliseconds
+	 */
+	static inline constexpr uint16_t InitialReportingIntervalMs = 700;
+	/**
 	 * The time at which the evaluation of statistics is initialized. It is basically the time when the statistics
 	 * are reset.
 	 */
@@ -31,7 +35,7 @@ private:
 	/**
 	 * The parameter statistics reporting interval
 	 */
-	SamplingInterval reportingIntervalMs = 700;
+	SamplingInterval reportingIntervalMs = InitialReportingIntervalMs;
 
 	/**
 	 * Initializer of the statistics map, so that its content can be accessed by FreeRTOS tasks.
@@ -39,7 +43,7 @@ private:
 	void initializeStatisticsMap();
 
 public:
-	inline static const ServiceTypeNum ServiceType = 4;
+	inline static constexpr ServiceTypeNum ServiceType = 4;
 
 	enum MessageType : uint8_t {
 		ReportParameterStatistics = 1,
@@ -63,11 +67,11 @@ public:
 	/**
 	 * If true, after every report reset the parameter statistics.
 	 */
-	bool hasAutomaticStatisticsReset = false; // todo: do const
+	bool hasAutomaticStatisticsReset = false; // todo (#223): do const
 	/**
 	 * Indicates whether to append/read the sampling interval to/from message
 	 */
-	const bool supportsSamplingInterval = true;
+	inline static constexpr bool SupportsSamplingInterval = true;
 
 	/**
 	 * Returns the periodic statistics reporting status
@@ -114,7 +118,7 @@ public:
 	 * TC[4,3] reset parameter statistics, clearing all samples and values. This is the function called by TC from
 	 * the GS.
 	 */
-	void resetParameterStatistics(Message& request);
+	void resetParameterStatistics(const Message& request);
 
 	/**
 	 * This function clears all the samples.
@@ -129,7 +133,7 @@ public:
 	/**
 	 * TC[4,5] disable periodic parameter statistics reporting
 	 */
-	void disablePeriodicStatisticsReporting(Message& request);
+	void disablePeriodicStatisticsReporting(const Message& request);
 
 	/**
 	 * TC[4,6] add or update parameter statistics definitions
@@ -144,7 +148,7 @@ public:
 	/**
 	 * TC[4,8] report the parameter statistics definitions, by calling statisticsDefinitionsReport()
 	 */
-	void reportStatisticsDefinitions(Message& request);
+	void reportStatisticsDefinitions(const Message& request);
 	/**
 	 * Constructs and stores a TM[4,9] packet containing the parameter statistics definitions report.
 	 */
@@ -162,7 +166,7 @@ public:
 	/**
 	 * BaseBytes: 4 bytes, FractionBytes: 0 bytes, Num: 1, Denom: 10.
 	 */
-	using DefaultTimestamp = TimeStamp<4, 0, 1, 10>;
+	using DefaultTimestamp = TimeStamp<4, 0, 1, 10>; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
 	/**
 	 * Get the current time as a TimeStamp object.

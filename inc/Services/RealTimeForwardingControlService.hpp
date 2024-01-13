@@ -19,7 +19,7 @@
  */
 class RealTimeForwardingControlService : Service {
 public:
-	inline static const ServiceTypeNum ServiceType = 14;
+	inline static constexpr ServiceTypeNum ServiceType = 14;
 
 	enum MessageType : uint8_t {
 		AddReportTypesToAppProcessConfiguration = 1,
@@ -48,7 +48,7 @@ public:
 	 * Receives a TC[14,3] 'Report the application process forward control configuration content' message and
 	 * performs the necessary error checking.
 	 */
-	void reportAppProcessConfigurationContent(Message& request);
+	void reportAppProcessConfigurationContent(const Message& request);
 
 	/**
 	 * Creates and stores a TM[14,4] 'Application process forward control configuration content report' message.
@@ -92,18 +92,18 @@ private:
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
-	bool checkAppControlled(Message& request, ApplicationProcessId applicationId);
+	bool checkAppControlled(const Message& request, ApplicationProcessId applicationId);
 
 	/**
 	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
 	 * definitions.
 	 */
-	bool allServiceTypesAllowed(Message& request, ApplicationProcessId applicationID);
+	bool allServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Checks if the maximum number of service type definitions per application process is reached.
 	 */
-	bool maxServiceTypesReached(Message& request, ApplicationProcessId applicationID);
+	bool maxServiceTypesReached(const Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -116,7 +116,7 @@ private:
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
 	 */
-	bool maxReportTypesReached(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
+	bool maxReportTypesReached(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
@@ -124,23 +124,23 @@ private:
 	 *
 	 * @return True: if the message type is valid and passes all the necessary error checking.
 	 */
-	bool checkMessage(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
+	bool checkMessage(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
 
 	/**
 	 * Returns true, if the defined application exists in the application process configuration map.
 	 */
-	bool isApplicationEnabled(ApplicationProcessId targetAppID);
+	bool isApplicationEnabled(ApplicationProcessId targetAppID) const;
 
 	/**
 	 * Returns true, if the defined service type exists in the application process configuration map.
 	 */
-	bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService);
+	bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService) const;
 
 	/**
 	 * Checks whether the specified message type already exists in the specified application process and service
 	 * type definition.
 	 */
-	bool isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
+	bool isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType) const;
 
 	/**
 	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
@@ -163,7 +163,7 @@ private:
 	 * Checks whether the requested report type is present in the application process configuration.
 	 * Reports an error if one exist.
 	 */
-	bool isReportTypeInConfiguration(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
+	bool isReportTypeInConfiguration(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType) const;
 
 	/**
 	 * Deletes the requested service type from the application process configuration. If the deletion results in an

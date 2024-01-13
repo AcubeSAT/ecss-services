@@ -4,4 +4,12 @@
 
 PMON::PMON(PMONId monitoredParameterId, uint16_t repetitionNumber)
     : monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId)->get()), monitoredParameterId(monitoredParameterId),
-      repetitionNumber(repetitionNumber) {}
+      repetitionNumber(repetitionNumber)
+{
+	auto paramOpt = Services.parameterManagement.getParameter(monitoredParameterId);
+	if (paramOpt.has_value()) {
+		monitoredParameter = paramOpt->get(); // Assuming get() returns a reference
+	} else {
+		ErrorHandler::reportInternalError(ErrorHandler::InvalidParameterId);
+	}
+}
