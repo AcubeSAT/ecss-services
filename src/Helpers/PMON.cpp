@@ -2,9 +2,9 @@
 #include "ServicePool.hpp"
 
 
-PMON::PMON(PMONId monitoredParameterId, uint16_t repetitionNumber)
+PMON::PMON(PMONId monitoredParameterId, PMONRepetitionNumber repetitionNumber)
     : monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId)->get()), monitoredParameterId(monitoredParameterId),
-      repetitionNumber(repetitionNumber)
+      repetitionNumber(repetitionNumber),checkType(CheckType::Limit)
 {
 	auto paramOpt = Services.parameterManagement.getParameter(monitoredParameterId);
 	if (paramOpt.has_value()) {
