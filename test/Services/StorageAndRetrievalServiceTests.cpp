@@ -912,150 +912,150 @@ TEST_CASE("Suspending the open retrieval process") {
 		Services.reset();
 	}
 }
-// Review this test
-//TEST_CASE("Starting the by-time-range retrieval of packet stores") {
-//	SECTION("Successful starting of the by-time-range retrieval") {
-//		initializePacketStores();
-//		INFO("Actual number of packet stores: " << storageAndRetrieval.currentNumberOfPacketStores());
-//		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-//		auto packetStoreIds = validPacketStoreIds();
-//		padWithZeros(packetStoreIds);
-//
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
-//
-//		NumOfPacketStores numOfPacketStores = 3;
-//		request.appendUint16(numOfPacketStores);
-//
-//		TimeStamps timeTags1[4] = {20, 30, 40, 50};
-//		TimeStamps timeTags2[4] = {60, 70, 80, 90};
-//
-//		int index = 0;
-//		for (auto& packetStoreId: packetStoreIds) {
-//			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
-//			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
-//			request.appendString(packetStoreId);
-//			TimeStamps timeTag1 = timeTags1[index];
-//			TimeStamps timeTag2 = timeTags2[index++];
-//			request.append<TimeStamps>(timeTag1);
-//			request.append<TimeStamps>(timeTag2);
-//		}
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 0);
-//		for (int i = 0; i < numOfPacketStores; i++) {
-//			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[i]);
-//			REQUIRE(packetStore.byTimeRangeRetrievalStatus == true);
-//			REQUIRE(packetStore.retrievalStartTime == timeTags1[i]);
-//			REQUIRE(packetStore.retrievalEndTime == timeTags2[i]);
-//		}
-//		auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[3]);
-//		REQUIRE(packetStore.byTimeRangeRetrievalStatus == false);
-//		REQUIRE(packetStore.retrievalStartTime == 0);
-//		REQUIRE(packetStore.retrievalEndTime == 0);
-//
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Failed starting of the by-time-range retrieval") {
-//		initializePacketStores();
-//		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-//		auto correctPacketStoreIds = validPacketStoreIds();
-//		auto wrongPacketStoreIds = invalidPacketStoreIds();
-//		padWithZeros(correctPacketStoreIds);
-//
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
-//
-//		NumOfPacketStores numOfPacketStores = 6;
-//		request.appendUint16(numOfPacketStores);
-//
-//		for (int i = 0; i < numOfPacketStores / 2; i++) {
-//			auto packetStoreId = correctPacketStoreIds[i];
-//			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
-//			    (i % 2 == 0) ? PacketStore::Suspended : PacketStore::InProgress;
-//			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
-//
-//			request.appendString(packetStoreId);
-//			TimeStamps timeTag1 = 20;
-//			TimeStamps timeTag2 = 40;
-//			request.append<TimeStamps>(timeTag1);
-//			request.append<TimeStamps>(timeTag2);
-//		}
-//		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus = false;
-//
-//		for (int i = 0; i < numOfPacketStores / 2; i++) {
-//			auto packetStoreId = wrongPacketStoreIds[i];
-//			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
-//			request.appendString(packetStoreId);
-//			TimeStamps timeTag1 = 20;
-//			TimeStamps timeTag2 = 40;
-//			request.append<TimeStamps>(timeTag1);
-//			request.append<TimeStamps>(timeTag2);
-//		}
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 6);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ByTimeRangeRetrievalAlreadyEnabled) == 2);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithOpenRetrievalInProgress) == 1);
-//
-//		for (int i = 0; i < numOfPacketStores / 2; i++) {
-//			auto& packetStore = storageAndRetrieval.getPacketStore(correctPacketStoreIds[i]);
-//			REQUIRE(packetStore.byTimeRangeRetrievalStatus == (i % 2 == 0));
-//			REQUIRE(packetStore.retrievalStartTime == 0);
-//			REQUIRE(packetStore.retrievalEndTime == 0);
-//		}
-//		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus == false);
-//		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).retrievalStartTime == 0);
-//
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//
-//	SECTION("Invalid window requested") {
-//		initializePacketStores();
-//		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
-//		auto packetStoreIds = validPacketStoreIds();
-//		padWithZeros(packetStoreIds);
-//
-//		Message request(StorageAndRetrievalService::ServiceType,
-//		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
-//
-//		NumOfPacketStores numOfPacketStores = 3;
-//		request.appendUint16(numOfPacketStores);
-//
-//		for (auto& packetStoreId: packetStoreIds) {
-//			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
-//			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
-//			request.appendString(packetStoreId);
-//			TimeStamps timeTag1 = 90;
-//			TimeStamps timeTag2 = 20;
-//			request.append<TimeStamps>(timeTag1);
-//			request.append<TimeStamps>(timeTag2);
-//		}
-//
-//		MessageParser::execute(request);
-//
-//		CHECK(ServiceTests::count() == 3);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidTimeWindow) == 3);
-//
-//		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).byTimeRangeRetrievalStatus == false);
-//		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).byTimeRangeRetrievalStatus == false);
-//		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).byTimeRangeRetrievalStatus == false);
-//		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).byTimeRangeRetrievalStatus == false);
-//
-//		for (auto& packetStoreId: packetStoreIds) {
-//			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).retrievalStartTime == 0);
-//		}
-//
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
-//}
+
+TEST_CASE("Starting the by-time-range retrieval of packet stores") {
+	SECTION("Successful starting of the by-time-range retrieval") {
+		initializePacketStores();
+		INFO("Actual number of packet stores: " << storageAndRetrieval.currentNumberOfPacketStores());
+		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
+
+		NumOfPacketStores numOfPacketStores = 3;
+		request.appendUint16(numOfPacketStores);
+
+		TimeStamps timeTags1[4] = {20, 30, 40, 50};
+		TimeStamps timeTags2[4] = {60, 70, 80, 90};
+
+		int index = 0;
+		for (auto& packetStoreId: packetStoreIds) {
+			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
+			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
+			request.appendString(packetStoreId);
+			TimeStamps timeTag1 = timeTags1[index];
+			TimeStamps timeTag2 = timeTags2[index++];
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		for (int i = 0; i < numOfPacketStores; i++) {
+			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[i]);
+			REQUIRE(packetStore.byTimeRangeRetrievalStatus == true);
+			REQUIRE(packetStore.retrievalStartTime == timeTags1[i]);
+			REQUIRE(packetStore.retrievalEndTime == timeTags2[i]);
+		}
+		auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[3]);
+		REQUIRE(packetStore.byTimeRangeRetrievalStatus == false);
+		REQUIRE(packetStore.retrievalStartTime == 0);
+		REQUIRE(packetStore.retrievalEndTime == 0);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Failed starting of the by-time-range retrieval") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
+		auto correctPacketStoreIds = validPacketStoreIds();
+		auto wrongPacketStoreIds = invalidPacketStoreIds();
+		padWithZeros(correctPacketStoreIds);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
+
+		NumOfPacketStores numOfPacketStores = 6;
+		request.appendUint16(numOfPacketStores);
+
+		for (int i = 0; i < numOfPacketStores / 2; i++) {
+			auto packetStoreId = correctPacketStoreIds[i];
+			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
+			    (i % 2 == 0) ? PacketStore::Suspended : PacketStore::InProgress;
+			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
+
+			request.appendString(packetStoreId);
+			TimeStamps timeTag1 = 20;
+			TimeStamps timeTag2 = 40;
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
+		}
+		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus = false;
+
+		for (int i = 0; i < numOfPacketStores / 2; i++) {
+			auto packetStoreId = wrongPacketStoreIds[i];
+			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
+			request.appendString(packetStoreId);
+			TimeStamps timeTag1 = 20;
+			TimeStamps timeTag2 = 40;
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 6);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ByTimeRangeRetrievalAlreadyEnabled) == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetPacketStoreWithOpenRetrievalInProgress) == 1);
+
+		for (int i = 0; i < numOfPacketStores / 2; i++) {
+			auto& packetStore = storageAndRetrieval.getPacketStore(correctPacketStoreIds[i]);
+			REQUIRE(packetStore.byTimeRangeRetrievalStatus == (i % 2 == 0));
+			REQUIRE(packetStore.retrievalStartTime == 0);
+			REQUIRE(packetStore.retrievalEndTime == 0);
+		}
+		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).retrievalStartTime == 0);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Invalid window requested") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
+
+		NumOfPacketStores numOfPacketStores = 3;
+		request.appendUint16(numOfPacketStores);
+
+		for (auto& packetStoreId: packetStoreIds) {
+			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
+			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
+			request.appendString(packetStoreId);
+			TimeStamps timeTag1 = 90;
+			TimeStamps timeTag2 = 20;
+			request.append<TimeStamps>(timeTag1);
+			request.append<TimeStamps>(timeTag2);
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidTimeWindow) == 3);
+
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).byTimeRangeRetrievalStatus == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).byTimeRangeRetrievalStatus == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).byTimeRangeRetrievalStatus == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).byTimeRangeRetrievalStatus == false);
+
+		for (auto& packetStoreId: packetStoreIds) {
+			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).retrievalStartTime == 0);
+		}
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
 
 TEST_CASE("Aborting the by-time-range retrieval of packet stores") {
 	SECTION("Successful aborting of the by-time-range retrieval") {

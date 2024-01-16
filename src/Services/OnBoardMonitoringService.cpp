@@ -202,7 +202,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				break;
 			}
 
-			case PMON::PMON::CheckType::ExpectedValue: {
+			case PMON::CheckType::ExpectedValue: {
 				PMONBitMask mask = message.read<PMONBitMask>();
 				PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 				EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
