@@ -144,6 +144,87 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 	storeMessage(report);
 }
 
+void FileManagementService::createDirectory(Message& message){
+	message.assertTC(ServiceType, CreateDirectory);
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto directoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, directoryPath);
+
+	if (findWildcardPosition(fullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	if (not repositoryType) {
+		ErrorHandler::reportError(message,
+		                          ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
+		return;
+	}
+
+	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
+		return;
+	}
+
+	if (auto fileCreationError = Filesystem::createDirectory(fullPath)) {
+		switch (fileCreationError.value()) {
+			case Filesystem::DirectoryCreationError::DirectoryAlreadyExists: {
+				ErrorHandler::reportError(message,
+				                          ErrorHandler::ExecutionCompletionErrorType::DirectoryAlreadyExists);
+				return;
+			}
+			default: {
+				ErrorHandler::reportError(message,
+				                          ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+				return;
+			}
+		}
+	}
+
+}
+
+void FileManagementService::deleteDirectory(Message& message){
+	message.assertTC(ServiceType, DeleteDirectory);
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto directoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, directoryPath);
+
+	if (findWildcardPosition(fullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	if (not repositoryType) {
+		ErrorHandler::reportError(message,
+		                          ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+		return;
+	}
+
+	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
+		return;
+	}
+
+	if (auto fileDeletionError = Filesystem::deleteDirectory(fullPath)) {
+		using Filesystem::DirectoryDeletionError;
+		switch (fileDeletionError.value()) {
+			case DirectoryDeletionError::DirectoryDoesNotExist:
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
+				break;
+			case DirectoryDeletionError::DirectoryIsNotEmpty:
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteNonEmptyDirectory);
+				break;
+			default:
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+				break;
+		}
+	}
+}
+
 void FileManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case CreateFile:
