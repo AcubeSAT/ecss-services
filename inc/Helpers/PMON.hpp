@@ -8,6 +8,7 @@
 #include "etl/array.h"
 #include "etl/list.h"
 #include "etl/map.h"
+#include "optional"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
@@ -65,7 +66,11 @@ public:
 	 * Returns the current Check Type.
 	 */
 	CheckType getCheckType() const {
-		return checkType;
+		if (checkType.has_value()) {
+			return checkType.value();
+		} else {
+			throw std::runtime_error("checkType is not set.");
+		}
 	}
 
 	/**
