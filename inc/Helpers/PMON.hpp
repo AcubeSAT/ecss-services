@@ -65,12 +65,8 @@ public:
 	/**
 	 * Returns the current Check Type.
 	 */
-	CheckType getCheckType() const {
-		if (checkType.has_value()) {
-			return checkType.value();
-		} else {
-			throw std::runtime_error("checkType is not set.");
-		}
+	const std::optional<CheckType> getCheckType() const {
+		return checkType;
 	}
 
 	/**

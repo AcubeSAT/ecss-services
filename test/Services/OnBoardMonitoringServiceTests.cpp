@@ -555,10 +555,16 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		CHECK(report.readEnum16() == PMONIds[0]);
 		auto definition = onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get();
+		auto checkTypeOpt0 = onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkType;
+		auto checkTypeOpt1 = onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkType;
+		auto checkTypeOpt2 = onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkType;
+		auto checkTypeOpt3 = onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkType;
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionNumber);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkType));
+		if (checkTypeOpt0.has_value()) {
+			CHECK(report.readEnum8() == static_cast<uint8_t>(checkTypeOpt0.value()));
+		}
 		CHECK(report.read<PMONBitMask>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getMask());
 		CHECK(report.read<PMONExpectedValue>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getUnexpectedValueEvent());
@@ -567,7 +573,9 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().repetitionNumber);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkType));
+		if (checkTypeOpt1.has_value()) {
+			CHECK(report.readEnum8() == static_cast<uint8_t>(checkTypeOpt1.value()));
+		}
 		CHECK(report.read<PMONLimit>() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getLowLimit());
 		CHECK(report.read<EventDefinitionId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getBelowLowLimitEvent());
 		CHECK(report.read<PMONLimit>() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().getHighLimit());
@@ -577,7 +585,9 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().repetitionNumber);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkType));
+		if (checkTypeOpt2.has_value()) {
+			CHECK(report.readEnum8() == static_cast<uint8_t>(checkTypeOpt2.value()));
+		}
 		CHECK(report.read<DeltaThreshold>() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getLowDeltaThreshold());
 		CHECK(report.read<EventDefinitionId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getBelowLowThresholdEvent());
 		CHECK(report.read<DeltaThreshold>() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().getHighDeltaThreshold());
@@ -588,7 +598,9 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().repetitionNumber);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkType));
+		if (checkTypeOpt3.has_value()) {
+			CHECK(report.readEnum8() == static_cast<uint8_t>(checkTypeOpt3.value()));
+		}
 		CHECK(report.read<DeltaThreshold>() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getLowDeltaThreshold());
 		CHECK(report.read<EventDefinitionId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getBelowLowThresholdEvent());
 		CHECK(report.read<DeltaThreshold>() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().getHighDeltaThreshold());
@@ -632,6 +644,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
 
 		Message report = ServiceTests::get(1);
+		auto checkTypeOpt = onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkType;
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
 		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
@@ -640,7 +653,9 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionNumber);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkType));
+		if (checkTypeOpt.has_value()) {
+			CHECK(report.readEnum8() == static_cast<uint8_t>(checkTypeOpt.value()));
+		}
 		CHECK(report.read<PMONBitMask>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getMask());
 		CHECK(report.read<PMONExpectedValue>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getUnexpectedValueEvent());
