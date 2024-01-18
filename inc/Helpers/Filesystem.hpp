@@ -131,7 +131,7 @@ namespace Filesystem {
 	 * @return A NodeType value
 	 */
 	inline etl::optional<NodeType> getNodeType(const ObjectPath& objectPath) {
-		Path path = objectPath.data();
+		const Path path = objectPath.data();
 		return getNodeType(path);
 	}
 

@@ -5,6 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "etl/deque.h"
 #include "Message.hpp"
+#include "numeric"
 
 /**
  * This is the Packet Store class, needed for the Storage-Retrieval Service. The purpose of the packet-store is to
@@ -16,7 +17,7 @@ public:
 	 * The virtual channel used to transmit the packet store to the ground station. There is an upper and a lower
 	 * bound for the virtual channels, defined in 'ECSSDefinitions' file.
 	 */
-	VirtualChannel virtualChannel;
+	VirtualChannel virtualChannel = 0;
 	/**
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
@@ -33,9 +34,9 @@ public:
 	/**
 	 * The maximum size of the packet store, in bytes.
 	 *
-	 * @todo: add a way of defining each packets store's size in bytes
+	 * @todo (#217): add a way of defining each packets store's size in bytes
 	 */
-	uint64_t sizeInBytes;
+	uint64_t sizeInBytes = 0;
 
 	/**
 	 * Whether the insertion of packets stores in the packet-store should cyclically overwrite older packets, or be
@@ -57,8 +58,8 @@ public:
 	 * Whether the by-time-range retrieval of packet stores is enabled for this packet-store.
 	 */
 	bool byTimeRangeRetrievalStatus = false;
-	PacketStoreType packetStoreType;
-	PacketStoreOpenRetrievalStatus openRetrievalStatus;
+	PacketStoreType packetStoreType = Circular;
+	PacketStoreOpenRetrievalStatus openRetrievalStatus = Suspended;
 
 	PacketStore() = default;
 

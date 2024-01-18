@@ -33,9 +33,9 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	auto evaluationStopTime = TimeGetter::getCurrentTimeDefaultCUC();
 	report.append(evaluationStopTime);
 
-	uint16_t numOfValidParameters = 0;
-	for (auto& currentStatistic: statisticsMap) {
-		ParameterSampleCount numOfSamples = currentStatistic.second.sampleCounter;
+	uint16_t numOfValidParameters = 0; // NOLINT(misc-const-correctness)
+	for (const auto& currentStatistic: statisticsMap) {
+		const ParameterSampleCount numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
 		}
@@ -44,8 +44,8 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	report.appendUint16(numOfValidParameters);
 
 	for (auto& currentStatistic: statisticsMap) {
-		ParameterId currentId = currentStatistic.first;
-		ParameterSampleCount numOfSamples = currentStatistic.second.sampleCounter;
+		const ParameterId currentId = currentStatistic.first;
+		const ParameterSampleCount numOfSamples = currentStatistic.second.sampleCounter;
 		if (numOfSamples == 0) {
 			continue;
 		}
@@ -56,7 +56,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 	storeMessage(report);
 }
 
-void ParameterStatisticsService::resetParameterStatistics(Message& request) {
+void ParameterStatisticsService::resetParameterStatistics(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::ResetParameterStatistics)) {
 		return;
 	}
@@ -77,7 +77,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 		return;
 	}
 
-	SamplingInterval timeInterval = request.readUint16();
+	const SamplingInterval timeInterval = request.readUint16();
 
 	if (timeInterval < SamplingParameterInterval) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
@@ -88,7 +88,7 @@ void ParameterStatisticsService::enablePeriodicStatisticsReporting(Message& requ
 	reportingIntervalMs = timeInterval;
 }
 
-void ParameterStatisticsService::disablePeriodicStatisticsReporting(Message& request) {
+void ParameterStatisticsService::disablePeriodicStatisticsReporting(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::DisablePeriodicParameterReporting)) {
 		return;
 	}
@@ -102,19 +102,19 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 		return;
 	}
 
-	uint16_t numOfIds = request.readUint16();
+	uint16_t const numOfIds = request.readUint16();
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		ParameterId currentId = request.read<ParameterId>();
+		const ParameterId currentId = request.read<ParameterId>();
 		if (!Services.parameterManagement.parameterExists(currentId)) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::SetNonExistingParameter);
-			if (supportsSamplingInterval) {
+			if (SupportsSamplingInterval) {
 				request.skipBytes(sizeof(SamplingInterval));
 			}
 			continue;
 		}
-		bool exists = statisticsMap.find(currentId) != statisticsMap.end();
+		bool const exists = statisticsMap.find(currentId) != statisticsMap.end(); // NOLINT(cppcoreguidelines-init-variables)
 		SamplingInterval interval = 0;
-		if (supportsSamplingInterval) {
+		if (SupportsSamplingInterval) {
 			interval = request.read<SamplingInterval>();
 			if (interval < reportingIntervalMs) {
 				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidSamplingRateError);
@@ -128,13 +128,13 @@ void ParameterStatisticsService::addOrUpdateStatisticsDefinitions(Message& reque
 				return;
 			}
 			Statistic newStatistic;
-			if (supportsSamplingInterval) {
+			if (SupportsSamplingInterval) {
 				newStatistic.setSelfSamplingInterval(interval);
 			}
 			statisticsMap.insert({currentId, newStatistic});
-			// TODO: start the evaluation of statistics for this parameter.
+			// TODO(#260): start the evaluation of statistics for this parameter.
 		} else {
-			if (supportsSamplingInterval) {
+			if (SupportsSamplingInterval) {
 				statisticsMap.at(currentId).setSelfSamplingInterval(interval);
 			}
 			statisticsMap.at(currentId).resetStatistics();
@@ -147,14 +147,14 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 		return;
 	}
 
-	uint16_t numOfIds = request.readUint16();
+	uint16_t const numOfIds = request.readUint16();
 	if (numOfIds == 0) {
 		statisticsMap.clear();
 		periodicStatisticsReportingStatus = false;
 		return;
 	}
 	for (uint16_t i = 0; i < numOfIds; i++) {
-		ParameterId currentId = request.read<ParameterId>();
+		const ParameterId currentId = request.read<ParameterId>();
 		if (!Services.parameterManagement.parameterExists(currentId)) {
 			ErrorHandler::reportError(request, ErrorHandler::GetNonExistingParameter);
 			continue;
@@ -166,7 +166,7 @@ void ParameterStatisticsService::deleteStatisticsDefinitions(Message& request) {
 	}
 }
 
-void ParameterStatisticsService::reportStatisticsDefinitions(Message& request) {
+void ParameterStatisticsService::reportStatisticsDefinitions(const Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::ReportParameterStatisticsDefinitions)) {
 		return;
 	}
@@ -183,11 +183,11 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 	definitionsReport.append<SamplingInterval>(currentReportingIntervalMs);
 	definitionsReport.appendUint16(statisticsMap.size());
 
-	for (auto& currentParam: statisticsMap) {
-		ParameterId currentId = currentParam.first;
-		SamplingInterval samplingInterval = currentParam.second.selfSamplingInterval;
+	for (const auto& currentParam: statisticsMap) {
+		const ParameterId currentId = currentParam.first;
+		const SamplingInterval samplingInterval = currentParam.second.selfSamplingInterval;
 		definitionsReport.append<ParameterId>(currentId);
-		if (supportsSamplingInterval) {
+		if (SupportsSamplingInterval) {
 			definitionsReport.append<SamplingInterval>(samplingInterval);
 		}
 	}

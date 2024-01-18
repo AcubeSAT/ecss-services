@@ -76,7 +76,7 @@ namespace Time {
 	inline constexpr uint16_t SecondsPerHour = 3600;
 	inline constexpr uint32_t SecondsPerDay = 86400;
 	inline constexpr uint8_t MonthsPerYear = 12;
-	static constexpr uint8_t DaysOfMonth[MonthsPerYear] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	static constexpr etl::array<uint8_t, MonthsPerYear> DaysOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	/**
 	 * Number of bytes used for the basic time units of the CUC header for this mission
@@ -119,8 +119,10 @@ namespace Time {
 	 */
 	inline constexpr uint8_t CUCTimestampMaximumSize = 9;
 
-	static_assert(Epoch.year >= 2019);
-	static_assert(Epoch.month < 11 && Epoch.month >= 0);
+	inline constexpr uint16_t AcubeSATEpoch = 2019;
+
+	static_assert(Epoch.year >= AcubeSATEpoch);
+	static_assert(Epoch.month < 11 && Epoch.month >= 0); //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	static_assert(Epoch.day < DaysOfMonth[Epoch.month]);
 
 	/**
@@ -174,9 +176,8 @@ namespace Time {
 	inline constexpr uint16_t buildLongCUCHeader() {
 		// cppcheck-suppress redundantCondition
 		static_assert(secondsBytes > 4 || fractionalBytes > 3, "Use buildShortCUCHeader instead");
-		static_assert(secondsBytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
-		static_assert(fractionalBytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS");
-
+		static_assert(secondsBytes <= 7, "Number of bytes for seconds over maximum number of octets allowed by CCSDS"); //NOLINT(cppcoreguidelines-avoid-magic-numbers)
+		static_assert(fractionalBytes <= 6, "Number of bytes for seconds over maximum number of octets allowed by CCSDS"); //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 		uint16_t header = 0;
 
 		uint8_t octet1secondsBytes = std::min(4, secondsBytes);
@@ -240,7 +241,7 @@ namespace Time {
 	 */
 	template <typename T, int secondsBytes, int fractionalBytes>
 	inline constexpr T buildCUCHeader() {
-		static_assert((secondsBytes + fractionalBytes) <= 8, "Complete arbitrary precision not supported");
+		static_assert((secondsBytes + fractionalBytes) <= 8, "Complete arbitrary precision not supported"); //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 		// cppcheck-suppress syntaxError
 		// cppcheck-suppress redundantCondition
 		if constexpr (secondsBytes <= 4 && fractionalBytes <= 3) {
@@ -257,10 +258,10 @@ namespace Time {
 		if ((year % 4) != 0) {
 			return false;
 		}
-		if ((year % 100) != 0) {
+		if ((year % 100) != 0) { //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 			return true;
 		}
-		return (year % 400) == 0;
+		return (year % 400) == 0; //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	}
 
 	/**

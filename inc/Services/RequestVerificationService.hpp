@@ -13,8 +13,8 @@
  * should be called, hasn't been implemented yet. In main.cpp there are some random calls with
  * dummy values.
  *
- * @todo See if the deduced data defined from the standard should still be ignored. This deduced
- * data exists only in reports that send failure signs(for example the TM[1,2])
+ * @todo (#224) See if the deduced data defined from the standard should still be ignored. This deduced
+ * data exists only in reports that send failure signs(for examp le the TM[1,2])
  *
  * @ingroup Services
  */
@@ -112,8 +112,8 @@ public:
 	 * of the telecommand packet that its progress of execution is successful
 	 * @param stepID If the execution of a request is a long process, then we can divide
 	 * the process into steps. Each step goes with its own definition, the stepID.
-	 * @todo Each value,that the stepID is assigned, should be documented.
-	 * @todo error handling for undocumented assigned values to stepID
+	 * @todo (#225) Each value,that the stepID is assigned, should be documented.
+	 * @todo (#226) error handling for undocumented assigned values to stepID
 	 */
 	void successProgressExecutionVerification(const Message& request, StepId stepID);
 
@@ -126,8 +126,8 @@ public:
 	 * @param errorCode The cause of creating this type of report
 	 * @param stepID If the execution of a request is a long process, then we can divide
 	 * the process into steps. Each step goes with its own definition, the stepID.
-	 * @todo Each value,that the stepID is assigned, should be documented.
-	 * @todo error handling for undocumented assigned values to stepID
+	 * @todo (#225) Each value,that the stepID is assigned, should be documented.
+	 * @todo (#226) error handling for undocumented assigned values to stepID
 	 */
 	void failProgressExecutionVerification(const Message& request, ErrorHandler::ExecutionProgressErrorType errorCode,
 	                                       StepId stepID);
@@ -171,6 +171,6 @@ public:
 	 * telecommand packet that failed the routing.
 	 * @param report Contains the appended bits to be stored
 	 */
-	void assembleReportMessage(const Message& request, Message& report) const;
+	void assembleReportMessage(const Message& request, Message& report);
 };
 #endif // ECSS_SERVICES_REQUESTVERIFICATIONSERVICE_HPP

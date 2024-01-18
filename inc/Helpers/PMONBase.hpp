@@ -8,6 +8,8 @@
 #include "etl/array.h"
 #include "etl/list.h"
 #include "etl/map.h"
+#include "Parameter.hpp"
+#include "optional"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
@@ -29,11 +31,12 @@ public:
 
 	PMONId monitoredParameterId;
 
-	std::reference_wrapper<ParameterBase> monitoredParameter;
+	std::optional<std::reference_wrapper<ParameterBase>> monitoredParameter;
+
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
-	uint16_t repetitionNumber;
+	uint16_t repetitionNumber = 0;
 	/**
 	 * The number of checks that have been conducted so far.
 	 */
@@ -48,7 +51,6 @@ protected:
 	 */
 	PMONBase(PMONId monitoredParameterId, uint16_t repetitionNumber);
 };
-
 /**
  * Contains the variables specific to Parameter Monitoring definitions of expected value check type.
  */

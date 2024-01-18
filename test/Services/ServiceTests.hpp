@@ -9,7 +9,7 @@
 /**
  * Supporting class for tests against ECSS services
  *
- * @todo See if members of this class can be made non-static
+ * @todo(#278) See if members of this class can be made non-static
  */
 class ServiceTests {
 protected:
@@ -30,7 +30,7 @@ protected:
 	 *
 	 * A multimap with keys (ErrorHandler::ErrorSource, ErrorHandler::ErrorType) and values of `1`.
 	 *
-	 * @todo If errors get more complex, this should hold the complete error information
+	 * @todo(#279) If errors get more complex, this should hold the complete error information
 	 */
 	static std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> thrownErrors;
 
@@ -111,7 +111,7 @@ public:
 	/**
 	 * Find if there are *no* thrown errors
 	 * @return True if 0 errors were thrown after the message
-	 * @todo Implement a way to run this assertion at the end of every test
+	 * @todo(#280) Implement a way to run this assertion at the end of every test
 	 */
 	static bool hasNoErrors() {
 		return thrownErrors.empty();

@@ -33,7 +33,6 @@ protected:
 	 *
 	 * @param messageType The ID of the message type, as specified in the standard. For example,
 	 *                    the TC[17,3] message has `messageType = 3`.
-	 * @todo See if the Message must be returned by reference
 	 */
 	Message createTM(MessageTypeNum messageType) const {
 		return Message(serviceType, messageType, Message::TM);

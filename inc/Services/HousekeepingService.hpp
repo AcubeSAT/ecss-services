@@ -72,7 +72,7 @@ public:
 	 * @return boolean True if periodic generation of housekeeping reports is enabled, false otherwise
 	 */
 	inline bool getPeriodicGenerationActionStatus(ParameterReportStructureId id) {
-		HousekeepingStructure newStructure{};
+		const HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
 			return newStructure.periodicGenerationActionStatus;
 		}
@@ -97,8 +97,8 @@ public:
 	 * @return uint32_t Integer multiples of the minimum sampling interval
 	 */
 	inline CollectionInterval getCollectionInterval(ParameterReportStructureId id) {
-		HousekeepingStructure newStructure{};
 		if (hasNonExistingStructInternalError(id)) {
+			const HousekeepingStructure newStructure{};
 			return newStructure.collectionInterval;
 		}
 		return housekeepingStructures.at(id).collectionInterval;
@@ -143,7 +143,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
-	bool hasNonExistingStructExecutionError(ParameterReportStructureId id, Message& request);
+	bool hasNonExistingStructExecutionError(ParameterReportStructureId id, const Message& request);
 
 	/**
 	 * Checks if the structure doesn't exist in the map and then accordingly reports error.
@@ -151,7 +151,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the structure doesn't exist, false otherwise
 	 */
-	bool hasNonExistingStructError(ParameterReportStructureId id, Message& request);
+	bool hasNonExistingStructError(ParameterReportStructureId id, const Message& request);
 
 	/**
 	 * Checks if the structure doesn't exist in the map and then accordingly reports internal error.
@@ -167,7 +167,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the parameter exists, false otherwise
 	 */
-	static bool hasAlreadyExistingParameterError(HousekeepingStructure& housekeepingStruct, ParameterReportStructureId id, Message& request);
+	static bool hasAlreadyExistingParameterError(const HousekeepingStructure& housekeepingStruct, ParameterReportStructureId id, const Message& request);
 
 	/**
 	 * Checks if the struct requested exists and if it exists reports execution error.
@@ -175,14 +175,14 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the structure exists, false otherwise
 	 */
-	bool hasAlreadyExistingStructError(ParameterReportStructureId id, Message& request);
+	bool hasAlreadyExistingStructError(ParameterReportStructureId id, const Message& request);
 
 	/**
 	 * Reports execution error if the max number of housekeeping structures is exceeded.
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if max number of housekeeping structures is exceeded, false otherwise
 	 */
-	bool hasExceededMaxNumOfHousekeepingStructsError(Message& request);
+	bool hasExceededMaxNumOfHousekeepingStructsError(const Message& request);
 
 	/**
 	 * Reports execution error if it's attempted to append a new parameter id to a housekeeping structure, but the periodic generation status is enabled.
@@ -190,7 +190,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if periodic generation status is enabled, false otherwise
 	 */
-	static bool hasRequestedAppendToEnabledHousekeepingError(HousekeepingStructure& housekeepingStruct, Message& request);
+	static bool hasRequestedAppendToEnabledHousekeepingError(const HousekeepingStructure& housekeepingStruct, const Message& request);
 
 	/**
 	 * Reports execution error if it's attempted to delete structure which has the periodic reporting status enabled.
@@ -198,7 +198,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if periodic reporting status is enabled, false otherwise
 	 */
-	bool hasRequestedDeletionOfEnabledHousekeepingError(ParameterReportStructureId id, Message& request);
+	bool hasRequestedDeletionOfEnabledHousekeepingError(ParameterReportStructureId id, const Message& request);
 
 	/**
 	 * Reports execution error if the max number of simply commutated parameters is exceeded.
@@ -206,7 +206,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if max number of simply commutated parameters is exceeded, false otherwise
 	 */
-	static bool hasExceededMaxNumOfSimplyCommutatedParamsError(HousekeepingStructure& housekeepingStruct, Message& request);
+	static bool hasExceededMaxNumOfSimplyCommutatedParamsError(const HousekeepingStructure& housekeepingStruct, const Message& request);
 
 	/**
 	 * Implementation of TC[3,1]. Request to create a housekeeping parameters report structure.

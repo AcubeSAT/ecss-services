@@ -33,7 +33,7 @@ int main() {
 	packet.appendSint32(-123456789);
 
 	std::cout << "Hello, World!" << std::endl;
-	std::cout << std::hex << packet.data << std::endl; // packet data must be 'helloQQ'
+	std::cout << std::hex << packet.data.data() << std::endl; // packet data must be 'helloQQ'
 
 	char string[6];
 	packet.readCString(string, 5);

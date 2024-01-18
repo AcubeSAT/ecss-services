@@ -53,11 +53,11 @@ TEST_CASE("Requirement 5.3.1", "[message][ecss]") {
 	}
 
 	SECTION("5.3.1c") {
-		// TODO: Unimplemented
+		// TODO(#273): Unimplemented
 	}
 
 	SECTION("5.3.1d") {
-		// TODO: Unimplemented
+		// TODO(#273): Unimplemented
 	}
 }
 
