@@ -25,7 +25,7 @@ private:
 	bool eventActionFunctionStatus = false;
 
 public:
-	inline static const uint8_t ServiceType = 19;
+	inline static constexpr ServiceTypeNum ServiceType = 19;
 
 	enum MessageType : uint8_t {
 		AddEventAction = 1,
@@ -40,13 +40,13 @@ public:
 	};
 
 	struct EventActionDefinition {
-		uint16_t applicationID = 0;
-		inline static const uint16_t MaxDefinitionID = 65535;
-		uint16_t eventDefinitionID = MaxDefinitionID;
+		ApplicationProcessId applicationID = 0;
+		inline static constexpr ApplicationProcessId MaxDefinitionID = 65535;
+		EventDefinitionId eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
 
-		EventActionDefinition(uint16_t applicationID, uint16_t eventDefinitionID, Message& message);
+		EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message& message);
 	};
 
 	friend EventReportService;
@@ -71,7 +71,7 @@ public:
 	/**
 	 * TC[19,3] delete all event-action definitions
 	 */
-	void deleteAllEventActionDefinitions(Message& message);
+	void deleteAllEventActionDefinitions(const Message& message);
 
 	/**
 	 * TC[19,4] enable event-action definitions
@@ -86,7 +86,7 @@ public:
 	/**
 	 * TC[19,6] report the status of each event-action definition
 	 */
-	void requestEventActionDefinitionStatus(Message& message);
+	void requestEventActionDefinitionStatus(const Message& message);
 
 	/**
 	 * TM[19,7] event-action status report
@@ -96,12 +96,12 @@ public:
 	/**
 	 * TC[19,8] enable the event-action function
 	 */
-	void enableEventActionFunction(Message& message);
+	void enableEventActionFunction(const Message& message);
 
 	/**
 	 * TC[19,9] disable the event-action function
 	 */
-	void disableEventActionFunction(Message& message);
+	void disableEventActionFunction(const Message& message);
 
 	/**
 	 * Setter for event-action function status
@@ -122,7 +122,7 @@ public:
 	 * Custom function that is called right after an event takes place, to initiate
 	 * the execution of the action
 	 */
-	void executeAction(uint16_t eventDefinitionID);
+	void executeAction(EventDefinitionId eventDefinitionID);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

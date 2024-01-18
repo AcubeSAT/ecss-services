@@ -16,7 +16,7 @@
 
 class LargePacketTransferService : public Service {
 public:
-	inline static const uint8_t ServiceType = 13;
+	inline static constexpr ServiceTypeNum ServiceType = 13;
 
 
 	enum MessageType : uint8_t {
@@ -38,7 +38,7 @@ public:
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
 	 */
-	void firstDownlinkPartReport(uint16_t largeMessageTransactionIdentifier, uint16_t partSequenceNumber,
+	void firstDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier, PartSequenceNum partSequenceNumber,
 	                             const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
@@ -47,7 +47,7 @@ public:
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
 	 */
-	void intermediateDownlinkPartReport(uint16_t largeMessageTransactionIdentifier, uint16_t partSequenceNumber,
+	void intermediateDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier, PartSequenceNum partSequenceNumber,
 	                                    const String<ECSSMaxFixedOctetStringSize>& string);
 
 	/**
@@ -56,12 +56,12 @@ public:
 	 * @param partSequenceNumber The identifier of the part of the large packet
 	 * @param string The data contained in this part of the large packet
 	 */
-	void lastDownlinkPartReport(uint16_t largeMessageTransactionIdentifier, uint16_t partSequenceNumber,
+	void lastDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier, PartSequenceNum partSequenceNumber,
 	                            const String<ECSSMaxFixedOctetStringSize>& string);
 
 	// The three uplink functions should handle a TC request to "upload" data. Since there is not
 	// a composeECSS function ready, I just return the given string.
-	// @TODO: Modify these functions properly
+	// @TODO (#220): Modify these functions properly
 	/**
 	 * TC[13,9] Function that handles the first part of the uplink request
 	 * @param string This will change when these function will be modified
@@ -86,7 +86,7 @@ public:
 	 * @param message that is exceeds the standards and has to be split down
 	 * @param largeMessageTransactionIdentifier that is a value we assign to this splitting of the large message
 	 */
-	void split(Message& message, uint16_t largeMessageTransactionIdentifier);
+	void split(const Message& message, LargeMessageTransactionId largeMessageTransactionIdentifier);
 };
 
 #endif // ECSS_SERVICES_LARGEPACKETTRANSFERSERVICE_HPP

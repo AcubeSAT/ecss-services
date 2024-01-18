@@ -4,7 +4,7 @@
 #include "Services/RequestVerificationService.hpp"
 
 
-void RequestVerificationService::assembleReportMessage(const Message& request, Message& report) const {
+void RequestVerificationService::assembleReportMessage(const Message& request, Message& report) {
 
 	report.appendEnumerated(CCSDSPacketVersionBits, CCSDSPacketVersion);
 	report.appendEnumerated(PacketTypeBits, request.packetType);
@@ -30,7 +30,7 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
 	Message report = createTM(RequestVerificationService::MessageType::FailedAcceptanceReport);
 
 	assembleReportMessage(request, report);
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
@@ -53,32 +53,32 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 
 	assembleReportMessage(request, report);
 
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
 
-void RequestVerificationService::successProgressExecutionVerification(const Message& request, uint8_t stepID) {
+void RequestVerificationService::successProgressExecutionVerification(const Message& request, StepId stepID) {
 	// TM[1,5] successful progress of execution verification report
 
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulProgressOfExecution);
 
 	assembleReportMessage(request, report);
-	report.appendByte(stepID); // step ID
+	report.append<StepId>(stepID); // step ID
 
 	storeMessage(report);
 }
 
 void RequestVerificationService::failProgressExecutionVerification(const Message& request,
                                                                    ErrorHandler::ExecutionProgressErrorType errorCode,
-                                                                   uint8_t stepID) {
+                                                                   StepId stepID) {
 	// TM[1,6] failed progress of execution verification report
 
 	Message report = createTM(RequestVerificationService::MessageType::FailedProgressOfExecution);
 
 	assembleReportMessage(request, report);
-	report.appendByte(stepID);      // step ID
-	report.appendEnum16(errorCode); // error code
+	report.append<StepId>(stepID);      // step ID
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
@@ -100,7 +100,7 @@ void RequestVerificationService::failCompletionExecutionVerification(
 	Message report = createTM(RequestVerificationService::MessageType::FailedCompletionOfExecution);
 
 	assembleReportMessage(request, report);
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }
@@ -112,7 +112,7 @@ void RequestVerificationService::failRoutingVerification(const Message& request,
 	Message report = createTM(RequestVerificationService::MessageType::FailedRoutingReport);
 
 	assembleReportMessage(request, report);
-	report.appendEnum16(errorCode); // error code
+	report.append<ErrorCode>(errorCode); // error code
 
 	storeMessage(report);
 }

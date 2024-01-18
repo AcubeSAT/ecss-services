@@ -9,7 +9,7 @@ stages:
 
 
 check-build:
-  image: spacedot/build-base # TODO: push build-base
+  image: spacedot/build-base
   stage: build
   variables:
     GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
@@ -20,7 +20,7 @@ check-build:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing
-    - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - make -j$(nproc)
 
 cppcheck:
@@ -28,19 +28,15 @@ cppcheck:
   stage: analyze
   before_script:
     - cppcheck --version
-  allow_failure: true
   script:
     - cd $CI_PROJECT_DIR
-    - cppcheck --enable=all --addon=misra --suppress=misra-c2012-3.1 --suppress=misra-c2012-5.1 --suppress=misra-c2012-5.2 \
-      --suppress=misra-c2012-5.3 --suppress=misra-c2012-12.3 --suppress=misra-c2012-13.4 --suppress=misra-c2012-14.4 \
-      --suppress=misra-c2012-15.5 --suppress=misra-c2012-16.3 --suppress=misra-c2012-18.4 --suppress=misra-c2012-18.8 \
-      --suppress=unusedFunction --suppress=noExplicitConstructor --force --inline-suppr --error-exitcode=1 \
-      --xml --xml-version=2 2>report.xml -I ./inc ./src
+    - cppcheck --enable=all --addon=misra --suppressions-list=./ci/suppressions.txt --force --inline-suppr --error-exitcode=1 \
+      -j $(nproc) --xml --xml-version=2 2>report.xml -I ./inc ./src -i ./src/Platform -i ./inc/Platform
   after_script:
     - mkdir cppcheck-html-report
     - cppcheck-htmlreport --source-dir=. --title=html-report --file=report.xml --report-dir=cppcheck-html-report
   artifacts:
-    when: on_failure
+    when: always
     paths:
       - ./cppcheck-html-report
 
@@ -54,7 +50,7 @@ clang-tidy:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing
-    - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    - cmake -B ./build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_TOOLCHAIN_FILE=conan-build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - clang-tidy -p $CI_PROJECT_DIR/build/compile_commands.json --config-file=$CI_PROJECT_DIR/ci/.clang-tidy --use-color `find $CI_PROJECT_DIR/src $CI_PROJECT_DIR/inc -not -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` | tee clang-tidy-output.log
   after_script:
     - sed -e 's/\x1b\[[0-9;]*m//g' -i clang-tidy-output.log
@@ -78,7 +74,7 @@ clang-analyzer:
      - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
      - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
      - conan install . --output-folder conan-build --build=missing
-     - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+     - scan-build cmake ./ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_TOOLCHAIN_FILE=conan-build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
      - scan-build -o ./scan-build-html-report make
    artifacts:
      paths:
@@ -105,7 +101,7 @@ ikos:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
-    - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
+    - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
     - ikos-scan make x86_services
     - ikos x86_services.bc
     - ikos-report -o=ikos-report.txt output.db
@@ -128,7 +124,7 @@ tests:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing
-    - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && make tests -j$(nproc)
+    - cmake . -DCMAKE_CXX_FLAGS="-g -O0 --coverage" -DCMAKE_TOOLCHAIN_FILE=conan-build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release && make tests -j$(nproc)
     - lcov -q --capture --initial --directory . -o coverage_base
     - ./tests --colour-mode ansi
     - lcov -q --capture --directory . -o coverage_tests
@@ -141,12 +137,12 @@ tests:
     paths:
       - ./gcovr
 pages:
-  image: spacedot/build-base:latest # TODO: Latest tag is temporary
+  image: spacedot/build-base:latest
   stage: deploy
   script:
     - mkdir .public
     - cp -r ./docs/html ./.public/docs
-    - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/ # TODO: USE THIS WHEN CLANG AND GCOVR HAVE BEEN FIXED
+    - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
     - cp -r ./{gcovr,ikos-report,cppcheck-html-report} ./.public/
     - ls ./.public
     - find ./.public
@@ -171,6 +167,6 @@ conan:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan create . --build=missing -pr conan-profile
-    - conan upload ecss-services/1.0 -r conan
+    - conan upload ecss-services/1.1 -r conan
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

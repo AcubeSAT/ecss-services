@@ -61,7 +61,11 @@ public:
 	using Ratio = std::ratio<Num, Denom>;
 
 private:
-	static_assert(BaseBytes + FractionBytes <= 8,
+	/**
+	 * The total number of bytes used to represent the timestamp. The internal counter is max uint64_t, so this is the maximum value.
+	 */
+	inline const static uint8_t TotalBytes = 8;
+	static_assert(BaseBytes + FractionBytes <= TotalBytes,
 	              "Currently, this class is not suitable for storage on internal counter larger than uint64_t");
 	using CUCHeader_t = typename std::conditional<(BaseBytes < 4 && FractionBytes < 3), uint8_t, uint16_t>::type;
 	using TAICounter_t = typename std::conditional<(BaseBytes + FractionBytes <= 4), uint32_t, uint64_t>::type;
@@ -71,7 +75,7 @@ private:
 	 *
 	 * Same as @ref Ratio, but instead of representing the Base bytes, it represents the entire value held by @ref taiCounter.
 	 */
-	using RawRatio = std::ratio<Num, Denom * 1UL << (8 * FractionBytes)>;
+	using RawRatio = std::ratio<Num, Denom * 1UL << (8 * FractionBytes)>;  //NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
 	/**
 	 * An std::chrono::duration representation of the base type (without the fractional part)
@@ -327,7 +331,10 @@ public:
 };
 
 namespace Time {
-	using DefaultCUC = TimeStamp<4, 0, 1, 10>;
+	/**
+	 * 4 bytes for the base, 0 for the fraction, 1/10 of a second for the ratio
+	 */
+	using DefaultCUC = TimeStamp<4, 0, 1, 10>; // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 
 	/**
 	 * Creates a custom literal to specify timestamp ticks.
@@ -340,7 +347,7 @@ namespace Time {
 	 *
 	 * The time amount of a "tick" is the period defined by the DefaultCUC::Ratio
 	 */
-	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator""_t(unsigned long long s) {
+	constexpr std::chrono::duration<uint32_t, DefaultCUC::Ratio> operator""_t(unsigned long long s) { // NOLINT(google-runtime-int) The literal is only defined for unsigned long long, so that it can be used with the chrono literals.
 		return std::chrono::duration<uint32_t, DefaultCUC::Ratio>(s);
 	}
 } // namespace Time

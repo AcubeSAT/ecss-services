@@ -17,6 +17,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 #include "Services/TestService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
+#include "Services/FileManagementService.hpp"
 
 /**
  * Defines a class that contains instances of all Services.
@@ -37,6 +38,14 @@ class ServicePool {
 	 * A counter for messages that corresponds to the total number of TM packets sent from an APID
 	 */
 	uint16_t packetSequenceCounter = 0;
+
+	/**
+	 * Maximum counter value for the packet sequence counter is 2^14 - 1. In `getAndUpdatePacketSequenceCounter
+	 * ()`, the counter is increased by 1 and if it reaches the maximum value, it is reset to 0. There is a comparison
+	 * that shifts 1 to the left by 14 bits to compare, and then reset.
+	 * For more info, see: ECSS-E-ST-70-41C, Figure 7-6, the CCSDS packet overview
+	 */
+	inline static const uint8_t MaxPacketSequenceCounterBit = 14U;
 
 public:
 #ifdef SERVICE_DUMMY
@@ -99,6 +108,9 @@ public:
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
 
+#ifdef SERVICE_FILE_MANAGEMENT
+    FileManagementService fileManagement;
+#endif
 
 	/**
 	 * The default ServicePool constructor
@@ -123,7 +135,7 @@ public:
 	 * @param messageType The message type ID
 	 * @return The message type count
 	 */
-	uint16_t getAndUpdateMessageTypeCounter(uint8_t serviceType, uint8_t messageType);
+	uint16_t getAndUpdateMessageTypeCounter(ServiceTypeNum serviceType, MessageTypeNum messageType);
 
 	/**
 	 * Get and increase the "packet sequence count" for the next message
