@@ -24,7 +24,6 @@ using MemoryDataLength = uint16_t;
 /**
  * Parameter Monitoring Identifier as used in the On-board Monitoring Service.
  */
-using PMONId = uint16_t;
 using LargeMessageTransactionId = uint16_t;
 using PartSequenceNum = uint16_t;
 using PacketStoreSize = uint16_t;

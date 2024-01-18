@@ -68,7 +68,7 @@ public:
 	/**
 	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
 	 */
-	void addPMONDefinition(PMONId PMONId, std::reference_wrapper<PMON> PMONDefinition) {
+	void addPMONDefinition(ParameterId PMONId, std::reference_wrapper<PMON> PMONDefinition) {
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
 	}
 
@@ -76,7 +76,7 @@ public:
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */
-	std::reference_wrapper<PMON> getPMONDefinition(PMONId PMONId) {
+	std::reference_wrapper<PMON> getPMONDefinition(ParameterId PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
 

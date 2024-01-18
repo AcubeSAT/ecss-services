@@ -43,10 +43,10 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
-		etl::array<PMONId, 3> PMONIds = {0, 1, 2};
-		request.append<PMONId>(PMONIds[0]);
-		request.append<PMONId>(PMONIds[1]);
-		request.append<PMONId>(PMONIds[2]);
+		etl::array<ParameterId, 3> PMONIds = {0, 1, 2};
+		request.append<ParameterId>(PMONIds[0]);
+		request.append<ParameterId>(PMONIds[1]);
+		request.append<ParameterId>(PMONIds[2]);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
@@ -69,10 +69,10 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<PMONId, 4> PMONIds = {0, 10, 1};
-		request.append<PMONId>(PMONIds[0]);
-		request.append<PMONId>(PMONIds[1]);
-		request.append<PMONId>(PMONIds[2]);
+		etl::array<ParameterId, 4> PMONIds = {0, 10, 1};
+		request.append<ParameterId>(PMONIds[0]);
+		request.append<ParameterId>(PMONIds[1]);
+		request.append<ParameterId>(PMONIds[2]);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -95,10 +95,10 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
-		etl::array<PMONId, 3> PMONIds = {0, 1, 2};
-		request.append<PMONId>(PMONIds[0]);
-		request.append<PMONId>(PMONIds[1]);
-		request.append<PMONId>(PMONIds[2]);
+		etl::array<ParameterId, 3> PMONIds = {0, 1, 2};
+		request.append<ParameterId>(PMONIds[0]);
+		request.append<ParameterId>(PMONIds[1]);
+		request.append<ParameterId>(PMONIds[2]);
 		onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled = true;
@@ -122,11 +122,11 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<PMONId, 4> PMONIds = {0, 10, 1, 2};
-		request.append<PMONId>(PMONIds[0]);
-		request.append<PMONId>(PMONIds[1]);
-		request.append<PMONId>(PMONIds[2]);
-		request.append<PMONId>(PMONIds[3]);
+		etl::array<ParameterId, 4> PMONIds = {0, 10, 1, 2};
+		request.append<ParameterId>(PMONIds[0]);
+		request.append<ParameterId>(PMONIds[1]);
+		request.append<ParameterId>(PMONIds[2]);
+		request.append<ParameterId>(PMONIds[3]);
 		onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled = true;
@@ -282,7 +282,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 1;
 		request.appendUint16(numberOfIds);
-		PMONId PMONId = 0;
+		ParameterId PMONId = 0;
 		ParameterId monitoredParameterId = 0;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONBitMask expectedValueCheckMask = 2;
@@ -314,11 +314,11 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		auto definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getRepetitionNumber() == repetitionNumber);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().isMonitoringEnabled() == false);
-//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckType() == PMON::ExpectedValueCheck);
-//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckingStatus() == PMON::Unchecked);
-//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getExpectedValue() == expectedValue);
-//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getMask() == expetedValueCheckMask);
-//		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getUnexpectedValueEvent() == unexpectedValueEvent);
+//		CHECK(onBoardMonitoringService.getPMONDefinition(ParameterId).get().getCheckType() == PMON::ExpectedValueCheck);
+//		CHECK(onBoardMonitoringService.getPMONDefinition(ParameterId).get().getCheckingStatus() == PMON::Unchecked);
+//		CHECK(onBoardMonitoringService.getPMONDefinition(ParameterId).get().getExpectedValue() == expectedValue);
+//		CHECK(onBoardMonitoringService.getPMONDefinition(ParameterId).get().getMask() == expetedValueCheckMask);
+//		CHECK(onBoardMonitoringService.getPMONDefinition(ParameterId).get().getUnexpectedValueEvent() == unexpectedValueEvent);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckType() == PMON::CheckType::Limit);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getCheckingStatus() == PMON::Unchecked);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().getLowLimit() == lowLimit);
@@ -333,7 +333,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//	SECTION("Parameter Monitoring List is full") {
 	//		initialiseParameterMonitoringDefinitions();
 	//		uint16_t numberOfIds = 1;
-	//		uint16_t PMONId = 5;
+	//		uint16_t ParameterId = 5;
 	//		uint16_t monitoredParameterId = 5;
 	//		uint16_t repetitionNumber = 5;
 	//
@@ -341,7 +341,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//		    Message(OnBoardMonitoringService::ServiceType,
 	//		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 	//		request.appendUint16(numberOfIds);
-	//		request.appendUint16(PMONId);
+	//		request.appendUint16(ParameterId);
 	//		request.appendEnum16(monitoredParameterId);
 	//		request.appendUint16(repetitionNumber);
 	//		request.appendEnum8(onBoardMonitoringService.ExpectedValueCheck);
@@ -357,7 +357,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//	SECTION("Parameter Monitoring Definition already exists") {
 	//		initialiseParameterMonitoringDefinitions();
 	//		uint16_t numberOfIds = 1;
-	//		uint16_t PMONId = 0;
+	//		uint16_t ParameterId = 0;
 	//		uint16_t monitoredParameterId = 0;
 	//		uint16_t repetitionNumber = 5;
 	//
@@ -365,7 +365,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//		    Message(OnBoardMonitoringService::ServiceType,
 	//		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 	//		request.appendUint16(numberOfIds);
-	//		request.appendUint16(PMONId);
+	//		request.appendUint16(ParameterId);
 	//		request.appendEnum16(monitoredParameterId);
 	//		request.appendUint16(repetitionNumber);
 	//		request.appendEnum8(onBoardMonitoringService.ExpectedValueCheck);
@@ -380,7 +380,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//
 	//	SECTION("Add Parameter Monitoring Definition with a non-existing parameter") {
 	//		uint16_t numberOfIds = 1;
-	//		uint16_t PMONId = 4;
+	//		uint16_t ParameterId = 4;
 	//		uint16_t monitoredParameterId = 100;
 	//		uint16_t repetitionNumber = 5;
 	//
@@ -388,7 +388,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//		    Message(OnBoardMonitoringService::ServiceType,
 	//		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 	//		request.appendUint16(numberOfIds);
-	//		request.appendUint16(PMONId);
+	//		request.appendUint16(ParameterId);
 	//		request.appendEnum16(monitoredParameterId);
 	//		request.appendUint16(repetitionNumber);
 	//		request.appendEnum8(onBoardMonitoringService.ExpectedValueCheck);
@@ -403,7 +403,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//
 	//	SECTION("High limit is lower than low limit") {
 	//		uint16_t numberOfIds = 1;
-	//		uint16_t PMONId = 0;
+	//		uint16_t ParameterId = 0;
 	//		uint16_t monitoredParameterId = 0;
 	//		uint16_t repetitionNumber = 5;
 	//		uint16_t lowLimit = 8;
@@ -413,7 +413,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//		    Message(OnBoardMonitoringService::ServiceType,
 	//		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 	//		request.appendUint16(numberOfIds);
-	//		request.appendUint16(PMONId);
+	//		request.appendUint16(ParameterId);
 	//		request.appendUint16(monitoredParameterId);
 	//		request.appendUint16(repetitionNumber);
 	//		request.appendEnum8(onBoardMonitoringService.LimitCheck);
@@ -432,7 +432,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//
 	//	SECTION("High threshold is lower than low threshold") {
 	//		uint16_t numberOfIds = 1;
-	//		uint16_t PMONId = 0;
+	//		uint16_t ParameterId = 0;
 	//		uint16_t monitoredParameterId = 0;
 	//		uint16_t repetitionNumber = 5;
 	//		uint16_t lowDeltaThreshold = 8;
@@ -443,7 +443,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	//		    Message(OnBoardMonitoringService::ServiceType,
 	//		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 	//		request.appendUint16(numberOfIds);
-	//		request.appendUint16(PMONId);
+	//		request.appendUint16(ParameterId);
 	//		request.appendUint16(monitoredParameterId);
 	//		request.appendUint16(repetitionNumber);
 	//		request.appendEnum8(onBoardMonitoringService.DeltaCheck);

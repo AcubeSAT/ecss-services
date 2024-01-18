@@ -2,7 +2,7 @@
 #include "ServicePool.hpp"
 
 
-PMON::PMON(PMONId monitoredParameterId, PMONRepetitionNumber repetitionNumber)
+PMON::PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber)
     : monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId)->get()), monitoredParameterId(monitoredParameterId),
       repetitionNumber(repetitionNumber)
 {
