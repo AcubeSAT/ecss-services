@@ -65,7 +65,7 @@ public:
 	/**
 	 * Returns the current Check Type.
 	 */
-	const std::optional<CheckType> getCheckType() const {
+	std::optional<CheckType> getCheckType() const {
 		return checkType;
 	}
 
