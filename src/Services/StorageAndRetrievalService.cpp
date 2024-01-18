@@ -151,10 +151,10 @@ bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSPacketStor
 
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSPacketStoreIdSize>& packetStoreId) {
-	TimeStamps oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
+	time_t oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first;
 	report.append<TimeStamps>(oldestStoredPacketTime);
 
-	TimeStamps newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
+	time_t newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first;
 	report.append<TimeStamps>(newestStoredPacketTime);
 
 	report.append<TimeStamps>(packetStores[packetStoreId].openRetrievalStartTimeTag);
