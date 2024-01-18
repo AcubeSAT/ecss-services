@@ -307,7 +307,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		validReportTypesFC(request);
 
-		for (auto message: AllMessageTypes::MessagesOfService.at(serviceType)) {
+		for (auto message: AllReportTypes::MessagesOfService.at(serviceType)) {
 			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
 			    .push_back(message);
 		}
@@ -319,7 +319,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		      2);
 		REQUIRE(
 		    realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
-		        .size() == AllMessageTypes::MessagesOfService.at(serviceType).size());
+		        .size() == AllReportTypes::MessagesOfService.at(serviceType).size());
 
 		resetAppProcessConfigurationFC();
 		ServiceTests::reset();
@@ -345,8 +345,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		REQUIRE(applicationProcessConfig.definitions[appServicePair1].empty());
 		REQUIRE(applicationProcessConfig.definitions[appServicePair2].empty());
 
-		auto numOfMessages1 = AllMessageTypes::MessagesOfService.at(serviceType1).size();
-		auto numOfMessages2 = AllMessageTypes::MessagesOfService.at(serviceType2).size();
+		auto numOfMessages1 = AllReportTypes::MessagesOfService.at(serviceType1).size();
+		auto numOfMessages2 = AllReportTypes::MessagesOfService.at(serviceType2).size();
 		for (uint8_t i = 0; i < numOfMessages1 - 1; i++) {
 			applicationProcessConfig.definitions[appServicePair1].push_back(i);
 		}
@@ -449,7 +449,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 		for (auto serviceType: servicesFC) {
 			REQUIRE(applicationProcesses[std::make_pair(applicationID1, serviceType)].size() ==
-			        AllMessageTypes::MessagesOfService.at(serviceType).size());
+			        AllReportTypes::MessagesOfService.at(serviceType).size());
 		}
 
 		resetAppProcessConfigurationFC();
@@ -490,11 +490,11 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		for (auto& serviceType: allServicesFC) {
 			REQUIRE(definitions[std::make_pair(applicationID1, serviceType)].size() ==
-			        AllMessageTypes::MessagesOfService.at(serviceType).size());
+			        AllReportTypes::MessagesOfService.at(serviceType).size());
 		}
 		for (auto& serviceType: servicesFC) {
 			REQUIRE(definitions[std::make_pair(applicationID2, serviceType)].size() ==
-			        AllMessageTypes::MessagesOfService.at(serviceType).size());
+			        AllReportTypes::MessagesOfService.at(serviceType).size());
 		}
 
 		resetAppProcessConfigurationFC();
@@ -519,7 +519,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		for (auto serviceType: allServicesFC) {
 			REQUIRE(std::equal(definitions[std::make_pair(applicationID1, serviceType)].begin(),
 			                   definitions[std::make_pair(applicationID1, serviceType)].end(),
-			                   AllMessageTypes::MessagesOfService.at(serviceType).begin()));
+			                   AllReportTypes::MessagesOfService.at(serviceType).begin()));
 		}
 
 		resetAppProcessConfigurationFC();

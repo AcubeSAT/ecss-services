@@ -1,5 +1,6 @@
 #include "Services/PacketSelectionSubservice.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
+#include "Helpers/AllReportTypes.hpp"
 
 PacketSelectionSubservice::PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores) : packetStores(mainServicePacketStores) {}
 
@@ -14,14 +15,14 @@ bool PacketSelectionSubservice::packetStoreExists(const String<ECSSPacketStoreId
 }
 
 void PacketSelectionSubservice::addAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
-	for (auto& service: AllMessageTypes::MessagesOfService) {
+	for (auto& service: AllReportTypes::MessagesOfService) {
 		uint8_t serviceType = service.first;
 		addAllReportsOfService(packetStoreID, applicationID, serviceType);
 	}
 }
 
 void PacketSelectionSubservice::addAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
-	for (auto& messageType: AllMessageTypes::MessagesOfService.at(serviceType)) {
+	for (auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		applicationProcessConfiguration[packetStoreID].definitions[appServicePair].push_back(messageType);
 	}
@@ -85,7 +86,7 @@ bool PacketSelectionSubservice::checkService(Message& request, const String<ECSS
 
 bool PacketSelectionSubservice::maxReportTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
                                                       uint8_t serviceType) {
-	if (countReportsOfService(packetStoreID, applicationID, serviceType) >= AllMessageTypes::MessagesOfService.at(serviceType).size()) {
+	if (countReportsOfService(packetStoreID, applicationID, serviceType) >= AllReportTypes::MessagesOfService.at(serviceType).size()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
 		return true;
 	}
