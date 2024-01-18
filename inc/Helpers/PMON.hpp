@@ -33,7 +33,7 @@ public:
 
 	ParameterId monitoredParameterId;
 
-	std::reference_wrapper<ParameterBase> monitoredParameter;
+	std::optional<std::reference_wrapper<ParameterBase>> monitoredParameter;
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
@@ -45,7 +45,7 @@ public:
 	bool monitoringEnabled = false;
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
-	CheckType checkType;
+	std::optional<CheckType> checkType;
 
 	/**
 	 * Returns the number of checks that need to be conducted in order to set a new Parameter Monitoring Status.

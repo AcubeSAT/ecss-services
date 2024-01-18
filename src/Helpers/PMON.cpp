@@ -4,7 +4,7 @@
 
 PMON::PMON(PMONId monitoredParameterId, PMONRepetitionNumber repetitionNumber)
     : monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId)->get()), monitoredParameterId(monitoredParameterId),
-      repetitionNumber(repetitionNumber),checkType(CheckType::Limit)
+      repetitionNumber(repetitionNumber)
 {
 	auto paramOpt = Services.parameterManagement.getParameter(monitoredParameterId);
 	if (paramOpt.has_value()) {
