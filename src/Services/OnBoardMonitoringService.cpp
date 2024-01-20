@@ -3,7 +3,7 @@
 #include "Message.hpp"
 #include "ServicePool.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
-#include "etl/vector.h"
+
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, EnableParameterMonitoringDefinitions)) {
@@ -68,10 +68,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 
 	uint16_t numberOfIds = message.readUint16();
 
-	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
-	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
-	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
-
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		ParameterId currentPMONId = message.read<ParameterId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
@@ -106,16 +102,14 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			}
 			PMONLimitCheck limitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 			                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
-			limitChecks.push_back(limitCheck);
-			addPMONDefinition(currentPMONId, limitCheck);
+			addPMONLimitCheck(currentPMONId, limitCheck);
 		} else if (static_cast<PMON::CheckType>(currentCheckType) == PMON::CheckType::ExpectedValue) {
 			PMONBitMask mask = message.read<PMONBitMask>();
 			PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 			EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
 			PMONExpectedValueCheck expectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 			                                          expectedValue, mask, unExpectedValueEvent);
-			expectedValueChecks.push_back(expectedValueCheck);
-			addPMONDefinition(currentPMONId, expectedValueCheck);
+			addPMONExpectedValueCheck(currentPMONId, expectedValueCheck);
 		} else if (static_cast<PMON::CheckType>(currentCheckType) == PMON::CheckType::Delta) {
 			DeltaThreshold lowDeltaThreshold = message.read<DeltaThreshold>();
 			EventDefinitionId belowLowThresholdEventId = message.read<EventDefinitionId>();
@@ -129,8 +123,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			}
 			PMONDeltaCheck deltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 			                          numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
-			deltaChecks.push_back(deltaCheck);
-			addPMONDefinition(currentPMONId, deltaCheck);
+			addPMONDeltaCheck(currentPMONId, deltaCheck);
 		}
 	}
 }

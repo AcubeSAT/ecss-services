@@ -9,6 +9,7 @@
 #include "etl/array.h"
 #include "etl/list.h"
 #include "etl/map.h"
+#include "etl/vector.h"
 
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
@@ -54,6 +55,10 @@ public:
 		serviceType = ServiceType;
 	}
 
+	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
+	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
+	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
+
 	/**
 	 * The maximum time between two transition reports.
 	 * Measured in "on-board parameter minimum sampling interval" units (see 5.4.3.2c in ECSS-E-ST-70-41C).
@@ -70,6 +75,30 @@ public:
 	 */
 	void addPMONDefinition(ParameterId PMONId, std::reference_wrapper<PMON> PMONDefinition) {
 		parameterMonitoringList.insert({PMONId, PMONDefinition});
+	}
+
+	/**
+	 * Adds a new Parameter Monitoring Limit Check to the parameter monitoring list.
+	 */
+	void addPMONLimitCheck(ParameterId PMONId, PMONLimitCheck& limitCheck) {
+		limitChecks.push_back(limitCheck);
+		parameterMonitoringList.insert({PMONId, std::ref(limitChecks.back())});
+	}
+
+	/**
+	 * Adds a new Parameter Monitoring Expected Value Check to the parameter monitoring list.
+	 */
+	void addPMONExpectedValueCheck(ParameterId PMONId, PMONExpectedValueCheck& expectedValueCheck) {
+		expectedValueChecks.push_back(expectedValueCheck);
+		parameterMonitoringList.insert({PMONId, std::ref(expectedValueChecks.back())});
+	}
+
+	/**
+	 * Adds a new Parameter Monitoring Delta Check to the parameter monitoring list.
+	 */
+	void addPMONDeltaCheck(ParameterId PMONId, PMONDeltaCheck& deltaCheck) {
+		deltaChecks.push_back(deltaCheck);
+		parameterMonitoringList.insert({PMONId, std::ref(deltaChecks.back())});
 	}
 
 	/**
