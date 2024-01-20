@@ -134,11 +134,17 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 	uint16_t numberOfIds = message.readUint16();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		ParameterId currentPMONId = message.read<ParameterId>();
-		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end() ||
-		    getPMONDefinition(currentPMONId).get().monitoringEnabled) {
+
+		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition);
 			continue;
 		}
+
+		if (getPMONDefinition(currentPMONId).get().monitoringEnabled) {
+			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition);
+			continue;
+		}
+
 		parameterMonitoringList.erase(currentPMONId);
 		}
 	}
