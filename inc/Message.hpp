@@ -694,7 +694,6 @@ public:
 		return assertType(TM, expectedServiceType, expectedMessageType);
 	}
 };
-
 template <>
 inline void Message::append(const uint8_t& value) {
 	appendUint8(value);
