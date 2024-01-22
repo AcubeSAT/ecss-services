@@ -7,7 +7,6 @@ using ParameterReportStructureId = uint8_t;
  * @deprecated Ought to be changed to use our custom class.
  * Used for the various timestamps that exist in the code and previously made use of the uint32_t type.
  */
-using TimeStamps = uint32_t;
 using EventDefinitionId = uint16_t;
 using ParameterId = uint16_t;
 using ParameterSampleCount = uint16_t;
