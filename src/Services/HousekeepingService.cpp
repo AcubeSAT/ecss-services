@@ -266,7 +266,7 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 
 TimeStamps
 HousekeepingService::reportPendingStructures(TimeStamps currentTime, TimeStamps previousTime, TimeStamps expectedDelay) {
-	TimeStamps nextCollection = std::numeric_limits<uint32_t>::max(); // NOLINT(misc-const-correctness)
+	TimeStamps nextCollection = std::numeric_limits<TimeStamps>::max(); // NOLINT(misc-const-correctness)
 
 	for (const auto& housekeepingStructure: housekeepingStructures) {
 		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
@@ -274,16 +274,19 @@ HousekeepingService::reportPendingStructures(TimeStamps currentTime, TimeStamps 
 		}
 		if (housekeepingStructure.second.collectionInterval == 0) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
-			nextCollection = 0;
+			nextCollection = TimeStamps (0);
 			continue;
 		}
-		if (currentTime != 0 and (currentTime % housekeepingStructure.second.collectionInterval == 0 or
-		                          (previousTime + expectedDelay) % housekeepingStructure.second.collectionInterval ==
+		if (currentTime.asTAIseconds() != 0 and (currentTime.asTAIseconds() % housekeepingStructure.second.collectionInterval ==
+		                                             0 or
+		                          (previousTime.asTAIseconds() + expectedDelay.asTAIseconds()) % housekeepingStructure.second
+		                                                                                              .collectionInterval ==
 		                              0)) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
 		}
-		const TimeStamps structureTimeToCollection = housekeepingStructure.second.collectionInterval -
-		                                     currentTime % housekeepingStructure.second.collectionInterval;
+		const TimeStamps structureTimeToCollection = static_cast<TimeStamps >(housekeepingStructure.second
+		                                                                         .collectionInterval -
+		                                     currentTime.asTAIseconds() % housekeepingStructure.second.collectionInterval);
 		if (nextCollection > structureTimeToCollection) {
 			nextCollection = structureTimeToCollection;
 		}
