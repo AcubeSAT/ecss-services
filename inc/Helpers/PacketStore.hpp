@@ -22,15 +22,15 @@ public:
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
 	 */
-	TimeStamps openRetrievalStartTimeTag = 0;
+	TimeStamps openRetrievalStartTimeTag = TimeStamps (0);
 	/**
 	 * The start time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	TimeStamps retrievalStartTime = 0;
+	TimeStamps retrievalStartTime =TimeStamps (0);
 	/**
 	 * The end time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	TimeStamps retrievalEndTime = 0;
+	TimeStamps retrievalEndTime = TimeStamps (0);
 	/**
 	 * The maximum size of the packet store, in bytes.
 	 *
@@ -72,7 +72,7 @@ public:
 	 * 				old packets  <---------->  new packets
 	 * 				[][][][][][][][][][][][][][][][][][][]	<--- deque
 	 */
-	etl::deque<std::pair<uint32_t, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
+	etl::deque<std::pair<TimeStamps, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
 
 	/**
 	 * Returns the sum of the sizes of the packets stored in this PacketStore, in bytes.
