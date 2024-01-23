@@ -27,10 +27,17 @@ private:
 	 * Maximum number of checks for each check type.
 	 */
 	static constexpr uint8_t MaximumNumberOfChecksLimitCheck = 32;
-
 	static constexpr uint8_t MaximumNumberOfChecksExpectedValueCheck = 32;
-
 	static constexpr uint8_t MaximumNumberOfChecksDeltaCheck = 32;
+
+	/**
+	 * These vectors are used as a mean of storing the PMON Definitons
+	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
+	 * before they are added to the parameterMonitoringList.
+	 */
+	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
+	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
+	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
 public:
 	inline static constexpr ServiceTypeNum ServiceType = 12;
@@ -54,10 +61,6 @@ public:
 	OnBoardMonitoringService() {
 		serviceType = ServiceType;
 	}
-
-	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
-	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
-	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
 	/**
 	 * The maximum time between two transition reports.
