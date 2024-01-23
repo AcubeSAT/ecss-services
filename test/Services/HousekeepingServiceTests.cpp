@@ -625,13 +625,13 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 }
 
 TEST_CASE("Periodically reporting Housekeeping Structures") {
-	TimeStamps nextCollection = 0;
-	TimeStamps currentTime = 0;
-	TimeStamps previousTime = 0;
+	auto nextCollection = TimeStamps (0);
+	auto currentTime =TimeStamps (0);
+	auto previousTime = TimeStamps (0);
 	SECTION("Non existent structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
+		CHECK(nextCollection == std::numeric_limits<TimeStamps>::max());
 	}
 	SECTION("Collection Intervals set to max") {
 		initializeHousekeepingStructures();
@@ -640,7 +640,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		}
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == std::numeric_limits<uint32_t>::max());
+		CHECK(nextCollection == std::numeric_limits<TimeStamps >::max());
 	}
 	SECTION("Calculating properly defined collection intervals") {
 		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
@@ -652,36 +652,36 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(currentTime == 900);
+		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		CHECK(currentTime.asTAIseconds() == 900);
 		CHECK(ServiceTests::count() == 0);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(currentTime == 1000);
+		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		CHECK(currentTime.asTAIseconds() == 1000);
 		CHECK(ServiceTests::count() == 1);
-		currentTime += 6;
+		currentTime= TimeStamps(currentTime.asTAIseconds()+ 6);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime += nextCollection;
-		CHECK(currentTime == 1800);
+		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		CHECK(currentTime.asTAIseconds() == 1800);
 		CHECK(ServiceTests::count() == 2);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime += nextCollection;
+		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 3);
-		CHECK(currentTime == 2000);
-		currentTime += 15;
+		CHECK(currentTime.asTAIseconds() == 2000);
+		currentTime=TimeStamps(currentTime.asTAIseconds()+ 15) ;
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime += nextCollection;
+		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 4);
-		CHECK(currentTime == 2700);
+		CHECK(currentTime.asTAIseconds() == 2700);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime += nextCollection;
+		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 6);
-		CHECK(currentTime == 3000);
+		CHECK(currentTime.asTAIseconds() ==3000);
 	}
 	SECTION("Collection Intervals set to 0") {
 		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
@@ -689,7 +689,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 			housekeepingStructure.second.collectionInterval = 0;
 		}
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		CHECK(nextCollection == 0);
+		CHECK(nextCollection == TimeStamps(0));
 	}
 }
 
