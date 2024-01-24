@@ -84,10 +84,10 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	                          0x11,0x00, 0x00,0x00, 0x02,0x00, 0x00,0x00,
 	                          0x00, 0x68,0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
 	TimeStamps time = TimeGetter::getCurrentTimeDefaultCUC();
-	wantedPacket[13] = (time.asTAIseconds() >> 24) & 0xFF;
-	wantedPacket[14] = (time.asTAIseconds() >> 16) & 0xFF;
-	wantedPacket[15] = (time.asTAIseconds() >> 8) & 0xFF;
-	wantedPacket[16] = (time.asTAIseconds()) & 0xFF;
+	wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
+	wantedPacket[14] = (time.formatAsBytes() >> 16) & 0xFF;
+	wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
+	wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
 
 	Message message;
 	message.packetType = Message::TM;
