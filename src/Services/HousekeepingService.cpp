@@ -284,7 +284,7 @@ HousekeepingService::reportPendingStructures(TimeStamps currentTime, TimeStamps 
 		                              0)) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
 		}
-		const TimeStamps structureTimeToCollection = static_cast<TimeStamps >(housekeepingStructure.second
+		const TimeStamps structureTimeToCollection = TimeStamps (housekeepingStructure.second
 		                                                                         .collectionInterval -
 		                                     currentTime.asTAIseconds() % housekeepingStructure.second.collectionInterval);
 		if (nextCollection > structureTimeToCollection) {
