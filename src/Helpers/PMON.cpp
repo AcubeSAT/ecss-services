@@ -3,7 +3,7 @@
 
 
 PMON::PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber)
-    : monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId)->get()), monitoredParameterId(monitoredParameterId),
+    : monitoredParameterId(monitoredParameterId),
       repetitionNumber(repetitionNumber)
 {
 	auto paramOpt = Services.parameterManagement.getParameter(monitoredParameterId);
