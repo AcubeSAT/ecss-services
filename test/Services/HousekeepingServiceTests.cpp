@@ -652,8 +652,8 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
-		CHECK(currentTime.formatAsBytes() == 900);
+		currentTime=TimeStamps(currentTime.asTAIseconds()+ nextCollection.asTAIseconds());
+		CHECK(currentTime.asTAIseconds() == 900);
 		CHECK(ServiceTests::count() == 0);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
