@@ -183,7 +183,7 @@ TEST_CASE("Test appending a CUC timestamp") {
 		Message message(0, 0, Message::TC, 0);
 		message.appendDefaultCUCTimeStamp(timeCUC);
 
-		REQUIRE(message.read<TimeStamps>().asTAIseconds() == 86769000);
+		REQUIRE(message.read<TimeStamps>().formatAsBytes() == 86769000);
 	}
 
 	SECTION("Test 2") {
@@ -192,7 +192,7 @@ TEST_CASE("Test appending a CUC timestamp") {
 		Message message(0, 0, Message::TC, 0);
 		message.appendDefaultCUCTimeStamp(timeCUC);
 
-		REQUIRE(message.read<TimeStamps>().asTAIseconds() ==34511);
+		REQUIRE(message.read<TimeStamps>().formatAsBytes() ==34511);
 	}
 }
 
