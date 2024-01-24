@@ -55,10 +55,10 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	                    0x11,0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00,
 	                    0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
 	TimeStamps time = TimeGetter::getCurrentTimeDefaultCUC();
-	packet[13] = (time.asTAIseconds() >> 24) & 0xFF;
-	packet[14] = (time.asTAIseconds() >> 16) & 0xFF;
-	packet[15] = (time.asTAIseconds() >> 8) & 0xFF;
-	packet[16] = (time.asTAIseconds()) & 0xFF;
+	packet[13] = (time.formatAsBytes() >> 24) & 0xFF;
+	packet[14] = (time.formatAsBytes()>> 16) & 0xFF;
+	packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
+	packet[16] = (time.formatAsBytes()) & 0xFF;
 
 	Message message = MessageParser::parse(packet, 24);
 	CHECK(message.packetType == Message::TM);
@@ -75,7 +75,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	auto messageTime =TimeStamps ((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF ) << 8) | (
 	                                                                                                         (createdPacket[14]
 	                                                                                             & 0xFF) << 16) | ((createdPacket[13] & 0xFF ) << 24));
-	CHECK(messageTime.asTAIseconds() == time.asTAIseconds());
+	CHECK(messageTime.formatAsBytes() == time.formatAsBytes());
 
 }
 
