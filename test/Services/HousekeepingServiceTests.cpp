@@ -653,35 +653,35 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
-		CHECK(currentTime.asTAIseconds() == 900);
+		CHECK(currentTime.formatAsBytes() == 900);
 		CHECK(ServiceTests::count() == 0);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
-		CHECK(currentTime.asTAIseconds() == 1000);
+		CHECK(currentTime.formatAsBytes() == 1000);
 		CHECK(ServiceTests::count() == 1);
 		currentTime= TimeStamps(currentTime.asTAIseconds()+ 6);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
-		CHECK(currentTime.asTAIseconds() == 1800);
+		CHECK(currentTime.formatAsBytes() == 1800);
 		CHECK(ServiceTests::count() == 2);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 3);
-		CHECK(currentTime.asTAIseconds() == 2000);
+		CHECK(currentTime.formatAsBytes() == 2000);
 		currentTime=TimeStamps(currentTime.asTAIseconds()+ 15) ;
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 4);
-		CHECK(currentTime.asTAIseconds() == 2700);
+		CHECK(currentTime.formatAsBytes() == 2700);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
 		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 6);
-		CHECK(currentTime.asTAIseconds() ==3000);
+		CHECK(currentTime.formatAsBytes() ==3000);
 	}
 	SECTION("Collection Intervals set to 0") {
 		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
