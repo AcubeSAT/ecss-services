@@ -1728,7 +1728,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.read<TimeStamps>() == timestamps1[0]);
-		CHECK(report.read<TimeStamps>().asTAIseconds() == 5);
+		CHECK(report.read<TimeStamps>().formatAsBytes() == 5);
 		CHECK(report.readUint32() == 5);
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 40);
@@ -1854,8 +1854,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.readUint32() == timestamps1[0].asTAIseconds());
-		CHECK(report.readUint32() == timestamps1[5].asTAIseconds());
+		CHECK(report.readUint32() == timestamps1[0].formatAsBytes());
+		CHECK(report.readUint32() == timestamps1[5].formatAsBytes());
 		CHECK(report.readUint32() == 5);
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 40);
