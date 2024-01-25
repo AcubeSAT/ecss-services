@@ -266,7 +266,7 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 
 TimeStamps
 HousekeepingService::reportPendingStructures(TimeStamps currentTime, TimeStamps previousTime, TimeStamps expectedDelay) {
-	TimeStamps nextCollection = std::numeric_limits<TimeStamps>::max(); // NOLINT(misc-const-correctness)
+	auto nextCollection = TimeStamps (std::numeric_limits<uint32_t >::max()); // NOLINT(misc-const-correctness)
 
 	for (const auto& housekeepingStructure: housekeepingStructures) {
 		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
