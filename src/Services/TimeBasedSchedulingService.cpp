@@ -116,6 +116,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 		receivedRequestID.sourceID = request.read<SourceId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
+
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                       return receivedRequestID != currentElement.requestID;
@@ -146,6 +147,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 		receivedRequestID.sourceID = request.read<SourceId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
+
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                             return receivedRequestID != currentElement.requestID;

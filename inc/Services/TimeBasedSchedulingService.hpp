@@ -64,6 +64,7 @@ private:
 		ApplicationProcessId applicationID = 0; ///< Application process ID
 		SequenceCount sequenceCount = 0; ///< Packet sequence count
 		SourceId sourceID = 0;       ///< Packet source ID
+
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or
 			       (sourceID != rightSide.sourceID);

@@ -20,7 +20,7 @@ public:
         serviceType = ServiceType;
     }
 
-    virtual void executeBusSwitch(Message message);
+	void executeBusSwitch(Message& message);
 };
 
 #endif
