@@ -31,7 +31,7 @@ public:
 	/**
 	 * The type of timestamps that the subservice sets to each incoming telemetry packet.
 	 */
-	const TimeStampType timeStamping = PacketBased;
+	TimeStampType timeStamping = PacketBased;
 
 private:
 	typedef String<ECSSPacketStoreIdSize> packetStoreId;
@@ -53,7 +53,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, uint32_t timeLimit);
+	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeStamps timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -88,14 +88,14 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool checkPacketStores(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                       const String<ECSSPacketStoreIdSize>& toPacketStoreId, Message& request);
+	                       const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Message& request);
 
 	/**
 	 * Checks whether the time window makes logical sense (end time should be after the start time)
 	 *
 	 * @param request used to raise errors.
 	 */
-	static bool checkTimeWindow(uint32_t startTime, uint32_t endTime, Message& request);
+	static bool checkTimeWindow(TimeStamps startTime, TimeStamps endTime, const Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -104,7 +104,7 @@ private:
 	 * checking.
 	 * @param request used to raise errors.
 	 */
-	bool checkDestinationPacketStore(const String<ECSSPacketStoreIdSize>& toPacketStoreId, Message& request);
+	bool checkDestinationPacketStore(const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
@@ -116,8 +116,8 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, uint32_t startTime,
-	                             uint32_t endTime, Message& request);
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeStamps startTime,
+	                             TimeStamps endTime, const Message& request);
 
 	/**
 	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
@@ -127,8 +127,8 @@ private:
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, uint32_t timeTag,
-	                             Message& request, bool isAfterTimeTag);
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeStamps timeTag,
+	                             const Message& request, bool isAfterTimeTag);
 
 	/**
 	 * Performs all the necessary error checking for the case of FromTagToTag copying of packets.
@@ -139,8 +139,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
-	                        uint32_t endTime, Message& request);
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps startTime,
+	                        TimeStamps endTime, const Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
@@ -151,8 +151,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t startTime,
-	                        Message& request);
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps startTime,
+	                        const Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of BeforeTimeTag copying of packets.
@@ -163,8 +163,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, uint32_t endTime,
-	                         Message& request);
+	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps endTime,
+	                         const Message& request);
 
 	/**
 	 * Performs the necessary error checking for a request to start the by-time-range retrieval process.
@@ -180,7 +180,7 @@ private:
 	void createContentSummary(Message& report, const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 public:
-	inline static const uint8_t ServiceType = 15;
+	inline static constexpr ServiceTypeNum ServiceType = 15;
 
 	enum MessageType : uint8_t {
 		EnableStorageInPacketStores = 1,
@@ -218,7 +218,7 @@ public:
 	/**
 	 * Adds telemetry to the specified packet store and timestamps it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, uint32_t timestamp);
+	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeStamps timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.
@@ -228,7 +228,7 @@ public:
 	/**
 	 * Returns the number of existing packet stores.
 	 */
-	uint16_t currentNumberOfPacketStores();
+	NumOfPacketStores currentNumberOfPacketStores();
 
 	/**
 	 * Returns the packet store with the specified packet store ID.
@@ -299,7 +299,7 @@ public:
 	 * This function takes a TC[15,18] 'report the status of packet stores' request as argument and responds with a
 	 * TM[15,19] 'packet stores status' report message.
 	 */
-	void packetStoresStatusReport(Message& request);
+	void packetStoresStatusReport(const Message& request);
 
 	/**
 	 * TC[15,20] create packet stores
@@ -315,7 +315,7 @@ public:
 	 * This function takes a TC[15,22] 'report the packet store configuration' as argument and responds with a TM[15,
 	 * 23] 'packet store configuration report' report message.
 	 */
-	void packetStoreConfigurationReport(Message& request);
+	void packetStoreConfigurationReport(const Message& request);
 
 	/**
 	 * TC[15,24] copy the packets contained into a packet store, selected by the time window

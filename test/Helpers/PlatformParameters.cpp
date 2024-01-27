@@ -5,7 +5,7 @@
 
 TEST_CASE("Getting a reference of a parameter") {
 	SECTION("Valid parameter requested") {
-		uint16_t parameterId = 7;
+		ParameterId parameterId = 7;
 		REQUIRE(static_cast<Parameter<uint16_t>&>(Services.parameterManagement.getParameter(parameterId)->get())
 		            .getValue() == 55);
 
@@ -15,7 +15,7 @@ TEST_CASE("Getting a reference of a parameter") {
 	}
 
 	SECTION("Invalid parameter requested") {
-		uint16_t parameterId = ECSSParameterCount + 1;
+		ParameterId parameterId = ECSSParameterCount + 1;
 		REQUIRE(not Services.parameterManagement.getParameter(parameterId));
 
 		parameterId = parameterId + 24;

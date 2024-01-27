@@ -12,7 +12,7 @@
  */
 class MemoryManagementService : public Service {
 public:
-	inline static const uint8_t ServiceType = 6;
+	inline static constexpr ServiceTypeNum ServiceType = 6;
 
 	enum MessageType : uint8_t {
 		LoadRawMemoryDataAreas = 2,
@@ -44,7 +44,7 @@ public:
 	 */
 	class RawDataMemoryManagement {
 	private:
-		MemoryManagementService& mainService; // Used to access main class's members
+		MemoryManagementService& mainService; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) // Used to access main class's members
 
 	public:
 		explicit RawDataMemoryManagement(MemoryManagementService& parent);
@@ -55,9 +55,9 @@ public:
 		 * @details This function reads the raw data from the RAM memory and
 		 * 			triggers a TM[6,6] report
 		 * @param request Provide the received message as a parameter
-		 * @todo In later embedded version, implement error checking for address validity for
+		 * @todo (#221) In later embedded version, implement error checking for address validity for
 		 * 		 different memory types
-		 * @todo Only allow aligned memory address to be start addresses
+		 * @todo (#222) Only allow aligned memory address to be start addresses
 		 */
 		void dumpRawData(Message& request);
 
@@ -67,9 +67,9 @@ public:
 		 * @details This function reads the raw data from the specified memory and
 		 * 			triggers a TM[6,10] report
 		 * @param request Provide the received message as a parameter
-		 * @todo In later embedded version, implement error checking for address validity for
+		 * @todo (#221) In later embedded version, implement error checking for address validity for
 		 * 		 different memory types
-		 * @todo Only allow aligned memory address to be start addresses
+		 * @todo (#222) Only allow aligned memory address to be start addresses
 		 */
 		void checkRawData(Message& request);
 	} rawDataMemorySubservice;
@@ -80,7 +80,7 @@ public:
 	 * @details This function loads new values to memory data areas
 	 * 			specified in the request
 	 * @param request Provide the received message as a parameter
-	 * @todo Only allow aligned memory address to be start addresses
+	 * @todo (#222) Only allow aligned memory address to be start addresses
 	 */
 	static void loadRawData(Message& request);
 
@@ -100,7 +100,7 @@ private:
 	 * @param memId The ID of the memory to check is passed
 	 * @param address Takes the address to be checked for validity
 	 */
-	static bool addressValidator(MemoryManagementService::MemoryID memId, uint64_t address);
+	static bool addressValidator(MemoryManagementService::MemoryID memId, StartAddress address);
 
 	/**
 	 * Check if the provided memory ID is valid
@@ -113,7 +113,7 @@ private:
 	 * Validate the data according to checksum calculation
 	 *
 	 */
-	static bool dataValidator(const uint8_t* data, uint16_t checksum, uint16_t length);
+	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP
