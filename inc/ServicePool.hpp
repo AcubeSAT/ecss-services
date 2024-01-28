@@ -49,20 +49,20 @@ class ServicePool {
 	inline static const uint8_t MaxPacketSequenceCounterBit = 14U;
 
 public:
+#ifdef SERVICE_MEMORY
+	MemoryManagementService memoryManagement;
+#endif
+
 #ifdef SERVICE_DUMMY
 	DummyService dummyService;
 #endif
 
-#ifdef SERVICE_ENVIRONMENTALTESTINGSERVICE
-    EnvironmentalTestingService environmentalTestingService;
+#ifdef SERVICE_ONBOARDMONITORING
+	OnBoardMonitoringService onBoardMonitoringService;
 #endif
 
-#ifdef SERVICE_EVENTACTION
-	EventActionService eventAction;
-#endif
-
-#ifdef SERVICE_EVENTREPORT
-	EventReportService eventReport;
+#ifdef SERVICE_PARAMETERSTATISTICS
+	ParameterStatisticsService parameterStatistics;
 #endif
 
 #ifdef SERVICE_FUNCTION
@@ -73,48 +73,48 @@ public:
 	HousekeepingService housekeeping;
 #endif
 
-#ifdef SERVICE_LARGEPACKET
-	LargePacketTransferService largePacketTransferService;
-#endif
-
-#ifdef SERVICE_MEMORY
-	MemoryManagementService memoryManagement;
-#endif
-
-#ifdef SERVICE_ONBOARDMONITORING
-	OnBoardMonitoringService onBoardMonitoringService;
-#endif
-
-#ifdef SERVICE_PARAMETER
-	ParameterService parameterManagement;
-#endif
-
 #ifdef SERVICE_REALTIMEFORWARDINGCONTROL
 	RealTimeForwardingControlService realTimeForwarding;
-#endif
-
-#ifdef SERVICE_PARAMETERSTATISTICS
-	ParameterStatisticsService parameterStatistics;
-#endif
-
-#ifdef SERVICE_REQUESTVERIFICATION
-	RequestVerificationService requestVerification;
-#endif
-
-#ifdef SERVICE_STORAGEANDRETRIEVAL
-	StorageAndRetrievalService storageAndRetrieval;
-#endif
-
-#ifdef SERVICE_TEST
-	TestService testService;
 #endif
 
 #ifdef SERVICE_TIMESCHEDULING
 	TimeBasedSchedulingService timeBasedScheduling;
 #endif
 
+#ifdef SERVICE_EVENTACTION
+	EventActionService eventAction;
+#endif
+
+#ifdef SERVICE_PARAMETER
+	ParameterService parameterManagement;
+#endif
+
+#ifdef SERVICE_STORAGEANDRETRIEVAL
+	StorageAndRetrievalService storageAndRetrieval;
+#endif
+
+#ifdef SERVICE_ENVIRONMENTALTESTINGSERVICE
+	EnvironmentalTestingService environmentalTestingService;
+#endif
+
+#ifdef SERVICE_LARGEPACKET
+	LargePacketTransferService largePacketTransferService;
+#endif
+
+#ifdef SERVICE_REQUESTVERIFICATION
+	RequestVerificationService requestVerification;
+#endif
+
+#ifdef SERVICE_TEST
+	TestService testService;
+#endif
+
 #ifdef SERVICE_FILE_MANAGEMENT
     FileManagementService fileManagement;
+#endif
+
+#ifdef SERVICE_EVENTREPORT
+	EventReportService eventReport;
 #endif
 
 	/**
