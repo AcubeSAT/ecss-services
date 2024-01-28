@@ -57,6 +57,7 @@ IF (X86_BUILD)
     add_executable(x86_services
             ${x86_main_SRC}
             )
+    target_link_libraries(x86_services PRIVATE EnvironmentalTestingService)
     target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
 
     # Logs all levels of messages. This command can be added by other users of this
@@ -71,6 +72,8 @@ IF (X86_BUILD)
                 ${test_main_SRC}
                 ${test_SRC})
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
+        target_link_libraries(x86_services PRIVATE EnvironmentalTestingService -L
+                src/Platform/x86/EnvironmentalTestingService.cpp)
     ENDIF()
 ENDIF()
 
