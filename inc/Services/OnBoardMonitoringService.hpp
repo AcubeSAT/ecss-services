@@ -105,6 +105,13 @@ public:
 	}
 
 	/**
+	 * This function clears the Parameter Monitoring List map.
+	 */
+	void clearParameterMonitoringList() {
+		parameterMonitoringList.clear();
+	}
+
+	/**
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */

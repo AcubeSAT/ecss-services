@@ -240,14 +240,12 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		SECTION("Parameter Monitoring List is full") {
 			initialiseParameterMonitoringDefinitions();
 			uint16_t numberOfIds = 1;
-		 //   uint16_t ParameterId = 5;
 		    ParameterId monitoredParameterId = 5;
 		    PMONRepetitionNumber repetitionNumber = 5;
 			Message request =
 			    Message(OnBoardMonitoringService::ServiceType,
 			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 			request.appendUint16(numberOfIds);
-		    //request.appendUint16(ParameterId);
 		    request.append<ParameterId>(monitoredParameterId);
 		    request.append<PMONRepetitionNumber>(repetitionNumber);
 		    request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
@@ -255,15 +253,14 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 			MessageParser::execute(request);
 			CHECK(ServiceTests::count() == 1);
 			CHECK(ServiceTests::countThrownErrors(ErrorHandler::ParameterMonitoringListIsFull) == 1);
-			//clearAllMaps();
 			ServiceTests::reset();
 			Services.reset();
 		}
 
 		SECTION("Parameter Monitoring Definition already exists") {
+		    onBoardMonitoringService.clearParameterMonitoringList();
 			initialiseParameterMonitoringDefinitions();
 			uint16_t numberOfIds = 1;
-		  //  uint16_t ParameterId = 0;
 		    ParameterId monitoredParameterId = 0;
 		    PMONRepetitionNumber repetitionNumber = 0;
 
@@ -271,7 +268,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 			    Message(OnBoardMonitoringService::ServiceType,
 			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 			request.appendUint16(numberOfIds);
-		    //request.appendUint16(ParameterId);
 		    request.append<ParameterId>(monitoredParameterId);
 		    request.append<PMONRepetitionNumber>(repetitionNumber);
 		    request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
@@ -279,93 +275,92 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 			MessageParser::execute(request);
 			CHECK(ServiceTests::count() == 1);
 			CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddAlreadyExistingParameter) == 1);
-			//clearAllMaps();
 			ServiceTests::reset();
 			Services.reset();
 		}
 
-//		SECTION("Add Parameter Monitoring Definition with a non-existing parameter") {
-//			uint16_t numberOfIds = 1;
-//			uint16_t ParameterId = 4;
-//		    ParameterId monitoredParameterId = 100;
-//		    PMONRepetitionNumber repetitionNumber = 5;
-//
-//			Message request =
-//			    Message(OnBoardMonitoringService::ServiceType,
-//			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
-//			request.appendUint16(numberOfIds);
-//			request.appendUint16(ParameterId);
-//		    request.append<ParameterId>(monitoredParameterId);
-//		    request.append<PMONRepetitionNumber>(repetitionNumber);
-//		    request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));;
-//
-//			MessageParser::execute(request);
-//			CHECK(ServiceTests::count() == 1);
-//			CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
-//			clearAllMaps();
-//			ServiceTests::reset();
-//			Services.reset();
-//		}
-//
-//		SECTION("High limit is lower than low limit") {
-//			uint16_t numberOfIds = 1;
-//			uint16_t ParameterId = 0;
-//			uint16_t monitoredParameterId = 0;
-//			uint16_t repetitionNumber = 5;
-//			uint16_t lowLimit = 8;
-//			uint16_t highLimit = 2;
-//
-//			Message request =
-//			    Message(OnBoardMonitoringService::ServiceType,
-//			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
-//			request.appendUint16(numberOfIds);
-//			request.appendUint16(ParameterId);
-//			request.appendUint16(monitoredParameterId);
-//			request.appendUint16(repetitionNumber);
-//			request.appendEnum8(onBoardMonitoringService.LimitCheck);
-//			request.appendUint16(lowLimit);
-//			request.appendEnum8(onBoardMonitoringService.BelowLowLimitEvent);
-//			request.appendUint16(highLimit);
-//			request.appendEnum8(onBoardMonitoringService.AboveHighLimitEvent);
-//
-//			MessageParser::execute(request);
-//			CHECK(ServiceTests::count() == 1);
-//			CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
-//			clearAllMaps();
-//			ServiceTests::reset();
-//			Services.reset();
-//		}
-//
-//		SECTION("High threshold is lower than low threshold") {
-//			uint16_t numberOfIds = 1;
-//			uint16_t ParameterId = 0;
-//			uint16_t monitoredParameterId = 0;
-//			uint16_t repetitionNumber = 5;
-//			uint16_t lowDeltaThreshold = 8;
-//			uint16_t highDeltaThreshold = 2;
-//			uint16_t numberOfConsecutiveDeltaChecks = 5;
-//
-//			Message request =
-//			    Message(OnBoardMonitoringService::ServiceType,
-//			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
-//			request.appendUint16(numberOfIds);
-//			request.appendUint16(ParameterId);
-//			request.appendUint16(monitoredParameterId);
-//			request.appendUint16(repetitionNumber);
-//			request.appendEnum8(onBoardMonitoringService.DeltaCheck);
-//			request.appendUint16(lowDeltaThreshold);
-//			request.appendEnum8(onBoardMonitoringService.BelowLowThresholdEvent);
-//			request.appendUint16(highDeltaThreshold);
-//			request.appendEnum8(onBoardMonitoringService.AboveHighThresholdEvent);
-//			request.appendUint16(numberOfConsecutiveDeltaChecks);
-//
-//			MessageParser::execute(request);
-//			CHECK(ServiceTests::count() == 1);
-//			CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
-//			clearAllMaps();
-//			ServiceTests::reset();
-//			Services.reset();
-//		}
+		SECTION("Add Parameter Monitoring Definition with a non-existing parameter") {
+		    onBoardMonitoringService.clearParameterMonitoringList();
+		    initialiseParameterMonitoringDefinitions();
+			uint16_t numberOfIds = 1;
+		    PMONRepetitionNumber repetitionNumber = 5;
+
+			Message request =
+			    Message(OnBoardMonitoringService::ServiceType,
+			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+			request.appendUint16(numberOfIds);
+		    request.append<PMONRepetitionNumber>(repetitionNumber);
+		    request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));;
+
+			MessageParser::execute(request);
+			CHECK(ServiceTests::count() == 1);
+			CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameter) == 1);
+			ServiceTests::reset();
+			Services.reset();
+		}
+
+		SECTION("High limit is lower than low limit") {
+
+		    initialiseParameterMonitoringDefinitions();
+			uint16_t numberOfIds = 1;
+		    ParameterId monitoredParameterId = 8;
+		    PMONRepetitionNumber repetitionNumber = 5;
+		    PMONLimit lowLimit = 6;
+		    PMONLimit highLimit = 2;
+		    EventDefinitionId belowLowLimitEventId = 1;
+		    EventDefinitionId aboveHighLimitEventId = 2;
+
+			Message request =
+			    Message(OnBoardMonitoringService::ServiceType,
+			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+			request.appendUint16(numberOfIds);
+			request.append<ParameterId>(monitoredParameterId);
+			request.append<PMONRepetitionNumber>(repetitionNumber);
+		    request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+			request.append<PMONLimit>(lowLimit);
+			request.append<EventDefinitionId>(belowLowLimitEventId);
+			request.append<PMONLimit>(highLimit);
+			request.append<EventDefinitionId>(aboveHighLimitEventId);
+
+			MessageParser::execute(request);
+			CHECK(ServiceTests::count() == 1);
+			CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
+			ServiceTests::reset();
+			Services.reset();
+		}
+
+		SECTION("High threshold is lower than low threshold") {
+		    onBoardMonitoringService.clearParameterMonitoringList();
+		    initialiseParameterMonitoringDefinitions();
+			uint16_t numberOfIds = 1;
+		    ParameterId monitoredParameterId = 0;
+		    PMONRepetitionNumber repetitionNumber = 5;
+		    DeltaThreshold lowDeltaThreshold = 8;
+		    DeltaThreshold highDeltaThreshold = 2;
+		    EventDefinitionId belowLowThresholdEventId = 1;
+		    EventDefinitionId aboveHighThresholdEventId = 2;
+		    NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks = 5;
+
+			Message request =
+			    Message(OnBoardMonitoringService::ServiceType,
+			            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+			request.appendUint16(numberOfIds);
+			request.appendUint16(monitoredParameterId);
+			request.appendUint16(repetitionNumber);
+		    request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Delta));
+			request.append<DeltaThreshold>(lowDeltaThreshold);
+			request.append<EventDefinitionId>(belowLowThresholdEventId);
+			request.append<DeltaThreshold>(highDeltaThreshold);
+			request.append<EventDefinitionId>(aboveHighThresholdEventId);
+			request.append<NumberOfConsecutiveDeltaChecks>(numberOfConsecutiveDeltaChecks);
+
+			MessageParser::execute(request);
+			CHECK(ServiceTests::count() == 1);
+			CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
+
+			ServiceTests::reset();
+			Services.reset();
+		}
 }
 
 TEST_CASE("Delete Parameter Monitoring Definitions") {
