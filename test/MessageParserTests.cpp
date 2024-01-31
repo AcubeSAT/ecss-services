@@ -75,7 +75,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	auto messageTime =TimeStamps ((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF ) << 8) | (
 	                                                                                                         (createdPacket[14]
 	                                                                                             & 0xFF) << 16) | ((createdPacket[13] & 0xFF ) << 24));
-	CHECK(messageTime.formatAsBytes() == time.formatAsBytes());
+	CHECK(messageTime.asTAIseconds() == time.formatAsBytes());
 
 }
 
