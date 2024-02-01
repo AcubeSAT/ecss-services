@@ -1,4 +1,5 @@
 #include "Services/HousekeepingService.hpp"
+#include <iostream>
 #include "ServicePool.hpp"
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
@@ -266,7 +267,7 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 
 TimeStamps
 HousekeepingService::reportPendingStructures(TimeStamps currentTime, TimeStamps previousTime, TimeStamps expectedDelay) {
-	auto nextCollection = TimeStamps (std::numeric_limits<uint32_t >::max()); // NOLINT(misc-const-correctness)
+	auto nextCollection = TimeStamps ((std::numeric_limits<uint32_t >::max())*TimeStamps::Ratio::num/TimeStamps::Ratio ::den );// NOLINT(misc-const-correctness)
 
 	for (const auto& housekeepingStructure: housekeepingStructures) {
 		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
