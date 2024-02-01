@@ -114,7 +114,7 @@ private:
 	/**
 	 * The maximum number of seconds since epoch that can be represented in this class
 	 */
-	static constexpr uint64_t MaxSeconds = MaxBase;
+	static constexpr uint64_t MaxSeconds = std::chrono::duration_cast<std::chrono::duration<uint64_t>>(BaseDuration(MaxBase)).count();
 
 	/**
 	 * Returns whether the amount of `seconds` can be represented by this TimeStamp.
