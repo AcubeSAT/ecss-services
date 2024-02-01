@@ -631,7 +631,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 	SECTION("Non existent structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == TimeStamps (429496728));//429496728 is the biggest value of a variable  that has type TimeStamps
+		CHECK(nextCollection == TimeStamps (std::numeric_limits<uint32_t >::max()));//429496729 is the biggest value of a variable  that has type TimeStamps
 	}
 	SECTION("Collection Intervals set to max") {
 		initializeHousekeepingStructures();
@@ -640,7 +640,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		}
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == TimeStamps (429496728));//429496728 is the biggest value of a variable  that has type TimeStamps
+		CHECK(nextCollection == TimeStamps (std::numeric_limits<uint32_t >::max()));//429496729 is the biggest value of a variable  that has type TimeStamps
 	}
 	SECTION("Calculating properly defined collection intervals") {
 		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
