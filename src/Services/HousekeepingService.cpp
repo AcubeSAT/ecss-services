@@ -266,7 +266,7 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 
 TimeStamps
 HousekeepingService::reportPendingStructures(TimeStamps currentTime, TimeStamps previousTime, TimeStamps expectedDelay) {
-	auto nextCollection = TimeStamps (429496728); //429496728 is the biggest value of a variable  that has type TimeStamps
+	auto nextCollection = TimeStamps (std::numeric_limits<uint32_t >::max()); // NOLINT(misc-const-correctness)
 
 	for (const auto& housekeepingStructure: housekeepingStructures) {
 		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
