@@ -29,7 +29,7 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		tm3.appendUint8(3);
 		tm3.appendUint32(55);
 
-		packetStore.storedTelemetryPackets.push_back({TimeStamps (3), tm3});
+		packetStore.storedTelemetryPackets.push_back({TimeStamps(3), tm3});
 
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 3);
 		REQUIRE(packetStore.calculateSizeInBytes() == 26);
