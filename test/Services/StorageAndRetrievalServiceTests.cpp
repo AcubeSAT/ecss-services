@@ -6,11 +6,11 @@
 
 StorageAndRetrievalService& storageAndRetrieval = Services.storageAndRetrieval;
 
-TimeStamps timestamps1[6] = {TimeStamps(2),TimeStamps(4) , TimeStamps(5), TimeStamps(7), TimeStamps(9) ,
+TimeStamps timestamps1[6] = {TimeStamps(2), TimeStamps(4), TimeStamps(5), TimeStamps(7), TimeStamps(9),
                              TimeStamps(11)};
-TimeStamps timestamps2[5] = {TimeStamps(0), TimeStamps(1), TimeStamps(4), TimeStamps(15),TimeStamps(22) };
-TimeStamps timestamps3[4] = {TimeStamps(4),TimeStamps(7) ,TimeStamps(9) , TimeStamps(14)};
-TimeStamps timestamps4[8] = {TimeStamps(4),TimeStamps(6) ,TimeStamps(34) , TimeStamps(40),TimeStamps(44) ,
+TimeStamps timestamps2[5] = {TimeStamps(0), TimeStamps(1), TimeStamps(4), TimeStamps(15), TimeStamps(22)};
+TimeStamps timestamps3[4] = {TimeStamps(4), TimeStamps(7), TimeStamps(9), TimeStamps(14)};
+TimeStamps timestamps4[8] = {TimeStamps(4), TimeStamps(6), TimeStamps(34), TimeStamps(40), TimeStamps(44),
                              TimeStamps(51), TimeStamps(52), TimeStamps(58)};
 
 void initializePacketStores() {
@@ -632,7 +632,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag = TimeStamps (200);
+		TimeStamps startTimeTag = TimeStamps(200);
 		NumOfPacketStores numOfPacketStores = 6;
 		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
@@ -674,7 +674,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag = TimeStamps (200);
+		TimeStamps startTimeTag = TimeStamps(200);
 		NumOfPacketStores numOfPacketStores = 0;
 		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
@@ -928,8 +928,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		TimeStamps timeTags1[4] = {TimeStamps (20), TimeStamps (30), TimeStamps (40), TimeStamps (50)};
-		TimeStamps timeTags2[4] = {TimeStamps (60), TimeStamps (70), TimeStamps (80), TimeStamps (90)};
+		TimeStamps timeTags1[4] = {TimeStamps(20), TimeStamps(30), TimeStamps(40), TimeStamps(50)};
+		TimeStamps timeTags2[4] = {TimeStamps(60), TimeStamps(70), TimeStamps(80), TimeStamps(90)};
 
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
@@ -980,8 +980,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
 
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1 = TimeStamps (20);
-			TimeStamps timeTag2 = TimeStamps (40);
+			TimeStamps timeTag1 = TimeStamps(20);
+			TimeStamps timeTag2 = TimeStamps(40);
 			request.append<TimeStamps>(timeTag1);
 			request.append<TimeStamps>(timeTag2);
 		}
@@ -1728,8 +1728,8 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.read<TimeStamps>() == timestamps1[0]);
-		CHECK(report.read<TimeStamps>()== timestamps1[5]);
-		CHECK(report.readUint32() == TimeStamps (5).formatAsBytes());
+		CHECK(report.read<TimeStamps>() == timestamps1[5]);
+		CHECK(report.readUint32() == TimeStamps(5).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 40);
 		// Packet store 2
@@ -1737,7 +1737,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.read<TimeStamps>() == timestamps2[0]);
 		CHECK(report.read<TimeStamps>() == timestamps2[4]);
-		CHECK(report.readUint32() ==  TimeStamps (5).formatAsBytes());
+		CHECK(report.readUint32() == TimeStamps(5).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 50);
 		CHECK(report.read<PercentageFilled>() == 20);
 
@@ -1755,8 +1755,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 
 		int count = 0;
 		for (auto& packetStoreId: packetStoreIds) {
-			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag = TimeStamps((count == 3) ?
-			                                                                                                      20 : 15);
+			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag = TimeStamps((count == 3) ? 20 : 15);
 			count++;
 		}
 
@@ -1784,7 +1783,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.read<TimeStamps>() == timestamps1[0]);
 		CHECK(report.read<TimeStamps>() == timestamps1[5]);
-		CHECK(report.readUint32() ==  TimeStamps (15).formatAsBytes());
+		CHECK(report.readUint32() == TimeStamps(15).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 0);
 		// Packet store 2
@@ -1792,7 +1791,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
 		CHECK(report.read<TimeStamps>() == timestamps2[0]);
 		CHECK(report.read<TimeStamps>() == timestamps2[4]);
-		CHECK(report.readUint32() ==  TimeStamps (15).formatAsBytes());
+		CHECK(report.readUint32() == TimeStamps(15).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 50);
 		CHECK(report.read<PercentageFilled>() == 20);
 		// Packet store 3
@@ -1800,7 +1799,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
 		CHECK(report.read<TimeStamps>() == timestamps4[0]);
 		CHECK(report.read<TimeStamps>() == timestamps4[7]);
-		CHECK(report.readUint32() ==  TimeStamps (20).formatAsBytes());
+		CHECK(report.readUint32() == TimeStamps(20).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 80);
 		CHECK(report.read<PercentageFilled>() == 60);
 		// Packet store 4
@@ -1808,7 +1807,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
 		CHECK(report.read<TimeStamps>() == timestamps3[0]);
 		CHECK(report.read<TimeStamps>() == timestamps3[3]);
-		CHECK(report.readUint32() ==  TimeStamps (15).formatAsBytes());
+		CHECK(report.readUint32() == TimeStamps(15).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 40);
 		CHECK(report.read<PercentageFilled>() == 0);
 
@@ -1856,7 +1855,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0].formatAsBytes());
 		CHECK(report.readUint32() == timestamps1[5].formatAsBytes());
-		CHECK(report.readUint32() ==  TimeStamps (5).formatAsBytes());
+		CHECK(report.readUint32() == TimeStamps(5).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 40);
 
@@ -2046,10 +2045,8 @@ TEST_CASE("Deleting packet store content") {
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets.empty());
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets.size() == 6);
 
-		TimeStamps expectedTimeStamps1[6] = {TimeStamps(2), TimeStamps(4), TimeStamps(5), TimeStamps(7), TimeStamps
-		                                     (9), TimeStamps(11)};
-		TimeStamps expectedTimeStamps2[5] = {TimeStamps(0), TimeStamps(1), TimeStamps(4), TimeStamps(15), TimeStamps
-		                                     (22)};
+		TimeStamps expectedTimeStamps1[6] = {TimeStamps(2), TimeStamps(4), TimeStamps(5), TimeStamps(7), TimeStamps(9), TimeStamps(11)};
+		TimeStamps expectedTimeStamps2[5] = {TimeStamps(0), TimeStamps(1), TimeStamps(4), TimeStamps(15), TimeStamps(22)};
 		TimeStamps expectedTimeStamps4[6] = {TimeStamps(34), TimeStamps(40), TimeStamps(44), TimeStamps(51),
 		                                     TimeStamps(52), TimeStamps(58)};
 
