@@ -407,6 +407,11 @@ public:
 		 * A file type that was expected to be a directory is a file instead
 		 */
 		RepositoryPathLeadsToFile = 62,
+		/**
+		 * PMON Check Type is requested, but it is missing (ST[12])
+		 */
+		 PMONCheckTypeMissing = 63,
+
 	};
 
 	/**

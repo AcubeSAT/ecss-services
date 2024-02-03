@@ -266,7 +266,7 @@ void OnBoardMonitoringService::parameterMonitoringDefinitionReport(Message& mess
 			uint8_t checkTypeValue = static_cast<uint8_t>(getPMONDefinition(currentPMONId).get().checkType.value());
 			parameterMonitoringDefinitionReport.appendEnum8(checkTypeValue);
 		} else {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::PMONCheckTypeMissing);
 			continue;
 		}
 		if (getPMONDefinition(currentPMONId).get().checkType == PMON::CheckType::Limit) {
