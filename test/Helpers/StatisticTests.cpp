@@ -52,7 +52,7 @@ TEST_CASE("Appending of statistics to message") {
 		stat.appendStatisticsToMessage(report);
 
 		REQUIRE(report.readFloat() == 8.35f);
-		REQUIRE(report.read<TimeStamps>().formatAsBytes() == 86769000);   // dummy time value
+		REQUIRE(report.read<TimeStamps>().formatAsBytes() == 86769000); // dummy time value
 		REQUIRE(report.readFloat() == 1.09f);
 		REQUIRE(report.read<TimeStamps>().formatAsBytes() == 86769000);
 		REQUIRE(report.readFloat() == Catch::Approx(4.99501).epsilon(0.00001));
