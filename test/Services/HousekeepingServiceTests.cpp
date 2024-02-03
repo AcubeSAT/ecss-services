@@ -2,9 +2,9 @@
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/HousekeepingService.hpp"
+#include "Time/TimeStamp.hpp"
 #include "catch2/catch_all.hpp"
 #include "etl/algorithm.h"
-#include "Time/TimeStamp.hpp"
 
 HousekeepingService& housekeepingService = Services.housekeeping;
 
@@ -19,7 +19,7 @@ void buildRequest(Message& request, ParameterReportStructureId idToCreate) {
 	request.append<ParameterReportStructureId>(idToCreate);
 	request.append<CollectionInterval>(interval);
 	request.appendUint16(numOfSimplyCommutatedParams);
-	for (auto& id : simplyCommutatedIds) {
+	for (auto& id: simplyCommutatedIds) {
 		request.append<ParameterId>(id);
 	}
 }
@@ -40,7 +40,7 @@ void initializeHousekeepingStructures() {
 
 	HousekeepingStructure structures[3];
 	int i = 0;
-	for (auto& newStructure : structures) {
+	for (auto& newStructure: structures) {
 		newStructure.structureId = ids[i];
 		newStructure.collectionInterval = interval;
 		newStructure.periodicGenerationActionStatus = false;
@@ -75,7 +75,7 @@ void appendNewParameters(Message& request, ParameterReportStructureId idToAppend
 
 	request.append<ParameterReportStructureId>(idToAppend);
 	request.appendUint16(numOfSimplyCommutatedParams);
-	for (auto& id : simplyCommutatedIds) {
+	for (auto& id: simplyCommutatedIds) {
 		request.append<ParameterId>(id);
 	}
 }
@@ -92,7 +92,7 @@ TEST_CASE("Create housekeeping structure") {
 		request.append<ParameterReportStructureId>(idToCreate);
 		request.append<CollectionInterval>(interval);
 		request.appendUint16(numOfSimplyCommutatedParams);
-		for (auto& id : simplyCommutatedIds) {
+		for (auto& id: simplyCommutatedIds) {
 			request.append<ParameterId>(id);
 		}
 
@@ -143,11 +143,11 @@ TEST_CASE("Create housekeeping structure") {
 		CollectionInterval interval = 12;
 		REQUIRE(housekeepingService.housekeepingStructures.size() == 0);
 
-		for (auto& structId : idsToCreate) {
+		for (auto& structId: idsToCreate) {
 			request.append<ParameterReportStructureId>(structId);
 			request.append<CollectionInterval>(interval);
 			request.appendUint16(numOfSimplyCommutatedParams);
-			for (auto& parameterId : simplyCommutatedIds) {
+			for (auto& parameterId: simplyCommutatedIds) {
 				request.append<ParameterId>(parameterId);
 			}
 			MessageParser::execute(request);
@@ -173,7 +173,7 @@ TEST_CASE("Create housekeeping structure") {
 		request.append<ParameterReportStructureId>(idToCreate);
 		request.append<CollectionInterval>(interval);
 		request.appendUint16(numOfSimplyCommutatedParams);
-		for (auto& id : simplyCommutatedIds) {
+		for (auto& id: simplyCommutatedIds) {
 			request.append<ParameterId>(id);
 		}
 
@@ -185,7 +185,7 @@ TEST_CASE("Create housekeeping structure") {
 
 		REQUIRE(newStruct.simplyCommutatedParameterIds.size() == 4);
 		ParameterId existingParameterIds[4] = {8, 4, 5, 11};
-		for (auto parameterId : newStruct.simplyCommutatedParameterIds) {
+		for (auto parameterId: newStruct.simplyCommutatedParameterIds) {
 			CHECK(std::find(std::begin(existingParameterIds), std::end(existingParameterIds), parameterId) !=
 			      std::end(existingParameterIds));
 		}
@@ -211,7 +211,7 @@ TEST_CASE("Delete housekeeping structure") {
 		ParameterReportStructureId numOfStructs = 5;
 		ParameterReportStructureId ids[5] = {2, 3, 4, 7, 8};
 		request.appendUint8(numOfStructs);
-		for (auto& id : ids) {
+		for (auto& id: ids) {
 			request.append<ParameterReportStructureId>(id);
 		}
 
@@ -256,7 +256,7 @@ TEST_CASE("Enable the periodic generation of housekeeping structures") {
 		uint8_t numOfStructs = 5;
 		ParameterReportStructureId idsToEnable[5] = {1, 3, 4, 6, 7};
 		request2.appendUint8(numOfStructs);
-		for (auto& id : idsToEnable) {
+		for (auto& id: idsToEnable) {
 			request2.append<ParameterReportStructureId>(id);
 		}
 		REQUIRE(not housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus);
@@ -284,7 +284,7 @@ TEST_CASE("Disable the periodic generation of housekeeping structures") {
 		uint8_t numOfStructs = 4;
 		ParameterReportStructureId idsToDisable[4] = {0, 1, 4, 6};
 		request2.appendUint8(numOfStructs);
-		for (auto& id : idsToDisable) {
+		for (auto& id: idsToDisable) {
 			request2.append<ParameterReportStructureId>(id);
 		}
 		housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus = true;
@@ -313,7 +313,7 @@ TEST_CASE("Reporting of housekeeping structures") {
 		uint8_t numOfStructs = 3;
 		ParameterReportStructureId idsToReport[3] = {9, 4, 2};
 		request2.appendUint8(numOfStructs);
-		for (auto& id : idsToReport) {
+		for (auto& id: idsToReport) {
 			request2.append<ParameterReportStructureId>(id);
 		}
 		MessageParser::execute(request2);
@@ -326,9 +326,9 @@ TEST_CASE("Reporting of housekeeping structures") {
 
 		ParameterReportStructureId validId = 4;
 		CHECK(report.read<ParameterReportStructureId>() == validId);
-		CHECK(not report.readBoolean()); // periodic status
+		CHECK(not report.readBoolean());               // periodic status
 		CHECK(report.read<CollectionInterval>() == 7); // interval
-		CHECK(report.readUint16() == 3); // number of simply commutated ids
+		CHECK(report.readUint16() == 3);               // number of simply commutated ids
 		CHECK(report.read<ParameterId>() == 8);
 		CHECK(report.read<ParameterId>() == 4); // ids
 		CHECK(report.read<ParameterId>() == 5);
@@ -427,7 +427,7 @@ TEST_CASE("One-shot housekeeping parameter report generation") {
 		uint8_t numOfStructs = 5;
 		ParameterReportStructureId structIds[5] = {0, 4, 7, 8, 11};
 		request2.appendUint8(numOfStructs);
-		for (auto& id : structIds) {
+		for (auto& id: structIds) {
 			request2.append<ParameterReportStructureId>(id);
 		}
 		MessageParser::execute(request2);
@@ -516,7 +516,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 		uint16_t currentlyExistingParameters[] = {8, 4, 5, 9, 10, 11};
 		HousekeepingStructure structToCheck = housekeepingService.housekeepingStructures[structId];
 		REQUIRE(structToCheck.simplyCommutatedParameterIds.size() == 6);
-		for (auto& existingParameter : currentlyExistingParameters) {
+		for (auto& existingParameter: currentlyExistingParameters) {
 			CHECK(std::find(std::begin(structToCheck.simplyCommutatedParameterIds),
 			                std::end(structToCheck.simplyCommutatedParameterIds),
 			                existingParameter) != std::end(structToCheck.simplyCommutatedParameterIds));
@@ -540,7 +540,7 @@ TEST_CASE("Append parameters in housekeeping report structure") {
 
 		request.append<ParameterReportStructureId>(structId);
 		request.appendUint16(numOfSimplyCommutatedParams);
-		for (auto& id : simplyCommutatedIds) {
+		for (auto& id: simplyCommutatedIds) {
 			request.append<ParameterId>(id);
 		}
 		REQUIRE(housekeepingService.housekeepingStructures.find(structId) !=
@@ -570,7 +570,7 @@ TEST_CASE("Modification of housekeeping structures' interval") {
 		CollectionInterval intervals[4] = {12, 21, 32, 17};
 		request.appendUint8(numOfStructs);
 		int i = 0;
-		for (auto& id : structIds) {
+		for (auto& id: structIds) {
 			request.append<ParameterReportStructureId>(id);
 			request.append<CollectionInterval>(intervals[i++]);
 		}
@@ -595,7 +595,7 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 		uint8_t numOfStructs = 6;
 		ParameterReportStructureId structIds[6] = {0, 4, 1, 6, 9, 10};
 		request.appendUint8(numOfStructs);
-		for (auto& id : structIds) {
+		for (auto& id: structIds) {
 			request.append<ParameterReportStructureId>(id);
 		}
 		housekeepingService.housekeepingStructures[0].periodicGenerationActionStatus = true;
@@ -626,13 +626,13 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 }
 
 TEST_CASE("Periodically reporting Housekeeping Structures") {
-	auto nextCollection = TimeStamps (0);
-	auto currentTime =TimeStamps (0);
-	auto previousTime = TimeStamps (0);
+	auto nextCollection = TimeStamps(0);
+	auto currentTime = TimeStamps(0);
+	auto previousTime = TimeStamps(0);
 	SECTION("Non existent structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == TimeStamps ((std::numeric_limits<uint32_t >::max())*TimeStamps::Ratio::num/TimeStamps::Ratio ::den));// NOLINT(misc-const-correctness)
+		CHECK(nextCollection == TimeStamps((std::numeric_limits<uint32_t>::max()) * TimeStamps::Ratio::num / TimeStamps::Ratio ::den)); // NOLINT(misc-const-correctness)
 	}
 	SECTION("Collection Intervals set to max") {
 		initializeHousekeepingStructures();
@@ -641,7 +641,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		}
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == TimeStamps ((std::numeric_limits<uint32_t >::max())*TimeStamps::Ratio::num/TimeStamps::Ratio ::den));// NOLINT(misc-const-correctness)
+		CHECK(nextCollection == TimeStamps((std::numeric_limits<uint32_t>::max()) * TimeStamps::Ratio::num / TimeStamps::Ratio ::den)); // NOLINT(misc-const-correctness)
 	}
 	SECTION("Calculating properly defined collection intervals") {
 		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
@@ -653,36 +653,36 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime=TimeStamps(currentTime.asTAIseconds()+ nextCollection.asTAIseconds());
+		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(currentTime.asTAIseconds() == 900);
 		CHECK(ServiceTests::count() == 0);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(currentTime.asTAIseconds() == 1000);
 		CHECK(ServiceTests::count() == 1);
-		currentTime= TimeStamps(currentTime.asTAIseconds()+ 6);
+		currentTime = TimeStamps(currentTime.asTAIseconds() + 6);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(currentTime.asTAIseconds() == 1800);
 		CHECK(ServiceTests::count() == 2);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 3);
 		CHECK(currentTime.asTAIseconds() == 2000);
-		currentTime=TimeStamps(currentTime.asTAIseconds()+ 15) ;
+		currentTime = TimeStamps(currentTime.asTAIseconds() + 15);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 4);
 		CHECK(currentTime.asTAIseconds() == 2700);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime=TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 6);
-		CHECK(currentTime.asTAIseconds() ==3000);
+		CHECK(currentTime.asTAIseconds() == 3000);
 	}
 	SECTION("Collection Intervals set to 0") {
 		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
