@@ -76,7 +76,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 
 		auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId);
 		if (!parameterToBeAdded) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			continue;
 		}
 
