@@ -2,8 +2,8 @@
 #define ECSS_SERVICES_PACKETSTORE_HPP
 
 #include "ECSS_Definitions.hpp"
-#include "ErrorHandler.hpp"
 #include "Message.hpp"
+#include "TypeDefinitions.hpp"
 #include "etl/deque.h"
 #include "numeric"
 
