@@ -1,9 +1,10 @@
 #pragma once
 #include <cstdint>
+#include "Time/TimeStamp.hpp"
 
 using StepId = uint8_t;
 using ParameterReportStructureId = uint8_t;
-
+using TimeStamps = Time::DefaultCUC;
 using EventDefinitionId = uint16_t;
 using ParameterId = uint16_t;
 using ParameterSampleCount = uint16_t;
