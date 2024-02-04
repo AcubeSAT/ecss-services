@@ -318,9 +318,9 @@ int main() {
 
 	// ST[11] test
 	TimeBasedSchedulingService timeBasedSchedulingService;
-	auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
+	TimeStamps currentTime(time(nullptr)); // Get the current system time
 	std::cout << "\n\nST[11] service is running";
-	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
+	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime.asTAIseconds() << std::endl;
 
 	Message receivedMsg =
 	    Message(TimeBasedSchedulingService::ServiceType,
@@ -337,10 +337,10 @@ int main() {
 	                      TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
-	receivedMsg.append<TimeStamps>(TimeStamps(currentTime + 1556435U));
+	receivedMsg.append<TimeStamps>(TimeStamps(currentTime.asTAIseconds() + 1556435U));
 	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
 
-	receivedMsg.append<TimeStamps>(TimeStamps(currentTime + 1957232U));
+	receivedMsg.append<TimeStamps>(TimeStamps(currentTime.asTAIseconds() + 1957232U));
 	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
