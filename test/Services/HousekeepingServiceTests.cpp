@@ -626,9 +626,9 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 }
 
 TEST_CASE("Periodically reporting Housekeeping Structures") {
-	auto nextCollection = TimeStamps(0);
-	auto currentTime = TimeStamps(0);
-	auto previousTime = TimeStamps(0);
+	TimeStamps nextCollection(0);
+	TimeStamps currentTime(0);
+	TimeStamps previousTime(0);
 	SECTION("Non existent structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
