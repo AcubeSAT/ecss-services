@@ -351,5 +351,4 @@ namespace Time {
 		return std::chrono::duration<uint32_t, DefaultCUC::Ratio>(s);
 	}
 } // namespace Time
-using TimeStamps = Time::DefaultCUC;
 #include "TimeStamp.tpp"
