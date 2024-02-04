@@ -599,7 +599,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag = TimeStamps(200);
+		TimeStamps startTimeTag(200);
 		NumOfPacketStores numOfPacketStores = 2;
 		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
@@ -632,7 +632,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag = TimeStamps(200);
+		TimeStamps startTimeTag(200);
 		NumOfPacketStores numOfPacketStores = 6;
 		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
@@ -674,7 +674,7 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag = TimeStamps(200);
+		TimeStamps startTimeTag(200);
 		NumOfPacketStores numOfPacketStores = 0;
 		request.append<TimeStamps>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
@@ -980,8 +980,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
 
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1 = TimeStamps(20);
-			TimeStamps timeTag2 = TimeStamps(40);
+			TimeStamps timeTag1(20);
+			TimeStamps timeTag2(40);
 			request.append<TimeStamps>(timeTag1);
 			request.append<TimeStamps>(timeTag2);
 		}
@@ -991,8 +991,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1 = TimeStamps(20);
-			TimeStamps timeTag2 = TimeStamps(40);
+			TimeStamps timeTag1(20);
+			TimeStamps timeTag2(40);
 			request.append<TimeStamps>(timeTag1);
 			request.append<TimeStamps>(timeTag2);
 		}
@@ -1033,8 +1033,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1 = TimeStamps(90);
-			TimeStamps timeTag2 = TimeStamps(20);
+			TimeStamps timeTag1(90);
+			TimeStamps timeTag2(20);
 			request.append<TimeStamps>(timeTag1);
 			request.append<TimeStamps>(timeTag2);
 		}
@@ -1876,7 +1876,7 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime = TimeStamps(5);
+		TimeStamps storageTime(5);
 		NumOfPacketStores numOfPacketStores = 2;
 		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
@@ -1928,7 +1928,7 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime = TimeStamps(3);
+		TimeStamps storageTime(3);
 		NumOfPacketStores numOfPacketStores = 2;
 		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
@@ -1982,7 +1982,7 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime = TimeStamps(59);
+		TimeStamps storageTime(59);
 		NumOfPacketStores numOfPacketStores = 2;
 		request.append<TimeStamps>(storageTime);
 		request.appendUint16(numOfPacketStores);
