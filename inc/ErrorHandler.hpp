@@ -2,10 +2,7 @@
 #define PROJECT_ERRORHANDLER_HPP
 
 #include <type_traits>
-#ifndef HELPERS_TYPEDEFINITIONS_HPP
-#include <cstdint>
-using StepId = uint8_t;
-#endif
+#include "Helpers/TypeDefinitions.hpp"
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
 class Message;
