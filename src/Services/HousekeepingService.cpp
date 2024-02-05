@@ -1,5 +1,4 @@
 #include "Services/HousekeepingService.hpp"
-#include <iostream>
 #include "ServicePool.hpp"
 
 void HousekeepingService::createHousekeepingReportStructure(Message& request) {
