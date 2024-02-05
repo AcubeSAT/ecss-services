@@ -52,7 +52,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x12, 0x20, 0x16,
 	                    0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	                    0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	TimeStamps time = TimeGetter::getCurrentTimeDefaultCUC();
+	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
 	packet[13] = (time.formatAsBytes() >> 24) & 0xFF;
 	packet[14] = (time.formatAsBytes() >> 16) & 0xFF;
 	packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
@@ -70,7 +70,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 
 	// Add ECSS and CCSDS header
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-	TimeStamps messageTime((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF) << 24));
+	Time::DefaultCUC messageTime((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF) << 24));
 	CHECK(messageTime.asTAIseconds() == time.formatAsBytes());
 }
 
@@ -78,7 +78,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
 	                          0x11, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
 	                          0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	TimeStamps time = TimeGetter::getCurrentTimeDefaultCUC();
+	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
 	wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
 	wantedPacket[14] = (time.formatAsBytes() >> 16) & 0xFF;
 	wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
