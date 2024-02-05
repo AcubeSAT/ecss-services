@@ -626,13 +626,13 @@ TEST_CASE("Reporting of housekeeping structure periodic properties") {
 }
 
 TEST_CASE("Periodically reporting Housekeeping Structures") {
-	TimeStamps nextCollection(0);
-	TimeStamps currentTime(0);
-	TimeStamps previousTime(0);
+	Time::DefaultCUC nextCollection(0);
+	Time::DefaultCUC currentTime(0);
+	Time::DefaultCUC previousTime(0);
 	SECTION("Non existent structures") {
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == TimeStamps((std::numeric_limits<uint32_t>::max()) * TimeStamps::Ratio::num / TimeStamps::Ratio ::den)); // NOLINT(misc-const-correctness)
+		CHECK(nextCollection == Time::DefaultCUC((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den)); // NOLINT(misc-const-correctness)
 	}
 	SECTION("Collection Intervals set to max") {
 		initializeHousekeepingStructures();
@@ -641,7 +641,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		}
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(nextCollection == TimeStamps((std::numeric_limits<uint32_t>::max()) * TimeStamps::Ratio::num / TimeStamps::Ratio ::den)); // NOLINT(misc-const-correctness)
+		CHECK(nextCollection == Time::DefaultCUC((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den)); // NOLINT(misc-const-correctness)
 	}
 	SECTION("Calculating properly defined collection intervals") {
 		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
@@ -653,34 +653,34 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(currentTime.asTAIseconds() == 900);
 		CHECK(ServiceTests::count() == 0);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(currentTime.asTAIseconds() == 1000);
 		CHECK(ServiceTests::count() == 1);
-		currentTime = TimeStamps(currentTime.asTAIseconds() + 6);
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + 6);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(currentTime.asTAIseconds() == 1800);
 		CHECK(ServiceTests::count() == 2);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 3);
 		CHECK(currentTime.asTAIseconds() == 2000);
-		currentTime = TimeStamps(currentTime.asTAIseconds() + 15);
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + 15);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 4);
 		CHECK(currentTime.asTAIseconds() == 2700);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = TimeStamps(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
 		CHECK(ServiceTests::count() == 6);
 		CHECK(currentTime.asTAIseconds() == 3000);
 	}
@@ -690,7 +690,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 			housekeepingStructure.second.collectionInterval = 0;
 		}
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		CHECK(nextCollection == TimeStamps(0));
+		CHECK(nextCollection == Time::DefaultCUC(0));
 	}
 }
 
