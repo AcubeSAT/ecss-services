@@ -2,8 +2,8 @@
 #define ECSS_SERVICES_HOUSEKEEPINGSTRUCTURE_HPP
 
 #include "ECSS_Definitions.hpp"
+#include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
-#include "TypeDefinitions.hpp"
 #include "etl/vector.h"
 
 /**
