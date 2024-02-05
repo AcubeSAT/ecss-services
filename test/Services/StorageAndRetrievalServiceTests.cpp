@@ -6,12 +6,12 @@
 
 StorageAndRetrievalService& storageAndRetrieval = Services.storageAndRetrieval;
 
-TimeStamps timestamps1[6] = {TimeStamps(2), TimeStamps(4), TimeStamps(5), TimeStamps(7), TimeStamps(9),
-                             TimeStamps(11)};
-TimeStamps timestamps2[5] = {TimeStamps(0), TimeStamps(1), TimeStamps(4), TimeStamps(15), TimeStamps(22)};
-TimeStamps timestamps3[4] = {TimeStamps(4), TimeStamps(7), TimeStamps(9), TimeStamps(14)};
-TimeStamps timestamps4[8] = {TimeStamps(4), TimeStamps(6), TimeStamps(34), TimeStamps(40), TimeStamps(44),
-                             TimeStamps(51), TimeStamps(52), TimeStamps(58)};
+Time::DefaultCUC timestamps1[6] = {Time::DefaultCUC(2), Time::DefaultCUC(4), Time::DefaultCUC(5), Time::DefaultCUC(7), Time::DefaultCUC(9),
+                                   Time::DefaultCUC(11)};
+Time::DefaultCUC timestamps2[5] = {Time::DefaultCUC(0), Time::DefaultCUC(1), Time::DefaultCUC(4), Time::DefaultCUC(15), Time::DefaultCUC(22)};
+Time::DefaultCUC timestamps3[4] = {Time::DefaultCUC(4), Time::DefaultCUC(7), Time::DefaultCUC(9), Time::DefaultCUC(14)};
+Time::DefaultCUC timestamps4[8] = {Time::DefaultCUC(4), Time::DefaultCUC(6), Time::DefaultCUC(34), Time::DefaultCUC(40), Time::DefaultCUC(44),
+                                   Time::DefaultCUC(51), Time::DefaultCUC(52), Time::DefaultCUC(58)};
 
 void initializePacketStores() {
 	NumOfPacketStores numOfPacketStores = 4;
@@ -599,13 +599,13 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag(200);
+		Time::DefaultCUC startTimeTag(200);
 		NumOfPacketStores numOfPacketStores = 2;
-		request.append<TimeStamps>(startTimeTag);
+		request.append<Time::DefaultCUC>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
-			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == TimeStamps(0));
+			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == Time::DefaultCUC(0));
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
 		}
@@ -613,10 +613,10 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStartTimeTag == TimeStamps(200));
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStartTimeTag == TimeStamps(200));
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStartTimeTag == TimeStamps(0));
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStartTimeTag == TimeStamps(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStartTimeTag == Time::DefaultCUC(200));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStartTimeTag == Time::DefaultCUC(200));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -632,14 +632,14 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag(200);
+		Time::DefaultCUC startTimeTag(200);
 		NumOfPacketStores numOfPacketStores = 6;
-		request.append<TimeStamps>(startTimeTag);
+		request.append<Time::DefaultCUC>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto packetStoreId = correctPacketStoreIds[i];
-			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == TimeStamps(0));
+			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == Time::DefaultCUC(0));
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::InProgress;
 			request.appendString(packetStoreId);
 		}
@@ -656,10 +656,10 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 3);
 
-		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag == TimeStamps(0));
-		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[1]).openRetrievalStartTimeTag == TimeStamps(0));
-		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[2]).openRetrievalStartTimeTag == TimeStamps(0));
-		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).openRetrievalStartTimeTag == TimeStamps(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[1]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[2]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -674,13 +674,13 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ChangeOpenRetrievalStartingTime, Message::TC, 1);
 
-		TimeStamps startTimeTag(200);
+		Time::DefaultCUC startTimeTag(200);
 		NumOfPacketStores numOfPacketStores = 0;
-		request.append<TimeStamps>(startTimeTag);
+		request.append<Time::DefaultCUC>(startTimeTag);
 		request.appendUint16(numOfPacketStores);
 
 		for (auto& packetStoreId: packetStoreIds) {
-			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == TimeStamps(0));
+			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag == Time::DefaultCUC(0));
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
 		storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus = PacketStore::InProgress;
@@ -691,10 +691,10 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithOpenRetrievalInProgress) == 2);
 
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStartTimeTag == TimeStamps(200));
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStartTimeTag == TimeStamps(200));
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStartTimeTag == TimeStamps(0));
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStartTimeTag == TimeStamps(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStartTimeTag == Time::DefaultCUC(200));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStartTimeTag == Time::DefaultCUC(200));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStartTimeTag == Time::DefaultCUC(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -928,18 +928,18 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		TimeStamps timeTags1[4] = {TimeStamps(20), TimeStamps(30), TimeStamps(40), TimeStamps(50)};
-		TimeStamps timeTags2[4] = {TimeStamps(60), TimeStamps(70), TimeStamps(80), TimeStamps(90)};
+		Time::DefaultCUC timeTags1[4] = {Time::DefaultCUC(20), Time::DefaultCUC(30), Time::DefaultCUC(40), Time::DefaultCUC(50)};
+		Time::DefaultCUC timeTags2[4] = {Time::DefaultCUC(60), Time::DefaultCUC(70), Time::DefaultCUC(80), Time::DefaultCUC(90)};
 
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1 = timeTags1[index];
-			TimeStamps timeTag2 = timeTags2[index++];
-			request.append<TimeStamps>(timeTag1);
-			request.append<TimeStamps>(timeTag2);
+			Time::DefaultCUC timeTag1(timeTags1[index]);
+			Time::DefaultCUC timeTag2(timeTags2[index++]);
+			request.append<Time::DefaultCUC>(timeTag1);
+			request.append<Time::DefaultCUC>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -953,8 +953,8 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		}
 		auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[3]);
 		REQUIRE(packetStore.byTimeRangeRetrievalStatus == false);
-		REQUIRE(packetStore.retrievalStartTime == TimeStamps(0));
-		REQUIRE(packetStore.retrievalEndTime == TimeStamps(0));
+		REQUIRE(packetStore.retrievalStartTime == Time::DefaultCUC(0));
+		REQUIRE(packetStore.retrievalEndTime == Time::DefaultCUC(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -980,10 +980,10 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = i % 2 == 0;
 
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1(20);
-			TimeStamps timeTag2(40);
-			request.append<TimeStamps>(timeTag1);
-			request.append<TimeStamps>(timeTag2);
+			Time::DefaultCUC timeTag1(20);
+			Time::DefaultCUC timeTag2(40);
+			request.append<Time::DefaultCUC>(timeTag1);
+			request.append<Time::DefaultCUC>(timeTag2);
 		}
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus = false;
 
@@ -991,10 +991,10 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			auto packetStoreId = wrongPacketStoreIds[i];
 			REQUIRE(not storageAndRetrieval.packetStoreExists(packetStoreId));
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1(20);
-			TimeStamps timeTag2(40);
-			request.append<TimeStamps>(timeTag1);
-			request.append<TimeStamps>(timeTag2);
+			Time::DefaultCUC timeTag1(20);
+			Time::DefaultCUC timeTag2(40);
+			request.append<Time::DefaultCUC>(timeTag1);
+			request.append<Time::DefaultCUC>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -1007,11 +1007,11 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		for (int i = 0; i < numOfPacketStores / 2; i++) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(correctPacketStoreIds[i]);
 			REQUIRE(packetStore.byTimeRangeRetrievalStatus == (i % 2 == 0));
-			REQUIRE(packetStore.retrievalStartTime == TimeStamps(0));
-			REQUIRE(packetStore.retrievalEndTime == TimeStamps(0));
+			REQUIRE(packetStore.retrievalStartTime == Time::DefaultCUC(0));
+			REQUIRE(packetStore.retrievalEndTime == Time::DefaultCUC(0));
 		}
 		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).byTimeRangeRetrievalStatus == false);
-		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).retrievalStartTime == TimeStamps(0));
+		REQUIRE(storageAndRetrieval.getPacketStore(correctPacketStoreIds[3]).retrievalStartTime == Time::DefaultCUC(0));
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1033,10 +1033,10 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			request.appendString(packetStoreId);
-			TimeStamps timeTag1(90);
-			TimeStamps timeTag2(20);
-			request.append<TimeStamps>(timeTag1);
-			request.append<TimeStamps>(timeTag2);
+			Time::DefaultCUC timeTag1(90);
+			Time::DefaultCUC timeTag2(20);
+			request.append<Time::DefaultCUC>(timeTag1);
+			request.append<Time::DefaultCUC>(timeTag2);
 		}
 
 		MessageParser::execute(request);
@@ -1050,7 +1050,7 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).byTimeRangeRetrievalStatus == false);
 
 		for (auto& packetStoreId: packetStoreIds) {
-			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).retrievalStartTime == TimeStamps(0));
+			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).retrievalStartTime == Time::DefaultCUC(0));
 		}
 
 		ServiceTests::reset();
@@ -1709,7 +1709,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		NumOfPacketStores numOfPacketStores = 2;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
-			storageAndRetrieval.getPacketStore(packetStoreIds[i]).openRetrievalStartTimeTag = TimeStamps(5);
+			storageAndRetrieval.getPacketStore(packetStoreIds[i]).openRetrievalStartTimeTag = Time::DefaultCUC(5);
 			request.appendString(packetStoreIds[i]);
 		}
 
@@ -1727,17 +1727,17 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.read<TimeStamps>() == timestamps1[0]);
-		CHECK(report.read<TimeStamps>() == timestamps1[5]);
-		CHECK(report.readUint32() == TimeStamps(5).formatAsBytes());
+		CHECK(report.read<Time::DefaultCUC>() == timestamps1[0]);
+		CHECK(report.read<Time::DefaultCUC>() == timestamps1[5]);
+		CHECK(report.readUint32() == Time::DefaultCUC(5).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 40);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.read<TimeStamps>() == timestamps2[0]);
-		CHECK(report.read<TimeStamps>() == timestamps2[4]);
-		CHECK(report.readUint32() == TimeStamps(5).formatAsBytes());
+		CHECK(report.read<Time::DefaultCUC>() == timestamps2[0]);
+		CHECK(report.read<Time::DefaultCUC>() == timestamps2[4]);
+		CHECK(report.readUint32() == Time::DefaultCUC(5).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 50);
 		CHECK(report.read<PercentageFilled>() == 20);
 
@@ -1755,7 +1755,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 
 		int count = 0;
 		for (auto& packetStoreId: packetStoreIds) {
-			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag = TimeStamps((count == 3) ? 20 : 15);
+			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStartTimeTag = Time::DefaultCUC((count == 3) ? 20 : 15);
 			count++;
 		}
 
@@ -1781,33 +1781,33 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		uint8_t data[ECSSPacketStoreIdSize];
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
-		CHECK(report.read<TimeStamps>() == timestamps1[0]);
-		CHECK(report.read<TimeStamps>() == timestamps1[5]);
-		CHECK(report.readUint32() == TimeStamps(15).formatAsBytes());
+		CHECK(report.read<Time::DefaultCUC>() == timestamps1[0]);
+		CHECK(report.read<Time::DefaultCUC>() == timestamps1[5]);
+		CHECK(report.readUint32() == Time::DefaultCUC(15).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 0);
 		// Packet store 2
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData2), std::end(packetStoreData2), std::begin(data)));
-		CHECK(report.read<TimeStamps>() == timestamps2[0]);
-		CHECK(report.read<TimeStamps>() == timestamps2[4]);
-		CHECK(report.readUint32() == TimeStamps(15).formatAsBytes());
+		CHECK(report.read<Time::DefaultCUC>() == timestamps2[0]);
+		CHECK(report.read<Time::DefaultCUC>() == timestamps2[4]);
+		CHECK(report.readUint32() == Time::DefaultCUC(15).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 50);
 		CHECK(report.read<PercentageFilled>() == 20);
 		// Packet store 3
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData3), std::end(packetStoreData3), std::begin(data)));
-		CHECK(report.read<TimeStamps>() == timestamps4[0]);
-		CHECK(report.read<TimeStamps>() == timestamps4[7]);
-		CHECK(report.readUint32() == TimeStamps(20).formatAsBytes());
+		CHECK(report.read<Time::DefaultCUC>() == timestamps4[0]);
+		CHECK(report.read<Time::DefaultCUC>() == timestamps4[7]);
+		CHECK(report.readUint32() == Time::DefaultCUC(20).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 80);
 		CHECK(report.read<PercentageFilled>() == 60);
 		// Packet store 4
 		report.readString(data, ECSSPacketStoreIdSize);
 		CHECK(std::equal(std::begin(packetStoreData4), std::end(packetStoreData4), std::begin(data)));
-		CHECK(report.read<TimeStamps>() == timestamps3[0]);
-		CHECK(report.read<TimeStamps>() == timestamps3[3]);
-		CHECK(report.readUint32() == TimeStamps(15).formatAsBytes());
+		CHECK(report.read<Time::DefaultCUC>() == timestamps3[0]);
+		CHECK(report.read<Time::DefaultCUC>() == timestamps3[3]);
+		CHECK(report.readUint32() == Time::DefaultCUC(15).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 40);
 		CHECK(report.read<PercentageFilled>() == 0);
 
@@ -1827,7 +1827,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		String<ECSSPacketStoreIdSize> finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
 		                                             correctPacketStoreIds[0]};
 
-		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag = TimeStamps(5);
+		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag = Time::DefaultCUC(5);
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ReportContentSummaryOfPacketStores, Message::TC, 1);
@@ -1855,7 +1855,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		CHECK(std::equal(std::begin(packetStoreData), std::end(packetStoreData), std::begin(data)));
 		CHECK(report.readUint32() == timestamps1[0].formatAsBytes());
 		CHECK(report.readUint32() == timestamps1[5].formatAsBytes());
-		CHECK(report.readUint32() == TimeStamps(5).formatAsBytes());
+		CHECK(report.readUint32() == Time::DefaultCUC(5).formatAsBytes());
 		CHECK(report.read<PercentageFilled>() == 60);
 		CHECK(report.read<PercentageFilled>() == 40);
 
@@ -1876,9 +1876,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime(5);
+		Time::DefaultCUC storageTime(5);
 		NumOfPacketStores numOfPacketStores = 2;
-		request.append<TimeStamps>(storageTime);
+		request.append<Time::DefaultCUC>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < numOfPacketStores; i++) {
@@ -1893,10 +1893,10 @@ TEST_CASE("Deleting packet store content") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		TimeStamps expectedTimeStamps1[3] = {TimeStamps(7), TimeStamps(9), TimeStamps(11)};
-		TimeStamps expectedTimeStamps2[2] = {TimeStamps(15), TimeStamps(22)};
-		TimeStamps leftTimeStamps1[3];
-		TimeStamps leftTimeStamps2[2];
+		Time::DefaultCUC expectedTimeStamps1[3] = {Time::DefaultCUC(7), Time::DefaultCUC(9), Time::DefaultCUC(11)};
+		Time::DefaultCUC expectedTimeStamps2[2] = {Time::DefaultCUC(15), Time::DefaultCUC(22)};
+		Time::DefaultCUC leftTimeStamps1[3];
+		Time::DefaultCUC leftTimeStamps2[2];
 
 		int count = 0;
 		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
@@ -1928,9 +1928,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime(3);
+		Time::DefaultCUC storageTime(3);
 		NumOfPacketStores numOfPacketStores = 2;
-		request.append<TimeStamps>(storageTime);
+		request.append<Time::DefaultCUC>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
@@ -1945,12 +1945,12 @@ TEST_CASE("Deleting packet store content") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
 
-		TimeStamps expectedTimeStamps1[4] = {TimeStamps(4), TimeStamps(7), TimeStamps(9), TimeStamps(14)};
-		TimeStamps expectedTimeStamps2[8] = {TimeStamps(4), TimeStamps(6), TimeStamps(34), TimeStamps(40),
-		                                     TimeStamps(44),
-		                                     TimeStamps(51), TimeStamps(52), TimeStamps(58)};
-		TimeStamps leftTimeStamps1[4];
-		TimeStamps leftTimeStamps2[8];
+		Time::DefaultCUC expectedTimeStamps1[4] = {Time::DefaultCUC(4), Time::DefaultCUC(7), Time::DefaultCUC(9), Time::DefaultCUC(14)};
+		Time::DefaultCUC expectedTimeStamps2[8] = {Time::DefaultCUC(4), Time::DefaultCUC(6), Time::DefaultCUC(34), Time::DefaultCUC(40),
+		                                           Time::DefaultCUC(44),
+		                                           Time::DefaultCUC(51), Time::DefaultCUC(52), Time::DefaultCUC(58)};
+		Time::DefaultCUC leftTimeStamps1[4];
+		Time::DefaultCUC leftTimeStamps2[8];
 
 		int count = 0;
 		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets) {
@@ -1982,9 +1982,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime(59);
+		Time::DefaultCUC storageTime(59);
 		NumOfPacketStores numOfPacketStores = 2;
-		request.append<TimeStamps>(storageTime);
+		request.append<Time::DefaultCUC>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 2; i < numOfPacketStores + 2; i++) {
@@ -2017,9 +2017,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime = TimeStamps(15);
+		Time::DefaultCUC storageTime(15);
 		NumOfPacketStores numOfPacketStores = 0;
-		request.append<TimeStamps>(storageTime);
+		request.append<Time::DefaultCUC>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		int count = 0;
@@ -2045,14 +2045,14 @@ TEST_CASE("Deleting packet store content") {
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storedTelemetryPackets.empty());
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storedTelemetryPackets.size() == 6);
 
-		TimeStamps expectedTimeStamps1[6] = {TimeStamps(2), TimeStamps(4), TimeStamps(5), TimeStamps(7), TimeStamps(9), TimeStamps(11)};
-		TimeStamps expectedTimeStamps2[5] = {TimeStamps(0), TimeStamps(1), TimeStamps(4), TimeStamps(15), TimeStamps(22)};
-		TimeStamps expectedTimeStamps4[6] = {TimeStamps(34), TimeStamps(40), TimeStamps(44), TimeStamps(51),
-		                                     TimeStamps(52), TimeStamps(58)};
+		Time::DefaultCUC expectedTimeStamps1[6] = {Time::DefaultCUC(2), Time::DefaultCUC(4), Time::DefaultCUC(5), Time::DefaultCUC(7), Time::DefaultCUC(9), Time::DefaultCUC(11)};
+		Time::DefaultCUC expectedTimeStamps2[5] = {Time::DefaultCUC(0), Time::DefaultCUC(1), Time::DefaultCUC(4), Time::DefaultCUC(15), Time::DefaultCUC(22)};
+		Time::DefaultCUC expectedTimeStamps4[6] = {Time::DefaultCUC(34), Time::DefaultCUC(40), Time::DefaultCUC(44), Time::DefaultCUC(51),
+		                                           Time::DefaultCUC(52), Time::DefaultCUC(58)};
 
-		TimeStamps leftTimeStamps1[6];
-		TimeStamps leftTimeStamps2[5];
-		TimeStamps leftTimeStamps4[6];
+		Time::DefaultCUC leftTimeStamps1[6];
+		Time::DefaultCUC leftTimeStamps2[5];
+		Time::DefaultCUC leftTimeStamps4[6];
 
 		count = 0;
 		for (auto& tmPacket: storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets) {
@@ -2094,9 +2094,9 @@ TEST_CASE("Deleting packet store content") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeletePacketStoreContent, Message::TC, 1);
 
-		TimeStamps storageTime = TimeStamps(59);
+		Time::DefaultCUC storageTime(59);
 		NumOfPacketStores numOfPacketStores = 7;
-		request.append<TimeStamps>(storageTime);
+		request.append<Time::DefaultCUC>(storageTime);
 		request.appendUint16(numOfPacketStores);
 
 		for (int i = 0; i < 3; i++) {
@@ -2157,14 +2157,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(0);
-		TimeStamps timeTag2 = TimeStamps(1);
+		Time::DefaultCUC timeTag1(0);
+		Time::DefaultCUC timeTag2(1);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2201,14 +2201,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(0);
-		TimeStamps timeTag2 = TimeStamps(4);
+		Time::DefaultCUC timeTag1(0);
+		Time::DefaultCUC timeTag2(4);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2248,14 +2248,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(35);
-		TimeStamps timeTag2 = TimeStamps(52);
+		Time::DefaultCUC timeTag1(35);
+		Time::DefaultCUC timeTag2(52);
 		auto fromPacketStoreId = packetStoreIds[3];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2273,7 +2273,7 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		Services.reset();
 	}
 
-	SECTION("Time-tag1 in between the stored timestamps and tag2 larger than the max timestamp") {
+	SECTION("Time-tag1 in between the stored Time::DefaultCUC and tag2 larger than the max timestamp") {
 		/**
 		 * CASE 3:
 		 *
@@ -2295,14 +2295,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(3);
-		TimeStamps timeTag2 = TimeStamps(27);
+		Time::DefaultCUC timeTag1(3);
+		Time::DefaultCUC timeTag2(27);
 		auto fromPacketStoreId = packetStoreIds[1];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2342,14 +2342,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(12);
-		TimeStamps timeTag2 = TimeStamps(14);
+		Time::DefaultCUC timeTag1(12);
+		Time::DefaultCUC timeTag2(14);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2381,14 +2381,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(3);
-		TimeStamps timeTag2 = TimeStamps(27);
+		Time::DefaultCUC timeTag1(3);
+		Time::DefaultCUC timeTag2(27);
 		auto fromPacketStoreId = wrongPacketStoreIds[0];
 		auto toPacketStoreId = correctPacketStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2418,14 +2418,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(26);
-		TimeStamps timeTag2 = TimeStamps(17);
+		Time::DefaultCUC timeTag1(26);
+		Time::DefaultCUC timeTag2(17);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2453,14 +2453,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(3);
-		TimeStamps timeTag2 = TimeStamps(7);
+		Time::DefaultCUC timeTag1(3);
+		Time::DefaultCUC timeTag2(7);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2489,14 +2489,14 @@ TEST_CASE("Copying packets in time window, from tag to tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::FromTagToTag;
-		TimeStamps timeTag1 = TimeStamps(0);
-		TimeStamps timeTag2 = TimeStamps(3);
+		Time::DefaultCUC timeTag1(0);
+		Time::DefaultCUC timeTag2(3);
 		auto fromPacketStoreId = packetStoreIds[3];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2528,12 +2528,12 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
-		TimeStamps timeTag1 = TimeStamps(6);
+		Time::DefaultCUC timeTag1(6);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2542,8 +2542,8 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		TimeStamps expectedTimestamps[3] = {TimeStamps(7), TimeStamps(9), TimeStamps(11)};
-		TimeStamps existingTimestamps[3];
+		Time::DefaultCUC expectedTimestamps[3] = {Time::DefaultCUC(7), Time::DefaultCUC(9), Time::DefaultCUC(11)};
+		Time::DefaultCUC existingTimestamps[3];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2572,12 +2572,12 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
-		TimeStamps timeTag1 = TimeStamps(1);
+		Time::DefaultCUC timeTag1(1);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2586,7 +2586,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 6);
-		TimeStamps existingTimestamps[6];
+		Time::DefaultCUC existingTimestamps[6];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2614,12 +2614,12 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::AfterTimeTag;
-		TimeStamps timeTag1 = TimeStamps(25);
+		Time::DefaultCUC timeTag1(25);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag1);
+		request.append<Time::DefaultCUC>(timeTag1);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2652,12 +2652,12 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
-		TimeStamps timeTag2 = TimeStamps(6);
+		Time::DefaultCUC timeTag2(6);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2666,8 +2666,8 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		TimeStamps expectedTimestamps[3] = {TimeStamps(2), TimeStamps(4), TimeStamps(5)};
-		TimeStamps existingTimestamps[3];
+		Time::DefaultCUC expectedTimestamps[3] = {Time::DefaultCUC(2), Time::DefaultCUC(4), Time::DefaultCUC(5)};
+		Time::DefaultCUC existingTimestamps[3];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2696,12 +2696,12 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
-		TimeStamps timeTag2 = TimeStamps(56);
+		Time::DefaultCUC timeTag2(56);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
@@ -2710,7 +2710,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 6);
-		TimeStamps existingTimestamps[6];
+		Time::DefaultCUC existingTimestamps[6];
 
 		int index = 0;
 		for (auto& tmPacket: targetPacketStore.storedTelemetryPackets) {
@@ -2738,12 +2738,12 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		                StorageAndRetrievalService::MessageType::CopyPacketsInTimeWindow, Message::TC, 1);
 
 		uint8_t typeOfTimeWindow = StorageAndRetrievalService::TimeWindowType::BeforeTimeTag;
-		TimeStamps timeTag2 = TimeStamps(1);
+		Time::DefaultCUC timeTag2(1);
 		auto fromPacketStoreId = packetStoreIds[0];
 		auto toPacketStoreId = packetStoreIds[2];
 
 		request.appendEnum8(typeOfTimeWindow);
-		request.append<TimeStamps>(timeTag2);
+		request.append<Time::DefaultCUC>(timeTag2);
 		request.appendString(fromPacketStoreId);
 		request.appendString(toPacketStoreId);
 
