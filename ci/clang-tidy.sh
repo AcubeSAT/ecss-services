@@ -14,5 +14,5 @@ fi
 
 echo -e "\033[0;34mRunning clang-tidy...\033[0m"
 
-clang-tidy -p "$1"/compile_commands.json --config-file=$(pwd)/.clang-tidy --use-color `find src inc -not \
+clang-tidy -p "$1"/compile_commands.json --config-file=ci/.clang-tidy --use-color `find src inc -not \
 -path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` | tee clang-tidy-output.log
