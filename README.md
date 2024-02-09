@@ -132,7 +132,7 @@ Settings -> Build, Execution, Deployment -> CMake -> CMake Options. In case you 
 3. Run the following command from the root of the repository:
 
 ```bash
-.ci/clang-tidy.sh <build-directory>
+./ci/clang-tidy.sh <build-directory>
 ```
 where the `<build-directory>` is the directory where the `compile_commands.json` file is located. This is usually 
 the `cmake-build-debug` directory if CLion is used, or the `build` directory if the CLI is used.
