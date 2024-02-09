@@ -90,7 +90,7 @@ will quickly fail. Follow these steps to set up the conan project:
 1. Follow steps 1-4 from the CLI instructions above.
 2. Run the following command to install relevant packages and create the CMakePreset.json files
 ```shell
-conan install . --output-folder=cmake-build-debug -u --build="*" -pr conan-profile --settings=build-type=Debug
+conan install . --output-folder=cmake-build-debug -u --build="*" -pr conan-profile --settings=build_type=Debug
 ```
 3. Add the following to the CMake Options (File -> Settings -> Build, Execution, Deployment -> CMake -> CMake Options):
    ```shell
