@@ -150,7 +150,7 @@ bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID
 	bool validIndicator = true;
 	auto iterator = MemoryManagementService::memoryLimitsMap.find(memId);
 	if (iterator != MemoryManagementService::memoryLimitsMap.end()) {
-		const auto& limits = it->second;
+		const auto& limits = iterator->second;
 		validIndicator = (address >= limits.lowerLim) && (address <= limits.upperLim);
 	} else {
 		// Default case (unknown MemoryID)
