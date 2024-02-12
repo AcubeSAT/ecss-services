@@ -148,8 +148,8 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 
 bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID memId, uint64_t address) {
 	bool validIndicator = true;
-	auto it = MemoryManagementService::memoryLimitsMap.find(memId);
-	if (it != MemoryManagementService::memoryLimitsMap.end()) {
+	auto iterator = MemoryManagementService::memoryLimitsMap.find(memId);
+	if (iterator != MemoryManagementService::memoryLimitsMap.end()) {
 		const auto& limits = it->second;
 		validIndicator = (address >= limits.lowerLim) && (address <= limits.upperLim);
 	} else {
