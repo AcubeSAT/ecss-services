@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+
+#
 # Code style checks using clang-tidy
 #
 # Usage:
