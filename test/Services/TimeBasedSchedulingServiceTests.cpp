@@ -239,6 +239,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.append<SourceId>(0);                           // Source ID is not implemented
 		receivedMessage.append<ApplicationProcessId>(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.append<SequenceCount>(0);                          // todo(#275): Remove the dummy sequence count
+
 		timeBasedService.timeShiftActivitiesByID(receivedMessage);
 		scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
 
@@ -268,6 +269,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.append<SourceId>(0);              // Dummy source ID
 		receivedMessage.append<ApplicationProcessId>(80);            // Dummy application ID to throw an error
 		receivedMessage.append<SequenceCount>(0);             // Dummy sequence count
+
 		timeBasedService.timeShiftActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
@@ -278,6 +280,7 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.append<SourceId>(0);                           // Source ID is not implemented
 		receivedMessage.append<ApplicationProcessId>(testMessage2.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.append<SequenceCount>(0);                          // todo(#275): Remove the dummy sequence count
+
 		timeBasedService.timeShiftActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
@@ -409,6 +412,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		receivedMessage.append<SourceId>(0);                           // Source ID is not implemented
 		receivedMessage.append<ApplicationProcessId>(testMessage1.applicationId); // todo: Remove the dummy app ID
 		receivedMessage.append<SequenceCount>(0);                          // todo(#275): Remove the dummy sequence count
+
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::hasOneMessage());
 
@@ -442,6 +446,7 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		receivedMessage.append<SourceId>(0);   // Dummy source ID
 		receivedMessage.append<ApplicationProcessId>(80); // Dummy application ID to throw an error
 		receivedMessage.append<SequenceCount>(0);  // Dummy sequence count
+
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
@@ -481,6 +486,7 @@ TEST_CASE("TM[11,13] time-based schedule summary report", "[service][st11]") {
 			SourceId receivedSourceID = response.read<SourceId>();
 			ApplicationProcessId receivedApplicationID = response.read<ApplicationProcessId>();
 			SequenceCount receivedSequenceCount = response.read<ParameterSampleCount>();
+
 			if (i == 0) {
 				REQUIRE(receivedReleaseTime == scheduledActivities.at(0)->requestReleaseTime);
 				REQUIRE(receivedSourceID == scheduledActivities.at(0)->requestID.sourceID);

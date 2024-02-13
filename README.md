@@ -116,8 +116,26 @@ You can do this by running:
 ./ci/cppcheck.sh
 ```
 
+### clang-tidy
+Make sure clang-tidy is installed. It can be installed with the following command:
 ```bash
-./ci/clang-tidy.sh
+sudo apt-get install clang-tidy
 ```
 
-and check the output files for errors.
+For clang-tidy to run according to the set configuration in `ci/.clang-tidy`, follow these steps if you use CLion:
+1. Add `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` in CLion -> File ->
+   Settings -> Build, Execution, Deployment -> CMake -> CMake Options. In case you use CLI, add it as argument to the
+   `cmake` command.
+2. Reload the CMake project in CLion (Tools -> CMake -> Reload CMake Project), or run the `cmake` command again in the
+   CLI, with all the needed arguments.
+3. Run the following command from the root of the repository:
+
+```bash
+./ci/clang-tidy.sh <build-directory>
+```
+where the `<build-directory>` is the directory where the `compile_commands.json` file is located. This is usually
+the `cmake-build-debug` directory if CLion is used, or the `build` directory if the CLI is used.
+
+Finally, check the output files for errors. The `clang-tidy-output.log` file will contain all the warnings, notes
+and errors. Any error in that file will cause failure of the pipeline.
+

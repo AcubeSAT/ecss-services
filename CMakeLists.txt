@@ -71,7 +71,6 @@ IF (X86_BUILD)
                 ${test_main_SRC}
                 ${test_SRC})
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
-
     ENDIF()
 ENDIF()
 

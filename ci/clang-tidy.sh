@@ -1,20 +1,15 @@
-#!/usr/bin/env bash
-
-#
 # Code style checks using clang-tidy
 #
 # Usage:
-# $ ci/clang-tidy.sh
+# $ ci/clang-tidy.sh <build-directory>
 #
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 <build-directory>"
+    exit 1
+fi
 
 echo -e "\033[0;34mRunning clang-tidy...\033[0m"
 
-cd "$(dirname "$0")"
-GCCVERSION=`g++ -dumpversion`
-
-clang-tidy --config-file=$(pwd)/.clang-tidy --use-color `find ../src/ -not -path "*/Platform/*" -type f -regextype \
-posix-egrep -regex '.*\.(cpp|hpp|c|h)'`  \
-    -extra-arg=-fcolor-diagnostics -- -std=c++17 -I../inc -I../lib/etl/include -I../lib/logger/inc/ \
-    -I/usr/include/c++/$GCCVERSION -I/usr/include/x86_64-linux-gnu/c++/$GCCVERSION \
-    -I/usr/include/c++/$GCCVERSION/$MACHTYPE | tee clang-tidy-output.log
-
+clang-tidy -p "$1"/compile_commands.json --config-file=ci/.clang-tidy --use-color `find src inc -not \
+-path "*/Platform/*" -type f -regextype posix-egrep -regex '.*\.(cpp|hpp|c|h)'` | tee clang-tidy-output.log
