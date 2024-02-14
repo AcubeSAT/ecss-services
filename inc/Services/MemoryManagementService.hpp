@@ -12,17 +12,17 @@
 /**
  * Number of Bits in Memory Management Checksum
  */
-inline constexpr size_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
+inline constexpr uint32_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
 
 /**
  * Maximum number of entries in Memory Limits Map
  */
-inline constexpr size_t MaxMemoryLimitsMapSize = 8;
+inline constexpr uint32_t MaxMemoryLimitsMapSize = 8;
 
 /**
  * Maximum number of entries in Valid Memory IDs set
  */
-inline constexpr size_t MaxValidMemoryIdsSize = 8;
+inline constexpr uint32_t MaxValidMemoryIdsSize = 8;
 
 /**
  * @ingroup Services
