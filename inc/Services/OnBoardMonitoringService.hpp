@@ -24,19 +24,39 @@ private:
 	etl::map<uint16_t, std::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
-	 * Maximum number of checks for each check type.
+	 * Maximum number of checks for each Limit Check.
 	 */
 	static constexpr uint8_t MaximumNumberOfChecksLimitCheck = 32;
+
+	/**
+	 * Maximum number of checks for each Expected Value Check.
+	 */
 	static constexpr uint8_t MaximumNumberOfChecksExpectedValueCheck = 32;
+
+	/**
+	 * Maximum number of checks for each Delta check.
+	 */
 	static constexpr uint8_t MaximumNumberOfChecksDeltaCheck = 32;
 
 	/**
-	 * These vectors are used as a mean of storing the PMON Definitons
+	 * This vector is used as a mean of storing the PMON Definitons
 	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
 	 * before they are added to the parameterMonitoringList.
 	 */
 	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
+
+	/**
+	 * This vector is used as a mean of storing the PMON Definitons
+	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
+	 * before they are added to the parameterMonitoringList.
+	 */
 	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
+
+	/**
+	 * This vector is used as a mean of storing the PMON Definitons
+	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
+	 * before they are added to the parameterMonitoringList.
+	 */
 	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
 public:
