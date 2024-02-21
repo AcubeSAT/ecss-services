@@ -284,7 +284,7 @@ public:
 	 * @param expectedDelay The output of this function after its last execution.
 	 * @return uint32_t The minimum amount of time until the next periodic housekeeping report, in milliseconds.
 	 */
-	TimeStamps reportPendingStructures(TimeStamps currentTime, TimeStamps previousTime, TimeStamps expectedDelay);
+	Time::DefaultCUC reportPendingStructures(Time::DefaultCUC currentTime, Time::DefaultCUC previousTime, Time::DefaultCUC expectedDelay);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

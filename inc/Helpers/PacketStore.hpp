@@ -3,8 +3,8 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "etl/deque.h"
 #include "Message.hpp"
+#include "etl/deque.h"
 #include "numeric"
 
 /**
@@ -22,15 +22,15 @@ public:
 	 * The time-tag that defines the starting point of the open retrieval process, meaning that we retrieve packets,
 	 * starting from the open-retrieval-start-time-tag until the latest packet.
 	 */
-	TimeStamps openRetrievalStartTimeTag = 0;
+	Time::DefaultCUC openRetrievalStartTimeTag{0};
 	/**
 	 * The start time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	TimeStamps retrievalStartTime = 0;
+	Time::DefaultCUC retrievalStartTime{0};
 	/**
 	 * The end time of a by-time-range retrieval process, i.e. retrieval of packets between two specified time-tags.
 	 */
-	TimeStamps retrievalEndTime = 0;
+	Time::DefaultCUC retrievalEndTime{0};
 	/**
 	 * The maximum size of the packet store, in bytes.
 	 *
@@ -42,12 +42,14 @@ public:
 	 * Whether the insertion of packets stores in the packet-store should cyclically overwrite older packets, or be
 	 * suspended when the packet-store is full.
 	 */
-	enum PacketStoreType : uint8_t { Circular = 0, Bounded = 1 };
+	enum PacketStoreType : uint8_t { Circular = 0,
+		                             Bounded = 1 };
 
 	/**
 	 * Whether the open retrieval status of the packet-store is in progress or not.
 	 */
-	enum PacketStoreOpenRetrievalStatus : bool { Suspended = false, InProgress = true };
+	enum PacketStoreOpenRetrievalStatus : bool { Suspended = false,
+		                                         InProgress = true };
 
 	/**
 +	 * Whether the storage of TM packets is enabled for this packet store
@@ -72,7 +74,7 @@ public:
 	 * 				old packets  <---------->  new packets
 	 * 				[][][][][][][][][][][][][][][][][][][]	<--- deque
 	 */
-	etl::deque<std::pair<uint32_t, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
+	etl::deque<std::pair<Time::DefaultCUC, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
 
 	/**
 	 * Returns the sum of the sizes of the packets stored in this PacketStore, in bytes.
