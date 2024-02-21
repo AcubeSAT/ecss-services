@@ -94,7 +94,7 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress[constParamet
 	}
 }
 
-Message MessageParser::parse(const uint8_t* data, uint32_t length) {
+Message MessageParser::parse(const etl::array<uint8_t, CCSDSMaxMessageSize>& data, uint32_t length) {
 	ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket);
 
 	uint16_t const packetHeaderIdentification = (data[0] << 8) | data[1];
@@ -118,16 +118,21 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
+
 	if (packetType == Message::TC) {
-		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		etl::array<uint8_t, ECSSSecondaryTCHeaderSize> newData = {};
+		etl::copy(data.begin() + CCSDSPrimaryHeaderSize, data.end(), newData.begin());
+		parseECSSTCHeader(newData, packetDataLength, message);
 	} else {
-		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		etl::array<uint8_t, ECSSSecondaryTMHeaderSize> newData = {};
+		etl::copy(data.begin() + CCSDSPrimaryHeaderSize, data.end(), newData.begin());
+		parseECSSTMHeader(newData, packetDataLength, message);
 	}
 
 	return message;
 }
 
-void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTCHeader(const etl::array<uint8_t, ECSSSecondaryTCHeaderSize>& data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -145,22 +150,16 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	message.serviceType = serviceType;
 	message.messageType = messageType;
 	message.sourceId = sourceId;
-	std::copy(data + ECSSSecondaryTCHeaderSize, data + ECSSSecondaryTCHeaderSize + length, message.data.begin());
+	etl::copy(data.begin() + ECSSSecondaryTCHeaderSize, data.begin() + ECSSSecondaryTCHeaderSize + length, message.data.begin());
 	message.dataSize = length;
 }
 
 Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
 	Message message;
-	const auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
+	etl::array<uint8_t, ECSSSecondaryTCHeaderSize> dataInt = {};
+	etl::copy(reinterpret_cast<uint8_t*>(data.begin()), reinterpret_cast<uint8_t*>(data.end()), dataInt.begin());
 	message.packetType = Message::TC;
 	parseECSSTCHeader(dataInt, ECSSTCRequestStringSize, message);
-	return message;
-}
-
-Message MessageParser::parseECSSTC(const uint8_t* data) {
-	Message message;
-	message.packetType = Message::TC;
-	parseECSSTCHeader(data, ECSSTCRequestStringSize, message);
 	return message;
 }
 
@@ -250,7 +249,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	return ccsdsMessage;
 }
 
-void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTMHeader(const etl::array<uint8_t, ECSSSecondaryTMHeaderSize>& data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
@@ -266,7 +265,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	// Copy the data to the message
 	message.serviceType = serviceType;
 	message.messageType = messageType;
-	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data.begin());
+	etl::copy(data.begin() + ECSSSecondaryTMHeaderSize, data.begin() + ECSSSecondaryTMHeaderSize + length, message.data.begin());
 	message.dataSize = length;
 }
 // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
