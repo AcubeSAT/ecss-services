@@ -32,7 +32,6 @@ TEST_CASE("Reporting of statistics") {
 		initializeStatistics(6, 7);
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -69,7 +68,6 @@ TEST_CASE("Reporting of statistics") {
 	SECTION("Report statistics, with auto statistics reset enabled with TC") {
 		Message request = Message(ParameterStatisticsService::ServiceType,
 		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
-		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
 		MessageParser::execute(request);
 
 		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
@@ -82,7 +80,6 @@ TEST_CASE("Reporting of statistics") {
 		request.appendBoolean(true);
 		Services.parameterStatistics.statisticsMap[5].mean = 5;
 		Services.parameterStatistics.statisticsMap[7].mean = 3;
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
 		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
@@ -98,7 +95,6 @@ TEST_CASE("Reporting of statistics") {
 	SECTION("Report statistics, with auto statistic reset disabled without TC") {
 		initializeStatistics(6, 7);
 		Services.parameterStatistics.reportParameterStatistics(false);
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
 		CHECK(ServiceTests::count() == 1);
 
@@ -132,7 +128,6 @@ TEST_CASE("Reporting of statistics") {
 	}
 
 	SECTION("Report statistics, with auto statistics reset enabled without TC") {
-		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
 		Services.parameterStatistics.reportParameterStatistics(false);
 
 		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
@@ -142,7 +137,6 @@ TEST_CASE("Reporting of statistics") {
 	SECTION("Report statistics, with auto statistics reset disabled, but reset is given with args, without TC") {
 		Services.parameterStatistics.statisticsMap[5].mean = 5;
 		Services.parameterStatistics.statisticsMap[7].mean = 3;
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
 		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
