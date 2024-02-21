@@ -183,7 +183,7 @@ TEST_CASE("Test appending a CUC timestamp") {
 		Message message(0, 0, Message::TC, 0);
 		message.appendDefaultCUCTimeStamp(timeCUC);
 
-		REQUIRE(message.read<TimeStamps>() == 86769000);
+		REQUIRE(message.read<Time::DefaultCUC>().formatAsBytes() == 86769000);
 	}
 
 	SECTION("Test 2") {
@@ -192,7 +192,7 @@ TEST_CASE("Test appending a CUC timestamp") {
 		Message message(0, 0, Message::TC, 0);
 		message.appendDefaultCUCTimeStamp(timeCUC);
 
-		REQUIRE(message.read<TimeStamps>() == 34511);
+		REQUIRE(message.read<Time::DefaultCUC>().formatAsBytes() == 34511);
 	}
 }
 
@@ -440,7 +440,7 @@ TEST_CASE("Storing and retrieving enums in Messages") {
 		CHECK(parameter1.getValue() == parameter2.getValue());
 	}
 
-		SECTION("Another type of enum") {
+	SECTION("Another type of enum") {
 		enum MemoryPartitionUsed : bool {
 			first = false,
 			second = true

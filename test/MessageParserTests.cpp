@@ -1,9 +1,9 @@
-#include "MessageParser.hpp"
 #include <Message.hpp>
 #include <catch2/catch_all.hpp>
 #include <cstring>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeGetter.hpp"
+#include "MessageParser.hpp"
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
@@ -15,7 +15,7 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 5);
 	CHECK(message.serviceType == 129);
 	CHECK(message.messageType == 31);
-        CHECK(message.sourceId == 0);
+	CHECK(message.sourceId == 0);
 	CHECK(memcmp(message.data.begin(), "hello", 5) == 0);
 }
 
@@ -42,23 +42,21 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
 		uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
 		CHECK(crc_verification == 0);
-	}
-	else {
+	} else {
 		CHECK(createdPacket.size() == 16);
 		CHECK((createdPacket == String<16>(wantedPacket)));
 	}
-
 }
 
 TEST_CASE("TM message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x12, 0x20, 0x16,
-	                    0x11,0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00,
+	                    0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	                    0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	TimeStamps time = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
-	packet[13] = (time >> 24) & 0xFF;
-	packet[14] = (time >> 16) & 0xFF;
-	packet[15] = (time >> 8) & 0xFF;
-	packet[16] = (time) & 0xFF;
+	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
+	packet[13] = (time.formatAsBytes() >> 24) & 0xFF;
+	packet[14] = (time.formatAsBytes() >> 16) & 0xFF;
+	packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
+	packet[16] = (time.formatAsBytes()) & 0xFF;
 
 	Message message = MessageParser::parse(packet, 24);
 	CHECK(message.packetType == Message::TM);
@@ -67,25 +65,24 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	CHECK(message.dataSize == 7);
 	CHECK(message.serviceType == 22);
 	CHECK(message.messageType == 17);
-        CHECK(message.sourceId == 0);
+	CHECK(message.sourceId == 0);
 	CHECK(memcmp(message.data.begin(), "hellohi", 7) == 0);
 
 	// Add ECSS and CCSDS header
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-	TimeStamps messageTime =  (createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF ) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF ) << 24);
-	CHECK(messageTime == time);
-
+	Time::DefaultCUC messageTime((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF) << 24));
+	CHECK(messageTime.asTAIseconds() == time.formatAsBytes());
 }
 
 TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
-	                          0x11,0x00, 0x00,0x00, 0x02,0x00, 0x00,0x00,
-	                          0x00, 0x68,0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	TimeStamps time = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
-	wantedPacket[13] = (time >> 24) & 0xFF;
-	wantedPacket[14] = (time >> 16) & 0xFF;
-	wantedPacket[15] = (time >> 8) & 0xFF;
-	wantedPacket[16] = (time) & 0xFF;
+	                          0x11, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+	                          0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
+	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
+	wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
+	wantedPacket[14] = (time.formatAsBytes() >> 16) & 0xFF;
+	wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
+	wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
 
 	Message message;
 	message.packetType = Message::TM;
@@ -106,8 +103,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
 		uint8_t crc_verification = CRCHelper::validateCRC(packet, 26);
 		CHECK(crc_verification == 0);
-	}
-	else {
+	} else {
 		CHECK(createdPacket.size() == 24);
 		CHECK((createdPacket == String<24>(wantedPacket)));
 	}

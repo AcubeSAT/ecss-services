@@ -40,27 +40,27 @@ TEST_CASE("Reporting of statistics") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.read<TimeStamps>() == 86769000); // start time
-		CHECK(report.read<TimeStamps>() == 86769000); // end time
-		CHECK(report.readUint16() == 2);        // number of parameters reported
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // start time
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // end time
+		CHECK(report.readUint16() == 2);                                    // number of parameters reported
 		// Parameter B
-		CHECK(report.read<ParameterId>() == 5);        // ID-2
-		CHECK(report.read<ParameterSampleCount>() == 6);        // number of samples
-		CHECK(report.readFloat() == 13);        // max value
-		CHECK(report.read<TimeStamps>() == 86769000); // max time
-		CHECK(report.readFloat() == 3);         // min value
-		CHECK(report.read<TimeStamps>() == 86769000); // min time
-		CHECK(report.readFloat() == 8);         // mean
+		CHECK(report.read<ParameterId>() == 5);                             // ID-2
+		CHECK(report.read<ParameterSampleCount>() == 6);                    // number of samples
+		CHECK(report.readFloat() == 13);                                    // max value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+		CHECK(report.readFloat() == 3);                                     // min value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+		CHECK(report.readFloat() == 8);                                     // mean
 		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
-		CHECK(report.read<ParameterId>() == 7);                  // ID-1
-		CHECK(report.read<ParameterSampleCount>() == 3);                  // number of samples
-		CHECK(report.readFloat() == 5);                   // max value
-		CHECK(report.read<TimeStamps>() == 86769000);           // max time
-		CHECK(report.readFloat() == 1);                   // min value
-		CHECK(report.read<TimeStamps>() == 86769000);           // min time
-		CHECK(report.readFloat() == 3);                   // mean
-		CHECK(static_cast<int>(report.readFloat()) == 1); // stddev
+		CHECK(report.read<ParameterId>() == 7);                             // ID-1
+		CHECK(report.read<ParameterSampleCount>() == 3);                    // number of samples
+		CHECK(report.readFloat() == 5);                                     // max value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+		CHECK(report.readFloat() == 1);                                     // min value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+		CHECK(report.readFloat() == 3);                                     // mean
+		CHECK(static_cast<int>(report.readFloat()) == 1);                   // stddev
 
 		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
@@ -105,27 +105,27 @@ TEST_CASE("Reporting of statistics") {
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
 		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.read<TimeStamps>() == 86769000); // start time
-		CHECK(report.read<TimeStamps>() == 86769000); // end time
-		CHECK(report.readUint16() == 2);        // number of parameters reported
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // start time
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // end time
+		CHECK(report.readUint16() == 2);                                    // number of parameters reported
 		// Parameter B
-		CHECK(report.read<ParameterId>() == 5);        // ID-2
-		CHECK(report.read<ParameterSampleCount>() == 6);        // number of samples
-		CHECK(report.readFloat() == 13);        // max value
-		CHECK(report.read<TimeStamps>() == 86769000); // max time
-		CHECK(report.readFloat() == 3);         // min value
-		CHECK(report.read<TimeStamps>() == 86769000); // min time
-		CHECK(report.readFloat() == 8);         // mean
+		CHECK(report.read<ParameterId>() == 5);                             // ID-2
+		CHECK(report.read<ParameterSampleCount>() == 6);                    // number of samples
+		CHECK(report.readFloat() == 13);                                    // max value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+		CHECK(report.readFloat() == 3);                                     // min value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+		CHECK(report.readFloat() == 8);                                     // mean
 		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
 		// Parameter A
-		CHECK(report.read<ParameterId>() == 7);                  // ID-1
-		CHECK(report.read<ParameterSampleCount>() == 3);                  // number of samples
-		CHECK(report.readFloat() == 5);                   // max value
-		CHECK(report.read<TimeStamps>() == 86769000);           // max time
-		CHECK(report.readFloat() == 1);                   // min value
-		CHECK(report.read<TimeStamps>() == 86769000);           // min time
-		CHECK(report.readFloat() == 3);                   // mean
-		CHECK(static_cast<int>(report.readFloat()) == 1); // stddev
+		CHECK(report.read<ParameterId>() == 7);                             // ID-1
+		CHECK(report.read<ParameterSampleCount>() == 3);                    // number of samples
+		CHECK(report.readFloat() == 5);                                     // max value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+		CHECK(report.readFloat() == 1);                                     // min value
+		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+		CHECK(report.readFloat() == 3);                                     // mean
+		CHECK(static_cast<int>(report.readFloat()) == 1);                   // stddev
 
 		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
 		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
@@ -408,8 +408,8 @@ TEST_CASE("Parameter statistics definition report") {
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
 		CHECK(report.read<SamplingInterval>() == 700); // Reporting interval
-		CHECK(report.readUint16() == 2);   // Num of valid Ids
-		CHECK(report.read<ParameterId>() == 5);   // Valid parameter ID
+		CHECK(report.readUint16() == 2);               // Num of valid Ids
+		CHECK(report.read<ParameterId>() == 5);        // Valid parameter ID
 		CHECK(report.read<SamplingInterval>() == 12);  // Sampling interval
 		CHECK(report.read<ParameterId>() == 7);
 		CHECK(report.read<SamplingInterval>() == 0);
