@@ -1,6 +1,6 @@
 #include "Services/PacketSelectionSubservice.hpp"
-#include "Services/StorageAndRetrievalService.hpp"
 #include "Helpers/AllReportTypes.hpp"
+#include "Services/StorageAndRetrievalService.hpp"
 
 PacketSelectionSubservice::PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores) : packetStores(mainServicePacketStores) {}
 
@@ -153,9 +153,229 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 					continue;
 				}
 				auto appServicePair = std::make_pair(applicationID, serviceType);
-				applicationProcessConfiguration[packetStoreID].definitions[appServicePair].push_back(
-				    messageType);
+				applicationProcessConfiguration[packetStoreID].definitions[appServicePair].push_back(messageType);
 			}
+		}
+	}
+}
+
+void PacketSelectionSubservice::deleteAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
+	for (auto& service: AllReportTypes::MessagesOfService) {
+		uint8_t serviceType = service.first;
+		deleteAllReportsOfService(packetStoreID, applicationID, serviceType);
+	}
+}
+
+void PacketSelectionSubservice::deleteAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
+	for (auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
+		auto appServicePair = std::make_pair(applicationID, serviceType);
+		applicationProcessConfiguration[packetStoreID].definitions.erase(appServicePair);
+	}
+}
+void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Message& request) {
+	request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::DeleteReportTypesTFromAppProcessConfiguration);
+	auto packetStoreID = readPacketStoreId(request);
+	if (not packetStoreExists(packetStoreID)) {
+		return;
+	}
+
+	auto numOfApplication = request.readUint8();
+	if (!numOfApplication) {
+		auto definition = applicationProcessConfiguration[packetStoreID].definitions;
+		for (; !definition.empty();) {
+			definition.erase(definition.begin());
+		}
+	}
+
+	for (uint8_t i = 0; i < numOfApplication; i++) {
+		//		if (not checkService(request, packetStoreID, applicationID, numOfMessages)) {
+		//			continue;
+		//		}
+
+
+		uint8_t applicationID = request.readUint8();
+		uint8_t numOfServices = request.readUint8();
+		if (numOfServices == 0) {
+			deleteAllReportsOfApplication(packetStoreID, applicationID);
+			continue;
+		}
+
+		for (uint8_t j = 0; j < numOfServices; j++) {
+			uint8_t serviceType = request.readUint8();
+			uint8_t numOfMessages = request.readUint8();
+
+			if (numOfMessages == 0) {
+				deleteAllReportsOfService(packetStoreID,applicationID,serviceType);
+			}
+			for (uint8_t k = 0; k < numOfMessages; k++) {
+				uint8_t messageType = request.readUint8();
+				auto appServicePair = std::make_pair(applicationID, serviceType);
+				auto messageTypeIndex = etl::find(applicationProcessConfiguration[packetStoreID].definitions.at(appServicePair).begin(),applicationProcessConfiguration[packetStoreID].definitions.at(appServicePair).end(),messageType);
+
+				applicationProcessConfiguration[packetStoreID].definitions.at(appServicePair).erase(messageTypeIndex);
+			}
+		}
+	}
+
+
+//	if (!numOfApplication) {
+//		auto definition = applicationProcessConfiguration[packetStoreID].definitions;
+//		for (; !definition.empty();) {
+//			definition.erase(definition.begin());
+//		}
+//	}
+}
+
+
+void PacketSelectionSubservice::reportApplicationProcess(Message& request) {
+	request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::reportApplicationProcess);
+	auto packetStoreID = readPacketStoreId(request);
+	if (!packetStoreExists(packetStoreID)) {
+		return;
+	}
+	Message report = createTM(StorageAndRetrievalService::MessageType::applicationProcessReport);
+
+
+	report.appendString(packetStoreID);
+	uint8_t numberOfApplications = applicationProcessConfiguration[packetStoreID].definitions.size();
+	report.appendUint8(numberOfApplications);
+
+
+	for (auto application = applicationProcessConfiguration[packetStoreID].definitions.begin(); application != applicationProcessConfiguration[packetStoreID].definitions.end(); application++) {
+		auto applicationsID = application->first.first;
+		report.appendUint8(applicationsID);
+
+		uint8_t numberOfServiceTypes = 0;
+		etl::array<uint8_t, ECSSMaxApplicationsServicesCombinations> serviceTypes;
+		for (auto getApplication = applicationProcessConfiguration[packetStoreID].definitions.begin(); getApplication != applicationProcessConfiguration[packetStoreID].definitions.end(); getApplication++) {
+			if (applicationsID == getApplication->first.first) {
+				serviceTypes[numberOfServiceTypes] = getApplication->first.second;
+				numberOfServiceTypes++;
+			}
+		}
+
+		report.appendUint8(numberOfServiceTypes);
+
+		for(uint8_t i=0; i<numberOfServiceTypes; i++){
+			report.appendUint8(serviceTypes[i]);
+
+			uint8_t numberOfMessages = applicationProcessConfiguration[packetStoreID].definitions.size();
+			for(uint8_t j = 0; j<numberOfMessages; j ++){
+				auto appServicePair = std::make_pair(applicationsID, serviceTypes[i]);
+				report.appendUint8(applicationProcessConfiguration[packetStoreID].definitions.at(appServicePair)[j]);
+			}
+		}
+	}
+}
+
+void PacketSelectionSubservice::addStructureIdentifiersToTheHousekeepingParameterReport(Message& request){
+	request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::addStructureIdentifiersToTheHousekeepingParameterReport);
+	auto packetStoreID = readPacketStoreId(request);
+
+	uint8_t numberOfApplications = request.readUint8();
+
+	for(uint8_t i=0; i<numberOfApplications; i++){
+		uint8_t applicationId = request.readUint8();
+
+		uint8_t numberHousekeepingParameterReports =request.readUint8();
+
+		if(numberHousekeepingParameterReports == 0){
+
+			for(const auto & housekeepingStructures : Services.housekeeping.housekeepingStructures ){
+				applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[housekeepingStructures.first].push_back(housekeepingStructures.second.collectionInterval);
+			}
+		}
+		for(uint8_t j=0; j<numberHousekeepingParameterReports; j++){
+
+			uint8_t housekeepingParameterReportId = request.readUint8();
+			CollectionInterval samplingRate = Services.housekeeping.getCollectionInterval(housekeepingParameterReportId);
+			applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[housekeepingParameterReportId].push_back(samplingRate);
+		}
+
+	}
+
+}
+
+
+void PacketSelectionSubservice::deleteStructureIdentifiersToTheHousekeepingParameterReport(Message& request){
+	request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::deleteStructureIdentifiersToTheHousekeepingParameterReport);
+	auto packetStoreID = readPacketStoreId(request);
+
+	uint8_t numberOfApplications = request.readUint8();
+
+	if(numberOfApplications == 0){
+
+	}
+	for(uint8_t i=0; i<numberOfApplications; i++){
+		uint8_t applicationId = request.readUint8();
+
+		uint8_t numberHousekeepingParameterReports =request.readUint8();
+
+		if(numberHousekeepingParameterReports == 0){
+
+						for(const auto & housekeepingStructures : Services.housekeeping.housekeepingStructures ){
+							applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions.erase(housekeepingStructures.first);
+						}
+		}
+		for(uint8_t j=0; j<numberHousekeepingParameterReports; j++){
+
+
+			uint8_t housekeepingParameterReportId = request.readUint8();
+			CollectionInterval samplingRate = Services.housekeeping.getCollectionInterval(housekeepingParameterReportId);
+			applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions.erase(housekeepingParameterReportId);
+		}
+
+	}
+
+}
+
+
+
+void PacketSelectionSubservice::addStructureIdentifiersToTheDiagnosticParameterReport(Message& request){
+	request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::addStructureIdentifiersToTheHousekeepingParameterReport);
+	auto packetStoreID = readPacketStoreId(request);
+	uint8_t numberOfApplications = request.readUint8();
+
+
+	for(uint8_t i=0; i<numberOfApplications; i++){
+		uint8_t applicationId = request.readUint8();
+
+		uint8_t numberDiagnosticParameterReports = request.readUint8();
+
+		if(numberDiagnosticParameterReports == 0){
+
+		}
+		for(uint8_t j=0; j<numberDiagnosticParameterReports; j++){
+
+			uint8_t diagnosticParameterReportId = request.readUint8();
+			CollectionInterval samplingRate = 0;
+//			applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[housekeepingParameterReportId].push_back(samplingRate);
+		}
+	}
+}
+
+void PacketSelectionSubservice::deleteStructureIdentifiersFromTheDiagnosticParameterReport(Message& request){
+	request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::addStructureIdentifiersToTheHousekeepingParameterReport);
+	auto packetStoreID = readPacketStoreId(request);
+	uint8_t numberOfApplications = request.readUint8();
+
+	if(numberOfApplications == 0){
+
+	}
+
+	for(uint8_t i=0; i<numberOfApplications; i++){
+		uint8_t applicationId = request.readUint8();
+
+		uint8_t numberDiagnosticParameterReports = request.readUint8();
+
+		if(numberDiagnosticParameterReports == 0){
+
+		}
+		for(uint8_t j=0; j<numberDiagnosticParameterReports; j++){
+
+			uint8_t diagnosticParameterReportId = request.readUint8();
+			CollectionInterval samplingRate = 0;
+			//			applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[housekeepingParameterReportId].push_back(samplingRate);
 		}
 	}
 }

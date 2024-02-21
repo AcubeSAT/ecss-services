@@ -27,6 +27,10 @@ public:
 	 */
 	typedef std::pair<uint8_t, uint8_t> AppServiceKey;
 
+	typedef uint8_t HousekeepingParameterReportId;
+
+	typedef etl::vector<SamplingInterval, ECSSMaxReportTypeDefinitions> ReportSamplingDefinitions;
+
 	/**
 	 * Map containing the report type definitions. Each application process has its own ID. The combination of the
 	 * application ID and the service type is used as a key to provide access to the list of report type definitions.
@@ -41,6 +45,8 @@ public:
 	 * to the appID and service type.
 	 */
 	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
+
+	etl::map<HousekeepingParameterReportId, ReportSamplingDefinitions, ECSSMaxApplicationsServicesCombinations> housekeepingParameterReportDefinitions;
 
 	ApplicationProcessConfiguration() = default;
 };

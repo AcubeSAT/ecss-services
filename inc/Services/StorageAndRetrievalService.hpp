@@ -191,6 +191,9 @@ public:
 		EnableStorageInPacketStores = 1,
 		DisableStorageInPacketStores = 2,
 		AddReportTypesToAppProcessConfiguration = 3,
+		DeleteReportTypesTFromAppProcessConfiguration = 4,
+		reportApplicationProcess = 5,
+		applicationProcessReport = 6,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
 		ReportContentSummaryOfPacketStores = 12,
@@ -209,7 +212,9 @@ public:
 		ResizePacketStores = 25,
 		ChangeTypeToCircular = 26,
 		ChangeTypeToBounded = 27,
-		ChangeVirtualChannel = 28
+		ChangeVirtualChannel = 28,
+		addStructureIdentifiersToTheHousekeepingParameterReport = 29,
+		deleteStructureIdentifiersToTheHousekeepingParameterReport = 30
 	};
 
 	StorageAndRetrievalService() {
@@ -219,7 +224,7 @@ public:
 	/**
 	 * The packet selection sub-service of the Storage and Retrieval service.
 	 */
-	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(packetStores);
+	//PacketSelectionSubservice packetSelection = PacketSelectionSubservice(packetStores);
 
 	/**
 	 * Adds new packet store into packet stores.
