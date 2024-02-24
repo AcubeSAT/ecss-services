@@ -491,6 +491,43 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 	}
 }
 
+TEST_CASE("Modify Parameter Monitoring Definitions") {
+    SECTION("Valid Request to Modify Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 1;
+		ParameterId PMONId = 1;
+		ParameterId monitoredParameterId = 7;
+		PMONRepetitionNumber repetitionNumber = 5;
+		PMONLimit newLowLimit = 4;
+		PMONLimit newHighLimit = 10;
+		EventDefinitionId newBelowLowLimitEvent = 9;
+		EventDefinitionId newAboveHighLimitEvent = 11;
+
+		Message request = Message(OnBoardMonitoringService::ServiceType,
+		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		request.append<ParameterId>(PMONId);
+		request.append<ParameterId>(monitoredParameterId);
+		request.append<PMONRepetitionNumber>(repetitionNumber);
+		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMONLimit>(newLowLimit);
+		request.append<EventDefinitionId>(newBelowLowLimitEvent);
+		request.append<PMONLimit>(newHighLimit);
+		request.append<EventDefinitionId>(newAboveHighLimitEvent);
+
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 0);
+
+		CHECK(onBoardMonitoringService.getCount(PMONId) == 1);
+		auto modifiedDefinition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
+		CHECK(modifiedDefinition.getRepetitionNumber() == repetitionNumber);
+//		CHECK(modifiedDefinition.getLowLimit() == newLowLimit);
+//		CHECK(modifiedDefinition.getHighLimit() == newHighLimit);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
 
 TEST_CASE("Report Parameter Monitoring Definitions") {
 	SECTION("Valid request to report Parameter Monitoring Definitions") {

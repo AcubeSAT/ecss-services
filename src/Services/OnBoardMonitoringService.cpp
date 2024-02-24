@@ -3,6 +3,7 @@
 #include "Message.hpp"
 #include "ServicePool.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
+#include <iostream>
 
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
