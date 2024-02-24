@@ -174,8 +174,8 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		}
 
 		auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId);
-		if (not parameterToBeModified) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameter);
+		if (!parameterToBeModified) {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			return;
 		}
 
@@ -196,8 +196,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
 				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
-				auto monitoringDefinition = PMONLimitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
-				addPMONDefinition(currentPMONId, monitoringDefinition);
+				PMONLimitCheck limitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
+				                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
+				addPMONLimitCheck(currentPMONId, limitCheck);
 				break;
 			}
 
@@ -210,8 +211,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
 				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
-				auto monitoringDefinition = PMONExpectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, expectedValue, mask, unExpectedValueEvent);
-				addPMONDefinition(currentPMONId, monitoringDefinition);
+				PMONExpectedValueCheck expectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
+				                                          expectedValue, mask, unExpectedValueEvent);
+				addPMONExpectedValueCheck(currentPMONId, expectedValueCheck);
 				break;
 			}
 
@@ -232,8 +234,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
 				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
 				parameterMonitoringList.erase(currentPMONId);
-				auto monitoringDefinition = PMONDeltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber, numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
-				addPMONDefinition(currentPMONId, monitoringDefinition);
+				PMONDeltaCheck deltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
+				                          numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
+				addPMONDeltaCheck(currentPMONId, deltaCheck);
 				break;
 			}
 		}
