@@ -464,8 +464,8 @@ public:
 		 */
 		AttemptedReportAttributesOnDirectory = 8,
 		/**
-                 * Directory already exists, thus can't be created again
-                 */
+         * Directory already exists, thus can't be created again
+         */
 		DirectoryAlreadyExists = 9,
 		/**
 		 * A delete directory command was requested on a non empty directory
