@@ -144,7 +144,7 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 	storeMessage(report);
 }
 
-void FileManagementService::createDirectory(Message& message){
+void FileManagementService::createDirectory(Message& message) {
 	message.assertTC(ServiceType, CreateDirectory);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -182,10 +182,9 @@ void FileManagementService::createDirectory(Message& message){
 			}
 		}
 	}
-
 }
 
-void FileManagementService::deleteDirectory(Message& message){
+void FileManagementService::deleteDirectory(Message& message) {
 	message.assertTC(ServiceType, DeleteDirectory);
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
