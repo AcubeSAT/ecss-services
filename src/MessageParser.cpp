@@ -118,7 +118,6 @@ Message MessageParser::parse(const etl::array<uint8_t, CCSDSMaxMessageSize>& dat
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
-
 	if (packetType == Message::TC) {
 		etl::array<uint8_t, CCSDSMaxMessageSize> newData = {};
 		etl::copy(data.begin() + CCSDSPrimaryHeaderSize, data.end(), newData.begin());
