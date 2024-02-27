@@ -7,7 +7,7 @@ String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Mess
 }
 
 void StorageAndRetrievalService::deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId,
-                                                    TimeStamps timeLimit) {
+                                                    Time::DefaultCUC timeLimit) {
 	auto& telemetryPackets = packetStores[packetStoreId].storedTelemetryPackets;
 	while (not telemetryPackets.empty() and telemetryPackets.front().first <= timeLimit) {
 		telemetryPackets.pop_front();
@@ -15,8 +15,8 @@ void StorageAndRetrievalService::deleteContentUntil(const String<ECSSPacketStore
 }
 
 void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
-	const TimeStamps startTime = request.read<TimeStamps>();
-	const TimeStamps endTime = request.read<TimeStamps>();
+	const Time::DefaultCUC startTime(request.read<Time::DefaultCUC>());
+	const Time::DefaultCUC endTime(request.read<Time::DefaultCUC>());
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -37,7 +37,7 @@ void StorageAndRetrievalService::copyFromTagToTag(Message& request) {
 }
 
 void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
-	const TimeStamps startTime = request.read<TimeStamps>();
+	const Time::DefaultCUC startTime(request.read<Time::DefaultCUC>());
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -55,7 +55,7 @@ void StorageAndRetrievalService::copyAfterTimeTag(Message& request) {
 }
 
 void StorageAndRetrievalService::copyBeforeTimeTag(Message& request) {
-	const TimeStamps endTime = request.read<TimeStamps>();
+	const Time::DefaultCUC endTime(request.read<Time::DefaultCUC>());
 
 	auto fromPacketStoreId = readPacketStoreId(request);
 	auto toPacketStoreId = readPacketStoreId(request);
@@ -83,7 +83,7 @@ bool StorageAndRetrievalService::checkPacketStores(const String<ECSSPacketStoreI
 	return true;
 }
 
-bool StorageAndRetrievalService::checkTimeWindow(TimeStamps startTime, TimeStamps endTime, const Message& request) {
+bool StorageAndRetrievalService::checkTimeWindow(Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request) {
 	if (startTime >= endTime) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
 		return true;
@@ -101,7 +101,7 @@ bool StorageAndRetrievalService::checkDestinationPacketStore(const String<ECSSPa
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-                                                         TimeStamps startTime, TimeStamps endTime, const Message& request) {
+                                                         Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request) {
 	if (endTime < packetStores[fromPacketStoreId].storedTelemetryPackets.front().first ||
 	    startTime > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -111,7 +111,7 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacket
 }
 
 bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-                                                         TimeStamps timeTag, const Message& request, bool isAfterTimeTag) {
+                                                         Time::DefaultCUC timeTag, const Message& request, bool isAfterTimeTag) {
 	if (isAfterTimeTag) {
 		if (timeTag > packetStores[fromPacketStoreId].storedTelemetryPackets.back().first) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::CopyOfPacketsFailed);
@@ -126,7 +126,7 @@ bool StorageAndRetrievalService::noTimestampInTimeWindow(const String<ECSSPacket
 
 bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSPacketStoreIdSize>& toPacketStoreId,
-                                                    TimeStamps startTime, TimeStamps endTime, const Message& request) {
+                                                    Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkTimeWindow(startTime, endTime, request) or checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, endTime, request));
@@ -134,7 +134,7 @@ bool StorageAndRetrievalService::failedFromTagToTag(const String<ECSSPacketStore
 
 bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
                                                     const String<ECSSPacketStoreIdSize>& toPacketStoreId,
-                                                    TimeStamps startTime, const Message& request) {
+                                                    Time::DefaultCUC startTime, const Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, startTime, request, true));
@@ -142,7 +142,7 @@ bool StorageAndRetrievalService::failedAfterTimeTag(const String<ECSSPacketStore
 
 bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
                                                      const String<ECSSPacketStoreIdSize>& toPacketStoreId,
-                                                     TimeStamps endTime, const Message& request) {
+                                                     Time::DefaultCUC endTime, const Message& request) {
 	return (not checkPacketStores(fromPacketStoreId, toPacketStoreId, request) or
 	        checkDestinationPacketStore(toPacketStoreId, request) or
 	        noTimestampInTimeWindow(fromPacketStoreId, endTime, request, false));
@@ -150,13 +150,13 @@ bool StorageAndRetrievalService::failedBeforeTimeTag(const String<ECSSPacketStor
 
 void StorageAndRetrievalService::createContentSummary(Message& report,
                                                       const String<ECSSPacketStoreIdSize>& packetStoreId) {
-	const TimeStamps oldestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.front().first; // NOLINT(cppcoreguidelines-init-variables)
-	report.append<TimeStamps>(oldestStoredPacketTime);
+	const Time::DefaultCUC oldestStoredPacketTime(packetStores[packetStoreId].storedTelemetryPackets.front().first);
+	report.append<Time::DefaultCUC>(oldestStoredPacketTime);
 
-	const TimeStamps newestStoredPacketTime = packetStores[packetStoreId].storedTelemetryPackets.back().first; // NOLINT(cppcoreguidelines-init-variables)
-	report.append<TimeStamps>(newestStoredPacketTime);
+	const Time::DefaultCUC newestStoredPacketTime(packetStores[packetStoreId].storedTelemetryPackets.back().first);
+	report.append<Time::DefaultCUC>(newestStoredPacketTime);
 
-	report.append<TimeStamps>(packetStores[packetStoreId].openRetrievalStartTimeTag);
+	report.append<Time::DefaultCUC>(packetStores[packetStoreId].openRetrievalStartTimeTag);
 
 	auto filledPercentage1 = static_cast<uint16_t>(static_cast<float>(packetStores[packetStoreId].storedTelemetryPackets.size()) * 100 / // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	                                               ECSSMaxPacketStoreSize);
@@ -200,7 +200,7 @@ void StorageAndRetrievalService::addPacketStore(const String<ECSSPacketStoreIdSi
 }
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
-                                                           TimeStamps timestamp) {
+                                                           Time::DefaultCUC timestamp) {
 	Message tmPacket; // NOLINT(misc-const-correctness) as we might need to change
 	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, tmPacket});
 }
@@ -272,8 +272,8 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		if (failedStartOfByTimeRangeRetrieval(packetStoreId, request)) {
 			continue;
 		}
-		const TimeStamps retrievalStartTime = request.read<TimeStamps>();
-		const TimeStamps retrievalEndTime = request.read<TimeStamps>();
+		const Time::DefaultCUC retrievalStartTime(request.read<Time::DefaultCUC>());
+		const Time::DefaultCUC retrievalEndTime(request.read<Time::DefaultCUC>());
 
 		if (retrievalStartTime >= retrievalEndTime) { //cppcheck-suppress knownConditionTrueFalse
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidTimeWindow);
@@ -295,7 +295,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 		return;
 	}
 
-	const TimeStamps timeLimit = request.read<TimeStamps>();
+	const Time::DefaultCUC timeLimit = request.read<Time::DefaultCUC>();
 	const NumOfPacketStores numOfPacketStores = request.readUint16();
 
 	if (numOfPacketStores == 0) {
@@ -380,7 +380,7 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 		return;
 	}
 
-	const TimeStamps newStartTimeTag = request.read<TimeStamps>();
+	const Time::DefaultCUC newStartTimeTag = request.read<Time::DefaultCUC>();
 	/**
 	 * @todo (#263): check if newStartTimeTag is in the future
 	 */

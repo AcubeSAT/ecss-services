@@ -2,9 +2,9 @@
 #define ECSS_SERVICES_STORAGEANDRETRIEVALSERVICE_HPP
 
 #include "ECSS_Definitions.hpp"
-#include "Service.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/PacketStore.hpp"
+#include "Service.hpp"
 #include "etl/map.h"
 
 /**
@@ -19,17 +19,20 @@
 class StorageAndRetrievalService : public Service {
 public:
 	/**
-	 * The type of timestamps that the Storage and Retrieval Subservice assigns to each incoming packet.
+	 * The type of Time::DefaultCUC that the Storage and Retrieval Subservice assigns to each incoming packet.
 	 */
-	enum TimeStampType : uint8_t { StorageBased = 0, PacketBased = 1 };
+	enum TimeStampType : uint8_t { StorageBased = 0,
+		                           PacketBased = 1 };
 
 	/**
 	 * Different types of packet retrieval from a packet store, relative to a specified time-tag.
 	 */
-	enum TimeWindowType : uint8_t { FromTagToTag = 0, AfterTimeTag = 1, BeforeTimeTag = 2 };
+	enum TimeWindowType : uint8_t { FromTagToTag = 0,
+		                            AfterTimeTag = 1,
+		                            BeforeTimeTag = 2 };
 
 	/**
-	 * The type of timestamps that the subservice sets to each incoming telemetry packet.
+	 * The type of Time::DefaultCUC that the subservice sets to each incoming telemetry packet.
 	 */
 	TimeStampType timeStamping = PacketBased;
 
@@ -53,7 +56,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeStamps timeLimit);
+	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, Time::DefaultCUC timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -95,7 +98,7 @@ private:
 	 *
 	 * @param request used to raise errors.
 	 */
-	static bool checkTimeWindow(TimeStamps startTime, TimeStamps endTime, const Message& request);
+	static bool checkTimeWindow(Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -107,7 +110,7 @@ private:
 	bool checkDestinationPacketStore(const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Message& request);
 
 	/**
-	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
+	 * Checks if there are no stored Time::DefaultCUC that fall between the two specified time-tags.
 	 *
 	 * @param fromPacketStoreId  the source packet store, whose content is to be copied. Needed for error checking.
 	 * @param request used to raise errors.
@@ -116,18 +119,18 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeStamps startTime,
-	                             TimeStamps endTime, const Message& request);
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, Time::DefaultCUC startTime,
+	                             Time::DefaultCUC endTime, const Message& request);
 
 	/**
-	 * Checks if there are no stored timestamps that fall between the two specified time-tags.
+	 * Checks if there are no stored Time::DefaultCUC that fall between the two specified time-tags.
 	 *
 	 * @param isAfterTimeTag true indicates that we are examining the case of AfterTimeTag. Otherwise, we are referring
 	 * to the case of BeforeTimeTag.
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, TimeStamps timeTag,
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, Time::DefaultCUC timeTag,
 	                             const Message& request, bool isAfterTimeTag);
 
 	/**
@@ -139,8 +142,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps startTime,
-	                        TimeStamps endTime, const Message& request);
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC startTime,
+	                        Time::DefaultCUC endTime, const Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
@@ -151,7 +154,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps startTime,
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC startTime,
 	                        const Message& request);
 
 	/**
@@ -163,7 +166,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, TimeStamps endTime,
+	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC endTime,
 	                         const Message& request);
 
 	/**
@@ -216,9 +219,9 @@ public:
 	void addPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const PacketStore& packetStore);
 
 	/**
-	 * Adds telemetry to the specified packet store and timestamps it.
+	 * Adds telemetry to the specified packet store and Time::DefaultCUC it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, TimeStamps timestamp);
+	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, Time::DefaultCUC timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.

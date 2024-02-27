@@ -8,7 +8,7 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		tm1.appendFloat(5.6);
 
 		PacketStore packetStore;
-		packetStore.storedTelemetryPackets.push_back({2, tm1});
+		packetStore.storedTelemetryPackets.push_back({Time::DefaultCUC(2), tm1});
 
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 1);
 		REQUIRE(packetStore.calculateSizeInBytes() == 5);
@@ -19,7 +19,7 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		tm2.appendUint8(3);
 		tm2.appendUint32(55);
 
-		packetStore.storedTelemetryPackets.push_back({2, tm2});
+		packetStore.storedTelemetryPackets.push_back({Time::DefaultCUC(2), tm2});
 
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 2);
 		REQUIRE(packetStore.calculateSizeInBytes() == 13);
@@ -29,7 +29,7 @@ TEST_CASE("Counting a packet store's size in bytes") {
 		tm3.appendUint8(3);
 		tm3.appendUint32(55);
 
-		packetStore.storedTelemetryPackets.push_back({3, tm3});
+		packetStore.storedTelemetryPackets.push_back({Time::DefaultCUC(3), tm3});
 
 		REQUIRE(packetStore.storedTelemetryPackets.size() == 3);
 		REQUIRE(packetStore.calculateSizeInBytes() == 26);

@@ -604,7 +604,7 @@ public:
 	 */
 	uint16_t readOctetString(uint8_t* byteString) {
 		uint16_t const size = readUint16(); // Get the data length from the message
-		readString(byteString, size); // Read the string data
+		readString(byteString, size);       // Read the string data
 
 		return size; // Return the string size
 	}
@@ -821,4 +821,3 @@ inline Time::RelativeTime Message::read() {
 }
 
 #endif // ECSS_SERVICES_PACKET_H
-
