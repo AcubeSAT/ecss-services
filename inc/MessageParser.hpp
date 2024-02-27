@@ -91,7 +91,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	static void parseECSSTCHeader(const etl::array<uint8_t, ECSSSecondaryTCHeaderSize>& data, uint16_t length, Message& message);
+	static void parseECSSTCHeader(const etl::array<uint8_t, CCSDSMaxMessageSize>& data, uint16_t length, Message& message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -102,7 +102,7 @@ private:
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
 	 */
-	static void parseECSSTMHeader(const etl::array<uint8_t, ECSSSecondaryTMHeaderSize>& data, uint16_t length, Message& message);
+	static void parseECSSTMHeader(const etl::array<uint8_t, CCSDSMaxMessageSize>& data, uint16_t length, Message& message);
 };
 
 #endif // ECSS_SERVICES_MESSAGEPARSER_HPP

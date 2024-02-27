@@ -120,11 +120,11 @@ Message MessageParser::parse(const etl::array<uint8_t, CCSDSMaxMessageSize>& dat
 
 
 	if (packetType == Message::TC) {
-		etl::array<uint8_t, ECSSSecondaryTCHeaderSize> newData = {};
+		etl::array<uint8_t, CCSDSMaxMessageSize> newData = {};
 		etl::copy(data.begin() + CCSDSPrimaryHeaderSize, data.end(), newData.begin());
 		parseECSSTCHeader(newData, packetDataLength, message);
 	} else {
-		etl::array<uint8_t, ECSSSecondaryTMHeaderSize> newData = {};
+		etl::array<uint8_t, CCSDSMaxMessageSize> newData = {};
 		etl::copy(data.begin() + CCSDSPrimaryHeaderSize, data.end(), newData.begin());
 		parseECSSTMHeader(newData, packetDataLength, message);
 	}
@@ -132,7 +132,7 @@ Message MessageParser::parse(const etl::array<uint8_t, CCSDSMaxMessageSize>& dat
 	return message;
 }
 
-void MessageParser::parseECSSTCHeader(const etl::array<uint8_t, ECSSSecondaryTCHeaderSize>& data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTCHeader(const etl::array<uint8_t, CCSDSMaxMessageSize>& data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -156,7 +156,7 @@ void MessageParser::parseECSSTCHeader(const etl::array<uint8_t, ECSSSecondaryTCH
 
 Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
 	Message message;
-	etl::array<uint8_t, ECSSSecondaryTCHeaderSize> dataInt = {};
+	etl::array<uint8_t, CCSDSMaxMessageSize> dataInt = {};
 	etl::copy(reinterpret_cast<uint8_t*>(data.begin()), reinterpret_cast<uint8_t*>(data.end()), dataInt.begin());
 	message.packetType = Message::TC;
 	parseECSSTCHeader(dataInt, ECSSTCRequestStringSize, message);
@@ -249,7 +249,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	return ccsdsMessage;
 }
 
-void MessageParser::parseECSSTMHeader(const etl::array<uint8_t, ECSSSecondaryTMHeaderSize>& data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTMHeader(const etl::array<uint8_t, CCSDSMaxMessageSize>& data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
