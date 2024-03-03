@@ -411,7 +411,16 @@ public:
 		 * PMON Check Type is requested, but it is missing (ST[12])
 		 */
 		 PMONCheckTypeMissing = 63,
-
+		/**
+		 * Attempt to add or modify a limit check parameter monitoring definition, but the low limit is higher than
+		 * the high limit.
+		 */
+		LowLimitIsHigherThanHighLimit = 64,
+		/**
+		 * Attempt to add or modify a delta check parameter monitoring definition, but the low threshold is higher than
+		 * the high threshold.
+		 */
+		LowThresholdIsHigherThanHighThreshold = 65,
 	};
 
 	/**

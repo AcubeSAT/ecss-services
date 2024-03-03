@@ -351,7 +351,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 
 		    MessageParser::execute(request);
 		    CHECK(ServiceTests::count() == 1);
-		    CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
+		    CHECK(ServiceTests::countThrownErrors(ErrorHandler::LowLimitIsHigherThanHighLimit) == 1);
 		    ServiceTests::reset();
 		    Services.reset();
 	    }
