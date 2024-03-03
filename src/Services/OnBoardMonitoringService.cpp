@@ -162,7 +162,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		uint16_t currentCheckType = message.readEnum8();
 
-		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
+		auto it = parameterMonitoringList.find(currentPMONId);
+
+		if (it == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
 			    message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
 			return;
@@ -180,6 +182,11 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			return;
 		}
 
+		PMON& pmon = it->second.get();
+		pmon.repetitionCounter = 0;
+		pmon.repetitionNumber = currentPMONRepetitionNumber;
+		pmon.checkingStatus = PMON::Unchecked;
+
 		switch (static_cast<PMON::CheckType>(currentCheckType)) {
 			case PMON::CheckType::Limit: {
 				PMONLimit lowLimit = message.read<PMONLimit>();
@@ -193,15 +200,14 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
-				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
-				parameterMonitoringList.erase(currentPMONId);
-				PMONLimitCheck limitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
-				                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
-				addPMONLimitCheck(currentPMONId, limitCheck);
+				PMONLimitCheck& limitCheck = dynamic_cast<PMONLimitCheck&>(pmon);
+				limitCheck.lowLimit = lowLimit;
+				limitCheck.belowLowLimitEvent = belowLowLimitEventId;
+				limitCheck.highLimit = highLimit;
+				limitCheck.aboveHighLimitEvent = aboveHighLimitEventId;
 				break;
 			}
+
 
 			case PMON::CheckType::ExpectedValue: {
 				PMONBitMask mask = message.read<PMONBitMask>();

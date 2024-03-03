@@ -498,10 +498,10 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		ParameterId PMONId = 1;
 		ParameterId monitoredParameterId = 7;
 		PMONRepetitionNumber repetitionNumber = 5;
-		PMONLimit newLowLimit = 4;
-		PMONLimit newHighLimit = 10;
-		EventDefinitionId newBelowLowLimitEvent = 9;
-		EventDefinitionId newAboveHighLimitEvent = 11;
+		PMONLimit lowLimit = 4;
+		PMONLimit highLimit = 10;
+		EventDefinitionId belowLowLimitEvent = 9;
+		EventDefinitionId aboveHighLimitEvent = 11;
 
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
@@ -510,10 +510,10 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
 		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
-		request.append<PMONLimit>(newLowLimit);
-		request.append<EventDefinitionId>(newBelowLowLimitEvent);
-		request.append<PMONLimit>(newHighLimit);
-		request.append<EventDefinitionId>(newAboveHighLimitEvent);
+		request.append<PMONLimit>(lowLimit);
+		request.append<EventDefinitionId>(belowLowLimitEvent);
+		request.append<PMONLimit>(highLimit);
+		request.append<EventDefinitionId>(aboveHighLimitEvent);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
@@ -521,8 +521,8 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getCount(PMONId) == 1);
 		auto modifiedDefinition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
 		CHECK(modifiedDefinition.getRepetitionNumber() == repetitionNumber);
-//		CHECK(modifiedDefinition.getLowLimit() == newLowLimit);
-//		CHECK(modifiedDefinition.getHighLimit() == newHighLimit);
+		CHECK(modifiedDefinition.getLowLimit() == lowLimit);
+		CHECK(modifiedDefinition.getHighLimit() == highLimit);
 
 		ServiceTests::reset();
 		Services.reset();
