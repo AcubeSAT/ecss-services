@@ -32,6 +32,8 @@ HousekeepingService& housekeepingService = Services.housekeeping;
 ParameterService parameterManagement;
 ParameterServiceYamcs parameterManagementYamcs;
 
+
+// -------------- This to other file for better managment
 void storeSamplesToParametersYamcs(uint16_t id1, uint16_t id2, uint16_t id3, uint16_t id4, uint16_t id5, uint16_t id6, uint16_t id7, uint16_t id8, uint16_t id9, uint16_t id10, uint16_t id11) {
 	//	Message samples(HousekeepingService::ServiceType,
 	//	                HousekeepingService::MessageType::ReportHousekeepingPeriodicProperties, Message::TM, 1);
@@ -55,6 +57,7 @@ void storeSamplesToParameters(uint16_t id1, uint16_t id2, uint16_t id3) {
 	static_cast<Parameter<uint8_t>&>(Services.parameterManagement.getParameter(id2)->get()).setValue(77);
 	static_cast<Parameter<uint32_t>&>(Services.parameterManagement.getParameter(id3)->get()).setValue(99);
 }
+
 
 void initializeHousekeepingStructuresYamcs() {
 	uint8_t ids[1] = {3};
@@ -93,7 +96,9 @@ void initializeHousekeepingStructures() {
 		i++;
 	}
 }
+// -----------------------
 
+// ---------- This to utils file with a logger class to be used for more simple code
 void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	Statistic stat1;
 	Statistic stat2;
@@ -113,11 +118,13 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 	Services.parameterStatistics.statisticsMap.insert({id1, stat1});
 	Services.parameterStatistics.statisticsMap.insert({id2, stat2});
 }
-
+// ---------------------------------------
 
 int main() {
 	sleep(5);
 
+    // ------------ This before the tcp into an object maybe for easier package creation and use farther into the project
+    // when there is more packages
 	Message packet = Message(0, 0, Message::TC, 1);
 
 	packet.appendString(String<5>("hello"));
@@ -315,7 +322,7 @@ int main() {
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
 
 
-
+    // ----------- This to a file and use the main to manage the running of the tcp server
 
 	LOG_NOTICE << "ECSS Services test application";
 
@@ -398,4 +405,6 @@ int main() {
 
 	//TCP socket closed
 	close(listening);
+
+    // -----------------------
 }
