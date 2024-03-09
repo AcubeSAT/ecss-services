@@ -101,11 +101,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				    message, ErrorHandler::ExecutionStartErrorType::HighLimitIsLowerThanLowLimit);
 				continue;
 			}
-			else if (lowLimit >= highLimit) {
-				ErrorHandler::reportError(
-				    message, ErrorHandler::ExecutionStartErrorType::LowLimitIsHigherThanHighLimit);
-				continue;
-			}
 			PMONLimitCheck limitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 			                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
 			addPMONLimitCheck(currentPMONId, limitCheck);
@@ -125,11 +120,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			if (highDeltaThreshold <= lowDeltaThreshold) {
 				ErrorHandler::reportError(
 				    message, ErrorHandler::ExecutionStartErrorType::HighThresholdIsLowerThanLowThreshold);
-				continue;
-			}
-			else if (lowDeltaThreshold >= highDeltaThreshold) {
-				ErrorHandler::reportError(
-				    message, ErrorHandler::ExecutionStartErrorType::LowThresholdIsHigherThanHighThreshold);
 				continue;
 			}
 			PMONDeltaCheck deltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
