@@ -176,12 +176,6 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			return;
 		}
 
-		auto parameterToBeModified = Services.parameterManagement.getParameter(currentMonitoredParameterId);
-		if (!parameterToBeModified) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
-			return;
-		}
-
 		PMON& pmon = it->second.get();
 		pmon.repetitionCounter = 0;
 		pmon.repetitionNumber = currentPMONRepetitionNumber;
@@ -200,7 +194,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				PMONLimitCheck& limitCheck = dynamic_cast<PMONLimitCheck&>(pmon);
+				auto& limitCheck = dynamic_cast<PMONLimitCheck&>(pmon);
 				limitCheck.lowLimit = lowLimit;
 				limitCheck.belowLowLimitEvent = belowLowLimitEventId;
 				limitCheck.highLimit = highLimit;
@@ -214,7 +208,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 				EventDefinitionId unexpectedValueEvent = message.read<EventDefinitionId>();
 
-				PMONExpectedValueCheck& expectedValueCheck = dynamic_cast<PMONExpectedValueCheck&>(pmon);
+				auto& expectedValueCheck = dynamic_cast<PMONExpectedValueCheck&>(pmon);
 				expectedValueCheck.mask = mask;
 				expectedValueCheck.expectedValue = expectedValue;
 				expectedValueCheck.unexpectedValueEvent = unexpectedValueEvent;
@@ -234,7 +228,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				PMONDeltaCheck& deltaCheck = dynamic_cast<PMONDeltaCheck&>(pmon);
+				auto& deltaCheck = dynamic_cast<PMONDeltaCheck&>(pmon);
 				deltaCheck.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
 				deltaCheck.lowDeltaThreshold = lowDeltaThreshold;
 				deltaCheck.belowLowThresholdEvent = belowLowThresholdEventId;
