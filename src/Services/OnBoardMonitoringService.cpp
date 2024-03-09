@@ -73,8 +73,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		ParameterId currentPMONId = message.read<ParameterId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
-		uint16_t currentCheckTypeRaw = message.readEnum8();
-		PMON::CheckType currentCheckType = static_cast<PMON::CheckType>(currentCheckTypeRaw);
+		uint16_t checkTypeValue = message.readEnum8();
+		auto currentCheckType = static_cast<PMON::CheckType>(checkTypeValue);
 
 		auto parameterToBeAdded = Services.parameterManagement.getParameter(currentMonitoredParameterId);
 		if (!parameterToBeAdded) {
