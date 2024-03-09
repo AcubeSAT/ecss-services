@@ -212,15 +212,12 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			case PMON::CheckType::ExpectedValue: {
 				PMONBitMask mask = message.read<PMONBitMask>();
 				PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
-				EventDefinitionId unExpectedValueEvent = message.read<EventDefinitionId>();
+				EventDefinitionId unexpectedValueEvent = message.read<EventDefinitionId>();
 
-				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
-				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
-				parameterMonitoringList.erase(currentPMONId);
-				PMONExpectedValueCheck expectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
-				                                          expectedValue, mask, unExpectedValueEvent);
-				addPMONExpectedValueCheck(currentPMONId, expectedValueCheck);
+				PMONExpectedValueCheck& expectedValueCheck = dynamic_cast<PMONExpectedValueCheck&>(pmon);
+				expectedValueCheck.mask = mask;
+				expectedValueCheck.expectedValue = expectedValue;
+				expectedValueCheck.unexpectedValueEvent = unexpectedValueEvent;
 				break;
 			}
 
@@ -237,13 +234,12 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				getPMONDefinition(currentPMONId).get().repetitionCounter = 0;
-				getPMONDefinition(currentPMONId).get().repetitionNumber = currentPMONRepetitionNumber;
-				getPMONDefinition(currentPMONId).get().checkingStatus = PMON::Unchecked;
-				parameterMonitoringList.erase(currentPMONId);
-				PMONDeltaCheck deltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
-				                          numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
-				addPMONDeltaCheck(currentPMONId, deltaCheck);
+				PMONDeltaCheck& deltaCheck = dynamic_cast<PMONDeltaCheck&>(pmon);
+				deltaCheck.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
+				deltaCheck.lowDeltaThreshold = lowDeltaThreshold;
+				deltaCheck.belowLowThresholdEvent = belowLowThresholdEventId;
+				deltaCheck.highDeltaThreshold = highDeltaThreshold;
+				deltaCheck.aboveHighThresholdEvent = aboveHighThresholdEventId;
 				break;
 			}
 		}

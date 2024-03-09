@@ -456,10 +456,15 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::count() == 0);
 
 		CHECK(onBoardMonitoringService.getCount(PMONId) == 1);
-		auto modifiedDefinition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
-		CHECK(modifiedDefinition.getRepetitionNumber() == repetitionNumber);
-		CHECK(modifiedDefinition.getLowLimit() == lowLimit);
-		CHECK(modifiedDefinition.getHighLimit() == highLimit);
+
+		auto& baseDefinition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
+		auto& modifiedDefinition = dynamic_cast<PMONLimitCheck&>(baseDefinition);
+
+		CHECK(modifiedDefinition.repetitionNumber == repetitionNumber);
+		CHECK(modifiedDefinition.lowLimit == lowLimit);
+		CHECK(modifiedDefinition.highLimit == highLimit);
+		CHECK(modifiedDefinition.belowLowLimitEvent == belowLowLimitEvent);
+		CHECK(modifiedDefinition.aboveHighLimitEvent == aboveHighLimitEvent);
 
 		ServiceTests::reset();
 		Services.reset();
