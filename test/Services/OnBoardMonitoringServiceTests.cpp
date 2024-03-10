@@ -2,9 +2,9 @@
 #include <ServicePool.hpp>
 #include <Services/OnBoardMonitoringService.hpp>
 #include <catch2/catch_all.hpp>
-#include <etl/String.hpp>
 #include <etl/array.h>
 #include "ServiceTests.hpp"
+#include "etl/functional.h"
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
@@ -28,10 +28,10 @@ void initialiseParameterMonitoringDefinitions() {
 	// Reset fixtures to the defaults set up by the constructor
 	new (&fixtures) Fixtures();
 
-	onBoardMonitoringService.addPMONDefinition(0, fixtures.monitoringDefinition1);
-	onBoardMonitoringService.addPMONDefinition(1, fixtures.monitoringDefinition2);
-	onBoardMonitoringService.addPMONDefinition(2, fixtures.monitoringDefinition3);
-	onBoardMonitoringService.addPMONDefinition(3, fixtures.monitoringDefinition4);
+	onBoardMonitoringService.addPMONExpectedValueCheck(0, etl::ref(fixtures.monitoringDefinition1));
+	onBoardMonitoringService.addPMONLimitCheck(1, etl::ref(fixtures.monitoringDefinition2));
+	onBoardMonitoringService.addPMONDeltaCheck(2, etl::ref(fixtures.monitoringDefinition3));
+	onBoardMonitoringService.addPMONDeltaCheck(3, etl::ref(fixtures.monitoringDefinition4));
 }
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {

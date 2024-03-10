@@ -10,6 +10,7 @@
 #include "etl/list.h"
 #include "etl/map.h"
 #include "etl/vector.h"
+#include "etl/functional.h"
 
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
@@ -21,7 +22,7 @@ private:
 	/**
 	 * Map storing the parameter monitoring definitions.
 	 */
-	etl::map<uint16_t, std::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
+	etl::map<uint16_t, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
 	 * Maximum number of checks for each Limit Check.
@@ -94,26 +95,20 @@ public:
 	bool parameterMonitoringFunctionStatus = false;
 
 	/**
-	 * Adds a new Parameter Monitoring definition to the parameter monitoring list.
-	 */
-	void addPMONDefinition(ParameterId PMONId, std::reference_wrapper<PMON> PMONDefinition) {
-		parameterMonitoringList.insert({PMONId, PMONDefinition});
-	}
-
-	/**
 	 * Adds a new Parameter Monitoring Limit Check to the parameter monitoring list.
 	 */
 	void addPMONLimitCheck(ParameterId PMONId, PMONLimitCheck& limitCheck) {
 		limitChecks.push_back(limitCheck);
-		parameterMonitoringList.insert({PMONId, std::ref(limitChecks.back())});
+		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(limitChecks.back())));
 	}
+
 
 	/**
 	 * Adds a new Parameter Monitoring Expected Value Check to the parameter monitoring list.
 	 */
 	void addPMONExpectedValueCheck(ParameterId PMONId, PMONExpectedValueCheck& expectedValueCheck) {
 		expectedValueChecks.push_back(expectedValueCheck);
-		parameterMonitoringList.insert({PMONId, std::ref(expectedValueChecks.back())});
+		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(expectedValueChecks.back())));
 	}
 
 	/**
@@ -121,7 +116,7 @@ public:
 	 */
 	void addPMONDeltaCheck(ParameterId PMONId, PMONDeltaCheck& deltaCheck) {
 		deltaChecks.push_back(deltaCheck);
-		parameterMonitoringList.insert({PMONId, std::ref(deltaChecks.back())});
+		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(deltaChecks.back())));
 	}
 
 	/**
@@ -135,7 +130,7 @@ public:
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */
-	std::reference_wrapper<PMON> getPMONDefinition(ParameterId PMONId) {
+	etl::reference_wrapper<PMON> getPMONDefinition(ParameterId PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
 

@@ -8,7 +8,8 @@
 #include "etl/array.h"
 #include "etl/list.h"
 #include "etl/map.h"
-#include "optional"
+#include "etl/optional.h"
+#include "etl/functional.h"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
@@ -34,7 +35,7 @@ public:
 
 	ParameterId monitoredParameterId;
 
-	std::optional<std::reference_wrapper<ParameterBase>> monitoredParameter;
+	etl::optional<etl::reference_wrapper<ParameterBase>> monitoredParameter;
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
@@ -46,7 +47,7 @@ public:
 	bool monitoringEnabled = false;
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
-	std::optional<CheckType> checkType;
+	etl::optional<CheckType> checkType;
 
 	/**
 	 * Returns the number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
@@ -65,7 +66,7 @@ public:
 	/**
 	 * Returns the current Check Type.
 	 */
-	std::optional<CheckType> getCheckType() const {
+	etl::optional<CheckType> getCheckType() const {
 		return checkType;
 	}
 
