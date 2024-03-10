@@ -3,8 +3,6 @@
 #include "Message.hpp"
 #include "ServicePool.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
-#include <iostream>
-
 
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, EnableParameterMonitoringDefinitions)) {
@@ -160,8 +158,8 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 		}
 
 		parameterMonitoringList.erase(currentPMONId);
-		}
 	}
+}
 
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
