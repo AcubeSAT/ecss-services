@@ -28,129 +28,129 @@ void initializeStatistics(uint16_t interval1, uint16_t interval2) {
 }
 
 TEST_CASE("Reporting of statistics") {
-	SECTION("Report statistics, with auto statistic reset disabled with TC") {
-		initializeStatistics(6, 7);
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
 
-		MessageParser::execute(request);
-		CHECK(ServiceTests::count() == 1);
+	if (not Services.parameterStatistics.HasAutomaticStatisticsReset) {
+		SECTION("Report statistics, with auto statistic reset disabled with TC") {
+			initializeStatistics(6, 7);
+			Message request = Message(ParameterStatisticsService::ServiceType,
+			                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
 
-		Message report = ServiceTests::get(0);
-		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
-		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // start time
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // end time
-		CHECK(report.readUint16() == 2);                                    // number of parameters reported
-		// Parameter B
-		CHECK(report.read<ParameterId>() == 5);                             // ID-2
-		CHECK(report.read<ParameterSampleCount>() == 6);                    // number of samples
-		CHECK(report.readFloat() == 13);                                    // max value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
-		CHECK(report.readFloat() == 3);                                     // min value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
-		CHECK(report.readFloat() == 8);                                     // mean
-		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
-		// Parameter A
-		CHECK(report.read<ParameterId>() == 7);                             // ID-1
-		CHECK(report.read<ParameterSampleCount>() == 3);                    // number of samples
-		CHECK(report.readFloat() == 5);                                     // max value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
-		CHECK(report.readFloat() == 1);                                     // min value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
-		CHECK(report.readFloat() == 3);                                     // mean
-		CHECK(static_cast<int>(report.readFloat()) == 1);                   // stddev
+			MessageParser::execute(request);
+			CHECK(ServiceTests::count() == 1);
 
-		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+			Message report = ServiceTests::get(0);
+			CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
+			CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // start time
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // end time
+			CHECK(report.readUint16() == 2);                                    // number of parameters reported
+			// Parameter B
+			CHECK(report.read<ParameterId>() == 5);                             // ID-2
+			CHECK(report.read<ParameterSampleCount>() == 6);                    // number of samples
+			CHECK(report.readFloat() == 13);                                    // max value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+			CHECK(report.readFloat() == 3);                                     // min value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+			CHECK(report.readFloat() == 8);                                     // mean
+			CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
+			// Parameter A
+			CHECK(report.read<ParameterId>() == 7);                             // ID-1
+			CHECK(report.read<ParameterSampleCount>() == 3);                    // number of samples
+			CHECK(report.readFloat() == 5);                                     // max value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+			CHECK(report.readFloat() == 1);                                     // min value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+			CHECK(report.readFloat() == 3);                                     // mean
+			CHECK(static_cast<int>(report.readFloat()) == 1);                   // stddev
+
+			CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+		}
+
+		SECTION("Report statistics, with auto statistics reset disabled, but reset is given by TC") {
+			Message request = Message(ParameterStatisticsService::ServiceType,
+			                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+			request.appendBoolean(true);
+			Services.parameterStatistics.statisticsMap[5].mean = 5;
+			Services.parameterStatistics.statisticsMap[7].mean = 3;
+
+			CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+
+			MessageParser::execute(request);
+
+			CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+		}
+
+		ServiceTests::reset();
+
+		SECTION("Report statistics, with auto statistic reset disabled without TC") {
+			initializeStatistics(6, 7);
+			Services.parameterStatistics.reportParameterStatistics(false);
+
+			CHECK(ServiceTests::count() == 1);
+
+			Message report = ServiceTests::get(0);
+			CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
+			CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // start time
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // end time
+			CHECK(report.readUint16() == 2);                                    // number of parameters reported
+			// Parameter B
+			CHECK(report.read<ParameterId>() == 5);                             // ID-2
+			CHECK(report.read<ParameterSampleCount>() == 6);                    // number of samples
+			CHECK(report.readFloat() == 13);                                    // max value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+			CHECK(report.readFloat() == 3);                                     // min value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+			CHECK(report.readFloat() == 8);                                     // mean
+			CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
+			// Parameter A
+			CHECK(report.read<ParameterId>() == 7);                             // ID-1
+			CHECK(report.read<ParameterSampleCount>() == 3);                    // number of samples
+			CHECK(report.readFloat() == 5);                                     // max value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
+			CHECK(report.readFloat() == 1);                                     // min value
+			CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
+			CHECK(report.readFloat() == 3);                                     // mean
+			CHECK(static_cast<int>(report.readFloat()) == 1);                   // stddev
+
+			CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+		}
+
+		SECTION("Report statistics, with auto statistics reset disabled, but reset is given with args, without TC") {
+			Services.parameterStatistics.statisticsMap[5].mean = 5;
+			Services.parameterStatistics.statisticsMap[7].mean = 3;
+
+			CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+
+			Services.parameterStatistics.reportParameterStatistics(true);
+
+			CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+		}
 	}
+	else {
+		SECTION("Report statistics, with auto statistics reset enabled with TC") {
+			Message request = Message(ParameterStatisticsService::ServiceType,
+			                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
+			MessageParser::execute(request);
 
-	SECTION("Report statistics, with auto statistics reset enabled with TC") {
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
-		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
-		MessageParser::execute(request);
+			CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+		}
 
-		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
-	}
+		ServiceTests::reset();
 
-	SECTION("Report statistics, with auto statistics reset disabled, but reset is given by TC") {
-		Message request = Message(ParameterStatisticsService::ServiceType,
-		                          ParameterStatisticsService::MessageType::ReportParameterStatistics, Message::TC, 1);
-		request.appendBoolean(true);
-		Services.parameterStatistics.statisticsMap[5].mean = 5;
-		Services.parameterStatistics.statisticsMap[7].mean = 3;
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
+		SECTION("Report statistics, with auto statistics reset enabled without TC") {
+			Services.parameterStatistics.reportParameterStatistics(false);
 
-		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
-
-		MessageParser::execute(request);
-
-		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
-	}
-
-	ServiceTests::reset();
-
-	SECTION("Report statistics, with auto statistic reset disabled without TC") {
-		initializeStatistics(6, 7);
-		Services.parameterStatistics.reportParameterStatistics(false);
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
-
-		CHECK(ServiceTests::count() == 1);
-
-		Message report = ServiceTests::get(0);
-		CHECK(report.serviceType == ParameterStatisticsService::ServiceType);
-		CHECK(report.messageType == ParameterStatisticsService::MessageType::ParameterStatisticsReport);
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // start time
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // end time
-		CHECK(report.readUint16() == 2);                                    // number of parameters reported
-		// Parameter B
-		CHECK(report.read<ParameterId>() == 5);                             // ID-2
-		CHECK(report.read<ParameterSampleCount>() == 6);                    // number of samples
-		CHECK(report.readFloat() == 13);                                    // max value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
-		CHECK(report.readFloat() == 3);                                     // min value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
-		CHECK(report.readFloat() == 8);                                     // mean
-		CHECK(report.readFloat() == Catch::Approx(3.41565).epsilon(0.01));
-		// Parameter A
-		CHECK(report.read<ParameterId>() == 7);                             // ID-1
-		CHECK(report.read<ParameterSampleCount>() == 3);                    // number of samples
-		CHECK(report.readFloat() == 5);                                     // max value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // max time
-		CHECK(report.readFloat() == 1);                                     // min value
-		CHECK(report.read<Time::DefaultCUC>().formatAsBytes() == 86769000); // min time
-		CHECK(report.readFloat() == 3);                                     // mean
-		CHECK(static_cast<int>(report.readFloat()) == 1);                   // stddev
-
-		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
-	}
-
-	SECTION("Report statistics, with auto statistics reset enabled without TC") {
-		Services.parameterStatistics.hasAutomaticStatisticsReset = true;
-		Services.parameterStatistics.reportParameterStatistics(false);
-
-		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
-	}
-
-	SECTION("Report statistics, with auto statistics reset disabled, but reset is given with args, without TC") {
-		Services.parameterStatistics.statisticsMap[5].mean = 5;
-		Services.parameterStatistics.statisticsMap[7].mean = 3;
-		Services.parameterStatistics.hasAutomaticStatisticsReset = false;
-
-		CHECK(not Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(not Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
-
-		Services.parameterStatistics.reportParameterStatistics(true);
-
-		CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
-		CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+			CHECK(Services.parameterStatistics.statisticsMap[5].statisticsAreInitialized());
+			CHECK(Services.parameterStatistics.statisticsMap[7].statisticsAreInitialized());
+		}
 	}
 }
 
