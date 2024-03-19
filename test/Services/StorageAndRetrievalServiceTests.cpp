@@ -918,6 +918,7 @@ TEST_CASE("Suspending the open retrieval process") {
 TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 	SECTION("Successful starting of the by-time-range retrieval") {
 		initializePacketStores();
+		INFO("Actual number of packet stores: " << storageAndRetrieval.currentNumberOfPacketStores());
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);

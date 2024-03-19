@@ -39,7 +39,7 @@ target_sources(common PRIVATE
         src/Services/OnBoardMonitoringService.cpp
         src/Helpers/Statistic.cpp
         src/Services/RealTimeForwardingControlService.cpp
-        src/Helpers/PMONBase.cpp
+        src/Helpers/PMON.cpp
         src/Helpers/AllReportTypes.cpp
         src/Helpers/FilepathValidators.cpp
         src/Services/FileManagementService.cpp
