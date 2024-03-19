@@ -14,7 +14,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 	}
 	parameterStatisticsReport();
 
-	if (hasAutomaticStatisticsReset or request.readBoolean()) {
+	if (HasAutomaticStatisticsReset or request.readBoolean()) {
 		resetParameterStatistics();
 	}
 }
@@ -22,7 +22,7 @@ void ParameterStatisticsService::reportParameterStatistics(Message& request) {
 void ParameterStatisticsService::reportParameterStatistics(bool reset) {
 	parameterStatisticsReport();
 
-	if (hasAutomaticStatisticsReset or reset) {
+	if (HasAutomaticStatisticsReset or reset) {
 		resetParameterStatistics();
 	}
 }
