@@ -141,6 +141,21 @@ public:
    * TC[15,3] 'add report types to an application process storage control configuration'.
    */
 	void addReportTypesToAppProcessConfiguration(Message& request);
+
+	/**
+   * TC[15,4] 'delete report types from the application process storage control configuration'
+   */
+	void deleteReportTypesFromAppProcessConfiguration(Message& request);
+
+	/**
+   	* Deletes all report types of the specified service type, to the application process configuration.
+   	*/
+	void deleteAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
+
+	/**
+   	* Deletes all report types of the specified application process definition, to the application process configuration.
+   	*/
+	void deleteAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 };
 
 #endif

@@ -158,3 +158,59 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 		}
 	}
 }
+
+void PacketSelectionSubservice::deleteAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
+	for (auto& service: AllReportTypes::MessagesOfService) {
+		uint8_t serviceType = service.first;
+		deleteAllReportsOfService(packetStoreID, applicationID, serviceType);
+	}
+}
+
+void PacketSelectionSubservice::deleteAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
+	for (auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
+		auto appServicePair = std::make_pair(applicationID, serviceType);
+		applicationProcessConfiguration[packetStoreID].definitions.erase(appServicePair);
+	}
+}
+
+void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Message& request) {
+	request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::DeleteReportTypesTFromAppProcessConfiguration);
+	auto packetStoreID = readPacketStoreId(request);
+	if (not packetStoreExists(packetStoreID)) {
+		return;
+	}
+
+	auto numOfApplication = request.readUint8();
+	if (!numOfApplication) {
+		auto definition = applicationProcessConfiguration[packetStoreID].definitions;
+		for (; !definition.empty();) {
+			definition.erase(definition.begin());
+		}
+	}
+
+	for (uint8_t i = 0; i < numOfApplication; i++) {
+		uint8_t applicationID = request.readUint8();
+		uint8_t numOfServices = request.readUint8();
+		if (numOfServices == 0) {
+			deleteAllReportsOfApplication(packetStoreID, applicationID);
+			continue;
+		}
+
+		for (uint8_t j = 0; j < numOfServices; j++) {
+			uint8_t serviceType = request.readUint8();
+			uint8_t numOfMessages = request.readUint8();
+
+			if (numOfMessages == 0) {
+				deleteAllReportsOfService(packetStoreID,applicationID,serviceType);
+			}
+			for (uint8_t k = 0; k < numOfMessages; k++) {
+				uint8_t messageType = request.readUint8();
+				auto appServicePair = std::make_pair(applicationID, serviceType);
+				auto messageTypeIndex = etl::find(applicationProcessConfiguration[packetStoreID].definitions.at(appServicePair).begin(),applicationProcessConfiguration[packetStoreID].definitions.at(appServicePair).end(),messageType);
+
+				applicationProcessConfiguration[packetStoreID].definitions.at(appServicePair).erase(messageTypeIndex);
+			}
+		}
+	}
+
+}
