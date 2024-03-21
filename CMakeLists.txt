@@ -43,6 +43,7 @@ target_sources(common PRIVATE
         src/Helpers/AllReportTypes.cpp
         src/Helpers/FilepathValidators.cpp
         src/Services/FileManagementService.cpp
+        src/Services/PacketSelectionSubservice.cpp
         )
 
 target_link_libraries(common

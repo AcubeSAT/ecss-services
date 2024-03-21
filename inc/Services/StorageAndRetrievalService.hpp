@@ -3,6 +3,8 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
+//#include "Helpers/AllMessageTypes.hpp"
+#include "PacketSelectionSubservice.hpp"
 #include "Helpers/PacketStore.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
@@ -188,6 +190,10 @@ public:
 	enum MessageType : uint8_t {
 		EnableStorageInPacketStores = 1,
 		DisableStorageInPacketStores = 2,
+		AddReportTypesToAppProcessConfiguration = 3,
+		DeleteReportTypesTFromAppProcessConfiguration = 4,
+		reportApplicationProcess = 5,
+		applicationProcessReport = 6,
 		StartByTimeRangeRetrieval = 9,
 		DeletePacketStoreContent = 11,
 		ReportContentSummaryOfPacketStores = 12,
@@ -212,6 +218,11 @@ public:
 	StorageAndRetrievalService() {
 		serviceType = ServiceType;
 	}
+
+	/**
+	 * The packet selection sub-service of the Storage and Retrieval service.
+	 */
+	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(packetStores);
 
 	/**
 	 * Adds new packet store into packet stores.
