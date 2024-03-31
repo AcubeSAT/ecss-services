@@ -77,30 +77,10 @@ public:
 		return checkingStatus;
 	}
 
-	virtual PMONExpectedValue getExpectedValue() {
-		return 0.0; }
-	virtual PMONBitMask getMask() {
-		return 0; }
-	virtual EventDefinitionId getUnexpectedValueEvent() {
-		return 0; }
-	virtual PMONLimit getLowLimit() {
-		return 0.0; }
-	virtual EventDefinitionId getBelowLowLimitEvent() {
-		return 0; }
-	virtual PMONLimit getHighLimit() {
-		return 0.0; }
-	virtual EventDefinitionId getAboveHighLimitEvent() {
-		return 0; }
-	virtual NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() {
-		return 0; }
-	virtual DeltaThreshold getLowDeltaThreshold() {
-		return 0.0; }
-	virtual EventDefinitionId getBelowLowThresholdEvent() {
-		return 0; }
-	virtual DeltaThreshold getHighDeltaThreshold() {
-		return 0.0; }
-	virtual EventDefinitionId getAboveHighThresholdEvent() {
-		return 0; }
+	/**
+	 *  Minimal overhead to enable polymorphism
+	 */
+	virtual ~PMON() = default;
 
 protected:
 	/**
@@ -128,21 +108,21 @@ public:
 	/**
 	 * Returns the value of the bit mask used in an Expected Value Check.
 	 */
-	PMONBitMask getMask() override {
+	PMONBitMask getMask() {
 		return mask;
 	}
 
 	/**
 	 * Returns the value resulting from applying the bit mask.
 	 */
-	PMONExpectedValue getExpectedValue() override {
+	PMONExpectedValue getExpectedValue() {
 		return expectedValue;
 	}
 
 	/**
 	 * Returns the Id of an Unexpected Value Event.
 	 */
-	EventDefinitionId getUnexpectedValueEvent() override {
+	EventDefinitionId getUnexpectedValueEvent() {
 		return unexpectedValueEvent;
 	}
 };
@@ -167,28 +147,28 @@ public:
 	/**
 	 * Returns the value of the Low PMONLimit used on a PMONLimit Check.
 	 */
-	PMONLimit getLowLimit() override {
+	PMONLimit getLowLimit() {
 		return lowLimit;
 	}
 
 	/**
 	 * Returns the Id of a Below Low PMONLimit Event.
 	 */
-	EventDefinitionId getBelowLowLimitEvent() override {
+	EventDefinitionId getBelowLowLimitEvent() {
 		return belowLowLimitEvent;
 	}
 
 	/**
 	 * Returns the value of the High PMONLimit used on a PMONLimit Check.
 	 */
-	PMONLimit getHighLimit() override {
+	PMONLimit getHighLimit() {
 		return highLimit;
 	}
 
 	/**
 	 * Returns the Id of a High PMONLimit Event.
 	 */
-	EventDefinitionId getAboveHighLimitEvent() override {
+	EventDefinitionId getAboveHighLimitEvent() {
 		return aboveHighLimitEvent;
 	}
 };
@@ -217,35 +197,35 @@ public:
 	/**
 	 * Returns the number of consecutive Delta Checks.
 	 */
-	NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() override {
+	NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() {
 		return numberOfConsecutiveDeltaChecks;
 	}
 
 	/**
 	 * Returns the value of the Low Threshold used on a Delta Check.
 	 */
-	DeltaThreshold getLowDeltaThreshold() override {
+	DeltaThreshold getLowDeltaThreshold() {
 		return lowDeltaThreshold;
 	}
 
 	/**
 	 * Returns the Id of a Below Low Threshold Event.
 	 */
-	EventDefinitionId getBelowLowThresholdEvent() override {
+	EventDefinitionId getBelowLowThresholdEvent() {
 		return belowLowThresholdEvent;
 	}
 
 	/**
 	 * Returns the value of the High Threshold used on a Delta Check.
 	 */
-	DeltaThreshold getHighDeltaThreshold() override {
+	DeltaThreshold getHighDeltaThreshold() {
 		return highDeltaThreshold;
 	}
 
 	/**
 	 * Returns the Id of an Above High Threshold Event.
 	 */
-	EventDefinitionId getAboveHighThresholdEvent() override {
+	EventDefinitionId getAboveHighThresholdEvent() {
 		return aboveHighThresholdEvent;
 	}
 };
