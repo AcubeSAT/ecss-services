@@ -230,14 +230,13 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(pmon.isMonitoringEnabled() == false);
 		CHECK(pmon.getCheckingStatus() == PMON::Unchecked);
 
-		if (pmon.getCheckType() == PMON::CheckType::Limit) {
-			auto* limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
-			REQUIRE(limitCheck != nullptr);
-			CHECK(limitCheck->getLowLimit() == lowLimit);
-			CHECK(limitCheck->getBelowLowLimitEvent() == belowLowLimitEvent);
-			CHECK(limitCheck->getHighLimit() == highLimit);
-			CHECK(limitCheck->getAboveHighLimitEvent() == aboveHighLimitEvent);
-		}
+		auto* limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
+		REQUIRE(limitCheck != nullptr);
+		CHECK(limitCheck->getLowLimit() == lowLimit);
+		CHECK(limitCheck->getBelowLowLimitEvent() == belowLowLimitEvent);
+		CHECK(limitCheck->getHighLimit() == highLimit);
+		CHECK(limitCheck->getAboveHighLimitEvent() == aboveHighLimitEvent);
+
 
 		ServiceTests::reset();
 		Services.reset();
