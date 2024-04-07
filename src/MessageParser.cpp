@@ -246,7 +246,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 
 
 	if constexpr (CRCHelper::EnableCRC) {
-		const uint16_t crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
+		const CRCSize crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
 		etl::array<uint8_t, CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
 		                                            (crcField &  0xFF)};
 		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), 2);

@@ -3,11 +3,6 @@
 
 using StepId = uint8_t;
 using ParameterReportStructureId = uint8_t;
-/**
- * @deprecated Ought to be changed to use our custom class.
- * Used for the various timestamps that exist in the code and previously made use of the uint32_t type.
- */
-using TimeStamps = uint32_t;
 using EventDefinitionId = uint16_t;
 using ParameterId = uint16_t;
 using ParameterSampleCount = uint16_t;
@@ -24,7 +19,6 @@ using MemoryDataLength = uint16_t;
 /**
  * Parameter Monitoring Identifier as used in the On-board Monitoring Service.
  */
-using PMONId = uint16_t;
 using LargeMessageTransactionId = uint16_t;
 using PartSequenceNum = uint16_t;
 using PacketStoreSize = uint16_t;
@@ -52,3 +46,12 @@ using PercentageFilled = uint16_t;
  */
 using CollectionInterval = uint32_t;
 using ErrorCode = uint16_t;
+/**
+ * The types used for the three Check Types and their variables in OnBoardMonitoringService.
+ */
+ using PMONRepetitionNumber = uint16_t;
+ using PMONLimit = double;
+ using PMONExpectedValue = double;
+ using PMONBitMask = uint64_t;
+ using NumberOfConsecutiveDeltaChecks = uint16_t;
+ using DeltaThreshold = double;

@@ -41,7 +41,7 @@ void TimeBasedSchedulingService::resetSchedule(const Message& request) {
 	}
 	executionFunctionStatus = false;
 	scheduledActivities.clear();
-// todo (#264): Add resetting for sub-schedules and groups, if defined
+	// todo (#264): Add resetting for sub-schedules and groups, if defined
 }
 
 void TimeBasedSchedulingService::insertActivities(Message& request) {
@@ -49,13 +49,13 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		return;
 	}
 
-// todo (#228): Get the sub-schedule ID if they are implemented
+	// todo (#228): Get the sub-schedule ID if they are implemented
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		// todo (#229): Get the group ID first, if groups are used
-		const Time::DefaultCUC currentTime = TimeGetter::getCurrentTimeDefaultCUC();
+		const Time::DefaultCUC currentTime(TimeGetter::getCurrentTimeDefaultCUC());
 
-		const Time::DefaultCUC releaseTime = request.readDefaultCUCTimeStamp();
+		const Time::DefaultCUC releaseTime(request.readDefaultCUCTimeStamp());
 		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.skipBytes(ECSSTCRequestStringSize);
@@ -84,14 +84,14 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 		return;
 	}
 
-	const Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
+	const Time::DefaultCUC current_time(TimeGetter::getCurrentTimeDefaultCUC());
 
 	const auto releaseTimes =
 	    etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end(),
 	                        [](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
 		                        return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
 	                        });
-// todo (#267): Define what the time format is going to be
+	// todo (#267): Define what the time format is going to be
 	const Time::RelativeTime relativeOffset = request.readRelativeTime();
 	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
@@ -107,7 +107,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 		return;
 	}
 
-	const Time::DefaultCUC current_time = TimeGetter::getCurrentTimeDefaultCUC();
+	const Time::DefaultCUC current_time(TimeGetter::getCurrentTimeDefaultCUC());
 
 	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
 	uint16_t iterationCount = request.readUint16();
@@ -170,7 +170,7 @@ void TimeBasedSchedulingService::detailReportAllActivities(const Message& reques
 }
 
 void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
-// todo (#228): (#229) append sub-schedule and group ID if they are defined
+	// todo (#228): (#229) append sub-schedule and group ID if they are defined
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
 
@@ -245,10 +245,10 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 
-// todo (#228): append sub-schedule and group ID if they are defined
+	// todo (#228): append sub-schedule and group ID if they are defined
 	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
 	for (const auto& match: listOfActivities) {
-// todo (#229): append sub-schedule and group ID if they are defined
+		// todo (#229): append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
 		report.append<SourceId>(match.requestID.sourceID);
 		report.append<ApplicationProcessId>(match.requestID.applicationID);

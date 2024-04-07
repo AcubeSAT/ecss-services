@@ -25,20 +25,20 @@ void MemoryManagementService::loadRawData(Message& request) {
 	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
 
 	if (!memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
-	// TODO(#257): Send a failed start of execution
+		// TODO(#257): Send a failed start of execution
 		return;
 	}
 
-	etl::array<ReadData , ECSSMaxStringSize> readData = {};
+	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();
 
 	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
-	// TODO(#258): Define FLASH specific access code when we transfer to embedded
+		// TODO(#258): Define FLASH specific access code when we transfer to embedded
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
 			const StartAddress startAddress = request.read<StartAddress>();
 			const MemoryDataLength dataLength = request.readOctetString(readData.data()); // NOLINT(cppcoreguidelines-init-variables)
-			const MemoryManagementChecksum checksum = request.readBits(8*sizeof(MemoryManagementChecksum));
+			const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
 
 			if (!dataValidator(readData.data(), checksum, dataLength)) {
 				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
@@ -75,7 +75,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	const MemoryId memoryID = request.read<MemoryId>();
 
 	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
-		etl::array<ReadData , ECSSMaxStringSize> readData = {};
+		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
 		report.append<MemoryId>(memoryID);
@@ -102,7 +102,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-	// TODO(#257): Send a failed start of execution
+		// TODO(#257): Send a failed start of execution
 	}
 }
 
@@ -115,7 +115,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	const MemoryId memoryID = request.read<MemoryId>();
 
 	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
-		etl::array<ReadData , ECSSMaxStringSize> readData = {};
+		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
 		report.append<MemoryId>(memoryID);
@@ -142,61 +142,27 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		mainService.storeMessage(report);
 		request.resetRead();
 	} else {
-	// TODO(#257): Send a failed start of execution report
+		// TODO(#257): Send a failed start of execution report
 	}
 }
 
 bool MemoryManagementService::addressValidator(MemoryManagementService::MemoryID memId, uint64_t address) {
-	bool validIndicator = false;
-
-	switch (memId) {
-		case MemoryManagementService::MemoryID::DTCMRAM:
-			if ((address >= DTCMRAMLowerLim) && (address <= DTCMRAMUpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::ITCMRAM:
-			if ((address >= ITCMRAMLowerLim) && (address <= ITCMRAMUpperLim)) { //cppcheck-suppress unsignedPositive
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::RAM_D1:
-			if ((address >= RAMD1LowerLim) && (address <= RAMD1UpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::RAM_D2:
-			if ((address >= RAMD2LowerLim) && (address <= RAMD2UpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::RAM_D3:
-			if ((address >= RAMD3LowerLim) && (address <= RAMD3UpperLim)) {
-				validIndicator = true;
-			}
-			break;
-		case MemoryManagementService::MemoryID::FLASH_MEMORY:
-			if ((address >= FlashLowerLim) && (address <= FlashUpperLim)) {
-				validIndicator = true;
-			}
-			break;
-
-		default:
-			validIndicator = true; // TODO(#259): Implemented so addresses from PC can be read. Remove.
-			break;
+	bool validIndicator = true;
+	auto iterator = MemoryManagementService::memoryLimitsMap.find(memId);
+	if (iterator != MemoryManagementService::memoryLimitsMap.end()) {
+		const auto& limits = iterator->second;
+		validIndicator = (address >= limits.lowerLim) && (address <= limits.upperLim);
+	} else {
+		// Default case (unknown MemoryID)
+		validIndicator = true;
+		// TODO(#259): Implemented so addresses from PC can be read. Remove.
 	}
-
 	return validIndicator;
 }
 
 inline bool MemoryManagementService::memoryIdValidator(MemoryManagementService::MemoryID memId) {
-	return (memId == MemoryManagementService::MemoryID::RAM_D1) ||
-	       (memId == MemoryManagementService::MemoryID::RAM_D2) ||
-	       (memId == MemoryManagementService::MemoryID::RAM_D3) ||
-	       (memId == MemoryManagementService::MemoryID::DTCMRAM) ||
-	       (memId == MemoryManagementService::MemoryID::ITCMRAM) ||
-	       (memId == MemoryManagementService::MemoryID::FLASH_MEMORY) ||
-	       (memId == MemoryManagementService::MemoryID::EXTERNAL);
+	return etl::find(MemoryManagementService::validMemoryIds.begin(), MemoryManagementService::validMemoryIds.end(),
+	                 memId) != MemoryManagementService::validMemoryIds.end();
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length) {

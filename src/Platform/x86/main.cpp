@@ -56,17 +56,17 @@ int main() {
 	Message sentPacket = Message(ParameterService::ServiceType, ParameterService::MessageType::ReportParameterValues,
 	                             Message::TC, 1); // application id is a dummy number (1)
 	sentPacket.appendUint16(2);                   // number of contained IDs
-	sentPacket.append<ParameterId>(0);                   // first ID
-	sentPacket.append<ParameterId>(1);                   // second ID
+	sentPacket.append<ParameterId>(0);            // first ID
+	sentPacket.append<ParameterId>(1);            // second ID
 	paramService.reportParameters(sentPacket);
 
 	// Test code for setParameter
 	Message sentPacket2 = Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues,
 	                              Message::TC, 1); // application id is a dummy number (1)
 	sentPacket2.appendUint16(2);                   // number of contained IDs
-	sentPacket2.append<ParameterId>(0);                   // first parameter ID
+	sentPacket2.append<ParameterId>(0);            // first parameter ID
 	sentPacket2.appendUint32(63238);               // settings for first parameter
-	sentPacket2.append<ParameterId>(1);                   // 2nd parameter ID
+	sentPacket2.append<ParameterId>(1);            // 2nd parameter ID
 	sentPacket2.appendUint32(45823);               // settings for 2nd parameter
 
 	paramService.setParameters(sentPacket2);
@@ -84,9 +84,9 @@ int main() {
 	Message rcvPack = Message(MemoryManagementService::ServiceType,
 	                          MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
 	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	rcvPack.appendUint16(3);                                          // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(string));         // Start address
-	rcvPack.append<MemoryDataLength>(sizeof(string) / sizeof(string[0]));         // Data read length
+	rcvPack.appendUint16(3);                                               // Iteration count
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(string));  // Start address
+	rcvPack.append<MemoryDataLength>(sizeof(string) / sizeof(string[0]));  // Data read length
 
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(anotherStr));
 	rcvPack.append<MemoryDataLength>(sizeof(anotherStr) / sizeof(anotherStr[0]));
@@ -100,10 +100,10 @@ int main() {
 
 	uint8_t data[2] = {'h', 'R'};
 	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	rcvPack.appendUint16(2);                                          // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));           // Start address
+	rcvPack.appendUint16(2);                                               // Iteration count
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));    // Start address
 	rcvPack.appendOctetString(String<2>(data, 2));
-	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2));   // Append the CRC value
+	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2));               // Append the CRC value
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr + 1)); // Start address
 	rcvPack.appendOctetString(String<1>(data, 1));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
@@ -113,8 +113,8 @@ int main() {
 	                  Message::TC, 1);
 
 	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
-	rcvPack.appendUint16(2);                                          // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data));           // Start address
+	rcvPack.appendUint16(2);                                               // Iteration count
+	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data));    // Start address
 	rcvPack.append<MemoryDataLength>(2);
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data + 1)); // Start address
 	rcvPack.append<MemoryDataLength>(1);
@@ -318,9 +318,9 @@ int main() {
 
 	// ST[11] test
 	TimeBasedSchedulingService timeBasedSchedulingService;
-	auto currentTime = static_cast<uint32_t>(time(nullptr)); // Get the current system time
+	Time::DefaultCUC currentTime(time(nullptr)); // Get the current system time
 	std::cout << "\n\nST[11] service is running";
-	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime << std::endl;
+	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime.asTAIseconds() << std::endl;
 
 	Message receivedMsg =
 	    Message(TimeBasedSchedulingService::ServiceType,
@@ -337,10 +337,10 @@ int main() {
 	                      TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
-	receivedMsg.append<TimeStamps>(currentTime + 1556435U);
+	receivedMsg.append<Time::DefaultCUC>(Time::DefaultCUC(currentTime.asTAIseconds() + 1556435U));
 	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
 
-	receivedMsg.append<TimeStamps>(currentTime + 1957232U);
+	receivedMsg.append<Time::DefaultCUC>(Time::DefaultCUC(currentTime.asTAIseconds() + 1957232U));
 	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
