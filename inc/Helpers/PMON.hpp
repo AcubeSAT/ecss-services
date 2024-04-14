@@ -133,7 +133,7 @@ public:
 	PMONExpectedValueCheck(PMONExpectedValueCheck&&) = delete; // move constructor
 	PMONExpectedValueCheck& operator=(PMONExpectedValueCheck&&) = delete; // move assignment operator
 
-	virtual ~PMONExpectedValueCheck() = default; // destructor
+	~PMONExpectedValueCheck() = default; // destructor
 
 	/**
 	 * Returns the value of the bit mask used in an Expected Value Check.
@@ -186,7 +186,7 @@ public:
 	PMONLimitCheck(PMONLimitCheck&&) = delete; // move constructor
 	PMONLimitCheck& operator=(PMONLimitCheck&&) = delete; // move assignment operator
 
-	virtual ~PMONLimitCheck() = default; // destructor
+	~PMONLimitCheck() override = default; // destructor
 
 	/**
 	 * Returns the value of the Low PMONLimit used on a PMONLimit Check.
@@ -251,7 +251,7 @@ public:
 	PMONDeltaCheck(PMONDeltaCheck&&) = delete; // move constructor
 	PMONDeltaCheck& operator=(PMONDeltaCheck&&) = delete; // move assignment operator
 
-	virtual ~PMONDeltaCheck() = default; // destructor
+	~PMONDeltaCheck() override = default; // destructor
 
 	/**
 	 * Returns the number of consecutive Delta Checks.
