@@ -722,37 +722,49 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 	}
 
 
-//	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
-//		initialiseParameterMonitoringDefinitions();
-//		uint16_t numberOfIds = 2;
-//		Message request =
-//		    Message(OnBoardMonitoringService::ServiceType,
-//		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
-//		request.appendUint16(numberOfIds);
-//		etl::array<uint16_t, 2> PMONIds = {0, 5};
-//		request.appendEnum16(PMONIds[0]);
-//		request.appendEnum16(PMONIds[1]);
-//		MessageParser::execute(request);
-//		CHECK(ServiceTests::count() == 2);
-//		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
-//
-//		Message report = ServiceTests::get(1);
-//		auto checkTypeOpt = onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkType;
-//		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
-//		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
-//		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
-//		CHECK(report.readUint16() == numberOfIds);
-//		CHECK(report.readEnum16() == PMONIds[0]);
-//		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoredParameterId);
-//		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled);
-//		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionNumber);
-//		if (checkTypeOpt.has_value()) {
-//			CHECK(report.readEnum8() == static_cast<uint8_t>(checkTypeOpt.value()));
-//		}
-//		CHECK(report.read<PMONBitMask>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getMask());
-//		CHECK(report.read<PMONExpectedValue>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getExpectedValue());
-//		CHECK(report.read<EventDefinitionId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().getUnexpectedValueEvent());
-//		ServiceTests::reset();
-//		Services.reset();
-//	}
+	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
+		initialiseParameterMonitoringDefinitions();
+		uint16_t numberOfIds = 2;
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(numberOfIds);
+		etl::array<uint16_t, 2> PMONIds = {0, 5};
+		request.appendEnum16(PMONIds[0]);
+		request.appendEnum16(PMONIds[1]);
+		MessageParser::execute(request);
+		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ReportParameterNotInTheParameterMonitoringList) == 1);
+
+		Message report = ServiceTests::get(1);
+
+
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
+		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
+		CHECK(report.readUint16() == numberOfIds);
+
+		auto definitionOpt0 = onBoardMonitoringService.getPMONDefinition(PMONIds[0]);
+		auto& pmon0 = definitionOpt0.get();
+
+		CHECK(report.readEnum16() == PMONIds[0]);
+		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoredParameterId);
+		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled);
+		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionNumber);
+
+		if (pmon0.getCheckType() == PMON::CheckType::ExpectedValue) {
+
+			auto expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon0);
+
+			if (expectedValueCheck) {
+				CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+				CHECK(report.read<PMONBitMask>() == expectedValueCheck->getMask());
+				CHECK(report.read<PMONExpectedValue>() == expectedValueCheck->getExpectedValue());
+				CHECK(report.read<EventDefinitionId>() == expectedValueCheck->getUnexpectedValueEvent());
+			}
+		}
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
