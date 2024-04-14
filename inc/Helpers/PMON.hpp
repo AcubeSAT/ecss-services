@@ -6,10 +6,10 @@
 #include "Message.hpp"
 #include "Service.hpp"
 #include "etl/array.h"
+#include "etl/functional.h"
 #include "etl/list.h"
 #include "etl/map.h"
 #include "etl/optional.h"
-#include "etl/functional.h"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
@@ -94,8 +94,8 @@ public:
 	}
 
 	PMON& operator=(const PMON& other) = delete; // copy assignment operator
-	PMON(PMON&&) = delete; // move constructor
-	PMON& operator=(PMON&&) = delete; // move assignment operator
+	PMON(PMON&&) = delete;                       // move constructor
+	PMON& operator=(PMON&&) = delete;            // move assignment operator
 
 	virtual ~PMON() = default; // destructor
 
@@ -130,10 +130,10 @@ public:
 	}
 
 	PMONExpectedValueCheck& operator=(const PMONExpectedValueCheck&) = delete; // copy assignment operator
-	PMONExpectedValueCheck(PMONExpectedValueCheck&&) = delete; // move constructor
-	PMONExpectedValueCheck& operator=(PMONExpectedValueCheck&&) = delete; // move assignment operator
+	PMONExpectedValueCheck(PMONExpectedValueCheck&&) = delete;                 // move constructor
+	PMONExpectedValueCheck& operator=(PMONExpectedValueCheck&&) = delete;      // move assignment operator
 
-	~PMONExpectedValueCheck() = default; // destructor
+	~PMONExpectedValueCheck() override = default; // destructor
 
 	/**
 	 * Returns the value of the bit mask used in an Expected Value Check.
@@ -183,8 +183,8 @@ public:
 	}
 
 	PMONLimitCheck& operator=(const PMONLimitCheck&) = delete; // copy assignment operator
-	PMONLimitCheck(PMONLimitCheck&&) = delete; // move constructor
-	PMONLimitCheck& operator=(PMONLimitCheck&&) = delete; // move assignment operator
+	PMONLimitCheck(PMONLimitCheck&&) = delete;                 // move constructor
+	PMONLimitCheck& operator=(PMONLimitCheck&&) = delete;      // move assignment operator
 
 	~PMONLimitCheck() override = default; // destructor
 
@@ -248,8 +248,8 @@ public:
 	}
 
 	PMONDeltaCheck& operator=(const PMONDeltaCheck&) = delete; // copy assignment operator
-	PMONDeltaCheck(PMONDeltaCheck&&) = delete; // move constructor
-	PMONDeltaCheck& operator=(PMONDeltaCheck&&) = delete; // move assignment operator
+	PMONDeltaCheck(PMONDeltaCheck&&) = delete;                 // move constructor
+	PMONDeltaCheck& operator=(PMONDeltaCheck&&) = delete;      // move assignment operator
 
 	~PMONDeltaCheck() override = default; // destructor
 

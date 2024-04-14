@@ -7,10 +7,10 @@
 #include "Message.hpp"
 #include "Service.hpp"
 #include "etl/array.h"
+#include "etl/functional.h"
 #include "etl/list.h"
 #include "etl/map.h"
 #include "etl/vector.h"
-#include "etl/functional.h"
 
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
