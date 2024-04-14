@@ -253,10 +253,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 
 void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
-	Message parameterMonitoringDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport, Message::TM, ApplicationId);
-	parameterMonitoringDefinitionReport.appendUint16(maximumTransitionReportingDelay);
+	Message pmonDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport, Message::TM, ApplicationId);
+	pmonDefinitionReport.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();
-	parameterMonitoringDefinitionReport.appendUint16(numberOfIds);
+	pmonDefinitionReport.appendUint16(numberOfIds);
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		auto currentPMONId = message.read<ParameterId>();
@@ -269,10 +269,10 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 
 		PMON& pmon = it->second.get();
 
-		parameterMonitoringDefinitionReport.append<ParameterId>(currentPMONId);
-		parameterMonitoringDefinitionReport.append<ParameterId>(pmon.monitoredParameterId);
-		parameterMonitoringDefinitionReport.appendEnum8(static_cast<uint8_t>(pmon.monitoringEnabled));
-		parameterMonitoringDefinitionReport.append<PMONRepetitionNumber>(pmon.repetitionNumber);
+		pmonDefinitionReport.append<ParameterId>(currentPMONId);
+		pmonDefinitionReport.append<ParameterId>(pmon.monitoredParameterId);
+		pmonDefinitionReport.appendEnum8(static_cast<uint8_t>(pmon.monitoringEnabled));
+		pmonDefinitionReport.append<PMONRepetitionNumber>(pmon.repetitionNumber);
 
 		if (!pmon.checkType.has_value()) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::PMONCheckTypeMissing);
@@ -280,39 +280,39 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 		}
 
 		auto checkTypeValue = static_cast<uint8_t>(pmon.checkType.value());
-		parameterMonitoringDefinitionReport.appendEnum8(checkTypeValue);
+		pmonDefinitionReport.appendEnum8(checkTypeValue);
 
 		switch (pmon.checkType.value()) {
 			case PMON::CheckType::Limit: {
-				auto limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
-				parameterMonitoringDefinitionReport.append<PMONLimit>(limitCheck->getLowLimit());
-				parameterMonitoringDefinitionReport.append<EventDefinitionId>(limitCheck->getBelowLowLimitEvent());
-				parameterMonitoringDefinitionReport.append<PMONLimit>(limitCheck->getHighLimit());
-				parameterMonitoringDefinitionReport.append<EventDefinitionId>(limitCheck->getAboveHighLimitEvent());
+				auto* limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
+				pmonDefinitionReport.append<PMONLimit>(limitCheck->getLowLimit());
+				pmonDefinitionReport.append<EventDefinitionId>(limitCheck->getBelowLowLimitEvent());
+				pmonDefinitionReport.append<PMONLimit>(limitCheck->getHighLimit());
+				pmonDefinitionReport.append<EventDefinitionId>(limitCheck->getAboveHighLimitEvent());
 
 				break;
 			}
 			case PMON::CheckType::ExpectedValue: {
-				auto expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon);
-				parameterMonitoringDefinitionReport.append<PMONBitMask>(expectedValueCheck->getMask());
-				parameterMonitoringDefinitionReport.append<PMONExpectedValue>(expectedValueCheck->getExpectedValue());
-				parameterMonitoringDefinitionReport.append<EventDefinitionId>(expectedValueCheck->getUnexpectedValueEvent());
+				auto* expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon);
+				pmonDefinitionReport.append<PMONBitMask>(expectedValueCheck->getMask());
+				pmonDefinitionReport.append<PMONExpectedValue>(expectedValueCheck->getExpectedValue());
+				pmonDefinitionReport.append<EventDefinitionId>(expectedValueCheck->getUnexpectedValueEvent());
 
 				break;
 			}
 			case PMON::CheckType::Delta: {
-				auto deltaCheck = dynamic_cast<PMONDeltaCheck*>(&pmon);
-				parameterMonitoringDefinitionReport.append<DeltaThreshold>(deltaCheck->getLowDeltaThreshold());
-				parameterMonitoringDefinitionReport.append<EventDefinitionId>(deltaCheck->getBelowLowThresholdEvent());
-				parameterMonitoringDefinitionReport.append<DeltaThreshold>(deltaCheck->getHighDeltaThreshold());
-				parameterMonitoringDefinitionReport.append<EventDefinitionId>(deltaCheck->getAboveHighThresholdEvent());
-				parameterMonitoringDefinitionReport.append<NumberOfConsecutiveDeltaChecks>(deltaCheck->getNumberOfConsecutiveDeltaChecks());
+				auto* deltaCheck = dynamic_cast<PMONDeltaCheck*>(&pmon);
+				pmonDefinitionReport.append<DeltaThreshold>(deltaCheck->getLowDeltaThreshold());
+				pmonDefinitionReport.append<EventDefinitionId>(deltaCheck->getBelowLowThresholdEvent());
+				pmonDefinitionReport.append<DeltaThreshold>(deltaCheck->getHighDeltaThreshold());
+				pmonDefinitionReport.append<EventDefinitionId>(deltaCheck->getAboveHighThresholdEvent());
+				pmonDefinitionReport.append<NumberOfConsecutiveDeltaChecks>(deltaCheck->getNumberOfConsecutiveDeltaChecks());
 
 				break;
 			}
 		}
 	}
-	storeMessage(parameterMonitoringDefinitionReport);
+	storeMessage(pmonDefinitionReport);
 }
 
 void OnBoardMonitoringService::execute(Message& message) {

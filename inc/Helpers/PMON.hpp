@@ -80,7 +80,24 @@ public:
 	/**
 	 *  Minimal overhead to enable polymorphism
 	 */
-	virtual ~PMON() = default;
+	PMON(const PMON& other) // copy constructor
+	    : monitoredParameterId(other.monitoredParameterId),
+	      repetitionNumber(other.repetitionNumber),
+	      repetitionCounter(other.repetitionCounter),
+	      monitoringEnabled(other.monitoringEnabled),
+	      checkingStatus(other.checkingStatus),
+	      checkTransitionList(other.checkTransitionList),
+	      checkType(other.checkType) {
+		if (other.monitoredParameter) {
+			monitoredParameter = other.monitoredParameter;
+		}
+	}
+
+	PMON& operator=(const PMON& other) = delete; // copy assignment operator
+	PMON(PMON&&) = delete; // move constructor
+	PMON& operator=(PMON&&) = delete; // move assignment operator
+
+	virtual ~PMON() = default; // destructor
 
 protected:
 	/**
@@ -105,24 +122,31 @@ public:
 		checkType = CheckType::ExpectedValue;
 	};
 
+	PMONExpectedValueCheck(const PMONExpectedValueCheck& other)
+	    : PMON(other),
+	      expectedValue(other.expectedValue),
+	      mask(other.mask),
+	      unexpectedValueEvent(other.unexpectedValueEvent) {
+	}
+
 	/**
 	 * Returns the value of the bit mask used in an Expected Value Check.
 	 */
-	PMONBitMask getMask() {
+	PMONBitMask getMask() const {
 		return mask;
 	}
 
 	/**
 	 * Returns the value resulting from applying the bit mask.
 	 */
-	PMONExpectedValue getExpectedValue() {
+	PMONExpectedValue getExpectedValue() const {
 		return expectedValue;
 	}
 
 	/**
 	 * Returns the Id of an Unexpected Value Event.
 	 */
-	EventDefinitionId getUnexpectedValueEvent() {
+	EventDefinitionId getUnexpectedValueEvent() const {
 		return unexpectedValueEvent;
 	}
 };
@@ -144,31 +168,39 @@ public:
 		checkType = CheckType::Limit;
 	};
 
+	PMONLimitCheck(const PMONLimitCheck& other) // copy constructor
+	    : PMON(other),
+	      lowLimit(other.lowLimit),
+	      belowLowLimitEvent(other.belowLowLimitEvent),
+	      highLimit(other.highLimit),
+	      aboveHighLimitEvent(other.aboveHighLimitEvent) {
+	}
+
 	/**
 	 * Returns the value of the Low PMONLimit used on a PMONLimit Check.
 	 */
-	PMONLimit getLowLimit() {
+	PMONLimit getLowLimit() const {
 		return lowLimit;
 	}
 
 	/**
 	 * Returns the Id of a Below Low PMONLimit Event.
 	 */
-	EventDefinitionId getBelowLowLimitEvent() {
+	EventDefinitionId getBelowLowLimitEvent() const {
 		return belowLowLimitEvent;
 	}
 
 	/**
 	 * Returns the value of the High PMONLimit used on a PMONLimit Check.
 	 */
-	PMONLimit getHighLimit() {
+	PMONLimit getHighLimit() const {
 		return highLimit;
 	}
 
 	/**
 	 * Returns the Id of a High PMONLimit Event.
 	 */
-	EventDefinitionId getAboveHighLimitEvent() {
+	EventDefinitionId getAboveHighLimitEvent() const {
 		return aboveHighLimitEvent;
 	}
 };
@@ -194,38 +226,47 @@ public:
 		checkType = CheckType::Delta;
 	};
 
+	PMONDeltaCheck(const PMONDeltaCheck& other) // copy constructor
+	    : PMON(other),
+	      numberOfConsecutiveDeltaChecks(other.numberOfConsecutiveDeltaChecks),
+	      lowDeltaThreshold(other.lowDeltaThreshold),
+	      belowLowThresholdEvent(other.belowLowThresholdEvent),
+	      highDeltaThreshold(other.highDeltaThreshold),
+	      aboveHighThresholdEvent(other.aboveHighThresholdEvent) {
+	}
+
 	/**
 	 * Returns the number of consecutive Delta Checks.
 	 */
-	NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() {
+	NumberOfConsecutiveDeltaChecks getNumberOfConsecutiveDeltaChecks() const {
 		return numberOfConsecutiveDeltaChecks;
 	}
 
 	/**
 	 * Returns the value of the Low Threshold used on a Delta Check.
 	 */
-	DeltaThreshold getLowDeltaThreshold() {
+	DeltaThreshold getLowDeltaThreshold() const {
 		return lowDeltaThreshold;
 	}
 
 	/**
 	 * Returns the Id of a Below Low Threshold Event.
 	 */
-	EventDefinitionId getBelowLowThresholdEvent() {
+	EventDefinitionId getBelowLowThresholdEvent() const {
 		return belowLowThresholdEvent;
 	}
 
 	/**
 	 * Returns the value of the High Threshold used on a Delta Check.
 	 */
-	DeltaThreshold getHighDeltaThreshold() {
+	DeltaThreshold getHighDeltaThreshold() const {
 		return highDeltaThreshold;
 	}
 
 	/**
 	 * Returns the Id of an Above High Threshold Event.
 	 */
-	EventDefinitionId getAboveHighThresholdEvent() {
+	EventDefinitionId getAboveHighThresholdEvent() const {
 		return aboveHighThresholdEvent;
 	}
 };
