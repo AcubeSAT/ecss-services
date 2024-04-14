@@ -261,12 +261,12 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		auto currentPMONId = message.read<ParameterId>();
 
-		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
+		auto it = parameterMonitoringList.find(currentPMONId);
+		if (it == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(message, ErrorHandler::ReportParameterNotInTheParameterMonitoringList);
 			continue;
 		}
 
-		auto it = parameterMonitoringList.find(currentPMONId);
 		PMON& pmon = it->second.get();
 
 		parameterMonitoringDefinitionReport.append<ParameterId>(currentPMONId);
@@ -284,7 +284,7 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 
 		switch (pmon.checkType.value()) {
 			case PMON::CheckType::Limit: {
-				auto* limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
+				auto limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
 				parameterMonitoringDefinitionReport.append<PMONLimit>(limitCheck->getLowLimit());
 				parameterMonitoringDefinitionReport.append<EventDefinitionId>(limitCheck->getBelowLowLimitEvent());
 				parameterMonitoringDefinitionReport.append<PMONLimit>(limitCheck->getHighLimit());
@@ -293,7 +293,7 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 				break;
 			}
 			case PMON::CheckType::ExpectedValue: {
-				auto* expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon);
+				auto expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon);
 				parameterMonitoringDefinitionReport.append<PMONBitMask>(expectedValueCheck->getMask());
 				parameterMonitoringDefinitionReport.append<PMONExpectedValue>(expectedValueCheck->getExpectedValue());
 				parameterMonitoringDefinitionReport.append<EventDefinitionId>(expectedValueCheck->getUnexpectedValueEvent());
@@ -301,7 +301,7 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 				break;
 			}
 			case PMON::CheckType::Delta: {
-				auto* deltaCheck = dynamic_cast<PMONDeltaCheck*>(&pmon);
+				auto deltaCheck = dynamic_cast<PMONDeltaCheck*>(&pmon);
 				parameterMonitoringDefinitionReport.append<DeltaThreshold>(deltaCheck->getLowDeltaThreshold());
 				parameterMonitoringDefinitionReport.append<EventDefinitionId>(deltaCheck->getBelowLowThresholdEvent());
 				parameterMonitoringDefinitionReport.append<DeltaThreshold>(deltaCheck->getHighDeltaThreshold());
