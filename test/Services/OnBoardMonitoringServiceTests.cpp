@@ -230,8 +230,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(pmon.isMonitoringEnabled() == false);
 		CHECK(pmon.getCheckingStatus() == PMON::Unchecked);
 
-		auto* limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
-		REQUIRE(limitCheck != nullptr);
+		auto limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
 		CHECK(limitCheck->getLowLimit() == lowLimit);
 		CHECK(limitCheck->getBelowLowLimitEvent() == belowLowLimitEvent);
 		CHECK(limitCheck->getHighLimit() == highLimit);
