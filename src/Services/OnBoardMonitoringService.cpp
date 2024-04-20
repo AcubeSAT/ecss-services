@@ -205,7 +205,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				auto& limitCheck = dynamic_cast<PMONLimitCheck&>(pmon);
+				auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
 				limitCheck.lowLimit = lowLimit;
 				limitCheck.belowLowLimitEvent = belowLowLimitEventId;
 				limitCheck.highLimit = highLimit;
@@ -219,7 +219,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 				EventDefinitionId unexpectedValueEvent = message.read<EventDefinitionId>();
 
-				auto& expectedValueCheck = dynamic_cast<PMONExpectedValueCheck&>(pmon);
+				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon);
 				expectedValueCheck.mask = mask;
 				expectedValueCheck.expectedValue = expectedValue;
 				expectedValueCheck.unexpectedValueEvent = unexpectedValueEvent;
@@ -239,7 +239,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				auto& deltaCheck = dynamic_cast<PMONDeltaCheck&>(pmon);
+				auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
 				deltaCheck.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
 				deltaCheck.lowDeltaThreshold = lowDeltaThreshold;
 				deltaCheck.belowLowThresholdEvent = belowLowThresholdEventId;
@@ -271,42 +271,37 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 
 		pmonDefinitionReport.append<ParameterId>(currentPMONId);
 		pmonDefinitionReport.append<ParameterId>(pmon.monitoredParameterId);
-		pmonDefinitionReport.appendEnum8(static_cast<uint8_t>(pmon.monitoringEnabled));
+		pmonDefinitionReport.appendBoolean(pmon.monitoringEnabled);
 		pmonDefinitionReport.append<PMONRepetitionNumber>(pmon.repetitionNumber);
 
-		if (!pmon.checkType.has_value()) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::PMONCheckTypeMissing);
-			continue;
-		}
-
-		auto checkTypeValue = static_cast<uint8_t>(pmon.checkType.value());
+		auto checkTypeValue = static_cast<uint8_t>(pmon.checkType);
 		pmonDefinitionReport.appendEnum8(checkTypeValue);
 
-		switch (pmon.checkType.value()) {
+		switch (pmon.checkType) {
 			case PMON::CheckType::Limit: {
-				auto* limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
-				pmonDefinitionReport.append<PMONLimit>(limitCheck->getLowLimit());
-				pmonDefinitionReport.append<EventDefinitionId>(limitCheck->getBelowLowLimitEvent());
-				pmonDefinitionReport.append<PMONLimit>(limitCheck->getHighLimit());
-				pmonDefinitionReport.append<EventDefinitionId>(limitCheck->getAboveHighLimitEvent());
+				auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
+				pmonDefinitionReport.append<PMONLimit>(limitCheck.getLowLimit());
+				pmonDefinitionReport.append<EventDefinitionId>(limitCheck.getBelowLowLimitEvent());
+				pmonDefinitionReport.append<PMONLimit>(limitCheck.getHighLimit());
+				pmonDefinitionReport.append<EventDefinitionId>(limitCheck.getAboveHighLimitEvent());
 
 				break;
 			}
 			case PMON::CheckType::ExpectedValue: {
-				auto* expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon);
-				pmonDefinitionReport.append<PMONBitMask>(expectedValueCheck->getMask());
-				pmonDefinitionReport.append<PMONExpectedValue>(expectedValueCheck->getExpectedValue());
-				pmonDefinitionReport.append<EventDefinitionId>(expectedValueCheck->getUnexpectedValueEvent());
+				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon);
+				pmonDefinitionReport.append<PMONBitMask>(expectedValueCheck.getMask());
+				pmonDefinitionReport.append<PMONExpectedValue>(expectedValueCheck.getExpectedValue());
+				pmonDefinitionReport.append<EventDefinitionId>(expectedValueCheck.getUnexpectedValueEvent());
 
 				break;
 			}
 			case PMON::CheckType::Delta: {
-				auto* deltaCheck = dynamic_cast<PMONDeltaCheck*>(&pmon);
-				pmonDefinitionReport.append<DeltaThreshold>(deltaCheck->getLowDeltaThreshold());
-				pmonDefinitionReport.append<EventDefinitionId>(deltaCheck->getBelowLowThresholdEvent());
-				pmonDefinitionReport.append<DeltaThreshold>(deltaCheck->getHighDeltaThreshold());
-				pmonDefinitionReport.append<EventDefinitionId>(deltaCheck->getAboveHighThresholdEvent());
-				pmonDefinitionReport.append<NumberOfConsecutiveDeltaChecks>(deltaCheck->getNumberOfConsecutiveDeltaChecks());
+				auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
+				pmonDefinitionReport.append<DeltaThreshold>(deltaCheck.getLowDeltaThreshold());
+				pmonDefinitionReport.append<EventDefinitionId>(deltaCheck.getBelowLowThresholdEvent());
+				pmonDefinitionReport.append<DeltaThreshold>(deltaCheck.getHighDeltaThreshold());
+				pmonDefinitionReport.append<EventDefinitionId>(deltaCheck.getAboveHighThresholdEvent());
+				pmonDefinitionReport.append<NumberOfConsecutiveDeltaChecks>(deltaCheck.getNumberOfConsecutiveDeltaChecks());
 
 				break;
 			}

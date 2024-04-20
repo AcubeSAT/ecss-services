@@ -230,12 +230,11 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(pmon.isMonitoringEnabled() == false);
 		CHECK(pmon.getCheckingStatus() == PMON::Unchecked);
 
-		auto limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon);
-		CHECK(limitCheck->getLowLimit() == lowLimit);
-		CHECK(limitCheck->getBelowLowLimitEvent() == belowLowLimitEvent);
-		CHECK(limitCheck->getHighLimit() == highLimit);
-		CHECK(limitCheck->getAboveHighLimitEvent() == aboveHighLimitEvent);
-
+		auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
+		CHECK(limitCheck.getLowLimit() == lowLimit);
+		CHECK(limitCheck.getBelowLowLimitEvent() == belowLowLimitEvent);
+		CHECK(limitCheck.getHighLimit() == highLimit);
+		CHECK(limitCheck.getAboveHighLimitEvent() == aboveHighLimitEvent);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -292,7 +291,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendUint16(numberOfIds);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
 		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
-		;
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -463,7 +461,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getCount(PMONId) == 1);
 
 		auto& baseDefinition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
-		auto& modifiedDefinition = dynamic_cast<PMONLimitCheck&>(baseDefinition);
+		auto& modifiedDefinition = static_cast<PMONLimitCheck&>(baseDefinition);
 
 		CHECK(modifiedDefinition.repetitionNumber == repetitionNumber);
 		CHECK(modifiedDefinition.lowLimit == lowLimit);
@@ -505,7 +503,6 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		ServiceTests::reset();
 		Services.reset();
 	}
-
 
 	SECTION("Different Parameter Monitoring Definition And Monitored Parameter") {
 		initialiseParameterMonitoringDefinitions();
@@ -626,84 +623,68 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
 		CHECK(report.readUint16() == numberOfIds);
 
-		auto definitionOpt0 = onBoardMonitoringService.getPMONDefinition(PMONIds[0]);
-		auto& pmon0 = definitionOpt0.get();
+		auto& pmon0 = onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get();
 
 		CHECK(report.readEnum16() == PMONIds[0]);
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionNumber);
 
-		if (pmon0.getCheckType() == PMON::CheckType::ExpectedValue) {
+		REQUIRE(pmon0.getCheckType() == PMON::CheckType::ExpectedValue);
+		auto expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon0);
+		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
+		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
+		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
 
-			auto expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon0);
-
-			if (expectedValueCheck) {
-				CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
-				CHECK(report.read<PMONBitMask>() == expectedValueCheck->getMask());
-				CHECK(report.read<PMONExpectedValue>() == expectedValueCheck->getExpectedValue());
-				CHECK(report.read<EventDefinitionId>() == expectedValueCheck->getUnexpectedValueEvent());
-			}
-		}
-
-		auto definitionOpt1 = onBoardMonitoringService.getPMONDefinition(PMONIds[1]);
-		auto& pmon1 = definitionOpt1.get();
+		auto& pmon1 = onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get();
 
 		CHECK(report.readEnum16() == PMONIds[1]);
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().repetitionNumber);
 
-		if (pmon1.getCheckType() == PMON::CheckType::Limit) {
+		REQUIRE(pmon1.getCheckType() == PMON::CheckType::Limit);
+		auto limitCheck = static_cast<PMONLimitCheck&>(pmon1);
+		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Limit));
+		CHECK(report.read<PMONLimit>() == limitCheck.getLowLimit());
+		CHECK(report.read<EventDefinitionId>() == limitCheck.getBelowLowLimitEvent());
+		CHECK(report.read<PMONLimit>() == limitCheck.getHighLimit());
+		CHECK(report.read<EventDefinitionId>() == limitCheck.getAboveHighLimitEvent());
 
-			auto limitCheck = dynamic_cast<PMONLimitCheck*>(&pmon1);
-			CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Limit));
-			CHECK(report.read<PMONLimit>() == limitCheck->getLowLimit());
-			CHECK(report.read<EventDefinitionId>() == limitCheck->getBelowLowLimitEvent());
-			CHECK(report.read<PMONLimit>() == limitCheck->getHighLimit());
-			CHECK(report.read<EventDefinitionId>() == limitCheck->getAboveHighLimitEvent());
-		}
-
-		auto definitionOpt2 = onBoardMonitoringService.getPMONDefinition(PMONIds[2]);
-		auto& pmon2 = definitionOpt2.get();
+		auto& pmon2 = onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get();
 		CHECK(report.readEnum16() == PMONIds[2]);
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().repetitionNumber);
 
-		if (pmon2.getCheckType() == PMON::CheckType::Delta) {
+		REQUIRE(pmon2.getCheckType() == PMON::CheckType::Delta);
+		auto deltaCheck = static_cast<PMONDeltaCheck&>(pmon2);
+		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
+		CHECK(report.read<DeltaThreshold>() == deltaCheck.getLowDeltaThreshold());
+		CHECK(report.read<EventDefinitionId>() == deltaCheck.getBelowLowThresholdEvent());
+		CHECK(report.read<DeltaThreshold>() == deltaCheck.getHighDeltaThreshold());
+		CHECK(report.read<EventDefinitionId>() == deltaCheck.getAboveHighThresholdEvent());
+		CHECK(report.read<NumberOfConsecutiveDeltaChecks>() == deltaCheck.getNumberOfConsecutiveDeltaChecks());
 
-			auto deltaCheck = dynamic_cast<PMONDeltaCheck*>(&pmon2);
-			CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
-			CHECK(report.read<DeltaThreshold>() == deltaCheck->getLowDeltaThreshold());
-			CHECK(report.read<EventDefinitionId>() == deltaCheck->getBelowLowThresholdEvent());
-			CHECK(report.read<DeltaThreshold>() == deltaCheck->getHighDeltaThreshold());
-			CHECK(report.read<EventDefinitionId>() == deltaCheck->getAboveHighThresholdEvent());
-			CHECK(report.read<NumberOfConsecutiveDeltaChecks>() == deltaCheck->getNumberOfConsecutiveDeltaChecks());
-		}
-
-		auto definitionOpt3 = onBoardMonitoringService.getPMONDefinition(PMONIds[3]);
-		auto& pmon3 = definitionOpt3.get();
+		auto& pmon3 = onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get();
 		CHECK(report.readEnum16() == PMONIds[3]);
 		CHECK(report.read<ParameterId>() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoredParameterId);
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().repetitionNumber);
 
-		if (pmon3.getCheckType() == PMON::CheckType::Delta) {
-
-			auto deltaCheck = dynamic_cast<PMONDeltaCheck*>(&pmon3);
-			CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
-			CHECK(report.read<DeltaThreshold>() == deltaCheck->getLowDeltaThreshold());
-			CHECK(report.read<EventDefinitionId>() == deltaCheck->getBelowLowThresholdEvent());
-			CHECK(report.read<DeltaThreshold>() == deltaCheck->getHighDeltaThreshold());
-			CHECK(report.read<EventDefinitionId>() == deltaCheck->getAboveHighThresholdEvent());
-			CHECK(report.read<NumberOfConsecutiveDeltaChecks>() == deltaCheck->getNumberOfConsecutiveDeltaChecks());
-		}
+		REQUIRE(pmon3.getCheckType() == PMON::CheckType::Delta);
+		auto deltaCheck1 = static_cast<PMONDeltaCheck&>(pmon3);
+		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
+		CHECK(report.read<DeltaThreshold>() == deltaCheck1.getLowDeltaThreshold());
+		CHECK(report.read<EventDefinitionId>() == deltaCheck1.getBelowLowThresholdEvent());
+		CHECK(report.read<DeltaThreshold>() == deltaCheck1.getHighDeltaThreshold());
+		CHECK(report.read<EventDefinitionId>() == deltaCheck1.getAboveHighThresholdEvent());
+		CHECK(report.read<NumberOfConsecutiveDeltaChecks>() == deltaCheck1.getNumberOfConsecutiveDeltaChecks());
 
 		ServiceTests::reset();
 		Services.reset();
 	}
-
 
 	SECTION("Invalid request to report Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
@@ -721,7 +702,6 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		Services.reset();
 	}
 
-
 	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 2;
@@ -738,7 +718,6 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		Message report = ServiceTests::get(1);
 
-
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
 		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
@@ -752,17 +731,12 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.readEnum8() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled);
 		CHECK(report.read<PMONRepetitionNumber>() == onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().repetitionNumber);
 
-		if (pmon0.getCheckType() == PMON::CheckType::ExpectedValue) {
-
-			auto expectedValueCheck = dynamic_cast<PMONExpectedValueCheck*>(&pmon0);
-
-			if (expectedValueCheck) {
-				CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
-				CHECK(report.read<PMONBitMask>() == expectedValueCheck->getMask());
-				CHECK(report.read<PMONExpectedValue>() == expectedValueCheck->getExpectedValue());
-				CHECK(report.read<EventDefinitionId>() == expectedValueCheck->getUnexpectedValueEvent());
-			}
-		}
+		REQUIRE(pmon0.getCheckType() == PMON::CheckType::ExpectedValue);
+		auto expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon0);
+		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
+		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
+		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
 
 		ServiceTests::reset();
 		Services.reset();

@@ -34,8 +34,7 @@ public:
 		                             Delta = 3 };
 
 	ParameterId monitoredParameterId;
-
-	etl::optional<etl::reference_wrapper<ParameterBase>> monitoredParameter;
+	etl::reference_wrapper<ParameterBase> monitoredParameter;
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
@@ -47,7 +46,7 @@ public:
 	bool monitoringEnabled = false;
 	CheckingStatus checkingStatus = Unchecked;
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
-	etl::optional<CheckType> checkType;
+	CheckType checkType;
 
 	/**
 	 * Returns the number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
@@ -77,33 +76,11 @@ public:
 		return checkingStatus;
 	}
 
-	/**
-	 *  Minimal overhead to enable polymorphism
-	 */
-	PMON(const PMON& other) // copy constructor
-	    : monitoredParameterId(other.monitoredParameterId),
-	      repetitionNumber(other.repetitionNumber),
-	      repetitionCounter(other.repetitionCounter),
-	      monitoringEnabled(other.monitoringEnabled),
-	      checkingStatus(other.checkingStatus),
-	      checkTransitionList(other.checkTransitionList),
-	      checkType(other.checkType) {
-		if (other.monitoredParameter) {
-			monitoredParameter = other.monitoredParameter;
-		}
-	}
-
-	PMON& operator=(const PMON& other) = delete; // copy assignment operator
-	PMON(PMON&&) = delete;                       // move constructor
-	PMON& operator=(PMON&&) = delete;            // move assignment operator
-
-	virtual ~PMON() = default; // destructor
-
 protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
-	PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber);
+	PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, CheckType checkType);
 };
 
 /**
@@ -117,23 +94,11 @@ public:
 
 	explicit PMONExpectedValueCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONExpectedValue expectedValue,
 	                                PMONBitMask mask, EventDefinitionId unexpectedValueEvent)
-	    : expectedValue(expectedValue), mask(mask), unexpectedValueEvent(unexpectedValueEvent),
-	      PMON(monitoredParameterId, repetitionNumber) {
-		checkType = CheckType::ExpectedValue;
-	};
-
-	PMONExpectedValueCheck(const PMONExpectedValueCheck& other)
-	    : PMON(other),
-	      expectedValue(other.expectedValue),
-	      mask(other.mask),
-	      unexpectedValueEvent(other.unexpectedValueEvent) {
+	    : PMON(monitoredParameterId, repetitionNumber, CheckType::ExpectedValue),
+	      expectedValue(expectedValue),
+	      mask(mask),
+	      unexpectedValueEvent(unexpectedValueEvent) {
 	}
-
-	PMONExpectedValueCheck& operator=(const PMONExpectedValueCheck&) = delete; // copy assignment operator
-	PMONExpectedValueCheck(PMONExpectedValueCheck&&) = delete;                 // move constructor
-	PMONExpectedValueCheck& operator=(PMONExpectedValueCheck&&) = delete;      // move assignment operator
-
-	~PMONExpectedValueCheck() override = default; // destructor
 
 	/**
 	 * Returns the value of the bit mask used in an Expected Value Check.
@@ -170,23 +135,8 @@ public:
 	explicit PMONLimitCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONLimit lowLimit,
 	                        EventDefinitionId belowLowLimitEvent, PMONLimit highLimit, EventDefinitionId aboveHighLimitEvent)
 	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
-	      aboveHighLimitEvent(aboveHighLimitEvent), PMON(monitoredParameterId, repetitionNumber) {
-		checkType = CheckType::Limit;
-	};
-
-	PMONLimitCheck(const PMONLimitCheck& other) // copy constructor
-	    : PMON(other),
-	      lowLimit(other.lowLimit),
-	      belowLowLimitEvent(other.belowLowLimitEvent),
-	      highLimit(other.highLimit),
-	      aboveHighLimitEvent(other.aboveHighLimitEvent) {
+	      aboveHighLimitEvent(aboveHighLimitEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Limit) {
 	}
-
-	PMONLimitCheck& operator=(const PMONLimitCheck&) = delete; // copy assignment operator
-	PMONLimitCheck(PMONLimitCheck&&) = delete;                 // move constructor
-	PMONLimitCheck& operator=(PMONLimitCheck&&) = delete;      // move assignment operator
-
-	~PMONLimitCheck() override = default; // destructor
 
 	/**
 	 * Returns the value of the Low PMONLimit used on a PMONLimit Check.
@@ -234,24 +184,8 @@ public:
 	                        EventDefinitionId aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
-	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber) {
-		checkType = CheckType::Delta;
-	};
-
-	PMONDeltaCheck(const PMONDeltaCheck& other) // copy constructor
-	    : PMON(other),
-	      numberOfConsecutiveDeltaChecks(other.numberOfConsecutiveDeltaChecks),
-	      lowDeltaThreshold(other.lowDeltaThreshold),
-	      belowLowThresholdEvent(other.belowLowThresholdEvent),
-	      highDeltaThreshold(other.highDeltaThreshold),
-	      aboveHighThresholdEvent(other.aboveHighThresholdEvent) {
+	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Delta) {
 	}
-
-	PMONDeltaCheck& operator=(const PMONDeltaCheck&) = delete; // copy assignment operator
-	PMONDeltaCheck(PMONDeltaCheck&&) = delete;                 // move constructor
-	PMONDeltaCheck& operator=(PMONDeltaCheck&&) = delete;      // move assignment operator
-
-	~PMONDeltaCheck() override = default; // destructor
 
 	/**
 	 * Returns the number of consecutive Delta Checks.
