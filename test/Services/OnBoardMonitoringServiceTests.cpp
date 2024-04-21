@@ -290,7 +290,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		request.append<PMON::CheckType>(PMON::CheckType::ExpectedValue);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);

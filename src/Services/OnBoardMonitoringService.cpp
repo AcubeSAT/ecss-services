@@ -274,8 +274,8 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 		pmonDefinitionReport.appendBoolean(pmon.monitoringEnabled);
 		pmonDefinitionReport.append<PMONRepetitionNumber>(pmon.repetitionNumber);
 
-		auto checkTypeValue = static_cast<uint8_t>(pmon.checkType);
-		pmonDefinitionReport.appendEnum8(checkTypeValue);
+		auto checkTypeValue = pmon.checkType;
+		pmonDefinitionReport.append<PMON::CheckType>(checkTypeValue);
 
 		switch (pmon.checkType) {
 			case PMON::CheckType::Limit: {
