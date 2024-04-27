@@ -632,7 +632,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon0.getCheckType() == PMON::CheckType::ExpectedValue);
 		auto expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon0);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::ExpectedValue));
 		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
 		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
@@ -646,7 +646,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon1.getCheckType() == PMON::CheckType::Limit);
 		auto limitCheck = static_cast<PMONLimitCheck&>(pmon1);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Limit));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::Limit));
 		CHECK(report.read<PMONLimit>() == limitCheck.getLowLimit());
 		CHECK(report.read<EventDefinitionId>() == limitCheck.getBelowLowLimitEvent());
 		CHECK(report.read<PMONLimit>() == limitCheck.getHighLimit());
@@ -660,7 +660,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon2.getCheckType() == PMON::CheckType::Delta);
 		auto deltaCheck = static_cast<PMONDeltaCheck&>(pmon2);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::Delta));
 		CHECK(report.read<DeltaThreshold>() == deltaCheck.getLowDeltaThreshold());
 		CHECK(report.read<EventDefinitionId>() == deltaCheck.getBelowLowThresholdEvent());
 		CHECK(report.read<DeltaThreshold>() == deltaCheck.getHighDeltaThreshold());
@@ -675,7 +675,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon3.getCheckType() == PMON::CheckType::Delta);
 		auto deltaCheck1 = static_cast<PMONDeltaCheck&>(pmon3);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::Delta));
 		CHECK(report.read<DeltaThreshold>() == deltaCheck1.getLowDeltaThreshold());
 		CHECK(report.read<EventDefinitionId>() == deltaCheck1.getBelowLowThresholdEvent());
 		CHECK(report.read<DeltaThreshold>() == deltaCheck1.getHighDeltaThreshold());
@@ -733,7 +733,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon0.getCheckType() == PMON::CheckType::ExpectedValue);
 		auto expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon0);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::ExpectedValue));
 		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
 		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
