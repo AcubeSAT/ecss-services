@@ -213,7 +213,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendEnum16(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -251,7 +251,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendUint16(numberOfIds);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		request.append<PMON::CheckType>(PMON::CheckType::ExpectedValue);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -272,7 +272,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendUint16(numberOfIds);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		request.append<PMON::CheckType>(PMON::CheckType::ExpectedValue);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -316,7 +316,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEventId);
 		request.append<PMONLimit>(highLimit);
@@ -347,7 +347,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.appendUint16(monitoredParameterId);
 		request.appendUint16(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Delta));
+		request.append<PMON::CheckType>(PMON::CheckType::Delta);
 		request.append<DeltaThreshold>(lowDeltaThreshold);
 		request.append<EventDefinitionId>(belowLowThresholdEventId);
 		request.append<DeltaThreshold>(highDeltaThreshold);
@@ -449,7 +449,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -490,7 +490,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONIdNotInList);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -521,7 +521,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(existingPMONId);
 		request.append<ParameterId>(wrongMonitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -552,7 +552,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType> (PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -585,7 +585,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.appendUint16(monitoredParameterId);
 		request.appendUint16(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Delta));
+		request.append<PMON::CheckType>(PMON::CheckType::Delta);
 		request.append<DeltaThreshold>(lowDeltaThreshold);
 		request.append<EventDefinitionId>(belowLowThresholdEventId);
 		request.append<DeltaThreshold>(highDeltaThreshold);
