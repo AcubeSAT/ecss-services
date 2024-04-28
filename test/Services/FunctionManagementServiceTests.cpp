@@ -1,17 +1,24 @@
 #include "Services/FunctionManagementService.hpp"
-#include <iostream>
 #include "ServicePool.hpp"
 #include "ServiceTests.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "catch2/catch_all.hpp"
+#include "Services/ParameterService.hpp"
+#include "Parameters/PlatformParameters.hpp"
 
 FunctionManagementService& fms = Services.functionManagement;
+ParameterService& ps = Services.parameterManagement;
 
 uint8_t globalVariable = 10;
 
 void test(String<ECSSFunctionMaxArgLength> a) {
 	globalVariable = a[0];
 }
+
+/**
+ * The "preinitializedTest" function named here can be found in the tests/TestPlatform.cpp file.
+ * It is used there to intialize the function map.
+ */
 
 TEST_CASE("ST[08] - Call Tests") {
 	SECTION("Function call") {
@@ -73,5 +80,33 @@ TEST_CASE("ST[08] - Insert Tests") {
 			fms.include(String<ECSSFunctionNameLength>(name.c_str()), &test);
 		}
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
+	}
+}
+
+TEST_CASE("ST[08] - Check preinitialized function map") {
+	SECTION("Check if the function map is preinitialized") {
+		// make sure the pointer map is full to the brim
+		ServiceTests::reset();
+
+		CHECK(fms.getMapSize() == 1);
+	}
+
+	SECTION("Check if the preinitialized functions in the function map can run") {
+		ServiceTests::reset();
+		globalVariable = 10;
+
+		Message message(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
+		            Message::TC, 1);
+
+		message.appendFixedString(String<ECSSFunctionNameLength>("preinitializedTest"));
+		message.appendByte(199);
+		message.appendByte(255);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::hasNoErrors());
+		// 34 is the FunctionManagementTestParameterID1 as defined in the TestPlatform.cpp file
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(34)->get()).getValue() == 199);
+		// 35 is the FunctionManagementTestParameterID1 as defined in the TestPlatform.cpp file
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(35)->get()).getValue() == 255);
 	}
 }

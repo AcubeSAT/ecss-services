@@ -28,10 +28,17 @@ typedef etl::map<functionName, void (*)(String<ECSSFunctionMaxArgLength>), ECSSF
  * @author Grigoris Pavlakis <grigpavl@ece.auth.gr>
  */
 class FunctionManagementService : public Service {
+private:
+
 	/**
 	 * Map of the function names to their respective pointers. Size controlled by FUNC_MAP_SIZE
 	 */
 	FunctionMap funcPtrIndex;
+
+	/**
+	 * Initializes the function map with the default functions
+	 */
+	void initializeFunctionMap();
 
 public:
 
@@ -47,6 +54,7 @@ public:
 	 */
 	FunctionManagementService() {
 		serviceType = ServiceType;
+		initializeFunctionMap();
 	}
 
 	/**

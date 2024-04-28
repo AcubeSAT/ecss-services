@@ -14,6 +14,10 @@
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
+#include "Services/FunctionManagementService.hpp"
+
+uint8_t FunctionManagementTestParameterID1 = 34;
+uint8_t FunctionManagementTestParameterID2 = 35;
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
@@ -127,12 +131,15 @@ namespace PlatformParameters {
 	inline Parameter<uint8_t> parameter32(1);
 	inline Parameter<uint8_t> parameter33(1);
 	inline Parameter<uint8_t> parameter34(1);
+	inline Parameter<uint8_t> functionManagementTestParameter1(0);
+	inline Parameter<uint8_t> functionManagementTestParameter2(0);
 
 } // namespace PlatformParameters
 
 /**
  * Specific definition for \ref ParameterService's initialize function, for testing purposes.
  */
+
 void ParameterService::initializeParameterMap() {
 	parameters = {
 	    {uint16_t{0}, PlatformParameters::parameter1},
@@ -168,7 +175,9 @@ void ParameterService::initializeParameterMap() {
 	    {uint16_t{30}, PlatformParameters::parameter31},
 	    {uint16_t{31}, PlatformParameters::parameter32},
 	    {uint16_t{32}, PlatformParameters::parameter33},
-	    {uint16_t{33}, PlatformParameters::parameter34}};
+	    {uint16_t{33}, PlatformParameters::parameter34},
+		{uint16_t{FunctionManagementTestParameterID1}, PlatformParameters::functionManagementTestParameter1},
+		{uint16_t{FunctionManagementTestParameterID2}, PlatformParameters::functionManagementTestParameter2}};
 }
 
 void TimeBasedSchedulingService::notifyNewActivityAddition() {}
@@ -291,5 +300,22 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 } // namespace Filesystem
+
+
+void preinitializedTest(String<ECSSFunctionMaxArgLength> a) {
+	Message request =
+	    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
+	request.appendUint16(2);
+	request.append<ParameterId>(FunctionManagementTestParameterID1);
+	request.appendUint8(a[0]);
+	request.append<ParameterId>(FunctionManagementTestParameterID2);
+	request.appendUint8(a[1]);
+
+	MessageParser::execute(request);
+}
+
+void FunctionManagementService::initializeFunctionMap() {
+    FunctionManagementService::include(String<ECSSFunctionNameLength>("preinitializedTest"), &preinitializedTest);
+}
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
