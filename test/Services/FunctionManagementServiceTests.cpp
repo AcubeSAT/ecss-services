@@ -91,7 +91,7 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		Message message(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
 		            Message::TC, 1);
 
-		message.appendFixedString(String<ECSSFunctionNameLength>("preinitializedTest"));
+		message.appendFixedString(String<ECSSFunctionNameLength>("st08FunctionTest"));
 		message.appendByte(199);
 		message.appendByte(255);
 
