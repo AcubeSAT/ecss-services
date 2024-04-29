@@ -14,12 +14,6 @@ uint8_t globalVariable = 10;
 void test(String<ECSSFunctionMaxArgLength> a) {
 	globalVariable = a[0];
 }
-
-/**
- * The "preinitializedTest" function named here can be found in the tests/TestPlatform.cpp file.
- * It is used there to intialize the function map.
- */
-
 TEST_CASE("ST[08] - Call Tests") {
 	SECTION("Function call") {
 		ServiceTests::reset();
