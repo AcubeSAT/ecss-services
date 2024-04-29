@@ -79,7 +79,6 @@ TEST_CASE("ST[08] - Insert Tests") {
 
 TEST_CASE("ST[08] - Check preinitialized function map") {
 	SECTION("Check if the function map is preinitialized") {
-		// make sure the pointer map is full to the brim
 		ServiceTests::reset();
 
 		CHECK(fms.getMapSize() == 1);
