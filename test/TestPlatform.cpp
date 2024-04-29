@@ -302,7 +302,7 @@ namespace Filesystem {
 } // namespace Filesystem
 
 
-void preinitializedTest(String<ECSSFunctionMaxArgLength> a) {
+void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
 	Message request =
 	    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
 	request.appendUint16(2);
