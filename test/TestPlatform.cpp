@@ -16,7 +16,6 @@
 #include "Services/ServiceTests.hpp"
 #include "Services/FunctionManagementService.hpp"
 
-uint8_t FunctionManagementTestParameterID1 = 34;
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
