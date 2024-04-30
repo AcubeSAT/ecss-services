@@ -302,8 +302,8 @@ namespace Filesystem {
 
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
         ParameterService& ps = Services.parameterManagement;
-        static_cast<Parameter<√>&>(ps.getParameter(34)->get()).setValue(a[0]);
-	static_cast<Parameter<√>&>(ps.getParameter(35)->get()).setValue(a[1]);
+        static_cast<Parameter<uint16_t>&>(ps.getParameter(34)->get()).setValue(a[0]);
+	static_cast<Parameter<uint16_t>&>(ps.getParameter(35)->get()).setValue(a[1]);
 }
 
 void FunctionManagementService::initializeFunctionMap() {
