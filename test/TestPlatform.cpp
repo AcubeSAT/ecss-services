@@ -174,8 +174,8 @@ void ParameterService::initializeParameterMap() {
 	    {uint16_t{31}, PlatformParameters::parameter32},
 	    {uint16_t{32}, PlatformParameters::parameter33},
 	    {uint16_t{33}, PlatformParameters::parameter34},
-		{uint16_t{34}, PlatformParameters::parameter35},
-		{uint16_t{35}, PlatformParameters::parameter36}};
+        {uint16_t{34}, PlatformParameters::parameter35},
+        {uint16_t{35}, PlatformParameters::parameter36}};
 }
 
 void TimeBasedSchedulingService::notifyNewActivityAddition() {}
