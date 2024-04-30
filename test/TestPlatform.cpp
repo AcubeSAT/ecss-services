@@ -307,7 +307,7 @@ void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
 }
 
 void FunctionManagementService::initializeFunctionMap() {
-	FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
 }
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
