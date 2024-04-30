@@ -129,8 +129,8 @@ namespace PlatformParameters {
 	inline Parameter<uint8_t> parameter32(1);
 	inline Parameter<uint8_t> parameter33(1);
 	inline Parameter<uint8_t> parameter34(1);
-	inline Parameter<uint8_t> parameter35(0);
-	inline Parameter<uint8_t> parameter36(0);
+	inline Parameter<uint16_t> parameter35(0);
+	inline Parameter<uint16_t> parameter36(0);
 
 } // namespace PlatformParameters
 
