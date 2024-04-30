@@ -301,15 +301,8 @@ namespace Filesystem {
 
 
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
-	Message request =
-	    Message(ParameterService::ServiceType, ParameterService::MessageType::SetParameterValues, Message::TC, 1);
-	request.appendUint16(2);
-	request.append<ParameterId>(FunctionManagementTestParameterID1);
-	request.appendUint8(a[0]);
-	request.append<ParameterId>(FunctionManagementTestParameterID2);
-	request.appendUint8(a[1]);
-
-	MessageParser::execute(request);
+	static_cast<Parameter<uint8_t>&>(ps.getParameter(34)->get()).setValue(a[0])
+	static_cast<Parameter<uint8_t>&>(ps.getParameter(34)->get()).setValue(a[1])
 }
 
 void FunctionManagementService::initializeFunctionMap() {
