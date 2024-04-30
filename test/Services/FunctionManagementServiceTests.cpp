@@ -91,8 +91,8 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		            Message::TC, 1);
 
 		message.appendFixedString(String<ECSSFunctionNameLength>("st08FunctionTest"));
-		message.appendByte(199);
-		message.appendByte(255);
+		message.appendHalfword(199);
+		message.appendHalfword(255);
 
 		MessageParser::execute(message);
 		CHECK(ServiceTests::hasNoErrors());
