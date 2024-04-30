@@ -99,5 +99,3 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(35)->get()).getValue() == 255);
 	}
 }
-	}
-}
