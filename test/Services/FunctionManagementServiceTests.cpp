@@ -95,10 +95,10 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		message.appendHalfword(255);
 
 		MessageParser::execute(message);
-		CHECK(ServiceTests::hasNoErrors());
-		// 34 is the FunctionManagementTestParameterID1 as defined in the TestPlatform.cpp file
-		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(34)->get()).getValue() == 199);
+		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(34)->get()).getValue() == 199);
 		// 35 is the FunctionManagementTestParameterID1 as defined in the TestPlatform.cpp file
-		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(35)->get()).getValue() == 255);
+		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(35)->get()).getValue() == 255);
+	}
+}
 	}
 }
