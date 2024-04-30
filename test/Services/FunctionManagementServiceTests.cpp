@@ -86,7 +86,6 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 
 	SECTION("Check if the preinitialized functions in the function map can run") {
 		ServiceTests::reset();
-		globalVariable = 10;
 
 		Message message(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
 		            Message::TC, 1);
