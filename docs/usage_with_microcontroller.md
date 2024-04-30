@@ -224,6 +224,33 @@ void ParameterStatisticsService::initializeStatisticsMap() {
 }
 ```
 
+4. @ref FunctionManagementService::initializeFunctionMap
+
+The FunctionManagementService is responsible for managing functionality regarding arbitrarily executing functions, 
+after receiving a telecommand (TC). Towards that goal, each platform needs to initialize their own map that stores 
+references to a function. For example, we can define a function, and then initialize the map with the function name 
+as key, and the function reference as value. Example code is shown below:
+
+The `include` function from the FunctionManagementService class is used to add a function to the map, with proper 
+handling of the function name and reference.
+
+```cpp
+void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
+
+	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+	PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+}
+
+void FunctionManagementService::initializeFunctionMap() {
+    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+}
+```
+
+For a more detailed example in functionality, refer to the `test/FunctionManagementServiceTest.cpp` file and the 
+`TestPlatform.cpp` file.
+
+
+
 ## Receiving messages
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can

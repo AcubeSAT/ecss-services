@@ -130,7 +130,7 @@ namespace PlatformParameters {
 	inline Parameter<uint8_t> parameter33(1);
 	inline Parameter<uint8_t> parameter34(1);
 	inline Parameter<uint16_t> parameter35(0);
-	inline Parameter<uint16_t> parameter36(0);
+	inline Parameter<uint8_t> parameter36(0);
 
 } // namespace PlatformParameters
 
@@ -301,9 +301,9 @@ namespace Filesystem {
 
 
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
-        ParameterService& ps = Services.parameterManagement;
-        static_cast<Parameter<uint16_t>&>(ps.getParameter(34)->get()).setValue(a[0]);
-	static_cast<Parameter<uint16_t>&>(ps.getParameter(35)->get()).setValue(a[1]);
+
+	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+	PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
 }
 
 void FunctionManagementService::initializeFunctionMap() {
