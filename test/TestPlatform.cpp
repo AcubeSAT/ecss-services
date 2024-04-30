@@ -11,10 +11,10 @@
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
+#include "Services/FunctionManagementService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
-#include "Services/FunctionManagementService.hpp"
 
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
@@ -302,12 +302,12 @@ namespace Filesystem {
 
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
 
-	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
-	PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+    PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+    PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
 }
 
 void FunctionManagementService::initializeFunctionMap() {
-    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+	FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
 }
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
