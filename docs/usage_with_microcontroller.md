@@ -236,21 +236,13 @@ handling of the function name and reference.
 
 ```cpp
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
-
-	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
-	PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]));
+	// ...do other stuff...
 }
 
 void FunctionManagementService::initializeFunctionMap() {
-    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+    FunctionManagementService::include("st08FunctionTest", &st08FunctionTest);
 }
-```
-
-For a more detailed example in functionality, refer to the `test/FunctionManagementServiceTest.cpp` file and the 
-`TestPlatform.cpp` file.
-
-
-
 ## Receiving messages
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can
