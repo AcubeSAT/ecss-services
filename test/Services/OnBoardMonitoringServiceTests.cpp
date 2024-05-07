@@ -213,7 +213,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendEnum16(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -251,7 +251,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendUint16(numberOfIds);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		request.append<PMON::CheckType>(PMON::CheckType::ExpectedValue);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -272,7 +272,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.appendUint16(numberOfIds);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		request.append<PMON::CheckType>(PMON::CheckType::ExpectedValue);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -316,7 +316,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEventId);
 		request.append<PMONLimit>(highLimit);
@@ -347,7 +347,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.appendUint16(monitoredParameterId);
 		request.appendUint16(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Delta));
+		request.append<PMON::CheckType>(PMON::CheckType::Delta);
 		request.append<DeltaThreshold>(lowDeltaThreshold);
 		request.append<EventDefinitionId>(belowLowThresholdEventId);
 		request.append<DeltaThreshold>(highDeltaThreshold);
@@ -449,7 +449,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -490,7 +490,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONIdNotInList);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -521,7 +521,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(existingPMONId);
 		request.append<ParameterId>(wrongMonitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -552,7 +552,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Limit));
+		request.append<PMON::CheckType> (PMON::CheckType::Limit);
 		request.append<PMONLimit>(lowLimit);
 		request.append<EventDefinitionId>(belowLowLimitEvent);
 		request.append<PMONLimit>(highLimit);
@@ -585,7 +585,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		request.append<ParameterId>(PMONId);
 		request.appendUint16(monitoredParameterId);
 		request.appendUint16(repetitionNumber);
-		request.appendEnum8(static_cast<uint8_t>(PMON::CheckType::Delta));
+		request.append<PMON::CheckType>(PMON::CheckType::Delta);
 		request.append<DeltaThreshold>(lowDeltaThreshold);
 		request.append<EventDefinitionId>(belowLowThresholdEventId);
 		request.append<DeltaThreshold>(highDeltaThreshold);
@@ -632,7 +632,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon0.getCheckType() == PMON::CheckType::ExpectedValue);
 		auto expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon0);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::ExpectedValue));
 		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
 		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
@@ -646,7 +646,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon1.getCheckType() == PMON::CheckType::Limit);
 		auto limitCheck = static_cast<PMONLimitCheck&>(pmon1);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Limit));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::Limit));
 		CHECK(report.read<PMONLimit>() == limitCheck.getLowLimit());
 		CHECK(report.read<EventDefinitionId>() == limitCheck.getBelowLowLimitEvent());
 		CHECK(report.read<PMONLimit>() == limitCheck.getHighLimit());
@@ -660,7 +660,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon2.getCheckType() == PMON::CheckType::Delta);
 		auto deltaCheck = static_cast<PMONDeltaCheck&>(pmon2);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::Delta));
 		CHECK(report.read<DeltaThreshold>() == deltaCheck.getLowDeltaThreshold());
 		CHECK(report.read<EventDefinitionId>() == deltaCheck.getBelowLowThresholdEvent());
 		CHECK(report.read<DeltaThreshold>() == deltaCheck.getHighDeltaThreshold());
@@ -675,7 +675,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon3.getCheckType() == PMON::CheckType::Delta);
 		auto deltaCheck1 = static_cast<PMONDeltaCheck&>(pmon3);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::Delta));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::Delta));
 		CHECK(report.read<DeltaThreshold>() == deltaCheck1.getLowDeltaThreshold());
 		CHECK(report.read<EventDefinitionId>() == deltaCheck1.getBelowLowThresholdEvent());
 		CHECK(report.read<DeltaThreshold>() == deltaCheck1.getHighDeltaThreshold());
@@ -733,7 +733,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 
 		REQUIRE(pmon0.getCheckType() == PMON::CheckType::ExpectedValue);
 		auto expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon0);
-		CHECK(report.readEnum8() == static_cast<uint8_t>(PMON::CheckType::ExpectedValue));
+		CHECK(report.read<PMON::CheckType>() == (PMON::CheckType::ExpectedValue));
 		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
 		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
