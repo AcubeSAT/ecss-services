@@ -319,6 +319,10 @@ namespace Filesystem {
 			return DirectoryDeletionError::UnknownError;
 		}
 	}
+
+	uint32_t getUnallocatedMemory() {
+		return 42U;
+	}
 } // namespace Filesystem
 
 

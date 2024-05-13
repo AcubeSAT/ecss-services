@@ -428,3 +428,9 @@ TEST_CASE("Delete a directory TC[23,10]", "[service][st23]") {
 
 	fs::remove_all(fs::temp_directory_path() / "st23");
 }
+
+TEST_CASE("Observe available unallocated memory 6.23.4.7", "[service][st23]") {
+	ServiceTests::reset();
+	uint32_t freeMemory = Services.fileManagement.getUnallocatedMemory();
+	CHECK(freeMemory == 42);
+}

@@ -111,6 +111,13 @@ public:
 	void deleteDirectory(Message& message);
 
 	/**
+	 * Ask the FS for the available unallocated memory and return it.
+	 * 
+	 * @return uint32_t The bytes of available unallocated memory 
+	 */
+	uint32_t getUnallocatedMemory();
+
+	/**
 	 * It is responsible to call the suitable function that executes a tele-command packet. The source of that packet
 	 * is the ground station.
 	 *
