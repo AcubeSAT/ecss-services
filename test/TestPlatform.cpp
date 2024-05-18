@@ -11,9 +11,11 @@
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
+#include "Services/FunctionManagementService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
+
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
@@ -127,12 +129,15 @@ namespace PlatformParameters {
 	inline Parameter<uint8_t> parameter32(1);
 	inline Parameter<uint8_t> parameter33(1);
 	inline Parameter<uint8_t> parameter34(1);
+	inline Parameter<uint16_t> parameter35(0);
+	inline Parameter<uint8_t> parameter36(0);
 
 } // namespace PlatformParameters
 
 /**
  * Specific definition for \ref ParameterService's initialize function, for testing purposes.
  */
+
 void ParameterService::initializeParameterMap() {
 	parameters = {
 	    {uint16_t{0}, PlatformParameters::parameter1},
@@ -168,7 +173,10 @@ void ParameterService::initializeParameterMap() {
 	    {uint16_t{30}, PlatformParameters::parameter31},
 	    {uint16_t{31}, PlatformParameters::parameter32},
 	    {uint16_t{32}, PlatformParameters::parameter33},
-	    {uint16_t{33}, PlatformParameters::parameter34}};
+	    {uint16_t{33}, PlatformParameters::parameter34},
+        {uint16_t{34}, PlatformParameters::parameter35},
+        {uint16_t{35}, PlatformParameters::parameter36},
+	};
 }
 
 void TimeBasedSchedulingService::notifyNewActivityAddition() {}
@@ -291,5 +299,15 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 } // namespace Filesystem
+
+
+void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
+    PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+    PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+}
+
+void FunctionManagementService::initializeFunctionMap() {
+    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+}
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
