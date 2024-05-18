@@ -7,7 +7,6 @@ stages:
   - test
   - deploy
 
-
 check-build:
   image: spacedot/build-base
   stage: build
@@ -41,7 +40,7 @@ cppcheck:
       - ./cppcheck-html-report
 
 clang-tidy:
-  image: spacedot/clang-tools:13.0.0-html-1.4.1
+  image: spacedot/clang-tools:14.0.6-html-1.6.1
   stage: analyze
   script:
     - cd $CI_PROJECT_DIR
@@ -63,7 +62,7 @@ clang-tidy:
       - ./clang-tidy-html-report
 
 clang-analyzer:
-   image: spacedot/clang-tools:13.0.0-html-1.4.1
+   image: spacedot/clang-tools:14.0.6-html-1.6.1
    stage: analyze
    before_script:
      - mkdir scan-build-html-report
@@ -89,7 +88,7 @@ doxygen:
     paths:
       - ./docs/html
 ikos:
-  image: spacedot/ikos:3.0
+  image: spacedot/ikos:3.3
   stage: analyze
   before_script:
     - mkdir ikos-report
