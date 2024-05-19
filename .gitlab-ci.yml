@@ -100,7 +100,6 @@ ikos:
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
     - conan install . --output-folder conan-build --build=missing -pr conan-profile
-    - apt-get install llvm-tools llvm-16
     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
     - ikos-scan make x86_services
     - ikos x86_services.bc
