@@ -9,4 +9,4 @@ os=Linux
 
 [buildenv]
 CXX=/usr/bin/clang++-14
-C=/usr/bin/clang-14
+CC=/usr/bin/clang-14
