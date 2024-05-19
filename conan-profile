@@ -6,3 +6,6 @@ compiler.cppstd=gnu17
 compiler.libcxx=libstdc++11
 compiler.version=12
 os=Linux
+
+[env]
+CXX=usr/bin/clang
