@@ -8,4 +8,4 @@ compiler.version=12
 os=Linux
 
 [buildenv]
-CXX=usr/bin/clang
+CXX=usr/bin/clang-14
