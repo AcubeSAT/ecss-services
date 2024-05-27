@@ -51,7 +51,7 @@ using ErrorCode = uint16_t;
  */
  using PMONRepetitionNumber = uint16_t;
  using PMONLimit = double;
- using PMONExpectedValue = double;
+ using PMONExpectedValue = uint64_t;
  using PMONBitMask = uint64_t;
  using NumberOfConsecutiveDeltaChecks = uint16_t;
  using DeltaThreshold = double;

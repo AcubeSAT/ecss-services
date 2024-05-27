@@ -158,23 +158,33 @@ public:
 			}
 		}
 
-		return etl::optional<etl::reference_wrapper<PMON>>();
+		return {};
 	}
 
 	/**
 	 * This function performs a check on the provided PMON object. The type of check performed is determined by the checkType member of the PMON object.
 	 * The function updates the checkingStatus member of the PMON object based on the result of the check.
 	 *
+	 * This function is expected to be called by the periodic monitoring system, which is responsible for
+	 * invoking the check on each monitored parameter at regular intervals. It ensures that parameters are
+	 * within their defined limits, match expected values, or have acceptable delta changes over time.
+	 *
+	 * @note
+	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system.
+	 * Irregular calls or missed checks can lead to incorrect status updates and potentially missed parameter anomalies.
+	 *
 	 * @param pmon A reference to the PMON object to be checked.
 	 */
 	void performCheck(PMON& pmon) const {
 		auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
+		PMON::CheckingStatus previousStatus = pmon.checkingStatus;
+
 		switch (pmon.checkType) {
 			case PMON::CheckType::Limit: {
-				auto* limitCheck = static_cast<PMONLimitCheck*>(&pmon);
-				if (currentValue < limitCheck->getLowLimit()) {
+				auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
+				if (currentValue < limitCheck.getLowLimit()) {
 					pmon.checkingStatus = PMON::CheckingStatus::BelowLowLimit;
-				} else if (currentValue > limitCheck->getHighLimit()) {
+				} else if (currentValue > limitCheck.getHighLimit()) {
 					pmon.checkingStatus = PMON::CheckingStatus::AboveHighLimit;
 				} else {
 					pmon.checkingStatus = PMON::CheckingStatus::WithinLimits;
@@ -182,9 +192,10 @@ public:
 				break;
 			}
 			case PMON::CheckType::ExpectedValue: {
-				auto* expectedValueCheck = static_cast<PMONExpectedValueCheck*>(&pmon);
-				uint64_t maskedValue = static_cast<uint64_t>(currentValue) & expectedValueCheck->getMask();
-				if (static_cast<double>(maskedValue) == expectedValueCheck->getExpectedValue()) {
+				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon);
+				uint64_t currentValueAsUint64 = pmon.monitoredParameter.get().getValueAsUint64();
+				uint64_t maskedValue = currentValueAsUint64 & expectedValueCheck.getMask();
+				if (maskedValue == expectedValueCheck.getExpectedValue()) {
 					pmon.checkingStatus = PMON::CheckingStatus::ExpectedValue;
 				} else {
 					pmon.checkingStatus = PMON::CheckingStatus::UnexpectedValue;
@@ -192,14 +203,12 @@ public:
 				break;
 			}
 			case PMON::CheckType::Delta: {
-				auto* deltaCheck = static_cast<PMONDeltaCheck*>(&pmon);
-				auto previousPMONOpt = getPreviousPMON(pmon.monitoredParameterId, PMON::CheckType::Delta);
-				if (previousPMONOpt.has_value()) {
-					auto previousValue = previousPMONOpt.value().get().monitoredParameter.get().getValueAsDouble();
-					auto delta = currentValue - previousValue;
-					if (delta < deltaCheck->getLowDeltaThreshold()) {
+				auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
+				if (deltaCheck.isPreviousTimestampValid()) {
+					double deltaPerSecond = deltaCheck.getDeltaPerSecond();
+					if (deltaPerSecond < deltaCheck.getLowDeltaThreshold()) {
 						pmon.checkingStatus = PMON::CheckingStatus::BelowLowThreshold;
-					} else if (delta > deltaCheck->getHighDeltaThreshold()) {
+					} else if (deltaPerSecond > deltaCheck.getHighDeltaThreshold()) {
 						pmon.checkingStatus = PMON::CheckingStatus::AboveHighThreshold;
 					} else {
 						pmon.checkingStatus = PMON::CheckingStatus::WithinThreshold;
@@ -207,10 +216,17 @@ public:
 				} else {
 					pmon.checkingStatus = PMON::CheckingStatus::Invalid;
 				}
+
+				deltaCheck.updateValuesAndTimestamps(currentValue);
 				break;
 			}
 		}
-		pmon.repetitionCounter++;
+
+		if (pmon.checkingStatus == previousStatus) {
+			pmon.repetitionCounter++;
+		} else {
+			pmon.repetitionCounter = 1;
+		}
 	}
 
 	/**

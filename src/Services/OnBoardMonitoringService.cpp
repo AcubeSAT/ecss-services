@@ -106,7 +106,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				limitCheck.checkingStatus = PMON::Unchecked;
 				limitCheck.monitoringEnabled = false;
 				addPMONLimitCheck(currentPMONId, limitCheck);
-				performCheck(limitCheck);
 				break;
 			}
 			case PMON::CheckType::ExpectedValue: {
@@ -118,7 +117,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				expectedValueCheck.checkingStatus = PMON::Unchecked;
 				expectedValueCheck.monitoringEnabled = false;
 				addPMONExpectedValueCheck(currentPMONId, expectedValueCheck);
-				performCheck(expectedValueCheck);
 				break;
 			}
 			case PMON::CheckType::Delta: {
@@ -137,7 +135,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				deltaCheck.checkingStatus = PMON::Unchecked;
 				deltaCheck.monitoringEnabled = false;
 				addPMONDeltaCheck(currentPMONId, deltaCheck);
-				performCheck(deltaCheck);
 				break;
 			}
 		}
@@ -213,7 +210,6 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				limitCheck.belowLowLimitEvent = belowLowLimitEventId;
 				limitCheck.highLimit = highLimit;
 				limitCheck.aboveHighLimitEvent = aboveHighLimitEventId;
-				performCheck(limitCheck);
 				break;
 			}
 
@@ -227,7 +223,6 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				expectedValueCheck.mask = mask;
 				expectedValueCheck.expectedValue = expectedValue;
 				expectedValueCheck.unexpectedValueEvent = unexpectedValueEvent;
-				performCheck(expectedValueCheck);
 				break;
 			}
 
@@ -250,7 +245,6 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				deltaCheck.belowLowThresholdEvent = belowLowThresholdEventId;
 				deltaCheck.highDeltaThreshold = highDeltaThreshold;
 				deltaCheck.aboveHighThresholdEvent = aboveHighThresholdEventId;
-				performCheck(deltaCheck);
 				break;
 			}
 		}

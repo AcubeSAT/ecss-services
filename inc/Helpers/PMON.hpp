@@ -5,6 +5,7 @@
 #include "Helpers/Parameter.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
+#include "TimeGetter.hpp"
 #include "etl/array.h"
 #include "etl/functional.h"
 #include "etl/list.h"
@@ -178,13 +179,21 @@ public:
 	DeltaThreshold highDeltaThreshold;
 	EventDefinitionId aboveHighThresholdEvent;
 
+private:
+	double currentValue;
+	double previousValue;
+	Time::DefaultCUC currentTimestamp;
+	Time::DefaultCUC previousTimestamp;
+
+public:
 	explicit PMONDeltaCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber,
 	                        NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks, DeltaThreshold lowDeltaThreshold,
 	                        EventDefinitionId belowLowThresholdEvent, DeltaThreshold highDeltaThreshold,
 	                        EventDefinitionId aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
-	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Delta) {
+	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Delta),
+	      currentValue(0.0), previousValue(0.0), currentTimestamp(), previousTimestamp() {
 	}
 
 	/**
@@ -220,6 +229,41 @@ public:
 	 */
 	EventDefinitionId getAboveHighThresholdEvent() const {
 		return aboveHighThresholdEvent;
+	}
+
+	/**
+	 * @brief Updates the values and timestamps for the PMONDeltaCheck object.
+	 *
+	 * This method is used to update the current and previous values and timestamps
+	 * of the PMONDeltaCheck object. The current value and timestamp are moved to
+	 * their respective previous value and timestamp variables, and the new current
+	 * value and timestamp are set to the provided value and the current time
+	 *
+	 * @param newValue The new value to be set as the current value.
+	 */
+	void updateValuesAndTimestamps(double newValue) {
+		previousValue = currentValue;
+		previousTimestamp = currentTimestamp;
+		currentValue = newValue;
+		currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
+	}
+
+	/**
+	 * This method calculates the difference between the current and previous values of the monitored parameter,
+	 * and divides it by the time difference between the current and previous timestamps. The result is the rate
+	 * of change of the monitored parameter per second.
+	 *
+	 * @return The rate of change of the monitored parameter per second.
+	 */
+	double getDeltaPerSecond() const {
+		double delta = currentValue - previousValue;
+		auto duration = currentTimestamp - previousTimestamp;
+		double deltaTime = std::chrono::duration<double>(duration).count();
+		return delta / deltaTime;
+	}
+
+	bool isPreviousTimestampValid() const {
+		return previousTimestamp.isValid();
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP

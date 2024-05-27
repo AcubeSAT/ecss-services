@@ -188,6 +188,13 @@ public:
 	template <typename T>
 	T asTAIseconds();
 
+	 /**
+	 * Method to check if the timestamp is valid
+	 */
+	bool isValid() const {
+		return taiCounter != 0;
+	}
+
 	/**
 	 * Converts a TimeStamp to a duration of seconds since the @ref Time::Epoch.
 	 *
