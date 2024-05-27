@@ -148,6 +148,71 @@ public:
 		return parameterMonitoringList.count(key);
 	}
 
+	 /**
+     * Helper function to get the previous PMON with the same check type.
+ 	 */
+	etl::optional<etl::reference_wrapper<PMON>> getPreviousPMON(ParameterId PMONId, PMON::CheckType checkType) const {
+		for (auto reverseIt = parameterMonitoringList.crbegin(); reverseIt != parameterMonitoringList.crend(); ++reverseIt) {
+			if (reverseIt->second.get().monitoredParameterId == PMONId && reverseIt->second.get().checkType == checkType) {
+				return reverseIt->second;
+			}
+		}
+
+		return etl::optional<etl::reference_wrapper<PMON>>();
+	}
+
+	 /**
+	 * This function performs a check on the provided PMON object. The type of check performed is determined by the checkType member of the PMON object.
+	 * The function updates the checkingStatus member of the PMON object based on the result of the check.
+	 *
+	 * @param pmon A reference to the PMON object to be checked.
+	 */
+	void performCheck(PMON& pmon) const {
+		auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
+		switch (pmon.checkType) {
+			case PMON::CheckType::Limit: {
+				auto limitCheck = static_cast<PMONLimitCheck*>(&pmon);
+				if (currentValue < limitCheck->getLowLimit()) {
+					pmon.checkingStatus = PMON::CheckingStatus::BelowLowLimit;
+				} else if (currentValue > limitCheck->getHighLimit()) {
+					pmon.checkingStatus = PMON::CheckingStatus::AboveHighLimit;
+				} else {
+					pmon.checkingStatus = PMON::CheckingStatus::WithinLimits;
+				}
+				break;
+			}
+			case PMON::CheckType::ExpectedValue: {
+				auto expectedValueCheck = static_cast<PMONExpectedValueCheck*>(&pmon);
+				unsigned long maskedValue = static_cast<unsigned long>(currentValue) & expectedValueCheck->getMask();
+				if (static_cast<double>(maskedValue) == expectedValueCheck->getExpectedValue()) {
+					pmon.checkingStatus = PMON::CheckingStatus::ExpectedValue;
+				} else {
+					pmon.checkingStatus = PMON::CheckingStatus::UnexpectedValue;
+				}
+				break;
+			}
+			case PMON::CheckType::Delta: {
+				auto deltaCheck = static_cast<PMONDeltaCheck*>(&pmon);
+				auto previousPMONOpt = getPreviousPMON(pmon.monitoredParameterId, PMON::CheckType::Delta);
+				if (previousPMONOpt.has_value()) {
+					auto previousValue = previousPMONOpt.value().get().monitoredParameter.get().getValueAsDouble();
+					auto delta = currentValue - previousValue;
+					if (delta < deltaCheck->getLowDeltaThreshold()) {
+						pmon.checkingStatus = PMON::CheckingStatus::BelowLowThreshold;
+					} else if (delta > deltaCheck->getHighDeltaThreshold()) {
+						pmon.checkingStatus = PMON::CheckingStatus::AboveHighThreshold;
+					} else {
+						pmon.checkingStatus = PMON::CheckingStatus::WithinThreshold;
+					}
+				} else {
+					pmon.checkingStatus = PMON::CheckingStatus::Invalid;
+				}
+				break;
+			}
+		}
+		pmon.repetitionCounter++;
+	}
+
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
