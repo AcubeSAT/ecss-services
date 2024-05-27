@@ -171,7 +171,7 @@ public:
 		auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
 		switch (pmon.checkType) {
 			case PMON::CheckType::Limit: {
-				auto limitCheck = static_cast<PMONLimitCheck*>(&pmon);
+				auto* limitCheck = static_cast<PMONLimitCheck*>(&pmon);
 				if (currentValue < limitCheck->getLowLimit()) {
 					pmon.checkingStatus = PMON::CheckingStatus::BelowLowLimit;
 				} else if (currentValue > limitCheck->getHighLimit()) {
@@ -182,8 +182,8 @@ public:
 				break;
 			}
 			case PMON::CheckType::ExpectedValue: {
-				auto expectedValueCheck = static_cast<PMONExpectedValueCheck*>(&pmon);
-				unsigned long maskedValue = static_cast<unsigned long>(currentValue) & expectedValueCheck->getMask();
+				auto* expectedValueCheck = static_cast<PMONExpectedValueCheck*>(&pmon);
+				uint64_t maskedValue = static_cast<uint64_t>(currentValue) & expectedValueCheck->getMask();
 				if (static_cast<double>(maskedValue) == expectedValueCheck->getExpectedValue()) {
 					pmon.checkingStatus = PMON::CheckingStatus::ExpectedValue;
 				} else {
@@ -192,7 +192,7 @@ public:
 				break;
 			}
 			case PMON::CheckType::Delta: {
-				auto deltaCheck = static_cast<PMONDeltaCheck*>(&pmon);
+				auto* deltaCheck = static_cast<PMONDeltaCheck*>(&pmon);
 				auto previousPMONOpt = getPreviousPMON(pmon.monitoredParameterId, PMON::CheckType::Delta);
 				if (previousPMONOpt.has_value()) {
 					auto previousValue = previousPMONOpt.value().get().monitoredParameter.get().getValueAsDouble();
