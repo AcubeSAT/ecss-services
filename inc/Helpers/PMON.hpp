@@ -193,7 +193,7 @@ public:
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
 	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Delta),
-	      currentValue(0.0), previousValue(0.0), currentTimestamp(), previousTimestamp() {
+	      currentValue(0.0), previousValue(0.0) {
 	}
 
 	/**
