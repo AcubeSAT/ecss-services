@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.7)
 project(ecss_services)
+
+# Set C++ version to c++17
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(etl CONFIG REQUIRED)
-find_package(logger CONFIG REQUIRED COMPONENTS log_common log_x86)
+# Specify the directories for #includes
+include_directories("${PROJECT_SOURCE_DIR}/inc" "${PROJECT_SOURCE_DIR}/lib/etl/include"
+        "${PROJECT_SOURCE_DIR}/lib/logger/inc")
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -11,11 +14,17 @@ add_custom_target(check
         COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
-add_compile_options(-Wvla)
+# Allow the user to set the ECSS Configuration directory using the -DECSS_CONFIGURATION=... command line argument
+set(ECSS_CONFIGURATION "${PROJECT_SOURCE_DIR}/inc/Platform/x86" CACHE PATH
+        "The include directory for the platform-specific ECSS configuration headers"
+)
 include_directories(${ECSS_CONFIGURATION})
-add_library(common STATIC)
-target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
-target_sources(common PRIVATE
+
+add_compile_options(-Wvla)
+
+# Specify the .cpp files common across all targets
+add_library(common OBJECT
+        lib/logger/src/Logger.cpp
         src/Service.cpp
         src/ErrorHandler.cpp
         src/Message.cpp
@@ -41,37 +50,30 @@ target_sources(common PRIVATE
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMON.cpp
         src/Helpers/AllReportTypes.cpp
-        src/Helpers/FilepathValidators.cpp
-        src/Services/FileManagementService.cpp
-        )
-
-target_link_libraries(common
-        PUBLIC etl log_common
-        PRIVATE log_x86
 )
 
 # Specify the .cpp files for the executables
-IF (X86_BUILD)
-    file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
+file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
 
-    add_executable(x86_services
-            ${x86_main_SRC}
-            )
-    target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
+add_executable(ecss_services
+        $<TARGET_OBJECTS:common>
+        ${x86_main_SRC}
+)
 
-    # Logs all levels of messages. This command can be added by other users of this
-    # library to override the respective log level.
-    target_compile_definitions(x86_services PRIVATE LOGLEVEL_TRACE)
+# Logs all levels of messages. This command can be added by other users of this
+# library to override the respective log level.
+target_compile_definitions(ecss_services PUBLIC LOGLEVEL_TRACE)
 
-    find_package(Catch2 CONFIG)
-    IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
-        file(GLOB test_main_SRC "test/*.cpp")
-        file(GLOB test_SRC "test/**/*.cpp")
-        add_executable(tests
-                ${test_main_SRC}
-                ${test_SRC})
-        target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
-    ENDIF()
-ENDIF()
+IF (EXISTS "${PROJECT_SOURCE_DIR}/lib/Catch2/CMakeLists.txt")
+    # Gather all the .cpp files corresponding to tests
+    file(GLOB test_main_SRC "test/*.cpp")
+    file(GLOB test_SRC "test/**/*.cpp")
 
-install(TARGETS common)
+    add_subdirectory(lib/Catch2)
+    add_executable(tests
+            $<TARGET_OBJECTS:common>
+            ${test_main_SRC}
+            ${test_SRC}
+    )
+    target_link_libraries(tests Catch2::Catch2WithMain)
+ENDIF ()
