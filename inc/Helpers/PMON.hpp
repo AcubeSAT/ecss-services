@@ -39,9 +39,6 @@ public:
 	 */
 	ParameterId monitoredParameterId;
 
-	/**
-	 * The reference to the ParameterBase object that is being monitored.
-	 */
 	etl::reference_wrapper<ParameterBase> monitoredParameter;
 
 	/**
