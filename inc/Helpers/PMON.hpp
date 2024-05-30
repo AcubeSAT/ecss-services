@@ -246,7 +246,7 @@ public:
 	/**
 	 * This method updates the last value and timestamp of the PMONDeltaCheck object.
 	 */
-	void updateLastValueAndTimestamp(double newValue, const Time::DefaultCUC& newTimestamp) {
+	void updatePreviousValueAndTimestamp(double newValue, const Time::DefaultCUC& newTimestamp) {
 		previousValue = newValue;
 		previousTimestamp = newTimestamp;
 	}
@@ -267,10 +267,10 @@ public:
 
 
 	/**
-	 * This method checks if the PMON has a previous value by verifying if the last timestamp has been initialized and is valid.
+	 * This method checks if the PMON has a previous value by verifying if the previous timestamp has value.
 	 */
 	bool hasOldValue() const {
-		return previousValue.has_value() && previousTimestamp.has_value();
+		return previousTimestamp.has_value();
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP
