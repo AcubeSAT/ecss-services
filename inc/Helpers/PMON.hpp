@@ -56,9 +56,6 @@ public:
 	 */
 	bool monitoringEnabled = false;
 
-	/**
-	 * The current Checking Status.
-	 */
 	CheckingStatus checkingStatus = Unchecked;
 
 	/**
