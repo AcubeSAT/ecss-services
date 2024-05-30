@@ -34,19 +34,44 @@ public:
 		                             ExpectedValue = 2,
 		                             Delta = 3 };
 
+	/**
+	 * The Parameter Monitoring Identifier.
+	 */
 	ParameterId monitoredParameterId;
+
+	/**
+	 * The reference to the ParameterBase object that is being monitored.
+	 */
 	etl::reference_wrapper<ParameterBase> monitoredParameter;
+
 	/**
 	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
 	PMONRepetitionNumber repetitionNumber;
+
 	/**
 	 * The number of checks that have been conducted so far.
 	 */
 	uint16_t repetitionCounter = 0;
+
+	/**
+	 * True if Monitoring is enabled, False otherwise.
+	 */
 	bool monitoringEnabled = false;
+
+	/**
+	 * The current Checking Status.
+	 */
 	CheckingStatus checkingStatus = Unchecked;
+
+	/**
+	 * The list of Checking Statuses that have been recorded so far.
+	 */
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
+
+	/**
+	 * The current Check Type.
+	 */
 	CheckType checkType;
 
 	/**
@@ -180,9 +205,7 @@ public:
 	EventDefinitionId aboveHighThresholdEvent;
 
 private:
-	double currentValue;
 	double previousValue;
-	Time::DefaultCUC currentTimestamp;
 	Time::DefaultCUC previousTimestamp;
 
 public:
@@ -192,8 +215,7 @@ public:
 	                        EventDefinitionId aboveHighThresholdEvent)
 	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
-	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Delta),
-	      currentValue(0.0), previousValue(0.0) {
+	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Delta), previousValue(0.0) {
 	}
 
 	/**
@@ -232,36 +254,26 @@ public:
 	}
 
 	/**
-	 * @brief Updates the values and timestamps for the PMONDeltaCheck object.
-	 *
-	 * This method is used to update the current and previous values and timestamps
-	 * of the PMONDeltaCheck object. The current value and timestamp are moved to
-	 * their respective previous value and timestamp variables, and the new current
-	 * value and timestamp are set to the provided value and the current time
-	 *
-	 * @param newValue The new value to be set as the current value.
+	 * Updates the previous value and timestamp with the current ones.
 	 */
 	void updateValuesAndTimestamps(double newValue) {
-		previousValue = currentValue;
-		previousTimestamp = currentTimestamp;
-		currentValue = newValue;
-		currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
+		previousValue = newValue;
+		previousTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
 	}
 
 	/**
-	 * This method calculates the difference between the current and previous values of the monitored parameter,
-	 * and divides it by the time difference between the current and previous timestamps. The result is the rate
-	 * of change of the monitored parameter per second.
-	 *
-	 * @return The rate of change of the monitored parameter per second.
+	 * Returns the delta per second between the current value and the previous one.
 	 */
-	double getDeltaPerSecond() const {
+	double getDeltaPerSecond(double currentValue) const {
 		double delta = currentValue - previousValue;
-		auto duration = currentTimestamp - previousTimestamp;
+		auto duration = TimeGetter::getCurrentTimeDefaultCUC() - previousTimestamp;
 		double deltaTime = std::chrono::duration<double>(duration).count();
 		return delta / deltaTime;
 	}
 
+	/**
+	 * Returns True if the previous timestamp is valid, False otherwise.
+	 */
 	bool isPreviousTimestampValid() const {
 		return previousTimestamp.isValid();
 	}

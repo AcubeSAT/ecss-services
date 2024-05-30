@@ -205,7 +205,7 @@ public:
 			case PMON::CheckType::Delta: {
 				auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
 				if (deltaCheck.isPreviousTimestampValid()) {
-					double deltaPerSecond = deltaCheck.getDeltaPerSecond();
+					double deltaPerSecond = deltaCheck.getDeltaPerSecond(currentValue);
 					if (deltaPerSecond < deltaCheck.getLowDeltaThreshold()) {
 						pmon.checkingStatus = PMON::CheckingStatus::BelowLowThreshold;
 					} else if (deltaPerSecond > deltaCheck.getHighDeltaThreshold()) {
