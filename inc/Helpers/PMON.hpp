@@ -34,11 +34,7 @@ public:
 		                             ExpectedValue = 2,
 		                             Delta = 3 };
 
-	/**
-	 * The Parameter Monitoring Identifier.
-	 */
 	ParameterId monitoredParameterId;
-
 	etl::reference_wrapper<ParameterBase> monitoredParameter;
 
 	/**
@@ -199,8 +195,8 @@ public:
 	EventDefinitionId aboveHighThresholdEvent;
 
 private:
-	double previousValue;
-	Time::DefaultCUC previousTimestamp;
+	etl::optional<double> previousValue;
+	etl::optional<Time::DefaultCUC> previousTimestamp;
 
 public:
 	explicit PMONDeltaCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber,
@@ -248,28 +244,33 @@ public:
 	}
 
 	/**
-	 * Updates the previous value and timestamp with the current ones.
+	 * This method updates the last value and timestamp of the PMONDeltaCheck object.
 	 */
-	void updateValuesAndTimestamps(double newValue) {
+	void updateLastValueAndTimestamp(double newValue, const Time::DefaultCUC& newTimestamp) {
 		previousValue = newValue;
-		previousTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
+		previousTimestamp = newTimestamp;
 	}
 
 	/**
 	 * Returns the delta per second between the current value and the previous one.
 	 */
 	double getDeltaPerSecond(double currentValue) const {
-		double delta = currentValue - previousValue;
-		auto duration = TimeGetter::getCurrentTimeDefaultCUC() - previousTimestamp;
+		double delta = currentValue - *previousValue;
+		auto duration = TimeGetter::getCurrentTimeDefaultCUC() - *previousTimestamp;
 		double deltaTime = std::chrono::duration<double>(duration).count();
+
+		if (deltaTime == 0) {
+			return 0;
+		}
 		return delta / deltaTime;
 	}
 
+
 	/**
-	 * Returns True if the previous timestamp is valid, False otherwise.
+	 * This method checks if the PMON has a previous value by verifying if the last timestamp has been initialized and is valid.
 	 */
-	bool isPreviousTimestampValid() const {
-		return previousTimestamp.isValid();
+	bool hasOldValue() const {
+		return previousValue.has_value() && previousTimestamp.has_value();
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP

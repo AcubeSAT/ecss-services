@@ -163,12 +163,13 @@ public:
 	 * @param pmon A reference to the PMON object to be checked.
 	 */
 	void performCheck(PMON& pmon) const {
-		auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
 		auto previousStatus = pmon.checkingStatus;
 
 		switch (pmon.checkType) {
 			case PMON::CheckType::Limit: {
 				auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
+				auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
+
 				if (currentValue < limitCheck.getLowLimit()) {
 					pmon.checkingStatus = PMON::CheckingStatus::BelowLowLimit;
 				} else if (currentValue > limitCheck.getHighLimit()) {
@@ -182,6 +183,7 @@ public:
 				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon);
 				uint64_t currentValueAsUint64 = pmon.monitoredParameter.get().getValueAsUint64();
 				uint64_t maskedValue = currentValueAsUint64 & expectedValueCheck.getMask();
+
 				if (maskedValue == expectedValueCheck.getExpectedValue()) {
 					pmon.checkingStatus = PMON::CheckingStatus::ExpectedValue;
 				} else {
@@ -191,7 +193,10 @@ public:
 			}
 			case PMON::CheckType::Delta: {
 				auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
-				if (deltaCheck.isPreviousTimestampValid()) {
+				auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
+				auto currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
+
+				if (deltaCheck.hasOldValue()) {
 					double deltaPerSecond = deltaCheck.getDeltaPerSecond(currentValue);
 					if (deltaPerSecond < deltaCheck.getLowDeltaThreshold()) {
 						pmon.checkingStatus = PMON::CheckingStatus::BelowLowThreshold;
@@ -204,15 +209,31 @@ public:
 					pmon.checkingStatus = PMON::CheckingStatus::Invalid;
 				}
 
-				deltaCheck.updateValuesAndTimestamps(currentValue);
+				deltaCheck.updateLastValueAndTimestamp(currentValue, currentTimestamp);
 				break;
 			}
+			default:
+				ErrorHandler::reportInternalError(ErrorHandler::UnknownCheckType);
 		}
 
 		if (pmon.checkingStatus == previousStatus) {
 			pmon.repetitionCounter++;
 		} else {
 			pmon.repetitionCounter = 1;
+		}
+	}
+
+	/**
+     * Checks all PMON objects in the parameter monitoring list if they are enabled.
+     * This function iterates through all PMON objects in the parameter monitoring list
+     * and calls the performCheck method for each enabled PMON.
+     */
+	void checkAll() const {
+		for (const auto& entry : parameterMonitoringList) {
+			auto& pmon = entry.second.get();
+			if (pmon.isMonitoringEnabled()) {
+				performCheck(pmon);
+			}
 		}
 	}
 

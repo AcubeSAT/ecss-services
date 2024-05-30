@@ -104,6 +104,10 @@ public:
 		 * PMON base couldn't be initialized with the given parameter ID
 		 */
 		InvalidParameterId = 18,
+		/**
+		 * An unknown or unsupported PMON check type was encountered
+		 */
+		UnknownCheckType = 19,
 	};
 
 	/**
