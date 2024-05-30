@@ -209,7 +209,7 @@ public:
 					pmon.checkingStatus = PMON::CheckingStatus::Invalid;
 				}
 
-				deltaCheck.updateLastValueAndTimestamp(currentValue, currentTimestamp);
+				deltaCheck.updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
 				break;
 			}
 			default:
