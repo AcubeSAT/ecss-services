@@ -149,19 +149,6 @@ public:
 	}
 
 	/**
-     * Helper function to get the previous PMON with the same check type.
- 	 */
-	etl::optional<etl::reference_wrapper<PMON>> getPreviousPMON(ParameterId PMONId, PMON::CheckType checkType) const {
-		for (auto reverseIt = parameterMonitoringList.crbegin(); reverseIt != parameterMonitoringList.crend(); ++reverseIt) {
-			if (reverseIt->second.get().monitoredParameterId == PMONId && reverseIt->second.get().checkType == checkType) {
-				return reverseIt->second;
-			}
-		}
-
-		return {};
-	}
-
-	/**
 	 * This function performs a check on the provided PMON object. The type of check performed is determined by the checkType member of the PMON object.
 	 * The function updates the checkingStatus member of the PMON object based on the result of the check.
 	 *
