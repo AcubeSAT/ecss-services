@@ -149,8 +149,8 @@ public:
 	}
 
 	/**
-	 * This function performs a check on the provided PMON object. The type of check performed is determined by the checkType member of the PMON object.
-	 * The function updates the checkingStatus member of the PMON object based on the result of the check.
+	 * This function performs a check on the provided PMON object, based on its child type.
+	 * The function updates PMON::checkingStatus based on the result of the check.
 	 *
 	 * This function is expected to be called by the periodic monitoring system, which is responsible for
 	 * invoking the check on each monitored parameter at regular intervals. It ensures that parameters are
