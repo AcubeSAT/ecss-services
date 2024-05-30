@@ -164,7 +164,7 @@ public:
 	 */
 	void performCheck(PMON& pmon) const {
 		auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
-		PMON::CheckingStatus previousStatus = pmon.checkingStatus;
+		auto previousStatus = pmon.checkingStatus;
 
 		switch (pmon.checkType) {
 			case PMON::CheckType::Limit: {
