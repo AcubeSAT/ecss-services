@@ -188,7 +188,7 @@ public:
 	template <typename T>
 	T asTAIseconds();
 
-	 /**
+	/**
 	 * Method to check if the timestamp is valid
 	 */
 	bool isValid() const {
