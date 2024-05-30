@@ -64,7 +64,7 @@ public:
 	etl::array<CheckingStatus, 2> checkTransitionList = {};
 
 	/**
-	 * The current Check Type.
+	 * The check type of this monitoring definition, set by the child classes to differentiate between class types
 	 */
 	CheckType checkType;
 
