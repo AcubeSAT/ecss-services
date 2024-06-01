@@ -160,90 +160,24 @@ public:
 	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system.
 	 * Irregular calls or missed checks can lead to incorrect status updates and potentially missed parameter anomalies.
 	 *
-     * @note
-     * This function does not ensure that a monitoring definition is _enabled_. It will
-     * perform a check even if the PMON definition is _disabled_.
-     *
-     * @note
-     * The delta check is performed on the actual difference between the previous and the current
-     * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
-     *
+	 * @note
+	 * This function does not ensure that a monitoring definition is _enabled_. It will
+	 * perform a check even if the PMON definition is _disabled_.
+	 *
+	 * @note
+	 * The delta check is performed on the actual difference between the previous and the current
+	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
+	 *
 	 * @param pmon A reference to the PMON object to be checked.
 	 */
-	void performCheck(PMON& pmon) const {
-		auto previousStatus = pmon.checkingStatus;
-
-		switch (pmon.checkType) {
-			case PMON::CheckType::Limit: {
-				auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
-				auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
-
-				if (currentValue < limitCheck.getLowLimit()) {
-					pmon.checkingStatus = PMON::CheckingStatus::BelowLowLimit;
-				} else if (currentValue > limitCheck.getHighLimit()) {
-					pmon.checkingStatus = PMON::CheckingStatus::AboveHighLimit;
-				} else {
-					pmon.checkingStatus = PMON::CheckingStatus::WithinLimits;
-				}
-				break;
-			}
-			case PMON::CheckType::ExpectedValue: {
-				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon);
-				uint64_t currentValueAsUint64 = pmon.monitoredParameter.get().getValueAsUint64();
-				uint64_t maskedValue = currentValueAsUint64 & expectedValueCheck.getMask();
-
-				if (maskedValue == expectedValueCheck.getExpectedValue()) {
-					pmon.checkingStatus = PMON::CheckingStatus::ExpectedValue;
-				} else {
-					pmon.checkingStatus = PMON::CheckingStatus::UnexpectedValue;
-				}
-				break;
-			}
-			case PMON::CheckType::Delta: {
-				auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
-				auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
-				auto currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
-
-				if (deltaCheck.hasOldValue()) {
-					double deltaPerSecond = deltaCheck.getDeltaPerSecond(currentValue);
-					if (deltaPerSecond < deltaCheck.getLowDeltaThreshold()) {
-						pmon.checkingStatus = PMON::CheckingStatus::BelowLowThreshold;
-					} else if (deltaPerSecond > deltaCheck.getHighDeltaThreshold()) {
-						pmon.checkingStatus = PMON::CheckingStatus::AboveHighThreshold;
-					} else {
-						pmon.checkingStatus = PMON::CheckingStatus::WithinThreshold;
-					}
-				} else {
-					pmon.checkingStatus = PMON::CheckingStatus::Invalid;
-				}
-
-				deltaCheck.updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
-				break;
-			}
-			default:
-				ErrorHandler::reportInternalError(ErrorHandler::UnknownCheckType);
-		}
-
-		if (pmon.checkingStatus == previousStatus) {
-			pmon.repetitionCounter++;
-		} else {
-			pmon.repetitionCounter = 1;
-		}
-	}
+	void performCheck(PMON& pmon) const;
 
 	/**
-     * Checks all PMON objects in the parameter monitoring list if they are enabled.
-     * This function iterates through all PMON objects in the parameter monitoring list
-     * and calls the performCheck method for each enabled PMON.
-     */
-	void checkAll() const {
-		for (const auto& entry : parameterMonitoringList) {
-			auto& pmon = entry.second.get();
-			if (pmon.isMonitoringEnabled()) {
-				performCheck(pmon);
-			}
-		}
-	}
+	 * Checks all PMON objects in the parameter monitoring list if they are enabled.
+	 * This function iterates through all PMON objects in the parameter monitoring list
+	 * and calls the performCheck method for each enabled PMON.
+	 */
+	void checkAll() const;
 
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
