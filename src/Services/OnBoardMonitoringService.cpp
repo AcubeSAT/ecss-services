@@ -371,7 +371,7 @@ void OnBoardMonitoringService::performCheck(PMON& pmon) const {
 }
 
 void OnBoardMonitoringService::checkAll() const {
-	for (auto& entry : parameterMonitoringList) {
+	for (const auto& entry : parameterMonitoringList) {
 		auto& pmon = entry.second.get();
 		if (pmon.isMonitoringEnabled()) {
 			performCheck(pmon);
