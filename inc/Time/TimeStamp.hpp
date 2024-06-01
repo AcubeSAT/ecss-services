@@ -189,13 +189,6 @@ public:
 	T asTAIseconds();
 
 	/**
-	 * Method to check if the timestamp is valid
-	 */
-	bool isValid() const {
-		return taiCounter != 0;
-	}
-
-	/**
 	 * Converts a TimeStamp to a duration of seconds since the @ref Time::Epoch.
 	 *
 	 * @warning This function does not perform overflow calculations. It is up to the user to ensure that the types are compatible so that no overflow occurs.

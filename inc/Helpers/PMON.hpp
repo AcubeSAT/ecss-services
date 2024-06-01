@@ -1,14 +1,12 @@
 #ifndef ECSS_SERVICES_PMON_HPP
 #define ECSS_SERVICES_PMON_HPP
 #include <cstdint>
-#include "ECSS_Definitions.hpp"
 #include "Helpers/Parameter.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
 #include "TimeGetter.hpp"
 #include "etl/array.h"
 #include "etl/functional.h"
-#include "etl/list.h"
 #include "etl/map.h"
 #include "etl/optional.h"
 
@@ -38,7 +36,7 @@ public:
 	etl::reference_wrapper<ParameterBase> monitoredParameter;
 
 	/**
-	 * The number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
+	 * The number of consecutive checks with the same result that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
 	PMONRepetitionNumber repetitionNumber;
 
@@ -150,8 +148,8 @@ public:
 
 	explicit PMONLimitCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONLimit lowLimit,
 	                        EventDefinitionId belowLowLimitEvent, PMONLimit highLimit, EventDefinitionId aboveHighLimitEvent)
-	    : lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
-	      aboveHighLimitEvent(aboveHighLimitEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Limit) {
+	    : PMON(monitoredParameterId, repetitionNumber, CheckType::Limit), lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
+	      aboveHighLimitEvent(aboveHighLimitEvent) {
 	}
 
 	/**
@@ -203,9 +201,9 @@ public:
 	                        NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks, DeltaThreshold lowDeltaThreshold,
 	                        EventDefinitionId belowLowThresholdEvent, DeltaThreshold highDeltaThreshold,
 	                        EventDefinitionId aboveHighThresholdEvent)
-	    : numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
+	    : PMON(monitoredParameterId, repetitionNumber, CheckType::Delta), numberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks), lowDeltaThreshold(lowDeltaThreshold),
 	      belowLowThresholdEvent(belowLowThresholdEvent), highDeltaThreshold(highDeltaThreshold),
-	      aboveHighThresholdEvent(aboveHighThresholdEvent), PMON(monitoredParameterId, repetitionNumber, CheckType::Delta), previousValue(0.0) {
+	      aboveHighThresholdEvent(aboveHighThresholdEvent), previousValue(0.0) {
 	}
 
 	/**
@@ -255,16 +253,18 @@ public:
 	 * Returns the delta per second between the current value and the previous one.
 	 */
 	double getDeltaPerSecond(double currentValue) const {
-		double delta = currentValue - *previousValue;
-		auto duration = TimeGetter::getCurrentTimeDefaultCUC() - *previousTimestamp;
-		double deltaTime = std::chrono::duration<double>(duration).count();
+		if (previousValue.has_value()) {
+			double delta = currentValue - *previousValue;
+			auto duration = TimeGetter::getCurrentTimeDefaultCUC() - *previousTimestamp;
+			double deltaTime = std::chrono::duration<double>(duration).count();
 
-		if (deltaTime == 0) {
-			return 0;
+			if (deltaTime == 0) {
+				return 0;
+			}
+			return delta / deltaTime;
 		}
-		return delta / deltaTime;
+		return 0;
 	}
-
 
 	/**
 	 * This method checks if the PMON has a previous value by verifying if the previous timestamp has value.
