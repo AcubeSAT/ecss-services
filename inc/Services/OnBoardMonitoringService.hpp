@@ -160,6 +160,14 @@ public:
 	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system.
 	 * Irregular calls or missed checks can lead to incorrect status updates and potentially missed parameter anomalies.
 	 *
+     * @note
+     * This function does not ensure that a monitoring definition is _enabled_. It will
+     * perform a check even if the PMON definition is _disabled_.
+     *
+     * @note
+     * The delta check is performed on the actual difference between the previous and the current
+     * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
+     *
 	 * @param pmon A reference to the PMON object to be checked.
 	 */
 	void performCheck(PMON& pmon) const {
