@@ -92,7 +92,7 @@ public:
 
 	/**
 	 * Pure virtual function to be implemented by derived classes for performing the specific check.
-	 * The function updates checkingStatus based on the result of the check.
+	 * The function updates PMON::checkingStatus based on the result of the check.
 	 *
 	 * This function is expected to be called by the periodic monitoring system, which is responsible for
 	 * invoking the check on each monitored parameter at regular intervals. It ensures that parameters are
@@ -157,6 +157,18 @@ public:
 		return unexpectedValueEvent;
 	}
 
+	/**
+	 * @brief Performs the check for the PMONExpectedValueCheck class.
+	 *
+	 * This function first retrieves the current value of the monitored parameter and applies the bit mask to it.
+	 * It then compares the masked value to the expected value. If they match, the checking status is set to ExpectedValue.
+	 * If they don't match, the checking status is set to UnexpectedValue.
+	 *
+	 * After the check, the function compares the current checking status to the previous one.
+	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
+	 *
+	 * @note This function overrides the pure virtual function in the base PMON class.
+	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;
 		auto currentValueAsUint64 = monitoredParameter.get().getValueAsUint64();
@@ -219,6 +231,18 @@ public:
 		return aboveHighLimitEvent;
 	}
 
+	/**
+	 * @brief Performs the check for the PMONExpectedValueCheck class.
+	 *
+	 * This function first retrieves the current value of the monitored parameter and applies the bit mask to it.
+	 * It then compares the masked value to the expected value. If they match, the checking status is set to ExpectedValue.
+	 * If they don't match, the checking status is set to UnexpectedValue.
+	 *
+	 * After the check, the function compares the current checking status to the previous one.
+	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
+	 *
+	 * @note This function overrides the pure virtual function in the base PMON class.
+	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
@@ -330,6 +354,21 @@ public:
 		return previousTimestamp.has_value();
 	}
 
+	/**
+	 * @brief Performs the check for the PMONDeltaCheck class.
+	 *
+	 * This function first retrieves the current value of the monitored parameter and the current timestamp.
+	 * If there is a previous value, it calculates the delta per second between the current and previous values.
+	 * Depending on the delta per second, it sets the checking status to BelowLowThreshold, AboveHighThreshold, or WithinThreshold.
+	 * If there is no previous value, it sets the checking status to Invalid.
+	 *
+	 * After the check, the function updates the previous value and timestamp to the current ones.
+	 *
+	 * Finally, it compares the current checking status to the previous one.
+	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
+	 *
+	 * @note This function overrides the pure virtual function in the base PMON class.
+	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
