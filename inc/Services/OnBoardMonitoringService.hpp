@@ -149,30 +149,6 @@ public:
 	}
 
 	/**
-	 * This function performs a check on the provided PMON object, based on its child type.
-	 * The function updates PMON::checkingStatus based on the result of the check.
-	 *
-	 * This function is expected to be called by the periodic monitoring system, which is responsible for
-	 * invoking the check on each monitored parameter at regular intervals. It ensures that parameters are
-	 * within their defined limits, match expected values, or have acceptable delta changes over time.
-	 *
-	 * @note
-	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system.
-	 * Irregular calls or missed checks can lead to incorrect status updates and potentially missed parameter anomalies.
-	 *
-	 * @note
-	 * This function does not ensure that a monitoring definition is _enabled_. It will
-	 * perform a check even if the PMON definition is _disabled_.
-	 *
-	 * @note
-	 * The delta check is performed on the actual difference between the previous and the current
-	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
-	 *
-	 * @param pmon A reference to the PMON object to be checked.
-	 */
-	void performCheck(PMON& pmon) const;
-
-	/**
 	 * Checks all PMON objects in the parameter monitoring list if they are enabled.
 	 * This function iterates through all PMON objects in the parameter monitoring list
 	 * and calls the performCheck method for each enabled PMON.

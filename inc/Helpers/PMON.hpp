@@ -90,6 +90,28 @@ public:
 		return checkingStatus;
 	}
 
+	/**
+	 * Pure virtual function to be implemented by derived classes for performing the specific check.
+	 * The function updates checkingStatus based on the result of the check.
+	 *
+	 * This function is expected to be called by the periodic monitoring system, which is responsible for
+	 * invoking the check on each monitored parameter at regular intervals. It ensures that parameters are
+	 * within their defined limits, match expected values, or have acceptable delta changes over time.
+	 *
+	 * @note
+	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system.
+	 * Irregular calls or missed checks can lead to incorrect status updates and potentially missed parameter anomalies.
+	 *
+	 * @note
+	 * This function does not ensure that a monitoring definition is _enabled_. It will
+	 * perform a check even if the PMON definition is _disabled_.
+	 *
+	 * @note
+	 * The delta check is performed on the actual difference between the previous and the current
+	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
+	 */
+	virtual void performCheck() = 0;
+
 protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
@@ -133,6 +155,23 @@ public:
 	 */
 	EventDefinitionId getUnexpectedValueEvent() const {
 		return unexpectedValueEvent;
+	}
+
+	void performCheck() override {
+		auto previousStatus = checkingStatus;
+		auto currentValueAsUint64 = monitoredParameter.get().getValueAsUint64();
+		uint64_t maskedValue = currentValueAsUint64 & getMask();
+		if (maskedValue == getExpectedValue()) {
+			checkingStatus = CheckingStatus::ExpectedValue;
+		} else {
+			checkingStatus = CheckingStatus::UnexpectedValue;
+		}
+
+		if (checkingStatus == previousStatus) {
+			repetitionCounter++;
+		} else {
+			repetitionCounter = 1;
+		}
 	}
 };
 
@@ -179,6 +218,24 @@ public:
 	EventDefinitionId getAboveHighLimitEvent() const {
 		return aboveHighLimitEvent;
 	}
+
+	void performCheck() override {
+		auto previousStatus = checkingStatus;
+		auto currentValue = monitoredParameter.get().getValueAsDouble();
+		if (currentValue < getLowLimit()) {
+			checkingStatus = BelowLowLimit;
+		} else if (currentValue > getHighLimit()) {
+			checkingStatus = AboveHighLimit;
+		} else {
+			checkingStatus = WithinLimits;
+		}
+
+		if (checkingStatus == previousStatus) {
+			repetitionCounter++;
+		} else {
+			repetitionCounter = 1;
+		}
+	}
 };
 
 /**
@@ -193,7 +250,7 @@ public:
 	EventDefinitionId aboveHighThresholdEvent;
 
 private:
-	etl::optional<double> previousValue;
+	double previousValue;
 	etl::optional<Time::DefaultCUC> previousTimestamp;
 
 public:
@@ -253,8 +310,8 @@ public:
 	 * Returns the delta per second between the current value and the previous one.
 	 */
 	double getDeltaPerSecond(double currentValue) const {
-		if (previousValue.has_value()) {
-			double delta = currentValue - *previousValue;
+		if (previousTimestamp.has_value()) {
+			double delta = currentValue - previousValue;
 			auto duration = TimeGetter::getCurrentTimeDefaultCUC() - *previousTimestamp;
 			double deltaTime = std::chrono::duration<double>(duration).count();
 
@@ -271,6 +328,33 @@ public:
 	 */
 	bool hasOldValue() const {
 		return previousTimestamp.has_value();
+	}
+
+	void performCheck() override {
+		auto previousStatus = checkingStatus;
+		auto currentValue = monitoredParameter.get().getValueAsDouble();
+		auto currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
+
+		if (hasOldValue()) {
+			double deltaPerSecond = getDeltaPerSecond(currentValue);
+			if (deltaPerSecond < getLowDeltaThreshold()) {
+				checkingStatus = BelowLowThreshold;
+			} else if (deltaPerSecond > getHighDeltaThreshold()) {
+				checkingStatus = AboveHighThreshold;
+			} else {
+				checkingStatus = WithinThreshold;
+			}
+		} else {
+			checkingStatus = Invalid;
+		}
+
+		updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
+
+		if (checkingStatus == previousStatus) {
+			repetitionCounter++;
+		} else {
+			repetitionCounter = 1;
+		}
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP

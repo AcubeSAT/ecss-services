@@ -309,72 +309,11 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 	storeMessage(pmonDefinitionReport);
 }
 
-void OnBoardMonitoringService::performCheck(PMON& pmon) const {
-	auto previousStatus = pmon.checkingStatus;
-
-	switch (pmon.checkType) {
-		case PMON::CheckType::Limit: {
-			auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
-			auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
-
-			if (currentValue < limitCheck.getLowLimit()) {
-				pmon.checkingStatus = PMON::CheckingStatus::BelowLowLimit;
-			} else if (currentValue > limitCheck.getHighLimit()) {
-				pmon.checkingStatus = PMON::CheckingStatus::AboveHighLimit;
-			} else {
-				pmon.checkingStatus = PMON::CheckingStatus::WithinLimits;
-			}
-			break;
-		}
-		case PMON::CheckType::ExpectedValue: {
-			auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon);
-			uint64_t currentValueAsUint64 = pmon.monitoredParameter.get().getValueAsUint64();
-			uint64_t maskedValue = currentValueAsUint64 & expectedValueCheck.getMask();
-
-			if (maskedValue == expectedValueCheck.getExpectedValue()) {
-				pmon.checkingStatus = PMON::CheckingStatus::ExpectedValue;
-			} else {
-				pmon.checkingStatus = PMON::CheckingStatus::UnexpectedValue;
-			}
-			break;
-		}
-		case PMON::CheckType::Delta: {
-			auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
-			auto currentValue = pmon.monitoredParameter.get().getValueAsDouble();
-			auto currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
-
-			if (deltaCheck.hasOldValue()) {
-				double deltaPerSecond = deltaCheck.getDeltaPerSecond(currentValue);
-				if (deltaPerSecond < deltaCheck.getLowDeltaThreshold()) {
-					pmon.checkingStatus = PMON::CheckingStatus::BelowLowThreshold;
-				} else if (deltaPerSecond > deltaCheck.getHighDeltaThreshold()) {
-					pmon.checkingStatus = PMON::CheckingStatus::AboveHighThreshold;
-				} else {
-					pmon.checkingStatus = PMON::CheckingStatus::WithinThreshold;
-				}
-			} else {
-				pmon.checkingStatus = PMON::CheckingStatus::Invalid;
-			}
-
-			deltaCheck.updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
-			break;
-		}
-		default:
-			ErrorHandler::reportInternalError(ErrorHandler::UnknownInternalError);
-	}
-
-	if (pmon.checkingStatus == previousStatus) {
-		pmon.repetitionCounter++;
-	} else {
-		pmon.repetitionCounter = 1;
-	}
-}
-
 void OnBoardMonitoringService::checkAll() const {
 	for (const auto& entry : parameterMonitoringList) {
 		auto& pmon = entry.second.get();
 		if (pmon.isMonitoringEnabled()) {
-			performCheck(pmon);
+			pmon.performCheck();
 		}
 	}
 }
