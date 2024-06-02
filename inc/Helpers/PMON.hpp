@@ -41,9 +41,9 @@ public:
 	PMONRepetitionNumber repetitionNumber;
 
 	/**
-	 * The number of checks that have been conducted so far.
+	 * The number of consecutive checks with the same result that have been conducted so far.
 	 */
-	uint16_t repetitionCounter = 0;
+	PMONRepetitionCounter repetitionCounter = 0;
 
 	/**
 	 * If false, the parameter of this PMON will not be checked, and no events will be generated if it goes off-bounds.
@@ -63,7 +63,7 @@ public:
 	CheckType checkType;
 
 	/**
-	 * Returns the number of checks that need to be conducted in order to set a new Parameter Monitoring Status.
+	 * Returns the number of consecutive checks with the same result that need to be conducted in order to set a new Parameter Monitoring Status.
 	 */
 	PMONRepetitionNumber getRepetitionNumber() const {
 		return repetitionNumber;
@@ -74,6 +74,13 @@ public:
 	 */
 	bool isMonitoringEnabled() const {
 		return monitoringEnabled;
+	}
+
+	/**
+	 * Returns the number of consecutive checks with the same result that have been conducted so far.
+	 */
+	PMONRepetitionCounter getRepetitionCounter() const {
+		return repetitionCounter;
 	}
 
 	/**
