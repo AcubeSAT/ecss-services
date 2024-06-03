@@ -180,10 +180,11 @@ public:
 		auto previousStatus = checkingStatus;
 		auto currentValueAsUint64 = monitoredParameter.get().getValueAsUint64();
 		uint64_t maskedValue = currentValueAsUint64 & getMask();
+
 		if (maskedValue == getExpectedValue()) {
-			checkingStatus = CheckingStatus::ExpectedValue;
+			checkingStatus = ExpectedValue;
 		} else {
-			checkingStatus = CheckingStatus::UnexpectedValue;
+			checkingStatus = UnexpectedValue;
 		}
 
 		if (checkingStatus == previousStatus) {
@@ -239,7 +240,7 @@ public:
 	}
 
 	/**
-	 * @brief Performs the check for the PMONExpectedValueCheck class.
+	 * @brief Performs the check for the PMONLimitCheck class.
 	 *
 	 * This function first retrieves the current value of the monitored parameter and applies the bit mask to it.
 	 * It then compares the masked value to the expected value. If they match, the checking status is set to ExpectedValue.

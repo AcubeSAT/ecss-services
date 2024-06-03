@@ -742,3 +742,114 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		Services.reset();
 	}
 }
+
+TEST_CASE("Limit Check Behavior") {
+	SECTION("Value within limits") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition2;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(5);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		pmon.performCheck();
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Value below low limit") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition2;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(1);
+		REQUIRE(param.getValue() == 1);
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowLimit);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Value above high limit") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition2;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		REQUIRE(param.getValue() == 10);
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Repetition Counter Resets on Status Change") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition2;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(5);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(5);
+		pmon.performCheck();
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		param.setValue(1);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowLimit);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(1);
+		pmon.performCheck();
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		param.setValue(10);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(5);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Continuous Monitoring Within Limits") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition2;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		for (unsigned char i = 2; i <= 8; ++i) {
+			param.setValue(i);
+			pmon.performCheck();
+			CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
+		}
+
+		param.setValue(1);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowLimit);
+
+		param.setValue(10);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
