@@ -9,7 +9,7 @@
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
 struct Fixtures {
-	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(7, 5, 10, 8, 0);
+	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(8, 5, 10, 8, 0);
 	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, 5, 2, 1, 9, 2);
 	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
 	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
@@ -848,6 +848,117 @@ TEST_CASE("Limit Check Behavior") {
 		param.setValue(10);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Expected Value Check Behavior") {
+	SECTION("Value matches expected value") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		pmon.mask = 0xFF;
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		pmon.performCheck();
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Value does not match expected value") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(5);
+		pmon.mask = 0xFF;
+		pmon.expectedValue = 10;
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		pmon.performCheck();
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Status Changes from Unexpected to Expected") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(5);
+		pmon.mask = 0xFF;
+		pmon.expectedValue = 10;
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(10);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Repetition Counter Resets on Status Change") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		pmon.mask = 0xFF;
+		pmon.expectedValue = 10;
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(5);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(10);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Edge Cases for Parameter Values") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(0);
+		pmon.mask = 0xFF;
+		pmon.expectedValue = 10;
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(255);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 2);
 
 		ServiceTests::reset();
 		Services.reset();
