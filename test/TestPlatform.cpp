@@ -292,11 +292,36 @@ namespace Filesystem {
 	}
 
 	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
+		if (getNodeType(path)) {
+			return DirectoryCreationError::DirectoryAlreadyExists;
+		}
+
+		std::filesystem::create_directory(path.data());
+
 		return etl::nullopt;
 	}
 
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
-		return etl::nullopt;
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (not nodeType) {
+			return DirectoryDeletionError::DirectoryDoesNotExist;
+		}
+
+		if (not std::filesystem::is_empty(path.data())) {
+			return DirectoryDeletionError::DirectoryIsNotEmpty;
+		}
+
+		bool successfulFileDeletion = fs::remove(path.data());
+
+		if (successfulFileDeletion) {
+			return etl::nullopt;
+		} else {
+			return DirectoryDeletionError::UnknownError;
+		}
+	}
+
+	uint32_t getUnallocatedMemory() {
+		return 42U;
 	}
 } // namespace Filesystem
 
