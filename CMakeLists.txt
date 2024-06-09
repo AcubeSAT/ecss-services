@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.18)
 project(ecss_services)
 set(CMAKE_CXX_STANDARD 17)
 
+add_definitions(-DETL_LOG_ERRORS -DETL_CHECK_PUSH_POP -DETL_VERBOSE_ERRORS)
+
 find_package(etl CONFIG REQUIRED)
 find_package(logger CONFIG REQUIRED COMPONENTS log_common log_x86)
 
