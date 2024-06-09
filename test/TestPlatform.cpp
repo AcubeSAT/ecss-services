@@ -17,15 +17,24 @@
 #include "Services/ServiceTests.hpp"
 
 
+UTCTimestamp fixedTime(2020, 4, 10, 10, 15, 0);
+
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
-	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
-	return currentTime;
+	return fixedTime;
 }
 
 Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 	UTCTimestamp timeUTC = getCurrentTimeUTC();
 	Time::DefaultCUC timeCUC(timeUTC);
 	return timeCUC;
+}
+
+void UTCTimestamp::setMockTime(const UTCTimestamp& time) {
+	fixedTime = time;
+}
+
+void UTCTimestamp::resetMockTime() {
+	fixedTime = UTCTimestamp(2020, 4, 10, 10, 15, 0);
 }
 
 // Explicit template specializations for the logError() function

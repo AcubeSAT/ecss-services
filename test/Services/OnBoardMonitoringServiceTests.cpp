@@ -5,13 +5,14 @@
 #include <etl/array.h>
 #include "ServiceTests.hpp"
 #include "etl/functional.h"
+#include <Time/UTCTimestamp.hpp>
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
 struct Fixtures {
 	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(8, 5, 10, 8, 0);
 	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, 5, 2, 1, 9, 2);
-	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
+	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(9, 5, 5, 3, 3, 11, 4);
 	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
 
 	/*
@@ -33,6 +34,8 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.addPMONDeltaCheck(2, etl::ref(fixtures.monitoringDefinition3));
 	onBoardMonitoringService.addPMONDeltaCheck(3, etl::ref(fixtures.monitoringDefinition4));
 }
+
+extern UTCTimestamp fixedTime;
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {
 	SECTION("3 valid requests to enable Parameter Monitoring Definitions") {
@@ -881,7 +884,6 @@ TEST_CASE("Expected Value Check Behavior") {
 
 		param.setValue(5);
 		pmon.mask = 0xFF;
-		pmon.expectedValue = 10;
 
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
@@ -901,7 +903,6 @@ TEST_CASE("Expected Value Check Behavior") {
 
 		param.setValue(5);
 		pmon.mask = 0xFF;
-		pmon.expectedValue = 10;
 
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
@@ -922,7 +923,6 @@ TEST_CASE("Expected Value Check Behavior") {
 
 		param.setValue(10);
 		pmon.mask = 0xFF;
-		pmon.expectedValue = 10;
 
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
@@ -949,7 +949,6 @@ TEST_CASE("Expected Value Check Behavior") {
 
 		param.setValue(0);
 		pmon.mask = 0xFF;
-		pmon.expectedValue = 10;
 
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
@@ -962,5 +961,158 @@ TEST_CASE("Expected Value Check Behavior") {
 
 		ServiceTests::reset();
 		Services.reset();
+	}
+
+	SECTION("Mask with zeros (no bits set)") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		pmon.mask = 0x00;
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(5);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Mask with some bits set to zero") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(0xFF); // 255 in decimal, which is 11111111 in binary
+		pmon.mask = 0xF0; // 11110000 in binary, so it will only consider the upper 4 bits
+		pmon.expectedValue = 0xF0;
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		param.setValue(0x0F); // 15 in decimal, which is 00001111 in binary
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Delta Check Perform Check") {
+	SECTION("Value changes above high threshold") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition3;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+
+		param.setValue(10);
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		param.setValue(180);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::AboveHighThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+		UTCTimestamp::resetMockTime();
+	}
+
+	SECTION("Value changes below low threshold") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition3;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		param.setValue(20);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+		UTCTimestamp::resetMockTime();
+	}
+
+	SECTION("Repetition Counter Behavior") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition3;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		param.setValue(20);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		param.setValue(50);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
+		param.setValue(100);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+		UTCTimestamp::resetMockTime();
+	}
+
+	SECTION("Repetition Counter Resets on Status Change") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition3;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		param.setValue(20);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		param.setValue(100);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+		UTCTimestamp::resetMockTime();
 	}
 }
