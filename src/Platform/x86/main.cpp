@@ -21,6 +21,16 @@
 #include "Services/TimeBasedSchedulingService.hpp"
 #include "etl/String.hpp"
 
+#include "etl/vector.h"
+
+
+void etlErrorCallback2(const etl::exception& e)  {
+	std::cout << "Tried printing an ETL error!" << std::endl;
+	LOG_ERROR << "ETL error: \"" << e.what() << "\""
+	          << " in file: "    << e.file_name()
+	          << " at line:"     << e.line_number() << "\n";
+}
+
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
@@ -366,5 +376,17 @@ int main() {
 	ErrorHandler::reportInternalError(static_cast<ErrorHandler::InternalErrorType>(254));
 
 	std::cout << UTCTimestamp() << std::endl;
+
+
+	std::cout << "--------------" << std::endl;
+	etl::error_handler::set_callback<etlErrorCallback>();
+	etl::vector<int,5> testV;
+	for( int i=0; i<7; i++){
+		testV.push_back(i);
+		std::cout << testV[i] << std::endl;
+	}
+
+
+
 	return 0;
 }
