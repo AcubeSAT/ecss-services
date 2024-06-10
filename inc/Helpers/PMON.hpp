@@ -172,6 +172,7 @@ public:
 	 * It then compares the masked value to the expected value. If they match, the checking status is set to ExpectedValue.
 	 * If they don't match, the checking status is set to UnexpectedValue.
 	 *
+	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;
@@ -239,12 +240,9 @@ public:
 	/**
 	 * @brief Performs the check for the PMONLimitCheck class.
 	 *
-	 * This function first retrieves the current value of the monitored parameter and applies the bit mask to it.
-	 * It then compares the masked value to the expected value. If they match, the checking status is set to ExpectedValue.
-	 * If they don't match, the checking status is set to UnexpectedValue.
-	 *
-	 * After the check, the function compares the current checking status to the previous one.
-	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
+	 * This function first retrieves the current value of the monitored parameter.
+	 * It then checks if the current value is below the low limit, above the high limit, or within the limits.
+	 * Depending on the comparison, it sets the checking status to BelowLowLimit, AboveHighLimit, or WithinLimits.
 	 *
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
@@ -368,9 +366,6 @@ public:
 	 * If there is no previous value, it sets the checking status to Invalid.
 	 *
 	 * After the check, the function updates the previous value and timestamp to the current ones.
-	 *
-	 * Finally, it compares the current checking status to the previous one.
-	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
 	 *
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 * @note The delta check is performed on the actual difference between the previous and the current
