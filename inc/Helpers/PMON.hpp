@@ -173,8 +173,6 @@ public:
 	 *
 	 * After the check, the function compares the current checking status to the previous one.
 	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
-	 *
-	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;

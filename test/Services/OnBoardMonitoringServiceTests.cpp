@@ -35,8 +35,6 @@ void initialiseParameterMonitoringDefinitions() {
 	onBoardMonitoringService.addPMONDeltaCheck(3, etl::ref(fixtures.monitoringDefinition4));
 }
 
-extern UTCTimestamp fixedTime;
-
 TEST_CASE("Enable Parameter Monitoring Definitions") {
 	SECTION("3 valid requests to enable Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
@@ -990,7 +988,7 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(0xFF); // 255 in decimal, which is 11111111 in binary
-		pmon.mask = 0xF0; // 11110000 in binary, so it will only consider the upper 4 bits
+		pmon.mask = 0b1111'0000;
 		pmon.expectedValue = 0xF0;
 
 		pmon.performCheck();
@@ -1012,7 +1010,6 @@ TEST_CASE("Delta Check Perform Check") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = fixtures.monitoringDefinition3;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
-
 
 		param.setValue(10);
 		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));

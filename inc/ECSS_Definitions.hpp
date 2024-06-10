@@ -253,9 +253,7 @@ inline constexpr uint8_t ECSSMaxMonitoringDefinitions = 4;
  * @details This variable specifies how often the checkAll method of ST[12] should be called.
  * The default value is set to 60 seconds but can be modified later.
  */
-inline constexpr std::chrono::seconds ECSSCheckAllFrequency(60);
-
-
+inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
 /**
  * 6.18.2.2 The applicationId that is assigned on the specific device that runs these Services.
  * In the ECSS-E-ST-70-41C the application ID is also referred as application process.

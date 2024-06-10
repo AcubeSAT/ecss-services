@@ -18,6 +18,8 @@
 
 
 UTCTimestamp fixedTime(2020, 4, 10, 10, 15, 0);
+const UTCTimestamp DefaultTime(2020, 4, 10, 10, 15, 0);
+UTCTimestamp fixedTime = DefaultTime;
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	return fixedTime;
@@ -34,7 +36,7 @@ void UTCTimestamp::setMockTime(const UTCTimestamp& time) {
 }
 
 void UTCTimestamp::resetMockTime() {
-	fixedTime = UTCTimestamp(2020, 4, 10, 10, 15, 0);
+	fixedTime = DefaultTime;
 }
 
 // Explicit template specializations for the logError() function
