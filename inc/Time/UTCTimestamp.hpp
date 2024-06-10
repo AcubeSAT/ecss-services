@@ -93,25 +93,6 @@ public:
 	}
 
 	/**
-	 * Sets a mock time for testing purposes.
-	 *
-	 * This function is used to set a mock time that will be returned by the
-	 * UTCTimestamp class instead of the actual current time. This is useful
-	 * for testing time-dependent behavior.
-	 *
-	 * @param time The mock time to set.
-	 */
-	static void setMockTime(const UTCTimestamp& time);
-
-	/**
-	 * @brief Resets the mock time to a specific time.
-	 *
-	 * This static function is used to reset the mock time to a specific time.
-	 * This can be useful in testing scenarios where you want to ensure that the time is reset to a known value.
-	 */
-	static void resetMockTime();
-
-	/**
 	 * @name Comparison operators
 	 * @{
 	 */

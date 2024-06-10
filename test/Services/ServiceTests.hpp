@@ -57,6 +57,20 @@ public:
 	}
 
 	/**
+	 * Sets a mock time that will be returned by the UTCTimestamp class instead of the actual current time.
+	 * This is useful for testing time-dependent behavior.
+	 *
+	 * @param time The mock time to set.
+	 */
+	static void setMockTime(const UTCTimestamp& time);
+
+	/**
+	 * Resets the mock time to the default time as set in TestPlatform.
+	 * This is useful in testing scenarios where you want to ensure that the time is reset to a known value.
+	 */
+	static void resetMockTime();
+
+	/**
 	 * Add one error to the list of occurred errors.
 	 *
 	 * @note This function will be called automatically by the ErrorHandler, and should not be

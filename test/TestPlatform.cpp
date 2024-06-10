@@ -30,11 +30,11 @@ Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 	return timeCUC;
 }
 
-void UTCTimestamp::setMockTime(const UTCTimestamp& time) {
+void ServiceTests::setMockTime(const UTCTimestamp& time) {
 	fixedTime = time;
 }
 
-void UTCTimestamp::resetMockTime() {
+void ServiceTests::resetMockTime() {
 	fixedTime = DefaultTime;
 }
 

@@ -5,7 +5,6 @@
 #include <etl/array.h>
 #include "ServiceTests.hpp"
 #include "etl/functional.h"
-#include <Time/UTCTimestamp.hpp>
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
@@ -1012,19 +1011,19 @@ TEST_CASE("Delta Check Perform Check") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
 		param.setValue(180);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(5);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
@@ -1032,7 +1031,7 @@ TEST_CASE("Delta Check Perform Check") {
 
 		ServiceTests::reset();
 		Services.reset();
-		UTCTimestamp::resetMockTime();
+		ServiceTests::resetMockTime();
 	}
 
 	SECTION("Repetition Counter Behavior") {
@@ -1041,24 +1040,24 @@ TEST_CASE("Delta Check Perform Check") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
 		param.setValue(20);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(50);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 2);
 
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
 		param.setValue(100);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
@@ -1066,7 +1065,7 @@ TEST_CASE("Delta Check Perform Check") {
 
 		ServiceTests::reset();
 		Services.reset();
-		UTCTimestamp::resetMockTime();
+		ServiceTests::resetMockTime();
 	}
 
 	SECTION("Repetition Counter Resets on Status Change") {
@@ -1075,18 +1074,18 @@ TEST_CASE("Delta Check Perform Check") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
 		param.setValue(20);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(100);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
@@ -1094,6 +1093,6 @@ TEST_CASE("Delta Check Perform Check") {
 
 		ServiceTests::reset();
 		Services.reset();
-		UTCTimestamp::resetMockTime();
+		ServiceTests::resetMockTime();
 	}
 }
