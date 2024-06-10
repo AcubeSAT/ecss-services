@@ -50,7 +50,6 @@ using ErrorCode = uint16_t;
  * The types used for the three Check Types and their variables in OnBoardMonitoringService.
  */
  using PMONRepetitionNumber = uint16_t;
- using PMONRepetitionCounter = uint16_t;
  using PMONLimit = double;
  using PMONExpectedValue = uint64_t;
  using PMONBitMask = uint64_t;

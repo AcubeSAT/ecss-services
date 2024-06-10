@@ -17,7 +17,6 @@
 #include "Services/ServiceTests.hpp"
 
 
-UTCTimestamp fixedTime(2020, 4, 10, 10, 15, 0);
 const UTCTimestamp DefaultTime(2020, 4, 10, 10, 15, 0);
 UTCTimestamp fixedTime = DefaultTime;
 

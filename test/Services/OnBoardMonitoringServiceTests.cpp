@@ -1006,7 +1006,7 @@ TEST_CASE("Expected Value Check Behavior") {
 }
 
 TEST_CASE("Delta Check Perform Check") {
-	SECTION("Value changes above high threshold") {
+	SECTION("Delta threshold checks including negative delta") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = fixtures.monitoringDefinition3;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
@@ -1024,24 +1024,8 @@ TEST_CASE("Delta Check Perform Check") {
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
-		ServiceTests::reset();
-		Services.reset();
-		UTCTimestamp::resetMockTime();
-	}
-
-	SECTION("Value changes below low threshold") {
-		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
-
-		param.setValue(10);
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
-		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
-		CHECK(pmon.getRepetitionCounter() == 1);
-
-		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
-		param.setValue(20);
+		UTCTimestamp::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		param.setValue(5);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);

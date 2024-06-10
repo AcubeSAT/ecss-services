@@ -9,6 +9,7 @@
 #include "etl/functional.h"
 #include "etl/map.h"
 #include "etl/optional.h"
+#include "ECSS_Definitions.hpp"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
@@ -43,7 +44,7 @@ public:
 	/**
 	 * The number of consecutive checks with the same result that have been conducted so far.
 	 */
-	PMONRepetitionCounter repetitionCounter = 0;
+	PMONRepetitionNumber repetitionCounter = 0;
 
 	/**
 	 * If false, the parameter of this PMON will not be checked, and no events will be generated if it goes off-bounds.
@@ -79,7 +80,7 @@ public:
 	/**
 	 * Returns the number of consecutive checks with the same result that have been conducted so far.
 	 */
-	PMONRepetitionCounter getRepetitionCounter() const {
+	PMONRepetitionNumber getRepetitionCounter() const {
 		return repetitionCounter;
 	}
 
@@ -105,17 +106,17 @@ public:
 	 * invoking the check on each monitored parameter at regular intervals. It ensures that parameters are
 	 * within their defined limits, match expected values, or have acceptable delta changes over time.
 	 *
+	 * After the check, the function compares the current checking status to the previous one.
+	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
+	 *
 	 * @note
-	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system.
+	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system @ref ECSSMonitoringFrequency.
 	 * Irregular calls or missed checks can lead to incorrect status updates and potentially missed parameter anomalies.
 	 *
 	 * @note
 	 * This function does not ensure that a monitoring definition is _enabled_. It will
 	 * perform a check even if the PMON definition is _disabled_.
 	 *
-	 * @note
-	 * The delta check is performed on the actual difference between the previous and the current
-	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
 	 */
 	virtual void performCheck() = 0;
 
@@ -171,8 +172,6 @@ public:
 	 * It then compares the masked value to the expected value. If they match, the checking status is set to ExpectedValue.
 	 * If they don't match, the checking status is set to UnexpectedValue.
 	 *
-	 * After the check, the function compares the current checking status to the previous one.
-	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
 	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;
@@ -374,6 +373,8 @@ public:
 	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
 	 *
 	 * @note This function overrides the pure virtual function in the base PMON class.
+	 * @note The delta check is performed on the actual difference between the previous and the current
+	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
 	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;
