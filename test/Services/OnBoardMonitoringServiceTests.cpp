@@ -10,7 +10,7 @@ OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringS
 
 struct Fixtures {
 	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(8, 5, 10, 8, 0);
-	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(7, 5, 2, 1, 9, 2);
+	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(6, 5, 2, 1, 9, 2);
 	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(9, 5, 5, 3, 3, 11, 4);
 	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
 
@@ -436,7 +436,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		ParameterId PMONId = 1;
-		ParameterId monitoredParameterId = 7;
+		ParameterId monitoredParameterId = 6;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 4;
 		PMONLimit highLimit = 10;
@@ -539,7 +539,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		ParameterId PMONId = 1;
-		ParameterId monitoredParameterId = 7;
+		ParameterId monitoredParameterId = 6;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 10;
 		PMONLimit highLimit = 4;
@@ -570,7 +570,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
 		ParameterId PMONId = 1;
-		ParameterId monitoredParameterId = 7;
+		ParameterId monitoredParameterId = 6;
 		PMONRepetitionNumber repetitionNumber = 5;
 		DeltaThreshold lowDeltaThreshold = 8;
 		DeltaThreshold highDeltaThreshold = 2;
@@ -1093,3 +1093,97 @@ TEST_CASE("Delta Check Perform Check") {
 		Services.reset();
 	}
 }
+
+TEST_CASE("Check All Behavior") {
+    SECTION("monitoringDefinition1 and 2 enabled") {
+        initialiseParameterMonitoringDefinitions();
+        auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
+    	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
+        auto& pmon2 = onBoardMonitoringService.getPMONDefinition(1).get();
+    	auto& pmonLimit = static_cast<PMONLimitCheck&>(pmon2);
+        auto& pmon3 = onBoardMonitoringService.getPMONDefinition(2).get();
+    	auto& pmonDelta = static_cast<PMONDeltaCheck&>(pmon3);
+
+        auto& param1 = static_cast<Parameter<unsigned char>&>(pmon1.monitoredParameter.get());
+        auto& param2 = static_cast<Parameter<unsigned char>&>(pmon2.monitoredParameter.get());
+        auto& param3 = static_cast<Parameter<unsigned char>&>(pmon3.monitoredParameter.get());
+
+        param1.setValue(10);
+        pmonExpected.mask = 0xFF;
+        param2.setValue(5);
+    	pmonLimit.monitoringEnabled = true;
+        param3.setValue(100);
+
+    	CHECK(pmonExpected.getCheckingStatus() == PMON::Unchecked);
+    	CHECK(pmonLimit.getCheckingStatus() == PMON::Unchecked);
+    	CHECK(pmonDelta.getCheckingStatus() == PMON::Unchecked);
+
+    	onBoardMonitoringService.checkAll();
+
+    	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
+    	CHECK(pmonLimit.getCheckingStatus() == PMON::WithinLimits);
+    	CHECK(pmonDelta.getCheckingStatus() == PMON::Unchecked);
+
+        ServiceTests::reset();
+        Services.reset();
+    }
+
+	SECTION("Monitoring definitions initially disabled, then enabled") {
+    	initialiseParameterMonitoringDefinitions();
+    	auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
+    	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
+    	auto& pmon2 = onBoardMonitoringService.getPMONDefinition(1).get();
+    	auto& pmonLimit = static_cast<PMONLimitCheck&>(pmon2);
+
+    	auto& param1 = static_cast<Parameter<unsigned char>&>(pmon1.monitoredParameter.get());
+    	auto& param2 = static_cast<Parameter<unsigned char>&>(pmon2.monitoredParameter.get());
+
+    	param1.setValue(10);
+    	pmonExpected.mask = 0xFF;
+    	param2.setValue(5);
+    	pmonExpected.monitoringEnabled = false;
+    	pmonLimit.monitoringEnabled = false;
+
+    	onBoardMonitoringService.checkAll();
+
+    	CHECK(pmonExpected.getCheckingStatus() == PMON::Unchecked);
+    	CHECK(pmonLimit.getCheckingStatus() == PMON::Unchecked);
+
+    	pmonExpected.monitoringEnabled = true;
+    	pmonLimit.monitoringEnabled = true;
+
+    	onBoardMonitoringService.checkAll();
+
+    	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
+    	CHECK(pmonLimit.getCheckingStatus() == PMON::WithinLimits);
+
+    	ServiceTests::reset();
+    	Services.reset();
+    }
+
+	SECTION("Multiple consecutive calls to checkAll") {
+    	initialiseParameterMonitoringDefinitions();
+    	auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
+    	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
+
+    	auto& param1 = static_cast<Parameter<unsigned char>&>(pmon1.monitoredParameter.get());
+
+    	param1.setValue(10);
+    	pmonExpected.mask = 0xFF;
+
+    	onBoardMonitoringService.checkAll();
+    	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
+
+    	param1.setValue(5);
+    	onBoardMonitoringService.checkAll();
+    	CHECK(pmonExpected.getCheckingStatus() == PMON::UnexpectedValue);
+
+    	param1.setValue(10);
+    	onBoardMonitoringService.checkAll();
+    	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
+
+    	ServiceTests::reset();
+    	Services.reset();
+    }
+}
+
