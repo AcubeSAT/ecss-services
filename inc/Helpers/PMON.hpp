@@ -110,8 +110,9 @@ public:
 	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
 	 *
 	 * @note
-	 * It is crucial that this function is called periodically and consistently to ensure the reliability of the monitoring system @ref ECSSMonitoringFrequency.
-	 * Irregular calls or missed checks can lead to incorrect status updates and potentially missed parameter anomalies.
+	 * It is crucial that this function is called periodically and consistently every @ref ECSSMonitoringFrequency to ensure the
+	 * reliability of the monitoring system. Irregular calls or missed checks can lead to incorrect status updates and potentially
+	 * missed parameter anomalies.
 	 *
 	 * @note
 	 * This function does not ensure that a monitoring definition is _enabled_. It will
@@ -340,12 +341,12 @@ public:
 		if (previousTimestamp.has_value()) {
 			double delta = currentValue - previousValue;
 			auto duration = TimeGetter::getCurrentTimeDefaultCUC() - *previousTimestamp;
-			double deltaTime = std::chrono::duration<double>(duration).count();
+			double deltaSeconds = std::chrono::duration<double>(duration).count();
 
-			if (deltaTime == 0) {
+			if (deltaSeconds == 0) {
 				return 0;
 			}
-			return delta / deltaTime;
+			return delta / deltaSeconds;
 		}
 		return 0;
 	}

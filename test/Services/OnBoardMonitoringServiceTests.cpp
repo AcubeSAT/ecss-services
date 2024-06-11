@@ -986,15 +986,15 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& pmon = fixtures.monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
-		param.setValue(0xFF); // 255 in decimal, which is 11111111 in binary
+		param.setValue(0xFF);
 		pmon.mask = 0b1111'0000;
-		pmon.expectedValue = 0xF0;
+		pmon.expectedValue = 0b1111'0000;
 
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
-		param.setValue(0x0F); // 15 in decimal, which is 00001111 in binary
+		param.setValue(0b0000'1111);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
 		CHECK(pmon.getRepetitionCounter() == 1);
@@ -1031,7 +1031,6 @@ TEST_CASE("Delta Check Perform Check") {
 
 		ServiceTests::reset();
 		Services.reset();
-		ServiceTests::resetMockTime();
 	}
 
 	SECTION("Repetition Counter Behavior") {
@@ -1065,7 +1064,6 @@ TEST_CASE("Delta Check Perform Check") {
 
 		ServiceTests::reset();
 		Services.reset();
-		ServiceTests::resetMockTime();
 	}
 
 	SECTION("Repetition Counter Resets on Status Change") {
@@ -1093,6 +1091,5 @@ TEST_CASE("Delta Check Perform Check") {
 
 		ServiceTests::reset();
 		Services.reset();
-		ServiceTests::resetMockTime();
 	}
 }

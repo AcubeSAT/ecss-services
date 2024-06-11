@@ -30,14 +30,6 @@ Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 	return timeCUC;
 }
 
-void ServiceTests::setMockTime(const UTCTimestamp& time) {
-	fixedTime = time;
-}
-
-void ServiceTests::resetMockTime() {
-	fixedTime = DefaultTime;
-}
-
 // Explicit template specializations for the logError() function
 template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
 template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionStartErrorType);

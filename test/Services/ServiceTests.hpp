@@ -62,13 +62,17 @@ public:
 	 *
 	 * @param time The mock time to set.
 	 */
-	static void setMockTime(const UTCTimestamp& time);
+	static void setMockTime(const UTCTimestamp& time) {
+		fixedTime = time;
+	}
 
 	/**
 	 * Resets the mock time to the default time as set in TestPlatform.
 	 * This is useful in testing scenarios where you want to ensure that the time is reset to a known value.
 	 */
-	static void resetMockTime();
+	static void resetMockTime() {
+		fixedTime = DefaultTime;
+	}
 
 	/**
 	 * Add one error to the list of occurred errors.
@@ -109,6 +113,7 @@ public:
 	 */
 	static void reset() {
 		resetErrors();
+		resetMockTime();
 
 		Services.reset();
 	}
