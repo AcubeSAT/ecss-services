@@ -16,10 +16,8 @@
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
 
-
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
-	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
-	return currentTime;
+	return ServiceTests::getMockTime();
 }
 
 Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
@@ -71,6 +69,10 @@ void Logger::log(Logger::LogLevel level, etl::istring& message) {
 
 struct ServiceTestsListener : Catch::EventListenerBase {
 	using EventListenerBase::EventListenerBase; // inherit constructor
+
+	void testRunStarting(Catch::TestRunInfo const& testRunInfo) override {
+		ServiceTests::reset();
+	}
 
 	void sectionEnded(Catch::SectionStats const& sectionStats) override {
 		// Make sure we don't have any errors
