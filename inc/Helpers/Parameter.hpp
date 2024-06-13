@@ -49,6 +49,11 @@ public:
 	 * then usually 0 is returned.
 	 */
 	virtual double getValueAsDouble() = 0;
+
+	/**
+     * Retrieves the value of a parameter as uint64_t for bit-precision operations.
+     */
+	virtual uint64_t getValueAsUint64() = 0;
 };
 
 /**
@@ -75,6 +80,14 @@ public:
 	inline double getValueAsDouble() override {
 		if constexpr (std::is_arithmetic_v<DataType>) {
 			return static_cast<double>(currentValue);
+		} else {
+			return 0;
+		}
+	}
+
+	inline uint64_t getValueAsUint64() override {
+		if constexpr (std::is_arithmetic_v<DataType>) {
+			return static_cast<uint64_t>(currentValue);
 		} else {
 			return 0;
 		}

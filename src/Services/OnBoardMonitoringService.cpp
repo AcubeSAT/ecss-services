@@ -167,7 +167,6 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 	uint16_t numberOfIds = message.readUint16();
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-
 		ParameterId currentPMONId = message.read<ParameterId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
@@ -308,6 +307,15 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 		}
 	}
 	storeMessage(pmonDefinitionReport);
+}
+
+void OnBoardMonitoringService::checkAll() const {
+	for (const auto& entry : parameterMonitoringList) {
+		auto& pmon = entry.second.get();
+		if (pmon.isMonitoringEnabled()) {
+			pmon.performCheck();
+		}
+	}
 }
 
 void OnBoardMonitoringService::execute(Message& message) {
