@@ -377,9 +377,6 @@ int main() {
 		testV.push_back(i);
 		std::cout << testV[i] << std::endl;
 	}
-	LOG_ERROR << "Bruh momento. \n";
-
-
 
 	return 0;
 }
