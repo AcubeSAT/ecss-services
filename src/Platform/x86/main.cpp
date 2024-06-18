@@ -371,7 +371,7 @@ int main() {
 
 
 	std::cout << "--------------" << std::endl;
-	etl::error_handler::set_callback<etlErrorCallback<Logger::error>>();
+	etl::error_handler::set_callback<etlErrorCallback<Logger::debug>>();
 	etl::vector<int,5> testV;
 	for( int i=0; i<7; i++){
 		testV.push_back(i);
