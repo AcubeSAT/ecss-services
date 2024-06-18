@@ -23,14 +23,6 @@
 
 #include "etl/vector.h"
 
-
-void etlErrorCallback2(const etl::exception& e)  {
-	std::cout << "Tried printing an ETL error!" << std::endl;
-	LOG_ERROR << "ETL error: \"" << e.what() << "\""
-	          << " in file: "    << e.file_name()
-	          << " at line:"     << e.line_number() << "\n";
-}
-
 int main() {
 	LOG_NOTICE << "ECSS Services test application";
 
@@ -379,7 +371,7 @@ int main() {
 
 
 	std::cout << "--------------" << std::endl;
-	etl::error_handler::set_callback<etlErrorCallback>();
+	etl::error_handler::set_callback<etlErrorCallback<Logger::error>>();
 	etl::vector<int,5> testV;
 	for( int i=0; i<7; i++){
 		testV.push_back(i);

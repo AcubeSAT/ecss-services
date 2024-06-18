@@ -66,6 +66,6 @@ class ECSSServicesRecipe(ConanFile):
 
     def requirements(self):
         self.requires("etl/20.37.2", transitive_headers=True)
-        self.requires("logger/1.76", transitive_headers=True)
+        self.requires("logger/1.0", transitive_headers=True)
         if self.settings.arch != 'armv7':
             self.requires("catch2/3.3.1")
