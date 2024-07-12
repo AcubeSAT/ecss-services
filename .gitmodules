@@ -1,3 +1,16 @@
-[submodule "ci/page_style/doxygen-awesome-css"]
-	path = ci/page_style/doxygen-awesome-css
-	url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "lib/Catch2"]
+    path = lib/Catch2
+    url = https://github.com/catchorg/Catch2.git
+[submodule "lib/etl"]
+    path = lib/etl
+    url = https://github.com/ETLCPP/etl.git
+[submodule "ci/page_style/doxygen_dark_theme"]
+    path = ci/page_style/doxygen_dark_theme
+    url = https://github.com/MaJerle/doxygen_dark_theme.git
+[submodule "ci/page_style/doxygen_awesome_css"]
+    path = ci/page_style/doxygen-awesome-css
+    url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "lib/logger"]
+    path = lib/logger
+    url = https://gitlab.com/acubesat/obc/logger.git
+
