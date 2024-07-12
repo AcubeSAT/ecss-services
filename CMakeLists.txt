@@ -48,7 +48,16 @@ add_library(common OBJECT
         src/Services/RealTimeForwardingControlService.cpp
         src/Helpers/PMON.cpp
         src/Helpers/AllReportTypes.cpp
+        src/Helpers/FilepathValidators.cpp
+        src/Services/FileManagementService.cpp
 )
+
+target_link_libraries(common
+        PUBLIC etl log_common
+        PRIVATE log_x86
+)
+
+
 
 # Specify the .cpp files for the executables
 file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp" "lib/logger/src/Platform/x86/*.cpp")
