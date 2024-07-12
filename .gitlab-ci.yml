@@ -158,15 +158,15 @@ ikos:
 #      - public
 #
 #
-conan:
-  image: spacedot/build-base
-  stage: deploy
-  script:
-    - conan profile detect --force
-    - cp conan-profile /root/.conan2/profiles/
-    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
-    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
-    - conan create . --build=missing -pr conan-profile
-    - conan upload ecss-services/1.1 -r conan
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#conan:
+#  image: spacedot/build-base
+#  stage: deploy
+#  script:
+#    - conan profile detect --force
+#    - cp conan-profile /root/.conan2/profiles/
+#    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+#    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+#    - conan create . --build=missing -pr conan-profile
+#    - conan upload ecss-services/1.1 -r conan
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
