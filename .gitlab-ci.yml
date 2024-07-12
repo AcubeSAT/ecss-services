@@ -88,29 +88,29 @@ doxygen:
   artifacts:
     paths:
       - ./docs/html
-# ikos:
-#   image: spacedot/ikos:3.0
-#   stage: analyze
-#   before_script:
-#     - mkdir ikos-report
-#   script:
-#     - cd $CI_PROJECT_DIR
-#     - conan profile detect --force
-#     - cp conan-profile /root/.conan2/profiles/
-#     - mkdir conan-build
-#     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
-#     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
-#     - conan install . --output-folder conan-build --build=missing -pr conan-profile
-#     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
-#     - ikos-scan make x86_services
-#     - ikos x86_services.bc
-#     - ikos-report -o=ikos-report.txt output.db
-#   after_script:
-#     - mv ikos-report.txt ikos-report
-#     - mv output.db ikos-report
-#   artifacts:
-#     paths:
-#       - ./ikos-report
+ikos:
+   image: spacedot/ikos:3.0
+   stage: analyze
+   before_script:
+     - mkdir ikos-report
+   script:
+     - cd $CI_PROJECT_DIR
+     - conan profile detect --force
+     - cp conan-profile /root/.conan2/profiles/
+     - mkdir conan-build
+     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+     - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+     - conan install . --output-folder conan-build --build=missing -pr conan-profile
+     - ikos-scan cmake . -DCMAKE_TOOLCHAIN_FILE=conan-build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
+     - ikos-scan make x86_services
+     - ikos x86_services.bc
+     - ikos-report -o=ikos-report.txt output.db
+   after_script:
+     - mv ikos-report.txt ikos-report
+     - mv output.db ikos-report
+   artifacts:
+     paths:
+       - ./ikos-report
 tests:
   image: spacedot/coverage:gcovr-6.0-lcov-1.15.5a0
   stage: test
@@ -142,10 +142,8 @@ pages:
   script:
     - mkdir .public
     - cp -r ./docs/html ./.public/docs
-    # - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
-    # - cp -r ./{gcovr,ikos-report,cppcheck-html-report} ./.public/
-    - cp -r ./{gcovr,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
-    - cp -r ./{gcovr,cppcheck-html-report} ./.public/
+    - cp -r ./{gcovr,ikos-report,scan-build-html-report,clang-tidy-html-report,cppcheck-html-report} ./.public/
+    - cp -r ./{gcovr,ikos-report,cppcheck-html-report} ./.public/
     - ls ./.public
     - find ./.public
     - mv .public public
