@@ -53,7 +53,7 @@ add_library(common OBJECT
 )
 
 target_link_libraries(common
-        PUBLIC etl log_common
+        PUBLIC log_common
         PRIVATE log_x86
 )
 
