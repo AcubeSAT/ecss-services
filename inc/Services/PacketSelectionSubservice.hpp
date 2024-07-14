@@ -99,7 +99,7 @@ private:
    *
    * @return True: if the message type is valid and passes all the necessary error checking.
    */
-	bool checkMessage(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
+	bool checkMessage(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
 public:
 	typedef String<ECSSPacketStoreIdSize> PacketStoreId;

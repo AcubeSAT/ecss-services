@@ -93,7 +93,7 @@ bool PacketSelectionSubservice::maxReportTypesReached(const Message& request, co
 	return false;
 }
 
-bool PacketSelectionSubservice::checkMessage(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType,
+bool PacketSelectionSubservice::checkMessage(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType,
                                              uint8_t messageType) {
 	return !(maxReportTypesReached(request, packetStoreID, applicationID, serviceType) or
 	    reportExistsInAppProcessConfiguration(packetStoreID, applicationID, serviceType, messageType));
