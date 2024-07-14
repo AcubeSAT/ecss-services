@@ -178,7 +178,7 @@ void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Mes
 	}
 
 	auto numOfApplication = request.readUint8();
-	if (numOfApplication == 0u) {
+	if (numOfApplication == 0U) {
 		auto definition = applicationProcessConfiguration[packetStoreID].definitions;
 		for (; !definition.empty();) {
 			definition.erase(definition.begin());
