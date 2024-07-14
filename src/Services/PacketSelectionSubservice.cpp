@@ -30,7 +30,7 @@ void PacketSelectionSubservice::addAllReportsOfService(const String<ECSSPacketSt
 
 uint8_t PacketSelectionSubservice::countServicesOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
 	auto& definitions = applicationProcessConfiguration[packetStoreID].definitions;
-	return std::count_if(std::begin(definitions), std::end(definitions), [applicationID](auto& definition) { return applicationID == definition.first.first; });
+	return std::count_if(std::begin(definitions), std::end(definitions), [applicationID](const auto& definition) { return applicationID == definition.first.first; });
 }
 
 uint8_t PacketSelectionSubservice::countReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType) {
@@ -38,7 +38,7 @@ uint8_t PacketSelectionSubservice::countReportsOfService(const String<ECSSPacket
 	return applicationProcessConfiguration[packetStoreID].definitions[appServicePair].size();
 }
 
-bool PacketSelectionSubservice::isAppControlled(Message& request, uint8_t applicationId) {
+bool PacketSelectionSubservice::isAppControlled(const Message& request, uint8_t applicationId) {
 	if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationId) ==
 	    controlledApplications.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
@@ -60,7 +60,7 @@ bool PacketSelectionSubservice::checkApplicationOfAppProcessConfig(Message& requ
 	return true;
 }
 
-bool PacketSelectionSubservice::allServiceTypesAllowed(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
+bool PacketSelectionSubservice::allServiceTypesAllowed(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
 	if (countServicesOfApplication(packetStoreID, applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
 		return true;
@@ -68,7 +68,7 @@ bool PacketSelectionSubservice::allServiceTypesAllowed(Message& request, const S
 	return false;
 }
 
-bool PacketSelectionSubservice::maxServiceTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
+bool PacketSelectionSubservice::maxServiceTypesReached(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
 	if (countServicesOfApplication(packetStoreID, applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
@@ -84,7 +84,7 @@ bool PacketSelectionSubservice::checkService(Message& request, const String<ECSS
 	return true;
 }
 
-bool PacketSelectionSubservice::maxReportTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
+bool PacketSelectionSubservice::maxReportTypesReached(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
                                                       uint8_t serviceType) {
 	if (countReportsOfService(packetStoreID, applicationID, serviceType) >= AllReportTypes::MessagesOfService.at(serviceType).size()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);

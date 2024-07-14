@@ -67,18 +67,18 @@ private:
 	/**
    * Checks if the specified application process is controlled by the Service and returns true if it does.
    */
-	bool isAppControlled(Message& request, uint8_t applicationId);
+	bool isAppControlled(const Message& request, uint8_t applicationId);
 
 	/**
    * Checks if all service types are allowed already, i.e. if the application process contains no service type
    * definitions.
    */
-	bool allServiceTypesAllowed(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
+	bool allServiceTypesAllowed(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 
 	/**
    * Checks if the maximum number of service type definitions per application process is reached.
    */
-	bool maxServiceTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
+	bool maxServiceTypesReached(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
 
 	/**
    * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -91,7 +91,7 @@ private:
 	/**
    * Checks if the maximum number of report type definitions per service type definition is reached.
    */
-	bool maxReportTypesReached(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
+	bool maxReportTypesReached(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType);
 
 	/**
    * Checks if the maximum number of message types that can be contained inside a service type definition, is
