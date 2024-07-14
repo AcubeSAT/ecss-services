@@ -153,4 +153,11 @@ namespace Filesystem {
 	 * @return The FileLockStatus value
 	 */
 	FileLockStatus getFileLockStatus(const Path& path);
+
+	/**
+	 * Get the Unallocated Memory
+	 * @return The unallocated memory in bytes 
+	 */
+	uint32_t getUnallocatedMemory();
+
 } // namespace Filesystem

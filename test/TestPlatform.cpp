@@ -11,13 +11,13 @@
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
+#include "Services/FunctionManagementService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
-	UTCTimestamp currentTime(2020, 4, 10, 10, 15, 0);
-	return currentTime;
+	return ServiceTests::getMockTime();
 }
 
 Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
@@ -69,6 +69,10 @@ void Logger::log(Logger::LogLevel level, etl::istring& message) {
 
 struct ServiceTestsListener : Catch::EventListenerBase {
 	using EventListenerBase::EventListenerBase; // inherit constructor
+
+	void testRunStarting(Catch::TestRunInfo const& testRunInfo) override {
+		ServiceTests::reset();
+	}
 
 	void sectionEnded(Catch::SectionStats const& sectionStats) override {
 		// Make sure we don't have any errors
@@ -127,12 +131,15 @@ namespace PlatformParameters {
 	inline Parameter<uint8_t> parameter32(1);
 	inline Parameter<uint8_t> parameter33(1);
 	inline Parameter<uint8_t> parameter34(1);
+	inline Parameter<uint16_t> parameter35(0);
+	inline Parameter<uint8_t> parameter36(0);
 
 } // namespace PlatformParameters
 
 /**
  * Specific definition for \ref ParameterService's initialize function, for testing purposes.
  */
+
 void ParameterService::initializeParameterMap() {
 	parameters = {
 	    {uint16_t{0}, PlatformParameters::parameter1},
@@ -168,7 +175,10 @@ void ParameterService::initializeParameterMap() {
 	    {uint16_t{30}, PlatformParameters::parameter31},
 	    {uint16_t{31}, PlatformParameters::parameter32},
 	    {uint16_t{32}, PlatformParameters::parameter33},
-	    {uint16_t{33}, PlatformParameters::parameter34}};
+	    {uint16_t{33}, PlatformParameters::parameter34},
+        {uint16_t{34}, PlatformParameters::parameter35},
+        {uint16_t{35}, PlatformParameters::parameter36},
+	};
 }
 
 void TimeBasedSchedulingService::notifyNewActivityAddition() {}
@@ -284,12 +294,47 @@ namespace Filesystem {
 	}
 
 	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
+		if (getNodeType(path)) {
+			return DirectoryCreationError::DirectoryAlreadyExists;
+		}
+
+		std::filesystem::create_directory(path.data());
+
 		return etl::nullopt;
 	}
 
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
-		return etl::nullopt;
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (not nodeType) {
+			return DirectoryDeletionError::DirectoryDoesNotExist;
+		}
+
+		if (not std::filesystem::is_empty(path.data())) {
+			return DirectoryDeletionError::DirectoryIsNotEmpty;
+		}
+
+		bool successfulFileDeletion = fs::remove(path.data());
+
+		if (successfulFileDeletion) {
+			return etl::nullopt;
+		} else {
+			return DirectoryDeletionError::UnknownError;
+		}
+	}
+
+	uint32_t getUnallocatedMemory() {
+		return 42U;
 	}
 } // namespace Filesystem
+
+
+void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
+    PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+    PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+}
+
+void FunctionManagementService::initializeFunctionMap() {
+    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+}
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

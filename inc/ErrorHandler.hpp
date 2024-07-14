@@ -104,6 +104,10 @@ public:
 		 * PMON base couldn't be initialized with the given parameter ID
 		 */
 		InvalidParameterId = 18,
+		/**
+		 * An unknown or unsupported PMON check type was encountered
+		 */
+		UnknownCheckType = 19,
 	};
 
 	/**
@@ -463,6 +467,14 @@ public:
 		 * A report file attributes command was requested on a directory
 		 */
 		AttemptedReportAttributesOnDirectory = 8,
+		/**
+         * Directory already exists, thus can't be created again
+         */
+		DirectoryAlreadyExists = 9,
+		/**
+		 * A delete directory command was requested on a non empty directory
+		 */
+		AttemptedDeleteNonEmptyDirectory = 10,
 	};
 
 	/**
