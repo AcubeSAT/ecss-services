@@ -113,7 +113,7 @@ public:
 	* Constructor of the Packet Selection Subservice.
 	* @param mainServicePacketStores: reference to the packet stores of the storage and retrieval service.
 	*/
-	PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores);
+	explicit PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores);
 
 	/**
    * Vector containing the IDs of the application processes controlled by the packet selection subservice.
