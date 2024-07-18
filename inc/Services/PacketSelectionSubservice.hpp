@@ -21,7 +21,7 @@
 class PacketSelectionSubservice : public Service {
 private:
 	/**
-	* Helper function that reads the packet store ID string from a TM[15] message
+	* Helper function that reads the packet store ID string from a TC/TM[15,x] message
 	*/
 	inline String<ECSSPacketStoreIdSize> readPacketStoreId(Message& message);
 
