@@ -13,6 +13,7 @@ add_custom_target(check
 
 add_compile_options(-Wvla)
 include_directories(${ECSS_CONFIGURATION})
+include_directories(${MEMORYADDRESSLIMITS})
 add_library(common STATIC)
 target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
 target_sources(common PRIVATE
@@ -43,7 +44,7 @@ target_sources(common PRIVATE
         src/Helpers/AllReportTypes.cpp
         src/Helpers/FilepathValidators.cpp
         src/Services/FileManagementService.cpp
-        )
+)
 
 target_link_libraries(common
         PUBLIC etl log_common
@@ -56,7 +57,7 @@ IF (X86_BUILD)
 
     add_executable(x86_services
             ${x86_main_SRC}
-            )
+    )
     target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
 
     # Logs all levels of messages. This command can be added by other users of this
