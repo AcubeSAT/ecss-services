@@ -12,8 +12,7 @@ add_custom_target(check
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
 add_compile_options(-Wvla)
-include_directories(${ECSS_CONFIGURATION})
-include_directories(${MEMORYADDRESSLIMITS})
+include_directories(${PLATFORM_DEFINITIONS_PATH})
 add_library(common STATIC)
 target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
 target_sources(common PRIVATE
