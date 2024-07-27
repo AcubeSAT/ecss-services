@@ -329,7 +329,7 @@ void PacketSelectionSubservice::addStructureIdentifiersToTheDiagnosticParameterR
 
 			uint8_t diagnosticParameterReportId = request.readUint8();
 			CollectionInterval samplingRate = 0;
-			//applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[diagnosticParameterReportId].push_back(samplingRate);
+			applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[diagnosticParameterReportId].push_back(samplingRate);
 		}
 	}
 }
@@ -353,7 +353,7 @@ void PacketSelectionSubservice::deleteStructureIdentifiersFromTheDiagnosticParam
 
 			uint8_t diagnosticParameterReportId = request.readUint8();
 			CollectionInterval samplingRate = 0;
-			//applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[diagnosticParameterReportId].push_back(samplingRate);
+			applicationProcessConfiguration[packetStoreID].housekeepingParameterReportDefinitions[diagnosticParameterReportId].push_back(samplingRate);
 		}
 	}
 }

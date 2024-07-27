@@ -16,7 +16,7 @@
 * should or should not be stored into the packet stores. For a specific TM message, if the packet selection
 * includes a definition related to that message, it means that it can be stored into the packet stores.
 *
-* @author Konstantinos Petridis <petridkon@gmail.com>
+* @authors Konstantinos Petridis <petridkon@gmail.com>, Xhulio Luli <lulixhulio@gmail.com>
 */
 class PacketSelectionSubservice : public Service {
 private:
