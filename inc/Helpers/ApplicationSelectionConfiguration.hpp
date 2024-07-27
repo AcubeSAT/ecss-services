@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_APPLICATIONSELECTIONCONFIGURATION_HPP
-#define ECSS_SERVICES_APPLICATIONSELECTIONCONFIGURATION_HPP
+#pragma once
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
@@ -43,5 +42,3 @@ public:
 
 	ApplicationProcessConfiguration() = default;
 };
-
-#endif

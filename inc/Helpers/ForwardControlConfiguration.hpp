@@ -43,6 +43,12 @@ public:
 	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
 
 	ApplicationProcessConfiguration() = default;
+
+	typedef uint8_t HousekeepingParameterReportId;
+
+	typedef etl::vector<SamplingInterval, ECSSMaxReportTypeDefinitions> ReportSamplingDefinitions;
+
+	etl::map<HousekeepingParameterReportId, ReportSamplingDefinitions, ECSSMaxApplicationsServicesCombinations> housekeepingParameterReportDefinitions;
 };
 
 #endif

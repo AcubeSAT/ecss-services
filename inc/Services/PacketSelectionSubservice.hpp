@@ -156,6 +156,32 @@ public:
    	* Deletes all report types of the specified application process definition, to the application process configuration.
    	*/
 	void deleteAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
+
+	/**
+    * This function takes a TC[15,5] request 'report the content of the application process storage control
+    * configuration' as an argument and response with a TM[15,6] 'application process storage-control configuration
+    * content report'
+    */
+	void reportApplicationProcess(Message& request);
+	/**
+	 * TC[15,29] 'add structure identifiers to the housekeeping parameter report storage control configuration'
+	 */
+	void addStructureIdentifiersToTheHousekeepingParameterReport(Message& request);
+
+	/**
+	 * TC[15,30] 'delete structure identifiers from the housekeeping parameter report storage control configuration'
+	 */
+	void deleteStructureIdentifiersToTheHousekeepingParameterReport(Message& request);
+
+	/**
+	 * TC[15,31] 'add structure identifiers to the diagnostic parameter report storage control configuration'
+	 */
+	void addStructureIdentifiersToTheDiagnosticParameterReport(Message& request);
+
+	/**
+	 * TC[15,32] 'delete structure identifiers from the diagnostic parameter report storage control configuration'
+	 */
+	void deleteStructureIdentifiersFromTheDiagnosticParameterReport(Message& request);
 };
 
 #endif
