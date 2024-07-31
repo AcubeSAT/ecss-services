@@ -6,7 +6,7 @@ from conan.tools.files import copy
 
 class ECSSServicesRecipe(ConanFile):
     name = "ecss-services"
-    version = "1.1"
+    version = "1.2"
     revision_mode = "scm"
 
     # Optional metadata
