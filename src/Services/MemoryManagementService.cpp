@@ -12,6 +12,58 @@ MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*th
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
     : mainService(parent) {}
 
+
+void MemoryManagementService::loadObjectData(Message& request) {
+	if(!request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadObjectMemoryData)) {
+		return;
+	}
+	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
+
+	if (!memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
+		// TODO(#257): Send a failed start of execution
+		return;
+	}
+
+	uint64_t const baseIdentifier = request.readUint64();
+
+	etl::array<ReadData, ECSSMaxStringSize> readData = {};
+	uint16_t const iterationCount = request.readUint16();
+
+	if (memoryID == MemoryManagementService::MemoryID::FLASH_MEMORY) {
+		// TODO(#258): Define FLASH specific access code when we transfer to embedded
+	} else {
+		for (std::size_t j = 0; j < iterationCount; j++) {
+			const uint64_t byteOffset = request.readUint64();
+			const StartAddress startAddress = baseIdentifier + byteOffset;
+			const MemoryDataLength dataLength = request.readOctetString(readData.data()); // NOLINT(cppcoreguidelines-init-variables)
+			const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
+
+			if (!dataValidator(readData.data(), checksum, dataLength)) {
+				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+				continue;
+			}
+
+			if (!addressValidator(memoryID, startAddress) ||
+			    !addressValidator(memoryID, startAddress + dataLength)) {
+				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+				continue;
+			}
+
+			for (std::size_t i = 0; i < dataLength; i++) {
+				*(reinterpret_cast<uint8_t*>(startAddress) + i) = readData[i];
+			}
+
+			for (std::size_t i = 0; i < dataLength; i++) {
+				readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
+			}
+
+			if (checksum != CRCHelper::calculateCRC(readData.data(), dataLength)) {
+				ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+			}
+		}
+	}
+}
+
 void MemoryManagementService::loadRawData(Message& request) {
 	/**
 	 * Bear in mind that there is currently no error checking for invalid parameters.
@@ -171,6 +223,9 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryMa
 
 void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
+		case LoadObjectMemoryData:
+			loadObjectData(message);
+			break;
 		case LoadRawMemoryDataAreas:
 			loadRawData(message);
 			break;

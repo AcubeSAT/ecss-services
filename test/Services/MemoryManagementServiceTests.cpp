@@ -6,6 +6,33 @@
 
 MemoryManagementService& memMangService = Services.memoryManagement;
 
+TEST_CASE("TC[6,1]", "[service][st06]") {
+	// Required test variables
+	char* pStr = static_cast<char*>(malloc(4));
+	*pStr = 'A';
+	*(pStr + 1) = 'B';
+	*(pStr + 2) = '\0';
+	uint8_t data[2] = {'c', 'D'};
+
+	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadObjectMemoryData, Message::TC, 1);
+	receivedPacket.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL);           // Memory ID
+	receivedPacket.appendUint64(reinterpret_cast<uint64_t>(pStr));                          // Base Identifier
+	receivedPacket.appendUint16(2);                                                         // Iteration count
+	receivedPacket.append<uint64_t>(0);                                                     // Byte Offset
+	receivedPacket.appendOctetString(String<2>(data));
+	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 2));  // Append CRC
+	receivedPacket.append<uint64_t>(2);                                                     // Byte Offset
+	receivedPacket.appendOctetString(String<1>(data));
+	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 1));  // Append CRC
+	MessageParser::execute(receivedPacket);
+
+	CHECK(pStr[0] == 'c');
+	CHECK(pStr[1] == 'D');
+	CHECK(pStr[2] == 'c');
+
+	free(pStr);
+}
+
 TEST_CASE("TC[6,2]", "[service][st06]") {
 	// Required test variables
 	char* pStr = static_cast<char*>(malloc(4));

@@ -32,6 +32,7 @@ public:
 	inline static constexpr ServiceTypeNum ServiceType = 6;
 
 	enum MessageType : uint8_t {
+		LoadObjectMemoryData = 1,
 		LoadRawMemoryDataAreas = 2,
 		DumpRawMemoryData = 5,
 		DumpRawMemoryDataReport = 6,
@@ -90,6 +91,13 @@ public:
 		 */
 		void checkRawData(Message& request);
 	} rawDataMemorySubservice;
+
+	/**
+	 * TC[6,1] load object memory data
+	 *
+	 * @param request Provide the received message as a parameter
+	 */
+	static void loadObjectData(Message& request);
 
 	/**
 	 * TC[6,2] load raw values to memory
