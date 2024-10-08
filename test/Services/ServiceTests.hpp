@@ -5,6 +5,7 @@
 #include <map>
 #include <Message.hpp>
 #include <ServicePool.hpp>
+#include <Time/UTCTimestamp.hpp>
 
 /**
  * Supporting class for tests against ECSS services
@@ -40,7 +41,23 @@ protected:
 	 */
 	static bool expectingErrors;
 
+	/**
+	 * A timestamp during which most tests will assume to be executed
+	 */
+	inline static const UTCTimestamp DefaultTime = UTCTimestamp(2020, 4, 10, 10, 15, 0);
+
+	/**
+	 * The timestamp that tests assume during their execution; usually equal to DefaultTime,
+	 * unless a test decides to move time forwards or backwards
+	 */
+	inline static UTCTimestamp fixedTime;
+
 public:
+	/**
+	 * Disabled default constructor
+	 */
+	ServiceTests() = delete;
+
 	/**
 	 * Get a message from the list of queued messages to send
 	 * @param number The number of the message, starting from 0 in chronological order
@@ -54,6 +71,31 @@ public:
 	 */
 	static void queue(const Message& message) {
 		queuedMessages.push_back(message);
+	}
+
+	/**
+	 * Sets a mock time that will be returned by the UTCTimestamp class instead of the actual current time.
+	 * This is useful for testing time-dependent behavior.
+	 *
+	 * @param time The mock time to set.
+	 */
+	static void setMockTime(const UTCTimestamp& time) {
+		fixedTime = time;
+	}
+
+	/**
+	 * Gets the mock time returned by the TimeGetter instead of the actual current time.
+	 */
+	static UTCTimestamp getMockTime() {
+		return fixedTime;
+	}
+
+	/**
+	 * Resets the mock time to the default time as set in TestPlatform.
+	 * This is useful in testing scenarios where you want to ensure that the time is reset to a known value.
+	 */
+	static void resetMockTime() {
+		fixedTime = DefaultTime;
 	}
 
 	/**
@@ -95,6 +137,7 @@ public:
 	 */
 	static void reset() {
 		resetErrors();
+		resetMockTime();
 
 		Services.reset();
 	}

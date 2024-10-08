@@ -82,6 +82,14 @@ public:
 		}
 	}
 
+	inline uint64_t getValueAsUint64() override {
+		if constexpr (std::is_arithmetic_v<DataType>) {
+			return static_cast<uint64_t>(getValue().value_or(fallback));
+		} else {
+			return 0;
+		}
+	}
+
 	inline void appendValueToMessage(Message& message) override {
 		if (getter) {
 			message.append<DataType>((*getter)());

@@ -39,4 +39,8 @@ namespace Filesystem {
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
 		return etl::nullopt;
 	}
+
+	uint32_t getUnallocatedMemory() {
+		return 0;
+	}
 } // namespace Filesystem

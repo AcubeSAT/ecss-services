@@ -78,7 +78,7 @@ your own, by cloning the respective repositories, and running `conan create . --
 
 The following command will download all the dependencies through conan:
 ```bash
-conan install . --output-folder=build --build=missing --setings=build_type=Debug
+conan install . --output-folder=build --build=missing --settings=build_type=Debug
 ```
 @endparblock
 

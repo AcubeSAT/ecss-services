@@ -38,11 +38,13 @@ namespace unit_test {
 } // namespace unit_test
 
 Message testMessage1, testMessage2, testMessage3, testMessage4;
-Time::DefaultCUC currentTime(TimeGetter::getCurrentTimeDefaultCUC()); // Get the current system time
-bool messagesPopulated = false;                                       // Indicate whether the test messages are initialized
+Time::DefaultCUC currentTime;
+bool messagesPopulated = false; // Indicate whether the test messages are initialized
 
 // Run this function to set the service up before moving on with further testing
 auto activityInsertion(TimeBasedSchedulingService& timeService) {
+	currentTime = TimeGetter::getCurrentTimeDefaultCUC();
+
 	if (not messagesPopulated) {
 		// Initialize the test messages
 		testMessage1.serviceType = 6;
