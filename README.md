@@ -96,6 +96,10 @@ conan install . --output-folder=cmake-build-debug -u --build="*" -pr conan-profi
    ```shell
    --preset=cmake-build-debug-debug
    ```
+   and in the build direcotry:
+   ```shell
+   cmake-build-debug/Debug
+   ```
 4. If your CMake project doesn't reload automatically, reload it manually (Tools -> CMake -> Reload CMake Project).
 
 We do not recommend using a Conan plugin for your IDE, as it may tamper with the default configuration for this repository.
