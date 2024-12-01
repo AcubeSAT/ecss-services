@@ -5,7 +5,7 @@
 #include "Helpers/TypeDefinitions.hpp"
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
-class Message;
+template<uint16_t MessageSize = ECSSMaxMessageSize> class Message;
 
 /**
  * A class that handles unexpected software errors, including internal errors or errors due to

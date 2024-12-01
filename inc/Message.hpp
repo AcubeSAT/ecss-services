@@ -15,6 +15,7 @@
  * @todo (#243) Make sure that a message can't be written to or read from at the same time, or make
  *       readable and writable message different classes
  */
+template<uint16_t Size =  ECSSMaxMessageSize>
 class Message {
 public:
 	Message() = default;
@@ -110,7 +111,7 @@ public:
 	 * @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	 * Message::appendBits() relies on this in order to easily OR the requested bits.
 	 */
-	etl::array<uint8_t, ECSSMaxMessageSize> data = {0};
+	etl::array<uint8_t, Size> data = {0};
 
 	uint8_t currentBit = 0;
 

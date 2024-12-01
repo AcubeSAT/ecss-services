@@ -6,13 +6,13 @@
 #include "macros.hpp"
 
 
-Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId)
+template<uint16_t Size> Message<Size>::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
 
-Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType)
+template<uint16_t Size> Message<Size>::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType)
     : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(ApplicationId) {}
 
-void Message::appendBits(uint8_t numBits, uint16_t data) {
+template<uint16_t Size> void Message<Size>::appendBits(uint8_t numBits, uint16_t data) {
 	// TODO(#271): Add assertion that data does not contain 1s outside of numBits bits
 	ASSERT_INTERNAL(numBits <= 16, ErrorHandler::TooManyBitsAppend);
 
@@ -40,7 +40,7 @@ void Message::appendBits(uint8_t numBits, uint16_t data) {
 	}
 }
 
-void Message::finalize() {
+template<uint16_t Size> void Message<Size>::finalize() {
 	// Define the spare field in telemetry and telecommand user data field (7.4.3.2.c and 7.4.4.2.c)
 	if (currentBit != 0) {
 		currentBit = 0;
@@ -53,7 +53,7 @@ void Message::finalize() {
 	}
 }
 
-void Message::appendByte(uint8_t value) {
+template<uint16_t Size> void Message<Size>::appendByte(uint8_t value) {
 	ASSERT_INTERNAL(dataSize < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
 	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
@@ -61,7 +61,7 @@ void Message::appendByte(uint8_t value) {
 	dataSize++;
 }
 
-void Message::appendHalfword(uint16_t value) {
+template<uint16_t Size> void Message<Size>::appendHalfword(uint16_t value) {
 	ASSERT_INTERNAL((dataSize + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
 	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
@@ -71,7 +71,7 @@ void Message::appendHalfword(uint16_t value) {
 	dataSize += 2;
 }
 
-void Message::appendWord(uint32_t value) {
+template<uint16_t Size> void Message<Size>::appendWord(uint32_t value) {
 	ASSERT_INTERNAL((dataSize + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
 	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
 
@@ -83,7 +83,7 @@ void Message::appendWord(uint32_t value) {
 	dataSize += 4;
 }
 
-uint16_t Message::readBits(uint8_t numBits) {
+template<uint16_t Size> uint16_t Message<Size>::readBits(uint8_t numBits) {
 	ASSERT_REQUEST(numBits <= 16, ErrorHandler::TooManyBitsRead);
 
 	uint16_t value = 0x0;
@@ -111,7 +111,7 @@ uint16_t Message::readBits(uint8_t numBits) {
 	return value;
 }
 
-uint8_t Message::readByte() {
+template<uint16_t Size> uint8_t Message<Size>::readByte() {
 	ASSERT_REQUEST(readPosition < ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
 	uint8_t const value = data[readPosition]; // NOLINT(cppcoreguidelines-init-variables)
@@ -120,7 +120,7 @@ uint8_t Message::readByte() {
 	return value;
 }
 
-uint16_t Message::readHalfword() {
+template<uint16_t Size> uint16_t Message<Size>::readHalfword() {
 	ASSERT_REQUEST((readPosition + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
 	uint16_t const value = (data[readPosition] << 8) | data[readPosition + 1]; // NOLINT (cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables)
@@ -129,7 +129,7 @@ uint16_t Message::readHalfword() {
 	return value;
 }
 
-uint32_t Message::readWord() {
+template<uint16_t Size> uint32_t Message<Size>::readWord() {
 	ASSERT_REQUEST((readPosition + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 
 	uint32_t const value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) | (data[readPosition + 2] << 8) | // NOLINT(cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables)
@@ -139,35 +139,35 @@ uint32_t Message::readWord() {
 	return value;
 }
 
-void Message::readString(char* string, uint16_t size) {
+template<uint16_t Size> void Message<Size>::readString(char* string, uint16_t size) {
 	ASSERT_REQUEST((readPosition + size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSSMaxStringSize, ErrorHandler::StringTooShort);
 	std::copy(data.begin() + readPosition, data.begin() + readPosition + size, string);
 	readPosition += size;
 }
 
-void Message::readString(uint8_t* string, uint16_t size) {
+template<uint16_t Size> void Message<Size>::readString(uint8_t* string, uint16_t size) {
 	ASSERT_REQUEST((readPosition + size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
 	ASSERT_REQUEST(size < ECSSMaxStringSize, ErrorHandler::StringTooShort);
 	std::copy(data.begin() + readPosition, data.begin() + readPosition + size, string);
 	readPosition += size;
 }
 
-void Message::readCString(char* string, uint16_t size) {
+template<uint16_t Size> void Message<Size>::readCString(char* string, uint16_t size) {
 	readString(string, size);
 	string[size] = 0;
 }
 
-void Message::resetRead() {
+template<uint16_t Size> void Message<Size>::resetRead() {
 	readPosition = 0;
 	currentBit = 0;
 }
 
-void Message::appendMessage(const Message& message, uint16_t size) {
+template<uint16_t Size> void Message<Size>::appendMessage(const Message& message, uint16_t size) {
 	appendString(MessageParser::composeECSS(message, size));
 }
 
-void Message::appendString(const etl::istring& string) {
+template<uint16_t Size> void Message<Size>::appendString(const etl::istring& string) {
 	ASSERT_INTERNAL(dataSize + string.size() <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
 	// TODO(#272): Do we need to keep this check? How does etl::string handle it?
 	ASSERT_INTERNAL(string.size() <= string.capacity(), ErrorHandler::StringTooLarge);
@@ -175,14 +175,14 @@ void Message::appendString(const etl::istring& string) {
 	dataSize += string.size();
 }
 
-void Message::appendFixedString(const etl::istring& string) {
+template<uint16_t Size> void Message<Size>::appendFixedString(const etl::istring& string) {
 	ASSERT_INTERNAL((dataSize + string.max_size()) < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
 	std::copy(string.data(), string.data() + string.size(), data.begin() + dataSize);
 	(void) memset(data.begin() + dataSize + string.size(), 0, string.max_size() - string.size());
 	dataSize += string.max_size();
 }
 
-void Message::appendOctetString(const etl::istring& string) {
+template<uint16_t Size> void Message<Size>::appendOctetString(const etl::istring& string) {
 	// Make sure that the string is large enough to count
 	ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
 	// Redundant check to make sure we fail before appending string.size()
