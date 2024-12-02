@@ -697,57 +697,70 @@ public:
 };
 
 template <>
-inline void Message::append(const uint8_t& value) {
+template <>
+inline void Message<>::append(const uint8_t& value) {
 	appendUint8(value);
 }
 template <>
-inline void Message::append(const uint16_t& value) {
+template <>
+inline void Message<>::append(const uint16_t& value) {
 	appendUint16(value);
 }
 template <>
-inline void Message::append(const uint32_t& value) {
+template <>
+inline void Message<>::append(const uint32_t& value) {
 	appendUint32(value);
 }
 template <>
-inline void Message::append(const uint64_t& value) {
+template <>
+inline void Message<>::append(const uint64_t& value) {
 	appendUint64(value);
 }
 
 template <>
-inline void Message::append(const int8_t& value) {
+template <>
+inline void Message<>::append(const int8_t& value) {
 	appendSint8(value);
 }
 template <>
-inline void Message::append(const int16_t& value) {
+template <>
+inline void Message<>::append(const int16_t& value) {
 	appendSint16(value);
 }
 template <>
-inline void Message::append(const int32_t& value) {
+template <>
+inline void Message<>::append(const int32_t& value) {
 	appendSint32(value);
 }
 
 template <>
-inline void Message::append(const bool& value) {
+template <>
+inline void Message<>::append(const bool& value) {
 	appendBoolean(value);
 }
 template <>
-inline void Message::append(const char& value) {
+template <>
+inline void Message<>::append(const char& value) {
 	appendByte(value);
 }
 template <>
-inline void Message::append(const float& value) {
+template <>
+inline void Message<>::append(const float& value) {
 	appendFloat(value);
 }
 template <>
-inline void Message::append(const double& value) {
+template <>
+inline void Message<>::append(const double& value) {
 	appendDouble(value);
 }
 template <>
-inline void Message::append(const Time::DefaultCUC& value) {
+template <>
+inline void Message<>::append(const Time::DefaultCUC& value) {
 	appendDefaultCUCTimeStamp(value);
 }
 template <>
-inline void Message::append(const Time::RelativeTime& value) {
+template <>
+inline void Message<>::append(const Time::RelativeTime& value) {
 	appendRelativeTime(value);
 }
 
@@ -757,67 +770,82 @@ inline void Message::append(const Time::RelativeTime& value) {
  * functions
  */
 template <>
-inline void Message::append(const etl::istring& value) {
+template <>
+inline void Message<>::append(const etl::istring& value) {
 	appendOctetString(value);
 }
+template<>
 template <typename T>
-inline void Message::append(const T& value) {
+inline void Message<>::append(const T& value) {
 	append(std::underlying_type_t<T>(value)); //cppcheck-suppress misra-c2012-17.2
 }
+template <>
 template <typename T>
-inline T Message::read() {
+inline T Message<>::read() {
 	return static_cast<T>(read<std::underlying_type_t<T>>());
 }
 template <>
-inline uint8_t Message::read() {
+template <>
+inline uint8_t Message<>::read() {
 	return readUint8();
 }
 template <>
-inline uint16_t Message::read() {
+template <>
+inline uint16_t Message<>::read() {
 	return readUint16();
 }
 template <>
-inline uint32_t Message::read() {
+template <>
+inline uint32_t Message<>::read() {
 	return readUint32();
 }
 template <>
-inline uint64_t Message::read() {
+template <>
+inline uint64_t Message<>::read() {
 	return readUint64();
 }
 
 template <>
-inline int8_t Message::read() {
+template <>
+inline int8_t Message<>::read() {
 	return readSint8();
 }
 template <>
-inline int16_t Message::read() {
+template <>
+inline int16_t Message<>::read() {
 	return readSint16();
 }
 template <>
-inline int32_t Message::read() {
+template<>
+inline int32_t Message<>::read() {
 	return readSint32();
 }
 
 template <>
-inline bool Message::read<bool>() {
+template <>
+inline bool Message<>::read<bool>() {
 	return readBoolean();
 }
 
 template <>
-inline float Message::read() {
+template <>
+inline float Message<>::read() {
 	return readFloat();
 }
 
 template <>
-inline double Message::read() {
+template <>
+inline double Message<>::read() {
 	return readDouble();
 }
 template <>
-inline Time::DefaultCUC Message::read() {
+template <>
+inline Time::DefaultCUC Message<>::read() {
 	return readDefaultCUCTimeStamp();
 }
 template <>
-inline Time::RelativeTime Message::read() {
+template <>
+inline Time::RelativeTime Message<>::read() {
 	return readRelativeTime();
 }
 

@@ -10,7 +10,7 @@ static_assert(sizeof(ServiceTypeNum) == 1);
 
 static_assert(sizeof(MessageTypeNum) == 1);
 
-void MessageParser::execute(Message& message) { //cppcheck-suppress[constParameter,constParameterReference]
+void MessageParser::execute(Message<>& message) { //cppcheck-suppress[constParameter,constParameterReference]
 	switch (message.serviceType) {
 
 #ifdef SERVICE_HOUSEKEEPING
@@ -94,7 +94,7 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress[constParamet
 	}
 }
 
-Message MessageParser::parse(const uint8_t* data, uint32_t length) {
+Message<> MessageParser::parse(const uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket);
 
 	uint16_t const packetHeaderIdentification = (data[0] << 8) | data[1];
@@ -103,7 +103,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 
 	// Individual fields of the CCSDS Space Packet primary header
 	uint8_t const versionNumber = data[0] >> 5;
-	Message::PacketType const packetType = ((data[0] & 0x10) == 0) ? Message::TM : Message::TC;
+	Message<>::PacketType const packetType = ((data[0] & 0x10) == 0) ? Message<>::TM : Message<>::TC;
 	bool const secondaryHeaderFlag = (data[0] & 0x08U) != 0U;
 	ApplicationProcessId const APID = packetHeaderIdentification & static_cast<ApplicationProcessId>(0x07ff);
 	auto sequenceFlags = static_cast<uint8_t>(packetSequenceControl >> 14);
@@ -115,10 +115,10 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	ASSERT_INTERNAL(sequenceFlags == 0x3U, ErrorHandler::UnacceptablePacket);
 	ASSERT_INTERNAL(packetDataLength == (length - CCSDSPrimaryHeaderSize), ErrorHandler::UnacceptablePacket);
 
-	Message message(0, 0, packetType, APID);
+	Message<> message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
-	if (packetType == Message::TC) {
+	if (packetType == Message<>::TC) {
 		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
 	} else {
 		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
@@ -127,7 +127,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	return message;
 }
 
-void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message<>& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -149,26 +149,26 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	message.dataSize = length;
 }
 
-Message MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
-	Message message;
+Message<> MessageParser::parseECSSTC(String<ECSSTCRequestStringSize> data) {
+	Message<> message;
 	const auto* dataInt = reinterpret_cast<uint8_t*>(data.data());
-	message.packetType = Message::TC;
+	message.packetType = Message<>::TC;
 	parseECSSTCHeader(dataInt, ECSSTCRequestStringSize, message);
 	return message;
 }
 
-Message MessageParser::parseECSSTC(const uint8_t* data) {
-	Message message;
-	message.packetType = Message::TC;
+Message<> MessageParser::parseECSSTC(const uint8_t* data) {
+	Message<> message;
+	message.packetType = Message<>::TC;
 	parseECSSTCHeader(data, ECSSTCRequestStringSize, message);
 	return message;
 }
 
-String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, uint16_t size) {
+String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message<>& message, uint16_t size) {
 	// Unfortunately to avoid using VLAs, we will create an array with the maximum size.
 	etl::array<uint8_t, ECSSSecondaryTMHeaderSize> header = {};
 
-	if (message.packetType == Message::TC) {
+	if (message.packetType == Message<>::TC) {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
 		header[0] |= 0x00;                //ack flags
 		header[1] = message.serviceType;
@@ -191,7 +191,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[10] = (ticks) & 0xffU;
 	}
 
-	String<CCSDSMaxMessageSize> dataString(header.data(), ((message.packetType == Message::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize));
+	String<CCSDSMaxMessageSize> dataString(header.data(), ((message.packetType == Message<>::TM) ? ECSSSecondaryTMHeaderSize : ECSSSecondaryTCHeaderSize));
 	dataString.append(message.data.begin(), message.dataSize);
 
 	// Make sure to reach the requested size
@@ -210,7 +210,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 	return dataString;
 }
 
-String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
+String<CCSDSMaxMessageSize> MessageParser::compose(const Message<>& message) {
 	etl::array<uint8_t, CCSDSPrimaryHeaderSize> header = {};
 
 	// First, compose the ECSS part
@@ -222,7 +222,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	// Parts of the header
 	ApplicationProcessId packetId = message.applicationId;
 	packetId |= (1U << 11U);                                              // Secondary header flag
-	packetId |= (message.packetType == Message::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
+	packetId |= (message.packetType == Message<>::TC) ? (1U << 12U) : (0U); // Ignore-MISRA
 	SequenceCount const packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
@@ -250,7 +250,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	return ccsdsMessage;
 }
 
-void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message<>& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header

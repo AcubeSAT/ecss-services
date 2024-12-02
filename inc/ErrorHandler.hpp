@@ -5,7 +5,7 @@
 #include "Helpers/TypeDefinitions.hpp"
 
 // Forward declaration of the class, since its header file depends on the ErrorHandler
-template<uint16_t MessageSize = ECSSMaxMessageSize> class Message;
+template<uint16_t Size> class Message;
 
 /**
  * A class that handles unexpected software errors, including internal errors or errors due to
@@ -18,8 +18,8 @@ private:
 	/**
 	 * Log the error to a logging facility. Platform-dependent.
 	 */
-	template <typename ErrorType>
-	static void logError(const Message& message, ErrorType errorType);
+	template <typename ErrorType, uint16_t Size>
+	static void logError(const Message<Size>& message, ErrorType errorType);
 
 	/**
 	 * Log an error without a Message to a logging facility. Platform-dependent.
@@ -508,8 +508,8 @@ public:
 	 * @param errorCode The error's code, as defined in ErrorHandler
 	 * @todo (#241) See if this needs to include InternalErrorType
 	 */
-	template <typename ErrorType>
-	static void reportError(const Message& message, ErrorType errorCode);
+	template <typename ErrorType, uint16_t Size>
+	static void reportError(const Message<Size>& message, ErrorType errorCode);
 
 	/**
 	 * Report a failure about the progress of the execution of a request
@@ -524,7 +524,8 @@ public:
 	 * the process into steps. Each step goes with its own definition, the stepID. Each value
 	 * ,that the stepID is assigned, should be documented.
 	 */
-	static void reportProgressError(const Message& message, ExecutionProgressErrorType errorCode, StepId stepID);
+	template <uint16_t Size>
+	static void reportProgressError(const Message<Size>& message, ExecutionProgressErrorType errorCode, StepId stepID);
 
 	/**
 	 * Report a failure that occurred internally, not due to a failure of a received packet.
@@ -565,8 +566,8 @@ public:
 	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	template <typename ErrorType>
-	static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
+	template <typename ErrorType, uint16_t Size>
+	static bool assertRequest(bool condition, const Message<Size>& message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
 		}
