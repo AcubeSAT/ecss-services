@@ -5,12 +5,15 @@
 #include "MessageParser.hpp"
 #include "Services/EventActionService.hpp"
 
-EventActionService::EventActionDefinition::EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message& message)
+template <uint16_t Size>
+EventActionService::EventActionDefinition::EventActionDefinition(ApplicationProcessId applicationID,
+EventDefinitionId eventDefinitionID, Message<Size>& message)
     : applicationID(applicationID), eventDefinitionID(eventDefinitionID), request(message.data.begin() + message.readPosition) {
 	message.readPosition += ECSSTCRequestStringSize;
 }
 
-void EventActionService::addEventActionDefinitions(Message& message) {
+template <uint16_t Size>
+void EventActionService::addEventActionDefinitions(Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::AddEventAction)) {
 		return;
 	}
@@ -43,7 +46,8 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::deleteEventActionDefinitions(Message& message) {
+template <uint16_t Size>
+void EventActionService::deleteEventActionDefinitions(Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::DeleteEventAction)) {
 		return;
 	}
@@ -74,7 +78,8 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::deleteAllEventActionDefinitions(const Message& message) {
+template <uint16_t Size>
+void EventActionService::deleteAllEventActionDefinitions(const Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::DeleteAllEventAction)) {
 		return;
 	}
@@ -82,7 +87,8 @@ void EventActionService::deleteAllEventActionDefinitions(const Message& message)
 	eventActionDefinitionMap.clear();
 }
 
-void EventActionService::enableEventActionDefinitions(Message& message) {
+template <uint16_t Size>
+void EventActionService::enableEventActionDefinitions(Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::EnableEventAction)) {
 		return;
 	}
@@ -116,7 +122,8 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::disableEventActionDefinitions(Message& message) {
+template <uint16_t Size>
+void EventActionService::disableEventActionDefinitions(Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::DisableEventAction)) {
 		return;
 	}
@@ -150,15 +157,17 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	}
 }
 
-void EventActionService::requestEventActionDefinitionStatus(const Message& message) {
+template <uint16_t Size>
+void EventActionService::requestEventActionDefinitionStatus(const Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::ReportStatusOfEachEventAction)) {
 		return;
 	}
-	eventActionStatusReport();
+	eventActionStatusReport<Size>();
 }
 
+template <uint16_t Size>
 void EventActionService::eventActionStatusReport() {
-	Message report = createTM(EventActionStatusReport);
+	Message report = createTM<Size>(EventActionStatusReport);
 	const uint16_t count = eventActionDefinitionMap.size(); // NOLINT(cppcoreguidelines-init-variables)
 	report.appendUint16(count);
 	for (const auto& element: eventActionDefinitionMap) {
@@ -169,14 +178,16 @@ void EventActionService::eventActionStatusReport() {
 	storeMessage(report);
 }
 
-void EventActionService::enableEventActionFunction(const Message& message) {
+template <uint16_t Size>
+void EventActionService::enableEventActionFunction(const Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::EnableEventActionFunction)) {
 		return;
 	}
 	setEventActionFunctionStatus(true);
 }
 
-void EventActionService::disableEventActionFunction(const Message& message) {
+template <uint16_t Size>
+void EventActionService::disableEventActionFunction(const Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::DisableEventActionFunction)) {
 		return;
 	}
@@ -195,7 +206,8 @@ void EventActionService::executeAction(EventDefinitionId eventDefinitionID) { //
 	}
 }
 
-void EventActionService::execute(Message& message) {
+template <uint16_t Size>
+void EventActionService::execute(Message<Size>& message) {
 	switch (message.messageType) {
 		case AddEventAction:
 			addEventActionDefinitions(message);

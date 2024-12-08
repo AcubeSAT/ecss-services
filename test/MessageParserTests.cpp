@@ -8,8 +8,8 @@
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
-	Message message = MessageParser::parse(packet, 16);
-	CHECK(message.packetType == Message::TC);
+	Message<> message = MessageParser::parse(packet, 16);
+	CHECK(message.packetType == Message<>::TC);
 	CHECK(message.applicationId == 7);
 	CHECK(message.packetSequenceCount == 8199);
 	CHECK(message.dataSize == 5);
@@ -23,8 +23,8 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81,
 	                          0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
-	Message message;
-	message.packetType = Message::TC;
+	Message<> message;
+	message.packetType = Message<>::TC;
 	message.applicationId = 7;
 	message.serviceType = 129;
 	message.messageType = 31;
@@ -58,8 +58,8 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
 	packet[16] = (time.formatAsBytes()) & 0xFF;
 
-	Message message = MessageParser::parse(packet, 24);
-	CHECK(message.packetType == Message::TM);
+	Message<> message = MessageParser::parse(packet, 24);
+	CHECK(message.packetType == Message<>::TM);
 	CHECK(message.applicationId == 2);
 	CHECK(message.packetSequenceCount == 77);
 	CHECK(message.dataSize == 7);
@@ -84,8 +84,8 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
 	wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
 
-	Message message;
-	message.packetType = Message::TM;
+	Message<> message;
+	message.packetType = Message<>::TM;
 	message.applicationId = 2;
 	message.packetSequenceCount = 77;
 	message.serviceType = 22;

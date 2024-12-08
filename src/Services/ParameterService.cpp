@@ -4,13 +4,13 @@
 #include "Helpers/Parameter.hpp"
 #include "Services/ParameterService.hpp"
 
-
-void ParameterService::reportParameters(Message& paramIds) {
+template <uint16_t Size>
+void ParameterService::reportParameters(Message<Size>& paramIds) {
 
 	if (!paramIds.assertTC(ServiceType, ReportParameterValues)) {
 		return;
 	}
-	Message parameterReport = createTM(ParameterValuesReport);
+	Message<Size> parameterReport = createTM<Size>(ParameterValuesReport);
 
 	uint16_t numOfIds = paramIds.readUint16();
 	uint16_t numberOfValidIds = 0;

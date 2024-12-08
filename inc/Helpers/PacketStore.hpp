@@ -74,7 +74,7 @@ public:
 	 * 				old packets  <---------->  new packets
 	 * 				[][][][][][][][][][][][][][][][][][][]	<--- deque
 	 */
-	etl::deque<std::pair<Time::DefaultCUC, Message>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
+		etl::deque<std::pair<Time::DefaultCUC, Message<>>, ECSSMaxPacketStoreSize> storedTelemetryPackets;
 
 	/**
 	 * Returns the sum of the sizes of the packets stored in this PacketStore, in bytes.

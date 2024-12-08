@@ -9,9 +9,10 @@
  * @todo (#252): Add message type in TCs
  * @todo (#253): this code is error prone, depending on parameters given, add fail safes (probably?)
  */
+template <uint16_t Size>
 void EventReportService::informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
-		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
+		Message<Size> report = createTM<Size>(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		EventActionService eventActionService;
@@ -21,11 +22,12 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 	}
 }
 
+template <uint16_t Size>
 void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	lowSeverityEventCount++;
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		lowSeverityReportCount++;
-		Message report = createTM(EventReportService::MessageType::LowSeverityAnomalyReport);
+		Message<Size> report = createTM<Size>(EventReportService::MessageType::LowSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
@@ -36,11 +38,12 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 	}
 }
 
+template <uint16_t Size>
 void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	mediumSeverityEventCount++;
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		mediumSeverityReportCount++;
-		Message report = createTM(EventReportService::MessageType::MediumSeverityAnomalyReport);
+		Message report = createTM<Size>(EventReportService::MessageType::MediumSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
@@ -51,11 +54,12 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 	}
 }
 
+template <uint16_t Size>
 void EventReportService::highSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	highSeverityEventCount++;
 	if (stateOfEvents[static_cast<EventDefinitionId>(eventID)]) {
 		highSeverityReportCount++;
-		Message report = createTM(EventReportService::MessageType::HighSeverityAnomalyReport);
+		Message report = createTM<Size>(EventReportService::MessageType::HighSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
@@ -66,7 +70,8 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 	}
 }
 
-void EventReportService::enableReportGeneration(Message& message) {
+template <uint16_t Size>
+void EventReportService::enableReportGeneration(Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::EnableReportGenerationOfEvents)) {
 		return;
 	}
@@ -83,7 +88,8 @@ void EventReportService::enableReportGeneration(Message& message) {
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
-void EventReportService::disableReportGeneration(Message& message) {
+template <uint16_t Size>
+void EventReportService::disableReportGeneration(Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::DisableReportGenerationOfEvents)) {
 		return;
 	}
@@ -100,7 +106,8 @@ void EventReportService::disableReportGeneration(Message& message) {
 	disabledEventsCount = stateOfEvents.size() - stateOfEvents.count();
 }
 
-void EventReportService::requestListOfDisabledEvents(const Message& message) {
+template <uint16_t Size>
+void EventReportService::requestListOfDisabledEvents(const Message<Size>& message) {
 	if (!message.assertTC(ServiceType, MessageType::ReportListOfDisabledEvents)) {
 		return;
 	}
@@ -108,8 +115,9 @@ void EventReportService::requestListOfDisabledEvents(const Message& message) {
 	listOfDisabledEventsReport();
 }
 
+template <uint16_t Size>
 void EventReportService::listOfDisabledEventsReport() {
-	Message report = createTM(EventReportService::MessageType::DisabledListEventReport);
+	Message report = createTM<Size>(EventReportService::MessageType::DisabledListEventReport);
 
 	uint16_t const numberOfDisabledEvents = stateOfEvents.size() - stateOfEvents.count(); // NOLINT(cppcoreguidelines-init-variables)
 	report.appendHalfword(numberOfDisabledEvents);
@@ -122,7 +130,8 @@ void EventReportService::listOfDisabledEventsReport() {
 	storeMessage(report);
 }
 
-void EventReportService::execute(Message& message) {
+template <uint16_t Size>
+void EventReportService::execute(Message<Size>& message) {
 	switch (message.messageType) {
 		case EnableReportGenerationOfEvents:
 			enableReportGeneration(message);

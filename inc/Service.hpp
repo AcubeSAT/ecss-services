@@ -34,8 +34,9 @@ protected:
 	 * @param messageType The ID of the message type, as specified in the standard. For example,
 	 *                    the TC[17,3] message has `messageType = 3`.
 	 */
-	Message createTM(MessageTypeNum messageType) const {
-		return Message(serviceType, messageType, Message::TM);
+	template<uint16_t Size>
+	Message<Size> createTM(MessageTypeNum messageType) const {
+		return Message<Size>(serviceType, messageType, Message<Size>::TM);
 	}
 
 	/**
@@ -44,13 +45,15 @@ protected:
 	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
 	 * we just print the message to the screen
 	 */
-	void storeMessage(Message& message);
+	template<uint16_t Size>
+	void storeMessage(Message<Size>& message);
 
 	/**
 	 * This function declared only to remind us that every service must have a function like
 	 * this, but this particular function does actually nothing.
 	 */
-	void execute(Message& message);
+	template<uint16_t Size>
+	void execute(Message<Size>& message);
 
 	/**
 	 * Default protected constructor for this Service

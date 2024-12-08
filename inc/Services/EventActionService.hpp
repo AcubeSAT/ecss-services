@@ -45,8 +45,9 @@ public:
 		EventDefinitionId eventDefinitionID = MaxDefinitionID;
 		String<ECSSTCRequestStringSize> request = "";
 		bool enabled = false;
-
-		EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message& message);
+		template <uint16_t Size>
+		EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message<Size>&
+		message);
 	};
 
 	friend EventReportService;
@@ -61,47 +62,56 @@ public:
 	/**
 	 * TC[19,1] add event-action definitions
 	 */
-	void addEventActionDefinitions(Message& message);
+	template <uint16_t Size>
+	void addEventActionDefinitions(Message<Size>& message);
 
 	/**
 	 * TC[19,2] delete event-action definitions
 	 */
-	void deleteEventActionDefinitions(Message& message);
+	template <uint16_t Size>
+	void deleteEventActionDefinitions(Message<Size>& message);
 
 	/**
 	 * TC[19,3] delete all event-action definitions
 	 */
-	void deleteAllEventActionDefinitions(const Message& message);
+	template <uint16_t Size>
+	void deleteAllEventActionDefinitions(const Message<Size>& message);
 
 	/**
 	 * TC[19,4] enable event-action definitions
 	 */
-	void enableEventActionDefinitions(Message& message);
+	template <uint16_t Size>
+	void enableEventActionDefinitions(Message<Size>& message);
 
 	/**
 	 * TC[19,5] disable event-action definitions
 	 */
-	void disableEventActionDefinitions(Message& message);
+	template <uint16_t Size>
+	void disableEventActionDefinitions(Message<Size>& message);
 
 	/**
 	 * TC[19,6] report the status of each event-action definition
 	 */
-	void requestEventActionDefinitionStatus(const Message& message);
+	template <uint16_t Size>
+	void requestEventActionDefinitionStatus(const Message<Size>& message);
 
 	/**
 	 * TM[19,7] event-action status report
 	 */
+	template <uint16_t Size>
 	void eventActionStatusReport();
 
 	/**
 	 * TC[19,8] enable the event-action function
 	 */
-	void enableEventActionFunction(const Message& message);
+	template <uint16_t Size>
+	void enableEventActionFunction(const Message<Size>& message);
 
 	/**
 	 * TC[19,9] disable the event-action function
 	 */
-	void disableEventActionFunction(const Message& message);
+	template <uint16_t Size>
+	void disableEventActionFunction(const Message<Size>& message);
 
 	/**
 	 * Setter for event-action function status
@@ -131,7 +141,8 @@ public:
 	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
 	 * @param message Contains the necessary parameters to call the suitable subservice
 	 */
-	void execute(Message& message);
+	template <uint16_t Size>
+	void execute(Message<Size>& message);
 };
 
 #endif // ECSS_SERVICES_EVENTACTIONSERVICE_HPP

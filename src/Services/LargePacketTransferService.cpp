@@ -8,7 +8,7 @@
 void LargePacketTransferService::firstDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier,
                                                          PartSequenceNum partSequenceNumber,
                                                          const String<ECSSMaxFixedOctetStringSize>& string) {
-	Message report = createTM(LargePacketTransferService::MessageType::FirstDownlinkPartReport);
+	Message report = createTM<ECSSMaxMessageSize>(LargePacketTransferService::MessageType::FirstDownlinkPartReport);
 	report.append<LargeMessageTransactionId>(largeMessageTransactionIdentifier); // large message transaction identifier
 	report.append<PartSequenceNum>(partSequenceNumber);                // part sequence number
 	report.appendOctetString(string);                       // fixed octet-string

@@ -27,7 +27,8 @@ public:
 	 * @param message2 Second message for comparison
 	 * @return A boolean value indicating whether the messages are of the same type
 	 */
-	static bool isSameType(const Message& message1, const Message& message2) {
+	template<uint16_t Size1, uint16_t Size2>
+	static bool isSameType(const Message<Size1>& message1, const Message<Size2>& message2) {
 		return (message1.packetType == message2.packetType) && (message1.messageType == message2.messageType) &&
 		       (message1.serviceType == message2.serviceType);
 	}
@@ -38,7 +39,8 @@ public:
 	 * @param message The message content to compare against
 	 * @return The result of comparison
 	 */
-	bool operator==(const Message& message) const {
+	template<uint16_t Size1>
+	bool operator==(const Message<Size1>& message) const {
 		if (dataSize != message.dataSize) {
 			return false;
 		}
@@ -60,7 +62,8 @@ public:
 	 * @return False if the messages are not of the same type, if `message.dataSize < this->dataSize`, or if the first
 	 * `this->dataSize` bytes are not equal between the two messages.
 	 */
-	bool bytesEqualWith(const Message& message) const {
+	template<uint16_t Size1>
+	bool bytesEqualWith(const Message<Size1>& message) const {
 		if (message.dataSize < dataSize) {
 			return false;
 		}
