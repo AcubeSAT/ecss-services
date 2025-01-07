@@ -1,4 +1,4 @@
---==# ECSS-E-ST-70-41C Services
+# ECSS-E-ST-70-41C Services
 
 In this repository you can find the implementation of the ECSS services, based
 on
