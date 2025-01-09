@@ -1,8 +1,7 @@
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTREPORT
 
-#include <EventReportService.hpp>
-#include <ServicePool.hpp>
+#include <Services/EventReportService.hpp>
 #include "Message.hpp"
 #include "ErrorHandler.hpp"
 
@@ -25,7 +24,7 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
-		eventActionService.executeAction(eventID);
+//		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -43,15 +42,14 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
-		EventActionService& eventActionService = Services.eventAction;
-		eventActionService.executeAction(eventID);
+//		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}
 }
 
 void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
-	if (!validateParameters(eventID) {
+	if (!validateParameters(eventID)) {
 		//Add ST[01] handling
 		return;
 	}
@@ -62,8 +60,7 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
-		EventActionService& eventActionService = Services.eventAction;
-		eventActionService.executeAction(eventID);
+//		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -81,8 +78,7 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
-		EventActionService& eventActionService = Services.eventAction;
-		eventActionService.executeAction(eventID);
+//		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -93,6 +89,7 @@ void EventReportService::enableReportGeneration(Message& message) {
 	uint16_t const length = message.readUint16();
 	if (length > numberOfEvents) {
 		//Add ST[01] handling
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::MessageTooLarge);
 		return;
 	}
 	if (length <= numberOfEvents) {

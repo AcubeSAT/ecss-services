@@ -118,9 +118,13 @@ public:
 		 * Event data size exceeded.
 		 * This error occurs when the size of event data exceeds the defined maximum allowable size.
 		 */
-		EventDataSizeExeceded = 21
+		EventDataSizeExeceded = 21,
 
-
+		/**
+		 * The length of the provided data exceeds the maximum number of events allowed.
+		 * This error occurs when attempting to process more events than the system can handle.
+		 */
+		LengthExceedsNumberOfEvents = 22
 	};
 
 	/**

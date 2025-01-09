@@ -3,7 +3,7 @@
 
 #include <etl/bitset.h>
 #include "Service.hpp"
-#include <EventActionService.hpp>
+//#include "ServicePool.hpp"
 
 /**
  * Implementation of ST[05] event reporting service
@@ -17,6 +17,11 @@
 
 class EventReportService : public Service
 {
+private:
+    static constexpr uint16_t numberOfEvents = 5;
+    etl::bitset<numberOfEvents> stateOfEvents;
+    static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
+    //    static EventActionService& eventActionService = Services.eventAction;
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
 
@@ -175,21 +180,15 @@ public:
     void listOfDisabledEventsReport();
 
     /**
-     * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
-     * is the ground station.
-     *
-     * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
-     * @param message Contains the necessary parameters to call the suitable subservice
+     * Getter for stateOfEvents bitset
+     * @return stateOfEvents, just in case the whole bitset is needed
      */
-    void execute(Message& message);
+    etl::bitset<numberOfEvents> getStateOfEvents()
+    {
+        return stateOfEvents;
+    }
 
-private:
-    static constexpr uint16_t numberOfEvents = 5;
-    etl::bitset<numberOfEvents> stateOfEvents;
-    static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
-    EventActionService& eventActionService = Services.eventAction;
-
-	/**
+    /**
      * Validates the parameters for an event.
      * Ensures the event ID is within the allowable range and not 0.
      *
@@ -199,13 +198,13 @@ private:
     static inline bool validateParameters(Event eventID);
 
     /**
-     * Getter for stateOfEvents bitset
-     * @return stateOfEvents, just in case the whole bitset is needed
+     * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+     * is the ground station.
+     *
+     * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+     * @param message Contains the necessary parameters to call the suitable subservice
      */
-    etl::bitset<numberOfEvents> getStateOfEvents()
-    {
-        return stateOfEvents;
-    }
+    void execute(Message& message);
 };
 
 #endif // ECSS_SERVICES_EVENTREPORTSERVICE_HPP
