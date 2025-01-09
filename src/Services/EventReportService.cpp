@@ -1,12 +1,13 @@
 #include <ApplicationLayer.hpp>
+#include <ServicePool.hpp>
 
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTREPORT
 
 #include <EventReportService.hpp>
 #include <EventActionService.hpp>
-#include "ServicePool.hpp"
 #include "Message.hpp"
+
 
 bool EventReportService::validateParameters(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	if (static_cast<EventDefinitionId>(eventID) > numberOfEvents || static_cast<EventDefinitionId>(eventID) == 0) {
