@@ -141,7 +141,7 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 }
 
 TEST_CASE("List of observables 6.5.6", "[service][st05]") {
-	EventReportService::Event eventID[] = {EventReportService::UnknownEvent};
+	EventReportService::Event eventID[] = {EventReportService::UnknownEvent, EventReportService::MCUStart};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(1);
 	message.append<EventDefinitionId>(eventID[0]);
@@ -150,9 +150,9 @@ TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	const String<64> eventReportData = "HelloWorld";
 
 	eventReportService.highSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
-	eventReportService.mediumSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::MCUStart, eventReportData);
 	CHECK(eventReportService.lowSeverityReportCount == 0);
-	CHECK(eventReportService.mediumSeverityReportCount == 0);
+	CHECK(eventReportService.mediumSeverityReportCount == 1);
 	CHECK(eventReportService.highSeverityReportCount == 0);
 
 	CHECK(eventReportService.lowSeverityEventCount == 0);
@@ -162,7 +162,7 @@ TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 	CHECK(eventReportService.disabledEventsCount == 1);
 
 	CHECK(eventReportService.lastLowSeverityReportID == 65535);
-	CHECK(eventReportService.lastMediumSeverityReportID == 65535);
+	CHECK(eventReportService.lastMediumSeverityReportID == 4);
 	CHECK(eventReportService.lastHighSeverityReportID == 65535);
 
 }
