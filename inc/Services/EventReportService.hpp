@@ -75,7 +75,7 @@ public:
         /**
          * An unknown event occured
          */
-        InformativeUnknownEvent = 1,
+        UnknownEvent = 1,
         /**
          * Watchdogs have reset
          */
@@ -88,22 +88,11 @@ public:
          * Microcontroller has started
          */
         MCUStart = 4,
-        /**
-         * An unknown anomaly of low severity anomalyhas occurred
-         */
-        LowSeverityUnknownEvent = 5,
-        /**
-         * An unknown anomaly of medium severity has occurred
-         */
-        MediumSeverityUnknownEvent = 6,
-        /**
-         * An unknown anomaly of high severity has occurred
-         */
-        HighSeverityUnknownEvent = 7,
+
         /**
          * When an execution of a notification/event fails to start
          */
-        FailedStartOfExecution = 8
+        FailedStartOfExecution = 5
     };
 
 
@@ -194,7 +183,7 @@ public:
     void execute(Message& message);
 
 private:
-    static constexpr uint16_t numberOfEvents = 8;
+    static constexpr uint16_t numberOfEvents = 5;
     etl::bitset<numberOfEvents> stateOfEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
     static inline bool validateParameters(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data);
