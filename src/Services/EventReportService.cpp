@@ -6,7 +6,6 @@
 #include "Message.hpp"
 
 /**
- * @todo (#252): Add message type in TCs
  * @todo (#253): this code is error prone, depending on parameters given, add fail safes (probably?)
  */
 void EventReportService::informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
