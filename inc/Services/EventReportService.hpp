@@ -3,6 +3,7 @@
 
 #include <etl/bitset.h>
 #include "Service.hpp"
+#include <EventActionService.hpp>
 
 /**
  * Implementation of ST[05] event reporting service
@@ -186,7 +187,16 @@ private:
     static constexpr uint16_t numberOfEvents = 5;
     etl::bitset<numberOfEvents> stateOfEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
-    static inline bool validateParameters(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data);
+    EventActionService& eventActionService = Services.eventAction;
+
+	/**
+     * Validates the parameters for an event.
+     * Ensures the event ID is within the allowable range and not 0.
+     *
+     * @param eventID The ID of the event to validate.
+     * @return True if parameters are valid, false otherwise.
+     */
+    static inline bool validateParameters(Event eventID);
 
     /**
      * Getter for stateOfEvents bitset

@@ -104,6 +104,23 @@ public:
 		 * PMON base couldn't be initialized with the given parameter ID
 		 */
 		InvalidParameterId = 18,
+
+		/**
+		 * An unknown or unsupported PMON check type was encountered
+		 */
+		UnknownCheckType = 19,
+		/**
+		 * Invalid Event ID.
+		 * This error occurs when an event ID is outside the acceptable range or conflicts with reserved identifiers.
+		 */
+		InvalidEventID = 20,
+		/**
+		 * Event data size exceeded.
+		 * This error occurs when the size of event data exceeds the defined maximum allowable size.
+		 */
+		EventDataSizeExeceded = 21
+
+
 	};
 
 	/**

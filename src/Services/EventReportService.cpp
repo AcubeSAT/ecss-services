@@ -1,15 +1,13 @@
-#include <ApplicationLayer.hpp>
-#include <ServicePool.hpp>
-
 #include "ECSS_Configuration.hpp"
 #ifdef SERVICE_EVENTREPORT
 
 #include <EventReportService.hpp>
-#include <EventActionService.hpp>
+#include <ServicePool.hpp>
 #include "Message.hpp"
+#include "ErrorHandler.hpp"
 
 
-bool EventReportService::validateParameters(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+bool EventReportService::validateParameters(Event eventID) {
 	if (static_cast<EventDefinitionId>(eventID) > numberOfEvents || static_cast<EventDefinitionId>(eventID) == 0) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidEventID);
 		return false;
@@ -27,7 +25,6 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
-		EventActionService& eventActionService = Services.eventAction;
 		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
@@ -139,13 +136,17 @@ void EventReportService::listOfDisabledEventsReport() {
 
 void EventReportService::execute(Message& message) {
 	switch (message.messageType) {
-		case EnableReportGenerationOfEvents: enableReportGeneration(message);
+		case EnableReportGenerationOfEvents:
+			enableReportGeneration(message);
 			break;
-		case DisableReportGenerationOfEvents: disableReportGeneration(message);
+		case DisableReportGenerationOfEvents:
+			disableReportGeneration(message);
 			break;
-		case ReportListOfDisabledEvents: requestListOfDisabledEvents(message);
+		case ReportListOfDisabledEvents:
+			requestListOfDisabledEvents(message);
 			break;
-		default: ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
 
