@@ -75,35 +75,35 @@ public:
         /**
          * An unknown event occured
          */
-        InformativeUnknownEvent = 0,
+        InformativeUnknownEvent = 1,
         /**
          * Watchdogs have reset
          */
-        WWDGReset = 1,
+        WWDGReset = 2,
         /**
          * Assertion has failed
          */
-        AssertionFail = 2,
+        AssertionFail = 3,
         /**
          * Microcontroller has started
          */
-        MCUStart = 3,
+        MCUStart = 4,
         /**
          * An unknown anomaly of low severity anomalyhas occurred
          */
-        LowSeverityUnknownEvent = 4,
+        LowSeverityUnknownEvent = 5,
         /**
          * An unknown anomaly of medium severity has occurred
          */
-        MediumSeverityUnknownEvent = 5,
+        MediumSeverityUnknownEvent = 6,
         /**
          * An unknown anomaly of high severity has occurred
          */
-        HighSeverityUnknownEvent = 6,
+        HighSeverityUnknownEvent = 7,
         /**
          * When an execution of a notification/event fails to start
          */
-        FailedStartOfExecution = 7
+        FailedStartOfExecution = 8
     };
 
 

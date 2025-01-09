@@ -7,7 +7,7 @@
 #include "Message.hpp"
 
 bool EventReportService::validateParameters(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
-	if (static_cast<EventDefinitionId>(eventID) >= numberOfEvents || static_cast<EventDefinitionId>(eventID) == 0) {
+	if (static_cast<EventDefinitionId>(eventID) > numberOfEvents || static_cast<EventDefinitionId>(eventID) == 0) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidEventID);
 		return false;
 	}
