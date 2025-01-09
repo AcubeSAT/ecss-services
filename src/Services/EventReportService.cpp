@@ -4,8 +4,9 @@
 #include <Services/EventReportService.hpp>
 #include "Message.hpp"
 #include "ErrorHandler.hpp"
+#include "ServicePool.hpp"
 
-
+EventActionService& eventAction = Services.eventAction;
 bool EventReportService::validateParameters(Event eventID) {
 	if (static_cast<EventDefinitionId>(eventID) > numberOfEvents || static_cast<EventDefinitionId>(eventID) == 0) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidEventID);
@@ -25,7 +26,7 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
-//		eventActionService.executeAction(eventID);
+		eventAction.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -44,7 +45,7 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
-//		eventActionService.executeAction(eventID);
+		eventAction.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -63,7 +64,7 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
-//		eventActionService.executeAction(eventID);
+		eventAction.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -83,7 +84,7 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
-//		eventActionService.executeAction(eventID);
+		eventAction.executeAction(eventID);
 
 		storeMessage(report);
 	}

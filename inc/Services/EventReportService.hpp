@@ -3,7 +3,6 @@
 
 #include <etl/bitset.h>
 #include "Service.hpp"
-//#include "ServicePool.hpp"
 
 /**
  * Implementation of ST[05] event reporting service
@@ -21,7 +20,6 @@ private:
     static constexpr uint16_t numberOfEvents = 5;
     etl::bitset<numberOfEvents> stateOfEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
-    //    static EventActionService& eventActionService = Services.eventAction;
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
 
