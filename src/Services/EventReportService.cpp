@@ -4,6 +4,8 @@
 #ifdef SERVICE_EVENTREPORT
 
 #include <EventReportService.hpp>
+#include <EventActionService.hpp>
+#include "ServicePool.hpp"
 #include "Message.hpp"
 
 bool EventReportService::validateParameters(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
@@ -24,6 +26,9 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
+		EventActionService& eventActionService = Services.eventAction;
+		eventActionService.executeAction(eventID);
+
 		storeMessage(report);
 	}
 }
@@ -40,6 +45,8 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
+		EventActionService& eventActionService = Services.eventAction;
+		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -57,6 +64,8 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
+		EventActionService& eventActionService = Services.eventAction;
+		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}
@@ -74,6 +83,8 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 		report.append<EventDefinitionId>(eventID);
 		report.appendString(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
+		EventActionService& eventActionService = Services.eventAction;
+		eventActionService.executeAction(eventID);
 
 		storeMessage(report);
 	}

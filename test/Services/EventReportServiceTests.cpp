@@ -9,7 +9,7 @@ EventReportService& eventReportService = Services.eventReport;
 TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
-	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent, eventReportData);
+	eventReportService.informativeEventReport(EventReportService::UnknownEvent, eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -27,7 +27,7 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
-	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent, eventReportData);
+	eventReportService.lowSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -45,7 +45,7 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
-	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent, eventReportData);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -63,7 +63,7 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	const char eventReportData[] = "HelloWorld";
 	char checkString[255];
-	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent, eventReportData);
+	eventReportService.highSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
 	REQUIRE(ServiceTests::hasOneMessage());
 
 	Message report = ServiceTests::get(0);
@@ -81,7 +81,7 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	eventReportService.getStateOfEvents().reset();
 	EventReportService::Event eventID[] = {EventReportService::AssertionFail,
-	                                       EventReportService::LowSeverityUnknownEvent};
+	                                       EventReportService::UnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
 	message.append<EventDefinitionId>(eventID[0]);
@@ -92,8 +92,7 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 }
 
 TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
-	EventReportService::Event eventID[] = {EventReportService::InformativeUnknownEvent,
-	                                       EventReportService::MediumSeverityUnknownEvent};
+	EventReportService::Event eventID[] = {EventReportService::UnknownEvent,};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
 	message.append<EventDefinitionId>(eventID[0]);
@@ -103,7 +102,7 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	CHECK(eventReportService.getStateOfEvents()[5] == 0);
 
 	const String<64> eventReportData = "HelloWorld";
-	eventReportService.highSeverityAnomalyReport(EventReportService::InformativeUnknownEvent, eventReportData);
+	eventReportService.highSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
 	CHECK(ServiceTests::hasOneMessage() == false);
 }
 
@@ -119,7 +118,7 @@ TEST_CASE("Request list of disabled events TC[5,7]", "[service][st05]") {
 }
 
 TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
-	EventReportService::Event eventID[] = {EventReportService::MCUStart, EventReportService::HighSeverityUnknownEvent};
+	EventReportService::Event eventID[] = {EventReportService::MCUStart, EventReportService::UnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
 	message.append<EventDefinitionId>(eventID[0]);
@@ -142,7 +141,7 @@ TEST_CASE("List of Disabled Events Report TM[5,8]", "[service][st05]") {
 }
 
 TEST_CASE("List of observables 6.5.6", "[service][st05]") {
-	EventReportService::Event eventID[] = {EventReportService::HighSeverityUnknownEvent};
+	EventReportService::Event eventID[] = {EventReportService::UnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(1);
 	message.append<EventDefinitionId>(eventID[0]);
@@ -150,8 +149,8 @@ TEST_CASE("List of observables 6.5.6", "[service][st05]") {
 
 	const String<64> eventReportData = "HelloWorld";
 
-	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent, eventReportData);
-	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent, eventReportData);
+	eventReportService.highSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
 	CHECK(eventReportService.lowSeverityReportCount == 0);
 	CHECK(eventReportService.mediumSeverityReportCount == 1);
 	CHECK(eventReportService.highSeverityReportCount == 0);
