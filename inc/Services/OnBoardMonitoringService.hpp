@@ -149,6 +149,13 @@ public:
 	}
 
 	/**
+	 * Checks all PMON objects in the parameter monitoring list if they are enabled.
+	 * This function iterates through all PMON objects in the parameter monitoring list
+	 * and calls the performCheck method for each enabled PMON.
+	 */
+	void checkAll() const;
+
+	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
 	void enableParameterMonitoringDefinitions(Message& message);

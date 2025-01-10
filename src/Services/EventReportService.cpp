@@ -15,7 +15,9 @@ bool EventReportService::validateParameters(Event eventID) {
 	return true;
 }
 
-
+/**
+ * @todo (#253): this code is error prone, depending on parameters given, add fail safes (probably?)
+ */
 void EventReportService::informativeEventReport(Event eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
 	if (!validateParameters(eventID)) {
 		//Add ST[01] handling

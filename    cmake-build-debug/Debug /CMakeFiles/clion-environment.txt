@@ -1,0 +1,4 @@
+ToolSet: 1.0 (local)Ninja: 1.12.0@/home/athanasios/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/241.18034.45/bin/ninja/linux/x64/ninja
+Options: 
+
+Options:--preset=cmake-build-debug-debug
