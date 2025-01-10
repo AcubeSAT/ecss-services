@@ -7,7 +7,7 @@
 #include "ErrorHandler.hpp"
 #include "ServicePool.hpp"
 
-EventActionService& eventAction = Services.eventAction;
+EventActionService& eventAction = Services.eventAction; // NOLINT (cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-interfaces-global-init)
 
 bool EventReportService::validateParameters(Event eventID) {
 	if (static_cast<EventDefinitionId>(eventID) > NumberOfEvents || static_cast<EventDefinitionId>(eventID) == 0) {
