@@ -17,8 +17,8 @@
 class EventReportService : public Service
 {
 private:
-    static constexpr uint16_t numberOfEvents = 5;
-    etl::bitset<numberOfEvents> stateOfEvents;
+    static constexpr uint16_t NumberOfEvents = 5;
+    etl::bitset<NumberOfEvents> enabledEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
@@ -63,7 +63,7 @@ public:
 
     EventReportService()
     {
-        stateOfEvents.set();
+        enabledEvents.set();
         serviceType = ServiceType;
     }
 
@@ -178,12 +178,12 @@ public:
     void listOfDisabledEventsReport();
 
     /**
-     * Getter for stateOfEvents bitset
-     * @return stateOfEvents, just in case the whole bitset is needed
+     * Getter for enabledEvents bitset
+     * @return enabledEvents, just in case the whole bitset is needed
      */
-    etl::bitset<numberOfEvents> getStateOfEvents()
+    etl::bitset<NumberOfEvents> getStateOfEvents()
     {
-        return stateOfEvents;
+        return enabledEvents;
     }
 
     /**
@@ -194,6 +194,14 @@ public:
      * @return True if parameters are valid, false otherwise.
      */
     static inline bool validateParameters(Event eventID);
+
+	/**
+	 * Checks if the number of events included in a TC is larger than the number of events in this service.
+	 * Throws a InternalErrorType::LengthExceedsNumberOfEvents if false
+	 * @param tcNumberOfEvents the TC's number of events
+	 * @return True if the number of events is smaller or equal to the number of events in the service, false otherwise.
+	 */
+	static inline bool isNumberOfEventsValid(uint16_t tcNumberOfEvents);
 
     /**
      * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
