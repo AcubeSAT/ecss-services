@@ -156,6 +156,11 @@ public:
 	void checkAll() const;
 
 	/**
+	 * Initializes PMON monitoring for all PMON objects added in the Monitoring Map.
+	 */
+    void initializeParameterMonitoringMap();
+
+	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
 	 */
 	void enableParameterMonitoringDefinitions(Message& message);
