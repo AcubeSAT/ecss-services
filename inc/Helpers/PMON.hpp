@@ -49,7 +49,7 @@ public:
 	/**
 	 * If false, the parameter of this PMON will not be checked, and no events will be generated if it goes off-bounds.
 	 */
-	bool monitoringEnabled = false;
+	bool monitoringEnabled = true;
 
 	CheckingStatus checkingStatus = Unchecked;
 
