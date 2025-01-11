@@ -318,9 +318,9 @@ void OnBoardMonitoringService::checkAll() const {
 	}
 }
 
-void OnBoardMonitoringService::initializeParameterMonitoringMap(etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> &subsystemLimitChecks,
-		etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> &subsystemExpectedValueChecks,
-		etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> &subsystemDeltaChecks) {
+void OnBoardMonitoringService::initializeParameterMonitoringMap(const etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> &subsystemLimitChecks,
+                                                                const etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> &subsystemExpectedValueChecks,
+                                                                const etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> &subsystemDeltaChecks) {
     limitChecks = subsystemLimitChecks;
 	for (auto& limitCheck: limitChecks) {
 		limitCheck.monitoringEnabled = true;

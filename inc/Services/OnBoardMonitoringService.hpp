@@ -161,9 +161,9 @@ public:
 	 * @param subsystemExpectedValueChecks an array containing the expected value checks, specific to each subsystem.
 	 * @param subsystemDeltaChecks an array containg the delta checks, specific
 	 */
-    void initializeParameterMonitoringMap(etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> &subsystemLimitChecks,
-    	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> &subsystemExpectedValueChecks,
-    	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> &subsystemDeltaChecks);
+    void initializeParameterMonitoringMap(const etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> &subsystemLimitChecks,
+	                                      const etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> &subsystemExpectedValueChecks,
+	                                      const etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> &subsystemDeltaChecks);
 
 	/**
 	 * Enables the PMON definitions which correspond to the ids in TC[12,1].
