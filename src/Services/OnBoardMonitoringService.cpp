@@ -323,16 +323,19 @@ void OnBoardMonitoringService::initializeParameterMonitoringMap(const etl::vecto
                                                                 const etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> &subsystemDeltaChecks) {
     limitChecks = subsystemLimitChecks;
 	for (auto& limitCheck: limitChecks) {
+		limitCheck.monitoringEnabled = true;
 		addPMONLimitCheck(limitCheck.monitoredParameterId, limitCheck);
 	}
 
 	expectedValueChecks = subsystemExpectedValueChecks;
 	for (auto& expectedValueCheck: expectedValueChecks) {
+		expectedValueCheck.monitoringEnabled = true;
 		addPMONExpectedValueCheck(expectedValueCheck.monitoredParameterId, expectedValueCheck);
 	}
 
 	deltaChecks = subsystemDeltaChecks;
 	for (auto& deltaCheck: deltaChecks) {
+		deltaCheck.monitoringEnabled = true;
 		addPMONDeltaCheck(deltaCheck.monitoredParameterId, deltaCheck);
 	}
 }
