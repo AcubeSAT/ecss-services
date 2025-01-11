@@ -27,17 +27,17 @@ private:
 	/**
 	 * Maximum number of checks for each Limit Check.
 	 */
-	static constexpr uint8_t MaximumNumberOfChecksLimitCheck = 32;
+	static constexpr uint8_t MaximumNumberOfChecksLimitCheck = 64;
 
 	/**
 	 * Maximum number of checks for each Expected Value Check.
 	 */
-	static constexpr uint8_t MaximumNumberOfChecksExpectedValueCheck = 32;
+	static constexpr uint8_t MaximumNumberOfChecksExpectedValueCheck = 64;
 
 	/**
 	 * Maximum number of checks for each Delta check.
 	 */
-	static constexpr uint8_t MaximumNumberOfChecksDeltaCheck = 32;
+	static constexpr uint8_t MaximumNumberOfChecksDeltaCheck = 64;
 
 	/**
 	 * This vector is used as a mean of storing the PMON Definitons
