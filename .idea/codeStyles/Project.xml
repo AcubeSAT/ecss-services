@@ -118,12 +118,6 @@
       </extensions>
     </files>
     <codeStyleSettings language="ObjectiveC">
-      <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
-      <option name="ALIGN_MULTILINE_FOR" value="false" />
-      <option name="ALIGN_MULTILINE_ASSIGNMENT" value="false" />
-      <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="false" />
-      <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
-      <option name="ENUM_CONSTANTS_WRAP" value="2" />
       <indentOptions>
         <option name="CONTINUATION_INDENT_SIZE" value="4" />
         <option name="USE_TAB_CHARACTER" value="true" />

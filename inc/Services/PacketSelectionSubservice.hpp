@@ -163,25 +163,7 @@ public:
     * content report'
     */
 	void reportApplicationProcess(Message& request);
-	/**
-	 * TC[15,29] 'add structure identifiers to the housekeeping parameter report storage control configuration'
-	 */
-	void addStructureIdentifiersToTheHousekeepingParameterReport(Message& request);
 
-	/**
-	 * TC[15,30] 'delete structure identifiers from the housekeeping parameter report storage control configuration'
-	 */
-	void deleteStructureIdentifiersToTheHousekeepingParameterReport(Message& request);
-
-	/**
-	 * TC[15,31] 'add structure identifiers to the diagnostic parameter report storage control configuration'
-	 */
-	void addStructureIdentifiersToTheDiagnosticParameterReport(Message& request);
-
-	/**
-	 * TC[15,32] 'delete structure identifiers from the diagnostic parameter report storage control configuration'
-	 */
-	void deleteStructureIdentifiersFromTheDiagnosticParameterReport(Message& request);
 };
 
 #endif

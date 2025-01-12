@@ -9,7 +9,7 @@
 
 /**
  *
- * The Application Process configuration. It's basically a map, storing a vector of report type definitions for each
+ * The Application Process configuration. It's a map, storing a vector of report type definitions for each
  * pair of (applicationID, serviceType). It contains definitions, which indicate whether a telemetry message, produced
  * by a service, inside an application process (subsystem), should be forwarded to the ground station.
  */
@@ -43,12 +43,6 @@ public:
 	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
 
 	ApplicationProcessConfiguration() = default;
-
-	typedef uint8_t HousekeepingParameterReportId;
-
-	typedef etl::vector<SamplingInterval, ECSSMaxReportTypeDefinitions> ReportSamplingDefinitions;
-
-	etl::map<HousekeepingParameterReportId, ReportSamplingDefinitions, ECSSMaxApplicationsServicesCombinations> housekeepingParameterReportDefinitions;
 };
 
 #endif
