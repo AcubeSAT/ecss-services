@@ -164,10 +164,10 @@ int main() {
 	// ST[05] (5,1 to 5,4) test [works]
 	constexpr char eventReportData[12] = "Hello World";
 	EventReportService eventReportService;
-	eventReportService.informativeEventReport(EventReportService::InformativeUnknownEvent, eventReportData);
-	eventReportService.lowSeverityAnomalyReport(EventReportService::LowSeverityUnknownEvent, eventReportData);
-	eventReportService.mediumSeverityAnomalyReport(EventReportService::MediumSeverityUnknownEvent, eventReportData);
-	eventReportService.highSeverityAnomalyReport(EventReportService::HighSeverityUnknownEvent, eventReportData);
+	eventReportService.informativeEventReport(EventReportService::UnknownEvent, eventReportData);
+	eventReportService.lowSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
+	eventReportService.mediumSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
+	eventReportService.highSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);
 
 	Message trivialMessage = Message();
 	MessageParser::execute(trivialMessage);
@@ -182,9 +182,8 @@ int main() {
 	errorMessage.appendByte(15);
 
 	// ST[05] (5,5 to 5,8) test [works]
-	EventReportService::Event eventIDs[] = {EventReportService::HighSeverityUnknownEvent,
-	                                        EventReportService::MediumSeverityUnknownEvent};
-	EventReportService::Event eventIDs2[] = {EventReportService::HighSeverityUnknownEvent};
+	EventReportService::Event eventIDs[] = {EventReportService::UnknownEvent,};
+	EventReportService::Event eventIDs2[] = {EventReportService::UnknownEvent};
 	Message eventMessage(EventReportService::ServiceType,
 	                     EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	eventMessage.appendUint16(2);
