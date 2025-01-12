@@ -214,9 +214,6 @@ public:
 		ChangeTypeToCircular = 26,
 		ChangeTypeToBounded = 27,
 		ChangeVirtualChannel = 28,
-		addStructureIdentifiersToTheHousekeepingParameterReport = 29,
-		deleteStructureIdentifiersToTheHousekeepingParameterReport = 30
-
 	};
 
 	StorageAndRetrievalService() {

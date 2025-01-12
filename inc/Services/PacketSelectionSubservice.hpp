@@ -101,13 +101,15 @@ private:
    */
 	bool checkMessage(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
 
-public:
 	typedef String<ECSSPacketStoreIdSize> PacketStoreId;
 
 	/**
 	* Reference to the packet stores of the storage and retrieval service.
 	*/
 	etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& packetStores;
+
+public:
+
 
 	/**
 	* Constructor of the Packet Selection Subservice.
