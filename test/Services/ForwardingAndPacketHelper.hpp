@@ -1,5 +1,5 @@
 #pragma once
-#include "Message.hpp"
+
 #include "Services/HousekeepingService.hpp"
 #include "Services/EventReportService.hpp"
 
@@ -14,17 +14,17 @@ namespace ForwardingAndPacketHelper {
                                 EventReportService::MessageType::DisabledListEventReport};
 
 
-    static void validReportTypes(Message& request);
+	void validReportTypes(Message& request);
 
-    static void duplicateReportTypes(Message& request);
+    void duplicateReportTypes(Message& request);
 
-    static void validInvalidReportTypes(Message& request);
+    void validInvalidReportTypes(Message& request);
 
-    static void validAllReportsOfService(Message& request);
+    void validAllReportsOfService(Message& request);
 
-    static void validInvalidAllReportsOfService(Message& request);
+    void validInvalidAllReportsOfService(Message& request);
     
-    static void validAllReportsOfApp(Message& request);
+    void validAllReportsOfApp(Message& request);
     
-    static void validInvalidAllReportsOfApp(Message& request);
+    void validInvalidAllReportsOfApp(Message& request);
 }

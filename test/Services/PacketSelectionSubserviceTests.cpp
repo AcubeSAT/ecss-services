@@ -19,7 +19,7 @@ String<ECSSPacketStoreIdSize> addPacketStoreToPacketSelection() {
 	return packetStoreID;
 }
 
-void resetAppProcessConfiguration() {
+void resetAppProcessConfigurationPacketSelection() {
 	packetSelection.applicationProcessConfiguration.clear();
 	packetSelection.controlledApplications.clear();
 	storageAndRetrieval1.resetPacketStores();
@@ -59,7 +59,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 			}
 		}
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -79,7 +79,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::NonExistingPacketStore) == 1);
 		REQUIRE(packetSelection.applicationProcessConfiguration.empty());
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -99,7 +99,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		REQUIRE(packetSelection.applicationProcessConfiguration.empty());
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -126,7 +126,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		      1);
 		REQUIRE(packetSelection.applicationProcessConfiguration[packetStoreID].definitions.size() == ECSSMaxServiceTypeDefinitions);
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -157,7 +157,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 1);
 		REQUIRE(applicationProcessConfig.size() == ECSSMaxServiceTypeDefinitions);
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -187,7 +187,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		    packetSelection.applicationProcessConfiguration[packetStoreID].definitions[std::make_pair(applicationID, serviceType)]
 		        .size() == AllReportTypes::MessagesOfService.at(serviceType).size());
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -232,7 +232,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		REQUIRE(definitions[appServicePair1].size() == numOfMessages1);
 		REQUIRE(definitions[appServicePair2].size() == numOfMessages2);
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -264,7 +264,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 			}
 		}
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -301,7 +301,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
 		}
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -325,7 +325,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 			        AllReportTypes::MessagesOfService.at(serviceType).size());
 		}
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -372,7 +372,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 			        AllReportTypes::MessagesOfService.at(serviceType).size());
 		}
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -399,7 +399,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 			                   AllReportTypes::MessagesOfService.at(serviceType).begin()));
 		}
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -424,7 +424,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
 
-		resetAppProcessConfiguration();
+		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
 		Services.reset();
 	}

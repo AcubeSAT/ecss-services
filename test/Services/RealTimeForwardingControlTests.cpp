@@ -11,7 +11,7 @@ static RealTimeForwardingControlService& realTimeForwarding = Services.realTimeF
 /**
  * Reset the map containing the report definitions to an empty state.
  */
-void resetAppProcessConfiguration() {
+void resetAppProcessConfigurationRealTimeForwarding() {
 	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
 	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
 }
