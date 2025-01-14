@@ -90,12 +90,49 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		Message message(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
 		            Message::TC, 1);
 
-		message.appendFixedString(String<ECSSFunctionNameLength>("test")); // "stFunc" = "st08FunctionTest"
+		message.appendFixedString(String<ECSSFunctionNameLength>("Test"));
 		message.appendHalfword(400);
-		message.appendByte(8);
+		message.appendByte(109);
 
 		MessageParser::execute(message);
-		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(12)->get()).getValue() == 400);
+		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(7)->get()).getValue() == 400);
+
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(0)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(1)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(2)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(3)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(4)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(5)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(6)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(7)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(8)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(9)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(10)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(11)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(12)->get()).getValue() == 8);
 		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(13)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(14)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(15)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(16)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(17)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(18)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(19)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(20)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(21)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(22)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(23)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(24)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(25)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(26)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(27)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(28)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(29)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(30)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(31)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(32)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(33)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(34)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(35)->get()).getValue() == 8);
+
 	}
 }
