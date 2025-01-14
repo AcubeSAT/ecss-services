@@ -67,7 +67,7 @@ TEST_CASE("ST[08] - Insert Tests") {
 	SECTION("Insertion to full pointer map") {
 		// make sure the pointer map is full to the brim
 		ServiceTests::reset();
-		std::string name = "test"; // FOR TESTING ONLY!
+		std::string name = "01"; // FOR TESTING ONLY!  "01" -> "test"
 
 		for (int i = 0; i < ECSSFunctionMapSize + 1; i++) {
 			name += std::to_string(i); // different names to fill up the map
@@ -90,7 +90,7 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		Message message(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
 		            Message::TC, 1);
 
-		message.appendFixedString(String<ECSSFunctionNameLength>("st08FunctionTest"));
+		message.appendFixedString(String<ECSSFunctionNameLength>("stFunc")); // "stFunc" = "st08FunctionTest"
 		message.appendHalfword(400);
 		message.appendByte(8);
 
