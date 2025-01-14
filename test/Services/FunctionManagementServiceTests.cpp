@@ -95,7 +95,7 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		message.appendByte(8);
 
 		MessageParser::execute(message);
-		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(8)->get()).getValue() == 400);
-		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(9)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(12)->get()).getValue() == 400);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(13)->get()).getValue() == 8);
 	}
 }
