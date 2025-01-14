@@ -90,12 +90,12 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		Message message(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
 		            Message::TC, 1);
 
-		message.appendFixedString(String<ECSSFunctionNameLength>("stFunc")); // "stFunc" = "st08FunctionTest"
+		message.appendFixedString(String<ECSSFunctionNameLength>("stFun")); // "stFunc" = "st08FunctionTest"
 		message.appendHalfword(400);
 		message.appendByte(8);
 
 		MessageParser::execute(message);
-		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(7)->get()).getValue() == 400);
-		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(8)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(8)->get()).getValue() == 400);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(9)->get()).getValue() == 8);
 	}
 }
