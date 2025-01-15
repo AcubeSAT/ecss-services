@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_STORAGEANDRETRIEVALSERVICE_HPP
-#define ECSS_SERVICES_STORAGEANDRETRIEVALSERVICE_HPP
+#pragma once
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
@@ -186,6 +185,11 @@ private:
 	void createContentSummary(Message& report, const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 public:
+	/**
+	 * The packet selection sub-service of the Storage and Retrieval service.
+	 */
+	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(packetStores);
+	
 	inline static constexpr ServiceTypeNum ServiceType = 15;
 
 	enum MessageType : uint8_t {
@@ -219,11 +223,6 @@ public:
 	StorageAndRetrievalService() {
 		serviceType = ServiceType;
 	}
-
-	/**
-	 * The packet selection sub-service of the Storage and Retrieval service.
-	 */
-	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(packetStores);
 
 	/**
 	 * Adds new packet store into packet stores.
@@ -366,5 +365,3 @@ public:
 	 */
 	void execute(Message& request);
 };
-
-#endif

@@ -242,6 +242,15 @@ public:
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
 	 *
 	 * NOTE: We assume that \p string is already allocated, and its size is at least
+	 * ECSSMaxStringSize. This function does NOT place a \0 at the end of the created string,
+	 * meaning that \p string should contain exactly the string stored in the message.
+	 */
+	void readFixedString(String<ECSSMaxStringSize>& string, uint16_t size);
+
+	/**
+	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
+	 *
+	 * NOTE: We assume that \p string is already allocated, and its size is at least
 	 * ECSSMaxStringSize + 1. This function DOES place a \0 at the end of the created string,
 	 * meaning that \p string should contain 1 more byte than the string stored in the message.
 	 */

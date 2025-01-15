@@ -2,8 +2,6 @@
 #include "Helpers/AllReportTypes.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
 
-PacketSelectionSubservice::PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores) : packetStores(mainServicePacketStores) {}
-
 String<ECSSPacketStoreIdSize> PacketSelectionSubservice::readPacketStoreId(Message& message) {
 	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId{};
 	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);

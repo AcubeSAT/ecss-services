@@ -786,6 +786,15 @@ void StorageAndRetrievalService::execute(Message& request) {
 		case DisableStorageInPacketStores:
 			disableStorageFunction(request);
 			break;
+		case AddReportTypesToAppProcessConfiguration:
+			packetSelection.addReportTypesToAppProcessConfiguration(request);
+			break;
+		case DeleteReportTypesTFromAppProcessConfiguration:
+			packetSelection.deleteReportTypesFromAppProcessConfiguration(request);
+			break;
+		case ReportApplicationProcess:
+			packetSelection.reportApplicationProcess(request);
+			break;
 		case StartByTimeRangeRetrieval:
 			startByTimeRangeRetrieval(request);
 			break;
