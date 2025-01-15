@@ -90,9 +90,9 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		Message message(FunctionManagementService::ServiceType, FunctionManagementService::MessageType::PerformFunction,
 		            Message::TC, 1);
 
-		message.appendFixedString(String<ECSSFunctionNameLength>("Test"));
+		message.appendFixedString(String<ECSSFunctionNameLength>("st08FunctionTest"));
 		message.appendHalfword(400);
-		message.appendByte(109);
+		message.appendByte(61);
 
 		MessageParser::execute(message);
 		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(7)->get()).getValue() == 400);
@@ -133,6 +133,7 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(33)->get()).getValue() == 8);
 		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(34)->get()).getValue() == 8);
 		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(35)->get()).getValue() == 8);
+
 
 	}
 }
