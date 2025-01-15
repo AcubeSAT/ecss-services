@@ -66,7 +66,7 @@ bool PacketSelectionSubservice::allServiceTypesAllowed(const Message& request, c
 	return false;
 }
 
-bool PacketSelectionSubservice::maxServiceTypesReached(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
+bool PacketSelectionSubservice::checkMaxServiceTypesReached(const Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID) {
 	if (countServicesOfApplication(packetStoreID, applicationID) >= ECSSMaxServiceTypeDefinitions) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		return true;
@@ -75,7 +75,8 @@ bool PacketSelectionSubservice::maxServiceTypesReached(const Message& request, c
 }
 
 bool PacketSelectionSubservice::checkService(Message& request, const String<ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID, uint8_t numOfMessages) {
-	if (maxServiceTypesReached(request, packetStoreID, applicationID)) {
+	if (checkMaxServiceTypesReached(request, packetStoreID, applicationID)) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
 		request.skipBytes(numOfMessages);
 		return false;
 	}

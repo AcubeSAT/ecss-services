@@ -83,7 +83,7 @@ private:
 	/**
      * Checks if the maximum number of service type definitions per application process is reached.
      */
-	bool maxServiceTypesReached(const Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID,
+	bool checkMaxServiceTypesReached(const Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID,
 		uint8_t applicationID);
 
 	/**

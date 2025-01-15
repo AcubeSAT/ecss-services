@@ -123,7 +123,7 @@ public:
 		 * The length of the provided data exceeds the maximum number of events allowed.
 		 * This error occurs when attempting to process more events than the system can handle.
 		 */
-		LengthExceedsNumberOfEvents = 22
+		LengthExceedsNumberOfEvents = 22,
 	};
 
 	/**

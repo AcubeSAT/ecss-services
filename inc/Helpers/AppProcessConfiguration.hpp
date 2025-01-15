@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_FORWARDCONTROLCONFIGURATION_HPP
-#define ECSS_SERVICES_FORWARDCONTROLCONFIGURATION_HPP
+#pragma once
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
@@ -40,9 +39,22 @@ public:
 	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
 	 * to the appID and service type.
 	 */
-	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
+	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> realTimeForwardControlServiceDefinitions;
+
+
+	/**
+	 * Map containing the report type definitions. Each application process has its own ID. The combination of the
+	 * application ID and the service type is used as a key to provide access to the list of report type definitions.
+	 *
+	 * @note
+	 * The report type definitions are basically the message types of each service. For example a message type for the
+	 * 'ParameterStatisticsService' (ST04) is 'ParameterStatisticsService::MessageType::ParameterStatisticsReport'. The
+	 * Packet Selectoion Subservice (ST15) uses this map as a lookup table, to identify whether a requested
+	 * triplet (app->service->message type) is allowed to be stored to the packet stores. The requested message type is only stored, if the requested application process ID and service type
+	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
+	 * to the appID and service type.
+	 */
+	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> packetSelectionServiceDefinitions;
 
 	ApplicationProcessConfiguration() = default;
 };
-
-#endif
