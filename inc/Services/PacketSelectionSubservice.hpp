@@ -135,7 +135,7 @@ public:
 	 * process definitions, the service type definitions and the message type definitions.
 	 *
 	 * @note
-	 * The report type definitions are basically the message types of each service. For example a message type for the
+	 * The report type definitions are  the message types of each service. For example a message type for the
 	 * 'ParameterStatisticsService' (ST04) is 'ParameterStatisticsService::MessageType::ParameterStatisticsReport'. The
 	 * Packet Selection Subservice of the Storage and Retrieval Service (ST15) uses this map as a lookup table, to identify
 	 * whether a requested quadruplet (packetStoreID->app->service->message type) is allowed to be stored in the packet stores
