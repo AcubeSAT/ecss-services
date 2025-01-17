@@ -70,7 +70,7 @@ TEST_CASE("ST[08] - Insert Tests") {
 		std::string name = "test"; // FOR TESTING ONLY!
 
 		for (int i = 0; i < ECSSFunctionMapSize ; i++) {
-			name += std::to_string(i); // different names to fill up the map
+			//name += std::to_string(i); // different names to fill up the map
 			fms.include(String<ECSSFunctionNameLength>(name.c_str()), &test);
 		}
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
