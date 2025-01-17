@@ -69,8 +69,8 @@ TEST_CASE("ST[08] - Insert Tests") {
 		ServiceTests::reset();
 		std::string name = "test"; // FOR TESTING ONLY!
 
-		for (int i = 0; i < ECSSFunctionMapSize ; i++) {
-			//name += std::to_string(i); // different names to fill up the map
+		for (int i = 0; i < ECSSFunctionMapSize - 1 ; i++) {
+			name += std::to_string(i); // different names to fill up the map
 			fms.include(String<ECSSFunctionNameLength>(name.c_str()), &test);
 		}
 		CHECK(ServiceTests::thrownError(ErrorHandler::InternalErrorType::MapFull));
@@ -95,8 +95,8 @@ TEST_CASE("ST[08] - Check preinitialized function map") {
 		message.appendByte(8);
 
 		MessageParser::execute(message);
-		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(35)->get()).getValue() == 400);
-		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(36)->get()).getValue() == 8);
+		CHECK(static_cast<Parameter<uint16_t>&>(ps.getParameter(34)->get()).getValue() == 400);
+		CHECK(static_cast<Parameter<uint8_t>&>(ps.getParameter(35)->get()).getValue() == 8);
 
 
 	}
