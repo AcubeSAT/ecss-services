@@ -142,7 +142,7 @@ inline constexpr uint8_t ECSSFunctionMapSize = 5;
  * The maximum length of a function name, in bytes
  * @see FunctionManagementService
  */
-inline constexpr uint8_t ECSSFunctionNameLength = 32;
+inline constexpr uint8_t ECSSFunctionNameLength = 6;
 
 /**
  * The maximum length of the argument of a function
