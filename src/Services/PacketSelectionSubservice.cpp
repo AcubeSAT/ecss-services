@@ -144,26 +144,26 @@ void PacketSelectionSubservice::reportApplicationProcess(Message& request) {
         }
     }
     const uint8_t numberOfApplications = uniqueApps.size();	
-	report.append(numberOfApplications);
+	report.appendUint8(numberOfApplications);
 
 	for (const auto& applicationID : uniqueApps) {
-        report.append(applicationID);
+        report.append<ApplicationProcessId>(applicationID);
 
 		uint8_t numberOfServiceTypes = etl::count_if(packetStoreAppProcessConfig[packetStoreID].definitions.begin(), packetStoreAppProcessConfig[packetStoreID].definitions.end(), [applicationID](const auto& definition) {
 			return definition.first.first == applicationID;
 		});
-		report.append(numberOfServiceTypes);
+		report.appendUint8(numberOfServiceTypes);
 
         for (const auto& [appServicePair, _] : packetStoreAppProcessConfig[packetStoreID].definitions) {
             if (appServicePair.first == applicationID) {
                 auto serviceType = appServicePair.second;
-				report.append(serviceType);
+				report.append<ServiceTypeNum>(serviceType);
 
 				const auto& messages = packetStoreAppProcessConfig[packetStoreID].definitions[appServicePair];
             
 				report.appendUint8(messages.size());
 				for (const auto& messageType : messages) {
-					report.appendUint8(messageType);
+					report.append<MessageTypeNum>(messageType);
 				}
             }
         }
