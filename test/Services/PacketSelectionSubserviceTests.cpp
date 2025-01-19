@@ -1,4 +1,3 @@
-#include <iostream>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
@@ -49,7 +48,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 				auto appServicePair = std::make_pair(appID, serviceType);
 				REQUIRE(definitions.find(appServicePair) != definitions.end());
 				REQUIRE(definitions[appServicePair].size() == 2);
-				uint8_t* messages = (j == 0) ? ForwardingAndPacketHelper::messages1 : ForwardingAndPacketHelper::messages2;
+				auto& messages = (j == 0) ? ForwardingAndPacketHelper::messages1 : ForwardingAndPacketHelper::messages2;
 
 				for (uint8_t k = 0; k < 2; k++) {
 					REQUIRE(std::find(definitions[appServicePair].begin(),
@@ -237,7 +236,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		Services.reset();
 	}
 
-	SECTION("Requested  addition of duplicate report type definitions") {
+	SECTION("Requested addition of duplicate report type definitions") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);

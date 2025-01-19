@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_REALTIMEFORWARDINGCONTROLSERVICE_HPP
-#define ECSS_SERVICES_REALTIMEFORWARDINGCONTROLSERVICE_HPP
+#pragma once
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
@@ -128,5 +127,3 @@ public:
 	 */
 	void execute(Message& message);
 };
-
-#endif

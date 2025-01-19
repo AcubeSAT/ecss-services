@@ -13,7 +13,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 		const ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
 		uint8_t const numOfServices = request.readUint8();
 
-		if (not applicationProcessConfiguration.checkApplicationOfAppProcessConfig(request, applicationID,
+		if (not applicationProcessConfiguration.isApplicationOfAppProcessConfigValid(request, applicationID,
 		numOfServices, controlledApplications)) {
 			continue;
 		}
@@ -27,7 +27,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			const ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
 			uint8_t const numOfMessages = request.readUint8();
 
-			if (not applicationProcessConfiguration.checkService(request, applicationID, numOfMessages)) {
+			if (not applicationProcessConfiguration.canServiceBeAdded(request, applicationID, numOfMessages, serviceType)) {
 				continue;
 			}
 
@@ -39,7 +39,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
 				MessageTypeNum const messageType = request.read<MessageTypeNum>();
 
-				if (not applicationProcessConfiguration.checkMessage(request, applicationID, serviceType, messageType)) {
+				if (not applicationProcessConfiguration.canMessageBeAdded(request, applicationID, serviceType, messageType)) {
 					continue;
 				}
 				auto key = std::make_pair(applicationID, serviceType);

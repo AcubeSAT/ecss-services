@@ -431,6 +431,10 @@ public:
 		 * PMON Check Type is requested, but it is missing (ST[12])
 		 */
 		 PMONCheckTypeMissing = 63,
+		/**
+		 * AppProcessConfiguration adding an already existing report type in a map with an application id - service type key
+		 */
+		AlreadyExistingReportType = 64
 	};
 
 	/**

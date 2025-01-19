@@ -2,7 +2,6 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/Parameter.hpp"
 #include "etl/map.h"
 #include "etl/vector.h"
 
@@ -15,108 +14,61 @@
 class ApplicationProcessConfiguration {
 public:
 	/**
- * Adds all report types of the specified application process definition, to the application process configuration.
- */
-	void addAllReportsOfApplication(ApplicationProcessId applicationID) {
-		for (const auto& service: AllReportTypes::MessagesOfService) {
-			uint8_t const serviceType = service.first;
-			addAllReportsOfService(applicationID, serviceType);
-		}
-	}
+	 * Adds all report types of the specified application process definition, to the application process configuration.
+	 */
+	void addAllReportsOfApplication(ApplicationProcessId applicationID);
 
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
 	 */
-	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-		for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
-			auto appServicePair = std::make_pair(applicationID, serviceType);
-			definitions[appServicePair].push_back(messageType);
-		}
-	}
+	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
-	 * Counts the number of service types, stored for the specified packet store ID and application process.
+	 * Counts the number of service types, stored for the specified application process.
 	 */
-	uint8_t countServicesOfApplication(ApplicationProcessId applicationID) {
-		return std::count_if(std::begin(definitions), std::end(definitions), [applicationID](const auto& definition) { return applicationID == definition.first.first; });
-	}
+	uint8_t countServicesOfApplication(ApplicationProcessId applicationID);
 
 	/**
 	 * Counts the number of report types, stored for the specified service type.
 	 */
-	uint8_t countReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-		auto appServicePair = std::make_pair(applicationID, serviceType);
-		return definitions[appServicePair].size();
-	}
+	uint8_t countReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
-	 * Checks whether the specified message type already exists in the specified packet store ID, application process and service
+	 * Checks whether the specified message type already exists in the application process and service
 	 * type definition.
 	 */
-	bool reportExistsInAppProcessConfiguration(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-																			 MessageTypeNum messageType) {
-		auto key = std::make_pair(applicationID, serviceType);
-		auto& messages = definitions[key];
-		return std::find(messages.begin(), messages.end(), messageType) != messages.end();
-	}
+	bool reportExistsInAppProcessConfiguration(const Message& request, ApplicationProcessId applicationID,
+		ServiceTypeNum serviceType,
+		MessageTypeNum messageType);
 
 	/**
-	 * Performs the necessary error checking/logging for a specific packet store ID and application process ID. Also, skips the necessary
+	 * Performs the necessary error checking/logging for an application process ID. Also, skips the necessary
 	 * bytes from the request message, in case of an invalid request.
 	 *
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
-	bool checkApplicationOfAppProcessConfig(Message& request, ApplicationProcessId applicationID,
-																			  uint8_t numOfServices,
-																			  etl::vector <ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications,) {
-		if (not checkAppControlled(controlledApplications, request, applicationID) or allServiceTypesAllowed(request,
-		applicationID)) {
-			for (uint8_t i = 0; i < numOfServices; i++) {
-				request.skipBytes(sizeof(ServiceTypeNum));
-				uint8_t const numOfMessages = request.readUint8();
-				request.skipBytes(numOfMessages);
-			}
-			return false;
-		}
-		return true;
-	}
+	bool isApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,
+		uint8_t numOfServices,
+		const etl::vector <ApplicationProcessId, ECSSMaxControlledApplicationProcesses>& controlledApplications);
 
 	/**
 	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
 	 * definitions.
 	 */
-	bool allServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID) {
-		if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
-			return true;
-		}
-		return false;
-	}
+	bool areAllServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Checks if the specified application process is controlled by the Service and returns true if it does.
 	 */
-	bool checkAppControlled(etl::vector <ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications, const
-	Message& request,
-	ApplicationProcessId applicationID) {
-		if (std::find(controlledApplications.begin(), controlledApplications.end(), applicationID) ==
-			controlledApplications.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
-			return false;
-			}
-		return true;
-	}
+	bool checkAppControlled(
+		etl::vector <ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications, const
+		Message& request,
+		ApplicationProcessId applicationID);
 
 	/**
 	 * Checks if the maximum number of service type definitions per application process is reached.
 	 */
-	bool checkMaxServiceTypesReached(const Message& request, ApplicationProcessId applicationID) {
-		if (countServicesOfApplication(applicationID) >= ECSSMaxServiceTypeDefinitions) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached);
-			return true;
-		}
-		return false;
-	}
+	bool isMaxServiceTypesReached(const Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
@@ -124,56 +76,51 @@ public:
 	 *
 	 * @return True: if the service type is valid and passes all the necessary error checking.
 	 */
-	bool checkService(Message& request, ApplicationProcessId applicationID, uint8_t numOfMessages) {
-		if (checkMaxServiceTypesReached(request, applicationID)) {
-			request.skipBytes(numOfMessages);
-			return false;
-		}
-		return true;
-	}
+	bool canServiceBeAdded(Message& request, ApplicationProcessId applicationID, uint8_t numOfMessages, ServiceTypeNum serviceType);
 
 	/**
-	 * Checks if the maximum number of report type definitions per service type definition is reached.
+	 * Checks if the maximum number of report type definitions per service type definition is reached. Reports a MaxReportTypesReached
+	 * error if it's true
 	 */
 	bool checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum
-	serviceType)  {
-		if (countReportsOfService(applicationID, serviceType) >= AllReportTypes::MessagesOfService.at(serviceType).size
-		()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
-			return true;
-		}
-		return false;
-	}
+		serviceType);
 
 	/**
 	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
-	 * already reached.
+	 * already reached and if the message type already exists. A MaxReportTypesReached or a AlreadyExistingReportType error
+	 * will be generated if the checks don't pass.
 	 *
 	 * @return True: if the message type is valid and passes all the necessary error checking.
 	 */
-	bool checkMessage(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType)  {
-		return !checkMaxReportTypesReached(request, applicationID, serviceType) or
-			   !reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType);
+	bool canMessageBeAdded(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
+		MessageTypeNum messageType);
+
+	/**
+	 * This function was created for the sole purpose of increasing readability where it's being used.
+	 * @return true if the pair of applicationID and serviceType already exists in the definitions map, false otherwise
+	 */
+	bool isServiceExisting(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
+		return definitions.find(std::make_pair(applicationID, serviceType)) != definitions.end();
 	}
 
 	/**
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
 	 * example, a Report Type definition could be 'ReportHousekeepingStructures'.
 	 */
-	typedef etl::vector<uint8_t, ECSSMaxReportTypeDefinitions> ReportTypeDefinitions;
+	typedef etl::vector<MessageTypeNum, ECSSMaxReportTypeDefinitions> ReportTypeDefinitions;
 
 	/**
 	 * This is the key for the application process configuration map. It contains a pair with the applicationID and
 	 * the serviceType.
 	 */
-	typedef std::pair<uint8_t, uint8_t> AppServiceKey;
+	typedef std::pair<ApplicationProcessId, ServiceTypeNum> AppServiceKey;
 
 	/**
 	 * Map containing the report type definitions. Each application process has its own ID. The combination of the
 	 * application ID and the service type is used as a key to provide access to the list of report type definitions.
 	 *
 	 * @note
-	 * The report type definitions are basically the message types of each service. For example a message type for the
+	 * The report type definitions are the message types of each service. For example a message type for the
 	 * 'ParameterStatisticsService' (ST04) is 'ParameterStatisticsService::MessageType::ParameterStatisticsReport'. The
 	 * Real Time Forwarding Control Service (ST14) uses this map as a lookup table, to identify whether a requested
 	 * triplet (app->service->message type) is allowed to be forwarded to the ground station via the corresponding virtual
