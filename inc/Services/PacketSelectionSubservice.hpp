@@ -3,10 +3,11 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/ForwardControlConfiguration.hpp"
 #include "Helpers/PacketStore.hpp"
+#include "Helpers/AppProcessConfiguration.hpp"
 #include "Service.hpp"
 #include "etl/map.h"
+#include "etl/vector.h"
 
 /**
  * Implementation of the Packet Selection Subservice of the ST[15] Storage and Retrieval Service.
@@ -30,86 +31,6 @@ private:
 	 */
 	bool packetStoreExists(const String <ECSSPacketStoreIdSize>& packetStoreId);
 
-	/**
-     * Adds all report types of the specified application process definition, to the application process configuration.
-     */
-	void addAllReportsOfApplication(const String <ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
-
-	/**
-     * Adds all report types of the specified service type, to the application process configuration.
-     */
-	void addAllReportsOfService(const String <ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
-		uint8_t serviceType);
-
-	/**
-     * Counts the number of service types, stored for the specified packet store ID and application process.
-     */
-	uint8_t countServicesOfApplication(const String <ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
-
-	/**
-     * Counts the number of report types, stored for the specified service type.
-     */
-	uint8_t countReportsOfService(const String <ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
-		uint8_t serviceType);
-
-	/**
-     * Checks whether the specified message type already exists in the specified packet store ID, application process and service
-     * type definition.
-     */
-	bool reportExistsInAppProcessConfiguration(const String <ECSSPacketStoreIdSize>& packetStoreID,
-		uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
-
-	/**
-     * Performs the necessary error checking/logging for a specific packet store ID and application process ID. Also, skips the necessary
-     * bytes from the request message, in case of an invalid request.
-     *
-     * @return True: if the application is valid and passes all the necessary error checking.
-     */
-	bool checkApplicationOfAppProcessConfig(Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID,
-		uint8_t applicationID, uint8_t numOfServices);
-
-	/**
-     * Checks if the specified application process is controlled by the Service and returns true if it does.
-     */
-	bool isAppControlled(const Message& request, uint8_t applicationId);
-
-	/**
-     * Checks if all service types are allowed already, i.e. if the application process contains no service type
-     * definitions.
-     */
-	bool allServiceTypesAllowed(const Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID,
-		uint8_t applicationID);
-
-	/**
-     * Checks if the maximum number of service type definitions per application process is reached.
-     */
-	bool checkMaxServiceTypesReached(const Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID,
-		uint8_t applicationID);
-
-	/**
-     * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
-     * from the request message, in case of an invalid request.
-     *
-     * @return True: if the service type is valid and passes all the necessary error checking.
-     */
-	bool checkService(Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
-		uint8_t numOfMessages);
-
-	/**
-     * Checks if the maximum number of report type definitions per service type definition is reached.
-     */
-	bool maxReportTypesReached(const Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID,
-		uint8_t applicationID, uint8_t serviceType);
-
-	/**
-     * Checks if the maximum number of message types that can be contained inside a service type definition, is
-     * already reached.
-     *
-     * @return True: if the message type is valid and passes all the necessary error checking.
-     */
-	bool checkMessage(const Message& request, const String <ECSSPacketStoreIdSize>& packetStoreID,
-		uint8_t applicationID, uint8_t serviceType, uint8_t messageType);
-
 	typedef String <ECSSPacketStoreIdSize> PacketStoreId;
 
 	/**
@@ -127,7 +48,7 @@ public:
 	/**
      * Vector containing the IDs of the application processes controlled by the packet selection subservice.
      */
-	etl::vector <uint8_t, ECSSMaxControlledApplicationProcesses> controlledApplications;
+	etl::vector <ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
 	typedef String <ECSSPacketStoreIdSize> PacketStoreID;
 	/**
@@ -143,7 +64,7 @@ public:
 	 * application process ID and service type already exist in the map, and the requested report type is located in the vector
 	 * of report types, which corresponds to the packet store ID, appID and service type.
 	 */
-	etl::map <PacketStoreID, ApplicationProcessConfiguration, ECSSMaxPacketStores> applicationProcessConfiguration;
+	etl::map <PacketStoreID, ApplicationProcessConfiguration, ECSSMaxPacketStores> packetStoreAppProcessConfig;
 
 	/**
      * TC[15,3] 'add report types to an application process storage control configuration'.
@@ -158,13 +79,13 @@ public:
 	/**
    	 * Deletes all report types of the specified service type, to the application process configuration.
    	 */
-	void deleteAllReportsOfService(const String <ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID,
-		uint8_t serviceType);
+	void deleteAllReportsOfService(const String <ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID,
+		ServiceTypeNum serviceType);
 
 	/**
    	 * Deletes all report types of the specified application process definition, to the application process configuration.
    	 */
-	void deleteAllReportsOfApplication(const String <ECSSPacketStoreIdSize>& packetStoreID, uint8_t applicationID);
+	void deleteAllReportsOfApplication(const String <ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID);
 
 	/**
      * This function takes a TC[15,5] request 'report the content of the application process storage control
