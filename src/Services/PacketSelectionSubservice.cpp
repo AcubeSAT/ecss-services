@@ -76,7 +76,7 @@ void PacketSelectionSubservice::deleteAllReportsOfApplication(const String<ECSSP
 }
 
 void PacketSelectionSubservice::deleteAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-	for (auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
+	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		packetStoreAppProcessConfig[packetStoreID].definitions.erase(appServicePair);
 	}
