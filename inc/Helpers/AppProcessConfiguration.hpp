@@ -16,12 +16,12 @@ public:
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
 	 */
-	void addAllReportsOfApplication(ApplicationProcessId applicationID);
+	void addAllReportsOfApplication(const Message& message, ApplicationProcessId applicationID);
 
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
 	 */
-	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
+	void addAllReportsOfService(const Message& message, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
 	 * Counts the number of service types, stored for the specified application process.

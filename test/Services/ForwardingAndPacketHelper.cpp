@@ -15,7 +15,7 @@ namespace ForwardingAndPacketHelper {
 				ServiceTypeNum serviceType = services[serviceIndex];
 				request.append <ServiceTypeNum>(serviceType);
 				request.appendUint8(numOfMessagesPerService);
-				uint8_t* messages = (serviceIndex == 0) ? messages1 : messages2;
+				auto& messages = (serviceIndex == 0) ? messages1 : messages2;
 
 				for (uint8_t messageIndex = 0; messageIndex < numOfMessagesPerService; messageIndex++) {
 					request.append <MessageTypeNum>(messages[messageIndex]);
@@ -64,7 +64,7 @@ namespace ForwardingAndPacketHelper {
 				ServiceTypeNum serviceType = servicesToPick[serviceIndex];
 				request.append <ServiceTypeNum>(serviceType);
 				request.appendUint8(numOfMessagesPerService);
-				uint8_t* messages = (serviceIndex == 0) ? messages1 : messages2;
+				auto& messages = (serviceIndex == 0) ? messages1 : messages2;
 
 				for (uint8_t messageIndex = 0; messageIndex < numOfMessagesPerService; messageIndex++) {
 					request.append <MessageTypeNum>(messages[messageIndex]);

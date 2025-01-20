@@ -365,31 +365,6 @@ int main() {
 	ErrorHandler::reportInternalError(static_cast<ErrorHandler::InternalErrorType>(254));
 
 	std::cout << UTCTimestamp() << std::endl;
-	typedef std::pair<uint8_t, uint8_t> AppServiceKey;
-	typedef etl::vector<uint8_t, 2> ReportTypeDefinitions;
-
-	etl::map<AppServiceKey, ReportTypeDefinitions, 2> mapTest = {};
-	mapTest[std::make_pair(1, 2)].push_back(2);
-	mapTest[std::make_pair(1, 2)].push_back(3);
-	std::cout << mapTest[std::make_pair(1, 2)].size() << std::endl;
-	std::cout << static_cast<uint8_t>(mapTest[std::make_pair(1, 2)][0]);
-	std::cout << static_cast<uint8_t>(mapTest[std::make_pair(1, 2)][1]);
-	uint8_t x = 2;
-	std::cout << x << std::endl;
-	std::cout << "Size of non existing pair: " << static_cast<int>(mapTest[std::make_pair(2, 2)][3]) << std::endl;
-	ReportTypeDefinitions reportTypeDefinitions = {};
-	std::cout << "vector content in out of memory:" << static_cast<int>(reportTypeDefinitions[4]) << std::endl;
-	
-	// Use find_if with lambda to compare map key with pair
-	if (std::find_if(mapTest.begin(), mapTest.end(), 
-	    [](const auto& item) { return item.first == std::make_pair(uint8_t(1), uint8_t(2)); }) != mapTest.end()) {
-		std::cout << "printed";
-	    }
-	if (std::find_if(mapTest.begin(), mapTest.end(),
-			[](const auto& item) { return item.first == std::make_pair(uint8_t(3), uint8_t(2)); }) == mapTest.end()) {
-		std::cout << "printed doestn exist";
-	}
-	ReportTypeDefinitions report_type_definitions = {1};
 
 	return 0;
 }

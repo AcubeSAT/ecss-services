@@ -34,6 +34,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		uint8_t applicationID = 1;
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validReportTypes(request);
 
 		MessageParser::execute(request);
@@ -90,13 +91,13 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		uint8_t applicationID = 1;
 		auto packetStoreID = addPacketStoreToPacketSelection();
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validReportTypes(request);
-
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
-		REQUIRE(packetSelection.packetStoreAppProcessConfig.empty());
+		REQUIRE(packetSelection.packetStoreAppProcessConfig.size() == 1);
 
 		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
@@ -111,6 +112,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		uint8_t applicationID = 1;
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validReportTypes(request);
 
 		for (uint8_t i = 1; i < ECSSMaxServiceTypeDefinitions + 1; i++) {
@@ -141,6 +143,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validReportTypes(request);
 
 		auto& applicationProcessConfig = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
@@ -170,6 +173,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		uint8_t serviceType = ForwardingAndPacketHelper::services[0]; // st03
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validReportTypes(request);
 
 		for (auto message: AllReportTypes::MessagesOfService.at(serviceType)) {
@@ -202,6 +206,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validReportTypes(request);
 
 		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
@@ -244,11 +249,12 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		uint8_t applicationID = 1;
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::duplicateReportTypes(request);
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 0);
+		CHECK(ServiceTests::count() == 2);
 		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
 		REQUIRE(definitions.size() == 2);
 
@@ -279,6 +285,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID1);
 		packetSelection.controlledApplications.push_back(applicationID3);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validInvalidReportTypes(request);
 
 		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
@@ -289,7 +296,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 7);
+		CHECK(ServiceTests::count() == 9);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 3);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
@@ -313,6 +320,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID1);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validAllReportsOfService(request);
 
 		MessageParser::execute(request);
@@ -339,11 +347,12 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID1);
 		packetSelection.controlledApplications.push_back(applicationID2);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validInvalidAllReportsOfService(request);
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 3);
+		CHECK(ServiceTests::count() == 18);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 2);
 
@@ -384,6 +393,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID1);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validAllReportsOfApp(request);
 
 		MessageParser::execute(request);
@@ -413,6 +423,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		packetSelection.controlledApplications.push_back(applicationID1);
 		packetSelection.controlledApplications.push_back(applicationID2);
+		request.appendFixedString(packetStoreID);
 		ForwardingAndPacketHelper::validInvalidAllReportsOfApp(request);
 
 		MessageParser::execute(request);

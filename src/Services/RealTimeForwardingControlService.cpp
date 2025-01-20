@@ -19,7 +19,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 		}
 
 		if (numOfServices == 0) {
-			applicationProcessConfiguration.addAllReportsOfApplication(applicationID);
+			applicationProcessConfiguration.addAllReportsOfApplication(request, applicationID);
 			continue;
 		}
 
@@ -32,7 +32,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			}
 
 			if (numOfMessages == 0) {
-				applicationProcessConfiguration.addAllReportsOfService(applicationID, serviceType);
+				applicationProcessConfiguration.addAllReportsOfService(request, applicationID, serviceType);
 				continue;
 			}
 

@@ -2,17 +2,22 @@
 #include "Message.hpp"
 #include "Helpers/AllReportTypes.hpp"
 
-void ApplicationProcessConfiguration::addAllReportsOfApplication(ApplicationProcessId applicationID) {
+void ApplicationProcessConfiguration::addAllReportsOfApplication(const Message& message, ApplicationProcessId
+applicationID) {
 	for (const auto& service: AllReportTypes::MessagesOfService) {
 		uint8_t const serviceType = service.first;
-		addAllReportsOfService(applicationID, serviceType);
+		addAllReportsOfService(message, applicationID, serviceType);
 	}
 }
 
-void ApplicationProcessConfiguration::addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
+void ApplicationProcessConfiguration::addAllReportsOfService(const Message& message, ApplicationProcessId applicationID,
+ServiceTypeNum
+serviceType) {
 	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
-		definitions[appServicePair].push_back(messageType);
+		if (canMessageBeAdded(message, applicationID, serviceType, messageType)) {
+			definitions[appServicePair].push_back(messageType);
+		}
 	}
 }
 
@@ -33,10 +38,14 @@ ServiceTypeNum serviceType,
 	MessageTypeNum messageType) {
 	auto key = std::make_pair(applicationID, serviceType);
 	if (definitions.find(key) != definitions.end()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
-		return true;
+		for (const auto& message: definitions[key]) {
+			if (message == messageType) {
+				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
+				return true;
+			}
+		}
 	}
-	return true;
+	return false;
 }
 
 bool ApplicationProcessConfiguration::isApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,

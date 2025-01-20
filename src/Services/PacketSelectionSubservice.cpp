@@ -27,7 +27,7 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 	const uint8_t numOfApplications = request.readUint8();
 
 	for (uint8_t app = 0; app < numOfApplications; app++) {
-		ApplicationProcessId applicationID = request.readUint8();
+		ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
 		const uint8_t numOfServices = request.readUint8();
 
 		if (not packetStoreAppProcessConfig[packetStoreID].isApplicationOfAppProcessConfigValid(request,
@@ -36,7 +36,7 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 		}
 
 		if (numOfServices == 0) {
-			packetStoreAppProcessConfig[packetStoreID].addAllReportsOfApplication(applicationID);
+			packetStoreAppProcessConfig[packetStoreID].addAllReportsOfApplication(request, applicationID);
 			continue;
 		}
 
@@ -50,7 +50,7 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 			}
 
 			if (numOfMessages == 0) {
-				packetStoreAppProcessConfig[packetStoreID].addAllReportsOfService(applicationID, serviceType);
+				packetStoreAppProcessConfig[packetStoreID].addAllReportsOfService(request, applicationID, serviceType);
 				continue;
 			}
 
