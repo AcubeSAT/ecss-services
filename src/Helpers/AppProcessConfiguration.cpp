@@ -38,11 +38,11 @@ ServiceTypeNum serviceType,
 	MessageTypeNum messageType) {
 	auto key = std::make_pair(applicationID, serviceType);
 	if (definitions.find(key) != definitions.end()) {
-		for (const auto& message: definitions[key]) {
-			if (message == messageType) {
-				ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
-				return true;
-			}
+		if (etl::any_of(definitions[key].begin(), definitions[key].end(), [messageType](const auto& message) {
+			return message == messageType;
+		})) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
+			return true;
 		}
 	}
 	return false;
