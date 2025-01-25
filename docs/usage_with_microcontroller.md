@@ -94,17 +94,31 @@ performance and size of your program.
 
 ### Message transmission
 
-Whenever PUS telemetry is generated, it needs to be transmitted or sent to a receiver. This is the responsibility of the
-@ref Service::storeMessage function.
+Whenever PUS telemetry is generated, it needs to be stored, transmitted or sent to a receiver. This is the 
+responsibility of the @ref Service::platformSpecificHandleMessage function.
+
+This function is always called from the `handleMessage()` function. The reason is that in this way, we can force 
+universal actions, such as storing telemetry in ST[15], or forwarding the message somewhere with ST[14].
 
 In this function, you can transmit the message via an antenna, send it through an interface for debugging, or both.
 
 An example definition can be as follows:
 
 ```cpp
-void Service::storeMessage(Message& message) {
+void Service::platformSpecificHandleMessage(Message& message) {
 	message.finalize();
 
+	CAN_Transmit(message.data, message.dataSize, Platform::OBC);
+
+	LOG_DEBUG << "Just sent a message with CAN to ST[" << static_cast<int>(message.serviceType) << "] message";
+}
+```
+
+A second function that needs to be implemented is @ref Service::releaseMessage, which is specific to ST[14] - Real 
+Time Forwarding Service. This function defines what happens when a TM is allowed to be forwarded to GS in real time.
+
+```cpp
+void Service::releaseMessage(Message& message) {
 	MCU_Antenna_Transmit(message.data, message.dataSize);
 
 	LOG_DEBUG << "Just sent ST[" << static_cast<int>(message.serviceType) << "] message";
@@ -243,6 +257,34 @@ void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
 void FunctionManagementService::initializeFunctionMap() {
     FunctionManagementService::include("st08FunctionTest", &st08FunctionTest);
 }
+```
+
+5. @ref StorageAndRetrievalService::initializePacketStores
+
+The StorageAndRetrievalService is responsible for storing generated telemetry in packet stores. Towards that goal, each
+platform needs to initialize their own packet store map - otherwise no telemetry will be stored.
+
+```cpp
+void StorageAndRetrievalService::initializePacketStores() {
+	packetStores.insert({"stats", PacketStore()});
+}
+```
+
+6. @ref PacketSelectionSubservice::initializePacketSelectionSubServiceStructures
+
+The PacketSelectionSubservice is responsible for controlling the storage of generated telemetry in packet stores. 
+Towards that goal, each platform needs to initialize their own controlledApplications vector and configuration of what
+<ApplicationId, ServiceType, MessageType> is stored.
+
+```cpp
+void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() {
+	ApplicationProcessConfiguration config;
+	packetStoreAppProcessConfig.insert({"stats", config});
+	controlledApplications.push_back(ApplicationId);
+}
+
+```
+
 ## Receiving messages
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can

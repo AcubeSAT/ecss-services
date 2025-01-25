@@ -40,8 +40,7 @@ std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> ServiceTests
     std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool>();
 bool ServiceTests::expectingErrors = false;
 
-void Service::handleMessage(Message& message) {
-	// Just add the message to the queue
+void Service::platformSpecificHandleMessage(Message& message) {
 	ServiceTests::queue(message);
 }
 
@@ -61,7 +60,6 @@ void ErrorHandler::logError(ErrorType errorType) {
 }
 
 void Logger::log(Logger::LogLevel level, etl::istring& message) {
-	// Logs while testing are passed on to Catch2, if they are important enough
 	if (level >= Logger::warning) {
 		UNSCOPED_INFO(message.c_str());
 	}
@@ -75,7 +73,6 @@ struct ServiceTestsListener : Catch::EventListenerBase {
 	}
 
 	void sectionEnded(Catch::SectionStats const& sectionStats) override {
-		// Make sure we don't have any errors
 		if (not ServiceTests::isExpectingErrors()) {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
 			// corresponding assertion function from ServiceTests to silence this message.
@@ -336,5 +333,14 @@ void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
 void FunctionManagementService::initializeFunctionMap() {
     FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
 }
+
+void StorageAndRetrievalService::initializeStorageAndRetrievalServiceStructures() {
+	serviceToPacketStore.insert({4, "stats"});
+}
+
+void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() {}
+
+void Service::releaseMessage(Message& message) {}
+
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

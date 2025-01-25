@@ -2,13 +2,13 @@
 #include "Helpers/AllReportTypes.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
 
-String<ECSSPacketStoreIdSize> PacketSelectionSubservice::readPacketStoreId(Message& message) {
+PacketStoreId PacketSelectionSubservice::readPacketStoreId(Message& message) {
 	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId{};
 	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
 	return packetStoreId.data();
 }
 
-bool PacketSelectionSubservice::packetStoreExists(const String<ECSSPacketStoreIdSize>& packetStoreId) {
+bool PacketSelectionSubservice::packetStoreExists(const PacketStoreId& packetStoreId) {
 	return packetStores.find(packetStoreId) != packetStores.end();
 }
 
@@ -68,14 +68,14 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 	}
 }
 
-void PacketSelectionSubservice::deleteAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID) {
+void PacketSelectionSubservice::deleteAllReportsOfApplication(const PacketStoreId& packetStoreID, ApplicationProcessId applicationID) {
 	for (const auto& [first, _]: AllReportTypes::MessagesOfService) {
 		ServiceTypeNum serviceType = first;
 		deleteAllReportsOfService(packetStoreID, applicationID, serviceType);
 	}
 }
 
-void PacketSelectionSubservice::deleteAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
+void PacketSelectionSubservice::deleteAllReportsOfService(const PacketStoreId& packetStoreID, ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
 	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		packetStoreAppProcessConfig[packetStoreID].definitions.erase(appServicePair);

@@ -7,13 +7,13 @@
 StorageAndRetrievalService& storageAndRetrieval1 = Services.storageAndRetrieval;
 PacketSelectionSubservice& packetSelection = storageAndRetrieval1.packetSelection;
 
-String<ECSSPacketStoreIdSize> addPacketStoreToPacketSelection() {
+PacketStoreId addPacketStoreToPacketSelection() {
 	uint8_t packetStoreData[ECSSPacketStoreIdSize];
 	uint8_t name[4] = "ps1";
 	std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 
 	std::copy(name, name + 3, packetStoreData);
-	String<ECSSPacketStoreIdSize> packetStoreID(packetStoreData);
+	PacketStoreId packetStoreID(packetStoreData);
 	storageAndRetrieval1.addPacketStore(packetStoreID, PacketStore());
 	return packetStoreID;
 }

@@ -24,33 +24,38 @@ private:
 	/**
 	 * Helper function that reads the packet store ID string from a TC/TM[15,x] message
 	 */
-	inline String <ECSSPacketStoreIdSize> readPacketStoreId(Message& message);
+	inline PacketStoreId readPacketStoreId(Message& message);
 
 	/**
 	 * Returns true if the specified packet store is present in packet stores of the main service.
 	 */
-	bool packetStoreExists(const String <ECSSPacketStoreIdSize>& packetStoreId);
-
-	typedef String <ECSSPacketStoreIdSize> PacketStoreId;
+	bool packetStoreExists(const PacketStoreId& packetStoreId);
 
 	/**
 	 * Reference to the packet stores of the storage and retrieval service.
 	 */
 	etl::map <PacketStoreId, PacketStore, ECSSMaxPacketStores>& packetStores;
 
+	/**
+	 * Function to be implemented by each platform that initializes the packetStoreAppProcessConfig map
+	 */
+	void initializePacketSelectionSubServiceStructures();
+
 public:
+
 	/**
 	 * Constructor of the Packet Selection Subservice.
 	 * @param mainServicePacketStores: reference to the packet stores of the storage and retrieval service.
 	 */
-	explicit PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores) : packetStores(mainServicePacketStores) {}
+	explicit PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores) : packetStores(mainServicePacketStores) {
+		initializePacketSelectionSubServiceStructures();
+	}
 
 	/**
      * Vector containing the IDs of the application processes controlled by the packet selection subservice.
      */
 	etl::vector <ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications;
 
-	typedef String <ECSSPacketStoreIdSize> PacketStoreID;
 	/**
 	 * The map containing the application process configuration. The packet store ID is used as key, to access the application
 	 * process definitions, the service type definitions and the message type definitions.
@@ -64,7 +69,7 @@ public:
 	 * application process ID and service type already exist in the map, and the requested report type is located in the vector
 	 * of report types, which corresponds to the packet store ID, appID and service type.
 	 */
-	etl::map <PacketStoreID, ApplicationProcessConfiguration, ECSSMaxPacketStores> packetStoreAppProcessConfig;
+	etl::map <PacketStoreId, ApplicationProcessConfiguration, ECSSMaxPacketStores> packetStoreAppProcessConfig;
 
 	/**
      * TC[15,3] 'add report types to an application process storage control configuration'.
@@ -79,13 +84,13 @@ public:
 	/**
    	 * Deletes all report types of the specified service type, to the application process configuration.
    	 */
-	void deleteAllReportsOfService(const String <ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID,
+	void deleteAllReportsOfService(const PacketStoreId& packetStoreID, ApplicationProcessId applicationID,
 		ServiceTypeNum serviceType);
 
 	/**
    	 * Deletes all report types of the specified application process definition, to the application process configuration.
    	 */
-	void deleteAllReportsOfApplication(const String <ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID);
+	void deleteAllReportsOfApplication(const PacketStoreId& packetStoreID, ApplicationProcessId applicationID);
 
 	/**
      * This function takes a TC[15,5] request 'report the content of the application process storage control

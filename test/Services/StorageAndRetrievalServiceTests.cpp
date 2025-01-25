@@ -26,7 +26,7 @@ void initializePacketStores() {
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
 
-		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+		PacketStoreId packetStoreId(packetStoreData);
 		PacketStore newPacketStore;
 		newPacketStore.sizeInBytes = sizes[i];
 		newPacketStore.packetStoreType = ((i % 2) == 0) ? PacketStore::Circular : PacketStore::Bounded;
@@ -50,7 +50,7 @@ void validPacketStoreCreationRequest(Message& request) {
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
 
-		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+		PacketStoreId packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
 		request.append<PacketStoreSize>(sizes[i]);
 		if ((i % 2) == 0) {
@@ -79,7 +79,7 @@ void invalidPacketStoreCreationRequest(Message& request) {
 		std::copy(concatenatedPacketStoreNames + offsets[i], concatenatedPacketStoreNames + offsets[i + 1],
 		          packetStoreData);
 
-		String<ECSSPacketStoreIdSize> packetStoreId(packetStoreData);
+		PacketStoreId packetStoreId(packetStoreData);
 		request.appendString(packetStoreId);
 		request.append<PacketStoreSize>(sizes[i]);
 		if ((i % 2) == 0) {
@@ -91,37 +91,37 @@ void invalidPacketStoreCreationRequest(Message& request) {
 	}
 }
 
-etl::array<String<ECSSPacketStoreIdSize>, 4> validPacketStoreIds() {
+etl::array<PacketStoreId, 4> validPacketStoreIds() {
 	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
 	uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps25";
 	uint8_t packetStoreData3[ECSSPacketStoreIdSize] = "ps799";
 	uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps5555";
 
-	String<ECSSPacketStoreIdSize> id(packetStoreData);
-	String<ECSSPacketStoreIdSize> id2(packetStoreData2);
-	String<ECSSPacketStoreIdSize> id3(packetStoreData3);
-	String<ECSSPacketStoreIdSize> id4(packetStoreData4);
+	PacketStoreId id(packetStoreData);
+	PacketStoreId id2(packetStoreData2);
+	PacketStoreId id3(packetStoreData3);
+	PacketStoreId id4(packetStoreData4);
 
-	etl::array<String<ECSSPacketStoreIdSize>, 4> validPacketStores = {id, id2, id3, id4};
+	etl::array<PacketStoreId, 4> validPacketStores = {id, id2, id3, id4};
 	return validPacketStores;
 }
 
-etl::array<String<ECSSPacketStoreIdSize>, 4> invalidPacketStoreIds() {
+etl::array<PacketStoreId, 4> invalidPacketStoreIds() {
 	uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps1";
 	uint8_t packetStoreData2[ECSSPacketStoreIdSize] = "ps36";
 	uint8_t packetStoreData3[ECSSPacketStoreIdSize] = "ps999";
 	uint8_t packetStoreData4[ECSSPacketStoreIdSize] = "ps1234";
 
-	String<ECSSPacketStoreIdSize> id(packetStoreData);
-	String<ECSSPacketStoreIdSize> id2(packetStoreData2);
-	String<ECSSPacketStoreIdSize> id3(packetStoreData3);
-	String<ECSSPacketStoreIdSize> id4(packetStoreData4);
+	PacketStoreId id(packetStoreData);
+	PacketStoreId id2(packetStoreData2);
+	PacketStoreId id3(packetStoreData3);
+	PacketStoreId id4(packetStoreData4);
 
-	etl::array<String<ECSSPacketStoreIdSize>, 4> validPacketStores = {id, id2, id3, id4};
+	etl::array<PacketStoreId, 4> validPacketStores = {id, id2, id3, id4};
 	return validPacketStores;
 }
 
-void padWithZeros(etl::array<String<ECSSPacketStoreIdSize>, 4>& packetStoreIds) {
+void padWithZeros(etl::array<PacketStoreId, 4>& packetStoreIds) {
 	uint8_t offsets[] = {3, 4, 5, 6};
 	int index = 0;
 	// Padding every empty position with zeros, to avoid memory garbage collection, which leads to a faulty result.
@@ -135,18 +135,18 @@ void padWithZeros(etl::array<String<ECSSPacketStoreIdSize>, 4>& packetStoreIds) 
 
 void addTelemetryPacketsInPacketStores() {
 	auto packetStoreIds = validPacketStoreIds();
-
+	Message msg;
 	for (auto& timestamp: timestamps1) {
-		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[0], timestamp);
+		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[0], msg, timestamp);
 	}
 	for (auto& timestamp: timestamps2) {
-		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[1], timestamp);
+		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[1], msg, timestamp);
 	}
 	for (auto& timestamp: timestamps3) {
-		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[2], timestamp);
+		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[2], msg, timestamp);
 	}
 	for (auto& timestamp: timestamps4) {
-		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[3], timestamp);
+		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[3], msg, timestamp);
 	}
 }
 
@@ -194,7 +194,7 @@ TEST_CASE("Creating packet stores") {
 
 	SECTION("Invalid packet store creation request") {
 		uint8_t packetStoreData[ECSSPacketStoreIdSize] = "ps2";
-		String<ECSSPacketStoreIdSize> existingPacketStoreId(packetStoreData);
+		PacketStoreId existingPacketStoreId(packetStoreData);
 		PacketStore existingPacketStore;
 		storageAndRetrieval.addPacketStore(existingPacketStoreId, existingPacketStore);
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 1);
@@ -1484,7 +1484,7 @@ TEST_CASE("Changing the packet store type to circular") {
 			count++;
 		}
 
-		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		PacketStoreId finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
@@ -1572,7 +1572,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 			count++;
 		}
 
-		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		PacketStoreId finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
@@ -1664,7 +1664,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 			count++;
 		}
 
-		String<ECSSPacketStoreIdSize> finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		PacketStoreId finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
 		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
@@ -1825,7 +1825,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		String<ECSSPacketStoreIdSize> finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
+		PacketStoreId finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
 		                                             correctPacketStoreIds[0]};
 
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag = Time::DefaultCUC(5);
@@ -2088,7 +2088,7 @@ TEST_CASE("Deleting packet store content") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		String<ECSSPacketStoreIdSize> finalIds[7] = {
+		PacketStoreId finalIds[7] = {
 		    wrongPacketStoreIds[0], wrongPacketStoreIds[1], wrongPacketStoreIds[2], correctPacketStoreIds[0],
 		    correctPacketStoreIds[1], correctPacketStoreIds[2], correctPacketStoreIds[3]};
 

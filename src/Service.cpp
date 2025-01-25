@@ -13,7 +13,8 @@ void Service::handleMessage(Message& message) {
 	#endif
 
 	#ifdef SERVICE_STORAGEANDRETRIEVAL
-	Services.storageAndRetrieval.addTelemetryToPacketStore();
+	// if (Services.storageAndRetrieval.
+	// Services.storageAndRetrieval.addTelemetryToPacketStore();
 	#endif
 
 	platformSpecificHandleMessage(message);

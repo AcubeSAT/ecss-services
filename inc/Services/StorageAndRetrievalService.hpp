@@ -39,17 +39,23 @@ public:
 	TimeStampType timeStamping = PacketBased;
 
 private:
-	typedef String<ECSSPacketStoreIdSize> packetStoreId;
+	/**
+	 * A map that specifies what service belongs to what packet store. This is NOT according to the ECSS-E-ST-70-41C
+	 * protocol. It has been added to help with correctly forwarding a TM report after generation to the correct packet
+	 * store, as there needs to be a way to map the generated reports to their respective packet stores. The convention
+	 * here is that each Service will be related to one packet store ONLY.
+	 */
+	etl::map<ServiceTypeNum, PacketStoreId, ECSSMaxPacketStores> serviceToPacketStore;
 
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	etl::map<packetStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
+	etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
 	 */
-	static inline String<ECSSPacketStoreIdSize> readPacketStoreId(Message& message);
+	static inline PacketStoreId readPacketStoreId(Message& message);
 
 	/**
 	 * Helper function that, given a time-limit, deletes every packet stored in the specified packet-store, up to the
@@ -58,7 +64,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, Time::DefaultCUC timeLimit);
+	void deleteContentUntil(const PacketStoreId& packetStoreId, Time::DefaultCUC timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -92,8 +98,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool checkPacketStores(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                       const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Message& request);
+	bool checkPacketStores(const PacketStoreId& fromPacketStoreId,
+	                       const PacketStoreId& toPacketStoreId, const Message& request);
 
 	/**
 	 * Checks whether the time window makes logical sense (end time should be after the start time)
@@ -109,7 +115,7 @@ private:
 	 * checking.
 	 * @param request used to raise errors.
 	 */
-	bool checkDestinationPacketStore(const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Message& request);
+	bool checkDestinationPacketStore(const PacketStoreId& toPacketStoreId, const Message& request);
 
 	/**
 	 * Checks if there are no stored Time::DefaultCUC that fall between the two specified time-tags.
@@ -121,7 +127,7 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, Time::DefaultCUC startTime,
+	bool noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId, Time::DefaultCUC startTime,
 	                             Time::DefaultCUC endTime, const Message& request);
 
 	/**
@@ -132,7 +138,7 @@ private:
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, Time::DefaultCUC timeTag,
+	bool noTimestampInTimeWindow(const PacketStoreId& fromPacketStoreId, Time::DefaultCUC timeTag,
 	                             const Message& request, bool isAfterTimeTag);
 
 	/**
@@ -143,8 +149,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC startTime,
+	bool failedFromTagToTag(const PacketStoreId& fromPacketStoreId,
+	                        const PacketStoreId& toPacketStoreId, Time::DefaultCUC startTime,
 	                        Time::DefaultCUC endTime, const Message& request);
 
 	/**
@@ -155,8 +161,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC startTime,
+	bool failedAfterTimeTag(const PacketStoreId& fromPacketStoreId,
+	                        const PacketStoreId& toPacketStoreId, Time::DefaultCUC startTime,
 	                        const Message& request);
 
 	/**
@@ -167,8 +173,8 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC endTime,
+	bool failedBeforeTimeTag(const PacketStoreId& fromPacketStoreId,
+	                         const PacketStoreId& toPacketStoreId, Time::DefaultCUC endTime,
 	                         const Message& request);
 
 	/**
@@ -177,12 +183,17 @@ private:
 	 * @param request used to raise errors.
 	 * @return true if an error has occurred.
 	 */
-	bool failedStartOfByTimeRangeRetrieval(const String<ECSSPacketStoreIdSize>& packetStoreId, Message& request);
+	bool failedStartOfByTimeRangeRetrieval(const PacketStoreId& packetStoreId, Message& request);
 
 	/**
 	 * Forms the content summary of the specified packet-store and appends it to a report message.
 	 */
-	void createContentSummary(Message& report, const String<ECSSPacketStoreIdSize>& packetStoreId);
+	void createContentSummary(Message& report, const PacketStoreId& packetStoreId);
+
+	/**
+	 * Function to be implemented by each platform. Initializes the packetStores serviceToPacketStore maps.
+	 */
+	void initializeStorageAndRetrievalServiceStructures();
 
 public:
 	/**
@@ -221,18 +232,19 @@ public:
 	};
 
 	StorageAndRetrievalService() {
+		initializeStorageAndRetrievalServiceStructures();
 		serviceType = ServiceType;
 	}
 
 	/**
 	 * Adds new packet store into packet stores.
 	 */
-	void addPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const PacketStore& packetStore);
+	void addPacketStore(const PacketStoreId& packetStoreId, const PacketStore& packetStore);
 
 	/**
 	 * Adds telemetry to the specified packet store and Time::DefaultCUC it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const Message&
+	void addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
 	message, Time::DefaultCUC timestamp);
 
 	/**
@@ -248,12 +260,12 @@ public:
 	/**
 	 * Returns the packet store with the specified packet store ID.
 	 */
-	PacketStore& getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId);
+	PacketStore& getPacketStore(const PacketStoreId& packetStoreId);
 
 	/**
 	 * Returns true if the specified packet store is present in packet stores.
 	 */
-	bool packetStoreExists(const String<ECSSPacketStoreIdSize>& packetStoreId);
+	bool packetStoreExists(const PacketStoreId& packetStoreId);
 
 	/**
 	 * Given a request that contains a number N, followed by N packet store IDs, this method calls function on every

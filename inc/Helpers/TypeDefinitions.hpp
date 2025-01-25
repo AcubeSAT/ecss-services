@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <ECSS_Definitions.hpp>
+#include <etl/String.hpp>
 
 using StepId = uint8_t;
 using ParameterReportStructureId = uint8_t;
@@ -55,3 +57,6 @@ using ErrorCode = uint16_t;
  using PMONBitMask = uint64_t;
  using NumberOfConsecutiveDeltaChecks = uint16_t;
  using DeltaThreshold = double;
+
+using PacketStoreId = String<ECSSPacketStoreIdSize>;
+

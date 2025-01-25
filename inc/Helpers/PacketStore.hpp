@@ -51,7 +51,7 @@ public:
 		                                         InProgress = true };
 
 	/**
-+	 * Whether the storage of TM packets is enabled for this packet store
+	 * Whether the storage of TM packets is enabled for this packet store
 	 */
 	bool storageStatus = false;
 
