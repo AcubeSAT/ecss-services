@@ -109,7 +109,7 @@ void HousekeepingService::housekeepingStructureReport(ParameterReportStructureId
 	for (auto parameterId: housekeepingStructure->second.simplyCommutatedParameterIds) {
 		structReport.append<ParameterId>(parameterId);
 	}
-	storeMessage(structReport);
+	handleMessage(structReport);
 }
 
 void HousekeepingService::housekeepingParametersReport(ParameterReportStructureId structureId) {
@@ -127,7 +127,7 @@ void HousekeepingService::housekeepingParametersReport(ParameterReportStructureI
 			parameter->get().appendValueToMessage(housekeepingReport);
 		}
 	}
-	storeMessage(housekeepingReport);
+	handleMessage(housekeepingReport);
 }
 
 void HousekeepingService::generateOneShotHousekeepingReport(Message& request) {
@@ -218,7 +218,7 @@ void HousekeepingService::reportHousekeepingPeriodicProperties(Message& request)
 		}
 		appendPeriodicPropertiesToMessage(periodicPropertiesReport, structIdToReport);
 	}
-	storeMessage(periodicPropertiesReport);
+	handleMessage(periodicPropertiesReport);
 }
 
 void HousekeepingService::appendPeriodicPropertiesToMessage(Message& report, ParameterReportStructureId structureId) {

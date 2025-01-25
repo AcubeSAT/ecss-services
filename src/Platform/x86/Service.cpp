@@ -43,14 +43,15 @@ PacketSender packetSender;
  */
 inline constexpr bool SendToYamcs = true;
 
-void Service::storeMessage(Message& message) {
-	// appends the remaining bits to complete a byte
-	message.finalize();
+void Service::releaseMessage(Message& message) {
+	LOG_DEBUG << "Releasing message with ApplicationID: " << message.messageType << " ServiceType: " << message.serviceType
+	<< " messageType: " << message.messageType;
+}
 
-	// Create a new stream to display the packet
+
+void Service::platformSpecificHandleMessage(Message& message) {
 	std::ostringstream ss;
 
-	// Just print it to the screen
 	ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
 	   << std::hex
 	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
@@ -62,9 +63,9 @@ void Service::storeMessage(Message& message) {
 	}
 
 
-	// Send data to YAMCS port
 	if constexpr (SendToYamcs) {
 		packetSender.sendPacketToYamcs(message);
 	}
 	LOG_DEBUG << ss.str();
 }
+

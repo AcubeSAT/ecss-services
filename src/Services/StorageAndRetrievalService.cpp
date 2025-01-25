@@ -199,10 +199,9 @@ void StorageAndRetrievalService::addPacketStore(const String<ECSSPacketStoreIdSi
 	packetStores.insert({packetStoreId, packetStore});
 }
 
-void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
-                                                           Time::DefaultCUC timestamp) {
-	Message tmPacket; // NOLINT(misc-const-correctness) as we might need to change
-	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, tmPacket});
+void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const Message&
+	message, Time::DefaultCUC timestamp) {
+	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, message});
 }
 
 void StorageAndRetrievalService::resetPacketStores() {
@@ -349,7 +348,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 			report.appendString(packetStoreId);
 			createContentSummary(report, packetStoreId);
 		}
-		storeMessage(report);
+		handleMessage(report);
 		return;
 	}
 	NumOfPacketStores numOfValidPacketStores = 0;
@@ -372,7 +371,7 @@ void StorageAndRetrievalService::packetStoreContentSummaryReport(Message& reques
 		report.appendString(packetStoreId);
 		createContentSummary(report, packetStoreId);
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& request) {
@@ -503,7 +502,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(const Message& request
 		report.appendEnum8(packetStore.second.openRetrievalStatus);
 		report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void StorageAndRetrievalService::createPacketStores(Message& request) {
@@ -625,7 +624,7 @@ void StorageAndRetrievalService::packetStoreConfigurationReport(const Message& r
 		report.append<PacketStoreType>(typeCode);
 		report.append<VirtualChannel>(packetStore.second.virtualChannel);
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void StorageAndRetrievalService::copyPacketsInTimeWindow(Message& request) {

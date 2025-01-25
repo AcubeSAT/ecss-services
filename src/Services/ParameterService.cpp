@@ -34,7 +34,7 @@ void ParameterService::reportParameters(Message& paramIds) {
 		parameter->get().appendValueToMessage(parameterReport);
 	}
 
-	storeMessage(parameterReport);
+	handleMessage(parameterReport);
 }
 
 void ParameterService::setParameters(Message& newParamValues) const {

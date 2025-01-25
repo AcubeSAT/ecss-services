@@ -12,7 +12,7 @@ void LargePacketTransferService::firstDownlinkPartReport(LargeMessageTransaction
 	report.append<LargeMessageTransactionId>(largeMessageTransactionIdentifier); // large message transaction identifier
 	report.append<PartSequenceNum>(partSequenceNumber);                // part sequence number
 	report.appendOctetString(string);                       // fixed octet-string
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void LargePacketTransferService::intermediateDownlinkPartReport(
@@ -23,7 +23,7 @@ void LargePacketTransferService::intermediateDownlinkPartReport(
 	report.append<LargeMessageTransactionId>(largeMessageTransactionIdentifier); // large message transaction identifier
 	report.append<PartSequenceNum>(partSequenceNumber);                // part sequence number
 	report.appendOctetString(string);                       // fixed octet-string
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void LargePacketTransferService::lastDownlinkPartReport(LargeMessageTransactionId largeMessageTransactionIdentifier,
@@ -33,7 +33,7 @@ void LargePacketTransferService::lastDownlinkPartReport(LargeMessageTransactionI
 	report.append<LargeMessageTransactionId>(largeMessageTransactionIdentifier); // large message transaction identifier
 	report.append<PartSequenceNum>(partSequenceNumber);                // part sequence number
 	report.appendOctetString(string);                       // fixed octet-string
-	storeMessage(report);
+	handleMessage(report);
 }
 
 String<ECSSMaxFixedOctetStringSize>

@@ -40,7 +40,7 @@ std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> ServiceTests
     std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool>();
 bool ServiceTests::expectingErrors = false;
 
-void Service::storeMessage(Message& message) {
+void Service::handleMessage(Message& message) {
 	// Just add the message to the queue
 	ServiceTests::queue(message);
 }

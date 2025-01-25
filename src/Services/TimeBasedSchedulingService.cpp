@@ -178,7 +178,7 @@ void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<S
 		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime); // todo (#267): Replace with the time parser
 		report.appendString(MessageParser::composeECSS(activity.request));
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
@@ -254,7 +254,7 @@ void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<
 		report.append<ApplicationProcessId>(match.requestID.applicationID);
 		report.append<SequenceCount>(match.requestID.sequenceCount);
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void TimeBasedSchedulingService::execute(Message& message) {

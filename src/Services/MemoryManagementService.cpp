@@ -99,7 +99,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 			}
 		}
 
-		mainService.storeMessage(report);
+		mainService.handleMessage(report);
 		request.resetRead();
 	} else {
 		// TODO(#257): Send a failed start of execution
@@ -139,7 +139,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 			}
 		}
 
-		mainService.storeMessage(report);
+		mainService.handleMessage(report);
 		request.resetRead();
 	} else {
 		// TODO(#257): Send a failed start of execution report

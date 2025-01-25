@@ -13,7 +13,7 @@ void TestService::areYouAlive(const Message& request) {
 
 void TestService::areYouAliveReport() {
 	Message report = createTM(TestService::MessageType::AreYouAliveTestReport);
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void TestService::onBoardConnection(Message& request) {
@@ -27,7 +27,7 @@ void TestService::onBoardConnection(Message& request) {
 void TestService::onBoardConnectionReport(ApplicationProcessId applicationProcessId) {
 	Message report = createTM(TestService::MessageType::OnBoardConnectionTestReport);
 	report.append<ApplicationProcessId>(applicationProcessId);
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void TestService::execute(Message& message) {

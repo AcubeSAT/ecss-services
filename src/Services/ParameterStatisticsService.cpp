@@ -53,7 +53,7 @@ void ParameterStatisticsService::parameterStatisticsReport() {
 		report.append<ParameterSampleCount>(numOfSamples);
 		currentStatistic.second.appendStatisticsToMessage(report);
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void ParameterStatisticsService::resetParameterStatistics(const Message& request) {
@@ -191,7 +191,7 @@ void ParameterStatisticsService::statisticsDefinitionsReport() {
 			definitionsReport.append<SamplingInterval>(samplingInterval);
 		}
 	}
-	storeMessage(definitionsReport);
+	handleMessage(definitionsReport);
 }
 
 void ParameterStatisticsService::execute(Message& message) {

@@ -21,6 +21,12 @@ class Service {
 private:
 	uint16_t messageTypeCounter = 0;
 
+	/**
+	 * Each platform should specifically implement the way they want to handle a message.
+	 * This function is called in handleMessage.
+	 */
+	void platformSpecificHandleMessage(Message& message);
+
 protected:
 	/**
 	 * The service type of this Service. For example, ST[12]'s serviceType is `12`.
@@ -40,11 +46,8 @@ protected:
 
 	/**
 	 * Stores a message so that it can be transmitted to the ground station
-	 *
-	 * Note: For now, since we don't have any mechanisms to queue messages and send them later,
-	 * we just print the message to the screen
 	 */
-	void storeMessage(Message& message);
+	void handleMessage(Message& message);
 
 	/**
 	 * This function declared only to remind us that every service must have a function like
@@ -86,6 +89,12 @@ public:
 	 * Default move assignment operator
 	 */
 	Service& operator=(Service&& service) noexcept = default;
+
+	/**
+	 * A platform implemented function that performs a "release" of a package. For example, an OBC subsystem might release
+	 * a message through CAN to COMMS, or the Payload subsystem might release it towards OBC, so that OBC can store it.
+	 */
+	void releaseMessage(Message& message);
 };
 
 #endif // ECSS_SERVICES_SERVICE_HPP

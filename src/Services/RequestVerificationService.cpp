@@ -20,7 +20,7 @@ void RequestVerificationService::successAcceptanceVerification(const Message& re
 	Message report = createTM(RequestVerificationService::MessageType::SuccessfulAcceptanceReport);
 
 	assembleReportMessage(request, report);
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::failAcceptanceVerification(const Message& request,
@@ -32,7 +32,7 @@ void RequestVerificationService::failAcceptanceVerification(const Message& reque
 	assembleReportMessage(request, report);
 	report.append<ErrorCode>(errorCode); // error code
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::successStartExecutionVerification(const Message& request) {
@@ -42,7 +42,7 @@ void RequestVerificationService::successStartExecutionVerification(const Message
 
 	assembleReportMessage(request, report);
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::failStartExecutionVerification(const Message& request,
@@ -55,7 +55,7 @@ void RequestVerificationService::failStartExecutionVerification(const Message& r
 
 	report.append<ErrorCode>(errorCode); // error code
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::successProgressExecutionVerification(const Message& request, StepId stepID) {
@@ -66,7 +66,7 @@ void RequestVerificationService::successProgressExecutionVerification(const Mess
 	assembleReportMessage(request, report);
 	report.append<StepId>(stepID); // step ID
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::failProgressExecutionVerification(const Message& request,
@@ -80,7 +80,7 @@ void RequestVerificationService::failProgressExecutionVerification(const Message
 	report.append<StepId>(stepID);      // step ID
 	report.append<ErrorCode>(errorCode); // error code
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::successCompletionExecutionVerification(const Message& request) {
@@ -90,7 +90,7 @@ void RequestVerificationService::successCompletionExecutionVerification(const Me
 
 	assembleReportMessage(request, report);
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::failCompletionExecutionVerification(
@@ -102,7 +102,7 @@ void RequestVerificationService::failCompletionExecutionVerification(
 	assembleReportMessage(request, report);
 	report.append<ErrorCode>(errorCode); // error code
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RequestVerificationService::failRoutingVerification(const Message& request,
@@ -114,7 +114,7 @@ void RequestVerificationService::failRoutingVerification(const Message& request,
 	assembleReportMessage(request, report);
 	report.append<ErrorCode>(errorCode); // error code
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 #endif

@@ -157,7 +157,7 @@ bool RealTimeForwardingControlService::isServiceTypeEnabled(ApplicationProcessId
 	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](const auto& definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
 }
 
-bool RealTimeForwardingControlService::isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID,
+bool RealTimeForwardingControlService::isReportTypeEnabled(MessageTypeNum target, ApplicationProcessId applicationID,
                                                            ServiceTypeNum serviceType) const {
 	auto appServicePair = std::make_pair(applicationID, serviceType);
 	auto serviceTypes = applicationProcessConfiguration.definitions.find(appServicePair);
@@ -216,7 +216,7 @@ void RealTimeForwardingControlService::deleteServiceRecursive(ApplicationProcess
 }
 
 void RealTimeForwardingControlService::deleteReportRecursive(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-                                                             MessageTypeNum messageType) {
+                                                             const MessageTypeNum messageType) {
 	auto appServicePair = std::make_pair(applicationID, serviceType);
 	auto reportTypes = applicationProcessConfiguration.definitions.find(appServicePair);
 	if (reportTypes == applicationProcessConfiguration.definitions.end()) {
@@ -230,7 +230,7 @@ void RealTimeForwardingControlService::deleteReportRecursive(ApplicationProcessI
 }
 
 void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfiguration(Message& request) {
-	if (!request.assertTC(ServiceType, MessageType::DeleteReportTypesFromAppProcessConfiguration)) {
+	if (!request.assertTC(ServiceType, DeleteReportTypesFromAppProcessConfiguration)) {
 		return;
 	}
 
@@ -324,7 +324,7 @@ void RealTimeForwardingControlService::appProcessConfigurationContentReport() {
 			report.appendUint8(messageType);
 		}
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void RealTimeForwardingControlService::execute(Message& message) {

@@ -166,7 +166,7 @@ void EventActionService::eventActionStatusReport() {
 		report.append<EventDefinitionId>(element.second.eventDefinitionID);
 		report.appendBoolean(element.second.enabled);
 	}
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void EventActionService::enableEventActionFunction(const Message& message) {

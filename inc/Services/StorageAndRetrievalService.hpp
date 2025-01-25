@@ -221,7 +221,8 @@ public:
 	/**
 	 * Adds telemetry to the specified packet store and Time::DefaultCUC it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, Time::DefaultCUC timestamp);
+	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const Message&
+	message, Time::DefaultCUC timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.

@@ -141,7 +141,7 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 	report.appendUint32(attributes.sizeInBytes);
 	report.appendBoolean(attributes.isLocked);
 
-	storeMessage(report);
+	handleMessage(report);
 }
 
 void FileManagementService::createDirectory(Message& message) {

@@ -137,12 +137,6 @@ private:
 	bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService) const;
 
 	/**
-	 * Checks whether the specified message type already exists in the specified application process and service
-	 * type definition.
-	 */
-	bool isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType) const;
-
-	/**
 	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
 	 */
 	void deleteApplicationProcess(ApplicationProcessId applicationID);
@@ -179,6 +173,12 @@ private:
 	void deleteReportRecursive(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
 
 public:
+	/**
+	 * Checks whether the specified message type already exists in the specified application process and service
+	 * type definition.
+	 */
+	[[nodiscard]] bool isReportTypeEnabled(MessageTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType) const;
+
 	/**
 	 * TC[14,1] 'Add report types to the application process forward control configuration'.
 	 */
