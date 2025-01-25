@@ -1,7 +1,6 @@
 #include "Service.hpp"
 #include "ServicePool.hpp"
-
-
+#include "Helpers/TimeGetter.hpp"
 
 void Service::handleMessage(Message& message) {
 	message.finalize();
@@ -13,8 +12,8 @@ void Service::handleMessage(Message& message) {
 	#endif
 
 	#ifdef SERVICE_STORAGEANDRETRIEVAL
-	// if (Services.storageAndRetrieval.
-	// Services.storageAndRetrieval.addTelemetryToPacketStore();
+	auto packetStoreId = Services.storageAndRetrieval.getPacketStoreFromServiceType(message.serviceType);
+	Services.storageAndRetrieval.addTelemetryToPacketStore(packetStoreId, message, TimeGetter::getCurrentTimeDefaultCUC());
 	#endif
 
 	platformSpecificHandleMessage(message);

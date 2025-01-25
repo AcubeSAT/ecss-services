@@ -237,6 +237,16 @@ public:
 	}
 
 	/**
+	 *
+	 * The @ref serviceToPacketStore is a map that connects a service number to a packet store. That allows easier direction
+	 * of a generated TM report, to be stored in the correct packet store.
+	 * @param serviceType a service number
+	 * @return the packet store ID that responds to that service
+	 */
+	PacketStoreId getPacketStoreFromServiceType(ServiceTypeNum serviceType) {
+		return serviceToPacketStore[serviceType];
+	}
+	/**
 	 * Adds new packet store into packet stores.
 	 */
 	void addPacketStore(const PacketStoreId& packetStoreId, const PacketStore& packetStore);

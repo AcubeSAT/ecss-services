@@ -201,6 +201,17 @@ void StorageAndRetrievalService::addPacketStore(const PacketStoreId& packetStore
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
 	message, Time::DefaultCUC timestamp) {
+	if (not packetStoreExists(packetStoreId)) {
+		return;
+	}
+	auto packetStore = packetStores.find(packetStoreId)->second;
+	if (not packetStore.storageStatus) {
+		return;
+	}
+	// block packet store if not in app process configuration
+	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].) {
+		return;
+	}
 	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, message});
 }
 
