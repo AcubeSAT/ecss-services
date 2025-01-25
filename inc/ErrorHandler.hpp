@@ -123,7 +123,7 @@ public:
 		 * The length of the provided data exceeds the maximum number of events allowed.
 		 * This error occurs when attempting to process more events than the system can handle.
 		 */
-		LengthExceedsNumberOfEvents = 22
+		LengthExceedsNumberOfEvents = 22,
 	};
 
 	/**
@@ -431,6 +431,10 @@ public:
 		 * PMON Check Type is requested, but it is missing (ST[12])
 		 */
 		 PMONCheckTypeMissing = 63,
+		/**
+		 * AppProcessConfiguration adding an already existing report type in a map with an application id - service type key
+		 */
+		AlreadyExistingReportType = 64
 	};
 
 	/**

@@ -1,15 +1,7 @@
 #pragma once
-#include "Services/EventActionService.hpp"
-#include "Services/EventReportService.hpp"
-#include "Services/HousekeepingService.hpp"
-#include "Services/LargePacketTransferService.hpp"
-#include "Services/MemoryManagementService.hpp"
-#include "Services/ParameterService.hpp"
-#include "Services/ParameterStatisticsService.hpp"
-#include "Services/RealTimeForwardingControlService.hpp"
-#include "Services/RequestVerificationService.hpp"
-#include "Services/TestService.hpp"
-#include "Services/TimeBasedSchedulingService.hpp"
+#include "etl/vector.h"
+#include "etl/map.h"
+#include "ECSS_Definitions.hpp"
 
 /**
  * Namespace containing all the report types for every service type.

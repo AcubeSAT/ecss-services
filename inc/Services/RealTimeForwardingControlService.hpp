@@ -1,10 +1,9 @@
-#ifndef ECSS_SERVICES_REALTIMEFORWARDINGCONTROLSERVICE_HPP
-#define ECSS_SERVICES_REALTIMEFORWARDINGCONTROLSERVICE_HPP
+#pragma once
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/AllReportTypes.hpp"
-#include "Helpers/ForwardControlConfiguration.hpp"
+#include "Helpers/AppProcessConfiguration.hpp"
 #include "Service.hpp"
 #include "etl/vector.h"
 
@@ -55,76 +54,6 @@ public:
 	 */
 	void appProcessConfigurationContentReport();
 private:
-	/**
-	 * Adds all report types of the specified application process definition, to the application process configuration.
-	 */
-	void addAllReportsOfApplication(ApplicationProcessId applicationID);
-
-	/**
-	 * Adds all report types of the specified service type, to the application process configuration.
-	 */
-	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
-
-	/**
-	 * Counts the number of service types, stored for the specified application process.
-	 */
-	uint8_t countServicesOfApplication(ApplicationProcessId applicationID);
-
-	/**
-	 * Counts the number of report types, stored for the specified service type.
-	 */
-	uint8_t countReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
-
-	/**
-	 * Checks whether the specified message type already exists in the specified application process and service
-	 * type definition.
-	 */
-	bool reportExistsInAppProcessConfiguration(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
-
-	/**
-	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
-	 * bytes from the request message, in case of an invalid request.
-	 *
-	 * @return True: if the application is valid and passes all the necessary error checking.
-	 */
-	bool checkApplicationOfAppProcessConfig(Message& request, ApplicationProcessId applicationID, uint8_t numOfServices);
-
-	/**
-	 * Checks if the specified application process is controlled by the Service and returns true if it does.
-	 */
-	bool checkAppControlled(const Message& request, ApplicationProcessId applicationId);
-
-	/**
-	 * Checks if all service types are allowed already, i.e. if the application process contains no service type
-	 * definitions.
-	 */
-	bool allServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID);
-
-	/**
-	 * Checks if the maximum number of service type definitions per application process is reached.
-	 */
-	bool maxServiceTypesReached(const Message& request, ApplicationProcessId applicationID);
-
-	/**
-	 * Performs the necessary error checking/logging for a specific service type. Also, skips the necessary bytes
-	 * from the request message, in case of an invalid request.
-	 *
-	 * @return True: if the service type is valid and passes all the necessary error checking.
-	 */
-	bool checkService(Message& request, ApplicationProcessId applicationID, uint8_t numOfMessages);
-
-	/**
-	 * Checks if the maximum number of report type definitions per service type definition is reached.
-	 */
-	bool maxReportTypesReached(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
-
-	/**
-	 * Checks if the maximum number of message types that can be contained inside a service type definition, is
-	 * already reached.
-	 *
-	 * @return True: if the message type is valid and passes all the necessary error checking.
-	 */
-	bool checkMessage(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
 
 	/**
 	 * Returns true, if the defined application exists in the application process configuration map.
@@ -198,5 +127,3 @@ public:
 	 */
 	void execute(Message& message);
 };
-
-#endif
