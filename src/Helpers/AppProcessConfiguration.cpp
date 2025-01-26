@@ -13,11 +13,7 @@ applicationID) {
 void ApplicationProcessConfiguration::addAllReportsOfService(const Message& message, ApplicationProcessId applicationID,
 ServiceTypeNum
 serviceType) {
-	if (AllReportTypes::getMessagesOfService().find(serviceType) == AllReportTypes::getMessagesOfService().end()) {
-		return;
-	}
-	auto& messages = AllReportTypes::getMessagesOfService().find(serviceType)->second;
-	for (const auto& messageType: messages) {
+	for (const auto& messageType: AllReportTypes::getMessagesOfService().find(serviceType)->second) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		if (canMessageBeAdded(message, applicationID, serviceType, messageType)) {
 			definitions[appServicePair].push_back(messageType);

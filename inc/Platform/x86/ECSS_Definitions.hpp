@@ -261,7 +261,5 @@ inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
  */
 inline constexpr uint16_t ApplicationId = 1;
 
-
-
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

@@ -71,7 +71,8 @@ namespace AllReportTypes {
 
 	const ServiceDefinitionsVector& getST11Reports() {
 		static const ServiceDefinitionsVector reports = {
-			TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport
+			TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport,
+			TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById
 		};
 		return reports;
 	}

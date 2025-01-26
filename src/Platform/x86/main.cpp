@@ -65,9 +65,9 @@ int main() {
 	                              Message::TC, 1); // application id is a dummy number (1)
 	sentPacket2.appendUint16(2);                   // number of contained IDs
 	sentPacket2.append<ParameterId>(0);            // first parameter ID
-	sentPacket2.appendUint32(63238);               // settings for first parameter
+	sentPacket2.appendUint8(254);               // settings for first parameter
 	sentPacket2.append<ParameterId>(1);            // 2nd parameter ID
-	sentPacket2.appendUint32(45823);               // settings for 2nd parameter
+	sentPacket2.appendUint16(45823);               // settings for 2nd parameter
 
 	paramService.setParameters(sentPacket2);
 	paramService.reportParameters(sentPacket);
@@ -208,26 +208,16 @@ int main() {
 
 	Message eventActionDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
 	                              Message::TC, 1);
-	eventActionDefinition.appendEnum16(0);
+	eventActionDefinition.append<NumberOfEventActionDefinitions>(1);
 	eventActionDefinition.append<ApplicationProcessId>(2);
 	eventActionDefinition.append<EventDefinitionId>(1);
 	String<64> TCdata = "0123456789123456789123456789123456789123456789123456789123456789";
 	eventActionDefinition.appendString(TCdata);
 	eventActionService.addEventActionDefinitions(eventActionDefinition);
 
-	Message eventActionDefinition1(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
-	                               Message::TC, 1);
-	eventActionDefinition1.appendEnum16(0);
-	eventActionDefinition1.append<ApplicationProcessId>(2);
-	eventActionDefinition1.append<EventDefinitionId>(1);
-	TCdata = "hi1";
-	eventActionDefinition1.appendString(TCdata);
-	std::cout << "After this message there should be a failed start of execution error \n";
-	eventActionService.addEventActionDefinitions(eventActionDefinition1);
-
 	Message eventActionDefinition2(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
 	                               Message::TC, 1);
-	eventActionDefinition2.appendEnum16(0);
+	eventActionDefinition2.append<NumberOfEventActionDefinitions>(1);
 	eventActionDefinition2.append<ApplicationProcessId>(4);
 	eventActionDefinition2.append<EventDefinitionId>(2);
 	TCdata = "hi2";
@@ -236,7 +226,7 @@ int main() {
 
 	Message eventActionDefinition7(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction,
 	                               Message::TC, 1);
-	eventActionDefinition7.appendEnum16(0);
+	eventActionDefinition7.append<NumberOfEventActionDefinitions>(1);
 	eventActionDefinition7.append<ApplicationProcessId>(4);
 	eventActionDefinition7.append<EventDefinitionId>(4);
 	TCdata = "hi2";
@@ -250,14 +240,11 @@ int main() {
 
 	Message eventActionDefinition5(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction,
 	                               Message::TC, 1);
-	eventActionDefinition5.appendUint16(3);
-	eventActionDefinition5.appendUint16(0);
+	eventActionDefinition5.append<NumberOfEventActionDefinitions>(3);
 	eventActionDefinition5.append<ApplicationProcessId>(2);
 	eventActionDefinition5.append<EventDefinitionId>(1);
-	eventActionDefinition5.appendUint16(0);
 	eventActionDefinition5.append<ApplicationProcessId>(4);
 	eventActionDefinition5.append<EventDefinitionId>(2);
-	eventActionDefinition5.appendUint16(0);
 	eventActionDefinition5.append<ApplicationProcessId>(4);
 	eventActionDefinition5.append<EventDefinitionId>(4);
 
@@ -269,14 +256,11 @@ int main() {
 
 	Message eventActionDefinition3(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
 	                               Message::TC, 1);
-	eventActionDefinition3.appendUint16(3);
-	eventActionDefinition3.appendUint16(0);
+	eventActionDefinition3.append<NumberOfEventActionDefinitions>(3);
 	eventActionDefinition3.append<ApplicationProcessId>(2);
 	eventActionDefinition3.append<EventDefinitionId>(1);
-	eventActionDefinition3.appendUint16(0);
 	eventActionDefinition3.append<ApplicationProcessId>(4);
 	eventActionDefinition3.append<EventDefinitionId>(2);
-	eventActionDefinition3.appendUint16(0);
 	eventActionDefinition3.append<ApplicationProcessId>(4);
 	eventActionDefinition3.append<EventDefinitionId>(4);
 	eventActionService.disableEventActionDefinitions(eventActionDefinition3);
@@ -289,8 +273,7 @@ int main() {
 
 	Message eventActionDefinition4(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction,
 	                               Message::TC, 1);
-	eventActionDefinition4.appendUint16(1);
-	eventActionDefinition4.appendUint16(0);
+	eventActionDefinition4.append<NumberOfEventActionDefinitions>(1);
 	eventActionDefinition4.append<ApplicationProcessId>(2);
 	eventActionDefinition4.append<EventDefinitionId>(1);
 
@@ -299,8 +282,7 @@ int main() {
 
 	Message eventActionDefinition6(EventActionService::ServiceType, EventActionService::MessageType::DisableEventAction,
 	                               Message::TC, 1);
-	eventActionDefinition6.appendUint16(1);
-	eventActionDefinition6.appendUint16(0);
+	eventActionDefinition6.append<NumberOfEventActionDefinitions>(1);
 	eventActionDefinition6.append<ApplicationProcessId>(2);
 	eventActionDefinition6.append<EventDefinitionId>(1);
 	eventActionService.disableEventActionDefinitions(eventActionDefinition6);
@@ -317,9 +299,9 @@ int main() {
 
 	// ST[11] test
 	TimeBasedSchedulingService timeBasedSchedulingService;
-	Time::DefaultCUC currentTime(time(nullptr)); // Get the current system time
+	const Time::DefaultCUC currentTime(TimeGetter::getCurrentTimeDefaultCUC());
 	std::cout << "\n\nST[11] service is running";
-	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime.asTAIseconds() << std::endl;
+	std::cout << "\nCurrent time in seconds (UNIX epoch): " << currentTime.asDuration().count() << std::endl;
 
 	Message receivedMsg =
 	    Message(TimeBasedSchedulingService::ServiceType,
@@ -336,10 +318,10 @@ int main() {
 	                      TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
 	receivedMsg.appendUint16(2); // Total number of requests
 
-	receivedMsg.append<Time::DefaultCUC>(Time::DefaultCUC(currentTime.asTAIseconds() + 1556435U));
-	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
+	receivedMsg.append<Time::DefaultCUC>(currentTime + static_cast<std::chrono::seconds>(1556435U));
+	receivedMsg.appendString(MessageParser::composeECSS(testMessage1, ECSSTCRequestStringSize));
 
-	receivedMsg.append<Time::DefaultCUC>(Time::DefaultCUC(currentTime.asTAIseconds() + 1957232U));
+	receivedMsg.append<Time::DefaultCUC>(currentTime + static_cast<std::chrono::seconds>(1957232U));
 	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 

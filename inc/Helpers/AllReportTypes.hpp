@@ -14,7 +14,6 @@ namespace AllReportTypes {
 	 */
 	using ServiceDefinitionsVector = etl::vector<MessageTypeNum, ECSSMaxReportTypeDefinitions>;
 
-	// Function declarations for getting service reports
 	const ServiceDefinitionsVector& getST01Reports();
 	const ServiceDefinitionsVector& getST03Reports();
 	const ServiceDefinitionsVector& getST04Reports();

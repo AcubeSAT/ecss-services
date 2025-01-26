@@ -14,7 +14,7 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::AddEventAction)) {
 		return;
 	}
-	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	NumberOfEventActionDefinitions numberOfEventActionDefinitions = message.read<NumberOfEventActionDefinitions>();
 	while (numberOfEventActionDefinitions-- != 0) {
 		const ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
@@ -47,7 +47,7 @@ void EventActionService::deleteEventActionDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::DeleteEventAction)) {
 		return;
 	}
-	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	NumberOfEventActionDefinitions numberOfEventActionDefinitions = message.read<NumberOfEventActionDefinitions>();
 	while (numberOfEventActionDefinitions-- != 0) {
 		ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
@@ -86,7 +86,7 @@ void EventActionService::enableEventActionDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::EnableEventAction)) {
 		return;
 	}
-	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	NumberOfEventActionDefinitions numberOfEventActionDefinitions = message.read<NumberOfEventActionDefinitions>();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
 			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
@@ -120,7 +120,7 @@ void EventActionService::disableEventActionDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, MessageType::DisableEventAction)) {
 		return;
 	}
-	uint8_t numberOfEventActionDefinitions = message.readUint8();
+	NumberOfEventActionDefinitions numberOfEventActionDefinitions = message.read<NumberOfEventActionDefinitions>();
 	if (numberOfEventActionDefinitions != 0U) {
 		while (numberOfEventActionDefinitions-- != 0) {
 			ApplicationProcessId applicationID = message.read<ApplicationProcessId>();

@@ -6,6 +6,7 @@
 using StepId = uint8_t;
 using ParameterReportStructureId = uint8_t;
 using EventDefinitionId = uint16_t;
+using NumberOfEventActionDefinitions = uint8_t;
 using ParameterId = uint16_t;
 using ParameterSampleCount = uint16_t;
 using SamplingInterval = uint16_t;
