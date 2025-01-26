@@ -69,14 +69,14 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 }
 
 void PacketSelectionSubservice::deleteAllReportsOfApplication(const PacketStoreId& packetStoreID, ApplicationProcessId applicationID) {
-	for (const auto& [first, _]: AllReportTypes::MessagesOfService) {
+	for (const auto& [first, _]: AllReportTypes::getMessagesOfService()) {
 		ServiceTypeNum serviceType = first;
 		deleteAllReportsOfService(packetStoreID, applicationID, serviceType);
 	}
 }
 
 void PacketSelectionSubservice::deleteAllReportsOfService(const PacketStoreId& packetStoreID, ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
+	for (const auto& messageType: AllReportTypes::getMessagesOfService().at(serviceType)) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		packetStoreAppProcessConfig[packetStoreID].definitions.erase(appServicePair);
 	}

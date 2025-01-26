@@ -4,7 +4,7 @@
 
 void ApplicationProcessConfiguration::addAllReportsOfApplication(const Message& message, ApplicationProcessId
 applicationID) {
-	for (const auto& service: AllReportTypes::MessagesOfService) {
+	for (const auto& service: AllReportTypes::getMessagesOfService()) {
 		uint8_t const serviceType = service.first;
 		addAllReportsOfService(message, applicationID, serviceType);
 	}
@@ -13,7 +13,11 @@ applicationID) {
 void ApplicationProcessConfiguration::addAllReportsOfService(const Message& message, ApplicationProcessId applicationID,
 ServiceTypeNum
 serviceType) {
-	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
+	if (AllReportTypes::getMessagesOfService().find(serviceType) == AllReportTypes::getMessagesOfService().end()) {
+		return;
+	}
+	auto& messages = AllReportTypes::getMessagesOfService().find(serviceType)->second;
+	for (const auto& messageType: messages) {
 		auto appServicePair = std::make_pair(applicationID, serviceType);
 		if (canMessageBeAdded(message, applicationID, serviceType, messageType)) {
 			definitions[appServicePair].push_back(messageType);
@@ -102,7 +106,7 @@ bool ApplicationProcessConfiguration::canServiceBeAdded(Message& request, Applic
 
 bool ApplicationProcessConfiguration::checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum
 	serviceType) {
-	if (countReportsOfService(applicationID, serviceType) >= AllReportTypes::MessagesOfService.at(serviceType).size
+	if (countReportsOfService(applicationID, serviceType) >= AllReportTypes::getMessagesOfService().at(serviceType).size
 	    ()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached);
 		return true;
@@ -117,7 +121,7 @@ bool ApplicationProcessConfiguration::canMessageBeAdded(const Message& request, 
 	}
 
 	if (reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
 		return false;
 	}
 	return true;

@@ -18,6 +18,7 @@
 #include "Services/TestService.hpp"
 #include "Services/TimeBasedSchedulingService.hpp"
 #include "Services/FileManagementService.hpp"
+#include "Helpers/AllReportTypes.hpp"
 
 /**
  * Defines a class that contains instances of all Services.

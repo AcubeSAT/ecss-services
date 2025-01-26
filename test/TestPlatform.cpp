@@ -335,12 +335,13 @@ void FunctionManagementService::initializeFunctionMap() {
 }
 
 void StorageAndRetrievalService::initializeStorageAndRetrievalServiceStructures() {
-	serviceToPacketStore.insert({4, "stats"});
 }
 
 void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() {}
 
 void Service::releaseMessage(Message& message) {}
+
+void RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures() {}
 
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

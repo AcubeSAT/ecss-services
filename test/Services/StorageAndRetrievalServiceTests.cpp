@@ -28,6 +28,7 @@ void initializePacketStores() {
 
 		PacketStoreId packetStoreId(packetStoreData);
 		PacketStore newPacketStore;
+		newPacketStore.storageEnabled = true;
 		newPacketStore.sizeInBytes = sizes[i];
 		newPacketStore.packetStoreType = ((i % 2) == 0) ? PacketStore::Circular : PacketStore::Bounded;
 		newPacketStore.virtualChannel = virtualChannels[i];
@@ -135,7 +136,15 @@ void padWithZeros(etl::array<PacketStoreId, 4>& packetStoreIds) {
 
 void addTelemetryPacketsInPacketStores() {
 	auto packetStoreIds = validPacketStoreIds();
-	Message msg;
+	Message msg(StorageAndRetrievalService::ServiceType,
+						StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport, Message::TM, ApplicationId);
+
+	for (auto& packetStoreId: packetStoreIds) {
+		ApplicationProcessConfiguration config;
+		config.addAllReportsOfApplication(msg, ApplicationId);
+		storageAndRetrieval.packetSelection.packetStoreAppProcessConfig.insert({packetStoreId, config});
+	}
+
 	for (auto& timestamp: timestamps1) {
 		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[0], msg, timestamp);
 	}

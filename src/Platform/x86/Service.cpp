@@ -44,7 +44,7 @@ PacketSender packetSender;
 inline constexpr bool SendToYamcs = true;
 
 void Service::releaseMessage(Message& message) {
-	LOG_DEBUG << "Releasing message with ApplicationID: " << message.messageType << " ServiceType: " << message.serviceType
+	LOG_DEBUG << "Releasing message with ApplicationID: " << message.applicationId << " ServiceType: " << message.serviceType
 	<< " messageType: " << message.messageType;
 }
 

@@ -29,6 +29,7 @@ public:
 	};
 
 	RealTimeForwardingControlService() {
+		initializeRealTimeForwardingServiceStructures();
 		serviceType = ServiceType;
 	}
 

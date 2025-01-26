@@ -130,7 +130,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		ForwardingAndPacketHelper::validReportTypes(request);
 
-		for (auto& message: AllReportTypes::MessagesOfService.at(serviceType)) {
+		for (auto& message: AllReportTypes::getMessagesOfService().at(serviceType)) {
 			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
 			    .push_back(message);
 		}
@@ -142,7 +142,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		      2);
 		REQUIRE(
 		    realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)]
-		        .size() == AllReportTypes::MessagesOfService.at(serviceType).size());
+		        .size() == AllReportTypes::getMessagesOfService().at(serviceType).size());
 
 		ServiceTests::reset();
 	}
@@ -165,8 +165,8 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		REQUIRE(applicationProcessConfig.definitions[appServicePair1].empty());
 		REQUIRE(applicationProcessConfig.definitions[appServicePair2].empty());
 
-		auto numOfMessages1 = AllReportTypes::MessagesOfService.at(serviceType1).size();
-		auto numOfMessages2 = AllReportTypes::MessagesOfService.at(serviceType2).size();
+		auto numOfMessages1 = AllReportTypes::getMessagesOfService().at(serviceType1).size();
+		auto numOfMessages2 = AllReportTypes::getMessagesOfService().at(serviceType2).size();
 
 		for (uint8_t i = 0; i < numOfMessages1 - 1; i++) {
 			applicationProcessConfig.definitions[appServicePair1].push_back(i);
@@ -231,18 +231,17 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		for (uint8_t i = 100; i < ECSSMaxServiceTypeDefinitions + 99; i++) {
 			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID3, i)];
 		}
-		CHECK(realTimeForwarding.applicationProcessConfiguration.definitions.size() ==
-		      ECSSMaxServiceTypeDefinitions - 1);
+		CHECK(realTimeForwarding.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions - 1);
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 9);
+		CHECK(ServiceTests::count() == 12);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 3);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 6);
 
 		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
-		REQUIRE(definitions.size() == 20);
+		REQUIRE(definitions.size() == 28);
 		for (auto serviceType: ForwardingAndPacketHelper::allServices) {
 			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
 		}
@@ -264,7 +263,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 		for (auto serviceType: ForwardingAndPacketHelper::services) {
 			REQUIRE(applicationProcesses[std::make_pair(applicationID1, serviceType)].size() ==
-			        AllReportTypes::MessagesOfService.at(serviceType).size());
+			        AllReportTypes::getMessagesOfService().at(serviceType).size());
 		}
 
 		ServiceTests::reset();
@@ -287,7 +286,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 2);
 
 		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
-		REQUIRE(definitions.size() == 12);
+		REQUIRE(definitions.size() == 16);
 
 		int cnt1 = 0;
 		int cnt2 = 0;
@@ -298,16 +297,16 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 				cnt2++;
 			}
 		}
-		REQUIRE(cnt1 == 10);
+		REQUIRE(cnt1 == 14);
 		REQUIRE(cnt2 == 2);
 
 		for (auto& serviceType: ForwardingAndPacketHelper::allServices) {
 			REQUIRE(definitions[std::make_pair(applicationID1, serviceType)].size() ==
-			        AllReportTypes::MessagesOfService.at(serviceType).size());
+			        AllReportTypes::getMessagesOfService().at(serviceType).size());
 		}
 		for (auto& serviceType: ForwardingAndPacketHelper::services) {
 			REQUIRE(definitions[std::make_pair(applicationID2, serviceType)].size() ==
-			        AllReportTypes::MessagesOfService.at(serviceType).size());
+			        AllReportTypes::getMessagesOfService().at(serviceType).size());
 		}
 
 		ServiceTests::reset();
@@ -330,7 +329,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		for (auto serviceType: ForwardingAndPacketHelper::allServices) {
 			REQUIRE(std::equal(definitions[std::make_pair(applicationID1, serviceType)].begin(),
 			                   definitions[std::make_pair(applicationID1, serviceType)].end(),
-			                   AllReportTypes::MessagesOfService.at(serviceType).begin()));
+			                   AllReportTypes::getMessagesOfService().at(serviceType).begin()));
 		}
 
 		ServiceTests::reset();
@@ -1048,7 +1047,7 @@ TEST_CASE("Report the Application Process Configuration content") {
 		for (auto appID: ForwardingAndPacketHelper::applications) {
 			for (auto serviceType: ForwardingAndPacketHelper::allServices) {
 				auto appServicePair = std::make_pair(appID, serviceType);
-				for (auto& message: AllReportTypes::MessagesOfService.at(serviceType)) {
+				for (auto& message: AllReportTypes::getMessagesOfService().at(serviceType)) {
 					realTimeForwarding.applicationProcessConfiguration.definitions[appServicePair].push_back(message);
 				}
 			}
@@ -1069,8 +1068,8 @@ TEST_CASE("Report the Application Process Configuration content") {
 
 			for (auto serviceType: ForwardingAndPacketHelper::allServices) {
 				REQUIRE(report.readUint8() == serviceType);
-				REQUIRE(report.readUint8() == AllReportTypes::MessagesOfService.at(serviceType).size());
-				for (auto& message: AllReportTypes::MessagesOfService.at(serviceType)) {
+				REQUIRE(report.readUint8() == AllReportTypes::getMessagesOfService().at(serviceType).size());
+				for (auto& message: AllReportTypes::getMessagesOfService().at(serviceType)) {
 					REQUIRE(report.readUint8() == message);
 				}
 			}

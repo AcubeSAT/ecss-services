@@ -220,7 +220,7 @@ inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
  * @see PacketSelectionSubService
  * todo: (#27) must change when all 15 services are implemented.
  */
-inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 15;
+inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 14;
 
 /**
  * The number of possible combinations between application processes and service types, i.e. the number of all
