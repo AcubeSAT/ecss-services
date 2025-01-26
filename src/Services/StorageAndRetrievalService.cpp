@@ -182,7 +182,7 @@ bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
 		errorFlag = true;
-	} else if (packetStores[packetStoreId].byTimeRangeRetrievalStatus) {
+	} else if (packetStores[packetStoreId].byTimeRangeRetrievalStatusEnabled) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::ByTimeRangeRetrievalAlreadyEnabled);
 		errorFlag = true;
 	}
@@ -296,9 +296,12 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 		// todo (#261): 6.15.3.5.2.d(4), actually count the current time
 
 		auto& packetStore = packetStores[packetStoreId];
-		packetStore.byTimeRangeRetrievalStatus = true;
+		packetStore.byTimeRangeRetrievalStatusEnabled = true;
 		packetStore.retrievalStartTime = retrievalStartTime;
 		packetStore.retrievalEndTime = retrievalEndTime;
+		if (packetStore.byTimeRangeRetrievalStatusEnabled) {
+
+		}
 		// todo (#262): start the by-time-range retrieval process according to the priority policy
 	}
 }
@@ -313,7 +316,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 
 	if (numOfPacketStores == 0) {
 		for (const auto& packetStore: packetStores) {
-			if (packetStore.second.byTimeRangeRetrievalStatus) {
+			if (packetStore.second.byTimeRangeRetrievalStatusEnabled) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
 				continue;
@@ -333,7 +336,7 @@ void StorageAndRetrievalService::deletePacketStoreContent(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
 		}
-		if (packetStores[packetStoreId].byTimeRangeRetrievalStatus) {
+		if (packetStores[packetStoreId].byTimeRangeRetrievalStatusEnabled) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
 			continue;
@@ -433,7 +436,7 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 	const NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
-			if (packetStore.second.byTimeRangeRetrievalStatus) {
+			if (packetStore.second.byTimeRangeRetrievalStatusEnabled) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
 				continue;
@@ -449,7 +452,7 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 			continue;
 		}
 		auto& packetStore = packetStores[packetStoreId];
-		if (packetStore.byTimeRangeRetrievalStatus) {
+		if (packetStore.byTimeRangeRetrievalStatusEnabled) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
 			continue;
@@ -488,7 +491,7 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 	const NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {
-			packetStore.second.byTimeRangeRetrievalStatus = false;
+			packetStore.second.byTimeRangeRetrievalStatusEnabled = false;
 		}
 		return;
 	}
@@ -498,7 +501,7 @@ void StorageAndRetrievalService::abortByTimeRangeRetrieval(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 			continue;
 		}
-		packetStores[packetStoreId].byTimeRangeRetrievalStatus = false;
+		packetStores[packetStoreId].byTimeRangeRetrievalStatusEnabled = false;
 	}
 }
 
@@ -514,7 +517,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(const Message& request
 		report.appendString(packetStoreId);
 		report.appendBoolean(packetStore.second.storageEnabled);
 		report.appendEnum8(packetStore.second.openRetrievalStatus);
-		report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
+		report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatusEnabled);
 	}
 	handleMessage(report);
 }
@@ -551,7 +554,7 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 		newPacketStore.sizeInBytes = packetStoreSize;
 		newPacketStore.packetStoreType = packetStoreType;
 		newPacketStore.storageEnabled = false;
-		newPacketStore.byTimeRangeRetrievalStatus = false;
+		newPacketStore.byTimeRangeRetrievalStatusEnabled = false;
 		newPacketStore.openRetrievalStatus = PacketStore::Suspended;
 		newPacketStore.virtualChannel = virtualChannel;
 		packetStores.insert({idToCreate, newPacketStore});
@@ -575,7 +578,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 				    request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
 				continue;
 			}
-			if (packetStore.second.byTimeRangeRetrievalStatus) {
+			if (packetStore.second.byTimeRangeRetrievalStatusEnabled) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketWithByTimeRangeRetrieval);
 				continue;
@@ -611,7 +614,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			    request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
 			continue;
 		}
-		if (packetStore.byTimeRangeRetrievalStatus) {
+		if (packetStore.byTimeRangeRetrievalStatusEnabled) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::DeletionOfPacketWithByTimeRangeRetrieval);
 			continue;
@@ -694,7 +697,7 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress);
 			continue;
 		}
-		if (packetStore.byTimeRangeRetrievalStatus) {
+		if (packetStore.byTimeRangeRetrievalStatusEnabled) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
 			continue;
@@ -720,7 +723,7 @@ void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 		return;
 	}
-	if (packetStore.byTimeRangeRetrievalStatus) {
+	if (packetStore.byTimeRangeRetrievalStatusEnabled) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
 		return;
@@ -750,7 +753,7 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 		return;
 	}
-	if (packetStore.byTimeRangeRetrievalStatus) {
+	if (packetStore.byTimeRangeRetrievalStatusEnabled) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
 		return;
@@ -780,7 +783,7 @@ void StorageAndRetrievalService::changeVirtualChannel(Message& request) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel);
 		return;
 	}
-	if (packetStore.byTimeRangeRetrievalStatus) {
+	if (packetStore.byTimeRangeRetrievalStatusEnabled) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval);
 		return;

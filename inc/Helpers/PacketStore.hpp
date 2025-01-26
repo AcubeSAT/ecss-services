@@ -58,7 +58,7 @@ public:
 	/**
 	 * Whether the by-time-range retrieval of packet stores is enabled for this packet-store.
 	 */
-	bool byTimeRangeRetrievalStatus = false;
+	bool byTimeRangeRetrievalStatusEnabled = false;
 	PacketStoreType packetStoreType = Circular;
 	PacketStoreOpenRetrievalStatus openRetrievalStatus = Suspended;
 
