@@ -220,7 +220,7 @@ inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
  * @see PacketSelectionSubService
  * todo: (#27) must change when all 15 services are implemented.
  */
-inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 10;
+inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 15;
 
 /**
  * The number of possible combinations between application processes and service types, i.e. the number of all
@@ -260,6 +260,8 @@ inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
  * In the ECSS-E-ST-70-41C the application ID is also referred as application process.
  */
 inline constexpr uint16_t ApplicationId = 1;
+
+
 
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

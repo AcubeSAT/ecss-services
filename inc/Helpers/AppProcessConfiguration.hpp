@@ -37,7 +37,7 @@ public:
 	 * Checks whether the specified message type already exists in the application process and service
 	 * type definition.
 	 */
-	bool reportExistsInAppProcessConfiguration(const Message& request, ApplicationProcessId applicationID,
+	bool reportExistsInAppProcessConfiguration(ApplicationProcessId applicationID,
 		ServiceTypeNum serviceType,
 		MessageTypeNum messageType);
 

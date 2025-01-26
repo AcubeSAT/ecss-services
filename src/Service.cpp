@@ -13,7 +13,9 @@ void Service::handleMessage(Message& message) {
 
 	#ifdef SERVICE_STORAGEANDRETRIEVAL
 	auto packetStoreId = Services.storageAndRetrieval.getPacketStoreFromServiceType(message.serviceType);
-	Services.storageAndRetrieval.addTelemetryToPacketStore(packetStoreId, message, TimeGetter::getCurrentTimeDefaultCUC());
+	if (packetStoreId) {
+		Services.storageAndRetrieval.addTelemetryToPacketStore(packetStoreId.value(), message, TimeGetter::getCurrentTimeDefaultCUC());
+	}
 	#endif
 
 	platformSpecificHandleMessage(message);

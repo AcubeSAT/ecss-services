@@ -32,16 +32,15 @@ uint8_t ApplicationProcessConfiguration::countReportsOfService(ApplicationProces
 	return definitions[appServicePair].size();
 }
 
-bool ApplicationProcessConfiguration::reportExistsInAppProcessConfiguration(const Message& request, ApplicationProcessId
-applicationID,
-ServiceTypeNum serviceType,
+bool ApplicationProcessConfiguration::reportExistsInAppProcessConfiguration(ApplicationProcessId
+	applicationID,
+	ServiceTypeNum serviceType,
 	MessageTypeNum messageType) {
 	auto key = std::make_pair(applicationID, serviceType);
 	if (definitions.find(key) != definitions.end()) {
 		if (etl::any_of(definitions[key].begin(), definitions[key].end(), [messageType](const auto& message) {
 			return message == messageType;
 		})) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
 			return true;
 		}
 	}
@@ -113,6 +112,13 @@ bool ApplicationProcessConfiguration::checkMaxReportTypesReached(const Message& 
 
 bool ApplicationProcessConfiguration::canMessageBeAdded(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
 	MessageTypeNum messageType) {
-	return !checkMaxReportTypesReached(request, applicationID, serviceType) and
-	       !reportExistsInAppProcessConfiguration(request, applicationID, serviceType, messageType);
+	if (checkMaxReportTypesReached(request, applicationID, serviceType)) {
+		return false;
+	}
+
+	if (reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType)) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
+		return false;
+	}
+	return true;
 }

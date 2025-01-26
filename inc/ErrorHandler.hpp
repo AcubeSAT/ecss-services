@@ -124,6 +124,17 @@ public:
 		 * This error occurs when attempting to process more events than the system can handle.
 		 */
 		LengthExceedsNumberOfEvents = 22,
+
+		/**
+		 * TM couldn't be added in a packet store due to the packet store being disabled
+		 */
+		TMRejectedFromDisabledPacketStore = 23,
+
+		/**
+		 * TM couldn't be added in a packet store due to the app process configuration not including the
+		 * AppId <-> Service Type <-> MessageType entyr
+		 */
+		TMRejectedFromPacketStoreDueToAppProcessConfiguration = 24
 	};
 
 	/**

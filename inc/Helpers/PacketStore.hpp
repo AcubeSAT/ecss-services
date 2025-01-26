@@ -53,7 +53,7 @@ public:
 	/**
 	 * Whether the storage of TM packets is enabled for this packet store
 	 */
-	bool storageStatus = false;
+	bool storageEnabled = false;
 
 	/**
 	 * Whether the by-time-range retrieval of packet stores is enabled for this packet-store.

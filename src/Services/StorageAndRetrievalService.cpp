@@ -202,14 +202,17 @@ void StorageAndRetrievalService::addPacketStore(const PacketStoreId& packetStore
 void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
 	message, Time::DefaultCUC timestamp) {
 	if (not packetStoreExists(packetStoreId)) {
+		ASSERT_INTERNAL(false, ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
 	auto packetStore = packetStores.find(packetStoreId)->second;
-	if (not packetStore.storageStatus) {
+	if (not packetStore.storageEnabled) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromDisabledPacketStore);
 		return;
 	}
-	// block packet store if not in app process configuration
-	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].) {
+	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].reportExistsInAppProcessConfiguration(message
+	.applicationId, message.serviceType, message.messageType)) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromPacketStoreDueToAppProcessConfiguration);
 		return;
 	}
 	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, message});
@@ -259,7 +262,7 @@ void StorageAndRetrievalService::enableStorageFunction(Message& request) {
 		return;
 	}
 
-	executeOnPacketStores(request, [](PacketStore& p) { p.storageStatus = true; });
+	executeOnPacketStores(request, [](PacketStore& p) { p.storageEnabled = true; });
 }
 
 void StorageAndRetrievalService::disableStorageFunction(Message& request) {
@@ -267,7 +270,7 @@ void StorageAndRetrievalService::disableStorageFunction(Message& request) {
 		return;
 	}
 
-	executeOnPacketStores(request, [](PacketStore& p) { p.storageStatus = false; });
+	executeOnPacketStores(request, [](PacketStore& p) { p.storageEnabled = false; });
 }
 
 void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
@@ -509,7 +512,7 @@ void StorageAndRetrievalService::packetStoresStatusReport(const Message& request
 	for (const auto& packetStore: packetStores) {
 		auto packetStoreId = packetStore.first;
 		report.appendString(packetStoreId);
-		report.appendBoolean(packetStore.second.storageStatus);
+		report.appendBoolean(packetStore.second.storageEnabled);
 		report.appendEnum8(packetStore.second.openRetrievalStatus);
 		report.appendBoolean(packetStore.second.byTimeRangeRetrievalStatus);
 	}
@@ -547,7 +550,7 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 		PacketStore newPacketStore;
 		newPacketStore.sizeInBytes = packetStoreSize;
 		newPacketStore.packetStoreType = packetStoreType;
-		newPacketStore.storageStatus = false;
+		newPacketStore.storageEnabled = false;
 		newPacketStore.byTimeRangeRetrievalStatus = false;
 		newPacketStore.openRetrievalStatus = PacketStore::Suspended;
 		newPacketStore.virtualChannel = virtualChannel;
@@ -567,7 +570,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 
 		packetStoresToDelete.fill(PacketStoreId(""));
 		for (const auto& packetStore: packetStores) {
-			if (packetStore.second.storageStatus) {
+			if (packetStore.second.storageEnabled) {
 				ErrorHandler::reportError(
 				    request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
 				continue;
@@ -603,7 +606,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 		}
 		const auto& packetStore = packetStores[idToDelete];
 
-		if (packetStore.storageStatus) {
+		if (packetStore.storageEnabled) {
 			ErrorHandler::reportError(
 			    request, ErrorHandler::ExecutionStartErrorType::DeletionOfPacketStoreWithStorageStatusEnabled);
 			continue;
@@ -681,7 +684,7 @@ void StorageAndRetrievalService::resizePacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnableToHandlePacketStoreSize);
 			continue;
 		}
-		if (packetStore.storageStatus) {
+		if (packetStore.storageEnabled) {
 			ErrorHandler::reportError(request,
 			                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 			continue;
@@ -712,7 +715,7 @@ void StorageAndRetrievalService::changeTypeToCircular(Message& request) {
 	}
 	auto& packetStore = packetStores[idToChange];
 
-	if (packetStore.storageStatus) {
+	if (packetStore.storageEnabled) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 		return;
@@ -742,7 +745,7 @@ void StorageAndRetrievalService::changeTypeToBounded(Message& request) {
 	}
 	auto& packetStore = packetStores[idToChange];
 
-	if (packetStore.storageStatus) {
+	if (packetStore.storageEnabled) {
 		ErrorHandler::reportError(request,
 		                          ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled);
 		return;

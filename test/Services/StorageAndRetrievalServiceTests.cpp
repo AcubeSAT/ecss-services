@@ -246,7 +246,7 @@ TEST_CASE("Deleting packet stores") {
 
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
@@ -274,7 +274,7 @@ TEST_CASE("Deleting packet stores") {
 
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -301,16 +301,16 @@ TEST_CASE("Deleting packet stores") {
 
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
 		}
 
-		storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageStatus = true;
+		storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageEnabled = true;
 		storageAndRetrieval.getPacketStore(packetStoreIds[1]).byTimeRangeRetrievalStatus = true;
 		storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus = PacketStore::InProgress;
-		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageStatus = true;
+		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageEnabled = true;
 
 		MessageParser::execute(request);
 
@@ -362,12 +362,12 @@ TEST_CASE("Deleting packet stores") {
 
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 		}
 
-		storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageStatus = true;
+		storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageEnabled = true;
 		storageAndRetrieval.getPacketStore(packetStoreIds[1]).byTimeRangeRetrievalStatus = true;
 		storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus = PacketStore::InProgress;
 		storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStatus = PacketStore::InProgress;
@@ -398,7 +398,7 @@ TEST_CASE("Deleting packet stores") {
 
 		for (auto& packetStoreId: correctPacketStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 			request.appendString(packetStoreId);
@@ -409,7 +409,7 @@ TEST_CASE("Deleting packet stores") {
 			request.appendString(packetStoreId);
 		}
 
-		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).storageStatus = true;
+		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).storageEnabled = true;
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[1]).byTimeRangeRetrievalStatus = true;
 
 		MessageParser::execute(request);
@@ -441,19 +441,19 @@ TEST_CASE("Enabling the storage of packet stores") {
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			REQUIRE(storageAndRetrieval.packetStoreExists(packetStoreIds[i]));
-			storageAndRetrieval.getPacketStore(packetStoreIds[i]).storageStatus = false;
+			storageAndRetrieval.getPacketStore(packetStoreIds[i]).storageEnabled = false;
 			request.appendString(packetStoreIds[i]);
 		}
-		storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageStatus = false;
-		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageStatus = false;
+		storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageEnabled = false;
+		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageEnabled = false;
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageStatus == true);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).storageStatus == true);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageStatus == false);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageStatus == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageEnabled == true);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).storageEnabled == true);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageEnabled == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageEnabled == false);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -501,7 +501,7 @@ TEST_CASE("Enabling the storage of packet stores") {
 
 		CHECK(ServiceTests::count() == 0);
 		for (auto& packetStoreId: packetStoreIds) {
-			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageStatus == true);
+			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageEnabled == true);
 		}
 
 		ServiceTests::reset();
@@ -522,19 +522,19 @@ TEST_CASE("Disabling the storage of packet stores") {
 		NumOfPacketStores numOfPacketStores = 2;
 		request.appendUint16(numOfPacketStores);
 		for (int i = 0; i < numOfPacketStores; i++) {
-			storageAndRetrieval.getPacketStore(packetStoreIds[i]).storageStatus = true;
+			storageAndRetrieval.getPacketStore(packetStoreIds[i]).storageEnabled = true;
 			request.appendString(packetStoreIds[i]);
 		}
-		storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageStatus = true;
-		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageStatus = true;
+		storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageEnabled = true;
+		storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageEnabled = true;
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageStatus == false);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).storageStatus == false);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageStatus == true);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageStatus == true);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).storageEnabled == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).storageEnabled == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).storageEnabled == true);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).storageEnabled == true);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -581,7 +581,7 @@ TEST_CASE("Disabling the storage of packet stores") {
 
 		CHECK(ServiceTests::count() == 0);
 		for (auto& packetStoreId: packetStoreIds) {
-			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageStatus == false);
+			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).storageEnabled == false);
 		}
 
 		ServiceTests::reset();
@@ -1170,7 +1170,7 @@ TEST_CASE("Reporting the status of packet stores") {
 		int count = 0;
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = (count % 2 == 0);
+			packetStore.storageEnabled = (count % 2 == 0);
 			packetStore.byTimeRangeRetrievalStatus = (count % 2 != 0);
 			packetStore.openRetrievalStatus = (count % 2 == 0) ? PacketStore::InProgress : PacketStore::Suspended;
 			count++;
@@ -1296,7 +1296,7 @@ TEST_CASE("Resizing the packet stores") {
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 			packetStore.byTimeRangeRetrievalStatus = false;
 
@@ -1333,7 +1333,7 @@ TEST_CASE("Resizing the packet stores") {
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = (index % 2 == 0);
+			packetStore.storageEnabled = (index % 2 == 0);
 			packetStore.byTimeRangeRetrievalStatus = (index == 1);
 			packetStore.openRetrievalStatus = (index == 3) ? PacketStore::InProgress : PacketStore::Suspended;
 
@@ -1374,7 +1374,7 @@ TEST_CASE("Resizing the packet stores") {
 		int index = 0;
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 
@@ -1434,7 +1434,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		for (auto& packetStoreId: packetStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.packetStoreType = PacketStore::Bounded;
-			packetStore.storageStatus = false;
+			packetStore.storageEnabled = false;
 			packetStore.byTimeRangeRetrievalStatus = false;
 			packetStore.openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -1478,7 +1478,7 @@ TEST_CASE("Changing the packet store type to circular") {
 		for (auto& packetStoreId: correctPacketStoreIds) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreId);
 			packetStore.packetStoreType = PacketStore::Bounded;
-			packetStore.storageStatus = (count == 0);
+			packetStore.storageEnabled = (count == 0);
 			packetStore.byTimeRangeRetrievalStatus = (count == 1);
 			packetStore.openRetrievalStatus = (count == 2) ? PacketStore::InProgress : PacketStore::Suspended;
 			count++;
@@ -1522,7 +1522,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 
 		for (auto& packetStoreId: packetStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType = PacketStore::Circular;
-			storageAndRetrieval.getPacketStore(packetStoreId).storageStatus = false;
+			storageAndRetrieval.getPacketStore(packetStoreId).storageEnabled = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = false;
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 		}
@@ -1565,7 +1565,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 		int count = 0;
 		for (auto& packetStoreId: correctPacketStoreIds) {
 			storageAndRetrieval.getPacketStore(packetStoreId).packetStoreType = PacketStore::Circular;
-			storageAndRetrieval.getPacketStore(packetStoreId).storageStatus = (count == 0);
+			storageAndRetrieval.getPacketStore(packetStoreId).storageEnabled = (count == 0);
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatus = (count == 1);
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus =
 			    (count == 2) ? PacketStore::InProgress : PacketStore::Suspended;

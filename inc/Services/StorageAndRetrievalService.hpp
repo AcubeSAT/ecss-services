@@ -1,5 +1,7 @@
 #pragma once
 
+#include <etl/optional.h>
+
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/PacketStore.hpp"
@@ -45,7 +47,7 @@ private:
 	 * store, as there needs to be a way to map the generated reports to their respective packet stores. The convention
 	 * here is that each Service will be related to one packet store ONLY.
 	 */
-	etl::map<ServiceTypeNum, PacketStoreId, ECSSMaxPacketStores> serviceToPacketStore;
+	etl::map<ServiceTypeNum, PacketStoreId, ECSSMaxServiceTypeDefinitions> serviceToPacketStore;
 
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
@@ -243,8 +245,11 @@ public:
 	 * @param serviceType a service number
 	 * @return the packet store ID that responds to that service
 	 */
-	PacketStoreId getPacketStoreFromServiceType(ServiceTypeNum serviceType) {
-		return serviceToPacketStore[serviceType];
+	etl::optional<PacketStoreId> getPacketStoreFromServiceType(ServiceTypeNum serviceType) {
+		if (serviceToPacketStore.find(serviceType) == serviceToPacketStore.end() ) {
+			return etl::nullopt;
+		}
+		return serviceToPacketStore.at(serviceType);
 	}
 	/**
 	 * Adds new packet store into packet stores.

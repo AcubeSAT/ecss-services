@@ -54,6 +54,11 @@ public:
 	 */
 	void appProcessConfigurationContentReport();
 private:
+	/**
+	 * Function to be implemented in platform. Initializes the applicationProcessConfiguration map and teh controlledApplications
+	 * vector with initial values that will be need in the startup of the system.
+	 */
+	void initializeRealTimeForwardingServiceStructures();
 
 	/**
 	 * Returns true, if the defined application exists in the application process configuration map.
