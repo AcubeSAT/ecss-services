@@ -115,9 +115,14 @@ void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Mes
 			for (uint8_t message = 0; message < numOfMessages; message++) {
 				uint8_t messageType = request.readUint8();
 				auto appServicePair = std::make_pair(applicationID, serviceType);
-				auto* const messageTypeIndex = etl::find(packetStoreAppProcessConfig[packetStoreID].definitions[appServicePair].begin(), packetStoreAppProcessConfig[packetStoreID].definitions.at(appServicePair).end(), messageType);
-
-				packetStoreAppProcessConfig[packetStoreID].definitions[appServicePair].erase(messageTypeIndex);
+				auto& definitions = packetStoreAppProcessConfig[packetStoreID].definitions;
+				if (definitions.find(appServicePair) != definitions.end()) {
+					auto& reportTypes = definitions[appServicePair];
+					auto messageTypeIndex = etl::find(reportTypes.begin(), reportTypes.end(), messageType);
+					if (messageTypeIndex != reportTypes.end()) {
+						reportTypes.erase(messageTypeIndex);
+					}
+				}
 			}
 		}
 	}
