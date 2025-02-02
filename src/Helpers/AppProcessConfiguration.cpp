@@ -32,19 +32,17 @@ uint8_t ApplicationProcessConfiguration::countReportsOfService(ApplicationProces
 	return definitions[appServicePair].size();
 }
 
-bool ApplicationProcessConfiguration::reportExistsInAppProcessConfiguration(ApplicationProcessId
-	applicationID,
+bool ApplicationProcessConfiguration::reportExistsInAppProcessConfiguration(ApplicationProcessId applicationID,
 	ServiceTypeNum serviceType,
 	MessageTypeNum messageType) {
 	auto key = std::make_pair(applicationID, serviceType);
-	if (definitions.find(key) != definitions.end()) {
-		if (etl::any_of(definitions[key].begin(), definitions[key].end(), [messageType](const auto& message) {
-			return message == messageType;
-		})) {
-			return true;
-		}
+	if (definitions.find(key) == definitions.end()) {
+		return false;
 	}
-	return false;
+	return etl::any_of(definitions[key].begin(), definitions[key].end(), 
+		[messageType](const auto& message) {
+			return message == messageType;
+		});
 }
 
 bool ApplicationProcessConfiguration::isApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,

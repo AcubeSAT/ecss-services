@@ -197,6 +197,19 @@ private:
 	 */
 	void initializeStorageAndRetrievalServiceStructures();
 
+	/**
+	 * Checks whether a message can be added in a packetStoreId. Checks include:
+	 * - existance of packet store
+	 * - whether the packet store has "enabled" status regarding storage of new packets
+	 * - whether the packet store's app process configuration includes the ApplicationId <-> Service Type <-> Report
+	 * type combination.
+	 * Will produce errors.
+	 * @param packetStoreId the id of the packet store that was requested to accept the message
+	 * @param message the message to store
+	 * @return true if the message can be added in the packet store storage, false otherwise.
+	 */
+	bool checkIfTelemetryCanBeAdded(const PacketStoreId& packetStoreId, const Message& message);
+
 public:
 	/**
 	 * The packet selection sub-service of the Storage and Retrieval service.

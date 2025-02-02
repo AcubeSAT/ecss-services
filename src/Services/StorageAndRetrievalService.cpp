@@ -199,20 +199,28 @@ void StorageAndRetrievalService::addPacketStore(const PacketStoreId& packetStore
 	packetStores.insert({packetStoreId, packetStore});
 }
 
-void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
-	message, Time::DefaultCUC timestamp) {
+bool StorageAndRetrievalService::checkIfTelemetryCanBeAdded(const PacketStoreId& packetStoreId, const Message&
+	message) {
 	if (not packetStoreExists(packetStoreId)) {
 		ASSERT_INTERNAL(false, ErrorHandler::InternalErrorType::ElementNotInArray);
-		return;
+		return false;
 	}
 	auto packetStore = packetStores.find(packetStoreId)->second;
 	if (not packetStore.storageEnabled) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromDisabledPacketStore);
-		return;
+		return false;
 	}
 	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].reportExistsInAppProcessConfiguration(message
 	.applicationId, message.serviceType, message.messageType)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromPacketStoreDueToAppProcessConfiguration);
+		return false;
+	}
+	return true;
+}
+
+void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
+	message, Time::DefaultCUC timestamp) {
+	if (not checkIfTelemetryCanBeAdded(packetStoreId, message)) {
 		return;
 	}
 	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, message});
@@ -303,6 +311,7 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 
 		}
 		// todo (#262): start the by-time-range retrieval process according to the priority policy
+
 	}
 }
 
