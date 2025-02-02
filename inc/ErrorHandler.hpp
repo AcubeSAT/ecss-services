@@ -445,7 +445,11 @@ public:
 		/**
 		 * AppProcessConfiguration adding an already existing report type in a map with an application id - service type key
 		 */
-		AlreadyExistingReportType = 64
+		AlreadyExistingReportType = 64,
+		/**
+		 * By-time-range retrieval time window is in the past, meaning that the oldest packet in the packet store is after the retrieval end time
+		 */
+		ByTimeRangeRetrievalTimeWindowInThePast = 65
 	};
 
 	/**

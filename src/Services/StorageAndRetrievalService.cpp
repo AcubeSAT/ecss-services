@@ -301,17 +301,30 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 			continue;
 		}
 
-		// todo (#261): 6.15.3.5.2.d(4), actually count the current time
-
 		auto& packetStore = packetStores[packetStoreId];
+
+		if (!packetStore.storedTelemetryPackets.empty() && 
+		    packetStore.storedTelemetryPackets.back().first > retrievalEndTime) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::ByTimeRangeRetrievalTimeWindowInThePast);
+			continue;
+		}
 		packetStore.byTimeRangeRetrievalStatusEnabled = true;
 		packetStore.retrievalStartTime = retrievalStartTime;
 		packetStore.retrievalEndTime = retrievalEndTime;
-		if (packetStore.byTimeRangeRetrievalStatusEnabled) {
 
+		auto it = packetStore.storedTelemetryPackets.begin();
+		while (it != packetStore.storedTelemetryPackets.end()) {
+			if (it->first >= retrievalStartTime && it->first <= retrievalEndTime) {
+				releaseMessage(it->second);
+			}
+			if (it->first < retrievalStartTime) {
+				break;
+			}
+			++it;
 		}
-		// todo (#262): start the by-time-range retrieval process according to the priority policy
-
+		packetStore.byTimeRangeRetrievalStatusEnabled = false;
+		packetStore.retrievalStartTime = Time::DefaultCUC(0);
+		packetStore.retrievalEndTime = Time::DefaultCUC(0);
 	}
 }
 
