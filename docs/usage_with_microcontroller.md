@@ -43,6 +43,12 @@ place the function body inside a compiled `.cpp` file. Otherwise, the linker wil
 For more details on the requirements, arguments and return values of each function, refer to their respective
 documentation.
 
+### Filesystem
+
+The filesystem interface needs to be implemented to support file operations on your platform. This includes file 
+creation, reading, writing, and management functions. See the [Filesystem Implementation](filesystem.md) guide for 
+detailed requirements.
+
 ### Logger
 
 The logger is responsible for outputting messages through a serial interface used for debugging purposes.
