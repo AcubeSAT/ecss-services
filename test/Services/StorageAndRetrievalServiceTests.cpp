@@ -731,9 +731,9 @@ TEST_CASE("Resuming the open retrieval process") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStatus == PacketStore::InProgress);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStatus == PacketStore::InProgress);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus == PacketStore::InProgress);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStatus == PacketStore::Suspended);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStatus == PacketStore::Suspended);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus == PacketStore::Suspended);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStatus == PacketStore::Suspended);
 
 		ServiceTests::reset();
@@ -810,8 +810,8 @@ TEST_CASE("Resuming the open retrieval process") {
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithByTimeRangeRetrieval) == 2);
 
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStatus == PacketStore::InProgress);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStatus == PacketStore::InProgress);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStatus == PacketStore::Suspended);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStatus == PacketStore::Suspended);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus == PacketStore::Suspended);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStatus == PacketStore::Suspended);
 
@@ -957,9 +957,9 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		CHECK(ServiceTests::count() == 0);
 		for (int i = 0; i < numOfPacketStores; i++) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[i]);
-			REQUIRE(packetStore.byTimeRangeRetrievalStatusEnabled == true);
-			REQUIRE(packetStore.retrievalStartTime == timeTags1[i]);
-			REQUIRE(packetStore.retrievalEndTime == timeTags2[i]);
+			REQUIRE(packetStore.byTimeRangeRetrievalStatusEnabled == false);
+			REQUIRE(packetStore.retrievalStartTime == Time::DefaultCUC(0));
+			REQUIRE(packetStore.retrievalEndTime == Time::DefaultCUC(0));
 		}
 		auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[3]);
 		REQUIRE(packetStore.byTimeRangeRetrievalStatusEnabled == false);

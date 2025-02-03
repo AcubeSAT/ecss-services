@@ -459,32 +459,25 @@ void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& requ
 		return;
 	}
 
-	const NumOfPacketStores numOfPacketStores = request.readUint16();
-	if (numOfPacketStores == 0) {
-		for (auto& packetStore: packetStores) {
-			if (packetStore.second.byTimeRangeRetrievalStatusEnabled) {
-				ErrorHandler::reportError(
-				    request, ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
-				continue;
+	executeOnPacketStores(request, [&request, this](PacketStore& p) {
+		if (p.byTimeRangeRetrievalStatusEnabled) {
+			ErrorHandler::reportError(request, 
+			    ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
+			return;
+		}
+		p.openRetrievalStatus = PacketStore::InProgress;
+		auto it = p.storedTelemetryPackets.begin();
+		while (it != p.storedTelemetryPackets.end()) {
+			if (it->first >= p.retrievalStartTime) {
+				releaseMessage(it->second);
 			}
-			packetStore.second.openRetrievalStatus = PacketStore::InProgress;
+			if (it->first < p.retrievalStartTime) {
+				break;
+			}
+			++it;
 		}
-		return;
-	}
-	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
-		auto packetStoreId = readPacketStoreId(request);
-		if (packetStores.find(packetStoreId) == packetStores.end()) {
-			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
-			continue;
-		}
-		auto& packetStore = packetStores[packetStoreId];
-		if (packetStore.byTimeRangeRetrievalStatusEnabled) {
-			ErrorHandler::reportError(request,
-			                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
-			continue;
-		}
-		packetStore.openRetrievalStatus = PacketStore::InProgress;
-	}
+		p.openRetrievalStatus = PacketStore::Suspended;
+	});
 }
 
 void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& request) {

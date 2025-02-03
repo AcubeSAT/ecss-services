@@ -40,14 +40,10 @@ bool ApplicationProcessConfiguration::reportExistsInAppProcessConfiguration(cons
 	if (definitions.find(key) == definitions.end()) {
 		return false;
 	}
-	if (not etl::any_of(definitions[key].begin(), definitions[key].end(), 
+	return etl::any_of(definitions[key].begin(), definitions[key].end(),
 		[messageType](const auto& message) {
 			return message == messageType;
-		})) {
-		return false;
-	}
-	ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
-	return true;
+		});
 }
 
 
