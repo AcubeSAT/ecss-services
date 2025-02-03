@@ -3,6 +3,7 @@
 #include <etl/span.h>
 
 #include "ECSS_Definitions.hpp"
+#include "TypeDefinitions.hpp"
 #include "etl/String.hpp"
 #include "etl/optional.h"
 #include "etl/result.h"
@@ -39,7 +40,7 @@ namespace Filesystem {
 	 */
 	enum class FileCreationError : uint8_t {
 		FileAlreadyExists = 0,
-		UnknownError = 255
+		UnknownError = 255,
 	};
 
 	/**
@@ -83,6 +84,28 @@ namespace Filesystem {
 	enum class FileAttributeError : uint8_t {
 		PathLeadsToDirectory = 0,
 		FileDoesNotExist = 1
+	};
+
+	/**
+	 * Possible errors returned by the filesystem during a file read operation
+	 */
+	enum class FileReadError : uint8_t {
+		FileNotFound = 0,
+		InvalidBufferSize = 1,
+		InvalidOffset = 2,
+		ReadError = 3,
+		UnknownError = 255
+	};
+
+	/**
+	 * Possible errors returned by the filesystem during a file write operation
+	 */
+	enum class FileWriteError : uint8_t {
+		FileNotFound = 0,
+		InvalidBufferSize = 1,
+		InvalidOffset = 2,
+		WriteError = 3,
+		UnknownError = 255
 	};
 
 	/**
@@ -152,17 +175,24 @@ namespace Filesystem {
 	/**
 	 * Creates a file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
+	 * @param offSet the starting byte to read from
+	 * @param fileDataLength the number of bytes to read on
+	 * @param buffer A buffer with the required data to be read from the file. Should be the same size as the offset,
+	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<FileCreationError> readFile(const Path& path, uint16_t startByte, uint16_t offSet, etl::span<uint8_t> buffer);
+	etl::optional<FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength, etl::span<uint8_t> buffer);
 
 	/**
 	 * Creates a file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
+	 * @param offSet the starting byte to write from
+	 * @param fileDataLength the number of bytes to write on
+	 * @param buffer A buffer with the required data to be written in the file. Should be the same size as the offset,
+	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<FileCreationError> writeFile(const Path& path, uint16_t startByte, uint16_t offSet, etl::span<uint8_t>
-	 buffer);
+	etl::optional<FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength, etl::span<uint8_t> buffer);
 
 	/**
 	 * Gets the current file lock status

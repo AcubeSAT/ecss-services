@@ -1,9 +1,11 @@
 #include "ECSS_Configuration.hpp"
+#include "Helpers/Filesystem.hpp"
 #ifdef SERVICE_MEMORY
 
 #include <cerrno>
 #include <etl/String.hpp>
 #include "Services/MemoryManagementService.hpp"
+#include "Filesystem/Filesystem.hpp"
 
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this),
                                                      structuredDataMemoryManagementSubService(*this) {
@@ -178,78 +180,90 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	auto memoryID = static_cast<MemoryID>(request.read<MemoryId>());
 
 	if (!mainService.memoryIdValidator(memoryID)) {
-		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryId);
+		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryID);
 		return;
 	}
 
-	// Read number of data blocks to load
 	uint16_t const iterationCount = request.readUint16();
 
-	// Process each data block
 	for (uint16_t i = 0; i < iterationCount; i++) {
-		// Read start address and data length
-		const StartAddress startAddress = request.read<StartAddress>();
-		const MemoryDataLength dataLength = request.readOctetString(readData.data());
+		Filesystem::Path filePath;
+		request.readString(filePath.data(), filePath.capacity());
+		const uint16_t startByte = request.read<Offset>();
+		const uint16_t dataLength = request.read<FileDataLength>();
+		
+		etl::array<uint8_t, ECSSMaxFixedOctetStringSize> data;
+		request.readOctetString(data.data(), dataLength);
 
-		// Validate address range
-		if (!mainService.addressValidator(memoryID, startAddress) ||
-			!mainService.addressValidator(memoryID, startAddress + dataLength)) {
-			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
-			continue;
-		}
-
-		// Load data into memory
-		for (std::size_t j = 0; j < dataLength; j++) {
-			*(reinterpret_cast<uint8_t*>(startAddress) + j) = readData[j];
+		// Write data to file
+		auto result = Filesystem::writeFile(filePath, startByte, dataLength, etl::span<uint8_t>(data.data(), dataLength));
+		
+		if (result.has_value()) {
+			switch (result.value()) {
+				case Filesystem::FileWriteError::FileNotFound:
+					ErrorHandler::reportError(request, ErrorHandler::FileNotFound);
+					break;
+				case Filesystem::FileWriteError::InvalidBufferSize:
+					ErrorHandler::reportError(request, ErrorHandler::InvalidBufferSize);
+					break;
+				case Filesystem::FileWriteError::InvalidOffset:
+					ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+					break;
+				case Filesystem::FileWriteError::WriteError:
+				case Filesystem::FileWriteError::UnknownError:
+					ErrorHandler::reportError(request, ErrorHandler::WriteError);
+					break;
+			}
 		}
 	}
 }
 
 void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObjectMemoryData(Message& request) {
-	request.assertTC(MemoryManagementService::ServiceType, MessageType::DumpObjectMemoryData);
+	request.assertTC(ServiceType, MessageType::DumpObjectMemoryData);
+	auto memoryID = static_cast<MemoryID>(request.read<MemoryId>());
 
-	// Read memory ID from request
-	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
-
-	// Validate memory ID
 	if (!mainService.memoryIdValidator(memoryID)) {
-		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryId);
+		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryID);
 		return;
 	}
 
-	// Read number of data blocks to dump
 	uint16_t const iterationCount = request.readUint16();
 
-	// Create report message
-	Message report = Message(MemoryManagementService::ServiceType, 
-						   MessageType::DumpedObjectMemoryDataReport);
+	Message report = Message(ServiceType, DumpedObjectMemoryDataReport, Message::TM);
 	report.appendUint16(iterationCount);
 
-	// Process each data block
 	for (uint16_t i = 0; i < iterationCount; i++) {
-		// Read start address and length
-		const StartAddress startAddress = request.read<StartAddress>();
-		const MemoryDataLength readLength = request.read<MemoryDataLength>();
+		Filesystem::Path filePath;
+		request.readString(filePath.data(), filePath.capacity());
+		const Offset startByte = request.read<Offset>();
+		const FileDataLength readLength = request.read<FileDataLength>();
 
-		// Validate address range
-		if (!mainService.addressValidator(memoryID, startAddress) ||
-			!mainService.addressValidator(memoryID, startAddress + readLength)) {
-			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
-			continue;
+		etl::array<uint8_t, ECSSMaxFixedOctetStringSize> data;
+		auto result = Filesystem::readFile(filePath, startByte, readLength, etl::span<uint8_t>(data.data(), readLength));
+
+		if (result.has_value()) {
+			switch (result.value()) {
+				case Filesystem::FileReadError::FileNotFound:
+					ErrorHandler::reportError(request, ErrorHandler::FileNotFound);
+					continue;
+				case Filesystem::FileReadError::InvalidBufferSize:
+					ErrorHandler::reportError(request, ErrorHandler::InvalidBufferSize);
+					continue;
+				case Filesystem::FileReadError::InvalidOffset:
+					ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+					continue;
+				case Filesystem::FileReadError::ReadError:
+				case Filesystem::FileReadError::UnknownError:
+					ErrorHandler::reportError(request, ErrorHandler::ReadError);
+					continue;
+			}
 		}
 
-		// Read data from memory
-		for (std::size_t j = 0; j < readLength; j++) {
-			readData[j] = *(reinterpret_cast<uint8_t*>(startAddress) + j);
-		}
-
-		// Add data block to report
-		report.append<StartAddress>(startAddress);
-		report.append<MemoryDataLength>(readLength);
-		report.appendOctetString(readData.data(), readLength);
+		report.append<Offset>(startByte);
+		report.append<FileDataLength>(readLength);
+		report.appendOctetString(data.data(), readLength);
 	}
 
-	// Send report
 	mainService.storeMessage(report);
 }
 

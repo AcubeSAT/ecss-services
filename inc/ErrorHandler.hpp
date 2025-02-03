@@ -431,6 +431,10 @@ public:
 		 * PMON Check Type is requested, but it is missing (ST[12])
 		 */
 		 PMONCheckTypeMissing = 63,
+		/**
+		 * Memoroy ID during an ST06 call is invalid - meaning this ID doesn't exist in the predefined enum
+		 */
+		InvalidMemoryID = 64,
 	};
 
 	/**
