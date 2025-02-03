@@ -120,7 +120,7 @@ bool ApplicationProcessConfiguration::canMessageBeAdded(const Message& request, 
 		return false;
 	}
 
-	if (reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType)) {
+	if (reportExistsInAppProcessConfiguration(request, applicationID, serviceType, messageType)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingReportType);
 		return false;
 	}

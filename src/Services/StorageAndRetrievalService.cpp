@@ -210,8 +210,8 @@ bool StorageAndRetrievalService::checkIfTelemetryCanBeAdded(const PacketStoreId&
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromDisabledPacketStore);
 		return false;
 	}
-	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].reportExistsInAppProcessConfiguration(message
-	.applicationId, message.serviceType, message.messageType)) {
+	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].reportExistsInAppProcessConfiguration
+	(message, message.applicationId, message.serviceType, message.messageType)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromPacketStoreDueToAppProcessConfiguration);
 		return false;
 	}
