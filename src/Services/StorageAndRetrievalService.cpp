@@ -1,5 +1,5 @@
 #include "Services/StorageAndRetrievalService.hpp"
-
+#include "Helpers/TimeGetter.hpp"
 PacketStoreId StorageAndRetrievalService::readPacketStoreId(Message& message) {
 	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId = {};
 	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
@@ -419,9 +419,13 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 	}
 
 	const Time::DefaultCUC newStartTimeTag = request.read<Time::DefaultCUC>();
-	/**
-	 * @todo (#263): check if newStartTimeTag is in the future
-	 */
+
+
+	if (newStartTimeTag > TimeGetter::getCurrentTimeDefaultCUC()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NewStartTimeTagIsInTheFuture);
+		return;
+	}
+
 	const NumOfPacketStores numOfPacketStores = request.readUint16();
 	if (numOfPacketStores == 0) {
 		for (auto& packetStore: packetStores) {

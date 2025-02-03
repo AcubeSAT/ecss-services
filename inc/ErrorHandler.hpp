@@ -449,7 +449,11 @@ public:
 		/**
 		 * By-time-range retrieval time window is in the past, meaning that the oldest packet in the packet store is after the retrieval end time
 		 */
-		ByTimeRangeRetrievalTimeWindowInThePast = 65
+		ByTimeRangeRetrievalTimeWindowInThePast = 65,
+		/**
+		 * New start time tag is in the future - during the change open retrieval starting time tag TC[15,14]
+		 */
+		NewStartTimeTagIsInTheFuture = 66
 	};
 
 	/**
