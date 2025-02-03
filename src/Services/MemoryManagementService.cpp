@@ -5,11 +5,15 @@
 #include <etl/String.hpp>
 #include "Services/MemoryManagementService.hpp"
 
-MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
+MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this),
+                                                     structuredDataMemoryManagementSubService(*this) {
 	serviceType = MemoryManagementService::ServiceType;
 }
 
-MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
+MemoryManagementService::RawDataMemoryManagementSubService::RawDataMemoryManagementSubService(MemoryManagementService& parent)
+    : mainService(parent) {}
+
+MemoryManagementService::StructuredDataMemoryManagementSubService::StructuredDataMemoryManagementSubService(MemoryManagementService& parent)
     : mainService(parent) {}
 
 void MemoryManagementService::loadRawData(Message& request) {
@@ -66,7 +70,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	}
 }
 
-void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {
+void MemoryManagementService::RawDataMemoryManagementSubService::dumpRawData(Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::DumpRawMemoryData)) {
 		return;
 	}
@@ -106,7 +110,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	}
 }
 
-void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& request) {
+void MemoryManagementService::RawDataMemoryManagementSubService::checkRawData(Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::CheckRawMemoryData)) {
 		return;
 	}
@@ -169,8 +173,91 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryMa
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
 
+void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObjectMemoryData(Message& request) {
+	request.assertTC(ServiceType, LoadObjectMemoryData);
+	auto memoryID = static_cast<MemoryID>(request.read<MemoryId>());
+
+	if (!mainService.memoryIdValidator(memoryID)) {
+		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryId);
+		return;
+	}
+
+	// Read number of data blocks to load
+	uint16_t const iterationCount = request.readUint16();
+
+	// Process each data block
+	for (uint16_t i = 0; i < iterationCount; i++) {
+		// Read start address and data length
+		const StartAddress startAddress = request.read<StartAddress>();
+		const MemoryDataLength dataLength = request.readOctetString(readData.data());
+
+		// Validate address range
+		if (!mainService.addressValidator(memoryID, startAddress) ||
+			!mainService.addressValidator(memoryID, startAddress + dataLength)) {
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			continue;
+		}
+
+		// Load data into memory
+		for (std::size_t j = 0; j < dataLength; j++) {
+			*(reinterpret_cast<uint8_t*>(startAddress) + j) = readData[j];
+		}
+	}
+}
+
+void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObjectMemoryData(Message& request) {
+	request.assertTC(MemoryManagementService::ServiceType, MessageType::DumpObjectMemoryData);
+
+	// Read memory ID from request
+	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
+
+	// Validate memory ID
+	if (!mainService.memoryIdValidator(memoryID)) {
+		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryId);
+		return;
+	}
+
+	// Read number of data blocks to dump
+	uint16_t const iterationCount = request.readUint16();
+
+	// Create report message
+	Message report = Message(MemoryManagementService::ServiceType, 
+						   MessageType::DumpedObjectMemoryDataReport);
+	report.appendUint16(iterationCount);
+
+	// Process each data block
+	for (uint16_t i = 0; i < iterationCount; i++) {
+		// Read start address and length
+		const StartAddress startAddress = request.read<StartAddress>();
+		const MemoryDataLength readLength = request.read<MemoryDataLength>();
+
+		// Validate address range
+		if (!mainService.addressValidator(memoryID, startAddress) ||
+			!mainService.addressValidator(memoryID, startAddress + readLength)) {
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			continue;
+		}
+
+		// Read data from memory
+		for (std::size_t j = 0; j < readLength; j++) {
+			readData[j] = *(reinterpret_cast<uint8_t*>(startAddress) + j);
+		}
+
+		// Add data block to report
+		report.append<StartAddress>(startAddress);
+		report.append<MemoryDataLength>(readLength);
+		report.appendOctetString(readData.data(), readLength);
+	}
+
+	// Send report
+	mainService.storeMessage(report);
+}
+
 void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
+		case LoadObjectMemoryData:
+			structuredDataMemoryManagementSubService.loadObjectMemoryData(message);
+			break;
 		case LoadRawMemoryDataAreas:
 			loadRawData(message);
 			break;
@@ -179,6 +266,9 @@ void MemoryManagementService::execute(Message& message) {
 			break;
 		case CheckRawMemoryData:
 			rawDataMemorySubservice.checkRawData(message);
+			break;
+		case DumpObjectMemoryData:
+			structuredDataMemoryManagementSubService.dumpObjectMemoryData(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

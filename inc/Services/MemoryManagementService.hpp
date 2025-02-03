@@ -32,14 +32,19 @@ public:
 	inline static constexpr ServiceTypeNum ServiceType = 6;
 
 	enum MessageType : uint8_t {
+		LoadObjectMemoryData = 1,
 		LoadRawMemoryDataAreas = 2,
+		DumpObjectMemoryData = 3,
+		DumpedObjectMemoryDataReport = 4,
 		DumpRawMemoryData = 5,
 		DumpRawMemoryDataReport = 6,
 		CheckRawMemoryData = 9,
 		CheckRawMemoryDataReport = 10,
 	};
 
-	// Memory type ID's
+	/**
+	 * The IDs of memories managed by the current service
+	 */
 	enum MemoryID {
 		DTCMRAM = 0,
 		RAM_D1,
@@ -59,12 +64,12 @@ public:
 	 * 			As per the ECSS manual, each memory service has to have at most one raw memory
 	 * 			data management subservice
 	 */
-	class RawDataMemoryManagement {
+	class RawDataMemoryManagementSubService {
 	private:
 		MemoryManagementService& mainService; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) // Used to access main class's members
 
 	public:
-		explicit RawDataMemoryManagement(MemoryManagementService& parent);
+		explicit RawDataMemoryManagementSubService(MemoryManagementService& parent);
 
 		/**
 		 * TC[6,5] read raw memory values
@@ -90,6 +95,35 @@ public:
 		 */
 		void checkRawData(Message& request);
 	} rawDataMemorySubservice;
+
+	/**
+	 * Structured data memory management subservice class. This class offers the capability of handling structured data
+	 * in a memory. For example, it can handle the transfer of a stored file from a Memory to the Ground Station.
+	 */
+	class StructuredDataMemoryManagementSubService {
+		private:
+		MemoryManagementService& mainService;
+
+	public:
+		explicit StructuredDataMemoryManagementSubService(MemoryManagementService& parent);
+
+		/**
+		 * @brief Load structured data into memory
+		 * @details Loads structured data into the specified memory area
+		 * @param request The TC[6,1] request message
+		 */
+		void loadObjectMemoryData(Message& request);
+
+		/**
+		 * @brief Dump structured memory data
+		 * @details Reads structured data from the specified memory area and generates a report
+		 * @param request The TC[6,3] request message
+		 */
+		void dumpObjectMemoryData(Message& request);
+
+		void dumpedStructuredDataReport();
+
+	} structuredDataMemoryManagementSubService;
 
 	/**
 	 * TC[6,2] load raw values to memory

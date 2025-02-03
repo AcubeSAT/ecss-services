@@ -1,5 +1,7 @@
 #pragma once
 
+#include <etl/span.h>
+
 #include "ECSS_Definitions.hpp"
 #include "etl/String.hpp"
 #include "etl/optional.h"
@@ -146,6 +148,21 @@ namespace Filesystem {
 	 * @param path A String representing the path on the filesystem
 	 */
 	void unlockFile(const Path& path);
+
+	/**
+	 * Creates a file using platform specific filesystem functions
+	 * @param path A String representing the path on the filesystem
+	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
+	 */
+	etl::optional<FileCreationError> readFile(const Path& path, uint16_t startByte, uint16_t offSet, etl::span<uint8_t> buffer);
+
+	/**
+	 * Creates a file using platform specific filesystem functions
+	 * @param path A String representing the path on the filesystem
+	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
+	 */
+	etl::optional<FileCreationError> writeFile(const Path& path, uint16_t startByte, uint16_t offSet, etl::span<uint8_t>
+	 buffer);
 
 	/**
 	 * Gets the current file lock status
