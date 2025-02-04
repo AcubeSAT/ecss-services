@@ -1,4 +1,6 @@
 #include "ECSS_Configuration.hpp"
+#include "ServicePool.hpp"
+#include "Services/RequestVerificationService.hpp"
 #ifdef SERVICE_MEMORY
 
 #include <cerrno>
@@ -187,94 +189,91 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	Path fullPath = "";
 	readAndBuildPath(request, fullPath);
 
-	auto const remainingInstructions = request.read<InstructionType>();
+	auto remainingInstructions = request.read<InstructionType>();
 	bool hasError = false;
 	
 	while (remainingInstructions-- && !hasError) {
 		const Offset offset = request.read<Offset>();
 		const FileDataLength dataLength = request.read<FileDataLength>();
 		
-		etl::array<uint8_t, dataLength> data;
-		request.readString(data, dataLength);
+		String<ChunkMaxFileSizeBytes> data = "";
+		request.readString(data.data(), dataLength);
 
-		auto result = Filesystem::writeFile(filePath, offset, dataLength, etl::span<uint8_t>(data.data(), dataLength));
+		auto result = writeFile(fullPath, offset, dataLength, data);
 		
 		if (result.has_value()) {
 			hasError = true;
-			RequestVerificationService::failStartExecutionVerification(request);
+			auto error = ErrorHandler::ExecutionStartErrorType::UnknownMemoryWriteError;
+
 			switch (result.value()) {
-				case Filesystem::FileWriteError::FileNotFound:
-					auto error = ErrorHandler::ExecutionStart::MemoryObjectDoesNotExist;
-				case Filesystem::FileWriteError::InvalidBufferSize:
-					error = ErrorHandler::ExecutionStart::MemoryBufferSizeError;
-				case Filesystem::FileWriteError::InvalidOffset:
-					error = ErrorHandler::ExecutionStart::InvalidMemoryOffset;
-				case Filesystem::FileWriteError::WriteError:
-					error = ErrorHandler::ExecutionStart::MemoryWriteError;
-				case Filesystem::FileWriteError::UnknownError:
-					error = ErrorHandler::ExecutionStart::UnknownMemoryWriteError;
+				case FileWriteError::FileNotFound:
+					error = ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist;
+				case FileWriteError::InvalidBufferSize:
+					error = ErrorHandler::ExecutionStartErrorType::MemoryBufferSizeError;
+				case FileWriteError::InvalidOffset:
+					error = ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset;
+				case FileWriteError::WriteError:
+					error = ErrorHandler::ExecutionStartErrorType::MemoryWriteError;
+				case FileWriteError::UnknownError:
+					error = ErrorHandler::ExecutionStartErrorType::UnknownMemoryWriteError;
 			}
 			ErrorHandler::reportError(request, error);
-			RequestVerificationService::failStartExecutionVerification(request, error);
+			Services.requestVerification.failStartExecutionVerification(request, error);
 			break;
 		}
 	}
 
 	if (!hasError) {
-		RequestVerificationService::successCompletionExecutionVerification(request);
+		Services.requestVerification.successCompletionExecutionVerification(request);
 	} else {
-		RequestVerificationService::failCompletionExecutionVerification(request, ErrorHandler::ExecutionCompletionErrorType::LoadObjectMemoryData);
+		Services.requestVerification.failCompletionExecutionVerification(request, ErrorHandler::ExecutionCompletionErrorType::LoadObjectMemoryData);
 	}
 }
 
 void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObjectMemoryData(Message& request) {
-	if (not request.assertTC(ServiceType, MessageType::DumpObjectMemoryData)) {
+	if (not request.assertTC(ServiceType, DumpObjectMemoryData)) {
 		return;
 	}
 
-	Message report = Message(ServiceType, DumpedObjectMemoryDataReport, Message::TM);
+	auto report = Message(ServiceType, DumpedObjectMemoryDataReport, Message::TM);
 	Path fullPath = "";
 	readAndBuildPath(request, fullPath);
 
-	auto const remainingInstructions = request.read<InstructionType>();
-	bool hasError = false;
-	report.append<String<FullPathSize>>(fullPath);
+	auto remainingInstructions = request.read<InstructionType>();
+	report.appendString(fullPath);
 	report.append<InstructionType>(remainingInstructions);
 
 	while (remainingInstructions--) {
-		hasError = !dumpedStructuredDataReport(report, fullPath, offset, dataLength);
+		const Offset offset = report.read<Offset>();
+		const FileDataLength readLength = report.read<FileDataLength>();
+		dumpedStructuredDataReport(report, fullPath, offset, readLength, remainingInstructions == 0);
 	}
 }
 
-bool MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report, Filesystem::Path filePath, Offset offset, FileDataLength dataLength, bool isFinal) {
-		const Offset offset = request.read<Offset>();
-		const FileDataLength readLength = request.read<FileDataLength>();
-		
-		String<readLength> data;
-		auto result = Filesystem::readFile(filePath, offset, readLength, etl::span<uint8_t>(data.data(), readLength));
-
+void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report,
+const Path& filePath, const Offset offset, const FileDataLength readLength, const bool isFinal) const {
+		String<ChunkMaxFileSizeBytes> data = "";
+		auto result = readFile(filePath, offset, readLength, data);
+		bool hasError = false;
 		if (result.has_value()) {
 			hasError = true;
-			RequestVerificationService::failStartExecutionVerification(request);
+			auto error = ErrorHandler::ExecutionStartErrorType::UnknownMemoryReadError;
 			switch (result.value()) {
-				case Filesystem::FileWriteError::FileNotFound:
-					auto error = ErrorHandler::ExecutionStart::MemoryObjectDoesNotExist;
-				case Filesystem::FileWriteError::InvalidBufferSize:
-					error = ErrorHandler::ExecutionStart::MemoryBufferSizeError;
-				case Filesystem::FileWriteError::InvalidOffset:
-					error = ErrorHandler::ExecutionStart::InvalidMemoryOffset;
-				case Filesystem::FileWriteError::WriteError:
-					error = ErrorHandler::ExecutionStart::MemoryReadError;
-				case Filesystem::FileWriteError::UnknownError:
-					error = ErrorHandler::ExecutionStart::UnknownMemoryReadError;
+				case FileReadError::FileNotFound:
+					error = ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist;
+				case FileReadError::InvalidBufferSize:
+					error = ErrorHandler::ExecutionStartErrorType::MemoryBufferSizeError;
+				case FileReadError::InvalidOffset:
+					error = ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset;
+				case FileReadError::ReadError:
+					error = ErrorHandler::ExecutionStartErrorType::MemoryReadError;
 			}
-			ErrorHandler::reportError(request, error);
-			RequestVerificationService::failStartExecutionVerification(request, error);
+			ErrorHandler::reportError(report, error);
+			Services.requestVerification.failStartExecutionVerification(report, error);
 		}
 		if (hasError) {
 			report.append<Offset>(0);
 			report.append<FileDataLength>(0);
-			return false;
 		}
 
 		report.append<Offset>(offset);
@@ -283,13 +282,12 @@ bool MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedSt
 		if (isFinal) {
 			mainService.storeMessage(report);
 		}
-		return !hasError;
 }
 
 void MemoryManagementService::execute(Message& message) {
 	switch (message.messageType) {
 		case LoadObjectMemoryData:
-			structuredDataMemoryManagementSubService.loadObjectMemoryData(message);
+			StructuredDataMemoryManagementSubService::loadObjectMemoryData(message);
 			break;
 		case LoadRawMemoryDataAreas:
 			loadRawData(message);

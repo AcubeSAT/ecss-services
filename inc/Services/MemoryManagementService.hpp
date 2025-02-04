@@ -8,6 +8,7 @@
 #include "Service.hpp"
 #include "etl/unordered_map.h"
 #include "etl/unordered_set.h"
+#include "Helpers/Filesystem.hpp"
 
 /**
  * Number of Bits in Memory Management Checksum
@@ -114,7 +115,7 @@ public:
 		 * @details Loads structured data into the specified memory area
 		 * @param request The TC[6,1] request message
 		 */
-		void loadObjectMemoryData(Message& request);
+		static void loadObjectMemoryData(Message& request);
 
 		/**
 		 * @brief Dump structured memory data
@@ -134,11 +135,11 @@ public:
 		 * @param report The TM[6,4] message
 		 * @param filePath The path of the file to be dumped
 		 * @param offset The offset of the dumped structured data
-		 * @param dataLength The length of the dumped structured data
+		 * @param readLength The length of the dumped structured data
 		 * @param isFinal Whether more data is expected or not to be appended to the report. If true, the report is also generated and stored.
-		 * @returns true if the appending of new data was successful
 		 */
-		bool dumpedStructuredDataReport(Message& report, Filesystem::Path filePath, Offset offset, FileDataLength dataLength, bool isFinal);
+		void dumpedStructuredDataReport(Message& report, const Filesystem::Path& filePath, Offset offset, FileDataLength
+		readLength, bool isFinal) const;
 
 	} structuredDataMemoryManagementSubService;
 

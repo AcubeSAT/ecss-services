@@ -48,8 +48,7 @@ namespace Filesystem {
 	}
 
 
-	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length,
-		etl::span<uint8_t> buffer) {
+	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, String<ChunkMaxFileSizeBytes>& buffer) {
 		if (buffer.size() != length) {
 			return FileReadError::InvalidBufferSize;
 		}
@@ -67,7 +66,7 @@ namespace Filesystem {
 		}
 
 		file.seekg(offset, std::ios::beg);
-		file.read(reinterpret_cast<char*>(buffer.data()), length);
+		file.read(buffer.data(), length);
 
 		if (file.fail()) {
 			return FileReadError::ReadError;
@@ -76,8 +75,7 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 
-	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength,
-		etl::span<uint8_t> buffer) {
+	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength, String<ChunkMaxFileSizeBytes>& buffer) {
 		if (buffer.size() != fileDataLength) {
 			return FileWriteError::InvalidBufferSize;
 		}
@@ -95,7 +93,7 @@ namespace Filesystem {
 		}
 
 		file.seekp(offset, std::ios::beg);
-		file.write(reinterpret_cast<const char*>(buffer.data()), fileDataLength);
+		file.write(buffer.data(), fileDataLength);
 
 		if (file.fail()) {
 			return FileWriteError::WriteError;

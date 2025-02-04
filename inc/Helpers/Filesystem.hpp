@@ -178,8 +178,7 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength,
-		etl::span <uint8_t> buffer);
+	etl::optional <FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength, String<ChunkMaxFileSizeBytes>& buffer);
 
 	/**
 	 * Creates a file using platform specific filesystem functions
@@ -190,8 +189,7 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength,
-		etl::span <uint8_t> buffer);
+	etl::optional <FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength, String<ChunkMaxFileSizeBytes>& buffer);
 
 	/**
 	 * Gets the current file lock status

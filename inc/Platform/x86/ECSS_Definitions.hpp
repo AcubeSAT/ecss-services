@@ -271,5 +271,14 @@ inline constexpr size_t FullPathSize = ECSSMaxStringSize;
  */
 inline constexpr size_t ObjectPathSize = (FullPathSize / 2) - 1;
 
+/**
+ * The maximum possible size of a file, in bytes.
+ */
+inline static constexpr size_t MaxPossibleFileSizeBytes = 4096;
+
+/**
+ * The max size in bytes, of a chunk of a file, to be read or written
+ */
+inline static constexpr uint16_t ChunkMaxFileSizeBytes = MaxPossibleFileSizeBytes;
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
