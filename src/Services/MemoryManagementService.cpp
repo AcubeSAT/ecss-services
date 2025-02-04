@@ -1,10 +1,10 @@
 #include "ECSS_Configuration.hpp"
-#include "Helpers/Filesystem.hpp"
 #ifdef SERVICE_MEMORY
 
 #include <cerrno>
 #include <etl/String.hpp>
 #include "Services/MemoryManagementService.hpp"
+#include "Helpers/Filesystem.hpp"
 
 using namespace Filesystem;
 
@@ -184,47 +184,46 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 		return;
 	}
 
-	auto memoryID = static_cast<MemoryID>(request.read<MemoryId>());
+	Path fullPath = "";
+	readAndBuildPath(request, fullPath);
 
-	if (!mainService.memoryIdValidator(memoryID)) {
-		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryID);
-		return;
-	}
-
-	uint16_t const iterationCount = request.readUint16();
-
-	for (uint16_t i = 0; i < iterationCount; i++) {
-		Path filePath = "";
-		ObjectPath repositoryPath = "";
-		ObjectPath fileName = "";
-		Path fullPath = "";
-		readAndBuildPath(request, repositoryPath, fileName, fullPath);
-		const uint16_t startByte = request.read<Offset>();
-		const uint16_t dataLength = request.read<FileDataLength>();
+	auto const remainingInstructions = request.read<InstructionType>();
+	bool hasError = false;
+	
+	while (remainingInstructions-- && !hasError) {
+		const Offset startByte = request.read<Offset>();
+		const FileDataLength dataLength = request.read<FileDataLength>();
 		
-		etl::array<uint8_t, ECSSMaxFixedOctetStringSize> data;
-		request.readOctetString(data, dataLength);
+		etl::array<uint8_t, dataLength> data;
+		request.readString(data, dataLength);
 
-		// Write data to file
 		auto result = Filesystem::writeFile(filePath, startByte, dataLength, etl::span<uint8_t>(data.data(), dataLength));
 		
 		if (result.has_value()) {
+			hasError = true;
+			RequestVerificationService::failStartExecutionVerification(request);
 			switch (result.value()) {
 				case Filesystem::FileWriteError::FileNotFound:
-					ErrorHandler::reportError(request, ErrorHandler::FileNotFound);
-					break;
+					auto error = ErrorHandler::ExecutionStart::MemoryObjectDoesNotExist;
 				case Filesystem::FileWriteError::InvalidBufferSize:
-					ErrorHandler::reportError(request, ErrorHandler::InvalidBufferSize);
-					break;
+					error = ErrorHandler::ExecutionStart::MemoryBufferSizeError;
 				case Filesystem::FileWriteError::InvalidOffset:
-					ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
-					break;
+					error = ErrorHandler::ExecutionStart::InvalidMemoryOffset;
 				case Filesystem::FileWriteError::WriteError:
+					error = ErrorHandler::ExecutionStart::MemoryWriteError;
 				case Filesystem::FileWriteError::UnknownError:
-					ErrorHandler::reportError(request, ErrorHandler::WriteError);
-					break;
+					error = ErrorHandler::ExecutionStart::UnknownMemoryWriteError;
 			}
+			ErrorHandler::reportError(request, error);
+			RequestVerificationService::failStartExecutionVerification(request, error);
+			break;
 		}
+	}
+
+	if (!hasError) {
+		RequestVerificationService::successCompletionExecutionVerification(request);
+	} else {
+		RequestVerificationService::failCompletionExecutionVerification(request, ErrorHandler::ExecutionCompletionErrorType::LoadObjectMemoryData);
 	}
 }
 

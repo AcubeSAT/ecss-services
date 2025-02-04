@@ -61,3 +61,8 @@ using ErrorCode = uint16_t;
  */
 using Offset = uint16_t;
 using FileDataLength = uint16_t;
+
+/**
+ * Type of the numOfInstructions parameter in TC[6,1] - loadObjectMemoryData
+ */
+using InstructionType = uint16_t;

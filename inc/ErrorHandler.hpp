@@ -435,6 +435,26 @@ public:
 		 * Memoroy ID during an ST06 call is invalid - meaning this ID doesn't exist in the predefined enum
 		 */
 		InvalidMemoryID = 64,
+		/**
+		 * Invalid buffer size during memory operations
+		 */
+		MemoryBufferSizeError = 65,
+		/**
+		 * Error during memory write operation
+		 */
+		MemoryWriteError = 66,
+		/**
+		 * Unknown error during memory write operation
+		 */
+		UnknownMemoryWriteError = 67,
+		/**
+		 * The requested memory object does not exist
+		 */
+		MemoryObjectDoesNotExist = 68,
+		/**
+		 * Memory offset is outside the valid range for the specified memory operation
+		 */
+		InvalidMemoryOffset = 69,
 	};
 
 	/**
@@ -495,6 +515,10 @@ public:
 		 * A delete directory command was requested on a non empty directory
 		 */
 		AttemptedDeleteNonEmptyDirectory = 10,
+		/**
+		 * The request to load object memory data failed
+		 */
+		LoadObjectMemoryData = 70,
 	};
 
 	/**

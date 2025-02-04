@@ -245,4 +245,16 @@ namespace Filesystem {
 		fileName = message.readOctetString <ObjectPathSize>();
 		fullPath = getFullPath(repositoryPath, fileName);
 	}
+
+	/**
+	 * Reads repository path and filename from a message and constructs a full path
+	 * Overloaded function to read only the full path from a message
+	 * @param message The message to read from
+	 * @param fullPath Reference to store the constructed full path
+	 */
+	static void readAndBuildPath(Message& message, Path& fullPath) {
+		auto repositoryPath = message.readOctetString <ObjectPathSize>();
+		auto fileName = message.readOctetString <ObjectPathSize>();
+		fullPath = getFullPath(repositoryPath, fileName);
+	}
 } // namespace Filesystem

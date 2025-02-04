@@ -99,6 +99,8 @@ public:
 	/**
 	 * Structured data memory management subservice class. This class offers the capability of handling structured data
 	 * in a memory. For example, it can handle the transfer of a stored file from a Memory to the Ground Station.
+	 * @note The base plus offset scheme, as defined by 6.6.4.3 is the repository path + file name
+	 * @note We assume that only one memory is managed by the current subservice. That means that we don't read for memory ID.
 	 */
 	class StructuredDataMemoryManagementSubService {
 		private:
