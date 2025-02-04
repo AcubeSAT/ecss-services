@@ -232,14 +232,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 		return;
 	}
 
-	auto memoryID = static_cast<MemoryID>(request.read<MemoryId>());
-
-	if (!mainService.memoryIdValidator(memoryID)) {
-		ErrorHandler::reportError(request, ErrorHandler::InvalidMemoryID);
-		return;
-	}
-
-	uint16_t const iterationCount = request.readUint16();
+	auto const remainingInstructions = request.read<InstructionType>();
 
 	Message report = Message(ServiceType, DumpedObjectMemoryDataReport, Message::TM);
 	report.appendUint16(iterationCount);
