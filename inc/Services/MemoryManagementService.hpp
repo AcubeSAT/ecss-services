@@ -138,7 +138,7 @@ public:
 		 * @param isFinal Whether more data is expected or not to be appended to the report. If true, the report is also generated and stored.
 		 * @returns true if the appending of new data was successful
 		 */
-		bool dumpedStructuredDataReport(Message& report, FilePath filePath, Offset offset, FileDataLength dataLength, bool isFinal);
+		bool dumpedStructuredDataReport(Message& report, Path filePath, Offset offset, FileDataLength dataLength, bool isFinal);
 
 	} structuredDataMemoryManagementSubService;
 
