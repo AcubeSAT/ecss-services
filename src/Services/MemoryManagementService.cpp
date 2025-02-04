@@ -191,13 +191,13 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	bool hasError = false;
 	
 	while (remainingInstructions-- && !hasError) {
-		const Offset startByte = request.read<Offset>();
+		const Offset offset = request.read<Offset>();
 		const FileDataLength dataLength = request.read<FileDataLength>();
 		
 		etl::array<uint8_t, dataLength> data;
 		request.readString(data, dataLength);
 
-		auto result = Filesystem::writeFile(filePath, startByte, dataLength, etl::span<uint8_t>(data.data(), dataLength));
+		auto result = Filesystem::writeFile(filePath, offset, dataLength, etl::span<uint8_t>(data.data(), dataLength));
 		
 		if (result.has_value()) {
 			hasError = true;
@@ -232,19 +232,21 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 		return;
 	}
 
-	auto const remainingInstructions = request.read<InstructionType>();
-
 	Message report = Message(ServiceType, DumpedObjectMemoryDataReport, Message::TM);
-	report.appendUint16(iterationCount);
+	Path fullPath = "";
+	readAndBuildPath(request, fullPath);
 
-	for (uint16_t i = 0; i < iterationCount; i++) {
-		Filesystem::Path filePath;
-		request.readString(filePath.data(), filePath.capacity());
-		const Offset startByte = request.read<Offset>();
+	auto const remainingInstructions = request.read<InstructionType>();
+	bool hasError = false;
+	report.append<String<FullPathSize>>(fullPath);
+	report.append<InstructionType>(remainingInstructions);
+
+	while (remainingInstructions-- && !hasError) {
+		const Offset offset = request.read<Offset>();
 		const FileDataLength readLength = request.read<FileDataLength>();
-
-		etl::array<uint8_t, ECSSMaxFixedOctetStringSize> data;
-		auto result = Filesystem::readFile(filePath, startByte, readLength, etl::span<uint8_t>(data.data(), readLength));
+		
+		etl::array<uint8_t, readLength> data;
+		auto result = Filesystem::readFile(filePath, offset, readLength, etl::span<uint8_t>(data.data(), readLength));
 
 		if (result.has_value()) {
 			switch (result.value()) {
