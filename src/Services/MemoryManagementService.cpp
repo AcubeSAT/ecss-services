@@ -246,7 +246,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 	}
 }
 
-bool MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report, Path filePath, Offset offset, FileDataLength dataLength, bool isFinal) {
+bool MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report, Filesystem::Path filePath, Offset offset, FileDataLength dataLength, bool isFinal) {
 		const Offset offset = request.read<Offset>();
 		const FileDataLength readLength = request.read<FileDataLength>();
 		
