@@ -444,17 +444,25 @@ public:
 		 */
 		MemoryWriteError = 66,
 		/**
+		 * Error during memory read operation
+		 */
+		MemoryReadError = 67,
+		/**
 		 * Unknown error during memory write operation
 		 */
-		UnknownMemoryWriteError = 67,
+		UnknownMemoryWriteError = 68,
+		/**
+		 * Error during memory read operation
+		 */
+		UnknownMemoryReadError = 69,
 		/**
 		 * The requested memory object does not exist
 		 */
-		MemoryObjectDoesNotExist = 68,
+		MemoryObjectDoesNotExist = 70,
 		/**
 		 * Memory offset is outside the valid range for the specified memory operation
 		 */
-		InvalidMemoryOffset = 69,
+		InvalidMemoryOffset = 71,
 	};
 
 	/**

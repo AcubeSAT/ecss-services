@@ -241,12 +241,12 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 	report.append<String<FullPathSize>>(fullPath);
 	report.append<InstructionType>(remainingInstructions);
 
-	while (remainingInstructions-- && !hasError) {
-		dumpedStructuredDataReport(report, fullPath, offset, dataLength);
+	while (remainingInstructions--) {
+		hasError = !dumpedStructuredDataReport(report, fullPath, offset, dataLength);
 	}
 }
 
-void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report, FilePath filePath, Offset offset, FileDataLength dataLength, bool isFinal) {
+bool MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report, FilePath filePath, Offset offset, FileDataLength dataLength, bool isFinal) {
 		const Offset offset = request.read<Offset>();
 		const FileDataLength readLength = request.read<FileDataLength>();
 		
@@ -254,27 +254,36 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedSt
 		auto result = Filesystem::readFile(filePath, offset, readLength, etl::span<uint8_t>(data.data(), readLength));
 
 		if (result.has_value()) {
+			hasError = true;
+			RequestVerificationService::failStartExecutionVerification(request);
 			switch (result.value()) {
-				case Filesystem::FileReadError::FileNotFound:
-					ErrorHandler::reportError(request, ErrorHandler::FileNotFound);
-					continue;
-				case Filesystem::FileReadError::InvalidBufferSize:
-					ErrorHandler::reportError(request, ErrorHandler::InvalidBufferSize);
-					continue;
-				case Filesystem::FileReadError::InvalidOffset:
-					ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
-					continue;
-				case Filesystem::FileReadError::ReadError:
-				case Filesystem::FileReadError::UnknownError:
-					ErrorHandler::reportError(request, ErrorHandler::ReadError);
-					continue;
+				case Filesystem::FileWriteError::FileNotFound:
+					auto error = ErrorHandler::ExecutionStart::MemoryObjectDoesNotExist;
+				case Filesystem::FileWriteError::InvalidBufferSize:
+					error = ErrorHandler::ExecutionStart::MemoryBufferSizeError;
+				case Filesystem::FileWriteError::InvalidOffset:
+					error = ErrorHandler::ExecutionStart::InvalidMemoryOffset;
+				case Filesystem::FileWriteError::WriteError:
+					error = ErrorHandler::ExecutionStart::MemoryReadError;
+				case Filesystem::FileWriteError::UnknownError:
+					error = ErrorHandler::ExecutionStart::UnknownMemoryReadError;
 			}
+			ErrorHandler::reportError(request, error);
+			RequestVerificationService::failStartExecutionVerification(request, error);
+		}
+		if (hasError) {
+			report.append<Offset>(0);
+			report.append<FileDataLength>(0);
+			return false;
 		}
 
 		report.append<Offset>(offset);
 		report.append<FileDataLength>(readLength);
 		report.appendString(data);
-		mainService.storeMessage(report);
+		if (isFinal) {
+			mainService.storeMessage(report);
+		}
+		return !hasError;
 }
 
 void MemoryManagementService::execute(Message& message) {
