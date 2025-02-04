@@ -5,7 +5,8 @@
 #include <cerrno>
 #include <etl/String.hpp>
 #include "Services/MemoryManagementService.hpp"
-#include "Helpers/Filesystem.hpp"
+
+using namespace Filesystem;
 
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this),
                                                      structuredDataMemoryManagementSubService(*this) {
@@ -27,7 +28,10 @@ void MemoryManagementService::loadRawData(Message& request) {
 	 * @todo (#255): Add error checking and reporting for the parameters
 	 * @todo (#256): Add failure reporting
 	 */
-	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
+	if (not request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas)) {
+		return;
+	}
+
 	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read<MemoryId>());
 
 	if (!memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
@@ -176,7 +180,10 @@ inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryMa
 }
 
 void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObjectMemoryData(Message& request) {
-	request.assertTC(ServiceType, LoadObjectMemoryData);
+	if (not request.assertTC(ServiceType, LoadObjectMemoryData)) {
+		return;
+	}
+
 	auto memoryID = static_cast<MemoryID>(request.read<MemoryId>());
 
 	if (!mainService.memoryIdValidator(memoryID)) {
@@ -187,13 +194,16 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	uint16_t const iterationCount = request.readUint16();
 
 	for (uint16_t i = 0; i < iterationCount; i++) {
-		Filesystem::Path filePath = "";
-		request.readString(filePath.data(), filePath.capacity());
+		Path filePath = "";
+		ObjectPath repositoryPath = "";
+		ObjectPath fileName = "";
+		Path fullPath = "";
+		readAndBuildPath(request, repositoryPath, fileName, fullPath);
 		const uint16_t startByte = request.read<Offset>();
 		const uint16_t dataLength = request.read<FileDataLength>();
 		
 		etl::array<uint8_t, ECSSMaxFixedOctetStringSize> data;
-		request.readOctetString(data.data(), dataLength);
+		request.readOctetString(data, dataLength);
 
 		// Write data to file
 		auto result = Filesystem::writeFile(filePath, startByte, dataLength, etl::span<uint8_t>(data.data(), dataLength));
@@ -219,7 +229,10 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 }
 
 void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObjectMemoryData(Message& request) {
-	request.assertTC(ServiceType, MessageType::DumpObjectMemoryData);
+	if (not request.assertTC(ServiceType, MessageType::DumpObjectMemoryData)) {
+		return;
+	}
+
 	auto memoryID = static_cast<MemoryID>(request.read<MemoryId>());
 
 	if (!mainService.memoryIdValidator(memoryID)) {
