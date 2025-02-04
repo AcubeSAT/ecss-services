@@ -158,7 +158,7 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		// Verify success verification was sent
 		REQUIRE(ServiceTests::hasOneMessage());
 		Message response = ServiceTests::get(0);
-		CHECK(response.messageType == RequestVerificationService::SuccessfulCompletion);
+		CHECK(response.messageType == RequestVerificationService::SuccessfulCompletionOfExecution);
 	}
 
 	SECTION("Multiple instruction load") {
@@ -192,7 +192,7 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		REQUIRE(ServiceTests::hasOneMessage());
 		Message response = ServiceTests::get(0);
-		CHECK(response.messageType == RequestVerificationService::SuccessfulCompletion);
+		CHECK(response.messageType == RequestVerificationService::SuccessfulCompletionOfExecution);
 	}
 
 	SECTION("File not found error") {
@@ -218,11 +218,12 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		// Check error report
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::MemoryObjectDoesNotExist);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() ==
+		ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist);
 
 		// Check failed completion
 		Message completion = ServiceTests::get(1);
-		CHECK(completion.messageType == RequestVerificationService::FailedCompletion);
+		CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
 	}
 
 	SECTION("Invalid offset error") {
@@ -247,7 +248,7 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::InvalidMemoryOffset);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset);
 	}
 }
 
@@ -268,8 +269,8 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		Message response = ServiceTests::get(0);
 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
 		
-		String<FullPathSize> responsePath;
-		response.readString(responsePath);
+		String<FullPathSize> responsePath = "";
+		response.readString(responsePath, FullPathSize);
 		CHECK(responsePath == path);
 		
 		CHECK(response.read<InstructionType>() == 1);
@@ -340,7 +341,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::MemoryObjectDoesNotExist);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist);
 
 		// Verify error response contains zeros
 		Message response = ServiceTests::get(1);
@@ -360,7 +361,7 @@ TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 		const FileDataLength contentLength = sizeof(testData);
 		
 		// Create test file
-		auto writeResult = Filesystem::writeFile(path, 0, contentLength, etl::span<const uint8_t>(testData, contentLength));
+		auto writeResult = Filesystem::writeFile(path, 0, contentLength, testData);
 		REQUIRE(!writeResult.has_value());
 		
 		// Build request
@@ -411,7 +412,7 @@ TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 		// Verify error report
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::InvalidMemoryOffset);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset);
 		
 		// Verify error response format
 		Message report = ServiceTests::get(1);
@@ -442,7 +443,8 @@ TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 		// Verify error report
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::MemoryBufferSizeError);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() ==
+		ErrorHandler::ExecutionStartErrorType::MemoryBufferSizeError);
 		
 		// Verify error response format
 		Message report = ServiceTests::get(1);
@@ -476,7 +478,7 @@ TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 		// Verify error report
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::MemoryReadError);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStartErrorType::MemoryReadError);
 		
 		// Verify error response format
 		Message report = ServiceTests::get(1);
@@ -505,7 +507,8 @@ TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 		// Verify error report
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::UnknownMemoryReadError);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() ==
+		ErrorHandler::ExecutionStartErrorType::UnknownMemoryReadError);
 		
 		// Verify error response format
 		Message report = ServiceTests::get(1);
@@ -524,7 +527,7 @@ TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 		const FileDataLength contentLength = sizeof(testData);
 		
 		// Create test file
-		auto writeResult = Filesystem::writeFile(path, 0, contentLength, etl::span<const uint8_t>(testData, contentLength));
+		auto writeResult = Filesystem::writeFile(path, 0, contentLength, testData);
 		REQUIRE(!writeResult.has_value());
 		
 		request.appendString(path);
@@ -545,7 +548,8 @@ TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 		// Verify error report
 		Message errorReport = ServiceTests::get(0);
 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStart::InvalidMemoryOffset);
+		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() ==
+		ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset);
 		
 		// Verify report format - should contain first block but zeros for second
 		Message report = ServiceTests::get(1);

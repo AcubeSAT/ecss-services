@@ -41,7 +41,7 @@ TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 		message4.appendOctetString(repo4);
 		message4.appendOctetString(file4);
 
-		message4.appendUint32(FileManagementService::MaxPossibleFileSizeBytes + 10);
+		message4.appendUint32(MaxPossibleFileSizeBytes + 10);
 		bool isFileLocked = false;
 		message4.appendBoolean(isFileLocked);
 
