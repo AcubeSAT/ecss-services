@@ -245,7 +245,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 		const Offset offset = request.read<Offset>();
 		const FileDataLength readLength = request.read<FileDataLength>();
 		
-		etl::array<uint8_t, readLength> data;
+		String<readLength> data;
 		auto result = Filesystem::readFile(filePath, offset, readLength, etl::span<uint8_t>(data.data(), readLength));
 
 		if (result.has_value()) {
@@ -266,9 +266,9 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 			}
 		}
 
-		report.append<Offset>(startByte);
+		report.append<Offset>(offset);
 		report.append<FileDataLength>(readLength);
-		report.appendOctetString(data.data(), readLength);
+		report.appendString(data);
 	}
 
 	mainService.storeMessage(report);
