@@ -242,6 +242,11 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 	report.append<InstructionType>(remainingInstructions);
 
 	while (remainingInstructions-- && !hasError) {
+		dumpedStructuredDataReport(report, fullPath, offset, dataLength);
+	}
+}
+
+void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report, FilePath filePath, Offset offset, FileDataLength dataLength, bool isFinal) {
 		const Offset offset = request.read<Offset>();
 		const FileDataLength readLength = request.read<FileDataLength>();
 		
@@ -269,9 +274,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 		report.append<Offset>(offset);
 		report.append<FileDataLength>(readLength);
 		report.appendString(data);
-	}
-
-	mainService.storeMessage(report);
+		mainService.storeMessage(report);
 }
 
 void MemoryManagementService::execute(Message& message) {

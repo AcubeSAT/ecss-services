@@ -123,7 +123,19 @@ public:
 		 */
 		void dumpObjectMemoryData(Message& request);
 
-		void dumpedStructuredDataReport();
+		/**
+		 * @brief Dumped structured data report
+		 * @details Appends to the provided TM[6,4] report the dumped structured data. If the isFinal flag is true, the report is also generated and stored
+		 * @attention It is expected, and not checked, that:
+		 * 1. the provided report is a TM[6,4] message
+		 * 2. it already includes base & N, per the 8.6.2.4 section of the ECSS-E-ST-70-41C standard
+		 * @param report The TM[6,4] message
+		 * @param filePath The path of the file to be dumped
+		 * @param offset The offset of the dumped structured data
+		 * @param dataLength The length of the dumped structured data
+		 * @param isFinal Whether more data is expected or not to be appended to the report. If true, the report is also generated and stored.
+		 */
+		void dumpedStructuredDataReport(Message& report, FilePath filePath, Offset offset, FileDataLength dataLength, bool isFinal);
 
 	} structuredDataMemoryManagementSubService;
 
