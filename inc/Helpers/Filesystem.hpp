@@ -4,21 +4,17 @@
 #include <etl/string_utilities.h>
 
 #include "ECSS_Definitions.hpp"
+#include "Message.hpp"
 #include "TypeDefinitions.hpp"
 #include "etl/String.hpp"
 #include "etl/optional.h"
 #include "etl/result.h"
 
-namespace Filesystem {
-	constexpr size_t FullPathSize = ECSSMaxStringSize;
-	using Path = String<FullPathSize>;
+class Message;
 
-	/**
-	 * ObjectPathSize is half the maximum size, minus one character for the '/' delimiter between the
-	 * repository and file paths.
-	 */
-	constexpr size_t ObjectPathSize = (FullPathSize / 2) - 1;
-	using ObjectPath = String<ObjectPathSize>;
+namespace Filesystem {
+	using Path = String <FullPathSize>;
+	using ObjectPath = String <ObjectPathSize>;
 
 	/**
 	 * The available metadata for a file
@@ -114,49 +110,49 @@ namespace Filesystem {
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<FileCreationError> createFile(const Path& path);
+	etl::optional <FileCreationError> createFile(const Path& path);
 
 	/**
 	 * Deletes a file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a file deletion error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<FileDeletionError> deleteFile(const Path& path);
+	etl::optional <FileDeletionError> deleteFile(const Path& path);
 
 	/**
 	 * Creates a directory using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a directory creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<DirectoryCreationError> createDirectory(const Path& path);
+	etl::optional <DirectoryCreationError> createDirectory(const Path& path);
 
 	/**
 	 * Deletes a directory using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a directory deletion error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
+	etl::optional <DirectoryDeletionError> deleteDirectory(const Path& path);
 
 	/**
 	 * Gets the file metadata
 	 * @param path A String representing the path on the filesystem
 	 * @return Either an Attributes struct if there were no errors, either a FileAttributeError.
 	 */
-	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path);
+	etl::result <Attributes, FileAttributeError> getFileAttributes(const Path& path);
 
 	/**
 	 * Gets the type of node in the filesystem
 	 * @param path A String representing the path on the filesystem
 	 * @return A NodeType value, or nothing if the file can't be accessed
 	 */
-	etl::optional<NodeType> getNodeType(const Path& path);
+	etl::optional <NodeType> getNodeType(const Path& path);
 
 	/**
 	 * An overloaded function providing support for getNodeType on repository objects.
 	 * @param objectPath A String representing a path on the filesystem
 	 * @return A NodeType value
 	 */
-	inline etl::optional<NodeType> getNodeType(const ObjectPath& objectPath) {
+	inline etl::optional <NodeType> getNodeType(const ObjectPath& objectPath) {
 		const Path path = objectPath.data();
 		return getNodeType(path);
 	}
@@ -182,7 +178,8 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength, etl::span<uint8_t> buffer);
+	etl::optional <FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength,
+		etl::span <uint8_t> buffer);
 
 	/**
 	 * Creates a file using platform specific filesystem functions
@@ -193,7 +190,8 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional<FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength, etl::span<uint8_t> buffer);
+	etl::optional <FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength,
+		etl::span <uint8_t> buffer);
 
 	/**
 	 * Gets the current file lock status
@@ -233,4 +231,18 @@ namespace Filesystem {
 		return fullPath;
 	}
 
+
+	/**
+	 * Reads repository path and filename from a message and constructs a full path
+	 * @param message The message to read from
+	 * @param repositoryPath Reference to store the repository path
+	 * @param fileName Reference to store the file name
+	 * @param fullPath Reference to store the constructed full path
+	 */
+	static void readAndBuildPath(Message& message, ObjectPath& repositoryPath,
+		ObjectPath& fileName, Path& fullPath) {
+		repositoryPath = message.readOctetString <ObjectPathSize>();
+		fileName = message.readOctetString <ObjectPathSize>();
+		fullPath = getFullPath(repositoryPath, fileName);
+	}
 } // namespace Filesystem

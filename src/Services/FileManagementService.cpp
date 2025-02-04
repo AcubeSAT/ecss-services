@@ -12,9 +12,10 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
-	auto repositoryPath = message.readOctetString<ObjectPathSize>();
-	auto fileName = message.readOctetString<ObjectPathSize>();
-	auto fullPath = getFullPath(repositoryPath, fileName);
+	ObjectPath repositoryPath = "";
+	ObjectPath fileName = "";
+	Path fullPath = "";
+	readAndBuildPath(message, repositoryPath, fileName, fullPath);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -24,7 +25,7 @@ void FileManagementService::createFile(Message& message) {
 	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
-		                          ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
+			ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 		return;
 	}
 
@@ -45,12 +46,12 @@ void FileManagementService::createFile(Message& message) {
 		switch (fileCreationError.value()) {
 			case FileCreationError::FileAlreadyExists: {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
+					ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
 				return;
 			}
 			default: {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+					ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
 				return;
 			}
 		}
@@ -66,9 +67,10 @@ void FileManagementService::deleteFile(Message& message) {
 		return;
 	}
 
-	auto repositoryPath = message.readOctetString<ObjectPathSize>();
-	auto fileName = message.readOctetString<ObjectPathSize>();
-	auto fullPath = getFullPath(repositoryPath, fileName);
+	ObjectPath repositoryPath = "";
+	ObjectPath fileName = "";
+	Path fullPath = "";
+	readAndBuildPath(message, repositoryPath, fileName, fullPath);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -78,7 +80,7 @@ void FileManagementService::deleteFile(Message& message) {
 	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
-		                          ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+			ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
 		return;
 	}
 
@@ -94,10 +96,12 @@ void FileManagementService::deleteFile(Message& message) {
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 				break;
 			case FileDeletionError::PathLeadsToDirectory:
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnDirectory);
+				ErrorHandler::reportError(message,
+					ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnDirectory);
 				break;
 			case FileDeletionError::FileIsLocked:
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnLockedFile);
+				ErrorHandler::reportError(message,
+					ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteOnLockedFile);
 				break;
 			default:
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownFileDeleteError);
@@ -107,18 +111,20 @@ void FileManagementService::deleteFile(Message& message) {
 }
 
 void FileManagementService::reportAttributes(Message& message) {
-	message.assertTC(ServiceType, ReportAttributes);
+	if (not message.assertTC(ServiceType, ReportAttributes)) {
+		return;
+	}
 
-	auto repositoryPath = message.readOctetString<ObjectPathSize>();
-	auto fileName = message.readOctetString<ObjectPathSize>();
-	auto fullPath = getFullPath(repositoryPath, fileName);
+	ObjectPath repositoryPath = "";
+	ObjectPath fileName = "";
+	Path fullPath = "";
+	readAndBuildPath(message, repositoryPath, fileName, fullPath);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
 		return;
 	}
 
-	using namespace Filesystem;
 	auto fileAttributeResult = getFileAttributes(fullPath);
 	if (fileAttributeResult.is_value()) {
 		fileAttributeReport(repositoryPath, fileName, fileAttributeResult.value());
@@ -127,18 +133,21 @@ void FileManagementService::reportAttributes(Message& message) {
 
 	switch (fileAttributeResult.error()) {
 		case FileAttributeError::PathLeadsToDirectory:
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedReportAttributesOnDirectory);
+			ErrorHandler::reportError(message,
+				ErrorHandler::ExecutionCompletionErrorType::AttemptedReportAttributesOnDirectory);
 			break;
 		case FileAttributeError::FileDoesNotExist:
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 			break;
 		default:
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+			ErrorHandler::reportError(message,
+				ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
 			break;
 	}
 }
 
-void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath, const ObjectPath& fileName, const Attributes& attributes) {
+void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath, const ObjectPath& fileName,
+	const Attributes& attributes) {
 	Message report = createTM(MessageType::CreateAttributesReport);
 
 	report.appendOctetString(repositoryPath);
@@ -150,11 +159,14 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 }
 
 void FileManagementService::createDirectory(Message& message) {
-	message.assertTC(ServiceType, CreateDirectory);
+	if (not message.assertTC(ServiceType, CreateDirectory)) {
+		return;
+	}
 
-	auto repositoryPath = message.readOctetString<ObjectPathSize>();
-	auto directoryPath = message.readOctetString<ObjectPathSize>();
-	auto fullPath = getFullPath(repositoryPath, directoryPath);
+	ObjectPath repositoryPath = "";
+	ObjectPath directoryPath = "";
+	Path fullPath = "";
+	readAndBuildPath(message, repositoryPath, directoryPath, fullPath);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -164,7 +176,7 @@ void FileManagementService::createDirectory(Message& message) {
 	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
-		                          ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
+			ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 		return;
 	}
 
@@ -177,12 +189,12 @@ void FileManagementService::createDirectory(Message& message) {
 		switch (fileCreationError.value()) {
 			case DirectoryCreationError::DirectoryAlreadyExists: {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::DirectoryAlreadyExists);
+					ErrorHandler::ExecutionCompletionErrorType::DirectoryAlreadyExists);
 				return;
 			}
 			default: {
 				ErrorHandler::reportError(message,
-				                          ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+					ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
 				return;
 			}
 		}
@@ -190,11 +202,14 @@ void FileManagementService::createDirectory(Message& message) {
 }
 
 void FileManagementService::deleteDirectory(Message& message) {
-	message.assertTC(ServiceType, DeleteDirectory);
+	if (not message.assertTC(ServiceType, DeleteDirectory)) {
+		return;
+	}
 
-	auto repositoryPath = message.readOctetString<ObjectPathSize>();
-	auto directoryPath = message.readOctetString<ObjectPathSize>();
-	auto fullPath = getFullPath(repositoryPath, directoryPath);
+	ObjectPath repositoryPath = "";
+	ObjectPath directoryPath = "";
+	Path fullPath = "";
+	readAndBuildPath(message, repositoryPath, directoryPath, fullPath);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -204,7 +219,7 @@ void FileManagementService::deleteDirectory(Message& message) {
 	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
-		                          ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+			ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
 		return;
 	}
 
@@ -220,10 +235,12 @@ void FileManagementService::deleteDirectory(Message& message) {
 				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 				break;
 			case DirectoryDeletionError::DirectoryIsNotEmpty:
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteNonEmptyDirectory);
+				ErrorHandler::reportError(message,
+					ErrorHandler::ExecutionCompletionErrorType::AttemptedDeleteNonEmptyDirectory);
 				break;
 			default:
-				ErrorHandler::reportError(message, ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+				ErrorHandler::reportError(message,
+					ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
 				break;
 		}
 	}

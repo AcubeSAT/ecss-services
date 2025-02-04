@@ -260,5 +260,16 @@ inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
  */
 inline constexpr uint16_t ApplicationId = 1;
 
+/**
+ * Max size of the full path of a file
+ */
+inline constexpr size_t FullPathSize = ECSSMaxStringSize;
+
+/**
+ * ObjectPathSize is half the maximum size, minus one character for the '/' delimiter between the
+ * repository and file paths.
+ */
+inline constexpr size_t ObjectPathSize = (FullPathSize / 2) - 1;
+
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
