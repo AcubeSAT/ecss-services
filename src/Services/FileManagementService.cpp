@@ -5,12 +5,15 @@
 #include "Message.hpp"
 
 using namespace FilepathValidators;
+using namespace Filesystem;
 
 void FileManagementService::createFile(Message& message) {
-	message.assertTC(ServiceType, CreateFile);
+	if (not message.assertTC(ServiceType, CreateFile)) {
+		return;
+	}
 
-	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto repositoryPath = message.readOctetString<ObjectPathSize>();
+	auto fileName = message.readOctetString<ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath)) {
@@ -18,14 +21,14 @@ void FileManagementService::createFile(Message& message) {
 		return;
 	}
 
-	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
 		                          ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 		return;
 	}
 
-	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+	if (repositoryType.value() != NodeType::Directory) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
 		return;
 	}
@@ -40,7 +43,7 @@ void FileManagementService::createFile(Message& message) {
 
 	if (auto fileCreationError = Filesystem::createFile(fullPath)) {
 		switch (fileCreationError.value()) {
-			case Filesystem::FileCreationError::FileAlreadyExists: {
+			case FileCreationError::FileAlreadyExists: {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionCompletionErrorType::FileAlreadyExists);
 				return;
@@ -54,15 +57,17 @@ void FileManagementService::createFile(Message& message) {
 	}
 
 	if (isFileLocked) {
-		Filesystem::lockFile(fullPath);
+		lockFile(fullPath);
 	}
 }
 
 void FileManagementService::deleteFile(Message& message) {
-	message.assertTC(ServiceType, DeleteFile);
+	if (not message.assertTC(ServiceType, DeleteFile)) {
+		return;
+	}
 
-	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto repositoryPath = message.readOctetString<ObjectPathSize>();
+	auto fileName = message.readOctetString<ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath)) {
@@ -70,14 +75,14 @@ void FileManagementService::deleteFile(Message& message) {
 		return;
 	}
 
-	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
 		                          ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
 		return;
 	}
 
-	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+	if (repositoryType.value() != NodeType::Directory) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
 		return;
 	}
@@ -104,8 +109,8 @@ void FileManagementService::deleteFile(Message& message) {
 void FileManagementService::reportAttributes(Message& message) {
 	message.assertTC(ServiceType, ReportAttributes);
 
-	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto repositoryPath = message.readOctetString<ObjectPathSize>();
+	auto fileName = message.readOctetString<ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath)) {
@@ -133,7 +138,7 @@ void FileManagementService::reportAttributes(Message& message) {
 	}
 }
 
-void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath, const ObjectPath& fileName, const Filesystem::Attributes& attributes) {
+void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath, const ObjectPath& fileName, const Attributes& attributes) {
 	Message report = createTM(MessageType::CreateAttributesReport);
 
 	report.appendOctetString(repositoryPath);
@@ -147,8 +152,8 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 void FileManagementService::createDirectory(Message& message) {
 	message.assertTC(ServiceType, CreateDirectory);
 
-	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto directoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto repositoryPath = message.readOctetString<ObjectPathSize>();
+	auto directoryPath = message.readOctetString<ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, directoryPath);
 
 	if (findWildcardPosition(fullPath)) {
@@ -156,21 +161,21 @@ void FileManagementService::createDirectory(Message& message) {
 		return;
 	}
 
-	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
 		                          ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
 		return;
 	}
 
-	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+	if (repositoryType.value() != NodeType::Directory) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
 		return;
 	}
 
 	if (auto fileCreationError = Filesystem::createDirectory(fullPath)) {
 		switch (fileCreationError.value()) {
-			case Filesystem::DirectoryCreationError::DirectoryAlreadyExists: {
+			case DirectoryCreationError::DirectoryAlreadyExists: {
 				ErrorHandler::reportError(message,
 				                          ErrorHandler::ExecutionCompletionErrorType::DirectoryAlreadyExists);
 				return;
@@ -187,8 +192,8 @@ void FileManagementService::createDirectory(Message& message) {
 void FileManagementService::deleteDirectory(Message& message) {
 	message.assertTC(ServiceType, DeleteDirectory);
 
-	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto directoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto repositoryPath = message.readOctetString<ObjectPathSize>();
+	auto directoryPath = message.readOctetString<ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, directoryPath);
 
 	if (findWildcardPosition(fullPath)) {
@@ -196,14 +201,14 @@ void FileManagementService::deleteDirectory(Message& message) {
 		return;
 	}
 
-	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	auto repositoryType = getNodeType(repositoryPath);
 	if (not repositoryType) {
 		ErrorHandler::reportError(message,
 		                          ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
 		return;
 	}
 
-	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+	if (repositoryType.value() != NodeType::Directory) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
 		return;
 	}
@@ -225,7 +230,7 @@ void FileManagementService::deleteDirectory(Message& message) {
 }
 
 uint32_t FileManagementService::getUnallocatedMemory() {
-	return Filesystem::getUnallocatedMemory();
+	return getUnallocatedMemory();
 }
 
 void FileManagementService::execute(Message& message) {

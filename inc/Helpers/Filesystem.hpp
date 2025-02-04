@@ -1,6 +1,7 @@
 #pragma once
 
 #include <etl/span.h>
+#include <etl/string_utilities.h>
 
 #include "ECSS_Definitions.hpp"
 #include "TypeDefinitions.hpp"
@@ -206,5 +207,30 @@ namespace Filesystem {
 	 * @return The unallocated memory in bytes 
 	 */
 	uint32_t getUnallocatedMemory();
+
+	using ObjectPath = Filesystem::ObjectPath;
+	using Path = Filesystem::Path;
+
+	/**
+	 * Returns the full filesystem path for an object given the repository path and the file path
+	 * @param repositoryPath The repository path
+	 * @param filePath The file path
+	 * @return The full path, where the repository path and file path are separated by a single '/' (slash)
+	 *
+	 * @note All leading and trailing slashes are removed from the repositoryPath and filePath objects.
+	 */
+	inline static Path getFullPath(ObjectPath& repositoryPath, ObjectPath& filePath) {
+		etl::trim_from_left(repositoryPath, "/");
+		etl::trim_from_right(repositoryPath, "/");
+
+		etl::trim_from_left(filePath, "/");
+		etl::trim_from_right(filePath, "/");
+
+		Path fullPath = ("");
+		fullPath.append(repositoryPath);
+		fullPath.append("/");
+		fullPath.append(filePath);
+		return fullPath;
+	}
 
 } // namespace Filesystem

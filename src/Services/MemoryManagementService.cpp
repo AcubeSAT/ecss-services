@@ -187,7 +187,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	uint16_t const iterationCount = request.readUint16();
 
 	for (uint16_t i = 0; i < iterationCount; i++) {
-		Filesystem::Path filePath;
+		Filesystem::Path filePath = "";
 		request.readString(filePath.data(), filePath.capacity());
 		const uint16_t startByte = request.read<Offset>();
 		const uint16_t dataLength = request.read<FileDataLength>();
