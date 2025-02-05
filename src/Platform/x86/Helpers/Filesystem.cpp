@@ -75,7 +75,7 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 
-	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength, String<ChunkMaxFileSizeBytes>& buffer) {
+	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength, etl::array<unsigned char, 4096>& buffer) {
 		if (buffer.size() != fileDataLength) {
 			return FileWriteError::InvalidBufferSize;
 		}
@@ -93,7 +93,7 @@ namespace Filesystem {
 		}
 
 		file.seekp(offset, std::ios::beg);
-		file.write(buffer.data(), fileDataLength);
+		file.write(reinterpret_cast<const char*>(buffer.data()), fileDataLength);
 
 		if (file.fail()) {
 			return FileWriteError::WriteError;

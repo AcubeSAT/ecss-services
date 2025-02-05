@@ -8,6 +8,8 @@
 #include <cxxabi.h>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "Parameters/PlatformParameters.hpp"
@@ -324,6 +326,64 @@ namespace Filesystem {
 
 	uint32_t getUnallocatedMemory() {
 		return 42U;
+	}
+
+	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, String<ChunkMaxFileSizeBytes>& buffer) {
+		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != length) {
+			return FileReadError::InvalidBufferSize;
+		}
+		std::filesystem::path fullPath = "../../test";
+		fullPath /= path.c_str();
+		std::ifstream file(fullPath, std::ios::binary);
+		if (!file.is_open()) {
+			return FileReadError::FileNotFound;
+		}
+
+		file.seekg(0, std::ios::end);
+		std::streampos fileSize = file.tellg();
+
+		if (offset + length > fileSize) {
+			return FileReadError::InvalidOffset;
+		}
+
+		file.seekg(offset, std::ios::beg);
+		file.read(buffer.data(), length);
+
+		if (file.fail()) {
+			return FileReadError::ReadError;
+		}
+
+		return etl::nullopt;
+	}
+
+	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength, etl::array<unsigned char, 4096>& buffer) {
+
+		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != fileDataLength) {
+			return FileWriteError::InvalidBufferSize;
+		}
+
+		std::filesystem::path fullPath = "../../test";
+		fullPath /= path.c_str();
+		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
+		if (!file.is_open()) {
+			return FileWriteError::FileNotFound;
+		}
+
+		file.seekg(0, std::ios::end);
+		std::streampos fileSize = file.tellg();
+
+		if (offset > fileSize) {
+			return FileWriteError::InvalidOffset;
+		}
+
+		file.seekp(offset, std::ios::beg);
+		file.write(reinterpret_cast<const char*>(buffer.data()), fileDataLength);
+
+		if (file.fail()) {
+			return FileWriteError::WriteError;
+		}
+
+		return etl::nullopt;
 	}
 } // namespace Filesystem
 

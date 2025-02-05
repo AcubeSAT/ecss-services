@@ -187,7 +187,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	}
 
 	Path fullPath = "";
-	readAndBuildPath(request, fullPath);
+	readFullPath(request, fullPath);
 
 	auto remainingInstructions = request.read<InstructionType>();
 	bool hasError = false;
@@ -197,25 +197,31 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 		const FileDataLength dataLength = request.read<FileDataLength>();
 		
 		String<ChunkMaxFileSizeBytes> data = "";
-		request.readString(data.data(), dataLength);
+		etl::array<uint8_t, ChunkMaxFileSizeBytes> chunkData = {0};
+		request.readString(chunkData.data(), dataLength);
 
-		auto result = writeFile(fullPath, offset, dataLength, data);
-		
+		auto result = writeFile(fullPath, offset, dataLength, chunkData);
+
 		if (result.has_value()) {
 			hasError = true;
-			auto error = ErrorHandler::ExecutionStartErrorType::UnknownMemoryWriteError;
+			ErrorHandler::ExecutionStartErrorType error;
 
 			switch (result.value()) {
 				case FileWriteError::FileNotFound:
 					error = ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist;
+					break;
 				case FileWriteError::InvalidBufferSize:
 					error = ErrorHandler::ExecutionStartErrorType::MemoryBufferSizeError;
+					break;
 				case FileWriteError::InvalidOffset:
 					error = ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset;
+					break;
 				case FileWriteError::WriteError:
 					error = ErrorHandler::ExecutionStartErrorType::MemoryWriteError;
-				case FileWriteError::UnknownError:
+					break;
+				default:
 					error = ErrorHandler::ExecutionStartErrorType::UnknownMemoryWriteError;
+					break;
 			}
 			ErrorHandler::reportError(request, error);
 			Services.requestVerification.failStartExecutionVerification(request, error);
@@ -237,7 +243,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 
 	auto report = Message(ServiceType, DumpedObjectMemoryDataReport, Message::TM);
 	Path fullPath = "";
-	readAndBuildPath(request, fullPath);
+	readFullPath(request, fullPath);
 
 	auto remainingInstructions = request.read<InstructionType>();
 	report.appendString(fullPath);

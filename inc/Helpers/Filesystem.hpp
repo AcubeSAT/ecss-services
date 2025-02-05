@@ -189,7 +189,8 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength, String<ChunkMaxFileSizeBytes>& buffer);
+	etl::optional <FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength,
+		etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
 
 	/**
 	 * Gets the current file lock status
@@ -229,7 +230,6 @@ namespace Filesystem {
 		return fullPath;
 	}
 
-
 	/**
 	 * Reads repository path and filename from a message and constructs a full path
 	 * @param message The message to read from
@@ -245,14 +245,12 @@ namespace Filesystem {
 	}
 
 	/**
-	 * Reads repository path and filename from a message and constructs a full path
+	 * Reads the full path directly from a message and constructs a full path
 	 * Overloaded function to read only the full path from a message
 	 * @param message The message to read from
 	 * @param fullPath Reference to store the constructed full path
 	 */
-	static void readAndBuildPath(Message& message, Path& fullPath) {
-		auto repositoryPath = message.readOctetString <ObjectPathSize>();
-		auto fileName = message.readOctetString <ObjectPathSize>();
-		fullPath = getFullPath(repositoryPath, fileName);
+	static void readFullPath(Message& message, Path& fullPath) {
+		fullPath = message.readOctetString <FullPathSize>();
 	}
 } // namespace Filesystem
