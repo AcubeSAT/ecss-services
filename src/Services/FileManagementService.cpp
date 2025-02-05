@@ -247,7 +247,7 @@ void FileManagementService::deleteDirectory(Message& message) {
 }
 
 uint32_t FileManagementService::getUnallocatedMemory() {
-	return getUnallocatedMemory();
+	return Filesystem::getUnallocatedMemory();
 }
 
 void FileManagementService::execute(Message& message) {
