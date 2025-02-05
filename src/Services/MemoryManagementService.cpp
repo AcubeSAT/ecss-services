@@ -196,10 +196,8 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 		const Offset offset = request.read<Offset>();
 		const FileDataLength dataLength = request.read<FileDataLength>();
 		
-		String<ChunkMaxFileSizeBytes> data = "";
-		etl::array<uint8_t, ChunkMaxFileSizeBytes> chunkData = {0};
+		etl::array<uint8_t, ChunkMaxFileSizeBytes> chunkData = {};
 		request.readString(chunkData.data(), dataLength);
-
 		auto result = writeFile(fullPath, offset, dataLength, chunkData);
 
 		if (result.has_value()) {

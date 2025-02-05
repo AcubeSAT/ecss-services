@@ -1,4 +1,8 @@
+#include <fstream>
+#include <iostream>
 #include <Message.hpp>
+#include <bits/fs_fwd.h>
+#include <bits/fs_path.h>
 #include <Services/MemoryManagementService.hpp>
 #include <catch2/catch_all.hpp>
 #include "Helpers/CRCHelper.hpp"
@@ -151,26 +155,25 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		request.appendString(testData);
 
 		MessageParser::execute(request);
-		REQUIRE(ServiceTests::count() == 1);
-		// REQUIRE(ServiceTests::hasOneMessage());
 		Message response = ServiceTests::get(0);
+		REQUIRE(ServiceTests::count() == 1);
 		CHECK(response.messageType == RequestVerificationService::SuccessfulCompletionOfExecution);
+		ServiceTests::reset();
 	}
-
 	SECTION("Multiple instruction load") {
 		Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
-		
+
 		String<FullPathSize> path = "memoryManagementTestFile.txt";
 		request.appendOctetString(path);
-		
+
 		// Two instructions
 		request.append<InstructionType>(2);
-		
+
 		// First data block
 		const Offset offset1 = 0;
 		const String<ChunkMaxFileSizeBytes> testData1 = "First block";
 		const FileDataLength dataLength1 = testData1.size();
-		
+
 		request.append<Offset>(offset1);
 		request.append<FileDataLength>(dataLength1);
 		request.appendString(testData1);
@@ -179,7 +182,7 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		const Offset offset2 = 100;
 		const String<ChunkMaxFileSizeBytes> testData2 = "Second block";
 		const FileDataLength dataLength2 = testData2.size();
-		
+
 		request.append<Offset>(offset2);
 		request.append<FileDataLength>(dataLength2);
 		request.appendString(testData2);
@@ -191,61 +194,90 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		CHECK(response.messageType == RequestVerificationService::SuccessfulCompletionOfExecution);
 	}
 
-	// SECTION("File not found error") {
-	// 	Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
-	//
-	// 	String<FullPathSize> path = "/nonexistent/file.txt";
-	// 	request.appendString(path);
-	//
-	// 	request.append<InstructionType>(1);
-	//
-	// 	const Offset offset = 0;
-	// 	const uint8_t testData[] = "Test data";
-	// 	const FileDataLength dataLength = sizeof(testData);
-	//
-	// 	request.append<Offset>(offset);
-	// 	request.append<FileDataLength>(dataLength);
-	// 	request.appendString(String<ECSSMaxFixedOctetStringSize>(testData, dataLength));
-	//
-	// 	MessageParser::execute(request);
-	//
-	// 	REQUIRE(ServiceTests::count() == 2);
-	//
-	// 	// Check error report
-	// 	Message errorReport = ServiceTests::get(0);
-	// 	CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-	// 	CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() ==
-	// 	ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist);
-	//
-	// 	// Check failed completion
-	// 	Message completion = ServiceTests::get(1);
-	// 	CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
-	// }
-	//
-	// SECTION("Invalid offset error") {
-	// 	Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
-	//
-	// 	String<FullPathSize> path = "/test/file.txt";
-	// 	request.appendString(path);
-	//
-	// 	request.append<InstructionType>(1);
-	//
-	// 	const Offset invalidOffset = 0xFFFFFFFF;  // Very large offset
-	// 	const uint8_t testData[] = "Test data";
-	// 	const FileDataLength dataLength = sizeof(testData);
-	//
-	// 	request.append<Offset>(invalidOffset);
-	// 	request.append<FileDataLength>(dataLength);
-	// 	request.appendString(String<ECSSMaxFixedOctetStringSize>(testData, dataLength));
-	//
-	// 	MessageParser::execute(request);
-	//
-	// 	REQUIRE(ServiceTests::count() == 2);
-	//
-	// 	Message errorReport = ServiceTests::get(0);
-	// 	CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-	// 	CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset);
-	// }
+	SECTION("File not found error") {
+		Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
+
+		String<FullPathSize> path = "/nonexistent/file.txt";
+		request.appendOctetString(path);
+
+		request.append<InstructionType>(1);
+
+		const Offset offset = 0;
+		const String<ChunkMaxFileSizeBytes> testData1 = "First block";
+		const FileDataLength dataLength1 = testData1.size();
+
+		request.append<Offset>(offset);
+		request.append<FileDataLength>(dataLength1);
+		request.appendString(testData1);
+
+		MessageParser::execute(request);
+
+		REQUIRE(ServiceTests::count() == 3);
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist) == 1);
+
+		Message completion = ServiceTests::get(2);
+		CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
+	}
+
+	SECTION("Invalid offset error") {
+		Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
+
+		String<FullPathSize> path = "memoryManagementTestFile.txt";
+		request.appendOctetString(path);
+
+		request.append<InstructionType>(1);
+
+		const Offset offset = 0xFFFF;
+		const String<ChunkMaxFileSizeBytes> testData = "Hello World";
+		const FileDataLength dataLength = testData.size();
+
+		request.append<Offset>(offset);
+		request.append<FileDataLength>(dataLength);
+		request.appendString(testData);
+
+		MessageParser::execute(request);
+
+		REQUIRE(ServiceTests::count() == 3);
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset) == 1);
+
+		Message completion = ServiceTests::get(2);
+		CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
+	}
+
+	SECTION("Write error") {
+		Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
+
+		String<FullPathSize> path = "memoryManagementTestBroken.txt";
+		request.appendOctetString(path);
+
+		request.append<InstructionType>(1);
+
+		const Offset offset = 0;
+		const String<ChunkMaxFileSizeBytes> testData = "Test data";
+		const FileDataLength dataLength = testData.size();
+		namespace fs = std::filesystem;
+
+		request.append<Offset>(offset);
+		request.append<FileDataLength>(dataLength);
+		request.appendString(testData);
+		const char* filename = "memoryManagementTestBroken.txt";
+		std::filesystem::path fileNamePath = fs::path(filename);
+		std::ofstream file(filename);
+		for (size_t i = 0; i < 50; i++) {
+			file << i << " block\n";
+		}
+		file.close();
+
+		MessageParser::execute(request);
+
+		REQUIRE(ServiceTests::count() == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryWriteError) == 1);
+
+		Message completion = ServiceTests::get(2);
+		CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
+	}
 }
 
 // TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
