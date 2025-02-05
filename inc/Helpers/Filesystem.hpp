@@ -178,7 +178,7 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength, String<ChunkMaxFileSizeBytes>& buffer);
+	etl::optional <FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength, etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
 
 	/**
 	 * Creates a file using platform specific filesystem functions

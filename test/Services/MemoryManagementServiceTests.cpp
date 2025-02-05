@@ -280,104 +280,160 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 	}
 }
 
-// TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
-// 	SECTION("Successful single block dump") {
-// 		Message request(MemoryManagementService::ServiceType, MemoryManagementService::DumpObjectMemoryData, Message::TC, 1);
-//
-// 		String<FullPathSize> path = "/test/file.txt";
-// 		request.appendString(path);
-//
-// 		request.append<InstructionType>(1);
-// 		request.append<Offset>(0);
-// 		request.append<FileDataLength>(10);  // Request 10 bytes
-//
-// 		MessageParser::execute(request);
-//
-// 		REQUIRE(ServiceTests::hasOneMessage());
-// 		Message response = ServiceTests::get(0);
-// 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
-//
-// 		String<FullPathSize> responsePath = "";
-// 		response.readString(responsePath, FullPathSize);
-// 		CHECK(responsePath == path);
-//
-// 		CHECK(response.read<InstructionType>() == 1);
-// 		CHECK(response.read<Offset>() == 0);
-// 		CHECK(response.read<FileDataLength>() == 10);
-//
-// 		// Verify data content if needed
-// 		String<10> data;
-// 		response.readString(data);
-// 		// Add specific data checks here
-// 	}
-//
-// 	SECTION("Multiple block dump") {
-// 		Message request(MemoryManagementService::ServiceType, MemoryManagementService::DumpObjectMemoryData, Message::TC, 1);
-//
-// 		String<FullPathSize> path = "/test/file.txt";
-// 		request.appendString(path);
-//
-// 		request.append<InstructionType>(2);
-//
-// 		// First block
-// 		request.append<Offset>(0);
-// 		request.append<FileDataLength>(5);
-//
-// 		// Second block
-// 		request.append<Offset>(10);
-// 		request.append<FileDataLength>(5);
-//
-// 		MessageParser::execute(request);
-//
-// 		REQUIRE(ServiceTests::hasOneMessage());
-// 		Message response = ServiceTests::get(0);
-// 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
-//
-// 		// Verify response contains both blocks
-// 		String<FullPathSize> responsePath;
-// 		response.readString(responsePath);
-// 		CHECK(responsePath == path);
-//
-// 		CHECK(response.read<InstructionType>() == 2);
-//
-// 		// First block verification
-// 		CHECK(response.read<Offset>() == 0);
-// 		CHECK(response.read<FileDataLength>() == 5);
-// 		String<5> data1;
-// 		response.readString(data1);
-//
-// 		// Second block verification
-// 		CHECK(response.read<Offset>() == 10);
-// 		CHECK(response.read<FileDataLength>() == 5);
-// 		String<5> data2;
-// 		response.readString(data2);
-// 	}
-//
-// 	SECTION("File not found error") {
-// 		Message request(MemoryManagementService::ServiceType, MemoryManagementService::DumpObjectMemoryData, Message::TC, 1);
-//
-// 		String<FullPathSize> path = "/nonexistent/file.txt";
-// 		request.appendString(path);
-//
-// 		request.append<InstructionType>(1);
-// 		request.append<Offset>(0);
-// 		request.append<FileDataLength>(10);
-//
-// 		MessageParser::execute(request);
-//
-// 		REQUIRE(ServiceTests::count() == 2);
-//
-// 		Message errorReport = ServiceTests::get(0);
-// 		CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
-// 		CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist);
-//
-// 		// Verify error response contains zeros
-// 		Message response = ServiceTests::get(1);
-// 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
-// 		CHECK(response.read<Offset>() == 0);
-// 		CHECK(response.read<FileDataLength>() == 0);
-// 	}
-// }
+TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
+	SECTION("Successful single block dump") {
+		Message request(MemoryManagementService::ServiceType, MemoryManagementService::DumpObjectMemoryData, Message::TC, 1);
+
+		String<FullPathSize> path = "memoryManagementTestFile.txt";
+		request.appendOctetString(path);
+
+
+		request.append<InstructionType>(1);
+		request.append<Offset>(0);
+		request.append<FileDataLength>(10);  // Request 10 bytes
+
+		MessageParser::execute(request);
+
+		REQUIRE(ServiceTests::count() == 1);
+		Message response = ServiceTests::get(0);
+		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
+
+		Filesystem::Path responsePath = "";
+		Filesystem::readFullPath(response, responsePath);
+
+		CHECK(responsePath == path);
+
+		CHECK(response.read<InstructionType>() == 1);
+		CHECK(response.read<Offset>() == 0);
+		CHECK(response.read<FileDataLength>() == 10);
+	}
+
+	// SECTION("Multiple block dump") {
+	// 	Message request(MemoryManagementService::ServiceType, MemoryManagementService::DumpObjectMemoryData, Message::TC, 1);
+	//
+	// 	String<FullPathSize> path = "memoryManagementTestBroken.txt";
+	// 	request.appendOctetString(path);
+	//
+	// 	request.append<InstructionType>(2);
+	//
+	// 	// First block
+	// 	request.append<Offset>(0);
+	// 	request.append<FileDataLength>(5);
+	//
+	// 	// Second block
+	// 	request.append<Offset>(10);
+	// 	request.append<FileDataLength>(5);
+	//
+	// 	MessageParser::execute(request);
+	//
+	// 	REQUIRE(ServiceTests::hasOneMessage());
+	// 	Message response = ServiceTests::get(0);
+	// 	CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
+	//
+	// 	// Verify response contains both blocks
+	// 	String<FullPathSize> responsePath;
+	// 	response.readString(responsePath);
+	// 	CHECK(responsePath == path);
+	//
+	// 	CHECK(response.read<InstructionType>() == 2);
+	//
+	// 	// First block verification
+	// 	CHECK(response.read<Offset>() == 0);
+	// 	CHECK(response.read<FileDataLength>() == 5);
+	// 	String<5> data1;
+	// 	response.readString(data1);
+	//
+	// 	// Second block verification
+	// 	CHECK(response.read<Offset>() == 10);
+	// 	CHECK(response.read<FileDataLength>() == 5);
+	// 	String<5> data2;
+	// 	response.readString(data2);
+	// }
+	//
+	// SECTION("File not found error") {
+	// 	Message request(MemoryManagementService::ServiceType, MemoryManagementService::DumpObjectMemoryData, Message::TC, 1);
+	//
+	// 	String<FullPathSize> path = "/nonexistent/file.txt";
+	// 	request.appendOctetString(path);
+	//
+	// 	request.append<InstructionType>(1);
+	// 	request.append<Offset>(0);
+	// 	request.append<FileDataLength>(10);
+	//
+	// 	MessageParser::execute(request);
+	//
+	// 	REQUIRE(ServiceTests::count() == 2);
+	//
+	// 	Message errorReport = ServiceTests::get(0);
+	// 	CHECK(errorReport.messageType == ErrorHandler::MessageType::ErrorReport);
+	// 	CHECK(errorReport.read<ErrorHandler::ExecutionStartErrorType>() == ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist);
+	//
+	// 	// Verify error response contains zeros
+	// 	Message response = ServiceTests::get(1);
+	// 	CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
+	// 	CHECK(response.read<Offset>() == 0);
+	// 	CHECK(response.read<FileDataLength>() == 0);
+	// }
+	//
+	// SECTION("Invalid offset error") {
+	// 	Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
+	//
+	// 	String<FullPathSize> path = "memoryManagementTestFile.txt";
+	// 	request.appendOctetString(path);
+	//
+	// 	request.append<InstructionType>(1);
+	//
+	// 	const Offset offset = 0xFFFF;
+	// 	const String<ChunkMaxFileSizeBytes> testData = "Hello World";
+	// 	const FileDataLength dataLength = testData.size();
+	//
+	// 	request.append<Offset>(offset);
+	// 	request.append<FileDataLength>(dataLength);
+	// 	request.appendString(testData);
+	//
+	// 	MessageParser::execute(request);
+	//
+	// 	REQUIRE(ServiceTests::count() == 3);
+	//
+	// 	CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset) == 1);
+	//
+	// 	Message completion = ServiceTests::get(2);
+	// 	CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
+	// }
+	//
+	// SECTION("Write error") {
+	// 	Message request(MemoryManagementService::ServiceType, MemoryManagementService::LoadObjectMemoryData, Message::TC, 1);
+	//
+	// 	String<FullPathSize> path = "memoryManagementTestBroken.txt";
+	// 	request.appendOctetString(path);
+	//
+	// 	request.append<InstructionType>(1);
+	//
+	// 	const Offset offset = 0;
+	// 	const String<ChunkMaxFileSizeBytes> testData = "Test data";
+	// 	const FileDataLength dataLength = testData.size();
+	// 	namespace fs = std::filesystem;
+	//
+	// 	request.append<Offset>(offset);
+	// 	request.append<FileDataLength>(dataLength);
+	// 	request.appendString(testData);
+	// 	const char* filename = "memoryManagementTestBroken.txt";
+	// 	std::filesystem::path fileNamePath = fs::path(filename);
+	// 	std::ofstream file(filename);
+	// 	for (size_t i = 0; i < 50; i++) {
+	// 		file << i << " block\n";
+	// 	}
+	// 	file.close();
+	//
+	// 	MessageParser::execute(request);
+	//
+	// 	REQUIRE(ServiceTests::count() == 3);
+	// 	CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryWriteError) == 1);
+	//
+	// 	Message completion = ServiceTests::get(2);
+	// 	CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
+	// }
+}
 //
 // TEST_CASE("TM[6,4] Dumped Object Memory Data Report", "[service][st06]") {
 // 	SECTION("Single block report") {

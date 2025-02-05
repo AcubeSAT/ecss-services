@@ -328,8 +328,9 @@ namespace Filesystem {
 		return 42U;
 	}
 
-	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, String<ChunkMaxFileSizeBytes>& buffer) {
-		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != length) {
+	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, etl::array<uint8_t,
+	ChunkMaxFileSizeBytes>& buffer) {
+		if (buffer.size() < length) {
 			return FileReadError::InvalidBufferSize;
 		}
 		std::filesystem::path fullPath = "../../test";
@@ -347,7 +348,7 @@ namespace Filesystem {
 		}
 
 		file.seekg(offset, std::ios::beg);
-		file.read(buffer.data(), length);
+		file.read(reinterpret_cast<std::istream::char_type*>(buffer.data()), length);
 
 		if (file.fail()) {
 			return FileReadError::ReadError;
@@ -356,9 +357,8 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 
-	namespace fs = std::filesystem;
-
-	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength, etl::array<unsigned char, 4096>& buffer) {
+	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength,
+	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer) {
 
 		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != fileDataLength) {
 			return FileWriteError::InvalidBufferSize;

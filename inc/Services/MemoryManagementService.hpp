@@ -124,7 +124,7 @@ public:
 		 * @details Reads structured data from the specified memory area and generates a report
 		 * @param request The TC[6,3] request message
 		 */
-		void dumpObjectMemoryData(Message& request);
+		void dumpObjectMemoryData(Message& request) const;
 
 		/**
 		 * @brief Dumped structured data report
