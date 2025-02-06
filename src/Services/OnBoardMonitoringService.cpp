@@ -251,7 +251,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 }
 
 void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
+	if (!message.assertTC(ServiceType, ReportParameterMonitoringDefinitions)) {
+		return;
+	}
 	Message pmonDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport, Message::TM, ApplicationId);
 	pmonDefinitionReport.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();
@@ -309,6 +311,33 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 	storeMessage(pmonDefinitionReport);
 }
 
+void OnBoardMonitoringService::enableParameterMonitoringFunction(const Message& message) {
+	if (not message.assertTC(ServiceType, EnableParameterMonitoringFunctions)) {
+		return;
+	}
+	parameterMonitoringFunctionStatus = true;
+}
+
+void OnBoardMonitoringService::disableParameterMonitoringFunction(const Message& message) {
+	if (not message.assertTC(ServiceType, DisableParameterMonitoringFunctions)) {
+		return;
+	}
+	parameterMonitoringFunctionStatus = false;
+}
+
+void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
+	if (not message.assertTC(ServiceType, ReportOutOfLimits)) {
+		return;
+	}
+}
+
+void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Message& message) {
+	if (not message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition)) {
+		return;
+	}
+}
+
+
 void OnBoardMonitoringService::checkAll() const {
 	for (const auto& entry : parameterMonitoringList) {
 		auto& pmon = entry.second.get();
@@ -343,6 +372,18 @@ void OnBoardMonitoringService::execute(Message& message) {
 			break;
 		case ReportParameterMonitoringDefinitions:
 			reportParameterMonitoringDefinitions(message);
+			break;
+		case ReportOutOfLimits:
+			reportOutOfLimits(message);
+			break;
+		case ReportStatusOfParameterMonitoringDefinition:
+			reportStatusOfParameterMonitoringDefinition(message);
+			break;
+		case EnableParameterMonitoringFunctions:
+			enableParameterMonitoringFunction(message);
+			break;
+		case DisableParameterMonitoringFunctions:
+			disableParameterMonitoringFunction(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

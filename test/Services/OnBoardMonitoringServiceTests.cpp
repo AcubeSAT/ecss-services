@@ -24,14 +24,14 @@ struct Fixtures {
 
 Fixtures fixtures;
 
-void initialiseParameterMonitoringDefinitions() {
+void initialiseParameterMonitoringDefinitions(OnBoardMonitoringService& service = onBoardMonitoringService) {
 	// Reset fixtures to the defaults set up by the constructor
 	new (&fixtures) Fixtures();
 
-	onBoardMonitoringService.addPMONExpectedValueCheck(0, etl::ref(fixtures.monitoringDefinition1));
-	onBoardMonitoringService.addPMONLimitCheck(1, etl::ref(fixtures.monitoringDefinition2));
-	onBoardMonitoringService.addPMONDeltaCheck(2, etl::ref(fixtures.monitoringDefinition3));
-	onBoardMonitoringService.addPMONDeltaCheck(3, etl::ref(fixtures.monitoringDefinition4));
+	service.addPMONExpectedValueCheck(0, etl::ref(fixtures.monitoringDefinition1));
+	service.addPMONLimitCheck(1, etl::ref(fixtures.monitoringDefinition2));
+	service.addPMONDeltaCheck(2, etl::ref(fixtures.monitoringDefinition3));
+	service.addPMONDeltaCheck(3, etl::ref(fixtures.monitoringDefinition4));
 }
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {
@@ -162,12 +162,12 @@ TEST_CASE("Change Maximum Transition Reporting Delay") {
 
 TEST_CASE("Delete all Parameter Monitoring Definitions") {
 	SECTION("Valid request to delete all Parameter Monitoring Definitions") {
-		initialiseParameterMonitoringDefinitions();
-		onBoardMonitoringService.parameterMonitoringFunctionStatus = false;
+		OnBoardMonitoringService oBMService = OnBoardMonitoringService(false);
+		initialiseParameterMonitoringDefinitions(oBMService);
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
-		MessageParser::execute(request);
+		oBMService.deleteAllParameterMonitoringDefinitions(request);
 		CHECK(ServiceTests::count() == 0);
 		CHECK(onBoardMonitoringService.isPMONListEmpty());
 
@@ -175,17 +175,17 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		Services.reset();
 	}
 	SECTION("Invalid request to delete all Parameter Monitoring Definitions") {
-		initialiseParameterMonitoringDefinitions();
-		onBoardMonitoringService.parameterMonitoringFunctionStatus = true;
+		OnBoardMonitoringService oBMService = OnBoardMonitoringService(true);
+		initialiseParameterMonitoringDefinitions(oBMService);
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
-		MessageParser::execute(request);
+		oBMService.deleteAllParameterMonitoringDefinitions(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InvalidRequestToDeleteAllParameterMonitoringDefinitions) ==
 		      1);
 
-		CHECK(!onBoardMonitoringService.isPMONListEmpty());
+		CHECK(!oBMService.isPMONListEmpty());
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1181,6 +1181,88 @@ TEST_CASE("Check All Behavior") {
     	param1.setValue(10);
     	onBoardMonitoringService.checkAll();
     	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
+
+    	ServiceTests::reset();
+    	Services.reset();
+    }
+}
+
+TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
+    SECTION("Enable Parameter Monitoring Function") {
+        Message request(OnBoardMonitoringService::ServiceType, 
+                       OnBoardMonitoringService::EnableParameterMonitoringFunctions, 
+                       Message::TC, 
+                       0);
+        
+        // Ensure function starts disabled
+        CHECK(onBoardMonitoringService.getParameterMonitoringFunctionStatus() == false);
+        
+        MessageParser::execute(request);
+        
+        CHECK(ServiceTests::count() == 0);
+        CHECK(onBoardMonitoringService.getParameterMonitoringFunctionStatus() == true);
+        
+        ServiceTests::reset();
+        Services.reset();
+    }
+
+    SECTION("Disable Parameter Monitoring Function") {
+        Message request(OnBoardMonitoringService::ServiceType, 
+                       OnBoardMonitoringService::DisableParameterMonitoringFunctions, 
+                       Message::TC, 
+                       0);
+        
+        // First enable it
+        onBoardMonitoringService.enableParameterMonitoringFunction(Message(
+            OnBoardMonitoringService::ServiceType,
+            OnBoardMonitoringService::EnableParameterMonitoringFunctions,
+            Message::TC,
+            0));
+        
+        REQUIRE(onBoardMonitoringService.getParameterMonitoringFunctionStatus() == true);
+        
+        MessageParser::execute(request);
+        
+        CHECK(ServiceTests::count() == 0);
+        CHECK(onBoardMonitoringService.getParameterMonitoringFunctionStatus() == false);
+        
+        ServiceTests::reset();
+        Services.reset();
+    }
+
+    SECTION("Invalid Message Type TC[6,15]") {
+        Message request(OnBoardMonitoringService::ServiceType, 
+                       OnBoardMonitoringService::CheckTransitionReport, // Invalid message type
+                       Message::TC, 
+                       0);
+        
+        bool initialStatus = onBoardMonitoringService.getParameterMonitoringFunctionStatus();
+        
+        onBoardMonitoringService.enableParameterMonitoringFunction(request);
+        
+        // Status should remain unchanged
+        CHECK(onBoardMonitoringService.getParameterMonitoringFunctionStatus() == initialStatus);
+        CHECK(ServiceTests::count() == 0);
+        CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::OtherMessageType) == 1);
+        
+        ServiceTests::reset();
+        Services.reset();
+    }
+
+	SECTION("Invalid Message Type TC[6,16]") {
+    	Message request(OnBoardMonitoringService::ServiceType,
+					   OnBoardMonitoringService::CheckTransitionReport, // Invalid message type
+					   Message::TC,
+					   0);
+
+    	bool initialStatus = onBoardMonitoringService.getParameterMonitoringFunctionStatus();
+
+    	onBoardMonitoringService.disableParameterMonitoringFunction(request);
+
+    	// Status should remain unchanged
+    	CHECK(onBoardMonitoringService.getParameterMonitoringFunctionStatus() == initialStatus);
+    	CHECK(ServiceTests::count() == 0);
+    	CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::OtherMessageType) == 1);
 
     	ServiceTests::reset();
     	Services.reset();

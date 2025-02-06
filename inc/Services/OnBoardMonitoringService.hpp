@@ -15,7 +15,9 @@
 /**
  * Implementation of the ST[12] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
  * @ingroup Services
- * @author Konstantinos Michopoulos <konstantinos.michopoulos@gmail.com> and Thomas Pravinos <tompravi99@gmail.com>
+ * @author Konstantinos Michopoulos <konstantinos.michopoulos@gmail.com>
+ * @author Thomas Pravinos <tompravi99@gmail.com>
+ * @author Athanasios Theocharis <athatheoc@gmail.com>
  */
 class OnBoardMonitoringService : public Service {
 private:
@@ -60,6 +62,11 @@ private:
 	 */
 	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
+	/**
+	 * If true, parameter monitoring is enabled
+	 */
+	bool parameterMonitoringFunctionStatus = false;
+
 public:
 	inline static constexpr ServiceTypeNum ServiceType = 12;
 	enum MessageType : uint8_t {
@@ -76,11 +83,17 @@ public:
 		OutOfLimitsReport = 11,
 		CheckTransitionReport = 12,
 		ReportStatusOfParameterMonitoringDefinition = 13,
-		ParameterMonitoringDefinitionStatusReport = 14
+		ParameterMonitoringDefinitionStatusReport = 14,
+		EnableParameterMonitoringFunctions = 15,
+		DisableParameterMonitoringFunctions = 16
 	};
 
 	OnBoardMonitoringService() {
 		serviceType = ServiceType;
+	}
+
+	explicit OnBoardMonitoringService(const bool initialParameterMonitoringFunctionStatus) {
+		parameterMonitoringFunctionStatus = initialParameterMonitoringFunctionStatus;
 	}
 
 	/**
@@ -88,11 +101,6 @@ public:
 	 * Measured in "on-board parameter minimum sampling interval" units (see 5.4.3.2c in ECSS-E-ST-70-41C).
 	 */
 	uint16_t maximumTransitionReportingDelay = 0;
-
-	/**
-	 * If true, parameter monitoring is enabled
-	 */
-	bool parameterMonitoringFunctionStatus = false;
 
 	/**
 	 * Adds a new Parameter Monitoring Limit Check to the parameter monitoring list.
@@ -200,7 +208,7 @@ public:
 	/**
 	 * TM[12,9]
 	 */
-	void parameterMonitoringDefinitionReport(Message& message);
+	void parameterMonitoringDefinitionReport();
 
 	/**
 	 * TC[12,10]
@@ -227,7 +235,33 @@ public:
 	 */
 	void parameterMonitoringDefinitionStatusReport();
 
+	/**
+	 * TC[12,15]
+	 * @param message The TC message
+	 */
+	void enableParameterMonitoringFunction(const Message& message);
+
+	/**
+	 * TC[12,16]
+	 * @param message The TC message
+	 */
+	void disableParameterMonitoringFunction(const Message& message);
+
+	/**
+	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
+	 * is the ground station.
+	 *
+	 * @note This function is called from the main execute() that is defined in the file MessageParser.hpp
+	 * @param message Contains the necessary parameters to call the suitable subservice
+	 */
 	void execute(Message& message);
+
+	/**
+	 * @return The current status of parameter monitoring function
+	 */
+	bool getParameterMonitoringFunctionStatus() const {
+		return parameterMonitoringFunctionStatus;
+	}
 };
 
 #endif // ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
