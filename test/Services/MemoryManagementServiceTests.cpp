@@ -223,11 +223,11 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 3);
+		REQUIRE(ServiceTests::count() == 2);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist) == 1);
 
-		Message completion = ServiceTests::get(2);
+		Message completion = ServiceTests::get(1);
 		CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
 		ServiceTests::reset();
 	}
@@ -250,11 +250,11 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 3);
+		REQUIRE(ServiceTests::count() == 2);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset) == 1);
 
-		Message completion = ServiceTests::get(2);
+		Message completion = ServiceTests::get(1);
 		CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
 		ServiceTests::reset();
 	}
@@ -295,10 +295,10 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 3);
+		REQUIRE(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryWriteError) == 1);
 
-		Message completion = ServiceTests::get(2);
+		Message completion = ServiceTests::get(1);
 		CHECK(completion.messageType == RequestVerificationService::FailedCompletionOfExecution);
 		ServiceTests::reset();
 	}
@@ -404,12 +404,12 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 3);
+		REQUIRE(ServiceTests::count() == 2);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist) == 1);
 
 		// Verify error response contains zeros
-		Message response = ServiceTests::get(2);
+		Message response = ServiceTests::get(1);
 		Filesystem::Path responsePath = "";
 		Filesystem::readFullPath(response, responsePath);
 		CHECK(responsePath == path);
@@ -433,11 +433,11 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 3);
+		REQUIRE(ServiceTests::count() == 2);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset) == 1);
 
-		Message response = ServiceTests::get(2);
+		Message response = ServiceTests::get(1);
 		Filesystem::Path responsePath = "";
 		Filesystem::readFullPath(response, responsePath);
 		CHECK(responsePath == path);
@@ -468,11 +468,11 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 3);
+		REQUIRE(ServiceTests::count() == 2);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::InvalidMemoryOffset) == 1);
 
-		Message response = ServiceTests::get(2);
+		Message response = ServiceTests::get(1);
 		Filesystem::Path responsePath = "";
 		Filesystem::readFullPath(response, responsePath);
 		CHECK(responsePath == path);
@@ -525,10 +525,10 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 3);
+		REQUIRE(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryReadError) == 1);
 
-		Message response = ServiceTests::get(2);
+		Message response = ServiceTests::get(1);
 		Filesystem::Path responsePath = "";
 		Filesystem::readFullPath(response, responsePath);
 		CHECK(responsePath == path);

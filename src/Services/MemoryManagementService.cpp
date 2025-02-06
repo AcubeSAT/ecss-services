@@ -231,7 +231,6 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 					break;
 			}
 			ErrorHandler::reportError(request, error);
-			Services.requestVerification.failStartExecutionVerification(request, error);
 			break;
 		}
 	}
@@ -286,7 +285,6 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedSt
 				error = ErrorHandler::ExecutionStartErrorType::MemoryReadError;
 		}
 		ErrorHandler::reportError(report, error);
-		Services.requestVerification.failStartExecutionVerification(report, error);
 	}
 	if (hasError) {
 		report.append <Offset>(0);
