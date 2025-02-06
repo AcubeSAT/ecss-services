@@ -325,13 +325,13 @@ void OnBoardMonitoringService::disableParameterMonitoringFunction(const Message&
 	parameterMonitoringFunctionStatus = false;
 }
 
-void OnBoardMonitoringService::reportOutOfLimits(Message& message) {
+void OnBoardMonitoringService::reportOutOfLimits(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportOutOfLimits)) {
 		return;
 	}
 }
 
-void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(Message& message) {
+void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition)) {
 		return;
 	}
