@@ -201,7 +201,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	auto remainingInstructions = request.read <InstructionType>();
 	bool hasError = false;
 
-	while (remainingInstructions-- != 0u) {
+	while (remainingInstructions-- != 0U) {
 		const Offset offset = request.read <Offset>();
 		const FileDataLength dataLength = request.read <FileDataLength>();
 
