@@ -1,6 +1,5 @@
 #include "ECSS_Configuration.hpp"
 #include "ServicePool.hpp"
-#include "../../../../.conan2/p/b/catch6b0a899ecbca7/p/include/catch2/catch_message.hpp"
 #include "Services/RequestVerificationService.hpp"
 #ifdef SERVICE_MEMORY
 
