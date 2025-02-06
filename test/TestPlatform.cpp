@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sys/stat.h>
 
 #include "Helpers/Parameter.hpp"
 #include "Helpers/TimeGetter.hpp"
@@ -340,17 +341,26 @@ namespace Filesystem {
 			fullPath = "../../test";
 			fullPath /= path.c_str();
 		}
+		struct stat st;
+        if (stat(fullPath.c_str(), &st) == 0 && (st.st_mode & (S_IRUSR | S_IRGRP | S_IROTH)) == 0) {
+            return FileReadError::ReadError;
+        }
 		errno = 0;
 		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
-		if (errno == ENOENT) {
-			return FileReadError::FileNotFound;
-		}
-		if (errno == EACCES || errno == EPERM) {
+
+		if (file.fail() || !file.is_open()) {
+			if (errno == ENOENT) {
+				return FileReadError::FileNotFound;
+			}
+			if (errno == EACCES || errno == EPERM) {
+				return FileReadError::ReadError;
+			}
+			if (errno == ENOSPC) {
+				return FileReadError::ReadError;
+			}
 			return FileReadError::ReadError;
 		}
-		if (errno == ENOSPC) {
-			return FileReadError::ReadError;
-		}
+		
 
 		file.seekg(0, std::ios::end);
 		std::streampos fileSize = file.tellg();
@@ -362,7 +372,7 @@ namespace Filesystem {
 		file.seekg(offset, std::ios::beg);
 		file.read(reinterpret_cast<std::istream::char_type*>(buffer.data()), length);
 
-		if (file.fail()) {
+		if (file.fail() or !file.is_open()) {
 			return FileReadError::ReadError;
 		}
 
@@ -383,6 +393,10 @@ namespace Filesystem {
 			fullPath = "../../test";
 			fullPath /= path.c_str();
 		}
+		struct stat st;
+        if (stat(fullPath.c_str(), &st) == 0 && (st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH)) == 0) {
+            return FileWriteError::WriteError;
+        }
 		errno = 0;
 		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
 		if (errno == ENOENT) {
