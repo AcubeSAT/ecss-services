@@ -201,7 +201,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	auto remainingInstructions = request.read <InstructionType>();
 	bool hasError = false;
 
-	while (remainingInstructions-- && !hasError) {
+	while (remainingInstructions-- != 0u) {
 		const Offset offset = request.read <Offset>();
 		const FileDataLength dataLength = request.read <FileDataLength>();
 
@@ -211,7 +211,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 
 		if (result.has_value()) {
 			hasError = true;
-			ErrorHandler::ExecutionStartErrorType error;
+			ErrorHandler::ExecutionStartErrorType error; // NOLINT(cppcoreguidelines-init-variables)
 
 			switch (result.value()) {
 				case FileWriteError::FileNotFound:
@@ -270,7 +270,8 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedSt
 	bool hasError = false;
 	if (result.has_value()) {
 		hasError = true;
-		auto error = ErrorHandler::ExecutionStartErrorType::UnknownMemoryReadError;
+		ErrorHandler::ExecutionStartErrorType error; // NOLINT(cppcoreguidelines-init-variables)
+
 		switch (result.value()) {
 			case FileReadError::FileNotFound:
 				error = ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist;
@@ -283,6 +284,9 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedSt
 				break;
 			case FileReadError::ReadError:
 				error = ErrorHandler::ExecutionStartErrorType::MemoryReadError;
+				break;
+			default:
+				error = ErrorHandler::ExecutionStartErrorType::UnknownMemoryReadError;
 		}
 		ErrorHandler::reportError(report, error);
 	}
