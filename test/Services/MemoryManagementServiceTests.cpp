@@ -522,7 +522,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 #else
 		chmod(filename, 0);
 #endif
-
+		INFO(system("ls -l memoryManagementTestBroken.txt"));
 		MessageParser::execute(request);
 
 		REQUIRE(ServiceTests::count() == 2);
