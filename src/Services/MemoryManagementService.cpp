@@ -256,7 +256,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 	report.appendOctetString(fullPath);
 	report.append <InstructionType>(remainingInstructions);
 
-	while (remainingInstructions--) {
+	while (remainingInstructions-- != 0U) {
 		const Offset offset = request.read <Offset>();
 		const FileDataLength readLength = request.read <FileDataLength>();
 		dumpedStructuredDataReport(report, fullPath, offset, readLength, remainingInstructions == 0);
