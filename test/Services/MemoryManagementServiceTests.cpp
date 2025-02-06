@@ -295,7 +295,7 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 2);
+		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryWriteError) == 1);
 
 		Message completion = ServiceTests::get(1);
@@ -522,10 +522,10 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 #else
 		chmod(filename, 0);
 #endif
-		INFO(system("ls -l memoryManagementTestBroken.txt"));
+
 		MessageParser::execute(request);
 
-		REQUIRE(ServiceTests::count() == 2);
+		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryReadError) == 1);
 
 		Message response = ServiceTests::get(1);
