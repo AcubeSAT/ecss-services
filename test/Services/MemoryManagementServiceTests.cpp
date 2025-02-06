@@ -522,7 +522,8 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 #else
 		chmod(filename, 0);
 #endif
-		INFO("errno", errno);
+		INFO("errno");
+		INFO(errno);
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 2);
