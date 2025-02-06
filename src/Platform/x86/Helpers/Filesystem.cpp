@@ -1,5 +1,7 @@
 #include "Helpers/Filesystem.hpp"
 #include <fstream>
+#include <bits/fs_fwd.h>
+#include <bits/fs_path.h>
 
 #include "Helpers/TypeDefinitions.hpp"
 
@@ -48,12 +50,14 @@ namespace Filesystem {
 	}
 
 
-	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, String<ChunkMaxFileSizeBytes>& buffer) {
-		if (buffer.size() != length) {
+	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, etl::array<uint8_t,
+	ChunkMaxFileSizeBytes>& buffer) {
+		if (buffer.size() < length) {
 			return FileReadError::InvalidBufferSize;
 		}
-
-		std::ifstream file(path.c_str(), std::ios::binary);
+		std::filesystem::path fullPath = "../../test";
+		fullPath /= path.c_str();
+		std::ifstream file(fullPath, std::ios::binary);
 		if (!file.is_open()) {
 			return FileReadError::FileNotFound;
 		}
@@ -66,7 +70,7 @@ namespace Filesystem {
 		}
 
 		file.seekg(offset, std::ios::beg);
-		file.read(buffer.data(), length);
+		file.read(reinterpret_cast<std::istream::char_type*>(buffer.data()), length);
 
 		if (file.fail()) {
 			return FileReadError::ReadError;
@@ -75,14 +79,30 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 
-	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength, etl::array<unsigned char, 4096>& buffer) {
-		if (buffer.size() != fileDataLength) {
+	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength,
+	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer) {
+
+		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != fileDataLength) {
 			return FileWriteError::InvalidBufferSize;
 		}
 
-		std::fstream file(path.c_str(), std::ios::binary | std::ios::in | std::ios::out);
-		if (!file.is_open()) {
+		std::filesystem::path fullPath = "";
+		if (std::filesystem::current_path() == "/tmp") {
+			fullPath = path.c_str();
+		} else {
+			fullPath = "../../test";
+			fullPath /= path.c_str();
+		}
+		errno = 0;
+		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
+		if (errno == ENOENT) {
 			return FileWriteError::FileNotFound;
+		}
+		if (errno == EACCES || errno == EPERM) {
+			return FileWriteError::WriteError;
+		}
+		if (errno == ENOSPC) {
+			return FileWriteError::WriteError;
 		}
 
 		file.seekg(0, std::ios::end);
@@ -94,11 +114,7 @@ namespace Filesystem {
 
 		file.seekp(offset, std::ios::beg);
 		file.write(reinterpret_cast<const char*>(buffer.data()), fileDataLength);
-
-		if (file.fail()) {
-			return FileWriteError::WriteError;
-		}
-
+		file.close();
 		return etl::nullopt;
 	}
 } // namespace Filesystem

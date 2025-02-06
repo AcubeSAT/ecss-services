@@ -291,11 +291,12 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedSt
 	if (hasError) {
 		report.append <Offset>(0);
 		report.append <FileDataLength>(0);
+	} else {
+		report.append <Offset>(offset);
+		report.append <FileDataLength>(readLength);
+		report.appendString(String<ChunkMaxFileSizeBytes>(chunkData.data(), readLength));
 	}
 
-	report.append <Offset>(offset);
-	report.append <FileDataLength>(readLength);
-	report.appendString(String<ChunkMaxFileSizeBytes>(chunkData.data(), readLength));
 	if (isFinal) {
 		mainService.storeMessage(report);
 	}

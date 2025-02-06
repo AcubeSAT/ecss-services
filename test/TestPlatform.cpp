@@ -333,11 +333,23 @@ namespace Filesystem {
 		if (buffer.size() < length) {
 			return FileReadError::InvalidBufferSize;
 		}
-		std::filesystem::path fullPath = "../../test";
-		fullPath /= path.c_str();
-		std::ifstream file(fullPath, std::ios::binary);
-		if (!file.is_open()) {
+		std::filesystem::path fullPath = "";
+		if (std::filesystem::current_path() == "/tmp") {
+			fullPath = path.c_str();
+		} else {
+			fullPath = "../../test";
+			fullPath /= path.c_str();
+		}
+		errno = 0;
+		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
+		if (errno == ENOENT) {
 			return FileReadError::FileNotFound;
+		}
+		if (errno == EACCES || errno == EPERM) {
+			return FileReadError::ReadError;
+		}
+		if (errno == ENOSPC) {
+			return FileReadError::ReadError;
 		}
 
 		file.seekg(0, std::ios::end);
