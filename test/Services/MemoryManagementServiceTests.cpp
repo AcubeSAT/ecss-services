@@ -522,7 +522,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 #else
 		chmod(filename, 0);
 #endif
-
+		INFO(std::filesystem::current_path());
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 2);
