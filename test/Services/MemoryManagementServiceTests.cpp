@@ -522,12 +522,12 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 #else
 		chmod(filename, 0);
 #endif
-		INFO("errno");
-		INFO(errno);
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MemoryReadError) == 1);
+		INFO("MessageType");
+		INFO(ServiceTests::get(0).messageType);
 
 		Message response = ServiceTests::get(1);
 		Filesystem::Path responsePath = "";
