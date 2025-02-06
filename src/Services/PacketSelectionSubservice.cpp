@@ -118,7 +118,7 @@ void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Mes
 				auto& definitions = packetStoreAppProcessConfig[packetStoreID].definitions;
 				if (definitions.find(appServicePair) != definitions.end()) {
 					auto& reportTypes = definitions[appServicePair];
-					auto messageTypeIndex = etl::find(reportTypes.begin(), reportTypes.end(), messageType);
+					auto *messageTypeIndex = etl::find(reportTypes.begin(), reportTypes.end(), messageType);
 					if (messageTypeIndex != reportTypes.end()) {
 						reportTypes.erase(messageTypeIndex);
 					}
