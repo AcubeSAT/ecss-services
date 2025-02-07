@@ -1,4 +1,4 @@
-#include "EventReportService.hpp"
+#include "Services/EventReportService.hpp"
 
 void EventReportService::initializeEventDefinitionSeverityMap() {
     eventDefinitionSeverityMap.insert({Event::UnknownEvent, EventReportSeverity::Informative});

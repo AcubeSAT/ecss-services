@@ -3,6 +3,7 @@
 
 #include <etl/bitset.h>
 #include "Service.hpp"
+#include "etl/map.h"
 
 /**
  * Implementation of ST[05] event reporting service

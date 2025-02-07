@@ -4,6 +4,7 @@
 #include "Services/HousekeepingService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/MemoryManagementService.hpp"
+#include "Services/OnBoardMonitoringService.hpp"
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/RealTimeForwardingControlService.hpp"

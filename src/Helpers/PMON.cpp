@@ -1,5 +1,6 @@
 #include "Helpers/PMON.hpp"
 #include "ServicePool.hpp"
+#include "Services/EventReportService.hpp"
 
 PMON::PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, CheckType checkType)
     : monitoredParameterId(monitoredParameterId),
@@ -16,26 +17,30 @@ void PMON::updatePMONAfterPerformCheck(CheckingStatus previousStatus, CheckingSt
 		repetitionCounter++;
 	} else {
 		repetitionCounter = 1;
-    etl::pair<CheckingStatus, CheckingStatus> transition = etl::make_pair(previousStatus, checkingStatus);
-		checkTransitionList.push_back(transition);
+		etl::pair<CheckingStatus, CheckingStatus> transition = etl::make_pair(previousStatus, checkingStatus);
+		checkTransitionList.insert(nullptr, transition);
 
-    if (pmonEventMap.find(transition) == pmonEventMap.end()) {
-      return;
-    }
+		if (pmonTransitionEventMap.find(transition) == pmonTransitionEventMap.end()) {
+			return;
+		}
 
-    EventDefinitionId eventID = pmonEventMap[transition];
-    if (eventDefinitionSeverityMap.find(eventID) == eventDefinitionSeverityMap.end()) {
-      return;
-    }
-    EventReportService::EventReportSeverity severity = eventDefinitionSeverityMap[eventID];
-    if (severity == EventReportService::EventReportSeverity::Informative) {
-      Services.eventReport.informativeEventReport(eventID, "checkTransitionFailedFrom"+previousStatus+"To"+checkingStatus);
-    } else if (severity == EventReportService::EventReportSeverity::Low) {
-      Services.eventReport.lowSeverityAnomalyReport(eventID, "checkTransitionFailedFrom"+previousStatus+"To"+checkingStatus);
-    } else if (severity == EventReportService::EventReportSeverity::Medium) {
-      Services.eventReport.mediumSeverityAnomalyReport(eventID, "checkTransitionFailedFrom"+previousStatus+"To"+checkingStatus);
-    } else if (severity == EventReportService::EventReportSeverity::High) {
-      Services.eventReport.highSeverityAnomalyReport(eventID, "checkTransitionFailedFrom"+previousStatus+"To"+checkingStatus);
-    }
+		EventDefinitionId eventID = pmonTransitionEventMap[transition];
+		if (Services.eventReport.eventDefinitionSeverityMap.find(eventID) == Services.eventReport.eventDefinitionSeverityMap.end()) {
+			return;
+		}
+		EventReportService::EventReportSeverity severity = Services.eventReport.eventDefinitionSeverityMap[eventID];
+		String<ECSSEventDataAuxiliaryMaxSize> data = String<ECSSEventDataAuxiliaryMaxSize>("checkTransitionFailedFrom");
+		data.append(reinterpret_cast<const char*>(previousStatus));
+		data.append("To");
+		data.append(reinterpret_cast<const char*>(currentStatus));
+		if (severity == EventReportService::EventReportSeverity::Informative) {
+			Services.eventReport.informativeEventReport(static_cast<EventReportService::Event>(eventID), data);
+		} else if (severity == EventReportService::EventReportSeverity::Low) {
+			Services.eventReport.lowSeverityAnomalyReport(static_cast<EventReportService::Event>(eventID), data);
+		} else if (severity == EventReportService::EventReportSeverity::Medium) {
+			Services.eventReport.mediumSeverityAnomalyReport(static_cast<EventReportService::Event>(eventID), data);
+		} else if (severity == EventReportService::EventReportSeverity::High) {
+			Services.eventReport.highSeverityAnomalyReport(static_cast<EventReportService::Event>(eventID), data);
+		}
 	}
 }

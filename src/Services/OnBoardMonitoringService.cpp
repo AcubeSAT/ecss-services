@@ -317,13 +317,6 @@ void OnBoardMonitoringService::enableParameterMonitoringFunction(const Message& 
 	}
 
 	parameterMonitoringFunctionStatus = true;
-
-	for (auto& pmon : monitoringDefinitions) {
-		if (pmon->isMonitoringEnabled()) {
-			pmon->checkingStatus = PMON::Unchecked;
-			pmon->repetitionCounter = 0;
-		}
-	}
 }
 
 void OnBoardMonitoringService::disableParameterMonitoringFunction(const Message& message) {
@@ -337,12 +330,9 @@ void OnBoardMonitoringService::reportOutOfLimits(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportOutOfLimits)) {
 		return;
 	}
-
-
 }
 
 void OnBoardMonitoringService::outOfLimitsReport() {
-	Message report = createTM(ServiceType, OutOfLimitsReport);
 }
 
 void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(const Message& message) {

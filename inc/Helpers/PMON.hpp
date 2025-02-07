@@ -9,7 +9,7 @@
 #include "etl/functional.h"
 #include "etl/map.h"
 #include "etl/optional.h"
-#include "etl/pair.h"
+#include "etl/utility.h"
 #include "ECSS_Definitions.hpp"
 
 /**
@@ -64,7 +64,7 @@ public:
 	/**
 	 * The map of event definitions connected to the check transitions.
 	 */
-	etl::map<PMONTransition, PMONEventMapSize> pmonEventMap = {};
+	etl::map<PMONTransition, EventDefinitionId, PMONEventMapSize> pmonTransitionEventMap = {};
 
 	/**
 	 * The check type of this monitoring definition, set by the child classes to differentiate between class types
