@@ -21,6 +21,8 @@ private:
     static constexpr uint16_t NumberOfEvents = 5;
     etl::bitset<NumberOfEvents> enabledEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
+
+    void initializeEventDefinitionSeverityMap();
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
 
@@ -72,6 +74,7 @@ public:
     {
         enabledEvents.set();
         serviceType = ServiceType;
+        initializeEventDefinitionSeverityMap();
     }
 
 
@@ -103,19 +106,39 @@ public:
         /**
          * When an execution of a notification/event fails to start
          */
-        FailedStartOfExecution = 5
+        FailedStartOfExecution = 5,
+
+        /**
+         * When an unexpected value is detected in PMON
+         */
+        UnexpectedValuePMON = 6,
+
+        /**
+         * When a parameter value goes below the low limit in PMON
+         */
+        BelowLowLimitPMON = 7,
+
+        /**
+         * When a parameter value goes above the high limit in PMON
+         */
+        AboveHighLimitPMON = 8,
+
+        /**
+         * When a parameter delta goes below the low threshold in PMON
+         */
+        BelowLowThresholdPMON = 9,
+
+        /**
+         * When a parameter delta goes above the high threshold in PMON
+         */
+        AboveHighThresholdPMON = 10,
+
     };
 
     /**
      * Map of event definitions to their severity
      */
-    etl::map<EventDefinitionId, EventReportSeverity, NumberOfEvents> eventDefinitionSeverityMap = {
-        {Event::UnknownEvent, EventReportSeverity::Informative},
-        {Event::WWDGReset, EventReportSeverity::Low},
-        {Event::AssertionFail, EventReportSeverity::Medium},
-        {Event::MCUStart, EventReportSeverity::High},
-        {Event::FailedStartOfExecution, EventReportSeverity::Low}
-    };
+    etl::map<EventDefinitionId, EventReportSeverity, NumberOfEvents> eventDefinitionSeverityMap = {};
 
     /**
      * TM[5,1] informative event report
