@@ -46,6 +46,12 @@ namespace AllReportTypes {
 
 	const ServiceDefinitionsVector ST11Reports = {TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
 
+
+	const ServiceDefinitionsVector ST12Reports = {OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport,
+													OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionStatusReport,
+													OnBoardMonitoringService::MessageType::OutOfLimitsReport,
+													OnBoardMonitoringService::MessageType::CheckTransitionReport};
+													
 	const ServiceDefinitionsVector ST13Reports = {LargePacketTransferService::MessageType::FirstDownlinkPartReport,
 	                                                                         LargePacketTransferService::MessageType::InternalDownlinkPartReport,
 	                                                                         LargePacketTransferService::MessageType::LastDownlinkPartReport};

@@ -9,6 +9,7 @@
 #include "etl/functional.h"
 #include "etl/map.h"
 #include "etl/optional.h"
+#include "etl/pair.h"
 #include "ECSS_Definitions.hpp"
 
 /**
@@ -16,6 +17,7 @@
  */
 class PMON {
 public:
+
 	enum CheckingStatus : uint8_t {
 		Unchecked = 1,
 		Invalid = 2,
@@ -35,6 +37,7 @@ public:
 
 	ParameterId monitoredParameterId;
 	etl::reference_wrapper<ParameterBase> monitoredParameter;
+	using PMONTransition = etl::pair<CheckingStatus, CheckingStatus>;
 
 	/**
 	 * The number of consecutive checks with the same result that need to be conducted in order to set a new Parameter Monitoring Status.
@@ -56,7 +59,12 @@ public:
 	/**
 	 * The list of Checking Statuses that have been recorded so far.
 	 */
-	etl::array<CheckingStatus, 2> checkTransitionList = {};
+	etl::array<PMONTransition, CheckTransitionListSize> checkTransitionList = {};
+
+	/**
+	 * The map of event definitions connected to the check transitions.
+	 */
+	etl::map<PMONTransition, PMONEventMapSize> pmonEventMap = {};
 
 	/**
 	 * The check type of this monitoring definition, set by the child classes to differentiate between class types
@@ -126,6 +134,16 @@ protected:
 	 * @param monitoredParameterId is assumed to be correct and not checked.
 	 */
 	PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, CheckType checkType);
+
+	/**
+	 * Updates the PMON after a check has been performed. 
+	 * More specifically, it updates the repetition counter and the check transition list.
+	 * If the transition is connected with an event definition, it also raises the corresponding event, connecting it to ST05 & ST19.
+	 * @attention to be called in the performCheck() function of the derived classes.
+	 * @param previousStatus The previous checking status.
+	 * @param currentStatus The current checking status.
+	 */
+	void updatePMONAfterPerformCheck(CheckingStatus previousStatus, CheckingStatus currentStatus);
 };
 
 /**
@@ -186,11 +204,7 @@ public:
 			checkingStatus = UnexpectedValue;
 		}
 
-		if (checkingStatus == previousStatus) {
-			repetitionCounter++;
-		} else {
-			repetitionCounter = 1;
-		}
+		updatePMONAfterPerformCheck(previousStatus, checkingStatus);
 	}
 };
 
@@ -258,11 +272,7 @@ public:
 			checkingStatus = WithinLimits;
 		}
 
-		if (checkingStatus == previousStatus) {
-			repetitionCounter++;
-		} else {
-			repetitionCounter = 1;
-		}
+		updatePMONAfterPerformCheck(previousStatus, checkingStatus);
 	}
 };
 
@@ -392,11 +402,7 @@ public:
 
 		updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
 
-		if (checkingStatus == previousStatus) {
-			repetitionCounter++;
-		} else {
-			repetitionCounter = 1;
-		}
+		updatePMONAfterPerformCheck(previousStatus, checkingStatus);
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP

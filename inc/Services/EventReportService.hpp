@@ -8,6 +8,7 @@
  * Implementation of ST[05] event reporting service
  *
  * @ingroup Services
+ * @attention 
  * @todo (#27) add more enums event IDs
  * @todo (#219) make sure there isn't an event ID == 0, because there's a confliction with another service
  * Note: enum IDs are these just for test purposes
@@ -35,6 +36,12 @@ public:
         DisabledListEventReport = 8,
     };
 
+    enum class EventReportSeverity : uint8_t {
+        Informative = 1,
+        Low = 2,
+        Medium = 3,
+        High = 4
+    };
 
     // Variables that count the event reports per severity level
     uint16_t lowSeverityReportCount = 0;
@@ -99,6 +106,16 @@ public:
         FailedStartOfExecution = 5
     };
 
+    /**
+     * Map of event definitions to their severity
+     */
+    etl::map<EventDefinitionId, EventReportSeverity, NumberOfEvents> eventDefinitionSeverityMap = {
+        {Event::UnknownEvent, EventReportSeverity::Informative},
+        {Event::WWDGReset, EventReportSeverity::Low},
+        {Event::AssertionFail, EventReportSeverity::Medium},
+        {Event::MCUStart, EventReportSeverity::High},
+        {Event::FailedStartOfExecution, EventReportSeverity::Low}
+    };
 
     /**
      * TM[5,1] informative event report
