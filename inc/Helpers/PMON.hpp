@@ -54,7 +54,7 @@ public:
 	 */
 	bool monitoringEnabled = false;
 
-	CheckingStatus checkingStatus = Unchecked;
+	CheckingStatus currentCheckingStatus = Unchecked;
 
 	/**
 	 * The list of Checking Statuses that have been recorded so far.
@@ -70,6 +70,12 @@ public:
 	 * The check type of this monitoring definition, set by the child classes to differentiate between class types
 	 */
 	CheckType checkType;
+
+	/**
+	 * The check type that can possibly replace the current one, if the repetition counter reaches the repetition number.
+	 * The repetition counter refers to the number of times this new possible check type has appeared consecutively.
+	 */
+	CheckingStatus newTrackedCheckingStatus;
 
 	/**
 	 * Returns the number of consecutive checks with the same result that need to be conducted in order to set a new Parameter Monitoring Status.
@@ -103,7 +109,7 @@ public:
 	 * Returns the current Checking Status.
 	 */
 	CheckingStatus getCheckingStatus() const {
-		return checkingStatus;
+		return currentCheckingStatus;
 	}
 
 	/**
@@ -114,8 +120,12 @@ public:
 	 * invoking the check on each monitored parameter at regular intervals. It ensures that parameters are
 	 * within their defined limits, match expected values, or have acceptable delta changes over time.
 	 *
-	 * After the check, the function compares the current checking status to the previous one.
+	 * After the check, the function compares the new status - the one defined by the comparison of the current value of the paramter
+	 * to the expected/limits/deltas - to the previously tracked checking status - the  one that the repetition counter refers to.
+	 *
 	 * If they are the same, the repetition counter is incremented. If they are different, the repetition counter is reset to 1.
+	 * If the repetition counter exceeds the repetition number, then the tracked checking status is set as the `currentCheckingStatus`
+	 * and an event might be raised if the transition is related to an event.
 	 *
 	 * @note
 	 * It is crucial that this function is called periodically and consistently every @ref ECSSMonitoringFrequency to ensure the
@@ -132,6 +142,9 @@ public:
 protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
+	 * @param repetitionNumber the repetition number that the repetition counter must reach to change the established checking status
+	 * @param checkType the check type of this PMON
+	 *
 	 */
 	PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, CheckType checkType);
 
@@ -140,10 +153,9 @@ protected:
 	 * More specifically, it updates the repetition counter and the check transition list.
 	 * If the transition is connected with an event definition, it also raises the corresponding event, connecting it to ST05 & ST19.
 	 * @attention to be called in the performCheck() function of the derived classes.
-	 * @param previousStatus The previous checking status.
 	 * @param currentStatus The current checking status.
 	 */
-	void updatePMONAfterPerformCheck(CheckingStatus previousStatus, CheckingStatus currentStatus);
+	void updatePMONAfterPerformCheck(CheckingStatus currentStatus);
 };
 
 /**
@@ -194,17 +206,17 @@ public:
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
 	void performCheck() override {
-		auto previousStatus = checkingStatus;
+		CheckingStatus newCheckStatus;
 		auto currentValueAsUint64 = monitoredParameter.get().getValueAsUint64();
 		uint64_t maskedValue = currentValueAsUint64 & getMask();
 
 		if (maskedValue == getExpectedValue()) {
-			checkingStatus = ExpectedValue;
+			newCheckStatus = ExpectedValue;
 		} else {
-			checkingStatus = UnexpectedValue;
+			newCheckStatus = UnexpectedValue;
 		}
 
-		updatePMONAfterPerformCheck(previousStatus, checkingStatus);
+		updatePMONAfterPerformCheck(newCheckStatus);
 	}
 };
 
@@ -262,17 +274,17 @@ public:
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
 	void performCheck() override {
-		auto previousStatus = checkingStatus;
+		CheckingStatus newStatus;
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
 		if (currentValue < getLowLimit()) {
-			checkingStatus = BelowLowLimit;
+			newStatus = BelowLowLimit;
 		} else if (currentValue > getHighLimit()) {
-			checkingStatus = AboveHighLimit;
+			newStatus = AboveHighLimit;
 		} else {
-			checkingStatus = WithinLimits;
+			newStatus = WithinLimits;
 		}
 
-		updatePMONAfterPerformCheck(previousStatus, checkingStatus);
+		updatePMONAfterPerformCheck(newStatus);
 	}
 };
 
@@ -383,26 +395,26 @@ public:
 	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
 	 */
 	void performCheck() override {
-		auto previousStatus = checkingStatus;
+		CheckingStatus newStatus;
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
 		auto currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
 
 		if (hasOldValue()) {
 			double deltaPerSecond = getDeltaPerSecond(currentValue);
 			if (deltaPerSecond < getLowDeltaThreshold()) {
-				checkingStatus = BelowLowThreshold;
+				newStatus = BelowLowThreshold;
 			} else if (deltaPerSecond > getHighDeltaThreshold()) {
-				checkingStatus = AboveHighThreshold;
+				newStatus = AboveHighThreshold;
 			} else {
-				checkingStatus = WithinThreshold;
+				newStatus = WithinThreshold;
 			}
 		} else {
-			checkingStatus = Invalid;
+			newStatus = Invalid;
 		}
 
 		updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
 
-		updatePMONAfterPerformCheck(previousStatus, checkingStatus);
+		updatePMONAfterPerformCheck(newStatus);
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP

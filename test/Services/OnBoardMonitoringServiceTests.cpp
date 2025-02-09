@@ -108,9 +108,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled == false);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMON::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().checkingStatus == PMON::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().currentCheckingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().currentCheckingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().currentCheckingStatus == PMON::Unchecked);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -136,9 +136,9 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled == false);
 		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled == false);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().checkingStatus == PMON::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().checkingStatus == PMON::Unchecked);
-		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().checkingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().currentCheckingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().currentCheckingStatus == PMON::Unchecked);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().currentCheckingStatus == PMON::Unchecked);
 
 		ServiceTests::reset();
 		Services.reset();

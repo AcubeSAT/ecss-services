@@ -12,12 +12,16 @@ PMON::PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumb
 	}
 }
 
-void PMON::updatePMONAfterPerformCheck(CheckingStatus previousStatus, CheckingStatus currentStatus) {
-	if (checkingStatus == previousStatus) {
+void PMON::updatePMONAfterPerformCheck(const CheckingStatus newStatus) {
+	if (newTrackedCheckingStatus == newStatus) {
 		repetitionCounter++;
 	} else {
 		repetitionCounter = 1;
-		etl::pair<CheckingStatus, CheckingStatus> transition = etl::make_pair(previousStatus, checkingStatus);
+		newTrackedCheckingStatus = newStatus;
+	}
+
+	if (repetitionCounter >= repetitionNumber) {
+		const etl::pair<CheckingStatus, CheckingStatus> transition = etl::make_pair(currentCheckingStatus, newTrackedCheckingStatus);
 		checkTransitionList.insert(nullptr, transition);
 
 		if (pmonTransitionEventMap.find(transition) == pmonTransitionEventMap.end()) {
@@ -29,10 +33,10 @@ void PMON::updatePMONAfterPerformCheck(CheckingStatus previousStatus, CheckingSt
 			return;
 		}
 		EventReportService::EventReportSeverity severity = Services.eventReport.eventDefinitionSeverityMap[eventID];
-		String<ECSSEventDataAuxiliaryMaxSize> data = String<ECSSEventDataAuxiliaryMaxSize>("checkTransitionFailedFrom");
-		data.append(reinterpret_cast<const char*>(previousStatus));
+		auto data = String<ECSSEventDataAuxiliaryMaxSize>("checkTransitionFailedFrom");
+		data.append(reinterpret_cast<const char*>(currentCheckingStatus));
 		data.append("To");
-		data.append(reinterpret_cast<const char*>(currentStatus));
+		data.append(reinterpret_cast<const char*>(newTrackedCheckingStatus));
 		if (severity == EventReportService::EventReportSeverity::Informative) {
 			Services.eventReport.informativeEventReport(static_cast<EventReportService::Event>(eventID), data);
 		} else if (severity == EventReportService::EventReportSeverity::Low) {
@@ -42,5 +46,7 @@ void PMON::updatePMONAfterPerformCheck(CheckingStatus previousStatus, CheckingSt
 		} else if (severity == EventReportService::EventReportSeverity::High) {
 			Services.eventReport.highSeverityAnomalyReport(static_cast<EventReportService::Event>(eventID), data);
 		}
+		currentCheckingStatus = newTrackedCheckingStatus;
+		newTrackedCheckingStatus = Unchecked;
 	}
 }

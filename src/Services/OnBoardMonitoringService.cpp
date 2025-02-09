@@ -38,7 +38,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 			continue;
 		}
 		definition->second.get().monitoringEnabled = false;
-		definition->second.get().checkingStatus = PMON::Unchecked;
+		definition->second.get().currentCheckingStatus = PMON::Unchecked;
 	}
 }
 
@@ -103,7 +103,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				}
 				PMONLimitCheck limitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 				                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
-				limitCheck.checkingStatus = PMON::Unchecked;
+				limitCheck.currentCheckingStatus = PMON::Unchecked;
 				limitCheck.monitoringEnabled = false;
 				addPMONLimitCheck(currentPMONId, limitCheck);
 				break;
@@ -114,7 +114,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				EventDefinitionId unexpectedValueEvent = message.read<EventDefinitionId>();
 				PMONExpectedValueCheck expectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 				                                          expectedValue, mask, unexpectedValueEvent);
-				expectedValueCheck.checkingStatus = PMON::Unchecked;
+				expectedValueCheck.currentCheckingStatus = PMON::Unchecked;
 				expectedValueCheck.monitoringEnabled = false;
 				addPMONExpectedValueCheck(currentPMONId, expectedValueCheck);
 				break;
@@ -132,7 +132,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				}
 				PMONDeltaCheck deltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 				                          numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
-				deltaCheck.checkingStatus = PMON::Unchecked;
+				deltaCheck.currentCheckingStatus = PMON::Unchecked;
 				deltaCheck.monitoringEnabled = false;
 				addPMONDeltaCheck(currentPMONId, deltaCheck);
 				break;
@@ -189,7 +189,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		PMON& pmon = it->second.get();
 		pmon.repetitionCounter = 0;
 		pmon.repetitionNumber = currentPMONRepetitionNumber;
-		pmon.checkingStatus = PMON::Unchecked;
+		pmon.currentCheckingStatus = PMON::Unchecked;
 
 		switch (static_cast<PMON::CheckType>(currentCheckType)) {
 			case PMON::CheckType::Limit: {
