@@ -834,6 +834,8 @@ TEST_CASE("Limit Check Behavior") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = fixtures.monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		pmon.performCheck();
+		pmon.performCheck();
 
 		for (unsigned char i = 2; i <= 8; ++i) {
 			param.setValue(i);
@@ -1079,13 +1081,17 @@ TEST_CASE("Delta Check Perform Check") {
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
 		param.setValue(20);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(100);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
@@ -1118,7 +1124,9 @@ TEST_CASE("Check All Behavior") {
     	CHECK(pmonLimit.getCheckingStatus() == PMON::Unchecked);
     	CHECK(pmonDelta.getCheckingStatus() == PMON::Unchecked);
 
-    	onBoardMonitoringService.checkAll();
+    	for (int i = 0; i < 6; i++) {
+    		onBoardMonitoringService.checkAll();
+    	}
 
     	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
     	CHECK(pmonLimit.getCheckingStatus() == PMON::WithinLimits);
@@ -1152,7 +1160,9 @@ TEST_CASE("Check All Behavior") {
     	pmonExpected.monitoringEnabled = true;
     	pmonLimit.monitoringEnabled = true;
 
-    	onBoardMonitoringService.checkAll();
+    	for (int i = 0; i < 6; i++) {
+    		onBoardMonitoringService.checkAll();
+    	}
 
     	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
     	CHECK(pmonLimit.getCheckingStatus() == PMON::WithinLimits);
@@ -1171,15 +1181,20 @@ TEST_CASE("Check All Behavior") {
     	param1.setValue(10);
     	pmonExpected.mask = 0xFF;
 
-    	onBoardMonitoringService.checkAll();
-    	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
+    	for (int i = 0; i < 6; i++) {
+    		onBoardMonitoringService.checkAll();
+    	}    	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
 
     	param1.setValue(5);
-    	onBoardMonitoringService.checkAll();
+    	for (int i = 0; i < 6; i++) {
+    		onBoardMonitoringService.checkAll();
+    	}
     	CHECK(pmonExpected.getCheckingStatus() == PMON::UnexpectedValue);
 
     	param1.setValue(10);
-    	onBoardMonitoringService.checkAll();
+    	for (int i = 0; i < 6; i++) {
+    		onBoardMonitoringService.checkAll();
+    	}
     	CHECK(pmonExpected.getCheckingStatus() == PMON::ExpectedValue);
 
     	ServiceTests::reset();

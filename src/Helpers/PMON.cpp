@@ -22,7 +22,10 @@ void PMON::updatePMONAfterPerformCheck(const CheckingStatus newStatus) {
 
 	if (repetitionCounter >= repetitionNumber) {
 		const etl::pair<CheckingStatus, CheckingStatus> transition = etl::make_pair(currentCheckingStatus, newTrackedCheckingStatus);
-		checkTransitionList.insert(nullptr, transition);
+		checkTransitionList.insert(checkTransitionList.begin(), transition);
+		currentCheckingStatus = newTrackedCheckingStatus;
+		newTrackedCheckingStatus = Unchecked;
+
 
 		if (pmonTransitionEventMap.find(transition) == pmonTransitionEventMap.end()) {
 			return;
@@ -34,9 +37,9 @@ void PMON::updatePMONAfterPerformCheck(const CheckingStatus newStatus) {
 		}
 		EventReportService::EventReportSeverity severity = Services.eventReport.eventDefinitionSeverityMap[eventID];
 		auto data = String<ECSSEventDataAuxiliaryMaxSize>("checkTransitionFailedFrom");
-		data.append(reinterpret_cast<const char*>(currentCheckingStatus));
+		data.append(reinterpret_cast<const char*>(transition.first));
 		data.append("To");
-		data.append(reinterpret_cast<const char*>(newTrackedCheckingStatus));
+		data.append(reinterpret_cast<const char*>(transition.second));
 		if (severity == EventReportService::EventReportSeverity::Informative) {
 			Services.eventReport.informativeEventReport(static_cast<EventReportService::Event>(eventID), data);
 		} else if (severity == EventReportService::EventReportSeverity::Low) {
@@ -46,7 +49,6 @@ void PMON::updatePMONAfterPerformCheck(const CheckingStatus newStatus) {
 		} else if (severity == EventReportService::EventReportSeverity::High) {
 			Services.eventReport.highSeverityAnomalyReport(static_cast<EventReportService::Event>(eventID), data);
 		}
-		currentCheckingStatus = newTrackedCheckingStatus;
-		newTrackedCheckingStatus = Unchecked;
+
 	}
 }
