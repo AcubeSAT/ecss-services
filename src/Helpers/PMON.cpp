@@ -6,18 +6,19 @@ PMON::PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumb
     : monitoredParameterId(monitoredParameterId),
       repetitionNumber(repetitionNumber),
       checkType(checkType),
-      monitoredParameter(*Services.parameterManagement.getParameter(monitoredParameterId)) {
+      monitoredParameter(*Services.parameterManagement.getParameter(monitoredParameterId)),
+      	newTrackedCheckingStatus(Unchecked) {
 	if (!Services.parameterManagement.getParameter(monitoredParameterId)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InvalidParameterId);
 	}
 }
 
-void PMON::updatePMONAfterPerformCheck(const CheckingStatus newStatus) {
-	if (newTrackedCheckingStatus == newStatus) {
+void PMON::updatePMONAfterPerformCheck(const CheckingStatus newCheckingStatus) {
+	if (newTrackedCheckingStatus == newCheckingStatus) {
 		repetitionCounter++;
 	} else {
 		repetitionCounter = 1;
-		newTrackedCheckingStatus = newStatus;
+		newTrackedCheckingStatus = newCheckingStatus;
 	}
 
 	if (repetitionCounter >= repetitionNumber) {

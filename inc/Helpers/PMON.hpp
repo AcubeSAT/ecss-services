@@ -153,9 +153,9 @@ protected:
 	 * More specifically, it updates the repetition counter and the check transition list.
 	 * If the transition is connected with an event definition, it also raises the corresponding event, connecting it to ST05 & ST19.
 	 * @attention to be called in the performCheck() function of the derived classes.
-	 * @param currentStatus The current checking status.
+	 * @param newCheckingStatus The current checking status.
 	 */
-	void updatePMONAfterPerformCheck(CheckingStatus currentStatus);
+	void updatePMONAfterPerformCheck(CheckingStatus newCheckingStatus);
 };
 
 /**
@@ -206,17 +206,14 @@ public:
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
 	void performCheck() override {
-		CheckingStatus newCheckStatus;
 		auto currentValueAsUint64 = monitoredParameter.get().getValueAsUint64();
 		uint64_t maskedValue = currentValueAsUint64 & getMask();
 
 		if (maskedValue == getExpectedValue()) {
-			newCheckStatus = ExpectedValue;
+			updatePMONAfterPerformCheck(ExpectedValue);
 		} else {
-			newCheckStatus = UnexpectedValue;
+			updatePMONAfterPerformCheck(UnexpectedValue);
 		}
-
-		updatePMONAfterPerformCheck(newCheckStatus);
 	}
 };
 
@@ -274,17 +271,14 @@ public:
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
 	void performCheck() override {
-		CheckingStatus newStatus;
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
 		if (currentValue < getLowLimit()) {
-			newStatus = BelowLowLimit;
+			updatePMONAfterPerformCheck(BelowLowLimit);
 		} else if (currentValue > getHighLimit()) {
-			newStatus = AboveHighLimit;
+			updatePMONAfterPerformCheck(AboveHighLimit);
 		} else {
-			newStatus = WithinLimits;
+			updatePMONAfterPerformCheck(WithinLimits);
 		}
-
-		updatePMONAfterPerformCheck(newStatus);
 	}
 };
 
@@ -395,26 +389,26 @@ public:
 	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
 	 */
 	void performCheck() override {
-		CheckingStatus newStatus;
+		CheckingStatus newCheckingStatus; //NOLINT(cppcoreguidelines-init-variables)
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
 		auto currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
 
 		if (hasOldValue()) {
 			double deltaPerSecond = getDeltaPerSecond(currentValue);
 			if (deltaPerSecond < getLowDeltaThreshold()) {
-				newStatus = BelowLowThreshold;
+				newCheckingStatus = BelowLowThreshold;
 			} else if (deltaPerSecond > getHighDeltaThreshold()) {
-				newStatus = AboveHighThreshold;
+				newCheckingStatus = AboveHighThreshold;
 			} else {
-				newStatus = WithinThreshold;
+				newCheckingStatus = WithinThreshold;
 			}
 		} else {
-			newStatus = Invalid;
+			newCheckingStatus = Invalid;
 		}
 
 		updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
 
-		updatePMONAfterPerformCheck(newStatus);
+		updatePMONAfterPerformCheck(newCheckingStatus);
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP
