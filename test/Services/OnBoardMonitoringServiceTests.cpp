@@ -1327,3 +1327,10 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
     }
 }
 
+TEST_CASE("Event Raising", "[service][st12][st05]") {
+	SECTION("Valid event raising") {
+		CHECK(false==true);
+		// fill tests for event raising here
+	}
+}
+
