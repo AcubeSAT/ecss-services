@@ -25,8 +25,6 @@ void PMON::updatePMONAfterPerformCheck(const CheckingStatus newCheckingStatus) {
 		const etl::pair<CheckingStatus, CheckingStatus> transition = etl::make_pair(currentCheckingStatus, newTrackedCheckingStatus);
 		checkTransitionList.insert(checkTransitionList.begin(), transition);
 		currentCheckingStatus = newTrackedCheckingStatus;
-		newTrackedCheckingStatus = Unchecked;
-
 
 		if (pmonTransitionEventMap.find(transition) == pmonTransitionEventMap.end()) {
 			return;
@@ -50,6 +48,5 @@ void PMON::updatePMONAfterPerformCheck(const CheckingStatus newCheckingStatus) {
 		} else if (severity == EventReportService::EventReportSeverity::High) {
 			Services.eventReport.highSeverityAnomalyReport(static_cast<EventReportService::Event>(eventID), data);
 		}
-
 	}
 }

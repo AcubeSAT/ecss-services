@@ -750,12 +750,14 @@ TEST_CASE("Limit Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		pmon.performCheck();
-		CHECK(pmon.getRepetitionCounter() == 2);
+		CHECK(pmon.getRepetitionCounter() == 7);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -769,9 +771,11 @@ TEST_CASE("Limit Check Behavior") {
 		param.setValue(1);
 		REQUIRE(param.getValue() == 1);
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowLimit);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -785,9 +789,11 @@ TEST_CASE("Limit Check Behavior") {
 		param.setValue(10);
 		REQUIRE(param.getValue() == 10);
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -799,32 +805,44 @@ TEST_CASE("Limit Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(5);
-		pmon.performCheck();
-		CHECK(pmon.getRepetitionCounter() == 2);
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.getRepetitionCounter() == 12);
 
 		param.setValue(1);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowLimit);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(1);
-		pmon.performCheck();
-		CHECK(pmon.getRepetitionCounter() == 2);
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.getRepetitionCounter() == 12);
 
 		param.setValue(10);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(5);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -835,7 +853,9 @@ TEST_CASE("Limit Check Behavior") {
 		auto& pmon = fixtures.monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 		pmon.performCheck();
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 
 		for (unsigned char i = 2; i <= 8; ++i) {
 			param.setValue(i);
@@ -844,11 +864,15 @@ TEST_CASE("Limit Check Behavior") {
 		}
 
 		param.setValue(1);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowLimit);
 
 		param.setValue(10);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
 
 		ServiceTests::reset();
@@ -865,12 +889,14 @@ TEST_CASE("Expected Value Check Behavior") {
 		param.setValue(10);
 		pmon.mask = 0xFF;
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		pmon.performCheck();
-		CHECK(pmon.getRepetitionCounter() == 2);
+		CHECK(pmon.getRepetitionCounter() == 7);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -884,12 +910,14 @@ TEST_CASE("Expected Value Check Behavior") {
 		param.setValue(5);
 		pmon.mask = 0xFF;
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		pmon.performCheck();
-		CHECK(pmon.getRepetitionCounter() == 2);
+		CHECK(pmon.getRepetitionCounter() == 7);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -903,14 +931,18 @@ TEST_CASE("Expected Value Check Behavior") {
 		param.setValue(5);
 		pmon.mask = 0xFF;
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(10);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 		ServiceTests::reset();
 		Services.reset();
 	}
@@ -923,19 +955,25 @@ TEST_CASE("Expected Value Check Behavior") {
 		param.setValue(10);
 		pmon.mask = 0xFF;
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(5);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(10);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -949,14 +987,18 @@ TEST_CASE("Expected Value Check Behavior") {
 		param.setValue(0);
 		pmon.mask = 0xFF;
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(255);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 2);
+		CHECK(pmon.getRepetitionCounter() == 12);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -970,14 +1012,18 @@ TEST_CASE("Expected Value Check Behavior") {
 		param.setValue(10);
 		pmon.mask = 0x00;
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(5);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 2);
+		CHECK(pmon.getRepetitionCounter() == 12);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -992,14 +1038,18 @@ TEST_CASE("Expected Value Check Behavior") {
 		pmon.mask = 0b1111'0000;
 		pmon.expectedValue = 0b1111'0000;
 
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::ExpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		param.setValue(0b0000'1111);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1010,68 +1060,58 @@ TEST_CASE("Delta Check Perform Check") {
 	SECTION("Delta threshold checks including negative delta") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = fixtures.monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
-
+		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
+		UTCTimestamp sixMockTimes[6] = {
+			UTCTimestamp(2024, 4, 10, 10, 15, 15),
+			UTCTimestamp(2024, 4, 10, 10, 15, 30),
+			UTCTimestamp(2024, 4, 10, 10, 15, 45),
+			UTCTimestamp(2024, 4, 10, 10, 16, 0),
+			UTCTimestamp(2024, 4, 10, 10, 16, 15),
+			UTCTimestamp(2024, 4, 10, 10, 16, 30),
+		};
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
 		pmon.performCheck();
+
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
-		param.setValue(180);
-		pmon.performCheck();
+		uint16_t prevValue = 0;
+		for (int i = 0; i < 7; i++) {
+			ServiceTests::setMockTime(sixMockTimes[i]);
+			prevValue += 180;
+			param.setValue(prevValue);
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(5);
-		pmon.performCheck();
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
-		CHECK(pmon.getRepetitionCounter() == 1);
-
-		ServiceTests::reset();
-		Services.reset();
-	}
-
-	SECTION("Repetition Counter Behavior") {
-		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
-
-		param.setValue(10);
-		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
-		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
-		CHECK(pmon.getRepetitionCounter() == 1);
-
-		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
-		param.setValue(20);
-		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
-		CHECK(pmon.getRepetitionCounter() == 1);
-
-		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
-		param.setValue(50);
-		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
-		CHECK(pmon.getRepetitionCounter() == 2);
-
-		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
-		param.setValue(100);
-		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 7);
 
 		ServiceTests::reset();
 		Services.reset();
 	}
 
 	SECTION("Repetition Counter Resets on Status Change") {
+		UTCTimestamp sixMockTimes[6] = {
+			UTCTimestamp(2024, 4, 10, 10, 15, 15),
+			UTCTimestamp(2024, 4, 10, 10, 15, 30),
+			UTCTimestamp(2024, 4, 10, 10, 15, 45),
+			UTCTimestamp(2024, 4, 10, 10, 16, 0),
+			UTCTimestamp(2024, 4, 10, 10, 16, 15),
+			UTCTimestamp(2024, 4, 10, 10, 16, 30),
+		};
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = fixtures.monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
@@ -1085,11 +1125,14 @@ TEST_CASE("Delta Check Perform Check") {
 			pmon.performCheck();
 		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
-		param.setValue(100);
-		for (int i = 0; i < 6; i++) {
+		uint16_t prevValue = 0;
+		for (int i = 0; i < 7; i++) {
+			ServiceTests::setMockTime(sixMockTimes[i]);
+			prevValue += 140;
+			param.setValue(prevValue);
 			pmon.performCheck();
 		}
 		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);

@@ -379,7 +379,8 @@ public:
 	 *
 	 * This function first retrieves the current value of the monitored parameter and the current timestamp.
 	 * If there is a previous value, it calculates the delta per second between the current and previous values.
-	 * Depending on the delta per second, it sets the checking status to BelowLowThreshold, AboveHighThreshold, or WithinThreshold.
+	 * Depending on the delta per second, it sets the checking status to BelowLowThreshold, AboveHighThreshold, or WithinThreshold,
+	 * given that the repetition number for each status has been reached.
 	 * If there is no previous value, it sets the checking status to Invalid.
 	 *
 	 * After the check, the function updates the previous value and timestamp to the current ones.
@@ -403,7 +404,7 @@ public:
 				newCheckingStatus = WithinThreshold;
 			}
 		} else {
-			newCheckingStatus = Invalid;
+			currentCheckingStatus = Invalid;
 		}
 
 		updatePreviousValueAndTimestamp(currentValue, currentTimestamp);

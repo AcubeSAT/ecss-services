@@ -162,7 +162,9 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 }
 
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
+	if (!message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions)) {
+		return;
+	}
 
 	uint16_t numberOfIds = message.readUint16();
 
