@@ -390,7 +390,7 @@ public:
 	 * value ($\Delta = \mathrm{current} - \mathrm{last}$). No absolute value is considered.
 	 */
 	void performCheck() override {
-		CheckingStatus newCheckingStatus; //NOLINT(cppcoreguidelines-init-variables)
+		CheckingStatus newCheckingStatus = Invalid;
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
 		auto currentTimestamp = TimeGetter::getCurrentTimeDefaultCUC();
 

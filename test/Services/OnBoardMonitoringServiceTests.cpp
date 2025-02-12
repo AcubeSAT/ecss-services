@@ -1328,9 +1328,208 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
 }
 
 TEST_CASE("Event Raising", "[service][st12][st05]") {
-	SECTION("Valid event raising") {
-		CHECK(false==true);
-		// fill tests for event raising here
+	SECTION("Valid event raising for Expected Value Check") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		// Set up event mapping for transition from Unchecked to UnexpectedValue
+		pmon.pmonTransitionEventMap.insert(etl::make_pair(etl::make_pair(PMON::Unchecked, PMON::UnexpectedValue), 
+		                                                  EventReportService::UnexpectedValuePMON));
+
+		// Enable monitoring and set value that will trigger UnexpectedValue
+		pmon.monitoringEnabled = true;
+		param.setValue(5);
+		pmon.mask = 0xFF;
+
+		// Perform checks until repetition number is reached
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+
+		// Verify event was raised
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == EventReportService::ServiceType);
+		CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid event raising for Limit Check") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition2;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		// Set up event mapping for transition from Unchecked to BelowLowLimit
+		pmon.pmonTransitionEventMap.insert(etl::make_pair(etl::make_pair(PMON::Unchecked, PMON::BelowLowLimit), 
+		                                                  EventReportService::BelowLowLimitPMON));
+
+		// Enable monitoring and set value that will trigger BelowLowLimit
+		pmon.monitoringEnabled = true;
+		param.setValue(1);
+
+		// Perform checks until repetition number is reached
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+
+		// Verify event was raised
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == EventReportService::ServiceType);
+		CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid event raising for Delta Check") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition3;
+		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
+
+		// Set up event mapping for transition from Invalid to AboveHighThreshold
+		pmon.pmonTransitionEventMap.insert(etl::make_pair(etl::make_pair(PMON::Invalid, PMON::BelowLowThreshold),
+		                                                  EventReportService::BelowLowThresholdPMON));
+
+		// Enable monitoring and set initial value
+		pmon.monitoringEnabled = true;
+		param.setValue(10);
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		pmon.performCheck();
+
+		// Set value that will trigger AboveHighThreshold
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		uint16_t prevValue = 0;
+		for (int i = 0; i < 7; i++) {
+			prevValue += 180;
+			param.setValue(prevValue);
+			pmon.performCheck();
+		}
+
+		// Verify event was raised
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == EventReportService::ServiceType);
+		CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
+		CHECK(report.read<EventDefinitionId>() == EventReportService::Event::BelowLowThresholdPMON);
+		String<ECSSEventDataAuxiliaryMaxSize> data = "";
+		etl::array<uint8_t, ECSSEventDataAuxiliaryMaxSize> eventData = {};
+		report.readString(eventData.data(), ECSSEventDataAuxiliaryMaxSize);
+		CHECK(strcmp(reinterpret_cast<const char*>(eventData.data()),"ID9checkTransitionFailedFrom2To9") == 0);
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Transition List Management", "[service][st12]") {
+	SECTION("Transition list updates correctly for Expected Value Check") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition1;
+		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
+
+		pmon.monitoringEnabled = true;
+		param.setValue(10); // Expected value
+		pmon.mask = 0xFF;
+
+		// First transition: Unchecked -> ExpectedValue
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.checkTransitionList[0].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitionList[0].second == PMON::ExpectedValue);
+
+		// Second transition: ExpectedValue -> UnexpectedValue
+		param.setValue(5);
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		// Check newest transition
+		CHECK(pmon.checkTransitionList[0].first == PMON::ExpectedValue);
+		CHECK(pmon.checkTransitionList[0].second == PMON::UnexpectedValue);
+		// Check previous transition
+		CHECK(pmon.checkTransitionList[1].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitionList[1].second == PMON::ExpectedValue);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Transition list updates correctly for Limit Check") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition2;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		pmon.monitoringEnabled = true;
+		param.setValue(5); // Within limits
+
+		// First transition: Unchecked -> WithinLimits
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.checkTransitionList[0].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitionList[0].second == PMON::WithinLimits);
+
+		// Second transition: WithinLimits -> BelowLowLimit
+		param.setValue(1);
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		// Check newest transition
+		CHECK(pmon.checkTransitionList[0].first == PMON::WithinLimits);
+		CHECK(pmon.checkTransitionList[0].second == PMON::BelowLowLimit);
+		// Check previous transition
+		CHECK(pmon.checkTransitionList[1].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitionList[1].second == PMON::WithinLimits);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Transition list updates correctly for Delta Check") {
+		UTCTimestamp sixMockTimes[6] = {
+			UTCTimestamp(2024, 4, 10, 10, 15, 15),
+			UTCTimestamp(2024, 4, 10, 10, 15, 30),
+			UTCTimestamp(2024, 4, 10, 10, 15, 45),
+			UTCTimestamp(2024, 4, 10, 10, 16, 0),
+			UTCTimestamp(2024, 4, 10, 10, 16, 15),
+			UTCTimestamp(2024, 4, 10, 10, 16, 30),
+		};
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = fixtures.monitoringDefinition3;
+		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		uint16_t prevValue = 0;
+		for (int i = 0; i < 7; i++) {
+			ServiceTests::setMockTime(sixMockTimes[i]);
+			prevValue += 150;
+			param.setValue(prevValue);
+			pmon.performCheck();
+		}
+		CHECK(pmon.checkTransitionList[0].first == PMON::Invalid);
+		CHECK(pmon.checkTransitionList[0].second == PMON::WithinThreshold);
+
+		// Second transition: WithinThreshold -> AboveHighThreshold
+		prevValue = 0;
+		for (int i = 0; i < 7; i++) {
+			ServiceTests::setMockTime(sixMockTimes[i]);
+			prevValue += 180;
+			param.setValue(prevValue);
+			pmon.performCheck();
+		}
+		// Check newest transition
+		CHECK(pmon.checkTransitionList[0].first == PMON::WithinThreshold);
+		CHECK(pmon.checkTransitionList[0].second == PMON::AboveHighThreshold);
+		// Check previous transition
+		CHECK(pmon.checkTransitionList[1].first == PMON::Invalid);
+		CHECK(pmon.checkTransitionList[1].second == PMON::WithinThreshold);
+
+		ServiceTests::reset();
+		Services.reset();
 	}
 }
 
