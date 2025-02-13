@@ -301,6 +301,164 @@ TEST_CASE("File attributes report TM[23,4]", "[service][st23]") {
 	fs::remove_all(fs::temp_directory_path() / "st23");
 }
 
+TEST_CASE("Lock a file TC[23,5]", "[service][st23]") {
+	fs::current_path(fs::temp_directory_path());
+	fs::create_directory("st23");
+
+	SECTION("Good scenario") {
+		std::ofstream fileToLock(fs::temp_directory_path() / "st23/file_to_lock");
+		fileToLock.close();
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
+		String<64> repo1 = "st23";
+		String<64> file1 = "file_to_lock";
+		message.appendOctetString(repo1);
+		message.appendOctetString(file1);
+
+		uint32_t maxFileSizeBytes = 100;
+		message.appendUint32(maxFileSizeBytes);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 0);
+		CHECK((fs::status("st23/file_to_lock").permissions() & fs::perms::owner_read) != fs::perms::none);
+	}
+
+	SECTION("Repository name has a wildcard") {
+		Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC,
+		                 0);
+		String<64> repo4 = "test1*";
+		String<64> file4 = "test2";
+		message4.appendOctetString(repo4);
+		message4.appendOctetString(file4);
+
+		MessageParser::execute(message4);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("File name has a wildcard") {
+		Message message5(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC,
+		                 0);
+		String<1024> repo5 = "test1";
+		String<1024> file5 = "test2*";
+		message5.appendOctetString(repo5);
+		message5.appendOctetString(file5);
+
+		MessageParser::execute(message5);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("File does not exist") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
+		String<64> repo1 = "st23";
+		String<64> file1 = "file_to_lock";
+		message.appendOctetString(repo1);
+		message.appendOctetString(file1);
+
+		uint32_t maxFileSizeBytes = 100;
+		message.appendUint32(maxFileSizeBytes);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ObjectDoesNotExist));
+	}
+
+	SECTION("Object's repository is a directory, so it cannot be locked with this TC") {
+		fs::create_directories("st23/directory_1");
+		Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC,
+		                 0);
+		String<64> repo9 = "st23";
+		String<64> file9 = "directory_1";
+		message9.appendOctetString(repo9);
+		message9.appendOctetString(file9);
+
+		MessageParser::execute(message9);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::AttemptedAccessModificationOnDirectory));
+	}
+
+	fs::remove_all(fs::temp_directory_path() / "st23");
+}
+
+TEST_CASE("Unlock a file TC[23,6]", "[service][st23]") {
+	fs::current_path(fs::temp_directory_path());
+	fs::create_directory("st23");
+
+	SECTION("Good scenario") {
+		std::ofstream fileToLock(fs::temp_directory_path() / "st23/file_to_unlock");
+		fileToLock.close();
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
+		String<64> repo1 = "st23";
+		String<64> file1 = "file_to_unlock";
+		message.appendOctetString(repo1);
+		message.appendOctetString(file1);
+
+		uint32_t maxFileSizeBytes = 100;
+		message.appendUint32(maxFileSizeBytes);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 0);
+		CHECK((fs::status("st23/file_to_unlock").permissions() & fs::perms::owner_write) != fs::perms::none);
+	}
+
+	SECTION("Repository name has a wildcard") {
+		Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC,
+		                 0);
+		String<64> repo4 = "test1*";
+		String<64> file4 = "test2";
+		message4.appendOctetString(repo4);
+		message4.appendOctetString(file4);
+
+		MessageParser::execute(message4);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("File name has a wildcard") {
+		Message message5(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC,
+		                 0);
+		String<1024> repo5 = "test1";
+		String<1024> file5 = "test2*";
+		message5.appendOctetString(repo5);
+		message5.appendOctetString(file5);
+
+		MessageParser::execute(message5);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("File does not exist") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
+		String<64> repo1 = "st23";
+		String<64> file1 = "file_to_lock";
+		message.appendOctetString(repo1);
+		message.appendOctetString(file1);
+
+		uint32_t maxFileSizeBytes = 100;
+		message.appendUint32(maxFileSizeBytes);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ObjectDoesNotExist));
+	}
+
+	SECTION("Object's repository is a directory, so it cannot be unlocked with this TC") {
+		fs::create_directories("st23/directory_1");
+		Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC,
+		                 0);
+		String<64> repo9 = "st23";
+		String<64> file9 = "directory_1";
+		message9.appendOctetString(repo9);
+		message9.appendOctetString(file9);
+
+		MessageParser::execute(message9);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::AttemptedAccessModificationOnDirectory));
+	}
+
+	fs::remove_all(fs::temp_directory_path() / "st23");
+}
+
 TEST_CASE("Create a directory TC[23,9]", "[service][st23]") {
 	fs::current_path(fs::temp_directory_path());
 	fs::create_directories("st23");

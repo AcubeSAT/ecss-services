@@ -51,6 +51,16 @@ namespace Filesystem {
 	};
 
 	/**
+	 * Possible errors returned by the filesystem during file locking/unlocking
+	 */
+	enum class FilePermissionModificationError : uint8_t {
+		FileDoesNotExist = 0,
+		PathLeadsToDirectory = 1,
+		UnknownError = 255
+	};
+
+
+	/**
 	 * Possible errors returned by the filesystem during directory creation
 	 */
 	enum class DirectoryCreationError : uint8_t {
@@ -139,13 +149,13 @@ namespace Filesystem {
 	 * Locks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	void lockFile(const Path& path);
+	etl::optional<FilePermissionModificationError> lockFile(const Path& path);
 
 	/**
 	 * Unlocks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	void unlockFile(const Path& path);
+	etl::optional<FilePermissionModificationError> unlockFile(const Path& path);
 
 	/**
 	 * Gets the current file lock status

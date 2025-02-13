@@ -1,4 +1,8 @@
 #include "Helpers/Filesystem.hpp"
+#include <iostream>
+#include <fstream>
+#include <sys/file.h>
+#include <unistd.h>
 
 /**
  * These functions are built on the x86_services target and will never run.
@@ -22,10 +26,12 @@ namespace Filesystem {
 		return FileLockStatus::Unlocked;
 	}
 
-	void lockFile(const Path& path) {
+	etl::optional<FilePermissionModificationError> lockFile(const Path& path) {
+		return etl::nullopt;
 	}
 
-	void unlockFile(const Path& path) {
+	etl::optional<FilePermissionModificationError> unlockFile(const Path& path) {
+		return etl::nullopt;
 	}
 
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {

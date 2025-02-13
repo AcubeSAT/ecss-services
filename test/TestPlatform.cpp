@@ -237,44 +237,6 @@ namespace Filesystem {
 		}
 	}
 
-	FileLockStatus getFileLockStatus(const Path& path) {
-		fs::perms permissions = fs::status(path.data()).permissions();
-
-		if ((permissions & fs::perms::owner_write) == fs::perms::none) {
-			return FileLockStatus::Locked;
-		}
-
-		return FileLockStatus::Unlocked;
-	}
-
-	/**
-	 * Locks a file using POSIX permission operations.
-	 * @param path The path to the file
-	 * @warning If a file is locked, a chmod +w ./file operation will allow the
-	 * current user to modify the file again.
-	 */
-	void lockFile(const Path& path) {
-		fs::perms permissions = fs::status(path.data()).permissions();
-
-		auto newPermissions = permissions & ~fs::perms::owner_write;
-
-		fs::status(path.data()).permissions(newPermissions);
-	}
-
-	/**
-	 * Unlocks a file using POSIX permission operations.
-	 * @param path The path to the file
-	 * @warning If a file is unlocked, a chmod -w ./file operation will stop the
-	 * current user from modifying the file again.
-	 */
-	void unlockFile(const Path& path) {
-		fs::perms permissions = fs::status(path.data()).permissions();
-
-		auto newPermissions = permissions & fs::perms::owner_write;
-
-		fs::status(path.data()).permissions(newPermissions);
-	}
-
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
 		Attributes attributes{};
 
@@ -291,6 +253,67 @@ namespace Filesystem {
 		attributes.isLocked = getFileLockStatus(path) == FileLockStatus::Locked;
 
 		return attributes;
+	}
+
+	/**
+	 * Locks a file using POSIX permission operations.
+	 * @param path The path to the file
+	 * @warning If a file is locked, a chmod +w ./file operation will allow the
+	 * current user to modify the file again.
+	 *
+	 */
+	etl::optional<FilePermissionModificationError> lockFile(const Path& path) {
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (not nodeType) {
+			return FilePermissionModificationError::FileDoesNotExist;
+		}
+
+		if (nodeType.value() != NodeType::File) {
+			return FilePermissionModificationError::PathLeadsToDirectory;
+		}
+
+		fs::perms permissions = fs::status(path.data()).permissions();
+
+		auto newPermissions = permissions & ~fs::perms::owner_write;
+
+		fs::status(path.data()).permissions(newPermissions);
+
+		return etl::nullopt;
+	}
+
+	/**
+	 * Unlocks a file using POSIX permission operations.
+	 * @param path The path to the file
+	 * @warning If a file is unlocked, a chmod -w ./file operation will stop the
+	 * current user from modifying the file again.
+	 */
+	etl::optional<FilePermissionModificationError> unlockFile(const Path& path) {
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (not nodeType) {
+			return FilePermissionModificationError::FileDoesNotExist;
+		}
+
+		if (nodeType.value() != NodeType::File) {
+			return FilePermissionModificationError::PathLeadsToDirectory;
+		}
+
+		fs::perms permissions = fs::status(path.data()).permissions();
+
+		auto newPermissions = permissions & fs::perms::owner_write;
+
+		fs::status(path.data()).permissions(newPermissions);
+
+		return etl::nullopt;
+	}
+
+	FileLockStatus getFileLockStatus(const Path& path) {
+		fs::perms permissions = fs::status(path.data()).permissions();
+
+		if ((permissions & fs::perms::owner_write) == fs::perms::none) {
+			return FileLockStatus::Locked;
+		}
+
+		return FileLockStatus::Unlocked;
 	}
 
 	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {

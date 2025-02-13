@@ -144,6 +144,71 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 	storeMessage(report);
 }
 
+void FileManagementService::lockFile(Message& message) {
+	message.assertTC(ServiceType, LockFile);
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, fileName);
+
+	if (findWildcardPosition(fullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	if (auto filePermissionModificationError = Filesystem::lockFile(fullPath)) {
+		switch (filePermissionModificationError.value()) {
+			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
+				ErrorHandler::reportError(message,
+										  ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
+				return;
+			}
+			case Filesystem::FilePermissionModificationError::PathLeadsToDirectory: {
+				ErrorHandler::reportError(message,
+										  ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory);
+				return;
+			}
+			default: {
+				ErrorHandler::reportError(message,
+										  ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+			}
+		}
+	}
+
+}
+
+void FileManagementService::unlockFile(Message& message) {
+	message.assertTC(ServiceType, UnlockFile);
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, fileName);
+
+	if (findWildcardPosition(fullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	if (auto filePermissionModificationError = Filesystem::unlockFile(fullPath)) {
+		switch (filePermissionModificationError.value()) {
+			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
+				ErrorHandler::reportError(message,
+										  ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
+				return;
+			}
+			case Filesystem::FilePermissionModificationError::PathLeadsToDirectory: {
+				ErrorHandler::reportError(message,
+										  ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory);
+				return;
+			}
+			default: {
+				ErrorHandler::reportError(message,
+										  ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+			}
+		}
+	}
+}
+
 void FileManagementService::createDirectory(Message& message) {
 	message.assertTC(ServiceType, CreateDirectory);
 
@@ -238,6 +303,12 @@ void FileManagementService::execute(Message& message) {
 			break;
 		case ReportAttributes:
 			reportAttributes(message);
+			break;
+		case LockFile:
+			lockFile(message);
+			break;
+		case UnlockFile:
+			unlockFile(message);
 			break;
 		case CreateDirectory:
 			createDirectory(message);

@@ -491,6 +491,10 @@ public:
 		 * A delete directory command was requested on a non empty directory
 		 */
 		AttemptedDeleteNonEmptyDirectory = 10,
+		/**
+		 * A lock/unlcock file command was requested on a directory
+		 */
+		AttemptedAccessModificationOnDirectory = 11,
 	};
 
 	/**
