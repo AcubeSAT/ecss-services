@@ -314,17 +314,14 @@ TEST_CASE("Lock a file TC[23,5]", "[service][st23]") {
 		message.appendOctetString(repo1);
 		message.appendOctetString(file1);
 
-		uint32_t maxFileSizeBytes = 100;
-		message.appendUint32(maxFileSizeBytes);
-
 		MessageParser::execute(message);
+		fs::perms permissions = fs::status("st23/file_to_lock").permissions();
 		CHECK(ServiceTests::countErrors() == 0);
-		CHECK((fs::status("st23/file_to_lock").permissions() & fs::perms::owner_read) != fs::perms::none);
+		CHECK((permissions & fs::perms::owner_write) == fs::perms::none);
 	}
 
 	SECTION("Repository name has a wildcard") {
-		Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC,
-		                 0);
+		Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
 		String<64> repo4 = "test1*";
 		String<64> file4 = "test2";
 		message4.appendOctetString(repo4);
@@ -336,8 +333,7 @@ TEST_CASE("Lock a file TC[23,5]", "[service][st23]") {
 	}
 
 	SECTION("File name has a wildcard") {
-		Message message5(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC,
-		                 0);
+		Message message5(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
 		String<1024> repo5 = "test1";
 		String<1024> file5 = "test2*";
 		message5.appendOctetString(repo5);
@@ -365,8 +361,7 @@ TEST_CASE("Lock a file TC[23,5]", "[service][st23]") {
 
 	SECTION("Object's repository is a directory, so it cannot be locked with this TC") {
 		fs::create_directories("st23/directory_1");
-		Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC,
-		                 0);
+		Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
 		String<64> repo9 = "st23";
 		String<64> file9 = "directory_1";
 		message9.appendOctetString(repo9);
@@ -397,13 +392,13 @@ TEST_CASE("Unlock a file TC[23,6]", "[service][st23]") {
 		message.appendUint32(maxFileSizeBytes);
 
 		MessageParser::execute(message);
+		fs::perms permissions = fs::status("st23/file_to_unlock").permissions();
 		CHECK(ServiceTests::countErrors() == 0);
-		CHECK((fs::status("st23/file_to_unlock").permissions() & fs::perms::owner_write) != fs::perms::none);
+		CHECK((permissions & fs::perms::owner_write) == fs::perms::owner_write);
 	}
 
 	SECTION("Repository name has a wildcard") {
-		Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC,
-		                 0);
+		Message message4(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
 		String<64> repo4 = "test1*";
 		String<64> file4 = "test2";
 		message4.appendOctetString(repo4);
@@ -415,8 +410,7 @@ TEST_CASE("Unlock a file TC[23,6]", "[service][st23]") {
 	}
 
 	SECTION("File name has a wildcard") {
-		Message message5(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC,
-		                 0);
+		Message message5(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
 		String<1024> repo5 = "test1";
 		String<1024> file5 = "test2*";
 		message5.appendOctetString(repo5);
@@ -444,8 +438,7 @@ TEST_CASE("Unlock a file TC[23,6]", "[service][st23]") {
 
 	SECTION("Object's repository is a directory, so it cannot be unlocked with this TC") {
 		fs::create_directories("st23/directory_1");
-		Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC,
-		                 0);
+		Message message9(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
 		String<64> repo9 = "st23";
 		String<64> file9 = "directory_1";
 		message9.appendOctetString(repo9);

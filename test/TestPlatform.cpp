@@ -260,7 +260,6 @@ namespace Filesystem {
 	 * @param path The path to the file
 	 * @warning If a file is locked, a chmod +w ./file operation will allow the
 	 * current user to modify the file again.
-	 *
 	 */
 	etl::optional<FilePermissionModificationError> lockFile(const Path& path) {
 		etl::optional<NodeType> nodeType = getNodeType(path);
@@ -276,7 +275,7 @@ namespace Filesystem {
 
 		auto newPermissions = permissions & ~fs::perms::owner_write;
 
-		fs::status(path.data()).permissions(newPermissions);
+		fs::permissions(path.data(), newPermissions);
 
 		return etl::nullopt;
 	}
@@ -299,9 +298,9 @@ namespace Filesystem {
 
 		fs::perms permissions = fs::status(path.data()).permissions();
 
-		auto newPermissions = permissions & fs::perms::owner_write;
+		auto newPermissions = permissions | fs::perms::owner_write;
 
-		fs::status(path.data()).permissions(newPermissions);
+		fs::permissions(path.data(), newPermissions);
 
 		return etl::nullopt;
 	}

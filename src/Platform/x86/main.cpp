@@ -3,6 +3,7 @@
 #include <Time/UTCTimestamp.hpp>
 #include <ctime>
 #include <iostream>
+#include <filesystem>
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/Statistic.hpp"
@@ -11,6 +12,7 @@
 #include "ServicePool.hpp"
 #include "Services/EventActionService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/FileManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/MemoryManagementService.hpp"
@@ -359,6 +361,79 @@ int main() {
 	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
 	                      TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
+
+	//ST[23]
+	namespace fs = std::filesystem;
+	FileManagementService& fileManagementService = Services.fileManagement;
+
+	fs::current_path(fs::temp_directory_path());
+	std::cout << "\n\nST[23] File System Service - Start\n\n";
+	fs::create_directories("st23");
+	String<64> repo = "st23";
+
+	//Create directory
+	Message createDirectoryMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CreateDirectory, Message::TC, 0);
+	String<64> directory = "created_directory";
+	createDirectoryMessage.appendOctetString(repo);
+	createDirectoryMessage.appendOctetString(directory);
+	MessageParser::execute(createDirectoryMessage);
+	std::cout << "Created directory.\n";
+	std::cout << "fs::exists(\"st23/created_directory\") -> " << fs::exists("st23/created_directory") << "\n";
+	std::cout << "fs::is_directory(\"st23/created_directory\") -> " << fs::is_directory("st23/created_directory") << "\n\n";
+
+	String<64> fullPathToDirectory = repo;
+	fullPathToDirectory.append("/").append(directory);
+
+	//Create file
+	Message createFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+	String<64> file = "created_file";
+	createFileMessage.appendOctetString(fullPathToDirectory);
+	createFileMessage.appendOctetString(file);
+	MessageParser::execute(createFileMessage);
+	std::cout << "Created file.\n";
+	std::cout << "fs::exists(\"st23/created_directory/created_file\") -> " << fs::exists("st23/created_directory/created_file") << "\n";
+	std::cout << "fs::is_regular_file(\"st23/created_directory/created_file\") -> " << fs::is_regular_file("st23/created_directory/created_file") << "\n\n";
+
+	//Lock file
+	Message lockFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
+	lockFileMessage.appendOctetString(fullPathToDirectory);
+	lockFileMessage.appendOctetString(file);
+	MessageParser::execute(lockFileMessage);
+	std::cout << "Locked file.\n";
+	Filesystem::FileLockStatus lockStatus = Filesystem::getFileLockStatus("st23/created_directory/created_file");
+	std::cout << "FileSystem::getFileLockStatus == Locked -> " << (lockStatus == Filesystem::FileLockStatus::Locked) << "\n\n";
+
+	//Unlock file
+	Message unlockFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
+	unlockFileMessage.appendOctetString(fullPathToDirectory);
+	unlockFileMessage.appendOctetString(file);
+	MessageParser::execute(unlockFileMessage);
+	lockStatus = Filesystem::getFileLockStatus("st23/created_directory/created_file");
+	std::cout << "Unlocked file.\n";
+	std::cout << "FileSystem::getFileLockStatus == Unlocked -> " << (lockStatus == Filesystem::FileLockStatus::Unlocked) <<"\n\n";
+
+	//Delete file
+	Message deleteFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
+	deleteFileMessage.appendOctetString(fullPathToDirectory);
+	deleteFileMessage.appendOctetString(file);
+	MessageParser::execute(deleteFileMessage);
+	std::cout << "Deleted file.\n";
+	std::cout << "fs::exists(\"st23/created_directory/created_file\") -> " << fs::exists("st23/created_directory/created_file") << "\n";
+	std::cout << "fs::is_regular_file(\"st23/created_directory/created_file\") -> " << fs::is_regular_file("st23/created_directory/created_file") << "\n\n";
+
+	//Delete directory
+	Message deleteDirectoryMessage(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteDirectory, Message::TC,0);
+	deleteDirectoryMessage.appendOctetString(repo);
+	deleteDirectoryMessage.appendOctetString(directory);
+	MessageParser::execute(deleteDirectoryMessage);
+	std::cout << "Deleted directory.\n";
+	std::cout << "fs::exists(\"st23/created_directory\") -> " << fs::exists("st23/created_directory") << "\n";
+	std::cout << "fs::is_directory(\"st23/created_directory\") -> " << fs::is_directory("st23/created_directory") << "\n\n";
+
+	//cleanup
+	fs::remove_all(fs::temp_directory_path() / "st23");
+	std::cout << "ST[23] File System Service - End\n\n";
+	//ST[23] end
 
 	LOG_NOTICE << "ECSS Services test complete";
 
