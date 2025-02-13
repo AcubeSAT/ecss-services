@@ -59,7 +59,6 @@ namespace Filesystem {
 		UnknownError = 255
 	};
 
-
 	/**
 	 * Possible errors returned by the filesystem during directory creation
 	 */
