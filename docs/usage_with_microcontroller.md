@@ -100,7 +100,7 @@ responsibility of the @ref Service::platformSpecificHandleMessage function.
 This function is always called from the `handleMessage()` function. The reason is that in this way, we can force 
 universal actions, such as storing telemetry in ST[15], or forwarding the message somewhere with ST[14].
 
-In this function, you can transmit the message via an antenna, send it through an interface for debugging, or both.
+In @ref Service::platformSpecificHandleMessage() function, you can transmit the message internally or send it through an interface for debugging.
 
 An example definition can be as follows:
 
