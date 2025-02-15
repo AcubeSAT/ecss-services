@@ -261,12 +261,12 @@ inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
 inline constexpr uint16_t ApplicationId = 1;
 
 /**
- * The size of the check transition list in the PMON class
+ * The size of the check transition list of the PMON class of ST[12]
  */
 inline constexpr uint8_t CheckTransitionListSize = 2;
 
 /**
- * The size of the map of event definitions connected to the check transitions in the PMON class
+ * The size of the map of event definitions connected to the check transitions of the PMON class of ST[12]
  */
 inline constexpr uint8_t PMONEventMapSize = 2;
 
