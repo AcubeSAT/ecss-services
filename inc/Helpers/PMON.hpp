@@ -155,7 +155,7 @@ protected:
 	 * @attention to be called in the performCheck() function of the derived classes.
 	 * @param newCheckingStatus The current checking status.
 	 */
-	void updatePMONAfterPerformCheck(CheckingStatus newCheckingStatus);
+	void updateAfterCheck(CheckingStatus newCheckingStatus);
 };
 
 /**
