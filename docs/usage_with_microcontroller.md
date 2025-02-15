@@ -106,8 +106,6 @@ An example definition can be as follows:
 
 ```cpp
 void Service::platformSpecificHandleMessage(Message& message) {
-	message.finalize();
-
 	CAN_Transmit(message.data, message.dataSize, Platform::OBC);
 
 	LOG_DEBUG << "Just sent a message with CAN to ST[" << static_cast<int>(message.serviceType) << "]";
