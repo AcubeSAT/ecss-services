@@ -32,6 +32,8 @@ uint8_t ApplicationProcessConfiguration::countReportsOfService(ApplicationProces
 	return definitions[appServicePair].size();
 }
 
+
+
 bool ApplicationProcessConfiguration::reportExistsInAppProcessConfiguration(ApplicationProcessId
 	applicationID,
 	ServiceTypeNum serviceType,
@@ -46,6 +48,7 @@ bool ApplicationProcessConfiguration::reportExistsInAppProcessConfiguration(Appl
 	}
 	return false;
 }
+
 
 bool ApplicationProcessConfiguration::isApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,
 	uint8_t numOfServices,
