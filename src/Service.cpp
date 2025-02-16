@@ -8,7 +8,8 @@ void Service::handleMessage(Message& message) {
 	if (Services.realTimeForwarding.isReportTypeEnabled(message.messageType, message.applicationId, message.serviceType)) {
 		releaseMessage(message);
 	}
-
+	#else
+		releaseMessage(message);
 	#endif
 
 	#ifdef SERVICE_STORAGEANDRETRIEVAL
