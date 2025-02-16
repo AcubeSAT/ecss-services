@@ -63,7 +63,9 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Mes
 }
 
 void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, AddParameterMonitoringDefinitions);
+	if (!message.assertTC(ServiceType, AddParameterMonitoringDefinitions)) {
+		return;
+	}
 
 	uint16_t numberOfIds = message.readUint16();
 
