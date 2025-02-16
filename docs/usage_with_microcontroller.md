@@ -97,19 +97,22 @@ performance and size of your program.
 Whenever PUS telemetry is generated, it needs to be stored, transmitted or sent to a receiver. PUS functions will call @ref Service::handleMessage to do this every time a telemetry packet is generated.
 
 This function performs the following:
-1. Calls @ref Service::platformSpecificHandleMessage(), a platform-specific callback
+1. Calls @ref Service::releaseMessage(), a platform-specific callback (if the linked definitions of **ST[14] - 
+real-time forwarding control** are enabled)
 2. Stores the packet in any packet stores (if **ST[15] - on-board storage** is enabled)
-3. Calls @ref Service::releaseMessage(), a platform-specific callback (if the linked definitions of **ST[14] - real-time forwarding control** are enabled)
+3. Calls @ref Service::platformSpecificHandleMessage(), a platform-specific callback, for any misc functionality.
 
-In @ref Service::platformSpecificHandleMessage() function, you can transmit the message internally or send it through an interface for debugging.
+In @ref Service::releaseMessage() function, you can transmit the message internally or send it through an interface for 
+debugging.
 
-An example definition can be as follows:
+In @ref Service::platformSpecificHandleMessage() function, you can handle anything that isn't fitting in the @ref 
+Service::releaseMessage() functionality.
+
+Examples follow: 
 
 ```cpp
-void Service::platformSpecificHandleMessage(Message& message) {
-	CAN_Transmit(message.data, message.dataSize, Platform::OBC);
-
-	LOG_DEBUG << "Just sent a message with CAN to ST[" << static_cast<int>(message.serviceType) << "]";
+void Service::platfromSpecificHandleMessage(Message& message) {
+    LOG_DEBUG << "Just sent a message with CAN to ST[" << static_cast<int>(message.serviceType) << "]";
 }
 ```
 
