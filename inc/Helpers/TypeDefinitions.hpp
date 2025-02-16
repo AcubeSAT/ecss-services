@@ -57,9 +57,34 @@ using ErrorCode = uint16_t;
  using DeltaThreshold = double;
 
 /**
- * File types
+ * File operation types used in memory and file management services
  */
-using Offset = uint16_t;
+
+/**
+ * @brief Position indicator for file operations
+ * @details Represents the starting byte position in a file for read/write operations.
+ * 
+ * Example usage:
+ * - FileOffset = 0: Start at the beginning of the file
+ * - FileOffset = 100: Start at the 100th byte of the file
+ * 
+ * This type is commonly used in conjunction with FileDataLength to specify
+ * a range of bytes to operate on in file operations.
+ */
+using FileOffset = uint32_t;
+
+/**
+ * @brief Size indicator for file operations
+ * @details Represents the number of bytes to read or write in a file operation.
+ *          As a uint16_t, it can specify lengths from 0 to 65535 bytes.
+ * 
+ * Example usage:
+ * - FileDataLength = 50: Process 50 bytes of data
+ * - FileDataLength = 0: No data to process
+ * 
+ * This type is commonly used in conjunction with Offset to define the exact
+ * range of bytes to process in file operations.
+ */
 using FileDataLength = uint16_t;
 
 /**

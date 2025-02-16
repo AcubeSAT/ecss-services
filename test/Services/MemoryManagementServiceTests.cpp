@@ -148,11 +148,11 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		
 		request.append<InstructionType>(1);
 		
-		const Offset offset = 0;
+		const FileOffset offset = 0;
 		const String<ChunkMaxFileSizeBytes> testData = "Hello World";
 		const FileDataLength dataLength = testData.size();
 		
-		request.append<Offset>(offset);
+		request.append<FileOffset>(offset);
 		request.append<FileDataLength>(dataLength);
 		request.appendString(testData);
 
@@ -180,20 +180,20 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		request.append<InstructionType>(2);
 
 		// First data block
-		const Offset offset1 = 0;
+		const FileOffset offset1 = 0;
 		const String<ChunkMaxFileSizeBytes> testData1 = "First block";
 		const FileDataLength dataLength1 = testData1.size();
 
-		request.append<Offset>(offset1);
+		request.append<FileOffset>(offset1);
 		request.append<FileDataLength>(dataLength1);
 		request.appendString(testData1);
 
 		// Second data block
-		const Offset offset2 = 100;
+		const FileOffset offset2 = 100;
 		const String<ChunkMaxFileSizeBytes> testData2 = "Second block";
 		const FileDataLength dataLength2 = testData2.size();
 
-		request.append<Offset>(offset2);
+		request.append<FileOffset>(offset2);
 		request.append<FileDataLength>(dataLength2);
 		request.appendString(testData2);
 
@@ -213,11 +213,11 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		request.append<InstructionType>(1);
 
-		const Offset offset = 0;
+		const FileOffset offset = 0;
 		const String<ChunkMaxFileSizeBytes> testData1 = "First block";
 		const FileDataLength dataLength1 = testData1.size();
 
-		request.append<Offset>(offset);
+		request.append<FileOffset>(offset);
 		request.append<FileDataLength>(dataLength1);
 		request.appendString(testData1);
 
@@ -240,11 +240,11 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		request.append<InstructionType>(1);
 
-		const Offset offset = 0xFFFF;
+		const FileOffset offset = 0xFFFF;
 		const String<ChunkMaxFileSizeBytes> testData = "Hello World";
 		const FileDataLength dataLength = testData.size();
 
-		request.append<Offset>(offset);
+		request.append<FileOffset>(offset);
 		request.append<FileDataLength>(dataLength);
 		request.appendString(testData);
 
@@ -267,11 +267,11 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 
 		request.append<InstructionType>(1);
 
-		const Offset offset = 0;
+		const FileOffset offset = 0;
 		const String<ChunkMaxFileSizeBytes> testData = "Test data";
 		const FileDataLength dataLength = testData.size();
 
-		request.append<Offset>(offset);
+		request.append<FileOffset>(offset);
 		request.append<FileDataLength>(dataLength);
 		request.appendString(testData);
 		const char* filename = "memoryManagementTestBroken.txt";
@@ -320,7 +320,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		file.close();
 
 		request.append<InstructionType>(1);
-		request.append<Offset>(2);
+		request.append<FileOffset>(2);
 		request.append<FileDataLength>(5);  // Request 10 bytes
 
 		MessageParser::execute(request);
@@ -335,7 +335,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		CHECK(responsePath == path);
 
 		CHECK(response.read<InstructionType>() == 1);
-		CHECK(response.read<Offset>() == 2);
+		CHECK(response.read<FileOffset>() == 2);
 		CHECK(response.read<FileDataLength>() == 5);
 		etl::array<uint8_t, 5> data = {};
 		response.readString(data.data(), 5);
@@ -353,11 +353,11 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		request.append<InstructionType>(2);
 
 		// First block
-		request.append<Offset>(2);
+		request.append<FileOffset>(2);
 		request.append<FileDataLength>(5);
 
 		// Second block
-		request.append<Offset>(10);
+		request.append<FileOffset>(10);
 		request.append<FileDataLength>(5);
 
 		MessageParser::execute(request);
@@ -374,7 +374,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		CHECK(response.read<InstructionType>() == 2);
 
 		// First block verification
-		CHECK(response.read<Offset>() == 2);
+		CHECK(response.read<FileOffset>() == 2);
 		CHECK(response.read<FileDataLength>() == 5);
 		etl::array<uint8_t, 5> data1 = {};
 		response.readString(data1.data(), 5);
@@ -382,7 +382,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		CHECK(strcmp(dataString1.data(), "block") == 0);
 
 		// Second block verification
-		CHECK(response.read<Offset>() == 10);
+		CHECK(response.read<FileOffset>() == 10);
 		CHECK(response.read<FileDataLength>() == 5);
 		etl::array<uint8_t, 5> data2 = {};
 		response.readString(data2.data(), 5);
@@ -399,7 +399,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		request.appendOctetString(path);
 
 		request.append<InstructionType>(1);
-		request.append<Offset>(0);
+		request.append<FileOffset>(0);
 		request.append<FileDataLength>(10);
 
 		MessageParser::execute(request);
@@ -416,7 +416,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		CHECK(response.read<InstructionType>() == 1);
 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
-		CHECK(response.read<Offset>() == 0);
+		CHECK(response.read<FileOffset>() == 0);
 		CHECK(response.read<FileDataLength>() == 0);
 		ServiceTests::reset();
 	}
@@ -428,7 +428,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		request.appendOctetString(path);
 
 		request.append<InstructionType>(1);
-		request.append<Offset>(0xFFFF);
+		request.append<FileOffset>(0xFFFF);
 		request.append<FileDataLength>(10);
 
 		MessageParser::execute(request);
@@ -444,7 +444,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		CHECK(response.read<InstructionType>() == 1);
 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
-		CHECK(response.read<Offset>() == 0);
+		CHECK(response.read<FileOffset>() == 0xFFFF);
 		CHECK(response.read<FileDataLength>() == 0);
 		ServiceTests::reset();
 	}
@@ -457,13 +457,13 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		request.append<InstructionType>(3);
 
-		request.append<Offset>(2);
+		request.append<FileOffset>(2);
 		request.append<FileDataLength>(5);
 
-		request.append<Offset>(0xFFFF);
+		request.append<FileOffset>(0xFFFF);
 		request.append<FileDataLength>(10);
 
-		request.append<Offset>(10);
+		request.append<FileOffset>(10);
 		request.append<FileDataLength>(5);
 
 		MessageParser::execute(request);
@@ -479,15 +479,15 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		CHECK(response.read<InstructionType>() == 3);
 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
-		CHECK(response.read<Offset>() == 2);
+		CHECK(response.read<FileOffset>() == 2);
 		CHECK(response.read<FileDataLength>() == 5);
 		etl::array<uint8_t, 5> data1 = {};
 		response.readString(data1.data(), 5);
 		String<5> dataString1 = String<5>(data1.data(), 5);
 		CHECK(strcmp(dataString1.data(), "block") == 0);
-		CHECK(response.read<Offset>() == 0);
+		CHECK(response.read<FileOffset>() == 0xFFFF);
 		CHECK(response.read<FileDataLength>() == 0);
-		CHECK(response.read<Offset>() == 10);
+		CHECK(response.read<FileOffset>() == 10);
 		CHECK(response.read<FileDataLength>() == 5);
 		etl::array<uint8_t, 5> data2 = {};
 		response.readString(data2.data(), 5);
@@ -503,7 +503,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		request.appendOctetString(path);
 
 		request.append<InstructionType>(1);
-		request.append<Offset>(0);
+		request.append<FileOffset>(0);
 		request.append<FileDataLength>(10);
 
 		namespace fs = std::filesystem;
@@ -534,7 +534,7 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 
 		CHECK(response.read<InstructionType>() == 1);
 		CHECK(response.messageType == MemoryManagementService::DumpedObjectMemoryDataReport);
-		CHECK(response.read<Offset>() == 0);
+		CHECK(response.read<FileOffset>() == 0);
 		CHECK(response.read<FileDataLength>() == 0);
 		ServiceTests::reset();
 	}

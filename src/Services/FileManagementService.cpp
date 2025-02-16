@@ -11,11 +11,7 @@ void FileManagementService::createFile(Message& message) {
 	if (not message.assertTC(ServiceType, CreateFile)) {
 		return;
 	}
-
-	ObjectPath repositoryPath = "";
-	ObjectPath fileName = "";
-	Path fullPath = "";
-	readAndBuildPath(message, repositoryPath, fileName, fullPath);
+	auto [repositoryPath, fileName, fullPath] = readAndBuildPath(message);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -67,10 +63,7 @@ void FileManagementService::deleteFile(Message& message) {
 		return;
 	}
 
-	ObjectPath repositoryPath = "";
-	ObjectPath fileName = "";
-	Path fullPath = "";
-	readAndBuildPath(message, repositoryPath, fileName, fullPath);
+	auto [repositoryPath, fileName, fullPath] = readAndBuildPath(message);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -115,10 +108,8 @@ void FileManagementService::reportAttributes(Message& message) {
 		return;
 	}
 
-	ObjectPath repositoryPath = "";
-	ObjectPath fileName = "";
-	Path fullPath = "";
-	readAndBuildPath(message, repositoryPath, fileName, fullPath);
+	auto [repositoryPath, fileName, fullPath] = readAndBuildPath(message);
+
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -163,10 +154,7 @@ void FileManagementService::createDirectory(Message& message) {
 		return;
 	}
 
-	ObjectPath repositoryPath = "";
-	ObjectPath directoryPath = "";
-	Path fullPath = "";
-	readAndBuildPath(message, repositoryPath, directoryPath, fullPath);
+	auto [repositoryPath, fileName, fullPath] = readAndBuildPath(message);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
@@ -206,10 +194,7 @@ void FileManagementService::deleteDirectory(Message& message) {
 		return;
 	}
 
-	ObjectPath repositoryPath = "";
-	ObjectPath directoryPath = "";
-	Path fullPath = "";
-	readAndBuildPath(message, repositoryPath, directoryPath, fullPath);
+	auto [repositoryPath, fileName, fullPath] = readAndBuildPath(message);
 
 	if (findWildcardPosition(fullPath)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);

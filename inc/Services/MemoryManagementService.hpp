@@ -106,8 +106,9 @@ public:
 	 * Structured data memory management subservice class. This class offers the capability of handling structured data
 	 * in a memory. For example, it can handle the transfer of a stored file from a Memory to the Ground Station.
 	 * @attention This service is using octet strings for base - meaning that we append the length of the base string
-	  before the base section in the data array.
-	 * @note The base plus offset scheme, as defined by 6.6.4.3, is the repository path + file name.
+	 * before the base section in the data array.
+	 * @note In the "Base plus offset" scheme, as defined by 6.6.4.3, the base is defined the unique identifier of the
+	 * file used by the file management service (see clause 6.23), i.e. the combination of a repository path and a file name.
 	 * @note We assume that only one memory is managed by the current subservice. That means that we don't read the first byte(s) in any of the TC/TMs to get the memory ID.
 	 */
 	class StructuredDataMemoryManagementSubService {
@@ -146,7 +147,7 @@ public:
 		 * @param readLength The length of the dumped structured data
 		 * @param isFinal Whether more data is expected or not to be appended to the report. If true, the report is also generated and stored.
 		 */
-		void dumpedStructuredDataReport(Message& report, const Filesystem::Path& filePath, Offset offset, FileDataLength
+		void dumpedStructuredDataReport(Message& report, const Filesystem::Path& filePath, FileOffset offset, FileDataLength
 		readLength, bool isFinal) const;
 
 	} structuredDataMemoryManagementSubService;

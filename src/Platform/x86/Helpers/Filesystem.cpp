@@ -50,71 +50,14 @@ namespace Filesystem {
 	}
 
 
-	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, etl::array<uint8_t,
+	etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset, FileDataLength length,
+	etl::array<uint8_t,
 	ChunkMaxFileSizeBytes>& buffer) {
-		if (buffer.size() < length) {
-			return FileReadError::InvalidBufferSize;
-		}
-		std::filesystem::path fullPath = "../../test";
-		fullPath /= path.c_str();
-		std::ifstream file(fullPath, std::ios::binary);
-		if (!file.is_open()) {
-			return FileReadError::FileNotFound;
-		}
-
-		file.seekg(0, std::ios::end);
-		std::streampos fileSize = file.tellg();
-
-		if (offset + length > fileSize) {
-			return FileReadError::InvalidOffset;
-		}
-
-		file.seekg(offset, std::ios::beg);
-		file.read(reinterpret_cast<std::istream::char_type*>(buffer.data()), length);
-
-		if (file.fail()) {
-			return FileReadError::ReadError;
-		}
-
-		return etl::nullopt;
+		return {};
 	}
 
-	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength,
+	etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
 	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer) {
-
-		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != fileDataLength) {
-			return FileWriteError::InvalidBufferSize;
-		}
-
-		std::filesystem::path fullPath = "";
-		if (std::filesystem::current_path() == "/tmp") {
-			fullPath = path.c_str();
-		} else {
-			fullPath = "../../test";
-			fullPath /= path.c_str();
-		}
-		errno = 0;
-		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
-		if (errno == ENOENT) {
-			return FileWriteError::FileNotFound;
-		}
-		if (errno == EACCES || errno == EPERM) {
-			return FileWriteError::WriteError;
-		}
-		if (errno == ENOSPC) {
-			return FileWriteError::WriteError;
-		}
-
-		file.seekg(0, std::ios::end);
-		std::streampos fileSize = file.tellg();
-
-		if (offset > fileSize) {
-			return FileWriteError::InvalidOffset;
-		}
-
-		file.seekp(offset, std::ios::beg);
-		file.write(reinterpret_cast<const char*>(buffer.data()), fileDataLength);
-		file.close();
-		return etl::nullopt;
+		return {};
 	}
 } // namespace Filesystem

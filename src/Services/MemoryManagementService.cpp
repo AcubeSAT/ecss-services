@@ -187,18 +187,18 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	bool hasError = false;
 
 	while (remainingInstructions-- != 0U) {
-		const Offset offset = request.read <Offset>();
+		const FileOffset offset = request.read <FileOffset>();
 		const FileDataLength dataLength = request.read <FileDataLength>();
 
 		etl::array <uint8_t, ChunkMaxFileSizeBytes> chunkData = {};
 		request.readString(chunkData.data(), dataLength);
 		auto result = writeFile(fullPath, offset, dataLength, chunkData);
 
-		if (result.has_value()) {
+		if (!result.has_value()) {
 			hasError = true;
 			ErrorHandler::ExecutionStartErrorType error; // NOLINT(cppcoreguidelines-init-variables)
 
-			switch (result.value()) {
+			switch (result.error()) {
 				case FileWriteError::FileNotFound:
 					error = ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist;
 					break;
@@ -242,22 +242,22 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 	report.append <InstructionType>(remainingInstructions);
 
 	while (remainingInstructions-- != 0U) {
-		const Offset offset = request.read <Offset>();
+		const FileOffset offset = request.read <FileOffset>();
 		const FileDataLength readLength = request.read <FileDataLength>();
 		dumpedStructuredDataReport(report, fullPath, offset, readLength, remainingInstructions == 0);
 	}
 }
 
 void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedStructuredDataReport(Message& report,
-	const Path& filePath, const Offset offset, const FileDataLength readLength, const bool isFinal) const {
+	const Path& filePath, const FileOffset offset, const FileDataLength readLength, const bool isFinal) const {
 	etl::array <uint8_t, ChunkMaxFileSizeBytes> chunkData = {};
 	auto result = readFile(filePath, offset, readLength, chunkData);
 	bool hasError = false;
-	if (result.has_value()) {
+	if (!result.has_value()) {
 		hasError = true;
 		ErrorHandler::ExecutionStartErrorType error; // NOLINT(cppcoreguidelines-init-variables)
 
-		switch (result.value()) {
+		switch (result.error()) {
 			case FileReadError::FileNotFound:
 				error = ErrorHandler::ExecutionStartErrorType::MemoryObjectDoesNotExist;
 				break;
@@ -276,10 +276,10 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpedSt
 		ErrorHandler::reportError(report, error);
 	}
 	if (hasError) {
-		report.append <Offset>(0);
+		report.append <FileOffset>(offset);
 		report.append <FileDataLength>(0);
 	} else {
-		report.append <Offset>(offset);
+		report.append <FileOffset>(offset);
 		report.append <FileDataLength>(readLength);
 		report.appendString(String<ChunkMaxFileSizeBytes>(chunkData.data(), readLength));
 	}

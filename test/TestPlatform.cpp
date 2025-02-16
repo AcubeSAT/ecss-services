@@ -329,10 +329,11 @@ namespace Filesystem {
 		return 42U;
 	}
 
-	etl::optional<FileReadError> readFile(const Path& path, Offset offset, FileDataLength length, etl::array<uint8_t,
+	etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset, FileDataLength length,
+	etl::array<uint8_t,
 	ChunkMaxFileSizeBytes>& buffer) {
 		if (buffer.size() < length) {
-			return FileReadError::InvalidBufferSize;
+			return etl::unexpected(FileReadError::InvalidBufferSize);
 		}
 		std::filesystem::path fullPath = "";
 		if (std::filesystem::current_path() == "/tmp") {
@@ -343,22 +344,22 @@ namespace Filesystem {
 		}
 		struct stat st;
         if (stat(fullPath.c_str(), &st) == 0 && (st.st_mode & (S_IRUSR | S_IRGRP | S_IROTH)) == 0) {
-            return FileReadError::ReadError;
+            return etl::unexpected(FileReadError::ReadError);
         }
 		errno = 0;
 		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
 
 		if (file.fail() || !file.is_open()) {
 			if (errno == ENOENT) {
-				return FileReadError::FileNotFound;
+				return etl::unexpected(FileReadError::FileNotFound);
 			}
 			if (errno == EACCES || errno == EPERM) {
-				return FileReadError::ReadError;
+				return etl::unexpected(FileReadError::ReadError);
 			}
 			if (errno == ENOSPC) {
-				return FileReadError::ReadError;
+				return etl::unexpected(FileReadError::ReadError);
 			}
-			return FileReadError::ReadError;
+			return etl::unexpected(FileReadError::ReadError);
 		}
 		
 
@@ -366,24 +367,24 @@ namespace Filesystem {
 		std::streampos fileSize = file.tellg();
 
 		if (offset + length > fileSize) {
-			return FileReadError::InvalidOffset;
+			return etl::unexpected(FileReadError::InvalidOffset);
 		}
 
 		file.seekg(offset, std::ios::beg);
 		file.read(reinterpret_cast<std::istream::char_type*>(buffer.data()), length);
 
 		if (file.fail() or !file.is_open()) {
-			return FileReadError::ReadError;
+			return etl::unexpected(FileReadError::ReadError);
 		}
 
-		return etl::nullopt;
+		return {};
 	}
 
-	etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength,
+	etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
 	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer) {
 
 		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != fileDataLength) {
-			return FileWriteError::InvalidBufferSize;
+			return etl::unexpected(FileWriteError::InvalidBufferSize);
 		}
 
 		std::filesystem::path fullPath = "";
@@ -395,31 +396,31 @@ namespace Filesystem {
 		}
 		struct stat st;
         if (stat(fullPath.c_str(), &st) == 0 && (st.st_mode & (S_IWUSR | S_IWGRP | S_IWOTH)) == 0) {
-            return FileWriteError::WriteError;
+            return etl::unexpected(FileWriteError::WriteError);
         }
 		errno = 0;
 		std::fstream file(fullPath, std::ios::binary | std::ios::in | std::ios::out);
 		if (errno == ENOENT) {
-			return FileWriteError::FileNotFound;
+			return etl::unexpected(FileWriteError::FileNotFound);
 		}
 		if (errno == EACCES || errno == EPERM) {
-			return FileWriteError::WriteError;
+			return etl::unexpected(FileWriteError::WriteError);
 		}
 		if (errno == ENOSPC) {
-			return FileWriteError::WriteError;
+			return etl::unexpected(FileWriteError::WriteError);
 		}
 
 		file.seekg(0, std::ios::end);
 		std::streampos fileSize = file.tellg();
 
 		if (offset > fileSize) {
-			return FileWriteError::InvalidOffset;
+			return etl::unexpected(FileWriteError::InvalidOffset);
 		}
 
 		file.seekp(offset, std::ios::beg);
 		file.write(reinterpret_cast<const char*>(buffer.data()), fileDataLength);
 		file.close();
-		return etl::nullopt;
+		return {};
 	}
 
 

@@ -1,16 +1,13 @@
 #pragma once
 
-#include <etl/span.h>
 #include <etl/string_utilities.h>
 
 #include "ECSS_Definitions.hpp"
 #include "Message.hpp"
 #include "TypeDefinitions.hpp"
 #include "etl/String.hpp"
-#include "etl/optional.h"
+#include "etl/expected.h"
 #include "etl/result.h"
-
-class Message;
 
 namespace Filesystem {
 	using Path = String <FullPathSize>;
@@ -178,7 +175,8 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileReadError> readFile(const Path& path, Offset offset, FileDataLength fileDataLength, etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
+	etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
+	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
 
 	/**
 	 * Creates a file using platform specific filesystem functions
@@ -189,7 +187,7 @@ namespace Filesystem {
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength,
+	etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
 		etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
 
 	/**
@@ -237,11 +235,11 @@ namespace Filesystem {
 	 * @param fileName Reference to store the file name
 	 * @param fullPath Reference to store the constructed full path
 	 */
-	static void readAndBuildPath(Message& message, ObjectPath& repositoryPath,
-		ObjectPath& fileName, Path& fullPath) {
-		repositoryPath = message.readOctetString <ObjectPathSize>();
-		fileName = message.readOctetString <ObjectPathSize>();
-		fullPath = getFullPath(repositoryPath, fileName);
+	static std::tuple<ObjectPath, ObjectPath, Path> readAndBuildPath(Message& message) {
+		ObjectPath repositoryPath = message.readOctetString <ObjectPathSize>();
+		ObjectPath fileName = message.readOctetString <ObjectPathSize>();
+		Path fullPath = getFullPath(repositoryPath, fileName);
+		return std::make_tuple(repositoryPath, fileName, fullPath);
 	}
 
 	/**
