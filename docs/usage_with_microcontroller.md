@@ -117,7 +117,9 @@ void Service::platfromSpecificHandleMessage(Message& message) {
 ```
 
 A second function that needs to be implemented is @ref Service::releaseMessage, which is specific to ST[14] - Real 
-Time Forwarding Service. This function defines what happens when a TM is allowed to be forwarded to GS in real time.
+Time Forwarding Service and to ST[15] On-Board Storage & Retrieval Service. This function defines what happens when a 
+TM is 
+allowed to be forwarded to GS in real time.
 
 ```cpp
 void Service::releaseMessage(Message& message) {

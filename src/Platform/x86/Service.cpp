@@ -43,7 +43,7 @@ PacketSender packetSender;
  */
 inline constexpr bool SendToYamcs = true;
 
-void Service::releaseMessage(const Message& message) {
+void Service::releaseMessage(Message& message) {
 	std::ostringstream ss;
 
 	ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
