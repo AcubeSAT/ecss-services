@@ -147,6 +147,29 @@ void EventReportService::listOfDisabledEventsReport() {
 	storeMessage(report);
 }
 
+void EventReportService::raiseTransitionEvent(ParameterId monitoredParameterId, etl::pair <PMON::CheckingStatus,
+PMON::CheckingStatus> transition, EventDefinitionId eventID) {
+	EventReportSeverity severity = eventDefinitionSeverityArray[eventID];
+	auto data = String<ECSSEventDataAuxiliaryMaxSize>("ID");
+	data.append(std::to_string(monitoredParameterId).c_str());
+	data.append("checkTransitionFailedFrom");
+	data.append(std::to_string(transition.first).c_str());
+	data.append("To");
+	data.append(std::to_string(transition.second).c_str());
+
+
+	if (severity == EventReportSeverity::Informative) {
+		informativeEventReport(static_cast<Event>(eventID), data);
+	} else if (severity == EventReportSeverity::Low) {
+		lowSeverityAnomalyReport(static_cast<Event>(eventID), data);
+	} else if (severity == EventReportSeverity::Medium) {
+		mediumSeverityAnomalyReport(static_cast<Event>(eventID), data);
+	} else if (severity == EventReportSeverity::High) {
+		highSeverityAnomalyReport(static_cast<Event>(eventID), data);
+	}
+}
+
+
 void EventReportService::execute(Message& message) {
 	switch (message.messageType) {
 		case EnableReportGenerationOfEvents: enableReportGeneration(message);

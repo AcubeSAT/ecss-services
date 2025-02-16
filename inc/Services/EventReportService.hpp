@@ -4,6 +4,7 @@
 #include <etl/bitset.h>
 #include "Service.hpp"
 #include "etl/map.h"
+#include "Helpers/PMON.hpp"
 
 /**
  * Implementation of ST[05] event reporting service
@@ -22,7 +23,7 @@ private:
     etl::bitset<NumberOfEvents> enabledEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
 
-    void initializeEventDefinitionSeverityMap();
+    void initializeEventDefinitionSeverityArray();
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
 
@@ -74,7 +75,7 @@ public:
     {
         enabledEvents.set();
         serviceType = ServiceType;
-        initializeEventDefinitionSeverityMap();
+        initializeEventDefinitionSeverityArray();
     }
 
 
@@ -136,9 +137,14 @@ public:
     };
 
     /**
-     * Map of event definitions to their severity
+     * Map of event definitions to their severity.
+     * The position in the array is connected 1-1 with the EventDefinitionID.
+     * The contents are of type EventReportSeverity.
+     *
+     * e.g. if we define eventDefinitionSeverityArray[0] = EventReportSeverity::Informative,
+     * then that means that the Event with ID 0 should be raised with severity -> Informative.
      */
-    etl::map<EventDefinitionId, EventReportSeverity, NumberOfEvents> eventDefinitionSeverityMap = {};
+    etl::array<EventReportSeverity, NumberOfEvents> eventDefinitionSeverityArray = {};
 
     /**
      * TM[5,1] informative event report
@@ -242,6 +248,25 @@ public:
 	 * @return True if the number of events is smaller or equal to the number of events in the service, false otherwise.
 	 */
 	static inline bool isNumberOfEventsValid(uint16_t tcNumberOfEvents);
+
+    /**
+     * Raises an event for a parameter monitoring status transition.
+     * 
+     * This method is called when a parameter's monitoring status changes and needs to generate
+     * an event report. The severity of the event is determined by the eventDefinitionSeverityArray,
+     * and the appropriate event report (informative/low/medium/high) is generated.
+     * 
+     * The event data will include:
+     * - The parameter ID that triggered the transition
+     * - The previous monitoring status (transition.first)
+     * - The new monitoring status (transition.second)
+     * 
+     * @param monitoredParameterId The ID of the parameter being monitored
+     * @param transition A pair containing the previous (first) and new (second) checking status
+     * @param eventId The ID of the event to be raised, used to determine severity from eventDefinitionSeverityArray
+     */
+    void raiseTransitionEvent(ParameterId monitoredParameterId, etl::pair<PMON::CheckingStatus, PMON::CheckingStatus>
+    transition, EventDefinitionId eventId);
 
     /**
      * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet

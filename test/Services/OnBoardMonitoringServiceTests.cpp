@@ -1438,8 +1438,8 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
 		}
-		CHECK(pmon.checkTransitionList[0].first == PMON::Unchecked);
-		CHECK(pmon.checkTransitionList[0].second == PMON::ExpectedValue);
+		CHECK(pmon.checkTransitions[0].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitions[0].second == PMON::ExpectedValue);
 
 		// Second transition: ExpectedValue -> UnexpectedValue
 		param.setValue(5);
@@ -1447,11 +1447,11 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 			pmon.performCheck();
 		}
 		// Check newest transition
-		CHECK(pmon.checkTransitionList[0].first == PMON::ExpectedValue);
-		CHECK(pmon.checkTransitionList[0].second == PMON::UnexpectedValue);
+		CHECK(pmon.checkTransitions[1].first == PMON::ExpectedValue);
+		CHECK(pmon.checkTransitions[1].second == PMON::UnexpectedValue);
 		// Check previous transition
-		CHECK(pmon.checkTransitionList[1].first == PMON::Unchecked);
-		CHECK(pmon.checkTransitionList[1].second == PMON::ExpectedValue);
+		CHECK(pmon.checkTransitions[0].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitions[0].second == PMON::ExpectedValue);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1469,8 +1469,8 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
 		}
-		CHECK(pmon.checkTransitionList[0].first == PMON::Unchecked);
-		CHECK(pmon.checkTransitionList[0].second == PMON::WithinLimits);
+		CHECK(pmon.checkTransitions[0].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitions[0].second == PMON::WithinLimits);
 
 		// Second transition: WithinLimits -> BelowLowLimit
 		param.setValue(1);
@@ -1478,11 +1478,11 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 			pmon.performCheck();
 		}
 		// Check newest transition
-		CHECK(pmon.checkTransitionList[0].first == PMON::WithinLimits);
-		CHECK(pmon.checkTransitionList[0].second == PMON::BelowLowLimit);
+		CHECK(pmon.checkTransitions[1].first == PMON::WithinLimits);
+		CHECK(pmon.checkTransitions[1].second == PMON::BelowLowLimit);
 		// Check previous transition
-		CHECK(pmon.checkTransitionList[1].first == PMON::Unchecked);
-		CHECK(pmon.checkTransitionList[1].second == PMON::WithinLimits);
+		CHECK(pmon.checkTransitions[0].first == PMON::Unchecked);
+		CHECK(pmon.checkTransitions[0].second == PMON::WithinLimits);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1510,8 +1510,8 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 			param.setValue(prevValue);
 			pmon.performCheck();
 		}
-		CHECK(pmon.checkTransitionList[0].first == PMON::Invalid);
-		CHECK(pmon.checkTransitionList[0].second == PMON::WithinThreshold);
+		CHECK(pmon.checkTransitions[0].first == PMON::Invalid);
+		CHECK(pmon.checkTransitions[0].second == PMON::WithinThreshold);
 
 		// Second transition: WithinThreshold -> AboveHighThreshold
 		prevValue = 0;
@@ -1522,11 +1522,11 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 			pmon.performCheck();
 		}
 		// Check newest transition
-		CHECK(pmon.checkTransitionList[0].first == PMON::WithinThreshold);
-		CHECK(pmon.checkTransitionList[0].second == PMON::AboveHighThreshold);
+		CHECK(pmon.checkTransitions[1].first == PMON::WithinThreshold);
+		CHECK(pmon.checkTransitions[1].second == PMON::AboveHighThreshold);
 		// Check previous transition
-		CHECK(pmon.checkTransitionList[1].first == PMON::Invalid);
-		CHECK(pmon.checkTransitionList[1].second == PMON::WithinThreshold);
+		CHECK(pmon.checkTransitions[0].first == PMON::Invalid);
+		CHECK(pmon.checkTransitions[0].second == PMON::WithinThreshold);
 
 		ServiceTests::reset();
 		Services.reset();

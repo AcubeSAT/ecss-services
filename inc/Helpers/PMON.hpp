@@ -5,7 +5,7 @@
 #include "Message.hpp"
 #include "Service.hpp"
 #include "TimeGetter.hpp"
-#include "etl/array.h"
+#include "etl/vector.h"
 #include "etl/functional.h"
 #include "etl/map.h"
 #include "etl/optional.h"
@@ -59,7 +59,7 @@ public:
 	/**
 	 * The list of Checking Statuses that have been recorded so far.
 	 */
-	etl::array<PMONTransition, CheckTransitionListSize> checkTransitionList = {};
+	etl::vector<PMONTransition, CheckTransitionListSize> checkTransitions = {};
 
 	/**
 	 * The map of event definitions connected to the check transitions.
@@ -210,9 +210,9 @@ public:
 		uint64_t maskedValue = currentValueAsUint64 & getMask();
 
 		if (maskedValue == getExpectedValue()) {
-			updatePMONAfterPerformCheck(ExpectedValue);
+			updateAfterCheck(ExpectedValue);
 		} else {
-			updatePMONAfterPerformCheck(UnexpectedValue);
+			updateAfterCheck(UnexpectedValue);
 		}
 	}
 };
@@ -273,11 +273,11 @@ public:
 	void performCheck() override {
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
 		if (currentValue < getLowLimit()) {
-			updatePMONAfterPerformCheck(BelowLowLimit);
+			updateAfterCheck(BelowLowLimit);
 		} else if (currentValue > getHighLimit()) {
-			updatePMONAfterPerformCheck(AboveHighLimit);
+			updateAfterCheck(AboveHighLimit);
 		} else {
-			updatePMONAfterPerformCheck(WithinLimits);
+			updateAfterCheck(WithinLimits);
 		}
 	}
 };
@@ -409,7 +409,7 @@ public:
 
 		updatePreviousValueAndTimestamp(currentValue, currentTimestamp);
 
-		updatePMONAfterPerformCheck(newCheckingStatus);
+		updateAfterCheck(newCheckingStatus);
 	}
 };
 #endif // ECSS_SERVICES_PMON_HPP

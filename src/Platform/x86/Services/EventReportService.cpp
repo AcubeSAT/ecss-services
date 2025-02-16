@@ -1,14 +1,14 @@
 #include "Services/EventReportService.hpp"
 
-void EventReportService::initializeEventDefinitionSeverityMap() {
-    eventDefinitionSeverityMap.insert({Event::UnknownEvent, EventReportSeverity::Informative});
-    eventDefinitionSeverityMap.insert({Event::WWDGReset, EventReportSeverity::Low});
-    eventDefinitionSeverityMap.insert({Event::AssertionFail, EventReportSeverity::Medium});
-    eventDefinitionSeverityMap.insert({Event::MCUStart, EventReportSeverity::High});
-    eventDefinitionSeverityMap.insert({Event::FailedStartOfExecution, EventReportSeverity::Low});
-    eventDefinitionSeverityMap.insert({Event::UnexpectedValuePMON, EventReportSeverity::Low});
-    eventDefinitionSeverityMap.insert({Event::BelowLowLimitPMON, EventReportSeverity::Low});
-    eventDefinitionSeverityMap.insert({Event::AboveHighLimitPMON, EventReportSeverity::Low});
-    eventDefinitionSeverityMap.insert({Event::BelowLowThresholdPMON, EventReportSeverity::Low});
-    eventDefinitionSeverityMap.insert({Event::AboveHighThresholdPMON, EventReportSeverity::Low});
+void EventReportService::initializeEventDefinitionSeverityArray() {
+    eventDefinitionSeverityArray.at(Event::UnknownEvent - 1) = EventReportSeverity::Informative;
+    eventDefinitionSeverityArray.at(Event::WWDGReset - 1) = EventReportSeverity::Low;
+    eventDefinitionSeverityArray.at(Event::AssertionFail - 1) = EventReportSeverity::Medium;
+    eventDefinitionSeverityArray.at(Event::MCUStart - 1) = EventReportSeverity::High;
+    eventDefinitionSeverityArray.at(Event::FailedStartOfExecution - 1) = EventReportSeverity::Low;
+    eventDefinitionSeverityArray.at(Event::UnexpectedValuePMON - 1) = EventReportSeverity::Low;
+    eventDefinitionSeverityArray.at(Event::BelowLowLimitPMON - 1) = EventReportSeverity::Low;
+    eventDefinitionSeverityArray.at(Event::AboveHighLimitPMON - 1) = EventReportSeverity::Low;
+    eventDefinitionSeverityArray.at(Event::BelowLowThresholdPMON - 1) = EventReportSeverity::Low;
+    eventDefinitionSeverityArray.at(Event::AboveHighThresholdPMON - 1) = EventReportSeverity::Low;
 }
