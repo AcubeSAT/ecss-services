@@ -153,13 +153,6 @@ void Message::readString(uint8_t* string, uint16_t size) {
 	readPosition += size;
 }
 
-void Message::readFixedString(String<ECSSMaxStringSize>& string, uint16_t size) {
-	ASSERT_REQUEST((readPosition + size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
-	ASSERT_REQUEST(size < ECSSMaxStringSize, ErrorHandler::StringTooShort);
-	std::copy(data.begin() + readPosition, data.begin() + readPosition + size, string.data());
-	readPosition += size;
-}
-
 void Message::readCString(char* string, uint16_t size) {
 	readString(string, size);
 	string[size] = 0;

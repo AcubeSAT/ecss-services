@@ -246,7 +246,7 @@ TEST_CASE("Test string reading", "[message][ecss]") {
         message.appendString(String<8>("fixed123"));
 	
         String<ECSSMaxStringSize> result = {""};
-		message.readFixedString(result, 8);
+		result = message.readFixedString<ECSSMaxStringSize>();
         CHECK_THAT(result.c_str(), Catch::Matchers::Equals("fixed123"));
     }
 
