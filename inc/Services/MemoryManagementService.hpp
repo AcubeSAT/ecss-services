@@ -111,7 +111,6 @@ public:
 	 * @note We assume that only one memory is managed by the current subservice. That means that we don't read the first byte(s) in any of the TC/TMs to get the memory ID.
 	 */
 	class StructuredDataMemoryManagementSubService {
-		private:
 		MemoryManagementService& mainService;
 
 	public:
