@@ -172,24 +172,24 @@ namespace Filesystem {
 	/**
 	 * Creates a file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
-	 * @param offSet the starting byte to read from
+	 * @param offset the starting byte to read from
 	 * @param fileDataLength the number of bytes to read on
 	 * @param buffer A buffer with the required data to be read from the file. Should be the same size as the offset,
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileReadError> readFile(const Path& path, Offset offSet, FileDataLength fileDataLength, etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
+	etl::optional <FileReadError> readFile(const Path& path, Offset offset, FileDataLength fileDataLength, etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
 
 	/**
 	 * Creates a file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
-	 * @param offSet the starting byte to write from
+	 * @param offset the starting byte to write from
 	 * @param fileDataLength the number of bytes to write on
 	 * @param buffer A buffer with the required data to be written in the file. Should be the same size as the offset,
 	 * otherwise an error is produced
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileWriteError> writeFile(const Path& path, Offset offSet, FileDataLength fileDataLength,
+	etl::optional <FileWriteError> writeFile(const Path& path, Offset offset, FileDataLength fileDataLength,
 		etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
 
 	/**

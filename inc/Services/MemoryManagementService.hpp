@@ -56,7 +56,10 @@ public:
 		EXTERNAL,
 	};
 
-	MemoryManagementService();
+	MemoryManagementService() : rawDataMemorySubservice(*this),
+                               structuredDataMemoryManagementSubService(*this) {
+		serviceType = MemoryManagementService::ServiceType;
+	}
 
 	/**
 	 * Raw data memory management subservice class
@@ -70,7 +73,9 @@ public:
 		MemoryManagementService& mainService; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members) // Used to access main class's members
 
 	public:
-		explicit RawDataMemoryManagementSubService(MemoryManagementService& parent);
+		explicit RawDataMemoryManagementSubService(MemoryManagementService& parent)
+			: mainService(parent) {
+		}
 
 		/**
 		 * TC[6,5] read raw memory values
@@ -102,15 +107,17 @@ public:
 	 * in a memory. For example, it can handle the transfer of a stored file from a Memory to the Ground Station.
 	 * @attention This service is using octet strings for base - meaning that we append the length of the base string
 	  before the base section in the data array.
-	 * @note The base plus offset scheme, as defined by 6.6.4.3 is the repository path + file name
-	 * @note We assume that only one memory is managed by the current subservice. That means that we don't read for memory ID.
+	 * @note The base plus offset scheme, as defined by 6.6.4.3, is the repository path + file name.
+	 * @note We assume that only one memory is managed by the current subservice. That means that we don't read the first byte(s) in any of the TC/TMs to get the memory ID.
 	 */
 	class StructuredDataMemoryManagementSubService {
 		private:
 		MemoryManagementService& mainService;
 
 	public:
-		explicit StructuredDataMemoryManagementSubService(MemoryManagementService& parent);
+		explicit StructuredDataMemoryManagementSubService(MemoryManagementService& parent)
+			: mainService(parent) {
+		}
 
 		/**
 		 * @brief Load structured data into memory

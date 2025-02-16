@@ -10,21 +10,6 @@
 
 using namespace Filesystem;
 
-MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this),
-                                                     structuredDataMemoryManagementSubService(*this) {
-	serviceType = MemoryManagementService::ServiceType;
-}
-
-MemoryManagementService::RawDataMemoryManagementSubService::RawDataMemoryManagementSubService(
-	MemoryManagementService& parent)
-	: mainService(parent) {
-}
-
-MemoryManagementService::StructuredDataMemoryManagementSubService::StructuredDataMemoryManagementSubService(
-	MemoryManagementService& parent)
-	: mainService(parent) {
-}
-
 void MemoryManagementService::loadRawData(Message& request) {
 	/**
 	 * Bear in mind that there is currently no error checking for invalid parameters.
