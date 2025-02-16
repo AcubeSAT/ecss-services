@@ -94,11 +94,12 @@ performance and size of your program.
 
 ### Message transmission
 
-Whenever PUS telemetry is generated, it needs to be stored, transmitted or sent to a receiver. This is the 
-responsibility of the @ref Service::platformSpecificHandleMessage function.
+Whenever PUS telemetry is generated, it needs to be stored, transmitted or sent to a receiver. PUS functions will call @ref Service::handleMessage to do this every time a telemetry packet is generated.
 
-This function is always called from the `handleMessage()` function. The reason is that in this way, we can force 
-universal actions, such as storing telemetry in ST[15], or forwarding the message somewhere with ST[14].
+This function performs the following:
+1. Calls @ref Service::platformSpecificHandleMessage(), a platform-specific callback
+2. Stores the packet in any packet stores (if **ST[15] - on-board storage** is enabled)
+3. Calls @ref Service::releaseMessage(), a platform-specific callback (if the linked definitions of **ST[14] - real-time forwarding control** are enabled)
 
 In @ref Service::platformSpecificHandleMessage() function, you can transmit the message internally or send it through an interface for debugging.
 
