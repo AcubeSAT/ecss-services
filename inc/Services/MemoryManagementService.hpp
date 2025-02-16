@@ -106,7 +106,6 @@ public:
 	 * @note We assume that only one memory is managed by the current subservice. That means that we don't read for memory ID.
 	 */
 	class StructuredDataMemoryManagementSubService {
-		private:
 		MemoryManagementService& mainService;
 
 	public:
