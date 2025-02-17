@@ -261,14 +261,14 @@ namespace Filesystem {
 	 * @warning If a file is locked, a chmod +w ./file operation will allow the
 	 * current user to modify the file again.
 	 */
-	etl::optional<FilePermissionModificationError> lockFile(const Path& path) {
+	etl::expected<void, FilePermissionModificationError> lockFile(const Path& path) {
 		etl::optional<NodeType> nodeType = getNodeType(path);
 		if (not nodeType) {
-			return FilePermissionModificationError::FileDoesNotExist;
+			return etl::unexpected(FilePermissionModificationError::FileDoesNotExist);
 		}
 
 		if (nodeType.value() != NodeType::File) {
-			return FilePermissionModificationError::PathLeadsToDirectory;
+			return etl::unexpected(FilePermissionModificationError::PathLeadsToDirectory);
 		}
 
 		fs::perms permissions = fs::status(path.data()).permissions();
@@ -277,7 +277,7 @@ namespace Filesystem {
 
 		fs::permissions(path.data(), newPermissions);
 
-		return etl::nullopt;
+		return {};
 	}
 
 	/**
@@ -286,14 +286,14 @@ namespace Filesystem {
 	 * @warning If a file is unlocked, a chmod -w ./file operation will stop the
 	 * current user from modifying the file again.
 	 */
-	etl::optional<FilePermissionModificationError> unlockFile(const Path& path) {
+	etl::expected<void, FilePermissionModificationError> unlockFile(const Path& path) {
 		etl::optional<NodeType> nodeType = getNodeType(path);
 		if (not nodeType) {
-			return FilePermissionModificationError::FileDoesNotExist;
+			return etl::unexpected(FilePermissionModificationError::FileDoesNotExist);
 		}
 
 		if (nodeType.value() != NodeType::File) {
-			return FilePermissionModificationError::PathLeadsToDirectory;
+			return etl::unexpected(FilePermissionModificationError::PathLeadsToDirectory);
 		}
 
 		fs::perms permissions = fs::status(path.data()).permissions();
@@ -302,7 +302,7 @@ namespace Filesystem {
 
 		fs::permissions(path.data(), newPermissions);
 
-		return etl::nullopt;
+		return {};
 	}
 
 	FileLockStatus getFileLockStatus(const Path& path) {

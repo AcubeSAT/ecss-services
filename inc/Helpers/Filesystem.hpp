@@ -2,7 +2,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "etl/String.hpp"
-#include "etl/optional.h"
+#include "etl/expected.h"
 #include "etl/result.h"
 
 namespace Filesystem {
@@ -148,13 +148,13 @@ namespace Filesystem {
 	 * Locks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	etl::optional<FilePermissionModificationError> lockFile(const Path& path);
+	etl::expected<void, FilePermissionModificationError> lockFile(const Path& path);
 
 	/**
 	 * Unlocks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	etl::optional<FilePermissionModificationError> unlockFile(const Path& path);
+	etl::expected<void, FilePermissionModificationError> unlockFile(const Path& path);
 
 	/**
 	 * Gets the current file lock status

@@ -67,14 +67,14 @@ namespace Filesystem {
 		return FileLockStatus::Unlocked;
 	}
 
-	etl::optional<FilePermissionModificationError> lockFile(const Path& path) {
+	etl::expected<void, FilePermissionModificationError> lockFile(const Path& path) {
 		etl::optional<NodeType> nodeType = getNodeType(path);
 		if (not nodeType) {
-			return FilePermissionModificationError::FileDoesNotExist;
+			return etl::unexpected(FilePermissionModificationError::FileDoesNotExist);
 		}
 
 		if (nodeType.value() != NodeType::File) {
-			return FilePermissionModificationError::PathLeadsToDirectory;
+			return etl::unexpected(FilePermissionModificationError::PathLeadsToDirectory);
 		}
 
 		fs::perms permissions = fs::status(path.data()).permissions();
@@ -83,17 +83,17 @@ namespace Filesystem {
 
 		fs::permissions(path.data(), newPermissions);
 
-		return etl::nullopt;
+		return {};
 	}
 
-	etl::optional<FilePermissionModificationError> unlockFile(const Path& path) {
+	etl::expected<void, FilePermissionModificationError> unlockFile(const Path& path) {
 		etl::optional<NodeType> nodeType = getNodeType(path);
 		if (not nodeType) {
-			return FilePermissionModificationError::FileDoesNotExist;
+			return etl::unexpected(FilePermissionModificationError::FileDoesNotExist);
 		}
 
 		if (nodeType.value() != NodeType::File) {
-			return FilePermissionModificationError::PathLeadsToDirectory;
+			return etl::unexpected(FilePermissionModificationError::PathLeadsToDirectory);
 		}
 
 		fs::perms permissions = fs::status(path.data()).permissions();
@@ -102,7 +102,7 @@ namespace Filesystem {
 
 		fs::permissions(path.data(), newPermissions);
 
-		return etl::nullopt;
+		return {};
 	}
 
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {

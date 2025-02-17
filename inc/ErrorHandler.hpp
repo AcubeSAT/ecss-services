@@ -492,7 +492,7 @@ public:
 		 */
 		AttemptedDeleteNonEmptyDirectory = 10,
 		/**
-		 * A lock/unlcock file command was requested on a directory
+		 * A lock/unlock file command was requested on a directory
 		 */
 		AttemptedAccessModificationOnDirectory = 11,
 	};

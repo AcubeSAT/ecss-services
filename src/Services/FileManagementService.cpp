@@ -145,7 +145,9 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 }
 
 void FileManagementService::lockFile(Message& message) {
-	message.assertTC(ServiceType, LockFile);
+	if (not message.assertTC(ServiceType, LockFile)) {
+		return;
+	}
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
 	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -156,29 +158,30 @@ void FileManagementService::lockFile(Message& message) {
 		return;
 	}
 
-	if (auto filePermissionModificationError = Filesystem::lockFile(fullPath)) {
-		switch (filePermissionModificationError.value()) {
+	if (auto result = Filesystem::lockFile(fullPath); !result.has_value()) {
+		ErrorHandler::ExecutionCompletionErrorType error;
+		switch (result.error()) {
 			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
-				ErrorHandler::reportError(message,
-										  ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
-				return;
+				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
+				break;
 			}
 			case Filesystem::FilePermissionModificationError::PathLeadsToDirectory: {
-				ErrorHandler::reportError(message,
-										  ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory);
-				return;
+				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory;
+				break;
 			}
 			default: {
-				ErrorHandler::reportError(message,
-										  ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+				break;
 			}
 		}
+		ErrorHandler::reportError(message, error);
 	}
-
 }
 
 void FileManagementService::unlockFile(Message& message) {
-	message.assertTC(ServiceType, UnlockFile);
+	if (not message.assertTC(ServiceType, UnlockFile)) {
+		return;
+	}
 
 	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
 	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
@@ -189,23 +192,23 @@ void FileManagementService::unlockFile(Message& message) {
 		return;
 	}
 
-	if (auto filePermissionModificationError = Filesystem::unlockFile(fullPath)) {
-		switch (filePermissionModificationError.value()) {
+	if (auto result = Filesystem::unlockFile(fullPath); !result.has_value()) {
+		ErrorHandler::ExecutionCompletionErrorType error;
+		switch (result.error()) {
 			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
-				ErrorHandler::reportError(message,
-										  ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist);
-				return;
+				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
+				break;
 			}
 			case Filesystem::FilePermissionModificationError::PathLeadsToDirectory: {
-				ErrorHandler::reportError(message,
-										  ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory);
-				return;
+				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory;
+				break;
 			}
 			default: {
-				ErrorHandler::reportError(message,
-										  ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError);
+				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+				break;
 			}
 		}
+		ErrorHandler::reportError(message, error);
 	}
 }
 
