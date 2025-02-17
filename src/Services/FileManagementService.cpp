@@ -159,7 +159,7 @@ void FileManagementService::lockFile(Message& message) {
 	}
 
 	if (auto result = Filesystem::lockFile(fullPath); !result.has_value()) {
-		ErrorHandler::ExecutionCompletionErrorType error;
+		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
 		switch (result.error()) {
 			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
 				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
@@ -193,7 +193,7 @@ void FileManagementService::unlockFile(Message& message) {
 	}
 
 	if (auto result = Filesystem::unlockFile(fullPath); !result.has_value()) {
-		ErrorHandler::ExecutionCompletionErrorType error;
+		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
 		switch (result.error()) {
 			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
 				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
