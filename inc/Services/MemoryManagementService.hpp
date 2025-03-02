@@ -8,21 +8,12 @@
 #include "Service.hpp"
 #include "etl/unordered_map.h"
 #include "etl/unordered_set.h"
+#include "Helpers/Memory/MemoryAddressProvider.hpp"
 
 /**
  * Number of Bits in Memory Management Checksum
  */
 inline constexpr uint32_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
-
-/**
- * Maximum number of entries in Memory Limits Map
- */
-inline constexpr uint32_t MaxMemoryLimitsMapSize = 8;
-
-/**
- * Maximum number of entries in Valid Memory IDs set
- */
-inline constexpr uint32_t MaxValidMemoryIdsSize = 8;
 
 /**
  * @ingroup Services
@@ -37,17 +28,6 @@ public:
 		DumpRawMemoryDataReport = 6,
 		CheckRawMemoryData = 9,
 		CheckRawMemoryDataReport = 10,
-	};
-
-	// Memory type ID's
-	enum MemoryID {
-		DTCMRAM = 0,
-		RAM_D1,
-		RAM_D2,
-		RAM_D3,
-		ITCMRAM,
-		FLASH_MEMORY,
-		EXTERNAL,
 	};
 
 	MemoryManagementService();
@@ -111,36 +91,6 @@ public:
 	void execute(Message& message);
 
 private:
-	/**
-	 * Helper struct to define upper and lower limits of different memories
-	 */
-	struct MemoryLimits {
-		uint32_t lowerLim;
-		uint32_t upperLim;
-	};
-
-	/**
-	 * Map containing all the different types of memory limits
-	 */
-	inline static const etl::unordered_map<MemoryID, MemoryLimits, MaxMemoryLimitsMapSize> memoryLimitsMap = {
-	    {MemoryManagementService::MemoryID::DTCMRAM, {DTCMRAMLowerLim, DTCMRAMUpperLim}},
-	    {MemoryManagementService::MemoryID::ITCMRAM, {ITCMRAMLowerLim, ITCMRAMUpperLim}},
-	    {MemoryManagementService::MemoryID::RAM_D1, {RAMD1LowerLim, RAMD1UpperLim}},
-	    {MemoryManagementService::MemoryID::RAM_D2, {RAMD2LowerLim, RAMD2UpperLim}},
-	    {MemoryManagementService::MemoryID::RAM_D3, {RAMD3LowerLim, RAMD3UpperLim}},
-	    {MemoryManagementService::MemoryID::FLASH_MEMORY, {FlashLowerLim, FlashUpperLim}}};
-
-	/**
-	 * Data structure containing all the valid memory IDs
-	 */
-	inline static const etl::unordered_set<MemoryID, MaxValidMemoryIdsSize> validMemoryIds = {
-	    MemoryManagementService::MemoryID::RAM_D1,
-	    MemoryManagementService::MemoryID::RAM_D2,
-	    MemoryManagementService::MemoryID::RAM_D3,
-	    MemoryManagementService::MemoryID::DTCMRAM,
-	    MemoryManagementService::MemoryID::ITCMRAM,
-	    MemoryManagementService::MemoryID::FLASH_MEMORY,
-	    MemoryManagementService::MemoryID::EXTERNAL};
 
 	/**
 	 * Check whether the provided address is valid or not, based on the defined limit values
@@ -148,19 +98,19 @@ private:
 	 * @param memId The ID of the memory to check is passed
 	 * @param address Takes the address to be checked for validity
 	 */
-	static bool addressValidator(MemoryManagementService::MemoryID memId, StartAddress address);
+	// static bool addressValidator(MemoryId memId, StartAddress address);
 
 	/**
 	 * Check if the provided memory ID is valid
 	 *
 	 * @param memId The memory ID for validation
 	 */
-	static bool memoryIdValidator(MemoryManagementService::MemoryID memId);
+	static bool memoryIdValidator(MemoryId memId);
 
 	/**
 	 * Validate the data according to checksum calculation
 	 */
 	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
-};
+	};
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

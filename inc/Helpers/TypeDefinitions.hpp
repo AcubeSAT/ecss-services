@@ -55,3 +55,9 @@ using ErrorCode = uint16_t;
  using PMONBitMask = uint64_t;
  using NumberOfConsecutiveDeltaChecks = uint16_t;
  using DeltaThreshold = double;
+
+ /**
+* Memory Limits
+*/
+ using LowerLimit = std::size_t;
+ using UpperLimit = std::size_t;
