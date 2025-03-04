@@ -5,19 +5,18 @@
 #ifndef TESTMEMORY_HPP
 #define TESTMEMORY_HPP
 
-#include "IMemoryType.hpp"
+#include "Memory.hpp"
 #include <etl/array.h>
 
-class TestMemory : public IMemoryType<TestMemory, 0, 0> {
-public:
-	etl::array<ReadData, ECSSMaxStringSize> readData(const std::size_t address, const MemoryDataLength& dataLength) const;
+template<LowerLimit lowerLimit, UpperLimit upperLimit>
+class TestMemory : public Memory {
+	public:
+	    etl::array<ReadData, ECSSMaxStringSize> readData(std::size_t address, MemoryDataLength dataLength) const override {etl::array<ReadData, ECSSMaxStringSize> result;
+        return result;}
 
-	bool writeData(const std::size_t address, const MemoryDataLength& dataLength, const etl::array<ReadData, const ECSSMaxStringSize>& data);
+		bool writeData(std::size_t address, MemoryDataLength dataLength, const etl::array<ReadData, ECSSMaxStringSize>& data) override { return true;}
 
-private:
-	uint8_t readByte(const std::size_t address) const;
-
-	bool writeByte(const std::size_t address);
+	    bool isValidAddress(std::size_t address) const override { return lowerLimit <= address && upperLimit >= address; }
 
 	};
 #endif //TESTMEMORY_HPP

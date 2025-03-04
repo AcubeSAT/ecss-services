@@ -15,6 +15,7 @@
 #include "etl/unordered_set.h"
 #include <inc/Helpers/Memory/IMemoryType.hpp>
 #include "ECSS_Definitions.hpp"
+#include "Memory.hpp"
 
 
 /**
@@ -47,12 +48,10 @@ namespace MemoryAddressProvider {
 		EXTERNAL,*/
 	//};
 
-	using ReadFunction = etl::array<ReadData, ECSSMaxStringSize>(*)(std::size_t, MemoryDataLength);
-
 	/**
-	* Map containing memory objects that map to IDs
+	*
 	*/
-	extern etl::unordered_map<MemoryId, ReadFunction> readMemoryMap;
+	extern const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
 
 	/**
 	 * Map containing all the different types of memory limits

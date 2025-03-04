@@ -3,12 +3,12 @@
 //
 
 #include "MemoryAddressProvider.hpp"
-#include "TestMemory.cpp"
+#include "TestMemory.hpp"
 
-constexpr TestMemory testMemory;
+TestMemory<0, 0> testMemory;
 
-constexpr etl::unordered_map<MemoryId, MemoryAddressProvider::ReadFunction> memoryMap = {
-	{0, [](std::size_t address, MemoryDataLength len){testMemory.readData(address, len); }}	// Add more entries as needed
+const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap = {
+	{0, &testMemory}	// Add more entries as needed
 };
 
 // constexpr etl::unordered_map<MemoryId, MemoryLimits, MaxMemoryLimitsMapSize> memoryLimitsMap = {};
