@@ -5,8 +5,6 @@
 #ifndef MEMORYADDRESSPROVIDER_HPP
 #define MEMORYADDRESSPROVIDER_HPP
 
-
-
 #include <memory>
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"

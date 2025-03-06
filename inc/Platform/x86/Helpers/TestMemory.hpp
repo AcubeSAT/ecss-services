@@ -8,7 +8,6 @@
 #include "Memory.hpp"
 #include <etl/array.h>
 
-template<LowerLimit lowerLimit, UpperLimit upperLimit>
 class TestMemory : public Memory {
 	public:
 	    etl::array<ReadData, ECSSMaxStringSize> readData(std::size_t address, MemoryDataLength dataLength) const override {etl::array<ReadData, ECSSMaxStringSize> result;
@@ -16,7 +15,6 @@ class TestMemory : public Memory {
 
 		bool writeData(std::size_t address, MemoryDataLength dataLength, const etl::array<ReadData, ECSSMaxStringSize>& data) override { return true;}
 
-	    bool isValidAddress(std::size_t address) const override { return lowerLimit <= address && upperLimit >= address; }
-
+	    TestMemory(LowerLimit lowerLimit, UpperLimit upperLimit) : Memory(lowerLimit, upperLimit) {}
 	};
 #endif //TESTMEMORY_HPP

@@ -4,8 +4,9 @@
 
 #include "MemoryAddressProvider.hpp"
 #include "TestMemory.hpp"
+#include <etl/unordered_map.h>
 
-TestMemory<0, 0> testMemory;
+TestMemory testMemory(0,0);
 
 const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap = {
 	{0, &testMemory}	// Add more entries as needed
