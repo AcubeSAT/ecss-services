@@ -21,7 +21,7 @@ bool TestMemory::writeData(Message& request, const etl::array<ReadData, ECSSMaxS
 
 		// VALIDATE ADDRESS
 
-		// WRITE DATA
+		// WRITE DATA (Writing data can be implemented with a private writeByte method)
 
 		// READ DATA FOR VALIDATION
 
