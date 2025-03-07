@@ -10,11 +10,11 @@
 
 class Memory {
 	public:
-	    virtual etl::array<ReadData, ECSSMaxStringSize> readData(std::size_t address, MemoryDataLength dataLength) const = 0;
+	    virtual etl::array<ReadData, ECSSMaxStringSize> readData(std::uintptr_t address, MemoryDataLength dataLength) const = 0;
 
-		virtual bool writeData(std::size_t address, MemoryDataLength dataLength, const etl::array<ReadData, ECSSMaxStringSize>& data) = 0;
+		virtual bool writeData(Message& request, const etl::array<ReadData, ECSSMaxStringSize>& data) = 0;
 
-	   	bool isValidAddress(std::size_t address) const override { return lowerLimit <= address && upperLimit >= address; }
+	   	bool isValidAddress(std::uintptr_t address) const override { return lowerLimit <= address && upperLimit >= address; }
 
 	    Memory(LowerLimit lowerLimit, UpperLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
 

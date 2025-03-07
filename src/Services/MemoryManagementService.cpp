@@ -17,10 +17,12 @@ void MemoryManagementService::loadRawData(Message& request) {
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
 	auto memory = MemoryAddressProvider::memoryMap.at(request.read<MemoryId>());
 
+	if (memory == nullptr) {}
+
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();
 
-	// memory->readData();
+	memory.writeData(iterationCount, readData);
 }
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {}

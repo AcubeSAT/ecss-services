@@ -10,10 +10,9 @@
 
 class TestMemory : public Memory {
 	public:
-	    etl::array<ReadData, ECSSMaxStringSize> readData(std::size_t address, MemoryDataLength dataLength) const override {etl::array<ReadData, ECSSMaxStringSize> result;
-        return result;}
+	    etl::array<ReadData, ECSSMaxStringSize> readData(std::size_t address, MemoryDataLength dataLength) const override;
 
-		bool writeData(std::size_t address, MemoryDataLength dataLength, const etl::array<ReadData, ECSSMaxStringSize>& data) override { return true;}
+		bool writeData(Message& request, const etl::array<ReadData, ECSSMaxStringSize>& data) override;
 
 	    TestMemory(LowerLimit lowerLimit, UpperLimit upperLimit) : Memory(lowerLimit, upperLimit) {}
 	};

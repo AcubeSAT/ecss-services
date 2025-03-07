@@ -7,7 +7,7 @@ using EventDefinitionId = uint16_t;
 using ParameterId = uint16_t;
 using ParameterSampleCount = uint16_t;
 using SamplingInterval = uint16_t;
-using StartAddress = uint64_t;
+using StartAddress = std::uintptr_t;
 using MemoryId = uint8_t;
 using ReadData = uint8_t;
 using MemoryManagementChecksum = uint16_t;
@@ -59,5 +59,5 @@ using ErrorCode = uint16_t;
  /**
 * Memory Limits
 */
- using LowerLimit = std::size_t;
- using UpperLimit = std::size_t;
+ using LowerLimit = std::uintptr_t;
+ using UpperLimit = std::uintptr_t;
