@@ -20,9 +20,8 @@ void MemoryManagementService::loadRawData(Message& request) {
 	if (memory == nullptr) {}
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
-	uint16_t const iterationCount = request.readUint16();
 
-	memory.writeData(iterationCount, readData);
+	memory.writeData(request, readData);
 }
 
 void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& request) {}
