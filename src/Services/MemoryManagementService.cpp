@@ -59,15 +59,15 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 
-	MemoryId memId = request.read<MemoryId>();
+	MemoryId memoryID = request.read<MemoryId>();
 
-	auto memory = MemoryAddressProvider::memoryMap.at(memId);
+	auto memory = MemoryAddressProvider::memoryMap.at(memoryID);
 
 	if (memory != nullptr) {
 		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
-		report.append<MemoryId>(memId);
+		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
@@ -104,7 +104,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	const MemoryId memoryID = request.read<MemoryId>();
 
-	auto memory = MemoryAddressProvider::memoryMap.at(memId);
+	auto memory = MemoryAddressProvider::memoryMap.at(memoryID);
 
 	if (memory != nullptr) {
 		etl::array<ReadData, ECSSMaxStringSize> readData = {};
