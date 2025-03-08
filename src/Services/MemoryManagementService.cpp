@@ -104,7 +104,9 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	const MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
+	auto memory = MemoryAddressProvider::memoryMap.at(memId);
+
+	if (memory != nullptr) {
 		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
