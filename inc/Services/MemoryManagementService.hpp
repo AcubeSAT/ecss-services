@@ -12,7 +12,7 @@
 
 /**
  * Number of Bits in Memory Management Checksum
- * TODO move this somewhere else
+ * TODO move this; somewhere else
  */
 inline constexpr uint32_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
 

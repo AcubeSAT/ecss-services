@@ -8,27 +8,17 @@
 #include "MemoryManagementService.hpp"
 #include "Message.hpp"
 
-bool TestMemory::writeData(Message& request, const etl::array<ReadData, ECSSMaxStringSize>& data)
+bool TestMemory::writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data)
 {
-	uint16_t const iterationCount = request.readUint16();
+	// Assume one byte (?) for now
+	*(reinterpret_cast<uint8_t*>(address) + offset) = data;
 
-	for(uint16_t i = 0; i < iterationCount; ++i) {
-		const StartAddress startAddress = request.read<StartAddress>();
-		const MemoryDataLength dataLength = request.readOctetString(readData.data()); // NOLINT(cppcoreguidelines-init-variables)
-		const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
-
-		// VALIDATE DATA
-
-		// VALIDATE ADDRESS
-
-		// WRITE DATA (Writing data can be implemented with a private writeByte method)
-
-		// READ DATA FOR VALIDATION
-
-		// CHECK CRC
-	}
-
-	// RETURN TYPE WILL CHANGE
-
+	// We'll see what return type we'll need
 	return true;
+}
+
+ReadData TestMemory::readData(std::uintptr_t address, std::uintptr_t offset) const {
+
+	// Assume one byte (?) for now
+	return *(reinterpret_cast<uint8_t*>(address) + offset);
 }
