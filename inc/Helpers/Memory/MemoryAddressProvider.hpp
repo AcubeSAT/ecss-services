@@ -11,7 +11,6 @@
 #include "MemoryAddressLimits.hpp"
 #include "etl/unordered_map.h"
 #include "etl/unordered_set.h"
-#include <inc/Helpers/Memory/IMemoryType.hpp>
 #include "ECSS_Definitions.hpp"
 #include "Memory.hpp"
 
