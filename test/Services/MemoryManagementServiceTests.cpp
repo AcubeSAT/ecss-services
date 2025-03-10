@@ -15,7 +15,7 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	uint8_t data[2] = {'h', 'R'};
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
-	receivedPacket.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	receivedPacket.append<MemoryId>(0); // Memory ID
 	receivedPacket.appendUint16(2);                                          // Iteration count
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));           // Start address
 	receivedPacket.appendOctetString(String<2>(data));
@@ -41,7 +41,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
-	receivedPacket.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
+	receivedPacket.append<MemoryId>(0);     // Memory ID
 	receivedPacket.appendUint16(3);                                              // Iteration count (Equal to 3 test strings)
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
 	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
@@ -59,7 +59,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	CHECK(response.messageType == MemoryManagementService::MessageType::DumpRawMemoryDataReport);
 	REQUIRE(response.dataSize == 55);
 
-	CHECK(response.read<MemoryId>() == MemoryManagementService::MemoryID::EXTERNAL);
+	CHECK(response.read<MemoryId>() == 0);
 	CHECK(response.readUint16() == 3);
 	CHECK(response.read<StartAddress>() == reinterpret_cast<StartAddress>(testString_1));
 	readSize = response.readOctetString(checkString);
@@ -102,7 +102,7 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
-	receivedPacket.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL);     // Memory ID
+	receivedPacket.append<MemoryId>(0);     // Memory ID
 	receivedPacket.appendUint16(2);                                              // Iteration count
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
 	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
@@ -117,7 +117,7 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	CHECK(response.messageType == MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	REQUIRE(response.dataSize == 27);
 
-	CHECK(response.read<MemoryId>() == MemoryManagementService::MemoryID::EXTERNAL);
+	CHECK(response.read<MemoryId>() == 0);
 	CHECK(response.readUint16() == 2);
 	CHECK(response.read<StartAddress>() == reinterpret_cast<StartAddress>(testString_1));
 	readSize = response.readUint16();
