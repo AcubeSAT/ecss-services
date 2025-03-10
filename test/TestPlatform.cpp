@@ -141,7 +141,6 @@ namespace PlatformParameters {
 /**
 * Memory Management Tests
 */
-
 TestMemory testMemory(0, std::numeric_limits<uintptr_t>::max());
 
 const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> MemoryAddressProvider::memoryMap = {

@@ -1,7 +1,3 @@
-//
-// Created by kyriakum on 8/3/2025.
-//
-
 #include "Platform/x86/Helpers/TestMemory.hpp"
 #include <stdexcept>
 

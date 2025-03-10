@@ -1,7 +1,3 @@
-//
-// Created by kyriakum on 8/3/2025.
-//
-
 #include "Platform/x86/Helpers/TestMemory.hpp"
 
 bool TestMemory::writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data)

@@ -1,7 +1,3 @@
-//
-// Created by kyriakum on 26/2/2025.
-//
-
 #include "Services/MemoryManagementService.hpp"
 
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
@@ -16,14 +12,15 @@ void MemoryManagementService::loadRawData(Message& request) {
 
 	auto MemoryID = request.read<MemoryId>();
 
-	if(memoryIdValidator(MemoryID) == false) {
-			ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
-	        return;
+	if (memoryIdValidator(MemoryID) == false) {
+		ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+	    return;
 	}
 
 	auto memory = MemoryAddressProvider::memoryMap.find(MemoryID)->second;
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
+
 	uint16_t const iterationCount = request.readUint16();
 
 		for (std::size_t j = 0; j < iterationCount; j++) {

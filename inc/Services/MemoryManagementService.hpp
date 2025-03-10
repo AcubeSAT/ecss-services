@@ -96,14 +96,6 @@ public:
 private:
 
 	/**
-	 * Check whether the provided address is valid or not, based on the defined limit values
-	 *
-	 * @param memId The ID of the memory to check is passed
-	 * @param address Takes the address to be checked for validity
-	 */
-	// static bool addressValidator(MemoryId memId, StartAddress address);
-
-	/**
 	 * Check if the provided memory ID is valid
 	 *
 	 * @param memId The memory ID for validation

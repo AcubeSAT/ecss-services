@@ -1,7 +1,3 @@
-//
-// Created by kyriakum on 3/3/2025.
-//
-
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 
@@ -16,7 +12,7 @@ class Memory {
 
 	   	bool isValidAddress(std::uintptr_t address) const { return lowerLimit <= address && upperLimit >= address; }
 
-	    Memory(LowerLimit lowerLimit, UpperLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
+	    constexpr Memory(LowerLimit lowerLimit, UpperLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
 
 	private:
 		LowerLimit lowerLimit;
