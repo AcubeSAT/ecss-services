@@ -10,7 +10,6 @@
 #include "Helpers/CRCHelper.hpp"
 #include "MemoryAddressLimits.hpp"
 #include "etl/unordered_map.h"
-#include "etl/unordered_set.h"
 #include "ECSS_Definitions.hpp"
 #include "Memory.hpp"
 

@@ -15,6 +15,8 @@
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
+#include "Helpers/Memory/MemoryAddressProvider.hpp"
+#include "Platform/x86/Helpers/TestMemory.hpp"
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	return ServiceTests::getMockTime();
@@ -135,6 +137,16 @@ namespace PlatformParameters {
 	inline Parameter<uint8_t> parameter36(0);
 
 } // namespace PlatformParameters
+
+/**
+* Memory Management Tests
+*/
+
+TestMemory testMemory(0, std::numeric_limits<uintptr_t>::max());
+
+const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> MemoryAddressProvider::memoryMap = {
+	{0, &testMemory}	// Add more entries as needed
+};
 
 /**
  * Specific definition for \ref ParameterService's initialize function, for testing purposes.

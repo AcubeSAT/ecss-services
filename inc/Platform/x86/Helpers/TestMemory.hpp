@@ -5,7 +5,7 @@
 #ifndef TESTMEMORY_HPP
 #define TESTMEMORY_HPP
 
-#include "Memory.hpp"
+#include "Helpers/Memory/Memory.hpp"
 #include <etl/array.h>
 
 class TestMemory : public Memory {

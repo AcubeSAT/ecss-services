@@ -83,7 +83,7 @@ int main() {
 	MemoryManagementService& memMangService = Services.memoryManagement;
 	Message rcvPack = Message(MemoryManagementService::ServiceType,
 	                          MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
-	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(3);                                               // Iteration count
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(string));  // Start address
 	rcvPack.append<MemoryDataLength>(sizeof(string) / sizeof(string[0]));  // Data read length
@@ -99,7 +99,7 @@ int main() {
 	                  MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
-	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(2);                                               // Iteration count
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));    // Start address
 	rcvPack.appendOctetString(String<2>(data, 2));
@@ -112,7 +112,7 @@ int main() {
 	rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData,
 	                  Message::TC, 1);
 
-	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(2);                                               // Iteration count
 	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data));    // Start address
 	rcvPack.append<MemoryDataLength>(2);

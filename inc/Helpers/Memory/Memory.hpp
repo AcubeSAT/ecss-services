@@ -6,7 +6,7 @@
 #define MEMORY_HPP
 
 #include <etl/array.h>
-#include "TypeDefinitions.hpp"
+#include "Helpers/TypeDefinitions.hpp"
 
 class Memory {
 	public:

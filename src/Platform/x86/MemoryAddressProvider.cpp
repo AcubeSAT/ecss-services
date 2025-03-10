@@ -2,12 +2,12 @@
 // Created by kyriakum on 24/2/2025.
 //
 
-#include "MemoryAddressProvider.hpp"
-#include "TestMemory.hpp"
+#include "Helpers/Memory/MemoryAddressProvider.hpp"
+#include "Platform/x86/Helpers/TestMemory.hpp"
 
 TestMemory testMemory(0, 0);
 
-const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap = {
+const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> MemoryAddressProvider::memoryMap = {
 	{0, &testMemory}	// Add more entries as needed
 };
 

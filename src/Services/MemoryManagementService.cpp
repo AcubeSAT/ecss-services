@@ -2,9 +2,7 @@
 // Created by kyriakum on 26/2/2025.
 //
 
-#include "MemoryManagementService.hpp"
-#include "TypeDefinitions.hpp"
-#include <inc/Helpers/Memory/IMemoryType.hpp>
+#include "Services/MemoryManagementService.hpp"
 
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
 	serviceType = MemoryManagementService::ServiceType;
@@ -17,7 +15,10 @@ void MemoryManagementService::loadRawData(Message& request) {
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
 	auto memory = MemoryAddressProvider::memoryMap.at(request.read<MemoryId>());
 
-	if (memory == nullptr) {}
+	if (memory == nullptr) {
+		// Temp error to check if null
+		ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+	}
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();

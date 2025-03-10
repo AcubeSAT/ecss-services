@@ -9,6 +9,8 @@
 #include "etl/unordered_map.h"
 #include "etl/unordered_set.h"
 #include "Helpers/Memory/MemoryAddressProvider.hpp"
+#include "Helpers/TypeDefinitions.hpp"
+
 
 /**
  * Number of Bits in Memory Management Checksum
