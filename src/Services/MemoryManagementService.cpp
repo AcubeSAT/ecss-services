@@ -13,12 +13,15 @@ MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(Memory
 
 void MemoryManagementService::loadRawData(Message& request) {
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
-	auto memory = MemoryAddressProvider::memoryMap.at(request.read<MemoryId>());
 
-	if (memory == nullptr) {
-		// Temp error to check if null
-		ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+	auto MemoryID = request.read<MemoryId>();
+
+	if(memoryIdValidator(MemoryID) == false) {
+			ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+	        return;
 	}
+
+	auto memory = MemoryAddressProvider::memoryMap.find(MemoryID)->second;
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();
@@ -62,9 +65,9 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 	MemoryId memoryID = request.read<MemoryId>();
 
-	auto memory = MemoryAddressProvider::memoryMap.at(memoryID);
+	if (memoryIdValidator(memoryID) == true) {
+		auto memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
 
-	if (memory != nullptr) {
 		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
@@ -78,7 +81,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 			if (memory->isValidAddress(startAddress) &&
 			    memory->isValidAddress(startAddress + readLength)) {
 				for (std::size_t i = 0; i < readLength; i++) {
-					readData[i] = memory->readData(startAddress, i);
+					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
 				}
 
 				report.append<StartAddress>(startAddress);
@@ -105,9 +108,10 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	const MemoryId memoryID = request.read<MemoryId>();
 
-	auto memory = MemoryAddressProvider::memoryMap.at(memoryID);
+	if (memoryIdValidator(memoryID) == true) {
 
-	if (memory != nullptr) {
+		auto memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
+
 		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
@@ -157,7 +161,7 @@ void MemoryManagementService::execute(Message& message) {
 
 
 inline bool MemoryManagementService::memoryIdValidator(MemoryId memId) {
-	return MemoryAddressProvider::memoryMap.find(memId) == MemoryAddressProvider::memoryMap.end();
+	return MemoryAddressProvider::memoryMap.find(memId) != MemoryAddressProvider::memoryMap.end();
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,
