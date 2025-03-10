@@ -14,6 +14,7 @@ class Memory {
 
 	    constexpr Memory(LowerLimit lowerLimit, UpperLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
 
+	    virtual ~Memory() = default;
 	private:
 		LowerLimit lowerLimit;
 	    UpperLimit upperLimit;

@@ -12,12 +12,12 @@ void MemoryManagementService::loadRawData(Message& request) {
 
 	auto MemoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(MemoryID) == false) {
+	if (!memoryIdValidator(MemoryID)) {
 		ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 	    return;
 	}
 
-	auto memory = MemoryAddressProvider::memoryMap.find(MemoryID)->second;
+	auto *memory = MemoryAddressProvider::memoryMap.find(MemoryID)->second;
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 
@@ -62,8 +62,8 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 	MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(memoryID) == true) {
-		auto memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
+	if (memoryIdValidator(memoryID)) {
+		auto *memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
 
 		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
@@ -105,9 +105,9 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	const MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(memoryID) == true) {
+	if (memoryIdValidator(memoryID)) {
 
-		auto memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
+		auto *memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
 
 		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
