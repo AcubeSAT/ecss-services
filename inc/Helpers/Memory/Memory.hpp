@@ -15,6 +15,14 @@ class Memory {
 	    constexpr Memory(LowerLimit lowerLimit, UpperLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
 
 	    virtual ~Memory() = default;
+
+	    Memory(Memory const&) = default;
+
+	    Memory& operator=(Memory const&) = default;
+
+	    Memory(Memory&&) = delete;
+
+	    Memory& operator=(Memory&&) = delete;
 	private:
 		LowerLimit lowerLimit;
 	    UpperLimit upperLimit;

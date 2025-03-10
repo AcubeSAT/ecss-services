@@ -20,7 +20,7 @@ namespace MemoryAddressProvider {
 	*
 	*/
 	extern const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
-};
+}
 
 #endif //MEMORYADDRESSPROVIDER_HPP
 
