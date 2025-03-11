@@ -2,7 +2,6 @@
 #define TESTMEMORY_HPP
 
 #include "Helpers/Memory/Memory.hpp"
-#include <etl/array.h>
 
 class TestMemory : public Memory {
 	public:
