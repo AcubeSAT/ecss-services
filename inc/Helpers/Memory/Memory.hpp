@@ -8,7 +8,7 @@ class Memory {
 	public:
 	    virtual ReadData readData(std::uintptr_t address, std::uintptr_t offset) const = 0;
 
-		virtual bool writeData(std::uintptr_t address, std::uintptr_t offset,  ReadData data) = 0;
+		virtual bool writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data) = 0;
 
 	   	bool isValidAddress(std::uintptr_t address) const { return lowerLimit <= address && upperLimit >= address; }
 
@@ -26,6 +26,6 @@ class Memory {
 		LowerLimit lowerLimit;
 	    UpperLimit upperLimit;
 
-			};
+};
 
 #endif //MEMORY_HPP

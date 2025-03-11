@@ -56,7 +56,7 @@ using ErrorCode = uint16_t;
  using NumberOfConsecutiveDeltaChecks = uint16_t;
  using DeltaThreshold = double;
 
- /**
+/**
 * Memory Limits
 */
  using LowerLimit = std::uintptr_t;
