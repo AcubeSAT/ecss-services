@@ -8,6 +8,15 @@ MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(Memory
 	: mainService(parent) {}
 
 void MemoryManagementService::loadRawData(Message& request) {
+	/**
+	 * Bear in mind that there is currently no error checking for invalid parameters.
+	 * A future version will include error checking and the corresponding error report/notification,
+	 * as the manual implies.
+	 *
+	 * @todo (#255): Add error checking and reporting for the parameters
+	 * @todo (#256): Add failure reporting
+	 */
+
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
 
 	MemoryId memoryID = request.read<MemoryId>();
@@ -15,7 +24,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	auto *memory = MemoryManagementService::getMemoryFromId(memoryID);
 
 	if(memory == nullptr) {
-		// TODO(no-assignee) throw an error (AddressOutOfRange) (This also needs to be implemented in the tests)
+		// TODO(#257): Send a failed start of execution
 		return;
 	}
 
@@ -65,7 +74,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	auto *memory = MemoryManagementService::getMemoryFromId(memoryID);
 
 	if(memory == nullptr) {
-		// TODO(no-assignee) throw an error (AddressOutOfRange) (This also needs to be implemented in the tests)
+		// TODO(#257): Send a failed start of execution
 		return;
 	}
 
