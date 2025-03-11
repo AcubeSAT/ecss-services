@@ -10,14 +10,14 @@ MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(Memory
 void MemoryManagementService::loadRawData(Message& request) {
 	request.assertTC(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas);
 
-	auto MemoryID = request.read<MemoryId>();
+	MemoryId memoryID = request.read<MemoryId>();
 
-	if (!memoryIdValidator(MemoryID)) {
-		ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
-	    return;
+	auto *memory = MemoryManagementService::getMemoryFromId(memoryID);
+
+	if(memory == nullptr) {
+		// Error
+		return;
 	}
-
-	auto *memory = MemoryAddressProvider::memoryMap.find(MemoryID)->second;
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 
@@ -62,38 +62,39 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 	MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(memoryID)) {
-		auto *memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
+	auto *memory = MemoryManagementService::getMemoryFromId(memoryID);
 
-		etl::array<ReadData, ECSSMaxStringSize> readData = {};
-		uint16_t const iterationCount = request.readUint16();
-
-		report.append<MemoryId>(memoryID);
-		report.appendUint16(iterationCount);
-
-		for (std::size_t j = 0; j < iterationCount; j++) {
-			const StartAddress startAddress = request.read<StartAddress>();
-			const MemoryDataLength readLength = request.read<MemoryDataLength>();
-
-			if (memory->isValidAddress(startAddress) &&
-			    memory->isValidAddress(startAddress + readLength)) {
-				for (std::size_t i = 0; i < readLength; i++) {
-					readData[i] = *(reinterpret_cast<uint8_t*>(startAddress) + i);
-				}
-
-				report.append<StartAddress>(startAddress);
-				report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
-				report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
-			} else {
-				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
-			}
-		}
-
-		mainService.storeMessage(report);
-		request.resetRead();
-	} else {
-		// TODO(#257): Send a failed start of execution
+	if(memory == nullptr) {
+		// Error
+		return;
 	}
+
+	etl::array<ReadData, ECSSMaxStringSize> readData = {};
+	uint16_t const iterationCount = request.readUint16();
+
+	report.append<MemoryId>(memoryID);
+	report.appendUint16(iterationCount);
+
+	for (std::size_t j = 0; j < iterationCount; j++) {
+		const StartAddress startAddress = request.read<StartAddress>();
+		const MemoryDataLength readLength = request.read<MemoryDataLength>();
+
+		if (memory->isValidAddress(startAddress) &&
+			memory->isValidAddress(startAddress + readLength)) {
+			for (std::size_t i = 0; i < readLength; i++) {
+				readData[i] = memory->readData(startAddress, i);
+			}
+
+			report.append<StartAddress>(startAddress);
+			report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
+			report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
+		} else {
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+		}
+	}
+
+	mainService.storeMessage(report);
+	request.resetRead();
 
 }
 
@@ -105,39 +106,38 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	const MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(memoryID)) {
+	auto *memory = MemoryManagementService::getMemoryFromId(memoryID);
 
-		auto *memory = MemoryAddressProvider::memoryMap.find(memoryID)->second;
-
-		etl::array<ReadData, ECSSMaxStringSize> readData = {};
-		uint16_t const iterationCount = request.readUint16();
-
-		report.append<MemoryId>(memoryID);
-		report.appendUint16(iterationCount);
-
-		for (std::size_t j = 0; j < iterationCount; j++) {
-			const StartAddress startAddress = request.read<StartAddress>();
-			const MemoryDataLength readLength = request.read<MemoryDataLength>();
-
-			if (memory->isValidAddress(startAddress) &&
-			    memory->isValidAddress(startAddress + readLength)) {
-				for (std::size_t i = 0; i < readLength; i++) {
-					readData[i] = memory->readData(startAddress, i);
-				}
-
-				report.append<StartAddress>(startAddress);
-				report.append<MemoryDataLength>(readLength);
-				report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
-			} else {
-				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
-			}
-		}
-
-		mainService.storeMessage(report);
-		request.resetRead();
-	} else {
-		// TODO(#257): Send a failed start of execution report
+	if(memory == nullptr) {
+		ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+		return;
 	}
+
+	etl::array<ReadData, ECSSMaxStringSize> readData = {};
+	uint16_t const iterationCount = request.readUint16();
+
+	report.append<MemoryId>(memoryID);
+	report.appendUint16(iterationCount);
+
+	for (std::size_t j = 0; j < iterationCount; j++) {
+		const StartAddress startAddress = request.read<StartAddress>();
+		const MemoryDataLength readLength = request.read<MemoryDataLength>();
+
+		if (memory->isValidAddress(startAddress) &&
+			memory->isValidAddress(startAddress + readLength)) {
+			for (std::size_t i = 0; i < readLength; i++) {
+				readData[i] = memory->readData(startAddress, i);
+			}
+
+			report.append<StartAddress>(startAddress);
+			report.append<MemoryDataLength>(readLength);
+			report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
+		} else {
+		}
+	}
+
+	mainService.storeMessage(report);
+	request.resetRead();
 }
 
 void MemoryManagementService::execute(Message& message) {
@@ -156,9 +156,11 @@ void MemoryManagementService::execute(Message& message) {
 	}
 }
 
-
-inline bool MemoryManagementService::memoryIdValidator(MemoryId memId) {
-	return MemoryAddressProvider::memoryMap.find(memId) != MemoryAddressProvider::memoryMap.end();
+inline Memory* MemoryManagementService::getMemoryFromId(MemoryId memId) {
+    if (MemoryAddressProvider::memoryMap.find(memId) != MemoryAddressProvider::memoryMap.end()) {
+		return MemoryAddressProvider::memoryMap.find(memId)->second;
+	}
+		return nullptr;
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,

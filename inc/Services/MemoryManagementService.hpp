@@ -92,11 +92,11 @@ public:
 private:
 
 	/**
-	 * Check if the provided memory ID is valid
+	 * Get Memory from ID
 	 *
-	 * @param memId The memory ID for validation
+	 * @param memId The memory ID to get
 	 */
-	static bool memoryIdValidator(MemoryId memId);
+	static Memory* getMemoryFromId(MemoryId memId);
 
 	/**
 	 * Validate the data according to checksum calculation
