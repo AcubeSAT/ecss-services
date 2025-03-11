@@ -10,7 +10,6 @@ bool TestMemory::writeData(std::uintptr_t address, std::uintptr_t offset, ReadDa
 }
 
 ReadData TestMemory::readData(std::uintptr_t address, std::uintptr_t offset) const {
-
 	// Assume one byte (?) for now
 	return *(reinterpret_cast<uint8_t*>(address) + offset);
 }

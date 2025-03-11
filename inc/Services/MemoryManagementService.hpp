@@ -8,7 +8,6 @@
 #include "Helpers/Memory/MemoryAddressProvider.hpp"
 #include "Helpers/TypeDefinitions.hpp"
 
-
 /**
  * Number of Bits in Memory Management Checksum
  * TODO move this somewhere else
