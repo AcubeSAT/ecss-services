@@ -156,11 +156,9 @@ void MemoryManagementService::execute(Message& message) {
 	}
 }
 
-inline Memory* MemoryManagementService::getMemoryFromId(MemoryId memId) {
-    if (MemoryAddressProvider::memoryMap.find(memId) != MemoryAddressProvider::memoryMap.end()) {
-		return MemoryAddressProvider::memoryMap.find(memId)->second;
-	}
-		return nullptr;
+Memory* MemoryManagementService::getMemoryFromId(MemoryId memId) {
+    auto iter = MemoryAddressProvider::memoryMap.find(memId);
+    return (iter != MemoryAddressProvider::memoryMap.end()) ? iter->second : nullptr;
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,
