@@ -15,7 +15,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	auto *memory = MemoryManagementService::getMemoryFromId(memoryID);
 
 	if(memory == nullptr) {
-		// TODO throw an error (AddressOutOfRange) (This also needs to be implemented in the tests)
+		// TODO(no-assignee) throw an error (AddressOutOfRange) (This also needs to be implemented in the tests)
 		return;
 	}
 
@@ -65,7 +65,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	auto *memory = MemoryManagementService::getMemoryFromId(memoryID);
 
 	if(memory == nullptr) {
-		// TODO throw an error (AddressOutOfRange) (This also needs to be implemented in the tests)
+		// TODO(no-assignee) throw an error (AddressOutOfRange) (This also needs to be implemented in the tests)
 		return;
 	}
 
