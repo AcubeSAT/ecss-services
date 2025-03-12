@@ -56,6 +56,7 @@ namespace Filesystem {
 	enum class FilePermissionModificationError : uint8_t {
 		FileDoesNotExist = 0,
 		PathLeadsToDirectory = 1,
+		FilePermissionModificationFailed = 2,
 		UnknownError = 255
 	};
 

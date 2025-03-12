@@ -1,11 +1,12 @@
 #include "Helpers/Filesystem.hpp"
 #include <filesystem>
 #include <fstream>
+#include <system_error>
 
 /**
- * These functions are built on the x86_services target and will never run.
- * To combat undefined function errors, they are defined here.
- * Each function returns the minimum viable option without errors.
+ * Implementation of a filesystem using C++'s standard library for x86 file access.
+ *
+ * (Un)locking is implemented by setting the _write_ permission  on a file.
  */
 namespace Filesystem {
 	namespace fs = std::filesystem;
@@ -81,7 +82,11 @@ namespace Filesystem {
 
 		auto newPermissions = permissions & ~fs::perms::owner_write;
 
-		fs::permissions(path.data(), newPermissions);
+		std::error_code ec;
+		fs::permissions(path.data(), newPermissions, ec);
+		if (ec) {
+			return etl::unexpected(FilePermissionModificationError::FilePermissionModificationFailed);
+		}
 
 		return {};
 	}
@@ -100,13 +105,31 @@ namespace Filesystem {
 
 		auto newPermissions = permissions | fs::perms::owner_write;
 
-		fs::permissions(path.data(), newPermissions);
+		std::error_code ec;
+		fs::permissions(path.data(), newPermissions, ec);
+		if (ec) {
+			return etl::unexpected(FilePermissionModificationError::FilePermissionModificationFailed);
+		}
 
 		return {};
 	}
 
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
-		return Attributes{};
+		Attributes attributes{};
+
+		auto nodeType = getNodeType(path);
+		if (not nodeType) {
+			return FileAttributeError::FileDoesNotExist;
+		}
+
+		if (nodeType.value() != NodeType::File) {
+			return FileAttributeError::PathLeadsToDirectory;
+		}
+
+		attributes.sizeInBytes = fs::file_size(path.data());
+		attributes.isLocked = getFileLockStatus(path) == FileLockStatus::Locked;
+
+		return attributes;
 	}
 
 	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {

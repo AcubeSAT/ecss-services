@@ -369,11 +369,11 @@ int main() {
 	fs::current_path(fs::temp_directory_path());
 	std::cout << "\n\nST[23] File System Service - Start\n\n";
 	fs::create_directories("st23");
-	String<64> repo = "st23";
+	String<ECSSTCRequestStringSize> repo = "st23";
 
 	//Create directory
 	Message createDirectoryMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CreateDirectory, Message::TC, 0);
-	String<64> directory = "created_directory";
+	String<ECSSTCRequestStringSize> directory = "created_directory";
 	createDirectoryMessage.appendOctetString(repo);
 	createDirectoryMessage.appendOctetString(directory);
 	MessageParser::execute(createDirectoryMessage);
@@ -381,12 +381,12 @@ int main() {
 	std::cout << "fs::exists(\"st23/created_directory\") -> " << fs::exists("st23/created_directory") << "\n";
 	std::cout << "fs::is_directory(\"st23/created_directory\") -> " << fs::is_directory("st23/created_directory") << "\n\n";
 
-	String<64> fullPathToDirectory = repo;
+	String<ECSSTCRequestStringSize> fullPathToDirectory = repo;
 	fullPathToDirectory.append("/").append(directory);
 
 	//Create file
 	Message createFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
-	String<64> file = "created_file";
+	String<ECSSTCRequestStringSize> file = "created_file";
 	createFileMessage.appendOctetString(fullPathToDirectory);
 	createFileMessage.appendOctetString(file);
 	MessageParser::execute(createFileMessage);
