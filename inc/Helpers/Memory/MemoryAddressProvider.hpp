@@ -1,9 +1,9 @@
 #ifndef MEMORYADDRESSPROVIDER_HPP
 #define MEMORYADDRESSPROVIDER_HPP
 
-#include "etl/unordered_map.h"
 #include "ECSS_Definitions.hpp"
 #include "Memory.hpp"
+#include "etl/unordered_map.h"
 
 /**
  * Maximum number of entries in Valid Memory IDs set
@@ -19,4 +19,3 @@ namespace MemoryAddressProvider {
 } // namespace MemoryAddressProvider
 
 #endif //MEMORYADDRESSPROVIDER_HPP
-

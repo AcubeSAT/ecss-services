@@ -15,13 +15,13 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	uint8_t data[2] = {'h', 'R'};
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
-	receivedPacket.append<MemoryId>(0); // Memory ID
-	receivedPacket.appendUint16(2);                                          // Iteration count
-	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));           // Start address
+	receivedPacket.append<MemoryId>(0);                                        // Memory ID
+	receivedPacket.appendUint16(2);                                            // Iteration count
+	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(pStr)); // Start address
 	receivedPacket.appendOctetString(String<2>(data));
-	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 2));   // Append CRC
+	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 2));               // Append CRC
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(pStr + 2)); // Start address
-	receivedPacket.appendOctetString(String<1>(data));                 // Append CRC
+	receivedPacket.appendOctetString(String<1>(data));                             // Append CRC
 	receivedPacket.appendBits(16, CRCHelper::calculateCRC(data, 1));
 	MessageParser::execute(receivedPacket);
 
@@ -41,8 +41,8 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
-	receivedPacket.append<MemoryId>(0);     // Memory ID
-	receivedPacket.appendUint16(3);                                              // Iteration count (Equal to 3 test strings)
+	receivedPacket.append<MemoryId>(0);                                                      // Memory ID
+	receivedPacket.appendUint16(3);                                                          // Iteration count (Equal to 3 test strings)
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
 	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
 
@@ -63,7 +63,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	CHECK(response.readUint16() == 3);
 	CHECK(response.read<StartAddress>() == reinterpret_cast<StartAddress>(testString_1));
 	readSize = response.readOctetString(checkString);
-	checksum = response.readBits(8*sizeof(MemoryManagementChecksum));
+	checksum = response.readBits(8 * sizeof(MemoryManagementChecksum));
 	CHECK(readSize == sizeof(testString_1) / sizeof(testString_1[0]));
 	CHECK(checkString[0] == 'F');
 	CHECK(checkString[1] == 'S');
@@ -75,7 +75,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 
 	CHECK(response.read<StartAddress>() == reinterpret_cast<StartAddress>(testString_2));
 	readSize = response.readOctetString(checkString);
-	checksum = response.readBits(8*sizeof(MemoryManagementChecksum));
+	checksum = response.readBits(8 * sizeof(MemoryManagementChecksum));
 	CHECK(readSize == sizeof(testString_2) / sizeof(testString_2[0]));
 	CHECK(checkString[0] == 'S');
 	CHECK(checkString[1] == 'e');
@@ -89,7 +89,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 
 	CHECK(response.read<StartAddress>() == reinterpret_cast<StartAddress>(testString_3));
 	readSize = response.readOctetString(checkString);
-	checksum = response.readBits(8*sizeof(MemoryManagementChecksum));
+	checksum = response.readBits(8 * sizeof(MemoryManagementChecksum));
 	CHECK(readSize == sizeof(testString_3) / sizeof(testString_3[0]));
 	CHECK(checkString[0] == 5);
 	CHECK(checkString[1] == 8);
@@ -102,8 +102,8 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
-	receivedPacket.append<MemoryId>(0);     // Memory ID
-	receivedPacket.appendUint16(2);                                              // Iteration count
+	receivedPacket.append<MemoryId>(0);                                                      // Memory ID
+	receivedPacket.appendUint16(2);                                                          // Iteration count
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
 	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
 
@@ -121,13 +121,13 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	CHECK(response.readUint16() == 2);
 	CHECK(response.read<StartAddress>() == reinterpret_cast<StartAddress>(testString_1));
 	readSize = response.readUint16();
-	checksum = response.readBits(8*sizeof(MemoryManagementChecksum));
+	checksum = response.readBits(8 * sizeof(MemoryManagementChecksum));
 	CHECK(readSize == sizeof(testString_1) / sizeof(testString_1[0]));
 	CHECK(checksum == CRCHelper::calculateCRC(testString_1, readSize));
 
 	CHECK(response.read<StartAddress>() == reinterpret_cast<StartAddress>(testString_2));
 	readSize = response.readUint16();
-	checksum = response.readBits(8*sizeof(MemoryManagementChecksum));
+	checksum = response.readBits(8 * sizeof(MemoryManagementChecksum));
 	CHECK(readSize == sizeof(testString_2) / sizeof(testString_2[0]));
 	CHECK(checksum == CRCHelper::calculateCRC(testString_2, readSize));
 }
