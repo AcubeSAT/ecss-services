@@ -4,5 +4,5 @@
 TestMemory testMemory(0, std::numeric_limits<uintptr_t>::max());
 
 const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> MemoryAddressProvider::memoryMap = {
-	{0, &testMemory}	// Add more entries as needed
+	{0, &testMemory}
 };

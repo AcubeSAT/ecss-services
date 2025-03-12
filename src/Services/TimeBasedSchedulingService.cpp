@@ -2,7 +2,6 @@
 #ifdef SERVICE_TIMESCHEDULING
 
 #include "Services/TimeBasedSchedulingService.hpp"
-#include <iostream>
 
 TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
