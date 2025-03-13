@@ -107,6 +107,6 @@ private:
 
 namespace MemoryMapProvider {
 	extern const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
-}
+} // MemoryMapProvider namespace
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP
