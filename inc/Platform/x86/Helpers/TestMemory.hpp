@@ -9,7 +9,7 @@ class TestMemory : public Memory {
 
 		bool writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data) override;
 
-	    constexpr TestMemory(LowerLimit lowerLimit, UpperLimit upperLimit) : Memory(lowerLimit, upperLimit) {}
+	    constexpr TestMemory(LowerLimit lowerLimit, UpperLimit upperLimit) noexcept : Memory(lowerLimit, upperLimit) {}
 
 	    ~TestMemory() override = default;
 	};
