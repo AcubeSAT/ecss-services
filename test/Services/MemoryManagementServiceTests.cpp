@@ -1,10 +1,11 @@
 #include <Message.hpp>
 #include <Services/MemoryManagementService.hpp>
 #include <catch2/catch_all.hpp>
-#include "../TestDefinitions.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "Platform/x86/Helpers/TestMemory.hpp"
 #include "ServiceTests.hpp"
+
+constexpr MemoryId TEST_MEMORY = 0;
 
 MemoryManagementService& memMangService = Services.memoryManagement;
 

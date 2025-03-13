@@ -15,7 +15,6 @@
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
-#include "TestDefinitions.hpp"
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
 	return ServiceTests::getMockTime();
