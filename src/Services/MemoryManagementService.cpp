@@ -1,4 +1,7 @@
 #include "Services/MemoryManagementService.hpp"
+#include "Platform/x86/Helpers/TestMemory.hpp"
+
+TestMemory testMemory(0, std::numeric_limits<uintptr_t>::max());
 
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
 	serviceType = MemoryManagementService::ServiceType;
@@ -165,9 +168,12 @@ void MemoryManagementService::execute(Message& message) {
 }
 
 Memory* MemoryManagementService::getMemoryFromId(MemoryId memId) {
-	auto iter = MemoryAddressProvider::memoryMap.find(memId);
-	return (iter != MemoryAddressProvider::memoryMap.end()) ? iter->second : nullptr;
+	auto iter = MemoryManagementService::memoryMap.find(memId);
+	return (iter != MemoryManagementService::memoryMap.end()) ? iter->second : nullptr;
 }
+
+const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> MemoryManagementService::memoryMap = {
+    {0, &testMemory}};
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,
                                                    MemoryDataLength length) {

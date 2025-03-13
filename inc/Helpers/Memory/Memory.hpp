@@ -1,7 +1,6 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 
-#include <etl/array.h>
 #include "Helpers/TypeDefinitions.hpp"
 
 class Memory {

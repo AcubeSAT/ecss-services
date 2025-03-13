@@ -4,9 +4,11 @@
 #include <memory>
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
-#include "Helpers/Memory/MemoryAddressProvider.hpp"
 #include "Helpers/TypeDefinitions.hpp"
+#include "ECSS_Definitions.hpp"
+#include "Helpers/Memory/Memory.hpp"
 #include "Service.hpp"
+#include <etl/unordered_map.h>
 
 /**
  * Number of Bits in Memory Management Checksum
@@ -101,6 +103,8 @@ private:
 	 * Validate the data according to checksum calculation
 	 */
 	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
+
+	static const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

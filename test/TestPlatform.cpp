@@ -15,8 +15,6 @@
 #include "Services/ParameterService.hpp"
 #include "Services/ParameterStatisticsService.hpp"
 #include "Services/ServiceTests.hpp"
-#include "Helpers/Memory/MemoryAddressProvider.hpp"
-#include "Platform/x86/Helpers/TestMemory.hpp"
 #include "TestDefinitions.hpp"
 
 UTCTimestamp TimeGetter::getCurrentTimeUTC() {
@@ -140,15 +138,6 @@ namespace PlatformParameters {
 } // namespace PlatformParameters
 
 /**
-* Memory Management Tests
-*/
-TestMemory testMemory(0, std::numeric_limits<uintptr_t>::max());
-
-const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> MemoryAddressProvider::memoryMap = {
-	{TEST_MEMORY, &testMemory}
-};
-
-/**
  * Specific definition for \ref ParameterService's initialize function, for testing purposes.
  */
 
@@ -188,8 +177,8 @@ void ParameterService::initializeParameterMap() {
 	    {uint16_t{31}, PlatformParameters::parameter32},
 	    {uint16_t{32}, PlatformParameters::parameter33},
 	    {uint16_t{33}, PlatformParameters::parameter34},
-        {uint16_t{34}, PlatformParameters::parameter35},
-        {uint16_t{35}, PlatformParameters::parameter36},
+	    {uint16_t{34}, PlatformParameters::parameter35},
+	    {uint16_t{35}, PlatformParameters::parameter36},
 	};
 }
 
@@ -341,12 +330,12 @@ namespace Filesystem {
 
 
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
-    PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
-    PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+	PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
 }
 
 void FunctionManagementService::initializeFunctionMap() {
-    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+	FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
 }
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

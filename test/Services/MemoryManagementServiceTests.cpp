@@ -1,9 +1,10 @@
 #include <Message.hpp>
 #include <Services/MemoryManagementService.hpp>
 #include <catch2/catch_all.hpp>
-#include "Helpers/CRCHelper.hpp"
-#include "ServiceTests.hpp"
 #include "../TestDefinitions.hpp"
+#include "Helpers/CRCHelper.hpp"
+#include "Platform/x86/Helpers/TestMemory.hpp"
+#include "ServiceTests.hpp"
 
 MemoryManagementService& memMangService = Services.memoryManagement;
 
@@ -16,7 +17,7 @@ TEST_CASE("TC[6,2]", "[service][st06]") {
 	uint8_t data[2] = {'h', 'R'};
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
-	receivedPacket.append<MemoryId>(TEST_MEMORY);                                        // Memory ID
+	receivedPacket.append<MemoryId>(TEST_MEMORY);                              // Memory ID
 	receivedPacket.appendUint16(2);                                            // Iteration count
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(pStr)); // Start address
 	receivedPacket.appendOctetString(String<2>(data));
@@ -42,7 +43,7 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
-	receivedPacket.append<MemoryId>(TEST_MEMORY);                                                      // Memory ID
+	receivedPacket.append<MemoryId>(TEST_MEMORY);                                            // Memory ID
 	receivedPacket.appendUint16(3);                                                          // Iteration count (Equal to 3 test strings)
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
 	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
@@ -103,7 +104,7 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	uint16_t readSize = 0, checksum = 0;
 
 	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
-	receivedPacket.append<MemoryId>(TEST_MEMORY);                                                      // Memory ID
+	receivedPacket.append<MemoryId>(TEST_MEMORY);                                            // Memory ID
 	receivedPacket.appendUint16(2);                                                          // Iteration count
 	receivedPacket.append<StartAddress>(reinterpret_cast<StartAddress>(testString_1));       // Start address
 	receivedPacket.append<MemoryDataLength>(sizeof(testString_1) / sizeof(testString_1[0])); // Data read length
