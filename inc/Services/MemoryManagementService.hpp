@@ -80,7 +80,7 @@ public:
 	 * @param request Provide the received message as a parameter
 	 * @todo (#222) Only allow aligned memory address to be start addresses
 	 */
-	static void loadRawData(Message& request);
+	void loadRawData(Message& request);
 
 	/**
 	 * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
@@ -97,16 +97,13 @@ private:
 	 *
 	 * @param memId The memory ID to get
 	 */
-	static Memory* getMemoryFromId(MemoryId memId);
+	Memory* getMemoryFromId(MemoryId memId);
 
+	const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
 	/**
 	 * Validate the data according to checksum calculation
 	 */
 	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
 };
-
-namespace MemoryMapProvider {
-	extern const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
-} // MemoryMapProvider namespace
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

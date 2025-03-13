@@ -1,7 +1,12 @@
 #include "Services/MemoryManagementService.hpp"
+#include <etl/functional.h>
 #include "Platform/x86/Helpers/TestMemory.hpp"
 
-MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
+TestMemory testMemory(0, std::numeric_limits<std::uintptr_t>::max());
+
+MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this), memoryMap({{static_cast<MemoryId>(0), &testMemory}},
+                                                                                               etl::hash<MemoryId>{},
+                                                                                               etl::equal_to<MemoryId>{}) {
 	serviceType = MemoryManagementService::ServiceType;
 }
 
@@ -22,7 +27,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 
 	MemoryId memoryID = request.read<MemoryId>();
 
-	auto* memory = MemoryManagementService::getMemoryFromId(memoryID);
+	auto* memory = getMemoryFromId(memoryID);
 
 	if (memory == nullptr) {
 		// TODO(#257): Send a failed start of execution
@@ -72,7 +77,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 	MemoryId memoryID = request.read<MemoryId>();
 
-	auto* memory = MemoryManagementService::getMemoryFromId(memoryID);
+	auto* memory = mainService.getMemoryFromId(memoryID);
 
 	if (memory == nullptr) {
 		// TODO(#257): Send a failed start of execution
@@ -115,7 +120,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	const MemoryId memoryID = request.read<MemoryId>();
 
-	auto* memory = MemoryManagementService::getMemoryFromId(memoryID);
+	auto* memory = mainService.getMemoryFromId(memoryID);
 
 	if (memory == nullptr) {
 		ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
@@ -166,16 +171,11 @@ void MemoryManagementService::execute(Message& message) {
 }
 
 Memory* MemoryManagementService::getMemoryFromId(MemoryId memId) {
-	auto iter = MemoryMapProvider::memoryMap.find(memId);
-	return (iter != MemoryMapProvider::memoryMap.end()) ? iter->second : nullptr;
+	auto iter = memoryMap.find(memId);
+	return (iter != memoryMap.end()) ? iter->second : nullptr;
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,
                                                    MemoryDataLength length) {
 	return (checksum == CRCHelper::calculateCRC(data, length));
 }
-
-TestMemory testMemory(0, std::numeric_limits<uintptr_t>::max());
-
-const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> MemoryMapProvider::memoryMap = {
-    {0, &testMemory}};
