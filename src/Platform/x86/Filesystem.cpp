@@ -6,7 +6,7 @@
 /**
  * Implementation of a filesystem using C++'s standard library for x86 file access.
  *
- * (Un)locking is implemented by setting the _write_ permission  on a file.
+ * (Un)locking is implemented by setting the _write_ permission on a file.
  */
 namespace Filesystem {
 	namespace fs = std::filesystem;
@@ -115,7 +115,7 @@ namespace Filesystem {
 	}
 
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
-		Attributes attributes{};
+		Attributes attributes;
 
 		auto nodeType = getNodeType(path);
 		if (not nodeType) {
@@ -162,6 +162,7 @@ namespace Filesystem {
 	}
 
 	uint32_t getUnallocatedMemory() {
+		// Dummy value for use during testing
 		return 42U;
 	}
 } // namespace Filesystem
