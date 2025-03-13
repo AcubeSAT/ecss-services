@@ -67,9 +67,14 @@ IF (X86_BUILD)
     IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
         file(GLOB test_main_SRC "test/*.cpp")
         file(GLOB test_SRC "test/**/*.cpp")
+        file(GLOB test_x86_shared_SRC "src/Platform/x86/Filesystem.cpp")
+
         add_executable(tests
+                ${test_x86_shared_SRC}
                 ${test_main_SRC}
-                ${test_SRC})
+                ${test_SRC}
+        )
+
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()
