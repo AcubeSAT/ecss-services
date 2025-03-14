@@ -57,7 +57,6 @@ using ErrorCode = uint16_t;
  using DeltaThreshold = double;
 
 /**
-* Memory Limits
+* Memory Related Types
 */
- using LowerLimit = std::uintptr_t;
- using UpperLimit = std::uintptr_t;
+ using AddressLimit = std::uintptr_t;

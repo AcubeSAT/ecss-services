@@ -100,7 +100,7 @@ private:
 	 */
 	etl::optional<etl::reference_wrapper<Memory>> getMemoryFromId(MemoryId memId);
 
-	etl::vector<etl::reference_wrapper<Memory>, MaxValidMemoryIdsSize> memoryVector;
+	etl::vector<etl::reference_wrapper<Memory>, MaxValidMemoryIds> memoryVector;
 	/**
 	 * Validate the data according to checksum calculation
 	 */

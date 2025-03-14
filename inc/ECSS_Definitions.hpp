@@ -262,7 +262,7 @@ inline constexpr uint16_t ApplicationId = 1;
 /**
  * Maximum number of entries in Valid Memory IDs set
  */
-inline constexpr uint32_t MaxValidMemoryIdsSize = 8;
+inline constexpr uint32_t MaxValidMemoryIds = 8;
 
 
 /** @} */

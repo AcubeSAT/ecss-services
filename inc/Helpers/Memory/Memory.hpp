@@ -11,7 +11,7 @@ public:
 
 	bool isValidAddress(std::uintptr_t address) const { return lowerLimit <= address && upperLimit >= address; }
 
-	constexpr Memory(LowerLimit lowerLimit, UpperLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
+	constexpr Memory(AddressLimit lowerLimit, AddressLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
 
 	virtual ~Memory() = default;
 
@@ -22,8 +22,8 @@ public:
 	Memory& operator=(Memory&&) = delete;
 
 private:
-	LowerLimit lowerLimit;
-	UpperLimit upperLimit;
+	AddressLimit lowerLimit;
+	AddressLimit upperLimit;
 };
 
 #endif //MEMORY_HPP
