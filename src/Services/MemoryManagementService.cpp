@@ -2,7 +2,7 @@
 #include <etl/functional.h>
 #include "Platform/x86/Helpers/TestMemory.hpp"
 
-TestMemory testMemory(0, std::numeric_limits<std::uintptr_t>::max());
+TestMemory testMemory{0, std::numeric_limits<std::uintptr_t>::max()};
 
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this), memoryMap({{static_cast<MemoryId>(0), &testMemory}},
                                                                                                etl::hash<MemoryId>{},
@@ -27,12 +27,14 @@ void MemoryManagementService::loadRawData(Message& request) {
 
 	MemoryId memoryID = request.read<MemoryId>();
 
-	auto* memory = getMemoryFromId(memoryID);
+	auto memoryOpt = getMemoryFromId(memoryID);
 
-	if (memory == nullptr) {
-		// TODO(#257): Send a failed start of execution
+	if (!memoryOpt.has_value()) {
+		// @todo(#257): Send a failed start of execution
 		return;
 	}
+
+	auto& memory = memoryOpt.value().get();
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 
@@ -48,18 +50,18 @@ void MemoryManagementService::loadRawData(Message& request) {
 			continue;
 		}
 
-		if (!memory->isValidAddress(startAddress) ||
-		    !memory->isValidAddress(startAddress + dataLength)) {
+		if (!memory.isValidAddress(startAddress) ||
+		    !memory.isValidAddress(startAddress + dataLength)) {
 			ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 			continue;
 		}
 
 		for (std::size_t i = 0; i < dataLength; i++) {
-			memory->writeData(startAddress, i, readData[i]);
+			memory.writeData(startAddress, i, readData[i]);
 		}
 
 		for (std::size_t i = 0; i < dataLength; i++) {
-			readData[i] = memory->readData(startAddress, i);
+			readData[i] = memory.readData(startAddress, i);
 		}
 
 		if (checksum != CRCHelper::calculateCRC(readData.data(), dataLength)) {
@@ -77,12 +79,14 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 	MemoryId memoryID = request.read<MemoryId>();
 
-	auto* memory = mainService.getMemoryFromId(memoryID);
+	auto memoryOpt = mainService.getMemoryFromId(memoryID);
 
-	if (memory == nullptr) {
-		// TODO(#257): Send a failed start of execution
+	if (!memoryOpt.has_value()) {
+		// @todo(#257): Send a failed start of execution
 		return;
 	}
+
+	auto& memory = memoryOpt.value().get();
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();
@@ -94,10 +98,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		const StartAddress startAddress = request.read<StartAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (memory->isValidAddress(startAddress) &&
-		    memory->isValidAddress(startAddress + readLength)) {
+		if (memory.isValidAddress(startAddress) &&
+		    memory.isValidAddress(startAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
-				readData[i] = memory->readData(startAddress, i);
+				readData[i] = memory.readData(startAddress, i);
 			}
 
 			report.append<StartAddress>(startAddress);
@@ -120,12 +124,14 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
 	const MemoryId memoryID = request.read<MemoryId>();
 
-	auto* memory = mainService.getMemoryFromId(memoryID);
+	auto memoryOpt = mainService.getMemoryFromId(memoryID);
 
-	if (memory == nullptr) {
-		ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+	if (!memoryOpt.has_value()) {
+		// @todo(#257): Send a failed start of execution
 		return;
 	}
+
+	auto& memory = memoryOpt.value().get();
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();
@@ -137,10 +143,10 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		const StartAddress startAddress = request.read<StartAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (memory->isValidAddress(startAddress) &&
-		    memory->isValidAddress(startAddress + readLength)) {
+		if (memory.isValidAddress(startAddress) &&
+		    memory.isValidAddress(startAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
-				readData[i] = memory->readData(startAddress, i);
+				readData[i] = memory.readData(startAddress, i);
 			}
 
 			report.append<StartAddress>(startAddress);
@@ -170,9 +176,10 @@ void MemoryManagementService::execute(Message& message) {
 	}
 }
 
-Memory* MemoryManagementService::getMemoryFromId(MemoryId memId) {
+etl::optional<std::reference_wrapper<Memory>> MemoryManagementService::getMemoryFromId(MemoryId memId) {
 	auto iter = memoryMap.find(memId);
-	return (iter != memoryMap.end()) ? iter->second : nullptr;
+	return (iter != memoryMap.end()) ? etl::optional<std::reference_wrapper<Memory >>{std::ref(*iter->second)} :
+	                                 etl::nullopt;
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,

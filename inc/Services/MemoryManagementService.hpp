@@ -5,6 +5,7 @@
 #include <memory>
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
+#include <etl/optional.h>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/Memory/Memory.hpp"
 #include "Helpers/TypeDefinitions.hpp"
@@ -12,7 +13,6 @@
 
 /**
  * Number of Bits in Memory Management Checksum
- * TODO move this somewhere else
  */
 inline constexpr uint32_t BitsInMemoryManagementChecksum = 8 * sizeof(MemoryManagementChecksum);
 
@@ -97,7 +97,7 @@ private:
 	 *
 	 * @param memId The memory ID to get
 	 */
-	Memory* getMemoryFromId(MemoryId memId);
+	etl::optional<std::reference_wrapper<Memory>> getMemoryFromId(MemoryId memId);
 
 	const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
 	/**
