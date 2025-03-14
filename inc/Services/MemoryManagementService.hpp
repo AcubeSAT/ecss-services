@@ -1,11 +1,12 @@
 #ifndef ECSS_SERVICES_MEMMANGSERVICE_HPP
 #define ECSS_SERVICES_MEMMANGSERVICE_HPP
 
+#include <etl/functional.h>
+#include <etl/optional.h>
 #include <etl/unordered_map.h>
 #include <memory>
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include <etl/optional.h>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/Memory/Memory.hpp"
 #include "Helpers/TypeDefinitions.hpp"
@@ -95,15 +96,20 @@ private:
 	/**
 	 * Get Memory from ID
 	 *
-	 * @param memId The memory ID to get
+	 * @param memId The memory ID that corresponds to a memory instance
 	 */
-	etl::optional<std::reference_wrapper<Memory>> getMemoryFromId(MemoryId memId);
+	etl::optional<etl::reference_wrapper<Memory>> getMemoryFromId(MemoryId memId);
 
-	const etl::unordered_map<MemoryId, Memory*, MaxValidMemoryIdsSize> memoryMap;
+	etl::vector<etl::reference_wrapper<Memory>, MaxValidMemoryIdsSize> memoryVector;
 	/**
 	 * Validate the data according to checksum calculation
 	 */
 	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
+
+	/**
+	*
+	*/
+	void initializeMemoryVector();
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP

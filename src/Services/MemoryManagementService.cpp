@@ -2,12 +2,9 @@
 #include <etl/functional.h>
 #include "Platform/x86/Helpers/TestMemory.hpp"
 
-TestMemory testMemory{0, std::numeric_limits<std::uintptr_t>::max()};
-
-MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this), memoryMap({{static_cast<MemoryId>(0), &testMemory}},
-                                                                                               etl::hash<MemoryId>{},
-                                                                                               etl::equal_to<MemoryId>{}) {
+MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
 	serviceType = MemoryManagementService::ServiceType;
+	initializeMemoryVector();
 }
 
 MemoryManagementService::RawDataMemoryManagement::RawDataMemoryManagement(MemoryManagementService& parent)
@@ -86,7 +83,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		return;
 	}
 
-	auto& memory = memoryOpt.value().get();
+	const auto& memory = memoryOpt.value().get();
 
 	etl::array<ReadData, ECSSMaxStringSize> readData = {};
 	uint16_t const iterationCount = request.readUint16();
@@ -176,10 +173,11 @@ void MemoryManagementService::execute(Message& message) {
 	}
 }
 
-etl::optional<std::reference_wrapper<Memory>> MemoryManagementService::getMemoryFromId(MemoryId memId) {
-	auto iter = memoryMap.find(memId);
-	return (iter != memoryMap.end()) ? etl::optional<std::reference_wrapper<Memory >>{std::ref(*iter->second)} :
-	                                 etl::nullopt;
+etl::optional<etl::reference_wrapper<Memory>> MemoryManagementService::getMemoryFromId(MemoryId memId) {
+	if (memId < memoryVector.size()) {
+		return memoryVector[memId];
+	}
+	return etl::nullopt;
 }
 
 inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,
