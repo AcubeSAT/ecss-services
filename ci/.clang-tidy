@@ -1,4 +1,6 @@
 ---
+CheckOptions:
+  cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor: true
 Checks: >
   -clang-diagnostic-error,
   clang-analyzer-*,
