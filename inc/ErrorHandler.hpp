@@ -108,6 +108,22 @@ public:
 		 * An unknown or unsupported PMON check type was encountered
 		 */
 		UnknownCheckType = 19,
+		/**
+		 * Invalid Event ID.
+		 * This error occurs when an event ID is outside the acceptable range or conflicts with reserved identifiers.
+		 */
+		InvalidEventID = 20,
+		/**
+		 * Event data size exceeded.
+		 * This error occurs when the size of event data exceeds the defined maximum allowable size.
+		 */
+		EventDataSizeExceeded = 21,
+
+		/**
+		 * The length of the provided data exceeds the maximum number of events allowed.
+		 * This error occurs when attempting to process more events than the system can handle.
+		 */
+		LengthExceedsNumberOfEvents = 22
 	};
 
 	/**
@@ -475,6 +491,10 @@ public:
 		 * A delete directory command was requested on a non empty directory
 		 */
 		AttemptedDeleteNonEmptyDirectory = 10,
+		/**
+		 * A lock/unlock file command was requested on a directory
+		 */
+		AttemptedAccessModificationOnDirectory = 11,
 	};
 
 	/**

@@ -67,7 +67,7 @@ TEST_CASE("ST[08] - Insert Tests") {
 	SECTION("Insertion to full pointer map") {
 		// make sure the pointer map is full to the brim
 		ServiceTests::reset();
-		std::string name = "test"; // FOR TESTING ONLY!
+		std::string name = ""; // FOR TESTING ONLY!
 
 		for (int i = 0; i < ECSSFunctionMapSize + 1; i++) {
 			name += std::to_string(i); // different names to fill up the map
