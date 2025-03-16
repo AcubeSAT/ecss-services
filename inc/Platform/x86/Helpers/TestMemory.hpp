@@ -7,7 +7,7 @@ class TestMemory : public Memory {
 	public:
 	    ReadData readData(std::uintptr_t address, std::uintptr_t offset) const override;
 
-		bool writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data) override;
+		void writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data) override;
 
 	    constexpr TestMemory(AddressLimit lowerLimit, AddressLimit upperLimit) noexcept : Memory(lowerLimit, upperLimit) {}
 
