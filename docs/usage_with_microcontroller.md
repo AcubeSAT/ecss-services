@@ -253,3 +253,17 @@ MessageParser::parse(string, size);
 ```
 
 You can use the rest of the @ref MessageParser functions if you have a more specific use-case.
+
+5. @ref MemoryManagementService::initializeMemoryVector
+
+`initializeMemoryVector` is a function member of the class MemoryManagementService and is invoked in the constructor of the class.
+It's purpose is to initialize the memory vector that will include all the instances of the different types of memories.
+Example code using a hypothetical `TestMemory` object:
+
+```c++
+TestMemory testMemory{0, std::numeric_limits<std::uintptr_t>::max()};
+
+void MemoryManagementService::initializeMemoryVector() {
+	memoryVector.push_back(etl::ref(static_cast<Memory&>(testMemory)));
+}
+```
