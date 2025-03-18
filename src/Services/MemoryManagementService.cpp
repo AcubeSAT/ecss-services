@@ -172,15 +172,3 @@ void MemoryManagementService::execute(Message& message) {
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
-
-etl::optional<etl::reference_wrapper<Memory>> MemoryManagementService::getMemoryFromId(MemoryId memId) {
-	if (memId < memoryVector.size()) {
-		return memoryVector[memId];
-	}
-	return etl::nullopt;
-}
-
-inline bool MemoryManagementService::dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,
-                                                   MemoryDataLength length) {
-	return (checksum == CRCHelper::calculateCRC(data, length));
-}

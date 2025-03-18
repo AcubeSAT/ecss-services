@@ -98,18 +98,26 @@ private:
 	 *
 	 * @param memId The memory ID that corresponds to a memory instance
 	 */
-	etl::optional<etl::reference_wrapper<Memory>> getMemoryFromId(MemoryId memId);
+	etl::optional<etl::reference_wrapper<Memory>> getMemoryFromId(MemoryId memId) {
+	if (memId < memoryVector.size()) {
+		return memoryVector[memId];
+	}
+	return etl::nullopt;
+	}
 
-	etl::vector<etl::reference_wrapper<Memory>, MaxValidMemoryIds> memoryVector;
 	/**
 	 * Validate the data according to checksum calculation
 	 */
-	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum, MemoryDataLength length);
-
+	static bool dataValidator(const uint8_t* data, MemoryManagementChecksum checksum,
+                                                   MemoryDataLength length) {
+	return (checksum == CRCHelper::calculateCRC(data, length));
+	}
 	/**
-	*
+	* Initialize vector that holds all memory instances
 	*/
 	void initializeMemoryVector();
+
+	etl::vector<etl::reference_wrapper<Memory>, MaxValidMemoryIds> memoryVector;
 };
 
 #endif // ECSS_SERVICES_MEMMANGSERVICE_HPP
