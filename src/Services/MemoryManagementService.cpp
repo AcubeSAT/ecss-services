@@ -1,6 +1,4 @@
 #include "Services/MemoryManagementService.hpp"
-#include <etl/functional.h>
-#include "Platform/x86/Helpers/TestMemory.hpp"
 
 MemoryManagementService::MemoryManagementService() : rawDataMemorySubservice(*this) {
 	serviceType = MemoryManagementService::ServiceType;
