@@ -47,7 +47,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 
 		if (!memory.isValidAddress(startAddress) ||
 		    !memory.isValidAddress(startAddress + dataLength)) {
-			ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			continue;
 		}
 
@@ -148,6 +148,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 			report.append<MemoryDataLength>(readLength);
 			report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 		} else {
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 		}
 	}
 
