@@ -544,7 +544,7 @@ TEST_CASE("Find files report TM[23,8]", "[service][st23]") {
 	CHECK(report.readByte() == 'i');
 	CHECK(report.readByte() == 'l');
 	CHECK(report.readByte() == 'e');
-	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '1');
 	CHECK(report.readByte() == '.');
 	CHECK(report.readByte() == 'p');
 	CHECK(report.readByte() == 'n');
@@ -564,7 +564,7 @@ TEST_CASE("Find files report TM[23,8]", "[service][st23]") {
 	CHECK(report.readByte() == 'i');
 	CHECK(report.readByte() == 'l');
 	CHECK(report.readByte() == 'e');
-	CHECK(report.readByte() == '1');
+	CHECK(report.readByte() == '2');
 	CHECK(report.readByte() == '.');
 	CHECK(report.readByte() == 'p');
 	CHECK(report.readByte() == 'n');
