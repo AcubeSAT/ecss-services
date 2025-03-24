@@ -431,6 +431,10 @@ public:
 		 * PMON Check Type is requested, but it is missing (ST[12])
 		 */
 		 PMONCheckTypeMissing = 63,
+		/**
+		 * Search file pattern is empty or contains illegal characters
+		 */
+		InvalidSearchPattern = 64,
 	};
 
 	/**

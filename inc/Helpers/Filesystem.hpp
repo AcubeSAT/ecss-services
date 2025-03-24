@@ -25,6 +25,14 @@ namespace Filesystem {
 	};
 
 	/**
+	 * The found files path
+	 */
+	struct FoundFiles {
+		std::vector<Path> paths;
+	};
+
+
+	/**
 	 * The type of a node in the file system
 	 */
 	enum class NodeType : uint8_t {
@@ -57,6 +65,15 @@ namespace Filesystem {
 		FileDoesNotExist = 0,
 		PathLeadsToDirectory = 1,
 		FilePermissionModificationFailed = 2,
+		UnknownError = 255
+	};
+
+	/**
+	 * Possible errors returned by the filesystem during searching for files
+	 */
+	enum class FileSearchError : uint8_t {
+		PathLeadsToDirectory = 0,
+		DirectoryDoesNotExist = 1,
 		UnknownError = 255
 	};
 
@@ -106,6 +123,13 @@ namespace Filesystem {
 	 * @return Optionally, a file deletion error. If no errors occur, returns etl::nullopt
 	 */
 	etl::optional<FileDeletionError> deleteFile(const Path& path);
+
+	/**
+	 * Finds a file using platofrm specific filesystem functions
+	 * @param path A string representing the path on the filesystem
+	 * @return Optionally, a file search error. If no errors occur, returns the found file(s) full path.
+	 */
+	etl::result<FoundFiles, FileSearchError> findFiles(const Path& path);
 
 	/**
 	 * Creates a directory using platform specific filesystem functions

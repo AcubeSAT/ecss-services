@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <system_error>
+#include <regex>
 
 /**
  * Implementation of a filesystem using C++'s standard library for x86 file access.
@@ -112,6 +113,29 @@ namespace Filesystem {
 		}
 
 		return {};
+	}
+
+	etl::result<FoundFiles, FileSearchError> findFiles(const Path& path) {
+		FoundFiles files;
+
+		const fs::path full_path(path.data());
+		const fs::path directory = full_path.parent_path();
+		const std::string pattern = full_path.filename().string();
+		const std::string regex_pattern = std::regex_replace(pattern, std::regex(R"(\*)"), ".*");
+		const std::regex file_regex(regex_pattern);
+		if (!exists(directory) || !is_directory(directory)) {
+			return FileSearchError::DirectoryDoesNotExist;
+		}
+
+		for (const auto& entry : fs::directory_iterator(directory)) {
+			if (is_regular_file(entry.path())) {
+				std::string full_file_path = entry.path().string();
+				if (const std::string filename = entry.path().filename().string(); std::regex_match(filename, file_regex)) {
+					files.paths.emplace_back(full_file_path.data());
+				}
+			}
+		}
+		return files;
 	}
 
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {

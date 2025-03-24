@@ -212,6 +212,55 @@ void FileManagementService::unlockFile(Message& message) {
 	}
 }
 
+void FileManagementService::findFiles(Message& message) {
+	if (not message.assertTC(ServiceType, FindFiles)) {
+		return;
+	}
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto searchPattern = message.readOctetString<Filesystem::ObjectPathSize>();
+	const auto fullPath = getFullPath(repositoryPath, searchPattern);
+
+	if (findWildcardPosition(getRepositoryPath(repositoryPath))) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	if (auto repositoryType = Filesystem::getNodeType(repositoryPath);
+		not repositoryType.has_value() || repositoryType.value() != Filesystem::NodeType::Directory) {
+		ErrorHandler::reportError(message,ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+		return;
+	}
+
+	if (validateSearchPattern(searchPattern)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::InvalidSearchPattern);
+	}
+
+	const auto result = Filesystem::findFiles(fullPath);
+
+	if (result.has_value()) {
+		foundFilesReport(repositoryPath, searchPattern, result.value());
+	}
+
+	if (!result.has_value()) {
+		constexpr ErrorHandler::ExecutionCompletionErrorType error =
+			ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+		ErrorHandler::reportError(message, error);
+	}
+
+}
+
+void FileManagementService::foundFilesReport(const ObjectPath& repositoryPath, const ObjectPath& searchPattern, const Filesystem::FoundFiles& foundFiles) {
+	Message report = createTM(FoundFilesReport);
+	report.appendOctetString(repositoryPath);
+	report.appendOctetString(etl::string<Filesystem::ObjectPathSize>("/"));
+	report.appendOctetString(searchPattern);
+	for (const auto& path: foundFiles.paths) {
+		report.appendOctetString(path);
+	}
+
+	storeMessage(report);
+}
+
 void FileManagementService::createDirectory(Message& message) {
 	message.assertTC(ServiceType, CreateDirectory);
 
@@ -312,6 +361,9 @@ void FileManagementService::execute(Message& message) {
 			break;
 		case UnlockFile:
 			unlockFile(message);
+			break;
+		case FindFiles:
+			findFiles(message);
 			break;
 		case CreateDirectory:
 			createDirectory(message);

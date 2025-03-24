@@ -41,8 +41,8 @@ public:
 		CreateAttributesReport = 4,
 		LockFile = 5,
 		UnlockFile = 6,
-		FindFile = 7,
-		FoundFileReport = 8,
+		FindFiles = 7,
+		FoundFilesReport = 8,
 		CreateDirectory = 9,
 		DeleteDirectory = 10,
 		RenameDirectory = 11,
@@ -101,7 +101,7 @@ public:
 	void fileAttributeReport(const Filesystem::ObjectPath& repositoryPath, const Filesystem::ObjectPath& fileName, const Filesystem::Attributes& attributes);
 
 	/**
-	 * TM[23,5] Lock a file at the provided repository path and file name.
+	 * TC[23,5] Lock a file at the provided repository path and file name.
 	 * Checks done prior to locking a file:
 	 * - The path is valid, meaning it leads to an existing file
 	 * - The repository's path and file's name do not contain a wildcard
@@ -109,12 +109,27 @@ public:
 	void lockFile(Message& message);
 
 	/**
-	 * TM[23,6] Unlock a file at the provided repository path and file name.
+	 * TC[23,6] Unlock a file at the provided repository path and file name.
 	 * Checks done prior to unlocking a file:
 	 * - The path is valid, meaning it leads to an existing file
 	 * - The repository's path and file's name do not contain a wildcard
 	 */
 	void unlockFile(Message& message);
+
+	/**
+	 * TC[23,7] Find a file at the provided repository and directory path,
+	 * that matches the provided search pattern.
+	 * Checks done prior to finding a file:
+	 * - The repository's path does not contain a wildcard
+	 * @param message
+	 */
+	void findFiles(Message& message);
+
+	/**
+	 * TM[23,8] Create a report containing the full paths of all files found by TC[23,7] find a file.
+	 * @param foundFile
+	 */
+	void foundFilesReport(const Filesystem::ObjectPath& repositoryPath, const Filesystem::ObjectPath& searchPattern,const Filesystem::FoundFiles& foundFile);
 
 	/**
      * TC[23,9] Create a directory on the filesystem
@@ -166,6 +181,14 @@ private:
 		fullPath.append("/");
 		fullPath.append(filePath);
 		return fullPath;
+	}
+
+	static Path getRepositoryPath(ObjectPath& repositoryPath) {
+		trim_from_left(repositoryPath, "/");
+		trim_from_right(repositoryPath, "/");
+		Path path = ("");
+		path.append(repositoryPath);
+		return path;
 	}
 };
 

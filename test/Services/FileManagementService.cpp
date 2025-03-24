@@ -369,8 +369,8 @@ TEST_CASE("Unlock a file TC[23,6]", "[service][st23]") {
 	fs::create_directory("st23");
 
 	SECTION("Good scenario") {
-		std::ofstream fileToLock("st23/file_to_unlock");
-		fileToLock.close();
+		std::ofstream fileToUnlock("st23/file_to_unlock");
+		fileToUnlock.close();
 		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
 		String<ECSSTCRequestStringSize> repo1 = "st23";
 		String<ECSSTCRequestStringSize> file1 = "file_to_unlock";
@@ -432,6 +432,143 @@ TEST_CASE("Unlock a file TC[23,6]", "[service][st23]") {
 		CHECK(ServiceTests::thrownError(ErrorHandler::AttemptedAccessModificationOnDirectory));
 	}
 
+	fs::remove_all("st23");
+}
+
+TEST_CASE("Find files TC[23,7]", "[service][st23]") {
+	fs::create_directory("st23");
+
+	SECTION("Good scenario") {
+		std::ofstream file1("st23/file1.txt");
+		std::ofstream file2("st23/file2.txt");
+		std::ofstream file3("st23/file3.png");
+		file1.close();
+		file2.close();
+		file3.close();
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFiles, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> searchPattern = "*file*";
+		message.appendOctetString(repo);
+		message.appendOctetString(searchPattern);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 0);
+	}
+
+	SECTION("Repository name has a wildcard") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFiles, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "test1*";
+		String<ECSSTCRequestStringSize> searchPattern = "*file*";
+		message.appendOctetString(repo);
+		message.appendOctetString(searchPattern);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("Repository path is invalid") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFiles, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "directory";
+		String<ECSSTCRequestStringSize> searchPattern = "*file*";
+		message.appendOctetString(repo);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid));
+	}
+
+	SECTION("Search pattern is invalid") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFiles, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> searchPattern = "^file/?";
+		message.appendOctetString(repo);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InvalidSearchPattern));
+	}
+
+	fs::remove_all("st23");
+}
+
+TEST_CASE("Find files report TM[23,8]", "[service][st23]") {
+	fs::create_directory("st23");
+	std::ofstream file1("st23/testfile1.png");
+	std::ofstream file2("st23/testfile2.png");
+	file1.close();
+	file2.close();
+
+	Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFiles, Message::TC, 0);
+	String<ECSSTCRequestStringSize> repo = "st23";
+	String<ECSSTCRequestStringSize> searchPattern = "test*.png";
+	message.appendOctetString(repo);
+	message.appendOctetString(searchPattern);
+
+	MessageParser::execute(message);
+	CHECK(ServiceTests::countErrors() == 0);
+	REQUIRE(ServiceTests::hasOneMessage());
+
+	// Checking the contents of the report
+	Message report = ServiceTests::get(0);
+	//repository path and search pattern
+	CHECK(report.readUint16() == 4);
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '3');
+	CHECK(report.readUint16() == 1);
+	CHECK(report.readByte() == '/');
+	CHECK(report.readUint16() == 9);
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == '*');
+	CHECK(report.readByte() == '.');
+	CHECK(report.readByte() == 'p');
+	CHECK(report.readByte() == 'n');
+	CHECK(report.readByte() == 'g');
+	//file1
+	CHECK(report.readUint16() == 18);
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '3');
+	CHECK(report.readByte() == '/');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'f');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'l');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '.');
+	CHECK(report.readByte() == 'p');
+	CHECK(report.readByte() == 'n');
+	CHECK(report.readByte() == 'g');
+	//file 2
+	CHECK(report.readUint16() == 18);
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '3');
+	CHECK(report.readByte() == '/');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'f');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'l');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == '1');
+	CHECK(report.readByte() == '.');
+	CHECK(report.readByte() == 'p');
+	CHECK(report.readByte() == 'n');
+	CHECK(report.readByte() == 'g');
 	fs::remove_all("st23");
 }
 
