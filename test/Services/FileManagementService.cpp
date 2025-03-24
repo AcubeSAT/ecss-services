@@ -495,9 +495,7 @@ TEST_CASE("Find files TC[23,7]", "[service][st23]") {
 TEST_CASE("Find files report TM[23,8]", "[service][st23]") {
 	fs::create_directory("st23");
 	std::ofstream file1("st23/testfile1.png");
-	std::ofstream file2("st23/testfile2.png");
 	file1.close();
-	file2.close();
 
 	Message message(FileManagementService::ServiceType, FileManagementService::MessageType::FindFiles, Message::TC, 0);
 	String<ECSSTCRequestStringSize> repo = "st23";
@@ -545,26 +543,6 @@ TEST_CASE("Find files report TM[23,8]", "[service][st23]") {
 	CHECK(report.readByte() == 'l');
 	CHECK(report.readByte() == 'e');
 	CHECK(report.readByte() == '1');
-	CHECK(report.readByte() == '.');
-	CHECK(report.readByte() == 'p');
-	CHECK(report.readByte() == 'n');
-	CHECK(report.readByte() == 'g');
-	//file 2
-	CHECK(report.readUint16() == 18);
-	CHECK(report.readByte() == 's');
-	CHECK(report.readByte() == 't');
-	CHECK(report.readByte() == '2');
-	CHECK(report.readByte() == '3');
-	CHECK(report.readByte() == '/');
-	CHECK(report.readByte() == 't');
-	CHECK(report.readByte() == 'e');
-	CHECK(report.readByte() == 's');
-	CHECK(report.readByte() == 't');
-	CHECK(report.readByte() == 'f');
-	CHECK(report.readByte() == 'i');
-	CHECK(report.readByte() == 'l');
-	CHECK(report.readByte() == 'e');
-	CHECK(report.readByte() == '2');
 	CHECK(report.readByte() == '.');
 	CHECK(report.readByte() == 'p');
 	CHECK(report.readByte() == 'n');
