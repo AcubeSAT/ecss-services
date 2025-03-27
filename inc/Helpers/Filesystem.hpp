@@ -31,7 +31,6 @@ namespace Filesystem {
 		std::vector<Path> paths;
 	};
 
-
 	/**
 	 * The type of a node in the file system
 	 */

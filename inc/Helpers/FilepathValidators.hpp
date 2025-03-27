@@ -21,9 +21,10 @@ namespace FilepathValidators {
 	etl::optional<size_t> findWildcardPosition(const Filesystem::Path& path);
 
 	/**
-	 * 
-	 * @param pattern 
-	 * @return 
-	 */
-	etl::optional<FilePatternError> validateSearchPattern(const etl::string<Filesystem::ObjectPathSize>& pattern);
+		 * Validates the input search pattern. If the pattern is empty, or contains illegal characters an
+		 * appropriate error is returned.
+		 * @param pattern the pattern to validate.
+		 * @return an error if the pattern is invalid, nothing otherwise.
+		 */
+	etl::expected<void, FilePatternError> validateSearchPattern(const etl::string<Filesystem::ObjectPathSize>& pattern);
 } //namespace FilepathValidators

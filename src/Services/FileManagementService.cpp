@@ -231,7 +231,7 @@ void FileManagementService::findFiles(Message& message) {
 		return;
 	}
 
-	if (validateSearchPattern(searchPattern)) {
+	if (not validateSearchPattern(searchPattern).has_value()) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::InvalidSearchPattern);
 	}
 

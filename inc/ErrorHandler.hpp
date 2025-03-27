@@ -434,7 +434,7 @@ public:
 		/**
 		 * Search file pattern is empty or contains illegal characters
 		 */
-		InvalidSearchPattern = 64,
+		InvalidSearchPattern = 64
 	};
 
 	/**
