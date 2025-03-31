@@ -3,8 +3,6 @@
 #include <cstdint>
 #include <etl/optional.h>
 #include "Services/FileManagementService.hpp"
-#include "etl/String.hpp"
-#include <regex>
 
 namespace FilepathValidators {
 
