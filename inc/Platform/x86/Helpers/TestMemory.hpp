@@ -4,6 +4,9 @@
 #include "Helpers/Memory/Memory.hpp"
 #include <etl/span.h>
 
+/**
+* Acts as a type of memory for testing purposes
+*/
 class TestMemory : public Memory {
 	public:
 	    ReadData readData(std::uintptr_t address, std::uintptr_t offset) const override;
@@ -12,6 +15,11 @@ class TestMemory : public Memory {
 
 	    constexpr TestMemory() noexcept : Memory(0, DUMMY_SIZE), dummyArray{} {}
 
+	    /**
+		* Method to access the private dummy array safely
+		*
+		* @return etl::span "view" of dummy array
+		*/
 	    etl::span<uint8_t> getDummyArea() { return etl::span<uint8_t>(dummyArray); }
 
 	private:
