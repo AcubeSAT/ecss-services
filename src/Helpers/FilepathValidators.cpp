@@ -18,11 +18,15 @@ namespace FilepathValidators {
 
 		constexpr std::array<char, 8> ILLEGAL_CHARS = {'<', '>', ':', '"', '/', '\\', '|', '?'};
 
+		auto isIllegalCharacter = [&ILLEGAL_CHARS](char c) {
+			return std::any_of(ILLEGAL_CHARS.begin(), ILLEGAL_CHARS.end(), [c](const char illegal) {
+				return c == illegal;
+			});
+		};
+
 		for (const char c : pattern) {
-			for (const char illegal : ILLEGAL_CHARS) {
-				if (c == illegal) {
-					return etl::unexpected(FilePatternError::IllegalCharacter);
-				}
+			if (isIllegalCharacter(c)) {
+				return etl::unexpected(FilePatternError::IllegalCharacter);
 			}
 		}
 
