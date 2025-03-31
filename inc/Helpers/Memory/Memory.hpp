@@ -51,7 +51,7 @@ public:
 	 *
 	 * Initializes the lower and upper limits of the address range of a memory instance.
 	 */
-	constexpr Memory(AddressLimit lowerLimit, AddressLimit upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
+	constexpr Memory(MemoryAddress lowerLimit, MemoryAddress upperLimit) : lowerLimit(lowerLimit), upperLimit(upperLimit) {}
 
 	/**
 	 * Default virtual destructor.
@@ -59,8 +59,8 @@ public:
 	virtual ~Memory() = default;
 
 private:
-	AddressLimit lowerLimit;
-	AddressLimit upperLimit;
+	MemoryAddress lowerLimit;
+	MemoryAddress upperLimit;
 };
 
 #endif //MEMORY_HPP

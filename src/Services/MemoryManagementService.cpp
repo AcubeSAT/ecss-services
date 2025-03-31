@@ -36,7 +36,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 	uint16_t const iterationCount = request.readUint16();
 
 	for (std::size_t j = 0; j < iterationCount; j++) {
-		const StartAddress startAddress = request.read<StartAddress>();
+		const MemoryAddress memoryAddress = request.read<MemoryAddress>();
 		const MemoryDataLength dataLength = request.readOctetString(readData.data()); // NOLINT(cppcoreguidelines-init-variables)
 		const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
 
@@ -45,18 +45,18 @@ void MemoryManagementService::loadRawData(Message& request) {
 			continue;
 		}
 
-		if (!memory.isValidAddress(startAddress) ||
-		    !memory.isValidAddress(startAddress + dataLength)) {
+		if (!memory.isValidAddress(memoryAddress) ||
+		    !memory.isValidAddress(memoryAddress + dataLength)) {
 			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			continue;
 		}
 
 		for (std::size_t i = 0; i < dataLength; i++) {
-			memory.writeData(startAddress, i, readData[i]);
+			memory.writeData(memoryAddress, i, readData[i]);
 		}
 
 		for (std::size_t i = 0; i < dataLength; i++) {
-			readData[i] = memory.readData(startAddress, i);
+			readData[i] = memory.readData(memoryAddress, i);
 		}
 
 		if (checksum != CRCHelper::calculateCRC(readData.data(), dataLength)) {
@@ -90,16 +90,16 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 	report.appendUint16(iterationCount);
 
 	for (std::size_t j = 0; j < iterationCount; j++) {
-		const StartAddress startAddress = request.read<StartAddress>();
+		const MemoryAddress memoryAddress = request.read<MemoryAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (memory.isValidAddress(startAddress) &&
-		    memory.isValidAddress(startAddress + readLength)) {
+		if (memory.isValidAddress(memoryAddress) &&
+		    memory.isValidAddress(memoryAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
-				readData[i] = memory.readData(startAddress, i);
+				readData[i] = memory.readData(memoryAddress, i);
 			}
 
-			report.append<StartAddress>(startAddress);
+			report.append<MemoryAddress>(memoryAddress);
 			report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
 			report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 		} else {
@@ -135,16 +135,16 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 	report.appendUint16(iterationCount);
 
 	for (std::size_t j = 0; j < iterationCount; j++) {
-		const StartAddress startAddress = request.read<StartAddress>();
+		const MemoryAddress memoryAddress = request.read<MemoryAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (memory.isValidAddress(startAddress) &&
-		    memory.isValidAddress(startAddress + readLength)) {
+		if (memory.isValidAddress(memoryAddress) &&
+		    memory.isValidAddress(memoryAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
-				readData[i] = memory.readData(startAddress, i);
+				readData[i] = memory.readData(memoryAddress, i);
 			}
 
-			report.append<StartAddress>(startAddress);
+			report.append<MemoryAddress>(memoryAddress);
 			report.append<MemoryDataLength>(readLength);
 			report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 		} else {

@@ -87,13 +87,13 @@ int main() {
 	                          MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
 	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(3);                                               // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(string));  // Start address
+	rcvPack.append<MemoryAddress>(reinterpret_cast<MemoryAddress>(string));  // Start address
 	rcvPack.append<MemoryDataLength>(sizeof(string) / sizeof(string[0]));  // Data read length
 
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(anotherStr));
+	rcvPack.append<MemoryAddress>(reinterpret_cast<MemoryAddress>(anotherStr));
 	rcvPack.append<MemoryDataLength>(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(yetAnotherStr));
+	rcvPack.append<MemoryAddress>(reinterpret_cast<MemoryAddress>(yetAnotherStr));
 	rcvPack.append<MemoryDataLength>(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
@@ -103,10 +103,10 @@ int main() {
 	uint8_t data[2] = {'h', 'R'};
 	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(2);                                               // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));    // Start address
+	rcvPack.append<MemoryAddress>(reinterpret_cast<MemoryAddress>(pStr));    // Start address
 	rcvPack.appendOctetString(String<2>(data, 2));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2));               // Append the CRC value
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr + 1)); // Start address
+	rcvPack.append<MemoryAddress>(reinterpret_cast<MemoryAddress>(pStr + 1)); // Start address
 	rcvPack.appendOctetString(String<1>(data, 1));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.loadRawData(rcvPack);
@@ -116,9 +116,9 @@ int main() {
 
 	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(2);                                               // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data));    // Start address
+	rcvPack.append<MemoryAddress>(reinterpret_cast<MemoryAddress>(data));    // Start address
 	rcvPack.append<MemoryDataLength>(2);
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data + 1)); // Start address
+	rcvPack.append<MemoryAddress>(reinterpret_cast<MemoryAddress>(data + 1)); // Start address
 	rcvPack.append<MemoryDataLength>(1);
 	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
