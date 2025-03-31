@@ -15,9 +15,10 @@ namespace FilepathValidators {
 		if (pattern.empty()) {
 			return etl::unexpected(FilePatternError::EmptyPattern);
 		}
+		constexpr std::array<char, 8> ILLEGAL_CHARS = {'<', '>', ':', '"', '/', '\\', '|', '?'};
 
-		if (constexpr char ILLEGAL_CHARS[] = "<>:\"/\\|?";
-			pattern.find_first_of(ILLEGAL_CHARS) != etl::string<Filesystem::ObjectPathSize>::npos) {
+		// Use find_first_of() with a cast to const char*
+		if (pattern.find_first_of(ILLEGAL_CHARS.data()) != etl::string<Filesystem::ObjectPathSize>::npos) {
 			return etl::unexpected(FilePatternError::IllegalCharacter);
 		}
 
