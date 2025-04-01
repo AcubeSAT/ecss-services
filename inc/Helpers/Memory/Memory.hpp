@@ -22,7 +22,7 @@ public:
 	 * @param offset Offset to base address to read from.
 	 * @return Data it found at specified address in the form of ReadData.
 	*/
-	virtual ReadData readData(std::uintptr_t address, std::uintptr_t offset) const = 0;
+	virtual ReadData readData(MemoryAddress address, MemoryAddress offset) const = 0;
 
 	/**
 	 * Pure virtual writeData method.
@@ -34,7 +34,7 @@ public:
 	 * @param offset Offset to base address to read from.
 	 * @param data Data to write at specified address.
 	 */
-	virtual void writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data) = 0;
+	virtual void writeData(MemoryAddress address, MemoryAddress offset, ReadData data) = 0;
 
 	/**
 	 * Virtual isValidAddress method.
@@ -44,7 +44,7 @@ public:
 	 * @param address Address to check for validity.
 	 * @return true if address is valid else false.
 	 */
-	virtual bool isValidAddress(std::uintptr_t address) const { return lowerLimit <= address && upperLimit >= address; }
+	virtual bool isValidAddress(MemoryAddress address) const { return lowerLimit <= address && upperLimit >= address; }
 
 	/**
 	 * Constexpr constructor.

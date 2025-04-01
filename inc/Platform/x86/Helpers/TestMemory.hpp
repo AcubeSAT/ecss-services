@@ -9,9 +9,9 @@
 */
 class TestMemory : public Memory {
 	public:
-	    ReadData readData(std::uintptr_t address, std::uintptr_t offset) const override;
+	    ReadData readData(MemoryAddress address, MemoryAddress offset) const override;
 
-		void writeData(std::uintptr_t address, std::uintptr_t offset, ReadData data) override;
+		void writeData(MemoryAddress address, MemoryAddress offset, ReadData data) override;
 
 	    constexpr TestMemory() noexcept : Memory(0, DUMMY_SIZE), dummyArray{} {}
 
