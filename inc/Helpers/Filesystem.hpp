@@ -77,6 +77,12 @@ namespace Filesystem {
 		UnknownError = 255
 	};
 
+	enum class DirectoryRenameError : uint8_t {
+		DirectoryDoesNotExist = 0,
+		DirectoryContainsLockedFile = 1,
+		UnknownError = 255
+	};
+
 	/**
 	 * The current file lock status
 	 */
@@ -120,6 +126,14 @@ namespace Filesystem {
 	 * @return Optionally, a directory deletion error. If no errors occur, returns etl::nullopt
 	 */
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
+
+	/**
+	 * Renames a directory using platform specific filesystem functions
+	 * @param oldPath A String representing the path on the filesystem
+	 * @param newDirectoryName A String representing the new name of the directory
+	 * @return Optionally, a directory rename error.
+	 */
+	etl::expected<void, DirectoryRenameError> renameDirectory(const Path& oldPath, const Path& newDirectoryName);
 
 	/**
 	 * Gets the file metadata

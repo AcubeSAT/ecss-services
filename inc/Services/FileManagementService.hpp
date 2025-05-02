@@ -127,6 +127,11 @@ public:
 	void deleteDirectory(Message& message);
 
 	/**
+	 * TC[23,11] Rename a directory
+	 */
+	void renameDirectory(Message& message);
+
+	/**
 	 * Ask the FS for the available unallocated memory and return it.
 	 * 
 	 * @return uint32_t The bytes of available unallocated memory 

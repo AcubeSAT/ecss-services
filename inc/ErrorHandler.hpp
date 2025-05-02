@@ -495,6 +495,10 @@ public:
 		 * A lock/unlock file command was requested on a directory
 		 */
 		AttemptedAccessModificationOnDirectory = 11,
+		/**
+		 * A delete directory command was requested on a directory that contains a locked file
+		 */
+		AttemptedRenameOnDirectoryThatContainsLockedFile = 12
 	};
 
 	/**

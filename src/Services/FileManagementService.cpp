@@ -292,6 +292,51 @@ void FileManagementService::deleteDirectory(Message& message) {
 	}
 }
 
+void FileManagementService::renameDirectory(Message& message) {
+	message.assertTC(ServiceType, RenameDirectory);
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto oldDirectoryName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto oldFullPath = getFullPath(repositoryPath, oldDirectoryName);
+	auto newDirectoryName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto newFullPath = getFullPath(repositoryPath, newDirectoryName);
+
+	if (findWildcardPosition(oldFullPath) || findWildcardPosition(newFullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	auto repositoryType = Filesystem::getNodeType(repositoryPath);
+	if (not repositoryType) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+		return;
+	}
+
+	if (repositoryType.value() != Filesystem::NodeType::Directory) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::RepositoryPathLeadsToFile);
+		return;
+	}
+
+	if (auto result = Filesystem::renameDirectory(oldFullPath, newDirectoryName.data()); !result.has_value()) {
+		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
+		switch (result.error()) {
+			case Filesystem::DirectoryRenameError::DirectoryDoesNotExist: {
+				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
+				break;
+			}
+			case Filesystem::DirectoryRenameError::DirectoryContainsLockedFile: {
+				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedRenameOnDirectoryThatContainsLockedFile;
+				break;
+			}
+			default: {
+				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+				break;
+			}
+		}
+		ErrorHandler::reportError(message, error);
+	}
+}
+
 uint32_t FileManagementService::getUnallocatedMemory() {
 	return Filesystem::getUnallocatedMemory();
 }
@@ -318,6 +363,9 @@ void FileManagementService::execute(Message& message) {
 			break;
 		case DeleteDirectory:
 			deleteDirectory(message);
+			break;
+		case RenameDirectory:
+			renameDirectory(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);

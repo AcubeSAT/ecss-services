@@ -161,6 +161,34 @@ namespace Filesystem {
 		}
 	}
 
+	etl::expected<void,DirectoryRenameError> renameDirectory(const Path& oldPath, const Path& newDirectoryName) {
+		if (const etl::optional<NodeType> nodeType = getNodeType(oldPath); not nodeType) {
+			return etl::unexpected(DirectoryRenameError::DirectoryDoesNotExist);
+		}
+
+		if (not fs::is_empty(oldPath.data())) {
+			for (const auto& entry: fs::recursive_directory_iterator(oldPath.data())) {
+				Path filePath = ("");
+				filePath.append(entry.path().string().c_str());
+				if (auto nodeType = getNodeType(filePath); nodeType && nodeType.value() == NodeType::File) {
+					if (FileLockStatus::Locked == getFileLockStatus(filePath)) {
+						return etl::unexpected(DirectoryRenameError::DirectoryContainsLockedFile);
+					}
+				}
+			}
+		}
+
+		const fs::path oldFullPath = oldPath.data();
+		const fs::path newFullPath = oldFullPath.parent_path() / newDirectoryName.data();
+		try {
+			fs::rename(oldFullPath, newFullPath);
+		} catch ([[maybe_unused]] const fs::filesystem_error& e) {
+			return etl::unexpected(DirectoryRenameError::UnknownError);
+		}
+
+		return {};
+	}
+
 	uint32_t getUnallocatedMemory() {
 		// Dummy value for use during testing
 		return 42U;

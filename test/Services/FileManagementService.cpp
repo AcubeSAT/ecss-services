@@ -597,6 +597,118 @@ TEST_CASE("Delete a directory TC[23,10]", "[service][st23]") {
 	fs::remove_all("st23");
 }
 
+TEST_CASE("Rename a directory TC[23,11], [service][st23]") {
+	fs::create_directories("st23/directory_to_rename");
+
+	SECTION("Good scenario") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::RenameDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> directory = "directory_to_rename";
+		String<ECSSTCRequestStringSize> newDirectoryName = "newDirectory";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+		message.appendOctetString(newDirectoryName);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 0);
+		CHECK(fs::exists("st23/directory_to_rename") == false);
+		CHECK(fs::exists("st23/newDirectory") == true);
+	}
+
+	SECTION("Directory does not exist") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::RenameDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> directory = "directory_to_rename_1";
+		String<ECSSTCRequestStringSize> newDirectoryName = "newDirectory";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+		message.appendOctetString(newDirectoryName);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ObjectDoesNotExist));
+	}
+
+	SECTION("Repository name has a wildcard") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::RenameDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "test1*";
+		String<ECSSTCRequestStringSize> directory = "test2";
+		String<ECSSTCRequestStringSize> newDirectoryName = "newDirectory";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+		message.appendOctetString(newDirectoryName);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("Old directory name has a wildcard") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::RenameDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "test1";
+		String<ECSSTCRequestStringSize> directory = "test2*";
+		String<ECSSTCRequestStringSize> newDirectoryName = "newDirectory";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+		message.appendOctetString(newDirectoryName);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("New directory name has a wildcard") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::RenameDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "test1";
+		String<ECSSTCRequestStringSize> directory = "test2";
+		String<ECSSTCRequestStringSize> newDirectoryName = "newDirect*ry";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+		message.appendOctetString(newDirectoryName);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	SECTION("Object's repository is a file, so it cannot be renamed with this TC") {
+		std::ofstream fileAsRepository("st23/file");
+		fileAsRepository.close();
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::RenameDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "st23/file";
+		String<ECSSTCRequestStringSize> directory = "test4";
+		String<ECSSTCRequestStringSize> newDirectoryName = "newDirectory";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+		message.appendOctetString(newDirectoryName);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::RepositoryPathLeadsToFile));
+	}
+
+	SECTION("Repository contains locked file") {
+		std::ofstream fileAsRepository("st23/directory_to_rename/file");
+		fileAsRepository.close();
+		fs::perms permissions = fs::status("st23/directory_to_rename/file").permissions();
+		auto newPermissions = permissions & ~fs::perms::owner_write;
+		std::error_code ec;
+		fs::permissions("st23/directory_to_rename/file", newPermissions, ec);
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::RenameDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> directory = "directory_to_rename";
+		String<ECSSTCRequestStringSize> newDirectoryName = "newDirectoryName";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::AttemptedRenameOnDirectoryThatContainsLockedFile));
+	}
+
+	fs::remove_all("st23");
+}
+
 TEST_CASE("Observe available unallocated memory 6.23.4.7", "[service][st23]") {
 	uint32_t freeMemory = Services.fileManagement.getUnallocatedMemory();
 	CHECK(freeMemory == 42);
