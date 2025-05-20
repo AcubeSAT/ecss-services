@@ -8,6 +8,7 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 }
 
 Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::DefaultCUC currentTime) {
+
 	if (currentTime >= scheduledActivities.front().requestReleaseTime && !scheduledActivities.empty()) {
 		if (scheduledActivities.front().requestID.applicationID == ApplicationId) {
 			MessageParser::execute(scheduledActivities.front().request);
