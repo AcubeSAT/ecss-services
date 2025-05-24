@@ -71,7 +71,13 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	Message response = ServiceTests::get(0);
 	CHECK(response.serviceType == MemoryManagementService::ServiceType);
 	CHECK(response.messageType == MemoryManagementService::MessageType::DumpRawMemoryDataReport);
-	REQUIRE(response.dataSize == 55);
+	REQUIRE(response.dataSize ==
+	        sizeof(MemoryId) +
+	        sizeof(uint16_t) + // iteration count size
+			(sizeof(MemoryAddress) + sizeof(testString_1)/sizeof(testString_1[0]) + sizeof(uint16_t) + sizeof(uint16_t)) + // iteration 1
+			(sizeof(MemoryAddress) + sizeof(testString_2)/sizeof(testString_2[0]) + sizeof(uint16_t) + sizeof(uint16_t)) + // iteration 2
+			(sizeof(MemoryAddress) + sizeof(testString_3)/sizeof(testString_3[0]) + sizeof(uint16_t) + sizeof(uint16_t)) // iteration 3
+	        );
 
 	CHECK(response.read<MemoryId>() == TEST_MEMORY);
 	CHECK(response.readUint16() == 3);
@@ -136,7 +142,11 @@ TEST_CASE("TC[6,9]", "[service][st06]") {
 	Message response = ServiceTests::get(0);
 	CHECK(response.serviceType == MemoryManagementService::ServiceType);
 	CHECK(response.messageType == MemoryManagementService::MessageType::CheckRawMemoryDataReport);
-	REQUIRE(response.dataSize == 27);
+	REQUIRE(response.dataSize ==
+	        sizeof(MemoryId) +
+	        sizeof(uint16_t) + // iteration count size
+	        2 * (sizeof(MemoryAddress) + sizeof(uint16_t) + sizeof(uint16_t)) // two iterations
+	        );
 
 	CHECK(response.read<MemoryId>() == TEST_MEMORY);
 	CHECK(response.readUint16() == 2);
