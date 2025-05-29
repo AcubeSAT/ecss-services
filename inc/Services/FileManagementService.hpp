@@ -127,6 +127,17 @@ public:
 	void deleteDirectory(Message& message);
 
 	/**
+	 * TC[23,12] Summary-report the content of a repository/directory.
+	 * Only reports direct children.
+	 */
+	void reportSummaryDirectory(Message& message);
+
+	/**
+	 * TM[23,13] Create a report with the content of a repository/directory
+	 */
+	void summaryDirectoryReport(const Filesystem::DirectoryContentSummary& summary);
+
+	/**
 	 * Ask the FS for the available unallocated memory and return it.
 	 * 
 	 * @return uint32_t The bytes of available unallocated memory 

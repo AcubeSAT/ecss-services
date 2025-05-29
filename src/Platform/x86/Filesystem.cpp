@@ -1,6 +1,7 @@
 #include "Helpers/Filesystem.hpp"
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <system_error>
 
 /**
@@ -159,6 +160,40 @@ namespace Filesystem {
 		} else {
 			return DirectoryDeletionError::UnknownError;
 		}
+	}
+
+	etl::expected<DirectoryContentSummary, ReportDirectorySummaryError> reportDirectorySummary(const Path& path) {
+		DirectoryContentSummary contentSummary;
+
+		etl::optional<NodeType> nodeType = getNodeType(path);
+		if (not nodeType) {
+			return etl::unexpected(ReportDirectorySummaryError::DirectoryDoesNotExist);
+		}
+
+		if (nodeType.value() == NodeType::File) {
+			return etl::unexpected(ReportDirectorySummaryError::PathLeadsToFile);
+		}
+
+		const fs::path dir(path.c_str());
+
+		try {
+			for (const auto& entry : fs::directory_iterator(dir)) {
+				DirectoryContentSummaryNotification notification {
+					path.data(),
+					NodeType::File,
+					entry.path().filename().string().data()
+				};
+				if (fs::is_directory(entry.status())) {
+					notification.nodeType = NodeType::Directory;
+				}
+
+				contentSummary.notifications.push_back(notification);
+			}
+		} catch ([[maybe_unused]] const fs::filesystem_error& e) {
+			return etl::unexpected(ReportDirectorySummaryError::UnknownError);
+		}
+
+		return contentSummary;
 	}
 
 	uint32_t getUnallocatedMemory() {

@@ -1,11 +1,15 @@
 #pragma once
 
 #include "ECSS_Definitions.hpp"
+#include "Filesystem.hpp"
+
+#include <utility>
 #include "etl/String.hpp"
 #include "etl/expected.h"
 #include "etl/result.h"
 
 namespace Filesystem {
+	enum class NodeType : uint8_t;
 	constexpr size_t FullPathSize = ECSSMaxStringSize;
 	using Path = String<FullPathSize>;
 
@@ -23,6 +27,23 @@ namespace Filesystem {
 		size_t sizeInBytes;
 		bool isLocked;
 	};
+
+	struct DirectoryContentSummaryNotification {
+		Path directoryPath;
+		NodeType nodeType{};
+		Path objectName;
+
+		DirectoryContentSummaryNotification(Path  dir, const NodeType type, Path  name)
+		: directoryPath(std::move(dir)), nodeType(type), objectName(std::move(name)) {}
+	};
+
+	/**
+	 * The repository content summary notification
+	 */
+	struct DirectoryContentSummary {
+		std::vector<DirectoryContentSummaryNotification> notifications;
+	};
+
 
 	/**
 	 * The type of a node in the file system
@@ -77,6 +98,12 @@ namespace Filesystem {
 		UnknownError = 255
 	};
 
+	enum class ReportDirectorySummaryError : uint8_t {
+		DirectoryDoesNotExist = 0,
+		PathLeadsToFile = 1,
+		UnknownError = 255
+	};
+
 	/**
 	 * The current file lock status
 	 */
@@ -120,6 +147,13 @@ namespace Filesystem {
 	 * @return Optionally, a directory deletion error. If no errors occur, returns etl::nullopt
 	 */
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
+
+	/**
+	 * Generates a directory content summary containing the directory path, and for each object
+	 * found, the object name, and type (file, directory).
+	 * @param path A String representing the path on the filesystem
+	 */
+	etl::expected<DirectoryContentSummary, ReportDirectorySummaryError> reportDirectorySummary(const Path& path);
 
 	/**
 	 * Gets the file metadata

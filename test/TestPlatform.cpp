@@ -225,6 +225,10 @@ etl::optional<Filesystem::DirectoryDeletionError> deleteDirectory(const Filesyst
 	return Filesystem::deleteDirectory(path);
 }
 
+etl::expected<Filesystem::DirectoryContentSummary, Filesystem::ReportDirectorySummaryError> reportDirectorySummary(const Filesystem::Path& path) {
+	return Filesystem::reportDirectorySummary(path);
+}
+
 uint32_t getUnallocatedMemory() {
 	return Filesystem::getUnallocatedMemory();
 }

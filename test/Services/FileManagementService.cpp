@@ -597,6 +597,168 @@ TEST_CASE("Delete a directory TC[23,10]", "[service][st23]") {
 	fs::remove_all("st23");
 }
 
+TEST_CASE("Summary-report the content of a repository TC[23,12]", "[service][st23]") {
+	fs::create_directories("st23/directory");
+
+	SECTION("Good scenario") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportSummaryDirectory, Message::TC, 0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> directory = "directory";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 0);
+	}
+
+	SECTION("Directory is invalid") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportSummaryDirectory, Message::TC,0);
+		String<ECSSTCRequestStringSize> repo = "a-3412--a";
+		String<ECSSTCRequestStringSize> directory = "test2*";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid));
+	}
+
+	SECTION("Directory does not exist") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportSummaryDirectory, Message::TC,0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> directory = "test";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ObjectDoesNotExist));
+	}
+
+	SECTION("Path leads to file") {
+		std::ofstream file("st23/file");
+		file.close();
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportSummaryDirectory, Message::TC,0);
+		String<ECSSTCRequestStringSize> repo = "st23";
+		String<ECSSTCRequestStringSize> directory = "file";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::AttemptedContentSummaryReportOnFile));
+	}
+
+	SECTION("Directory name has a wildcard") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportSummaryDirectory, Message::TC,0);
+		String<1024> repo = "st23";
+		String<1024> directory = "test2*";
+		message.appendOctetString(repo);
+		message.appendOctetString(directory);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::UnexpectedWildcard));
+	}
+
+	fs::remove_all("st23");
+}
+
+TEST_CASE("Directory summary report TM[23,13]", "[service][st23]") {
+	fs::create_directories("st23/directory/directory2");
+	std::ofstream file1("st23/directory/file1");
+	file1.close();
+	std::ofstream file2("st23/directory/file2");
+	file2.close();
+
+	Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ReportSummaryDirectory,Message::TC, 0);
+	String<ECSSTCRequestStringSize> repo = "st23";
+	String<ECSSTCRequestStringSize> directory = "directory";
+	message.appendOctetString(repo);
+	message.appendOctetString(directory);
+
+	MessageParser::execute(message);
+	CHECK(ServiceTests::countErrors() == 0);
+	REQUIRE(ServiceTests::hasOneMessage());
+
+	// Checking the contents of the report
+	Message report = ServiceTests::get(0);
+
+	CHECK(report.readUint16() == 14);
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '3');
+	CHECK(report.readByte() == '/');
+	CHECK(report.readByte() == 'd');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == 'c');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'o');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'y');
+	CHECK(report.readUint8() == 0);
+	CHECK(report.readUint16() == 10);
+	CHECK(report.readByte() == 'd');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == 'c');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'o');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'y');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readUint16() == 14);
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '3');
+	CHECK(report.readByte() == '/');
+	CHECK(report.readByte() == 'd');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == 'c');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'o');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'y');
+	CHECK(report.readUint8() == 1);
+	CHECK(report.readUint16() == 5);
+	CHECK(report.readByte() == 'f');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'l');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readUint16() == 14);
+	CHECK(report.readByte() == 's');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == '2');
+	CHECK(report.readByte() == '3');
+	CHECK(report.readByte() == '/');
+	CHECK(report.readByte() == 'd');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == 'c');
+	CHECK(report.readByte() == 't');
+	CHECK(report.readByte() == 'o');
+	CHECK(report.readByte() == 'r');
+	CHECK(report.readByte() == 'y');
+	CHECK(report.readUint8() == 1);
+	CHECK(report.readUint16() == 5);
+	CHECK(report.readByte() == 'f');
+	CHECK(report.readByte() == 'i');
+	CHECK(report.readByte() == 'l');
+	CHECK(report.readByte() == 'e');
+	CHECK(report.readByte() == '1');
+
+	fs::remove_all("st23");
+}
+
 TEST_CASE("Observe available unallocated memory 6.23.4.7", "[service][st23]") {
 	uint32_t freeMemory = Services.fileManagement.getUnallocatedMemory();
 	CHECK(freeMemory == 42);

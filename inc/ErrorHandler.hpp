@@ -495,6 +495,10 @@ public:
 		 * A lock/unlock file command was requested on a directory
 		 */
 		AttemptedAccessModificationOnDirectory = 11,
+		/**
+		 * A content summary report was requested on a file
+		 */
+		AttemptedContentSummaryReportOnFile = 12,
 	};
 
 	/**

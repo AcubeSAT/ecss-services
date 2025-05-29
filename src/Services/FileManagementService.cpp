@@ -292,6 +292,62 @@ void FileManagementService::deleteDirectory(Message& message) {
 	}
 }
 
+void FileManagementService::reportSummaryDirectory(Message& message) {
+	if (not message.assertTC(ServiceType, ReportSummaryDirectory)) {
+		return;
+	}
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto directoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	const auto fullPath = getFullPath(repositoryPath, directoryPath);
+
+	if (const auto repositoryType = Filesystem::getNodeType(repositoryPath); not repositoryType) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+		return;
+	}
+
+	if (findWildcardPosition(fullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	etl::expected<Filesystem::DirectoryContentSummary, Filesystem::ReportDirectorySummaryError> result = Filesystem::reportDirectorySummary(fullPath);
+	if (!result.has_value()) {
+		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
+		switch (result.error()) {
+			case Filesystem::ReportDirectorySummaryError::DirectoryDoesNotExist: {
+				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
+				break;
+			}
+			case Filesystem::ReportDirectorySummaryError::PathLeadsToFile: {
+				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedContentSummaryReportOnFile;
+				break;
+			}
+			default: {
+				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+				break;
+			}
+		}
+		ErrorHandler::reportError(message, error);
+		return;
+	}
+	summaryDirectoryReport(result.value());
+
+}
+
+void FileManagementService::summaryDirectoryReport(const Filesystem::DirectoryContentSummary& summary) {
+	Message report = createTM(SummaryDirectoryReport);
+
+	for (const auto& notification: summary.notifications) {
+		report.appendOctetString(notification.directoryPath);
+		report.appendUint8(static_cast<uint8_t>(notification.nodeType));
+		report.appendOctetString(notification.objectName);
+	}
+
+	storeMessage(report);
+}
+
+
 uint32_t FileManagementService::getUnallocatedMemory() {
 	return Filesystem::getUnallocatedMemory();
 }
@@ -318,6 +374,9 @@ void FileManagementService::execute(Message& message) {
 			break;
 		case DeleteDirectory:
 			deleteDirectory(message);
+			break;
+		case ReportSummaryDirectory:
+			reportSummaryDirectory(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
