@@ -13,12 +13,12 @@ namespace Filesystem {
 	class OperationIdGenerator {
 	public:
 		static OperationId next() {
-			do {
-				currentId++;
-				if (currentId == InvalidOperationId) {
-					currentId = 1;
+			while (true) {
+				currentId = (currentId == UINT32_MAX) ? 1 : currentId + 1;
+				if (activeIds.find(currentId) == activeIds.end()) {
+					break;
 				}
-			} while (activeIds.find(currentId) != activeIds.end());
+			}
 			return currentId;
 		}
 
