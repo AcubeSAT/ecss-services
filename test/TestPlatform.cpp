@@ -177,8 +177,8 @@ void ParameterService::initializeParameterMap() {
 	    {uint16_t{31}, PlatformParameters::parameter32},
 	    {uint16_t{32}, PlatformParameters::parameter33},
 	    {uint16_t{33}, PlatformParameters::parameter34},
-        {uint16_t{34}, PlatformParameters::parameter35},
-        {uint16_t{35}, PlatformParameters::parameter36},
+	    {uint16_t{34}, PlatformParameters::parameter35},
+	    {uint16_t{35}, PlatformParameters::parameter36},
 	};
 }
 
@@ -231,12 +231,12 @@ uint32_t getUnallocatedMemory() {
 
 
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
-    PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
-    PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+	PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
 }
 
 void FunctionManagementService::initializeFunctionMap() {
-    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+	FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
 }
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

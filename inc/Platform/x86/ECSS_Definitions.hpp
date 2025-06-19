@@ -259,6 +259,11 @@ inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
  * In the ECSS-E-ST-70-41C the application ID is also referred as application process.
  */
 inline constexpr uint16_t ApplicationId = 1;
+/**
+ * Maximum number of entries in Valid Memory IDs set
+ */
+inline constexpr uint32_t MaxValidMemoryIds = 8;
+
 
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
