@@ -2,6 +2,8 @@
 #include <filesystem>
 #include <fstream>
 #include <system_error>
+#include "Helpers/FilepathValidators.hpp"
+#include "Helpers/RepositoryClassifier.hpp"
 
 /**
  * Implementation of a filesystem using C++'s standard library for x86 file access.
@@ -10,6 +12,8 @@
  */
 namespace Filesystem {
 	namespace fs = std::filesystem;
+
+	static const auto localFileSystemPrefix = Path("st23");
 
 	etl::optional<FileCreationError> createFile(const Path& path) {
 		if (getNodeType(path)) {
@@ -114,6 +118,32 @@ namespace Filesystem {
 		return {};
 	}
 
+	etl::expected<void, FileCopyError> copyFile(const Path& sourcePath, const Path& destinationPath) {
+
+		if (auto sourceNodeType = getNodeType(sourcePath); sourceNodeType.value() != NodeType::File) {
+			return etl::unexpected(FileCopyError::SourcePathLeadsToDirectory);
+		}
+
+		if (auto destinationNodeType = getNodeType(destinationPath); destinationNodeType && destinationNodeType.value() == NodeType::File) {
+			return etl::unexpected(FileCopyError::DestinationFileAlreadyExists);
+		}
+
+		const fs::path sourceFile(sourcePath.data());
+		const fs::path destinationFile(destinationPath.data());
+
+		try {
+			if (getUnallocatedMemory() <= fs::file_size(sourceFile)) {
+				return etl::unexpected(FileCopyError::InsufficientSpace);
+			}
+			fs::copy_file(sourceFile, destinationFile, fs::copy_options::overwrite_existing);
+		} catch (const fs::filesystem_error&) {
+			return etl::unexpected(FileCopyError::UnknownError);
+		}
+
+		return {};
+
+	}
+
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
 		Attributes attributes;
 
@@ -164,5 +194,12 @@ namespace Filesystem {
 	uint32_t getUnallocatedMemory() {
 		// Dummy value for use during testing
 		return 42U;
+	}
+
+	bool copyOperationIsAllowed(const Path& source, const Path& destination) {
+		if (RepositoryClassifier::getLocalPrefix().empty()) {
+			RepositoryClassifier::setLocalPrefix(localFileSystemPrefix);
+		}
+		return RepositoryClassifier::isLocal(source) || RepositoryClassifier::isLocal(destination);
 	}
 } // namespace Filesystem

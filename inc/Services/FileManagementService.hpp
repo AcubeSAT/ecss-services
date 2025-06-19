@@ -127,6 +127,11 @@ public:
 	void deleteDirectory(Message& message);
 
 	/**
+	 * TC[23,14] Copy a file in the requested path.
+	 */
+	void copyFile(Message& message);
+
+	/**
 	 * Ask the FS for the available unallocated memory and return it.
 	 * 
 	 * @return uint32_t The bytes of available unallocated memory 

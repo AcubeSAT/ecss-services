@@ -430,7 +430,15 @@ public:
 		/**
 		 * PMON Check Type is requested, but it is missing (ST[12])
 		 */
-		 PMONCheckTypeMissing = 63,
+		PMONCheckTypeMissing = 63,
+		/**
+		 * The file copy operation ID requested is already in use by another process
+		 */
+		FileCopyOperationIdAlreadyInUse = 64,
+		/**
+		 * A file copy operation was requested to copy a file from a remote repository to a remote repository
+		 */
+		FileCopyRequestedFromRemoteToRemoteRepository = 65
 	};
 
 	/**
@@ -495,6 +503,35 @@ public:
 		 * A lock/unlock file command was requested on a directory
 		 */
 		AttemptedAccessModificationOnDirectory = 11,
+		/**
+		 * A content summary report was requested on a file
+		 */
+		AttemptedContentSummaryReportOnFile = 12,
+		/**
+		 * A copy file operation was requested on a directory
+		 */
+		AttemptedCopyFileOperationOnDirectory = 13,
+		/**
+		 * A copy file operation was requested on a file that already exists in the destination
+		 */
+		DestinationFileAlreadyExists = 14,
+		/**
+		 * A copy file operation failed because the filesystem failed to write to the file
+		 */
+		FileSystemWriteFailure = 15,
+		/**
+		 * A copy file operation failed because the filesystem failed to read from the file
+		 */
+		FileSystemReadFailure = 16,
+		/**
+		 * A copy file operation failed because of communication failure between remote filesystems
+		 */
+		FileSystemCommunicationFailure = 17,
+		/**
+		 * A copy file operation failed because of insufficient space in the target filesystem
+		 */
+		FileSystemInsufficientSpace = 18
+
 	};
 
 	/**

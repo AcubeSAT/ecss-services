@@ -78,6 +78,20 @@ namespace Filesystem {
 	};
 
 	/**
+	 * Possible errors returned by the filesystem during copy operations
+	 */
+	enum class FileCopyError : uint8_t {
+		SourceFileDoesNotExist = 0,
+		SourcePathLeadsToDirectory = 1,
+		DestinationFileAlreadyExists = 2,
+		ReadFailure = 3,
+		WriteFailure = 4,
+		CommunicationFailure = 5,
+		InsufficientSpace = 6,
+		UnknownError = 255
+	};
+
+	/**
 	 * The current file lock status
 	 */
 	enum class FileLockStatus : uint8_t {
@@ -158,6 +172,13 @@ namespace Filesystem {
 	etl::expected<void, FilePermissionModificationError> unlockFile(const Path& path);
 
 	/**
+	 * Copies a file to the requested location using the filesystem functions.
+	 * @param sourcePath A String representing the path on the filesystem
+	 * @param destinationPath A String representing the destination path on the filesystem
+	 */
+	etl::expected<void, FileCopyError> copyFile(const Path& sourcePath, const Path& destinationPath);
+
+	/**
 	 * Gets the current file lock status
 	 * @param path A String representing the path on the filesystem
 	 * @return The FileLockStatus value
@@ -169,5 +190,14 @@ namespace Filesystem {
 	 * @return The unallocated memory in bytes 
 	 */
 	uint32_t getUnallocatedMemory();
+
+	/**
+	 * Asserts if a file copy operation is allowed between the source full path and the destination full path.
+	 * If both the source and the destination paths belong to a remote repository returns false, else true.
+	 * @param source The source path passed in as a String.
+	 * @param destination The destination path passed in as a String.
+	 * @return true if the copy file operation is allowed, false otherwise.
+	 */
+	bool copyOperationIsAllowed(const Path& source, const Path& destination);
 
 } // namespace Filesystem

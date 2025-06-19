@@ -5,6 +5,7 @@
 #include <etl/String.hpp>
 #include <filesystem>
 #include <fstream>
+#include "Helpers/FileCopyOperationIdGenerator.hpp"
 #include "ServiceTests.hpp"
 
 namespace fs = std::filesystem;
@@ -595,6 +596,141 @@ TEST_CASE("Delete a directory TC[23,10]", "[service][st23]") {
 	}
 
 	fs::remove_all("st23");
+}
+
+TEST_CASE("Copy a file TC[23,14]", "[service][st23]") {
+	fs::create_directories("st23/source");
+	fs::create_directories("st23/destination");
+	std::ofstream file("st23/source/file");
+	file.close();
+	std::ofstream file1("st23/destination/file1");
+	file1.close();
+	fs::create_directories("remote/source");
+	fs::create_directories("remote/destination");
+	std::ofstream file2("remote/source/file");
+	file2.close();
+
+	SECTION("Good scenario") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+		message.appendUint32(Filesystem::OperationIdGenerator::next());
+		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+		String<ECSSTCRequestStringSize> sourceFile = "file";
+		message.appendOctetString(sourceRepo);
+		message.appendOctetString(sourceFile);
+		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
+		message.appendOctetString(destinationRepo);
+		message.appendOctetString(sourceFile);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 0);
+		CHECK(fs::exists("st23/source/file"));
+		CHECK(fs::exists("st23/destination/file"));
+	}
+
+	SECTION("Copy operation ID is in use") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+		Filesystem::OperationIdGenerator::markInUse(1);
+		message.appendUint32(1);
+		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+		String<ECSSTCRequestStringSize> sourceFile = "file";
+		message.appendOctetString(sourceRepo);
+		message.appendOctetString(sourceFile);
+		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
+		message.appendOctetString(destinationRepo);
+		message.appendOctetString(sourceFile);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse));
+	}
+
+	SECTION("Invalid source directory path") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+		message.appendUint32(Filesystem::OperationIdGenerator::next());
+		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+		String<ECSSTCRequestStringSize> sourceFile = "file---";
+		message.appendOctetString(sourceRepo);
+		message.appendOctetString(sourceFile);
+		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
+		message.appendOctetString(destinationRepo);
+		message.appendOctetString(sourceFile);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid));
+	}
+
+	SECTION("Copy operation requested from remote filesystem to remote filesystem") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+		message.appendUint32(Filesystem::OperationIdGenerator::next());
+		String<ECSSTCRequestStringSize> sourceRepo = "remote/source";
+		String<ECSSTCRequestStringSize> sourceFile = "file";
+		message.appendOctetString(sourceRepo);
+		message.appendOctetString(sourceFile);
+		String<ECSSTCRequestStringSize> destinationRepo = "remote/destination";
+		message.appendOctetString(destinationRepo);
+		message.appendOctetString(sourceFile);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyRequestedFromRemoteToRemoteRepository));
+	}
+
+	SECTION("Source path leads to directory") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+		message.appendUint32(Filesystem::OperationIdGenerator::next());
+		String<ECSSTCRequestStringSize> sourceRepo = "st23";
+		String<ECSSTCRequestStringSize> sourceFile = "source";
+		message.appendOctetString(sourceRepo);
+		message.appendOctetString(sourceFile);
+		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
+		message.appendOctetString(destinationRepo);
+		message.appendOctetString(sourceFile);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::AttemptedCopyFileOperationOnDirectory));
+	}
+
+	SECTION("Destination file already exists") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+		message.appendUint32(Filesystem::OperationIdGenerator::next());
+
+		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+		String<ECSSTCRequestStringSize> sourceFile = "file";
+		message.appendOctetString(sourceRepo);
+		message.appendOctetString(sourceFile);
+		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
+		String<ECSSTCRequestStringSize> destinationFile = "file1";
+		message.appendOctetString(destinationRepo);
+		message.appendOctetString(destinationFile);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists));
+	}
+
+	SECTION("Insufficient memory") {
+		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+		message.appendUint32(Filesystem::OperationIdGenerator::next());
+		const std::string longText = "This text is definitely longer than forty-two bytes.\n";
+		if (std::ofstream outFile("st23/source/test_file.txt"); outFile.is_open()) {
+			outFile << longText;
+			outFile.close();
+		}
+		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+		String<ECSSTCRequestStringSize> sourceFile = "test_file.txt";
+		message.appendOctetString(sourceRepo);
+		message.appendOctetString(sourceFile);
+		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
+		String<ECSSTCRequestStringSize> destinationFile = "file2.txt";
+		message.appendOctetString(destinationRepo);
+		message.appendOctetString(destinationFile);
+
+		MessageParser::execute(message);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace));
+	}
 }
 
 TEST_CASE("Observe available unallocated memory 6.23.4.7", "[service][st23]") {

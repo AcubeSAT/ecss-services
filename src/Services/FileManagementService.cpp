@@ -1,5 +1,6 @@
 #include "Services/FileManagementService.hpp"
 #include "ErrorHandler.hpp"
+#include "Helpers/FileCopyOperationIdGenerator.hpp"
 #include "Helpers/FilepathValidators.hpp"
 #include "Helpers/Filesystem.hpp"
 #include "Message.hpp"
@@ -292,6 +293,74 @@ void FileManagementService::deleteDirectory(Message& message) {
 	}
 }
 
+void FileManagementService::copyFile(Message& message) {
+	if (not message.assertTC(ServiceType, CopyFile)) {
+		return;
+	}
+
+	// TODO handle wildcard characters. Could reject them here and have a separate caller for this function to copy each file
+	const auto copyOperationId = message.readUint32();
+	if (Filesystem::OperationIdGenerator::isInUse(copyOperationId)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse);
+		return;
+	}
+	Filesystem::OperationIdGenerator::markInUse(copyOperationId);
+	auto sourceRepositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto sourceFileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto targetRepositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto targetFileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	const auto sourceFullPath = getFullPath(sourceRepositoryPath, sourceFileName);
+	const auto targetFullPath = getFullPath(targetRepositoryPath, targetFileName);
+
+	if (const auto sourceRepositoryType = Filesystem::getNodeType(sourceFullPath); not sourceRepositoryType) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+		return;
+	}
+
+	if (not Filesystem::copyOperationIsAllowed(sourceFullPath, targetFullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyRequestedFromRemoteToRemoteRepository);
+		return;
+	}
+
+	if (auto result = Filesystem::copyFile(sourceFullPath, targetFullPath); !result.has_value()) {
+		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
+		switch (result.error()) {
+			case Filesystem::FileCopyError::SourcePathLeadsToDirectory: {
+				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedCopyFileOperationOnDirectory;
+				break;
+			}
+			case Filesystem::FileCopyError::DestinationFileAlreadyExists: {
+				error = ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists;
+				break;
+			}
+			case Filesystem::FileCopyError::ReadFailure: {
+				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemReadFailure;
+				break;
+			}
+			case Filesystem::FileCopyError::WriteFailure: {
+				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemWriteFailure;
+				break;
+			}
+			case Filesystem::FileCopyError::CommunicationFailure: {
+				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemCommunicationFailure;
+				break;
+			}
+			case Filesystem::FileCopyError::InsufficientSpace: {
+				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace;
+				break;
+			}
+			default: {
+				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+				break;
+			}
+		}
+		ErrorHandler::reportError(message, error);
+		// TODO generate failed execution verification report, the above error reporting might be enough
+	}
+	// TODO generate successful execution verification report if requested
+	Filesystem::OperationIdGenerator::release(copyOperationId);
+}
+
 uint32_t FileManagementService::getUnallocatedMemory() {
 	return Filesystem::getUnallocatedMemory();
 }
@@ -318,6 +387,9 @@ void FileManagementService::execute(Message& message) {
 			break;
 		case DeleteDirectory:
 			deleteDirectory(message);
+			break;
+		case CopyFile:
+			copyFile(message);
 			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
