@@ -14,7 +14,8 @@ namespace Filesystem {
 	public:
 		static OperationId next() {
 			do {
-				if (++currentId == InvalidOperationId) {
+				currentId++;
+				if (currentId == InvalidOperationId) {
 					currentId = 1;
 				}
 			} while (activeIds.find(currentId) != activeIds.end());
