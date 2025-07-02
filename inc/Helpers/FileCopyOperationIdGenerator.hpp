@@ -9,6 +9,8 @@ namespace Filesystem {
 
 	using OperationId = uint32_t;
 	constexpr OperationId InvalidOperationId = 0;
+	// TODO (#317): Discuss and determine a maximum for this value if the implementation does not change
+	constexpr size_t MaxConcurrentFileOperations = 16;
 
 	class OperationIdGenerator {
 	public:
@@ -36,7 +38,7 @@ namespace Filesystem {
 
 	private:
 		inline static OperationId currentId = InvalidOperationId;
-		inline static etl::unordered_set<OperationId, 16> activeIds;
+		inline static etl::unordered_set<OperationId, MaxConcurrentFileOperations> activeIds; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 	};
 
 } // namespace Filesystem
