@@ -14,7 +14,7 @@ namespace Filesystem {
 	public:
 		static OperationId next() {
 			while (true) {
-				currentId = (currentId == UINT32_MAX) ? 1 : currentId + 1;
+				currentId++;
 				if (activeIds.find(currentId) == activeIds.end()) {
 					break;
 				}

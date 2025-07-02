@@ -298,7 +298,7 @@ void FileManagementService::copyFile(Message& message) {
 		return;
 	}
 
-	// TODO handle wildcard characters. Could reject them here and have a separate caller for this function to copy each file
+	// TODO (#317): Handle wildcard characters. Could reject them here and have a separate caller for this function to copy each file
 	const auto copyOperationId = message.readUint32();
 	if (Filesystem::OperationIdGenerator::isInUse(copyOperationId)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse);
@@ -355,9 +355,9 @@ void FileManagementService::copyFile(Message& message) {
 			}
 		}
 		ErrorHandler::reportError(message, error);
-		// TODO generate failed execution verification report, the above error reporting might be enough
+		// TODO (#317): generate failed execution verification report, the above error reporting might be enough
 	}
-	// TODO generate successful execution verification report if requested
+	// TODO (#317): generate successful execution verification report if requested
 	Filesystem::OperationIdGenerator::release(copyOperationId);
 }
 
