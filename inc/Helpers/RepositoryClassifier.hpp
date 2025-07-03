@@ -26,7 +26,7 @@ namespace Filesystem {
 		}
 
 	private:
-		inline static Path localPrefix = "";
+		inline static Path localPrefix = ""; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 	};
 
 } // namespace Filesystem
