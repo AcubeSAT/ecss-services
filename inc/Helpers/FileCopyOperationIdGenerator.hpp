@@ -37,7 +37,7 @@ namespace Filesystem {
 		}
 
 	private:
-		inline static OperationId currentId = InvalidOperationId;
+		inline static OperationId currentId = InvalidOperationId; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 		inline static etl::unordered_set<OperationId, MaxConcurrentFileOperations> activeIds; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 	};
 
