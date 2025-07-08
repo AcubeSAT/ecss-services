@@ -141,7 +141,30 @@ namespace Filesystem {
 		}
 
 		return {};
+	}
 
+	etl::expected<void, FileCopyError> moveFile(const Path& sourcePath, const Path& destinationPath) {
+		if (auto sourceNodeType = getNodeType(sourcePath); sourceNodeType.value() != NodeType::File) {
+			return etl::unexpected(FileCopyError::SourcePathLeadsToDirectory);
+		}
+
+		if (auto destinationNodeType = getNodeType(destinationPath); destinationNodeType && destinationNodeType.value() == NodeType::File) {
+			return etl::unexpected(FileCopyError::DestinationFileAlreadyExists);
+		}
+
+		const fs::path sourceFile(sourcePath.data());
+		const fs::path destinationFile(destinationPath.data());
+
+		try {
+			if (getUnallocatedMemory() <= fs::file_size(sourceFile)) {
+				return etl::unexpected(FileCopyError::InsufficientSpace);
+			}
+			fs::rename(sourceFile, destinationFile);
+		} catch (const fs::filesystem_error&) {
+			return etl::unexpected(FileCopyError::UnknownError);
+		}
+
+		return {};
 	}
 
 	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {

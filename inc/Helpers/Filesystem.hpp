@@ -179,6 +179,13 @@ namespace Filesystem {
 	etl::expected<void, FileCopyError> copyFile(const Path& sourcePath, const Path& destinationPath);
 
 	/**
+	 * Moves a file to the requested location using the filesystem functions.
+	 * @param sourcePath A String representing the path on the filesystem
+	 * @param destinationPath A String representing the destination path on the filesystem
+	 */
+	etl::expected<void, FileCopyError> moveFile(const Path& sourcePath, const Path& destinationPath);
+
+	/**
 	 * Gets the current file lock status
 	 * @param path A String representing the path on the filesystem
 	 * @return The FileLockStatus value

@@ -438,7 +438,11 @@ public:
 		/**
 		 * A file copy operation was requested to copy a file from a remote repository to a remote repository
 		 */
-		FileCopyRequestedFromRemoteToRemoteRepository = 65
+		FileCopyOperationRequestedFromRemoteToRemoteRepository = 65,
+		/**
+		 * A file copy operation was requested on a file that is locked
+		 */
+		FileCopyOperationRequestedOnLockedFile = 66
 	};
 
 	/**
