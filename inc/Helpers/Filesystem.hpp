@@ -8,7 +8,7 @@
 #include "etl/String.hpp"
 #include "etl/expected.h"
 #include "etl/result.h"
-
+    #include "etl/span.h"
 namespace Filesystem {
 	using Path = String<FullPathSize>;
 	using ObjectPath = String<ObjectPathSize>;
