@@ -24,9 +24,9 @@ void MemoryManagementService::loadRawData(Message& request) {
 		return;
 	}
 
-	auto memoryID = static_cast <MemoryManagementService::MemoryID>(request.read <MemoryId>());
+	auto memoryID = static_cast<MemoryManagementService::MemoryID>(request.read <MemoryId>());
 
-	if (!memoryIdValidator(static_cast <MemoryManagementService::MemoryID>(memoryID))) {
+	if (!memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
 		// TODO(#257): Send a failed start of execution
 		return;
 	}
@@ -38,7 +38,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 		// TODO(#258): Define FLASH specific access code when we transfer to embedded
 	} else {
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			const StartAddress startAddress = request.read <StartAddress>();
+			const StartAddress startAddress = request.read<StartAddress>();
 			const MemoryDataLength dataLength = request.readOctetString(readData.data());
 			// NOLINT(cppcoreguidelines-init-variables)
 			const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
@@ -55,11 +55,11 @@ void MemoryManagementService::loadRawData(Message& request) {
 			}
 
 			for (std::size_t i = 0; i < dataLength; i++) {
-				*(reinterpret_cast <uint8_t*>(startAddress) + i) = readData[i];
+				reinterpret_cast<uint8_t*>(startAddress)[i] = readData[i];
 			}
 
 			for (std::size_t i = 0; i < dataLength; i++) {
-				readData[i] = *(reinterpret_cast <uint8_t*>(startAddress) + i);
+				readData[i] = reinterpret_cast<uint8_t*>(startAddress)[i];
 			}
 
 			if (checksum != CRCHelper::calculateCRC(readData.data(), dataLength)) {
@@ -75,29 +75,29 @@ void MemoryManagementService::RawDataMemoryManagementSubService::dumpRawData(Mes
 	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::DumpRawMemoryDataReport);
-	const MemoryId memoryID = request.read <MemoryId>();
+	const MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(static_cast <MemoryManagementService::MemoryID>(memoryID))) {
-		etl::array <ReadData, ECSSMaxStringSize> readData = {};
+	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
+		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
-		report.append <MemoryId>(memoryID);
+		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			const StartAddress startAddress = request.read <StartAddress>();
-			const MemoryDataLength readLength = request.read <MemoryDataLength>();
+			const StartAddress startAddress = request.read<StartAddress>();
+			const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
 			if (addressValidator(static_cast <MemoryManagementService::MemoryID>(memoryID), startAddress) &&
 			    addressValidator(static_cast <MemoryManagementService::MemoryID>(memoryID),
 				    startAddress + readLength)) {
 				for (std::size_t i = 0; i < readLength; i++) {
-					readData[i] = *(reinterpret_cast <uint8_t*>(startAddress) + i);
+					readData[i] = reinterpret_cast<uint8_t*>(startAddress)[i];
 				}
 
-				report.append <StartAddress>(startAddress);
-				report.appendOctetString(String <ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
-				report.append <CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
+				report.append<StartAddress>(startAddress);
+				report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
+				report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
@@ -116,29 +116,29 @@ void MemoryManagementService::RawDataMemoryManagementSubService::checkRawData(Me
 	}
 
 	Message report = mainService.createTM(MemoryManagementService::MessageType::CheckRawMemoryDataReport);
-	const MemoryId memoryID = request.read <MemoryId>();
+	const MemoryId memoryID = request.read<MemoryId>();
 
-	if (memoryIdValidator(static_cast <MemoryManagementService::MemoryID>(memoryID))) {
-		etl::array <ReadData, ECSSMaxStringSize> readData = {};
+	if (memoryIdValidator(static_cast<MemoryManagementService::MemoryID>(memoryID))) {
+		etl::array<ReadData, ECSSMaxStringSize> readData = {};
 		uint16_t const iterationCount = request.readUint16();
 
-		report.append <MemoryId>(memoryID);
+		report.append<MemoryId>(memoryID);
 		report.appendUint16(iterationCount);
 
 		for (std::size_t j = 0; j < iterationCount; j++) {
-			const StartAddress startAddress = request.read <StartAddress>();
-			const MemoryDataLength readLength = request.read <MemoryDataLength>();
+			const StartAddress startAddress = request.read<StartAddress>();
+			const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-			if (addressValidator(static_cast <MemoryManagementService::MemoryID>(memoryID), startAddress) &&
-			    addressValidator(static_cast <MemoryManagementService::MemoryID>(memoryID),
+			if (addressValidator(static_cast<MemoryManagementService::MemoryID>(memoryID), startAddress) &&
+			    addressValidator(static_cast<MemoryManagementService::MemoryID>(memoryID),
 				    startAddress + readLength)) {
 				for (std::size_t i = 0; i < readLength; i++) {
-					readData[i] = *(reinterpret_cast <uint8_t*>(startAddress) + i);
+					readData[i] = reinterpret_cast<uint8_t*>(startAddress)[i];
 				}
 
-				report.append <StartAddress>(startAddress);
-				report.append <MemoryDataLength>(readLength);
-				report.append <CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
+				report.append<StartAddress>(startAddress);
+				report.append<MemoryDataLength>(readLength);
+				report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 			} else {
 				ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
 			}
@@ -183,12 +183,12 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::loadObje
 	Path fullPath = "";
 	readFullPath(request, fullPath);
 
-	auto remainingInstructions = request.read <InstructionType>();
+	auto remainingInstructions = request.read<InstructionType>();
 	bool hasError = false;
 
 	while (remainingInstructions-- != 0U) {
-		const FileOffset offset = request.read <FileOffset>();
-		const FileDataLength dataLength = request.read <FileDataLength>();
+		const FileOffset offset = request.read<FileOffset>();
+		const FileDataLength dataLength = request.read<FileDataLength>();
 
 		etl::array <uint8_t, ChunkMaxFileSizeBytes> chunkData = {};
 		request.readString(chunkData.data(), dataLength);
@@ -237,13 +237,13 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 	Path fullPath = "";
 	readFullPath(request, fullPath);
 
-	auto remainingInstructions = request.read <InstructionType>();
+	auto remainingInstructions = request.read<InstructionType>();
 	report.appendOctetString(fullPath);
-	report.append <InstructionType>(remainingInstructions);
+	report.append<InstructionType>(remainingInstructions);
 
 	while (remainingInstructions-- != 0U) {
-		const FileOffset offset = request.read <FileOffset>();
-		const FileDataLength readLength = request.read <FileDataLength>();
+		const FileOffset offset = request.read<FileOffset>();
+		const FileDataLength readLength = request.read<FileDataLength>();
 		dumpedStructuredDataReport(report, fullPath, offset, readLength, remainingInstructions == 0);
 	}
 }

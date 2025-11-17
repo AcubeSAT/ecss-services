@@ -330,8 +330,8 @@ namespace Filesystem {
 	}
 
 	etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset, FileDataLength length,
-	etl::array<uint8_t,
-	ChunkMaxFileSizeBytes>& buffer) {
+	etl::span<uint8_t,
+	ChunkMaxFileSizeBytes> buffer) {
 		if (buffer.size() < length) {
 			return etl::unexpected(FileReadError::InvalidBufferSize);
 		}
@@ -381,7 +381,7 @@ namespace Filesystem {
 	}
 
 	etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
-	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer) {
+	etl::span<uint8_t, ChunkMaxFileSizeBytes> buffer) {
 
 		if (etl::strlen(reinterpret_cast<const char*>(buffer.data())) != fileDataLength) {
 			return etl::unexpected(FileWriteError::InvalidBufferSize);

@@ -11,15 +11,15 @@
  * Each function returns the minimum viable option without errors.
  */
 namespace Filesystem {
-	etl::optional <FileCreationError> createFile(const Path& path) {
+	etl::optional<FileCreationError> createFile(const Path& path) {
 		return etl::nullopt;
 	}
 
-	etl::optional <FileDeletionError> deleteFile(const Path& path) {
+	etl::optional<FileDeletionError> deleteFile(const Path& path) {
 		return etl::nullopt;
 	}
 
-	etl::optional <NodeType> getNodeType(const Path& path) {
+	etl::optional<NodeType> getNodeType(const Path& path) {
 		return etl::nullopt;
 	}
 
@@ -33,7 +33,7 @@ namespace Filesystem {
 	void unlockFile(const Path& path) {
 	}
 
-	etl::result <Attributes, FileAttributeError> getFileAttributes(const Path& path) {
+	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
 		return Attributes{};
 	}
 
@@ -41,7 +41,7 @@ namespace Filesystem {
 		return etl::nullopt;
 	}
 
-	etl::optional <DirectoryDeletionError> deleteDirectory(const Path& path) {
+	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
 		return etl::nullopt;
 	}
 
@@ -51,13 +51,13 @@ namespace Filesystem {
 
 
 	etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset, FileDataLength length,
-	etl::array<uint8_t,
-	ChunkMaxFileSizeBytes>& buffer) {
+	etl::span<uint8_t,
+	ChunkMaxFileSizeBytes> buffer) {
 		return {};
 	}
 
 	etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
-	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer) {
+	etl::span<uint8_t, ChunkMaxFileSizeBytes> buffer) {
 		return {};
 	}
 } // namespace Filesystem

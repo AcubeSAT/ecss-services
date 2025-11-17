@@ -10,8 +10,8 @@
 #include "etl/result.h"
 
 namespace Filesystem {
-	using Path = String <FullPathSize>;
-	using ObjectPath = String <ObjectPathSize>;
+	using Path = String<FullPathSize>;
+	using ObjectPath = String<ObjectPathSize>;
 
 	/**
 	 * The available metadata for a file
@@ -107,49 +107,49 @@ namespace Filesystem {
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileCreationError> createFile(const Path& path);
+	etl::optional<FileCreationError> createFile(const Path& path);
 
 	/**
 	 * Deletes a file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a file deletion error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <FileDeletionError> deleteFile(const Path& path);
+	etl::optional<FileDeletionError> deleteFile(const Path& path);
 
 	/**
 	 * Creates a directory using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a directory creation error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <DirectoryCreationError> createDirectory(const Path& path);
+	etl::optional<DirectoryCreationError> createDirectory(const Path& path);
 
 	/**
 	 * Deletes a directory using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
 	 * @return Optionally, a directory deletion error. If no errors occur, returns etl::nullopt
 	 */
-	etl::optional <DirectoryDeletionError> deleteDirectory(const Path& path);
+	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
 
 	/**
 	 * Gets the file metadata
 	 * @param path A String representing the path on the filesystem
 	 * @return Either an Attributes struct if there were no errors, either a FileAttributeError.
 	 */
-	etl::result <Attributes, FileAttributeError> getFileAttributes(const Path& path);
+	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path);
 
 	/**
 	 * Gets the type of node in the filesystem
 	 * @param path A String representing the path on the filesystem
 	 * @return A NodeType value, or nothing if the file can't be accessed
 	 */
-	etl::optional <NodeType> getNodeType(const Path& path);
+	etl::optional<NodeType> getNodeType(const Path& path);
 
 	/**
 	 * An overloaded function providing support for getNodeType on repository objects.
 	 * @param objectPath A String representing a path on the filesystem
 	 * @return A NodeType value
 	 */
-	inline etl::optional <NodeType> getNodeType(const ObjectPath& objectPath) {
+	inline etl::optional<NodeType> getNodeType(const ObjectPath& objectPath) {
 		const Path path = objectPath.data();
 		return getNodeType(path);
 	}
@@ -176,7 +176,7 @@ namespace Filesystem {
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
 	etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
-	etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
+	etl::span<uint8_t, ChunkMaxFileSizeBytes> buffer);
 
 	/**
 	 * Creates a file using platform specific filesystem functions
@@ -236,8 +236,8 @@ namespace Filesystem {
 	 * @param fullPath Reference to store the constructed full path
 	 */
 	static std::tuple<ObjectPath, ObjectPath, Path> readAndBuildPath(Message& message) {
-		ObjectPath repositoryPath = message.readOctetString <ObjectPathSize>();
-		ObjectPath fileName = message.readOctetString <ObjectPathSize>();
+		ObjectPath repositoryPath = message.readOctetString<ObjectPathSize>();
+		ObjectPath fileName = message.readOctetString<ObjectPathSize>();
 		Path fullPath = getFullPath(repositoryPath, fileName);
 		return std::make_tuple(repositoryPath, fileName, fullPath);
 	}
@@ -249,6 +249,6 @@ namespace Filesystem {
 	 * @param fullPath Reference to store the constructed full path
 	 */
 	static void readFullPath(Message& message, Path& fullPath) {
-		fullPath = message.readOctetString <FullPathSize>();
+		fullPath = message.readOctetString<FullPathSize>();
 	}
 } // namespace Filesystem
