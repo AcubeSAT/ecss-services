@@ -1,5 +1,6 @@
 #pragma once
 
+#include <etl/vector.h>
 #include "ECSS_Definitions.hpp"
 #include "etl/String.hpp"
 #include "etl/expected.h"
@@ -81,13 +82,11 @@ namespace Filesystem {
 	 * Possible errors returned by the filesystem during copy operations
 	 */
 	enum class FileCopyError : uint8_t {
-		SourceFileDoesNotExist = 0,
-		SourcePathLeadsToDirectory = 1,
-		DestinationFileAlreadyExists = 2,
-		ReadFailure = 3,
-		WriteFailure = 4,
-		CommunicationFailure = 5,
-		InsufficientSpace = 6,
+		DestinationFileAlreadyExists = 0,
+		ReadFailure = 1,
+		WriteFailure = 2,
+		CommunicationFailure = 3,
+		InsufficientSpace = 4,
 		UnknownError = 255
 	};
 
@@ -105,6 +104,17 @@ namespace Filesystem {
 	enum class FileAttributeError : uint8_t {
 		PathLeadsToDirectory = 0,
 		FileDoesNotExist = 1
+	};
+
+	struct PersistedOperationState {
+		uint16_t operationId{};
+		uint8_t state{};
+		uint8_t type{};
+		ObjectPath sourcePath;
+		ObjectPath targetPath;
+		uint32_t bytesTransferred{};
+		uint32_t totalBytes{};
+		uint32_t startTime{};
 	};
 
 	/**
@@ -173,17 +183,20 @@ namespace Filesystem {
 
 	/**
 	 * Copies a file to the requested location using the filesystem functions.
-	 * @param sourcePath A String representing the path on the filesystem
-	 * @param destinationPath A String representing the destination path on the filesystem
+	 * @param operationId The copy file operation ID.
 	 */
-	etl::expected<void, FileCopyError> copyFile(const Path& sourcePath, const Path& destinationPath);
+	void copyFile(uint16_t operationId);
 
 	/**
 	 * Moves a file to the requested location using the filesystem functions.
-	 * @param sourcePath A String representing the path on the filesystem
-	 * @param destinationPath A String representing the destination path on the filesystem
+	 * @param operationId The move file operation ID.
 	 */
-	etl::expected<void, FileCopyError> moveFile(const Path& sourcePath, const Path& destinationPath);
+	void moveFile(uint16_t operationId);
+
+	/**
+	 * Initializes all filesystems.
+	 */
+	void initializeFileSystems();
 
 	/**
 	 * Gets the current file lock status
@@ -194,17 +207,32 @@ namespace Filesystem {
 
 	/**
 	 * Get the Unallocated Memory
-	 * @return The unallocated memory in bytes 
+	 * @return The unallocated memory in bytes
 	 */
 	uint32_t getUnallocatedMemory();
 
 	/**
-	 * Asserts if a file copy operation is allowed between the source full path and the destination full path.
+	 * Checks if a file copy operation is allowed between the source full path and the destination full path.
 	 * If both the source and the destination paths belong to a remote repository returns false, else true.
 	 * @param source The source path passed in as a String.
 	 * @param destination The destination path passed in as a String.
 	 * @return true if the copy file operation is allowed, false otherwise.
 	 */
-	bool copyOperationIsAllowed(const Path& source, const Path& destination);
+	bool copyOperationInvolvesLocalPath(const Path& source, const Path& destination);
+
+	/**
+	 * Starts a thread that runs copy/move operations, emulating FreeRTOS task execution. Used for testing.
+	 */
+	void initializeFileCopyTask();
+
+	/**
+	 * Stops the thread that runs copy/move operations, emulating FreeRTOS task execution. Used for testing.
+	 */
+	void shutdownFileCopyTask();
+
+	/**
+	 * Called by the Filesystem internally, on initialization, to restore all persisted file copy/move operations.
+	 */
+	void restorePersistedOperations();
 
 } // namespace Filesystem

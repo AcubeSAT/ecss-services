@@ -2,16 +2,34 @@
 #include <ServicePool.hpp>
 #include <Services/FileManagementService.hpp>
 #include <catch2/catch_all.hpp>
+#include <chrono>
 #include <etl/String.hpp>
 #include <filesystem>
 #include <fstream>
-#include "Helpers/FileCopyOperationIdGenerator.hpp"
+#include <thread>
+#include <unistd.h>
+
 #include "ServiceTests.hpp"
 
 namespace fs = std::filesystem;
 
 // @todo (#277): Add more tests covering cases where the repository and/or the object path is too long.
 // For more information check https://gitlab.com/acubesat/obc/ecss-services/-/merge_requests/80#note_1610840164
+
+void waitForOperationCompletion(const uint16_t operationId, const int timeoutMs = 2000) {
+    const auto start = std::chrono::steady_clock::now();
+    while (true) {
+       if (const auto* op = Services.fileManagement.findFileCopyOperation(operationId);
+          !op || op->getState() == FileManagementService::FileCopyOperation::State::COMPLETED ||
+           op->getState() == FileManagementService::FileCopyOperation::State::FAILED) {
+          break;
+       }
+       if (const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count(); elapsed > timeoutMs) {
+          break;
+       }
+       std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+}
 
 TEST_CASE("Create a file TC[23,1]", "[service][st23]") {
 	fs::create_directories("st23");
@@ -598,333 +616,482 @@ TEST_CASE("Delete a directory TC[23,10]", "[service][st23]") {
 	fs::remove_all("st23");
 }
 
-TEST_CASE("Copy a file TC[23,14]", "[service][st23]") {
-	fs::create_directories("st23/source");
-	fs::create_directories("st23/destination");
-	std::ofstream file("st23/source/file");
-	file.close();
-	std::ofstream file1("st23/destination/file1");
-	file1.close();
-	fs::create_directories("remote/source");
-	fs::create_directories("remote/destination");
-	std::ofstream file2("remote/source/file");
-	file2.close();
-	std::ofstream file3("st23/source/lockedFile");
-	file3.close();
+TEST_CASE("Copy a file TC[23,14], service st23", "[service][st23]") {
+    Filesystem::initializeFileSystems();
+    Filesystem::initializeFileCopyTask();
 
-	SECTION("Good scenario") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    auto createFile = [](const char* path, const char* data = "") {
+        std::ofstream f(path);
+        f << data;
+    };
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 0);
-		CHECK(fs::exists("st23/source/file"));
-		CHECK(fs::exists("st23/destination/file"));
-	}
+    SECTION("Good scenario - successful execution notification") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::remove_all("remote");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        createFile("st23/source/file", "data");
+        fs::remove("st23/destination/file");
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        message.appendUint16(1);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file";
+        String<ECSSTCRequestStringSize> destRepo   = "st23/destination";
+        message.appendOctetString(sourceRepo);
+        message.appendOctetString(sourceFile);
+        message.appendOctetString(destRepo);
+        message.appendOctetString(sourceFile);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        waitForOperationCompletion(1);
+        CHECK(fs::exists("st23/source/file"));
+        CHECK(fs::exists("st23/destination/file"));
+    }
 
-	SECTION("Copy operation ID is in use") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		Filesystem::OperationIdGenerator::markInUse(1);
-		message.appendUint32(1);
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    SECTION("Copy operation ID is in use") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::remove_all("remote");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        createFile("st23/source/file", "data");
+        Message message1(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        message1.appendUint16(100);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file";
+        String<ECSSTCRequestStringSize> destRepo   = "st23/destination";
+        message1.appendOctetString(sourceRepo);
+        message1.appendOctetString(sourceFile);
+        message1.appendOctetString(destRepo);
+        message1.appendOctetString(sourceFile);
+        MessageParser::execute(message1);
+        CHECK(ServiceTests::countErrors() == 0);
+        Message message2(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        message2.appendUint16(100);
+        message2.appendOctetString(sourceRepo);
+        message2.appendOctetString(sourceFile);
+        message2.appendOctetString(destRepo);
+        message2.appendOctetString(sourceFile);
+        MessageParser::execute(message2);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse));
+        waitForOperationCompletion(100);
+    }
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse));
-	}
+    SECTION("Invalid source directory path - fails at START verification") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::remove_all("remote");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        message.appendUint16(2);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file---";
+        String<ECSSTCRequestStringSize> destRepo   = "st23/destination";
+        message.appendOctetString(sourceRepo);
+        message.appendOctetString(sourceFile);
+        message.appendOctetString(destRepo);
+        message.appendOctetString(sourceFile);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid));
+    }
 
-	SECTION("Invalid source directory path") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file---";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    SECTION("Remote to remote - fails at START verification") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::remove_all("remote");
+        fs::create_directories("remote/source");
+        fs::create_directories("remote/destination");
+        createFile("remote/source/file", "data");
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        message.appendUint16(3);
+        String<ECSSTCRequestStringSize> sourceRepo = "remote/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file";
+        String<ECSSTCRequestStringSize> destRepo   = "remote/destination";
+        message.appendOctetString(sourceRepo);
+        message.appendOctetString(sourceFile);
+        message.appendOctetString(destRepo);
+        message.appendOctetString(sourceFile);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedFromRemoteToRemoteRepository));
+    }
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid));
-	}
+    SECTION("Locked file - fails at START verification") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::remove_all("remote");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        createFile("st23/source/lockedFile", "data");
+        Message lockFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
+        String<ECSSTCRequestStringSize> repo       = "st23/source";
+        String<ECSSTCRequestStringSize> lockedFile = "lockedFile";
+        lockFileMessage.appendOctetString(repo);
+        lockFileMessage.appendOctetString(lockedFile);
+        MessageParser::execute(lockFileMessage);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        message.appendUint16(4);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "lockedFile";
+        String<ECSSTCRequestStringSize> destRepo   = "st23/destination";
+        message.appendOctetString(sourceRepo);
+        message.appendOctetString(sourceFile);
+        message.appendOctetString(destRepo);
+        message.appendOctetString(sourceFile);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedOnLockedFile));
+    }
 
-	SECTION("Copy operation requested from remote filesystem to remote filesystem") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "remote/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "remote/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    SECTION("Destination file already exists - fails at COMPLETION verification") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::remove_all("remote");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        createFile("st23/source/file", "src-data");
+        createFile("st23/destination/file", "dest-data");
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        message.appendUint16(10);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file";
+        String<ECSSTCRequestStringSize> destRepo   = "st23/destination";
+        message.appendOctetString(sourceRepo);
+        message.appendOctetString(sourceFile);
+        message.appendOctetString(destRepo);
+        message.appendOctetString(sourceFile);
+        MessageParser::execute(message);
+        waitForOperationCompletion(10);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists));
+        CHECK(fs::exists("st23/source/file"));
+        CHECK(fs::exists("st23/destination/file"));
+    }
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedFromRemoteToRemoteRepository));
-	}
-
-	SECTION("Copy operation requested on locked file") {
-		Message lockFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
-		String<ECSSTCRequestStringSize> repo = "st23/source";
-		String<ECSSTCRequestStringSize> lockedFile = "lockedFile";
-		lockFileMessage.appendOctetString(repo);
-		lockFileMessage.appendOctetString(lockedFile);
-		MessageParser::execute(lockFileMessage);
-
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "lockedFile";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
-
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedOnLockedFile));
-	}
-
-	SECTION("Source path leads to directory") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23";
-		String<ECSSTCRequestStringSize> sourceFile = "source";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
-
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::AttemptedCopyFileOperationOnDirectory));
-	}
-
-	SECTION("Destination file already exists") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		String<ECSSTCRequestStringSize> destinationFile = "file1";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(destinationFile);
-
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists));
-	}
-
-	SECTION("Insufficient memory") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		const std::string longText = "This text is definitely longer than forty-two bytes.\n";
-		if (std::ofstream outFile("st23/source/test_file.txt"); outFile.is_open()) {
-			outFile << longText;
-			outFile.close();
-		}
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "test_file.txt";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		String<ECSSTCRequestStringSize> destinationFile = "file2.txt";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(destinationFile);
-
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace));
-	}
-
-	fs::remove_all("st23");
-	fs::remove_all("remote");
+    Filesystem::shutdownFileCopyTask();
+    fs::remove_all("st23");
+    fs::remove_all("remote");
 }
 
-TEST_CASE("Move a file TC[23,15]", "[service][st23]") {
-	fs::create_directories("st23/source");
-	fs::create_directories("st23/destination");
-	std::ofstream file("st23/source/file");
-	file.close();
-	std::ofstream file1("st23/destination/file1");
-	file1.close();
-	fs::create_directories("remote/source");
-	fs::create_directories("remote/destination");
-	std::ofstream file2("remote/source/file");
-	file2.close();
-	std::ofstream file3("st23/source/lockedFile");
-	file3.close();
+TEST_CASE("Move a file TC[23,15], service st23", "[service][st23]") {
+    Filesystem::initializeFileSystems();
+    Filesystem::initializeFileCopyTask();
 
-	SECTION("Good scenario") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    auto createFile = [](const char* path, const char* data = "") {
+        std::ofstream f(path);
+        f << data;
+    };
 
-		MessageParser::execute(message);
+    SECTION("Good scenario - successful execution notification") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        createFile("st23/source/file", "data");
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
+        message.appendUint16(1);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file";
+        String<ECSSTCRequestStringSize> destRepo = "st23/destination";
+        message.appendOctetString(sourceRepo);
+        message.appendOctetString(sourceFile);
+        message.appendOctetString(destRepo);
+        message.appendOctetString(sourceFile);
+        MessageParser::execute(message);
+		waitForOperationCompletion(1);
 		CHECK(ServiceTests::countErrors() == 0);
-		CHECK(not fs::exists("st23/source/file"));
 		CHECK(fs::exists("st23/destination/file"));
+		CHECK(!fs::exists("st23/source/file"));
 	}
 
-	SECTION("Copy operation ID is in use") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		Filesystem::OperationIdGenerator::markInUse(1);
-		message.appendUint32(1);
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    SECTION("Move operation ID is in use") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        createFile("st23/source/file", "data");
+        fs::remove("st23/destination/file");
+        Message message1(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
+        message1.appendUint16(100);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file";
+        String<ECSSTCRequestStringSize> destRepo = "st23/destination";
+        message1.appendOctetString(sourceRepo);
+        message1.appendOctetString(sourceFile);
+        message1.appendOctetString(destRepo);
+        message1.appendOctetString(sourceFile);
+        MessageParser::execute(message1);
+        Message message2(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
+        message2.appendUint16(100);
+        message2.appendOctetString(sourceRepo);
+        message2.appendOctetString(sourceFile);
+        message2.appendOctetString(destRepo);
+        message2.appendOctetString(sourceFile);
+        MessageParser::execute(message2);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse));
+        waitForOperationCompletion(100);
+    }
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse));
-	}
+    SECTION("Destination file already exists - fails at COMPLETION verification") {
+        ServiceTests::reset();
+        fs::remove_all("st23");
+        fs::create_directories("st23/source");
+        fs::create_directories("st23/destination");
+        createFile("st23/source/file", "src-data");
+        createFile("st23/destination/file", "src-data");
+        constexpr uint16_t operationId = 11;
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
+        message.appendUint16(operationId);
+        String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
+        String<ECSSTCRequestStringSize> sourceFile = "file";
+        String<ECSSTCRequestStringSize> destRepo   = "st23/destination";
+        message.appendOctetString(sourceRepo);
+        message.appendOctetString(sourceFile);
+        message.appendOctetString(destRepo);
+        message.appendOctetString(sourceFile);
+        MessageParser::execute(message);
+        waitForOperationCompletion(operationId);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists));
+        CHECK(fs::exists("st23/source/file"));
+        CHECK(fs::exists("st23/destination/file"));
+    }
 
-	SECTION("Invalid source directory path") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file---";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    Filesystem::shutdownFileCopyTask();
+    fs::remove_all("st23");
+}
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid));
-	}
+TEST_CASE("Suspend file copy operations TC[23,16]", "[service][st23]") {
+    SECTION("Suspend single operation by ID") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(100, "source/file", "dest/file",
+        	FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        auto* op = Services.fileManagement.findFileCopyOperation(100);
+        REQUIRE(op != nullptr);
+        op->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::SuspendFileCopyOperation, Message::TC, 0);
+        message.appendUint8(1);
+        message.appendUint16(100);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+    }
 
-	SECTION("Copy operation requested from remote filesystem to remote filesystem") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "remote/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "remote/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    SECTION("Suspend multiple operations") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType,FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(101, "source/file1", "dest/file1",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        Services.fileManagement.addFileCopyOperation(102, "source/file2", "dest/file2",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        auto* op1 = Services.fileManagement.findFileCopyOperation(101);
+        auto* op2 = Services.fileManagement.findFileCopyOperation(102);
+        op1->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        op2->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::SuspendFileCopyOperation, Message::TC, 0);
+        message.appendUint8(2);
+        message.appendUint16(101);
+        message.appendUint16(102);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(op1->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op2->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+    }
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedFromRemoteToRemoteRepository));
-	}
+    SECTION("Suspend non-existent operation") {
+        ServiceTests::reset();
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::SuspendFileCopyOperation, Message::TC, 0);
+        message.appendUint8(1);
+        message.appendUint16(999);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdNotFound));
+    }
+}
 
-	SECTION("Copy operation requested on locked file") {
-		Message lockFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
-		String<ECSSTCRequestStringSize> repo = "st23/source";
-		String<ECSSTCRequestStringSize> lockedFile = "lockedFile";
-		lockFileMessage.appendOctetString(repo);
-		lockFileMessage.appendOctetString(lockedFile);
-		MessageParser::execute(lockFileMessage);
+TEST_CASE("Resume file copy operations TC[23,17]", "[service][st23]") {
+    SECTION("Resume single operation") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(200, "source/file", "dest/file",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        auto* op = Services.fileManagement.findFileCopyOperation(200);
+        op->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        op->setState(FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ResumeFileCopyOperation, Message::TC, 0);
+        message.appendUint8(1);
+        message.appendUint16(200);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+    }
 
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "lockedFile";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+    SECTION("Resume multiple operations") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(201, "source/file1", "dest/file1",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        Services.fileManagement.addFileCopyOperation(202, "source/file2", "dest/file2",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        auto* op1 = Services.fileManagement.findFileCopyOperation(201);
+        auto* op2 = Services.fileManagement.findFileCopyOperation(202);
+        op1->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        op1->setState(FileManagementService::FileCopyOperation::State::ON_HOLD);
+        op2->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        op2->setState(FileManagementService::FileCopyOperation::State::ON_HOLD);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ResumeFileCopyOperation, Message::TC, 0);
+        message.appendUint8(2);
+        message.appendUint16(201);
+        message.appendUint16(202);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(op1->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        CHECK(op2->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+    }
+}
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedOnLockedFile));
-	}
 
-	SECTION("Source path leads to directory") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		String<ECSSTCRequestStringSize> sourceRepo = "st23";
-		String<ECSSTCRequestStringSize> sourceFile = "source";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(sourceFile);
+TEST_CASE("Abort file copy operations TC[23,18]", "[service][st23]") {
+    SECTION("Abort single operation") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(300, "source/file", "dest/file",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        auto* op = Services.fileManagement.findFileCopyOperation(300);
+        op->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::AbortFileCopyOperation, Message::TC, 0);
+        message.appendUint8(1);
+        message.appendUint16(300);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(Services.fileManagement.findFileCopyOperation(300) == nullptr);
+    }
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::AttemptedCopyFileOperationOnDirectory));
-	}
+    SECTION("Abort multiple operations") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(301, "source/file1", "dest/file1",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        Services.fileManagement.addFileCopyOperation(302, "source/file2", "dest/file2",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        Services.fileManagement.findFileCopyOperation(301)->setState(
+            FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        Services.fileManagement.findFileCopyOperation(302)->setState(
+            FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::AbortFileCopyOperation, Message::TC, 0);
+        message.appendUint8(2);
+        message.appendUint16(301);
+        message.appendUint16(302);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(Services.fileManagement.findFileCopyOperation(301) == nullptr);
+        CHECK(Services.fileManagement.findFileCopyOperation(302) == nullptr);
+    }
+}
 
-	SECTION("Destination file already exists") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
+TEST_CASE("Suspend/Resume/Abort operations in path TC[23,19-21]", "[service][st23]") {
+    SECTION("Suspend operations in path") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(400, "st23/source/file1", "st23/dest/file1",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        Services.fileManagement.addFileCopyOperation(401, "st23/source/file2", "st23/dest/file2",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        Services.fileManagement.addFileCopyOperation(402, "other/source/file", "other/dest/file",
+                                                      FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        auto* op1 = Services.fileManagement.findFileCopyOperation(400);
+        auto* op2 = Services.fileManagement.findFileCopyOperation(401);
+        auto* op3 = Services.fileManagement.findFileCopyOperation(402);
+        op1->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        op2->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        op3->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::SuspendFileCopyOperationInPath, Message::TC, 0);
+        String<ECSSTCRequestStringSize> repo = "st23/source";
+        message.appendOctetString(repo);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(op1->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op2->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op3->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+    }
 
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "file";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		String<ECSSTCRequestStringSize> destinationFile = "file1";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(destinationFile);
+	SECTION("Resume operations in path") {
+    	ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+    	Services.fileManagement.addFileCopyOperation(403, "st23/source/file1", "st23/dest/file1",
+													  FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists));
-	}
+    	auto* op = Services.fileManagement.findFileCopyOperation(403);
+    	op->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+    	op->setState(FileManagementService::FileCopyOperation::State::ON_HOLD);
+    	Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ResumeFileCopyOperationInPath, Message::TC, 0);
+    	String<ECSSTCRequestStringSize> repo = "st23/source";
+    	message.appendOctetString(repo);
+    	MessageParser::execute(message);
+    	CHECK(ServiceTests::countErrors() == 0);
+    	CHECK(op->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+    }
 
-	SECTION("Insufficient memory") {
-		Message message(FileManagementService::ServiceType, FileManagementService::MessageType::MoveFile, Message::TC, 0);
-		message.appendUint32(Filesystem::OperationIdGenerator::next());
-		const std::string longText = "This text is definitely longer than forty-two bytes.\n";
-		if (std::ofstream outFile("st23/source/test_file.txt"); outFile.is_open()) {
-			outFile << longText;
-			outFile.close();
-		}
-		String<ECSSTCRequestStringSize> sourceRepo = "st23/source";
-		String<ECSSTCRequestStringSize> sourceFile = "test_file.txt";
-		message.appendOctetString(sourceRepo);
-		message.appendOctetString(sourceFile);
-		String<ECSSTCRequestStringSize> destinationRepo = "st23/destination";
-		String<ECSSTCRequestStringSize> destinationFile = "file2.txt";
-		message.appendOctetString(destinationRepo);
-		message.appendOctetString(destinationFile);
+    SECTION("Abort operations in path - success") {
+        ServiceTests::reset();
+    	Message dummyMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CopyFile, Message::TC, 0);
+        Services.fileManagement.addFileCopyOperation(404, "st23/source/file1",
+        	"st23/dest/file1", FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
+        Services.fileManagement.findFileCopyOperation(404)->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::AbortFileCopyOperationInPath, Message::TC, 0);
+        String<ECSSTCRequestStringSize> repo = "st23/source";
+        message.appendOctetString(repo);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+        CHECK(Services.fileManagement.findFileCopyOperation(404) == nullptr);
+    }
 
-		MessageParser::execute(message);
-		CHECK(ServiceTests::countErrors() == 1);
-		CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace));
-	}
+    SECTION("Abort operations in path - no active operations") {
+        ServiceTests::reset();
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::AbortFileCopyOperationInPath, Message::TC, 0);
+        String<ECSSTCRequestStringSize> repo = "empty/path";
+        message.appendOctetString(repo);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::NoActiveFileCopyOperationsFound));
+    }
+}
 
-	fs::remove_all("st23");
-	fs::remove_all("remote");
+TEST_CASE("Periodic file copy status reporting TC[23,22-24]", "[service][st23]") {
+    SECTION("Enable periodic reporting") {
+        ServiceTests::reset();
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::EnablePeriodicReportingOfFileCopy, Message::TC, 0);
+        message.appendUint16(1000);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+    }
+
+    SECTION("Interval too small") {
+        ServiceTests::reset();
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::EnablePeriodicReportingOfFileCopy, Message::TC, 0);
+        message.appendUint16(50);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 1);
+        CHECK(ServiceTests::thrownError(ErrorHandler::ExecutionStartErrorType::InvalidReportingInterval));
+    }
+
+    SECTION("Disable periodic reporting") {
+        ServiceTests::reset();
+        Message message(FileManagementService::ServiceType, FileManagementService::MessageType::DisablePeriodicReportingOfFileCopy, Message::TC, 0);
+        MessageParser::execute(message);
+        CHECK(ServiceTests::countErrors() == 0);
+    }
 }
 
 TEST_CASE("Observe available unallocated memory 6.23.4.7", "[service][st23]") {
-	uint32_t freeMemory = Services.fileManagement.getUnallocatedMemory();
-	CHECK(freeMemory == 42);
+    uint32_t freeMemory = Services.fileManagement.getUnallocatedMemory();
+    CHECK(freeMemory == 42);
 }

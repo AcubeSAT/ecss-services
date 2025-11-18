@@ -1,9 +1,9 @@
 #include "Services/FileManagementService.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/FileCopyOperationIdGenerator.hpp"
 #include "Helpers/FilepathValidators.hpp"
 #include "Helpers/Filesystem.hpp"
 #include "Message.hpp"
+#include "ServicePool.hpp"
 
 using namespace FilepathValidators;
 
@@ -294,151 +294,228 @@ void FileManagementService::deleteDirectory(Message& message) {
 }
 
 void FileManagementService::copyFile(Message& message) {
-	if (not message.assertTC(ServiceType, CopyFile)) {
-		return;
+	if (not message.assertTC(ServiceType, CopyFile)) return;
+	if (auto [operationId, sourceFullPath, targetFullPath] = parseFileCopyRequest(message);
+		validateFileCopyOperationRegistration(message, operationId, sourceFullPath, targetFullPath, FileCopyOperation::Type::COPY)) {
+		Filesystem::copyFile(operationId);
 	}
-
-	// TODO (#317): Handle wildcard characters. Could reject them here and have a separate caller for this function to copy each file
-	const auto copyOperationId = message.readUint32();
-	if (Filesystem::OperationIdGenerator::isInUse(copyOperationId)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse);
-		return;
-	}
-	Filesystem::OperationIdGenerator::markInUse(copyOperationId);
-	auto sourceRepositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto sourceFileName = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto targetRepositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto targetFileName = message.readOctetString<Filesystem::ObjectPathSize>();
-	const auto sourceFullPath = getFullPath(sourceRepositoryPath, sourceFileName);
-	const auto targetFullPath = getFullPath(targetRepositoryPath, targetFileName);
-
-	if (const auto sourceRepositoryType = Filesystem::getNodeType(sourceFullPath); not sourceRepositoryType) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
-		return;
-	}
-
-	if (not Filesystem::copyOperationIsAllowed(sourceFullPath, targetFullPath)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedFromRemoteToRemoteRepository);
-		return;
-	}
-
-	if (Filesystem::FileLockStatus::Locked == Filesystem::getFileLockStatus(sourceFullPath)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedOnLockedFile);
-		return;
-	}
-
-	if (auto result = Filesystem::copyFile(sourceFullPath, targetFullPath); !result.has_value()) {
-		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
-		switch (result.error()) {
-			case Filesystem::FileCopyError::SourcePathLeadsToDirectory: {
-				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedCopyFileOperationOnDirectory;
-				break;
-			}
-			case Filesystem::FileCopyError::DestinationFileAlreadyExists: {
-				error = ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists;
-				break;
-			}
-			case Filesystem::FileCopyError::ReadFailure: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemReadFailure;
-				break;
-			}
-			case Filesystem::FileCopyError::WriteFailure: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemWriteFailure;
-				break;
-			}
-			case Filesystem::FileCopyError::CommunicationFailure: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemCommunicationFailure;
-				break;
-			}
-			case Filesystem::FileCopyError::InsufficientSpace: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace;
-				break;
-			}
-			default: {
-				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
-				break;
-			}
-		}
-		ErrorHandler::reportError(message, error);
-		// TODO (#317): generate failed execution verification report, the above error reporting might be enough
-	}
-	// TODO (#317): generate successful execution verification report if requested
-	Filesystem::OperationIdGenerator::release(copyOperationId);
 }
 
 void FileManagementService::moveFile(Message& message) {
-	if (not message.assertTC(ServiceType, MoveFile)) {
+	if (not message.assertTC(ServiceType, MoveFile)) return;
+	if (auto [operationId, sourceFullPath, targetFullPath] = parseFileCopyRequest(message);
+		validateFileCopyOperationRegistration(message, operationId, sourceFullPath, targetFullPath, FileCopyOperation::Type::MOVE)) {
+		Filesystem::moveFile(operationId);
+	}
+}
+
+void FileManagementService::suspendFileCopyOperations(Message& message) {
+    if (not message.assertTC(ServiceType, SuspendFileCopyOperation)) {
 		return;
 	}
-	// TODO (#317): Handle wildcard characters. Could reject them here and have a separate caller for this function to move each file
-	const auto copyOperationId = message.readUint32();
-	if (Filesystem::OperationIdGenerator::isInUse(copyOperationId)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse);
+	const uint8_t operationCount = message.readUint8();
+    for (uint8_t i = 0; i < operationCount; i++) {
+		const auto operationId = message.readUint16();
+        FileCopyOperation* operation = findFileCopyOperation(operationId);
+        if (operation == nullptr) {
+            ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdNotFound);
+            continue;
+        }
+        if (operation->getState() == FileCopyOperation::State::IN_PROGRESS) {
+            operation->setState(FileCopyOperation::State::ON_HOLD);
+        }
+    }
+}
+
+void FileManagementService::resumeFileCopyOperations(Message& message) {
+    if (not message.assertTC(ServiceType, ResumeFileCopyOperation)) {
 		return;
 	}
-	Filesystem::OperationIdGenerator::markInUse(copyOperationId);
+	const uint8_t operationCount = message.readUint8();
+    for (uint8_t i = 0; i < operationCount; i++) {
+		const auto operationId = message.readUint16();
+        FileCopyOperation* operation = findFileCopyOperation(operationId);
+        if (operation == nullptr) {
+            ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdNotFound);
+            continue;
+        }
+        if (operation->getState() == FileCopyOperation::State::ON_HOLD) {
+            operation->setState(FileCopyOperation::State::IN_PROGRESS);
+        }
+    }
+}
+
+void FileManagementService::abortFileCopyOperations(Message& message) {
+    if (not message.assertTC(ServiceType, AbortFileCopyOperation)) {
+		return;
+	}
+	const uint8_t operationCount = message.readUint8();
+    for (uint8_t i = 0; i < operationCount; i++) {
+		const auto operationId = message.readUint16();
+        FileCopyOperation* operation = findFileCopyOperation(operationId);
+        if (operation == nullptr) {
+            ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdNotFound);
+            continue;
+        }
+        operation->setState(FileCopyOperation::State::FAILED);
+        removeFileCopyOperation(operationId);
+    }
+}
+
+void FileManagementService::suspendFileCopyOperationsInPath(Message& message) {
+    if (not message.assertTC(ServiceType, SuspendFileCopyOperationInPath)) {
+		return;
+	}
+	const auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+    for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+        if (fileCopyOperations[i].getState() == FileCopyOperation::State::IN_PROGRESS &&
+            fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
+            fileCopyOperations[i].setState(FileCopyOperation::State::ON_HOLD);
+        }
+    }
+}
+
+void FileManagementService::resumeFileCopyOperationsInPath(Message& message) {
+    if (not message.assertTC(ServiceType, ResumeFileCopyOperationInPath)) {
+		return;
+	}
+	const auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+    for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+        if (fileCopyOperations[i].getState() == FileCopyOperation::State::ON_HOLD &&
+            fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
+            fileCopyOperations[i].setState(FileCopyOperation::State::IN_PROGRESS);
+        }
+    }
+}
+
+void FileManagementService::abortFileCopyOperationsInPath(Message& message) {
+	if (not message.assertTC(ServiceType, AbortFileCopyOperationInPath)) {
+		return;
+	}
+
+	const auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+
+	bool hasActiveOperations = false;
+	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+		if (fileCopyOperations[i].isActive() &&
+		   fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
+			hasActiveOperations = true;
+			break;
+		   }
+	}
+
+	if (!hasActiveOperations) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::NoActiveFileCopyOperationsFound);
+		return;
+	}
+
+	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+		if (fileCopyOperations[i].isActive() &&
+		   fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
+			const uint16_t operationId = fileCopyOperations[i].getId();
+			fileCopyOperations[i].setState(FileCopyOperation::State::FAILED);
+			removeFileCopyOperation(operationId);
+		   }
+	}
+}
+
+void FileManagementService::enablePeriodicFileCopyStatusReporting(Message& message) {
+    if (not message.assertTC(ServiceType, EnablePeriodicReportingOfFileCopy)) {
+		return;
+	}
+	const uint16_t intervalMs = message.readUint16();
+    if (intervalMs < MinFileCopyReportingIntervalMs || intervalMs > MaxFileCopyReportingIntervalMs) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::InvalidReportingInterval);
+        return;
+    }
+    fileCopyReportingIntervalMs = intervalMs;
+    periodicFileCopyReportingEnabled = true;
+}
+
+void FileManagementService::disablePeriodicFileCopyStatusReporting(const Message& message) {
+    if (not message.assertTC(ServiceType, DisablePeriodicReportingOfFileCopy)) {
+        return;
+    }
+    periodicFileCopyReportingEnabled = false;
+}
+
+FileManagementService::FileCopyRequest FileManagementService::parseFileCopyRequest(Message& message) {
+	FileCopyRequest request;
+	request.operationId = message.readUint16();
 	auto sourceRepositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
 	auto sourceFileName = message.readOctetString<Filesystem::ObjectPathSize>();
 	auto targetRepositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
 	auto targetFileName = message.readOctetString<Filesystem::ObjectPathSize>();
-	const auto sourceFullPath = getFullPath(sourceRepositoryPath, sourceFileName);
-	const auto targetFullPath = getFullPath(targetRepositoryPath, targetFileName);
 
-	if (const auto sourceRepositoryType = Filesystem::getNodeType(sourceFullPath); not sourceRepositoryType) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
-		return;
-	}
+	request.sourceFullPath = getFullPath(sourceRepositoryPath, sourceFileName);
+	request.targetFullPath = getFullPath(targetRepositoryPath, targetFileName);
 
-	if (not Filesystem::copyOperationIsAllowed(sourceFullPath, targetFullPath)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedFromRemoteToRemoteRepository);
-		return;
-	}
-
-	if (Filesystem::FileLockStatus::Locked == Filesystem::getFileLockStatus(sourceFullPath)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedOnLockedFile);
-		return;
-	}
-
-	if (auto result = Filesystem::moveFile(sourceFullPath, targetFullPath); !result.has_value()) {
-		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
-		switch (result.error()) {
-			case Filesystem::FileCopyError::SourcePathLeadsToDirectory: {
-				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedCopyFileOperationOnDirectory;
-				break;
-			}
-			case Filesystem::FileCopyError::DestinationFileAlreadyExists: {
-				error = ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists;
-				break;
-			}
-			case Filesystem::FileCopyError::ReadFailure: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemReadFailure;
-				break;
-			}
-			case Filesystem::FileCopyError::WriteFailure: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemWriteFailure;
-				break;
-			}
-			case Filesystem::FileCopyError::CommunicationFailure: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemCommunicationFailure;
-				break;
-			}
-			case Filesystem::FileCopyError::InsufficientSpace: {
-				error = ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace;
-				break;
-			}
-			default: {
-				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
-				break;
-			}
-		}
-		ErrorHandler::reportError(message, error);
-		// TODO (#317): generate failed execution verification report, the above error reporting might be enough
-	}
-	// TODO (#317): generate successful execution verification report if requested
-	Filesystem::OperationIdGenerator::release(copyOperationId);
+	return request;
 }
 
+bool FileManagementService::validateFileCopyOperationRegistration(
+    const Message& message,
+    const uint16_t operationId,
+    const Filesystem::Path& sourceFullPath,
+    const Filesystem::Path& targetFullPath,
+    const FileCopyOperation::Type operationType) {
 
+    if (operationIdManager.isInUse(operationId)) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse);
+        return false;
+    }
+
+    if (findWildcardPosition(sourceFullPath) || findWildcardPosition(targetFullPath)) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+        return false;
+    }
+
+    const auto sourceRepositoryType = Filesystem::getNodeType(sourceFullPath);
+    if (not sourceRepositoryType) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ObjectPathIsInvalid);
+        return false;
+    }
+
+    if (sourceRepositoryType.value() == Filesystem::NodeType::Directory) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedOnDirectory);
+        return false;
+    }
+
+    if (not Filesystem::copyOperationInvolvesLocalPath(sourceFullPath, targetFullPath)) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedFromRemoteToRemoteRepository);
+        return false;
+    }
+
+    if (Filesystem::FileLockStatus::Locked == Filesystem::getFileLockStatus(sourceFullPath)) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationRequestedOnLockedFile);
+        return false;
+    }
+
+    if (!addFileCopyOperation(operationId, sourceFullPath.data(), targetFullPath.data(), operationType, message)) {
+        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::MaximumNumberOfFileCopyOperationsReached);
+        return false;
+    }
+    return true;
+}
+
+void FileManagementService::generateFileCopyStatusReport() {
+	Message report = createTM(FileCopyStatusReport);
+	uint8_t ongoingCount = 0;
+	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+		if (fileCopyOperations[i].isActive()) {
+			ongoingCount++;
+		}
+	}
+	report.appendUint8(ongoingCount);
+	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+		if (fileCopyOperations[i].isActive()) {
+			report.appendUint16(fileCopyOperations[i].getId());
+			report.appendUint8(static_cast<uint8_t>(fileCopyOperations[i].getState()));
+			report.appendUint8(fileCopyOperations[i].getProgressPercentage());
+		}
+	}
+	storeMessage(report);
+}
 
 uint32_t FileManagementService::getUnallocatedMemory() {
 	return Filesystem::getUnallocatedMemory();
@@ -473,7 +550,139 @@ void FileManagementService::execute(Message& message) {
 		case MoveFile:
 			moveFile(message);
 			break;
+		case SuspendFileCopyOperation:
+			suspendFileCopyOperations(message);
+			break;
+		case ResumeFileCopyOperation:
+			resumeFileCopyOperations(message);
+			break;
+		case AbortFileCopyOperation:
+			abortFileCopyOperations(message);
+			break;
+		case SuspendFileCopyOperationInPath:
+			suspendFileCopyOperationsInPath(message);
+			break;
+		case ResumeFileCopyOperationInPath:
+			resumeFileCopyOperationsInPath(message);
+			break;
+		case AbortFileCopyOperationInPath:
+			abortFileCopyOperationsInPath(message);
+			break;
+		case EnablePeriodicReportingOfFileCopy:
+			enablePeriodicFileCopyStatusReporting(message);
+			break;
+		case DisablePeriodicReportingOfFileCopy:
+			disablePeriodicFileCopyStatusReporting(message);
+			break;
 		default:
 			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
+}
+
+FileManagementService::FileCopyOperation* FileManagementService::findFileCopyOperation(const uint16_t operationId) {
+	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+	    if (fileCopyOperations[i].getId() == operationId) {
+	        return &fileCopyOperations[i];
+	    }
+	}
+	return nullptr;
+}
+
+bool FileManagementService::addFileCopyOperation(const uint16_t operationId,
+                                               const ObjectPath& sourcePath,
+                                               const ObjectPath& targetPath,
+                                               const FileCopyOperation::Type type,
+                                               const Message& message) {
+    if (activeFileCopyOperationCount >= MaxConcurrentFileCopyOperations) {
+        return false;
+    }
+    if (!operationIdManager.reserveId(operationId)) {
+        return false;
+    }
+    for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+        if (fileCopyOperations[i].getState() == FileCopyOperation::State::IDLE) {
+            fileCopyOperations[i].initialize(operationId, sourcePath, targetPath, type, message);
+            activeFileCopyOperationCount++;
+            return true;
+        }
+    }
+    operationIdManager.releaseId(operationId);
+    return false;
+}
+
+void FileManagementService::removeFileCopyOperation(const uint16_t operationId) {
+    for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+        if (fileCopyOperations[i].getId() == operationId && fileCopyOperations[i].getState() != FileCopyOperation::State::IDLE) {
+            fileCopyOperations[i].reset();
+            operationIdManager.releaseId(operationId);
+            activeFileCopyOperationCount--;
+            break;
+        }
+    }
+}
+
+bool FileManagementService::setOperationState(const uint16_t operationId, const FileCopyOperation::State newState) {
+	FileCopyOperation* operation = findFileCopyOperation(operationId);
+	if (operation == nullptr) {
+		return false;
+	}
+	operation->setState(newState);
+	return true;
+}
+
+bool FileManagementService::isOperationSuspended(const uint16_t operationId) const {
+	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
+		if (fileCopyOperations[i].getId() == operationId &&
+			fileCopyOperations[i].getState() == FileCopyOperation::State::ON_HOLD) {
+			return true;
+		}
+	}
+	return false;
+}
+
+void FileManagementService::updateOperationProgress(const uint16_t operationId,
+                                                    const uint32_t bytesTransferred,
+                                                    const uint32_t totalBytes) {
+	if (FileCopyOperation* operation = findFileCopyOperation(operationId); operation != nullptr) {
+        operation->bytesTransferred = bytesTransferred;
+        operation->totalBytes = totalBytes;
+        if (bytesTransferred >= totalBytes && totalBytes > 0) {
+            operation->setState(FileCopyOperation::State::COMPLETED);
+        }
+    }
+}
+
+void FileManagementService::notifyOperationSuccess(const uint16_t operationId) {
+	const FileCopyOperation* operation = findFileCopyOperation(operationId);
+	if (operation == nullptr) return;
+	Services.requestVerification.successCompletionExecutionVerification(operation->requestMessage);
+	removeFileCopyOperation(operationId);
+}
+
+void FileManagementService::notifyOperationFailure(const uint16_t operationId, const Filesystem::FileCopyError errorType) {
+	const FileCopyOperation* operation = findFileCopyOperation(operationId);
+    if (operation == nullptr) return;
+    ErrorHandler::ExecutionCompletionErrorType error;
+    switch (errorType) {
+        case Filesystem::FileCopyError::DestinationFileAlreadyExists:
+            error = ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists;
+            break;
+        case Filesystem::FileCopyError::ReadFailure:
+            error = ErrorHandler::ExecutionCompletionErrorType::FileSystemReadFailure;
+            break;
+        case Filesystem::FileCopyError::WriteFailure:
+            error = ErrorHandler::ExecutionCompletionErrorType::FileSystemWriteFailure;
+            break;
+        case Filesystem::FileCopyError::CommunicationFailure:
+            error = ErrorHandler::ExecutionCompletionErrorType::FileSystemCommunicationFailure;
+            break;
+        case Filesystem::FileCopyError::InsufficientSpace:
+            error = ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace;
+            break;
+        default:
+            error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+            break;
+    }
+	ErrorHandler::reportError(operation->requestMessage, error);
+    removeFileCopyOperation(operationId);
 }

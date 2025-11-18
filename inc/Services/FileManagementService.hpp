@@ -34,7 +34,17 @@ public:
 	 */
 	inline static constexpr size_t MaxPossibleFileSizeBytes = 4096;
 
+	// File Copy Subservice Configuration Constants
+	static constexpr uint8_t MaxConcurrentFileCopyOperations = 10;
+	static constexpr uint16_t DefaultFileCopyReportingIntervalMs = 1000;
+	static constexpr uint16_t MinFileCopyReportingIntervalMs = 1000;
+	static constexpr uint16_t MaxFileCopyReportingIntervalMs = 60000;
+	static constexpr bool InitialPeriodicReportingState = false;
+	static constexpr uint8_t InitialOperationCount = 0;
+	static constexpr uint16_t InvalidOperationId = 0;
+
 	enum MessageType : uint8_t {
+		// File handling subservice (ECSS 6.23.4)
 		CreateFile = 1,
 		DeleteFile = 2,
 		ReportAttributes = 3,
@@ -48,6 +58,7 @@ public:
 		RenameDirectory = 11,
 		ReportSummaryDirectory = 12,
 		SummaryDirectoryReport = 13,
+		// File copy subservice (ECSS 6.23.5)
 		CopyFile = 14,
 		MoveFile = 15,
 		SuspendFileCopyOperation = 16,
@@ -60,6 +71,117 @@ public:
 		FileCopyStatusReport = 23,
 		DisablePeriodicReportingOfFileCopy = 24
 	};
+
+	struct FileCopyOperation {
+
+		enum class State : uint8_t {
+			IDLE = 0,
+			PENDING = 1,
+			IN_PROGRESS = 2,
+			ON_HOLD = 3,
+			COMPLETED = 4,
+			FAILED = 5
+		};
+
+		enum class Type : uint8_t {
+			COPY = 0,
+			MOVE = 1
+		};
+
+		uint16_t operationId = InvalidOperationId;
+		State state = State::IDLE;
+		Type type = Type::COPY;
+		Filesystem::ObjectPath sourcePath;
+		Filesystem::ObjectPath targetPath;
+		uint32_t bytesTransferred = 0;
+		uint32_t totalBytes = 0;
+		uint32_t startTime = 0;
+		Message requestMessage;
+
+		FileCopyOperation() : sourcePath(""), targetPath("") {}
+
+		void initialize(const uint16_t id, const Filesystem::ObjectPath& srcPath,
+			const Filesystem::ObjectPath& dstPath, const Type opType, const Message& message) {
+			operationId = id;
+			sourcePath = srcPath;
+			targetPath = dstPath;
+			type = opType;
+			state = State::PENDING;
+			bytesTransferred = 0;
+			totalBytes = 0;
+			startTime = 0;
+			requestMessage = message;
+		}
+
+		void reset() {
+			operationId = InvalidOperationId;
+			state = State::IDLE;
+			type = Type::COPY;
+			sourcePath.clear();
+			targetPath.clear();
+			bytesTransferred = 0;
+			totalBytes = 0;
+			startTime = 0;
+			requestMessage = Message();
+		}
+
+		[[nodiscard]] State getState() const { return state; }
+		[[nodiscard]] uint16_t getId() const { return operationId; }
+		[[nodiscard]] Filesystem::ObjectPath getSourcePath() const { return sourcePath; }
+		[[nodiscard]] Filesystem::ObjectPath getTargetPath() const { return targetPath; }
+		void setState(const State newState) {
+			if (isValidStateTransition(state, newState)) {
+				state = newState;
+			}
+		}
+
+		[[nodiscard]] uint8_t getProgressPercentage() const {
+			if (totalBytes == 0) return 0;
+			return static_cast<uint8_t>((bytesTransferred * 100ULL) / totalBytes);
+		}
+
+		[[nodiscard]] bool isActive() const {
+			return state != State::IDLE && state != State::COMPLETED && state != State::FAILED;
+		}
+
+		[[nodiscard]] bool involvesRepositoryPath(const Filesystem::ObjectPath& repositoryPath) const {
+			return sourcePath.find(repositoryPath.c_str()) == 0 || targetPath.find(repositoryPath.c_str()) == 0;
+		}
+
+		static bool isValidStateTransition(const State from, const State to) {
+			switch (from) {
+				case State::PENDING:
+					return to == State::IN_PROGRESS || to == State::FAILED;
+				case State::IN_PROGRESS:
+					return to == State::ON_HOLD || to == State::COMPLETED || to == State::FAILED;
+				case State::ON_HOLD:
+					return to == State::IN_PROGRESS || to == State::FAILED;
+				default:
+					return false;
+			}
+		}
+	};
+
+	[[nodiscard]] bool isPeriodicFileCopyReportingEnabled() const {
+		return periodicFileCopyReportingEnabled;
+	}
+
+	[[nodiscard]] uint16_t getFileCopyReportingIntervalMs() const {
+		return fileCopyReportingIntervalMs;
+	}
+
+	FileCopyOperation* findFileCopyOperation(uint16_t operationId);
+	bool addFileCopyOperation(uint16_t operationId,
+							 const Filesystem::ObjectPath& sourcePath,
+							 const Filesystem::ObjectPath& targetPath,
+							 FileCopyOperation::Type type,
+							 const Message& message);
+	void removeFileCopyOperation(uint16_t operationId);
+	[[nodiscard]] bool isOperationSuspended(uint16_t operationId) const;
+	bool setOperationState(uint16_t operationId, FileCopyOperation::State newState);
+	void updateOperationProgress(uint16_t operationId, uint32_t bytesTransferred, uint32_t totalBytes);
+	void notifyOperationSuccess(uint16_t operationId);
+	void notifyOperationFailure(uint16_t operationId, Filesystem::FileCopyError errorType);
 
 	/**
      * TC[23,1] Create a file at the provided repository path, give it the provided file name and file size
@@ -137,9 +259,54 @@ public:
 	void moveFile(Message& message);
 
 	/**
+	 * TC[23,16] Suspend file copy operations
+	 */
+	void suspendFileCopyOperations(Message& message);
+
+	/**
+	 * TC[23,17] Resume file copy operations
+	 */
+	void resumeFileCopyOperations(Message& message);
+
+	/**
+	 * TC[23,18] Abort file copy operations
+	 */
+	void abortFileCopyOperations(Message& message);
+
+	/**
+	 * TC[23,19] Suspend all file copy operations involving a repository path
+	 */
+	void suspendFileCopyOperationsInPath(Message& message);
+
+	/**
+	 * TC[23,20] Resume all file copy operations involving a repository path
+	 */
+	void resumeFileCopyOperationsInPath(Message& message);
+
+	/**
+	 * TC[23,21] Abort all file copy operations involving a repository path
+	 */
+	void abortFileCopyOperationsInPath(Message& message);
+
+	/**
+	 * TC[23,22] Enable the periodic reporting of the file copy status
+	 */
+	void enablePeriodicFileCopyStatusReporting(Message& message);
+
+	/**
+	 * TM[23,23] File copy status report
+	 */
+	void generateFileCopyStatusReport();
+
+	/**
+	 * TC[23,24] Disable the periodic reporting of the file copy status
+	 */
+	void disablePeriodicFileCopyStatusReporting(const Message& message);
+
+	/**
 	 * Ask the FS for the available unallocated memory and return it.
-	 * 
-	 * @return uint32_t The bytes of available unallocated memory 
+	 *
+	 * @return uint32_t The bytes of available unallocated memory
 	 */
 	uint32_t getUnallocatedMemory();
 
@@ -177,6 +344,66 @@ private:
 		fullPath.append(filePath);
 		return fullPath;
 	}
+
+	struct FileCopyRequest {
+		uint16_t operationId = 0;
+   		Filesystem::Path sourceFullPath = "";
+   		Filesystem::Path targetFullPath = "";
+	};
+
+	bool validateFileCopyOperationRegistration(
+	    const Message& message,
+	    uint16_t operationId,
+	    const Filesystem::Path& sourceFullPath,
+	    const Filesystem::Path& targetFullPath,
+	    FileCopyOperation::Type operationType);
+
+	static FileCopyRequest parseFileCopyRequest(Message& message);
+
+	// File Copy Subservice State
+	std::array<FileCopyOperation, MaxConcurrentFileCopyOperations> fileCopyOperations{};
+	uint8_t activeFileCopyOperationCount = InitialOperationCount;
+	bool periodicFileCopyReportingEnabled = InitialPeriodicReportingState;
+	uint16_t fileCopyReportingIntervalMs = DefaultFileCopyReportingIntervalMs;
+
+	struct OperationIdManager {
+		std::array<uint16_t, MaxConcurrentFileCopyOperations> activeIds{};
+		uint8_t activeCount = 0;
+
+		bool reserveId(const uint16_t id) {
+			if (isInUse(id) || activeCount >= MaxConcurrentFileCopyOperations) {
+				return false;
+			}
+			activeIds[activeCount++] = id;
+			return true;
+		}
+
+		[[nodiscard]] bool isInUse(const uint16_t id) const {
+			for (uint8_t i = 0; i < activeCount; i++) {
+				if (activeIds[i] == id) return true;
+			}
+			return false;
+		}
+
+		void releaseId(const uint16_t id) {
+			for (uint8_t i = 0; i < activeCount; i++) {
+				if (activeIds[i] == id) {
+					for (uint8_t j = i; j < activeCount - 1; j++) {
+						activeIds[j] = activeIds[j + 1];
+					}
+					activeCount--;
+					break;
+				}
+			}
+		}
+
+		[[nodiscard]] size_t getActiveCount() const {
+			return activeCount;
+		}
+	};
+
+	OperationIdManager operationIdManager{};
+
 };
 
 #endif //ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP

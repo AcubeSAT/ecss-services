@@ -412,8 +412,8 @@ public:
 		 */
 		NonExistentApplicationProcess = 58,
 		/**
-         * Size of file is bigger than allowed
-         */
+		 * Size of file is bigger than allowed
+		 */
 		SizeOfFileIsOutOfBounds = 59,
 		/**
 		 * Object path is invalid
@@ -421,7 +421,7 @@ public:
 		ObjectPathIsInvalid = 60,
 		/**
 		 * A wildcard was found where it shouldn't be present
-	 	 */
+		  */
 		UnexpectedWildcard = 61,
 		/**
 		 * A file type that was expected to be a directory is a file instead
@@ -436,13 +436,33 @@ public:
 		 */
 		FileCopyOperationIdAlreadyInUse = 64,
 		/**
+		 * A file copy operation was requested on a repository
+		 */
+		FileCopyOperationRequestedOnDirectory = 65,
+		/**
 		 * A file copy operation was requested to copy a file from a remote repository to a remote repository
 		 */
-		FileCopyOperationRequestedFromRemoteToRemoteRepository = 65,
+		FileCopyOperationRequestedFromRemoteToRemoteRepository = 66,
 		/**
 		 * A file copy operation was requested on a file that is locked
 		 */
-		FileCopyOperationRequestedOnLockedFile = 66
+		FileCopyOperationRequestedOnLockedFile = 67,
+		/**
+		 * The maximum allows copy operations are already active
+		 */
+		MaximumNumberOfFileCopyOperationsReached = 68,
+		/**
+		 * File copy operation ID does not exist
+		 */
+		FileCopyOperationIdNotFound = 69,
+		/**
+		 * The requested reporting interval is invalid
+		 */
+		InvalidReportingInterval = 70,
+		/**
+		 * An "abort file copy operations in path" operation was requested on a path that has no active copy operations
+		 */
+		NoActiveFileCopyOperationsFound = 71
 	};
 
 	/**
@@ -508,34 +528,29 @@ public:
 		 */
 		AttemptedAccessModificationOnDirectory = 11,
 		/**
-		 * A content summary report was requested on a file
-		 */
-		AttemptedContentSummaryReportOnFile = 12,
-		/**
 		 * A copy file operation was requested on a directory
 		 */
-		AttemptedCopyFileOperationOnDirectory = 13,
+		AttemptedCopyFileOperationOnDirectory = 12,
 		/**
 		 * A copy file operation was requested on a file that already exists in the destination
 		 */
-		DestinationFileAlreadyExists = 14,
+		DestinationFileAlreadyExists = 13,
 		/**
 		 * A copy file operation failed because the filesystem failed to write to the file
 		 */
-		FileSystemWriteFailure = 15,
+		FileSystemWriteFailure = 14,
 		/**
 		 * A copy file operation failed because the filesystem failed to read from the file
 		 */
-		FileSystemReadFailure = 16,
+		FileSystemReadFailure = 15,
 		/**
 		 * A copy file operation failed because of communication failure between remote filesystems
 		 */
-		FileSystemCommunicationFailure = 17,
+		FileSystemCommunicationFailure = 16,
 		/**
 		 * A copy file operation failed because of insufficient space in the target filesystem
 		 */
-		FileSystemInsufficientSpace = 18
-
+		FileSystemInsufficientSpace = 17
 	};
 
 	/**
