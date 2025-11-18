@@ -294,7 +294,9 @@ void FileManagementService::deleteDirectory(Message& message) {
 }
 
 void FileManagementService::copyFile(Message& message) {
-	if (not message.assertTC(ServiceType, CopyFile)) return;
+	if (not message.assertTC(ServiceType, CopyFile)) {
+		return;
+	}
 	if (auto [operationId, sourceFullPath, targetFullPath] = parseFileCopyRequest(message);
 		validateFileCopyOperationRegistration(message, operationId, sourceFullPath, targetFullPath, FileCopyOperation::Type::COPY)) {
 		Filesystem::copyFile(operationId);
@@ -302,7 +304,9 @@ void FileManagementService::copyFile(Message& message) {
 }
 
 void FileManagementService::moveFile(Message& message) {
-	if (not message.assertTC(ServiceType, MoveFile)) return;
+	if (not message.assertTC(ServiceType, MoveFile)) {
+		return;
+	}
 	if (auto [operationId, sourceFullPath, targetFullPath] = parseFileCopyRequest(message);
 		validateFileCopyOperationRegistration(message, operationId, sourceFullPath, targetFullPath, FileCopyOperation::Type::MOVE)) {
 		Filesystem::moveFile(operationId);
@@ -654,15 +658,19 @@ void FileManagementService::updateOperationProgress(const uint16_t operationId,
 
 void FileManagementService::notifyOperationSuccess(const uint16_t operationId) {
 	const FileCopyOperation* operation = findFileCopyOperation(operationId);
-	if (operation == nullptr) return;
+	if (operation == nullptr) {
+		return;
+	}
 	Services.requestVerification.successCompletionExecutionVerification(operation->requestMessage);
 	removeFileCopyOperation(operationId);
 }
 
 void FileManagementService::notifyOperationFailure(const uint16_t operationId, const Filesystem::FileCopyError errorType) {
 	const FileCopyOperation* operation = findFileCopyOperation(operationId);
-    if (operation == nullptr) return;
-    ErrorHandler::ExecutionCompletionErrorType error;
+    if (operation == nullptr) {
+    	return;
+    }
+    ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
     switch (errorType) {
         case Filesystem::FileCopyError::DestinationFileAlreadyExists:
             error = ErrorHandler::ExecutionCompletionErrorType::DestinationFileAlreadyExists;

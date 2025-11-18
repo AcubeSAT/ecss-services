@@ -136,8 +136,10 @@ public:
 		}
 
 		[[nodiscard]] uint8_t getProgressPercentage() const {
-			if (totalBytes == 0) return 0;
-			return static_cast<uint8_t>((bytesTransferred * 100ULL) / totalBytes);
+			if (totalBytes == 0) {
+				return 0;
+			}
+			return static_cast<uint8_t>((bytesTransferred * 100ULL) / totalBytes); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 		}
 
 		[[nodiscard]] bool isActive() const {
@@ -380,7 +382,9 @@ private:
 
 		[[nodiscard]] bool isInUse(const uint16_t id) const {
 			for (uint8_t i = 0; i < activeCount; i++) {
-				if (activeIds[i] == id) return true;
+				if (activeIds[i] == id) {
+					return true;
+				}
 			}
 			return false;
 		}

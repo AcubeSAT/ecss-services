@@ -27,7 +27,7 @@ namespace Filesystem {
 		FileSystemKind kind;
 	};
 
-	inline etl::vector<FileSystemDescriptor, MaximumAllowedNumberOfFileSystems> fileSystems{};
+	inline etl::vector<FileSystemDescriptor, MaximumAllowedNumberOfFileSystems> fileSystems{}; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 	inline void registerFileSystem(const FileSystemDescriptor& fs) {
 		fileSystems.push_back(fs);
@@ -41,5 +41,5 @@ namespace Filesystem {
 		}
 		return nullptr;
 	}
-}
+} // namespace Filesystem
 #endif //ECSS_SERVICES_FILESYSTEMREGISTRY_HPP
