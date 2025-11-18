@@ -188,7 +188,7 @@ namespace Filesystem {
 	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
 	 */
 	etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
-		etl::array<uint8_t, ChunkMaxFileSizeBytes>& buffer);
+		const etl::span<uint8_t, ChunkMaxFileSizeBytes> buffer);
 
 	/**
 	 * Gets the current file lock status
