@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 find_package(etl CONFIG REQUIRED)
 find_package(logger CONFIG REQUIRED COMPONENTS log_common log_x86)
+find_package(Threads REQUIRED)
 
 add_custom_target(check
         COMMAND ./cppcheck.sh
@@ -57,7 +58,7 @@ IF (X86_BUILD)
     add_executable(x86_services
             ${x86_main_SRC}
     )
-    target_link_libraries(x86_services PRIVATE etl log_common log_x86 common)
+    target_link_libraries(x86_services PRIVATE etl log_common log_x86 common Threads::Threads)
 
     # Logs all levels of messages. This command can be added by other users of this
     # library to override the respective log level.
@@ -73,7 +74,7 @@ IF (X86_BUILD)
                 ${test_x86_shared_SRC}
                 ${test_main_SRC}
                 ${test_SRC})
-        target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
+        target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain Threads::Threads)
     ENDIF()
 ENDIF()
 
