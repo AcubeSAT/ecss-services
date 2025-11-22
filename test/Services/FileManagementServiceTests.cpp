@@ -378,7 +378,7 @@ TEST_CASE("Unlock a file TC[23,6]", "[service][st23]") {
 		message.appendOctetString(file1);
 
 		MessageParser::execute(message);
-		fs::perms permissions = fs::status("st23/file_to_unlock").permissions();
+		auto permissions = fs::status("st23/file_to_unlock").permissions();
 		CHECK(ServiceTests::countErrors() == 0);
 		CHECK((permissions & fs::perms::owner_write) == fs::perms::owner_write);
 	}
