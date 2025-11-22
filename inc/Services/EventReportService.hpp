@@ -190,7 +190,7 @@ public:
     * Disabled report generation for all events
     */
     inline void disableAllEvents() {
-		enabledEvents.reset();
+        enabledEvents.reset();
     }
 
     /**
