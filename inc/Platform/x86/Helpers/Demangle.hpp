@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _MSC_VER
 #include <cxxabi.h>
 #endif
