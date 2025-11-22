@@ -91,7 +91,17 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	CHECK(eventReportService.getStateOfEvents()[EventReportService::UnknownEvent] == 1);
 	CHECK(eventReportService.getStateOfEvents()[EventReportService::MCUStart] == 0);
 }
-
+TEST_CASE("Disable All Event Report Generation") {
+	auto eventStates = eventReportService.getStateOfEvents();
+	for (auto value: eventStates) {
+		CHECK(value == true);
+	}
+	eventReportService.disableAllEvents();
+	eventStates = eventReportService.getStateOfEvents();
+	for (auto value: eventStates) {
+		CHECK(value == false);
+	}
+}
 TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	EventReportService::Event eventID[] = {EventReportService::UnknownEvent, EventReportService::MCUStart};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
