@@ -93,13 +93,13 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 }
 TEST_CASE("Disable All Event Report Generation") {
 	auto eventStates = eventReportService.getStateOfEvents();
-	for (auto value: eventStates) {
-		CHECK(value == true);
+	for (size_t i = 0; i < eventStates.size(); i++) {
+		CHECK(eventStates[i] == true);
 	}
 	eventReportService.disableAllEvents();
 	eventStates = eventReportService.getStateOfEvents();
-	for (auto value: eventStates) {
-		CHECK(value == false);
+	for (size_t i = 0; i < eventStates.size(); i++) {
+		CHECK(eventStates[i] == false);
 	}
 }
 TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
