@@ -5,7 +5,7 @@
 #include <Message.hpp>
 #include <Service.hpp>
 #include <catch2/catch_all.hpp>
-#include "../inc/Platform/x86/Helpers/Demangle.hpp"
+#include "Helpers/Demangle.hpp"
 #include <filesystem>
 #include <fstream>
 #include "Helpers/Parameter.hpp"
