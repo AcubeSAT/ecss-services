@@ -110,7 +110,7 @@ public:
 	 * @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	 * Message::appendBits() relies on this in order to easily OR the requested bits.
 	 */
-	etl::array<uint8_t, ECSSMaxMessageSize> data = {0};
+	etl::array<uint8_t, ECSSMaxMessageSize> data = {};
 
 	uint8_t currentBit = 0;
 
