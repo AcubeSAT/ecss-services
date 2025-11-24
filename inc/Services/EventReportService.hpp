@@ -187,6 +187,13 @@ public:
     }
 
     /**
+    * Disabled report generation for all events
+    */
+    inline void disableAllEvents() {
+        enabledEvents.reset();
+    }
+
+    /**
      * Validates the parameters for an event.
      * Ensures the event ID is within the allowable range and not 0.
      *
