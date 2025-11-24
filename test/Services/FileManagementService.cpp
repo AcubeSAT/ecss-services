@@ -16,16 +16,15 @@ namespace fs = std::filesystem;
 // @todo (#277): Add more tests covering cases where the repository and/or the object path is too long.
 // For more information check https://gitlab.com/acubesat/obc/ecss-services/-/merge_requests/80#note_1610840164
 
-void waitForOperationCompletion(const uint16_t operationId, const int timeoutMs = 2000) {
+bool waitForOperationCompletion(const uint16_t operationId, const int timeoutMs = 2000) {
     const auto start = std::chrono::steady_clock::now();
     while (true) {
        if (const auto* op = Services.fileManagement.findFileCopyOperation(operationId);
-          !op || op->getState() == FileManagementService::FileCopyOperation::State::COMPLETED ||
-           op->getState() == FileManagementService::FileCopyOperation::State::FAILED) {
-          break;
+       	!op || !op->isActive()) {
+          return true;
        }
        if (const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count(); elapsed > timeoutMs) {
-          break;
+          return false;
        }
        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -880,7 +879,7 @@ TEST_CASE("Suspend file copy operations TC[23,16]", "[service][st23]") {
         message.appendUint16(100);
         MessageParser::execute(message);
         CHECK(ServiceTests::countErrors() == 0);
-        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op->state == FileManagementService::FileCopyOperation::State::ON_HOLD);
     }
 
     SECTION("Suspend multiple operations") {
@@ -900,8 +899,8 @@ TEST_CASE("Suspend file copy operations TC[23,16]", "[service][st23]") {
         message.appendUint16(102);
         MessageParser::execute(message);
         CHECK(ServiceTests::countErrors() == 0);
-        CHECK(op1->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
-        CHECK(op2->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op1->state == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op2->state == FileManagementService::FileCopyOperation::State::ON_HOLD);
     }
 
     SECTION("Suspend non-existent operation") {
@@ -923,15 +922,15 @@ TEST_CASE("Resume file copy operations TC[23,17]", "[service][st23]") {
                                                       FileManagementService::FileCopyOperation::Type::COPY, dummyMessage);
         auto* op = Services.fileManagement.findFileCopyOperation(200);
         op->setState(FileManagementService::FileCopyOperation::State::IN_PROGRESS);
-        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        CHECK(op->state == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
         op->setState(FileManagementService::FileCopyOperation::State::ON_HOLD);
-        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op->state == FileManagementService::FileCopyOperation::State::ON_HOLD);
         Message message(FileManagementService::ServiceType, FileManagementService::MessageType::ResumeFileCopyOperation, Message::TC, 0);
         message.appendUint8(1);
         message.appendUint16(200);
         MessageParser::execute(message);
         CHECK(ServiceTests::countErrors() == 0);
-        CHECK(op->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        CHECK(op->state == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
     }
 
     SECTION("Resume multiple operations") {
@@ -953,8 +952,8 @@ TEST_CASE("Resume file copy operations TC[23,17]", "[service][st23]") {
         message.appendUint16(202);
         MessageParser::execute(message);
         CHECK(ServiceTests::countErrors() == 0);
-        CHECK(op1->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
-        CHECK(op2->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        CHECK(op1->state == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        CHECK(op2->state == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
     }
 }
 
@@ -1018,9 +1017,9 @@ TEST_CASE("Suspend/Resume/Abort operations in path TC[23,19-21]", "[service][st2
         message.appendOctetString(repo);
         MessageParser::execute(message);
         CHECK(ServiceTests::countErrors() == 0);
-        CHECK(op1->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
-        CHECK(op2->getState() == FileManagementService::FileCopyOperation::State::ON_HOLD);
-        CHECK(op3->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+        CHECK(op1->state == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op2->state == FileManagementService::FileCopyOperation::State::ON_HOLD);
+        CHECK(op3->state == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
     }
 
 	SECTION("Resume operations in path") {
@@ -1037,7 +1036,7 @@ TEST_CASE("Suspend/Resume/Abort operations in path TC[23,19-21]", "[service][st2
     	message.appendOctetString(repo);
     	MessageParser::execute(message);
     	CHECK(ServiceTests::countErrors() == 0);
-    	CHECK(op->getState() == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
+    	CHECK(op->state == FileManagementService::FileCopyOperation::State::IN_PROGRESS);
     }
 
     SECTION("Abort operations in path - success") {

@@ -87,6 +87,8 @@ namespace Filesystem {
 		WriteFailure = 2,
 		CommunicationFailure = 3,
 		InsufficientSpace = 4,
+		FileCopyOperationNotFound = 5,
+		FailedToUpdateOperationState = 6,
 		UnknownError = 255
 	};
 
@@ -104,6 +106,10 @@ namespace Filesystem {
 	enum class FileAttributeError : uint8_t {
 		PathLeadsToDirectory = 0,
 		FileDoesNotExist = 1
+	};
+
+	enum class FileSystemInitializationError : uint8_t {
+		FileSystemListIsFull = 0
 	};
 
 	struct PersistedOperationState {
@@ -146,11 +152,11 @@ namespace Filesystem {
 	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path);
 
 	/**
-	 * Gets the file metadata
-	 * @param path A String representing the path on the filesystem
-	 * @return Either an Attributes struct if there were no errors, either a FileAttributeError.
+	 * Retrieves metadata for a file at the given filesystem path.
+	 * @param path Path object representing the location of the file.
+	 * @return etl::expected containing an Attributes struct on success, or a FileAttributeError describing the failure.
 	 */
-	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path);
+	etl::expected<Attributes, FileAttributeError> getFileAttributes(const Path& path);
 
 	/**
 	 * Gets the type of node in the filesystem
@@ -196,7 +202,7 @@ namespace Filesystem {
 	/**
 	 * Initializes all filesystems.
 	 */
-	void initializeFileSystems();
+	etl::expected<void, FileSystemInitializationError> initializeFileSystems();
 
 	/**
 	 * Gets the current file lock status

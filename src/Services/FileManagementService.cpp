@@ -116,7 +116,7 @@ void FileManagementService::reportAttributes(Message& message) {
 
 	using namespace Filesystem;
 	auto fileAttributeResult = getFileAttributes(fullPath);
-	if (fileAttributeResult.is_value()) {
+	if (fileAttributeResult.has_value()) {
 		fileAttributeReport(repositoryPath, fileName, fileAttributeResult.value());
 		return;
 	}
@@ -325,9 +325,7 @@ void FileManagementService::suspendFileCopyOperations(Message& message) {
             ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdNotFound);
             continue;
         }
-        if (operation->getState() == FileCopyOperation::State::IN_PROGRESS) {
-            operation->setState(FileCopyOperation::State::ON_HOLD);
-        }
+    	operation->updateOperationStateIfMatchesPath<FileCopyOperation::State::IN_PROGRESS, FileCopyOperation::State::ON_HOLD>(ObjectPath(""));
     }
 }
 
@@ -343,9 +341,7 @@ void FileManagementService::resumeFileCopyOperations(Message& message) {
             ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdNotFound);
             continue;
         }
-        if (operation->getState() == FileCopyOperation::State::ON_HOLD) {
-            operation->setState(FileCopyOperation::State::IN_PROGRESS);
-        }
+    	operation->updateOperationStateIfMatchesPath<FileCopyOperation::State::ON_HOLD, FileCopyOperation::State::IN_PROGRESS>(ObjectPath(""));
     }
 }
 
@@ -361,7 +357,10 @@ void FileManagementService::abortFileCopyOperations(Message& message) {
             ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdNotFound);
             continue;
         }
-        operation->setState(FileCopyOperation::State::FAILED);
+        if (!operation->setState(FileCopyOperation::State::FAILED)) {
+        	ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::InvalidStateTransition);
+        	continue;
+        }
         removeFileCopyOperation(operationId);
     }
 }
@@ -372,10 +371,7 @@ void FileManagementService::suspendFileCopyOperationsInPath(Message& message) {
 	}
 	const auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
     for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-        if (fileCopyOperations[i].getState() == FileCopyOperation::State::IN_PROGRESS &&
-            fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
-            fileCopyOperations[i].setState(FileCopyOperation::State::ON_HOLD);
-        }
+    	fileCopyOperations[i].updateOperationStateIfMatchesPath<FileCopyOperation::State::IN_PROGRESS, FileCopyOperation::State::ON_HOLD>(repositoryPath);
     }
 }
 
@@ -385,10 +381,7 @@ void FileManagementService::resumeFileCopyOperationsInPath(Message& message) {
 	}
 	const auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
     for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-        if (fileCopyOperations[i].getState() == FileCopyOperation::State::ON_HOLD &&
-            fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
-            fileCopyOperations[i].setState(FileCopyOperation::State::IN_PROGRESS);
-        }
+    	fileCopyOperations[i].updateOperationStateIfMatchesPath<FileCopyOperation::State::ON_HOLD, FileCopyOperation::State::IN_PROGRESS>(repositoryPath);
     }
 }
 
@@ -398,28 +391,22 @@ void FileManagementService::abortFileCopyOperationsInPath(Message& message) {
 	}
 
 	const auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-
 	bool hasActiveOperations = false;
+
 	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-		if (fileCopyOperations[i].isActive() &&
-		   fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
+		if (fileCopyOperations[i].isActive() && fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
 			hasActiveOperations = true;
-			break;
-		   }
+			const uint16_t operationId = fileCopyOperations[i].operationId;
+			if (!fileCopyOperations[i].setState(FileCopyOperation::State::FAILED)) {
+				ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::InvalidStateTransition);
+				continue;
+			}
+			removeFileCopyOperation(operationId);
+		}
 	}
 
 	if (!hasActiveOperations) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::NoActiveFileCopyOperationsFound);
-		return;
-	}
-
-	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-		if (fileCopyOperations[i].isActive() &&
-		   fileCopyOperations[i].involvesRepositoryPath(repositoryPath)) {
-			const uint16_t operationId = fileCopyOperations[i].getId();
-			fileCopyOperations[i].setState(FileCopyOperation::State::FAILED);
-			removeFileCopyOperation(operationId);
-		   }
 	}
 }
 
@@ -513,8 +500,8 @@ void FileManagementService::generateFileCopyStatusReport() {
 	report.appendUint8(ongoingCount);
 	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
 		if (fileCopyOperations[i].isActive()) {
-			report.appendUint16(fileCopyOperations[i].getId());
-			report.appendUint8(static_cast<uint8_t>(fileCopyOperations[i].getState()));
+			report.appendUint16(fileCopyOperations[i].operationId);
+			report.appendUint8(static_cast<uint8_t>(fileCopyOperations[i].state));
 			report.appendUint8(fileCopyOperations[i].getProgressPercentage());
 		}
 	}
@@ -585,7 +572,7 @@ void FileManagementService::execute(Message& message) {
 
 FileManagementService::FileCopyOperation* FileManagementService::findFileCopyOperation(const uint16_t operationId) {
 	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-	    if (fileCopyOperations[i].getId() == operationId) {
+	    if (fileCopyOperations[i].operationId == operationId) {
 	        return &fileCopyOperations[i];
 	    }
 	}
@@ -604,7 +591,7 @@ bool FileManagementService::addFileCopyOperation(const uint16_t operationId,
         return false;
     }
     for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-        if (fileCopyOperations[i].getState() == FileCopyOperation::State::IDLE) {
+        if (fileCopyOperations[i].state == FileCopyOperation::State::IDLE) {
             fileCopyOperations[i].initialize(operationId, sourcePath, targetPath, type, message);
             activeFileCopyOperationCount++;
             return true;
@@ -616,7 +603,7 @@ bool FileManagementService::addFileCopyOperation(const uint16_t operationId,
 
 void FileManagementService::removeFileCopyOperation(const uint16_t operationId) {
     for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-        if (fileCopyOperations[i].getId() == operationId && fileCopyOperations[i].getState() != FileCopyOperation::State::IDLE) {
+        if (fileCopyOperations[i].operationId == operationId && fileCopyOperations[i].state != FileCopyOperation::State::IDLE) {
             fileCopyOperations[i].reset();
             operationIdManager.releaseId(operationId);
             activeFileCopyOperationCount--;
@@ -630,30 +617,32 @@ bool FileManagementService::setOperationState(const uint16_t operationId, const 
 	if (operation == nullptr) {
 		return false;
 	}
-	operation->setState(newState);
-	return true;
+	return operation->setState(newState);
 }
 
-bool FileManagementService::isOperationSuspended(const uint16_t operationId) const {
+FileManagementService::FileCopyOperation::SuspensionStatus FileManagementService::getOperationSuspensionStatus(const uint16_t operationId) const {
 	for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
-		if (fileCopyOperations[i].getId() == operationId &&
-			fileCopyOperations[i].getState() == FileCopyOperation::State::ON_HOLD) {
-			return true;
+		if (fileCopyOperations[i].operationId == operationId) {
+			if (fileCopyOperations[i].state == FileCopyOperation::State::ON_HOLD) {
+				return FileCopyOperation::SuspensionStatus::SUSPENDED;
+			}
+			return FileCopyOperation::SuspensionStatus::NOT_SUSPENDED;
 		}
 	}
-	return false;
+	return FileCopyOperation::SuspensionStatus::NOT_FOUND;
 }
 
-void FileManagementService::updateOperationProgress(const uint16_t operationId,
+bool FileManagementService::updateOperationProgress(const uint16_t operationId,
                                                     const uint32_t bytesTransferred,
                                                     const uint32_t totalBytes) {
 	if (FileCopyOperation* operation = findFileCopyOperation(operationId); operation != nullptr) {
         operation->bytesTransferred = bytesTransferred;
         operation->totalBytes = totalBytes;
         if (bytesTransferred >= totalBytes && totalBytes > 0) {
-            operation->setState(FileCopyOperation::State::COMPLETED);
+        	return operation->setState(FileCopyOperation::State::COMPLETED);
         }
     }
+	return false;
 }
 
 void FileManagementService::notifyOperationSuccess(const uint16_t operationId) {
@@ -687,6 +676,12 @@ void FileManagementService::notifyOperationFailure(const uint16_t operationId, c
         case Filesystem::FileCopyError::InsufficientSpace:
             error = ErrorHandler::ExecutionCompletionErrorType::FileSystemInsufficientSpace;
             break;
+    	case Filesystem::FileCopyError::FileCopyOperationNotFound:
+    		error = ErrorHandler::ExecutionCompletionErrorType::FileCopyOperationNotFound;
+    		break;
+    	case Filesystem::FileCopyError::FailedToUpdateOperationState:
+    		error = ErrorHandler::ExecutionCompletionErrorType::FailedToUpdateOperationState;
+    		break;
         default:
             error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
             break;

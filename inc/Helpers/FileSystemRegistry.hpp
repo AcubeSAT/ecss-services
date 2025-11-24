@@ -1,8 +1,6 @@
-#ifndef ECSS_SERVICES_FILESYSTEMREGISTRY_HPP
-#define ECSS_SERVICES_FILESYSTEMREGISTRY_HPP
+#pragma once
 
 #include <etl/span.h>
-
 
 #include "Filesystem.hpp"
 namespace Filesystem {
@@ -29,8 +27,12 @@ namespace Filesystem {
 
 	inline etl::vector<FileSystemDescriptor, MaximumAllowedNumberOfFileSystems> fileSystems{}; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-	inline void registerFileSystem(const FileSystemDescriptor& fs) {
+	inline bool registerFileSystem(const FileSystemDescriptor& fs) {
+		if (fileSystems.full()) {
+			return false;
+		}
 		fileSystems.push_back(fs);
+		return true;
 	}
 
 	inline const FileSystemDescriptor* findFileSystemForPath(const Path& repoPath) {
@@ -42,4 +44,3 @@ namespace Filesystem {
 		return nullptr;
 	}
 } // namespace Filesystem
-#endif //ECSS_SERVICES_FILESYSTEMREGISTRY_HPP

@@ -462,7 +462,11 @@ public:
 		/**
 		 * An "abort file copy operations in path" operation was requested on a path that has no active copy operations
 		 */
-		NoActiveFileCopyOperationsFound = 71
+		NoActiveFileCopyOperationsFound = 71,
+		/**
+		 * An invalid state transition was requested on a FileCopyOperation
+		 */
+		InvalidStateTransition = 72,
 	};
 
 	/**
@@ -550,7 +554,15 @@ public:
 		/**
 		 * A copy file operation failed because of insufficient space in the target filesystem
 		 */
-		FileSystemInsufficientSpace = 17
+		FileSystemInsufficientSpace = 17,
+		/**
+		 * A file copy operation was not found for the provided ID
+		 */
+		FileCopyOperationNotFound = 18,
+		/**
+		 * A request to update operation state has failed.
+		 */
+		FailedToUpdateOperationState = 19,
 	};
 
 	/**

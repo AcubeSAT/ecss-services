@@ -200,7 +200,7 @@ etl::optional<Filesystem::NodeType> getNodeType(const Filesystem::Path& path) {
 	return Filesystem::getNodeType(path);
 }
 
-etl::result<Filesystem::Attributes, Filesystem::FileAttributeError> getFileAttributes(const Filesystem::Path& path) {
+etl::expected<Filesystem::Attributes, Filesystem::FileAttributeError> getFileAttributes(const Filesystem::Path& path) {
 	return Filesystem::getFileAttributes(path);
 }
 

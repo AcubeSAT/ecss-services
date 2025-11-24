@@ -25,14 +25,39 @@ namespace Filesystem {
 	static constexpr size_t CHUNK_SIZE = 1024;
 	static constexpr size_t DELAY_MS = 3;
 
+	/**
+	 * Queue of pending file copy/move operations consumed by the background worker thread.
+	 * Protected by queueMutex and signaled via queueCondition.
+	*/
 	static std::queue<QueuedOperation> operationQueue;
+
+	/**
+	 * Mutex guarding access to operationQueue and associated shared state used by the background file copy task.
+	 */
 	static std::mutex queueMutex;
+
+	/**
+	 * Condition variable used to wake the background worker when new operations are available or when shutdown is requested.
+	*/
 	static std::condition_variable queueCondition;
+
+	/**
+	 * Flag indicating whether the background copy task should keep running;
+	 * set to false in order to trigger a clean shutdown of the worker loop.
+	*/
 	static std::atomic<bool> taskRunning{false};
+
+	/**
+	 * Background thread that processes queued file operations using fileCopyTaskFunction.
+	 * Started and joined by initialize/shutdown helpers.
+	*/
 	static std::thread backgroundTask;
 
 	struct QueuedOperation {
-		enum class Type { COPY, MOVE };
+		enum class Type {
+			COPY,
+			MOVE
+		};
 		Type type{};
 		uint16_t operationId{};
 		ObjectPath sourcePath;
@@ -146,7 +171,7 @@ namespace Filesystem {
         {
             std::lock_guard lock(queueMutex);
 			const auto operation = Services.fileManagement.findFileCopyOperation(operationId);
-            operationQueue.push({QueuedOperation::Type::COPY, operationId, operation->getSourcePath(), operation->getTargetPath()});
+            operationQueue.push({QueuedOperation::Type::COPY, operationId, operation->sourcePath, operation->targetPath});
         }
         queueCondition.notify_one();
 	}
@@ -155,21 +180,21 @@ namespace Filesystem {
         {
             std::lock_guard lock(queueMutex);
         	const auto operation = Services.fileManagement.findFileCopyOperation(operationId);
-            operationQueue.push({QueuedOperation::Type::MOVE, operationId, operation->getSourcePath(), operation->getTargetPath()});
+            operationQueue.push({QueuedOperation::Type::MOVE, operationId, operation->sourcePath, operation->targetPath});
         }
         queueCondition.notify_one();
     }
 
-	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
-		Attributes attributes;
+	etl::expected<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
+		Attributes attributes{};
 
 		auto nodeType = getNodeType(path);
 		if (not nodeType) {
-			return FileAttributeError::FileDoesNotExist;
+			return etl::unexpected(FileAttributeError::FileDoesNotExist);
 		}
 
 		if (nodeType.value() != NodeType::File) {
-			return FileAttributeError::PathLeadsToDirectory;
+			return etl::unexpected(FileAttributeError::PathLeadsToDirectory);
 		}
 
 		attributes.sizeInBytes = fs::file_size(path.data());
@@ -223,7 +248,8 @@ namespace Filesystem {
 		return isLocal(srcFs) || isLocal(dstFs);
 	}
 
-	void performChunkedCopy(uint16_t operationId, const fs::path& source, const fs::path& destination, bool isMove) {
+	template<bool IsMove>
+	void performChunkedCopy(uint16_t operationId, const fs::path& source, const fs::path& destination) {
 		Services.fileManagement.setOperationState(operationId, FileManagementService::FileCopyOperation::State::IN_PROGRESS);
 		if (fs::exists(destination)) {
 			Services.fileManagement.setOperationState(operationId,FileManagementService::FileCopyOperation::State::FAILED);
@@ -247,7 +273,13 @@ namespace Filesystem {
 	    size_t transferred = 0;
 	    while (sourceStream.read(buffer, CHUNK_SIZE) || sourceStream.gcount() > 0) {
 	        std::streamsize bytesRead = sourceStream.gcount();
-	        while (Services.fileManagement.isOperationSuspended(operationId)) {
+			if (FileManagementService::FileCopyOperation::SuspensionStatus status = Services.fileManagement.getOperationSuspensionStatus(operationId);
+				FileManagementService::FileCopyOperation::SuspensionStatus::NOT_FOUND == status) {
+	    		Services.fileManagement.setOperationState(operationId, FileManagementService::FileCopyOperation::State::FAILED);
+	    		Services.fileManagement.notifyOperationFailure(operationId, FileCopyError::FileCopyOperationNotFound);
+	    	}
+	        while (FileManagementService::FileCopyOperation::SuspensionStatus::SUSPENDED ==
+	        	Services.fileManagement.getOperationSuspensionStatus(operationId)) {
 	            std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_MS));
 	        }
 	        destinationStream.write(buffer, bytesRead);
@@ -260,10 +292,13 @@ namespace Filesystem {
 	            return;
 	        }
 	        transferred += static_cast<size_t>(bytesRead);
-	        Services.fileManagement.updateOperationProgress(operationId, transferred, fileSize);
+	        if (!Services.fileManagement.updateOperationProgress(operationId, transferred, fileSize)) {
+	        	Services.fileManagement.setOperationState(operationId, FileManagementService::FileCopyOperation::State::FAILED);
+	        	Services.fileManagement.notifyOperationFailure(operationId, FileCopyError::FailedToUpdateOperationState);
+	        }
 	        std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_MS));
 	    }
-		if (isMove) {
+		if constexpr (IsMove) {
 			fs::remove(source);
 		}
 		sourceStream.close();
@@ -277,16 +312,18 @@ namespace Filesystem {
             queueCondition.wait(lock, [] {
                 return !operationQueue.empty() || !taskRunning;
             });
-            if (!taskRunning) break;
+            if (!taskRunning) {
+            	break;
+            }
             while (!operationQueue.empty()) {
                 auto [type, operationId, sourcePath, targetPath] = operationQueue.front();
                 operationQueue.pop();
                 lock.unlock();
                 try {
                     if (type == QueuedOperation::Type::COPY) {
-                        performChunkedCopy(operationId, sourcePath.data(), targetPath.data(), false);
+                        performChunkedCopy<false>(operationId, sourcePath.data(), targetPath.data());
                     } else {
-                    	performChunkedCopy(operationId, sourcePath.data(), targetPath.data(), true);
+                    	performChunkedCopy<true>(operationId, sourcePath.data(), targetPath.data());
                     }
                 } catch (const std::exception&) {
                 	Services.fileManagement.setOperationState(operationId, FileManagementService::FileCopyOperation::State::FAILED);
@@ -297,27 +334,34 @@ namespace Filesystem {
         }
     }
 
-	void initializeFileSystems() {
+	etl::expected<void, FileSystemInitializationError> initializeFileSystems() {
 		using Filesystem::FileSystemDescriptor;
 		using Filesystem::FileSystemRole;
 		using Filesystem::FileSystemKind;
 
-		registerFileSystem(FileSystemDescriptor{
+		if (!registerFileSystem(FileSystemDescriptor{
 			.prefix = Path("st23"),
 			.role   = FileSystemRole::SourceAndDestination,
-			.kind   = FileSystemKind::OnboardLocal
-		});
+			.kind   = FileSystemKind::OnboardLocal})) {
+			return etl::unexpected(FileSystemInitializationError::FileSystemListIsFull);
+		}
 
-		registerFileSystem(FileSystemDescriptor{
+		if (!registerFileSystem(FileSystemDescriptor{
 			.prefix = Path("remote"),
 			.role   = FileSystemRole::SourceAndDestination,
-			.kind   = FileSystemKind::GroundRemote
-		});
+			.kind   = FileSystemKind::GroundRemote})) {
+			return etl::unexpected(FileSystemInitializationError::FileSystemListIsFull);
+		}
+
+		return{};
 	}
 
     void initializeFileCopyTask() {
-        taskRunning = true;
-        backgroundTask = std::thread(fileCopyTaskFunction);
+		if (taskRunning) {
+			return;
+		}
+		taskRunning = true;
+		backgroundTask = std::thread(fileCopyTaskFunction);
     }
 
     void shutdownFileCopyTask() {
