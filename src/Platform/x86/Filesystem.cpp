@@ -22,8 +22,8 @@ namespace Filesystem {
 	struct QueuedOperation;
 	namespace fs = std::filesystem;
 
-	static constexpr size_t CHUNK_SIZE = 1024;
-	static constexpr size_t DELAY_MS = 3;
+	static constexpr size_t ChunkSize = 1024;
+	static constexpr size_t DelayMs = 3;
 
 	/**
 	 * Queue of pending file copy/move operations consumed by the background worker thread.
@@ -269,9 +269,9 @@ namespace Filesystem {
 	        return;
 	    }
 	    size_t fileSize = fs::file_size(source);
-	    char buffer[CHUNK_SIZE];
+	    char buffer[ChunkSize];
 	    size_t transferred = 0;
-	    while (sourceStream.read(buffer, CHUNK_SIZE) || sourceStream.gcount() > 0) {
+	    while (sourceStream.read(buffer, ChunkSize) || sourceStream.gcount() > 0) {
 	        std::streamsize bytesRead = sourceStream.gcount();
 			if (FileManagementService::FileCopyOperation::SuspensionStatus status = Services.fileManagement.getOperationSuspensionStatus(operationId);
 				FileManagementService::FileCopyOperation::SuspensionStatus::NOT_FOUND == status) {
@@ -280,7 +280,7 @@ namespace Filesystem {
 	    	}
 	        while (FileManagementService::FileCopyOperation::SuspensionStatus::SUSPENDED ==
 	        	Services.fileManagement.getOperationSuspensionStatus(operationId)) {
-	            std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_MS));
+	            std::this_thread::sleep_for(std::chrono::milliseconds(DelayMs));
 	        }
 	        destinationStream.write(buffer, bytesRead);
 	        if (!destinationStream) {
@@ -292,14 +292,28 @@ namespace Filesystem {
 	            return;
 	        }
 	        transferred += static_cast<size_t>(bytesRead);
-	        if (!Services.fileManagement.updateOperationProgress(operationId, transferred, fileSize)) {
-	        	Services.fileManagement.setOperationState(operationId, FileManagementService::FileCopyOperation::State::FAILED);
-	        	Services.fileManagement.notifyOperationFailure(operationId, FileCopyError::FailedToUpdateOperationState);
-	        }
-	        std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_MS));
+			if (auto result = Services.fileManagement.updateOperationProgress(operationId, transferred, fileSize);
+				!result.has_value()) {
+				Services.fileManagement.setOperationState(operationId, FileManagementService::FileCopyOperation::State::FAILED);
+				switch (result.error()) {
+					case FileManagementService::FileCopyOperation::OperationProgressUpdateError::FILE_COPY_OPERATION_NOT_FOUND:
+						Services.fileManagement.notifyOperationFailure(operationId, FileCopyError::FileCopyOperationNotFound);
+						break;
+					case FileManagementService::FileCopyOperation::OperationProgressUpdateError::INVALID_OPERATION_STATE_TRANSITION:
+					default:
+						Services.fileManagement.notifyOperationFailure(operationId, FileCopyError::FailedToUpdateOperationState);
+						break;
+				}
+				return;
+			}
+	        std::this_thread::sleep_for(std::chrono::milliseconds(DelayMs));
 	    }
 		if constexpr (IsMove) {
-			fs::remove(source);
+			if (!fs::remove(source)) {
+				Services.fileManagement.setOperationState(operationId, FileManagementService::FileCopyOperation::State::FAILED);
+				Services.fileManagement.notifyOperationFailure(operationId, FileCopyError::FailedToDeleteMovedFile);
+				return;
+			}
 		}
 		sourceStream.close();
 	    destinationStream.close();

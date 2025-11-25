@@ -89,6 +89,7 @@ namespace Filesystem {
 		InsufficientSpace = 4,
 		FileCopyOperationNotFound = 5,
 		FailedToUpdateOperationState = 6,
+		FailedToDeleteMovedFile = 7,
 		UnknownError = 255
 	};
 

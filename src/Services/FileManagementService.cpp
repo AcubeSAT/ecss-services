@@ -482,8 +482,24 @@ bool FileManagementService::validateFileCopyOperationRegistration(
         return false;
     }
 
-    if (!addFileCopyOperation(operationId, sourceFullPath.data(), targetFullPath.data(), operationType, message)) {
-        ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::MaximumNumberOfFileCopyOperationsReached);
+	if (const auto result = addFileCopyOperation(operationId, sourceFullPath.data(), targetFullPath.data(), operationType, message);
+		!result.has_value()) {
+		ErrorHandler::ExecutionStartErrorType error; // NOLINT(cppcoreguidelines-init-variables)
+		switch (result.error()) {
+			case FileCopyOperation::OperationRegistrationError::MAXIMUM_CONCURRENT_OPERATIONS_REACHED: {
+				error = ErrorHandler::ExecutionStartErrorType::MaximumNumberOfFileCopyOperationsReached;
+				break;
+			}
+			case FileCopyOperation::OperationRegistrationError::OPERATION_ID_ALREADY_EXISTS: {
+				error = ErrorHandler::ExecutionStartErrorType::FileCopyOperationIdAlreadyInUse;
+				break;
+			}
+			default: {
+				error = ErrorHandler::ExecutionStartErrorType::UnknownExecutionStartError;
+				break;
+			}
+		}
+		ErrorHandler::reportError(message, error);
         return false;
     }
     return true;
@@ -579,26 +595,26 @@ FileManagementService::FileCopyOperation* FileManagementService::findFileCopyOpe
 	return nullptr;
 }
 
-bool FileManagementService::addFileCopyOperation(const uint16_t operationId,
+etl::expected<void, FileManagementService::FileCopyOperation::OperationRegistrationError> FileManagementService::addFileCopyOperation(const uint16_t operationId,
                                                const ObjectPath& sourcePath,
                                                const ObjectPath& targetPath,
                                                const FileCopyOperation::Type type,
                                                const Message& message) {
     if (activeFileCopyOperationCount >= MaxConcurrentFileCopyOperations) {
-        return false;
+        return etl::unexpected(FileCopyOperation::OperationRegistrationError::MAXIMUM_CONCURRENT_OPERATIONS_REACHED);
     }
     if (!operationIdManager.reserveId(operationId)) {
-        return false;
+        return etl::unexpected(FileCopyOperation::OperationRegistrationError::OPERATION_ID_ALREADY_EXISTS);
     }
     for (uint8_t i = 0; i < MaxConcurrentFileCopyOperations; i++) {
         if (fileCopyOperations[i].state == FileCopyOperation::State::IDLE) {
             fileCopyOperations[i].initialize(operationId, sourcePath, targetPath, type, message);
             activeFileCopyOperationCount++;
-            return true;
+            return {};
         }
     }
     operationIdManager.releaseId(operationId);
-    return false;
+    return etl::unexpected(FileCopyOperation::OperationRegistrationError::UNKNOWN_ERROR);
 }
 
 void FileManagementService::removeFileCopyOperation(const uint16_t operationId) {
@@ -632,17 +648,20 @@ FileManagementService::FileCopyOperation::SuspensionStatus FileManagementService
 	return FileCopyOperation::SuspensionStatus::NOT_FOUND;
 }
 
-bool FileManagementService::updateOperationProgress(const uint16_t operationId,
+etl::expected<void, FileManagementService::FileCopyOperation::OperationProgressUpdateError> FileManagementService::updateOperationProgress(const uint16_t operationId,
                                                     const uint32_t bytesTransferred,
                                                     const uint32_t totalBytes) {
 	if (FileCopyOperation* operation = findFileCopyOperation(operationId); operation != nullptr) {
         operation->bytesTransferred = bytesTransferred;
         operation->totalBytes = totalBytes;
         if (bytesTransferred >= totalBytes && totalBytes > 0) {
-        	return operation->setState(FileCopyOperation::State::COMPLETED);
+        	if (operation->setState(FileCopyOperation::State::COMPLETED)) {
+        		return {};
+        	}
+        	return etl::unexpected(FileCopyOperation::OperationProgressUpdateError::INVALID_OPERATION_STATE_TRANSITION);
         }
     }
-	return false;
+	return etl::unexpected(FileCopyOperation::OperationProgressUpdateError::FILE_COPY_OPERATION_NOT_FOUND);
 }
 
 void FileManagementService::notifyOperationSuccess(const uint16_t operationId) {

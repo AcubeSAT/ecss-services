@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
-#define ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
+#pragma once
 
 #include "Helpers/Filesystem.hpp"
 #include "Service.hpp"
@@ -94,6 +93,18 @@ public:
 			NOT_FOUND = 255
 		};
 
+		enum class OperationRegistrationError : uint8_t {
+			MAXIMUM_CONCURRENT_OPERATIONS_REACHED = 0,
+			OPERATION_ID_ALREADY_EXISTS = 1,
+			UNKNOWN_ERROR = 255
+		};
+
+		enum class OperationProgressUpdateError : uint8_t {
+			FILE_COPY_OPERATION_NOT_FOUND = 0,
+			INVALID_OPERATION_STATE_TRANSITION = 1,
+			UNKNOWN_ERROR = 255
+		};
+
 		uint16_t operationId = InvalidOperationId;
 		State state = State::IDLE;
 		Type type = Type::COPY;
@@ -106,6 +117,9 @@ public:
 
 		FileCopyOperation() : sourcePath(""), targetPath("") {}
 
+		/**
+		 * Initializes the FileCopyOperation, so it can be picked up by the file transfer handler layer.
+		 */
 		void initialize(const uint16_t id, const Filesystem::ObjectPath& srcPath,
 			const Filesystem::ObjectPath& dstPath, const Type opType, const Message& message) {
 			operationId = id;
@@ -119,6 +133,9 @@ public:
 			requestMessage = message;
 		}
 
+		/**
+		 * Used to clear everything regarding a FileCopyOperation, so it can be removed safely.
+		 */
 		void reset() {
 			operationId = InvalidOperationId;
 			state = State::IDLE;
@@ -145,7 +162,7 @@ public:
 		 * @tparam From The current state of the file copy operation.
 		 * @tparam To The state the caller wants the file copy operation to transition to.
 		 * @param repositoryPath The repository path that must be involved with the file copy operation.
-		 * @return True if the operation state is changed, false otherwise.
+		 * @return True if the operation state is changed or does not involve the given path, false otherwise.
 		 */
 		template <State From, State To>
 		bool updateOperationStateIfMatchesPath(const Filesystem::ObjectPath& repositoryPath) {
@@ -199,20 +216,23 @@ public:
 	/**
 	 * @brief Register and initialize a new file copy operation.
 	 *
-	 * Reserves the provided operation identifier, locates a free operation slot, and initializes it with the specified
-	 * source and target paths, type, and associated request message.
+	 * Attempts to reserve the given operation identifier and allocate a free slot in the internal file copy operation
+	 * table, then initializes that slot with the provided source path, target path, operation type, and associated request message.
+	 * If the maximum number of concurrent operations has already been reached, if the operation identifier is already
+	 * in use, or if no idle slot can be found despite available capacity, the function returns an appropriate registration error.
 	 *
-	 * @param operationId Unique identifier to associate with the new file copy operation; must not already be reserved.
+	 * @param operationId Unique identifier to associate with the new file copy operation.
 	 * @param sourcePath  Path of the file or directory to be copied.
 	 * @param targetPath  Destination path for the file or directory copy.
-	 * @param type        Type of copy operation (e.g. file, directory, recursive).
-	 * @param message     Request message associated with this operation, used for later completion or error reporting.
+	 * @param type        Type of copy operation (e.g. copy or move).
+	 * @param message     Request message associated with this operation, used for later
+	 *                    completion or error reporting.
 	 *
-	 * @return true  If the operation was successfully created and registered.
-	 * @return false If the maximum number of concurrent operations is reached or the operation identifier cannot be reserved.
-	 *
+	 * @return etl::expected<void, FileCopyOperation::OperationRegistrationError>
+	 *         An engaged expected on successful registration, or an error indicating why
+	 *         the operation could not be registered.
 	 */
-	bool addFileCopyOperation(uint16_t operationId,
+	etl::expected<void, FileCopyOperation::OperationRegistrationError> addFileCopyOperation(uint16_t operationId,
 							 const Filesystem::ObjectPath& sourcePath,
 							 const Filesystem::ObjectPath& targetPath,
 							 FileCopyOperation::Type type,
@@ -235,9 +255,9 @@ public:
 	 * suspended (on hold), active, or if the operation ID is invalid.
 	 *
 	 * @param operationId Identifier of the operation to query.
-	 * @return FileCopyOperation::SuspensionStatus::SUSPENDED If the operation exists and its state is ON_HOLD.
-	 * @return FileCopyOperation::SuspensionStatus::NOT_SUSPENDED If the operation exists but is not currently on hold.
-	 * @return FileCopyOperation::SuspensionStatus::NOT_FOUND If no operation with the given identifier exists.
+	 * @retval FileCopyOperation::SuspensionStatus::SUSPENDED If the operation exists and its state is ON_HOLD.
+	 * @retval FileCopyOperation::SuspensionStatus::NOT_SUSPENDED If the operation exists but is not currently on hold.
+	 * @retval FileCopyOperation::SuspensionStatus::NOT_FOUND If no operation with the given identifier exists.
 	 */
 	[[nodiscard]] FileCopyOperation::SuspensionStatus getOperationSuspensionStatus(uint16_t operationId) const;
 
@@ -272,7 +292,7 @@ public:
 	 * @return false If no matching operation is found, or if the state cannot be updated to COMPLETED when requested,
 	 *				 or if the operation is not yet completed.
 	 */
-	bool updateOperationProgress(uint16_t operationId, uint32_t bytesTransferred, uint32_t totalBytes);
+	etl::expected<void, FileCopyOperation::OperationProgressUpdateError> updateOperationProgress(uint16_t operationId, uint32_t bytesTransferred, uint32_t totalBytes);
 
 	/**
 	 * @brief Signal successful completion of a file copy operation.
@@ -528,6 +548,30 @@ private:
    		Filesystem::Path targetFullPath = "";
 	};
 
+	/**
+	 * @brief Validate and register a new file copy operation.
+	 *
+	 * Performs a series of checks on the requested file copy operation before registering it in the internal operation table.
+	 * The function verifies that:
+	 * - The operation identifier is not already in use.
+	 * - The source and target paths do not contain wildcard characters.
+	 * - The source path refers to an existing regular file (not a directory).
+	 * - At least one of the paths involves the local repository.
+	 * - The source file is not locked.
+	 *
+	 * If any of these checks fail, an appropriate execution-start error is reported using the provided @p message and
+	 * the function returns false. If all checks pass, it attempts to register the operation via addFileCopyOperation();
+	 * any registration error is translated to a corresponding execution-start error and also causes the function to return false.
+	 *
+	 * @param message        Telecommand message used for error reporting.
+	 * @param operationId    Identifier requested for the new file copy operation.
+	 * @param sourceFullPath Fully qualified source path of the file to be copied.
+	 * @param targetFullPath Fully qualified target path where the file will be copied.
+	 * @param operationType  Type of copy operation being requested.
+	 *
+	 * @return true  If all validation checks pass and the operation is successfully registered.
+	 * @return false If validation fails or the operation cannot be registered.
+	 */
 	bool validateFileCopyOperationRegistration(
 	    const Message& message,
 	    uint16_t operationId,
@@ -547,7 +591,17 @@ private:
 		std::array<uint16_t, MaxConcurrentFileCopyOperations> activeIds{};
 		uint8_t activeCount = 0;
 
-		bool reserveId(const uint16_t id) {
+		/**
+		 * @brief Reserve an identifier for use.
+		 *
+		 * Attempts to add the given @p id to the set of active identifiers if there is available capacity and the
+		 * identifier is not already in use.
+		 *
+		 * @param id Identifier to reserve.
+		 * @return true  If the identifier was successfully reserved.
+		 * @return false If the maximum number of identifiers is reached or @p id is already in use.
+		 */
+		[[nodiscard]] bool reserveId(const uint16_t id) {
 			if (activeCount >= MaxConcurrentFileCopyOperations || isInUse(id)) {
 				return false;
 			}
@@ -555,6 +609,15 @@ private:
 			return true;
 		}
 
+		/**
+		 * @brief Check whether an identifier is currently in use.
+		 *
+		 * Scans the active identifier list and returns true if the given @p id is present among the currently reserved identifiers.
+		 *
+		 * @param id Identifier to query.
+		 * @return true  If the identifier is found in the active list.
+		 * @return false If the identifier is not in use.
+		 */
 		[[nodiscard]] bool isInUse(const uint16_t id) const {
 			for (uint8_t i = 0; i < activeCount; i++) {
 				if (activeIds[i] == id) {
@@ -564,6 +627,14 @@ private:
 			return false;
 		}
 
+		/**
+		 * @brief Release a previously reserved identifier.
+		 *
+		 * Removes the given @p id from the active identifier list, if present, by replacing it with the last active
+		 * entry and decrementing the active count.
+		 *
+		 * @param id Identifier to release back to the pool of available IDs.
+		 */
 		void releaseId(const uint16_t id) {
 			for (uint8_t i = 0; i < activeCount; i++) {
 				if (activeIds[i] == id) {
@@ -578,5 +649,3 @@ private:
 	OperationIdManager operationIdManager{};
 
 };
-
-#endif //ECSS_SERVICES_FILEMANAGEMENTSERVICE_HPP
