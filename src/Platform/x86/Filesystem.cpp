@@ -161,21 +161,28 @@ namespace Filesystem {
 		}
 	}
 
+	bool directoryContainsLockedFile(const Path& path) {
+		if (not fs::is_empty(path.data())) {
+			for (const auto& entry: fs::recursive_directory_iterator(path.data())) {
+				Path filePath = ("");
+				filePath.append(entry.path().string().c_str());
+				if (auto nodeType = getNodeType(filePath); nodeType && nodeType.value() == NodeType::File) {
+					if (FileLockStatus::Locked == getFileLockStatus(filePath)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	etl::expected<void,DirectoryRenameError> renameDirectory(const Path& oldPath, const Path& newDirectoryName) {
 		if (const etl::optional<NodeType> nodeType = getNodeType(oldPath); not nodeType) {
 			return etl::unexpected(DirectoryRenameError::DirectoryDoesNotExist);
 		}
 
-		if (not fs::is_empty(oldPath.data())) {
-			for (const auto& entry: fs::recursive_directory_iterator(oldPath.data())) {
-				Path filePath = ("");
-				filePath.append(entry.path().string().c_str());
-				if (auto nodeType = getNodeType(filePath); nodeType && nodeType.value() == NodeType::File) {
-					if (FileLockStatus::Locked == getFileLockStatus(filePath)) {
-						return etl::unexpected(DirectoryRenameError::DirectoryContainsLockedFile);
-					}
-				}
-			}
+		if (directoryContainsLockedFile(oldPath.data())) {
+			return etl::unexpected(DirectoryRenameError::DirectoryContainsLockedFile);
 		}
 
 		const fs::path oldFullPath = oldPath.data();
