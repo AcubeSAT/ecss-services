@@ -8,10 +8,14 @@
 #include "etl/expected.h"
 #include "etl/result.h"
 
+#include <etl/vector.h>
+
 namespace Filesystem {
 	enum class NodeType : uint8_t;
 	constexpr size_t FullPathSize = ECSSMaxStringSize;
 	using Path = String<FullPathSize>;
+
+	constexpr size_t MaxDirectoryNotifications = 128;
 
 	/**
 	 * ObjectPathSize is half the maximum size, minus one character for the '/' delimiter between the
@@ -41,7 +45,7 @@ namespace Filesystem {
 	 * The repository content summary notification
 	 */
 	struct DirectoryContentSummary {
-		std::vector<DirectoryContentSummaryNotification> notifications;
+		etl::vector<DirectoryContentSummaryNotification, MaxDirectoryNotifications> notifications;
 	};
 
 
@@ -101,6 +105,7 @@ namespace Filesystem {
 	enum class ReportDirectorySummaryError : uint8_t {
 		DirectoryDoesNotExist = 0,
 		PathLeadsToFile = 1,
+		MaximumAllowedDirectoryNotificationsReached = 2,
 		UnknownError = 255
 	};
 

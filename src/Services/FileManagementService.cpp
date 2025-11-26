@@ -311,7 +311,7 @@ void FileManagementService::reportSummaryDirectory(Message& message) {
 		return;
 	}
 
-	etl::expected<Filesystem::DirectoryContentSummary, Filesystem::ReportDirectorySummaryError> result = Filesystem::reportDirectorySummary(fullPath);
+	auto result = Filesystem::reportDirectorySummary(fullPath);
 	if (!result.has_value()) {
 		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
 		switch (result.error()) {

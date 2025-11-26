@@ -187,7 +187,11 @@ namespace Filesystem {
 					notification.nodeType = NodeType::Directory;
 				}
 
-				contentSummary.notifications.push_back(notification);
+				if (!contentSummary.notifications.full()) {
+					contentSummary.notifications.push_back(notification);
+				} else {
+					return etl::unexpected(ReportDirectorySummaryError::MaximumAllowedDirectoryNotificationsReached);
+				}
 			}
 		} catch ([[maybe_unused]] const fs::filesystem_error& e) {
 			return etl::unexpected(ReportDirectorySummaryError::UnknownError);
