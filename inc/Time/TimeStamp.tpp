@@ -9,7 +9,7 @@ constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) {
 	// TODO(#59): Proper error handling if assert fails
-	if(not ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::TimeStampOutOfBounds)) {
+	if (not ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::TimeStampOutOfBounds)) {
 		return;
 	}
 
@@ -92,7 +92,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& t
 	secondsAdd(timestamp.minute * Time::SecondsPerMinute);
 	secondsAdd(timestamp.second);
 	// TODO(#59): Proper error handling if assert fails
-	if(not ASSERT_INTERNAL(areSecondsValid(seconds), ErrorHandler::TimeStampOutOfBounds)) {
+	if (not ASSERT_INTERNAL(areSecondsValid(seconds), ErrorHandler::TimeStampOutOfBounds)) {
 		return;
 	}
 
