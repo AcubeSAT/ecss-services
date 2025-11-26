@@ -11,7 +11,10 @@ add_custom_target(check
         COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
-add_compile_options(-Wvla)
+if(NOT MSVC)
+    add_compile_options(-Wvla) 
+endif()
+
 include_directories(${PLATFORM_DEFINITIONS_PATH})
 add_library(common STATIC)
 target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
@@ -76,5 +79,7 @@ IF (X86_BUILD)
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()
-
+if(MSVC)
+    target_compile_options(common PUBLIC /permissive-)
+endif()
 install(TARGETS common)

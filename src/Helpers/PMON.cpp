@@ -5,7 +5,7 @@ PMON::PMON(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumb
     : monitoredParameterId(monitoredParameterId),
       repetitionNumber(repetitionNumber),
       checkType(checkType),
-      monitoredParameter(*Services.parameterManagement.getParameter(monitoredParameterId)) {
+      monitoredParameter(Services.parameterManagement.getParameter(monitoredParameterId).value()) {
 	if (!Services.parameterManagement.getParameter(monitoredParameterId)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InvalidParameterId);
 	}

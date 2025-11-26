@@ -5,7 +5,7 @@
 #include <Message.hpp>
 #include <Service.hpp>
 #include <catch2/catch_all.hpp>
-#include <cxxabi.h>
+#include "Helpers/Demangle.hpp"
 #include <filesystem>
 #include <fstream>
 #include "Helpers/Parameter.hpp"
@@ -54,7 +54,7 @@ template <typename ErrorType>
 void ErrorHandler::logError(ErrorType errorType) {
 	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
 
-	auto errorCategory = abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr);
+	auto errorCategory = Demangler::demangle<ErrorType>();
 	auto errorNumber = std::underlying_type_t<ErrorType>(errorType);
 
 	LOG_ERROR << "Error " << errorCategory << " with number " << errorNumber;
