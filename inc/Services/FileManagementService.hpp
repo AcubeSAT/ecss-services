@@ -298,7 +298,7 @@ public:
 	 * @brief Signal successful completion of a file copy operation.
 	 *
 	 * Triggers the execution completion verification for the original request message and removes the corresponding
-	 * operation from the internal registry.
+	 * operation from the internal registry. Returns if the operation is not found.
 	 *
 	 * @param operationId Identifier of the successfully completed operation.
 	 */
@@ -309,6 +309,7 @@ public:
 	 *
 	 * Maps the low-level filesystem copy error to a higher-level execution completion error type, reports it via
 	 * the error handler using the original request message, and finally removes the operation from the registry.
+	 * Returns if the operation is not found.
 	 *
 	 * @param operationId Identifier of the failed file copy operation.
 	 * @param errorType   Reason for the failure as reported by the filesystem layer.
