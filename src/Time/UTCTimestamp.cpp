@@ -5,6 +5,7 @@
 UTCTimestamp::UTCTimestamp() : year(UNIXEpochYear), month(1), second(0), minute(0), hour(0), day(1) {}
 
 UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
+	// TODO(#59): Proper error handling if assert fails
 	ASSERT_INTERNAL(UNIXEpochYear <= year, ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= month) && (month <= 12), ErrorHandler::InternalErrorType::InvalidDate);
 	ASSERT_INTERNAL((1 <= day) && (day <= 31), ErrorHandler::InternalErrorType::InvalidDate);

@@ -213,10 +213,12 @@ NumOfPacketStores StorageAndRetrievalService::currentNumberOfPacketStores() {
 	return packetStores.size();
 }
 
-PacketStore& StorageAndRetrievalService::getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId) {
+PacketStore* StorageAndRetrievalService::getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId) {
 	auto packetStore = packetStores.find(packetStoreId);
-	ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray);
-	return packetStore->second;
+	if(not ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray)) {
+		return nullptr;
+	}
+	return &packetStore->second;
 }
 
 bool StorageAndRetrievalService::packetStoreExists(const String<ECSSPacketStoreIdSize>& packetStoreId) {

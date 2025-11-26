@@ -234,9 +234,9 @@ public:
 	NumOfPacketStores currentNumberOfPacketStores();
 
 	/**
-	 * Returns the packet store with the specified packet store ID.
+	 * Returns the packet store with the specified packet store ID or nullptr if not found
 	 */
-	PacketStore& getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId);
+	PacketStore* getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 	/**
 	 * Returns true if the specified packet store is present in packet stores.
