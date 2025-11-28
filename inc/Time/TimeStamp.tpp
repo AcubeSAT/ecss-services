@@ -8,7 +8,10 @@ constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) {
-	ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::TimeStampOutOfBounds);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::TimeStampOutOfBounds)) {
+		return;
+	}
 
 	using FromDuration = std::chrono::duration<uint64_t>;
 	const auto duration = FromDuration(taiSecondsFromEpoch);
@@ -41,8 +44,13 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, T
 	}
 
 	// do checks wrt template precision parameters
-	ASSERT_INTERNAL(inputBaseBytes <= BaseBytes, ErrorHandler::InternalErrorType::InvalidTimeStampInput);
-	ASSERT_INTERNAL(inputFractionBytes <= FractionBytes, ErrorHandler::InternalErrorType::InvalidTimeStampInput);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(inputBaseBytes <= BaseBytes, ErrorHandler::InternalErrorType::InvalidTimeStampInput)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL(inputFractionBytes <= FractionBytes, ErrorHandler::InternalErrorType::InvalidTimeStampInput)) {
+		return;
+	}
 
 	// put timestamp into internal counter
 	taiCounter = 0;
@@ -83,8 +91,10 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& t
 	secondsAdd(timestamp.hour * Time::SecondsPerHour);
 	secondsAdd(timestamp.minute * Time::SecondsPerMinute);
 	secondsAdd(timestamp.second);
-
-	ASSERT_INTERNAL(areSecondsValid(seconds), ErrorHandler::TimeStampOutOfBounds);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(areSecondsValid(seconds), ErrorHandler::TimeStampOutOfBounds)) {
+		return;
+	}
 
 	taiCounter = std::chrono::duration_cast<RawDuration>(std::chrono::duration<TAICounter_t>(seconds)).count();
 }
@@ -116,9 +126,7 @@ template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 etl::array<uint8_t, Time::CUCTimestampMaximumSize> TimeStamp<BaseBytes, FractionBytes, Num, Denom>::formatAsCUC() {
 	etl::array<uint8_t, Time::CUCTimestampMaximumSize> returnArray = {0};
 
-	static constexpr uint8_t headerBytes = (BaseBytes < 4 && FractionBytes < 3) ? 1 : 2;
-
-	if (headerBytes == 1) {
+	if (sizeof(CUCHeader) == 1) {
 		returnArray[0] = static_cast<uint8_t>(CUCHeader);
 	} else {
 		returnArray[1] = static_cast<uint8_t>(CUCHeader);
@@ -127,7 +135,7 @@ etl::array<uint8_t, Time::CUCTimestampMaximumSize> TimeStamp<BaseBytes, Fraction
 
 	for (auto byte = 0; byte < BaseBytes + FractionBytes; byte++) {  //cppcheck-suppress misra-c2012-2.2
 		uint8_t taiCounterIndex = 8 * (BaseBytes + FractionBytes - byte - 1);  //cppcheck-suppress misra-c2012-2.2
-		returnArray[headerBytes + byte] = taiCounter >> taiCounterIndex;
+		returnArray[sizeof(CUCHeader) + byte] = taiCounter >> taiCounterIndex;
 	}
 
 	return returnArray;
@@ -157,7 +165,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 
 	ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
 
-	double output = inputSeconds / OutputRatio * (1UL << (8 * FractionBytes));  //cppcheck-suppress misra-c2012-2.2
+	double output = inputSeconds / OutputRatio * (1ULL << (8 * FractionBytes));  //cppcheck-suppress misra-c2012-2.2
 
 	taiCounter = static_cast<TAICounter_t>(round(output));
 }

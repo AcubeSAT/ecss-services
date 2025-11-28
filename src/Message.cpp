@@ -14,10 +14,16 @@ Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketT
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
 	// TODO(#271): Add assertion that data does not contain 1s outside of numBits bits
-	ASSERT_INTERNAL(numBits <= 16, ErrorHandler::TooManyBitsAppend);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(numBits <= 16, ErrorHandler::TooManyBitsAppend)) {
+		return;
+	}
 
 	while (numBits > 0) { // For every sequence of 8 bits...
-		ASSERT_INTERNAL(dataSize < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
+		// TODO(#59): Proper error handling if assert fails
+		if (not ASSERT_INTERNAL(dataSize < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge)) {
+			return;
+		}
 
 		if ((currentBit + numBits) >= 8) { // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 			// Will have to shift the bits and insert the next ones later
@@ -54,16 +60,26 @@ void Message::finalize() {
 }
 
 void Message::appendByte(uint8_t value) {
-	ASSERT_INTERNAL(dataSize < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
-	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(dataSize < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits)) {
+		return;
+	}
 
 	data[dataSize] = value;
 	dataSize++;
 }
 
 void Message::appendHalfword(uint16_t value) {
-	ASSERT_INTERNAL((dataSize + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
-	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL((dataSize + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits)) {
+		return;
+	}
 
 	data[dataSize] = static_cast<uint8_t>((value >> 8) & 0xFF); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	data[dataSize + 1] = static_cast<uint8_t>(value & 0xFF); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
@@ -72,8 +88,13 @@ void Message::appendHalfword(uint16_t value) {
 }
 
 void Message::appendWord(uint32_t value) {
-	ASSERT_INTERNAL((dataSize + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
-	ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL((dataSize + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL(currentBit == 0, ErrorHandler::ByteBetweenBits)) {
+		return;
+	}
 
 	data[dataSize] = static_cast<uint8_t>((value >> 24) & 0xFF); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 	data[dataSize + 1] = static_cast<uint8_t>((value >> 16) & 0xFF); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
@@ -84,12 +105,18 @@ void Message::appendWord(uint32_t value) {
 }
 
 uint16_t Message::readBits(uint8_t numBits) {
-	ASSERT_REQUEST(numBits <= 16, ErrorHandler::TooManyBitsRead);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_REQUEST(numBits <= 16, ErrorHandler::TooManyBitsRead)) {
+		return 0;
+	}
 
 	uint16_t value = 0x0;
 
 	while (numBits > 0) {
-		ASSERT_REQUEST(readPosition < ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+		// TODO(#59): Proper error handling if assert fails
+		if (not ASSERT_REQUEST(readPosition < ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+			return 0;
+		}
 
 		if ((currentBit + numBits) >= 8) { // NOLINT(cppcoreguidelines-avoid-magic-numbers)
 			auto bitsToAddNow = static_cast<uint8_t>(8 - currentBit); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
@@ -112,7 +139,10 @@ uint16_t Message::readBits(uint8_t numBits) {
 }
 
 uint8_t Message::readByte() {
-	ASSERT_REQUEST(readPosition < ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_REQUEST(readPosition < ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+		return 0;
+	}
 
 	uint8_t const value = data[readPosition]; // NOLINT(cppcoreguidelines-init-variables)
 	readPosition++;
@@ -121,7 +151,10 @@ uint8_t Message::readByte() {
 }
 
 uint16_t Message::readHalfword() {
-	ASSERT_REQUEST((readPosition + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_REQUEST((readPosition + 2) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+		return 0;
+	}
 
 	uint16_t const value = (data[readPosition] << 8) | data[readPosition + 1]; // NOLINT (cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables)
 	readPosition += 2;
@@ -130,7 +163,10 @@ uint16_t Message::readHalfword() {
 }
 
 uint32_t Message::readWord() {
-	ASSERT_REQUEST((readPosition + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_REQUEST((readPosition + 4) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+		return 0;
+	}
 
 	uint32_t const value = (data[readPosition] << 24) | (data[readPosition + 1] << 16) | (data[readPosition + 2] << 8) | // NOLINT(cppcoreguidelines-avoid-magic-numbers,cppcoreguidelines-init-variables)
 	                 data[readPosition + 3];
@@ -140,15 +176,25 @@ uint32_t Message::readWord() {
 }
 
 void Message::readString(char* string, uint16_t size) {
-	ASSERT_REQUEST((readPosition + size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
-	ASSERT_REQUEST(size < ECSSMaxStringSize, ErrorHandler::StringTooShort);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_REQUEST((readPosition + size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+		return;
+	}
+	if (not ASSERT_REQUEST(size < ECSSMaxStringSize, ErrorHandler::StringTooShort)) {
+		return;
+	}
 	std::copy(data.begin() + readPosition, data.begin() + readPosition + size, string);
 	readPosition += size;
 }
 
 void Message::readString(uint8_t* string, uint16_t size) {
-	ASSERT_REQUEST((readPosition + size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
-	ASSERT_REQUEST(size < ECSSMaxStringSize, ErrorHandler::StringTooShort);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_REQUEST((readPosition + size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+		return;
+	}
+	if (not ASSERT_REQUEST(size < ECSSMaxStringSize, ErrorHandler::StringTooShort)) {
+		return;
+	}
 	std::copy(data.begin() + readPosition, data.begin() + readPosition + size, string);
 	readPosition += size;
 }
@@ -168,25 +214,38 @@ void Message::appendMessage(const Message& message, uint16_t size) {
 }
 
 void Message::appendString(const etl::istring& string) {
-	ASSERT_INTERNAL(dataSize + string.size() <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(dataSize + string.size() <= ECSSMaxMessageSize, ErrorHandler::MessageTooLarge)) {
+		return;
+	}
 	// TODO(#272): Do we need to keep this check? How does etl::string handle it?
-	ASSERT_INTERNAL(string.size() <= string.capacity(), ErrorHandler::StringTooLarge);
+	if (not ASSERT_INTERNAL(string.size() <= string.capacity(), ErrorHandler::StringTooLarge)) {
+		return;
+	}
 	std::copy(string.data(), string.data() + string.size(), data.begin() + dataSize);
 	dataSize += string.size();
 }
 
 void Message::appendFixedString(const etl::istring& string) {
-	ASSERT_INTERNAL((dataSize + string.max_size()) < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL((dataSize + string.max_size()) < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge)) {
+		return;
+	}
 	std::copy(string.data(), string.data() + string.size(), data.begin() + dataSize);
 	(void) memset(data.begin() + dataSize + string.size(), 0, string.max_size() - string.size());
 	dataSize += string.max_size();
 }
 
 void Message::appendOctetString(const etl::istring& string) {
+	// TODO(#59): Proper error handling if assert fails
 	// Make sure that the string is large enough to count
-	ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge);
+	if (not ASSERT_INTERNAL(string.size() <= (std::numeric_limits<uint16_t>::max)(), ErrorHandler::StringTooLarge)) {
+		return;
+	}
 	// Redundant check to make sure we fail before appending string.size()
-	ASSERT_INTERNAL(dataSize + 2 + string.size() < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge);
+	if (not ASSERT_INTERNAL(dataSize + 2 + string.size() < ECSSMaxMessageSize, ErrorHandler::MessageTooLarge)) {
+		return;
+	}
 
 	appendUint16(string.size());
 	appendString(string);

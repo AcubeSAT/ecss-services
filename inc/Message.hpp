@@ -621,8 +621,13 @@ public:
 		String<MAX_SIZE> string("");
 
 		uint16_t length = readUint16();
-		ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort);
-		ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+		// TODO(#59): Proper error handling if assert fails
+		if (not ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort)) {
+			return {""};
+		}
+		if (not ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+			return {""};
+		}
 
 		string.append(data.begin() + readPosition, length);
 		readPosition += length;
