@@ -109,7 +109,7 @@ public:
 	void addPMONLimitCheck(ParameterId PMONId, PMONLimitCheck& limitCheck) {
 		limitChecks.push_back(limitCheck);
 		parameterMonitoringList.insert(
-			etl::pair<const ParameterId, etl::reference_wrapper <PMON> >(PMONId, etl::ref(limitChecks.back())));
+			etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(limitChecks.back())));
 	}
 
 
@@ -119,7 +119,7 @@ public:
 	void addPMONExpectedValueCheck(ParameterId PMONId, PMONExpectedValueCheck& expectedValueCheck) {
 		expectedValueChecks.push_back(expectedValueCheck);
 		parameterMonitoringList.insert(
-			etl::pair<const ParameterId, etl::reference_wrapper <PMON> >(PMONId,
+			etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId,
 				etl::ref(expectedValueChecks.back())));
 	}
 
@@ -129,7 +129,7 @@ public:
 	void addPMONDeltaCheck(ParameterId PMONId, PMONDeltaCheck& deltaCheck) {
 		deltaChecks.push_back(deltaCheck);
 		parameterMonitoringList.insert(
-			etl::pair<const ParameterId, etl::reference_wrapper <PMON> >(PMONId, etl::ref(deltaChecks.back())));
+			etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(deltaChecks.back())));
 	}
 
 	/**
