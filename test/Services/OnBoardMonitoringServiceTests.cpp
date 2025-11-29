@@ -20,18 +20,37 @@ struct Fixtures {
 	Fixtures() {
 		monitoringDefinition1.monitoringEnabled = true;
 	}
+	/**
+	 * Singleton function to access the instance	
+	 */
+	static Fixtures& getInstance() {
+		if (not instance.has_value()){
+			instance.emplace();
+		}
+		return *instance;
+	}
+	/**
+	 * Function to reset the singleton
+	 */
+	static void reset(){
+		instance.reset();
+	}
+	private:
+		/**
+		* Singleton instance
+		*/
+		static std::optional<Fixtures> instance;
 };
 
-Fixtures fixtures;
+	std::optional<Fixtures> Fixtures::instance{};
 
 void initialiseParameterMonitoringDefinitions(OnBoardMonitoringService& service = onBoardMonitoringService) {
 	// Reset fixtures to the defaults set up by the constructor
-	new (&fixtures) Fixtures();
-
-	service.addPMONExpectedValueCheck(0, etl::ref(fixtures.monitoringDefinition1));
-	service.addPMONLimitCheck(1, etl::ref(fixtures.monitoringDefinition2));
-	service.addPMONDeltaCheck(2, etl::ref(fixtures.monitoringDefinition3));
-	service.addPMONDeltaCheck(3, etl::ref(fixtures.monitoringDefinition4));
+	Fixtures::reset();
+	service.addPMONExpectedValueCheck(0, etl::ref(Fixtures::getInstance().monitoringDefinition1));
+	service.addPMONLimitCheck(1, etl::ref(Fixtures::getInstance().monitoringDefinition2));
+	service.addPMONDeltaCheck(2, etl::ref(Fixtures::getInstance().monitoringDefinition3));
+	service.addPMONDeltaCheck(3, etl::ref(Fixtures::getInstance().monitoringDefinition4));
 }
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {
@@ -169,7 +188,7 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
 		oBMService.deleteAllParameterMonitoringDefinitions(request);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(onBoardMonitoringService.isPMONListEmpty());
+		CHECK(oBMService.isPMONListEmpty());
 
 		ServiceTests::reset();
 		Services.reset();
@@ -746,7 +765,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 TEST_CASE("Limit Check Behavior") {
 	SECTION("Value within limits") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition2;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
@@ -765,7 +784,7 @@ TEST_CASE("Limit Check Behavior") {
 
 	SECTION("Value below low limit") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition2;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(1);
@@ -783,7 +802,7 @@ TEST_CASE("Limit Check Behavior") {
 
 	SECTION("Value above high limit") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition2;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
@@ -801,7 +820,7 @@ TEST_CASE("Limit Check Behavior") {
 
 	SECTION("Repetition Counter Resets on Status Change") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition2;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
@@ -850,7 +869,7 @@ TEST_CASE("Limit Check Behavior") {
 
 	SECTION("Continuous Monitoring Within Limits") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition2;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 		pmon.performCheck();
 		for (int i = 0; i < 6; i++) {
@@ -883,7 +902,7 @@ TEST_CASE("Limit Check Behavior") {
 TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Value matches expected value") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
@@ -904,7 +923,7 @@ TEST_CASE("Expected Value Check Behavior") {
 
 	SECTION("Value does not match expected value") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
@@ -925,7 +944,7 @@ TEST_CASE("Expected Value Check Behavior") {
 
 	SECTION("Status Changes from Unexpected to Expected") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
@@ -949,7 +968,7 @@ TEST_CASE("Expected Value Check Behavior") {
 
 	SECTION("Repetition Counter Resets on Status Change") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
@@ -981,7 +1000,7 @@ TEST_CASE("Expected Value Check Behavior") {
 
 	SECTION("Edge Cases for Parameter Values") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(0);
@@ -1006,7 +1025,7 @@ TEST_CASE("Expected Value Check Behavior") {
 
 	SECTION("Mask with zeros (no bits set)") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
@@ -1031,7 +1050,7 @@ TEST_CASE("Expected Value Check Behavior") {
 
 	SECTION("Mask with some bits set to zero") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(0xFF);
@@ -1059,16 +1078,9 @@ TEST_CASE("Expected Value Check Behavior") {
 TEST_CASE("Delta Check Perform Check") {
 	SECTION("Delta threshold checks including negative delta") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition3;
-		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
-		UTCTimestamp sixMockTimes[6] = {
-			UTCTimestamp(2024, 4, 10, 10, 15, 15),
-			UTCTimestamp(2024, 4, 10, 10, 15, 30),
-			UTCTimestamp(2024, 4, 10, 10, 15, 45),
-			UTCTimestamp(2024, 4, 10, 10, 16, 0),
-			UTCTimestamp(2024, 4, 10, 10, 16, 15),
-			UTCTimestamp(2024, 4, 10, 10, 16, 30),
-		};
+		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
 		pmon.performCheck();
@@ -1094,7 +1106,40 @@ TEST_CASE("Delta Check Perform Check") {
 			pmon.performCheck();
 		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
-		CHECK(pmon.getRepetitionCounter() == 7);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Repetition Counter Behavior") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+
+		param.setValue(10);
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		param.setValue(20);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		param.setValue(50);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
+		param.setValue(100);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
+		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1110,8 +1155,8 @@ TEST_CASE("Delta Check Perform Check") {
 			UTCTimestamp(2024, 4, 10, 10, 16, 30),
 		};
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition3;
-		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
+		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));

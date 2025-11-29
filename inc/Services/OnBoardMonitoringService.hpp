@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
-#define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
+#pragma once
 #include <cstdint>
 #include "ECSS_Definitions.hpp"
 #include "Helpers/PMON.hpp"
@@ -24,7 +23,7 @@ private:
 	/**
 	 * Map storing the parameter monitoring definitions.
 	 */
-	etl::map <uint16_t, etl::reference_wrapper <PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
+	etl::map<uint16_t, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
 	 * Maximum number of checks for each Limit Check.
@@ -46,21 +45,21 @@ private:
 	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
 	 * before they are added to the parameterMonitoringList.
 	 */
-	etl::vector <PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
+	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
 
 	/**
 	 * This vector is used as a mean of storing the PMON Definitons
 	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
 	 * before they are added to the parameterMonitoringList.
 	 */
-	etl::vector <PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
+	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
 
 	/**
 	 * This vector is used as a mean of storing the PMON Definitons
 	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
 	 * before they are added to the parameterMonitoringList.
 	 */
-	etl::vector <PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
+	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
 	/**
 	 * If true, parameter monitoring is enabled
@@ -110,7 +109,7 @@ public:
 	void addPMONLimitCheck(ParameterId PMONId, PMONLimitCheck& limitCheck) {
 		limitChecks.push_back(limitCheck);
 		parameterMonitoringList.insert(
-			etl::pair <const ParameterId, etl::reference_wrapper <PMON> >(PMONId, etl::ref(limitChecks.back())));
+			etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(limitChecks.back())));
 	}
 
 
@@ -120,7 +119,7 @@ public:
 	void addPMONExpectedValueCheck(ParameterId PMONId, PMONExpectedValueCheck& expectedValueCheck) {
 		expectedValueChecks.push_back(expectedValueCheck);
 		parameterMonitoringList.insert(
-			etl::pair <const ParameterId, etl::reference_wrapper <PMON> >(PMONId,
+			etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId,
 				etl::ref(expectedValueChecks.back())));
 	}
 
@@ -130,7 +129,7 @@ public:
 	void addPMONDeltaCheck(ParameterId PMONId, PMONDeltaCheck& deltaCheck) {
 		deltaChecks.push_back(deltaCheck);
 		parameterMonitoringList.insert(
-			etl::pair <const ParameterId, etl::reference_wrapper <PMON> >(PMONId, etl::ref(deltaChecks.back())));
+			etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(deltaChecks.back())));
 	}
 
 	/**
@@ -144,7 +143,7 @@ public:
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */
-	etl::reference_wrapper <PMON> getPMONDefinition(ParameterId PMONId) {
+	etl::reference_wrapper<PMON> getPMONDefinition(ParameterId PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
 
@@ -211,35 +210,18 @@ public:
 	 */
 	void reportParameterMonitoringDefinitions(Message& message);
 
-	/**
-	 * TM[12,9]
-	 */
-	void parameterMonitoringDefinitionReport();
 
 	/**
 	 * TC[12,10]
 	 */
 	void reportOutOfLimits(const Message& message);
 
-	/**
-	 * TM[12,11]
-	 */
-	void outOfLimitsReport();
-
-	/**
-	 * TM[12,12]
-	 */
-	void checkTransitionReport();
 
 	/**
 	 * TC[12,13]
 	 */
 	void reportStatusOfParameterMonitoringDefinition(const Message& message);
 
-	/**
-	 * TM[12,14]
-	 */
-	void parameterMonitoringDefinitionStatusReport();
 
 	/**
 	 * TC[12,15]
@@ -270,4 +252,3 @@ public:
 	}
 };
 
-#endif // ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP

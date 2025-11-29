@@ -79,7 +79,7 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 }
 
 TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
-	eventReportService.getStateOfEvents().reset();
+	eventReportService.disableAllEvents();
 	EventReportService::Event eventID[] = {EventReportService::AssertionFail,
 	                                       EventReportService::UnknownEvent};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::EnableReportGenerationOfEvents, Message::TC, 1);
@@ -87,19 +87,31 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	message.append<EventDefinitionId>(eventID[0]);
 	message.append<EventDefinitionId>(eventID[1]);
 	MessageParser::execute(message);
-	CHECK(eventReportService.getStateOfEvents()[2] == 1);
-	CHECK(eventReportService.getStateOfEvents()[4] == 1);
+	CHECK(eventReportService.getStateOfEvents()[EventReportService::AssertionFail] == 1);
+	CHECK(eventReportService.getStateOfEvents()[EventReportService::UnknownEvent] == 1);
+	CHECK(eventReportService.getStateOfEvents()[EventReportService::MCUStart] == 0);
 }
-
+TEST_CASE("Disable All Event Report Generation") {
+	auto eventStates = eventReportService.getStateOfEvents();
+	for (size_t i = 0; i < eventStates.size(); i++) {
+		CHECK(eventStates[i] == true);
+	}
+	eventReportService.disableAllEvents();
+	eventStates = eventReportService.getStateOfEvents();
+	for (size_t i = 0; i < eventStates.size(); i++) {
+		CHECK(eventStates[i] == false);
+	}
+}
 TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
-	EventReportService::Event eventID[] = {EventReportService::UnknownEvent};
+	EventReportService::Event eventID[] = {EventReportService::UnknownEvent, EventReportService::MCUStart};
 	Message message(EventReportService::ServiceType, EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
 	message.appendUint16(2);
 	message.append<EventDefinitionId>(eventID[0]);
 	message.append<EventDefinitionId>(eventID[1]);
 	MessageParser::execute(message);
-	CHECK(eventReportService.getStateOfEvents()[0] == 1);
-	CHECK(eventReportService.getStateOfEvents()[1] == 0);
+	CHECK(eventReportService.getStateOfEvents()[EventReportService::UnknownEvent] == 0);
+	CHECK(eventReportService.getStateOfEvents()[EventReportService::MCUStart] == 0);
+	CHECK(eventReportService.getStateOfEvents()[EventReportService::AssertionFail] == 1);
 
 	const String<64> eventReportData = "HelloWorld";
 	eventReportService.highSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);

@@ -144,6 +144,74 @@ void FileManagementService::fileAttributeReport(const ObjectPath& repositoryPath
 	storeMessage(report);
 }
 
+void FileManagementService::lockFile(Message& message) {
+	if (not message.assertTC(ServiceType, LockFile)) {
+		return;
+	}
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, fileName);
+
+	if (findWildcardPosition(fullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	if (auto result = Filesystem::lockFile(fullPath); !result.has_value()) {
+		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
+		switch (result.error()) {
+			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
+				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
+				break;
+			}
+			case Filesystem::FilePermissionModificationError::PathLeadsToDirectory: {
+				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory;
+				break;
+			}
+			default: {
+				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+				break;
+			}
+		}
+		ErrorHandler::reportError(message, error);
+	}
+}
+
+void FileManagementService::unlockFile(Message& message) {
+	if (not message.assertTC(ServiceType, UnlockFile)) {
+		return;
+	}
+
+	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto fullPath = getFullPath(repositoryPath, fileName);
+
+	if (findWildcardPosition(fullPath)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::UnexpectedWildcard);
+		return;
+	}
+
+	if (auto result = Filesystem::unlockFile(fullPath); !result.has_value()) {
+		ErrorHandler::ExecutionCompletionErrorType error; // NOLINT(cppcoreguidelines-init-variables)
+		switch (result.error()) {
+			case Filesystem::FilePermissionModificationError::FileDoesNotExist: {
+				error = ErrorHandler::ExecutionCompletionErrorType::ObjectDoesNotExist;
+				break;
+			}
+			case Filesystem::FilePermissionModificationError::PathLeadsToDirectory: {
+				error = ErrorHandler::ExecutionCompletionErrorType::AttemptedAccessModificationOnDirectory;
+				break;
+			}
+			default: {
+				error = ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
+				break;
+			}
+		}
+		ErrorHandler::reportError(message, error);
+	}
+}
+
 void FileManagementService::createDirectory(Message& message) {
 	message.assertTC(ServiceType, CreateDirectory);
 
@@ -238,6 +306,12 @@ void FileManagementService::execute(Message& message) {
 			break;
 		case ReportAttributes:
 			reportAttributes(message);
+			break;
+		case LockFile:
+			lockFile(message);
+			break;
+		case UnlockFile:
+			unlockFile(message);
 			break;
 		case CreateDirectory:
 			createDirectory(message);

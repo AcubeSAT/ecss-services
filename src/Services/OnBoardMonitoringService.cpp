@@ -63,7 +63,9 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Mes
 }
 
 void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, AddParameterMonitoringDefinitions);
+	if (!message.assertTC(ServiceType, AddParameterMonitoringDefinitions)) {
+		return;
+	}
 
 	uint16_t numberOfIds = message.readUint16();
 
@@ -341,6 +343,13 @@ void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(const
 	if (not message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition)) {
 		return;
 	}
+	Message pmonStatusReport{ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, ApplicationId};
+	pmonStatusReport.appendUint16(parameterMonitoringList.size());
+	for (auto& pmon : parameterMonitoringList) {
+		pmonStatusReport.append(pmon.first);
+		pmonStatusReport.append(pmon.second.get().getCheckingStatus());	
+	}
+	storeMessage(pmonStatusReport);
 }
 
 

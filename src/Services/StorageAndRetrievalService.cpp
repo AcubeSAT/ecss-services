@@ -215,7 +215,9 @@ NumOfPacketStores StorageAndRetrievalService::currentNumberOfPacketStores() {
 
 PacketStore& StorageAndRetrievalService::getPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId) {
 	auto packetStore = packetStores.find(packetStoreId);
-	ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray);
+	if (not ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray)) {
+		// TODO(#59): Proper error handling if assert fails
+	}
 	return packetStore->second;
 }
 

@@ -31,9 +31,11 @@ public:
 		AboveHighThreshold = 10
 	};
 
-	enum class CheckType : uint8_t { Limit = 1,
-		                             ExpectedValue = 2,
-		                             Delta = 3 };
+	enum class CheckType : uint8_t { 
+		Limit = 1,
+		ExpectedValue = 2,
+		Delta = 3 
+	};
 
 	ParameterId monitoredParameterId;
 	etl::reference_wrapper<ParameterBase> monitoredParameter;

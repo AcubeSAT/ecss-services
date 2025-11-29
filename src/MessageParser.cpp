@@ -95,7 +95,10 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress[constParamet
 }
 
 Message MessageParser::parse(const uint8_t* data, uint32_t length) {
-	ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket)) {
+		return {};
+	}
 
 	uint16_t const packetHeaderIdentification = (data[0] << 8) | data[1];
 	uint16_t const packetSequenceControl = (data[2] << 8) | data[3];
@@ -110,10 +113,19 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	SequenceCount const packetSequenceCount = packetSequenceControl & (~0xc000U); // keep last 14 bits
 
 	// Returning an internal error, since the Message is not available yet
-	ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(secondaryHeaderFlag, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(sequenceFlags == 0x3U, ErrorHandler::UnacceptablePacket);
-	ASSERT_INTERNAL(packetDataLength == (length - CCSDSPrimaryHeaderSize), ErrorHandler::UnacceptablePacket);
+	// TODO(#59): Proper error handling if assert fails
+	if (not ASSERT_INTERNAL(versionNumber == 0U, ErrorHandler::UnacceptablePacket)) {
+		return {};
+	}
+	if (not ASSERT_INTERNAL(secondaryHeaderFlag, ErrorHandler::UnacceptablePacket)) {
+		return {};
+	}
+	if (not ASSERT_INTERNAL(sequenceFlags == 0x3U, ErrorHandler::UnacceptablePacket)) {
+		return {};
+	}
+	if (not ASSERT_INTERNAL(packetDataLength == (length - CCSDSPrimaryHeaderSize), ErrorHandler::UnacceptablePacket)) {
+		return {};
+	}
 
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
@@ -216,8 +228,11 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	// First, compose the ECSS part
 	String<CCSDSMaxMessageSize> ecssMessage = MessageParser::composeECSS(message);
 
+	// TODO(#59): Proper error handling if assert fails
 	// Sanity check that there is enough space for the string
-	ASSERT_INTERNAL((ecssMessage.size() + CCSDSPrimaryHeaderSize) <= CCSDSMaxMessageSize, ErrorHandler::StringTooLarge);
+	if (not ASSERT_INTERNAL((ecssMessage.size() + CCSDSPrimaryHeaderSize) <= CCSDSMaxMessageSize, ErrorHandler::StringTooLarge)) {
+		return {""};
+	}
 
 	// Parts of the header
 	ApplicationProcessId packetId = message.applicationId;

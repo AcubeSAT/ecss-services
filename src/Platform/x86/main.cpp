@@ -3,6 +3,7 @@
 #include <Time/UTCTimestamp.hpp>
 #include <ctime>
 #include <iostream>
+#include <filesystem>
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/Statistic.hpp"
@@ -11,6 +12,7 @@
 #include "ServicePool.hpp"
 #include "Services/EventActionService.hpp"
 #include "Services/EventReportService.hpp"
+#include "Services/FileManagementService.hpp"
 #include "Services/FunctionManagementService.hpp"
 #include "Services/LargePacketTransferService.hpp"
 #include "Services/MemoryManagementService.hpp"
@@ -83,15 +85,15 @@ int main() {
 	MemoryManagementService& memMangService = Services.memoryManagement;
 	Message rcvPack = Message(MemoryManagementService::ServiceType,
 	                          MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
-	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(3);                                               // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(string));  // Start address
+	rcvPack.append<MemoryAddress>(static_cast<MemoryAddress>(reinterpret_cast<uintptr_t>(string)));  // Start address
 	rcvPack.append<MemoryDataLength>(sizeof(string) / sizeof(string[0]));  // Data read length
 
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(anotherStr));
+	rcvPack.append<MemoryAddress>(static_cast<MemoryAddress>(reinterpret_cast<uintptr_t>(anotherStr)));
 	rcvPack.append<MemoryDataLength>(sizeof(anotherStr) / sizeof(anotherStr[0]));
 
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(yetAnotherStr));
+	rcvPack.append<MemoryAddress>(static_cast<MemoryAddress>(reinterpret_cast<uintptr_t>(yetAnotherStr)));
 	rcvPack.append<MemoryDataLength>(sizeof(yetAnotherStr) / sizeof(yetAnotherStr[0]));
 	memMangService.rawDataMemorySubservice.dumpRawData(rcvPack);
 
@@ -99,12 +101,12 @@ int main() {
 	                  MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
 
 	uint8_t data[2] = {'h', 'R'};
-	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(2);                                               // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr));    // Start address
+	rcvPack.append<MemoryAddress>(static_cast<MemoryAddress>(reinterpret_cast<uintptr_t>(pStr)));    // Start address
 	rcvPack.appendOctetString(String<2>(data, 2));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 2));               // Append the CRC value
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(pStr + 1)); // Start address
+	rcvPack.append<MemoryAddress>(static_cast<MemoryAddress>(reinterpret_cast<uintptr_t>(pStr + 1))); // Start address
 	rcvPack.appendOctetString(String<1>(data, 1));
 	rcvPack.appendBits(16, CRCHelper::calculateCRC(data, 1)); // Append the CRC value
 	memMangService.loadRawData(rcvPack);
@@ -112,11 +114,11 @@ int main() {
 	rcvPack = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData,
 	                  Message::TC, 1);
 
-	rcvPack.append<MemoryId>(MemoryManagementService::MemoryID::EXTERNAL); // Memory ID
+	rcvPack.append<MemoryId>(0); // Memory ID
 	rcvPack.appendUint16(2);                                               // Iteration count
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data));    // Start address
+	rcvPack.append<MemoryAddress>(static_cast<MemoryAddress>(reinterpret_cast<uintptr_t>(data)));    // Start address
 	rcvPack.append<MemoryDataLength>(2);
-	rcvPack.append<StartAddress>(reinterpret_cast<StartAddress>(data + 1)); // Start address
+	rcvPack.append<MemoryAddress>(static_cast<MemoryAddress>(reinterpret_cast<uintptr_t>(data + 1))); // Start address
 	rcvPack.append<MemoryDataLength>(1);
 	memMangService.rawDataMemorySubservice.checkRawData(rcvPack);
 
@@ -359,6 +361,79 @@ int main() {
 	receivedMsg = Message(TimeBasedSchedulingService::ServiceType,
 	                      TimeBasedSchedulingService::MessageType::ActivitiesSummaryReportById, Message::TC, 1);
 	timeBasedSchedulingService.summaryReportActivitiesByID(receivedMsg);
+
+	//ST[23]
+	namespace fs = std::filesystem;
+	FileManagementService& fileManagementService = Services.fileManagement;
+
+	fs::current_path(fs::temp_directory_path());
+	std::cout << "\n\nST[23] File System Service - Start\n\n";
+	fs::create_directories("st23");
+	String<ECSSTCRequestStringSize> repo = "st23";
+
+	//Create directory
+	Message createDirectoryMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CreateDirectory, Message::TC, 0);
+	String<ECSSTCRequestStringSize> directory = "created_directory";
+	createDirectoryMessage.appendOctetString(repo);
+	createDirectoryMessage.appendOctetString(directory);
+	MessageParser::execute(createDirectoryMessage);
+	std::cout << "Created directory.\n";
+	std::cout << "fs::exists(\"st23/created_directory\") -> " << fs::exists("st23/created_directory") << "\n";
+	std::cout << "fs::is_directory(\"st23/created_directory\") -> " << fs::is_directory("st23/created_directory") << "\n\n";
+
+	String<ECSSTCRequestStringSize> fullPathToDirectory = repo;
+	fullPathToDirectory.append("/").append(directory);
+
+	//Create file
+	Message createFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::CreateFile, Message::TC, 0);
+	String<ECSSTCRequestStringSize> file = "created_file";
+	createFileMessage.appendOctetString(fullPathToDirectory);
+	createFileMessage.appendOctetString(file);
+	MessageParser::execute(createFileMessage);
+	std::cout << "Created file.\n";
+	std::cout << "fs::exists(\"st23/created_directory/created_file\") -> " << fs::exists("st23/created_directory/created_file") << "\n";
+	std::cout << "fs::is_regular_file(\"st23/created_directory/created_file\") -> " << fs::is_regular_file("st23/created_directory/created_file") << "\n\n";
+
+	//Lock file
+	Message lockFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::LockFile, Message::TC, 0);
+	lockFileMessage.appendOctetString(fullPathToDirectory);
+	lockFileMessage.appendOctetString(file);
+	MessageParser::execute(lockFileMessage);
+	std::cout << "Locked file.\n";
+	Filesystem::FileLockStatus lockStatus = Filesystem::getFileLockStatus("st23/created_directory/created_file");
+	std::cout << "FileSystem::getFileLockStatus == Locked -> " << (lockStatus == Filesystem::FileLockStatus::Locked) << "\n\n";
+
+	//Unlock file
+	Message unlockFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::UnlockFile, Message::TC, 0);
+	unlockFileMessage.appendOctetString(fullPathToDirectory);
+	unlockFileMessage.appendOctetString(file);
+	MessageParser::execute(unlockFileMessage);
+	lockStatus = Filesystem::getFileLockStatus("st23/created_directory/created_file");
+	std::cout << "Unlocked file.\n";
+	std::cout << "FileSystem::getFileLockStatus == Unlocked -> " << (lockStatus == Filesystem::FileLockStatus::Unlocked) <<"\n\n";
+
+	//Delete file
+	Message deleteFileMessage(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteFile, Message::TC, 0);
+	deleteFileMessage.appendOctetString(fullPathToDirectory);
+	deleteFileMessage.appendOctetString(file);
+	MessageParser::execute(deleteFileMessage);
+	std::cout << "Deleted file.\n";
+	std::cout << "fs::exists(\"st23/created_directory/created_file\") -> " << fs::exists("st23/created_directory/created_file") << "\n";
+	std::cout << "fs::is_regular_file(\"st23/created_directory/created_file\") -> " << fs::is_regular_file("st23/created_directory/created_file") << "\n\n";
+
+	//Delete directory
+	Message deleteDirectoryMessage(FileManagementService::ServiceType, FileManagementService::MessageType::DeleteDirectory, Message::TC,0);
+	deleteDirectoryMessage.appendOctetString(repo);
+	deleteDirectoryMessage.appendOctetString(directory);
+	MessageParser::execute(deleteDirectoryMessage);
+	std::cout << "Deleted directory.\n";
+	std::cout << "fs::exists(\"st23/created_directory\") -> " << fs::exists("st23/created_directory") << "\n";
+	std::cout << "fs::is_directory(\"st23/created_directory\") -> " << fs::is_directory("st23/created_directory") << "\n\n";
+
+	//cleanup
+	fs::remove_all(fs::temp_directory_path() / "st23");
+	std::cout << "ST[23] File System Service - End\n\n";
+	//ST[23] end
 
 	LOG_NOTICE << "ECSS Services test complete";
 
