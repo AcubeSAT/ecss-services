@@ -23,7 +23,7 @@ private:
 	/**
 	 * Map storing the parameter monitoring definitions.
 	 */
-	etl::map<uint16_t, etl::reference_wrapper <PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
+	etl::map<uint16_t, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
 	 * Maximum number of checks for each Limit Check.
@@ -210,35 +210,18 @@ public:
 	 */
 	void reportParameterMonitoringDefinitions(Message& message);
 
-	/**
-	 * TM[12,9]
-	 */
-	void parameterMonitoringDefinitionReport();
 
 	/**
 	 * TC[12,10]
 	 */
 	void reportOutOfLimits(const Message& message);
 
-	/**
-	 * TM[12,11]
-	 */
-	void outOfLimitsReport();
-
-	/**
-	 * TM[12,12]
-	 */
-	void checkTransitionReport();
 
 	/**
 	 * TC[12,13]
 	 */
 	void reportStatusOfParameterMonitoringDefinition(const Message& message);
 
-	/**
-	 * TM[12,14]
-	 */
-	void parameterMonitoringDefinitionStatusReport();
 
 	/**
 	 * TC[12,15]
