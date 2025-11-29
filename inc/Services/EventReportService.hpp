@@ -272,7 +272,7 @@ public:
      * @param transition A pair containing the previous (first) and new (second) checking status
      * @param eventId The ID of the event to be raised, used to determine severity from eventDefinitionSeverityArray
      */
-    void raiseTransitionEvent(ParameterId monitoredParameterId, etl::pair<PMON::CheckingStatus, PMON::CheckingStatus>
+    void raiseTransitionEvent(ParameterId monitoredParameterId, PMON::PMONTransition
     transition, EventDefinitionId eventId);
 
     /**

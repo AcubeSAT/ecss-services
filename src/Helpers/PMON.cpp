@@ -21,21 +21,19 @@ void PMON::updateAfterCheck(const CheckingStatus newCheckingStatus) {
 		newTrackedCheckingStatus = newCheckingStatus;
 	}
 
-	if (repetitionCounter < repetitionNumber) {
+	if (repetitionCounter < repetitionNumber || currentCheckingStatus == newTrackedCheckingStatus) {
 		return;
 	}
-	if (currentCheckingStatus == newTrackedCheckingStatus) {
-		return;
-	}
-	const etl::pair<CheckingStatus, CheckingStatus> transition = etl::make_pair(currentCheckingStatus, newTrackedCheckingStatus);
+	const PMONTransition transition = etl::make_pair(currentCheckingStatus, newTrackedCheckingStatus);
 	checkTransitions.push_back(transition);
 	currentCheckingStatus = newTrackedCheckingStatus;
 
-    if (pmonTransitionEventMap.find(transition) == pmonTransitionEventMap.end()) {
+    auto pmonMapResult = pmonTransitionEventMap.find(transition)
+    if (pmonMapResult == pmonTransitionEventMap.end()) {
       return;
     }
 
-    EventDefinitionId eventID = pmonTransitionEventMap[transition];
+    EventDefinitionId eventID = pmonMapResult->second;
 
 	if (eventID - 1 >= Services.eventReport.eventDefinitionSeverityArray.size()) {
 		return;
