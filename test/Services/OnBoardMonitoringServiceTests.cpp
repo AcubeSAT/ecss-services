@@ -47,10 +47,10 @@ struct Fixtures {
 void initialiseParameterMonitoringDefinitions(OnBoardMonitoringService& service = onBoardMonitoringService) {
 	// Reset fixtures to the defaults set up by the constructor
 	Fixtures::reset();
-	onBoardMonitoringService.addPMONExpectedValueCheck(0, etl::ref(Fixtures::getInstance().monitoringDefinition1));
-	onBoardMonitoringService.addPMONLimitCheck(1, etl::ref(Fixtures::getInstance().monitoringDefinition2));
-	onBoardMonitoringService.addPMONDeltaCheck(2, etl::ref(Fixtures::getInstance().monitoringDefinition3));
-	onBoardMonitoringService.addPMONDeltaCheck(3, etl::ref(Fixtures::getInstance().monitoringDefinition4));
+	service.addPMONExpectedValueCheck(0, etl::ref(Fixtures::getInstance().monitoringDefinition1));
+	service.addPMONLimitCheck(1, etl::ref(Fixtures::getInstance().monitoringDefinition2));
+	service.addPMONDeltaCheck(2, etl::ref(Fixtures::getInstance().monitoringDefinition3));
+	service.addPMONDeltaCheck(3, etl::ref(Fixtures::getInstance().monitoringDefinition4));
 }
 
 TEST_CASE("Enable Parameter Monitoring Definitions") {
@@ -188,7 +188,7 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
 		oBMService.deleteAllParameterMonitoringDefinitions(request);
 		CHECK(ServiceTests::count() == 0);
-		CHECK(onBoardMonitoringService.isPMONListEmpty());
+		CHECK(oBMService.isPMONListEmpty());
 
 		ServiceTests::reset();
 		Services.reset();
