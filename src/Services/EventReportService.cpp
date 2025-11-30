@@ -147,7 +147,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	storeMessage(report);
 }
 
-void EventReportService::raiseTransitionEvent(ParameterId monitoredParameterId, PMON::PMONTransition transition, EventDefinitionId eventID) {
+void EventReportService::raiseTransitionEvent(ParameterId monitoredParameterId, const PMON::PMONTransition& transition, EventDefinitionId eventID) {
 	EventReportSeverity severity = eventDefinitionSeverityArray[eventID];
 	auto data = String<ECSSEventDataAuxiliaryMaxSize>("ID");
 	data.append(std::to_string(monitoredParameterId).c_str());
