@@ -216,10 +216,7 @@ protected:
  */
 class PMONExpectedValueCheck : public PMON {
 public:
-	PMONExpectedValue expectedValue;
-	PMONBitMask mask;
-	EventDefinitionId unexpectedValueEvent;
-
+	
 	explicit PMONExpectedValueCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONExpectedValue expectedValue,
 	                                PMONBitMask mask, EventDefinitionId unexpectedValueEvent)
 	    : PMON(monitoredParameterId, repetitionNumber, CheckType::ExpectedValue),
@@ -268,6 +265,31 @@ public:
 			updateAfterCheck(UnexpectedValue);
 		}
 	}
+
+	/**
+	* Sets the expected value
+	*/ 
+	void setExpectedValue(PMONExpectedValue value) {
+		expectedValue = value;
+	}
+
+	/**
+	* Sets the unexpected value event
+	*/
+	void setUnexpectedValueEvent(EventDefinitionId value) {
+		unexpectedValueEvent = value;
+	}
+	/**
+	* Sets the bit mask
+	*/
+	void setMask(PMONBitMask value) {
+		mask = value;
+	}
+
+private:
+	PMONExpectedValue expectedValue;
+	PMONBitMask mask;
+	EventDefinitionId unexpectedValueEvent;
 };
 
 /**

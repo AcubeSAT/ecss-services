@@ -906,7 +906,7 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
-		pmon.mask = 0xFF;
+		pmon.setMask(0xFF);
 
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
@@ -927,7 +927,7 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
-		pmon.mask = 0xFF;
+		pmon.setMask(0xFF);
 
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
@@ -948,7 +948,7 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
-		pmon.mask = 0xFF;
+		pmon.setMask(0xFF);
 
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
@@ -972,7 +972,7 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
-		pmon.mask = 0xFF;
+		pmon.setMask(0xFF);
 
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
@@ -1004,7 +1004,7 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(0);
-		pmon.mask = 0xFF;
+		pmon.setMask(0xFF);
 
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
@@ -1029,7 +1029,7 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
-		pmon.mask = 0x00;
+		pmon.setMask(0x00);
 
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
@@ -1054,8 +1054,8 @@ TEST_CASE("Expected Value Check Behavior") {
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		param.setValue(0xFF);
-		pmon.mask = 0b1111'0000;
-		pmon.expectedValue = 0b1111'0000;
+		pmon.setMask(0b1111'0000);
+		pmon.setExpectedValue(0b1111'0000);
 
 		for (int i = 0; i < 6; i++) {
 			pmon.performCheck();
@@ -1210,7 +1210,7 @@ TEST_CASE("Check All Behavior") {
         auto& param3 = static_cast<Parameter<unsigned char>&>(pmon3.monitoredParameter.get());
 
         param1.setValue(10);
-        pmonExpected.mask = 0xFF;
+		pmonExpected.setMask(0xFF);
         param2.setValue(5);
     	pmonLimit.setMonitoringEnabled(true);
         param3.setValue(100);
@@ -1242,7 +1242,7 @@ TEST_CASE("Check All Behavior") {
     	auto& param2 = static_cast<Parameter<unsigned char>&>(pmon2.monitoredParameter.get());
 
     	param1.setValue(10);
-    	pmonExpected.mask = 0xFF;
+		pmonExpected.setMask(0xFF);
     	param2.setValue(5);
     	pmonExpected.setMonitoringEnabled(false);
     	pmonLimit.setMonitoringEnabled(false);
@@ -1274,7 +1274,7 @@ TEST_CASE("Check All Behavior") {
     	auto& param1 = static_cast<Parameter<unsigned char>&>(pmon1.monitoredParameter.get());
 
     	param1.setValue(10);
-    	pmonExpected.mask = 0xFF;
+    	pmonExpected.setMask(0xFF);
 
     	for (int i = 0; i < 6; i++) {
     		onBoardMonitoringService.checkAll();
@@ -1392,7 +1392,7 @@ TEST_CASE("Event Raising", "[service][st12][st05]") {
 		// Enable monitoring and set value that will trigger UnexpectedValue
 		pmon.setMonitoringEnabled(true);
 		param.setValue(5);
-		pmon.mask = 0xFF;
+		pmon.setMask(0xFF);
 
 		// Perform checks until repetition number is reached
 		for (int i = 0; i < 6; i++) {
@@ -1484,7 +1484,7 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 
 		pmon.setMonitoringEnabled(true);
 		param.setValue(10); // Expected value
-		pmon.mask = 0xFF;
+		pmon.setMask(0xFF);
 
 		// First transition: Unchecked -> ExpectedValue
 		for (int i = 0; i < 6; i++) {

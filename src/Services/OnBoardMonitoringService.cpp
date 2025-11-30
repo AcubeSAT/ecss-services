@@ -223,9 +223,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				EventDefinitionId unexpectedValueEvent = message.read<EventDefinitionId>();
 
 				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(pmon);
-				expectedValueCheck.mask = mask;
-				expectedValueCheck.expectedValue = expectedValue;
-				expectedValueCheck.unexpectedValueEvent = unexpectedValueEvent;
+				expectedValueCheck.setMask(mask);
+				expectedValueCheck.setExpectedValue(expectedValue);
+				expectedValueCheck.setUnexpectedValueEvent(unexpectedValueEvent);
 				break;
 			}
 
