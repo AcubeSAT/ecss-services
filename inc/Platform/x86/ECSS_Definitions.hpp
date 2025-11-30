@@ -268,7 +268,7 @@ inline constexpr uint32_t MaxValidMemoryIds = 8;
 /**
  * The size of the check transition list of the PMON class of ST[12]
  */
-inline constexpr uint8_t CheckTransitionListSize = 2;
+inline constexpr uint8_t CheckTransitionListSize = 5;
 
 /**
  * The size of the map of event definitions connected to the check transitions of the PMON class of ST[12]

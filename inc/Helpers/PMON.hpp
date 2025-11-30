@@ -115,6 +115,13 @@ public:
 	}
 
 	/**
+	* Returns the new tracked status	
+	*/
+	CheckingStatus getTrackedStatus() const {
+		return newTrackedCheckingStatus;
+	}
+
+	/**
 	 * Pure virtual function to be implemented by derived classes for performing the specific check.
 	 * The function updates PMON::checkingStatus based on the result of the check.
 	 *

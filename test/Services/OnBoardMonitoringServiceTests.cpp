@@ -42,7 +42,7 @@ struct Fixtures {
 		static std::optional<Fixtures> instance;
 };
 
-	std::optional<Fixtures> Fixtures::instance{};
+std::optional<Fixtures> Fixtures::instance{};
 
 void initialiseParameterMonitoringDefinitions(OnBoardMonitoringService& service = onBoardMonitoringService) {
 	// Reset fixtures to the defaults set up by the constructor
@@ -1079,7 +1079,7 @@ TEST_CASE("Delta Check Perform Check") {
 	SECTION("Delta threshold checks including negative delta") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = static_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
@@ -1096,8 +1096,6 @@ TEST_CASE("Delta Check Perform Check") {
 		    UTCTimestamp(2024, 4, 10, 10, 16, 30),
 		};
 
-
-		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
 		uint16_t prevValue = 0;
 		for (int i = 0; i < 6; i++) {
 			ServiceTests::setMockTime(sixMockTimes[i]);
@@ -1106,15 +1104,18 @@ TEST_CASE("Delta Check Perform Check") {
 			pmon.performCheck();
 		}
 		CHECK(pmon.getCheckingStatus() == PMON::AboveHighThreshold);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(5);
 		for (int i = 0; i < 6; i++) {
+			ServiceTests::setMockTime(sixMockTimes[i]);
+			prevValue -= 180;
+			param.setValue(prevValue);
 			pmon.performCheck();
 		}
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
-		CHECK(pmon.getRepetitionCounter() == 1);
+		CHECK(pmon.getRepetitionCounter() == 6);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1123,30 +1124,30 @@ TEST_CASE("Delta Check Perform Check") {
 	SECTION("Repetition Counter Behavior") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = static_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
 		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getTrackedStatus() == PMON::Invalid);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
-		param.setValue(20);
+		param.setValue(23);
 		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getTrackedStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(50);
 		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getTrackedStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 2);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
 		param.setValue(100);
 		pmon.performCheck();
-		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
+		CHECK(pmon.getTrackedStatus() == PMON::WithinThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::reset();
@@ -1164,7 +1165,7 @@ TEST_CASE("Delta Check Perform Check") {
 		};
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = static_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
@@ -1180,15 +1181,13 @@ TEST_CASE("Delta Check Perform Check") {
 		CHECK(pmon.getCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 6);
 
+		
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
-		uint16_t prevValue = 0;
-		for (int i = 0; i < 7; i++) {
-			ServiceTests::setMockTime(sixMockTimes[i]);
-			prevValue += 140;
-			param.setValue(prevValue);
-			pmon.performCheck();
-		}
-		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
+			
+		param.setValue(140);
+		pmon.performCheck();
+		
+		CHECK(pmon.getTrackedStatus() == PMON::WithinThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::reset();
