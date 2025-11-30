@@ -1,5 +1,4 @@
-#ifndef ECSS_SERVICES_PMON_HPP
-#define ECSS_SERVICES_PMON_HPP
+#pragma once
 #include <cstdint>
 #include "Helpers/Parameter.hpp"
 #include "Message.hpp"
@@ -391,16 +390,6 @@ private:
  * Contains the variables specific to Parameter Monitoring definitions of delta check type.
  */
 class PMONDeltaCheck : public PMON {
-public:
-	NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks;
-	DeltaThreshold lowDeltaThreshold;
-	EventDefinitionId belowLowThresholdEvent;
-	DeltaThreshold highDeltaThreshold;
-	EventDefinitionId aboveHighThresholdEvent;
-
-private:
-	double previousValue;
-	etl::optional<Time::DefaultCUC> previousTimestamp;
 
 public:
 	explicit PMONDeltaCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber,
@@ -445,6 +434,41 @@ public:
 	 */
 	EventDefinitionId getAboveHighThresholdEvent() const {
 		return aboveHighThresholdEvent;
+	}
+
+	/**
+	 * Sets the number of consecutive Delta Checks.
+	 */
+	void setNumberOfConsecutiveDeltaChecks(NumberOfConsecutiveDeltaChecks value) {
+		numberOfConsecutiveDeltaChecks = value;
+	}
+
+	/**
+	 * Sets the value of the Low Threshold used on a Delta Check.
+	 */
+	void setLowDeltaThreshold(DeltaThreshold value) {
+		lowDeltaThreshold = value;
+	}
+
+	/**
+	 * Sets the Id of a Below Low Threshold Event.
+	 */
+	void setBelowLowThresholdEvent(EventDefinitionId value) {
+		belowLowThresholdEvent = value;
+	}
+
+	/**
+	 * Sets the value of the High Threshold used on a Delta Check.
+	 */
+	void setHighDeltaThreshold(DeltaThreshold value) {
+		highDeltaThreshold = value;
+	}
+
+	/**
+	 * Sets the Id of an Above High Threshold Event.
+	 */
+	void setAboveHighThresholdEvent(EventDefinitionId value) {
+		aboveHighThresholdEvent = value;
 	}
 
 	/**
@@ -516,5 +540,13 @@ public:
 
 		updateAfterCheck(newCheckingStatus);
 	}
+
+private:
+	NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks;
+	DeltaThreshold lowDeltaThreshold;
+	EventDefinitionId belowLowThresholdEvent;
+	DeltaThreshold highDeltaThreshold;
+	EventDefinitionId aboveHighThresholdEvent;
+	double previousValue;
+	etl::optional<Time::DefaultCUC> previousTimestamp;
 };
-#endif // ECSS_SERVICES_PMON_HPP

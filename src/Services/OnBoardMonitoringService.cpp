@@ -243,11 +243,11 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				}
 
 				auto& deltaCheck = static_cast<PMONDeltaCheck&>(pmon);
-				deltaCheck.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
-				deltaCheck.lowDeltaThreshold = lowDeltaThreshold;
-				deltaCheck.belowLowThresholdEvent = belowLowThresholdEventId;
-				deltaCheck.highDeltaThreshold = highDeltaThreshold;
-				deltaCheck.aboveHighThresholdEvent = aboveHighThresholdEventId;
+				deltaCheck.setNumberOfConsecutiveDeltaChecks(numberOfConsecutiveDeltaChecks);
+				deltaCheck.setLowDeltaThreshold(lowDeltaThreshold);
+				deltaCheck.setBelowLowThresholdEvent(belowLowThresholdEventId);
+				deltaCheck.setHighDeltaThreshold(highDeltaThreshold);
+				deltaCheck.setAboveHighThresholdEvent(aboveHighThresholdEventId);
 				break;
 			}
 		}
