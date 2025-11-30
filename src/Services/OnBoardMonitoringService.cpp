@@ -154,7 +154,7 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 			continue;
 		}
 
-		if (getPMONDefinition(currentPMONId).get().isMonitoringEnabled() == true) {
+		if (getPMONDefinition(currentPMONId).get().isMonitoringEnabled()) {
 			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition);
 			continue;
 		}
