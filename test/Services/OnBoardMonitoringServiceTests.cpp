@@ -483,10 +483,10 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		auto& modifiedDefinition = static_cast<PMONLimitCheck&>(baseDefinition);
 
 		CHECK(modifiedDefinition.getRepetitionNumber() == repetitionNumber);
-		CHECK(modifiedDefinition.lowLimit == lowLimit);
-		CHECK(modifiedDefinition.highLimit == highLimit);
-		CHECK(modifiedDefinition.belowLowLimitEvent == belowLowLimitEvent);
-		CHECK(modifiedDefinition.aboveHighLimitEvent == aboveHighLimitEvent);
+		CHECK(modifiedDefinition.getLowLimit() == lowLimit);
+		CHECK(modifiedDefinition.getHighLimit() == highLimit);
+		CHECK(modifiedDefinition.getBelowLowLimitEvent() == belowLowLimitEvent);
+		CHECK(modifiedDefinition.getAboveHighLimitEvent() == aboveHighLimitEvent);
 
 		ServiceTests::reset();
 		Services.reset();

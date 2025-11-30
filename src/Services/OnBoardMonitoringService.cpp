@@ -209,10 +209,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				}
 
 				auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
-				limitCheck.lowLimit = lowLimit;
-				limitCheck.belowLowLimitEvent = belowLowLimitEventId;
-				limitCheck.highLimit = highLimit;
-				limitCheck.aboveHighLimitEvent = aboveHighLimitEventId;
+				limitCheck.setLowLimit(lowLimit);
+				limitCheck.setBelowLowLimitEvent(belowLowLimitEventId);
+				limitCheck.setHighLimit(highLimit);
+				limitCheck.setAboveHighLimitEvent(aboveHighLimitEventId);
 				break;
 			}
 

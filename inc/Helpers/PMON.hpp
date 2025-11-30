@@ -297,11 +297,7 @@ private:
  */
 class PMONLimitCheck : public PMON {
 public:
-	PMONLimit lowLimit;
-	EventDefinitionId belowLowLimitEvent;
-	PMONLimit highLimit;
-	EventDefinitionId aboveHighLimitEvent;
-
+	
 	explicit PMONLimitCheck(ParameterId monitoredParameterId, PMONRepetitionNumber repetitionNumber, PMONLimit lowLimit,
 	                        EventDefinitionId belowLowLimitEvent, PMONLimit highLimit, EventDefinitionId aboveHighLimitEvent)
 	    : PMON(monitoredParameterId, repetitionNumber, CheckType::Limit), lowLimit(lowLimit), belowLowLimitEvent(belowLowLimitEvent), highLimit(highLimit),
@@ -337,6 +333,34 @@ public:
 	}
 
 	/**
+	 * Returns the value of the Low PMONLimit used on a PMONLimit Check.
+	 */
+	void setLowLimit(PMONLimit limit) {
+		lowLimit = limit;
+	}
+
+	/**
+	 * Returns the Id of a Below Low PMONLimit Event.
+	 */
+	void setBelowLowLimitEvent(EventDefinitionId value) {
+		belowLowLimitEvent = value;
+	}
+
+	/**
+	 * Returns the value of the High PMONLimit used on a PMONLimit Check.
+	 */
+	void setHighLimit(PMONLimit limit) {
+		highLimit = limit;
+	}
+
+	/**
+	 * Returns the Id of a High PMONLimit Event.
+	 */
+	void setAboveHighLimitEvent(EventDefinitionId value) {
+		aboveHighLimitEvent = value;
+	}
+
+	/**
 	 * @brief Performs the check for the PMONLimitCheck class.
 	 *
 	 * This function first retrieves the current value of the monitored parameter.
@@ -355,6 +379,12 @@ public:
 			updateAfterCheck(WithinLimits);
 		}
 	}
+
+private:
+	PMONLimit lowLimit;
+	EventDefinitionId belowLowLimitEvent;
+	PMONLimit highLimit;
+	EventDefinitionId aboveHighLimitEvent;
 };
 
 /**
