@@ -336,9 +336,6 @@ void OnBoardMonitoringService::reportOutOfLimits(const Message& message) {
 	}
 }
 
-void OnBoardMonitoringService::outOfLimitsReport() {
-}
-
 void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition)) {
 		return;

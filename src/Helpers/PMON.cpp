@@ -28,7 +28,7 @@ void PMON::updateAfterCheck(const CheckingStatus newCheckingStatus) {
 	checkTransitions.push_back(transition);
 	currentCheckingStatus = newTrackedCheckingStatus;
 
-    auto pmonMapResult = pmonTransitionEventMap.find(transition)
+    auto pmonMapResult = pmonTransitionEventMap.find(transition);
     if (pmonMapResult == pmonTransitionEventMap.end()) {
       return;
     }

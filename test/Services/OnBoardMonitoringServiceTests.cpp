@@ -1087,11 +1087,19 @@ TEST_CASE("Delta Check Perform Check") {
 
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
 		CHECK(pmon.getRepetitionCounter() == 1);
+		UTCTimestamp sixMockTimes[6] = {
+		    UTCTimestamp(2024, 4, 10, 10, 15, 15),
+		    UTCTimestamp(2024, 4, 10, 10, 15, 30),
+		    UTCTimestamp(2024, 4, 10, 10, 15, 45),
+		    UTCTimestamp(2024, 4, 10, 10, 16, 0),
+		    UTCTimestamp(2024, 4, 10, 10, 16, 15),
+		    UTCTimestamp(2024, 4, 10, 10, 16, 30),
+		};
 
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
 		uint16_t prevValue = 0;
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < 6; i++) {
 			ServiceTests::setMockTime(sixMockTimes[i]);
 			prevValue += 180;
 			param.setValue(prevValue);
@@ -1375,7 +1383,7 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
 TEST_CASE("Event Raising", "[service][st12][st05]") {
 	SECTION("Valid event raising for Expected Value Check") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		// Set up event mapping for transition from Unchecked to UnexpectedValue
@@ -1404,7 +1412,7 @@ TEST_CASE("Event Raising", "[service][st12][st05]") {
 
 	SECTION("Valid event raising for Limit Check") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition2;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		// Set up event mapping for transition from Unchecked to BelowLowLimit
@@ -1432,7 +1440,7 @@ TEST_CASE("Event Raising", "[service][st12][st05]") {
 
 	SECTION("Valid event raising for Delta Check") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition3;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
 		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		// Set up event mapping for transition from Invalid to AboveHighThreshold
@@ -1472,7 +1480,7 @@ TEST_CASE("Event Raising", "[service][st12][st05]") {
 TEST_CASE("Transition List Management", "[service][st12]") {
 	SECTION("Transition list updates correctly for Expected Value Check") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition1;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
 		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		pmon.monitoringEnabled = true;
@@ -1504,7 +1512,7 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 
 	SECTION("Transition list updates correctly for Limit Check") {
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition2;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
 		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
 
 		pmon.monitoringEnabled = true;
@@ -1543,7 +1551,7 @@ TEST_CASE("Transition List Management", "[service][st12]") {
 			UTCTimestamp(2024, 4, 10, 10, 16, 30),
 		};
 		initialiseParameterMonitoringDefinitions();
-		auto& pmon = fixtures.monitoringDefinition3;
+		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
 		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
