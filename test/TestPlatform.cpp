@@ -240,16 +240,16 @@ void FunctionManagementService::initializeFunctionMap() {
 }
 
 void EventReportService::initializeEventDefinitionSeverityArray() {
-	eventDefinitionSeverityArray.at(Event::UnknownEvent - 1) = EventReportSeverity::Informative;
-	eventDefinitionSeverityArray.at(Event::WWDGReset - 1) = EventReportSeverity::Low;
-	eventDefinitionSeverityArray.at(Event::AssertionFail - 1) = EventReportSeverity::Medium;
-	eventDefinitionSeverityArray.at(Event::MCUStart - 1) = EventReportSeverity::High;
-	eventDefinitionSeverityArray.at(Event::FailedStartOfExecution - 1) = EventReportSeverity::Low;
-	eventDefinitionSeverityArray.at(Event::UnexpectedValuePMON - 1) = EventReportSeverity::Low;
-	eventDefinitionSeverityArray.at(Event::BelowLowLimitPMON - 1) = EventReportSeverity::Low;
-	eventDefinitionSeverityArray.at(Event::AboveHighLimitPMON - 1) = EventReportSeverity::Low;
-	eventDefinitionSeverityArray.at(Event::BelowLowThresholdPMON - 1) = EventReportSeverity::Low;
-	eventDefinitionSeverityArray.at(Event::AboveHighThresholdPMON - 1) = EventReportSeverity::Low;
+	eventDefinitionSeverityArray[Event::UnknownEvent - 1] = EventReportSeverity::Informative;
+	eventDefinitionSeverityArray[Event::WWDGReset - 1] = EventReportSeverity::Low;
+	eventDefinitionSeverityArray[Event::AssertionFail - 1] = EventReportSeverity::Medium;
+	eventDefinitionSeverityArray[Event::MCUStart - 1] = EventReportSeverity::High;
+	eventDefinitionSeverityArray[Event::FailedStartOfExecution - 1] = EventReportSeverity::Low;
+	eventDefinitionSeverityArray[Event::UnexpectedValuePMON - 1] = EventReportSeverity::Low;
+	eventDefinitionSeverityArray[Event::BelowLowLimitPMON - 1] = EventReportSeverity::Low;
+	eventDefinitionSeverityArray[Event::AboveHighLimitPMON - 1] = EventReportSeverity::Low;
+	eventDefinitionSeverityArray[Event::BelowLowThresholdPMON - 1] = EventReportSeverity::Low;
+	eventDefinitionSeverityArray[Event::AboveHighThresholdPMON - 1] = EventReportSeverity::Low;
 }
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)

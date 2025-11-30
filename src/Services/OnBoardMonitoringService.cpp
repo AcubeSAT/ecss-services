@@ -18,8 +18,8 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			continue;
 		}
-		definition->second.get().repetitionNumber = 0;
-		definition->second.get().monitoringEnabled = true;
+		definition->second.get().setRepetitionNumber(0);
+		definition->second.get().setMonitoringEnabled(true);
 	}
 }
 
@@ -37,8 +37,8 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			continue;
 		}
-		definition->second.get().monitoringEnabled = false;
-		definition->second.get().currentCheckingStatus = PMON::Unchecked;
+		definition->second.get().setMonitoringEnabled(false);
+		definition->second.get().setCheckingStatus(PMON::Unchecked);
 	}
 }
 
@@ -105,8 +105,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				}
 				PMONLimitCheck limitCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 				                          lowLimit, belowLowLimitEventId, highLimit, aboveHighLimitEventId);
-				limitCheck.currentCheckingStatus = PMON::Unchecked;
-				limitCheck.monitoringEnabled = false;
+				limitCheck.setCheckingStatus(PMON::Unchecked);
+				limitCheck.setMonitoringEnabled(false);
 				addPMONLimitCheck(currentPMONId, limitCheck);
 				break;
 			}
@@ -116,8 +116,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				EventDefinitionId unexpectedValueEvent = message.read<EventDefinitionId>();
 				PMONExpectedValueCheck expectedValueCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 				                                          expectedValue, mask, unexpectedValueEvent);
-				expectedValueCheck.currentCheckingStatus = PMON::Unchecked;
-				expectedValueCheck.monitoringEnabled = false;
+				expectedValueCheck.setCheckingStatus(PMON::Unchecked);
+				expectedValueCheck.setMonitoringEnabled(false);
 				addPMONExpectedValueCheck(currentPMONId, expectedValueCheck);
 				break;
 			}
@@ -134,8 +134,8 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				}
 				PMONDeltaCheck deltaCheck(currentMonitoredParameterId, currentPMONRepetitionNumber,
 				                          numberOfConsecutiveDeltaChecks, lowDeltaThreshold, belowLowThresholdEventId, highDeltaThreshold, aboveHighThresholdEventId);
-				deltaCheck.currentCheckingStatus = PMON::Unchecked;
-				deltaCheck.monitoringEnabled = false;
+				deltaCheck.setCheckingStatus(PMON::Unchecked);
+				deltaCheck.setMonitoringEnabled(false);
 				addPMONDeltaCheck(currentPMONId, deltaCheck);
 				break;
 			}
@@ -154,7 +154,7 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 			continue;
 		}
 
-		if (getPMONDefinition(currentPMONId).get().monitoringEnabled) {
+		if (getPMONDefinition(currentPMONId).get().isMonitoringEnabled() == true) {
 			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition);
 			continue;
 		}
@@ -184,16 +184,16 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			return;
 		}
 
-		if (getPMONDefinition(currentPMONId).get().monitoredParameterId != currentMonitoredParameterId) {
+		if (getPMONDefinition(currentPMONId).get().getMonitoredParameterId() != currentMonitoredParameterId) {
 			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
 			                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
 			return;
 		}
 
 		PMON& pmon = it->second.get();
-		pmon.repetitionCounter = 0;
-		pmon.repetitionNumber = currentPMONRepetitionNumber;
-		pmon.currentCheckingStatus = PMON::Unchecked;
+		pmon.setRepetitionCounter(0);
+		pmon.setRepetitionNumber(currentPMONRepetitionNumber);
+		pmon.setCheckingStatus(PMON::Unchecked);
 
 		switch (static_cast<PMON::CheckType>(currentCheckType)) {
 			case PMON::CheckType::Limit: {
@@ -275,14 +275,14 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 		PMON& pmon = it->second.get();
 
 		pmonDefinitionReport.append<ParameterId>(currentPMONId);
-		pmonDefinitionReport.append<ParameterId>(pmon.monitoredParameterId);
-		pmonDefinitionReport.appendBoolean(pmon.monitoringEnabled);
-		pmonDefinitionReport.append<PMONRepetitionNumber>(pmon.repetitionNumber);
+		pmonDefinitionReport.append<ParameterId>(pmon.getMonitoredParameterId());
+		pmonDefinitionReport.appendBoolean(pmon.isMonitoringEnabled());
+		pmonDefinitionReport.append<PMONRepetitionNumber>(pmon.getRepetitionNumber());
 
-		auto checkTypeValue = pmon.checkType;
+		auto checkTypeValue = pmon.getCheckType();
 		pmonDefinitionReport.append<PMON::CheckType>(checkTypeValue);
 
-		switch (pmon.checkType) {
+		switch (pmon.getCheckType()) {
 			case PMON::CheckType::Limit: {
 				auto& limitCheck = static_cast<PMONLimitCheck&>(pmon);
 				pmonDefinitionReport.append<PMONLimit>(limitCheck.getLowLimit());

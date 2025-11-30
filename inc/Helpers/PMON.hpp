@@ -10,6 +10,7 @@
 #include "etl/map.h"
 #include "etl/optional.h"
 #include "etl/utility.h"
+#include "etl/span.h"
 #include "ECSS_Definitions.hpp"
 
 /**
@@ -37,47 +38,8 @@ public:
 		Delta = 3 
 	};
 
-	ParameterId monitoredParameterId;
-	etl::reference_wrapper<ParameterBase> monitoredParameter;
+	
 	using PMONTransition = etl::pair<CheckingStatus, CheckingStatus>;
-
-	/**
-	 * The number of consecutive checks with the same result that need to be conducted in order to set a new Parameter Monitoring Status.
-	 */
-	PMONRepetitionNumber repetitionNumber;
-
-	/**
-	 * The number of consecutive checks with the same result that have been conducted so far.
-	 */
-	PMONRepetitionNumber repetitionCounter = 0;
-
-	/**
-	 * If false, the parameter of this PMON will not be checked, and no events will be generated if it goes off-bounds.
-	 */
-	bool monitoringEnabled = false;
-
-	CheckingStatus currentCheckingStatus = Unchecked;
-
-	/**
-	 * The list of Checking Statuses that have been recorded so far.
-	 */
-	etl::vector<PMONTransition, CheckTransitionListSize> checkTransitions = {};
-
-	/**
-	 * The map of event definitions connected to the check transitions.
-	 */
-	etl::map<PMONTransition, EventDefinitionId, PMONEventMapSize> pmonTransitionEventMap = {};
-
-	/**
-	 * The check type of this monitoring definition, set by the child classes to differentiate between class types
-	 */
-	CheckType checkType;
-
-	/**
-	 * The check type that can possibly replace the current one, if the repetition counter reaches the repetition number.
-	 * The repetition counter refers to the number of times this new possible check type has appeared consecutively.
-	 */
-	CheckingStatus newTrackedCheckingStatus;
 
 	/**
 	 * Returns the number of consecutive checks with the same result that need to be conducted in order to set a new Parameter Monitoring Status.
@@ -103,7 +65,7 @@ public:
 	/**
 	 * Returns the current Check Type.
 	 */
-	etl::optional<CheckType> getCheckType() const {
+	CheckType getCheckType() const {
 		return checkType;
 	}
 
@@ -113,12 +75,51 @@ public:
 	CheckingStatus getCheckingStatus() const {
 		return currentCheckingStatus;
 	}
+	/**
+	 * Sets the current Checking Status.
+	 */
+	void setCheckingStatus(PMON::CheckingStatus status) {
+		currentCheckingStatus = status;
+	}
 
 	/**
 	* Returns the new tracked status	
 	*/
 	CheckingStatus getTrackedStatus() const {
 		return newTrackedCheckingStatus;
+	}
+
+	/**
+	* Sets the repetition number 
+	*/
+	void setRepetitionNumber(PMONRepetitionNumber number) {
+		repetitionNumber = number;
+	}
+
+	/**
+	* Sets the repetition counter 
+	*/
+	void setRepetitionCounter(PMONRepetitionNumber counter) {
+		repetitionCounter = counter;
+	}
+
+	/**
+	* Sets monitoring to enabled or disabled
+	*/
+	void setMonitoringEnabled(bool enabled) {
+		monitoringEnabled = enabled;
+	}
+	/**
+	* Gets a span of the currently recorded check transitions
+	*/
+	etl::span<const PMONTransition> getCheckTransitions() const {
+		return checkTransitions;
+	}
+	/**
+	* Gets the Id of the monitored parameter
+	*/
+	ParameterId getMonitoredParameterId() const {
+		return monitoredParameterId;
 	}
 
 	/**
@@ -148,6 +149,14 @@ public:
 	 */
 	virtual void performCheck() = 0;
 
+	
+	etl::reference_wrapper<ParameterBase> monitoredParameter;
+	
+	/**
+	 * The map of event definitions connected to the check transitions.
+	 */
+	etl::map<PMONTransition, EventDefinitionId, PMONEventMapSize> pmonTransitionEventMap = {};
+
 protected:
 	/**
 	 * @param monitoredParameterId is assumed to be correct and not checked.
@@ -165,6 +174,41 @@ protected:
 	 * @param newCheckingStatus The current checking status.
 	 */
 	void updateAfterCheck(CheckingStatus newCheckingStatus);
+
+	ParameterId monitoredParameterId;
+
+	/**
+	 * The number of consecutive checks with the same result that need to be conducted in order to set a new Parameter Monitoring Status.
+	 */
+	PMONRepetitionNumber repetitionNumber;
+
+	/**
+	 * The number of consecutive checks with the same result that have been conducted so far.
+	 */
+	PMONRepetitionNumber repetitionCounter = 0;
+
+	/**
+	 * If false, the parameter of this PMON will not be checked, and no events will be generated if it goes off-bounds.
+	 */
+	bool monitoringEnabled = false;
+
+	CheckingStatus currentCheckingStatus = Unchecked;
+
+	/**
+	 * The list of Checking Statuses that have been recorded so far.
+	 */
+	etl::vector<PMONTransition, CheckTransitionListSize> checkTransitions = {};
+
+	/**
+	 * The check type of this monitoring definition, set by the child classes to differentiate between class types
+	 */
+	CheckType checkType;
+
+	/**
+	 * The check type that can possibly replace the current one, if the repetition counter reaches the repetition number.
+	 * The repetition counter refers to the number of times this new possible check type has appeared consecutively.
+	 */
+	CheckingStatus newTrackedCheckingStatus;
 };
 
 /**
