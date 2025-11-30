@@ -25,6 +25,10 @@ void PMON::updateAfterCheck(const CheckingStatus newCheckingStatus) {
 		return;
 	}
 	const PMONTransition transition = etl::make_pair(currentCheckingStatus, newTrackedCheckingStatus);
+	if (checkTransitions.full()) {
+		ErrorHandler::reportInternalError(ErrorHandler::PMONCheckTransitionsFull);
+		return;
+	}
 	checkTransitions.push_back(transition);
 	currentCheckingStatus = newTrackedCheckingStatus;
 
