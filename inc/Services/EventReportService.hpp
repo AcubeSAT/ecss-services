@@ -22,7 +22,9 @@ private:
     static constexpr uint16_t NumberOfEvents = 10;
     etl::bitset<NumberOfEvents> enabledEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
-
+	/**
+    * Initializes the Event Severity array by setting the default value for each event
+    */
     void initializeEventDefinitionSeverityArray();
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
