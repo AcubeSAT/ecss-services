@@ -239,9 +239,7 @@ void FileManagementService::findFiles(Message& message) {
 
 	if (result.has_value()) {
 		foundFilesReport(repositoryPath, searchPattern, result.value());
-	}
-
-	if (!result.has_value()) {
+	} else {
 		constexpr ErrorHandler::ExecutionCompletionErrorType error =
 			ErrorHandler::ExecutionCompletionErrorType::UnknownExecutionCompletionError;
 		ErrorHandler::reportError(message, error);
