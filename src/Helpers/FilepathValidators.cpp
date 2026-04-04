@@ -15,7 +15,7 @@ namespace FilepathValidators {
 		if (pattern.empty()) {
 			return etl::unexpected(FilePatternError::EmptyPattern);
 		}
-		constexpr std::array<char, 8> ILLEGAL_CHARS = {'<', '>', ':', '"', '/', '\\', '|', '?'};
+		constexpr std::array<char, 8> IllegalCharacters = {'<', '>', ':', '"', '/', '\\', '|', '?'};
 
 		// Use find_first_of() with a cast to const char*
 		if (pattern.find_first_of(ILLEGAL_CHARS.data()) != etl::string<Filesystem::ObjectPathSize>::npos) {
