@@ -102,7 +102,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 
 	uint16_t const packetHeaderIdentification = (data[0] << 8) | data[1];
 	uint16_t const packetSequenceControl = (data[2] << 8) | data[3];
-	uint16_t const packetDataLength = (data[4] << 8) | data[5];
+	uint32_t const packetDataLength = ((data[4] << 8) | data[5]) + 1;
 
 	// Individual fields of the CCSDS Space Packet primary header
 	uint8_t const versionNumber = data[0] >> 5;
@@ -139,7 +139,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	return message;
 }
 
-void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTCHeader(const uint8_t* data, uint32_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -265,7 +265,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	return ccsdsMessage;
 }
 
-void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
+void MessageParser::parseECSSTMHeader(const uint8_t* data, uint32_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header
