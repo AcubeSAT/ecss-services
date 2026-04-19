@@ -139,7 +139,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	return message;
 }
 
-void MessageParser::parseECSSTCHeader(const uint8_t* data, uint32_t length, Message& message) {
+void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TC header
@@ -265,7 +265,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	return ccsdsMessage;
 }
 
-void MessageParser::parseECSSTMHeader(const uint8_t* data, uint32_t length, Message& message) {
+void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
 	ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage);
 
 	// Individual fields of the TM header

@@ -108,3 +108,33 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 		CHECK((createdPacket == String<24>(wantedPacket)));
 	}
 }
+
+TEST_CASE("Compose and parse consistency", "[MessageParser]") {
+	Message originalMessage;
+	originalMessage.packetType = Message::TC;
+	originalMessage.applicationId = 15;
+	originalMessage.packetSequenceCount = 8199;
+	originalMessage.serviceType = 129;
+	originalMessage.messageType = 31;
+	originalMessage.sourceId = 42;
+	
+	String<11> sourceString = "hello world";
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), originalMessage.data.begin());
+	originalMessage.dataSize = 11;
+
+	String<CCSDSMaxMessageSize> createdPacket1 = MessageParser::compose(originalMessage);
+	Message parsedMessage1 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket1.data()), createdPacket1.size());
+
+	String<CCSDSMaxMessageSize> createdPacket2 = MessageParser::compose(parsedMessage1);
+	Message parsedMessage2 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket2.data()), createdPacket2.size());
+
+	CHECK(createdPacket1 == createdPacket2);
+	CHECK(parsedMessage2.packetType == originalMessage.packetType);
+	CHECK(parsedMessage2.applicationId == originalMessage.applicationId);
+	CHECK(parsedMessage2.packetSequenceCount == originalMessage.packetSequenceCount);
+	CHECK(parsedMessage2.serviceType == originalMessage.serviceType);
+	CHECK(parsedMessage2.messageType == originalMessage.messageType);
+	CHECK(parsedMessage2.sourceId == originalMessage.sourceId);
+	CHECK(parsedMessage2.dataSize == originalMessage.dataSize);
+	CHECK(memcmp(parsedMessage2.data.begin(), originalMessage.data.begin(), originalMessage.dataSize) == 0);
+}
