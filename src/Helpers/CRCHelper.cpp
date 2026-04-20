@@ -23,7 +23,7 @@ uint16_t CRCHelper::calculateCRC(const uint8_t* message, uint32_t length) {
 	return shiftReg;
 }
 
-uint16_t CRCHelper::validateCRC(const uint8_t* message, uint32_t length) {
-	return calculateCRC(message, length);
+bool CRCHelper::validateCRC(const uint8_t* message, uint32_t length) {
 	// CRC result of a correct msg w/checksum appended is 0
+	return calculateCRC(message, length) == 0U;
 }

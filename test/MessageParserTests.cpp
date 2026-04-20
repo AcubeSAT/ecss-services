@@ -40,8 +40,8 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 		CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
 
 		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-		uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
-		CHECK(crc_verification == 0);
+		bool crc_verification = CRCHelper::validateCRC(packet, 18);
+		CHECK(crc_verification == true);
 	} else {
 		CHECK(createdPacket.size() == 16);
 		CHECK((createdPacket == String<16>(wantedPacket)));
@@ -101,8 +101,8 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 		CHECK(memcmp(createdPacket.data(), wantedPacket, 24) == 0);
 
 		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-		uint8_t crc_verification = CRCHelper::validateCRC(packet, 26);
-		CHECK(crc_verification == 0);
+		bool crc_verification = CRCHelper::validateCRC(packet, 26);
+		CHECK(crc_verification == true);
 	} else {
 		CHECK(createdPacket.size() == 24);
 		CHECK((createdPacket == String<24>(wantedPacket)));

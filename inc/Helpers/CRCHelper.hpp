@@ -52,9 +52,9 @@ public:
 	 * appended at the very end!
 	 * @param  message (pointer to the data to be validated)
 	 * @param  length (in bytes, plus 2 bytes for the CRC checksum)
-	 * @return 0 when the data is valid, a nonzero uint16 when the data is corrupted
+	 * @return true when the data is valid (CRC matches), false otherwise
 	 */
-	static uint16_t validateCRC(const uint8_t* message, uint32_t length);
+	static bool validateCRC(const uint8_t* message, uint32_t length);
 
 	/**
 	 * Config bool to enable or disable CRC

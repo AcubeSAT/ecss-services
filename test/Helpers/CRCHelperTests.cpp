@@ -42,9 +42,9 @@ TEST_CASE("CRC validation - Basic tests") {
 
 	uint8_t data5[9] = {'C', 'U', 'B', 'E', 'S', 'A', 'T', 0x53, 0x15}; // corrupted CRC checksum
 
-	CHECK(CRCHelper::validateCRC(data1, 7) == 0x0);
-	CHECK(CRCHelper::validateCRC(data2, 6) == 0x0);
-	CHECK(CRCHelper::validateCRC(data3, 10) != 0x0);
-	CHECK(CRCHelper::validateCRC(data4, 6) != 0x0);
-	CHECK(CRCHelper::validateCRC(data5, 9) != 0x0);
+	CHECK(CRCHelper::validateCRC(data1, 7) == true);
+	CHECK(CRCHelper::validateCRC(data2, 6) == true);
+	CHECK(CRCHelper::validateCRC(data3, 10) == false);
+	CHECK(CRCHelper::validateCRC(data4, 6) == false);
+	CHECK(CRCHelper::validateCRC(data5, 9) == false);
 }
