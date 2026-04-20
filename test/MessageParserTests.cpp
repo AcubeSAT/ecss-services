@@ -111,12 +111,12 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 
 TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	Message message;
-	originalMessage.packetType = Message::TC;
-	originalMessage.applicationId = 15;
-	originalMessage.packetSequenceCount = 8199;
-	originalMessage.serviceType = 129;
-	originalMessage.messageType = 31;
-	originalMessage.sourceId = 0;
+	message.packetType = Message::TC;
+	message.applicationId = 15;
+	message.packetSequenceCount = 8199;
+	message.serviceType = 129;
+	message.messageType = 31;
+	message.sourceId = 0;
 	
 	String<10> sourceString = "helloworld";
 	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
@@ -129,12 +129,12 @@ TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	Message parsedMessage2 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket2.data()), createdPacket2.size());
 
 	CHECK(createdPacket1 == createdPacket2);
-	CHECK(parsedMessage2.packetType == originalMessage.packetType);
-	CHECK(parsedMessage2.applicationId == originalMessage.applicationId);
-	CHECK(parsedMessage2.packetSequenceCount == originalMessage.packetSequenceCount);
-	CHECK(parsedMessage2.serviceType == originalMessage.serviceType);
-	CHECK(parsedMessage2.messageType == originalMessage.messageType);
-	CHECK(parsedMessage2.sourceId == originalMessage.sourceId);
-	CHECK(parsedMessage2.dataSize == originalMessage.dataSize);
-	CHECK(memcmp(parsedMessage2.data.begin(), originalMessage.data.begin(), originalMessage.dataSize) == 0);
+	CHECK(parsedMessage2.packetType == message.packetType);
+	CHECK(parsedMessage2.applicationId == message.applicationId);
+	CHECK(parsedMessage2.packetSequenceCount == message.packetSequenceCount);
+	CHECK(parsedMessage2.serviceType == message.serviceType);
+	CHECK(parsedMessage2.messageType == message.messageType);
+	CHECK(parsedMessage2.sourceId == message.sourceId);
+	CHECK(parsedMessage2.dataSize == message.dataSize);
+	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
 }
