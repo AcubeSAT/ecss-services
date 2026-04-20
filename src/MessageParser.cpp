@@ -130,10 +130,23 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
+	uint32_t payloadLength = packetDataLength;
+	if constexpr (CRCHelper::EnableCRC) {
+		if (not ASSERT_INTERNAL(packetDataLength >= 2U, ErrorHandler::UnacceptablePacket)) {
+			return {};
+		}
+
+		if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::UnacceptablePacket)) {
+			return {};
+		}
+
+		payloadLength -= 2U;
+	}
+
 	if (packetType == Message::TC) {
-		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, payloadLength, message);
 	} else {
-		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, payloadLength, message);
 	}
 
 	return message;
