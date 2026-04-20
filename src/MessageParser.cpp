@@ -254,6 +254,10 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	SequenceCount const packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
+	if constexpr (CRCHelper::EnableCRC) {
+		packetDataLength += 2;
+	}
+
 	// Compile the header
 	header[0] = packetId >> 8U;
 	header[1] = packetId & 0xffU;

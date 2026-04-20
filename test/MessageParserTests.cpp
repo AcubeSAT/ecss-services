@@ -6,9 +6,9 @@
 #include "MessageParser.hpp"
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
-	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x43, 0xa1};
 
-	Message message = MessageParser::parse(packet, 16);
+	Message message = MessageParser::parse(packet, 18);
 	CHECK(message.packetType == Message::TC);
 	CHECK(message.applicationId == 7);
 	CHECK(message.packetSequenceCount == 8199);
@@ -58,7 +58,12 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
 	packet[16] = (time.formatAsBytes()) & 0xFF;
 
-	Message message = MessageParser::parse(packet, 24);
+	uint16_t crc = CRCHelper::calculateCRC(packet, 24);
+	uint8_t packetCRC[26];
+	std::memcpy(packetCRC, packet, 24);
+	packetCRC[24] = static_cast<uint8_t>(crc >> 8);
+	packetCRC[25] = static_cast<uint8_t>(crc & 0xFF);
+	Message message = MessageParser::parse(packetCRC, 26);
 	CHECK(message.packetType == Message::TM);
 	CHECK(message.applicationId == 2);
 	CHECK(message.packetSequenceCount == 77);
