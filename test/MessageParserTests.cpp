@@ -110,19 +110,19 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 }
 
 TEST_CASE("Compose and parse consistency", "[MessageParser]") {
-	Message originalMessage;
+	Message message;
 	originalMessage.packetType = Message::TC;
 	originalMessage.applicationId = 15;
 	originalMessage.packetSequenceCount = 8199;
 	originalMessage.serviceType = 129;
 	originalMessage.messageType = 31;
-	originalMessage.sourceId = 42;
+	originalMessage.sourceId = 0;
 	
-	String<11> sourceString = "hello world";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), originalMessage.data.begin());
-	originalMessage.dataSize = 11;
+	String<10> sourceString = "helloworld";
+	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
+	message.dataSize = 10;
 
-	String<CCSDSMaxMessageSize> createdPacket1 = MessageParser::compose(originalMessage);
+	String<CCSDSMaxMessageSize> createdPacket1 = MessageParser::compose(message);
 	Message parsedMessage1 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket1.data()), createdPacket1.size());
 
 	String<CCSDSMaxMessageSize> createdPacket2 = MessageParser::compose(parsedMessage1);
