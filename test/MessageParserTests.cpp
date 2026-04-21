@@ -111,7 +111,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 
 TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	Message message;
-	message.packetType = Message::TC;
+	message.packetType = Message::TM;
 	message.applicationId = 15;
 	message.packetSequenceCount = 8199;
 	message.serviceType = 129;
