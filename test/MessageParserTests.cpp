@@ -34,6 +34,8 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
 	message.dataSize = 5;
 
+	CHECK(message.dataSize == sourceString.size());
+
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 	if constexpr (CRCHelper::EnableCRC) {
 		CHECK(createdPacket.size() == 18);
@@ -94,6 +96,9 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	String<7> sourceString = "hellohi";
 	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
 	message.dataSize = 7;
+
+	CHECK(message.dataSize == sourceString.size());
+
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
 	if constexpr (CRCHelper::EnableCRC) {
@@ -121,6 +126,8 @@ TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	String<10> sourceString = "helloworld";
 	std::copy(sourceString.begin(), sourceString.end(), message.data.begin());
 	message.dataSize = 10;
+
+	CHECK(message.dataSize == sourceString.size());
 
 	String<CCSDSMaxMessageSize> createdPacket1 = MessageParser::compose(message);
 	Message parsedMessage1 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket1.data()), createdPacket1.size());
