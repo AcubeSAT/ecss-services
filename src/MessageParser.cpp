@@ -136,8 +136,10 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 			return {};
 		}
 
-		if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::UnacceptablePacket)) {
-			return {};
+		if constexpr (CRCHelper::EnableCRC) {
+			if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::UnacceptablePacket)) {
+				return {};
+			}
 		}
 
 		payloadLength -= 2U;

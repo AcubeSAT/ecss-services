@@ -2,6 +2,7 @@
 #define ECSS_SERVICES_CRCHELPER_HPP
 
 #include <cstdint>
+#include <etl/crc16_ccitt.h>
 
 class CRCHelper {
 	/**
