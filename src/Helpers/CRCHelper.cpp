@@ -10,6 +10,8 @@ uint16_t CRCHelper::calculateCRC(const uint8_t* message, uint32_t length) {
 }
 
 bool CRCHelper::validateCRC(const uint8_t* message, uint32_t length) {
-	// CRC result of a correct msg w/checksum appended is 0
-	return calculateCRC(message, length) == 0U;
+	uint16_t computed = calculateCRC(message, length - 2);
+    uint16_t appended = (static_cast<uint16_t>(message[length - 2]) << 8) | message[length - 1];
+    
+	return computed == appended;
 }

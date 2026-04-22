@@ -130,14 +130,14 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
-	uint32_t payloadLength = packetDataLength;
-	if constexpr (CRCHelper::EnableCRC) {
+	uint16_t payloadLength = packetDataLength;
+	if constexpr (ECSSCRCIncluded) {
 		if (not ASSERT_INTERNAL(packetDataLength >= 2U, ErrorHandler::UnacceptablePacket)) {
 			return {};
 		}
 
 		if constexpr (CRCHelper::EnableCRC) {
-			if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::UnacceptablePacket)) {
+			if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::InvalidCRC)) {
 				return {};
 			}
 		}
@@ -256,8 +256,12 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	SequenceCount const packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
-	if constexpr (CRCHelper::EnableCRC) {
-		packetDataLength += 2;
+	if constexpr (ECSSCRCIncluded) {
+    	uint32_t packetDataLengthWithCRC = static_cast<uint32_t>(packetDataLength) + 2U;
+    	if (not ASSERT_INTERNAL(packetDataLengthWithCRC <= 0xFFFFU, ErrorHandler::StringTooLarge)) {
+        	return {""};
+    	}
+    	packetDataLength = static_cast<uint16_t>(packetDataLengthWithCRC);
 	}
 
 	// Compile the header
