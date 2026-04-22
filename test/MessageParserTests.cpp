@@ -119,7 +119,7 @@ TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	message.sourceId = 0;
 	
 	String<10> sourceString = "helloworld";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
+	std::copy(sourceString.begin(), sourceString.end(), message.data.begin());
 	message.dataSize = 10;
 
 	String<CCSDSMaxMessageSize> createdPacket1 = MessageParser::compose(message);
