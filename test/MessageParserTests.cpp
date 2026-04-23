@@ -31,8 +31,7 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 8199;
 	message.sourceId = 0;
 	String<5> sourceString = "hello";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
-	message.dataSize = 5;
+	message.appendString(sourceString);
 
 	CHECK(message.dataSize == sourceString.size());
 
@@ -94,8 +93,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.messageType = 17;
 	message.sourceId = 0;
 	String<7> sourceString = "hellohi";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
-	message.dataSize = 7;
+	message.appendString(sourceString);
 
 	CHECK(message.dataSize == sourceString.size());
 
@@ -124,8 +122,7 @@ TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	message.sourceId = 0;
 	
 	String<10> sourceString = "helloworld";
-	std::copy(sourceString.begin(), sourceString.end(), message.data.begin());
-	message.dataSize = 10;
+	message.appendString(sourceString);
 
 	CHECK(message.dataSize == sourceString.size());
 
