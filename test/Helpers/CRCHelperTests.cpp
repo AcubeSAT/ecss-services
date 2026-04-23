@@ -6,6 +6,7 @@ TEST_CASE("CRC calculation - Basic String tests") {
 	CHECK(CRCHelper::calculateCRC((uint8_t*) "ASAT", 4) == 0xBFFA);
 	CHECK(CRCHelper::calculateCRC((uint8_t*) "All your space are belong to us", 31) == 0x545F);
 	CHECK(CRCHelper::calculateCRC((uint8_t*) "SPAAAAAAAAACE!", 14) == 0xB441);
+    CHECK(CRCHelper::calculateCRC((const uint8_t*)"123456789", 9) == 0x29B1);
 }
 
 TEST_CASE("CRC calculation - Basic byte tests") {

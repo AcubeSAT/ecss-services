@@ -23,25 +23,11 @@ private:
 	 * shift register contains all 1's initially (ECSS-E-ST-70-41C, Annex B - CRC and ISO checksum)
 	 */
 	inline static const uint16_t InitialShiftRegisterValue = 0xFFFFU;
-	// TODO (#204): Change this to hardware implementation or a trusted software one
-	/**
-	 * CRC16-CCITT generator polynomial (as specified in standard)
-	 */
-	inline static const uint16_t Polynomial = 0x1021U;
-	/**
-	 * MSB mask (for shifting)
-	 * if the MSB is set, the bitwise AND gives 1
-	 */
-	inline static const uint16_t MSBMask = 0x8000U;
-
-	/**
-	* Number of bits in a byte
-	 */
-	inline static const uint16_t BitNumber = 8U;
 
 public:
 	/**
 	 * Actual CRC calculation function.
+	 * Uses ETL crc16_ccitt implementation for the calculation.
 	 * @param  message (pointer to the data to be checksummed)
 	 * @param  length (size in bytes)
 	 * @return the CRC16 checksum of the input data
