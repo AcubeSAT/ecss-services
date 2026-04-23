@@ -6,7 +6,7 @@
 #include "MessageParser.hpp"
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
-	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0a, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x00, 0x00};
 
 	Message message = MessageParser::parse(packet, 16);
 	CHECK(message.packetType == Message::TC);
@@ -31,8 +31,9 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 8199;
 	message.sourceId = 0;
 	String<5> sourceString = "hello";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
-	message.dataSize = 5;
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 	if constexpr (CRCHelper::EnableCRC) {
@@ -49,7 +50,7 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 }
 
 TEST_CASE("TM message parsing", "[MessageParser]") {
-	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x12, 0x20, 0x16,
+	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
 	                    0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	                    0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
 	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
@@ -92,8 +93,10 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.messageType = 17;
 	message.sourceId = 0;
 	String<7> sourceString = "hellohi";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
-	message.dataSize = 7;
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
+
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 
 	if constexpr (CRCHelper::EnableCRC) {
@@ -107,4 +110,35 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 		CHECK(createdPacket.size() == 24);
 		CHECK((createdPacket == String<24>(wantedPacket)));
 	}
+}
+
+TEST_CASE("Compose and parse consistency", "[MessageParser]") {
+	Message message;
+	message.packetType = Message::TM;
+	message.applicationId = 15;
+	message.packetSequenceCount = 8199;
+	message.serviceType = 129;
+	message.messageType = 31;
+	message.sourceId = 0;
+	
+	String<10> sourceString = "helloworld";
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
+
+	String<CCSDSMaxMessageSize> createdPacket1 = MessageParser::compose(message);
+	Message parsedMessage1 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket1.data()), createdPacket1.size());
+
+	String<CCSDSMaxMessageSize> createdPacket2 = MessageParser::compose(parsedMessage1);
+	Message parsedMessage2 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket2.data()), createdPacket2.size());
+
+	CHECK(createdPacket1 == createdPacket2);
+	CHECK(parsedMessage2.packetType == message.packetType);
+	CHECK(parsedMessage2.applicationId == message.applicationId);
+	CHECK(parsedMessage2.packetSequenceCount == message.packetSequenceCount);
+	CHECK(parsedMessage2.serviceType == message.serviceType);
+	CHECK(parsedMessage2.messageType == message.messageType);
+	CHECK(parsedMessage2.sourceId == message.sourceId);
+	CHECK(parsedMessage2.dataSize == message.dataSize);
+	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
 }
