@@ -46,7 +46,7 @@ public:
 	/**
 	 * Config bool to enable or disable CRC
 	 */
-	static constexpr bool EnableCRC = true;
+	static constexpr bool EnableCRC = false;
 };
 
 #endif // ECSS_SERVICES_CRCHELPER_HPP

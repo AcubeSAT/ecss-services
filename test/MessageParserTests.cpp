@@ -28,8 +28,9 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 8199;
 	message.sourceId = 0;
 	String<5> sourceString = "hello";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
-	message.dataSize = 5;
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 	if constexpr (CRCHelper::EnableCRC) {
@@ -89,8 +90,10 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.messageType = 17;
 	message.sourceId = 0;
 	String<7> sourceString = "hellohi";
-	std::copy(sourceString.data(), sourceString.data() + sourceString.size(), message.data.begin());
-	message.dataSize = 7;
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
+
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
 
@@ -123,4 +126,35 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 		CHECK(createdPacket.size() == 24);
 		CHECK((createdPacket == String<24>(wantedPacket)));
 	}
+}
+
+TEST_CASE("Compose and parse consistency", "[MessageParser]") {
+	Message message;
+	message.packetType = Message::TM;
+	message.applicationId = 15;
+	message.packetSequenceCount = 8199;
+	message.serviceType = 129;
+	message.messageType = 31;
+	message.sourceId = 0;
+	
+	String<10> sourceString = "helloworld";
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
+
+	String<CCSDSMaxMessageSize> createdPacket1 = MessageParser::compose(message);
+	Message parsedMessage1 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket1.data()), createdPacket1.size());
+
+	String<CCSDSMaxMessageSize> createdPacket2 = MessageParser::compose(parsedMessage1);
+	Message parsedMessage2 = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket2.data()), createdPacket2.size());
+
+	CHECK(createdPacket1 == createdPacket2);
+	CHECK(parsedMessage2.packetType == message.packetType);
+	CHECK(parsedMessage2.applicationId == message.applicationId);
+	CHECK(parsedMessage2.packetSequenceCount == message.packetSequenceCount);
+	CHECK(parsedMessage2.serviceType == message.serviceType);
+	CHECK(parsedMessage2.messageType == message.messageType);
+	CHECK(parsedMessage2.sourceId == message.sourceId);
+	CHECK(parsedMessage2.dataSize == message.dataSize);
+	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
 }
