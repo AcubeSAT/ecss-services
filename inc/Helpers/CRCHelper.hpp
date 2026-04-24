@@ -42,11 +42,6 @@ public:
 	 * @return true when the data is valid (CRC matches), false otherwise
 	 */
 	static bool validateCRC(const uint8_t* message, uint32_t length);
-
-	/**
-	 * Config bool to enable or disable CRC
-	 */
-	static constexpr bool EnableCRC = false;
 };
 
 #endif // ECSS_SERVICES_CRCHELPER_HPP

@@ -136,10 +136,8 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 			return {};
 		}
 
-		if constexpr (CRCHelper::EnableCRC) {
-			if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::InvalidCRC)) {
-				return {};
-			}
+		if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::InvalidCRC)) {
+			return {};
 		}
 
 		payloadLength -= 2U;
@@ -277,7 +275,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	ccsdsMessage.append(ecssMessage);
 
 
-	if constexpr (CRCHelper::EnableCRC) {
+	if constexpr (ECSSCRCIncluded) {
 		const CRCSize crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
 		etl::array<uint8_t, CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
 		                                            (crcField &  0xFF)};
