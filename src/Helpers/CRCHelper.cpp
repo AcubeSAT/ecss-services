@@ -15,7 +15,6 @@ bool CRCHelper::validateCRC(const uint8_t* message, uint32_t length) {
     }
 
 	uint16_t computed = calculateCRC(message, length - 2);
-    uint16_t appended = (static_cast<uint16_t>(*(message + length - 2)) << 8) | *(message + length - 1);
-    
+    uint16_t appended = (static_cast<uint16_t>(message[length - 2]) << CRCHelper::BYTE_SHIFT) | message[length - 1];
 	return computed == appended;
 }

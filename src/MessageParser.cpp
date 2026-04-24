@@ -255,11 +255,11 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
 	if constexpr (ECSSCRCIncluded) {
-    	uint32_t packetDataLengthWithCRC = static_cast<uint32_t>(packetDataLength) + 2U;
-    	if (not ASSERT_INTERNAL(packetDataLengthWithCRC <= 0xFFFFU, ErrorHandler::StringTooLarge)) {
-        	return {""};
-    	}
-    	packetDataLength = static_cast<uint16_t>(packetDataLengthWithCRC);
+		if (not ASSERT_INTERNAL(packetDataLength <= std::numeric_limits<uint16_t>::max() - 2U, ErrorHandler::StringTooLarge)) {
+			return {""};
+		}
+		
+		packetDataLength += 2U;
 	}
 
 	// Compile the header

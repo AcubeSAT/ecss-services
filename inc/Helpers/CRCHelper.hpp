@@ -25,6 +25,8 @@ private:
 	inline static const uint16_t InitialShiftRegisterValue = 0xFFFFU;
 
 public:
+	/** Number of bits to shift the high CRC byte when reassembling the appended CRC */
+	inline static constexpr uint8_t BYTE_SHIFT = 8U;
 	/**
 	 * Actual CRC calculation function.
 	 * Uses ETL crc16_ccitt implementation for the calculation.
