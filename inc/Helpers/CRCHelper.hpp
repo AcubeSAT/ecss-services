@@ -2,7 +2,7 @@
 #define ECSS_SERVICES_CRCHELPER_HPP
 
 #include <cstdint>
-#include <etl/crc16_ccitt.h>
+#include "Helpers/TypeDefinitions.hpp"
 
 class CRCHelper {
 	/**
@@ -25,6 +25,11 @@ private:
 	 inline static constexpr uint8_t ByteShift = 8U;
 public:
 	/**
+	 * The number of bytes in the CRC field
+	 */
+	static constexpr CRCSize CRCField = 2U;
+	
+	/**
 	 * Actual CRC calculation function.
 	 * Uses ETL crc16_ccitt implementation for the calculation.
 	 * @param  message (pointer to the data to be checksummed)
@@ -36,8 +41,8 @@ public:
 	/**
 	 * CRC validation function. Make sure the passed message actually contains a CRC checksum
 	 * appended at the very end!
-	 * @param  message (pointer to the data to be validated)
-	 * @param  length (in bytes, plus 2 bytes for the CRC checksum)
+	 * @param message (pointer to the data to be validated)
+	 * @param length (in bytes, plus 2 bytes for the CRC checksum)
 	 * @return
  	 *  - true when the CRC check passes.
  	 *  - false when:
