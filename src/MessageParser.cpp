@@ -194,8 +194,8 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
-		header[5] = message.applicationId >> 8U; // DestinationID
-		header[6] = message.applicationId;
+		header[5] = message.destinationId >> 8U;
+		header[6] = message.destinationId;
 		uint32_t ticks = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
 		header[7] = (ticks >> 24) & 0xffU;
 		header[8] = (ticks >> 16) & 0xffU;
@@ -272,6 +272,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t const pusVersion = data[0] >> 4;
 	ServiceTypeNum const serviceType = data[1];
 	MessageTypeNum const messageType = data[2];
+	DestinationId const destinationId = (data[5] << 8) | data[6];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
@@ -281,6 +282,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	// Copy the data to the message
 	message.serviceType = serviceType;
 	message.messageType = messageType;
+	message.destinationId = destinationId;
 	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data.begin());
 	message.dataSize = length;
 }

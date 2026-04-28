@@ -6,11 +6,25 @@
 #include "macros.hpp"
 
 
-Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId)
-    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {}
+Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId, uint16_t applicationUserId)
+    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {
+	
+	if (packetType == PacketType::TM) {
+		destinationId = applicationUserId;
+	} else {
+		sourceId = applicationUserId;
+	}
+}
 
-Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType)
-    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(ApplicationId) {}
+Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, uint16_t applicationUserId)
+    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(ApplicationId) {
+
+	if (packetType == PacketType::TM) {
+		destinationId = applicationUserId;
+	} else {
+		sourceId = applicationUserId;
+	}
+}
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
 	// TODO(#271): Add assertion that data does not contain 1s outside of numBits bits

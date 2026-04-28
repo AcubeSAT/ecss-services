@@ -90,7 +90,19 @@ public:
 	 */
 	uint16_t applicationId = ApplicationId;
 
+	/**
+	 * The source ID of a TC message, added in the TC secondary header (5.4.2.1d) / (7.4.4.1b)
+	 *
+	 * Maximum value of 65535 (5.4.2.1e)
+	 */
 	uint16_t sourceId = 0;
+
+	/**
+	 * The destination ID of a TM message, added in the TM secondary header (5.4.2.1d) / (7.4.3.1b)
+	 *
+	 * Maximum value of 65535 (5.4.2.1e)
+	 */
+	uint16_t destinationId = 0;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
@@ -247,8 +259,8 @@ public:
 	 */
 	void readCString(char* string, uint16_t size);
 
-	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
-	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
+	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, ApplicationProcessId applicationId, uint16_t applicationUserId);
+	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationUserId);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message
