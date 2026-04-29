@@ -258,7 +258,6 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 		if (not ASSERT_INTERNAL(packetDataLength <= std::numeric_limits<uint16_t>::max() - 2U, ErrorHandler::StringTooLarge)) {
 			return {""};
 		}
-		
 		packetDataLength += 2U;
 	}
 
