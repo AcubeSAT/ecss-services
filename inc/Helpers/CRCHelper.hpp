@@ -42,7 +42,7 @@ public:
 	 * CRC validation function. Make sure the passed message actually contains a CRC checksum
 	 * appended at the very end!
 	 * @param message (pointer to the data to be validated)
-	 * @param length (in bytes, plus 2 bytes for the CRC checksum)
+	 * @param length (in bytes, including the 2-byte CRC checksum appended at the end)
 	 * @return
  	 *  - true when the CRC check passes.
  	 *  - false when:

@@ -132,7 +132,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 
 	uint16_t payloadLength = packetDataLength;
 	if constexpr (ECSSCRCIncluded) {
-		if (not ASSERT_INTERNAL(packetDataLength >= 2U, ErrorHandler::UnacceptablePacket)) {
+		if (not ASSERT_INTERNAL(packetDataLength >= CRCHelper::CRCField, ErrorHandler::UnacceptablePacket)) {
 			return {};
 		}
 
@@ -140,7 +140,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 			return {};
 		}
 
-		payloadLength -= 2U;
+		payloadLength -= CRCHelper::CRCField;
 	}
 
 	if (packetType == Message::TC) {
@@ -255,10 +255,10 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
 	if constexpr (ECSSCRCIncluded) {
-		if (not ASSERT_INTERNAL(packetDataLength <= std::numeric_limits<uint16_t>::max() - 2U, ErrorHandler::StringTooLarge)) {
+		if (not ASSERT_INTERNAL(packetDataLength <= std::numeric_limits<uint16_t>::max() - CRCHelper::CRCField, ErrorHandler::StringTooLarge)) {
 			return {""};
 		}
-		packetDataLength += 2U;
+		packetDataLength += CRCHelper::CRCField;
 	}
 
 	// Compile the header
@@ -278,7 +278,7 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 		const CRCSize crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
 		etl::array<uint8_t, CRCHelper::CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
 		                                            (crcField &  0xFF)};
-		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), 2);
+		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), CRCHelper::CRCField);
 		ccsdsMessage.append(crcString);
 	}
 

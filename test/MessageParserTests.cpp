@@ -4,6 +4,7 @@
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "MessageParser.hpp"
+#include "Services/ServiceTests.hpp"
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	if constexpr (ECSSCRCIncluded) {
@@ -125,7 +126,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 	}
 }
 
-TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
+TEST_CASE("TM message parsing into a string", "[MessageParser]") {
 	Message message;
 	message.packetType = Message::TM;
 	message.applicationId = 2;
@@ -172,7 +173,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	}
 }
 
-TEST_CASE("Compose and parse consistency", "[MessageParser]") {
+TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 	Message message;
 	message.packetType = Message::TM;
 	message.applicationId = 15;
@@ -201,4 +202,45 @@ TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	CHECK(parsedMessage2.sourceId == message.sourceId);
 	CHECK(parsedMessage2.dataSize == message.dataSize);
 	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
+}
+
+TEST_CASE("TC packet too short returns empty message", "[MessageParser]") {
+    uint8_t packet[] = {0x18, 0x07, 0xe0};
+    Message message = MessageParser::parse(packet, 3);
+
+	// Verify it's a default constructed message
+    CHECK(message.serviceType == 0);
+    CHECK(message.messageType == 0);
+    CHECK(message.dataSize == 0);
+    CHECK(message.packetSequenceCount == 0);
+    CHECK(message.sourceId == 0);
+    CHECK(ServiceTests::thrownError(ErrorHandler::UnacceptablePacket));
+}
+
+TEST_CASE("TC message parsing detects a bit flip by CRC", "[MessageParser]") {
+    if constexpr (ECSSCRCIncluded) {
+        uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81,
+                            0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x9b, 0xe8};
+
+        // Verify it parses correctly before flipping
+        Message validMessage = MessageParser::parse(packet, 18);
+        CHECK(validMessage.packetType == Message::TC);
+        CHECK(validMessage.applicationId == 7);
+        CHECK(validMessage.packetSequenceCount == 8199);
+        CHECK(validMessage.serviceType == 129);
+        CHECK(validMessage.messageType == 31);
+        CHECK(validMessage.dataSize == 5);
+        CHECK(memcmp(validMessage.data.begin(), "hello", 5) == 0);
+        ServiceTests::resetErrors();
+
+        // Flip a bit in the payload and verify CRC catches it (returning a default constructed message)
+        packet[11] ^= 0x01;
+        Message corruptedMessage = MessageParser::parse(packet, 18);
+
+        CHECK(corruptedMessage.serviceType == 0);
+        CHECK(corruptedMessage.messageType == 0);
+        CHECK(corruptedMessage.dataSize == 0);
+        CHECK(corruptedMessage.packetSequenceCount == 0);
+        CHECK(ServiceTests::thrownError(ErrorHandler::InvalidCRC));
+    }
 }
