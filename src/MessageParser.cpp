@@ -130,10 +130,23 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
+	uint16_t payloadLength = packetDataLength;
+	if constexpr (ECSSCRCIncluded) {
+		if (not ASSERT_INTERNAL(packetDataLength >= CRCHelper::CRCField, ErrorHandler::UnacceptablePacket)) {
+			return {};
+		}
+
+		if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::InvalidCRC)) {
+			return {};
+		}
+
+		payloadLength -= CRCHelper::CRCField;
+	}
+
 	if (packetType == Message::TC) {
-		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, payloadLength, message);
 	} else {
-		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, payloadLength, message);
 	}
 
 	return message;
@@ -241,6 +254,13 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	SequenceCount const packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
+	if constexpr (ECSSCRCIncluded) {
+		if (not ASSERT_INTERNAL(packetDataLength <= std::numeric_limits<uint16_t>::max() - CRCHelper::CRCField, ErrorHandler::StringTooLarge)) {
+			return {""};
+		}
+		packetDataLength += CRCHelper::CRCField;
+	}
+
 	// Compile the header
 	header[0] = packetId >> 8U;
 	header[1] = packetId & 0xffU;
@@ -254,11 +274,11 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	ccsdsMessage.append(ecssMessage);
 
 
-	if constexpr (CRCHelper::EnableCRC) {
+	if constexpr (ECSSCRCIncluded) {
 		const CRCSize crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
-		etl::array<uint8_t, CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
+		etl::array<uint8_t, CRCHelper::CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
 		                                            (crcField &  0xFF)};
-		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), 2);
+		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), crcMessage.size());
 		ccsdsMessage.append(crcString);
 	}
 

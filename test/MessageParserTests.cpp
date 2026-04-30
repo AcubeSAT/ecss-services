@@ -4,19 +4,36 @@
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "MessageParser.hpp"
+#include "Services/ServiceTests.hpp"
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
-	uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x00, 0x00};
+	const char expectedData[] = "hello";
 
-	Message message = MessageParser::parse(packet, 16);
-	CHECK(message.packetType == Message::TC);
-	CHECK(message.applicationId == 7);
-	CHECK(message.packetSequenceCount == 8199);
-	CHECK(message.dataSize == 5);
-	CHECK(message.serviceType == 129);
-	CHECK(message.messageType == 31);
-	CHECK(message.sourceId == 0);
-	CHECK(memcmp(message.data.begin(), "hello", 5) == 0);
+	if constexpr (ECSSCRCIncluded) {
+        uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x9b, 0xe8};
+        Message message = MessageParser::parse(packet, sizeof(packet));
+
+		CHECK(message.packetType == Message::TC);
+		CHECK(message.applicationId == 7);
+		CHECK(message.packetSequenceCount == 8199);
+		CHECK(message.dataSize == 5);
+		CHECK(message.serviceType == 129);
+		CHECK(message.messageType == 31);
+		CHECK(message.sourceId == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
+    } else {
+        uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+        Message message = MessageParser::parse(packet, sizeof(packet));
+
+		CHECK(message.packetType == Message::TC);
+		CHECK(message.applicationId == 7);
+		CHECK(message.packetSequenceCount == 8199);
+		CHECK(message.dataSize == std::strlen(expectedData));
+		CHECK(message.serviceType == 129);
+		CHECK(message.messageType == 31);
+		CHECK(message.sourceId == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
+    }
 }
 
 TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
@@ -36,43 +53,81 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	CHECK(message.dataSize == sourceString.size());
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-	if constexpr (CRCHelper::EnableCRC) {
-		CHECK(createdPacket.size() == 18);
-		CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
+	if constexpr (ECSSCRCIncluded) {
+		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81, 0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
-		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-		uint8_t crc_verification = CRCHelper::validateCRC(packet, 18);
-		CHECK(crc_verification == 0);
+		CHECK(createdPacket.size() == sizeof(wantedPacket) + CRCHelper::CRCField);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
+		CHECK(CRCHelper::validateCRC(reinterpret_cast<uint8_t*>(createdPacket.data()), createdPacket.size()));
 	} else {
-		CHECK(createdPacket.size() == 16);
-		CHECK((createdPacket == String<16>(wantedPacket)));
+		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+
+		CHECK(createdPacket.size() == sizeof(wantedPacket));
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
 	}
 }
 
 TEST_CASE("TM message parsing", "[MessageParser]") {
-	uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
-	                    0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	                    0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
-	packet[13] = (time.formatAsBytes() >> 24) & 0xFF;
-	packet[14] = (time.formatAsBytes() >> 16) & 0xFF;
-	packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
-	packet[16] = (time.formatAsBytes()) & 0xFF;
+	const char expectedData[] = "hellohi";
 
-	Message message = MessageParser::parse(packet, 24);
-	CHECK(message.packetType == Message::TM);
-	CHECK(message.applicationId == 2);
-	CHECK(message.packetSequenceCount == 77);
-	CHECK(message.dataSize == 7);
-	CHECK(message.serviceType == 22);
-	CHECK(message.messageType == 17);
-	CHECK(message.sourceId == 0);
-	CHECK(memcmp(message.data.begin(), "hellohi", 7) == 0);
+	if constexpr (ECSSCRCIncluded) {
+		uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x13, 0x20, 0x16,
+	                    	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	                    	0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
+		
+		Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
+		packet[13] = (time.formatAsBytes() >> 24) & 0xFF;
+		packet[14] = (time.formatAsBytes() >> 16) & 0xFF;
+		packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
+		packet[16] = (time.formatAsBytes()) & 0xFF;
 
-	// Add ECSS and CCSDS header
-	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-	Time::DefaultCUC messageTime((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF) << 24));
-	CHECK(messageTime.asTAIseconds() == time.formatAsBytes());
+		uint16_t crc = CRCHelper::calculateCRC(packet, sizeof(packet));
+		uint8_t packetCRC[sizeof(packet) + CRCHelper::CRCField];
+		std::memcpy(packetCRC, packet, sizeof(packet));
+		packetCRC[24] = static_cast<uint8_t>(crc >> 8);
+		packetCRC[25] = static_cast<uint8_t>(crc & 0xFF);
+		Message message = MessageParser::parse(packetCRC, sizeof(packetCRC));
+
+		CHECK(message.packetType == Message::TM);
+		CHECK(message.applicationId == 2);
+		CHECK(message.packetSequenceCount == 77);
+		CHECK(message.dataSize == std::strlen(expectedData));
+		CHECK(message.serviceType == 22);
+		CHECK(message.messageType == 17);
+		CHECK(message.sourceId == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
+
+		// Add ECSS and CCSDS header
+		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+		Time::DefaultCUC messageTime((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF) << 24));
+		CHECK(messageTime.asTAIseconds() == time.formatAsBytes());
+	} else {
+		uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
+	                    	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	                    	0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
+
+		Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
+		packet[13] = (time.formatAsBytes() >> 24) & 0xFF;
+		packet[14] = (time.formatAsBytes() >> 16) & 0xFF;
+		packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
+		packet[16] = (time.formatAsBytes()) & 0xFF;
+
+		Message message = MessageParser::parse(packet, sizeof(packet));
+
+		CHECK(message.packetType == Message::TM);
+		CHECK(message.applicationId == 2);
+		CHECK(message.packetSequenceCount == 77);
+		CHECK(message.dataSize == 7);
+		CHECK(message.serviceType == 22);
+		CHECK(message.messageType == 17);
+		CHECK(message.sourceId == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
+
+		// Add ECSS and CCSDS header
+		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+		Time::DefaultCUC messageTime((createdPacket[16] & 0xFF) | ((createdPacket[15] & 0xFF) << 8) | ((createdPacket[14] & 0xFF) << 16) | ((createdPacket[13] & 0xFF) << 24));
+		CHECK(messageTime.asTAIseconds() == time.formatAsBytes());
+	}
 }
 
 TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
@@ -98,21 +153,37 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	CHECK(message.dataSize == sourceString.size());
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
 
-	if constexpr (CRCHelper::EnableCRC) {
-		CHECK(createdPacket.size() == 26);
-		CHECK(memcmp(createdPacket.data(), wantedPacket, 24) == 0);
+	if constexpr (ECSSCRCIncluded) {
+		uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x13, 0x20, 0x16,
+	                        	0x11, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+	                        	0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
 
-		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-		uint8_t crc_verification = CRCHelper::validateCRC(packet, 26);
-		CHECK(crc_verification == 0);
+		wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
+		wantedPacket[14] = (time.formatAsBytes() >> 16) & 0xFF;
+		wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
+		wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
+
+		CHECK(createdPacket.size() == sizeof(wantedPacket) + CRCHelper::CRCField);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
+		CHECK(CRCHelper::validateCRC(reinterpret_cast<uint8_t*>(createdPacket.data()), createdPacket.size()));
 	} else {
-		CHECK(createdPacket.size() == 24);
-		CHECK((createdPacket == String<24>(wantedPacket)));
+		uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
+	                        	0x11, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+	                        	0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
+
+		wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
+		wantedPacket[14] = (time.formatAsBytes() >> 16) & 0xFF;
+		wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
+		wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
+
+		CHECK(createdPacket.size() == sizeof(wantedPacket));
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
 	}
 }
 
-TEST_CASE("Compose and parse consistency", "[MessageParser]") {
+TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 	Message message;
 	message.packetType = Message::TM;
 	message.applicationId = 15;
@@ -141,4 +212,46 @@ TEST_CASE("Compose and parse consistency", "[MessageParser]") {
 	CHECK(parsedMessage2.sourceId == message.sourceId);
 	CHECK(parsedMessage2.dataSize == message.dataSize);
 	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
+}
+
+TEST_CASE("TC packet too short returns empty message", "[MessageParser]") {
+    uint8_t packet[] = {0x18, 0x07, 0xe0};
+    Message message = MessageParser::parse(packet, sizeof(packet));
+
+	// Verify it's a default constructed message
+    CHECK(message.serviceType == 0);
+    CHECK(message.messageType == 0);
+    CHECK(message.dataSize == 0);
+    CHECK(message.packetSequenceCount == 0);
+    CHECK(message.sourceId == 0);
+    CHECK(ServiceTests::thrownError(ErrorHandler::UnacceptablePacket));
+}
+
+TEST_CASE("TC message parsing detects a bit flip by CRC", "[MessageParser]") {
+    if constexpr (ECSSCRCIncluded) {
+        uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81,
+                            0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x9b, 0xe8};
+		const char expectedData[] = "hello";
+
+        // Verify it parses correctly before flipping
+        Message validMessage = MessageParser::parse(packet, sizeof(packet));
+        CHECK(validMessage.packetType == Message::TC);
+        CHECK(validMessage.applicationId == 7);
+        CHECK(validMessage.packetSequenceCount == 8199);
+        CHECK(validMessage.serviceType == 129);
+        CHECK(validMessage.messageType == 31);
+        CHECK(validMessage.dataSize == std::strlen(expectedData));
+        CHECK(memcmp(validMessage.data.begin(), expectedData, validMessage.dataSize) == 0);
+        ServiceTests::resetErrors();
+
+        // Flip a bit in the payload and verify CRC catches it (returning a default constructed message)
+        packet[11] ^= 0x01;
+        Message corruptedMessage = MessageParser::parse(packet, sizeof(packet));
+
+        CHECK(corruptedMessage.serviceType == 0);
+        CHECK(corruptedMessage.messageType == 0);
+        CHECK(corruptedMessage.dataSize == 0);
+        CHECK(corruptedMessage.packetSequenceCount == 0);
+        CHECK(ServiceTests::thrownError(ErrorHandler::InvalidCRC));
+    }
 }

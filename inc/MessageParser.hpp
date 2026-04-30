@@ -86,10 +86,6 @@ public:
 
 private:
 	/**
-	 * The number of bytes in the CRC field
-	 */
-	static constexpr CRCSize CRCField = 2U;
-	/**
 	 * Parse the ECSS Telecommand packet secondary header
 	 *
 	 * As specified in section 7.4.4.1 of the standard
