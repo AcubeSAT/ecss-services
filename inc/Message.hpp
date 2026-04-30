@@ -105,7 +105,7 @@ public:
 	 *
 	 * Maximum value of 65535 (5.4.2.1e)
 	 */
-	ApplicationProcessUserId destinationId = 1;
+	ApplicationProcessUserId destinationId = 0;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
