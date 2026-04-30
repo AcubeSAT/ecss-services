@@ -7,6 +7,8 @@
 #include "Services/ServiceTests.hpp"
 
 TEST_CASE("TC message parsing", "[MessageParser]") {
+	const char expectedData[] = "hello";
+
 	if constexpr (ECSSCRCIncluded) {
         uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x9b, 0xe8};
         Message message = MessageParser::parse(packet, sizeof(packet));
@@ -18,19 +20,19 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 		CHECK(message.serviceType == 129);
 		CHECK(message.messageType == 31);
 		CHECK(message.sourceId == 0);
-		CHECK(memcmp(message.data.begin(), "hello", 5) == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
     } else {
         uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
-        Message message = MessageParser::parse(packet, 16);
+        Message message = MessageParser::parse(packet, sizeof(packet));
 
 		CHECK(message.packetType == Message::TC);
 		CHECK(message.applicationId == 7);
 		CHECK(message.packetSequenceCount == 8199);
-		CHECK(message.dataSize == 5);
+		CHECK(message.dataSize == std::strlen(expectedData));
 		CHECK(message.serviceType == 129);
 		CHECK(message.messageType == 31);
 		CHECK(message.sourceId == 0);
-		CHECK(memcmp(message.data.begin(), "hello", 5) == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
     }
 }
 
@@ -51,21 +53,20 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 	if constexpr (ECSSCRCIncluded) {
 		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81, 0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
-		CHECK(createdPacket.size() == 18);
-		CHECK(memcmp(createdPacket.data(), wantedPacket, 16) == 0);
-
-		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-		bool crc_verification = CRCHelper::validateCRC(packet, 18);
-		CHECK(crc_verification == true);
+		CHECK(createdPacket.size() == sizeof(wantedPacket) + CRCHelper::CRCField);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
+		CHECK(CRCHelper::validateCRC(reinterpret_cast<uint8_t*>(createdPacket.data()), createdPacket.size()));
 	} else {
 		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
-		CHECK(createdPacket.size() == 16);
-		CHECK((createdPacket == String<16>(wantedPacket)));
+		CHECK(createdPacket.size() == sizeof(wantedPacket));
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
 	}
 }
 
 TEST_CASE("TM message parsing", "[MessageParser]") {
+	const char expectedData[] = "hellohi";
+
 	if constexpr (ECSSCRCIncluded) {
 		uint8_t packet[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x13, 0x20, 0x16,
 	                    	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -77,21 +78,21 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 		packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
 		packet[16] = (time.formatAsBytes()) & 0xFF;
 
-		uint16_t crc = CRCHelper::calculateCRC(packet, 24);
-		uint8_t packetCRC[26];
-		std::memcpy(packetCRC, packet, 24);
+		uint16_t crc = CRCHelper::calculateCRC(packet, sizeof(packet));
+		uint8_t packetCRC[sizeof(packet) + CRCHelper::CRCField];
+		std::memcpy(packetCRC, packet, sizeof(packet));
 		packetCRC[24] = static_cast<uint8_t>(crc >> 8);
 		packetCRC[25] = static_cast<uint8_t>(crc & 0xFF);
-		Message message = MessageParser::parse(packetCRC, 26);
+		Message message = MessageParser::parse(packetCRC, sizeof(packetCRC));
 
 		CHECK(message.packetType == Message::TM);
 		CHECK(message.applicationId == 2);
 		CHECK(message.packetSequenceCount == 77);
-		CHECK(message.dataSize == 7);
+		CHECK(message.dataSize == std::strlen(expectedData));
 		CHECK(message.serviceType == 22);
 		CHECK(message.messageType == 17);
 		CHECK(message.sourceId == 0);
-		CHECK(memcmp(message.data.begin(), "hellohi", 7) == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
 
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
@@ -108,7 +109,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 		packet[15] = (time.formatAsBytes() >> 8) & 0xFF;
 		packet[16] = (time.formatAsBytes()) & 0xFF;
 
-		Message message = MessageParser::parse(packet, 24);
+		Message message = MessageParser::parse(packet, sizeof(packet));
 
 		CHECK(message.packetType == Message::TM);
 		CHECK(message.applicationId == 2);
@@ -117,7 +118,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 		CHECK(message.serviceType == 22);
 		CHECK(message.messageType == 17);
 		CHECK(message.sourceId == 0);
-		CHECK(memcmp(message.data.begin(), "hellohi", 7) == 0);
+		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
 
 		// Add ECSS and CCSDS header
 		String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
@@ -152,12 +153,9 @@ TEST_CASE("TM message parsing into a string", "[MessageParser]") {
 		wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
 		wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
 
-		CHECK(createdPacket.size() == 26);
-		CHECK(memcmp(createdPacket.data(), wantedPacket, 24) == 0);
-
-		const uint8_t* packet = reinterpret_cast<uint8_t*>(&createdPacket.data()[0]);
-		bool crc_verification = CRCHelper::validateCRC(packet, 26);
-		CHECK(crc_verification == true);
+		CHECK(createdPacket.size() == sizeof(wantedPacket) + CRCHelper::CRCField);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
+		CHECK(CRCHelper::validateCRC(reinterpret_cast<uint8_t*>(createdPacket.data()), createdPacket.size()));
 	} else {
 		uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
 	                        	0x11, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
@@ -168,8 +166,8 @@ TEST_CASE("TM message parsing into a string", "[MessageParser]") {
 		wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
 		wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
 
-		CHECK(createdPacket.size() == 24);
-		CHECK((createdPacket == String<24>(wantedPacket)));
+		CHECK(createdPacket.size() == sizeof(wantedPacket));
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
 	}
 }
 
@@ -206,7 +204,7 @@ TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 
 TEST_CASE("TC packet too short returns empty message", "[MessageParser]") {
     uint8_t packet[] = {0x18, 0x07, 0xe0};
-    Message message = MessageParser::parse(packet, 3);
+    Message message = MessageParser::parse(packet, sizeof(packet));
 
 	// Verify it's a default constructed message
     CHECK(message.serviceType == 0);
@@ -221,21 +219,22 @@ TEST_CASE("TC message parsing detects a bit flip by CRC", "[MessageParser]") {
     if constexpr (ECSSCRCIncluded) {
         uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81,
                             0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x9b, 0xe8};
+		const char expectedData[] = "hello";
 
         // Verify it parses correctly before flipping
-        Message validMessage = MessageParser::parse(packet, 18);
+        Message validMessage = MessageParser::parse(packet, sizeof(packet));
         CHECK(validMessage.packetType == Message::TC);
         CHECK(validMessage.applicationId == 7);
         CHECK(validMessage.packetSequenceCount == 8199);
         CHECK(validMessage.serviceType == 129);
         CHECK(validMessage.messageType == 31);
-        CHECK(validMessage.dataSize == 5);
-        CHECK(memcmp(validMessage.data.begin(), "hello", 5) == 0);
+        CHECK(validMessage.dataSize == std::strlen(expectedData));
+        CHECK(memcmp(validMessage.data.begin(), expectedData, validMessage.dataSize) == 0);
         ServiceTests::resetErrors();
 
         // Flip a bit in the payload and verify CRC catches it (returning a default constructed message)
         packet[11] ^= 0x01;
-        Message corruptedMessage = MessageParser::parse(packet, 18);
+        Message corruptedMessage = MessageParser::parse(packet, sizeof(packet));
 
         CHECK(corruptedMessage.serviceType == 0);
         CHECK(corruptedMessage.messageType == 0);
