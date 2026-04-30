@@ -9,7 +9,7 @@
 TEST_CASE("TC message parsing", "[MessageParser]") {
 	if constexpr (ECSSCRCIncluded) {
         uint8_t packet[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x9b, 0xe8};
-        Message message = MessageParser::parse(packet, 18);
+        Message message = MessageParser::parse(packet, sizeof(packet));
 
 		CHECK(message.packetType == Message::TC);
 		CHECK(message.applicationId == 7);
