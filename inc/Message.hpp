@@ -84,25 +84,28 @@ public:
 	PacketType packetType = PacketType::TM;
 
 	/**
-	 * The destination APID of the message
+	 * The application process ID of the message added in the primary header and acting as
+	 * - The source ID of a TM packet
+	 * - The destination ID of a TC packet
+	 * as described in 7.4.1 / 5.4.2.1c
 	 *
-	 * Maximum value of 2047 (5.4.2.1c)
+	 * Maximum value of 2046 (5.4.2.1c)
 	 */
-	uint16_t applicationId = ApplicationId;
+	ApplicationProcessId applicationId = ApplicationId;
 
 	/**
 	 * The source ID of a TC message, added in the TC secondary header (5.4.2.1d) / (7.4.4.1b)
 	 *
 	 * Maximum value of 65535 (5.4.2.1e)
 	 */
-	uint16_t sourceId = 0;
+	ApplicationProcessUserId sourceId = 0;
 
 	/**
 	 * The destination ID of a TM message, added in the TM secondary header (5.4.2.1d) / (7.4.3.1b)
 	 *
 	 * Maximum value of 65535 (5.4.2.1e)
 	 */
-	uint16_t destinationId = 0;
+	ApplicationProcessUserId destinationId = 1;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
@@ -259,8 +262,9 @@ public:
 	 */
 	void readCString(char* string, uint16_t size);
 
-	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, ApplicationProcessId applicationId, uint16_t applicationUserId);
-	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType, uint16_t applicationUserId);
+	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId, ApplicationProcessUserId applicationUserId);
+	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId);
+	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message

@@ -146,7 +146,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t const pusVersion = data[0] >> 4;
 	ServiceTypeNum const serviceType = data[1];
 	MessageTypeNum const messageType = data[2];
-	SourceId const sourceId = (data[3] << 8) + data[4];
+	ApplicationProcessUserId const sourceId = (data[3] << 8) + data[4];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
@@ -272,7 +272,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t const pusVersion = data[0] >> 4;
 	ServiceTypeNum const serviceType = data[1];
 	MessageTypeNum const messageType = data[2];
-	DestinationId const destinationId = (data[5] << 8) | data[6];
+	ApplicationProcessUserId const destinationId = (data[5] << 8) | data[6];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 

@@ -5,10 +5,8 @@
 #include "ServicePool.hpp"
 #include "macros.hpp"
 
-
-Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId, uint16_t applicationUserId)
-    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {
-	
+Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId, ApplicationProcessUserId applicationUserId)
+	: serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {
 	if (packetType == PacketType::TM) {
 		destinationId = applicationUserId;
 	} else {
@@ -16,14 +14,12 @@ Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketT
 	}
 }
 
-Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, uint16_t applicationUserId)
-    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(ApplicationId) {
+Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId)
+    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(applicationId) {
+}
 
-	if (packetType == PacketType::TM) {
-		destinationId = applicationUserId;
-	} else {
-		sourceId = applicationUserId;
-	}
+Message::Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType)
+    : serviceType(serviceType), messageType(messageType), packetType(packetType), applicationId(ApplicationId) {
 }
 
 void Message::appendBits(uint8_t numBits, uint16_t data) {
