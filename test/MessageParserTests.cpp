@@ -92,7 +92,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 		CHECK(message.dataSize == std::strlen(expectedData));
 		CHECK(message.serviceType == 22);
 		CHECK(message.messageType == 17);
-		CHECK(message.sourceId == 0);
+		CHECK(message.destinationId == 0);
 		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
 
 		// Add ECSS and CCSDS header
@@ -118,7 +118,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 		CHECK(message.dataSize == 7);
 		CHECK(message.serviceType == 22);
 		CHECK(message.messageType == 17);
-		CHECK(message.sourceId == 0);
+		CHECK(message.destinationId == 0);
 		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
 
 		// Add ECSS and CCSDS header
@@ -145,7 +145,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.packetSequenceCount = 77;
 	message.serviceType = 22;
 	message.messageType = 17;
-	message.sourceId = 0;
+	message.destinationId = 0;
 	String<7> sourceString = "hellohi";
 	message.appendString(sourceString);
 
@@ -186,7 +186,7 @@ TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 	message.packetSequenceCount = 8199;
 	message.serviceType = 129;
 	message.messageType = 31;
-	message.sourceId = 0;
+	message.destinationId = 0;
 	
 	String<10> sourceString = "helloworld";
 	message.appendString(sourceString);
@@ -205,7 +205,7 @@ TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 	CHECK(parsedMessage2.packetSequenceCount == message.packetSequenceCount);
 	CHECK(parsedMessage2.serviceType == message.serviceType);
 	CHECK(parsedMessage2.messageType == message.messageType);
-	CHECK(parsedMessage2.sourceId == message.sourceId);
+	CHECK(parsedMessage2.destinationId == message.destinationId);
 	CHECK(parsedMessage2.dataSize == message.dataSize);
 	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
 }
@@ -250,4 +250,50 @@ TEST_CASE("TC message parsing detects a bit flip by CRC", "[MessageParser]") {
         CHECK(corruptedMessage.packetSequenceCount == 0);
         CHECK(ServiceTests::thrownError(ErrorHandler::InvalidCRC));
     }
+}
+
+TEST_CASE("TC message initialization and consistency explicit constructor", "[MessageParser]") {
+	Message message(129, 31, Message::TC, 7, 55);
+	message.packetSequenceCount = 8199;
+	
+	String<10> sourceString = "helloworld";
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
+
+	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+	Message parsedMessage = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket.data()), createdPacket.size());
+
+	CHECK(parsedMessage.packetType == message.packetType);
+	CHECK(parsedMessage.applicationId == message.applicationId);
+	CHECK(parsedMessage.packetSequenceCount == message.packetSequenceCount);
+	CHECK(parsedMessage.serviceType == message.serviceType);
+	CHECK(parsedMessage.messageType == message.messageType);
+	CHECK(parsedMessage.sourceId == message.sourceId);
+	CHECK(parsedMessage.sourceId == 55);
+	CHECK(parsedMessage.dataSize == message.dataSize);
+	CHECK(memcmp(parsedMessage.data.begin(), message.data.begin(), message.dataSize) == 0);
+}
+
+TEST_CASE("TM message initialization and consistency explicit constructor", "[MessageParser]") {
+	Message message(22, 17, Message::TM, 2, 42);
+	message.packetSequenceCount = 77;
+	
+	String<7> sourceString = "hellohi";
+	message.appendString(sourceString);
+
+	CHECK(message.dataSize == sourceString.size());
+
+	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+	Message parsedMessage = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket.data()), createdPacket.size());
+
+	CHECK(parsedMessage.packetType == message.packetType);
+	CHECK(parsedMessage.applicationId == message.applicationId);
+	CHECK(parsedMessage.packetSequenceCount == message.packetSequenceCount);
+	CHECK(parsedMessage.serviceType == message.serviceType);
+	CHECK(parsedMessage.messageType == message.messageType);
+	CHECK(parsedMessage.destinationId == message.destinationId);
+	CHECK(parsedMessage.destinationId == 42);
+	CHECK(parsedMessage.dataSize == message.dataSize);
+	CHECK(memcmp(parsedMessage.data.begin(), message.data.begin(), message.dataSize) == 0);
 }
