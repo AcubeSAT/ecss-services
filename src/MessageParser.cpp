@@ -153,7 +153,9 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 }
 
 void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
-	ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage);
+	if (not ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage)) {
+		return;
+	}
 
 	// Individual fields of the TC header
 	uint8_t const pusVersion = data[0] >> 4;
@@ -161,7 +163,9 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	MessageTypeNum const messageType = data[2];
 	ApplicationProcessUserId const sourceId = (data[3] << 8) + data[4];
 
-	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
+	if (not ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage)) {
+		return;
+	}
 
 	// Remove the length of the header
 	length -= ECSSSecondaryTCHeaderSize;
@@ -286,7 +290,9 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 }
 
 void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
-	ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage);
+	if (not ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage)) {
+		return;
+	}
 
 	// Individual fields of the TM header
 	uint8_t const pusVersion = data[0] >> 4;
@@ -295,7 +301,9 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	uint16_t const messageTypeCounter = (data[3] << 8) | data[4];
 	ApplicationProcessUserId const destinationId = (data[5] << 8) | data[6];
 
-	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
+	if (not ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage)) {
+		return;
+	}
 
 	// Remove the length of the header
 	length -= ECSSSecondaryTMHeaderSize;

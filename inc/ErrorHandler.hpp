@@ -570,7 +570,7 @@ public:
 	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	static bool assertInternal(bool condition, InternalErrorType errorCode) {
+	[[nodiscard]] static bool assertInternal(bool condition, InternalErrorType errorCode) {
 		if (not condition) {
 			reportInternalError(errorCode);
 		}
@@ -591,7 +591,7 @@ public:
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
 	template <typename ErrorType>
-	static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
+	[[nodiscard]] static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
 		}

@@ -163,7 +163,10 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 	double inputSeconds = input.taiCounter / static_cast<double>(1 << (8 * FractionBytesIn));
 	inputSeconds *= InputRatio;
 
-	ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
+	if (not ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds)) {
+		taiCounter = 0;
+		return;
+	}
 
 	double output = inputSeconds / OutputRatio * (1ULL << (8 * FractionBytes));  //cppcheck-suppress misra-c2012-2.2
 

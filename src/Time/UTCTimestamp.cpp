@@ -4,15 +4,27 @@
 
 UTCTimestamp::UTCTimestamp() : year(UNIXEpochYear), month(1), second(0), minute(0), hour(0), day(1) {}
 
-UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
-	// TODO(#59): Proper error handling if assert fails
-	ASSERT_INTERNAL(UNIXEpochYear <= year, ErrorHandler::InternalErrorType::InvalidDate);
-	ASSERT_INTERNAL((1 <= month) && (month <= 12), ErrorHandler::InternalErrorType::InvalidDate);
-	ASSERT_INTERNAL((1 <= day) && (day <= 31), ErrorHandler::InternalErrorType::InvalidDate);
-	ASSERT_INTERNAL(hour < 24, ErrorHandler::InternalErrorType::InvalidDate);
-	ASSERT_INTERNAL(minute < 60, ErrorHandler::InternalErrorType::InvalidDate);
+UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second)
+    : year(UNIXEpochYear), month(1), day(1), hour(0), minute(0), second(0) {
+	if (not ASSERT_INTERNAL(UNIXEpochYear <= year, ErrorHandler::InternalErrorType::InvalidDate)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL((1 <= month) && (month <= 12), ErrorHandler::InternalErrorType::InvalidDate)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL((1 <= day) && (day <= 31), ErrorHandler::InternalErrorType::InvalidDate)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL(hour < 24, ErrorHandler::InternalErrorType::InvalidDate)) {
+		return;
+	} 
+	if (not ASSERT_INTERNAL(minute < 60, ErrorHandler::InternalErrorType::InvalidDate)) {
+		return;
+	}
 	// Seconds can be equal to 60, to account for leap seconds.
-	ASSERT_INTERNAL(second <= 60, ErrorHandler::InternalErrorType::InvalidDate);
+	if (not ASSERT_INTERNAL(second <= 60, ErrorHandler::InternalErrorType::InvalidDate)) {
+		return;
+	}
 
 	this->year = year;
 	this->month = month;
