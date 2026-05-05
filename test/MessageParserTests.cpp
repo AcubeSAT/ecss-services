@@ -37,9 +37,6 @@ TEST_CASE("TC message parsing", "[MessageParser]") {
 }
 
 TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
-	uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81,
-	                          0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
-
 	Message message;
 	message.packetType = Message::TC;
 	message.applicationId = 7;
@@ -54,11 +51,13 @@ TEST_CASE("TC Message parsing into a string", "[MessageParser]") {
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
 	if constexpr (ECSSCRCIncluded) {
-		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81, 0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x0b, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
+		CHECK(createdPacket.size() == sizeof(wantedPacket) + CRCHelper::CRCField);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
 		CHECK(CRCHelper::validateCRC(reinterpret_cast<uint8_t*>(createdPacket.data()), createdPacket.size()));
 	} else {
-		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x07, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
+		uint8_t wantedPacket[] = {0x18, 0x07, 0xe0, 0x07, 0x00, 0x09, 0x20, 0x81, 0x1f, 0x00, 0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f};
 
 		CHECK(createdPacket.size() == sizeof(wantedPacket));
 		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
@@ -155,7 +154,7 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 
 	if constexpr (ECSSCRCIncluded) {
 		uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x13, 0x20, 0x16,
-	                        	0x11, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+	                        	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	                        	0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
 
 		wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
@@ -163,10 +162,12 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 		wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
 		wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
 
+		CHECK(createdPacket.size() == sizeof(wantedPacket) + CRCHelper::CRCField);
+		CHECK(memcmp(createdPacket.data(), wantedPacket, sizeof(wantedPacket)) == 0);
 		CHECK(CRCHelper::validateCRC(reinterpret_cast<uint8_t*>(createdPacket.data()), createdPacket.size()));
 	} else {
 		uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
-	                        	0x11, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+	                        	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	                        	0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
 
 		wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
@@ -262,6 +263,12 @@ TEST_CASE("TC message initialization and consistency explicit constructor", "[Me
 	CHECK(message.dataSize == sourceString.size());
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+	
+	// For TC, sourceId corresponds to bytes 3 and 4 of the ECSS secondary header,
+	// meaning bytes 9 and 10 of the created packet.
+	CHECK(static_cast<uint8_t>(createdPacket[9]) == (55 >> 8));
+	CHECK(static_cast<uint8_t>(createdPacket[10]) == (55 & 0xFF));
+
 	Message parsedMessage = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket.data()), createdPacket.size());
 
 	CHECK(parsedMessage.packetType == message.packetType);
@@ -285,6 +292,12 @@ TEST_CASE("TM message initialization and consistency explicit constructor", "[Me
 	CHECK(message.dataSize == sourceString.size());
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+
+	// For TM, destinationId corresponds to bytes 5 and 6 of the ECSS secondary header,
+	// meaning bytes 11 and 12 of the created packet.
+	CHECK(static_cast<uint8_t>(createdPacket[11]) == (42 >> 8));
+	CHECK(static_cast<uint8_t>(createdPacket[12]) == (42 & 0xFF));
+
 	Message parsedMessage = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket.data()), createdPacket.size());
 
 	CHECK(parsedMessage.packetType == message.packetType);
