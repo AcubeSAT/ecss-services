@@ -128,16 +128,6 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 }
 
 TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
-	uint8_t wantedPacket[] = {0x08, 0x02, 0xc0, 0x4d, 0x00, 0x11, 0x20, 0x16,
-	                          0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	                          0x00, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x68, 0x69};
-	
-	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
-	wantedPacket[13] = (time.formatAsBytes() >> 24) & 0xFF;
-	wantedPacket[14] = (time.formatAsBytes() >> 16) & 0xFF;
-	wantedPacket[15] = (time.formatAsBytes() >> 8) & 0xFF;
-	wantedPacket[16] = (time.formatAsBytes()) & 0xFF;
-
 	Message message;
 	message.packetType = Message::TM;
 	message.applicationId = 2;
@@ -147,6 +137,8 @@ TEST_CASE("TM Message parsing into a string", "[MessageParser]") {
 	message.destinationId = 0;
 	String<7> sourceString = "hellohi";
 	message.appendString(sourceString);
+
+	Time::DefaultCUC time(TimeGetter::getCurrentTimeDefaultCUC());
 
 	CHECK(message.dataSize == sourceString.size());
 
