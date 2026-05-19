@@ -46,6 +46,10 @@ public:
 			return false;
 		}
 
+		if (applicationId != message.applicationId || sourceId != message.sourceId || destinationId != message.destinationId) {
+			return false;
+		}
+
 		return data == message.data;
 	}
 
