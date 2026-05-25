@@ -292,6 +292,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t const pusVersion = data[0] >> 4;
 	ServiceTypeNum const serviceType = data[1];
 	MessageTypeNum const messageType = data[2];
+	uint16_t const messageTypeCounter = (data[3] << 8) | data[4];
 	ApplicationProcessUserId const destinationId = (data[5] << 8) | data[6];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
@@ -302,6 +303,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	// Copy the data to the message
 	message.serviceType = serviceType;
 	message.messageType = messageType;
+	message.messageTypeCounter = messageTypeCounter;
 	message.destinationId = destinationId;
 	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data.begin());
 	message.dataSize = length;

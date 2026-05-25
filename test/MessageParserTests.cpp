@@ -179,6 +179,7 @@ TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 	message.packetSequenceCount = 8199;
 	message.serviceType = 129;
 	message.messageType = 31;
+	message.messageTypeCounter = 42;
 	message.destinationId = 0;
 	
 	String<10> sourceString = "helloworld";
@@ -198,6 +199,7 @@ TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 	CHECK(parsedMessage2.packetSequenceCount == message.packetSequenceCount);
 	CHECK(parsedMessage2.serviceType == message.serviceType);
 	CHECK(parsedMessage2.messageType == message.messageType);
+	CHECK(parsedMessage2.messageTypeCounter == message.messageTypeCounter);
 	CHECK(parsedMessage2.destinationId == message.destinationId);
 	CHECK(parsedMessage2.dataSize == message.dataSize);
 	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
