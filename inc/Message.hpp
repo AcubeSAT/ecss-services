@@ -46,7 +46,8 @@ public:
 			return false;
 		}
 
-		if (applicationId != message.applicationId || sourceId != message.sourceId || destinationId != message.destinationId) {
+		if (applicationId != message.applicationId || sourceId != message.sourceId || destinationId != message.destinationId
+			|| messageTypeCounter != message.messageTypeCounter || packetSequenceCount != message.packetSequenceCount) {
 			return false;
 		}
 
