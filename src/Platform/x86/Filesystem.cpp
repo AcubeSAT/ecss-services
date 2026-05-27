@@ -2,7 +2,6 @@
 #include <filesystem>
 #include <fstream>
 #include <system_error>
-#include <regex>
 
 /**
  * Implementation of a filesystem using C++'s standard library for x86 file access.
@@ -121,16 +120,29 @@ namespace Filesystem {
 		const fs::path full_path(path.data());
 		const fs::path directory = full_path.parent_path();
 		const std::string pattern = full_path.filename().string();
-		const std::string regex_pattern = std::regex_replace(pattern, std::regex(R"(\*)"), ".*");
-		const std::regex file_regex(regex_pattern);
+
 		if (!exists(directory) || !is_directory(directory)) {
 			return FileSearchError::DirectoryDoesNotExist;
 		}
 
+		auto matchesPattern = [](const std::string& name, const std::string& pat) -> bool {
+			size_t fi = 0, pi = 0, starPi = std::string::npos, starFi = 0;
+			while (fi < name.size()) {
+				if (pi < pat.size() && (pat[pi] == name[fi] || pat[pi] == '*')) {
+					if (pat[pi] == '*') { starPi = pi++; starFi = fi; }
+					else { ++fi; ++pi; }
+				} else if (starPi != std::string::npos) {
+					pi = starPi + 1; fi = ++starFi;
+				} else { return false; }
+			}
+			while (pi < pat.size() && pat[pi] == '*') ++pi;
+			return pi == pat.size();
+		};
+
 		for (const auto& entry : fs::directory_iterator(directory)) {
 			if (is_regular_file(entry.path())) {
 				std::string full_file_path = entry.path().string();
-				if (const std::string filename = entry.path().filename().string(); std::regex_match(filename, file_regex)) {
+				if (const std::string filename = entry.path().filename().string(); matchesPattern(filename, pattern)) {
 					files.paths.emplace_back(full_file_path.data());
 				}
 			}

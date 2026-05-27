@@ -121,13 +121,15 @@ public:
 	 * that matches the provided search pattern.
 	 * Checks done prior to finding a file:
 	 * - The repository's path does not contain a wildcard
-	 * @param message
+	 * @param message A TC[23,7] message containing the repository path and the search pattern
 	 */
 	void findFiles(Message& message);
 
 	/**
 	 * TM[23,8] Create a report containing the full paths of all files found by TC[23,7] find a file.
-	 * @param foundFile
+	 * @param repositoryPath The repository path used in the originating TC[23,7] request.
+	 * @param searchPattern The search pattern used in the originating TC[23,7] request.
+	 * @param foundFile Collection of absolute paths for every file that matched the search pattern.
 	 */
 	void foundFilesReport(const Filesystem::ObjectPath& repositoryPath, const Filesystem::ObjectPath& searchPattern,const Filesystem::FoundFiles& foundFile);
 
@@ -183,6 +185,11 @@ private:
 		return fullPath;
 	}
 
+	/**
+	 * Returns the trimmed filesystem path for a repository.
+	 * @param repositoryPath The repository path; leading and trailing slashes are removed in-place.
+	 * @return The trimmed repository path as a full Path string.
+	 */
 	static Path getRepositoryPath(ObjectPath& repositoryPath) {
 		trim_from_left(repositoryPath, "/");
 		trim_from_right(repositoryPath, "/");

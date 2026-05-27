@@ -6,9 +6,12 @@
 
 namespace FilepathValidators {
 
+	/**
+	 * Errors returned when a search pattern fails validation
+	 */
 	enum class FilePatternError : uint8_t {
-		EmptyPattern = 0,
-		IllegalCharacter = 1
+		EmptyPattern = 0,    ///< The provided pattern string is empty
+		IllegalCharacter = 1 ///< The pattern contains a character that is not permitted in a filename
 	};
 
 	/**
@@ -19,10 +22,10 @@ namespace FilepathValidators {
 	etl::optional<size_t> findWildcardPosition(const Filesystem::Path& path);
 
 	/**
-		 * Validates the input search pattern. If the pattern is empty, or contains illegal characters an
-		 * appropriate error is returned.
-		 * @param pattern the pattern to validate.
-		 * @return an error if the pattern is invalid, nothing otherwise.
-		 */
+	 * Validates the input search pattern. If the pattern is empty, or contains illegal characters an
+	 * appropriate error is returned.
+	 * @param pattern the pattern to validate.
+	 * @return an error if the pattern is invalid, nothing otherwise.
+	 */
 	etl::expected<void, FilePatternError> validateSearchPattern(const etl::string<Filesystem::ObjectPathSize>& pattern);
 } //namespace FilepathValidators

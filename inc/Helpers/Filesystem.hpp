@@ -4,6 +4,7 @@
 #include "etl/String.hpp"
 #include "etl/expected.h"
 #include "etl/result.h"
+#include "etl/vector.h"
 
 namespace Filesystem {
 	constexpr size_t FullPathSize = ECSSMaxStringSize;
@@ -24,11 +25,13 @@ namespace Filesystem {
 		bool isLocked;
 	};
 
+	constexpr size_t MaxFoundFiles = 128;
+
 	/**
-	 * The found files path
+	 * Holds the paths of files found by a TC[23,7] find-file search
 	 */
 	struct FoundFiles {
-		std::vector<Path> paths;
+		etl::vector<Path, MaxFoundFiles> paths;
 	};
 
 	/**
