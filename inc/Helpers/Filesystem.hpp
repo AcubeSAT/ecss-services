@@ -1,8 +1,6 @@
 #pragma once
 
 #include "ECSS_Definitions.hpp"
-#include "Filesystem.hpp"
-
 #include <utility>
 #include "etl/String.hpp"
 #include "etl/expected.h"
@@ -14,8 +12,6 @@ namespace Filesystem {
 	enum class NodeType : uint8_t;
 	constexpr size_t FullPathSize = ECSSMaxStringSize;
 	using Path = String<FullPathSize>;
-
-	constexpr size_t MaxDirectoryNotifications = 128;
 
 	/**
 	 * ObjectPathSize is half the maximum size, minus one character for the '/' delimiter between the
@@ -45,7 +41,7 @@ namespace Filesystem {
 	 * The repository content summary notification
 	 */
 	struct DirectoryContentSummary {
-		etl::vector<DirectoryContentSummaryNotification, MaxDirectoryNotifications> notifications;
+		etl::vector<DirectoryContentSummaryNotification, ECSSMaxDirectoryNotifications> notifications;
 	};
 
 

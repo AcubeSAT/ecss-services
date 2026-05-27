@@ -260,5 +260,11 @@ inline constexpr std::chrono::seconds ECSSMonitoringFrequency(60);
  */
 inline constexpr uint16_t ApplicationId = 1;
 
+/**
+ * Maximum number of file system nodes (files + directories) that can be reported in a single
+ * TC[23,12] directory summary report.
+ */
+inline constexpr uint8_t ECSSMaxDirectoryNotifications = 128;
+
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
