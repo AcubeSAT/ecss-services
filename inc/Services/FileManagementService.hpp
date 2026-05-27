@@ -43,7 +43,6 @@ public:
 	static constexpr uint16_t InvalidOperationId = 0;
 
 	enum MessageType : uint8_t {
-		// File handling subservice (ECSS 6.23.4)
 		CreateFile = 1,
 		DeleteFile = 2,
 		ReportAttributes = 3,
@@ -57,7 +56,6 @@ public:
 		RenameDirectory = 11,
 		ReportSummaryDirectory = 12,
 		SummaryDirectoryReport = 13,
-		// File copy subservice (ECSS 6.23.5)
 		CopyFile = 14,
 		MoveFile = 15,
 		SuspendFileCopyOperation = 16,

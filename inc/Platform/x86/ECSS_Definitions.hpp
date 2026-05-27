@@ -264,6 +264,11 @@ inline constexpr uint16_t ApplicationId = 1;
  */
 inline constexpr uint32_t MaxValidMemoryIds = 8;
 
+/**
+ * Maximum number of filesystems that can be registered with the FileSystemRegistry.
+ * Covers onboard-local, onboard-remote, and ground-remote roles as required by ECSS 6.23.5.
+ */
+inline constexpr uint8_t ECSSMaxRegisteredFileSystems = 2;
 
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

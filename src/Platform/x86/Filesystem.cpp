@@ -238,11 +238,11 @@ namespace Filesystem {
 	}
 
 	bool copyOperationInvolvesLocalPath(const Path& source, const Path& destination) {
-		auto* srcFs = findFileSystemForPath(source);
-		auto* dstFs = findFileSystemForPath(destination);
+		const auto srcFs = findFileSystemForPath(source);
+		const auto dstFs = findFileSystemForPath(destination);
 
-		auto isLocal = [](const FileSystemDescriptor* fs) {
-			return fs && fs->kind == FileSystemKind::OnboardLocal;
+		auto isLocal = [](const etl::optional<FileSystemDescriptor>& fs) {
+			return fs.has_value() && fs->kind == FileSystemKind::OnboardLocal;
 		};
 
 		return isLocal(srcFs) || isLocal(dstFs);

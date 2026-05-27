@@ -1,23 +1,23 @@
 #pragma once
 
-#include <etl/span.h>
+#include <etl/optional.h>
 
 #include "Filesystem.hpp"
-namespace Filesystem {
+#include "ECSS_Definitions.hpp"
 
-	static constexpr uint8_t MaximumAllowedNumberOfFileSystems = 10;
+namespace Filesystem {
 
 	enum class FileSystemRole : uint8_t {
 		SourceOnly,
 		DestinationOnly,
 		SourceAndDestination
-	 };
+	};
 
 	enum class FileSystemKind : uint8_t {
 		OnboardLocal,
 		OnboardRemote,
 		GroundRemote
-	 };
+	};
 
 	struct FileSystemDescriptor {
 		Path prefix;
@@ -25,8 +25,11 @@ namespace Filesystem {
 		FileSystemKind kind;
 	};
 
-	inline etl::vector<FileSystemDescriptor, MaximumAllowedNumberOfFileSystems> fileSystems{}; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+	inline etl::vector<FileSystemDescriptor, ECSSMaxRegisteredFileSystems> fileSystems{}; // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
+	/**
+	 * Registers a filesystem descriptor. Returns false if the registry is full.
+	 */
 	inline bool registerFileSystem(const FileSystemDescriptor& fs) {
 		if (fileSystems.full()) {
 			return false;
@@ -35,12 +38,16 @@ namespace Filesystem {
 		return true;
 	}
 
-	inline const FileSystemDescriptor* findFileSystemForPath(const Path& repoPath) {
-		for (auto& fs : fileSystems) {
+	/**
+	 * Finds the first registered filesystem whose prefix matches the start of @p repoPath.
+	 * @return The matching descriptor, or etl::nullopt if no registered filesystem covers the path.
+	 */
+	inline etl::optional<FileSystemDescriptor> findFileSystemForPath(const Path& repoPath) {
+		for (const auto& fs : fileSystems) {
 			if (repoPath.find(fs.prefix) == 0) {
-				return &fs;
+				return fs;
 			}
 		}
-		return nullptr;
+		return etl::nullopt;
 	}
 } // namespace Filesystem
