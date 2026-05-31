@@ -7,7 +7,7 @@ constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) : taiCounter(0) {
 	// TODO(#59): Proper error handling if assert fails
 	if (not ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::TimeStampOutOfBounds)) {
 		return;
@@ -20,7 +20,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFr
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp) : taiCounter(0) {
 	// process header
 	uint8_t headerSize = 1;
 	if ((timestamp[0] & 0b10000000U) != 0) {
@@ -64,7 +64,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, T
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& timestamp) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& timestamp) : taiCounter(0) {
 	TAICounter_t seconds = 0;
 
 	/**
