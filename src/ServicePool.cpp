@@ -25,7 +25,7 @@ uint16_t ServicePool::getAndUpdateMessageTypeCounter(ServiceTypeNum serviceType,
 		return (iterator->second)++;
 	}
 
-	auto const insertResult = messageTypeCounter.insert(std::make_pair(key, static_cast<uint16_t>(0)));
+	auto const insertResult = messageTypeCounter.insert(etl::pair{key, static_cast<uint16_t>(0)});
 	return (insertResult.first->second)++;
 }
 
