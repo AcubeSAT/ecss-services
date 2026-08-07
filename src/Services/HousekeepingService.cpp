@@ -267,11 +267,11 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 
 Time::DefaultCUC
 HousekeepingService::reportPendingStructures(Time::DefaultCUC currentTime, Time::DefaultCUC previousTime, Time::DefaultCUC expectedDelay) {
-	Time::DefaultCUC nextCollection((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den); // NOLINT(misc-const-correctness)
+	Time::DefaultCUC nextDelay((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den); // NOLINT(misc-const-correctness)
 
 	const auto currentTimeMs = static_cast<uint64_t>(currentTime.asDuration<std::chrono::milliseconds>().count());
-	const uint64_t scheduledTimeMs = static_cast<uint64_t>(previousTime.asDuration<std::chrono::milliseconds>().count()) +
-	                                 static_cast<uint64_t>(expectedDelay.asDuration<std::chrono::milliseconds>().count());
+	const auto scheduledTimeMs = static_cast<uint64_t>(previousTime.asDuration<std::chrono::milliseconds>().count()) +
+	                             static_cast<uint64_t>(expectedDelay.asDuration<std::chrono::milliseconds>().count());
 
 	for (const auto& housekeepingStructure: housekeepingStructures) {
 		if (!housekeepingStructure.second.periodicGenerationActionStatus) {
@@ -279,21 +279,21 @@ HousekeepingService::reportPendingStructures(Time::DefaultCUC currentTime, Time:
 		}
 		if (housekeepingStructure.second.collectionInterval == 0) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
-			nextCollection = Time::DefaultCUC(0);
+			nextDelay = Time::DefaultCUC(0);
 			continue;
 		}
-		if (currentTimeMs != 0 and (currentTimeMs % housekeepingStructure.second.collectionInterval == 0 or
-		                            scheduledTimeMs % housekeepingStructure.second.collectionInterval == 0)) {
+		if (currentTimeMs % housekeepingStructure.second.collectionInterval == 0 or
+		    scheduledTimeMs % housekeepingStructure.second.collectionInterval == 0) {
 			housekeepingParametersReport(housekeepingStructure.second.structureId);
 		}
 		const Time::DefaultCUC structureTimeToCollection(std::chrono::milliseconds(
 		    housekeepingStructure.second.collectionInterval - currentTimeMs % housekeepingStructure.second.collectionInterval));
-		if (nextCollection > structureTimeToCollection) {
-			nextCollection = structureTimeToCollection;
+		if (nextDelay > structureTimeToCollection) {
+			nextDelay = structureTimeToCollection;
 		}
 	}
 
-	return nextCollection;
+	return nextDelay;
 }
 
 bool HousekeepingService::hasNonExistingStructExecutionError(ParameterReportStructureId id, const Message& request) {
