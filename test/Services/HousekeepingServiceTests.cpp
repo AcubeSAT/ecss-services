@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
@@ -644,6 +645,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		CHECK(nextCollection == Time::DefaultCUC((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den)); // NOLINT(misc-const-correctness)
 	}
 	SECTION("Calculating properly defined collection intervals") {
+		auto asMilliseconds = [](Time::DefaultCUC time) { return time.asDuration<std::chrono::milliseconds>().count(); };
 		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
 		housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
 		housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
@@ -653,36 +655,36 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
-		CHECK(currentTime.asTAIseconds() == 900);
-		CHECK(ServiceTests::count() == 0);
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
-		CHECK(currentTime.asTAIseconds() == 1000);
-		CHECK(ServiceTests::count() == 1);
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + 6);
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
-		CHECK(currentTime.asTAIseconds() == 1800);
-		CHECK(ServiceTests::count() == 2);
-		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
-		previousTime = currentTime;
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime += nextCollection.asDuration<std::chrono::milliseconds>();
+		CHECK(asMilliseconds(currentTime) == 900);
 		CHECK(ServiceTests::count() == 3);
-		CHECK(currentTime.asTAIseconds() == 2000);
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + 15);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime += nextCollection.asDuration<std::chrono::milliseconds>();
+		CHECK(asMilliseconds(currentTime) == 1000);
 		CHECK(ServiceTests::count() == 4);
-		CHECK(currentTime.asTAIseconds() == 2700);
+		currentTime += std::chrono::milliseconds(100);
 		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
 		previousTime = currentTime;
-		currentTime = Time::DefaultCUC(currentTime.asTAIseconds() + nextCollection.asTAIseconds());
+		currentTime += nextCollection.asDuration<std::chrono::milliseconds>();
+		CHECK(asMilliseconds(currentTime) == 1800);
+		CHECK(ServiceTests::count() == 5);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection.asDuration<std::chrono::milliseconds>();
 		CHECK(ServiceTests::count() == 6);
-		CHECK(currentTime.asTAIseconds() == 3000);
+		CHECK(asMilliseconds(currentTime) == 2000);
+		currentTime += std::chrono::milliseconds(100);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection.asDuration<std::chrono::milliseconds>();
+		CHECK(ServiceTests::count() == 7);
+		CHECK(asMilliseconds(currentTime) == 2700);
+		nextCollection = housekeepingService.reportPendingStructures(currentTime, previousTime, nextCollection);
+		previousTime = currentTime;
+		currentTime += nextCollection.asDuration<std::chrono::milliseconds>();
+		CHECK(ServiceTests::count() == 9);
+		CHECK(asMilliseconds(currentTime) == 3000);
 	}
 	SECTION("Collection Intervals set to 0") {
 		for (auto& housekeepingStructure: housekeepingService.housekeepingStructures) {
