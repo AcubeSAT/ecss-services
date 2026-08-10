@@ -1,3 +1,7 @@
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -9,6 +13,7 @@ stages:
 
 
 check-build:
+  interruptible: true
   image: spacedot/build-base
   stage: build
   variables:
@@ -127,6 +132,7 @@ service-sizes:
       - service-sizes/
 
 cppcheck:
+  interruptible: true
   image: spacedot/cppcheck:2.8
   stage: analyze
   before_script:
@@ -144,6 +150,7 @@ cppcheck:
       - ./cppcheck-html-report
 
 clang-tidy:
+  interruptible: true
   image: spacedot/clang-tools:13.0.0-html-1.4.1
   stage: analyze
   script:
@@ -166,6 +173,7 @@ clang-tidy:
       - ./clang-tidy-html-report
 
 clang-analyzer:
+   interruptible: true
    image: spacedot/clang-tools:13.0.0-html-1.4.1
    stage: analyze
    before_script:
@@ -183,6 +191,7 @@ clang-analyzer:
      paths:
        - ./scan-build-html-report
 doxygen:
+  interruptible: true
   image: spacedot/doxygen:1.9.4-4-awesomecss-1.6.0
   stage: analyze
   script:
@@ -192,6 +201,7 @@ doxygen:
     paths:
       - ./docs/html
 ikos:
+   interruptible: true
    image: spacedot/ikos:3.0
    stage: analyze
    before_script:
@@ -215,6 +225,7 @@ ikos:
      paths:
        - ./ikos-report
 tests:
+  interruptible: true
   image: spacedot/coverage:gcovr-6.0-lcov-1.15.5a0
   stage: test
   when: always
@@ -240,6 +251,7 @@ tests:
     paths:
       - ./gcovr
 pages:
+  interruptible: false
   image: spacedot/build-base:latest
   stage: deploy
   script:
@@ -260,6 +272,7 @@ pages:
 
 
 conan:
+  interruptible: false
   image: spacedot/build-base
   stage: deploy
   script:
