@@ -431,7 +431,7 @@ public:
 	* to append auxiliary event data to an Event Report
 	*/
         inline void appendEventData(const String<ECSSEventDataAuxiliaryMaxSize>& data) {
-        appendFixedString(data);
+            appendFixedString(data);
         }
 
 	/**
