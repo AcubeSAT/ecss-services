@@ -1,5 +1,7 @@
 # Build files
 build
+build-tests
+build-warning-check
 cmake-build-debug
 conan-build
 

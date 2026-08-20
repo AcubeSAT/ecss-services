@@ -3,6 +3,7 @@
 
 #include <Time/TimeStamp.hpp>
 #include <cstdint>
+#include <cstring>
 #include <etl/String.hpp>
 #include <etl/wstring.h>
 #include "ECSS_Definitions.hpp"
@@ -406,7 +407,9 @@ public:
 	void appendFloat(float value) {
 		static_assert(sizeof(uint32_t) == sizeof(value), "Floating point numbers must be 32 bits long");
 
-		return appendWord(reinterpret_cast<uint32_t&>(value));
+		uint32_t bits = 0;
+		std::memcpy(&bits, &value, sizeof(bits));
+		return appendWord(bits);
 	}
 
 	/**
@@ -415,7 +418,9 @@ public:
 	void appendDouble(double value) {
 		static_assert(sizeof(uint64_t) == sizeof(value), "Double numbers must be 64 bits long");
 
-		return appendUint64(reinterpret_cast<uint64_t&>(value));
+		uint64_t bits = 0;
+		std::memcpy(&bits, &value, sizeof(bits));
+		return appendUint64(bits);
 	}
 
 	/**
@@ -594,14 +599,18 @@ public:
 		static_assert(sizeof(uint32_t) == sizeof(float), "Floating point numbers must be 32 bits long");
 
 		uint32_t value = readWord();
-		return reinterpret_cast<float&>(value);
+		float result = 0;
+		std::memcpy(&result, &value, sizeof(result));
+		return result;
 	}
 
 	double readDouble() {
 		static_assert(sizeof(uint64_t) == sizeof(double), "Double numbers must be 64 bits long");
 
 		uint64_t value = readUint64();
-		return reinterpret_cast<double&>(value);
+		double result = 0;
+		std::memcpy(&result, &value, sizeof(result));
+		return result;
 	}
 
 	/**
