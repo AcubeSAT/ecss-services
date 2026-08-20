@@ -185,7 +185,7 @@ public:
 	/**
 	 * Appends a default timestamp object to the message, without the header
 	 */
-	void appendDefaultCUCTimeStamp(Time::DefaultCUC timestamp) {
+	void appendDefaultCUCTimeStamp(const Time::DefaultCUC& timestamp) {
 		static_assert(std::is_same_v<uint32_t, decltype(timestamp.formatAsBytes())>, "The conan-profile timestamp should be 4 bytes");
 		appendUint32(timestamp.formatAsBytes());
 	}

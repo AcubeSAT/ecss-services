@@ -266,7 +266,7 @@ bool HousekeepingService::existsInVector(const etl::vector<uint16_t, ECSSMaxSimp
 }
 
 Time::DefaultCUC
-HousekeepingService::reportPendingStructures(Time::DefaultCUC currentTime, Time::DefaultCUC previousTime, Time::DefaultCUC expectedDelay) {
+HousekeepingService::reportPendingStructures(const Time::DefaultCUC& currentTime, const Time::DefaultCUC& previousTime, const Time::DefaultCUC& expectedDelay) {
 	Time::DefaultCUC nextDelay((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den); // NOLINT(misc-const-correctness)
 
 	const auto currentTimeMs = static_cast<uint64_t>(currentTime.asDuration<std::chrono::milliseconds>().count());
