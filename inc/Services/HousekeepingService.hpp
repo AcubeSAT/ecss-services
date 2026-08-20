@@ -289,7 +289,7 @@ public:
 	 * @param expectedDelay The delay the caller actually waited between the previous call and this one.
 	 * @return The minimum amount of time until the next periodic housekeeping report.
 	 */
-	Time::DefaultCUC reportPendingStructures(Time::DefaultCUC currentTime, Time::DefaultCUC previousTime, Time::DefaultCUC expectedDelay);
+	Time::DefaultCUC reportPendingStructures(const Time::DefaultCUC& currentTime, const Time::DefaultCUC& previousTime, const Time::DefaultCUC& expectedDelay);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

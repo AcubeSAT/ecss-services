@@ -1,6 +1,7 @@
 # Build files
 build
 cmake-build-debug
+conan-build
 
 # Documentation output
 /docs/html
