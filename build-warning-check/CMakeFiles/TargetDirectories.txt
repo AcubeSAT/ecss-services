@@ -1,0 +1,10 @@
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/check.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/common.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/x86_services.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/tests.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/edit_cache.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/rebuild_cache.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/list_install_components.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/install.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/install/local.dir
+/Users/atheocharis/repos/ecss-services/build-warning-check/CMakeFiles/install/strip.dir

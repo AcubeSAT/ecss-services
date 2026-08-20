@@ -46,7 +46,7 @@ void Service::storeMessage(Message& message) {
 }
 
 template <typename ErrorType>
-void ErrorHandler::logError(const Message& message, ErrorType errorType) {
+void ErrorHandler::logError(const Message&, ErrorType errorType) {
 	logError(errorType);
 }
 
@@ -70,12 +70,12 @@ void Logger::log(Logger::LogLevel level, etl::istring& message) {
 struct ServiceTestsListener : Catch::EventListenerBase {
 	using EventListenerBase::EventListenerBase; // inherit constructor
 
-	void testRunStarting(Catch::TestRunInfo const& testRunInfo) override {
+	void testRunStarting(Catch::TestRunInfo const&) override {
 		current_path(std::filesystem::temp_directory_path());
 		ServiceTests::reset();
 	}
 
-	void sectionEnded(Catch::SectionStats const& sectionStats) override {
+	void sectionEnded(Catch::SectionStats const&) override {
 		// Make sure we don't have any errors
 		if (not ServiceTests::isExpectingErrors()) {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
@@ -90,7 +90,7 @@ struct ServiceTestsListener : Catch::EventListenerBase {
 		ServiceTests::resetErrors();
 	}
 
-	void testCaseEnded(Catch::TestCaseStats const& testCaseStats) override {
+	void testCaseEnded(Catch::TestCaseStats const&) override {
 		// Tear-down after a test case is run
 		ServiceTests::reset();
 	}
