@@ -427,6 +427,13 @@ public:
 	void appendOctetString(const etl::istring& string);
 
 	/**
+	* Helper function to be used by the Event Report Service to append auxiliary event data to an Event Report
+	*/
+    inline void appendEventData(const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+        appendFixedString(data);
+    }
+
+	/**
 	 * Generic function to append any type of data to the message. The amount of bytes appended is equal to the size of
 	 * the @ref T value.
 	 *

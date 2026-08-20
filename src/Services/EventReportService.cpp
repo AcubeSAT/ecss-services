@@ -33,7 +33,7 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 	if (enabledEvents[static_cast<EventDefinitionId>(eventID)]) {
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
-		appendEventData(report, data);
+		report.appendEventData(data);
 		Services.eventAction.executeAction(eventID);
 
 		storeMessage(report);
@@ -50,7 +50,7 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 		lowSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::LowSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
-		appendEventData(report, data);
+		report.appendEventData(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
 		Services.eventAction.executeAction(eventID);
 
@@ -68,7 +68,7 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 		mediumSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::MediumSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
-		appendEventData(report, data);
+		report.appendEventData(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
 		Services.eventAction.executeAction(eventID);
 
@@ -86,7 +86,7 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 		highSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::HighSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
-		appendEventData(report, data);
+		report.appendEventData(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
 		Services.eventAction.executeAction(eventID);
 
