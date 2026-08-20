@@ -427,9 +427,9 @@ public:
 	void appendOctetString(const etl::istring& string);
 
 	/**
-	* Helper function to be used by the Event Report Service 
-	* to append auxiliary event data to an Event Report
-	*/
+	 * Helper function to be used by the Event Report Service 
+	 * to append auxiliary event data to an Event Report
+	 */
         inline void appendEventData(const String<ECSSEventDataAuxiliaryMaxSize>& data) {
             appendFixedString(data);
         }
