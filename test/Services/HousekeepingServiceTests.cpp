@@ -645,7 +645,7 @@ TEST_CASE("Periodically reporting Housekeeping Structures") {
 		CHECK(nextCollection == Time::DefaultCUC((std::numeric_limits<uint32_t>::max()) * Time::DefaultCUC::Ratio::num / Time::DefaultCUC::Ratio ::den)); // NOLINT(misc-const-correctness)
 	}
 	SECTION("Calculating properly defined collection intervals") {
-		auto asMilliseconds = [](Time::DefaultCUC time) { return time.asDuration<std::chrono::milliseconds>().count(); };
+		auto asMilliseconds = [](const Time::DefaultCUC& time) { return time.asDuration<std::chrono::milliseconds>().count(); };
 		housekeepingService.housekeepingStructures.at(0).collectionInterval = 900;
 		housekeepingService.housekeepingStructures.at(4).collectionInterval = 1000;
 		housekeepingService.housekeepingStructures.at(6).collectionInterval = 2700;
