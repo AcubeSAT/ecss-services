@@ -193,6 +193,10 @@ public:
         enabledEvents.reset();
     }
 
+    inline void appendEventData(Message& report, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+        report.appendFixedString(data);
+    }
+
     /**
      * Validates the parameters for an event.
      * Ensures the event ID is within the allowable range and not 0.
