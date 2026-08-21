@@ -27,6 +27,11 @@ private:
 	template <typename ErrorType>
 	static void logError(ErrorType errorType);
 
+	/**
+	 * Send a TM[5,4] AssertionFail event with the filename and line of a failed assertion.
+	 */
+	static void reportAssertionFailure(const char* location);
+
 public:
 	enum InternalErrorType {
 		UnknownInternalError = 0,
@@ -568,11 +573,13 @@ public:
 	 *
 	 * @param condition The condition to check. Throws an error if false.
 	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
+	 * @param location Compile-time `file:line` string, usually from \ref ASSERT_INTERNAL. Only the filename is sent.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	static bool assertInternal(bool condition, InternalErrorType errorCode) {
+	static bool assertInternal(bool condition, InternalErrorType errorCode, const char* location = "") {
 		if (not condition) {
 			reportInternalError(errorCode);
+			reportAssertionFailure(location);
 		}
 
 		return condition;
