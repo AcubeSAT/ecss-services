@@ -17,7 +17,7 @@ TEST_CASE("Informative Event Report TM[5,1]", "[service][st05]") {
 	CHECK(report.serviceType == EventReportService::ServiceType);
 	CHECK(report.messageType == EventReportService::MessageType::InformativeEventReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
-	REQUIRE(report.dataSize == 12);
+	REQUIRE(report.dataSize == ECSSEventDataAuxiliaryMaxSize + sizeof(EventDefinitionId));
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.read<EventDefinitionId>() == 1);
 	report.readCString(checkString, 10);
@@ -35,7 +35,7 @@ TEST_CASE("Low Severity Anomaly Report TM[5,2]", "[service][st05]") {
 	CHECK(report.serviceType == EventReportService::ServiceType);
 	CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
-	REQUIRE(report.dataSize == 12);
+	REQUIRE(report.dataSize == ECSSEventDataAuxiliaryMaxSize + sizeof(EventDefinitionId));
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.read<EventDefinitionId>() == 1);
 	report.readCString(checkString, 10);
@@ -53,7 +53,7 @@ TEST_CASE("Medium Severity Anomaly Report TM[5,3]", "[service][st05]") {
 	CHECK(report.serviceType == EventReportService::ServiceType);
 	CHECK(report.messageType == EventReportService::MessageType::MediumSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
-	REQUIRE(report.dataSize == 12);
+	REQUIRE(report.dataSize == ECSSEventDataAuxiliaryMaxSize + sizeof(EventDefinitionId));
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.read<EventDefinitionId>() == 1);
 	report.readCString(checkString, 10);
@@ -71,7 +71,7 @@ TEST_CASE("High Severity Anomaly Report TM[5,4]", "[service][st05]") {
 	CHECK(report.serviceType == EventReportService::ServiceType);
 	CHECK(report.messageType == EventReportService::MessageType::HighSeverityAnomalyReport);
 	CHECK(report.packetType == Message::TM); // packet type(TM = 0, TC = 1)
-	REQUIRE(report.dataSize == 12);
+	REQUIRE(report.dataSize == ECSSEventDataAuxiliaryMaxSize + sizeof(EventDefinitionId));
 	// Check for the value that is stored in <<data>> array(data-member of object response)
 	CHECK(report.read<EventDefinitionId>() == 1);
 	report.readCString(checkString, 10);
