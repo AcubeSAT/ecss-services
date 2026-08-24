@@ -23,12 +23,9 @@ private:
 
 	/**
 	 * Log an error without a Message to a logging facility. Platform-dependent.
-	 *
-	 * @param file Optional source filename (basename) included for failed assertions.
-	 * @param line Optional source line included for failed assertions.
 	 */
 	template <typename ErrorType>
-	static void logError(ErrorType errorType, const char* file = "", int line = 0);
+	static void logError(ErrorType errorType);
 
 public:
 	enum InternalErrorType {
