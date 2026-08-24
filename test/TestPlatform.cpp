@@ -32,7 +32,7 @@ template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionStar
 template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionProgressErrorType);
 template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionCompletionErrorType);
 template void ErrorHandler::logError(const Message&, ErrorHandler::RoutingErrorType);
-template void ErrorHandler::logError(ErrorHandler::InternalErrorType);
+template void ErrorHandler::logError(ErrorHandler::InternalErrorType, const char*, int);
 
 // Initialisation of ServiceTests properties
 std::vector<Message> ServiceTests::queuedMessages = std::vector<Message>();
@@ -51,11 +51,16 @@ void ErrorHandler::logError(const Message& message, ErrorType errorType) {
 }
 
 template <typename ErrorType>
-void ErrorHandler::logError(ErrorType errorType) {
+void ErrorHandler::logError(ErrorType errorType, const char* file, int line) {
 	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
 
 	auto errorCategory = Demangler::demangle<ErrorType>();
 	auto errorNumber = std::underlying_type_t<ErrorType>(errorType);
+
+	if ((file != nullptr) && (file[0] != '\0')) {
+		LOG_ERROR << "Error " << errorCategory << " with number " << errorNumber << " at " << file << ":" << line;
+		return;
+	}
 
 	LOG_ERROR << "Error " << errorCategory << " with number " << errorNumber;
 }

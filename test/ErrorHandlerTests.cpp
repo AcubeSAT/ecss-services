@@ -1,7 +1,5 @@
 #include <ErrorHandler.hpp>
 #include <catch2/catch_all.hpp>
-#include <string>
-#include "Services/EventReportService.hpp"
 #include "Services/RequestVerificationService.hpp"
 #include "Services/ServiceTests.hpp"
 #include "macros.hpp"
@@ -122,48 +120,14 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 	CHECK(report.read<ErrorCode>() == ErrorHandler::UnknownRoutingError);
 }
 
-TEST_CASE("Assertion failure sends filename and line as TM[5,4]", "[errors]") {
-	bool const assertionPassed = ASSERT_INTERNAL(false, ErrorHandler::UnknownInternalError);
-	int const assertionLine = __LINE__ - 1;
-
-	REQUIRE_FALSE(assertionPassed);
+TEST_CASE("Assertion failure logs an internal error and does not send a TM", "[errors]") {
+	REQUIRE_FALSE(ASSERT_INTERNAL(false, ErrorHandler::UnknownInternalError));
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
-	REQUIRE(ServiceTests::hasOneMessage());
-
-	Message report = ServiceTests::get(0);
-	CHECK(report.serviceType == EventReportService::ServiceType);
-	CHECK(report.messageType == EventReportService::MessageType::HighSeverityAnomalyReport);
-	CHECK(report.packetType == Message::TM);
-	CHECK(report.read<EventDefinitionId>() == EventReportService::AssertionFail);
-
-	char location[ECSSEventDataAuxiliaryMaxSize + 1] = {};
-	report.readCString(location, static_cast<uint16_t>(report.dataSize - sizeof(EventDefinitionId)));
-	CHECK(std::string(location) == (std::string("ErrorHandlerTests.cpp:") + std::to_string(assertionLine)));
-}
-
-TEST_CASE("Assertion TM uses the filename, not the full path", "[errors]") {
-	ErrorHandler::assertInternal(false, ErrorHandler::UnknownInternalError, "/home/user/repos/ecss-services/src/Message.cpp:128");
-
-	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
-	REQUIRE(ServiceTests::hasOneMessage());
-
-	Message report = ServiceTests::get(0);
-	CHECK(report.read<EventDefinitionId>() == EventReportService::AssertionFail);
-
-	char location[ECSSEventDataAuxiliaryMaxSize + 1] = {};
-	report.readCString(location, static_cast<uint16_t>(report.dataSize - sizeof(EventDefinitionId)));
-	CHECK(std::string(location) == "Message.cpp:128");
-}
-
-TEST_CASE("Passing assertion does not send a TM", "[errors]") {
-	REQUIRE(ASSERT_INTERNAL(true, ErrorHandler::UnknownInternalError));
-	CHECK(ServiceTests::hasNoErrors());
 	CHECK(ServiceTests::count() == 0);
 }
 
-TEST_CASE("Internal error without assertion does not send an AssertionFail TM", "[errors]") {
-	ErrorHandler::reportInternalError(ErrorHandler::UnknownInternalError);
-
-	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
+TEST_CASE("Passing assertion does not log or send a TM", "[errors]") {
+	REQUIRE(ASSERT_INTERNAL(true, ErrorHandler::UnknownInternalError));
+	CHECK(ServiceTests::hasNoErrors());
 	CHECK(ServiceTests::count() == 0);
 }

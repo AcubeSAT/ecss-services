@@ -1,7 +1,6 @@
 #include "ECSS_Configuration.hpp"
 #include <ErrorHandler.hpp>
 #include <ServicePool.hpp>
-#include <etl/String.hpp>
 #include "Services/RequestVerificationService.hpp"
 
 template <>
@@ -48,26 +47,13 @@ void ErrorHandler::reportError(const Message& message, RoutingErrorType errorCod
 	logError(message, errorCode);
 }
 
-void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode) {
-	logError(errorCode);
-}
-
-void ErrorHandler::reportAssertionFailure([[maybe_unused]] const char* location) {
-#ifdef SERVICE_EVENTREPORT
-	static bool inProgress = false;
-	if (inProgress) {
-		return;
-	}
-	inProgress = true;
-
-	const char* suffix = (location == nullptr) ? "" : location;
+void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode, const char* file, int line) {
+	const char* suffix = (file == nullptr) ? "" : file;
 	for (const char* cursor = suffix; *cursor != '\0'; ++cursor) {
 		if ((*cursor == '/') || (*cursor == '\\')) {
 			suffix = cursor + 1;
 		}
 	}
 
-	Services.eventReport.highSeverityAnomalyReport(EventReportService::AssertionFail, String<ECSSEventDataAuxiliaryMaxSize>(suffix));
-	inProgress = false;
-#endif
+	logError(errorCode, suffix, line);
 }

@@ -17,7 +17,7 @@ template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionStar
 template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionProgressErrorType);
 template void ErrorHandler::logError(const Message&, ErrorHandler::ExecutionCompletionErrorType);
 template void ErrorHandler::logError(const Message&, ErrorHandler::RoutingErrorType);
-template void ErrorHandler::logError(ErrorHandler::InternalErrorType);
+template void ErrorHandler::logError(ErrorHandler::InternalErrorType, const char*, int);
 
 template <typename ErrorType>
 void ErrorHandler::logError(const Message& message, ErrorType errorType) {
@@ -32,7 +32,15 @@ void ErrorHandler::logError(const Message& message, ErrorType errorType) {
 }
 
 template <typename ErrorType>
-void ErrorHandler::logError(ErrorType errorType) {
+void ErrorHandler::logError(ErrorType errorType, const char* file, int line) {
+	if ((file != nullptr) && (file[0] != '\0')) {
+		LOG_ERROR
+		    << Demangler::demangle<ErrorType>()
+		    << " Error: "
+		    << errorType << " (" << static_cast<std::underlying_type_t<ErrorType>>(errorType) << ") at " << file << ":" << line;
+		return;
+	}
+
 	LOG_ERROR
 	    /*
 	     * Gets the error class name from the template

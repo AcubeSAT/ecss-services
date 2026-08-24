@@ -23,14 +23,12 @@ private:
 
 	/**
 	 * Log an error without a Message to a logging facility. Platform-dependent.
+	 *
+	 * @param file Optional source filename (basename) included for failed assertions.
+	 * @param line Optional source line included for failed assertions.
 	 */
 	template <typename ErrorType>
-	static void logError(ErrorType errorType);
-
-	/**
-	 * Send a TM[5,4] AssertionFail event with the filename and line of a failed assertion.
-	 */
-	static void reportAssertionFailure(const char* location);
+	static void logError(ErrorType errorType, const char* file = "", int line = 0);
 
 public:
 	enum InternalErrorType {
@@ -561,8 +559,11 @@ public:
 	 *
 	 * Note that these errors correspond to bugs or faults in the software, and should be treated
 	 * differently. Such an error may prompt a task or software reset.
+	 *
+	 * @param file Optional source filename from a failed assertion. Only the basename is logged.
+	 * @param line Optional source line from a failed assertion.
 	 */
-	static void reportInternalError(InternalErrorType errorCode);
+	static void reportInternalError(InternalErrorType errorCode, const char* file = "", int line = 0);
 
 	/**
 	 * Make an assertion, to ensure that a runtime condition is met.
@@ -573,13 +574,13 @@ public:
 	 *
 	 * @param condition The condition to check. Throws an error if false.
 	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
-	 * @param location Compile-time `file:line` string, usually from \ref ASSERT_INTERNAL. Only the filename is sent.
+	 * @param file Source filename from \ref ASSERT_INTERNAL. Only the basename is logged.
+	 * @param line Source line from \ref ASSERT_INTERNAL.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	static bool assertInternal(bool condition, InternalErrorType errorCode, const char* location = "") {
+	static bool assertInternal(bool condition, InternalErrorType errorCode, const char* file = "", int line = 0) {
 		if (not condition) {
-			reportInternalError(errorCode);
-			reportAssertionFailure(location);
+			reportInternalError(errorCode, file, line);
 		}
 
 		return condition;
