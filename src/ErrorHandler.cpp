@@ -51,7 +51,11 @@ void ErrorHandler::reportError(const Message& message, RoutingErrorType errorCod
 void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode, const char* file, int line) {
 	logError(errorCode);
 
-	const char* suffix = (file == nullptr) ? "" : file;
+	if (file == nullptr) {
+		return;
+	}
+
+	const char* suffix = file;
 	for (const char* cursor = suffix; *cursor != '\0'; ++cursor) {
 		if ((*cursor == '/') || (*cursor == '\\')) {
 			suffix = cursor + 1;
