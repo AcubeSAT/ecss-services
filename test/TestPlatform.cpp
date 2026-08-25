@@ -38,6 +38,7 @@ template void ErrorHandler::logError(ErrorHandler::InternalErrorType);
 std::vector<Message> ServiceTests::queuedMessages = std::vector<Message>();
 std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> ServiceTests::thrownErrors =
     std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool>();
+std::string ServiceTests::lastLog;
 bool ServiceTests::expectingErrors = false;
 
 void Service::storeMessage(Message& message) {
@@ -63,6 +64,7 @@ void ErrorHandler::logError(ErrorType errorType) {
 void Logger::log(Logger::LogLevel level, etl::istring& message) {
 	// Logs while testing are passed on to Catch2, if they are important enough
 	if (level >= Logger::warning) {
+		ServiceTests::lastLog = message.c_str();
 		UNSCOPED_INFO(message.c_str());
 	}
 }
