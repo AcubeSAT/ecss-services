@@ -177,7 +177,7 @@ public:
 	 */
 	template <typename ErrorType>
 	static bool thrownError(ErrorType errorType) {
-		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource(errorType);
+		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource<ErrorType>();
 
 		expectingErrors = true;
 
@@ -191,7 +191,7 @@ public:
  	 */
 	template <typename ErrorType>
 	static int countThrownErrors(ErrorType errorType) {
-		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource(errorType);
+		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource<ErrorType>();
 
 		expectingErrors = true;
 

@@ -52,7 +52,7 @@ void ErrorHandler::logError(const Message&, ErrorType errorType) {
 
 template <typename ErrorType>
 void ErrorHandler::logError(ErrorType errorType) {
-	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
+	ServiceTests::addError(ErrorHandler::findErrorSource<ErrorType>(), errorType);
 
 	auto errorCategory = Demangler::demangle<ErrorType>();
 	auto errorNumber = std::underlying_type_t<ErrorType>(errorType);
