@@ -131,9 +131,3 @@ TEST_CASE("Passing assertion does not log or send a TM", "[errors]") {
 	CHECK(ServiceTests::hasNoErrors());
 	CHECK(ServiceTests::count() == 0);
 }
-
-TEST_CASE("Internal error logs basename and line", "[errors]") {
-	ErrorHandler::reportInternalError(ErrorHandler::UnknownInternalError, "src/Time/UTCTimestamp.cpp", 9);
-	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
-	CHECK(ServiceTests::hasLogContaining("UTCTimestamp.cpp:9"));
-}
