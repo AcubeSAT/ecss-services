@@ -23,6 +23,20 @@ check-build:
     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - make -j$(nproc)
 
+# Links OBC firmware against THIS pipeline checkout (conan create + local cache),
+# not Artifactory ecss-services/1.2. XPS CI cannot do that: XPS is a git submodule,
+# this repo is a Conan require, so a cloned XPS job would build published 1.2 and
+# give a false green. May fail for unrelated firmware/XPS/ATSAM reasons; that is
+# acceptable. Does not upload any package.
+firmware-obc:
+  image: spacedot/build-arm
+  stage: build
+  parallel:
+    matrix:
+      - PROJECT: [obc-dev, obc-eqm, obc-eqm-new]
+  script:
+    - ci/firmware-obc.sh
+
 cppcheck:
   image: spacedot/cppcheck:2.8
   stage: analyze
