@@ -22,6 +22,9 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	uint16_t const numOfSimplyCommutatedParams = request.readUint16();
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
+		if (hasExceededMaxNumOfSimplyCommutatedParamsError(newStructure, request)) {
+			break;
+		}
 		const ParameterId newParamId = request.read<ParameterId>();
 		if (hasAlreadyExistingParameterError(newStructure, newParamId, request)) {
 			continue;

@@ -194,6 +194,33 @@ TEST_CASE("Create housekeeping structure") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+
+	SECTION("Exceeding max number of simply commutated parameters") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		ParameterReportStructureId idToCreate = 2;
+		CollectionInterval interval = 7;
+		uint16_t numOfSimplyCommutatedParams = 34;
+
+		request.append<ParameterReportStructureId>(idToCreate);
+		request.append<CollectionInterval>(interval);
+		request.appendUint16(numOfSimplyCommutatedParams);
+		for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
+			request.append<ParameterId>(i);
+		}
+
+		MessageParser::execute(request);
+
+		REQUIRE(housekeepingService.housekeepingStructures.find(idToCreate) !=
+		        housekeepingService.housekeepingStructures.end());
+		CHECK(housekeepingService.housekeepingStructures[idToCreate].simplyCommutatedParameterIds.size() ==
+		      ECSSMaxSimplyCommutatedParameters);
+		CHECK(ServiceTests::countThrownErrors(
+		          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
 
 TEST_CASE("Delete housekeeping structure") {

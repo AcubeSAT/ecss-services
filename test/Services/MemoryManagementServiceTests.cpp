@@ -116,6 +116,55 @@ TEST_CASE("TC[6,5]", "[service][st06]") {
 	CHECK(checksum == CRCHelper::calculateCRC(checkString, readSize));
 }
 
+TEST_CASE("TC[6,5] rejects a dump longer than the transfer buffer", "[service][st06]") {
+	ServiceTests::reset();
+
+	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::DumpRawMemoryData, Message::TC, 1);
+	receivedPacket.append<MemoryId>(TEST_MEMORY);
+	receivedPacket.appendUint16(1);
+	receivedPacket.append<MemoryAddress>(0);
+	receivedPacket.append<MemoryDataLength>(5000);
+
+	MessageParser::execute(receivedPacket);
+
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddressOutOfRange) == 1);
+
+	ServiceTests::reset();
+}
+
+TEST_CASE("TC[6,2] rejects a load longer than the transfer buffer", "[service][st06]") {
+	ServiceTests::reset();
+
+	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::LoadRawMemoryDataAreas, Message::TC, 1);
+	receivedPacket.append<MemoryId>(TEST_MEMORY);
+	receivedPacket.appendUint16(1);
+	receivedPacket.append<MemoryAddress>(0);
+	receivedPacket.appendUint16(5000);
+	receivedPacket.appendBits(16, 0);
+
+	MessageParser::execute(receivedPacket);
+
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddressOutOfRange) == 1);
+
+	ServiceTests::reset();
+}
+
+TEST_CASE("TC[6,9] rejects a check longer than the transfer buffer", "[service][st06]") {
+	ServiceTests::reset();
+
+	Message receivedPacket = Message(MemoryManagementService::ServiceType, MemoryManagementService::MessageType::CheckRawMemoryData, Message::TC, 1);
+	receivedPacket.append<MemoryId>(TEST_MEMORY);
+	receivedPacket.appendUint16(1);
+	receivedPacket.append<MemoryAddress>(0);
+	receivedPacket.append<MemoryDataLength>(5000);
+
+	MessageParser::execute(receivedPacket);
+
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddressOutOfRange) == 1);
+
+	ServiceTests::reset();
+}
+
 TEST_CASE("TC[6,9]", "[service][st06]") {
 
 	auto dummyPointer = testMemory.getDummyArea().data();

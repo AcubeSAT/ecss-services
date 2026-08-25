@@ -40,6 +40,11 @@ void MemoryManagementService::loadRawData(Message& request) {
 		const MemoryDataLength dataLength = request.readOctetString(readData.data()); // NOLINT(cppcoreguidelines-init-variables)
 		const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
 
+		if (dataLength > readData.size()) {
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			continue;
+		}
+
 		if (!dataValidator(readData.data(), checksum, dataLength)) {
 			ErrorHandler::reportError(request, ErrorHandler::ChecksumFailed);
 			continue;
@@ -93,7 +98,7 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		const MemoryAddress memoryAddress = request.read<MemoryAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (memory.isValidAddress(memoryAddress) &&
+		if (readLength <= readData.size() && memory.isValidAddress(memoryAddress) &&
 		    memory.isValidAddress(memoryAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
 				readData[i] = memory.readData(memoryAddress, i);
@@ -138,7 +143,7 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		const MemoryAddress memoryAddress = request.read<MemoryAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (memory.isValidAddress(memoryAddress) &&
+		if (readLength <= readData.size() && memory.isValidAddress(memoryAddress) &&
 		    memory.isValidAddress(memoryAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
 				readData[i] = memory.readData(memoryAddress, i);
