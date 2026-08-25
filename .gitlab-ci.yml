@@ -34,7 +34,7 @@ firmware-obc:
     matrix:
       - PROJECT: [obc-dev, obc-eqm, obc-eqm-new]
   script:
-    - git clone https://gitlab.com/acubesat/obc/embedded-software.git && cd embedded-software
+    - git clone https://gitlab.com/acubesat/obc/embedded-software.git /tmp/embedded-software && cd /tmp/embedded-software
     - mkdir conan-build
     - conan profile detect --force
     - cp conan-arm-profile /root/.conan2/profiles/
@@ -57,7 +57,7 @@ firmware-adcs:
     matrix:
       - PROJECT: [adcs-dev, adcs-eqm]
   script:
-    - git clone https://gitlab.com/acubesat/adcs/adcs-software/adcs-embedded.git && cd adcs-embedded
+    - git clone https://gitlab.com/acubesat/adcs/adcs-software/adcs-embedded.git /tmp/adcs-embedded && cd /tmp/adcs-embedded
     - mkdir conan-build
     - conan profile detect --force
     - cp conan-arm-profile /root/.conan2/profiles/
@@ -81,7 +81,7 @@ firmware-su:
     matrix:
       - PROJECT: [su-dev, su-eqm-v1, su-eqm-v2, su-eqm-v3]
   script:
-    - git clone https://gitlab.com/acubesat/su/on-board-software/su-embedded-software.git && cd su-embedded-software
+    - git clone https://gitlab.com/acubesat/su/on-board-software/su-embedded-software.git /tmp/su-embedded-software && cd /tmp/su-embedded-software
     - mkdir conan-build
     - conan profile detect --force
     - cp conan-arm-profile /root/.conan2/profiles/
