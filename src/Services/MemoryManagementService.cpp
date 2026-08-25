@@ -100,18 +100,21 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 
 		if (readLength > readData.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength);
-		} else if (memory.isValidAddress(memoryAddress) &&
-		           memory.isValidAddress(memoryAddress + readLength)) {
-			for (std::size_t i = 0; i < readLength; i++) {
-				readData[i] = memory.readData(memoryAddress, i);
-			}
-
-			report.append<MemoryAddress>(memoryAddress);
-			report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
-			report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
-		} else {
-			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			continue;
 		}
+		if (!memory.isValidAddress(memoryAddress) ||
+		    !memory.isValidAddress(memoryAddress + readLength)) {
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			continue;
+		}
+
+		for (std::size_t i = 0; i < readLength; i++) {
+			readData[i] = memory.readData(memoryAddress, i);
+		}
+
+		report.append<MemoryAddress>(memoryAddress);
+		report.appendOctetString(String<ECSSMaxFixedOctetStringSize>(readData.data(), readLength));
+		report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 	}
 
 	mainService.storeMessage(report);
@@ -147,18 +150,21 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 
 		if (readLength > readData.size()) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength);
-		} else if (memory.isValidAddress(memoryAddress) &&
-		           memory.isValidAddress(memoryAddress + readLength)) {
-			for (std::size_t i = 0; i < readLength; i++) {
-				readData[i] = memory.readData(memoryAddress, i);
-			}
-
-			report.append<MemoryAddress>(memoryAddress);
-			report.append<MemoryDataLength>(readLength);
-			report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
-		} else {
-			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			continue;
 		}
+		if (!memory.isValidAddress(memoryAddress) ||
+		    !memory.isValidAddress(memoryAddress + readLength)) {
+			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			continue;
+		}
+
+		for (std::size_t i = 0; i < readLength; i++) {
+			readData[i] = memory.readData(memoryAddress, i);
+		}
+
+		report.append<MemoryAddress>(memoryAddress);
+		report.append<MemoryDataLength>(readLength);
+		report.append<CRCSize>(CRCHelper::calculateCRC(readData.data(), readLength));
 	}
 
 	mainService.storeMessage(report);
