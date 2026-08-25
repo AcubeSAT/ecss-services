@@ -184,7 +184,7 @@ int main() {
 	errorMessage.appendByte(15);
 
 	// ST[05] (5,5 to 5,8) test [works]
-	EventReportService::Event eventIDs[] = {EventReportService::UnknownEvent,};
+	EventReportService::Event eventIDs[] = {EventReportService::UnknownEvent, EventReportService::UnknownEvent};
 	EventReportService::Event eventIDs2[] = {EventReportService::UnknownEvent};
 	Message eventMessage(EventReportService::ServiceType,
 	                     EventReportService::MessageType::DisableReportGenerationOfEvents, Message::TC, 1);
@@ -364,7 +364,6 @@ int main() {
 
 	//ST[23]
 	namespace fs = std::filesystem;
-	FileManagementService& fileManagementService = Services.fileManagement;
 
 	fs::current_path(fs::temp_directory_path());
 	std::cout << "\n\nST[23] File System Service - Start\n\n";

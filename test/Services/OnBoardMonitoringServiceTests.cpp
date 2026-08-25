@@ -221,9 +221,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		ParameterId PMONId = 0;
 		ParameterId monitoredParameterId = 0;
 		PMONRepetitionNumber repetitionNumber = 5;
-		PMONBitMask expectedValueCheckMask = 2;
-		PMONExpectedValue expectedValue = 10;
-		EventDefinitionId unexpectedValueEvent = 5;
 		PMONLimit lowLimit = 3;
 		EventDefinitionId belowLowLimitEvent = 8;
 		PMONLimit highLimit = 8;

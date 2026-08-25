@@ -2,7 +2,7 @@
 #include "Time/UTCTimestamp.hpp"
 #include <iomanip>
 
-UTCTimestamp::UTCTimestamp() : year(UNIXEpochYear), month(1), second(0), minute(0), hour(0), day(1) {}
+UTCTimestamp::UTCTimestamp() : year(UNIXEpochYear), month(1), day(1), hour(0), minute(0), second(0) {}
 
 UTCTimestamp::UTCTimestamp(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second) {
 	// TODO(#59): Proper error handling if assert fails
