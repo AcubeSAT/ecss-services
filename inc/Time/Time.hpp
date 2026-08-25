@@ -122,7 +122,7 @@ namespace Time {
 	inline constexpr uint16_t AcubeSATEpoch = 2019;
 
 	static_assert(Epoch.year >= AcubeSATEpoch);
-	static_assert(Epoch.month < 11); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
+	static_assert(Epoch.month < MonthsPerYear);
 	static_assert(Epoch.day < DaysOfMonth[Epoch.month]);
 
 	/**
