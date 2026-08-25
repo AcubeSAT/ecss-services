@@ -121,13 +121,30 @@ TEST_CASE("Error: Failed Routing", "[errors]") {
 }
 
 TEST_CASE("Assertion failure logs an internal error and does not send a TM", "[errors]") {
-	REQUIRE_FALSE(ASSERT_INTERNAL(false, ErrorHandler::UnknownInternalError));
+	const int line = __LINE__; REQUIRE_FALSE(ASSERT_INTERNAL(false, ErrorHandler::UnknownInternalError));
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
 	CHECK(ServiceTests::count() == 0);
+	CHECK(ServiceTests::hasLogContaining("ErrorHandlerTests.cpp:" + std::to_string(line)));
 }
 
 TEST_CASE("Passing assertion does not log or send a TM", "[errors]") {
 	REQUIRE(ASSERT_INTERNAL(true, ErrorHandler::UnknownInternalError));
 	CHECK(ServiceTests::hasNoErrors());
 	CHECK(ServiceTests::count() == 0);
+	CHECK_FALSE(ServiceTests::hasLogContaining("ErrorHandlerTests.cpp:"));
+}
+
+TEST_CASE("Internal error without a file does not log a location", "[errors]") {
+	ErrorHandler::reportInternalError(ErrorHandler::UnknownInternalError);
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
+	CHECK(ServiceTests::count() == 0);
+	CHECK_FALSE(ServiceTests::hasLogContaining(".cpp:"));
+}
+
+TEST_CASE("Internal error logs basename and line", "[errors]") {
+	ErrorHandler::reportInternalError(ErrorHandler::UnknownInternalError, "src/Time/UTCTimestamp.cpp", 9);
+	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
+	CHECK(ServiceTests::count() == 0);
+	CHECK(ServiceTests::hasLogContaining("UTCTimestamp.cpp:9"));
+	CHECK_FALSE(ServiceTests::hasLogContaining("src/Time/"));
 }

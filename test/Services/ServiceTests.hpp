@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 #include <Message.hpp>
 #include <ServicePool.hpp>
 #include <Time/UTCTimestamp.hpp>
@@ -34,6 +35,11 @@ protected:
 	 * @todo(#279) If errors get more complex, this should hold the complete error information
 	 */
 	static std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> thrownErrors;
+
+	/**
+	 * Log lines captured from Logger::log during a test.
+	 */
+	static std::vector<std::string> loggedMessages;
 
 	/**
 	 * Whether an error assertion function was called, indicating that we are expecting to see
@@ -112,6 +118,19 @@ public:
 		thrownErrors.emplace(std::make_pair(errorSource, errorCode), 1);
 	}
 
+	static void addLog(const char* message) {
+		loggedMessages.emplace_back(message);
+	}
+
+	static bool hasLogContaining(const std::string& needle) {
+		for (const auto& log : loggedMessages) {
+			if (log.find(needle) != std::string::npos) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Counts the number of messages in the queue
 	 */
@@ -129,6 +148,7 @@ public:
 	static void resetErrors() {
 		queuedMessages.clear();
 		thrownErrors.clear();
+		loggedMessages.clear();
 		expectingErrors = false;
 	}
 
