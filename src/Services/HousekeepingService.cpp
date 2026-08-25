@@ -20,6 +20,10 @@ void HousekeepingService::createHousekeepingReportStructure(Message& request) {
 	newStructure.periodicGenerationActionStatus = false;
 
 	uint16_t const numOfSimplyCommutatedParams = request.readUint16();
+	if (numOfSimplyCommutatedParams > newStructure.simplyCommutatedParameterIds.max_size()) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
+		return;
+	}
 
 	for (uint16_t i = 0; i < numOfSimplyCommutatedParams; i++) {
 		const ParameterId newParamId = request.read<ParameterId>();
@@ -360,7 +364,7 @@ bool HousekeepingService::hasRequestedDeletionOfEnabledHousekeepingError(Paramet
 }
 
 bool HousekeepingService::hasExceededMaxNumOfSimplyCommutatedParamsError(const HousekeepingStructure& housekeepingStruct, const Message& request) {
-	if (housekeepingStruct.simplyCommutatedParameterIds.size() >= ECSSMaxSimplyCommutatedParameters) {
+	if (housekeepingStruct.simplyCommutatedParameterIds.full()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters);
 		return true;
 	}

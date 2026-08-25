@@ -436,6 +436,10 @@ public:
 		 * PMON Check Type is requested, but it is missing (ST[12])
 		 */
 		 PMONCheckTypeMissing = 63,
+		/**
+		 * Attempt to load, dump, or check a memory area whose data length exceeds the transfer buffer (ST[06])
+		 */
+		UnableToHandleMemoryDataLength = 64,
 	};
 
 	/**
