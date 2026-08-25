@@ -7,7 +7,6 @@
 #include "TimeGetter.hpp"
 #include "etl/array.h"
 #include "etl/functional.h"
-#include "etl/map.h"
 #include "etl/optional.h"
 #include "ECSS_Definitions.hpp"
 

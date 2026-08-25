@@ -1,14 +1,14 @@
 #ifndef ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
 #define ECSS_SERVICES_FUNCTIONMANAGEMENTSERVICE_HPP
 
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "etl/String.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
 #include "ErrorHandler.hpp"
 
 typedef String<ECSSFunctionNameLength> functionName;
-typedef etl::map<functionName, void (*)(String<ECSSFunctionMaxArgLength>), ECSSFunctionMapSize> FunctionMap;
+typedef etl::flat_map<functionName, void (*)(String<ECSSFunctionMaxArgLength>), ECSSFunctionMapSize> FunctionMap;
 
 /**
  * Implementation of the ST[08] function management service

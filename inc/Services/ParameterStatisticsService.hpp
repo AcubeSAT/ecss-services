@@ -7,7 +7,7 @@
 #include "Helpers/TimeGetter.hpp"
 #include "Service.hpp"
 #include "etl/deque.h"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 
 /**
  * Implementation of the ST[04] parameter statistics reporting service, as defined in ECSS-E-ST-70-41C.
@@ -62,7 +62,7 @@ public:
 	/**
 	 * Map containing parameters' IDs followed by the statistics that correspond to the specified parameter
 	 */
-	etl::map<ParameterId, Statistic, ECSSMaxStatisticParameters> statisticsMap;
+	etl::flat_map<ParameterId, Statistic, ECSSMaxStatisticParameters> statisticsMap;
 
 	/**
 	 * If true, after every report reset the parameter statistics.

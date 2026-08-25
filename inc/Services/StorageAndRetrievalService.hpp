@@ -5,7 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "Helpers/PacketStore.hpp"
 #include "Service.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -42,7 +42,7 @@ private:
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	etl::map<packetStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
+	etl::flat_map<packetStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message

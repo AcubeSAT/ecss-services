@@ -40,7 +40,7 @@ void FunctionManagementService::call(Message& msg) {
 
 void FunctionManagementService::include(String<ECSSFunctionNameLength> funcName,
                                         void (*ptr)(String<ECSSFunctionMaxArgLength>)) {
-	if (not funcPtrIndex.full()) { // CAUTION: etl::map won't check by itself if it's full
+	if (not funcPtrIndex.full()) { // CAUTION: etl::flat_map won't check by itself if it's full
 		// before attempting to insert a key-value pair, causing segmentation faults. Check first!
 		funcName.append(ECSSFunctionNameLength - funcName.length(), 0);
 		funcPtrIndex.insert(std::make_pair(funcName, ptr));

@@ -6,7 +6,7 @@
 #include "ErrorHandler.hpp"
 #include "Helpers/HousekeepingStructure.hpp"
 #include "Service.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 
 /**
  * Implementation of the ST[03] Housekeeping Reporting Service. The job of the Housekeeping Service is to store
@@ -44,7 +44,7 @@ public:
 	/**
 	 * Map containing the housekeeping structures. Map[i] contains the housekeeping structure with ID = i.
 	 */
-	etl::map<ParameterReportStructureId, HousekeepingStructure, ECSSMaxHousekeepingStructures> housekeepingStructures;
+	etl::flat_map<ParameterReportStructureId, HousekeepingStructure, ECSSMaxHousekeepingStructures> housekeepingStructures;
 
 	enum MessageType : uint8_t {
 		CreateHousekeepingReportStructure = 1,
