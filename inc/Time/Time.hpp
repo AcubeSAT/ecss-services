@@ -76,7 +76,6 @@ namespace Time {
 	inline constexpr uint16_t SecondsPerHour = 3600;
 	inline constexpr uint32_t SecondsPerDay = 86400;
 	inline constexpr uint8_t MonthsPerYear = 12;
-	inline constexpr uint8_t MaxMonth = MonthsPerYear - 1;
 	static constexpr etl::array<uint8_t, MonthsPerYear> DaysOfMonth = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 	/**
@@ -123,8 +122,8 @@ namespace Time {
 	inline constexpr uint16_t AcubeSATEpoch = 2019;
 
 	static_assert(Epoch.year >= AcubeSATEpoch);
-	static_assert(Epoch.month <= MaxMonth);
-	static_assert(Epoch.day < DaysOfMonth[Epoch.month]);
+	static_assert(Epoch.month >= 1 && Epoch.month <= MonthsPerYear);
+	static_assert(Epoch.day >= 1 && Epoch.day <= DaysOfMonth[Epoch.month - 1]);
 
 	/**
 	 * Builds the short P-field of the CUC (CCSDS Unsegmented Time Code) format, as defined in CCSDS 301.0-B-4.
