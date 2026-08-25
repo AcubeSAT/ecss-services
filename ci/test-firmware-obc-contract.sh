@@ -66,6 +66,8 @@ check "firmware-obc is in the build stage" \
   grep -q 'stage: build' <<<"$JOB"
 check "firmware-obc runs ci/firmware-obc.sh" \
   grep -q 'ci/firmware-obc.sh' <<<"$JOB"
+check "firmware-obc is optional and does not block merge" \
+  grep -q 'allow_failure: true' <<<"$JOB"
 check "firmware-obc does not conan upload" \
   absent 'conan upload' <<<"$JOB"
 check "default-branch conan job still uploads 1.2" \

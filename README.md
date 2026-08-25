@@ -52,9 +52,10 @@ For more detailed installation instructions, including how to integrate with a m
 
 Merge requests also run `firmware-obc`: that job `conan create`s **this checkout** for ARM
 with OBC's `platform_definitions_path`, then compiles OBC firmware against the local
-package. It does **not** use published Artifactory `ecss-services/1.2`. The job may fail
-for unrelated firmware, XPS, or ATSAM reasons; that is acceptable. Run the same steps
-with `PROJECT=obc-dev ci/firmware-obc.sh` (or the `spacedot/build-arm` image).
+package. It does **not** use published Artifactory `ecss-services/1.2`. The job is optional
+(`allow_failure`) and does not block merge; it may fail for unrelated firmware, XPS, or
+ATSAM reasons. Run the same steps with `PROJECT=obc-dev ci/firmware-obc.sh` (or the
+`spacedot/build-arm` image).
 
 ### From the Command Line (CLI)
 

@@ -26,11 +26,12 @@ check-build:
 # Links OBC firmware against THIS pipeline checkout (conan create + local cache),
 # not Artifactory ecss-services/1.2. XPS CI cannot do that: XPS is a git submodule,
 # this repo is a Conan require, so a cloned XPS job would build published 1.2 and
-# give a false green. May fail for unrelated firmware/XPS/ATSAM reasons; that is
-# acceptable. Does not upload any package.
+# give a false green. May fail for unrelated firmware/XPS/ATSAM reasons.
+# allow_failure: optional gate, does not block merge. Does not upload any package.
 firmware-obc:
   image: spacedot/build-arm
   stage: build
+  allow_failure: true
   parallel:
     matrix:
       - PROJECT: [obc-dev, obc-eqm, obc-eqm-new]
