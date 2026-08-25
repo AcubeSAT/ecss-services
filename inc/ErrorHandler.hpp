@@ -602,11 +602,10 @@ public:
 	/**
 	 * Convert a parameter given in C++ to an ErrorSource that can be easily used in comparisons.
 	 * @tparam ErrorType One of the enums specified in ErrorHandler.
-	 * @param error An error code of a specific type
 	 * @return The corresponding ErrorSource
 	 */
 	template <typename ErrorType>
-	inline static ErrorSource findErrorSource(ErrorType errorType) {
+	inline static ErrorSource findErrorSource() {
 		// Static type checking
 		ErrorSource source = Internal;
 
