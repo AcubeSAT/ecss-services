@@ -54,8 +54,7 @@ Merge requests also run `firmware-obc`: that job `conan create`s **this checkout
 with OBC's `platform_definitions_path`, then compiles OBC firmware against the local
 package. It does **not** use published Artifactory `ecss-services/1.2`. The job is optional
 (`allow_failure`) and does not block merge; it may fail for unrelated firmware, XPS, or
-ATSAM reasons. Run the same steps with `PROJECT=obc-dev ci/firmware-obc.sh` (or the
-`spacedot/build-arm` image).
+ATSAM reasons.
 
 ### From the Command Line (CLI)
 
