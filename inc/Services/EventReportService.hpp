@@ -9,7 +9,8 @@
  *
  * @ingroup Services
  * @todo (#27) add more enums event IDs
- * @todo (#219) make sure there isn't an event ID == 0, because there's a confliction with another service
+ * Event definition IDs are 1-based. ID 0 is reserved because ST[19] Event Action
+ * uses the same EventDefinitionId space and already treats 0 as a valid action key.
  * Note: enum IDs are these just for test purposes
  *
  */
@@ -18,7 +19,8 @@ class EventReportService : public Service
 {
 private:
     static constexpr uint16_t NumberOfEvents = 5;
-    etl::bitset<NumberOfEvents> enabledEvents;
+    static constexpr uint16_t EventBitsetSize = NumberOfEvents + 1;
+    etl::bitset<EventBitsetSize> enabledEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
@@ -98,6 +100,12 @@ public:
          */
         FailedStartOfExecution = 5
     };
+
+    static_assert(UnknownEvent != 0 && WWDGReset != 0 && AssertionFail != 0 && MCUStart != 0 &&
+                      FailedStartOfExecution != 0,
+                  "Event ID 0 is reserved");
+    static_assert(FailedStartOfExecution == NumberOfEvents,
+                  "NumberOfEvents must equal the highest Event ID");
 
 
     /**
@@ -181,7 +189,7 @@ public:
      * Getter for enabledEvents bitset
      * @return enabledEvents, just in case the whole bitset is needed
      */
-    etl::bitset<NumberOfEvents> getStateOfEvents()
+    etl::bitset<EventBitsetSize> getStateOfEvents()
     {
         return enabledEvents;
     }
@@ -191,6 +199,7 @@ public:
     */
     inline void disableAllEvents() {
         enabledEvents.reset();
+        enabledEvents[0] = true;
     }
 
     /**
@@ -200,7 +209,7 @@ public:
      * @param eventID The ID of the event to validate.
      * @return True if parameters are valid, false otherwise.
      */
-    static inline bool validateParameters(Event eventID);
+    static inline bool validateParameters(EventDefinitionId eventID);
 
 	/**
 	 * Checks if the number of events included in a TC is larger than the number of events in this service.

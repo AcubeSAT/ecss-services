@@ -7,8 +7,8 @@
 #include "ErrorHandler.hpp"
 #include "ServicePool.hpp"
 
-bool EventReportService::validateParameters(Event eventID) {
-	if (static_cast<EventDefinitionId>(eventID) > NumberOfEvents || static_cast<EventDefinitionId>(eventID) == 0) {
+bool EventReportService::validateParameters(EventDefinitionId eventID) {
+	if (eventID > NumberOfEvents || eventID == 0) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidEventID);
 		return false;
 	}
@@ -104,7 +104,11 @@ void EventReportService::enableReportGeneration(Message& message) {
 		return;
 	}
 	for (uint16_t i = 0; i < tcNumberOfEvents; i++) {
-		enabledEvents[message.read<EventDefinitionId>()] = true;
+		const EventDefinitionId eventID = message.read<EventDefinitionId>();
+		if (not validateParameters(eventID)) {
+			continue;
+		}
+		enabledEvents[eventID] = true;
 	}
 	disabledEventsCount = enabledEvents.size() - enabledEvents.count();
 }
@@ -120,7 +124,11 @@ void EventReportService::disableReportGeneration(Message& message) {
 	}
 
 	for (uint16_t i = 0; i < tcNumberOfEvents; i++) {
-		enabledEvents[message.read<EventDefinitionId>()] = false;
+		const EventDefinitionId eventID = message.read<EventDefinitionId>();
+		if (not validateParameters(eventID)) {
+			continue;
+		}
+		enabledEvents[eventID] = false;
 	}
 	disabledEventsCount = enabledEvents.size() - enabledEvents.count();
 }
@@ -138,7 +146,7 @@ void EventReportService::listOfDisabledEventsReport() {
 	uint16_t const numberOfDisabledEvents =
 		enabledEvents.size() - enabledEvents.count(); // NOLINT(cppcoreguidelines-init-variables)
 	report.appendHalfword(numberOfDisabledEvents);
-	for (size_t i = 0; i < enabledEvents.size(); i++) {
+	for (EventDefinitionId i = 1; i <= NumberOfEvents; i++) {
 		if (not enabledEvents[i]) {
 			report.append<EventDefinitionId>(i);
 		}
