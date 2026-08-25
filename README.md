@@ -50,11 +50,11 @@ from [ConanCenter](https://conan.io/center/) and [SpaceDot's packages](https://a
 For more detailed installation instructions, including how to integrate with a microcontroller, visit the
 [corresponding documentation page](https://acubesat.gitlab.io/obc/ecss-services/docs/md_docs_installation.html).
 
-Merge requests also run `firmware-obc`: that job `conan create`s **this checkout** for ARM
-with OBC's `platform_definitions_path`, then compiles OBC firmware against the local
-package. It does **not** use published Artifactory `ecss-services/1.2`. The job is optional
-(`allow_failure`) and does not block merge; it may fail for unrelated firmware, XPS, or
-ATSAM reasons.
+Merge requests also run `firmware-obc`, `firmware-adcs`, and `firmware-su`: those jobs
+`conan create` **this checkout** for ARM with each platform's `platform_definitions_path`,
+then compile firmware against the local package. They do **not** use published Artifactory
+`ecss-services/1.2`. The jobs are optional (`allow_failure`) and do not block merge; they
+may fail for unrelated firmware, XPS, or ATSAM reasons.
 
 ### From the Command Line (CLI)
 
