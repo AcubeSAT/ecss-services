@@ -41,7 +41,7 @@ void MemoryManagementService::loadRawData(Message& request) {
 		const MemoryManagementChecksum checksum = request.readBits(BitsInMemoryManagementChecksum);
 
 		if (dataLength > readData.size()) {
-			ErrorHandler::reportError(request, ErrorHandler::AddressOutOfRange);
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength);
 			continue;
 		}
 
@@ -98,8 +98,10 @@ void MemoryManagementService::RawDataMemoryManagement::dumpRawData(Message& requ
 		const MemoryAddress memoryAddress = request.read<MemoryAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (readLength <= readData.size() && memory.isValidAddress(memoryAddress) &&
-		    memory.isValidAddress(memoryAddress + readLength)) {
+		if (readLength > readData.size()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength);
+		} else if (memory.isValidAddress(memoryAddress) &&
+		           memory.isValidAddress(memoryAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
 				readData[i] = memory.readData(memoryAddress, i);
 			}
@@ -143,8 +145,10 @@ void MemoryManagementService::RawDataMemoryManagement::checkRawData(Message& req
 		const MemoryAddress memoryAddress = request.read<MemoryAddress>();
 		const MemoryDataLength readLength = request.read<MemoryDataLength>();
 
-		if (readLength <= readData.size() && memory.isValidAddress(memoryAddress) &&
-		    memory.isValidAddress(memoryAddress + readLength)) {
+		if (readLength > readData.size()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength);
+		} else if (memory.isValidAddress(memoryAddress) &&
+		           memory.isValidAddress(memoryAddress + readLength)) {
 			for (std::size_t i = 0; i < readLength; i++) {
 				readData[i] = memory.readData(memoryAddress, i);
 			}

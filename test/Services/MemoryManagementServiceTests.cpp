@@ -127,7 +127,7 @@ TEST_CASE("TC[6,5] rejects a dump longer than the transfer buffer", "[service][s
 
 	MessageParser::execute(receivedPacket);
 
-	CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddressOutOfRange) == 1);
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength) == 1);
 
 	ServiceTests::reset();
 }
@@ -144,7 +144,7 @@ TEST_CASE("TC[6,2] rejects a load longer than the transfer buffer", "[service][s
 
 	MessageParser::execute(receivedPacket);
 
-	CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddressOutOfRange) == 1);
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength) == 1);
 
 	ServiceTests::reset();
 }
@@ -160,7 +160,7 @@ TEST_CASE("TC[6,9] rejects a check longer than the transfer buffer", "[service][
 
 	MessageParser::execute(receivedPacket);
 
-	CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddressOutOfRange) == 1);
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::UnableToHandleMemoryDataLength) == 1);
 
 	ServiceTests::reset();
 }

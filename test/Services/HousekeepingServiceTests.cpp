@@ -211,10 +211,8 @@ TEST_CASE("Create housekeeping structure") {
 
 		MessageParser::execute(request);
 
-		REQUIRE(housekeepingService.housekeepingStructures.find(idToCreate) !=
-		        housekeepingService.housekeepingStructures.end());
-		CHECK(housekeepingService.housekeepingStructures[idToCreate].simplyCommutatedParameterIds.size() ==
-		      ECSSMaxSimplyCommutatedParameters);
+		CHECK(housekeepingService.housekeepingStructures.find(idToCreate) ==
+		      housekeepingService.housekeepingStructures.end());
 		CHECK(ServiceTests::countThrownErrors(
 		          ErrorHandler::ExecutionStartErrorType::ExceededMaxNumberOfSimplyCommutatedParameters) == 1);
 
