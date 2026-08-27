@@ -1110,9 +1110,19 @@ TEST_CASE("Delta Check Perform Check") {
 	}
 }
 
+/**
+ * Enables the parameter monitoring function, so that checkAll performs the checks (see 6.12.3.5.1 of the standard)
+ */
+void enableParameterMonitoringFunction() {
+	Message enableFunctionRequest(OnBoardMonitoringService::ServiceType,
+	                              OnBoardMonitoringService::EnableParameterMonitoringFunctions, Message::TC, 0);
+	MessageParser::execute(enableFunctionRequest);
+}
+
 TEST_CASE("Check All Behavior") {
     SECTION("monitoringDefinition1 and 2 enabled") {
         initialiseParameterMonitoringDefinitions();
+        enableParameterMonitoringFunction();
         auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
     	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
         auto& pmon2 = onBoardMonitoringService.getPMONDefinition(1).get();
@@ -1146,6 +1156,7 @@ TEST_CASE("Check All Behavior") {
 
 	SECTION("Monitoring definitions initially disabled, then enabled") {
     	initialiseParameterMonitoringDefinitions();
+    	enableParameterMonitoringFunction();
     	auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
     	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
     	auto& pmon2 = onBoardMonitoringService.getPMONDefinition(1).get();
@@ -1179,6 +1190,7 @@ TEST_CASE("Check All Behavior") {
 
 	SECTION("Multiple consecutive calls to checkAll") {
     	initialiseParameterMonitoringDefinitions();
+    	enableParameterMonitoringFunction();
     	auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
     	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
 
@@ -1246,7 +1258,7 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
         Services.reset();
     }
 
-    SECTION("Invalid Message Type TC[6,15]") {
+    SECTION("Invalid Message Type TC[12,15]") {
         Message request(OnBoardMonitoringService::ServiceType, 
                        OnBoardMonitoringService::CheckTransitionReport, // Invalid message type
                        Message::TC, 
@@ -1265,7 +1277,7 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
         Services.reset();
     }
 
-	SECTION("Invalid Message Type TC[6,16]") {
+	SECTION("Invalid Message Type TC[12,16]") {
     	Message request(OnBoardMonitoringService::ServiceType,
 					   OnBoardMonitoringService::CheckTransitionReport, // Invalid message type
 					   Message::TC,
@@ -1283,5 +1295,79 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
     	ServiceTests::reset();
     	Services.reset();
     }
+
+	SECTION("Monitoring function status gates the parameter monitoring process") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = onBoardMonitoringService.getPMONDefinition(1).get();
+		auto& pmonLimit = static_cast<PMONLimitCheck&>(pmon);
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		pmonLimit.monitoringEnabled = true;
+		param.setValue(15); // Above the high limit of 9
+
+		// The parameter monitoring function is disabled by default, so no check is performed
+		onBoardMonitoringService.checkAll();
+		CHECK(pmonLimit.getCheckingStatus() == PMON::Unchecked);
+
+		// Once the function is enabled, the out-of-limit value is detected
+		enableParameterMonitoringFunction();
+		onBoardMonitoringService.checkAll();
+		CHECK(pmonLimit.getCheckingStatus() == PMON::AboveHighLimit);
+
+		// Disabling the function stops the monitoring process, so the checking status is not updated any more
+		Message disableFunctionRequest(OnBoardMonitoringService::ServiceType,
+		                               OnBoardMonitoringService::DisableParameterMonitoringFunctions, Message::TC, 0);
+		MessageParser::execute(disableFunctionRequest);
+		param.setValue(5); // Back within the limits
+		onBoardMonitoringService.checkAll();
+		CHECK(pmonLimit.getCheckingStatus() == PMON::AboveHighLimit);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Report Status of each Parameter Monitoring Definition", "[service][st12]") {
+	SECTION("Valid request produces a TM[12,14] status report") {
+		initialiseParameterMonitoringDefinitions();
+		onBoardMonitoringService.getPMONDefinition(1).get().monitoringEnabled = true;
+
+		Message request(OnBoardMonitoringService::ServiceType,
+		                OnBoardMonitoringService::ReportStatusOfParameterMonitoringDefinition, Message::TC, 0);
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::ParameterMonitoringDefinitionStatusReport);
+		CHECK(report.readUint16() == 4);
+		CHECK(report.read<ParameterId>() == 0);
+		CHECK(report.readBoolean() == true); // Enabled by the fixture
+		CHECK(report.read<ParameterId>() == 1);
+		CHECK(report.readBoolean() == true); // Enabled above
+		CHECK(report.read<ParameterId>() == 2);
+		CHECK(report.readBoolean() == false);
+		CHECK(report.read<ParameterId>() == 3);
+		CHECK(report.readBoolean() == false);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Report Out Of Limits", "[service][st12]") {
+	SECTION("Valid request is accepted without generating a report yet") {
+		initialiseParameterMonitoringDefinitions();
+
+		Message request(OnBoardMonitoringService::ServiceType, OnBoardMonitoringService::ReportOutOfLimits,
+		                Message::TC, 0);
+		MessageParser::execute(request);
+
+		// The TM[12,11] out-of-limits report requires the check transition list, which is not implemented yet
+		CHECK(ServiceTests::count() == 0);
+		CHECK(ServiceTests::hasNoErrors());
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
 

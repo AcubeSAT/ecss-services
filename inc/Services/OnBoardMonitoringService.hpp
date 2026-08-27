@@ -92,10 +92,10 @@ public:
 		serviceType = ServiceType;
 	}
 
-	explicit
-	OnBoardMonitoringService(const bool initialParameterMonitoringFunctionStatus) : parameterMonitoringFunctionStatus(
-		initialParameterMonitoringFunctionStatus) {
-	};
+	explicit OnBoardMonitoringService(const bool initialParameterMonitoringFunctionStatus)
+	    : parameterMonitoringFunctionStatus(initialParameterMonitoringFunctionStatus) {
+		serviceType = ServiceType;
+	}
 
 	/**
 	 * The maximum time between two transition reports.
@@ -210,27 +210,32 @@ public:
 	 */
 	void reportParameterMonitoringDefinitions(Message& message);
 
-
 	/**
-	 * TC[12,10]
+	 * TC[12,10] report the out-of-limits
+	 *
+	 * @note The generation of the TM[12,11] out-of-limits report requires the check transition list, which is
+	 * not implemented yet. Until then, this function only validates the request.
+	 * @param message The TC message
 	 */
 	void reportOutOfLimits(const Message& message);
 
-
 	/**
-	 * TC[12,13]
+	 * TC[12,13] report the status of each parameter monitoring definition, generating a TM[12,14] parameter
+	 * monitoring definition status report that contains the identifier and the PMON status (enabled/disabled)
+	 * of every definition in the parameter monitoring list.
+	 * @param message The TC message
 	 */
 	void reportStatusOfParameterMonitoringDefinition(const Message& message);
 
-
 	/**
-	 * TC[12,15]
+	 * TC[12,15] enable the parameter monitoring function. While the function is disabled, the parameter
+	 * monitoring process (checkAll) does not perform any checks.
 	 * @param message The TC message
 	 */
 	void enableParameterMonitoringFunction(const Message& message);
 
 	/**
-	 * TC[12,16]
+	 * TC[12,16] disable the parameter monitoring function.
 	 * @param message The TC message
 	 */
 	void disableParameterMonitoringFunction(const Message& message);
