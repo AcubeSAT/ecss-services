@@ -229,11 +229,12 @@ void StorageAndRetrievalService::storeTelemetry(const Message& message, Time::De
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
 	message, Time::DefaultCUC timestamp) {
-	if (not packetStoreExists(packetStoreId)) {
-		ASSERT_INTERNAL(false, ErrorHandler::InternalErrorType::ElementNotInArray);
+	const auto packetStoreIterator = packetStores.find(packetStoreId);
+	if (packetStoreIterator == packetStores.end()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
-	auto& packetStore = packetStores.find(packetStoreId)->second;
+	auto& packetStore = packetStoreIterator->second;
 	if (not packetStore.storageEnabled) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromDisabledPacketStore);
 		return;
@@ -621,7 +622,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			etl::array<uint8_t, ECSSPacketStoreIdSize> data = {};
 			etl::string<ECSSPacketStoreIdSize> idToDelete = packetStoresToDelete[l];
 			std::copy(idToDelete.begin(), idToDelete.end(), data.data());
-			PacketStoreId const key(data.data());
+			const PacketStoreId key(data.data());
 			packetStores.erase(key);
 		}
 		return;

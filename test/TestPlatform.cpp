@@ -59,6 +59,7 @@ void ErrorHandler::logError(ErrorType errorType) {
 	LOG_ERROR << "Error " << errorCategory << " with number " << errorNumber;
 }
 
+// Logs while testing are passed on to Catch2, if they are important enough
 void Logger::log(Logger::LogLevel level, etl::istring& message) {
 	if (level >= Logger::warning) {
 		UNSCOPED_INFO(message.c_str());
@@ -342,6 +343,5 @@ void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() 
 void Service::releaseMessage(Message& message) {}
 
 void RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures() {}
-
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
