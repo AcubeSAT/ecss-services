@@ -16,6 +16,14 @@
 
 class EventReportService : public Service
 {
+public:
+    enum class EventReportSeverity : uint8_t {
+        Informative = 1,
+        Low = 2,
+        Medium = 3,
+        High = 4
+    };
+
 private:
     static constexpr uint16_t NumberOfEvents = 6;
     /**
@@ -28,6 +36,16 @@ private:
     * Initializes the Event Severity array by setting the default value for each event
     */
     void initializeEventDefinitionSeverityArray();
+
+    /**
+     * Map of event definitions to their severity.
+     * Index i of the array holds the severity of the event definition with ID i + 1, since event
+     * definition IDs start at 1.
+     *
+     * e.g. eventDefinitionSeverityArray[0] = EventReportSeverity::Informative means that the event
+     * with ID 1 is raised with Informative severity.
+     */
+    etl::array<EventReportSeverity, NumberOfEvents> eventDefinitionSeverityArray = {};
 
     /**
      * Counts the event definitions whose report generation is disabled, ignoring the unused slot 0
@@ -55,13 +73,6 @@ public:
         DisableReportGenerationOfEvents = 6,
         ReportListOfDisabledEvents = 7,
         DisabledListEventReport = 8,
-    };
-
-    enum class EventReportSeverity : uint8_t {
-        Informative = 1,
-        Low = 2,
-        Medium = 3,
-        High = 4
     };
 
     // Variables that count the event reports per severity level
@@ -135,16 +146,6 @@ public:
          */
         ParameterOutOfLimits = 6,
     };
-
-    /**
-     * Map of event definitions to their severity.
-     * Index i of the array holds the severity of the event definition with ID i + 1, since event
-     * definition IDs start at 1.
-     *
-     * e.g. eventDefinitionSeverityArray[0] = EventReportSeverity::Informative means that the event
-     * with ID 1 is raised with Informative severity.
-     */
-    etl::array<EventReportSeverity, NumberOfEvents> eventDefinitionSeverityArray = {};
 
     /**
      * TM[5,1] informative event report

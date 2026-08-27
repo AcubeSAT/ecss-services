@@ -18,7 +18,9 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			continue;
 		}
-		definition->second.get().setRepetitionNumber(0);
+		// As per 6.12.3.8.1g of ECSS-E-ST-70-41C, enabling a definition resets its repetition counter,
+		// without affecting its checking status.
+		definition->second.get().setRepetitionCounter(0);
 		definition->second.get().setMonitoringEnabled(true);
 	}
 }
@@ -321,6 +323,15 @@ void OnBoardMonitoringService::enableParameterMonitoringFunction(const Message& 
 	}
 
 	parameterMonitoringFunctionStatus = true;
+	// As per 6.12.3.5.1c of ECSS-E-ST-70-41C, each enabled parameter monitoring definition restarts its
+	// monitoring from a clean state when the parameter monitoring function is enabled.
+	for (auto& entry: parameterMonitoringList) {
+		auto& pmon = entry.second.get();
+		if (pmon.isMonitoringEnabled()) {
+			pmon.setCheckingStatus(PMON::Unchecked);
+			pmon.setRepetitionCounter(0);
+		}
+	}
 }
 
 void OnBoardMonitoringService::disableParameterMonitoringFunction(const Message& message) {
