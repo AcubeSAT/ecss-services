@@ -246,31 +246,25 @@ void StorageAndRetrievalService::storeTelemetry(const Message& message, Time::De
 	}
 }
 
-bool StorageAndRetrievalService::checkIfTelemetryCanBeAdded(const PacketStoreId& packetStoreId, const Message&
-	message) {
-	if (not packetStoreExists(packetStoreId)) {
-		ASSERT_INTERNAL(false, ErrorHandler::InternalErrorType::ElementNotInArray);
-		return false;
+void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
+	message, Time::DefaultCUC timestamp) {
+	const auto packetStoreIterator = packetStores.find(packetStoreId);
+	if (packetStoreIterator == packetStores.end()) {
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
+		return;
 	}
-	if (not packetStores.find(packetStoreId)->second.storageEnabled) {
+	auto& packetStore = packetStoreIterator->second;
+	if (not packetStore.storageEnabled) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromDisabledPacketStore);
-		return false;
+		return;
 	}
 	const auto configuration = packetSelection.packetStoreAppProcessConfig.find(packetStoreId);
 	if (configuration == packetSelection.packetStoreAppProcessConfig.end() or
 	    not configuration->second.isReportTypeAdded(message.applicationId, message.serviceType, message.messageType)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromPacketStoreDueToAppProcessConfiguration);
-		return false;
-	}
-	return true;
-}
-
-void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
-	message, Time::DefaultCUC timestamp) {
-	if (not checkIfTelemetryCanBeAdded(packetStoreId, message)) {
 		return;
 	}
-	pushTelemetryToPacketStore(packetStores.find(packetStoreId)->second, message, timestamp);
+	pushTelemetryToPacketStore(packetStore, message, timestamp);
 }
 
 void StorageAndRetrievalService::resetPacketStores() {
@@ -706,7 +700,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			etl::array<uint8_t, ECSSPacketStoreIdSize> data = {};
 			etl::string<ECSSPacketStoreIdSize> idToDelete = packetStoresToDelete[l];
 			std::copy(idToDelete.begin(), idToDelete.end(), data.data());
-			PacketStoreId const key(data.data());
+			const PacketStoreId key(data.data());
 			packetStores.erase(key);
 		}
 		return;

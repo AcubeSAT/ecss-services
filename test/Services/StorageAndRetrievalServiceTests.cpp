@@ -1581,10 +1581,10 @@ TEST_CASE("Changing the packet store type to circular") {
 			count++;
 		}
 
-		PacketStoreId finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		etl::array<PacketStoreId, 4> finalIds = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
-		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
+		etl::array<ErrorHandler::ExecutionStartErrorType, 4> expectedErrors = {
 		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval,
@@ -1669,10 +1669,10 @@ TEST_CASE("Changing the packet store type to bounded") {
 			count++;
 		}
 
-		PacketStoreId finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		etl::array<PacketStoreId, 4> finalIds = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
-		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
+		etl::array<ErrorHandler::ExecutionStartErrorType, 4> expectedErrors = {
 		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithStorageStatusEnabled,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval,
@@ -1761,10 +1761,10 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 			count++;
 		}
 
-		PacketStoreId finalIds[4] = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
+		etl::array<PacketStoreId, 4> finalIds = {wrongPacketStoreIds[0], correctPacketStoreIds[0],
 		                                             correctPacketStoreIds[1], correctPacketStoreIds[2]};
 
-		ErrorHandler::ExecutionStartErrorType expectedErrors[4] = {
+		etl::array<ErrorHandler::ExecutionStartErrorType, 4> expectedErrors = {
 		    ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithByTimeRangeRetrieval,
 		    ErrorHandler::ExecutionStartErrorType::GetPacketStoreWithOpenRetrievalInProgress,
@@ -1922,7 +1922,7 @@ TEST_CASE("Reporting the content summary of packet stores") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		PacketStoreId finalIds[3] = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
+		etl::array<PacketStoreId, 3> finalIds = {wrongPacketStoreIds[0], wrongPacketStoreIds[1],
 		                                             correctPacketStoreIds[0]};
 
 		storageAndRetrieval.getPacketStore(correctPacketStoreIds[0]).openRetrievalStartTimeTag = Time::DefaultCUC(5);
@@ -2185,7 +2185,7 @@ TEST_CASE("Deleting packet store content") {
 		auto wrongPacketStoreIds = invalidPacketStoreIds();
 		padWithZeros(correctPacketStoreIds);
 
-		PacketStoreId finalIds[7] = {
+		etl::array<PacketStoreId, 7> finalIds = {
 		    wrongPacketStoreIds[0], wrongPacketStoreIds[1], wrongPacketStoreIds[2], correctPacketStoreIds[0],
 		    correctPacketStoreIds[1], correctPacketStoreIds[2], correctPacketStoreIds[3]};
 
@@ -2640,7 +2640,7 @@ TEST_CASE("Copying packets in time window, after time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		Time::DefaultCUC expectedTimestamps[3] = {Time::DefaultCUC(7), Time::DefaultCUC(9), Time::DefaultCUC(11)};
+		etl::array<Time::DefaultCUC, 3> expectedTimestamps = {Time::DefaultCUC(7), Time::DefaultCUC(9), Time::DefaultCUC(11)};
 		Time::DefaultCUC existingTimestamps[3];
 
 		int index = 0;
@@ -2764,7 +2764,7 @@ TEST_CASE("Copying packets in time window, before time-tag") {
 		CHECK(ServiceTests::count() == 0);
 		auto& targetPacketStore = storageAndRetrieval.getPacketStore(toPacketStoreId);
 		REQUIRE(targetPacketStore.storedTelemetryPackets.size() == 3);
-		Time::DefaultCUC expectedTimestamps[3] = {Time::DefaultCUC(2), Time::DefaultCUC(4), Time::DefaultCUC(5)};
+		etl::array<Time::DefaultCUC, 3> expectedTimestamps = {Time::DefaultCUC(2), Time::DefaultCUC(4), Time::DefaultCUC(5)};
 		Time::DefaultCUC existingTimestamps[3];
 
 		int index = 0;
