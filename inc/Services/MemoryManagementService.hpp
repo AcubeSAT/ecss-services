@@ -125,8 +125,12 @@ public:
 		 */
 		void appendDumpedStructuredData(Message& request, Message& report, const Filesystem::Path& filePath,
 		                                FileOffset offset, FileDataLength readLength) const;
+	};
 
-	} structuredDataMemoryManagementSubService;
+	/**
+	 * The instance of the structured data memory management subservice, used to access its functions.
+	 */
+	StructuredDataMemoryManagementSubService structuredDataMemoryManagementSubService;
 
 	/**
 	 * TC[6,2] load raw values to memory

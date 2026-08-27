@@ -3,7 +3,7 @@
 @tableofcontents
 
 ecss-services provides a filesystem interface that needs to be implemented for each platform. This interface allows services 
-like Memory Management and Storage & Retrieval to work with files in a platform-independent way.
+like Memory Management and File Management to work with files in a platform-independent way.
 
 ## Functions to implement
 
@@ -27,17 +27,17 @@ These functions handle basic file creation and deletion. They should:
 #### Read and Write Files
 
 ```cpp
-etl::optional<FileReadError> readFile(const Path& path, Offset offset, 
-                                    FileDataLength length, etl::span<uint8_t> buffer);
-etl::optional<FileWriteError> writeFile(const Path& path, Offset offset, 
-                                      FileDataLength length, etl::span<uint8_t> buffer);
+etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset,
+                                            FileDataLength fileDataLength, etl::span<uint8_t> buffer);
+etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset,
+                                              FileDataLength fileDataLength, etl::span<const uint8_t> buffer);
 ```
 
 These functions handle file content operations. They should:
-- Validate buffer sizes match the length parameter
-- Handle reading/writing at specific offsets
-- Return appropriate errors for invalid operations
-- Return `etl::nullopt` on success
+- Validate that the buffer can hold at least `fileDataLength` bytes
+- Handle reading/writing at specific offsets, rejecting ranges beyond the current file size
+- Return the appropriate error for invalid operations
+- Return an empty (valid) `etl::expected` on success
 
 ### Directory Operations
 
@@ -68,8 +68,8 @@ These functions provide metadata about filesystem nodes. They should:
 ### File Locking
 
 ```cpp
-void lockFile(const Path& path);
-void unlockFile(const Path& path);
+etl::expected<void, FilePermissionModificationError> lockFile(const Path& path);
+etl::expected<void, FilePermissionModificationError> unlockFile(const Path& path);
 FileLockStatus getFileLockStatus(const Path& path);
 ```
 
@@ -92,7 +92,7 @@ This function should:
 ## Example Implementation
 
 For a reference implementation, see the x86 platform implementation in 
-`src/Platform/x86/Helpers/Filesystem.cpp`.
+`src/Platform/x86/Filesystem.cpp`.
 
 ## Error Handling
 
@@ -101,6 +101,7 @@ The filesystem interface uses several error enums:
 - `FileDeletionError` for file deletion issues
 - `FileReadError` for read operation failures
 - `FileWriteError` for write operation failures
+- `FilePermissionModificationError` for lock/unlock failures
 - `DirectoryCreationError` for directory creation issues
 - `DirectoryDeletionError` for directory deletion issues
 - `FileAttributeError` for metadata access issues
