@@ -433,8 +433,11 @@ public:
 		 PMONCheckTypeMissing = 63,
 		/**
 		 * AppProcessConfiguration adding an already existing report type in a map with an application id - service type key
+		 *
+		 * @note Numbered 73 because master allocates up to 64 (UnableToHandleMemoryDataLength) and the ST[06]
+		 * object memory MR (!203) allocates 65-72.
 		 */
-		AlreadyExistingReportType = 64
+		AlreadyExistingReportType = 73
 	};
 
 	/**

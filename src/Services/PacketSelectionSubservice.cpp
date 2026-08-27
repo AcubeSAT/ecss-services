@@ -10,7 +10,7 @@ PacketSelectionSubservice::PacketStoreId PacketSelectionSubservice::readPacketSt
 }
 
 bool PacketSelectionSubservice::packetStoreExists(const PacketStoreId& packetStoreId) {
-	return packetStores.find(packetStoreId) != packetStores.end();
+	return mainService.packetStoreExists(packetStoreId);
 }
 
 void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
@@ -58,10 +58,7 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 			for (uint8_t message = 0; message < numOfMessages; message++) {
 				const MessageTypeNum messageType = request.read<MessageTypeNum>();
 
-				if (not configuration.checkMessageCanBeAdded(request, applicationID, serviceType, messageType)) {
-					continue;
-				}
-				configuration.addReport(applicationID, serviceType, messageType);
+				configuration.checkAndAddReport(request, applicationID, serviceType, messageType);
 			}
 		}
 	}

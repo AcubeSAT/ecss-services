@@ -2,6 +2,7 @@
 #include <ServicePool.hpp>
 #include <catch2/catch_all.hpp>
 #include "Services/EventReportService.hpp"
+#include "Services/ServiceTests.hpp"
 #include "etl/String.hpp"
 
 TEST_CASE("Message is usable", "[message]") {
@@ -243,11 +244,28 @@ TEST_CASE("Test string reading", "[message][ecss]") {
     }
 
     SECTION("Test readFixedString") {
-        message.appendString(String<8>("fixed123"));
-	
-        String<ECSSMaxStringSize> result = {""};
-		result = message.readFixedString<ECSSMaxStringSize>();
+        constexpr size_t FixedStringSize = 8;
+        message.appendUint16(0xCAFE);
+        message.appendFixedString(String<FixedStringSize>("fixed123"));
+        message.appendUint32(0xDEADBEEF);
+
+        CHECK(message.readUint16() == 0xCAFE);
+        const String<FixedStringSize> result = message.readFixedString<FixedStringSize>();
         CHECK_THAT(result.c_str(), Catch::Matchers::Equals("fixed123"));
+        CHECK(message.readUint32() == 0xDEADBEEF);
+    }
+
+    SECTION("Test readFixedString with insufficient data") {
+        constexpr size_t FixedStringSize = 8;
+        message.appendUint16(0xCAFE);
+
+        const String<FixedStringSize> result = message.readFixedString<FixedStringSize>();
+        CHECK(result.empty());
+        CHECK(ServiceTests::thrownError(ErrorHandler::AcceptanceErrorType::MessageTooShort));
+
+        // The failed read must not consume any bytes
+        CHECK(message.readUint16() == 0xCAFE);
+        ServiceTests::reset();
     }
 
 }

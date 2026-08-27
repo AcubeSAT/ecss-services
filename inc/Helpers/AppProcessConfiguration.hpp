@@ -3,6 +3,8 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "etl/map.h"
+#include "etl/span.h"
+#include "etl/utility.h"
 #include "etl/vector.h"
 
 /**
@@ -21,13 +23,13 @@ public:
 	 * Vector containing the Report Type definitions. Each definition has its unique name of type uint8. For
 	 * example, a Report Type definition could be 'ReportHousekeepingStructures'.
 	 */
-	typedef etl::vector<MessageTypeNum, ECSSMaxReportTypeDefinitions> ReportTypeDefinitions;
+	using ReportTypeDefinitions = etl::vector<MessageTypeNum, ECSSMaxReportTypeDefinitions>;
 
 	/**
 	 * This is the key for the application process configuration map. It contains a pair with the applicationID and
 	 * the serviceType.
 	 */
-	typedef std::pair<ApplicationProcessId, ServiceTypeNum> AppServiceKey;
+	using AppServiceKey = etl::pair<ApplicationProcessId, ServiceTypeNum>;
 
 	/**
 	 * Map containing the report type definitions. Each application process has its own ID. The combination of the
@@ -49,21 +51,25 @@ public:
 
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
-	 * May report errors through checkMessageCanBeAdded for report types that cannot be added.
+	 * May report errors through checkAndAddReport for report types that cannot be added.
 	 */
 	void addAllReportsOfApplication(const Message& message, ApplicationProcessId applicationID);
 
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
-	 * May report errors through checkMessageCanBeAdded for report types that cannot be added.
+	 * May report errors through checkAndAddReport for report types that cannot be added.
 	 */
 	void addAllReportsOfService(const Message& message, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
-	 * Adds the specified report type to the application process configuration. The caller is responsible for
-	 * performing the necessary error checking first, via checkMessageCanBeAdded.
+	 * Checks whether the specified message type can be added to the specified application process and service type
+	 * definition, and adds it if all checks pass. Reports a MaxReportTypesReached or an AlreadyExistingReportType
+	 * error if the checks don't pass.
+	 *
+	 * @return True: if the message type passed all checks and was added to the configuration.
 	 */
-	void addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
+	bool checkAndAddReport(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
+	    MessageTypeNum messageType);
 
 	/**
 	 * Counts the number of service types, stored for the specified application process.
@@ -83,34 +89,7 @@ public:
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
 	bool checkApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,
-	    uint8_t numOfServices,
-	    const etl::vector<ApplicationProcessId, ECSSMaxControlledApplicationProcesses>& controlledApplications);
-
-	/**
-	 * Checks if all service types are effectively allowed already, i.e. if the maximum number of service type
-	 * definitions per application process has been reached. Reports an AllServiceTypesAlreadyAllowed error if so.
-	 *
-	 * @return True: if the maximum number of service type definitions has already been reached.
-	 */
-	bool checkAllServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID);
-
-	/**
-	 * Checks if the specified application process is controlled by the Service.
-	 * Reports a NotControlledApplication error if it is not.
-	 *
-	 * @return True: if the application process is controlled by the Service.
-	 */
-	bool checkAppControlled(
-	    const etl::vector<ApplicationProcessId, ECSSMaxControlledApplicationProcesses>& controlledApplications,
-	    const Message& request, ApplicationProcessId applicationID);
-
-	/**
-	 * Checks if the maximum number of service type definitions per application process is reached.
-	 * Reports a MaxServiceTypesReached error if it is.
-	 *
-	 * @return True: if the maximum number of service type definitions has already been reached.
-	 */
-	bool checkMaxServiceTypesReached(const Message& request, ApplicationProcessId applicationID);
+	    uint8_t numOfServices, etl::span<const ApplicationProcessId> controlledApplications);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type of an 'add report types' request.
@@ -122,34 +101,6 @@ public:
 	 */
 	bool checkServiceCanBeAdded(Message& request, ApplicationProcessId applicationID, uint8_t numOfMessages,
 	    ServiceTypeNum serviceType);
-
-	/**
-	 * Checks if the maximum number of report type definitions per service type definition is reached.
-	 * Reports a MaxReportTypesReached error if it is.
-	 *
-	 * @return True: if the maximum number of report type definitions has already been reached.
-	 */
-	bool checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID,
-	    ServiceTypeNum serviceType);
-
-	/**
-	 * Checks if the specified message type can be added to the specified application process and service type
-	 * definition. Reports a MaxReportTypesReached or an AlreadyExistingReportType error if the checks don't pass.
-	 *
-	 * @return True: if the message type is valid and passes all the necessary error checking.
-	 */
-	bool checkMessageCanBeAdded(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-	    MessageTypeNum messageType);
-
-	/**
-	 * Checks whether the specified message type already exists in the application process and service
-	 * type definition. Reports an AlreadyExistingReportType error if it does.
-	 *
-	 * @return True: if the message type already exists in the definition.
-	 */
-	bool checkAlreadyExistingReport(const Message& request, ApplicationProcessId applicationID,
-	    ServiceTypeNum serviceType,
-	    MessageTypeNum messageType);
 
 	/**
 	 * Checks whether the requested application process is present in the application process configuration.
@@ -181,19 +132,24 @@ public:
 
 	/**
 	 * Deletes every definition containing the requested application process ID, from the application process
-	 * configuration.
+	 * configuration. Reports an ElementNotInArray internal error if no definition of the application process
+	 * existed, since callers are expected to have validated the application process beforehand.
 	 */
 	void deleteApplicationProcess(ApplicationProcessId applicationID);
 
 	/**
 	 * Deletes the requested service type definition from the application process configuration. The deletion of the
 	 * last service type definition of an application process implicitly deletes the application process definition.
+	 * Reports an ElementNotInArray internal error if the definition did not exist, since callers are expected to
+	 * have validated the service type beforehand.
 	 */
 	void deleteServiceType(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
 	 * Deletes the requested report type from the application process configuration. If the deletion results in an
 	 * empty service type definition, it deletes the corresponding service type definition as well.
+	 * Reports an ElementNotInArray internal error if the report type did not exist, since callers are expected to
+	 * have validated the report type beforehand.
 	 */
 	void deleteReportType(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
 
@@ -216,8 +172,70 @@ public:
 
 private:
 	/**
+	 * Adds the specified report type to the application process configuration. Only called by checkAndAddReport,
+	 * after the necessary error checking has been performed.
+	 */
+	void addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
+
+	/**
+	 * Checks if all service types are effectively allowed already, i.e. if the maximum number of service type
+	 * definitions per application process has been reached. Reports an AllServiceTypesAlreadyAllowed error if so.
+	 *
+	 * @return True: if the maximum number of service type definitions has already been reached.
+	 */
+	bool checkAllServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID);
+
+	/**
+	 * Checks if the specified application process is controlled by the Service.
+	 * Reports a NotControlledApplication error if it is not.
+	 *
+	 * @return True: if the application process is controlled by the Service.
+	 */
+	bool checkAppControlled(etl::span<const ApplicationProcessId> controlledApplications, const Message& request,
+	    ApplicationProcessId applicationID);
+
+	/**
+	 * Checks if the maximum number of service type definitions per application process is reached.
+	 * Reports a MaxServiceTypesReached error if it is.
+	 *
+	 * @return True: if the maximum number of service type definitions has already been reached.
+	 */
+	bool checkMaxServiceTypesReached(const Message& request, ApplicationProcessId applicationID);
+
+	/**
+	 * Checks if the maximum number of report type definitions per service type definition is reached.
+	 * Reports a MaxReportTypesReached error if it is.
+	 *
+	 * @return True: if the maximum number of report type definitions has already been reached.
+	 */
+	bool checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID,
+	    ServiceTypeNum serviceType);
+
+	/**
+	 * Checks whether the specified message type already exists in the application process and service
+	 * type definition. Reports an AlreadyExistingReportType error if it does.
+	 *
+	 * @return True: if the message type already exists in the definition.
+	 */
+	bool checkAlreadyExistingReport(const Message& request, ApplicationProcessId applicationID,
+	    ServiceTypeNum serviceType,
+	    MessageTypeNum messageType);
+
+	/**
 	 * @return true if the maximum number of service type definitions per application process has been reached,
 	 * false otherwise.
 	 */
 	bool isMaxServiceTypesReached(ApplicationProcessId applicationID) const;
+
+	/**
+	 * Skips the report type definitions of a single service type block inside an 'add/delete report types' request,
+	 * advancing the read position past `numOfMessages` report type IDs.
+	 */
+	static void skipReportTypes(Message& request, uint8_t numOfMessages);
+
+	/**
+	 * Skips `numOfServices` whole service type blocks (service type ID, report type count and report type IDs)
+	 * inside an 'add/delete report types' request.
+	 */
+	static void skipServiceBlocks(Message& request, uint8_t numOfServices);
 };

@@ -239,15 +239,18 @@ public:
 	void readString(uint8_t* string, uint16_t size);
 
 	/**
-	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string
+	 * Reads the next \p Size bytes from the message and returns them as a fixed-size string.
 	 *
-	 * NOTE: We assume that \p string is already allocated, and its size is at least
-	 * ECSSMaxStringSize. This function does NOT place a \0 at the end of the created string,
-	 * meaning that \p string should contain exactly the string stored in the message.
+	 * The read is validated against the actual size of the message data (not the maximum message
+	 * size), so that reading past the end of the received content is caught. If the message is too
+	 * short, a MessageTooShort error is reported and an empty string is returned, leaving the read
+	 * position untouched.
 	 */
-	template<uint16_t Size>
+	template <size_t Size>
 	String<Size> readFixedString() {
-		ASSERT_REQUEST((readPosition + Size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+		if (not ASSERT_REQUEST((readPosition + Size) <= dataSize, ErrorHandler::MessageTooShort)) {
+			return String<Size>("");
+		}
 
 		const String<Size> string(data.begin() + readPosition, Size);
 
