@@ -1,5 +1,6 @@
 #include "ECSS_Configuration.hpp"
 #include <ErrorHandler.hpp>
+#include <Logger.hpp>
 #include <ServicePool.hpp>
 #include "Services/RequestVerificationService.hpp"
 
@@ -47,6 +48,21 @@ void ErrorHandler::reportError(const Message& message, RoutingErrorType errorCod
 	logError(message, errorCode);
 }
 
-void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode) {
+void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode, const char* file, int line) {
 	logError(errorCode);
+
+	if (file == nullptr) {
+		return;
+	}
+
+	const char* suffix = file;
+	for (const char* cursor = suffix; *cursor != '\0'; ++cursor) {
+		if ((*cursor == '/') || (*cursor == '\\')) {
+			suffix = cursor + 1;
+		}
+	}
+
+	if (suffix[0] != '\0') {
+		LOG_ERROR << suffix << ":" << line;
+	}
 }
