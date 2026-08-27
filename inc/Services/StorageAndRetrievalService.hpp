@@ -196,7 +196,7 @@ public:
 		EnableStorageInPacketStores = 1,
 		DisableStorageInPacketStores = 2,
 		AddReportTypesToAppProcessConfiguration = 3,
-		DeleteReportTypesTFromAppProcessConfiguration = 4,
+		DeleteReportTypesFromAppProcessConfiguration = 4,
 		ReportApplicationProcess = 5,
 		ApplicationProcessReport = 6,
 		StartByTimeRangeRetrieval = 9,

@@ -789,7 +789,7 @@ void StorageAndRetrievalService::execute(Message& request) {
 		case AddReportTypesToAppProcessConfiguration:
 			packetSelection.addReportTypesToAppProcessConfiguration(request);
 			break;
-		case DeleteReportTypesTFromAppProcessConfiguration:
+		case DeleteReportTypesFromAppProcessConfiguration:
 			packetSelection.deleteReportTypesFromAppProcessConfiguration(request);
 			break;
 		case ReportApplicationProcess:

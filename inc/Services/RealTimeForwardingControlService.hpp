@@ -53,61 +53,7 @@ public:
 	 * Creates and stores a TM[14,4] 'Application process forward control configuration content report' message.
 	 */
 	void appProcessConfigurationContentReport();
-private:
 
-	/**
-	 * Returns true, if the defined application exists in the application process configuration map.
-	 */
-	bool isApplicationEnabled(ApplicationProcessId targetAppID) const;
-
-	/**
-	 * Returns true, if the defined service type exists in the application process configuration map.
-	 */
-	bool isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService) const;
-
-	/**
-	 * Checks whether the specified message type already exists in the specified application process and service
-	 * type definition.
-	 */
-	bool isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID, ServiceTypeNum serviceType) const;
-
-	/**
-	 * Deletes every pair containing the requested application process ID, from the application process configuration, if it exists.
-	 */
-	void deleteApplicationProcess(ApplicationProcessId applicationID);
-
-	/**
-	 * Checks whether the requested application is present in the application process configuration.
-	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
-	 */
-	bool isApplicationInConfiguration(Message& request, ApplicationProcessId applicationID, uint8_t numOfServices);
-
-	/**
-	 * Checks whether the requested service type is present in the application process configuration.
-	 * Reports an error if one exist, skipping the necessary amount of bytes in the request.
-	 */
-	bool isServiceTypeInConfiguration(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, uint8_t numOfMessages);
-
-	/**
-	 * Checks whether the requested report type is present in the application process configuration.
-	 * Reports an error if one exist.
-	 */
-	bool isReportTypeInConfiguration(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType) const;
-
-	/**
-	 * Deletes the requested service type from the application process configuration. If the deletion results in an
-	 * empty application process, it deletes the corresponding application process definition as well.
-	 */
-	void deleteServiceRecursive(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
-
-	/**
-	 * Deletes the requested report type from the application process configuration. If the deletion results in an
-	 * empty service, it deletes the corresponding service. If the deletion of the service, results in an empty
-	 * application process, it deletes the corresponding application process definition as well.
-	 */
-	void deleteReportRecursive(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
-
-public:
 	/**
 	 * TC[14,1] 'Add report types to the application process forward control configuration'.
 	 */

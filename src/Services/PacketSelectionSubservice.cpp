@@ -1,14 +1,15 @@
+#include <limits>
 #include "Services/PacketSelectionSubservice.hpp"
 #include "Helpers/AllReportTypes.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
 
-String<ECSSPacketStoreIdSize> PacketSelectionSubservice::readPacketStoreId(Message& message) {
+PacketSelectionSubservice::PacketStoreId PacketSelectionSubservice::readPacketStoreId(Message& message) {
 	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId{};
 	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
 	return packetStoreId.data();
 }
 
-bool PacketSelectionSubservice::packetStoreExists(const String<ECSSPacketStoreIdSize>& packetStoreId) {
+bool PacketSelectionSubservice::packetStoreExists(const PacketStoreId& packetStoreId) {
 	return packetStores.find(packetStoreId) != packetStores.end();
 }
 
@@ -23,67 +24,51 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
 	}
+	auto& configuration = packetStoreAppProcessConfig[packetStoreID];
 
 	const uint8_t numOfApplications = request.readUint8();
 
 	for (uint8_t app = 0; app < numOfApplications; app++) {
-		ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
+		const ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
 		const uint8_t numOfServices = request.readUint8();
 
-		if (not packetStoreAppProcessConfig[packetStoreID].isApplicationOfAppProcessConfigValid(request,
-		applicationID, numOfServices, controlledApplications)) {
+		if (not configuration.checkApplicationOfAppProcessConfigValid(request, applicationID, numOfServices,
+		controlledApplications)) {
 			continue;
 		}
 
 		if (numOfServices == 0) {
-			packetStoreAppProcessConfig[packetStoreID].addAllReportsOfApplication(request, applicationID);
+			configuration.addAllReportsOfApplication(request, applicationID);
 			continue;
 		}
 
 		for (uint8_t service = 0; service < numOfServices; service++) {
-			ServiceTypeNum serviceType = request.readUint8();
+			const ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
 			const uint8_t numOfMessages = request.readUint8();
 
-			if (not packetStoreAppProcessConfig[packetStoreID].canServiceBeAdded(request, applicationID,
-			numOfMessages, serviceType)) {
+			if (not configuration.checkServiceCanBeAdded(request, applicationID, numOfMessages, serviceType)) {
 				continue;
 			}
 
 			if (numOfMessages == 0) {
-				packetStoreAppProcessConfig[packetStoreID].addAllReportsOfService(request, applicationID, serviceType);
+				configuration.addAllReportsOfService(request, applicationID, serviceType);
 				continue;
 			}
 
 			for (uint8_t message = 0; message < numOfMessages; message++) {
-				uint8_t messageType = request.readUint8();
+				const MessageTypeNum messageType = request.read<MessageTypeNum>();
 
-				if (not packetStoreAppProcessConfig[packetStoreID].canMessageBeAdded(request, applicationID,
-				serviceType, messageType)) {
+				if (not configuration.checkMessageCanBeAdded(request, applicationID, serviceType, messageType)) {
 					continue;
 				}
-				auto appServicePair = std::make_pair(applicationID, serviceType);
-				packetStoreAppProcessConfig[packetStoreID].definitions[appServicePair].push_back(messageType);
+				configuration.addReport(applicationID, serviceType, messageType);
 			}
 		}
 	}
 }
 
-void PacketSelectionSubservice::deleteAllReportsOfApplication(const String<ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID) {
-	for (const auto& [first, _]: AllReportTypes::MessagesOfService) {
-		ServiceTypeNum serviceType = first;
-		deleteAllReportsOfService(packetStoreID, applicationID, serviceType);
-	}
-}
-
-void PacketSelectionSubservice::deleteAllReportsOfService(const String<ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
-		auto appServicePair = std::make_pair(applicationID, serviceType);
-		packetStoreAppProcessConfig[packetStoreID].definitions.erase(appServicePair);
-	}
-}
-
 void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Message& request) {
-	if (!request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::DeleteReportTypesTFromAppProcessConfiguration)) {
+	if (!request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration)) {
 		return;
 	}
 	const auto packetStoreID = readPacketStoreId(request);
@@ -91,38 +76,47 @@ void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Mes
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
 	}
+	auto& configuration = packetStoreAppProcessConfig[packetStoreID];
 
-	const auto numOfApplications = request.readUint8();
+	const uint8_t numOfApplications = request.readUint8();
 	if (numOfApplications == 0U) {
-		packetStoreAppProcessConfig[packetStoreID].definitions.clear();
+		configuration.definitions.clear();
+		return;
 	}
 
 	for (uint8_t app = 0; app < numOfApplications; app++) {
-		ApplicationProcessId applicationID = request.readUint8();
+		const ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
 		const uint8_t numOfServices = request.readUint8();
+
+		if (not configuration.checkApplicationInConfiguration(request, applicationID, numOfServices)) {
+			continue;
+		}
+
 		if (numOfServices == 0) {
-			deleteAllReportsOfApplication(packetStoreID, applicationID);
+			configuration.deleteApplicationProcess(applicationID);
 			continue;
 		}
 
 		for (uint8_t service = 0; service < numOfServices; service++) {
-			ServiceTypeNum serviceType = request.readUint8();
+			const ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
 			const uint8_t numOfMessages = request.readUint8();
 
-			if (numOfMessages == 0) {
-				deleteAllReportsOfService(packetStoreID, applicationID, serviceType);
+			if (not configuration.checkServiceTypeInConfiguration(request, applicationID, serviceType, numOfMessages)) {
+				continue;
 			}
+
+			if (numOfMessages == 0) {
+				configuration.deleteServiceType(applicationID, serviceType);
+				continue;
+			}
+
 			for (uint8_t message = 0; message < numOfMessages; message++) {
-				uint8_t messageType = request.readUint8();
-				auto appServicePair = std::make_pair(applicationID, serviceType);
-				auto& definitions = packetStoreAppProcessConfig[packetStoreID].definitions;
-				if (definitions.find(appServicePair) != definitions.end()) {
-					auto& reportTypes = definitions[appServicePair];
-					auto *messageTypeIndex = etl::find(reportTypes.begin(), reportTypes.end(), messageType);
-					if (messageTypeIndex != reportTypes.end()) {
-						reportTypes.erase(messageTypeIndex);
-					}
+				const MessageTypeNum messageType = request.read<MessageTypeNum>();
+
+				if (not configuration.checkReportTypeInConfiguration(request, applicationID, serviceType, messageType)) {
+					continue;
 				}
+				configuration.deleteReportType(applicationID, serviceType, messageType);
 			}
 		}
 	}
@@ -137,41 +131,37 @@ void PacketSelectionSubservice::reportApplicationProcess(Message& request) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
 	}
-	Message report = createTM(StorageAndRetrievalService::MessageType::ApplicationProcessReport);
+	auto& configuration = packetStoreAppProcessConfig[packetStoreID];
+	const auto& definitions = configuration.definitions;
 
+	Message report = createTM(StorageAndRetrievalService::MessageType::ApplicationProcessReport);
 	report.appendFixedString(packetStoreID);
 
-    etl::vector<ApplicationProcessId, ECSSMaxControlledApplicationProcesses> uniqueApps;
-    for (const auto& [appServicePair, _] : packetStoreAppProcessConfig[packetStoreID].definitions) {
-        auto appId = appServicePair.first;
-        if (etl::find(uniqueApps.begin(), uniqueApps.end(), appId) == uniqueApps.end()) {
-            uniqueApps.push_back(appId);
-        }
-    }
-    const uint8_t numberOfApplications = uniqueApps.size();	
+	uint8_t numberOfApplications = 0;
+	ApplicationProcessId previousAppID = std::numeric_limits<ApplicationProcessId>::max();
+	for (const auto& [appServiceKey, reportTypes]: definitions) {
+		if (appServiceKey.first != previousAppID) {
+			previousAppID = appServiceKey.first;
+			numberOfApplications++;
+		}
+	}
 	report.appendUint8(numberOfApplications);
 
-	for (const auto& applicationID : uniqueApps) {
-        report.append<ApplicationProcessId>(applicationID);
+	// The map is sorted by key, so all entries of the same application process are accessed consecutively.
+	previousAppID = std::numeric_limits<ApplicationProcessId>::max();
+	for (const auto& [appServiceKey, reportTypes]: definitions) {
+		const ApplicationProcessId applicationID = appServiceKey.first;
+		if (applicationID != previousAppID) {
+			previousAppID = applicationID;
+			report.append<ApplicationProcessId>(applicationID);
+			report.appendUint8(configuration.countServicesOfApplication(applicationID));
+		}
 
-		uint8_t numberOfServiceTypes = etl::count_if(packetStoreAppProcessConfig[packetStoreID].definitions.begin(), packetStoreAppProcessConfig[packetStoreID].definitions.end(), [applicationID](const auto& definition) {
-			return definition.first.first == applicationID;
-		});
-		report.appendUint8(numberOfServiceTypes);
-
-        for (const auto& [appServicePair, _] : packetStoreAppProcessConfig[packetStoreID].definitions) {
-            if (appServicePair.first == applicationID) {
-                auto serviceType = appServicePair.second;
-				report.append<ServiceTypeNum>(serviceType);
-
-				const auto& messages = packetStoreAppProcessConfig[packetStoreID].definitions[appServicePair];
-            
-				report.appendUint8(messages.size());
-				for (const auto& messageType : messages) {
-					report.append<MessageTypeNum>(messageType);
-				}
-            }
-        }
-    }
+		report.append<ServiceTypeNum>(appServiceKey.second);
+		report.appendUint8(reportTypes.size());
+		for (const auto& messageType: reportTypes) {
+			report.append<MessageTypeNum>(messageType);
+		}
+	}
+	storeMessage(report);
 }
-

@@ -247,10 +247,10 @@ public:
 	 */
 	template<uint16_t Size>
 	String<Size> readFixedString() {
-		String<Size> string = "";
-		string.resize(Size);
 		ASSERT_REQUEST((readPosition + Size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
-		std::copy(data.begin() + readPosition, data.begin() + readPosition + Size, string.begin());
+
+		const String<Size> string(data.begin() + readPosition, Size);
+
 		readPosition += Size;
 		return string;
 	}

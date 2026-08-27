@@ -13,7 +13,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 		const ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
 		uint8_t const numOfServices = request.readUint8();
 
-		if (not applicationProcessConfiguration.isApplicationOfAppProcessConfigValid(request, applicationID,
+		if (not applicationProcessConfiguration.checkApplicationOfAppProcessConfigValid(request, applicationID,
 		numOfServices, controlledApplications)) {
 			continue;
 		}
@@ -27,7 +27,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			const ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
 			uint8_t const numOfMessages = request.readUint8();
 
-			if (not applicationProcessConfiguration.canServiceBeAdded(request, applicationID, numOfMessages, serviceType)) {
+			if (not applicationProcessConfiguration.checkServiceCanBeAdded(request, applicationID, numOfMessages, serviceType)) {
 				continue;
 			}
 
@@ -39,96 +39,12 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
 				MessageTypeNum const messageType = request.read<MessageTypeNum>();
 
-				if (not applicationProcessConfiguration.canMessageBeAdded(request, applicationID, serviceType, messageType)) {
+				if (not applicationProcessConfiguration.checkMessageCanBeAdded(request, applicationID, serviceType, messageType)) {
 					continue;
 				}
-				auto key = std::make_pair(applicationID, serviceType);
-				applicationProcessConfiguration.definitions[key].push_back(
-				    messageType);
+				applicationProcessConfiguration.addReport(applicationID, serviceType, messageType);
 			}
 		}
-	}
-}
-
-bool RealTimeForwardingControlService::isApplicationEnabled(ApplicationProcessId targetAppID) const {
-	const auto& definitions = applicationProcessConfiguration.definitions;
-	return std::any_of(std::begin(definitions), std::end(definitions), [targetAppID](const auto& definition) { return targetAppID == definition.first.first; });
-}
-
-bool RealTimeForwardingControlService::isServiceTypeEnabled(ApplicationProcessId applicationID, ServiceTypeNum targetService) const {
-	const auto& definitions = applicationProcessConfiguration.definitions;
-	return std::any_of(std::begin(definitions), std::end(definitions), [applicationID, targetService](const auto& definition) { return applicationID == definition.first.first and targetService == definition.first.second; });
-}
-
-bool RealTimeForwardingControlService::isReportTypeEnabled(ServiceTypeNum target, ApplicationProcessId applicationID,
-                                                           ServiceTypeNum serviceType) const {
-	auto appServicePair = std::make_pair(applicationID, serviceType);
-	auto serviceTypes = applicationProcessConfiguration.definitions.find(appServicePair);
-	if (serviceTypes == applicationProcessConfiguration.definitions.end()) {
-		return false;
-	}
-	return std::find(serviceTypes->second.begin(), serviceTypes->second.end(), target) != serviceTypes->second.end();
-}
-
-void RealTimeForwardingControlService::deleteApplicationProcess(ApplicationProcessId applicationID) {
-	auto& definitions = applicationProcessConfiguration.definitions;
-	auto iter = std::begin(definitions);
-	while (iter != definitions.end()) {
-		iter = std::find_if(
-		    std::begin(definitions), std::end(definitions), [applicationID](const auto& definition) { return applicationID == definition.first.first; });
-		definitions.erase(iter);
-	}
-}
-
-bool RealTimeForwardingControlService::isApplicationInConfiguration(Message& request, ApplicationProcessId applicationID,
-                                                         uint8_t numOfServices) {
-	if (not isApplicationEnabled(applicationID)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentApplicationProcess);
-		for (uint8_t currentServiceNumber = 0; currentServiceNumber < numOfServices; currentServiceNumber++) {
-			request.skipBytes(sizeof(ServiceTypeNum));
-			uint8_t const numOfMessages = request.readUint8();
-			request.skipBytes(numOfMessages);
-		}
-		return false;
-	}
-	return true;
-}
-
-bool RealTimeForwardingControlService::isServiceTypeInConfiguration(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-                                                         uint8_t numOfMessages) {
-	if (not isServiceTypeEnabled(applicationID, serviceType)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition);
-		request.skipBytes(numOfMessages);
-		return false;
-	}
-	return true;
-}
-
-bool RealTimeForwardingControlService::isReportTypeInConfiguration(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-                                                                   MessageTypeNum messageType) const {
-	if (not isReportTypeEnabled(messageType, applicationID, serviceType)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentReportTypeDefinition);
-		return false;
-	}
-	return true;
-}
-
-void RealTimeForwardingControlService::deleteServiceRecursive(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-	auto appServicePair = std::make_pair(applicationID, serviceType);
-	applicationProcessConfiguration.definitions.erase(appServicePair);
-}
-
-void RealTimeForwardingControlService::deleteReportRecursive(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-                                                             MessageTypeNum messageType) {
-	auto appServicePair = std::make_pair(applicationID, serviceType);
-	auto reportTypes = applicationProcessConfiguration.definitions.find(appServicePair);
-	if (reportTypes == applicationProcessConfiguration.definitions.end()) {
-		return;
-	}
-	reportTypes->second.erase(std::remove(reportTypes->second.begin(), reportTypes->second.end(), messageType));
-
-	if (applicationProcessConfiguration.definitions[appServicePair].empty()) {
-		deleteServiceRecursive(applicationID, serviceType);
 	}
 }
 
@@ -147,11 +63,11 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 		const ApplicationProcessId applicationID = request.read<ApplicationProcessId>();
 		uint8_t const numOfServices = request.readUint8();
 
-		if (not isApplicationInConfiguration(request, applicationID, numOfServices)) {
+		if (not applicationProcessConfiguration.checkApplicationInConfiguration(request, applicationID, numOfServices)) {
 			continue;
 		}
 		if (numOfServices == 0) {
-			deleteApplicationProcess(applicationID);
+			applicationProcessConfiguration.deleteApplicationProcess(applicationID);
 			continue;
 		}
 
@@ -159,21 +75,21 @@ void RealTimeForwardingControlService::deleteReportTypesFromAppProcessConfigurat
 			const ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
 			uint8_t const numOfMessages = request.readUint8();
 
-			if (not isServiceTypeInConfiguration(request, applicationID, serviceType, numOfMessages)) {
+			if (not applicationProcessConfiguration.checkServiceTypeInConfiguration(request, applicationID, serviceType, numOfMessages)) {
 				continue;
 			}
 			if (numOfMessages == 0) {
-				deleteServiceRecursive(applicationID, serviceType);
+				applicationProcessConfiguration.deleteServiceType(applicationID, serviceType);
 				continue;
 			}
 
 			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
 				const MessageTypeNum messageType = request.read<MessageTypeNum>();
 
-				if (not isReportTypeInConfiguration(request, applicationID, serviceType, messageType)) {
+				if (not applicationProcessConfiguration.checkReportTypeInConfiguration(request, applicationID, serviceType, messageType)) {
 					continue;
 				}
-				deleteReportRecursive(applicationID, serviceType, messageType);
+				applicationProcessConfiguration.deleteReportType(applicationID, serviceType, messageType);
 			}
 		}
 	}
