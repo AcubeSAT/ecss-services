@@ -40,9 +40,9 @@ void PMON::updateAfterCheck(const CheckingStatus newCheckingStatus) {
 		String<ECSSEventDataAuxiliaryMaxSize> eventData("ID ");
 		etl::to_string(monitoredParameterId, eventData, true);
 		eventData.append(" from ");
-		etl::to_string(transition.first, eventData, true);
+		etl::to_string(static_cast<uint16_t>(transition.first), eventData, true);
 		eventData.append(" to ");
-		etl::to_string(transition.second, eventData, true);
+		etl::to_string(static_cast<uint16_t>(transition.second), eventData, true);
 		Services.eventReport.raiseEvent(event.value(), eventData);
 	}
 }
