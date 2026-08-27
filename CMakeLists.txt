@@ -66,17 +66,14 @@ IF (X86_BUILD)
     target_compile_definitions(x86_services PRIVATE LOGLEVEL_TRACE)
 
     find_package(Catch2 CONFIG)
-    IF (Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
+    IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
         file(GLOB test_main_SRC "test/*.cpp")
         file(GLOB test_SRC "test/**/*.cpp")
         add_executable(tests
                 ${test_main_SRC}
                 ${test_SRC})
         target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
-        target_sources(tests 
-                PRIVATE
-        )
-    ENDIF ()
-ENDIF ()
+    ENDIF()
+ENDIF()
 
 install(TARGETS common)

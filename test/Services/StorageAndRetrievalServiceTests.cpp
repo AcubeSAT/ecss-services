@@ -146,7 +146,7 @@ void addTelemetryPacketsInPacketStores() {
 	// packet store contents.
 	for (auto& packetStoreId: packetStoreIds) {
 		ApplicationProcessConfiguration config;
-		config.addReport(ApplicationId, StorageAndRetrievalService::ServiceType,
+		config.checkAndAddReport(msg, ApplicationId, StorageAndRetrievalService::ServiceType,
 		    StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport);
 		storageAndRetrieval.packetSelection.packetStoreAppProcessConfig.insert({packetStoreId, config});
 	}

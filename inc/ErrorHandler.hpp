@@ -444,17 +444,20 @@ public:
 		 PMONCheckTypeMissing = 63,
 		/**
 		 * AppProcessConfiguration adding an already existing report type in a map with an application id - service type key
+		 *
+		 * @note Numbered 73 because master allocates up to 64 (UnableToHandleMemoryDataLength) and the ST[06]
+		 * object memory MR (!203) allocates 65-72.
 		 */
-		AlreadyExistingReportType = 64,
+		AlreadyExistingReportType = 73,
 		/**
 		 * By-time-range retrieval time window lies entirely in the past and the packet store contains no packet
 		 * with a time stamp inside it (ECSS-E-ST-70-41C 6.15.3.5.2d)
 		 */
-		ByTimeRangeRetrievalTimeWindowInThePast = 65,
+		ByTimeRangeRetrievalTimeWindowInThePast = 74,
 		/**
 		 * New start time tag is in the future - during the change open retrieval starting time tag TC[15,14]
 		 */
-		NewStartTimeTagIsInTheFuture = 66
+		NewStartTimeTagIsInTheFuture = 75
 	};
 
 	/**
