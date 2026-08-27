@@ -199,23 +199,52 @@ void StorageAndRetrievalService::addPacketStore(const PacketStoreId& packetStore
 	packetStores.insert({packetStoreId, packetStore});
 }
 
+void StorageAndRetrievalService::pushTelemetryToPacketStore(PacketStore& packetStore, const Message& message,
+	Time::DefaultCUC timestamp) {
+	if (packetStore.storedTelemetryPackets.full()) {
+		if (packetStore.packetStoreType == PacketStore::Bounded) {
+			return;
+		}
+		packetStore.storedTelemetryPackets.pop_front();
+	}
+	packetStore.storedTelemetryPackets.push_back({timestamp, message});
+}
+
+void StorageAndRetrievalService::storeTelemetry(const Message& message, Time::DefaultCUC timestamp) {
+	for (auto& packetStore: packetStores) {
+		if (not packetStore.second.storageEnabled) {
+			continue;
+		}
+		const auto configuration = packetSelection.packetStoreAppProcessConfig.find(packetStore.first);
+		if (configuration == packetSelection.packetStoreAppProcessConfig.end()) {
+			continue;
+		}
+		if (not configuration->second.isReportTypeAdded(message.applicationId, message.serviceType,
+		        message.messageType)) {
+			continue;
+		}
+		pushTelemetryToPacketStore(packetStore.second, message, timestamp);
+	}
+}
+
 void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
 	message, Time::DefaultCUC timestamp) {
 	if (not packetStoreExists(packetStoreId)) {
 		ASSERT_INTERNAL(false, ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
-	auto packetStore = packetStores.find(packetStoreId)->second;
+	auto& packetStore = packetStores.find(packetStoreId)->second;
 	if (not packetStore.storageEnabled) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromDisabledPacketStore);
 		return;
 	}
-	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].reportExistsInAppProcessConfiguration(message
-	.applicationId, message.serviceType, message.messageType)) {
+	const auto configuration = packetSelection.packetStoreAppProcessConfig.find(packetStoreId);
+	if (configuration == packetSelection.packetStoreAppProcessConfig.end() or
+	    not configuration->second.isReportTypeAdded(message.applicationId, message.serviceType, message.messageType)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromPacketStoreDueToAppProcessConfiguration);
 		return;
 	}
-	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, message});
+	pushTelemetryToPacketStore(packetStore, message, timestamp);
 }
 
 void StorageAndRetrievalService::resetPacketStores() {
@@ -804,7 +833,7 @@ void StorageAndRetrievalService::execute(Message& request) {
 		case AddReportTypesToAppProcessConfiguration:
 			packetSelection.addReportTypesToAppProcessConfiguration(request);
 			break;
-		case DeleteReportTypesTFromAppProcessConfiguration:
+		case DeleteReportTypesFromAppProcessConfiguration:
 			packetSelection.deleteReportTypesFromAppProcessConfiguration(request);
 			break;
 		case ReportApplicationProcess:

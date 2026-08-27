@@ -438,4 +438,342 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+
+	SECTION("Requested service type that does not exist, with explicit message types") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		ApplicationProcessId applicationID = 1;
+		ServiceTypeNum nonExistentServiceType = 99;
+		ServiceTypeNum validServiceType = ForwardingAndPacketHelper::services[0]; // st03
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
+
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(applicationID);
+		request.appendUint8(2); // numOfServices
+		request.append<ServiceTypeNum>(nonExistentServiceType);
+		request.appendUint8(2); // numOfMessages
+		request.append<MessageTypeNum>(ForwardingAndPacketHelper::messages1[0]);
+		request.append<MessageTypeNum>(ForwardingAndPacketHelper::messages1[1]);
+		request.append<ServiceTypeNum>(validServiceType);
+		request.appendUint8(2); // numOfMessages
+		request.append<MessageTypeNum>(ForwardingAndPacketHelper::messages1[0]);
+		request.append<MessageTypeNum>(ForwardingAndPacketHelper::messages1[1]);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition) == 1);
+
+		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
+		REQUIRE(definitions.size() == 1);
+		REQUIRE(definitions.find(std::make_pair(applicationID, nonExistentServiceType)) == definitions.end());
+		REQUIRE(definitions[std::make_pair(applicationID, validServiceType)].size() == 2);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Requested service type that does not exist, asking for all message types to be added (N3 = 0)") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		ApplicationProcessId applicationID = 1;
+		ServiceTypeNum nonExistentServiceType = 99;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		request.appendFixedString(packetStoreID);
+
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(applicationID);
+		request.appendUint8(1); // numOfServices
+		request.append<ServiceTypeNum>(nonExistentServiceType);
+		request.appendUint8(0); // numOfMessages = 0, requesting all message types
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition) == 1);
+		REQUIRE(packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions.empty());
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Delete report types from the packet selection subservice") {
+	auto populatePacketSelection = [](const String<ECSSPacketStoreIdSize>& packetStoreID, ApplicationProcessId applicationID) {
+		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
+		for (uint8_t serviceIndex = 0; serviceIndex < 2; serviceIndex++) {
+			ServiceTypeNum serviceType = ForwardingAndPacketHelper::services[serviceIndex];
+			auto& messages = (serviceIndex == 0) ? ForwardingAndPacketHelper::messages1 : ForwardingAndPacketHelper::messages2;
+			for (uint8_t messageIndex = 0; messageIndex < 2; messageIndex++) {
+				definitions[std::make_pair(applicationID, serviceType)].push_back(messages[messageIndex]);
+			}
+		}
+	};
+
+	SECTION("Requested packet store, not present in the storage and retrieval subservice") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = {0};
+		String<ECSSPacketStoreIdSize> nonExistentPacketStoreID(packetStoreData);
+		request.appendFixedString(nonExistentPacketStoreID);
+		request.appendUint8(0);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore) == 1);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Empty the application process storage-control configuration (N1 = 0)") {
+		ApplicationProcessId applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		populatePacketSelection(packetStoreID, applicationID);
+		REQUIRE(packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions.size() == 2);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		request.appendFixedString(packetStoreID);
+		request.appendUint8(0); // numOfApplications = 0, emptying the configuration
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions.empty());
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Delete a report type, with a deletion resulting in an empty service type definition") {
+		ApplicationProcessId applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		populatePacketSelection(packetStoreID, applicationID);
+		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
+		ServiceTypeNum serviceType = ForwardingAndPacketHelper::services[0]; // st03
+		auto appServicePair = std::make_pair(applicationID, serviceType);
+		REQUIRE(definitions[appServicePair].size() == 2);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		request.appendFixedString(packetStoreID);
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(applicationID);
+		request.appendUint8(1); // numOfServices
+		request.append<ServiceTypeNum>(serviceType);
+		request.appendUint8(1); // numOfMessages
+		request.append<MessageTypeNum>(ForwardingAndPacketHelper::messages1[0]);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(definitions[appServicePair].size() == 1);
+		REQUIRE(std::find(definitions[appServicePair].begin(), definitions[appServicePair].end(),
+		                  ForwardingAndPacketHelper::messages1[1]) != definitions[appServicePair].end());
+
+		Message secondRequest(StorageAndRetrievalService::ServiceType,
+		                      StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                      Message::TC, 1);
+		secondRequest.appendFixedString(packetStoreID);
+		secondRequest.appendUint8(1); // numOfApplications
+		secondRequest.append<ApplicationProcessId>(applicationID);
+		secondRequest.appendUint8(1); // numOfServices
+		secondRequest.append<ServiceTypeNum>(serviceType);
+		secondRequest.appendUint8(1); // numOfMessages
+		secondRequest.append<MessageTypeNum>(ForwardingAndPacketHelper::messages1[1]);
+
+		MessageParser::execute(secondRequest);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(definitions.find(appServicePair) == definitions.end());
+		REQUIRE(definitions.size() == 1);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Delete a whole service type definition (N3 = 0)") {
+		ApplicationProcessId applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		populatePacketSelection(packetStoreID, applicationID);
+		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
+		ServiceTypeNum serviceType = ForwardingAndPacketHelper::services[0]; // st03
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		request.appendFixedString(packetStoreID);
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(applicationID);
+		request.appendUint8(1); // numOfServices
+		request.append<ServiceTypeNum>(serviceType);
+		request.appendUint8(0); // numOfMessages = 0, deleting the whole service type definition
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(definitions.find(std::make_pair(applicationID, serviceType)) == definitions.end());
+		REQUIRE(definitions.size() == 1);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Delete a whole application process definition (N2 = 0)") {
+		ApplicationProcessId applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		populatePacketSelection(packetStoreID, applicationID);
+		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
+		REQUIRE(definitions.size() == 2);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		request.appendFixedString(packetStoreID);
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(applicationID);
+		request.appendUint8(0); // numOfServices = 0, deleting the whole application process definition
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(definitions.empty());
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Requested deletions of non-existent definitions") {
+		ApplicationProcessId applicationID = 1;
+		ApplicationProcessId nonExistentApplicationID = 2;
+		ServiceTypeNum nonExistentServiceType = 4; // exists in AllReportTypes, but not in the configuration
+		MessageTypeNum nonExistentMessageType = 99;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		populatePacketSelection(packetStoreID, applicationID);
+		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
+		ServiceTypeNum serviceType = ForwardingAndPacketHelper::services[0]; // st03
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, 1);
+		request.appendFixedString(packetStoreID);
+		request.appendUint8(2); // numOfApplications
+		request.append<ApplicationProcessId>(nonExistentApplicationID);
+		request.appendUint8(1); // numOfServices
+		request.append<ServiceTypeNum>(serviceType);
+		request.appendUint8(1); // numOfMessages
+		request.append<MessageTypeNum>(ForwardingAndPacketHelper::messages1[0]);
+		request.append<ApplicationProcessId>(applicationID);
+		request.appendUint8(2); // numOfServices
+		request.append<ServiceTypeNum>(nonExistentServiceType);
+		request.appendUint8(0); // numOfMessages
+		request.append<ServiceTypeNum>(serviceType);
+		request.appendUint8(1); // numOfMessages
+		request.append<MessageTypeNum>(nonExistentMessageType);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentApplicationProcess) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentReportTypeDefinition) == 1);
+		REQUIRE(definitions.size() == 2);
+		REQUIRE(definitions[std::make_pair(applicationID, serviceType)].size() == 2);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Report the content of the application process storage-control configuration") {
+	SECTION("Requested packet store, not present in the storage and retrieval subservice") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ReportApplicationProcess,
+		                Message::TC, 1);
+
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = {0};
+		String<ECSSPacketStoreIdSize> nonExistentPacketStoreID(packetStoreData);
+		request.appendFixedString(nonExistentPacketStoreID);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore) == 1);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Valid content report of the application process storage-control configuration") {
+		Message addRequest(StorageAndRetrievalService::ServiceType,
+		                   StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                   Message::TC, 1);
+
+		ApplicationProcessId applicationID = 1;
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		addRequest.appendFixedString(packetStoreID);
+		ForwardingAndPacketHelper::validReportTypes(addRequest);
+		MessageParser::execute(addRequest);
+		CHECK(ServiceTests::count() == 0);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::ReportApplicationProcess,
+		                Message::TC, 1);
+		request.appendFixedString(packetStoreID);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		REQUIRE(report.serviceType == StorageAndRetrievalService::ServiceType);
+		REQUIRE(report.messageType == StorageAndRetrievalService::MessageType::ApplicationProcessReport);
+
+		uint8_t reportedPacketStoreId[ECSSPacketStoreIdSize + 1] = {0};
+		report.readString(reportedPacketStoreId, ECSSPacketStoreIdSize);
+		CHECK(String<ECSSPacketStoreIdSize>(reportedPacketStoreId) == packetStoreID);
+
+		CHECK(report.readUint8() == 1); // numOfApplications
+		CHECK(report.read<ApplicationProcessId>() == applicationID);
+		CHECK(report.readUint8() == 2); // numOfServices
+
+		CHECK(report.read<ServiceTypeNum>() == ForwardingAndPacketHelper::services[0]);
+		CHECK(report.readUint8() == 2); // numOfMessages
+		CHECK(report.read<MessageTypeNum>() == ForwardingAndPacketHelper::messages1[0]);
+		CHECK(report.read<MessageTypeNum>() == ForwardingAndPacketHelper::messages1[1]);
+
+		CHECK(report.read<ServiceTypeNum>() == ForwardingAndPacketHelper::services[1]);
+		CHECK(report.readUint8() == 2); // numOfMessages
+		CHECK(report.read<MessageTypeNum>() == ForwardingAndPacketHelper::messages2[0]);
+		CHECK(report.read<MessageTypeNum>() == ForwardingAndPacketHelper::messages2[1]);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
 }

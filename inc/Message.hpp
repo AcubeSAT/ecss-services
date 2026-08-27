@@ -245,7 +245,15 @@ public:
 	 * ECSSMaxStringSize. This function does NOT place a \0 at the end of the created string,
 	 * meaning that \p string should contain exactly the string stored in the message.
 	 */
-	void readFixedString(String<ECSSMaxStringSize>& string, uint16_t size);
+	template<uint16_t Size>
+	String<Size> readFixedString() {
+		ASSERT_REQUEST((readPosition + Size) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+
+		const String<Size> string(data.begin() + readPosition, Size);
+
+		readPosition += Size;
+		return string;
+	}
 
 	/**
 	 * Reads the next \p size bytes from the message, and stores them into the allocated \p string

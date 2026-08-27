@@ -93,7 +93,7 @@ public:
 	 * **for the parameters specified in the carried valid IDs**.
 	 *
 	 * @param paramId: a TC[20, 1] packet carrying the requested parameter IDs
-	 * @return None (messages are stored using storeMessage())
+	 * @return None (messages are stored using handleMessage())
 	 */
 	void reportParameters(Message& paramIds);
 

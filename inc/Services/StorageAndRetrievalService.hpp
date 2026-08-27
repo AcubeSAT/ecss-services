@@ -42,17 +42,15 @@ public:
 
 private:
 	/**
-	 * A map that specifies what service belongs to what packet store. This is NOT according to the ECSS-E-ST-70-41C
-	 * protocol. It has been added to help with correctly forwarding a TM report after generation to the correct packet
-	 * store, as there needs to be a way to map the generated reports to their respective packet stores. The convention
-	 * here is that each Service will be related to one packet store ONLY.
-	 */
-	etl::map<ServiceTypeNum, PacketStoreId, ECSSMaxServiceTypeDefinitions> serviceToPacketStore;
-
-	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
 	etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
+
+	/**
+	 * Appends a telemetry packet to the packet store, respecting the packet store type: when a circular packet
+	 * store is full, the oldest packet is overwritten; when a bounded packet store is full, the packet is discarded.
+	 */
+	static void pushTelemetryToPacketStore(PacketStore& packetStore, const Message& message, Time::DefaultCUC timestamp);
 
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
@@ -193,7 +191,7 @@ private:
 	void createContentSummary(Message& report, const PacketStoreId& packetStoreId);
 
 	/**
-	 * Function to be implemented by each platform. Initializes the packetStores serviceToPacketStore maps.
+	 * Function to be implemented by each platform. Initializes the packet stores of the service.
 	 */
 	void initializeStorageAndRetrievalServiceStructures();
 
@@ -209,7 +207,7 @@ public:
 		EnableStorageInPacketStores = 1,
 		DisableStorageInPacketStores = 2,
 		AddReportTypesToAppProcessConfiguration = 3,
-		DeleteReportTypesTFromAppProcessConfiguration = 4,
+		DeleteReportTypesFromAppProcessConfiguration = 4,
 		ReportApplicationProcess = 5,
 		ApplicationProcessReport = 6,
 		StartByTimeRangeRetrieval = 9,
@@ -239,25 +237,21 @@ public:
 	}
 
 	/**
-	 *
-	 * The @ref serviceToPacketStore is a map that connects a service number to a packet store. That allows easier direction
-	 * of a generated TM report, to be stored in the correct packet store.
-	 * @param serviceType a service number
-	 * @return the packet store ID that responds to that service
-	 */
-	etl::optional<PacketStoreId> getPacketStoreFromServiceType(ServiceTypeNum serviceType) {
-		if (serviceToPacketStore.find(serviceType) == serviceToPacketStore.end() ) {
-			return etl::nullopt;
-		}
-		return serviceToPacketStore.at(serviceType);
-	}
-	/**
 	 * Adds new packet store into packet stores.
 	 */
 	void addPacketStore(const PacketStoreId& packetStoreId, const PacketStore& packetStore);
 
 	/**
-	 * Adds telemetry to the specified packet store and Time::DefaultCUC it.
+	 * Stores the provided telemetry message into every packet store whose storage is enabled and whose
+	 * application process storage-control configuration (@ref PacketSelectionSubservice) contains the message's
+	 * (application process, service type, message type). Messages that no packet store is interested in are
+	 * silently ignored, as per the packet selection concept of ECSS-E-ST-70-41C 6.15.
+	 */
+	void storeTelemetry(const Message& message, Time::DefaultCUC timestamp);
+
+	/**
+	 * Adds telemetry to the specified packet store and timestamps it. Reports an internal error if the packet
+	 * store does not exist, its storage is disabled, or its storage-control configuration excludes the message.
 	 */
 	void addTelemetryToPacketStore(const PacketStoreId& packetStoreId, const Message&
 	message, Time::DefaultCUC timestamp);

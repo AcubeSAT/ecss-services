@@ -46,6 +46,21 @@ inline constexpr bool SendToYamcs = true;
 void Service::releaseMessage(Message& message) {
 	std::ostringstream ss;
 
+	ss << "    " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
+	   << std::hex
+	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
+	   << static_cast<int>(message.messageType)        // Ignore-MISRA
+	   << "] released!";
+	LOG_DEBUG << ss.str();
+
+	if constexpr (SendToYamcs) {
+		packetSender.sendPacketToYamcs(message);
+	}
+}
+
+void Service::platformSpecificHandleMessage(Message& message) {
+	std::ostringstream ss;
+
 	ss << "New " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
 	   << std::hex
 	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
@@ -56,21 +71,5 @@ void Service::releaseMessage(Message& message) {
 		ss << static_cast<int>(message.data[i]) << " "; // Ignore-MISRA
 	}
 	LOG_DEBUG << ss.str();
-
-	ss << "    " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
-   << std::hex
-   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
-   << static_cast<int>(message.messageType)        // Ignore-MISRA
-   << "] released! ";
-	LOG_DEBUG << ss.str();
-
-	if constexpr (SendToYamcs) {
-		packetSender.sendPacketToYamcs(message);
-	}
-}
-
-
-void Service::platformSpecificHandleMessage(Message& message) {
-
 }
 
