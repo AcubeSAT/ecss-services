@@ -3,6 +3,7 @@
 #include <MessageParser.hpp>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #ifdef _MSC_VER
 #include <winsock2.h>
 #else

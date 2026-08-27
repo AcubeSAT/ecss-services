@@ -54,7 +54,7 @@ void FileManagementService::createFile(Message& message) {
 	}
 
 	if (isFileLocked) {
-		lockFile(fullPath);
+		Filesystem::lockFile(fullPath);
 	}
 }
 
@@ -154,8 +154,8 @@ void FileManagementService::lockFile(Message& message) {
 		return;
 	}
 
-	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto repositoryPath = message.readOctetString<ObjectPathSize>();
+	auto fileName = message.readOctetString<ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath)) {
@@ -188,8 +188,8 @@ void FileManagementService::unlockFile(Message& message) {
 		return;
 	}
 
-	auto repositoryPath = message.readOctetString<Filesystem::ObjectPathSize>();
-	auto fileName = message.readOctetString<Filesystem::ObjectPathSize>();
+	auto repositoryPath = message.readOctetString<ObjectPathSize>();
+	auto fileName = message.readOctetString<ObjectPathSize>();
 	auto fullPath = getFullPath(repositoryPath, fileName);
 
 	if (findWildcardPosition(fullPath)) {

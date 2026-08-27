@@ -539,7 +539,7 @@ public:
 		/**
 		 * The request to load object memory data failed
 		 */
-		LoadObjectMemoryData = 70,
+		LoadObjectMemoryData = 12,
 	};
 
 	/**
