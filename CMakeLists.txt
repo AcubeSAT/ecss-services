@@ -11,7 +11,10 @@ add_custom_target(check
         COMMAND ./cppcheck-misra.sh
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ci")
 
-add_compile_options(-Wvla)
+if(NOT MSVC)
+    add_compile_options(-Wvla) 
+endif()
+
 include_directories(${PLATFORM_DEFINITIONS_PATH})
 add_library(common STATIC)
 target_include_directories(common PUBLIC "${PROJECT_SOURCE_DIR}/inc/")
@@ -45,10 +48,11 @@ target_sources(common PRIVATE
         src/Services/FileManagementService.cpp
 )
 
+# Logger::log comes from the platform (log_x86 or TestPlatform), not this library.
 target_link_libraries(common
         PUBLIC etl log_common
-        PRIVATE log_x86
 )
+target_compile_definitions(common PRIVATE LOGLEVEL_ERROR)
 
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
@@ -67,11 +71,16 @@ IF (X86_BUILD)
     IF(Catch2_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/test")
         file(GLOB test_main_SRC "test/*.cpp")
         file(GLOB test_SRC "test/**/*.cpp")
+        file(GLOB test_x86_shared_SRC "src/Platform/x86/Filesystem.cpp" "src/Platform/x86/TestMemory.cpp" "src/Platform/x86/Services/MemoryManagementService.cpp")
+
         add_executable(tests
+                ${test_x86_shared_SRC}
                 ${test_main_SRC}
                 ${test_SRC})
-        target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
+        target_link_libraries(tests PRIVATE etl log_common common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()
-
+if(MSVC)
+    target_compile_options(common PUBLIC /permissive-)
+endif()
 install(TARGETS common)

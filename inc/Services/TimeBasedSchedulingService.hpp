@@ -63,7 +63,7 @@ private:
 	struct RequestID {
 		ApplicationProcessId applicationID = 0; ///< Application process ID
 		SequenceCount sequenceCount = 0; ///< Packet sequence count
-		SourceId sourceID = 0;       ///< Packet source ID
+		ApplicationProcessUserId sourceID = 0;       ///< Packet source ID
 
 		bool operator!=(const RequestID& rightSide) const {
 			return (sequenceCount != rightSide.sequenceCount) or (applicationID != rightSide.applicationID) or
@@ -150,7 +150,7 @@ public:
 	 * This function executes the next activity and removes it from the list.
 	 * @return the requestReleaseTime of next activity to be executed after this time
 	 */
-	Time::DefaultCUC executeScheduledActivity(Time::DefaultCUC currentTime);
+	Time::DefaultCUC executeScheduledActivity(const Time::DefaultCUC& currentTime);
 
 	/**
 	 * @brief TC[11,1] enable the time-based schedule execution function

@@ -46,6 +46,11 @@ public:
 			return false;
 		}
 
+		if (applicationId != message.applicationId || sourceId != message.sourceId || destinationId != message.destinationId
+			|| messageTypeCounter != message.messageTypeCounter || packetSequenceCount != message.packetSequenceCount) {
+			return false;
+		}
+
 		return data == message.data;
 	}
 
@@ -84,13 +89,28 @@ public:
 	PacketType packetType = PacketType::TM;
 
 	/**
-	 * The destination APID of the message
+	 * The application process ID of the message added in the primary header and acting as
+	 * - The source ID of a TM packet
+	 * - The destination ID of a TC packet
+	 * as described in 7.4.1 / 5.4.2.1c
 	 *
-	 * Maximum value of 2047 (5.4.2.1c)
+	 * Maximum value of 2046 (5.4.2.1c)
 	 */
-	uint16_t applicationId = ApplicationId;
+	ApplicationProcessId applicationId = ApplicationId;
 
-	uint16_t sourceId = 0;
+	/**
+	 * The source ID of a TC message, added in the TC secondary header (5.4.2.1d) / (7.4.4.1b)
+	 *
+	 * Maximum value of 65535 (5.4.2.1e)
+	 */
+	ApplicationProcessUserId sourceId = 0;
+
+	/**
+	 * The destination ID of a TM message, added in the TM secondary header (5.4.2.1d) / (7.4.3.1b)
+	 *
+	 * Maximum value of 65535 (5.4.2.1e)
+	 */
+	ApplicationProcessUserId destinationId = 0;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
@@ -110,7 +130,7 @@ public:
 	 * @note This is initialized to 0 in order to prevent any mishaps with non-properly initialized values. \ref
 	 * Message::appendBits() relies on this in order to easily OR the requested bits.
 	 */
-	etl::array<uint8_t, ECSSMaxMessageSize> data = {0};
+	etl::array<uint8_t, ECSSMaxMessageSize> data = {};
 
 	uint8_t currentBit = 0;
 
@@ -165,7 +185,7 @@ public:
 	/**
 	 * Appends a default timestamp object to the message, without the header
 	 */
-	void appendDefaultCUCTimeStamp(Time::DefaultCUC timestamp) {
+	void appendDefaultCUCTimeStamp(const Time::DefaultCUC& timestamp) {
 		static_assert(std::is_same_v<uint32_t, decltype(timestamp.formatAsBytes())>, "The conan-profile timestamp should be 4 bytes");
 		appendUint32(timestamp.formatAsBytes());
 	}
@@ -247,8 +267,9 @@ public:
 	 */
 	void readCString(char* string, uint16_t size);
 
-	Message(uint8_t serviceType, uint8_t messageType, PacketType packetType, uint16_t applicationId);
-	Message(uint8_t serviceType, uint8_t messageType, Message::PacketType packetType);
+	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId, ApplicationProcessUserId applicationUserId);
+	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType, ApplicationProcessId applicationId);
+	Message(ServiceTypeNum serviceType, MessageTypeNum messageType, PacketType packetType);
 
 	/**
 	 * Adds a single-byte boolean value to the end of the message
@@ -404,6 +425,14 @@ public:
 	 * PTC = 7, PFC = 0
 	 */
 	void appendOctetString(const etl::istring& string);
+
+	/**
+	 * Helper function to be used by the Event Report Service 
+	 * to append auxiliary event data to an Event Report
+	 */
+        inline void appendEventData(const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+            appendFixedString(data);
+        }
 
 	/**
 	 * Generic function to append any type of data to the message. The amount of bytes appended is equal to the size of
@@ -621,8 +650,13 @@ public:
 		String<MAX_SIZE> string("");
 
 		uint16_t length = readUint16();
-		ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort);
-		ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort);
+		// TODO(#59): Proper error handling if assert fails
+		if (not ASSERT_REQUEST(length <= string.max_size(), ErrorHandler::StringTooShort)) {
+			return {""};
+		}
+		if (not ASSERT_REQUEST((readPosition + length) <= ECSSMaxMessageSize, ErrorHandler::MessageTooShort)) {
+			return {""};
+		}
 
 		string.append(data.begin() + readPosition, length);
 		readPosition += length;

@@ -1,13 +1,19 @@
 #include "Service.hpp"
 #include <Logger.hpp>
 #include <MessageParser.hpp>
-#include <arpa/inet.h>
 #include <iomanip>
 #include <iostream>
+#ifdef _MSC_VER
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
 #include <netinet/in.h>
-#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
+#endif
+
+#include <string>
+
 
 class PacketSender {
 private:
@@ -25,7 +31,11 @@ public:
 	};
 
 	~PacketSender() {
-		::close(socket);
+		#ifdef _MSC_VER
+		closesocket(socket);
+		#else
+		close(socket);
+		#endif
 	};
 
 	void sendPacketToYamcs(const Message& message) {

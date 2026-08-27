@@ -274,17 +274,22 @@ public:
 	void reportHousekeepingPeriodicProperties(Message& request);
 
 	/**
-	 * This function calculates the time needed to pass until the next periodic report for each housekeeping 
+	 * This function calculates the time needed to pass until the next periodic report for each housekeeping
 	 * structure. The function also calls the housekeeping reporting functions as needed.
-	 * 
-	 * @note Three arguments are needed for resiliency in case the function doesn't execute at the exact time that is expected
-	 * 
-	 * @param currentTime The current system time, in milliseconds.
-	 * @param previousTime The system time of the previous call of the function.
-	 * @param expectedDelay The output of this function after its last execution.
-	 * @return uint32_t The minimum amount of time until the next periodic housekeeping report, in milliseconds.
+	 *
+	 * All time arithmetic is done in milliseconds, so collection intervals are interpreted as milliseconds.
+	 * Since the timestamps carry Time::DefaultCUC resolution (100ms), intervals should be multiples of 100ms.
+	 *
+	 * @note Three arguments are needed for resiliency: if the caller wakes up later than the time it was
+	 * scheduled for, previousTime + expectedDelay reconstructs that scheduled time, and a collection multiple
+	 * that was crossed while oversleeping is still reported instead of dropped.
+	 *
+	 * @param currentTime The current system time.
+	 * @param previousTime The system time passed to the previous call of the function.
+	 * @param expectedDelay The delay the caller actually waited between the previous call and this one.
+	 * @return The minimum amount of time until the next periodic housekeeping report.
 	 */
-	Time::DefaultCUC reportPendingStructures(Time::DefaultCUC currentTime, Time::DefaultCUC previousTime, Time::DefaultCUC expectedDelay);
+	Time::DefaultCUC reportPendingStructures(const Time::DefaultCUC& currentTime, const Time::DefaultCUC& previousTime, const Time::DefaultCUC& expectedDelay);
 
 	/**
 	 * It is responsible to call the suitable function that executes a TC packet. The source of that packet

@@ -4,7 +4,7 @@
  */
 
 #include <iostream>
-#include <cxxabi.h>
+#include "Helpers/Demangle.hpp"
 #include <ErrorHandler.hpp>
 #include <Message.hpp>
 #include <Logger.hpp>
@@ -26,7 +26,7 @@ void ErrorHandler::logError(const Message& message, ErrorType errorType) {
 	     * Gets the error class name from the template
 	     * Note: This is g++-dependent code and should only be used for debugging.
 	     */
-	    << abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr) << " Error "
+	    << Demangler::demangle<ErrorType>() << " Error "
 	    << "[" << static_cast<uint16_t>(message.serviceType) << "," << static_cast<uint16_t>(message.messageType)
 	    << "]: " << errorType << " (" << static_cast<std::underlying_type_t<ErrorType>>(errorType) << ")";
 }
@@ -38,7 +38,7 @@ void ErrorHandler::logError(ErrorType errorType) {
 	     * Gets the error class name from the template
 	     * Note: This is g++-dependent code and should only be used for debugging.
 	     */
-	    << abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr)
+	    << Demangler::demangle<ErrorType>()
 	    << " Error: "
 	    << errorType << " (" << static_cast<std::underlying_type_t<ErrorType>>(errorType) << ")";
 }

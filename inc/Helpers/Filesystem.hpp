@@ -8,7 +8,8 @@
 #include "etl/String.hpp"
 #include "etl/expected.h"
 #include "etl/result.h"
-    #include "etl/span.h"
+#include "etl/span.h"
+
 namespace Filesystem {
 	using Path = String<FullPathSize>;
 	using ObjectPath = String<ObjectPathSize>;
@@ -44,6 +45,16 @@ namespace Filesystem {
 		FileDoesNotExist = 0,
 		PathLeadsToDirectory = 1,
 		FileIsLocked = 2,
+		UnknownError = 255
+	};
+
+	/**
+	 * Possible errors returned by the filesystem during file locking/unlocking
+	 */
+	enum class FilePermissionModificationError : uint8_t {
+		FileDoesNotExist = 0,
+		PathLeadsToDirectory = 1,
+		FilePermissionModificationFailed = 2,
 		UnknownError = 255
 	};
 
@@ -158,37 +169,38 @@ namespace Filesystem {
 	 * Locks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	void lockFile(const Path& path);
+	etl::expected<void, FilePermissionModificationError> lockFile(const Path& path);
 
 	/**
 	 * Unlocks a file using the filesystem functions.
 	 * @param path A String representing the path on the filesystem
 	 */
-	void unlockFile(const Path& path);
+	etl::expected<void, FilePermissionModificationError> unlockFile(const Path& path);
 
 	/**
-	 * Creates a file using platform specific filesystem functions
+	 * Reads a contiguous chunk of a file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
 	 * @param offset the starting byte to read from
-	 * @param fileDataLength the number of bytes to read on
-	 * @param buffer A buffer with the required data to be read from the file. Should be the same size as the offset,
-	 * otherwise an error is produced
-	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
+	 * @param fileDataLength the number of bytes to read from the offset
+	 * @param buffer The buffer that receives the read data. It must be able to hold at least @p fileDataLength
+	 * bytes, otherwise a FileReadError::InvalidBufferSize error is returned
+	 * @return Nothing on success, or the FileReadError that occurred. If the file contains fewer than
+	 * @p offset + @p fileDataLength bytes, a FileReadError::InvalidOffset error is returned and nothing is read
 	 */
 	etl::expected<void, FileReadError> readFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
-	etl::span<uint8_t, ChunkMaxFileSizeBytes> buffer);
+	                                            etl::span<uint8_t> buffer);
 
 	/**
-	 * Creates a file using platform specific filesystem functions
+	 * Writes a contiguous chunk of data to an existing file using platform specific filesystem functions
 	 * @param path A String representing the path on the filesystem
-	 * @param offset the starting byte to write from
-	 * @param fileDataLength the number of bytes to write on
-	 * @param buffer A buffer with the required data to be written in the file. Should be the same size as the offset,
-	 * otherwise an error is produced
-	 * @return Optionally, a file creation error. If no errors occur, returns etl::nullopt
+	 * @param offset the starting byte to write to. It must be within the current size of the file
+	 * @param fileDataLength the number of bytes to write from the offset
+	 * @param buffer A buffer holding the data to be written. It must hold at least @p fileDataLength bytes,
+	 * otherwise a FileWriteError::InvalidBufferSize error is returned
+	 * @return Nothing on success, or the FileWriteError that occurred
 	 */
 	etl::expected<void, FileWriteError> writeFile(const Path& path, FileOffset offset, FileDataLength fileDataLength,
-		const etl::span<uint8_t, ChunkMaxFileSizeBytes> buffer);
+	                                              etl::span<const uint8_t> buffer);
 
 	/**
 	 * Gets the current file lock status
@@ -202,9 +214,6 @@ namespace Filesystem {
 	 * @return The unallocated memory in bytes 
 	 */
 	uint32_t getUnallocatedMemory();
-
-	using ObjectPath = Filesystem::ObjectPath;
-	using Path = Filesystem::Path;
 
 	/**
 	 * Returns the full filesystem path for an object given the repository path and the file path
@@ -229,11 +238,9 @@ namespace Filesystem {
 	}
 
 	/**
-	 * Reads repository path and filename from a message and constructs a full path
+	 * Reads a repository path and a filename from a message and constructs the full path
 	 * @param message The message to read from
-	 * @param repositoryPath Reference to store the repository path
-	 * @param fileName Reference to store the file name
-	 * @param fullPath Reference to store the constructed full path
+	 * @return A tuple of the repository path, the file name and the constructed full path
 	 */
 	static std::tuple<ObjectPath, ObjectPath, Path> readAndBuildPath(Message& message) {
 		ObjectPath repositoryPath = message.readOctetString<ObjectPathSize>();
@@ -243,12 +250,11 @@ namespace Filesystem {
 	}
 
 	/**
-	 * Reads the full path directly from a message and constructs a full path
-	 * Overloaded function to read only the full path from a message
+	 * Reads a full path directly from a message
 	 * @param message The message to read from
-	 * @param fullPath Reference to store the constructed full path
+	 * @return The full path
 	 */
-	static void readFullPath(Message& message, Path& fullPath) {
-		fullPath = message.readOctetString<FullPathSize>();
+	static Path readFullPath(Message& message) {
+		return message.readOctetString<FullPathSize>();
 	}
 } // namespace Filesystem

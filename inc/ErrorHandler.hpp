@@ -123,7 +123,12 @@ public:
 		 * The length of the provided data exceeds the maximum number of events allowed.
 		 * This error occurs when attempting to process more events than the system can handle.
 		 */
-		LengthExceedsNumberOfEvents = 22
+		LengthExceedsNumberOfEvents = 22,
+
+		/**
+ 		 * A packet failed CRC validation and cannot be trusted
+ 		 */
+		InvalidCRC = 23
 	};
 
 	/**
@@ -432,37 +437,41 @@ public:
 		 */
 		 PMONCheckTypeMissing = 63,
 		/**
-		 * Memoroy ID during an ST06 call is invalid - meaning this ID doesn't exist in the predefined enum
+		 * Attempt to load, dump, or check a memory area whose data length exceeds the transfer buffer (ST[06])
 		 */
-		InvalidMemoryID = 64,
+		UnableToHandleMemoryDataLength = 64,
+		/**
+		 * Memory ID during an ST[06] call is invalid - meaning this ID doesn't exist in the predefined enum
+		 */
+		InvalidMemoryID = 65,
 		/**
 		 * Invalid buffer size during memory operations
 		 */
-		MemoryBufferSizeError = 65,
+		MemoryBufferSizeError = 66,
 		/**
 		 * Error during memory write operation
 		 */
-		MemoryWriteError = 66,
+		MemoryWriteError = 67,
 		/**
 		 * Error during memory read operation
 		 */
-		MemoryReadError = 67,
+		MemoryReadError = 68,
 		/**
 		 * Unknown error during memory write operation
 		 */
-		UnknownMemoryWriteError = 68,
+		UnknownMemoryWriteError = 69,
 		/**
-		 * Error during memory read operation
+		 * Unknown error during memory read operation
 		 */
-		UnknownMemoryReadError = 69,
+		UnknownMemoryReadError = 70,
 		/**
 		 * The requested memory object does not exist
 		 */
-		MemoryObjectDoesNotExist = 70,
+		MemoryObjectDoesNotExist = 71,
 		/**
 		 * Memory offset is outside the valid range for the specified memory operation
 		 */
-		InvalidMemoryOffset = 71,
+		InvalidMemoryOffset = 72,
 	};
 
 	/**
@@ -524,6 +533,10 @@ public:
 		 */
 		AttemptedDeleteNonEmptyDirectory = 10,
 		/**
+		 * A lock/unlock file command was requested on a directory
+		 */
+		AttemptedAccessModificationOnDirectory = 11,
+		/**
 		 * The request to load object memory data failed
 		 */
 		LoadObjectMemoryData = 70,
@@ -583,8 +596,12 @@ public:
 	 *
 	 * Note that these errors correspond to bugs or faults in the software, and should be treated
 	 * differently. Such an error may prompt a task or software reset.
+	 *
+	 * @param file Optional source filename from a failed assertion. nullptr means no location is logged.
+	 *            Only the basename is logged when a path is given.
+	 * @param line Optional source line from a failed assertion.
 	 */
-	static void reportInternalError(InternalErrorType errorCode);
+	static void reportInternalError(InternalErrorType errorCode, const char* file = nullptr, int line = 0);
 
 	/**
 	 * Make an assertion, to ensure that a runtime condition is met.
@@ -595,11 +612,13 @@ public:
 	 *
 	 * @param condition The condition to check. Throws an error if false.
 	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
+	 * @param file Source filename from \ref ASSERT_INTERNAL. nullptr means no location is logged.
+	 * @param line Source line from \ref ASSERT_INTERNAL.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	static bool assertInternal(bool condition, InternalErrorType errorCode) {
+	static bool assertInternal(bool condition, InternalErrorType errorCode, const char* file = nullptr, int line = 0) {
 		if (not condition) {
-			reportInternalError(errorCode);
+			reportInternalError(errorCode, file, line);
 		}
 
 		return condition;
@@ -629,11 +648,10 @@ public:
 	/**
 	 * Convert a parameter given in C++ to an ErrorSource that can be easily used in comparisons.
 	 * @tparam ErrorType One of the enums specified in ErrorHandler.
-	 * @param error An error code of a specific type
 	 * @return The corresponding ErrorSource
 	 */
 	template <typename ErrorType>
-	inline static ErrorSource findErrorSource(ErrorType errorType) {
+	inline static ErrorSource findErrorSource() {
 		// Static type checking
 		ErrorSource source = Internal;
 
