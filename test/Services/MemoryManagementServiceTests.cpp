@@ -1,13 +1,11 @@
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <Message.hpp>
-#include <bits/fs_fwd.h>
-#include <bits/fs_path.h>
 #include <Services/MemoryManagementService.hpp>
 #include <catch2/catch_all.hpp>
 #include "Helpers/CRCHelper.hpp"
 #include "ServiceTests.hpp"
-#include <sys/stat.h>
 
 MemoryManagementService& memMangService = Services.memoryManagement;
 namespace fs = std::filesystem;
@@ -282,16 +280,9 @@ TEST_CASE("TC[6,1] Load Object Memory Data", "[service][st06]") {
 		}
 		file.close();
 
-		#ifdef WIN32
-		// Windows-specific code to make file read-only
-		std::filesystem::permissions(fileNamePath, 
-			std::filesystem::perms::owner_read |
-			std::filesystem::perms::group_read |
-			std::filesystem::perms::others_read);
-		#else
-		// Unix-specific code to make file read-only 
-		chmod(filename, S_IRUSR | S_IRGRP | S_IROTH);
-		#endif
+		std::filesystem::permissions(fileNamePath,
+		                             std::filesystem::perms::owner_read | std::filesystem::perms::group_read |
+		                                 std::filesystem::perms::others_read);
 
 		MessageParser::execute(request);
 
@@ -516,12 +507,8 @@ TEST_CASE("TC[6,3] Dump Object Memory Data", "[service][st06]") {
 		}
 		file.close();
 
-#ifdef WIN32
-		std::filesystem::permissions(fileNamePath,
-			std::filesystem::perms::none);
-#else
-		chmod(filename, 0);
-#endif
+		std::filesystem::permissions(fileNamePath, std::filesystem::perms::none);
+
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 2);
