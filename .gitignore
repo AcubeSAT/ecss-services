@@ -93,4 +93,6 @@ clang-tidy-html-report/
 gcovr/
 
 report.xml
-clang-tidy-output.logconan-build/
+clang-tidy-output.log
+# Conan generated files
+conan-build/
