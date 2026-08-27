@@ -251,7 +251,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 }
 
 void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& message) {
-	message.assertTC(ServiceType, ReportParameterMonitoringDefinitions);
+	if (not message.assertTC(ServiceType, ReportParameterMonitoringDefinitions)) {
+		return;
+	}
 	Message pmonDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport, Message::TM, ApplicationId);
 	pmonDefinitionReport.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();

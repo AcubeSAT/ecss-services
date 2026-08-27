@@ -1,4 +1,6 @@
+#include <chrono>
 #include <iostream>
+#include "Helpers/TimeGetter.hpp"
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
@@ -139,9 +141,13 @@ void addTelemetryPacketsInPacketStores() {
 	Message msg(StorageAndRetrievalService::ServiceType,
 						StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport, Message::TM, ApplicationId);
 
+	// The configuration deliberately contains only the message type stored below. Otherwise, reports generated
+	// by the requests under test would be auto-stored through Service::handleMessage, disturbing the expected
+	// packet store contents.
 	for (auto& packetStoreId: packetStoreIds) {
 		ApplicationProcessConfiguration config;
-		config.addAllReportsOfApplication(msg, ApplicationId);
+		config.addReport(ApplicationId, StorageAndRetrievalService::ServiceType,
+		    StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport);
 		storageAndRetrieval.packetSelection.packetStoreAppProcessConfig.insert({packetStoreId, config});
 	}
 
@@ -713,9 +719,15 @@ TEST_CASE("Changing the open retrieval start-time-tag") {
 TEST_CASE("Resuming the open retrieval process") {
 	SECTION("Successful resuming of the open retrieval") {
 		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
+
+		// Packet timestamps per store: ps2 {2,4,5,7,9,11}, ps25 {0,1,4,15,22}, ps799 {4,7,9,14}
+		storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStartTimeTag = Time::DefaultCUC(5);
+		storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStartTimeTag = Time::DefaultCUC(4);
+		storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStartTimeTag = Time::DefaultCUC(0);
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores, Message::TC, 1);
@@ -731,10 +743,43 @@ TEST_CASE("Resuming the open retrieval process") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStatus == PacketStore::Suspended);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStatus == PacketStore::Suspended);
-		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus == PacketStore::Suspended);
+		// ps2 releases {5,7,9,11}, ps25 releases {4,15,22} and ps799 releases {4,7,9,14}
+		CHECK(ServiceTests::releasedCount() == 11);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStatus == PacketStore::InProgress);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStatus == PacketStore::InProgress);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus == PacketStore::InProgress);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[3]).openRetrievalStatus == PacketStore::Suspended);
+
+		// The start time tags have advanced past the released packets, per requirement 6.15.3.4.1c
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStartTimeTag > Time::DefaultCUC(11));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStartTimeTag > Time::DefaultCUC(22));
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStartTimeTag > Time::DefaultCUC(14));
+
+		// While the open retrieval is in progress, a newly stored packet is released upon storage
+		Message newTelemetry(StorageAndRetrievalService::ServiceType,
+		                     StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport, Message::TM,
+		                     ApplicationId);
+		storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[0], newTelemetry, Time::DefaultCUC(60));
+		CHECK(ServiceTests::releasedCount() == 12);
+
+		// Consecutive suspend and resume operations cause no gap or overlap: no packet is released twice
+		Message suspendRequest(StorageAndRetrievalService::ServiceType,
+		                       StorageAndRetrievalService::MessageType::SuspendOpenRetrievalOfPacketStores,
+		                       Message::TC, 1);
+		suspendRequest.appendUint16(0);
+		MessageParser::execute(suspendRequest);
+
+		Message secondResumeRequest(StorageAndRetrievalService::ServiceType,
+		                            StorageAndRetrievalService::MessageType::ResumeOpenRetrievalOfPacketStores,
+		                            Message::TC, 1);
+		secondResumeRequest.appendUint16(numOfPacketStores);
+		for (int i = 0; i < numOfPacketStores; i++) {
+			secondResumeRequest.appendString(packetStoreIds[i]);
+		}
+		MessageParser::execute(secondResumeRequest);
+
+		CHECK(ServiceTests::count() == 0);
+		CHECK(ServiceTests::releasedCount() == 12);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -788,6 +833,7 @@ TEST_CASE("Resuming the open retrieval process") {
 
 	SECTION("Both successful and failed attempts to resume the open retrieval of all packet stores") {
 		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
 		auto packetStoreIds = validPacketStoreIds();
 		padWithZeros(packetStoreIds);
@@ -809,7 +855,11 @@ TEST_CASE("Resuming the open retrieval process") {
 
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::SetPacketStoreWithByTimeRangeRetrieval) == 2);
+		// ps2 releases all 6 stored packets and ps25 all 5; the rejected ps799 and ps5555 release nothing
+		CHECK(ServiceTests::releasedCount() == 11);
 
+		// After the packets stored before the request execution have been released, the open retrieval status of
+		// each packet store returns to "suspended", per requirement 6.15.3.4.3h
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).openRetrievalStatus == PacketStore::Suspended);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).openRetrievalStatus == PacketStore::Suspended);
 		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[2]).openRetrievalStatus == PacketStore::Suspended);
@@ -927,6 +977,7 @@ TEST_CASE("Suspending the open retrieval process") {
 TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 	SECTION("Successful starting of the by-time-range retrieval") {
 		initializePacketStores();
+		addTelemetryPacketsInPacketStores();
 		INFO("Actual number of packet stores: " << storageAndRetrieval.currentNumberOfPacketStores());
 		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
 		auto packetStoreIds = validPacketStoreIds();
@@ -938,23 +989,26 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		NumOfPacketStores numOfPacketStores = 3;
 		request.appendUint16(numOfPacketStores);
 
-		Time::DefaultCUC timeTags1[4] = {Time::DefaultCUC(20), Time::DefaultCUC(30), Time::DefaultCUC(40), Time::DefaultCUC(50)};
-		Time::DefaultCUC timeTags2[4] = {Time::DefaultCUC(60), Time::DefaultCUC(70), Time::DefaultCUC(80), Time::DefaultCUC(90)};
+		// Packet timestamps per store: ps2 {2,4,5,7,9,11}, ps25 {0,1,4,15,22}, ps799 {4,7,9,14}
+		Time::DefaultCUC timeTags1[3] = {Time::DefaultCUC(4), Time::DefaultCUC(1), Time::DefaultCUC(9)};
+		Time::DefaultCUC timeTags2[3] = {Time::DefaultCUC(9), Time::DefaultCUC(15), Time::DefaultCUC(100)};
 
-		int index = 0;
-		for (auto& packetStoreId: packetStoreIds) {
+		for (int i = 0; i < numOfPacketStores; i++) {
+			auto& packetStoreId = packetStoreIds[i];
 			storageAndRetrieval.getPacketStore(packetStoreId).openRetrievalStatus = PacketStore::Suspended;
 			storageAndRetrieval.getPacketStore(packetStoreId).byTimeRangeRetrievalStatusEnabled = false;
 			request.appendString(packetStoreId);
-			Time::DefaultCUC timeTag1(timeTags1[index]);
-			Time::DefaultCUC timeTag2(timeTags2[index++]);
-			request.append<Time::DefaultCUC>(timeTag1);
-			request.append<Time::DefaultCUC>(timeTag2);
+			request.append<Time::DefaultCUC>(timeTags1[i]);
+			request.append<Time::DefaultCUC>(timeTags2[i]);
 		}
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
+		// ps2 releases {4,5,7,9}, ps25 releases {1,4,15} and ps799 releases {9,14}
+		CHECK(ServiceTests::releasedCount() == 9);
+
+		// The synchronous retrieval has completed, so the by-time-range retrieval status is back to "disabled"
 		for (int i = 0; i < numOfPacketStores; i++) {
 			auto& packetStore = storageAndRetrieval.getPacketStore(packetStoreIds[i]);
 			REQUIRE(packetStore.byTimeRangeRetrievalStatusEnabled == false);
@@ -1062,6 +1116,40 @@ TEST_CASE("Starting the by-time-range retrieval of packet stores") {
 		for (auto& packetStoreId: packetStoreIds) {
 			REQUIRE(storageAndRetrieval.getPacketStore(packetStoreId).retrievalStartTime == Time::DefaultCUC(0));
 		}
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Time window in the past with no packets stored inside it") {
+		initializePacketStores();
+		REQUIRE(storageAndRetrieval.currentNumberOfPacketStores() == 4);
+		auto packetStoreIds = validPacketStoreIds();
+		padWithZeros(packetStoreIds);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::StartByTimeRangeRetrieval, Message::TC, 1);
+
+		NumOfPacketStores numOfPacketStores = 2;
+		request.appendUint16(numOfPacketStores);
+
+		// The packet stores are empty, so a time window that lies entirely in the past cannot yield any packet
+		request.appendString(packetStoreIds[0]);
+		request.append<Time::DefaultCUC>(Time::DefaultCUC(20));
+		request.append<Time::DefaultCUC>(Time::DefaultCUC(60));
+
+		// A time window that extends beyond the current time is accepted, since packets can still be stored in it
+		request.appendString(packetStoreIds[1]);
+		request.append<Time::DefaultCUC>(Time::DefaultCUC(20));
+		request.append<Time::DefaultCUC>(TimeGetter::getCurrentTimeDefaultCUC() + std::chrono::seconds(100));
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ByTimeRangeRetrievalTimeWindowInThePast) == 1);
+		CHECK(ServiceTests::releasedCount() == 0);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[0]).byTimeRangeRetrievalStatusEnabled == false);
+		REQUIRE(storageAndRetrieval.getPacketStore(packetStoreIds[1]).byTimeRangeRetrievalStatusEnabled == false);
 
 		ServiceTests::reset();
 		Services.reset();

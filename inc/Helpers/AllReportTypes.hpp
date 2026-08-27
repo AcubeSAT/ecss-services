@@ -2,7 +2,7 @@
 #include "etl/vector.h"
 #include "etl/map.h"
 #include "ECSS_Definitions.hpp"
-#include "TypeDefinitions.hpp"
+#include "Helpers/TypeDefinitions.hpp"
 
 /**
  * Namespace containing all the report types for every service type.
@@ -33,6 +33,6 @@ namespace AllReportTypes {
 	 * Returns a reference to the map containing all report types, per service. 
 	 * The key is the ServiceType and the value is a vector containing the report types.
 	 */
-	const etl::map<uint8_t, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions>& getMessagesOfService();
+	const etl::map<ServiceTypeNum, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions>& getMessagesOfService();
 
 } // namespace AllReportTypes

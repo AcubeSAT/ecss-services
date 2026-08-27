@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <netinet/in.h>
+#include <sstream>
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -44,10 +45,19 @@ PacketSender packetSender;
 inline constexpr bool SendToYamcs = true;
 
 void Service::releaseMessage(Message& message) {
-	LOG_DEBUG << "Releasing message with ApplicationID: " << message.applicationId << " ServiceType: " << message.serviceType
-	<< " messageType: " << message.messageType;
-}
+	std::ostringstream ss;
 
+	ss << "    " << ((message.packetType == Message::TM) ? "TM" : "TC") << "["
+	   << std::hex
+	   << static_cast<int>(message.serviceType) << "," // Ignore-MISRA
+	   << static_cast<int>(message.messageType)        // Ignore-MISRA
+	   << "] released!";
+	LOG_DEBUG << ss.str();
+
+	if constexpr (SendToYamcs) {
+		packetSender.sendPacketToYamcs(message);
+	}
+}
 
 void Service::platformSpecificHandleMessage(Message& message) {
 	std::ostringstream ss;
@@ -60,11 +70,6 @@ void Service::platformSpecificHandleMessage(Message& message) {
 
 	for (unsigned int i = 0; i < message.dataSize; i++) {
 		ss << static_cast<int>(message.data[i]) << " "; // Ignore-MISRA
-	}
-
-
-	if constexpr (SendToYamcs) {
-		packetSender.sendPacketToYamcs(message);
 	}
 	LOG_DEBUG << ss.str();
 }

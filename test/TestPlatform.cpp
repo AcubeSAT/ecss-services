@@ -36,6 +36,7 @@ template void ErrorHandler::logError(ErrorHandler::InternalErrorType);
 
 // Initialisation of ServiceTests properties
 std::vector<Message> ServiceTests::queuedMessages = std::vector<Message>();
+std::vector<Message> ServiceTests::releasedMessages = std::vector<Message>();
 std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> ServiceTests::thrownErrors =
     std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool>();
 bool ServiceTests::expectingErrors = false;
@@ -339,7 +340,9 @@ void StorageAndRetrievalService::initializeStorageAndRetrievalServiceStructures(
 
 void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() {}
 
-void Service::releaseMessage(Message& message) {}
+void Service::releaseMessage(Message& message) {
+	ServiceTests::release(message);
+}
 
 void RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures() {}
 

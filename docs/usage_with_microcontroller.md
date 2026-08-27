@@ -94,28 +94,33 @@ performance and size of your program.
 
 ### Message transmission
 
-Whenever PUS telemetry is generated, it needs to be stored, transmitted or sent to a receiver. This is the 
-responsibility of the @ref Service::platformSpecificHandleMessage function.
+Whenever PUS telemetry is generated, it needs to be stored, transmitted or sent to a receiver. PUS functions will call @ref Service::handleMessage to do this every time a telemetry packet is generated.
 
-This function is always called from the `handleMessage()` function. The reason is that in this way, we can force 
-universal actions, such as storing telemetry in ST[15], or forwarding the message somewhere with ST[14].
+This function performs the following:
+1. Calls @ref Service::platformSpecificHandleMessage(), a platform-specific callback, for any misc functionality
+(e.g. logging).
+2. Stores the packet in the interested packet stores (if **ST[15] - on-board storage** is enabled)
+3. Calls @ref Service::releaseMessage(), a platform-specific callback, if the real-time forwarding configuration of
+**ST[14] - real-time forwarding control** contains the message type (or unconditionally, when ST[14] is not enabled)
 
-In this function, you can transmit the message via an antenna, send it through an interface for debugging, or both.
+In @ref Service::releaseMessage() function, you can transmit the message internally or send it through an interface for 
+debugging.
 
-An example definition can be as follows:
+In @ref Service::platformSpecificHandleMessage() function, you can handle anything that isn't fitting in the @ref 
+Service::releaseMessage() functionality.
+
+Examples follow: 
 
 ```cpp
 void Service::platformSpecificHandleMessage(Message& message) {
-	message.finalize();
-
-	CAN_Transmit(message.data, message.dataSize, Platform::OBC);
-
-	LOG_DEBUG << "Just sent a message with CAN to ST[" << static_cast<int>(message.serviceType) << "] message";
+    LOG_DEBUG << "Just sent a message with CAN to ST[" << static_cast<int>(message.serviceType) << "]";
 }
 ```
 
 A second function that needs to be implemented is @ref Service::releaseMessage, which is specific to ST[14] - Real 
-Time Forwarding Service. This function defines what happens when a TM is allowed to be forwarded to GS in real time.
+Time Forwarding Service and to ST[15] On-Board Storage & Retrieval Service. This function defines what happens when a 
+TM is 
+allowed to be forwarded to GS in real time.
 
 ```cpp
 void Service::releaseMessage(Message& message) {
@@ -259,14 +264,16 @@ void FunctionManagementService::initializeFunctionMap() {
 }
 ```
 
-5. @ref StorageAndRetrievalService::initializePacketStores
+5. @ref StorageAndRetrievalService::initializeStorageAndRetrievalServiceStructures
 
 The StorageAndRetrievalService is responsible for storing generated telemetry in packet stores. Towards that goal, each
 platform needs to initialize their own packet store map - otherwise no telemetry will be stored.
 
 ```cpp
-void StorageAndRetrievalService::initializePacketStores() {
-	packetStores.insert({"stats", PacketStore()});
+void StorageAndRetrievalService::initializeStorageAndRetrievalServiceStructures() {
+	PacketStore packetStore;
+	packetStore.storageEnabled = true;
+	packetStores.insert({"stats", packetStore});
 }
 ```
 
@@ -283,6 +290,20 @@ void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() 
 	controlledApplications.push_back(ApplicationId);
 }
 
+```
+
+7. @ref RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures
+
+The RealTimeForwardingControlService gates which telemetry is released in real time. Each platform needs to initialize
+the applicationProcessConfiguration with the message types that shall be forwarded by default, and the
+controlledApplications vector with the application processes it controls.
+
+```cpp
+void RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures() {
+	Message message;
+	applicationProcessConfiguration.addAllReportsOfApplication(message, ApplicationId);
+	controlledApplications.push_back(ApplicationId);
+}
 ```
 
 ## Receiving messages

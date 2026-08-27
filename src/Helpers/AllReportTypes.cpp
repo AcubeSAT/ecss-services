@@ -139,8 +139,8 @@ namespace AllReportTypes {
 		return reports;
 	}
 
-	const etl::map<uint8_t, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions>& getMessagesOfService() {
-		static const etl::map<uint8_t, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions> messages = {
+	const etl::map<ServiceTypeNum, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions>& getMessagesOfService() {
+		static const etl::map<ServiceTypeNum, ServiceDefinitionsVector, ECSSMaxServiceTypeDefinitions> messages = {
 			{RequestVerificationService::ServiceType, getST01Reports()},
 			{HousekeepingService::ServiceType, getST03Reports()},
 			{ParameterStatisticsService::ServiceType, getST04Reports()},

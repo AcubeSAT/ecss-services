@@ -1,5 +1,14 @@
 #include "Services/StorageAndRetrievalService.hpp"
+#include <algorithm>
+#include <chrono>
 #include "Helpers/TimeGetter.hpp"
+
+/**
+ * The smallest time step that the packet time stamps can represent. Used to advance the open retrieval start time
+ * tag just past an already released packet.
+ */
+constexpr std::chrono::duration<uint32_t, Time::DefaultCUC::Ratio> SmallestTimeStep(1);
+
 PacketStoreId StorageAndRetrievalService::readPacketStoreId(Message& message) {
 	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId = {};
 	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
@@ -199,19 +208,57 @@ void StorageAndRetrievalService::addPacketStore(const PacketStoreId& packetStore
 	packetStores.insert({packetStoreId, packetStore});
 }
 
+void StorageAndRetrievalService::pushTelemetryToPacketStore(PacketStore& packetStore, const Message& message,
+	Time::DefaultCUC timestamp) {
+	if (packetStore.storedTelemetryPackets.full()) {
+		if (packetStore.packetStoreType == PacketStore::Bounded) {
+			return;
+		}
+		packetStore.storedTelemetryPackets.pop_front();
+	}
+	packetStore.storedTelemetryPackets.push_back({timestamp, message});
+
+	// While the open retrieval of a packet store is in progress, every newly stored packet that is not older than
+	// the open retrieval start time tag is part of the retrieval process, so it is released right away
+	// (requirement 6.15.3.4.1b). The tag is advanced past the packet, keeping consecutive suspend and resume
+	// operations free of gaps and overlaps (requirement 6.15.3.4.1c).
+	if (packetStore.openRetrievalStatus == PacketStore::InProgress and
+	    timestamp >= packetStore.openRetrievalStartTimeTag) {
+		releaseMessage(packetStore.storedTelemetryPackets.back().second);
+		packetStore.openRetrievalStartTimeTag = timestamp + SmallestTimeStep;
+	}
+}
+
+void StorageAndRetrievalService::storeTelemetry(const Message& message, Time::DefaultCUC timestamp) {
+	for (auto& packetStore: packetStores) {
+		if (not packetStore.second.storageEnabled) {
+			continue;
+		}
+		const auto configuration = packetSelection.packetStoreAppProcessConfig.find(packetStore.first);
+		if (configuration == packetSelection.packetStoreAppProcessConfig.end()) {
+			continue;
+		}
+		if (not configuration->second.isReportTypeAdded(message.applicationId, message.serviceType,
+		        message.messageType)) {
+			continue;
+		}
+		pushTelemetryToPacketStore(packetStore.second, message, timestamp);
+	}
+}
+
 bool StorageAndRetrievalService::checkIfTelemetryCanBeAdded(const PacketStoreId& packetStoreId, const Message&
 	message) {
 	if (not packetStoreExists(packetStoreId)) {
 		ASSERT_INTERNAL(false, ErrorHandler::InternalErrorType::ElementNotInArray);
 		return false;
 	}
-	auto packetStore = packetStores.find(packetStoreId)->second;
-	if (not packetStore.storageEnabled) {
+	if (not packetStores.find(packetStoreId)->second.storageEnabled) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromDisabledPacketStore);
 		return false;
 	}
-	if (not packetSelection.packetStoreAppProcessConfig[packetStoreId].reportExistsInAppProcessConfiguration
-	(message, message.applicationId, message.serviceType, message.messageType)) {
+	const auto configuration = packetSelection.packetStoreAppProcessConfig.find(packetStoreId);
+	if (configuration == packetSelection.packetStoreAppProcessConfig.end() or
+	    not configuration->second.isReportTypeAdded(message.applicationId, message.serviceType, message.messageType)) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::TMRejectedFromPacketStoreDueToAppProcessConfiguration);
 		return false;
 	}
@@ -223,7 +270,7 @@ void StorageAndRetrievalService::addTelemetryToPacketStore(const PacketStoreId& 
 	if (not checkIfTelemetryCanBeAdded(packetStoreId, message)) {
 		return;
 	}
-	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, message});
+	pushTelemetryToPacketStore(packetStores.find(packetStoreId)->second, message, timestamp);
 }
 
 void StorageAndRetrievalService::resetPacketStores() {
@@ -303,25 +350,37 @@ void StorageAndRetrievalService::startByTimeRangeRetrieval(Message& request) {
 
 		auto& packetStore = packetStores[packetStoreId];
 
-		if (!packetStore.storedTelemetryPackets.empty() && 
-		    packetStore.storedTelemetryPackets.back().first > retrievalEndTime) {
+		// Requirement 6.15.3.5.2d(4): a time window that lies entirely in the past and contains no stored packet
+		// can never yield any packet, so the instruction is rejected.
+		const bool timeWindowContainsPackets =
+		    std::any_of(packetStore.storedTelemetryPackets.begin(), packetStore.storedTelemetryPackets.end(),
+		                [retrievalStartTime, retrievalEndTime](const auto& storedPacket) {
+			                return storedPacket.first >= retrievalStartTime and storedPacket.first <= retrievalEndTime;
+		                });
+		if (retrievalEndTime < TimeGetter::getCurrentTimeDefaultCUC() and not timeWindowContainsPackets) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::ByTimeRangeRetrievalTimeWindowInThePast);
 			continue;
 		}
+
 		packetStore.byTimeRangeRetrievalStatusEnabled = true;
 		packetStore.retrievalStartTime = retrievalStartTime;
 		packetStore.retrievalEndTime = retrievalEndTime;
 
-		auto it = packetStore.storedTelemetryPackets.begin();
-		while (it != packetStore.storedTelemetryPackets.end()) {
-			if (it->first >= retrievalStartTime && it->first <= retrievalEndTime) {
-				releaseMessage(it->second);
-			}
-			if (it->first < retrievalStartTime) {
+		// The by-time-range retrieval is executed synchronously: every packet stored within the requested time
+		// window is released at once. Packets are stored chronologically, so the iteration skips the packets that
+		// are older than the window and stops at the first packet beyond it.
+		for (auto& storedPacket: packetStore.storedTelemetryPackets) {
+			if (storedPacket.first > retrievalEndTime) {
 				break;
 			}
-			++it;
+			if (storedPacket.first < retrievalStartTime) {
+				continue;
+			}
+			releaseMessage(storedPacket.second);
 		}
+
+		// The retrieval process has completed, so the by-time-range retrieval status returns to "disabled", as per
+		// requirement 6.15.3.5.1c(3).
 		packetStore.byTimeRangeRetrievalStatusEnabled = false;
 		packetStore.retrievalStartTime = Time::DefaultCUC(0);
 		packetStore.retrievalEndTime = Time::DefaultCUC(0);
@@ -454,30 +513,63 @@ void StorageAndRetrievalService::changeOpenRetrievalStartTimeTag(Message& reques
 	}
 }
 
+bool StorageAndRetrievalService::resumeOpenRetrieval(PacketStore& packetStore, const Message& request) {
+	if (packetStore.byTimeRangeRetrievalStatusEnabled) {
+		ErrorHandler::reportError(request,
+		                          ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
+		return false;
+	}
+	packetStore.openRetrievalStatus = PacketStore::InProgress;
+
+	// Packets are stored chronologically, so releasing every packet from the open retrieval start time tag
+	// onwards only requires skipping the packets that are older than the tag.
+	for (auto& storedPacket: packetStore.storedTelemetryPackets) {
+		if (storedPacket.first < packetStore.openRetrievalStartTimeTag) {
+			continue;
+		}
+		releaseMessage(storedPacket.second);
+	}
+
+	if (not packetStore.storedTelemetryPackets.empty()) {
+		const Time::DefaultCUC newestPacketTime = packetStore.storedTelemetryPackets.back().first;
+		if (newestPacketTime >= packetStore.openRetrievalStartTimeTag) {
+			// Advance the tag past the released packets, so that consecutive suspend and resume operations
+			// neither skip nor repeat any packet (requirement 6.15.3.4.1c).
+			packetStore.openRetrievalStartTimeTag = newestPacketTime + SmallestTimeStep;
+		}
+	}
+	return true;
+}
+
 void StorageAndRetrievalService::resumeOpenRetrievalOfPacketStores(Message& request) {
 	if (!request.assertTC(ServiceType, MessageType::ResumeOpenRetrievalOfPacketStores)) {
 		return;
 	}
 
-	executeOnPacketStores(request, [&request, this](PacketStore& p) {
-		if (p.byTimeRangeRetrievalStatusEnabled) {
-			ErrorHandler::reportError(request, 
-			    ErrorHandler::ExecutionStartErrorType::SetPacketStoreWithByTimeRangeRetrieval);
-			return;
-		}
-		p.openRetrievalStatus = PacketStore::InProgress;
-		auto it = p.storedTelemetryPackets.begin();
-		while (it != p.storedTelemetryPackets.end()) {
-			if (it->first >= p.retrievalStartTime) {
-				releaseMessage(it->second);
+	const NumOfPacketStores numOfPacketStores = request.readUint16();
+	if (numOfPacketStores == 0) {
+		// Instruction to resume the open retrieval of all packet stores: once the packets stored before the start
+		// of the request execution have been released, the open retrieval status returns to "suspended", as per
+		// requirement 6.15.3.4.3h(3).
+		for (auto& packetStore: packetStores) {
+			if (resumeOpenRetrieval(packetStore.second, request)) {
+				packetStore.second.openRetrievalStatus = PacketStore::Suspended;
 			}
-			if (it->first < p.retrievalStartTime) {
-				break;
-			}
-			++it;
 		}
-		p.openRetrievalStatus = PacketStore::Suspended;
-	});
+		return;
+	}
+
+	for (NumOfPacketStores i = 0; i < numOfPacketStores; i++) {
+		auto packetStoreId = readPacketStoreId(request);
+		auto packetStore = packetStores.find(packetStoreId);
+		if (packetStore == packetStores.end()) {
+			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
+			continue;
+		}
+		// Per-store instructions leave the open retrieval status "in progress" (requirement 6.15.3.4.3g), so
+		// packets stored from now on are released as they arrive, until the open retrieval is suspended.
+		resumeOpenRetrieval(packetStore->second, request);
+	}
 }
 
 void StorageAndRetrievalService::suspendOpenRetrievalOfPacketStores(Message& request) {
@@ -826,7 +918,7 @@ void StorageAndRetrievalService::execute(Message& request) {
 		case AddReportTypesToAppProcessConfiguration:
 			packetSelection.addReportTypesToAppProcessConfiguration(request);
 			break;
-		case DeleteReportTypesTFromAppProcessConfiguration:
+		case DeleteReportTypesFromAppProcessConfiguration:
 			packetSelection.deleteReportTypesFromAppProcessConfiguration(request);
 			break;
 		case ReportApplicationProcess:

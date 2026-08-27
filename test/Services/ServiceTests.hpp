@@ -23,6 +23,14 @@ protected:
 	static std::vector<Message> queuedMessages;
 
 	/**
+	 * The list of Messages that have been released towards the ground station.
+	 *
+	 * Whenever a Message is released via Service::releaseMessage (e.g. by the ST[15] retrieval functions), it is
+	 * stored in this array. The testing code can fetch these Messages using the ServiceTests::getReleased() method.
+	 */
+	static std::vector<Message> releasedMessages;
+
+	/**
 	 * The list of Errors that the ErrorHandler caught.
 	 *
 	 * Whenever an Error is thrown anywhere in the code, it is collected in the thrownErrors
@@ -71,6 +79,28 @@ public:
 	 */
 	static void queue(const Message& message) {
 		queuedMessages.push_back(message);
+	}
+
+	/**
+	 * Get a message from the list of released messages
+	 * @param number The number of the message, starting from 0 in chronological order
+	 */
+	static Message& getReleased(uint64_t number) {
+		return releasedMessages.at(number);
+	}
+
+	/**
+	 * Add a message to the list of released messages
+	 */
+	static void release(const Message& message) {
+		releasedMessages.push_back(message);
+	}
+
+	/**
+	 * Counts the number of released messages
+	 */
+	static uint64_t releasedCount() {
+		return releasedMessages.size();
 	}
 
 	/**
@@ -128,6 +158,7 @@ public:
 
 	static void resetErrors() {
 		queuedMessages.clear();
+		releasedMessages.clear();
 		thrownErrors.clear();
 		expectingErrors = false;
 	}

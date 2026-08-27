@@ -447,7 +447,8 @@ public:
 		 */
 		AlreadyExistingReportType = 64,
 		/**
-		 * By-time-range retrieval time window is in the past, meaning that the oldest packet in the packet store is after the retrieval end time
+		 * By-time-range retrieval time window lies entirely in the past and the packet store contains no packet
+		 * with a time stamp inside it (ECSS-E-ST-70-41C 6.15.3.5.2d)
 		 */
 		ByTimeRangeRetrievalTimeWindowInThePast = 65,
 		/**
