@@ -270,10 +270,5 @@ inline constexpr uint32_t MaxValidMemoryIds = 8;
  */
 inline constexpr uint8_t CheckTransitionListSize = 5;
 
-/**
- * The size of the map of event definitions connected to the check transitions of the PMON class of ST[12]
- */
-inline constexpr uint8_t PMONEventMapSize = 2;
-
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

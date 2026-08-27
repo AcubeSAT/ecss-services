@@ -7,7 +7,7 @@ constexpr bool TimeStamp<BaseBytes, FractionBytes, Num, Denom>::areSecondsValid(
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFromEpoch) : taiCounter(0) {
 	// TODO(#59): Proper error handling if assert fails
 	if (not ASSERT_INTERNAL(areSecondsValid((taiSecondsFromEpoch)), ErrorHandler::InternalErrorType::TimeStampOutOfBounds)) {
 		return;
@@ -20,7 +20,8 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFr
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp)
+    : taiCounter(0) {
 	// process header
 	uint8_t headerSize = 1;
 	if ((timestamp[0] & 0b10000000U) != 0) {
@@ -64,7 +65,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, T
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& timestamp) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(const UTCTimestamp& timestamp) : taiCounter(0) {
 	TAICounter_t seconds = 0;
 
 	/**
@@ -151,7 +152,8 @@ UTCTimestamp TimeStamp<BaseBytes, FractionBytes, Num, Denom>::toUTCtimestamp() {
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn, int DenomIn>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input)
+    : taiCounter(0) {
 	if constexpr (std::is_same_v<decltype(*this), decltype(input)>) {
 		taiCounter = input.taiCounter;
 		return;
@@ -163,7 +165,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 	double inputSeconds = input.taiCounter / static_cast<double>(1 << (8 * FractionBytesIn));
 	inputSeconds *= InputRatio;
 
-	ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
+	ASSERT_INTERNAL(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
 
 	double output = inputSeconds / OutputRatio * (1ULL << (8 * FractionBytes));  //cppcheck-suppress misra-c2012-2.2
 
@@ -180,7 +182,7 @@ Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() const {
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <class Duration, typename>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Duration duration) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Duration duration) : taiCounter(0) {
 	auto outputDuration = std::chrono::duration_cast<RawDuration>(duration);
 	taiCounter = outputDuration.count();
 }

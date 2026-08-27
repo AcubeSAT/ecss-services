@@ -9,7 +9,8 @@
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
 struct Fixtures {
-	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(8, 5, 10, 8, 0);
+	PMONExpectedValueCheck monitoringDefinition1 =
+	    PMONExpectedValueCheck(8, 5, 10, 8, EventReportService::Event::ParameterOutOfLimits);
 	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(6, 5, 2, 1, 9, 2);
 	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(9, 5, 5, 3, 3, 11, 4);
 	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
@@ -221,9 +222,6 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		ParameterId PMONId = 0;
 		ParameterId monitoredParameterId = 0;
 		PMONRepetitionNumber repetitionNumber = 5;
-		PMONBitMask expectedValueCheckMask = 2;
-		PMONExpectedValue expectedValue = 10;
-		EventDefinitionId unexpectedValueEvent = 5;
 		PMONLimit lowLimit = 3;
 		EventDefinitionId belowLowLimitEvent = 8;
 		PMONLimit highLimit = 8;
@@ -1129,25 +1127,25 @@ TEST_CASE("Delta Check Perform Check") {
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
 		pmon.performCheck();
-		CHECK(pmon.getTrackedStatus() == PMON::Invalid);
+		CHECK(pmon.getNextCheckingStatus() == PMON::Invalid);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
 		param.setValue(23);
 		pmon.performCheck();
-		CHECK(pmon.getTrackedStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getNextCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
 		param.setValue(50);
 		pmon.performCheck();
-		CHECK(pmon.getTrackedStatus() == PMON::BelowLowThreshold);
+		CHECK(pmon.getNextCheckingStatus() == PMON::BelowLowThreshold);
 		CHECK(pmon.getRepetitionCounter() == 2);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
 		param.setValue(100);
 		pmon.performCheck();
-		CHECK(pmon.getTrackedStatus() == PMON::WithinThreshold);
+		CHECK(pmon.getNextCheckingStatus() == PMON::WithinThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::reset();
@@ -1187,7 +1185,7 @@ TEST_CASE("Delta Check Perform Check") {
 		param.setValue(140);
 		pmon.performCheck();
 		
-		CHECK(pmon.getTrackedStatus() == PMON::WithinThreshold);
+		CHECK(pmon.getNextCheckingStatus() == PMON::WithinThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
 
 		ServiceTests::reset();
@@ -1195,9 +1193,19 @@ TEST_CASE("Delta Check Perform Check") {
 	}
 }
 
+/**
+ * Enables the parameter monitoring function, so that checkAll performs the checks (see 6.12.3.5.1 of the standard)
+ */
+void enableParameterMonitoringFunction() {
+	Message enableFunctionRequest(OnBoardMonitoringService::ServiceType,
+	                              OnBoardMonitoringService::EnableParameterMonitoringFunctions, Message::TC, 0);
+	MessageParser::execute(enableFunctionRequest);
+}
+
 TEST_CASE("Check All Behavior") {
     SECTION("monitoringDefinition1 and 2 enabled") {
         initialiseParameterMonitoringDefinitions();
+        enableParameterMonitoringFunction();
         auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
     	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
         auto& pmon2 = onBoardMonitoringService.getPMONDefinition(1).get();
@@ -1233,6 +1241,7 @@ TEST_CASE("Check All Behavior") {
 
 	SECTION("Monitoring definitions initially disabled, then enabled") {
     	initialiseParameterMonitoringDefinitions();
+    	enableParameterMonitoringFunction();
     	auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
     	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
     	auto& pmon2 = onBoardMonitoringService.getPMONDefinition(1).get();
@@ -1268,6 +1277,7 @@ TEST_CASE("Check All Behavior") {
 
 	SECTION("Multiple consecutive calls to checkAll") {
     	initialiseParameterMonitoringDefinitions();
+    	enableParameterMonitoringFunction();
     	auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
     	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
 
@@ -1340,7 +1350,7 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
         Services.reset();
     }
 
-    SECTION("Invalid Message Type TC[6,15]") {
+    SECTION("Invalid Message Type TC[12,15]") {
         Message request(OnBoardMonitoringService::ServiceType, 
                        OnBoardMonitoringService::CheckTransitionReport, // Invalid message type
                        Message::TC, 
@@ -1359,7 +1369,7 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
         Services.reset();
     }
 
-	SECTION("Invalid Message Type TC[6,16]") {
+	SECTION("Invalid Message Type TC[12,16]") {
     	Message request(OnBoardMonitoringService::ServiceType,
 					   OnBoardMonitoringService::CheckTransitionReport, // Invalid message type
 					   Message::TC,
@@ -1377,100 +1387,218 @@ TEST_CASE("Parameter Monitoring Function Control", "[service][st12]") {
     	ServiceTests::reset();
     	Services.reset();
     }
+
+	SECTION("Monitoring function status gates the parameter monitoring process") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = onBoardMonitoringService.getPMONDefinition(1).get();
+		auto& pmonLimit = static_cast<PMONLimitCheck&>(pmon);
+		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		pmonLimit.setMonitoringEnabled(true);
+		pmonLimit.setRepetitionNumber(1); // Establish a new checking status on every check
+		param.setValue(15); // Above the high limit of 9
+
+		// The parameter monitoring function is disabled by default, so no check is performed
+		onBoardMonitoringService.checkAll();
+		CHECK(pmonLimit.getCheckingStatus() == PMON::Unchecked);
+
+		// Once the function is enabled, the out-of-limit value is detected
+		enableParameterMonitoringFunction();
+		onBoardMonitoringService.checkAll();
+		CHECK(pmonLimit.getCheckingStatus() == PMON::AboveHighLimit);
+
+		// Disabling the function stops the monitoring process, so the checking status is not updated any more
+		Message disableFunctionRequest(OnBoardMonitoringService::ServiceType,
+		                               OnBoardMonitoringService::DisableParameterMonitoringFunctions, Message::TC, 0);
+		MessageParser::execute(disableFunctionRequest);
+		param.setValue(5); // Back within the limits
+		onBoardMonitoringService.checkAll();
+		CHECK(pmonLimit.getCheckingStatus() == PMON::AboveHighLimit);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Report Status of each Parameter Monitoring Definition", "[service][st12]") {
+	SECTION("Valid request produces a TM[12,14] status report") {
+		initialiseParameterMonitoringDefinitions();
+		onBoardMonitoringService.getPMONDefinition(1).get().setMonitoringEnabled(true);
+
+		Message request(OnBoardMonitoringService::ServiceType,
+		                OnBoardMonitoringService::ReportStatusOfParameterMonitoringDefinition, Message::TC, 0);
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
+		CHECK(report.messageType == OnBoardMonitoringService::ParameterMonitoringDefinitionStatusReport);
+		CHECK(report.readUint16() == 4);
+		CHECK(report.read<ParameterId>() == 0);
+		CHECK(report.readBoolean() == true); // Enabled by the fixture
+		CHECK(report.read<ParameterId>() == 1);
+		CHECK(report.readBoolean() == true); // Enabled above
+		CHECK(report.read<ParameterId>() == 2);
+		CHECK(report.readBoolean() == false);
+		CHECK(report.read<ParameterId>() == 3);
+		CHECK(report.readBoolean() == false);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Report Out Of Limits", "[service][st12]") {
+	SECTION("Valid request is accepted without generating a report yet") {
+		initialiseParameterMonitoringDefinitions();
+
+		Message request(OnBoardMonitoringService::ServiceType, OnBoardMonitoringService::ReportOutOfLimits,
+		                Message::TC, 0);
+		MessageParser::execute(request);
+
+		// The TM[12,11] out-of-limits report generation is tracked in issue #68
+		CHECK(ServiceTests::count() == 0);
+		CHECK(ServiceTests::hasNoErrors());
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
 
 TEST_CASE("Event Raising", "[service][st12][st05]") {
-	SECTION("Valid event raising for Expected Value Check") {
+	SECTION("Establishing an unexpected value raises the configured event") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
-
-		// Set up event mapping for transition from Unchecked to UnexpectedValue
-		pmon.pmonTransitionEventMap.insert(etl::make_pair(etl::make_pair(PMON::Unchecked, PMON::UnexpectedValue), 
-		                                                  EventReportService::UnexpectedValuePMON));
-
-		// Enable monitoring and set value that will trigger UnexpectedValue
-		pmon.setMonitoringEnabled(true);
-		param.setValue(5);
-		pmon.setMask(0xFF);
-
-		// Perform checks until repetition number is reached
-		for (int i = 0; i < 6; i++) {
-			pmon.performCheck();
-		}
-
-		// Verify event was raised
-		CHECK(ServiceTests::count() == 1);
-		Message report = ServiceTests::get(0);
-		CHECK(report.serviceType == EventReportService::ServiceType);
-		CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
-
-		ServiceTests::reset();
-		Services.reset();
-	}
-
-	SECTION("Valid event raising for Limit Check") {
-		initialiseParameterMonitoringDefinitions();
-		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
-
-		// Set up event mapping for transition from Unchecked to BelowLowLimit
-		pmon.pmonTransitionEventMap.insert(etl::make_pair(etl::make_pair(PMON::Unchecked, PMON::BelowLowLimit), 
-		                                                  EventReportService::BelowLowLimitPMON));
-
-		// Enable monitoring and set value that will trigger BelowLowLimit
-		pmon.setMonitoringEnabled(true);
-		param.setValue(1);
-
-		// Perform checks until repetition number is reached
-		for (int i = 0; i < 6; i++) {
-			pmon.performCheck();
-		}
-
-		// Verify event was raised
-		CHECK(ServiceTests::count() == 1);
-		Message report = ServiceTests::get(0);
-		CHECK(report.serviceType == EventReportService::ServiceType);
-		CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
-
-		ServiceTests::reset();
-		Services.reset();
-	}
-
-	SECTION("Valid event raising for Delta Check") {
-		initialiseParameterMonitoringDefinitions();
-		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
 		auto& param = static_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
-		// Set up event mapping for transition from Invalid to AboveHighThreshold
-		pmon.pmonTransitionEventMap.insert(etl::make_pair(etl::make_pair(PMON::Invalid, PMON::BelowLowThreshold),
-		                                                  EventReportService::BelowLowThresholdPMON));
+		pmon.setMonitoringEnabled(true);
+		pmon.setMask(0xFF);
+		param.setValue(5); // Differs from the expected value of 10
 
-		// Enable monitoring and set initial value
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.getCheckingStatus() == PMON::UnexpectedValue);
+
+		// Establishing UnexpectedValue raises the configured event, with low severity in the test platform
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		CHECK(report.serviceType == EventReportService::ServiceType);
+		CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
+		CHECK(report.read<EventDefinitionId>() == pmon.getUnexpectedValueEvent());
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Establishing an in-limits status does not raise an event") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
+		auto& param = static_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
+
+		pmon.setMonitoringEnabled(true);
+		param.setValue(5); // Within the limits [2, 9]
+
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.getCheckingStatus() == PMON::WithinLimits);
+
+		CHECK(ServiceTests::count() == 0);
+		CHECK(ServiceTests::hasNoErrors());
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Limit check raises the event configured for each limit") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
+		auto& param = static_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
+
+		pmon.setMonitoringEnabled(true);
+		param.setValue(1); // Below the low limit of 2
+
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.getCheckingStatus() == PMON::BelowLowLimit);
+
+		// The below-low-limit event of the fixture is informative in the test platform
+		REQUIRE(ServiceTests::count() == 1);
+		Message belowLowLimitReport = ServiceTests::get(0);
+		CHECK(belowLowLimitReport.messageType == EventReportService::MessageType::InformativeEventReport);
+		CHECK(belowLowLimitReport.read<EventDefinitionId>() == pmon.getBelowLowLimitEvent());
+
+		param.setValue(15); // Above the high limit of 9
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
+
+		// The above-high-limit event of the fixture has low severity in the test platform
+		REQUIRE(ServiceTests::count() == 2);
+		Message aboveHighLimitReport = ServiceTests::get(1);
+		CHECK(aboveHighLimitReport.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
+		CHECK(aboveHighLimitReport.read<EventDefinitionId>() == pmon.getAboveHighLimitEvent());
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Delta check raises the configured event with the transition as auxiliary data") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
+		auto& param = static_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
+
 		pmon.setMonitoringEnabled(true);
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
-		pmon.performCheck();
+		pmon.performCheck(); // No previous value, so the Invalid status is established
 
-		// Set value that will trigger AboveHighThreshold
-		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
-		uint16_t prevValue = 0;
+		// A delta of +180 per 15 seconds exceeds the high delta threshold of 11 per second
+		uint32_t value = 10;
 		for (int i = 0; i < 7; i++) {
-			prevValue += 180;
-			param.setValue(prevValue);
+			const int elapsedSeconds = 15 * (i + 1);
+			ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15 + elapsedSeconds / 60, elapsedSeconds % 60));
+			value += 180;
+			param.setValue(value);
 			pmon.performCheck();
 		}
+		CHECK(pmon.getCheckingStatus() == PMON::AboveHighThreshold);
 
-		// Verify event was raised
-		CHECK(ServiceTests::count() == 1);
+		// The above-high-threshold event of the fixture has high severity in the test platform
+		REQUIRE(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
 		CHECK(report.serviceType == EventReportService::ServiceType);
-		CHECK(report.messageType == EventReportService::MessageType::LowSeverityAnomalyReport);
-		CHECK(report.read<EventDefinitionId>() == EventReportService::Event::BelowLowThresholdPMON);
-		String<ECSSEventDataAuxiliaryMaxSize> data = "";
+		CHECK(report.messageType == EventReportService::MessageType::HighSeverityAnomalyReport);
+		CHECK(report.read<EventDefinitionId>() == pmon.getAboveHighThresholdEvent());
+
+		// The auxiliary data describes the transition from Invalid (2) to AboveHighThreshold (10)
 		etl::array<uint8_t, ECSSEventDataAuxiliaryMaxSize> eventData = {};
 		report.readString(eventData.data(), ECSSEventDataAuxiliaryMaxSize);
-		CHECK(strcmp(reinterpret_cast<const char*>(eventData.data()),"ID9checkTransitionFailedFrom2To9") == 0);
+		CHECK(strcmp(reinterpret_cast<const char*>(eventData.data()), "ID 9 from 2 to 10") == 0);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("An invalid configured event definition is reported as an internal error") {
+		initialiseParameterMonitoringDefinitions();
+		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
+		auto& param = static_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
+
+		pmon.setMonitoringEnabled(true);
+		pmon.setAboveHighLimitEvent(0); // 0 is not a valid event definition ID
+		param.setValue(15); // Above the high limit of 9
+
+		for (int i = 0; i < 6; i++) {
+			pmon.performCheck();
+		}
+		CHECK(pmon.getCheckingStatus() == PMON::AboveHighLimit);
+
+		CHECK(ServiceTests::count() == 0);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::InvalidEventID) == 1);
+
 		ServiceTests::reset();
 		Services.reset();
 	}

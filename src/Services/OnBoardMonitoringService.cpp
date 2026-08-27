@@ -334,24 +334,33 @@ void OnBoardMonitoringService::reportOutOfLimits(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportOutOfLimits)) {
 		return;
 	}
+	// TODO(#68): Generate the TM[12,11] out-of-limits report, whose contents are defined by requirement
+	// 6.12.3.7 of ECSS-E-ST-70-41C, from the transitions recorded in the check transition list of each
+	// parameter monitoring definition.
 }
 
 void OnBoardMonitoringService::reportStatusOfParameterMonitoringDefinition(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportStatusOfParameterMonitoringDefinition)) {
 		return;
 	}
+	// As per 6.12.3.11c of ECSS-E-ST-70-41C, each notification contains the identifier of the parameter
+	// monitoring definition and its PMON status (enabled/disabled).
 	Message pmonStatusReport{ServiceType, MessageType::ParameterMonitoringDefinitionStatusReport, Message::TM, ApplicationId};
 	pmonStatusReport.appendUint16(parameterMonitoringList.size());
-	for (auto& pmon : parameterMonitoringList) {
-		pmonStatusReport.append(pmon.first);
-		pmonStatusReport.append(pmon.second.get().getCheckingStatus());	
+	for (const auto& pmon: parameterMonitoringList) {
+		pmonStatusReport.append<ParameterId>(pmon.first);
+		pmonStatusReport.appendBoolean(pmon.second.get().isMonitoringEnabled());
 	}
 	storeMessage(pmonStatusReport);
 }
 
-
 void OnBoardMonitoringService::checkAll() const {
-	for (const auto& entry : parameterMonitoringList) {
+	// As per 6.12.3.5.1e and 6.12.3.5.2e of ECSS-E-ST-70-41C, the parameter monitoring process only runs
+	// while the parameter monitoring function is enabled.
+	if (not parameterMonitoringFunctionStatus) {
+		return;
+	}
+	for (const auto& entry: parameterMonitoringList) {
 		auto& pmon = entry.second.get();
 		if (pmon.isMonitoringEnabled()) {
 			pmon.performCheck();

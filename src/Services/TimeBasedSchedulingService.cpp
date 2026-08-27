@@ -7,7 +7,7 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
 }
 
-Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(Time::DefaultCUC currentTime) {
+Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(const Time::DefaultCUC& currentTime) {
 
 	if (currentTime >= scheduledActivities.front().requestReleaseTime && !scheduledActivities.empty()) {
 		if (scheduledActivities.front().requestID.applicationID == ApplicationId) {
@@ -114,7 +114,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.sourceID = request.read<ApplicationProcessUserId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
@@ -145,7 +145,7 @@ void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.sourceID = request.read<ApplicationProcessUserId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
@@ -192,7 +192,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.sourceID = request.read<ApplicationProcessUserId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
@@ -223,7 +223,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
-		receivedRequestID.sourceID = request.read<SourceId>();
+		receivedRequestID.sourceID = request.read<ApplicationProcessUserId>();
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
@@ -251,7 +251,7 @@ void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<
 	for (const auto& match: listOfActivities) {
 		// todo (#229): append sub-schedule and group ID if they are defined
 		report.appendDefaultCUCTimeStamp(match.requestReleaseTime);
-		report.append<SourceId>(match.requestID.sourceID);
+		report.append<ApplicationProcessUserId>(match.requestID.sourceID);
 		report.append<ApplicationProcessId>(match.requestID.applicationID);
 		report.append<SequenceCount>(match.requestID.sequenceCount);
 	}

@@ -23,6 +23,82 @@ check-build:
     - cmake . -DCMAKE_CXX_FLAGS="-Wall -Wextra -pedantic -fdiagnostics-color=always" -DCMAKE_TOOLCHAIN_FILE=conan-build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
     - make -j$(nproc)
 
+.firmware:
+  image: spacedot/build-arm
+  stage: build
+  allow_failure: true
+
+firmware-obc:
+  extends: .firmware
+  parallel:
+    matrix:
+      - PROJECT: [obc-dev, obc-eqm, obc-eqm-new]
+  script:
+    - git clone https://gitlab.com/acubesat/obc/embedded-software.git /tmp/embedded-software && cd /tmp/embedded-software
+    - mkdir conan-build
+    - conan profile detect --force
+    - cp conan-arm-profile /root/.conan2/profiles/
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan --force
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - cd common/lib
+    - git clone https://gitlab.com/acubesat/obc/cross-platform-software.git
+    - git clone https://gitlab.com/acubesat/obc/atsam-component-drivers.git
+    - cd cross-platform-software && git submodule update --init --recursive
+    - cd ../../..
+    - conan remove "ecss-services/*" -c || true
+    - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake
+    - make -j$(nproc)
+
+firmware-adcs:
+  extends: .firmware
+  parallel:
+    matrix:
+      - PROJECT: [adcs-dev, adcs-eqm]
+  script:
+    - git clone https://gitlab.com/acubesat/adcs/adcs-software/adcs-embedded.git /tmp/adcs-embedded && cd /tmp/adcs-embedded
+    - mkdir conan-build
+    - conan profile detect --force
+    - cp conan-arm-profile /root/.conan2/profiles/
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan --force
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - cd common/lib
+    - git clone https://gitlab.com/acubesat/adcs/adcs-component-drivers.git
+    - git clone https://gitlab.com/acubesat/obc/cross-platform-software.git
+    - git clone https://gitlab.com/acubesat/obc/atsam-component-drivers.git
+    - cd cross-platform-software && git submodule update --init --recursive
+    - cd ../../..
+    - conan remove "ecss-services/*" -c || true
+    - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_C_COMPILER=/usr/bin/arm-none-eabi-gcc -DCMAKE_CXX_COMPILER=/usr/bin/arm-none-eabi-g++ -DCMAKE_ASM_COMPILER=/usr/bin/arm-none-eabi-gcc
+    - make -j$(nproc)
+
+firmware-su:
+  extends: .firmware
+  parallel:
+    matrix:
+      - PROJECT: [su-dev, su-eqm-v1, su-eqm-v2, su-eqm-v3]
+  script:
+    - git clone https://gitlab.com/acubesat/su/on-board-software/su-embedded-software.git /tmp/su-embedded-software && cd /tmp/su-embedded-software
+    - mkdir conan-build
+    - conan profile detect --force
+    - cp conan-arm-profile /root/.conan2/profiles/
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan --force
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - cd common/lib
+    - git clone https://gitlab.com/acubesat/obc/cross-platform-software.git
+    - git clone https://gitlab.com/acubesat/obc/atsam-component-drivers.git
+    - git clone https://gitlab.com/acubesat/su/on-board-software/su-component-drivers.git
+    - cd cross-platform-software && git submodule update --init --recursive
+    - cd ../../..
+    - conan remove "ecss-services/*" -c || true
+    - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_CXX_COMPILER="arm-none-eabi-g++" -DCMAKE_C_COMPILER="arm-none-eabi-gcc"
+    - make -j$(nproc)
+
 cppcheck:
   image: spacedot/cppcheck:2.8
   stage: analyze

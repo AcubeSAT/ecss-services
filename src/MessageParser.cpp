@@ -52,6 +52,7 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress[constParamet
 #ifdef SERVICE_STORAGEANDRETRIEVAL
 		case StorageAndRetrievalService::ServiceType:
 			Services.storageAndRetrieval.execute(message);
+			break;
 #endif
 
 #ifdef SERVICE_ONBOARDMONITORING
@@ -102,7 +103,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 
 	uint16_t const packetHeaderIdentification = (data[0] << 8) | data[1];
 	uint16_t const packetSequenceControl = (data[2] << 8) | data[3];
-	uint16_t const packetDataLength = (data[4] << 8) | data[5];
+	uint32_t const packetDataLength = ((data[4] << 8) | data[5]) + 1;
 
 	// Individual fields of the CCSDS Space Packet primary header
 	uint8_t const versionNumber = data[0] >> 5;
@@ -130,10 +131,23 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	Message message(0, 0, packetType, APID);
 	message.packetSequenceCount = packetSequenceCount;
 
+	uint16_t payloadLength = packetDataLength;
+	if constexpr (ECSSCRCIncluded) {
+		if (not ASSERT_INTERNAL(packetDataLength >= CRCHelper::CRCField, ErrorHandler::UnacceptablePacket)) {
+			return {};
+		}
+
+		if (not ASSERT_INTERNAL(CRCHelper::validateCRC(data, length), ErrorHandler::InvalidCRC)) {
+			return {};
+		}
+
+		payloadLength -= CRCHelper::CRCField;
+	}
+
 	if (packetType == Message::TC) {
-		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		parseECSSTCHeader(data + CCSDSPrimaryHeaderSize, payloadLength, message);
 	} else {
-		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, packetDataLength, message);
+		parseECSSTMHeader(data + CCSDSPrimaryHeaderSize, payloadLength, message);
 	}
 
 	return message;
@@ -146,7 +160,7 @@ void MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t const pusVersion = data[0] >> 4;
 	ServiceTypeNum const serviceType = data[1];
 	MessageTypeNum const messageType = data[2];
-	SourceId const sourceId = (data[3] << 8) + data[4];
+	ApplicationProcessUserId const sourceId = (data[3] << 8) + data[4];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
@@ -185,8 +199,8 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[0] |= 0x00;                //ack flags
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
-		header[3] = message.applicationId >> 8U;
-		header[4] = message.applicationId;
+		header[3] = message.sourceId >> 8U;
+		header[4] = message.sourceId;
 	} else {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
 		header[0] |= 0x00;                // Spacecraft time reference status
@@ -194,8 +208,8 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
 		header[4] = static_cast<uint8_t>(message.messageTypeCounter & 0xffU);
-		header[5] = message.applicationId >> 8U; // DestinationID
-		header[6] = message.applicationId;
+		header[5] = message.destinationId >> 8U;
+		header[6] = message.destinationId;
 		uint32_t ticks = TimeGetter::getCurrentTimeDefaultCUC().formatAsBytes();
 		header[7] = (ticks >> 24) & 0xffU;
 		header[8] = (ticks >> 16) & 0xffU;
@@ -241,6 +255,13 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	SequenceCount const packetSequenceControl = message.packetSequenceCount | (3U << 14U);
 	uint16_t packetDataLength = ecssMessage.size() - 1;
 
+	if constexpr (ECSSCRCIncluded) {
+		if (not ASSERT_INTERNAL(packetDataLength <= std::numeric_limits<uint16_t>::max() - CRCHelper::CRCField, ErrorHandler::StringTooLarge)) {
+			return {""};
+		}
+		packetDataLength += CRCHelper::CRCField;
+	}
+
 	// Compile the header
 	header[0] = packetId >> 8U;
 	header[1] = packetId & 0xffU;
@@ -254,11 +275,11 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 	ccsdsMessage.append(ecssMessage);
 
 
-	if constexpr (CRCHelper::EnableCRC) {
+	if constexpr (ECSSCRCIncluded) {
 		const CRCSize crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
-		etl::array<uint8_t, CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
+		etl::array<uint8_t, CRCHelper::CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
 		                                            (crcField &  0xFF)};
-		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), 2);
+		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), crcMessage.size());
 		ccsdsMessage.append(crcString);
 	}
 
@@ -272,6 +293,8 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	uint8_t const pusVersion = data[0] >> 4;
 	ServiceTypeNum const serviceType = data[1];
 	MessageTypeNum const messageType = data[2];
+	uint16_t const messageTypeCounter = (data[3] << 8) | data[4];
+	ApplicationProcessUserId const destinationId = (data[5] << 8) | data[6];
 
 	ErrorHandler::assertRequest(pusVersion == 2U, message, ErrorHandler::UnacceptableMessage);
 
@@ -281,6 +304,8 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	// Copy the data to the message
 	message.serviceType = serviceType;
 	message.messageType = messageType;
+	message.messageTypeCounter = messageTypeCounter;
+	message.destinationId = destinationId;
 	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data.begin());
 	message.dataSize = length;
 }

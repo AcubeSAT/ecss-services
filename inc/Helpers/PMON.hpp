@@ -1,23 +1,24 @@
 #pragma once
 #include <cstdint>
+#include "ECSS_Definitions.hpp"
 #include "Helpers/Parameter.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
 #include "TimeGetter.hpp"
-#include "etl/vector.h"
 #include "etl/functional.h"
-#include "etl/map.h"
 #include "etl/optional.h"
-#include "etl/utility.h"
 #include "etl/span.h"
-#include "ECSS_Definitions.hpp"
+#include "etl/utility.h"
+#include "etl/vector.h"
 
 /**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
  */
 class PMON {
 public:
-
+	/**
+	 * The checking status of a parameter monitoring definition, as defined in ECSS-E-ST-70-41C 6.12.3.5.
+	 */
 	enum CheckingStatus : uint8_t {
 		Unchecked = 1,
 		Invalid = 2,
@@ -31,13 +32,19 @@ public:
 		AboveHighThreshold = 10
 	};
 
+	/**
+	 * The type of check that a parameter monitoring definition performs.
+	 */
 	enum class CheckType : uint8_t { 
 		Limit = 1,
 		ExpectedValue = 2,
 		Delta = 3 
 	};
 
-	
+	/**
+	 * A checking status transition, from the previously established status (first) to the newly
+	 * established one (second).
+	 */
 	using PMONTransition = etl::pair<CheckingStatus, CheckingStatus>;
 
 	/**
@@ -82,10 +89,11 @@ public:
 	}
 
 	/**
-	* Returns the new tracked status	
+	* Returns the checking status that will be established once the repetition counter reaches the
+	* repetition number.
 	*/
-	CheckingStatus getTrackedStatus() const {
-		return newTrackedCheckingStatus;
+	CheckingStatus getNextCheckingStatus() const {
+		return nextCheckingStatus;
 	}
 
 	/**
@@ -148,13 +156,16 @@ public:
 	 */
 	virtual void performCheck() = 0;
 
-	
-	etl::reference_wrapper<ParameterBase> monitoredParameter;
-	
 	/**
-	 * The map of event definitions connected to the check transitions.
+	 * Returns the event definition identifier associated with transitions into the given checking status,
+	 * as per requirement 6.12.3.3j of ECSS-E-ST-70-41C. Checking statuses that have no associated event
+	 * definition return an empty optional.
 	 */
-	etl::map<PMONTransition, EventDefinitionId, PMONEventMapSize> pmonTransitionEventMap = {};
+	virtual etl::optional<EventDefinitionId> getEventDefinitionForStatus(CheckingStatus status) const {
+		return etl::nullopt;
+	}
+
+	etl::reference_wrapper<ParameterBase> monitoredParameter;
 
 protected:
 	/**
@@ -204,10 +215,10 @@ protected:
 	CheckType checkType;
 
 	/**
-	 * The check type that can possibly replace the current one, if the repetition counter reaches the repetition number.
-	 * The repetition counter refers to the number of times this new possible check type has appeared consecutively.
+	 * The checking status that can possibly replace the current one, if the repetition counter reaches the repetition number.
+	 * The repetition counter refers to the number of times this new possible checking status has appeared consecutively.
 	 */
-	CheckingStatus newTrackedCheckingStatus;
+	CheckingStatus nextCheckingStatus = Unchecked;
 };
 
 /**
@@ -285,6 +296,13 @@ public:
 		mask = value;
 	}
 
+	etl::optional<EventDefinitionId> getEventDefinitionForStatus(CheckingStatus status) const override {
+		if (status == UnexpectedValue) {
+			return unexpectedValueEvent;
+		}
+		return etl::nullopt;
+	}
+
 private:
 	PMONExpectedValue expectedValue;
 	PMONBitMask mask;
@@ -332,31 +350,41 @@ public:
 	}
 
 	/**
-	 * Returns the value of the Low PMONLimit used on a PMONLimit Check.
+	 * Sets the value of the Low PMONLimit used on a PMONLimit Check.
 	 */
 	void setLowLimit(PMONLimit limit) {
 		lowLimit = limit;
 	}
 
 	/**
-	 * Returns the Id of a Below Low PMONLimit Event.
+	 * Sets the Id of a Below Low PMONLimit Event.
 	 */
 	void setBelowLowLimitEvent(EventDefinitionId value) {
 		belowLowLimitEvent = value;
 	}
 
 	/**
-	 * Returns the value of the High PMONLimit used on a PMONLimit Check.
+	 * Sets the value of the High PMONLimit used on a PMONLimit Check.
 	 */
 	void setHighLimit(PMONLimit limit) {
 		highLimit = limit;
 	}
 
 	/**
-	 * Returns the Id of a High PMONLimit Event.
+	 * Sets the Id of a High PMONLimit Event.
 	 */
 	void setAboveHighLimitEvent(EventDefinitionId value) {
 		aboveHighLimitEvent = value;
+	}
+
+	etl::optional<EventDefinitionId> getEventDefinitionForStatus(CheckingStatus status) const override {
+		if (status == BelowLowLimit) {
+			return belowLowLimitEvent;
+		}
+		if (status == AboveHighLimit) {
+			return aboveHighLimitEvent;
+		}
+		return etl::nullopt;
 	}
 
 	/**
@@ -503,6 +531,16 @@ public:
 		return previousTimestamp.has_value();
 	}
 
+	etl::optional<EventDefinitionId> getEventDefinitionForStatus(CheckingStatus status) const override {
+		if (status == BelowLowThreshold) {
+			return belowLowThresholdEvent;
+		}
+		if (status == AboveHighThreshold) {
+			return aboveHighThresholdEvent;
+		}
+		return etl::nullopt;
+	}
+
 	/**
 	 * @brief Performs the check for the PMONDeltaCheck class.
 	 *
@@ -533,6 +571,9 @@ public:
 				newCheckingStatus = WithinThreshold;
 			}
 		} else {
+			// Without a previous value there is no delta to evaluate (6.12.3.5.2c of the standard), so the
+			// Invalid status is established directly instead of waiting for the repetition counter to reach
+			// the repetition number: counting repetitions of an Invalid result serves no monitoring purpose.
 			currentCheckingStatus = Invalid;
 		}
 

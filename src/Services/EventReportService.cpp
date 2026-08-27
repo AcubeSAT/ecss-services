@@ -3,8 +3,8 @@
 #ifdef SERVICE_EVENTREPORT
 
 #include <Services/EventReportService.hpp>
-#include "Message.hpp"
 #include "ErrorHandler.hpp"
+#include "Message.hpp"
 #include "ServicePool.hpp"
 
 bool EventReportService::validateParameters(Event eventID) {
@@ -33,7 +33,7 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 	if (enabledEvents[static_cast<EventDefinitionId>(eventID)]) {
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
-		report.appendString(data);
+		report.appendEventData(data);
 		Services.eventAction.executeAction(eventID);
 
 		storeMessage(report);
@@ -50,7 +50,7 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 		lowSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::LowSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
-		report.appendString(data);
+		report.appendEventData(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
 		Services.eventAction.executeAction(eventID);
 
@@ -68,7 +68,7 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 		mediumSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::MediumSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
-		report.appendString(data);
+		report.appendEventData(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
 		Services.eventAction.executeAction(eventID);
 
@@ -86,7 +86,7 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 		highSeverityReportCount++;
 		Message report = createTM(EventReportService::MessageType::HighSeverityAnomalyReport);
 		report.append<EventDefinitionId>(eventID);
-		report.appendString(data);
+		report.appendEventData(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
 		Services.eventAction.executeAction(eventID);
 
@@ -104,9 +104,13 @@ void EventReportService::enableReportGeneration(Message& message) {
 		return;
 	}
 	for (uint16_t i = 0; i < tcNumberOfEvents; i++) {
-		enabledEvents[message.read<EventDefinitionId>()] = true;
+		const auto eventID = message.read<EventDefinitionId>();
+		if (!validateParameters(static_cast<Event>(eventID))) {
+			continue;
+		}
+		enabledEvents[eventID] = true;
 	}
-	disabledEventsCount = enabledEvents.size() - enabledEvents.count();
+	disabledEventsCount = countDisabledEvents();
 }
 
 void EventReportService::disableReportGeneration(Message& message) {
@@ -120,9 +124,13 @@ void EventReportService::disableReportGeneration(Message& message) {
 	}
 
 	for (uint16_t i = 0; i < tcNumberOfEvents; i++) {
-		enabledEvents[message.read<EventDefinitionId>()] = false;
+		const auto eventID = message.read<EventDefinitionId>();
+		if (!validateParameters(static_cast<Event>(eventID))) {
+			continue;
+		}
+		enabledEvents[eventID] = false;
 	}
-	disabledEventsCount = enabledEvents.size() - enabledEvents.count();
+	disabledEventsCount = countDisabledEvents();
 }
 
 void EventReportService::requestListOfDisabledEvents(const Message& message) {
@@ -135,10 +143,8 @@ void EventReportService::requestListOfDisabledEvents(const Message& message) {
 void EventReportService::listOfDisabledEventsReport() {
 	Message report = createTM(EventReportService::MessageType::DisabledListEventReport);
 
-	uint16_t const numberOfDisabledEvents =
-		enabledEvents.size() - enabledEvents.count(); // NOLINT(cppcoreguidelines-init-variables)
-	report.appendHalfword(numberOfDisabledEvents);
-	for (size_t i = 0; i < enabledEvents.size(); i++) {
+	report.appendHalfword(countDisabledEvents());
+	for (size_t i = 1; i < enabledEvents.size(); i++) {
 		if (not enabledEvents[i]) {
 			report.append<EventDefinitionId>(i);
 		}
@@ -147,24 +153,27 @@ void EventReportService::listOfDisabledEventsReport() {
 	storeMessage(report);
 }
 
-void EventReportService::raiseTransitionEvent(ParameterId monitoredParameterId, const PMON::PMONTransition& transition, EventDefinitionId eventID) {
-	EventReportSeverity severity = eventDefinitionSeverityArray[eventID];
-	auto data = String<ECSSEventDataAuxiliaryMaxSize>("ID");
-	data.append(std::to_string(monitoredParameterId).c_str());
-	data.append("checkTransitionFailedFrom");
-	data.append(std::to_string(transition.first).c_str());
-	data.append("To");
-	data.append(std::to_string(transition.second).c_str());
+void EventReportService::raiseEvent(EventDefinitionId eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+	const auto event = static_cast<Event>(eventID);
+	if (!validateParameters(event)) {
+		return;
+	}
+	const EventReportSeverity severity = eventDefinitionSeverityArray[eventID - 1];
 
-
-	if (severity == EventReportSeverity::Informative) {
-		informativeEventReport(static_cast<Event>(eventID), data);
-	} else if (severity == EventReportSeverity::Low) {
-		lowSeverityAnomalyReport(static_cast<Event>(eventID), data);
-	} else if (severity == EventReportSeverity::Medium) {
-		mediumSeverityAnomalyReport(static_cast<Event>(eventID), data);
-	} else if (severity == EventReportSeverity::High) {
-		highSeverityAnomalyReport(static_cast<Event>(eventID), data);
+	switch (severity) {
+		case EventReportSeverity::Low:
+			lowSeverityAnomalyReport(event, data);
+			break;
+		case EventReportSeverity::Medium:
+			mediumSeverityAnomalyReport(event, data);
+			break;
+		case EventReportSeverity::High:
+			highSeverityAnomalyReport(event, data);
+			break;
+		case EventReportSeverity::Informative:
+		default:
+			informativeEventReport(event, data);
+			break;
 	}
 }
 

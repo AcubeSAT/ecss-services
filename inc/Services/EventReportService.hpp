@@ -3,8 +3,6 @@
 
 #include <etl/bitset.h>
 #include "Service.hpp"
-#include "etl/map.h"
-#include "Helpers/PMON.hpp"
 
 /**
  * Implementation of ST[05] event reporting service
@@ -19,13 +17,31 @@
 class EventReportService : public Service
 {
 private:
-    static constexpr uint16_t NumberOfEvents = 10;
-    etl::bitset<NumberOfEvents> enabledEvents;
+    static constexpr uint16_t NumberOfEvents = 6;
+    /**
+     * Report generation state per event definition. The bitset is indexed by the raw event definition ID
+     * (IDs start at 1), so it holds one extra slot; slot 0 is unused.
+     */
+    etl::bitset<NumberOfEvents + 1> enabledEvents;
     static constexpr uint16_t LastElementID = std::numeric_limits<uint16_t>::max();
 	/**
     * Initializes the Event Severity array by setting the default value for each event
     */
     void initializeEventDefinitionSeverityArray();
+
+    /**
+     * Counts the event definitions whose report generation is disabled, ignoring the unused slot 0
+     * of the enabledEvents bitset.
+     */
+    uint16_t countDisabledEvents() const {
+        uint16_t disabledEvents = 0;
+        for (size_t i = 1; i < enabledEvents.size(); i++) {
+            if (not enabledEvents[i]) {
+                disabledEvents++;
+            }
+        }
+        return disabledEvents;
+    }
 public:
     inline static constexpr ServiceTypeNum ServiceType = 5;
 
@@ -112,39 +128,21 @@ public:
         FailedStartOfExecution = 5,
 
         /**
-         * When an unexpected value is detected in PMON
+         * Generic event to be used by default for parameter monitoring definitions (ST[12]) whose checking
+         * status transitioned to an out-of-limits status. Each parameter monitoring definition is configured
+         * with the event definition it raises per checking status, so mission-specific event definitions can
+         * be used instead of this one.
          */
-        UnexpectedValuePMON = 6,
-
-        /**
-         * When a parameter value goes below the low limit in PMON
-         */
-        BelowLowLimitPMON = 7,
-
-        /**
-         * When a parameter value goes above the high limit in PMON
-         */
-        AboveHighLimitPMON = 8,
-
-        /**
-         * When a parameter delta goes below the low threshold in PMON
-         */
-        BelowLowThresholdPMON = 9,
-
-        /**
-         * When a parameter delta goes above the high threshold in PMON
-         */
-        AboveHighThresholdPMON = 10,
-
+        ParameterOutOfLimits = 6,
     };
 
     /**
      * Map of event definitions to their severity.
-     * The position in the array is connected 1-1 with the EventDefinitionID.
-     * The contents are of type EventReportSeverity.
+     * Index i of the array holds the severity of the event definition with ID i + 1, since event
+     * definition IDs start at 1.
      *
-     * e.g. if we define eventDefinitionSeverityArray[0] = EventReportSeverity::Informative,
-     * then that means that the Event with ID 0 should be raised with severity -> Informative.
+     * e.g. eventDefinitionSeverityArray[0] = EventReportSeverity::Informative means that the event
+     * with ID 1 is raised with Informative severity.
      */
     etl::array<EventReportSeverity, NumberOfEvents> eventDefinitionSeverityArray = {};
 
@@ -229,7 +227,7 @@ public:
      * Getter for enabledEvents bitset
      * @return enabledEvents, just in case the whole bitset is needed
      */
-    etl::bitset<NumberOfEvents> getStateOfEvents()
+    etl::bitset<NumberOfEvents + 1> getStateOfEvents()
     {
         return enabledEvents;
     }
@@ -259,23 +257,17 @@ public:
 	static inline bool isNumberOfEventsValid(uint16_t tcNumberOfEvents);
 
     /**
-     * Raises an event for a parameter monitoring status transition.
-     * 
-     * This method is called when a parameter's monitoring status changes and needs to generate
-     * an event report. The severity of the event is determined by the eventDefinitionSeverityArray,
-     * and the appropriate event report (informative/low/medium/high) is generated.
-     * 
-     * The event data will include:
-     * - The parameter ID that triggered the transition
-     * - The previous monitoring status (transition.first)
-     * - The new monitoring status (transition.second)
-     * 
-     * @param monitoredParameterId The ID of the parameter being monitored
-     * @param transition A pair containing the previous (first) and new (second) checking status
-     * @param eventId The ID of the event to be raised, used to determine severity from eventDefinitionSeverityArray
+     * Raises the event with the given event definition ID.
+     *
+     * The severity of the event is determined by the eventDefinitionSeverityArray, and the corresponding
+     * event report (TM[5,1] informative, TM[5,2] low, TM[5,3] medium or TM[5,4] high severity) is
+     * generated. Events with no known severity are raised as informative.
+     *
+     * @param eventID The ID of the event to be raised. Invalid IDs (0, or larger than the number of event
+     * definitions) are reported as an internal error and no event is raised.
+     * @param data The auxiliary data of the event report
      */
-    void raiseTransitionEvent(ParameterId monitoredParameterId, const PMON::PMONTransition&
-    transition, EventDefinitionId eventId);
+    void raiseEvent(EventDefinitionId eventID, const String<ECSSEventDataAuxiliaryMaxSize>& data);
 
     /**
      * It is responsible to call the suitable function that executes a telecommand packet. The source of that packet
