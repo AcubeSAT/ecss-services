@@ -1,0 +1,1 @@
+. "/Users/claudemacmini/repos/ecss-mr-worktrees/mr201/conan-build/Debug/generators/conanrunenv-debug-x86_64.sh"

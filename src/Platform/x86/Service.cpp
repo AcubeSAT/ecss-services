@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <netinet/in.h>
+#include <sstream>
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>

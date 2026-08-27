@@ -139,9 +139,13 @@ void addTelemetryPacketsInPacketStores() {
 	Message msg(StorageAndRetrievalService::ServiceType,
 						StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport, Message::TM, ApplicationId);
 
+	// The configuration deliberately contains only the message type stored below. Otherwise, reports generated
+	// by the requests under test would be auto-stored through Service::handleMessage, disturbing the expected
+	// packet store contents.
 	for (auto& packetStoreId: packetStoreIds) {
 		ApplicationProcessConfiguration config;
-		config.addAllReportsOfApplication(msg, ApplicationId);
+		config.addReport(ApplicationId, StorageAndRetrievalService::ServiceType,
+		    StorageAndRetrievalService::MessageType::PacketStoreConfigurationReport);
 		storageAndRetrieval.packetSelection.packetStoreAppProcessConfig.insert({packetStoreId, config});
 	}
 

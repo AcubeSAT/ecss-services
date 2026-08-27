@@ -97,10 +97,11 @@ performance and size of your program.
 Whenever PUS telemetry is generated, it needs to be stored, transmitted or sent to a receiver. PUS functions will call @ref Service::handleMessage to do this every time a telemetry packet is generated.
 
 This function performs the following:
-1. Calls @ref Service::releaseMessage(), a platform-specific callback (if the linked definitions of **ST[14] - 
-real-time forwarding control** are enabled)
-2. Stores the packet in any packet stores (if **ST[15] - on-board storage** is enabled)
-3. Calls @ref Service::platformSpecificHandleMessage(), a platform-specific callback, for any misc functionality.
+1. Calls @ref Service::platformSpecificHandleMessage(), a platform-specific callback, for any misc functionality
+(e.g. logging).
+2. Stores the packet in the interested packet stores (if **ST[15] - on-board storage** is enabled)
+3. Calls @ref Service::releaseMessage(), a platform-specific callback, if the real-time forwarding configuration of
+**ST[14] - real-time forwarding control** contains the message type (or unconditionally, when ST[14] is not enabled)
 
 In @ref Service::releaseMessage() function, you can transmit the message internally or send it through an interface for 
 debugging.
@@ -111,7 +112,7 @@ Service::releaseMessage() functionality.
 Examples follow: 
 
 ```cpp
-void Service::platfromSpecificHandleMessage(Message& message) {
+void Service::platformSpecificHandleMessage(Message& message) {
     LOG_DEBUG << "Just sent a message with CAN to ST[" << static_cast<int>(message.serviceType) << "]";
 }
 ```
@@ -263,14 +264,16 @@ void FunctionManagementService::initializeFunctionMap() {
 }
 ```
 
-5. @ref StorageAndRetrievalService::initializePacketStores
+5. @ref StorageAndRetrievalService::initializeStorageAndRetrievalServiceStructures
 
 The StorageAndRetrievalService is responsible for storing generated telemetry in packet stores. Towards that goal, each
 platform needs to initialize their own packet store map - otherwise no telemetry will be stored.
 
 ```cpp
-void StorageAndRetrievalService::initializePacketStores() {
-	packetStores.insert({"stats", PacketStore()});
+void StorageAndRetrievalService::initializeStorageAndRetrievalServiceStructures() {
+	PacketStore packetStore;
+	packetStore.storageEnabled = true;
+	packetStores.insert({"stats", packetStore});
 }
 ```
 
@@ -287,6 +290,20 @@ void PacketSelectionSubservice::initializePacketSelectionSubServiceStructures() 
 	controlledApplications.push_back(ApplicationId);
 }
 
+```
+
+7. @ref RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures
+
+The RealTimeForwardingControlService gates which telemetry is released in real time. Each platform needs to initialize
+the applicationProcessConfiguration with the message types that shall be forwarded by default, and the
+controlledApplications vector with the application processes it controls.
+
+```cpp
+void RealTimeForwardingControlService::initializeRealTimeForwardingServiceStructures() {
+	Message message;
+	applicationProcessConfiguration.addAllReportsOfApplication(message, ApplicationId);
+	controlledApplications.push_back(ApplicationId);
+}
 ```
 
 ## Receiving messages
