@@ -39,10 +39,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			for (uint8_t currentMessageNumber = 0; currentMessageNumber < numOfMessages; currentMessageNumber++) {
 				MessageTypeNum const messageType = request.read<MessageTypeNum>();
 
-				if (not applicationProcessConfiguration.checkMessageCanBeAdded(request, applicationID, serviceType, messageType)) {
-					continue;
-				}
-				applicationProcessConfiguration.addReport(applicationID, serviceType, messageType);
+				applicationProcessConfiguration.checkAndAddReport(request, applicationID, serviceType, messageType);
 			}
 		}
 	}

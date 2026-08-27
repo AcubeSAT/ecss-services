@@ -199,7 +199,7 @@ public:
 	/**
 	 * The packet selection sub-service of the Storage and Retrieval service.
 	 */
-	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(packetStores);
+	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(*this);
 	
 	inline static constexpr ServiceTypeNum ServiceType = 15;
 

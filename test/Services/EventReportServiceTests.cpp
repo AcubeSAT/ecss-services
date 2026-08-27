@@ -87,8 +87,8 @@ TEST_CASE("Enable Report Generation TC[5,5]", "[service][st05]") {
 	message.append<EventDefinitionId>(eventID[0]);
 	message.append<EventDefinitionId>(eventID[1]);
 	MessageParser::execute(message);
-	CHECK(eventReportService.getStateOfEvents()[2] == 1);
-	CHECK(eventReportService.getStateOfEvents()[4] == 1);
+	CHECK(eventReportService.getStateOfEvents().test(2));
+	CHECK(eventReportService.getStateOfEvents().test(4));
 }
 
 TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
@@ -98,9 +98,9 @@ TEST_CASE("Disable Report Generation TC[5,6]", "[service][st05]") {
 	message.append<EventDefinitionId>(eventID[0]);
 	message.append<EventDefinitionId>(eventID[1]);
 	MessageParser::execute(message);
-	CHECK(eventReportService.getStateOfEvents()[0] == 1);
-	CHECK(eventReportService.getStateOfEvents()[EventReportService::UnknownEvent] == 0);
-	CHECK(eventReportService.getStateOfEvents()[EventReportService::MCUStart] == 0);
+	CHECK(eventReportService.getStateOfEvents().test(0));
+	CHECK(not eventReportService.getStateOfEvents().test(EventReportService::UnknownEvent));
+	CHECK(not eventReportService.getStateOfEvents().test(EventReportService::MCUStart));
 
 	const String<64> eventReportData = "HelloWorld";
 	eventReportService.highSeverityAnomalyReport(EventReportService::UnknownEvent, eventReportData);

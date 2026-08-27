@@ -8,6 +8,8 @@
 #include "etl/map.h"
 #include "etl/vector.h"
 
+class StorageAndRetrievalService;
+
 /**
  * Implementation of the Packet Selection Subservice of the ST[15] Storage and Retrieval Service.
  *
@@ -31,7 +33,7 @@ public:
 	/**
 	 * The type of the packet store ID, coming from the TC/TM[15,x] messages.
 	 */
-	typedef String<ECSSPacketStoreIdSize> PacketStoreId;
+	using PacketStoreId = String<ECSSPacketStoreIdSize>;
 
 private:
 	/**
@@ -45,9 +47,9 @@ private:
 	bool packetStoreExists(const PacketStoreId& packetStoreId);
 
 	/**
-	 * Reference to the packet stores of the storage and retrieval service.
+	 * Reference to the parent Storage and Retrieval Service, used to query the existing packet stores.
 	 */
-	etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& packetStores;
+	StorageAndRetrievalService& mainService;
 
 	/**
 	 * Initializes the packetStoreAppProcessConfig map and the controlledApplications vector with the initial
@@ -58,9 +60,9 @@ private:
 public:
 	/**
 	 * Constructor of the Packet Selection Subservice.
-	 * @param mainServicePacketStores: reference to the packet stores of the storage and retrieval service.
+	 * @param parent: reference to the parent Storage and Retrieval Service.
 	 */
-	explicit PacketSelectionSubservice(etl::map<PacketStoreId, PacketStore, ECSSMaxPacketStores>& mainServicePacketStores) : packetStores(mainServicePacketStores) {
+	explicit PacketSelectionSubservice(StorageAndRetrievalService& parent) : mainService(parent) {
 		serviceType = ServiceType;
 		initializePacketSelectionSubServiceStructures();
 	}
@@ -79,6 +81,14 @@ public:
 	/**
 	 * The map containing the application process configuration. The packet store ID is used as key, to access the application
 	 * process definitions, the service type definitions and the message type definitions.
+	 *
+	 * @note
+	 * The size of this object is known at compile time, but it is significant: each ApplicationProcessConfiguration
+	 * holds up to ECSSMaxApplicationsServicesCombinations vectors of ECSSMaxReportTypeDefinitions message types, and
+	 * this map holds one configuration per packet store (ECSSMaxPacketStores). With the current x86 definitions
+	 * (4 packet stores, 50 app-service combinations, 20 report types), this map measures ~16.6 kB on x86-64
+	 * (sizeof(ApplicationProcessConfiguration) = 4072 bytes). Keep this in mind when adjusting those definitions
+	 * for the embedded platform.
 	 *
 	 * @note
 	 * The report type definitions are the message types of each service. For example a message type for the
