@@ -331,7 +331,7 @@ void OnBoardMonitoringService::reportOutOfLimits(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportOutOfLimits)) {
 		return;
 	}
-	// TODO(#68): Generate the TM[12,11] out-of-limits report once the check transition list is available.
+	// TODO(#334): Generate the TM[12,11] out-of-limits report once the check transition list is available.
 	// The report contents are defined by requirement 6.12.3.12f of ECSS-E-ST-70-41C and require the
 	// transitions recorded by the check transition list, which is introduced together with the ST[12]
 	// event support.
