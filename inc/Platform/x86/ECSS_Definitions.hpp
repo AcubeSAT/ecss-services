@@ -263,12 +263,5 @@ inline constexpr uint16_t ApplicationId = 1;
  * Maximum number of entries in Valid Memory IDs set
  */
 inline constexpr uint32_t MaxValidMemoryIds = 8;
-
-
-/**
- * The size of the check transition list of the PMON class of ST[12]
- */
-inline constexpr uint8_t CheckTransitionListSize = 5;
-
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H

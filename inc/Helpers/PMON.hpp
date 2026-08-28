@@ -12,6 +12,12 @@
 #include "etl/vector.h"
 
 /**
+ * Maximum number of check-status transitions stored per PMON definition.
+ * Defined here so firmware platforms do not need a matching ECSS_Definitions entry.
+ */
+inline constexpr uint8_t CheckTransitionListSize = 5;
+
+/**
  * Base class for Parameter Monitoring definitions. Contains the common variables of all check types.
  */
 class PMON {
