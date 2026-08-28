@@ -1455,7 +1455,7 @@ TEST_CASE("Report Out Of Limits", "[service][st12]") {
 		                Message::TC, 0);
 		MessageParser::execute(request);
 
-		// The TM[12,11] out-of-limits report generation is tracked in issue #68
+		// The TM[12,11] out-of-limits report generation is tracked in issue #334
 		CHECK(ServiceTests::count() == 0);
 		CHECK(ServiceTests::hasNoErrors());
 

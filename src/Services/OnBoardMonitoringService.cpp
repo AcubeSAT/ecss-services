@@ -345,8 +345,8 @@ void OnBoardMonitoringService::reportOutOfLimits(const Message& message) {
 	if (not message.assertTC(ServiceType, ReportOutOfLimits)) {
 		return;
 	}
-	// TODO(#68): Generate the TM[12,11] out-of-limits report, whose contents are defined by requirement
-	// 6.12.3.7 of ECSS-E-ST-70-41C, from the transitions recorded in the check transition list of each
+	// TODO(#334): Generate the TM[12,11] out-of-limits report, whose contents are defined by requirement
+	// 6.12.3.12 of ECSS-E-ST-70-41C, from the transitions recorded in the check transition list of each
 	// parameter monitoring definition.
 }
 
