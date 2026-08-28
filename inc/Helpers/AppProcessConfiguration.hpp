@@ -89,7 +89,7 @@ public:
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
 	bool checkApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,
-	    uint8_t numOfServices, etl::span<const ApplicationProcessId> controlledApplications);
+	    uint8_t numOfServices, const etl::span<const ApplicationProcessId>& controlledApplications);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific service type of an 'add report types' request.
@@ -109,7 +109,8 @@ public:
 	 *
 	 * @return True: if the application process exists in the configuration.
 	 */
-	bool checkApplicationInConfiguration(Message& request, ApplicationProcessId applicationID, uint8_t numOfServices);
+	bool checkApplicationInConfiguration(Message& request, ApplicationProcessId applicationID,
+	    uint8_t numOfServices) const;
 
 	/**
 	 * Checks whether the requested service type is present in the application process configuration.
@@ -119,7 +120,7 @@ public:
 	 * @return True: if the service type exists in the configuration.
 	 */
 	bool checkServiceTypeInConfiguration(Message& request, ApplicationProcessId applicationID,
-	    ServiceTypeNum serviceType, uint8_t numOfMessages);
+	    ServiceTypeNum serviceType, uint8_t numOfMessages) const;
 
 	/**
 	 * Checks whether the requested report type is present in the application process configuration.
@@ -191,8 +192,8 @@ private:
 	 *
 	 * @return True: if the application process is controlled by the Service.
 	 */
-	bool checkAppControlled(etl::span<const ApplicationProcessId> controlledApplications, const Message& request,
-	    ApplicationProcessId applicationID);
+	bool checkAppControlled(const etl::span<const ApplicationProcessId>& controlledApplications,
+	    const Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Checks if the maximum number of service type definitions per application process is reached.
@@ -209,7 +210,7 @@ private:
 	 * @return True: if the maximum number of report type definitions has already been reached.
 	 */
 	bool checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID,
-	    ServiceTypeNum serviceType);
+	    ServiceTypeNum serviceType) const;
 
 	/**
 	 * Checks whether the specified message type already exists in the application process and service
@@ -218,8 +219,7 @@ private:
 	 * @return True: if the message type already exists in the definition.
 	 */
 	bool checkAlreadyExistingReport(const Message& request, ApplicationProcessId applicationID,
-	    ServiceTypeNum serviceType,
-	    MessageTypeNum messageType);
+	    ServiceTypeNum serviceType, MessageTypeNum messageType) const;
 
 	/**
 	 * @return true if the maximum number of service type definitions per application process has been reached,

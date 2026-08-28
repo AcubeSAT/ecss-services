@@ -53,8 +53,7 @@ uint8_t ApplicationProcessConfiguration::countReportsOfService(ApplicationProces
 }
 
 bool ApplicationProcessConfiguration::checkAlreadyExistingReport(const Message& request, ApplicationProcessId applicationID,
-    ServiceTypeNum serviceType,
-    MessageTypeNum messageType) {
+    ServiceTypeNum serviceType, MessageTypeNum messageType) const {
 	if (not isReportTypeAdded(applicationID, serviceType, messageType)) {
 		return false;
 	}
@@ -63,8 +62,7 @@ bool ApplicationProcessConfiguration::checkAlreadyExistingReport(const Message& 
 }
 
 bool ApplicationProcessConfiguration::checkApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,
-    uint8_t numOfServices,
-    etl::span<const ApplicationProcessId> controlledApplications) {
+    uint8_t numOfServices, const etl::span<const ApplicationProcessId>& controlledApplications) {
 	if ((not checkAppControlled(controlledApplications, request, applicationID)) or
 	    checkAllServiceTypesAllowed(request, applicationID)) {
 		skipServiceBlocks(request, numOfServices);
@@ -81,9 +79,8 @@ bool ApplicationProcessConfiguration::checkAllServiceTypesAllowed(const Message&
 	return false;
 }
 
-bool ApplicationProcessConfiguration::checkAppControlled(etl::span<const ApplicationProcessId> controlledApplications,
-    const Message& request,
-    ApplicationProcessId applicationID) {
+bool ApplicationProcessConfiguration::checkAppControlled(const etl::span<const ApplicationProcessId>& controlledApplications,
+    const Message& request, ApplicationProcessId applicationID) {
 	if (etl::find(controlledApplications.begin(), controlledApplications.end(), applicationID) ==
 	    controlledApplications.end()) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NotControlledApplication);
@@ -120,7 +117,7 @@ bool ApplicationProcessConfiguration::checkServiceCanBeAdded(Message& request, A
 }
 
 bool ApplicationProcessConfiguration::checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID,
-    ServiceTypeNum serviceType) {
+    ServiceTypeNum serviceType) const {
 	auto serviceReportTypes = AllReportTypes::MessagesOfService.find(serviceType);
 	if (serviceReportTypes == AllReportTypes::MessagesOfService.end()) {
 		return true;
@@ -133,7 +130,7 @@ bool ApplicationProcessConfiguration::checkMaxReportTypesReached(const Message& 
 }
 
 bool ApplicationProcessConfiguration::checkApplicationInConfiguration(Message& request, ApplicationProcessId applicationID,
-    uint8_t numOfServices) {
+    uint8_t numOfServices) const {
 	if (not isApplicationEnabled(applicationID)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentApplicationProcess);
 		skipServiceBlocks(request, numOfServices);
@@ -143,7 +140,7 @@ bool ApplicationProcessConfiguration::checkApplicationInConfiguration(Message& r
 }
 
 bool ApplicationProcessConfiguration::checkServiceTypeInConfiguration(Message& request, ApplicationProcessId applicationID,
-    ServiceTypeNum serviceType, uint8_t numOfMessages) {
+    ServiceTypeNum serviceType, uint8_t numOfMessages) const {
 	if (not isServiceAdded(applicationID, serviceType)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition);
 		skipReportTypes(request, numOfMessages);
