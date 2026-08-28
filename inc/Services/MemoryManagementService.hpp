@@ -123,7 +123,7 @@ public:
 		 * @param offset The offset of the dumped structured data
 		 * @param readLength The length of the dumped structured data
 		 */
-		void appendDumpedStructuredData(Message& request, Message& report, const Filesystem::Path& filePath,
+		void appendDumpedStructuredData(const Message& request, Message& report, const Filesystem::Path& filePath,
 		                                FileOffset offset, FileDataLength readLength) const;
 	};
 

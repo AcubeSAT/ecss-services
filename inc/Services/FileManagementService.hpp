@@ -29,6 +29,12 @@ public:
      */
 	inline static constexpr char Wildcard = '*';
 
+	/**
+	 * The maximum possible size of a file, in bytes. Used by ST[23] to validate the maximum size
+	 * attribute of created files.
+	 */
+	inline static constexpr size_t MaxPossibleFileSizeBytes = 4096;
+
 	enum MessageType : uint8_t {
 		CreateFile = 1,
 		DeleteFile = 2,

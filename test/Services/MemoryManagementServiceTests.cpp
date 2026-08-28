@@ -8,6 +8,8 @@
 #include "Platform/x86/Helpers/TestMemory.hpp"
 #include "ServiceTests.hpp"
 
+using namespace Filesystem;
+
 constexpr MemoryId TEST_MEMORY = 0;
 
 MemoryManagementService& memMangService = Services.memoryManagement;

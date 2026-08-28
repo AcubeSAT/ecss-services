@@ -168,6 +168,10 @@ namespace Filesystem {
 			return etl::unexpected(FileReadError::FileNotFound);
 		}
 
+		if ((fs::status(path.data()).permissions() & fs::perms::owner_read) == fs::perms::none) {
+			return etl::unexpected(FileReadError::ReadError);
+		}
+
 		if (fileDataLength > buffer.size()) {
 			return etl::unexpected(FileReadError::InvalidBufferSize);
 		}
@@ -201,6 +205,10 @@ namespace Filesystem {
 		etl::optional<NodeType> nodeType = getNodeType(path);
 		if (not nodeType or nodeType.value() != NodeType::File) {
 			return etl::unexpected(FileWriteError::FileNotFound);
+		}
+
+		if (getFileLockStatus(path) == FileLockStatus::Locked) {
+			return etl::unexpected(FileWriteError::WriteError);
 		}
 
 		if (fileDataLength > buffer.size()) {

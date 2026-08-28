@@ -11,8 +11,20 @@
 #include "etl/span.h"
 
 namespace Filesystem {
+	constexpr size_t FullPathSize = ECSSMaxStringSize;
 	using Path = String<FullPathSize>;
+
+	/**
+	 * ObjectPathSize is half the maximum size, minus one character for the '/' delimiter between the
+	 * repository and file paths.
+	 */
+	constexpr size_t ObjectPathSize = (FullPathSize / 2) - 1;
 	using ObjectPath = String<ObjectPathSize>;
+
+	/**
+	 * The max size in bytes of a chunk of a file to be read or written by ST[06] object-memory transfers.
+	 */
+	inline constexpr uint16_t ChunkMaxFileSizeBytes = 4096;
 
 	/**
 	 * The available metadata for a file

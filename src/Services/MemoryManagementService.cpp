@@ -256,7 +256,7 @@ void MemoryManagementService::StructuredDataMemoryManagementSubService::dumpObje
 }
 
 void MemoryManagementService::StructuredDataMemoryManagementSubService::appendDumpedStructuredData(
-    Message& request, Message& report, const Path& filePath, const FileOffset offset,
+    const Message& request, Message& report, const Path& filePath, const FileOffset offset,
     const FileDataLength readLength) const {
 	etl::array<uint8_t, ChunkMaxFileSizeBytes> chunkData = {};
 	auto result = readFile(filePath, offset, readLength, chunkData);

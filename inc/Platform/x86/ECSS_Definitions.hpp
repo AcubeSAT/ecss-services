@@ -263,28 +263,5 @@ inline constexpr uint16_t ApplicationId = 1;
  * Maximum number of entries in Valid Memory IDs set
  */
 inline constexpr uint32_t MaxValidMemoryIds = 8;
-
-
-/**
- * Max size of the full path of a file
- */
-inline constexpr size_t FullPathSize = ECSSMaxStringSize;
-
-/**
- * ObjectPathSize is half the maximum size, minus one character for the '/' delimiter between the
- * repository and file paths.
- */
-inline constexpr size_t ObjectPathSize = (FullPathSize / 2) - 1;
-
-/**
- * The maximum possible size of a file, in bytes. Only used by the File Management Service (ST[23]) to validate
- * the maximum size attribute of created files.
- */
-inline static constexpr size_t MaxPossibleFileSizeBytes = 4096;
-
-/**
- * The max size in bytes, of a chunk of a file, to be read or written
- */
-inline static constexpr uint16_t ChunkMaxFileSizeBytes = 4096;
 /** @} */
 #endif // ECSS_SERVICES_ECSS_DEFINITIONS_H
