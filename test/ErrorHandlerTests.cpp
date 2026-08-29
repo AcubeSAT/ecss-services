@@ -1,5 +1,7 @@
 #include <ErrorHandler.hpp>
 #include <catch2/catch_all.hpp>
+#include <etl/platform.h>
+#include <etl/vector.h>
 #include "Services/RequestVerificationService.hpp"
 #include "Services/ServiceTests.hpp"
 #include "macros.hpp"
@@ -136,4 +138,17 @@ TEST_CASE("Internal error logs basename and line", "[errors]") {
 	ErrorHandler::reportInternalError(ErrorHandler::UnknownInternalError, "src/Time/UTCTimestamp.cpp", 9);
 	CHECK(ServiceTests::thrownError(ErrorHandler::UnknownInternalError));
 	CHECK(ServiceTests::lastLog.find("UTCTimestamp.cpp:9") != std::string::npos);
+}
+
+TEST_CASE("ETL errors are logged without throwing C++ exceptions", "[errors][etl]") {
+	STATIC_REQUIRE(ETL_USING_EXCEPTIONS == 0);
+
+	etl::vector<uint8_t, 1> values;
+	values.push_back(1);
+	values.push_back(2);
+
+	CHECK(values.size() == 1);
+	CHECK(ServiceTests::lastLog.find("ETL Error") != std::string::npos);
+	CHECK(ServiceTests::lastLog.find("vector") != std::string::npos);
+	CHECK(ServiceTests::count() == 0);
 }
