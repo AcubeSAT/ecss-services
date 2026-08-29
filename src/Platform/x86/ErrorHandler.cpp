@@ -6,10 +6,15 @@
 #include <iostream>
 #include "Helpers/Demangle.hpp"
 #include <ErrorHandler.hpp>
+#include <EtlErrorLogger.hpp>
 #include <Message.hpp>
 #include <Logger.hpp>
 #include <type_traits>
 #include "Helpers/EnumMagic.hpp"
+
+namespace {
+[[maybe_unused]] const int etlErrorLoggerRegistered = (registerEtlErrorLogger(), 0);
+}
 
 // TODO (#251): Find a way to reduce the number of copies of this chunk
 template void ErrorHandler::logError(const Message&, ErrorHandler::AcceptanceErrorType);
