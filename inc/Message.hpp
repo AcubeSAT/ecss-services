@@ -47,7 +47,8 @@ public:
 		}
 
 		if (applicationId != message.applicationId || sourceId != message.sourceId || destinationId != message.destinationId
-			|| messageTypeCounter != message.messageTypeCounter || packetSequenceCount != message.packetSequenceCount) {
+			|| messageTypeCounter != message.messageTypeCounter || packetSequenceCount != message.packetSequenceCount
+			|| timeReferenceStatus != message.timeReferenceStatus) {
 			return false;
 		}
 
@@ -111,6 +112,9 @@ public:
 	 * Maximum value of 65535 (5.4.2.1e)
 	 */
 	ApplicationProcessUserId destinationId = 0;
+
+	//> 7.4.3.1d
+	uint8_t timeReferenceStatus = 0;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;

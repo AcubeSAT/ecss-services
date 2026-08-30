@@ -203,7 +203,7 @@ String<CCSDSMaxMessageSize> MessageParser::composeECSS(const Message& message, u
 		header[4] = message.sourceId;
 	} else {
 		header[0] = ECSSPUSVersion << 4U; // Assign the pusVersion = 2
-		header[0] |= 0x00;                // Spacecraft time reference status
+		header[0] |= (message.timeReferenceStatus & 0x0FU); // Spacecraft time reference status
 		header[1] = message.serviceType;
 		header[2] = message.messageType;
 		header[3] = static_cast<uint8_t>(message.messageTypeCounter >> 8U);
@@ -291,6 +291,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 
 	// Individual fields of the TM header
 	uint8_t const pusVersion = data[0] >> 4;
+	uint8_t const timeReferenceStatus = data[0] & 0x0FU;
 	ServiceTypeNum const serviceType = data[1];
 	MessageTypeNum const messageType = data[2];
 	uint16_t const messageTypeCounter = (data[3] << 8) | data[4];
@@ -305,6 +306,7 @@ void MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Mess
 	message.serviceType = serviceType;
 	message.messageType = messageType;
 	message.messageTypeCounter = messageTypeCounter;
+	message.timeReferenceStatus = timeReferenceStatus;
 	message.destinationId = destinationId;
 	std::copy(data + ECSSSecondaryTMHeaderSize, data + ECSSSecondaryTMHeaderSize + length, message.data.begin());
 	message.dataSize = length;

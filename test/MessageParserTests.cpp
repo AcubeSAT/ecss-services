@@ -91,6 +91,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 		CHECK(message.dataSize == std::strlen(expectedData));
 		CHECK(message.serviceType == 22);
 		CHECK(message.messageType == 17);
+		CHECK(message.timeReferenceStatus == 0);
 		CHECK(message.destinationId == 0);
 		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
 
@@ -117,6 +118,7 @@ TEST_CASE("TM message parsing", "[MessageParser]") {
 		CHECK(message.dataSize == 7);
 		CHECK(message.serviceType == 22);
 		CHECK(message.messageType == 17);
+		CHECK(message.timeReferenceStatus == 0);
 		CHECK(message.destinationId == 0);
 		CHECK(memcmp(message.data.begin(), expectedData, message.dataSize) == 0);
 
@@ -200,9 +202,32 @@ TEST_CASE("TM compose and parse consistency", "[MessageParser]") {
 	CHECK(parsedMessage2.serviceType == message.serviceType);
 	CHECK(parsedMessage2.messageType == message.messageType);
 	CHECK(parsedMessage2.messageTypeCounter == message.messageTypeCounter);
+	CHECK(parsedMessage2.timeReferenceStatus == message.timeReferenceStatus);
 	CHECK(parsedMessage2.destinationId == message.destinationId);
 	CHECK(parsedMessage2.dataSize == message.dataSize);
 	CHECK(memcmp(parsedMessage2.data.begin(), message.data.begin(), message.dataSize) == 0);
+}
+
+TEST_CASE("TM spacecraft time reference status round trip", "[MessageParser]") {
+	Message message;
+	message.packetType = Message::TM;
+	message.applicationId = 2;
+	message.packetSequenceCount = 77;
+	message.serviceType = 22;
+	message.messageType = 17;
+	message.messageTypeCounter = 11;
+	message.destinationId = 0;
+	message.timeReferenceStatus = 0x0AU;
+	String<3> sourceString = "Time Reference Status Test";
+	message.appendString(sourceString);
+
+	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
+	CHECK(static_cast<uint8_t>(createdPacket[6]) == 0x2AU);
+
+	Message parsedMessage = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket.data()), createdPacket.size());
+	CHECK(parsedMessage.timeReferenceStatus == 0x0AU);
+	CHECK(parsedMessage.messageTypeCounter == 11);
+	CHECK(memcmp(parsedMessage.data.begin(), message.data.begin(), message.dataSize) == 0);
 }
 
 TEST_CASE("TC packet too short returns empty message", "[MessageParser]") {
