@@ -167,9 +167,12 @@ def find_readelf():
 
 
 def find_object(root):
-    matches = sorted(Path(root).rglob("ServicePool.cpp.o"), key=lambda path: path.stat().st_mtime)
+    matches = []
+    for name in ("ServicePool.cpp.o", "ServicePool.cpp.obj"):
+        matches.extend(Path(root).rglob(name))
+    matches.sort(key=lambda path: path.stat().st_mtime)
     if not matches:
-        raise SystemExit(f"ServicePool.cpp.o not found under {root}")
+        raise SystemExit(f"ServicePool.cpp object not found under {root}")
     return matches[-1]
 
 
