@@ -69,7 +69,6 @@ public:
 
 	/**
 	 * @brief Converts a TC or TM message to a message string, appending just the ECSS header
-	 * @todo (#249) Add time reference, as soon as it is available and the format has been specified
 	 * @param message The Message object to be parsed to a String
 	 * @param size The wanted size of the message (including the headers). Messages larger than \p size display an
 	 * error. Messages smaller than \p size are padded with zeros. When `size = 0`, there is no size limit.
