@@ -114,6 +114,11 @@ public:
 	ApplicationProcessUserId destinationId = 0;
 
 	//> 7.4.3.1d
+	/**
+	 * The spacecraft time reference status field for the secondary header of a TM,
+	 * as defined in 7.4.3.1d.
+	 * The actual size is 4 bits, but a full byte is used with a mask for simplicity.
+	 */
 	uint8_t timeReferenceStatus = 0;
 
 	//> 7.4.3.1b
