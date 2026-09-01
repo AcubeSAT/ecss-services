@@ -54,6 +54,33 @@ target_link_libraries(common
 )
 target_compile_definitions(common PRIVATE LOGLEVEL_ERROR)
 
+if(ECSS_REPORT_STATIC_SIZES AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(DEFINED ENV{ECSS_SIZE_REPORT_DIR})
+        set(ECSS_SIZE_REPORT_DIR "$ENV{ECSS_SIZE_REPORT_DIR}")
+    else()
+        set(ECSS_SIZE_REPORT_DIR "${CMAKE_BINARY_DIR}/service-sizes")
+    endif()
+    file(MAKE_DIRECTORY "${ECSS_SIZE_REPORT_DIR}")
+    file(WRITE "${CMAKE_BINARY_DIR}/service_size_dump.cpp" "#include \"ServicePool.hpp\"\n")
+
+    add_library(service_size_dump OBJECT "${CMAKE_BINARY_DIR}/service_size_dump.cpp")
+    target_link_libraries(service_size_dump PRIVATE common)
+    target_compile_options(service_size_dump PRIVATE
+            "-fdump-lang-class=${ECSS_SIZE_REPORT_DIR}/service_pool.class")
+
+    add_custom_command(
+            OUTPUT "${ECSS_SIZE_REPORT_DIR}/service_sizes.txt"
+            DEPENDS service_size_dump
+            COMMAND python3 "${PROJECT_SOURCE_DIR}/ci/report_service_sizes.py"
+            --dump "${ECSS_SIZE_REPORT_DIR}/service_pool.class"
+            --label "$ENV{ECSS_SIZE_REPORT_LABEL}"
+            --output "${ECSS_SIZE_REPORT_DIR}/service_sizes.txt"
+            COMMAND ${CMAKE_COMMAND} -E cat "${ECSS_SIZE_REPORT_DIR}/service_sizes.txt"
+            COMMENT "Reporting static ServicePool and per-service object sizes"
+            VERBATIM)
+    add_custom_target(report_service_sizes ALL DEPENDS "${ECSS_SIZE_REPORT_DIR}/service_sizes.txt")
+endif()
+
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
     file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")

@@ -18,11 +18,21 @@ class ECSSServicesRecipe(ConanFile):
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "fPIC": [True, False], "platform_definitions_path": ["ANY"]}
-    default_options = {"shared": False, "fPIC": True, "platform_definitions_path": "inc/Platform/x86/"}
+    options = {
+        "shared": [True, False],
+        "fPIC": [True, False],
+        "platform_definitions_path": ["ANY"],
+        "report_static_sizes": [True, False],
+    }
+    default_options = {
+        "shared": False,
+        "fPIC": True,
+        "platform_definitions_path": "inc/Platform/x86/",
+        "report_static_sizes": False,
+    }
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/*", "inc/*"
+    exports_sources = "CMakeLists.txt", "src/*", "inc/*", "ci/report_service_sizes.py"
     generators = "CMakeDeps"
 
     def config_options(self):
@@ -33,11 +43,16 @@ class ECSSServicesRecipe(ConanFile):
         cmake_layout(self, build_folder=".")
         self.cpp.source.includedirs = ["inc"]
 
+    def package_id(self):
+        del self.info.options.report_static_sizes
+
     def generate(self):
         tc = CMakeToolchain(self)
         if self.settings.arch != 'armv7':
             tc.variables["X86_BUILD"] = True
         tc.variables["PLATFORM_DEFINITIONS_PATH"] = self.options.platform_definitions_path
+        if self.options.report_static_sizes:
+            tc.variables["ECSS_REPORT_STATIC_SIZES"] = True
 
         # Instead of prefixing all cmake presets with "conan", we prefix them with the selected build directory by the
         # user, in case they are working with multiple build folders.

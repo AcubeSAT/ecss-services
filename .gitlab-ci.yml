@@ -15,6 +15,7 @@ check-build:
     GCC_COLORS: "error=31;1:warning=35;1:note=36;1:range1=32:range2=34:locus=39;1:quote=39;1:fixit-insert=32:fixit-delete=31:diff-filename=39;1:diff-hunk=32:diff-delete=31:diff-insert=32:type-diff=32;1"
     CLICOLOR_FORCE: 1 # Necessary for cmake to output colours
   script:
+    - python3 ci/report_service_sizes.py --self-test
     - conan profile detect --force
     - mkdir conan-build
     - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
@@ -27,6 +28,23 @@ check-build:
   image: spacedot/build-arm
   stage: build
   allow_failure: true
+  before_script:
+    - export ECSS_SIZE_REPORT_DIR="$CI_PROJECT_DIR/service-sizes/${PROJECT}"
+    - export ECSS_SIZE_REPORT_LABEL="$PROJECT"
+    - mkdir -p "$ECSS_SIZE_REPORT_DIR"
+  after_script:
+    - |
+      REPORT="$CI_PROJECT_DIR/service-sizes/${PROJECT}/service_sizes.txt"
+      if [ -f "$REPORT" ]; then
+        echo "===== Static service object sizes ($PROJECT) ====="
+        cat "$REPORT"
+      else
+        echo "WARNING: service size report was not generated for $PROJECT"
+      fi
+  artifacts:
+    when: always
+    paths:
+      - service-sizes/
 
 firmware-obc:
   extends: .firmware
@@ -46,7 +64,7 @@ firmware-obc:
     - cd cross-platform-software && git submodule update --init --recursive
     - cd ../../..
     - conan remove "ecss-services/*" -c || true
-    - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - conan create $CI_PROJECT_DIR --build=missing --build=ecss-services -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform" -o "ecss-services/*:report_static_sizes=True"
     - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
     - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake
     - make -j$(nproc)
@@ -70,7 +88,7 @@ firmware-adcs:
     - cd cross-platform-software && git submodule update --init --recursive
     - cd ../../..
     - conan remove "ecss-services/*" -c || true
-    - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - conan create $CI_PROJECT_DIR --build=missing --build=ecss-services -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform" -o "ecss-services/*:report_static_sizes=True"
     - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
     - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_C_COMPILER=/usr/bin/arm-none-eabi-gcc -DCMAKE_CXX_COMPILER=/usr/bin/arm-none-eabi-g++ -DCMAKE_ASM_COMPILER=/usr/bin/arm-none-eabi-gcc
     - make -j$(nproc)
@@ -94,7 +112,7 @@ firmware-su:
     - cd cross-platform-software && git submodule update --init --recursive
     - cd ../../..
     - conan remove "ecss-services/*" -c || true
-    - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
+    - conan create $CI_PROJECT_DIR --build=missing --build=ecss-services -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform" -o "ecss-services/*:report_static_sizes=True"
     - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
     - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_CXX_COMPILER="arm-none-eabi-g++" -DCMAKE_C_COMPILER="arm-none-eabi-gcc"
     - make -j$(nproc)
