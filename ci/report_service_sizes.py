@@ -206,6 +206,7 @@ def main(argv):
     label = ""
     object_path = None
     search = None
+    output = None
     args = argv[1:]
     while args:
         if args[0] == "--label":
@@ -217,16 +218,22 @@ def main(argv):
         elif args[0] == "--search":
             search = Path(args[1])
             args = args[2:]
+        elif args[0] == "--output":
+            output = Path(args[1])
+            args = args[2:]
         else:
             raise SystemExit(f"unknown argument: {args[0]}")
 
     if object_path is None and search is not None:
         object_path = find_object(search)
     if object_path is None:
-        raise SystemExit("usage: report_service_sizes.py --object FILE|--search DIR [--label NAME]")
+        raise SystemExit("usage: report_service_sizes.py --object FILE|--search DIR [--label NAME] [--output FILE]")
 
-    classes = read_dwarf(object_path, find_readelf())
-    sys.stdout.write(format_report(classes, label))
+    report = format_report(read_dwarf(object_path, find_readelf()), label)
+    sys.stdout.write(report)
+    if output is not None:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(report)
     return 0
 
 

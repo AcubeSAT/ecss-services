@@ -28,6 +28,11 @@ check-build:
   image: spacedot/build-arm
   stage: build
   allow_failure: true
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - service-sizes/
 
 firmware-obc:
   extends: .firmware
@@ -48,7 +53,7 @@ firmware-obc:
     - cd ../../..
     - conan remove "ecss-services/*" -c || true
     - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
-    - python3 $CI_PROJECT_DIR/ci/report_service_sizes.py --search ~/.conan2 --label "$PROJECT"
+    - python3 $CI_PROJECT_DIR/ci/report_service_sizes.py --search ~/.conan2 --label "$PROJECT" --output "$CI_PROJECT_DIR/service-sizes/${PROJECT}.txt"
     - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
     - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake
     - make -j$(nproc)
@@ -73,7 +78,7 @@ firmware-adcs:
     - cd ../../..
     - conan remove "ecss-services/*" -c || true
     - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
-    - python3 $CI_PROJECT_DIR/ci/report_service_sizes.py --search ~/.conan2 --label "$PROJECT"
+    - python3 $CI_PROJECT_DIR/ci/report_service_sizes.py --search ~/.conan2 --label "$PROJECT" --output "$CI_PROJECT_DIR/service-sizes/${PROJECT}.txt"
     - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
     - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_C_COMPILER=/usr/bin/arm-none-eabi-gcc -DCMAKE_CXX_COMPILER=/usr/bin/arm-none-eabi-g++ -DCMAKE_ASM_COMPILER=/usr/bin/arm-none-eabi-gcc
     - make -j$(nproc)
@@ -98,10 +103,26 @@ firmware-su:
     - cd ../../..
     - conan remove "ecss-services/*" -c || true
     - conan create $CI_PROJECT_DIR --build=missing -pr conan-arm-profile -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
-    - python3 $CI_PROJECT_DIR/ci/report_service_sizes.py --search ~/.conan2 --label "$PROJECT"
+    - python3 $CI_PROJECT_DIR/ci/report_service_sizes.py --search ~/.conan2 --label "$PROJECT" --output "$CI_PROJECT_DIR/service-sizes/${PROJECT}.txt"
     - conan install . --output-folder conan-build --build="*" --build="!ecss-services" -pr conan-arm-profile -o project="$PROJECT" -o "ecss-services/*:platform_definitions_path=$(pwd)/common/inc/Platform"
     - cmake . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=conan-build/build/Debug/generators/conan_toolchain.cmake -DCMAKE_CXX_COMPILER="arm-none-eabi-g++" -DCMAKE_C_COMPILER="arm-none-eabi-gcc"
     - make -j$(nproc)
+
+service-sizes:
+  image: spacedot/build-base
+  stage: analyze
+  dependencies:
+    - firmware-obc
+    - firmware-adcs
+    - firmware-su
+  script:
+    - cat service-sizes/*.txt
+  artifacts:
+    when: always
+    expire_in: 1 week
+    expose_as: 'Service object sizes'
+    paths:
+      - service-sizes/
 
 cppcheck:
   image: spacedot/cppcheck:2.8
