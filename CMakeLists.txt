@@ -54,6 +54,10 @@ target_link_libraries(common
 )
 target_compile_definitions(common PRIVATE LOGLEVEL_ERROR)
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT X86_BUILD)
+    set_source_files_properties(src/ServicePool.cpp PROPERTIES COMPILE_OPTIONS "-g")
+endif()
+
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
     file(GLOB_RECURSE x86_main_SRC "src/Platform/x86/*.cpp")
