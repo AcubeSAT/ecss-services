@@ -580,11 +580,7 @@ public:
 	 * @param line Source line from \ref ASSERT_INTERNAL.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-<<<<<<< inc/ErrorHandler.hpp
 	[[nodiscard]] static bool assertInternal(bool condition, InternalErrorType errorCode, const char* file = nullptr, int line = 0) {
-=======
-	static bool assertInternal(bool condition, InternalErrorType errorCode, const char* file = nullptr, int line = 0) {
->>>>>>> inc/ErrorHandler.hpp
 		if (not condition) {
 			reportInternalError(errorCode, file, line);
 		}
