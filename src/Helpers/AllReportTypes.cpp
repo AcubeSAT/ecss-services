@@ -57,7 +57,7 @@ namespace AllReportTypes {
 
 	const ServiceDefinitionsVector ST20Reports = {ParameterService::MessageType::ParameterValuesReport};
 
-	const etl::map<uint8_t, const ServiceDefinitionsVector&, ECSSMaxServiceTypeDefinitions> MessagesOfService = {
+	const etl::flat_map<uint8_t, const ServiceDefinitionsVector&, ECSSMaxServiceTypeDefinitions> MessagesOfService = {
 	    {RequestVerificationService::ServiceType, ST01Reports},
 	    {HousekeepingService::ServiceType, ST03Reports},
 	    {ParameterStatisticsService::ServiceType, ST04Reports},

@@ -185,7 +185,7 @@ public:
 	/**
 	 * Appends a default timestamp object to the message, without the header
 	 */
-	void appendDefaultCUCTimeStamp(Time::DefaultCUC timestamp) {
+	void appendDefaultCUCTimeStamp(const Time::DefaultCUC& timestamp) {
 		static_assert(std::is_same_v<uint32_t, decltype(timestamp.formatAsBytes())>, "The conan-profile timestamp should be 4 bytes");
 		appendUint32(timestamp.formatAsBytes());
 	}
@@ -425,6 +425,14 @@ public:
 	 * PTC = 7, PFC = 0
 	 */
 	void appendOctetString(const etl::istring& string);
+
+	/**
+	 * Helper function to be used by the Event Report Service 
+	 * to append auxiliary event data to an Event Report
+	 */
+        inline void appendEventData(const String<ECSSEventDataAuxiliaryMaxSize>& data) {
+            appendFixedString(data);
+        }
 
 	/**
 	 * Generic function to append any type of data to the message. The amount of bytes appended is equal to the size of

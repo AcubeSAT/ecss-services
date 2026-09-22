@@ -205,12 +205,12 @@ conan editable add /path/to/ecss-services --output-folder /path/to/ecss-services
 
 Make sure that you have built `ecss-services` before moving on:
 ```bash
-conan build /path/to/ecss-services --output-folder=build --build=missing --setings=build_type=Debug
+conan build /path/to/ecss-services --output-folder=build --build=missing --settings=build_type=Debug
 ```
 
 Then, your project should be compileable directly:
 ```bash
-conan build /path/to/my/project --build=missing --setings=build_type=Debug # And any other settings you prefer
+conan build /path/to/my/project --build=missing --settings=build_type=Debug # And any other settings you prefer
 ```
 
 @note The build type between the two builds from the two projects must be the same.

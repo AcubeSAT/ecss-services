@@ -1499,7 +1499,7 @@ TEST_CASE("Changing the packet store type to circular") {
 
 			request.appendString(finalIds[i]);
 			MessageParser::execute(request);
-			CHECK(ServiceTests::count() == i + 1);
+			CHECK(ServiceTests::count() == static_cast<uint64_t>(i + 1));
 			CHECK(ServiceTests::countThrownErrors(expectedErrors[i]) == 1);
 		}
 
@@ -1587,7 +1587,7 @@ TEST_CASE("Changing the packet store type to bounded") {
 
 			request.appendString(finalIds[i]);
 			MessageParser::execute(request);
-			CHECK(ServiceTests::count() == i + 1);
+			CHECK(ServiceTests::count() == static_cast<uint64_t>(i + 1));
 			CHECK(ServiceTests::countThrownErrors(expectedErrors[i]) == 1);
 		}
 
@@ -1680,7 +1680,7 @@ TEST_CASE("Changing the virtual channel of packet stores") {
 			request.appendString(finalIds[i]);
 			request.appendUint8(i == 3 ? VirtualChannelLimits.max + 1 : 3);
 			MessageParser::execute(request);
-			CHECK(ServiceTests::count() == i + 1);
+			CHECK(ServiceTests::count() == static_cast<uint64_t>(i + 1));
 			CHECK(ServiceTests::countThrownErrors(expectedErrors[i]) == 1);
 		}
 

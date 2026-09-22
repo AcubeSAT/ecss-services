@@ -4,7 +4,7 @@
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "etl/vector.h"
 
 /**
@@ -40,7 +40,7 @@ public:
 	 * already exist in the map, and the requested report type is located in the vector of report types, which corresponds
 	 * to the appID and service type.
 	 */
-	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
+	etl::flat_map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
 
 	ApplicationProcessConfiguration() = default;
 };

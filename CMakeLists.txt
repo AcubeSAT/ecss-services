@@ -48,10 +48,11 @@ target_sources(common PRIVATE
         src/Services/FileManagementService.cpp
 )
 
+# Logger::log comes from the platform (log_x86 or TestPlatform), not this library.
 target_link_libraries(common
         PUBLIC etl log_common
-        PRIVATE log_x86
 )
+target_compile_definitions(common PRIVATE LOGLEVEL_ERROR)
 
 # Specify the .cpp files for the executables
 IF (X86_BUILD)
@@ -76,7 +77,7 @@ IF (X86_BUILD)
                 ${test_x86_shared_SRC}
                 ${test_main_SRC}
                 ${test_SRC})
-        target_link_libraries(tests PRIVATE etl log_common log_x86 common Catch2::Catch2WithMain)
+        target_link_libraries(tests PRIVATE etl log_common common Catch2::Catch2WithMain)
     ENDIF()
 ENDIF()
 if(MSVC)

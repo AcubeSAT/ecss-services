@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 #include <Message.hpp>
 #include <ServicePool.hpp>
 #include <Time/UTCTimestamp.hpp>
@@ -57,6 +58,8 @@ public:
 	 * Disabled default constructor
 	 */
 	ServiceTests() = delete;
+
+	static std::string lastLog;
 
 	/**
 	 * Get a message from the list of queued messages to send
@@ -129,6 +132,7 @@ public:
 	static void resetErrors() {
 		queuedMessages.clear();
 		thrownErrors.clear();
+		lastLog.clear();
 		expectingErrors = false;
 	}
 
@@ -177,7 +181,7 @@ public:
 	 */
 	template <typename ErrorType>
 	static bool thrownError(ErrorType errorType) {
-		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource(errorType);
+		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource<ErrorType>();
 
 		expectingErrors = true;
 
@@ -191,7 +195,7 @@ public:
  	 */
 	template <typename ErrorType>
 	static int countThrownErrors(ErrorType errorType) {
-		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource(errorType);
+		ErrorHandler::ErrorSource errorSource = ErrorHandler::findErrorSource<ErrorType>();
 
 		expectingErrors = true;
 

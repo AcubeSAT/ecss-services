@@ -52,6 +52,7 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress[constParamet
 #ifdef SERVICE_STORAGEANDRETRIEVAL
 		case StorageAndRetrievalService::ServiceType:
 			Services.storageAndRetrieval.execute(message);
+			break;
 #endif
 
 #ifdef SERVICE_ONBOARDMONITORING

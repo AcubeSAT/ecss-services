@@ -15,7 +15,18 @@ void ServicePool::reset() {
 
 uint16_t ServicePool::getAndUpdateMessageTypeCounter(ServiceTypeNum serviceType, MessageTypeNum messageType) {
 	uint16_t const key = (serviceType << 8U) | messageType; // Create the key of the map
-	return (messageTypeCounter[key])++;               // Fetch and increase the value
+
+	if (messageTypeCounter.full()) {
+		auto const iterator = messageTypeCounter.find(key);
+		// TODO(#59): Proper error handling if assert fails
+		if (not ASSERT_INTERNAL(iterator != messageTypeCounter.end(), ErrorHandler::MapFull)) {
+			return 0;
+		}
+		return (iterator->second)++;
+	}
+
+	auto const insertResult = messageTypeCounter.insert(etl::pair{key, static_cast<uint16_t>(0)});
+	return (insertResult.first->second)++;
 }
 
 uint16_t ServicePool::getAndUpdatePacketSequenceCounter() {

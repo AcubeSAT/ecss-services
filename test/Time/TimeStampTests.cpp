@@ -33,7 +33,7 @@ TEST_CASE("CUC headers generation") {
 }
 
 TEST_CASE("TAI idempotence") {
-	int input_time = 1000;
+	uint32_t input_time = 1000;
 	TimeStamp<CUCSecondsBytes, CUCFractionalBytes> time(input_time);
 
 	REQUIRE(time.asTAIseconds() == input_time);

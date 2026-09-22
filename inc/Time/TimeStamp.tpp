@@ -151,7 +151,8 @@ UTCTimestamp TimeStamp<BaseBytes, FractionBytes, Num, Denom>::toUTCtimestamp() {
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <uint8_t BaseBytesIn, uint8_t FractionBytesIn, int NumIn, int DenomIn>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn, FractionBytesIn, NumIn, DenomIn> input)
+    : taiCounter(0) {
 	if constexpr (std::is_same_v<decltype(*this), decltype(input)>) {
 		taiCounter = input.taiCounter;
 		return;
@@ -183,7 +184,7 @@ Duration TimeStamp<BaseBytes, FractionBytes, Num, Denom>::asDuration() const {
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
 template <class Duration, typename>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Duration duration) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(Duration duration) : taiCounter(0) {
 	auto outputDuration = std::chrono::duration_cast<RawDuration>(duration);
 	taiCounter = outputDuration.count();
 }
