@@ -2,8 +2,10 @@
 #define ECSS_SERVICES_MESSAGEPARSER_HPP
 
 #include <Services/EventActionService.hpp>
+#include "ErrorHandler.hpp"
 #include "Message.hpp"
 #include "etl/array.h"
+#include <etl/expected.h>
 /**
  * A generic class responsible for the execution and the parsing of the incoming telemetry and telecommand
  * packets
@@ -93,8 +95,9 @@ private:
 	 * @param data The data of the header (not null-terminated)
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
+	 * @return expected<void> if successful, error code otherwise
 	 */
-	static void parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message);
+	[[nodiscard]] static etl::expected<void, ErrorHandler::AcceptanceErrorType> parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -104,8 +107,9 @@ private:
 	 * @param data The data of the header (not null-terminated)
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
+	 * @return expected<void> if successful, error code otherwise
 	 */
-	static void parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
+	[[nodiscard]] static etl::expected<void, ErrorHandler::AcceptanceErrorType> parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
 };
 
 #endif // ECSS_SERVICES_MESSAGEPARSER_HPP

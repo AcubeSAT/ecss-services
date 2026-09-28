@@ -20,8 +20,7 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(uint64_t taiSecondsFr
 }
 
 template <uint8_t BaseBytes, uint8_t FractionBytes, int Num, int Denom>
-TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp)
-    : taiCounter(0) {
+TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(etl::array<uint8_t, Time::CUCTimestampMaximumSize> timestamp) : taiCounter(0) {
 	// process header
 	uint8_t headerSize = 1;
 	if ((timestamp[0] & 0b10000000U) != 0) {
@@ -165,7 +164,10 @@ TimeStamp<BaseBytes, FractionBytes, Num, Denom>::TimeStamp(TimeStamp<BaseBytesIn
 	double inputSeconds = input.taiCounter / static_cast<double>(1 << (8 * FractionBytesIn));
 	inputSeconds *= InputRatio;
 
-	ASSERT_INTERNAL(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds);
+	if (not ErrorHandler::assertInternal(inputSeconds <= MaxSeconds, ErrorHandler::TimeStampOutOfBounds)) {
+		taiCounter = 0;
+		return;
+	}
 
 	double output = inputSeconds / OutputRatio * (1ULL << (8 * FractionBytes));  //cppcheck-suppress misra-c2012-2.2
 
