@@ -580,7 +580,7 @@ public:
 	 * @param line Source line from \ref ASSERT_INTERNAL.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	static bool assertInternal(bool condition, InternalErrorType errorCode, const char* file = nullptr, int line = 0) {
+	[[nodiscard]] static bool assertInternal(bool condition, InternalErrorType errorCode, const char* file = nullptr, int line = 0) {
 		if (not condition) {
 			reportInternalError(errorCode, file, line);
 		}
@@ -601,7 +601,7 @@ public:
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
 	template <typename ErrorType>
-	static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
+	[[nodiscard]] static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
 		}
