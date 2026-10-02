@@ -218,7 +218,7 @@ TEST_CASE("TM spacecraft time reference status round trip", "[MessageParser]") {
 	message.messageTypeCounter = 11;
 	message.destinationId = 0;
 	message.timeReferenceStatus = 0x0AU;
-	String<3> sourceString = "Time Reference Status Test";
+	String<27> sourceString = "Time Reference Status Test";
 	message.appendString(sourceString);
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
