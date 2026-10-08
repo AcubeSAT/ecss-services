@@ -217,17 +217,21 @@ TEST_CASE("TM spacecraft time reference status round trip", "[MessageParser]") {
 	message.messageType = 17;
 	message.messageTypeCounter = 11;
 	message.destinationId = 0;
-	message.timeReferenceStatus = 0x0AU;
+	message.timeReferenceStatus = 0xFFU;
 	String<27> sourceString = "Time Reference Status Test";
 	message.appendString(sourceString);
 
 	String<CCSDSMaxMessageSize> createdPacket = MessageParser::compose(message);
-	CHECK(static_cast<uint8_t>(createdPacket[6]) == 0x2AU);
+	CHECK(static_cast<uint8_t>(createdPacket[6]) == 0x2FU);
 
 	Message parsedMessage = MessageParser::parse(reinterpret_cast<const uint8_t*>(createdPacket.data()), createdPacket.size());
-	CHECK(parsedMessage.timeReferenceStatus == 0x0AU);
+	CHECK(parsedMessage.timeReferenceStatus == 0x0FU);
 	CHECK(parsedMessage.messageTypeCounter == 11);
 	CHECK(memcmp(parsedMessage.data.begin(), message.data.begin(), message.dataSize) == 0);
+
+	Message messageWithDifferentStatus = message;
+	messageWithDifferentStatus.timeReferenceStatus = 0x0EU;
+	CHECK_FALSE(message == messageWithDifferentStatus);
 }
 
 TEST_CASE("TC packet too short returns empty message", "[MessageParser]") {
