@@ -47,7 +47,8 @@ public:
 		}
 
 		if (applicationId != message.applicationId || sourceId != message.sourceId || destinationId != message.destinationId
-			|| messageTypeCounter != message.messageTypeCounter || packetSequenceCount != message.packetSequenceCount) {
+			|| messageTypeCounter != message.messageTypeCounter || packetSequenceCount != message.packetSequenceCount
+			|| timeReferenceStatus != message.timeReferenceStatus) {
 			return false;
 		}
 
@@ -111,6 +112,18 @@ public:
 	 * Maximum value of 65535 (5.4.2.1e)
 	 */
 	ApplicationProcessUserId destinationId = 0;
+
+	//> 7.4.3.1d
+	/**
+	 * The spacecraft time reference status field for the secondary header of a TM,
+	 * as defined in 7.4.3.1d.
+	 * The actual size is 4 bits, but a full byte is used with a mask for simplicity.
+	 * The embedded software supplies the status before transmission. The defined values are:
+	 * - 0: Time not set since power-up
+	 * - 1: Time set from ground
+	 * - 2: Time recovered from another subsystem
+	 */
+	uint8_t timeReferenceStatus = 0;
 
 	//> 7.4.3.1b
 	uint16_t messageTypeCounter = 0;
