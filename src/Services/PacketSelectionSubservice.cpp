@@ -4,9 +4,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
 PacketSelectionSubservice::PacketStoreId PacketSelectionSubservice::readPacketStoreId(Message& message) {
-	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId{};
-	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
-	return packetStoreId.data();
+	return message.readFixedString<ECSSPacketStoreIdSize>();
 }
 
 bool PacketSelectionSubservice::packetStoreExists(const PacketStoreId& packetStoreId) {

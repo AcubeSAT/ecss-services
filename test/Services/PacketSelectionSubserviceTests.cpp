@@ -72,6 +72,9 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		uint8_t applicationID = 1;
 		packetSelection.controlledApplications.push_back(applicationID);
+		uint8_t packetStoreData[ECSSPacketStoreIdSize] = {0};
+		String<ECSSPacketStoreIdSize> nonExistentPacketStoreID(packetStoreData);
+		request.appendFixedString(nonExistentPacketStoreID);
 		ForwardingAndPacketHelper::validReportTypes(request);
 
 		MessageParser::execute(request);
@@ -818,6 +821,23 @@ TEST_CASE("Report the content of the application process storage-control configu
 		ServiceTests::reset();
 		Services.reset();
 	}
+}
+
+TEST_CASE("Packet selection requests shorter than a packet store ID") {
+	auto messageType = GENERATE(StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+	                            StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+	                            StorageAndRetrievalService::MessageType::ReportApplicationProcess);
+
+	Message request(StorageAndRetrievalService::ServiceType, messageType, Message::TC, 1);
+	request.appendUint8(1);
+
+	MessageParser::execute(request);
+
+	CHECK(ServiceTests::thrownError(ErrorHandler::AcceptanceErrorType::MessageTooShort));
+	CHECK(packetSelection.packetStoreAppProcessConfig.empty());
+
+	ServiceTests::reset();
+	Services.reset();
 }
 
 TEST_CASE("Deleting a packet store deletes its application process storage-control configuration") {
