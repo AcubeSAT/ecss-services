@@ -2,8 +2,10 @@
 #define ECSS_SERVICES_MESSAGEPARSER_HPP
 
 #include <Services/EventActionService.hpp>
+#include "ErrorHandler.hpp"
 #include "Message.hpp"
 #include "etl/array.h"
+#include <etl/expected.h>
 /**
  * A generic class responsible for the execution and the parsing of the incoming telemetry and telecommand
  * packets
@@ -69,7 +71,6 @@ public:
 
 	/**
 	 * @brief Converts a TC or TM message to a message string, appending just the ECSS header
-	 * @todo (#249) Add time reference, as soon as it is available and the format has been specified
 	 * @param message The Message object to be parsed to a String
 	 * @param size The wanted size of the message (including the headers). Messages larger than \p size display an
 	 * error. Messages smaller than \p size are padded with zeros. When `size = 0`, there is no size limit.
@@ -86,10 +87,6 @@ public:
 
 private:
 	/**
-	 * The number of bytes in the CRC field
-	 */
-	static constexpr CRCSize CRCField = 2U;
-	/**
 	 * Parse the ECSS Telecommand packet secondary header
 	 *
 	 * As specified in section 7.4.4.1 of the standard
@@ -97,8 +94,9 @@ private:
 	 * @param data The data of the header (not null-terminated)
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
+	 * @return expected<void> if successful, error code otherwise
 	 */
-	static void parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message);
+	[[nodiscard]] static etl::expected<void, ErrorHandler::AcceptanceErrorType> parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message);
 
 	/**
 	 * Parse the ECSS Telemetry packet secondary header
@@ -108,8 +106,9 @@ private:
 	 * @param data The data of the header (not null-terminated)
 	 * @param length The size of the header
 	 * @param message The Message to modify based on the header
+	 * @return expected<void> if successful, error code otherwise
 	 */
-	static void parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
+	[[nodiscard]] static etl::expected<void, ErrorHandler::AcceptanceErrorType> parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message);
 };
 
 #endif // ECSS_SERVICES_MESSAGEPARSER_HPP

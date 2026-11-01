@@ -124,6 +124,11 @@ public:
 		 * This error occurs when attempting to process more events than the system can handle.
 		 */
 		LengthExceedsNumberOfEvents = 22,
+
+		/**
+ 		 * A packet failed CRC validation and cannot be trusted
+ 		 */
+		InvalidCRC = 23
 	};
 
 	/**
@@ -432,6 +437,10 @@ public:
 		 */
 		 PMONCheckTypeMissing = 63,
 		/**
+		 * Attempt to load, dump, or check a memory area whose data length exceeds the transfer buffer (ST[06])
+		 */
+		UnableToHandleMemoryDataLength = 64,
+		/**
 		 * AppProcessConfiguration adding an already existing report type in a map with an application id - service type key
 		 *
 		 * @note Numbered 73 because master allocates up to 64 (UnableToHandleMemoryDataLength) and the ST[06]
@@ -498,6 +507,10 @@ public:
 		 * A delete directory command was requested on a non empty directory
 		 */
 		AttemptedDeleteNonEmptyDirectory = 10,
+		/**
+		 * A lock/unlock file command was requested on a directory
+		 */
+		AttemptedAccessModificationOnDirectory = 11,
 	};
 
 	/**
@@ -554,8 +567,12 @@ public:
 	 *
 	 * Note that these errors correspond to bugs or faults in the software, and should be treated
 	 * differently. Such an error may prompt a task or software reset.
+	 *
+	 * @param file Optional source filename from a failed assertion. nullptr means no location is logged.
+	 *            Only the basename is logged when a path is given.
+	 * @param line Optional source line from a failed assertion.
 	 */
-	static void reportInternalError(InternalErrorType errorCode);
+	static void reportInternalError(InternalErrorType errorCode, const char* file = nullptr, int line = 0);
 
 	/**
 	 * Make an assertion, to ensure that a runtime condition is met.
@@ -566,11 +583,13 @@ public:
 	 *
 	 * @param condition The condition to check. Throws an error if false.
 	 * @param errorCode The error code that is assigned to this error. One of the \ref ErrorHandler enum values.
+	 * @param file Source filename from \ref ASSERT_INTERNAL. nullptr means no location is logged.
+	 * @param line Source line from \ref ASSERT_INTERNAL.
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
-	static bool assertInternal(bool condition, InternalErrorType errorCode) {
+	[[nodiscard]] static bool assertInternal(bool condition, InternalErrorType errorCode, const char* file = nullptr, int line = 0) {
 		if (not condition) {
-			reportInternalError(errorCode);
+			reportInternalError(errorCode, file, line);
 		}
 
 		return condition;
@@ -589,7 +608,7 @@ public:
 	 * @return Returns \p condition, i.e. true if the assertion is successful, false if not.
 	 */
 	template <typename ErrorType>
-	static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
+	[[nodiscard]] static bool assertRequest(bool condition, const Message& message, ErrorType errorCode) {
 		if (not condition) {
 			reportError(message, errorCode);
 		}
@@ -600,11 +619,10 @@ public:
 	/**
 	 * Convert a parameter given in C++ to an ErrorSource that can be easily used in comparisons.
 	 * @tparam ErrorType One of the enums specified in ErrorHandler.
-	 * @param error An error code of a specific type
 	 * @return The corresponding ErrorSource
 	 */
 	template <typename ErrorType>
-	inline static ErrorSource findErrorSource(ErrorType errorType) {
+	inline static ErrorSource findErrorSource() {
 		// Static type checking
 		ErrorSource source = Internal;
 

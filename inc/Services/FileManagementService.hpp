@@ -101,6 +101,22 @@ public:
 	void fileAttributeReport(const Filesystem::ObjectPath& repositoryPath, const Filesystem::ObjectPath& fileName, const Filesystem::Attributes& attributes);
 
 	/**
+	 * TM[23,5] Lock a file at the provided repository path and file name.
+	 * Checks done prior to locking a file:
+	 * - The path is valid, meaning it leads to an existing file
+	 * - The repository's path and file's name do not contain a wildcard
+	 */
+	void lockFile(Message& message);
+
+	/**
+	 * TM[23,6] Unlock a file at the provided repository path and file name.
+	 * Checks done prior to unlocking a file:
+	 * - The path is valid, meaning it leads to an existing file
+	 * - The repository's path and file's name do not contain a wildcard
+	 */
+	void unlockFile(Message& message);
+
+	/**
      * TC[23,9] Create a directory on the filesystem
      */
 	void createDirectory(Message& message);

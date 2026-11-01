@@ -9,7 +9,7 @@
 #include "etl/array.h"
 #include "etl/functional.h"
 #include "etl/list.h"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "etl/vector.h"
 
 /**
@@ -20,9 +20,9 @@
 class OnBoardMonitoringService : public Service {
 private:
 	/**
-	 * Map storing the parameter monitoring definitions.
+	 * Flat map storing the parameter monitoring definitions.
 	 */
-	etl::map<uint16_t, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
+	etl::flat_map<uint16_t, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
 	 * Maximum number of checks for each Limit Check.

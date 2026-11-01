@@ -5,7 +5,7 @@
 #include "Helpers/PacketStore.hpp"
 #include "PacketSelectionSubservice.hpp"
 #include "Service.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 
 /**
  * Implementation of ST[15] Storage and Retrieval Service, as defined in ECSS-E-ST-70-41C.
@@ -44,7 +44,7 @@ private:
 	/**
 	 * All packet stores, held by the Storage and Retrieval Service. Each packet store has its ID as key.
 	 */
-	etl::map<packetStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
+	etl::flat_map<packetStoreId, PacketStore, ECSSMaxPacketStores> packetStores;
 
 	/**
 	 * Helper function that reads the packet store ID string from a TM[15] message
@@ -58,7 +58,7 @@ private:
 	 * @param packetStoreId required to access the correct packet store.
 	 * @param timeLimit the limit until which, packets are deleted.
 	 */
-	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, Time::DefaultCUC timeLimit);
+	void deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId, const Time::DefaultCUC& timeLimit);
 
 	/**
 	 * Copies all TM packets from source packet store to the target packet-store, that fall between the two specified
@@ -100,7 +100,7 @@ private:
 	 *
 	 * @param request used to raise errors.
 	 */
-	static bool checkTimeWindow(Time::DefaultCUC startTime, Time::DefaultCUC endTime, const Message& request);
+	static bool checkTimeWindow(const Time::DefaultCUC& startTime, const Time::DefaultCUC& endTime, const Message& request);
 
 	/**
 	 * Checks if the destination packet store is empty, in order to proceed with the copying of packets.
@@ -121,8 +121,8 @@ private:
 	 * This function assumes that `startTime` and `endTime` are valid at this point, so any necessary error checking
 	 * regarding these variables, should have already occurred.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, Time::DefaultCUC startTime,
-	                             Time::DefaultCUC endTime, const Message& request);
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, const Time::DefaultCUC& startTime,
+	                             const Time::DefaultCUC& endTime, const Message& request);
 
 	/**
 	 * Checks if there are no stored Time::DefaultCUC that fall between the two specified time-tags.
@@ -132,7 +132,7 @@ private:
 	 * @param request used to raise errors.
 	 * @param fromPacketStoreId the source packet store, whose content is to be copied.
 	 */
-	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, Time::DefaultCUC timeTag,
+	bool noTimestampInTimeWindow(const String<ECSSPacketStoreIdSize>& fromPacketStoreId, const Time::DefaultCUC& timeTag,
 	                             const Message& request, bool isAfterTimeTag);
 
 	/**
@@ -144,8 +144,8 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedFromTagToTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC startTime,
-	                        Time::DefaultCUC endTime, const Message& request);
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Time::DefaultCUC& startTime,
+	                        const Time::DefaultCUC& endTime, const Message& request);
 
 	/**
 	 * Performs all the necessary error checking for the case of AfterTimeTag copying of packets.
@@ -156,7 +156,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedAfterTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC startTime,
+	                        const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Time::DefaultCUC& startTime,
 	                        const Message& request);
 
 	/**
@@ -168,7 +168,7 @@ private:
 	 * @return true if an error has occurred.
 	 */
 	bool failedBeforeTimeTag(const String<ECSSPacketStoreIdSize>& fromPacketStoreId,
-	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, Time::DefaultCUC endTime,
+	                         const String<ECSSPacketStoreIdSize>& toPacketStoreId, const Time::DefaultCUC& endTime,
 	                         const Message& request);
 
 	/**
@@ -232,7 +232,7 @@ public:
 	/**
 	 * Adds telemetry to the specified packet store and Time::DefaultCUC it.
 	 */
-	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, Time::DefaultCUC timestamp);
+	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const Time::DefaultCUC& timestamp);
 
 	/**
 	 * Deletes the content from all the packet stores.

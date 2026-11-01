@@ -1,6 +1,6 @@
 #pragma once
 #include "etl/vector.h"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "ECSS_Definitions.hpp"
 #include "Helpers/TypeDefinitions.hpp"
 
@@ -26,9 +26,9 @@ namespace AllReportTypes {
 	const extern ServiceDefinitionsVector ST20Reports;
 
 	/**
-	 * Map containing all the report types, per service. The key is the ServiceType and the value,
-	 * an etl vector containing the report types.
+	 * Flat map containing all the report types, per service. The key is the ServiceType and the value
+	 * is an etl vector containing the report types.
 	 */
-	extern const etl::map<ServiceTypeNum, const ServiceDefinitionsVector&, ECSSMaxServiceTypeDefinitions> MessagesOfService;
+	extern const etl::flat_map<ServiceTypeNum, const ServiceDefinitionsVector&, ECSSMaxServiceTypeDefinitions> MessagesOfService;
 
 } // namespace AllReportTypes

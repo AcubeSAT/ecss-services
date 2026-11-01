@@ -2,7 +2,7 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "etl/span.h"
 #include "etl/utility.h"
 #include "etl/vector.h"
@@ -47,7 +47,7 @@ public:
 	 * This will also be used by the StorageAndRetrievalService (ST15) as a look-up table, regarding which TMs are
 	 * allowed to be stored.
 	 */
-	etl::map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
+	etl::flat_map<AppServiceKey, ReportTypeDefinitions, ECSSMaxApplicationsServicesCombinations> definitions;
 
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.

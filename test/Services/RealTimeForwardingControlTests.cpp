@@ -56,7 +56,6 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, ApplicationId);
 
-		ApplicationProcessId applicationID = 1;
 		ForwardingAndPacketHelper::validReportTypes(request);
 
 		MessageParser::execute(request);
@@ -98,8 +97,6 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                Message::TC, ApplicationId);
 
 		ApplicationProcessId applicationID = 1;
-		ServiceTypeNum serviceType1 = ForwardingAndPacketHelper::services[0]; // st03
-		ServiceTypeNum serviceType2 = ForwardingAndPacketHelper::services[1]; // st05
 
 		realTimeForwarding.controlledApplications.push_back(applicationID);
 		ForwardingAndPacketHelper::validReportTypes(request);
@@ -222,7 +219,6 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, ApplicationId);
 		ApplicationProcessId applicationID1 = 1;
-		ApplicationProcessId applicationID2 = 2;
 		ApplicationProcessId applicationID3 = 3;
 		realTimeForwarding.controlledApplications.push_back(applicationID1);
 		realTimeForwarding.controlledApplications.push_back(applicationID3);
@@ -853,7 +849,6 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
 		                Message::TC, ApplicationId);
-		ApplicationProcessId applicationID = 1;
 		deleteReportEmptyApplication(request);
 		initializeAppProcessConfig();
 
@@ -907,7 +902,6 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
 		                Message::TC, ApplicationId);
-		ApplicationProcessId applicationID = 1;
 		deleteServiceEmptyApplication(request);
 		initializeAppProcessConfig();
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;

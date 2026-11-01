@@ -5,7 +5,7 @@
 #include "Helpers/PacketStore.hpp"
 #include "Helpers/AppProcessConfiguration.hpp"
 #include "Service.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 #include "etl/vector.h"
 
 class StorageAndRetrievalService;
@@ -79,8 +79,8 @@ public:
 	 * The size of this object is known at compile time, but it is significant: each ApplicationProcessConfiguration
 	 * holds up to ECSSMaxApplicationsServicesCombinations vectors of ECSSMaxReportTypeDefinitions message types, and
 	 * this map holds one configuration per packet store (ECSSMaxPacketStores). With the current x86 definitions
-	 * (4 packet stores, 50 app-service combinations, 20 report types), this map measures ~16.6 kB on x86-64
-	 * (sizeof(ApplicationProcessConfiguration) = 4072 bytes). Keep this in mind when adjusting those definitions
+	 * (4 packet stores, 50 app-service combinations, 20 report types), this map measures ~13.5 kB on 64-bit hosts
+	 * (sizeof(ApplicationProcessConfiguration) = 3288 bytes). Keep this in mind when adjusting those definitions
 	 * for the embedded platform.
 	 *
 	 * @note
@@ -92,7 +92,7 @@ public:
 	 * application process ID and service type already exist in the map, and the requested report type is located in the vector
 	 * of report types, which corresponds to the packet store ID, appID and service type.
 	 */
-	etl::map<PacketStoreId, ApplicationProcessConfiguration, ECSSMaxPacketStores> packetStoreAppProcessConfig;
+	etl::flat_map<PacketStoreId, ApplicationProcessConfiguration, ECSSMaxPacketStores> packetStoreAppProcessConfig;
 
 	/**
 	 * TC[15,3] 'add report types to an application process storage control configuration'.

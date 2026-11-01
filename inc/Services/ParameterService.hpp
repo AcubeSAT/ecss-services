@@ -6,7 +6,7 @@
 #include "ErrorHandler.hpp"
 #include "Helpers/Parameter.hpp"
 #include "Service.hpp"
-#include "etl/map.h"
+#include "etl/flat_map.h"
 
 /**
  * Implementation of the ST[20] parameter management service,
@@ -24,7 +24,7 @@
  */
 class ParameterService : public Service {
 private:
-	typedef etl::map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSParameterCount> ParameterMap;
+	typedef etl::flat_map<uint16_t, std::reference_wrapper<ParameterBase>, ECSSParameterCount> ParameterMap;
 
 	/**
 	 * Map storing the IDs and references to each parameter

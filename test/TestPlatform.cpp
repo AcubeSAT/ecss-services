@@ -5,7 +5,7 @@
 #include <Message.hpp>
 #include <Service.hpp>
 #include <catch2/catch_all.hpp>
-#include <cxxabi.h>
+#include "Helpers/Demangle.hpp"
 #include <filesystem>
 #include <fstream>
 #include "Helpers/Parameter.hpp"
@@ -38,6 +38,7 @@ template void ErrorHandler::logError(ErrorHandler::InternalErrorType);
 std::vector<Message> ServiceTests::queuedMessages = std::vector<Message>();
 std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool> ServiceTests::thrownErrors =
     std::multimap<std::pair<ErrorHandler::ErrorSource, uint16_t>, bool>();
+std::string ServiceTests::lastLog;
 bool ServiceTests::expectingErrors = false;
 
 void Service::storeMessage(Message& message) {
@@ -46,15 +47,15 @@ void Service::storeMessage(Message& message) {
 }
 
 template <typename ErrorType>
-void ErrorHandler::logError(const Message& message, ErrorType errorType) {
+void ErrorHandler::logError(const Message&, ErrorType errorType) {
 	logError(errorType);
 }
 
 template <typename ErrorType>
 void ErrorHandler::logError(ErrorType errorType) {
-	ServiceTests::addError(ErrorHandler::findErrorSource(errorType), errorType);
+	ServiceTests::addError(ErrorHandler::findErrorSource<ErrorType>(), errorType);
 
-	auto errorCategory = abi::__cxa_demangle(typeid(ErrorType).name(), nullptr, nullptr, nullptr);
+	auto errorCategory = Demangler::demangle<ErrorType>();
 	auto errorNumber = std::underlying_type_t<ErrorType>(errorType);
 
 	LOG_ERROR << "Error " << errorCategory << " with number " << errorNumber;
@@ -63,18 +64,30 @@ void ErrorHandler::logError(ErrorType errorType) {
 void Logger::log(Logger::LogLevel level, etl::istring& message) {
 	// Logs while testing are passed on to Catch2, if they are important enough
 	if (level >= Logger::warning) {
+		ServiceTests::lastLog = message.c_str();
 		UNSCOPED_INFO(message.c_str());
 	}
+}
+
+template <>
+void convertValueToString(String<LOGGER_MAX_MESSAGE_SIZE>& message, char* value) {
+	message.append(value);
+}
+
+template <>
+void convertValueToString(String<LOGGER_MAX_MESSAGE_SIZE>& message, const char* value) {
+	message.append(value);
 }
 
 struct ServiceTestsListener : Catch::EventListenerBase {
 	using EventListenerBase::EventListenerBase; // inherit constructor
 
-	void testRunStarting(Catch::TestRunInfo const& testRunInfo) override {
+	void testRunStarting(Catch::TestRunInfo const&) override {
+		current_path(std::filesystem::temp_directory_path());
 		ServiceTests::reset();
 	}
 
-	void sectionEnded(Catch::SectionStats const& sectionStats) override {
+	void sectionEnded(Catch::SectionStats const&) override {
 		// Make sure we don't have any errors
 		if (not ServiceTests::isExpectingErrors()) {
 			// An Error was thrown with this Message. If you expected this to happen, please call a
@@ -89,7 +102,7 @@ struct ServiceTestsListener : Catch::EventListenerBase {
 		ServiceTests::resetErrors();
 	}
 
-	void testCaseEnded(Catch::TestCaseStats const& testCaseStats) override {
+	void testCaseEnded(Catch::TestCaseStats const&) override {
 		// Tear-down after a test case is run
 		ServiceTests::reset();
 	}
@@ -176,8 +189,8 @@ void ParameterService::initializeParameterMap() {
 	    {uint16_t{31}, PlatformParameters::parameter32},
 	    {uint16_t{32}, PlatformParameters::parameter33},
 	    {uint16_t{33}, PlatformParameters::parameter34},
-        {uint16_t{34}, PlatformParameters::parameter35},
-        {uint16_t{35}, PlatformParameters::parameter36},
+	    {uint16_t{34}, PlatformParameters::parameter35},
+	    {uint16_t{35}, PlatformParameters::parameter36},
 	};
 }
 
@@ -187,154 +200,55 @@ void ParameterStatisticsService::initializeStatisticsMap() {
 	statisticsMap = {};
 }
 
-namespace Filesystem {
-	namespace fs = std::filesystem;
+etl::optional<Filesystem::FileCreationError> createFile(const Filesystem::Path& path) {
+	return Filesystem::createFile(path);
+}
 
-	etl::optional<FileCreationError> createFile(const Path& path) {
-		if (getNodeType(path)) {
-			return FileCreationError::FileAlreadyExists;
-		}
+etl::optional<Filesystem::FileDeletionError> deleteFile(const Filesystem::Path& path) {
+	return Filesystem::deleteFile(path);
+}
 
-		std::ofstream file(path.data());
+etl::optional<Filesystem::NodeType> getNodeType(const Filesystem::Path& path) {
+	return Filesystem::getNodeType(path);
+}
 
-		file.flush();
-		file.close();
+etl::result<Filesystem::Attributes, Filesystem::FileAttributeError> getFileAttributes(const Filesystem::Path& path) {
+	return Filesystem::getFileAttributes(path);
+}
 
-		return etl::nullopt;
-	}
+etl::expected<void, Filesystem::FilePermissionModificationError> lockFile(const Filesystem::Path& path) {
+	return Filesystem::lockFile(path);
+}
 
-	etl::optional<FileDeletionError> deleteFile(const Path& path) {
-		etl::optional<NodeType> nodeType = getNodeType(path);
-		if (not nodeType) {
-			return FileDeletionError::FileDoesNotExist;
-		}
+etl::expected<void, Filesystem::FilePermissionModificationError> unlockFile(const Filesystem::Path& path) {
+	return Filesystem::unlockFile(path);
+}
 
-		if (nodeType.value() != NodeType::File) {
-			return FileDeletionError::PathLeadsToDirectory;
-		}
 
-		if (getFileLockStatus(path) == FileLockStatus::Locked) {
-			return FileDeletionError::FileIsLocked;
-		}
+Filesystem::FileLockStatus getFileLockStatus(const Filesystem::Path& path) {
+	return Filesystem::getFileLockStatus(path);
+}
 
-		bool successfulFileDeletion = fs::remove(path.data());
+etl::optional<Filesystem::DirectoryCreationError> createDirectory(const Filesystem::Path& path) {
+	return Filesystem::createDirectory(path);
+}
 
-		if (successfulFileDeletion) {
-			return etl::nullopt;
-		} else {
-			return FileDeletionError::UnknownError;
-		}
-	}
+etl::optional<Filesystem::DirectoryDeletionError> deleteDirectory(const Filesystem::Path& path) {
+	return Filesystem::deleteDirectory(path);
+}
 
-	etl::optional<NodeType> getNodeType(const Path& path) {
-		switch (fs::status(path.data()).type()) {
-			case fs::file_type::regular:
-				return NodeType::File;
-			case fs::file_type::directory:
-				return NodeType::Directory;
-			default:
-				return etl::nullopt;
-		}
-	}
-
-	FileLockStatus getFileLockStatus(const Path& path) {
-		fs::perms permissions = fs::status(path.data()).permissions();
-
-		if ((permissions & fs::perms::owner_write) == fs::perms::none) {
-			return FileLockStatus::Locked;
-		}
-
-		return FileLockStatus::Unlocked;
-	}
-
-	/**
-	 * Locks a file using POSIX permission operations.
-	 * @param path The path to the file
-	 * @warning If a file is locked, a chmod +w ./file operation will allow the
-	 * current user to modify the file again.
-	 */
-	void lockFile(const Path& path) {
-		fs::perms permissions = fs::status(path.data()).permissions();
-
-		auto newPermissions = permissions & ~fs::perms::owner_write;
-
-		fs::status(path.data()).permissions(newPermissions);
-	}
-
-	/**
-	 * Unlocks a file using POSIX permission operations.
-	 * @param path The path to the file
-	 * @warning If a file is unlocked, a chmod -w ./file operation will stop the
-	 * current user from modifying the file again.
-	 */
-	void unlockFile(const Path& path) {
-		fs::perms permissions = fs::status(path.data()).permissions();
-
-		auto newPermissions = permissions & fs::perms::owner_write;
-
-		fs::status(path.data()).permissions(newPermissions);
-	}
-
-	etl::result<Attributes, FileAttributeError> getFileAttributes(const Path& path) {
-		Attributes attributes{};
-
-		auto nodeType = getNodeType(path);
-		if (not nodeType) {
-			return FileAttributeError::FileDoesNotExist;
-		}
-
-		if (nodeType.value() != NodeType::File) {
-			return FileAttributeError::PathLeadsToDirectory;
-		}
-
-		attributes.sizeInBytes = fs::file_size(path.data());
-		attributes.isLocked = getFileLockStatus(path) == FileLockStatus::Locked;
-
-		return attributes;
-	}
-
-	etl::optional<DirectoryCreationError> createDirectory(const Path& path) {
-		if (getNodeType(path)) {
-			return DirectoryCreationError::DirectoryAlreadyExists;
-		}
-
-		std::filesystem::create_directory(path.data());
-
-		return etl::nullopt;
-	}
-
-	etl::optional<DirectoryDeletionError> deleteDirectory(const Path& path) {
-		etl::optional<NodeType> nodeType = getNodeType(path);
-		if (not nodeType) {
-			return DirectoryDeletionError::DirectoryDoesNotExist;
-		}
-
-		if (not std::filesystem::is_empty(path.data())) {
-			return DirectoryDeletionError::DirectoryIsNotEmpty;
-		}
-
-		bool successfulFileDeletion = fs::remove(path.data());
-
-		if (successfulFileDeletion) {
-			return etl::nullopt;
-		} else {
-			return DirectoryDeletionError::UnknownError;
-		}
-	}
-
-	uint32_t getUnallocatedMemory() {
-		return 42U;
-	}
-} // namespace Filesystem
+uint32_t getUnallocatedMemory() {
+	return Filesystem::getUnallocatedMemory();
+}
 
 
 void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
-    PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
-    PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
+	PlatformParameters::parameter35.setValue(static_cast<uint8_t>(a[0]) << 8 | static_cast<uint8_t>(a[1]));
+	PlatformParameters::parameter36.setValue(static_cast<uint8_t>(a[2]));
 }
 
 void FunctionManagementService::initializeFunctionMap() {
-    FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
+	FunctionManagementService::include(String<ECSSFunctionNameLength>("st08FunctionTest"), &st08FunctionTest);
 }
 
 CATCH_REGISTER_LISTENER(ServiceTestsListener)
