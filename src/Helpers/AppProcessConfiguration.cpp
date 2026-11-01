@@ -1,3 +1,4 @@
+#include <limits>
 #include "Helpers/AppProcessConfiguration.hpp"
 #include "Helpers/AllReportTypes.hpp"
 #include "Message.hpp"
@@ -208,6 +209,35 @@ bool ApplicationProcessConfiguration::isReportTypeAdded(ApplicationProcessId app
 		return false;
 	}
 	return etl::find(definition->second.begin(), definition->second.end(), messageType) != definition->second.end();
+}
+
+void ApplicationProcessConfiguration::appendContentToReport(Message& report) const {
+	uint8_t numberOfApplications = 0;
+	ApplicationProcessId previousAppID = std::numeric_limits<ApplicationProcessId>::max();
+	for (const auto& [appServiceKey, reportTypes]: definitions) {
+		if (appServiceKey.first != previousAppID) {
+			previousAppID = appServiceKey.first;
+			numberOfApplications++;
+		}
+	}
+	report.appendUint8(numberOfApplications);
+
+	// The map is sorted by key, so all entries of the same application process are accessed consecutively.
+	previousAppID = std::numeric_limits<ApplicationProcessId>::max();
+	for (const auto& [appServiceKey, reportTypes]: definitions) {
+		const ApplicationProcessId applicationID = appServiceKey.first;
+		if (applicationID != previousAppID) {
+			previousAppID = applicationID;
+			report.append<ApplicationProcessId>(applicationID);
+			report.appendUint8(countServicesOfApplication(applicationID));
+		}
+
+		report.append<ServiceTypeNum>(appServiceKey.second);
+		report.appendUint8(reportTypes.size());
+		for (const auto& messageType: reportTypes) {
+			report.append<MessageTypeNum>(messageType);
+		}
+	}
 }
 
 void ApplicationProcessConfiguration::skipReportTypes(Message& request, uint8_t numOfMessages) {

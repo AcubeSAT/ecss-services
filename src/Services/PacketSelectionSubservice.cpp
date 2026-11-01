@@ -1,4 +1,3 @@
-#include <limits>
 #include "Services/PacketSelectionSubservice.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
 
@@ -117,37 +116,8 @@ void PacketSelectionSubservice::reportApplicationProcess(Message& request) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
 	}
-	auto& configuration = packetStoreAppProcessConfig[packetStoreID];
-	const auto& definitions = configuration.definitions;
-
 	Message report = createTM(StorageAndRetrievalService::MessageType::ApplicationProcessReport);
 	report.appendFixedString(packetStoreID);
-
-	uint8_t numberOfApplications = 0;
-	ApplicationProcessId previousAppID = std::numeric_limits<ApplicationProcessId>::max();
-	for (const auto& [appServiceKey, reportTypes]: definitions) {
-		if (appServiceKey.first != previousAppID) {
-			previousAppID = appServiceKey.first;
-			numberOfApplications++;
-		}
-	}
-	report.appendUint8(numberOfApplications);
-
-	// The map is sorted by key, so all entries of the same application process are accessed consecutively.
-	previousAppID = std::numeric_limits<ApplicationProcessId>::max();
-	for (const auto& [appServiceKey, reportTypes]: definitions) {
-		const ApplicationProcessId applicationID = appServiceKey.first;
-		if (applicationID != previousAppID) {
-			previousAppID = applicationID;
-			report.append<ApplicationProcessId>(applicationID);
-			report.appendUint8(configuration.countServicesOfApplication(applicationID));
-		}
-
-		report.append<ServiceTypeNum>(appServiceKey.second);
-		report.appendUint8(reportTypes.size());
-		for (const auto& messageType: reportTypes) {
-			report.append<MessageTypeNum>(messageType);
-		}
-	}
+	packetStoreAppProcessConfig[packetStoreID].appendContentToReport(report);
 	storeMessage(report);
 }

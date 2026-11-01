@@ -174,6 +174,12 @@ public:
 	bool isReportTypeAdded(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
 	    MessageTypeNum messageType) const;
 
+	/**
+	 * Appends the content of the configuration to a TM[14,4] or TM[15,6] report: the number of application processes,
+	 * followed by each application process with its service type and report type definitions.
+	 */
+	void appendContentToReport(Message& report) const;
+
 private:
 	/**
 	 * Adds the specified report type to the application process configuration, if it is not already there. Callers

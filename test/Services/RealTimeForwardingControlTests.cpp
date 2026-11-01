@@ -997,7 +997,7 @@ TEST_CASE("Report the Application Process Configuration content") {
 		REQUIRE(report.readUint8() == 3);            // num of applications
 
 		// Application 1
-		REQUIRE(report.readUint8() == 1);            // applicationID
+		REQUIRE(report.read<ApplicationProcessId>() == 1); // applicationID
 		REQUIRE(report.readUint8() == 2);            // num of services
 		REQUIRE(report.readUint8() == 3);            // service 1
 		REQUIRE(report.readUint8() == 2);            // num of messages
@@ -1009,7 +1009,7 @@ TEST_CASE("Report the Application Process Configuration content") {
 		REQUIRE(report.readUint8() == ForwardingAndPacketHelper::messages1[1]); // message 1
 
 		// Application 2
-		REQUIRE(report.readUint8() == 2);            // applicationID
+		REQUIRE(report.read<ApplicationProcessId>() == 2); // applicationID
 		REQUIRE(report.readUint8() == 2);            // num of services
 		REQUIRE(report.readUint8() == 3);            // service 1
 		REQUIRE(report.readUint8() == 2);            // num of messages
@@ -1021,7 +1021,7 @@ TEST_CASE("Report the Application Process Configuration content") {
 		REQUIRE(report.readUint8() == ForwardingAndPacketHelper::messages1[1]); // message 1
 
 		// Application 3
-		REQUIRE(report.readUint8() == 3);            // applicationID
+		REQUIRE(report.read<ApplicationProcessId>() == 3); // applicationID
 		REQUIRE(report.readUint8() == 2);            // num of services
 		REQUIRE(report.readUint8() == 3);            // service 1
 		REQUIRE(report.readUint8() == 2);            // num of messages
@@ -1058,7 +1058,7 @@ TEST_CASE("Report the Application Process Configuration content") {
 
 		uint8_t numOfServices = sizeof(ForwardingAndPacketHelper::allServices)/sizeof(uint8_t);
 		for (auto appID: ForwardingAndPacketHelper::applications) {
-			REQUIRE(report.readUint8() == appID);
+			REQUIRE(report.read<ApplicationProcessId>() == appID);
 			REQUIRE(report.readUint8() == numOfServices);
 
 			for (auto serviceType: ForwardingAndPacketHelper::allServices) {
@@ -1088,7 +1088,7 @@ TEST_CASE("Report the Application Process Configuration content") {
 		CHECK(ServiceTests::count() == 1);
 		Message report = ServiceTests::get(0);
 		REQUIRE(report.readUint8() == 1);            // num of applications
-		report.readUint8();                          // applicationID
+		REQUIRE(report.read<ApplicationProcessId>() == applicationID);
 		REQUIRE(report.readUint8() == sizeof(ForwardingAndPacketHelper::allServices) / sizeof(uint8_t)); // num of services
 
 		ServiceTests::reset();
