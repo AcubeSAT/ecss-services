@@ -232,12 +232,14 @@ TEST_CASE("Test string reading", "[message][ecss]") {
     Message message(0, 0, Message::TC, 0);
 
     SECTION("Test readString") {
-        message.appendString(String<4>("test"));
-        message.appendString(String<6>("string"));
-		char string1[5];
-		uint8_t string2[7];
-        message.readString(string1, 4);
-        message.readString(string2, 6);
+        constexpr size_t Size1 = 4;
+        constexpr size_t Size2 = 6;
+        message.appendString(String<Size1>("test"));
+        message.appendString(String<Size2>("string"));
+        char string1[Size1 + 1] = {}; // readString does not null-terminate
+        uint8_t string2[Size2 + 1] = {};
+        message.readString(string1, Size1);
+        message.readString(string2, Size2);
 
         CHECK_THAT(string1, Catch::Matchers::Equals("test"));
         CHECK_THAT(reinterpret_cast<const char*>(string2), Catch::Matchers::Equals("string"));
