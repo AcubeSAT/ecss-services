@@ -1,3 +1,4 @@
+#include <limits>
 #include "Message.hpp"
 #include "ServiceTests.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
@@ -769,10 +770,15 @@ TEST_CASE("Delete report types from the packet selection subservice") {
 
 	SECTION("Delete a whole application process definition (N2 = 0)") {
 		ApplicationProcessId applicationID = 1;
+		ApplicationProcessId otherApplicationID = 2;
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		populatePacketSelection(packetStoreID, applicationID);
-		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
-		REQUIRE(definitions.size() == 2);
+		populatePacketSelection(packetStoreID, otherApplicationID);
+		auto& configuration = packetSelection.packetStoreAppProcessConfig[packetStoreID];
+		auto& definitions = configuration.definitions;
+		definitions[std::make_pair(applicationID, std::numeric_limits<ServiceTypeNum>::min())];
+		definitions[std::make_pair(applicationID, std::numeric_limits<ServiceTypeNum>::max())];
+		REQUIRE(definitions.size() == 6);
 
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
@@ -785,9 +791,24 @@ TEST_CASE("Delete report types from the packet selection subservice") {
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 0);
-		REQUIRE(definitions.empty());
+		CHECK(not configuration.isApplicationEnabled(applicationID));
+		CHECK(configuration.isApplicationEnabled(otherApplicationID));
+		REQUIRE(definitions.size() == 2);
 
 		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Deleting an application process that was not validated beforehand") {
+		ApplicationProcessConfiguration configuration;
+		configuration.definitions[std::make_pair(ApplicationProcessId{2}, ForwardingAndPacketHelper::services[0])];
+
+		configuration.deleteApplicationProcess(1);
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::ElementNotInArray) == 1);
+		REQUIRE(configuration.definitions.size() == 1);
+
 		ServiceTests::reset();
 		Services.reset();
 	}

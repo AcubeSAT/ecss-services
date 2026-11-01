@@ -147,19 +147,13 @@ bool ApplicationProcessConfiguration::checkReportTypeInConfiguration(const Messa
 }
 
 void ApplicationProcessConfiguration::deleteApplicationProcess(ApplicationProcessId applicationID) {
-	bool deletedAnyDefinition = false;
-	auto iter = definitions.begin();
-	while (iter != definitions.end()) {
-		if (iter->first.first == applicationID) {
-			iter = definitions.erase(iter);
-			deletedAnyDefinition = true;
-		} else {
-			++iter;
-		}
-	}
-	if (not deletedAnyDefinition) {
+	const auto firstDefinition = definitions.lower_bound(AppServiceKey{applicationID, std::numeric_limits<ServiceTypeNum>::min()});
+	const auto lastDefinition = definitions.upper_bound(AppServiceKey{applicationID, std::numeric_limits<ServiceTypeNum>::max()});
+	if (firstDefinition == lastDefinition) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
+		return;
 	}
+	definitions.erase(firstDefinition, lastDefinition);
 }
 
 void ApplicationProcessConfiguration::deleteServiceType(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
