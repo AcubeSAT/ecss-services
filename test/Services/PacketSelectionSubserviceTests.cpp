@@ -7,9 +7,10 @@
 StorageAndRetrievalService& storageAndRetrieval1 = Services.storageAndRetrieval;
 PacketSelectionSubservice& packetSelection = storageAndRetrieval1.packetSelection;
 
-String<ECSSPacketStoreIdSize> addPacketStoreToPacketSelection() {
+String<ECSSPacketStoreIdSize> addPacketStoreToPacketSelection(uint8_t nameSuffix = '1') {
 	uint8_t packetStoreData[ECSSPacketStoreIdSize];
 	uint8_t name[4] = "ps1";
+	name[2] = nameSuffix;
 	std::fill(std::begin(packetStoreData), std::end(packetStoreData), 0);
 
 	std::copy(name, name + 3, packetStoreData);
@@ -771,6 +772,83 @@ TEST_CASE("Report the content of the application process storage-control configu
 		CHECK(report.readUint8() == 2); // numOfMessages
 		CHECK(report.read<MessageTypeNum>() == ForwardingAndPacketHelper::messages2[0]);
 		CHECK(report.read<MessageTypeNum>() == ForwardingAndPacketHelper::messages2[1]);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
+TEST_CASE("Deleting a packet store deletes its application process storage-control configuration") {
+	auto addReportTypes = [](const String<ECSSPacketStoreIdSize>& packetStoreID) {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+		request.appendFixedString(packetStoreID);
+		ForwardingAndPacketHelper::validReportTypes(request);
+		MessageParser::execute(request);
+	};
+
+	auto deletePacketStore = [](const String<ECSSPacketStoreIdSize>& packetStoreID) {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeletePacketStores,
+		                Message::TC, 1);
+		request.appendUint16(1);
+		request.appendFixedString(packetStoreID);
+		MessageParser::execute(request);
+	};
+
+	auto& configurations = packetSelection.packetStoreAppProcessConfig;
+	packetSelection.controlledApplications.push_back(ForwardingAndPacketHelper::applications[0]);
+
+	SECTION("A recreated packet store starts with an empty configuration") {
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		addReportTypes(packetStoreID);
+		REQUIRE(configurations[packetStoreID].definitions.size() == 2);
+
+		deletePacketStore(packetStoreID);
+		CHECK(not storageAndRetrieval1.packetStoreExists(packetStoreID));
+		CHECK(configurations.empty());
+
+		addPacketStoreToPacketSelection();
+		CHECK(configurations[packetStoreID].definitions.empty());
+		CHECK(ServiceTests::count() == 0);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Deleting all packet stores (N = 0)") {
+		addReportTypes(addPacketStoreToPacketSelection('1'));
+		addReportTypes(addPacketStoreToPacketSelection('2'));
+		REQUIRE(configurations.size() == 2);
+
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::DeletePacketStores,
+		                Message::TC, 1);
+		request.appendUint16(0);
+		MessageParser::execute(request);
+
+		CHECK(storageAndRetrieval1.currentNumberOfPacketStores() == 0);
+		CHECK(configurations.empty());
+		CHECK(ServiceTests::count() == 0);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Going through more packet stores than can exist at the same time") {
+		for (uint16_t store = 0; store <= ECSSMaxPacketStores; store++) {
+			auto packetStoreID = addPacketStoreToPacketSelection(static_cast<uint8_t>('a' + store));
+			addReportTypes(packetStoreID);
+			REQUIRE(configurations[packetStoreID].definitions.size() == 2);
+
+			deletePacketStore(packetStoreID);
+			REQUIRE(configurations.empty());
+		}
+		CHECK(ServiceTests::count() == 0);
 
 		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();

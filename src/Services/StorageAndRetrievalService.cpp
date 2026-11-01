@@ -207,6 +207,7 @@ void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPack
 
 void StorageAndRetrievalService::resetPacketStores() {
 	packetStores.clear();
+	packetSelection.packetStoreAppProcessConfig.clear();
 }
 
 NumOfPacketStores StorageAndRetrievalService::currentNumberOfPacketStores() {
@@ -581,6 +582,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			std::copy(idToDelete.begin(), idToDelete.end(), data.data());
 			String<ECSSPacketStoreIdSize> const key(data.data());
 			packetStores.erase(key);
+			packetSelection.packetStoreAppProcessConfig.erase(key);
 		}
 		return;
 	}
@@ -609,6 +611,7 @@ void StorageAndRetrievalService::deletePacketStores(Message& request) {
 			continue;
 		}
 		packetStores.erase(idToDelete);
+		packetSelection.packetStoreAppProcessConfig.erase(idToDelete);
 	}
 }
 
