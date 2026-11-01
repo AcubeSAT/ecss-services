@@ -813,6 +813,21 @@ TEST_CASE("Delete report types from the packet selection subservice") {
 		Services.reset();
 	}
 
+	SECTION("Deleting a report type that was not validated beforehand") {
+		ApplicationProcessId applicationID = 1;
+		ServiceTypeNum serviceType = ForwardingAndPacketHelper::services[0];
+		ApplicationProcessConfiguration configuration;
+		configuration.definitions[std::make_pair(applicationID, serviceType)].push_back(ForwardingAndPacketHelper::messages1[0]);
+
+		configuration.deleteReportType(applicationID, serviceType, ForwardingAndPacketHelper::messages1[1]);
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::ElementNotInArray) == 1);
+		REQUIRE(configuration.isReportTypeAdded(applicationID, serviceType, ForwardingAndPacketHelper::messages1[0]));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
 	SECTION("Requested deletions of non-existent definitions") {
 		ApplicationProcessId applicationID = 1;
 		ApplicationProcessId nonExistentApplicationID = 2;

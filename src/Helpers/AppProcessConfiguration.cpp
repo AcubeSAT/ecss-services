@@ -170,12 +170,10 @@ void ApplicationProcessConfiguration::deleteReportType(ApplicationProcessId appl
 		return;
 	}
 	auto& reportTypes = definition->second;
-	auto* const reportTypeIndex = etl::find(reportTypes.begin(), reportTypes.end(), messageType);
-	if (reportTypeIndex == reportTypes.end()) {
+	if (etl::erase(reportTypes, messageType) == 0) {
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
-	reportTypes.erase(reportTypeIndex);
 	if (reportTypes.empty()) {
 		deleteServiceType(applicationID, serviceType);
 	}
