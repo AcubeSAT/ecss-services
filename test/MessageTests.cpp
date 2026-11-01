@@ -236,7 +236,7 @@ TEST_CASE("Test string reading", "[message][ecss]") {
         constexpr size_t Size2 = 6;
         message.appendString(String<Size1>("test"));
         message.appendString(String<Size2>("string"));
-        char string1[Size1 + 1] = {}; // readString does not null-terminate
+        char string1[Size1 + 1] = {};
         uint8_t string2[Size2 + 1] = {};
         message.readString(string1, Size1);
         message.readString(string2, Size2);
