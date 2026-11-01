@@ -5,6 +5,7 @@
 #include "ErrorHandler.hpp"
 #include "Message.hpp"
 #include "etl/deque.h"
+#include "numeric"
 
 /**
  * This is the Packet Store class, needed for the Storage-Retrieval Service. The purpose of the packet-store is to

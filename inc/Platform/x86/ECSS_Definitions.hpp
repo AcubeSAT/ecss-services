@@ -217,7 +217,7 @@ inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
  * The max number of service type definitions per application process type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
- * @see PacketSelectionSubService
+ * @see PacketSelectionSubservice
  * todo: (#27) must change when all 15 services are implemented.
  */
 inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 10;
