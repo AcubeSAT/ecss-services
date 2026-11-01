@@ -175,7 +175,7 @@ void ApplicationProcessConfiguration::deleteReportType(ApplicationProcessId appl
 		return;
 	}
 	if (reportTypes.empty()) {
-		deleteServiceType(applicationID, serviceType);
+		definitions.erase(definition);
 	}
 }
 
