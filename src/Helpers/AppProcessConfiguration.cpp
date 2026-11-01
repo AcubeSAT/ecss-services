@@ -13,9 +13,7 @@ void ApplicationProcessConfiguration::addAllReportsOfApplication(ApplicationProc
 void ApplicationProcessConfiguration::addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
 	auto serviceReportTypes = AllReportTypes::MessagesOfService.find(serviceType);
 	if (serviceReportTypes == AllReportTypes::MessagesOfService.end()) {
-		// Not an error: addAllReportsOfApplication iterates existing keys only, and TC-driven callers have
-		// already validated the service type (and reported NonExistentServiceTypeDefinition) via
-		// checkServiceCanBeAdded before reaching this point.
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
 	for (const auto& messageType: serviceReportTypes->second) {
@@ -23,13 +21,11 @@ void ApplicationProcessConfiguration::addAllReportsOfService(ApplicationProcessI
 	}
 }
 
-bool ApplicationProcessConfiguration::checkAndAddReport(const Message& request, ApplicationProcessId applicationID,
+void ApplicationProcessConfiguration::checkAndAddReport(const Message& request, ApplicationProcessId applicationID,
     ServiceTypeNum serviceType, MessageTypeNum messageType) {
-	if (checkMaxReportTypesReached(request, applicationID, serviceType)) {
-		return false;
+	if (not checkMaxReportTypesReached(request, applicationID, serviceType)) {
+		addReport(applicationID, serviceType, messageType);
 	}
-	addReport(applicationID, serviceType, messageType);
-	return true;
 }
 
 void ApplicationProcessConfiguration::addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
@@ -112,7 +108,7 @@ bool ApplicationProcessConfiguration::checkMaxReportTypesReached(const Message& 
     ServiceTypeNum serviceType) const {
 	auto serviceReportTypes = AllReportTypes::MessagesOfService.find(serviceType);
 	if (serviceReportTypes == AllReportTypes::MessagesOfService.end()) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition);
+		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return true;
 	}
 	if (countReportsOfService(applicationID, serviceType) >= serviceReportTypes->second.size()) {

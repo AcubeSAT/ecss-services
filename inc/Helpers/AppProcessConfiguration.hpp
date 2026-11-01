@@ -57,19 +57,18 @@ public:
 
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
-	 * Report types that are already in the configuration are left as they are.
+	 * Report types that are already in the configuration are left as they are. Reports an ElementNotInArray internal
+	 * error if the service type is unknown to AllReportTypes, since callers are expected to have validated it beforehand.
 	 */
 	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
-	 * Checks whether the specified message type can be added to the specified application process and service type
-	 * definition, and adds it if it is not already there. Reports a MaxReportTypesReached error if the definition is
-	 * full, or a NonExistentServiceTypeDefinition error if the service type is unknown to AllReportTypes. A message type
-	 * that already exists is not an error, as specified in ECSS 6.14.3.4.1k and 6.15.4.4.1m.
-	 *
-	 * @return True: if the message type passed all checks and is in the configuration.
+	 * Adds the specified message type to the specified application process and service type definition, if it is not
+	 * already there. Reports a MaxReportTypesReached error and adds nothing if the definition is full. A message type
+	 * that already exists in a definition that is not full is not an error, as specified in ECSS 6.14.3.4.1k and
+	 * 6.15.4.4.1m.
 	 */
-	bool checkAndAddReport(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
+	void checkAndAddReport(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
 	    MessageTypeNum messageType);
 
 	/**
@@ -214,8 +213,8 @@ private:
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
-	 * Reports a MaxReportTypesReached error if it is, or a NonExistentServiceTypeDefinition error if the service type
-	 * is unknown to AllReportTypes.
+	 * Reports a MaxReportTypesReached error if it is, or an ElementNotInArray internal error if the service type is
+	 * unknown to AllReportTypes, since callers are expected to have validated it beforehand.
 	 *
 	 * @return True: if the maximum number of report type definitions has already been reached.
 	 */
