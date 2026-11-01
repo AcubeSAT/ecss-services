@@ -48,13 +48,33 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, ApplicationId);
 
-		ForwardingAndPacketHelper::validReportTypes(request);
+		const ApplicationProcessId notControlledApplicationID = ApplicationId + 1;
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(notControlledApplicationID);
+		request.appendUint8(0); // numOfServices
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
+
+		ServiceTests::reset();
+	}
+
+	SECTION("The application process that hosts the service is controlled without being added") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, ApplicationId);
+
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(ApplicationId);
+		request.appendUint8(0); // numOfServices = 0, requesting all report types
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(realTimeForwarding.applicationProcessConfiguration.isApplicationEnabled(ApplicationId));
 
 		ServiceTests::reset();
 	}

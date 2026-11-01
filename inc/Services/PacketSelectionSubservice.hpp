@@ -47,6 +47,7 @@ public:
 	 */
 	explicit PacketSelectionSubservice(StorageAndRetrievalService& parent) : mainService(parent) {
 		serviceType = ServiceType;
+		controlledApplications.push_back(ApplicationId);
 	}
 
 	/**
@@ -54,9 +55,10 @@ public:
 	 *
 	 * @note
 	 * The subservice can only add report types to the storage-control configuration for application processes that
-	 * are contained in this vector. It is the responsibility of the platform initialization code (or the tests) to
-	 * populate it with the application process IDs that the subsystem controls, similarly to the
-	 * controlledApplications vector of the RealTimeForwardingControlService (ST[14]).
+	 * are contained in this vector. It always contains the application process that hosts the subservice, as specified
+	 * in ECSS 6.15.4.1.1a. It is the responsibility of the platform initialization code (or the tests) to add any other
+	 * application process IDs that the subsystem controls, similarly to the controlledApplications vector of the
+	 * RealTimeForwardingControlService (ST[14]).
 	 */
 	etl::vector<ApplicationProcessId, ECSSMaxControlledApplicationProcesses> controlledApplications;
 

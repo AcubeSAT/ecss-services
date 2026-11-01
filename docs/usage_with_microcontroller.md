@@ -243,6 +243,17 @@ void st08FunctionTest(String<ECSSFunctionMaxArgLength> a) {
 void FunctionManagementService::initializeFunctionMap() {
     FunctionManagementService::include("st08FunctionTest", &st08FunctionTest);
 }
+```
+
+ST[14] and ST[15] also keep a list of the application processes they control, in `controlledApplications`. They can only
+add report types for application processes in that list. The constructors add the application process that hosts the
+service (`ApplicationId`). A platform that controls other application processes has to add them during initialisation:
+
+```cpp
+Services.realTimeForwarding.controlledApplications.push_back(otherApplicationId);
+Services.storageAndRetrieval.packetSelection.controlledApplications.push_back(otherApplicationId);
+```
+
 ## Receiving messages
 
 After making sure that your code compiles, you need to provide a way of feeding received TC into the services. This can

@@ -21,7 +21,6 @@ String<ECSSPacketStoreIdSize> addPacketStoreToPacketSelection(uint8_t nameSuffix
 }
 
 void resetAppProcessConfigurationPacketSelection() {
-	packetSelection.controlledApplications.clear();
 	storageAndRetrieval1.resetPacketStores();
 	REQUIRE(packetSelection.packetStoreAppProcessConfig.empty());
 }
@@ -93,15 +92,38 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
 
-		uint8_t applicationID = 1;
+		const ApplicationProcessId notControlledApplicationID = ApplicationId + 1;
 		auto packetStoreID = addPacketStoreToPacketSelection();
 		request.appendFixedString(packetStoreID);
-		ForwardingAndPacketHelper::validReportTypes(request);
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(notControlledApplicationID);
+		request.appendUint8(0); // numOfServices
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		REQUIRE(packetSelection.packetStoreAppProcessConfig.size() == 1);
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("The application process that hosts the subservice is controlled without being added") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		request.appendFixedString(packetStoreID);
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(ApplicationId);
+		request.appendUint8(0); // numOfServices = 0, requesting all report types
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		REQUIRE(packetSelection.packetStoreAppProcessConfig[packetStoreID].isApplicationEnabled(ApplicationId));
 
 		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
