@@ -108,7 +108,7 @@ bool ApplicationProcessConfiguration::checkServiceCanBeAdded(Message& request, A
 		skipReportTypes(request, numOfMessages);
 		return false;
 	}
-	if (checkMaxServiceTypesReached(request, applicationID) and (not isServiceAdded(applicationID, serviceType))) {
+	if ((not isServiceAdded(applicationID, serviceType)) and checkMaxServiceTypesReached(request, applicationID)) {
 		skipReportTypes(request, numOfMessages);
 		return false;
 	}
