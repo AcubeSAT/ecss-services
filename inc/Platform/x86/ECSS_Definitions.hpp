@@ -200,8 +200,9 @@ inline constexpr uint16_t ECSSPacketStoreIdSize = 15;
 inline constexpr uint8_t ECSSMaxHousekeepingStructures = 10;
 
 /**
- * The max number of controlled application processes
+ * The max number of controlled application processes, including the one that hosts the service
  * @see RealTimeForwardingControlService
+ * @see PacketSelectionSubservice
  */
 inline constexpr uint8_t ECSSMaxControlledApplicationProcesses = 5;
 

@@ -247,7 +247,8 @@ void FunctionManagementService::initializeFunctionMap() {
 
 ST[14] and ST[15] also keep a list of the application processes they control, in `controlledApplications`. They can only
 add report types for application processes in that list. The constructors add the application process that hosts the
-service (`ApplicationId`). A platform that controls other application processes has to add them during initialisation:
+service (`ApplicationId`), which counts towards `ECSSMaxControlledApplicationProcesses`. A platform that controls other
+application processes has to add them during initialisation:
 
 ```cpp
 Services.realTimeForwarding.controlledApplications.push_back(otherApplicationId);
