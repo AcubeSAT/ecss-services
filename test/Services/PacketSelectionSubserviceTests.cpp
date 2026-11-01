@@ -922,6 +922,20 @@ TEST_CASE("Packet selection requests shorter than a packet store ID") {
 	Services.reset();
 }
 
+TEST_CASE("Deleting a packet store with a request shorter than a packet store ID") {
+	Message request(StorageAndRetrievalService::ServiceType,
+	                StorageAndRetrievalService::MessageType::DeletePacketStores,
+	                Message::TC, 1);
+	request.appendUint16(1);
+
+	MessageParser::execute(request);
+
+	CHECK(ServiceTests::thrownError(ErrorHandler::AcceptanceErrorType::MessageTooShort));
+
+	ServiceTests::reset();
+	Services.reset();
+}
+
 TEST_CASE("Deleting a packet store deletes its application process storage-control configuration") {
 	auto addReportTypes = [](const String<ECSSPacketStoreIdSize>& packetStoreID) {
 		Message request(StorageAndRetrievalService::ServiceType,
