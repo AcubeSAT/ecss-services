@@ -20,7 +20,6 @@ String<ECSSPacketStoreIdSize> addPacketStoreToPacketSelection(uint8_t nameSuffix
 }
 
 void resetAppProcessConfigurationPacketSelection() {
-	packetSelection.packetStoreAppProcessConfig.clear();
 	packetSelection.controlledApplications.clear();
 	storageAndRetrieval1.resetPacketStores();
 	REQUIRE(packetSelection.packetStoreAppProcessConfig.empty());

@@ -8,14 +8,6 @@
 
 static RealTimeForwardingControlService& realTimeForwarding = Services.realTimeForwarding;
 
-/**
- * Reset the map containing the report definitions to an empty state.
- */
-void resetAppProcessConfigurationRealTimeForwarding() {
-	realTimeForwarding.applicationProcessConfiguration.definitions.clear();
-	REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.empty());
-}
-
 TEST_CASE("Add report types to the Application Process Configuration") {
 	SECTION("Successful addition of report types to the Application Process Configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
