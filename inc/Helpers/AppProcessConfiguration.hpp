@@ -51,22 +51,23 @@ public:
 
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
-	 * May report errors through checkAndAddReport for report types that cannot be added.
+	 * Report types that are already in the configuration are left as they are.
 	 */
-	void addAllReportsOfApplication(const Message& message, ApplicationProcessId applicationID);
+	void addAllReportsOfApplication(ApplicationProcessId applicationID);
 
 	/**
 	 * Adds all report types of the specified service type, to the application process configuration.
-	 * May report errors through checkAndAddReport for report types that cannot be added.
+	 * Report types that are already in the configuration are left as they are.
 	 */
-	void addAllReportsOfService(const Message& message, ApplicationProcessId applicationID, ServiceTypeNum serviceType);
+	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
 	/**
 	 * Checks whether the specified message type can be added to the specified application process and service type
-	 * definition, and adds it if all checks pass. Reports a MaxReportTypesReached or an AlreadyExistingReportType
-	 * error if the checks don't pass.
+	 * definition, and adds it if it is not already there. Reports a MaxReportTypesReached error if the definition is
+	 * full, or a NonExistentServiceTypeDefinition error if the service type is unknown to AllReportTypes. A message type
+	 * that already exists is not an error, as specified in ECSS 6.14.3.4.1k and 6.15.4.4.1m.
 	 *
-	 * @return True: if the message type passed all checks and was added to the configuration.
+	 * @return True: if the message type passed all checks and is in the configuration.
 	 */
 	bool checkAndAddReport(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
 	    MessageTypeNum messageType);
@@ -84,7 +85,9 @@ public:
 	/**
 	 * Performs the necessary error checking/logging for an application process ID of an 'add report types' request.
 	 * Also, skips the necessary bytes from the request message, in case of an invalid request.
-	 * Reports a NotControlledApplication or an AllServiceTypesAlreadyAllowed error for invalid requests.
+	 * Reports a NotControlledApplication or an AllServiceTypesAlreadyAllowed error for invalid requests. A request to
+	 * add all report types of the application process (numOfServices = 0) can only be rejected as not controlled, as
+	 * specified in ECSS 6.14.3.4.1h and 6.15.4.4.1j.
 	 *
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
@@ -173,8 +176,8 @@ public:
 
 private:
 	/**
-	 * Adds the specified report type to the application process configuration. Only called by checkAndAddReport,
-	 * after the necessary error checking has been performed.
+	 * Adds the specified report type to the application process configuration, if it is not already there. Callers
+	 * have performed the necessary error checking.
 	 */
 	void addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
 
@@ -205,21 +208,13 @@ private:
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.
-	 * Reports a MaxReportTypesReached error if it is.
+	 * Reports a MaxReportTypesReached error if it is, or a NonExistentServiceTypeDefinition error if the service type
+	 * is unknown to AllReportTypes.
 	 *
 	 * @return True: if the maximum number of report type definitions has already been reached.
 	 */
 	bool checkMaxReportTypesReached(const Message& request, ApplicationProcessId applicationID,
 	    ServiceTypeNum serviceType) const;
-
-	/**
-	 * Checks whether the specified message type already exists in the application process and service
-	 * type definition. Reports an AlreadyExistingReportType error if it does.
-	 *
-	 * @return True: if the message type already exists in the definition.
-	 */
-	bool checkAlreadyExistingReport(const Message& request, ApplicationProcessId applicationID,
-	    ServiceTypeNum serviceType, MessageTypeNum messageType) const;
 
 	/**
 	 * @return true if the maximum number of service type definitions per application process has been reached,

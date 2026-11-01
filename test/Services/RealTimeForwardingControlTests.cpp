@@ -196,7 +196,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 2);
+		CHECK(ServiceTests::count() == 0);
 		auto& applicationProcesses = realTimeForwarding.applicationProcessConfiguration.definitions;
 		REQUIRE(applicationProcesses.size() == 2);
 
@@ -232,7 +232,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 7);
+		CHECK(ServiceTests::count() == 5);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
@@ -278,7 +278,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 16);
+		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 0);
 

@@ -440,13 +440,6 @@ public:
 		 * Attempt to load, dump, or check a memory area whose data length exceeds the transfer buffer (ST[06])
 		 */
 		UnableToHandleMemoryDataLength = 64,
-		/**
-		 * AppProcessConfiguration adding an already existing report type in a map with an application id - service type key
-		 *
-		 * @note Numbered 73 because master allocates up to 64 (UnableToHandleMemoryDataLength) and the ST[06]
-		 * object memory MR (!203) allocates 65-72.
-		 */
-		AlreadyExistingReportType = 73
 	};
 
 	/**

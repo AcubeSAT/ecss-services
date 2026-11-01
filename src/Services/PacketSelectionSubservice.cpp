@@ -36,7 +36,7 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 		}
 
 		if (numOfServices == 0) {
-			configuration.addAllReportsOfApplication(request, applicationID);
+			configuration.addAllReportsOfApplication(applicationID);
 			continue;
 		}
 
@@ -49,7 +49,7 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 			}
 
 			if (numOfMessages == 0) {
-				configuration.addAllReportsOfService(request, applicationID, serviceType);
+				configuration.addAllReportsOfService(applicationID, serviceType);
 				continue;
 			}
 
