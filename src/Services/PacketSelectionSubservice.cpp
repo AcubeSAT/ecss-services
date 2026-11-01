@@ -1,15 +1,6 @@
 #include <limits>
 #include "Services/PacketSelectionSubservice.hpp"
-#include "Helpers/AllReportTypes.hpp"
 #include "Services/StorageAndRetrievalService.hpp"
-
-PacketSelectionSubservice::PacketStoreId PacketSelectionSubservice::readPacketStoreId(Message& message) {
-	return message.readFixedString<ECSSPacketStoreIdSize>();
-}
-
-bool PacketSelectionSubservice::packetStoreExists(const PacketStoreId& packetStoreId) {
-	return mainService.packetStoreExists(packetStoreId);
-}
 
 void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message& request) {
 	if (!request.assertTC(StorageAndRetrievalService::ServiceType,
@@ -17,8 +8,8 @@ void PacketSelectionSubservice::addReportTypesToAppProcessConfiguration(Message&
 		return;
 	}
 
-	const auto packetStoreID = readPacketStoreId(request);
-	if (not packetStoreExists(packetStoreID)) {
+	const auto packetStoreID = request.readFixedString<ECSSPacketStoreIdSize>();
+	if (not mainService.packetStoreExists(packetStoreID)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
 	}
@@ -66,8 +57,8 @@ void PacketSelectionSubservice::deleteReportTypesFromAppProcessConfiguration(Mes
 	if (!request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::DeleteReportTypesFromAppProcessConfiguration)) {
 		return;
 	}
-	const auto packetStoreID = readPacketStoreId(request);
-	if (not packetStoreExists(packetStoreID)) {
+	const auto packetStoreID = request.readFixedString<ECSSPacketStoreIdSize>();
+	if (not mainService.packetStoreExists(packetStoreID)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
 	}
@@ -121,8 +112,8 @@ void PacketSelectionSubservice::reportApplicationProcess(Message& request) {
 	if (not request.assertTC(StorageAndRetrievalService::ServiceType, StorageAndRetrievalService::MessageType::ReportApplicationProcess)) {
 		return;
 	}
-	const auto packetStoreID = readPacketStoreId(request);
-	if (not packetStoreExists(packetStoreID)) {
+	const auto packetStoreID = request.readFixedString<ECSSPacketStoreIdSize>();
+	if (not mainService.packetStoreExists(packetStoreID)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistingPacketStore);
 		return;
 	}

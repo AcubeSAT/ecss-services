@@ -1,9 +1,7 @@
 #include "Services/StorageAndRetrievalService.hpp"
 
 String<ECSSPacketStoreIdSize> StorageAndRetrievalService::readPacketStoreId(Message& message) {
-	etl::array<uint8_t, ECSSPacketStoreIdSize> packetStoreId = {};
-	message.readString(packetStoreId.data(), ECSSPacketStoreIdSize);
-	return packetStoreId.data();
+	return message.readFixedString<ECSSPacketStoreIdSize>();
 }
 
 void StorageAndRetrievalService::deleteContentUntil(const String<ECSSPacketStoreIdSize>& packetStoreId,

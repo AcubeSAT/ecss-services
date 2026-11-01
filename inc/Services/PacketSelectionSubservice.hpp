@@ -2,7 +2,6 @@
 
 #include "ECSS_Definitions.hpp"
 #include "ErrorHandler.hpp"
-#include "Helpers/PacketStore.hpp"
 #include "Helpers/AppProcessConfiguration.hpp"
 #include "Service.hpp"
 #include "etl/flat_map.h"
@@ -36,16 +35,6 @@ public:
 	using PacketStoreId = String<ECSSPacketStoreIdSize>;
 
 private:
-	/**
-	 * Helper function that reads the packet store ID string from a TC/TM[15,x] message
-	 */
-	PacketStoreId readPacketStoreId(Message& message);
-
-	/**
-	 * Returns true if the specified packet store is present in packet stores of the main service.
-	 */
-	bool packetStoreExists(const PacketStoreId& packetStoreId);
-
 	/**
 	 * Reference to the parent Storage and Retrieval Service, used to query the existing packet stores.
 	 */
