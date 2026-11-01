@@ -217,7 +217,6 @@ void ApplicationProcessConfiguration::appendContentToReport(Message& report) con
 	}
 	report.appendUint8(numberOfApplications);
 
-	// The map is sorted by key, so all entries of the same application process are accessed consecutively.
 	previousAppID = std::numeric_limits<ApplicationProcessId>::max();
 	for (const auto& [appServiceKey, reportTypes]: definitions) {
 		const ApplicationProcessId applicationID = appServiceKey.first;
