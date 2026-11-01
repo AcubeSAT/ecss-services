@@ -1073,4 +1073,25 @@ TEST_CASE("Report the Application Process Configuration content") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+
+	SECTION("Application process ID that does not fit in 8 bits") {
+		Message request(RealTimeForwardingControlService::ServiceType, RealTimeForwardingControlService::MessageType::ReportAppProcessConfigurationContent, Message::TC, ApplicationId);
+
+		ApplicationProcessId applicationID = 300;
+		for (auto serviceType: ForwardingAndPacketHelper::allServices) {
+			realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)].push_back(
+			    ForwardingAndPacketHelper::messages1[0]);
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		Message report = ServiceTests::get(0);
+		REQUIRE(report.readUint8() == 1);            // num of applications
+		report.readUint8();                          // applicationID
+		REQUIRE(report.readUint8() == sizeof(ForwardingAndPacketHelper::allServices) / sizeof(uint8_t)); // num of services
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
