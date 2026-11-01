@@ -510,6 +510,39 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		Services.reset();
 	}
 
+	SECTION("Requesting all report types of a service type replaces its definition") {
+		Message request(StorageAndRetrievalService::ServiceType,
+		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, 1);
+
+		ApplicationProcessId applicationID = 1;
+		ServiceTypeNum serviceType = ForwardingAndPacketHelper::services[0]; // st03
+		MessageTypeNum meaninglessMessageType = 200;
+
+		auto packetStoreID = addPacketStoreToPacketSelection();
+		packetSelection.controlledApplications.push_back(applicationID);
+		auto& configuration = packetSelection.packetStoreAppProcessConfig[packetStoreID];
+		configuration.definitions[std::make_pair(applicationID, serviceType)].push_back(meaninglessMessageType);
+
+		request.appendFixedString(packetStoreID);
+		request.appendUint8(1); // numOfApplications
+		request.append<ApplicationProcessId>(applicationID);
+		request.appendUint8(1); // numOfServices
+		request.append<ServiceTypeNum>(serviceType);
+		request.appendUint8(0); // numOfMessages = 0, requesting all message types
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		CHECK(not configuration.isReportTypeAdded(applicationID, serviceType, meaninglessMessageType));
+		REQUIRE(configuration.countReportsOfService(applicationID, serviceType) ==
+		        AllReportTypes::MessagesOfService.at(serviceType).size());
+
+		resetAppProcessConfigurationPacketSelection();
+		ServiceTests::reset();
+		Services.reset();
+	}
+
 	SECTION("Requesting all report types of an application process again") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,

@@ -16,9 +16,8 @@ void ApplicationProcessConfiguration::addAllReportsOfService(ApplicationProcessI
 		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::ElementNotInArray);
 		return;
 	}
-	for (const auto& messageType: serviceReportTypes->second) {
-		addReport(applicationID, serviceType, messageType);
-	}
+	definitions[AppServiceKey{applicationID, serviceType}].assign(serviceReportTypes->second.begin(),
+	    serviceReportTypes->second.end());
 }
 
 void ApplicationProcessConfiguration::checkAndAddReport(const Message& request, ApplicationProcessId applicationID,

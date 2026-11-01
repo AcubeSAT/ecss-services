@@ -51,14 +51,14 @@ public:
 
 	/**
 	 * Adds all report types of the specified application process definition, to the application process configuration.
-	 * Report types that are already in the configuration are left as they are.
+	 * Existing definitions of those service types are replaced.
 	 */
 	void addAllReportsOfApplication(ApplicationProcessId applicationID);
 
 	/**
-	 * Adds all report types of the specified service type, to the application process configuration.
-	 * Report types that are already in the configuration are left as they are. Reports an ElementNotInArray internal
-	 * error if the service type is unknown to AllReportTypes, since callers are expected to have validated it beforehand.
+	 * Replaces the definition of the specified service type with all of its report types, as specified in ECSS
+	 * 6.14.3.4.1l and 6.15.4.4.1n. Reports an ElementNotInArray internal error if the service type is unknown to
+	 * AllReportTypes, since callers are expected to have validated it beforehand.
 	 */
 	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
@@ -181,8 +181,8 @@ public:
 
 private:
 	/**
-	 * Adds the specified report type to the application process configuration, if it is not already there. Callers
-	 * have performed the necessary error checking.
+	 * Adds the specified report type to the application process configuration, if it is not already there. Only called
+	 * by checkAndAddReport, after the necessary error checking has been performed.
 	 */
 	void addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
 
