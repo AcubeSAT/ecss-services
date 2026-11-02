@@ -66,13 +66,16 @@ private:
 	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
 	/**
-	 * Checks whether a TC[12,5] instruction can add its parameter monitoring definition, and reports why if it cannot.
+	 * Performs the error checking of a TC[12,5] instruction that does not depend on its check type.
+	 *
+	 * @return True: if the instruction passes all the necessary error checking.
 	 */
 	bool canAddDefinition(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId) const;
 
 	/**
-	 * Finds the parameter monitoring definition that a TC[12,7] instruction modifies, or reports why it cannot be
-	 * modified and returns nothing.
+	 * Performs the error checking of a TC[12,7] instruction that does not depend on its check type's criteria.
+	 *
+	 * @return The definition to modify, if the instruction passes all the necessary error checking.
 	 */
 	etl::optional<etl::reference_wrapper<PMON>> findDefinitionToModify(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) const;
 
@@ -195,9 +198,8 @@ public:
 
 	/**
 	 * TC[12,5]
-	 *
-	 * A rejected instruction does not stop the ones after it, unless its check type is unknown: the size of an
-	 * instruction depends on its check type, so the rest of the request cannot be parsed.
+	 * Adds a parameter monitoring definition for each valid instruction. Each rejected instruction gets a failed start
+	 * of execution notification, and an instruction with an unknown check type also ends the request.
 	 */
 	void addParameterMonitoringDefinitions(Message& message);
 
@@ -208,9 +210,8 @@ public:
 
 	/**
 	 * TC[12,7]
-	 *
-	 * A rejected instruction does not stop the ones after it, unless its check type is unknown: the size of an
-	 * instruction depends on its check type, so the rest of the request cannot be parsed.
+	 * Modifies the parameter monitoring definition of each valid instruction. Each rejected instruction gets a failed
+	 * start of execution notification, and an instruction with an unknown check type also ends the request.
 	 */
 	void modifyParameterMonitoringDefinitions(Message& message);
 
