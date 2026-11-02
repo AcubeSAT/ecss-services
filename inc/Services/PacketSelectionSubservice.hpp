@@ -97,7 +97,7 @@ public:
 
 	/**
 	 * This function takes a TC[15,5] request 'report the content of the application process storage control
-	 * configuration' as an argument and respond with a TM[15,6] 'application process storage-control configuration
+	 * configuration' as an argument and responds with a TM[15,6] 'application process storage-control configuration
 	 * content report'
 	 */
 	void reportApplicationProcess(Message& request);
