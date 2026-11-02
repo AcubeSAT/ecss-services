@@ -84,9 +84,9 @@ public:
 	/**
 	 * Performs the necessary error checking/logging for an application process ID of an 'add report types' request.
 	 * Also, skips the necessary bytes from the request message, in case of an invalid request.
-	 * Reports a NotControlledApplication or an AllServiceTypesAlreadyAllowed error for invalid requests. A request to
-	 * add all report types of the application process (numOfServices = 0) can only be rejected as not controlled, as
-	 * specified in ECSS 6.14.3.4.1h and 6.15.4.4.1j.
+	 * Reports a NotControlledApplication error for invalid requests. Reaching the maximum number of service types does
+	 * not invalidate the application, since it only rejects instructions that imply a new service type definition,
+	 * as specified in ECSS 6.14.3.4.1f and 6.15.4.4.1h.
 	 *
 	 * @return True: if the application is valid and passes all the necessary error checking.
 	 */
@@ -185,14 +185,6 @@ private:
 	 * by checkAndAddReport, after the necessary error checking has been performed.
 	 */
 	void addReport(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
-
-	/**
-	 * Checks if all service types are effectively allowed already, i.e. if the maximum number of service type
-	 * definitions per application process has been reached. Reports an AllServiceTypesAlreadyAllowed error if so.
-	 *
-	 * @return True: if the maximum number of service type definitions has already been reached.
-	 */
-	bool checkAllServiceTypesAllowed(const Message& request, ApplicationProcessId applicationID);
 
 	/**
 	 * Checks if the specified application process is controlled by the Service.

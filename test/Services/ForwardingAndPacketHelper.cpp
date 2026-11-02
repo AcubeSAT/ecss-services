@@ -56,7 +56,7 @@ namespace ForwardingAndPacketHelper {
 
 		for (uint8_t appIndex = 0; appIndex < numOfApplications; appIndex++) {
 			request.append <ApplicationProcessId>(applications2[appIndex]);
-			uint8_t numOfServicesPerApp = (appIndex == 0) ? 12 : 2;
+			uint8_t numOfServicesPerApp = (appIndex == 0) ? 16 : 2;
 			uint8_t* servicesToPick = (appIndex == 0) ? redundantServices : services;
 			request.appendUint8(numOfServicesPerApp);
 
@@ -101,7 +101,7 @@ namespace ForwardingAndPacketHelper {
 
 		for (uint8_t appIndex = 0; appIndex < numOfApplications; appIndex++) {
 			request.append <ApplicationProcessId>(applications2[appIndex]);
-			uint8_t numOfServicesPerApp = (appIndex == 0) ? 12 : 2;
+			uint8_t numOfServicesPerApp = (appIndex == 0) ? 16 : 2;
 			uint8_t* servicesToPick = (appIndex == 0) ? redundantServices : services;
 			request.appendUint8(numOfServicesPerApp);
 

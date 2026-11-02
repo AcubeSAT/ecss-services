@@ -219,9 +219,10 @@ inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
  * configuration
  * @see RealTimeForwardingControlService
  * @see PacketSelectionSubservice
- * todo: (#27) must change when all 15 services are implemented.
+ *
+ * @note Must be at least AllReportTypes::ReportingServiceCount, the report-generating services enabled in this build.
  */
-inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 10;
+inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 14;
 
 /**
  * The number of possible combinations between application processes and service types, i.e. the number of all

@@ -130,7 +130,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		Services.reset();
 	}
 
-	SECTION("All service types already allowed") {
+	SECTION("Report types of existing service types, with the max service types reached") {
 		Message request(StorageAndRetrievalService::ServiceType,
 		                StorageAndRetrievalService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, 1);
@@ -148,10 +148,10 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed) ==
-		      1);
+		CHECK(ServiceTests::count() == 0);
 		REQUIRE(packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions.size() == ECSSMaxServiceTypeDefinitions);
+		REQUIRE(packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions[std::make_pair(applicationID, ForwardingAndPacketHelper::services[0])].size() == 2);
+		REQUIRE(packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions[std::make_pair(applicationID, ForwardingAndPacketHelper::services[1])].size() == 2);
 
 		resetAppProcessConfigurationPacketSelection();
 		ServiceTests::reset();
@@ -369,7 +369,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
 
 		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
-		REQUIRE(definitions.size() == 20);
+		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
 		for (auto serviceType: ForwardingAndPacketHelper::allServices) {
 			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
 		}
@@ -424,7 +424,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 0);
 
 		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
-		REQUIRE(definitions.size() == 12);
+		REQUIRE(definitions.size() == ECSSMaxServiceTypeDefinitions + 2);
 
 		int cnt1 = 0;
 		int cnt2 = 0;
@@ -435,7 +435,7 @@ TEST_CASE("Add report types to the packet selection subservice") {
 				cnt2++;
 			}
 		}
-		REQUIRE(cnt1 == 10);
+		REQUIRE(cnt1 == ECSSMaxServiceTypeDefinitions);
 		REQUIRE(cnt2 == 2);
 
 		for (auto& serviceType: ForwardingAndPacketHelper::allServices) {

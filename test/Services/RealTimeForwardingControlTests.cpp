@@ -79,7 +79,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		ServiceTests::reset();
 	}
 
-	SECTION("All service types already allowed") {
+	SECTION("Report types of existing service types, with the max service types reached") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
 		                Message::TC, ApplicationId);
@@ -95,10 +95,10 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed) ==
-		      1);
+		CHECK(ServiceTests::count() == 0);
 		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions.size() == ECSSMaxServiceTypeDefinitions);
+		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, ForwardingAndPacketHelper::services[0])].size() == 2);
+		REQUIRE(realTimeForwarding.applicationProcessConfiguration.definitions[std::make_pair(applicationID, ForwardingAndPacketHelper::services[1])].size() == 2);
 
 		ServiceTests::reset();
 	}
@@ -250,7 +250,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
 
 		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
-		REQUIRE(definitions.size() == 20);
+		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
 		for (auto serviceType: ForwardingAndPacketHelper::allServices) {
 			REQUIRE(definitions.find(std::make_pair(applicationID1, serviceType)) != definitions.end());
 		}
@@ -295,7 +295,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 0);
 
 		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
-		REQUIRE(definitions.size() == 12);
+		REQUIRE(definitions.size() == ECSSMaxServiceTypeDefinitions + 2);
 
 		int cnt1 = 0;
 		int cnt2 = 0;
@@ -306,7 +306,7 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 				cnt2++;
 			}
 		}
-		REQUIRE(cnt1 == 10);
+		REQUIRE(cnt1 == ECSSMaxServiceTypeDefinitions);
 		REQUIRE(cnt2 == 2);
 
 		for (auto& serviceType: ForwardingAndPacketHelper::allServices) {

@@ -70,8 +70,8 @@ public:
 	 * The size of this object is known at compile time, but it is significant: each ApplicationProcessConfiguration
 	 * holds up to ECSSMaxApplicationsServicesCombinations vectors of ECSSMaxReportTypeDefinitions message types, and
 	 * this map holds one configuration per packet store (ECSSMaxPacketStores). With the current x86 definitions
-	 * (4 packet stores, 50 app-service combinations, 20 report types), this map measures ~13.5 kB on 64-bit hosts
-	 * (sizeof(ApplicationProcessConfiguration) = 3288 bytes). Keep this in mind when adjusting those definitions
+	 * (4 packet stores, 70 app-service combinations, 20 report types), this map measures ~18.6 kB on 64-bit hosts
+	 * (sizeof(ApplicationProcessConfiguration) = 4568 bytes). Keep this in mind when adjusting those definitions
 	 * for the embedded platform.
 	 *
 	 * @note

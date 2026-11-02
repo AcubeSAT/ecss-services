@@ -367,11 +367,6 @@ public:
 		 */
 		ReportParameterNotInTheParameterMonitoringList = 47,
 		/**
-		 * Attempt to add a new report type, when the addition of all report types is already enabled in the
-		 * Application Process configuration (ST[14])
-		 */
-		AllServiceTypesAlreadyAllowed = 48,
-		/**
 		 * Attempt to add a new report type, when the max number of reports types allowed per service type
 		 * definition in the Application Process configuration is already reached (ST[14])
 		 */

@@ -50,20 +50,11 @@ uint8_t ApplicationProcessConfiguration::countReportsOfService(ApplicationProces
 
 bool ApplicationProcessConfiguration::checkApplicationOfAppProcessConfigValid(Message& request, ApplicationProcessId applicationID,
     uint8_t numOfServices, const etl::span<const ApplicationProcessId>& controlledApplications) {
-	if ((not checkAppControlled(controlledApplications, request, applicationID)) or
-	    ((numOfServices != 0U) and checkAllServiceTypesAllowed(request, applicationID))) {
+	if (not checkAppControlled(controlledApplications, request, applicationID)) {
 		skipServiceBlocks(request, numOfServices);
 		return false;
 	}
 	return true;
-}
-
-bool ApplicationProcessConfiguration::checkAllServiceTypesAllowed(const Message& request, const ApplicationProcessId applicationID) {
-	if (isMaxServiceTypesReached(applicationID)) {
-		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AllServiceTypesAlreadyAllowed);
-		return true;
-	}
-	return false;
 }
 
 bool ApplicationProcessConfiguration::checkAppControlled(const etl::span<const ApplicationProcessId>& controlledApplications,
