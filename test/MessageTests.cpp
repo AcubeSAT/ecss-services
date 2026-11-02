@@ -1,6 +1,7 @@
 #include <Message.hpp>
 #include <ServicePool.hpp>
 #include <catch2/catch_all.hpp>
+#include <string_view>
 #include "Services/EventReportService.hpp"
 #include "Services/ServiceTests.hpp"
 #include "etl/String.hpp"
@@ -232,33 +233,33 @@ TEST_CASE("Test string reading", "[message][ecss]") {
     Message message(0, 0, Message::TC, 0);
 
     SECTION("Test readString") {
-        constexpr size_t Size1 = 4;
-        constexpr size_t Size2 = 6;
-        message.appendString(String<Size1>("test"));
-        message.appendString(String<Size2>("string"));
-        char string1[Size1 + 1] = {};
-        uint8_t string2[Size2 + 1] = {};
-        message.readString(string1, Size1);
-        message.readString(string2, Size2);
+        constexpr std::string_view Word1 = "test";
+        constexpr std::string_view Word2 = "string";
+        message.appendString(String<Word1.size()>(Word1.data()));
+        message.appendString(String<Word2.size()>(Word2.data()));
+        char string1[Word1.size() + 1] = {};
+        uint8_t string2[Word2.size() + 1] = {};
+        message.readString(string1, Word1.size());
+        message.readString(string2, Word2.size());
 
-        CHECK_THAT(string1, Catch::Matchers::Equals("test"));
-        CHECK_THAT(reinterpret_cast<const char*>(string2), Catch::Matchers::Equals("string"));
+        CHECK_THAT(string1, Catch::Matchers::Equals(Word1.data()));
+        CHECK_THAT(reinterpret_cast<const char*>(string2), Catch::Matchers::Equals(Word2.data()));
     }
 
     SECTION("Test readFixedString") {
-        constexpr size_t FixedStringSize = 8;
+        constexpr std::string_view Word = "fixed123";
         message.appendUint16(0xCAFE);
-        message.appendFixedString(String<FixedStringSize>("fixed123"));
+        message.appendFixedString(String<Word.size()>(Word.data()));
         message.appendUint32(0xDEADBEEF);
 
         CHECK(message.readUint16() == 0xCAFE);
-        const String<FixedStringSize> result = message.readFixedString<FixedStringSize>();
-        CHECK_THAT(result.c_str(), Catch::Matchers::Equals("fixed123"));
+        const String<Word.size()> result = message.readFixedString<Word.size()>();
+        CHECK_THAT(result.c_str(), Catch::Matchers::Equals(Word.data()));
         CHECK(message.readUint32() == 0xDEADBEEF);
     }
 
     SECTION("Test readFixedString with insufficient data") {
-        constexpr size_t FixedStringSize = 8;
+        constexpr size_t FixedStringSize = sizeof(uint16_t) + 1;
         message.appendUint16(0xCAFE);
 
         const String<FixedStringSize> result = message.readFixedString<FixedStringSize>();
