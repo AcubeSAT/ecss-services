@@ -4,11 +4,6 @@
 #include "ServicePool.hpp"
 #include "Services/OnBoardMonitoringService.hpp"
 
-/**
- * The size of the fields that start each TC[12,5] and TC[12,7] instruction, up to and including the check type
- */
-static constexpr uint16_t InstructionHeaderSize = 2 * sizeof(ParameterId) + sizeof(PMONRepetitionNumber) + sizeof(PMON::CheckType);
-
 void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& message) {
 	if (!message.assertTC(ServiceType, EnableParameterMonitoringDefinitions)) {
 		return;
@@ -67,6 +62,22 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Mes
 	parameterMonitoringList.clear();
 }
 
+bool OnBoardMonitoringService::canAddDefinition(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId) const {
+	if (!Services.parameterManagement.parameterExists(monitoredParameterId)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
+		return false;
+	}
+	if (parameterMonitoringList.find(PMONId) != parameterMonitoringList.end()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::AddAlreadyExistingParameter);
+		return false;
+	}
+	if (parameterMonitoringList.full()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
+		return false;
+	}
+	return true;
+}
+
 void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, AddParameterMonitoringDefinitions);
 
@@ -81,17 +92,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		const auto currentCheckType = message.read<PMON::CheckType>();
-		bool canBeAdded = false;
-
-		if (!Services.parameterManagement.parameterExists(currentMonitoredParameterId)) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
-		} else if (parameterMonitoringList.find(currentPMONId) != parameterMonitoringList.end()) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::AddAlreadyExistingParameter);
-		} else if (parameterMonitoringList.full()) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
-		} else {
-			canBeAdded = true;
-		}
+		const bool canBeAdded = canAddDefinition(message, currentPMONId, currentMonitoredParameterId);
 
 		switch (currentCheckType) {
 			case PMON::CheckType::Limit: {
@@ -178,6 +179,23 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 	}
 }
 
+etl::optional<etl::reference_wrapper<PMON>> OnBoardMonitoringService::findDefinitionToModify(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) const {
+	const auto definition = parameterMonitoringList.find(PMONId);
+	if (definition == parameterMonitoringList.end()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
+		return {};
+	}
+	if (definition->second.get().monitoredParameterId != monitoredParameterId) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::DifferentParameterMonitoringDefinitionAndMonitoredParameter);
+		return {};
+	}
+	if (definition->second.get().checkType != checkType) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::DifferentParameterMonitoringDefinitionAndCheckType);
+		return {};
+	}
+	return definition->second;
+}
+
 void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& message) {
 	message.assertTC(ServiceType, ModifyParameterMonitoringDefinitions);
 
@@ -192,22 +210,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		const auto currentCheckType = message.read<PMON::CheckType>();
-
-		auto it = parameterMonitoringList.find(currentPMONId);
-		bool matchesDefinition = false;
-
-		if (it == parameterMonitoringList.end()) {
-			ErrorHandler::reportError(
-			    message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
-		} else if (it->second.get().monitoredParameterId != currentMonitoredParameterId) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
-			                                       DifferentParameterMonitoringDefinitionAndMonitoredParameter);
-		} else if (it->second.get().checkType != currentCheckType) {
-			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::
-			                                       DifferentParameterMonitoringDefinitionAndCheckType);
-		} else {
-			matchesDefinition = true;
-		}
+		const auto definition = findDefinitionToModify(message, currentPMONId, currentMonitoredParameterId, currentCheckType);
 
 		switch (currentCheckType) {
 			case PMON::CheckType::Limit: {
@@ -216,7 +219,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				PMONLimit highLimit = message.read<PMONLimit>();
 				EventDefinitionId aboveHighLimitEventId = message.read<EventDefinitionId>();
 
-				if (not matchesDefinition) {
+				if (not definition) {
 					continue;
 				}
 
@@ -226,7 +229,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				auto& limitCheck = static_cast<PMONLimitCheck&>(it->second.get());
+				auto& limitCheck = static_cast<PMONLimitCheck&>(definition->get());
 				limitCheck.lowLimit = lowLimit;
 				limitCheck.belowLowLimitEvent = belowLowLimitEventId;
 				limitCheck.highLimit = highLimit;
@@ -240,11 +243,11 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				PMONExpectedValue expectedValue = message.read<PMONExpectedValue>();
 				EventDefinitionId unexpectedValueEvent = message.read<EventDefinitionId>();
 
-				if (not matchesDefinition) {
+				if (not definition) {
 					continue;
 				}
 
-				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(it->second.get());
+				auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(definition->get());
 				expectedValueCheck.mask = mask;
 				expectedValueCheck.expectedValue = expectedValue;
 				expectedValueCheck.unexpectedValueEvent = unexpectedValueEvent;
@@ -258,7 +261,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				EventDefinitionId aboveHighThresholdEventId = message.read<EventDefinitionId>();
 				NumberOfConsecutiveDeltaChecks numberOfConsecutiveDeltaChecks = message.read<NumberOfConsecutiveDeltaChecks>();
 
-				if (not matchesDefinition) {
+				if (not definition) {
 					continue;
 				}
 
@@ -268,7 +271,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 					continue;
 				}
 
-				auto& deltaCheck = static_cast<PMONDeltaCheck&>(it->second.get());
+				auto& deltaCheck = static_cast<PMONDeltaCheck&>(definition->get());
 				deltaCheck.numberOfConsecutiveDeltaChecks = numberOfConsecutiveDeltaChecks;
 				deltaCheck.lowDeltaThreshold = lowDeltaThreshold;
 				deltaCheck.belowLowThresholdEvent = belowLowThresholdEventId;
@@ -281,7 +284,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				return;
 		}
 
-		PMON& pmon = it->second.get();
+		PMON& pmon = definition->get();
 		pmon.repetitionCounter = 0;
 		pmon.repetitionNumber = currentPMONRepetitionNumber;
 		pmon.checkingStatus = PMON::Unchecked;

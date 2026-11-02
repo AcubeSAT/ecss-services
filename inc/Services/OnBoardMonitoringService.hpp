@@ -40,6 +40,11 @@ private:
 	static constexpr uint8_t MaximumNumberOfChecksDeltaCheck = 32;
 
 	/**
+	 * The size of the fields that start each TC[12,5] and TC[12,7] instruction.
+	 */
+	static constexpr uint16_t InstructionHeaderSize = 2 * sizeof(ParameterId) + sizeof(PMONRepetitionNumber) + sizeof(PMON::CheckType);
+
+	/**
 	 * This vector is used as a mean of storing the PMON Definitons
 	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
 	 * before they are added to the parameterMonitoringList.
@@ -59,6 +64,17 @@ private:
 	 * before they are added to the parameterMonitoringList.
 	 */
 	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
+
+	/**
+	 * Checks whether a TC[12,5] instruction can add its parameter monitoring definition, and reports why if it cannot.
+	 */
+	bool canAddDefinition(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId) const;
+
+	/**
+	 * Finds the parameter monitoring definition that a TC[12,7] instruction modifies, or reports why it cannot be
+	 * modified and returns nothing.
+	 */
+	etl::optional<etl::reference_wrapper<PMON>> findDefinitionToModify(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) const;
 
 public:
 	inline static constexpr ServiceTypeNum ServiceType = 12;
