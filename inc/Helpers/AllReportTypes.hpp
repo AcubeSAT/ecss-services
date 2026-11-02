@@ -20,7 +20,7 @@ namespace AllReportTypes {
 	/**
 	 * The number of services listed in MessagesOfService, i.e. the report-generating services enabled in this build.
 	 */
-	inline constexpr size_t ReportingServiceCount = 0
+	inline constexpr size_t ReportingServiceCount = 0 //cppcheck-suppress misra-c2012-2.2
 #ifdef SERVICE_REQUESTVERIFICATION
 	    + 1
 #endif
