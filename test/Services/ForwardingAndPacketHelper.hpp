@@ -27,4 +27,6 @@ namespace ForwardingAndPacketHelper {
     void validAllReportsOfApp(Message& request);
     
     void validInvalidAllReportsOfApp(Message& request);
+
+    uint8_t countServicesWithOneReportType();
 }

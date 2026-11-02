@@ -1,4 +1,7 @@
+#include <algorithm>
+#include <iterator>
 #include "ForwardingAndPacketHelper.hpp"
+#include "Helpers/AllReportTypes.hpp"
 namespace ForwardingAndPacketHelper {
 	void validReportTypes(Message& request) {
 		uint8_t numOfApplications = 1;
@@ -161,5 +164,11 @@ namespace ForwardingAndPacketHelper {
 				}
 			}
 		}
+	}
+
+	uint8_t countServicesWithOneReportType() {
+		return std::count_if(std::begin(allServices), std::end(allServices), [](ServiceTypeNum serviceType) {
+			return AllReportTypes::MessagesOfService.at(serviceType).size() == 1;
+		});
 	}
 }

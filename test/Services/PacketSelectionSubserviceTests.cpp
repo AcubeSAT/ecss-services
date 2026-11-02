@@ -363,10 +363,11 @@ TEST_CASE("Add report types to the packet selection subservice") {
 
 		MessageParser::execute(request);
 
-		CHECK(ServiceTests::count() == 5);
+		const uint8_t servicesWithOneReportType = ForwardingAndPacketHelper::countServicesWithOneReportType();
+		CHECK(ServiceTests::count() == 2U + servicesWithOneReportType);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NotControlledApplication) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxServiceTypesReached) == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == 3);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::MaxReportTypesReached) == servicesWithOneReportType);
 
 		auto& definitions = packetSelection.packetStoreAppProcessConfig[packetStoreID].definitions;
 		REQUIRE(definitions.size() == 2 * ECSSMaxServiceTypeDefinitions);
