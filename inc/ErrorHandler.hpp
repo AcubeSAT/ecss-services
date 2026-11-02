@@ -152,7 +152,7 @@ public:
 		 */
 		StringTooShort = 4,
 		/**
-		 * Cannot parse a Message, because there is an error in its secondary header
+		 * Cannot parse a Message, because there is an error in its secondary header or its data does not fit in a Message
 		 */
 		UnacceptableMessage = 5
 	};
@@ -433,13 +433,18 @@ public:
 		 */
 		RepositoryPathLeadsToFile = 62,
 		/**
-		 * PMON Check Type is requested, but it is missing (ST[12])
+		 * PMON Check Type is requested, but it is missing or not one of the known check types (ST[12])
 		 */
 		 PMONCheckTypeMissing = 63,
 		/**
 		 * Attempt to load, dump, or check a memory area whose data length exceeds the transfer buffer (ST[06])
 		 */
 		UnableToHandleMemoryDataLength = 64,
+		/**
+		 * Attempt to modify a parameter monitoring definition, but the instruction refers to a check type that is not
+		 * the one used in that parameter monitoring definition (ST[12]).
+		 */
+		DifferentParameterMonitoringDefinitionAndCheckType = 65,
 	};
 
 	/**

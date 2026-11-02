@@ -1,6 +1,7 @@
 #include <Message.hpp>
 #include <catch2/catch_all.hpp>
 #include <cstring>
+#include <vector>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeGetter.hpp"
 #include "MessageParser.hpp"
@@ -245,6 +246,54 @@ TEST_CASE("TC packet too short returns empty message", "[MessageParser]") {
     CHECK(message.packetSequenceCount == 0);
     CHECK(message.sourceId == 0);
     CHECK(ServiceTests::thrownError(ErrorHandler::UnacceptablePacket));
+}
+
+/**
+ * Creates a valid packet of the given type, with a packet data field of @p packetDataFieldSize bytes.
+ */
+static std::vector<uint8_t> createPacket(Message::PacketType packetType, uint32_t packetDataFieldSize) {
+	std::vector<uint8_t> packet(CCSDSPrimaryHeaderSize + packetDataFieldSize, 0);
+	packet[0] = (packetType == Message::TC) ? 0x18 : 0x08;
+	packet[2] = 0xc0;
+	packet[4] = (packetDataFieldSize - 1) >> 8;
+	packet[5] = (packetDataFieldSize - 1) & 0xFF;
+	packet[6] = ECSSPUSVersion << 4;
+	packet[7] = 17;
+	packet[8] = 1;
+
+	if constexpr (ECSSCRCIncluded) {
+		uint16_t crc = CRCHelper::calculateCRC(packet.data(), packet.size() - CRCHelper::CRCField);
+		packet[packet.size() - 2] = static_cast<uint8_t>(crc >> 8);
+		packet[packet.size() - 1] = static_cast<uint8_t>(crc & 0xFF);
+	}
+
+	return packet;
+}
+
+TEST_CASE("Packet whose data does not fit in a message returns empty message", "[MessageParser]") {
+	for (auto packetType: {Message::TC, Message::TM}) {
+		uint32_t otherFields = (packetType == Message::TC) ? ECSSSecondaryTCHeaderSize : ECSSSecondaryTMHeaderSize;
+		if constexpr (ECSSCRCIncluded) {
+			otherFields += CRCHelper::CRCField;
+		}
+
+		std::vector<uint8_t> packetThatFits = createPacket(packetType, otherFields + ECSSMaxMessageSize);
+		Message message = MessageParser::parse(packetThatFits.data(), packetThatFits.size());
+		CHECK(message.serviceType == 17);
+		CHECK(message.dataSize == ECSSMaxMessageSize);
+		CHECK(ServiceTests::hasNoErrors());
+
+		uint32_t const largestPacketDataFieldSize = 65536;
+		for (uint32_t packetDataFieldSize: {otherFields + ECSSMaxMessageSize + 1U, largestPacketDataFieldSize}) {
+			std::vector<uint8_t> packet = createPacket(packetType, packetDataFieldSize);
+			Message rejectedMessage = MessageParser::parse(packet.data(), packet.size());
+
+			CHECK(rejectedMessage.serviceType == 0);
+			CHECK(rejectedMessage.dataSize == 0);
+			CHECK(ServiceTests::thrownError(ErrorHandler::UnacceptableMessage));
+			ServiceTests::resetErrors();
+		}
+	}
 }
 
 TEST_CASE("TC message parsing detects a bit flip by CRC", "[MessageParser]") {

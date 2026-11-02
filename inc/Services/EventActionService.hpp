@@ -60,6 +60,9 @@ public:
 
 	/**
 	 * TC[19,1] add event-action definitions
+	 *
+	 * The ground sends nested requests without padding, so the request of the last instruction can be shorter than
+	 * \ref ECSSTCRequestStringSize and the rest of it is filled with zeros. It must contain at least its secondary header.
 	 */
 	void addEventActionDefinitions(Message& message);
 
@@ -120,7 +123,8 @@ public:
 
 	/**
 	 * Custom function that is called right after an event takes place, to initiate
-	 * the execution of the action
+	 * the execution of the action. The action may delete definitions, so nothing from the
+	 * map can be used after it executes.
 	 */
 	void executeAction(EventDefinitionId eventDefinitionID);
 

@@ -142,6 +142,54 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	REQUIRE(iterationCount == 0);
 }
 
+/**
+ * Inserts an activity with its own TC[11,4], so that its sequence count tells it apart from other activities.
+ */
+void insertActivity(const Message& request, const Time::DefaultCUC& releaseTime, SequenceCount sequenceCount) {
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+	receivedMessage.packetSequenceCount = sequenceCount;
+	receivedMessage.appendUint16(1);
+	receivedMessage.appendDefaultCUCTimeStamp(releaseTime);
+	receivedMessage.appendMessage(request, ECSSTCRequestStringSize);
+
+	timeBasedService.insertActivities(receivedMessage);
+}
+
+TEST_CASE("Execute an activity whose request changes the schedule", "[service][st11]") {
+	Services.reset();
+	const Time::DefaultCUC now(TimeGetter::getCurrentTimeDefaultCUC());
+	const Message otherRequest(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 1);
+
+	SECTION("TC[11,3] resets the schedule") {
+		const Message resetRequest(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::ResetTimeBasedSchedule, Message::TC, 1);
+		insertActivity(resetRequest, now + 100s, 0);
+		insertActivity(otherRequest, now + 200s, 1);
+
+		REQUIRE(timeBasedService.executeScheduledActivity(now + 100s) == Time::DefaultCUC::max());
+		REQUIRE(unit_test::Tester::scheduledActivities(timeBasedService).empty());
+
+		insertActivity(otherRequest, now + 300s, 2);
+		REQUIRE(unit_test::Tester::scheduledActivities(timeBasedService).size() == 1);
+	}
+
+	SECTION("TC[11,5] asks to delete its own activity") {
+		Message deleteRequest(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::DeleteActivitiesById, Message::TC, 1);
+		deleteRequest.appendUint16(1);
+		deleteRequest.append<ApplicationProcessUserId>(0);
+		deleteRequest.append<ApplicationProcessId>(1);
+		deleteRequest.append<SequenceCount>(0);
+		insertActivity(deleteRequest, now + 100s, 0);
+		insertActivity(otherRequest, now + 200s, 1);
+
+		REQUIRE(timeBasedService.executeScheduledActivity(now + 100s) == now + 200s);
+		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
+
+		auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
+		REQUIRE(scheduledActivities.size() == 1);
+		REQUIRE(scheduledActivities.at(0)->requestID.sequenceCount == 1);
+	}
+}
+
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
@@ -344,6 +392,23 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		timeBasedService.detailReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
+
+	SECTION("Repeated request ID, more times than a report can hold") {
+		uint16_t numberOfInstructions = ECSSMaxNumberOfTimeSchedActivities + 1;
+		receivedMessage.appendUint16(numberOfInstructions);
+		for (uint16_t i = 0; i < numberOfInstructions; i++) {
+			receivedMessage.append<ApplicationProcessUserId>(0); // Source ID is not implemented
+			receivedMessage.append<ApplicationProcessId>(1);     // Application ID of the TC[11,4] in activityInsertion
+			receivedMessage.append<SequenceCount>(0);            // todo(#275): Remove the dummy sequence count
+		}
+
+		timeBasedService.detailReportActivitiesByID(receivedMessage);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == 1);
+
+		Message response = ServiceTests::get(ServiceTests::count() - 1);
+		CHECK(response.messageType == 10);
+		CHECK(response.readUint16() == ECSSMaxNumberOfTimeSchedActivities);
+	}
 }
 
 TEST_CASE("TM[11,10] time-based schedule detail report", "[service][st11]") {
@@ -451,6 +516,23 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
+	}
+
+	SECTION("Repeated request ID, more times than a report can hold") {
+		uint16_t numberOfInstructions = ECSSMaxNumberOfTimeSchedActivities + 1;
+		receivedMessage.appendUint16(numberOfInstructions);
+		for (uint16_t i = 0; i < numberOfInstructions; i++) {
+			receivedMessage.append<ApplicationProcessUserId>(0); // Source ID is not implemented
+			receivedMessage.append<ApplicationProcessId>(1);     // Application ID of the TC[11,4] in activityInsertion
+			receivedMessage.append<SequenceCount>(0);            // todo(#275): Remove the dummy sequence count
+		}
+
+		timeBasedService.summaryReportActivitiesByID(receivedMessage);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == 1);
+
+		Message response = ServiceTests::get(ServiceTests::count() - 1);
+		CHECK(response.messageType == 13);
+		CHECK(response.readUint16() == ECSSMaxNumberOfTimeSchedActivities);
 	}
 }
 

@@ -147,7 +147,8 @@ public:
 	TimeBasedSchedulingService();
 
 	/**
-	 * This function executes the next activity and removes it from the list.
+	 * This function removes the next activity from the list and then executes it. The order matters, because the
+	 * request of the activity may itself change the list.
 	 * @return the requestReleaseTime of next activity to be executed after this time
 	 */
 	Time::DefaultCUC executeScheduledActivity(const Time::DefaultCUC& currentTime);

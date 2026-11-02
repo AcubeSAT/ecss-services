@@ -9,11 +9,13 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 
 Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(const Time::DefaultCUC& currentTime) {
 
-	if (currentTime >= scheduledActivities.front().requestReleaseTime && !scheduledActivities.empty()) {
-		if (scheduledActivities.front().requestID.applicationID == ApplicationId) {
-			MessageParser::execute(scheduledActivities.front().request);
-		}
+	if (!scheduledActivities.empty() && currentTime >= scheduledActivities.front().requestReleaseTime) {
+		ScheduledActivity activity = scheduledActivities.front();
 		scheduledActivities.pop_front();
+
+		if (activity.requestID.applicationID == ApplicationId) {
+			MessageParser::execute(activity.request);
+		}
 	}
 
 	if (!scheduledActivities.empty()) {
@@ -201,7 +203,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 			                                             return receivedRequestID != currentElement.requestID;
 		                                             });
 
-		if (requestIDMatch != scheduledActivities.end()) {
+		if (requestIDMatch != scheduledActivities.end() && !matchedActivities.full()) {
 			matchedActivities.push_back(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
@@ -232,7 +234,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 			                                       return receivedRequestID != currentElement.requestID;
 		                                       });
 
-		if (requestIDMatch != scheduledActivities.end()) {
+		if (requestIDMatch != scheduledActivities.end() && !matchedActivities.full()) {
 			matchedActivities.push_back(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);

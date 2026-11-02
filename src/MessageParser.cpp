@@ -158,7 +158,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 }
 
 etl::expected<void, ErrorHandler::AcceptanceErrorType> MessageParser::parseECSSTCHeader(const uint8_t* data, uint16_t length, Message& message) {
-	if (not ErrorHandler::assertRequest(length >= ECSSSecondaryTCHeaderSize, message, ErrorHandler::UnacceptableMessage)) {
+	if (not ErrorHandler::assertRequest((length >= ECSSSecondaryTCHeaderSize) and (length <= ECSSSecondaryTCHeaderSize + ECSSMaxMessageSize), message, ErrorHandler::UnacceptableMessage)) {
 		return etl::unexpected<ErrorHandler::AcceptanceErrorType>(ErrorHandler::UnacceptableMessage);
 	}
 
@@ -293,15 +293,14 @@ String<CCSDSMaxMessageSize> MessageParser::compose(const Message& message) {
 		const CRCSize crcField = CRCHelper::calculateCRC(reinterpret_cast<uint8_t*>(ccsdsMessage.data()), CCSDSPrimaryHeaderSize + ecssMessage.size());
 		etl::array<uint8_t, CRCHelper::CRCField> crcMessage = {static_cast<uint8_t>(crcField >> 8U), static_cast<uint8_t>
 		                                            (crcField &  0xFF)};
-		String<CCSDSMaxMessageSize> crcString(crcMessage.data(), crcMessage.size());
-		ccsdsMessage.append(crcString);
+		ccsdsMessage.append(crcMessage.data(), crcMessage.size());
 	}
 
 	return ccsdsMessage;
 }
 
 etl::expected<void, ErrorHandler::AcceptanceErrorType> MessageParser::parseECSSTMHeader(const uint8_t* data, uint16_t length, Message& message) {
-	if (not ErrorHandler::assertRequest(length >= ECSSSecondaryTMHeaderSize, message, ErrorHandler::UnacceptableMessage)) {
+	if (not ErrorHandler::assertRequest((length >= ECSSSecondaryTMHeaderSize) and (length <= ECSSSecondaryTMHeaderSize + ECSSMaxMessageSize), message, ErrorHandler::UnacceptableMessage)) {
 		return etl::unexpected<ErrorHandler::AcceptanceErrorType>(ErrorHandler::UnacceptableMessage);
 	}
 

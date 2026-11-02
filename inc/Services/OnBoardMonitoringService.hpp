@@ -179,6 +179,9 @@ public:
 
 	/**
 	 * TC[12,5]
+	 *
+	 * A rejected instruction does not stop the ones after it, unless its check type is unknown: the size of an
+	 * instruction depends on its check type, so the rest of the request cannot be parsed.
 	 */
 	void addParameterMonitoringDefinitions(Message& message);
 
@@ -189,6 +192,9 @@ public:
 
 	/**
 	 * TC[12,7]
+	 *
+	 * A rejected instruction does not stop the ones after it, unless its check type is unknown: the size of an
+	 * instruction depends on its check type, so the rest of the request cannot be parsed.
 	 */
 	void modifyParameterMonitoringDefinitions(Message& message);
 

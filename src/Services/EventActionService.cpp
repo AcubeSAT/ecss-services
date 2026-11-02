@@ -6,8 +6,9 @@
 #include "Services/EventActionService.hpp"
 
 EventActionService::EventActionDefinition::EventActionDefinition(ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, Message& message)
-    : applicationID(applicationID), eventDefinitionID(eventDefinitionID), request(message.data.begin() + message.readPosition) {
-	message.readPosition += ECSSTCRequestStringSize;
+    : applicationID(applicationID), eventDefinitionID(eventDefinitionID) {
+	request.resize(ECSSTCRequestStringSize);
+	message.readString(request.data(), std::min<uint16_t>(ECSSTCRequestStringSize, message.dataSize - message.readPosition));
 }
 
 void EventActionService::addEventActionDefinitions(Message& message) {
@@ -16,8 +17,15 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 	}
 	uint8_t numberOfEventActionDefinitions = message.readUint8();
 	while (numberOfEventActionDefinitions-- != 0) {
+		uint16_t const minimumRequestSize = (numberOfEventActionDefinitions == 0) ? ECSSSecondaryTCHeaderSize : ECSSTCRequestStringSize;
+		uint16_t const minimumInstructionSize = sizeof(ApplicationProcessId) + sizeof(EventDefinitionId) + minimumRequestSize;
+		if (not ErrorHandler::assertRequest(message.readPosition + minimumInstructionSize <= message.dataSize, message, ErrorHandler::MessageTooShort)) {
+			return;
+		}
+
 		const ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
+		const EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
 		bool canBeAdded = true; // NOLINT(misc-const-correctness)
 
 		auto it = std::find_if(eventActionDefinitionMap.begin(), eventActionDefinitionMap.end(), [&](const auto& element) {
@@ -37,7 +45,6 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
 				continue;
 			}
-			const EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
 			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
 		}
 	}
@@ -185,12 +192,10 @@ void EventActionService::disableEventActionFunction(const Message& message) {
 
 void EventActionService::executeAction(EventDefinitionId eventDefinitionID) { // NOLINT (readability-make-member-function-const)
 	if (eventActionFunctionStatus) {
-		auto range = eventActionDefinitionMap.equal_range(eventDefinitionID);
-		for (auto& element = range.first; element != range.second; ++element) {
-			if (element->second.enabled) {
-				Message message = MessageParser::parseECSSTC(element->second.request);
-				MessageParser::execute(message);
-			}
+		const auto definition = eventActionDefinitionMap.find(eventDefinitionID);
+		if (definition != eventActionDefinitionMap.end() && definition->second.enabled) {
+			Message message = MessageParser::parseECSSTC(definition->second.request);
+			MessageParser::execute(message);
 		}
 	}
 }
