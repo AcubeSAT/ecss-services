@@ -6,6 +6,7 @@
 #include "MessageParser.hpp"
 #include "Service.hpp"
 #include "etl/list.h"
+#include "etl/reference_flat_multiset.h"
 
 // Include platform specific files
 #include "Helpers/TimeGetter.hpp"
@@ -86,6 +87,12 @@ private:
 		Time::DefaultCUC requestReleaseTime{0}; ///< Keep the command release time
 	};
 
+	struct ReleaseTimeLess {
+		bool operator()(const ScheduledActivity& leftSide, const ScheduledActivity& rightSide) const {
+			return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
+		}
+	};
+
 	/**
 	 * @brief Hold the scheduled activities
 	 *
@@ -93,6 +100,8 @@ private:
 	 * standard requests.
 	 */
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> scheduledActivities;
+
+	typedef etl::reference_flat_multiset<const ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities, ReleaseTimeLess> ScheduledActivityReferences;
 
 	/**
 	 * @brief Sort the activities by their release time
@@ -102,10 +111,7 @@ private:
 	 */
 	inline static void
 	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& schedActivities) {
-		schedActivities.sort([](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
-			// cppcheck-suppress
-			return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
-		});
+		schedActivities.sort(ReleaseTimeLess());
 	}
 
 	/**
@@ -224,7 +230,7 @@ public:
 	 * on the provided list. Generates a TM[11,10] response.
 	 * @param listOfActivities Provide the list of activities that need to be reported on
 	 */
-	void timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities);
+	void timeBasedScheduleDetailReport(const ScheduledActivityReferences& listOfActivities);
 
 	/**
 	 * @brief TC[11,9] detail-report activities identified by request identifier
@@ -260,7 +266,7 @@ public:
 	 * on the provided list. Generates a TM[11,13] response.
 	 * @param listOfActivities Provide the list of activities that need to be reported on
 	 */
-	void timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities);
+	void timeBasedScheduleSummaryReport(const ScheduledActivityReferences& listOfActivities);
 
 	/**
 	 * @brief TC[11,5] delete time-based scheduled activities identified by a request identifier

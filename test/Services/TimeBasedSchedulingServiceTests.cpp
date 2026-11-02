@@ -344,6 +344,27 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		timeBasedService.detailReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
 	}
+
+	SECTION("Instructions past the report capacity are rejected") {
+		scheduledActivities.at(0)->requestID.applicationID = 8;
+
+		const uint16_t instructionCount = ECSSMaxNumberOfTimeSchedActivities + 2;
+		receivedMessage.appendUint16(instructionCount);
+		for (uint16_t i = 0; i < instructionCount; i++) {
+			receivedMessage.append<ApplicationProcessUserId>(0);
+			receivedMessage.append<ApplicationProcessId>(8);
+			receivedMessage.append<SequenceCount>(0);
+		}
+
+		timeBasedService.detailReportActivitiesByID(receivedMessage);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == 2);
+		REQUIRE(ServiceTests::count() == 3);
+
+		Message response = ServiceTests::get(2);
+		CHECK(response.serviceType == 11);
+		CHECK(response.messageType == 10);
+		CHECK(response.readUint16() == ECSSMaxNumberOfTimeSchedActivities);
+	}
 }
 
 TEST_CASE("TM[11,10] time-based schedule detail report", "[service][st11]") {
@@ -451,6 +472,27 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
 		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
+	}
+
+	SECTION("Instructions past the report capacity are rejected") {
+		scheduledActivities.at(0)->requestID.applicationID = 8;
+
+		const uint16_t instructionCount = ECSSMaxNumberOfTimeSchedActivities + 2;
+		receivedMessage.appendUint16(instructionCount);
+		for (uint16_t i = 0; i < instructionCount; i++) {
+			receivedMessage.append<ApplicationProcessUserId>(0);
+			receivedMessage.append<ApplicationProcessId>(8);
+			receivedMessage.append<SequenceCount>(0);
+		}
+
+		timeBasedService.summaryReportActivitiesByID(receivedMessage);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == 2);
+		REQUIRE(ServiceTests::count() == 3);
+
+		Message response = ServiceTests::get(2);
+		CHECK(response.serviceType == 11);
+		CHECK(response.messageType == 13);
+		CHECK(response.readUint16() == ECSSMaxNumberOfTimeSchedActivities);
 	}
 }
 
