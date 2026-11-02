@@ -65,6 +65,32 @@ TEST_CASE("Lazy Parameter: Messages") {
 	}
 }
 
+TEST_CASE("Lazy Parameter: Enumerated and negative float values") {
+	enum class ScopedEnum : int16_t { NegativeValue = -3, Value = 2 };
+
+	LazyParameter<ScopedEnum> enumParameter(ScopedEnum::NegativeValue);
+	ParameterBase& enumBase = enumParameter;
+
+	CHECK(enumBase.getValueAsDouble() == -3);
+	CHECK(enumBase.getValueAsUint64() == static_cast<uint64_t>(-3));
+
+	enumParameter.setGetter([]() -> auto{ return ScopedEnum::Value; });
+
+	CHECK(enumBase.getValueAsDouble() == 2);
+	CHECK(enumBase.getValueAsUint64() == 2);
+
+	LazyParameter<ScopedEnum> enumParameterWithoutFallback([]() -> auto{ return ScopedEnum::Value; });
+	LazyParameter<ScopedEnum> enumParameterWithoutGetter;
+
+	CHECK(enumParameterWithoutFallback.getValueAsDouble() == 2);
+	CHECK(enumParameterWithoutGetter.getValueAsDouble() == 0);
+
+	LazyParameter<float> floatParameter([]() -> auto{ return -12.5F; });
+	ParameterBase& floatBase = floatParameter;
+
+	CHECK(floatBase.getValueAsUint64() == static_cast<uint64_t>(-12));
+}
+
 TEST_CASE("Lazy Parameter: Complex Types") {
 	using namespace Time;
 

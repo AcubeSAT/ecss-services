@@ -1,6 +1,8 @@
 #ifndef ECSS_SERVICES_PARAMETER_HPP
 #define ECSS_SERVICES_PARAMETER_HPP
 
+#include <cmath>
+#include <limits>
 #include "etl/String.hpp"
 #include "Message.hpp"
 #include "ECSS_Definitions.hpp"
@@ -33,27 +35,68 @@
 class ParameterBase {
 public:
 	/**
-	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that parameter
+	 * Appends the parameter as an ECSS value to an ECSS Message
 	 */
 	virtual void appendValueToMessage(Message& message) = 0;
 
 	/**
-	 * Appends the parameter as an ECSS value to an ECSS Message
+	 * Given an ECSS message that contains this parameter as its first input, this loads the value from that parameter
 	 */
 	virtual void setValueFromMessage(Message& message) = 0;
 
 	/**
 	 * Converts the value of a parameter to a double.
 	 *
-	 * Some precision may be lost in the process. If the value is not arithmetic,
+	 * Some precision may be lost in the process. If the value is neither arithmetic nor enumerated,
 	 * then usually 0 is returned.
 	 */
 	virtual double getValueAsDouble() = 0;
 
 	/**
-     * Retrieves the value of a parameter as uint64_t for bit-precision operations.
-     */
+	 * Retrieves the value of a parameter as uint64_t for bit-precision operations.
+	 *
+	 * Some precision may be lost in the process. If the value is negative, then it is converted through int64_t.
+	 * If the value is out of range, then the closest int64_t or uint64_t limit is returned. If the value is NaN,
+	 * then 0 is returned.
+	 */
 	virtual uint64_t getValueAsUint64() = 0;
+
+protected:
+	template <typename T>
+	static double toDouble(const T& value) {
+		if constexpr (std::is_enum_v<T>) {
+			return static_cast<double>(static_cast<std::underlying_type_t<T>>(value));
+		} else if constexpr (std::is_arithmetic_v<T>) {
+			return static_cast<double>(value);
+		} else {
+			return 0;
+		}
+	}
+
+	template <typename T>
+	static uint64_t toUint64(const T& value) {
+		if constexpr (std::is_enum_v<T>) {
+			return static_cast<uint64_t>(static_cast<std::underlying_type_t<T>>(value));
+		} else if constexpr (std::is_floating_point_v<T>) {
+			if (std::isnan(value)) {
+				return 0;
+			}
+			if (value >= static_cast<T>(std::numeric_limits<uint64_t>::max())) {
+				return std::numeric_limits<uint64_t>::max();
+			}
+			if (value <= static_cast<T>(std::numeric_limits<int64_t>::min())) {
+				return static_cast<uint64_t>(std::numeric_limits<int64_t>::min());
+			}
+			if (value < static_cast<T>(0)) {
+				return static_cast<uint64_t>(static_cast<int64_t>(value));
+			}
+			return static_cast<uint64_t>(value);
+		} else if constexpr (std::is_arithmetic_v<T>) {
+			return static_cast<uint64_t>(value);
+		} else {
+			return 0;
+		}
+	}
 };
 
 /**
@@ -78,19 +121,11 @@ public:
 	}
 
 	inline double getValueAsDouble() override {
-		if constexpr (std::is_arithmetic_v<DataType>) {
-			return static_cast<double>(currentValue);
-		} else {
-			return 0;
-		}
+		return toDouble(currentValue);
 	}
 
 	inline uint64_t getValueAsUint64() override {
-		if constexpr (std::is_arithmetic_v<DataType>) {
-			return static_cast<uint64_t>(currentValue);
-		} else {
-			return 0;
-		}
+		return toUint64(currentValue);
 	}
 
 	inline void setValueFromMessage(Message& message) override {

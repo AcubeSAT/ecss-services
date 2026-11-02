@@ -37,14 +37,14 @@ public:
 	 * for the parameter. A @p fallback value will be returned in this case, if needed.
 	 * @param fallback
 	 */
-	explicit LazyParameter(const DataType& fallback = 0) : fallback(fallback) {}
+	explicit LazyParameter(const DataType& fallback = DataType{}) : fallback(fallback) {}
 
 	/**
 	 * LazyParameter constructor with a pre-defined getter function
 	 * @param getter
 	 * @param fallback
 	 */
-	explicit LazyParameter(const Getter& getter, const DataType& fallback = 0) : getter(getter), fallback(fallback) {}
+	explicit LazyParameter(const Getter& getter, const DataType& fallback = DataType{}) : getter(getter), fallback(fallback) {}
 
 	/**
 	 * Set a getter function for this parameter. The getter function is called
@@ -75,16 +75,16 @@ public:
 	}
 
 	inline double getValueAsDouble() override {
-		if constexpr (std::is_arithmetic_v<DataType>) {
-			return static_cast<double>(getValue().value_or(fallback));
+		if constexpr (std::is_arithmetic_v<DataType> || std::is_enum_v<DataType>) {
+			return toDouble(getValue().value_or(fallback));
 		} else {
 			return 0;
 		}
 	}
 
 	inline uint64_t getValueAsUint64() override {
-		if constexpr (std::is_arithmetic_v<DataType>) {
-			return static_cast<uint64_t>(getValue().value_or(fallback));
+		if constexpr (std::is_arithmetic_v<DataType> || std::is_enum_v<DataType>) {
+			return toUint64(getValue().value_or(fallback));
 		} else {
 			return 0;
 		}

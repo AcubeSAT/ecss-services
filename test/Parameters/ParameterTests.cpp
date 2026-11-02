@@ -70,3 +70,52 @@ TEST_CASE("Get value as double") {
 		CHECK(parameter4.getValueAsDouble() == Catch::Approx(14.237).epsilon(0.001));
 	}
 }
+
+TEST_CASE("Get enumerated value") {
+	enum UnscopedEnum : uint8_t { UnscopedValue = 2 };
+	enum class ScopedEnum : int16_t { NegativeValue = -3 };
+
+	SECTION("Unscoped enumeration") {
+		Parameter<UnscopedEnum> parameter(UnscopedValue);
+		ParameterBase& base = parameter;
+
+		CHECK(base.getValueAsDouble() == 2);
+		CHECK(base.getValueAsUint64() == 2);
+	}
+	SECTION("Scoped enumeration") {
+		Parameter<ScopedEnum> parameter(ScopedEnum::NegativeValue);
+		ParameterBase& base = parameter;
+
+		CHECK(base.getValueAsDouble() == -3);
+		CHECK(base.getValueAsUint64() == static_cast<uint64_t>(-3));
+	}
+}
+
+TEST_CASE("Get float value as uint64") {
+	Parameter<float> parameter(-12.5F);
+	ParameterBase& base = parameter;
+
+	CHECK(base.getValueAsUint64() == static_cast<uint64_t>(-12));
+
+	parameter.setValue(1e19F);
+	CHECK(base.getValueAsUint64() == static_cast<uint64_t>(1e19F));
+
+	parameter.setValue(std::numeric_limits<float>::lowest());
+	CHECK(base.getValueAsUint64() == static_cast<uint64_t>(std::numeric_limits<int64_t>::min()));
+
+	parameter.setValue(std::numeric_limits<float>::max());
+	CHECK(base.getValueAsUint64() == std::numeric_limits<uint64_t>::max());
+
+	parameter.setValue(std::numeric_limits<float>::quiet_NaN());
+	CHECK(base.getValueAsUint64() == 0);
+}
+
+TEST_CASE("Get non-numeric value") {
+	using namespace Time;
+
+	Parameter<DefaultCUC> parameter(DefaultCUC(100_t));
+	ParameterBase& base = parameter;
+
+	CHECK(base.getValueAsDouble() == 0);
+	CHECK(base.getValueAsUint64() == 0);
+}
