@@ -210,7 +210,9 @@ inline constexpr uint8_t ECSSMaxControlledApplicationProcesses = 5;
  * The max number of report type blocking definitions per service type definition in the application process
  * configuration
  * @see RealTimeForwardingControlService
- * todo: (#27) must change when a service with more report types is implemented.
+ *
+ * @note Must be at least the number of report types of every report-generating service enabled in this build, as
+ * AllReportTypes checks at compile time.
  */
 inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
 
@@ -220,7 +222,8 @@ inline constexpr uint8_t ECSSMaxReportTypeDefinitions = 20;
  * @see RealTimeForwardingControlService
  * @see PacketSelectionSubservice
  *
- * @note Must be at least AllReportTypes::ReportingServiceCount, the report-generating services enabled in this build.
+ * @note Must be at least the number of report-generating services enabled in this build, as AllReportTypes checks at
+ * compile time.
  */
 inline constexpr uint8_t ECSSMaxServiceTypeDefinitions = 14;
 
