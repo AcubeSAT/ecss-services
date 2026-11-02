@@ -38,6 +38,11 @@ public:
 	 */
 	TimeStampType timeStamping = PacketBased;
 
+	/**
+	 * The packet selection sub-service of the Storage and Retrieval service.
+	 */
+	PacketSelectionSubservice packetSelection{*this};
+
 private:
 	typedef String<ECSSPacketStoreIdSize> packetStoreId;
 
@@ -185,11 +190,6 @@ private:
 	void createContentSummary(Message& report, const String<ECSSPacketStoreIdSize>& packetStoreId);
 
 public:
-	/**
-	 * The packet selection sub-service of the Storage and Retrieval service.
-	 */
-	PacketSelectionSubservice packetSelection = PacketSelectionSubservice(*this);
-	
 	inline static constexpr ServiceTypeNum ServiceType = 15;
 
 	enum MessageType : uint8_t {
