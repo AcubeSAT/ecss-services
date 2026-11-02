@@ -9,7 +9,7 @@ namespace ForwardingAndPacketHelper {
     static inline ServiceTypeNum allServices[] = {1, 3, 4, 5, 6, 11, 12, 13, 14, 15, 17, 19, 20, 23};
     static inline ServiceTypeNum redundantServices[] = {1, 3, 4, 5, 6, 11, 12, 13, 14, 15, 17, 19, 20, 23, 1, 3};
     static inline MessageTypeNum messages1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
-                                HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport};
+                                HousekeepingService::MessageType::HousekeepingParametersReport};
     static inline MessageTypeNum messages2[] = {EventReportService::MessageType::InformativeEventReport,
                                 EventReportService::MessageType::DisabledListEventReport};
 

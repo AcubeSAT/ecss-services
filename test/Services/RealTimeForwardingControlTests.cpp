@@ -371,7 +371,7 @@ ServiceTypeNum servicesToFill[] = {3, 5};
 ServiceTypeNum allServicesToFill[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 ServiceTypeNum redundantServicesToFill[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
 uint8_t messagesToFill1[] = {HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
-                        HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport};
+                        HousekeepingService::MessageType::HousekeepingParametersReport};
 
 uint8_t messagesToFill2[] = {EventReportService::MessageType::InformativeEventReport,
                         EventReportService::MessageType::DisabledListEventReport};

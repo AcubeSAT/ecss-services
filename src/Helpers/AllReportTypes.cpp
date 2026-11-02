@@ -31,9 +31,6 @@ namespace AllReportTypes {
 		    RequestVerificationService::MessageType::SuccessfulStartOfExecution};
 
 		[[maybe_unused]] constexpr MessageTypeNum ST03Reports[] = {
-		    HousekeepingService::MessageType::DisablePeriodicHousekeepingParametersReport,
-		    HousekeepingService::MessageType::EnablePeriodicHousekeepingParametersReport,
-		    HousekeepingService::MessageType::GenerateOneShotHousekeepingReport,
 		    HousekeepingService::MessageType::HousekeepingParametersReport,
 		    HousekeepingService::MessageType::HousekeepingPeriodicPropertiesReport,
 		    HousekeepingService::MessageType::HousekeepingStructuresReport};
