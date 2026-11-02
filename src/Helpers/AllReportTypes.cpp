@@ -51,6 +51,7 @@ namespace AllReportTypes {
 		    MemoryManagementService::MessageType::DumpRawMemoryDataReport};
 
 		[[maybe_unused]] constexpr MessageTypeNum ST11Reports[] = {
+		    TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById,
 		    TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
 
 		[[maybe_unused]] constexpr MessageTypeNum ST12Reports[] = {
