@@ -244,7 +244,7 @@ public:
 	 * This function first retrieves the current value of the monitored parameter.
 	 * It then checks if the current value is below the low limit, above the high limit, or within the limits.
 	 * Depending on the comparison, it sets the checking status to BelowLowLimit, AboveHighLimit, or WithinLimits.
-	 * A NaN value or limit matches none of these, so it sets the checking status to Invalid.
+	 * If the current value is NaN, it sets the checking status to Invalid.
 	 *
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
@@ -367,8 +367,7 @@ public:
 	 * This function first retrieves the current value of the monitored parameter and the current timestamp.
 	 * If there is a previous value, it calculates the delta per second between the current and previous values.
 	 * Depending on the delta per second, it sets the checking status to BelowLowThreshold, AboveHighThreshold, or WithinThreshold.
-	 * A NaN delta per second or threshold matches none of these, so it sets the checking status to Invalid.
-	 * If there is no previous value, it sets the checking status to Invalid.
+	 * If there is no previous value or the delta per second is NaN, it sets the checking status to Invalid.
 	 *
 	 * After the check, the function updates the previous value and timestamp to the current ones.
 	 *
