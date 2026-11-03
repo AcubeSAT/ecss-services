@@ -3,6 +3,7 @@
 #include <Services/OnBoardMonitoringService.hpp>
 #include <catch2/catch_all.hpp>
 #include <etl/array.h>
+#include <limits>
 #include "ServiceTests.hpp"
 #include "etl/functional.h"
 
@@ -868,6 +869,24 @@ TEST_CASE("Limit Check Behavior") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+
+	SECTION("NaN value or limit") {
+		Parameter<float> param(std::numeric_limits<float>::quiet_NaN());
+		PMONLimitCheck pmon(6, 5, 2, 1, 9, 2);
+		pmon.monitoredParameter = etl::reference_wrapper<ParameterBase>(param);
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
+		param.setValue(5);
+		pmon.highLimit = std::numeric_limits<PMONLimit>::quiet_NaN();
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 2);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
 
 TEST_CASE("Expected Value Check Behavior") {
@@ -1104,6 +1123,52 @@ TEST_CASE("Delta Check Perform Check") {
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
 		CHECK(pmon.getRepetitionCounter() == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("NaN value, delta or threshold") {
+		Parameter<float> param(10);
+		PMONDeltaCheck pmon(9, 5, 5, 3, 3, 11, 4);
+		pmon.monitoredParameter = etl::reference_wrapper<ParameterBase>(param);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
+		pmon.performCheck();
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 15));
+		param.setValue(std::numeric_limits<float>::quiet_NaN());
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		param.setValue(100);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 45));
+		param.setValue(190);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
+		param.setValue(200);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		param.setValue(125);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 16, 0));
+		param.setValue(280);
+		pmon.highDeltaThreshold = std::numeric_limits<DeltaThreshold>::quiet_NaN();
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 4);
 
 		ServiceTests::reset();
 		Services.reset();
