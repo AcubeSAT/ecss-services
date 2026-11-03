@@ -882,6 +882,7 @@ TEST_CASE("Limit Check Behavior") {
 		pmon.highLimit = std::numeric_limits<PMONLimit>::quiet_NaN();
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 2);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1162,6 +1163,7 @@ TEST_CASE("Delta Check Perform Check") {
 		pmon.highDeltaThreshold = std::numeric_limits<DeltaThreshold>::quiet_NaN();
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+		CHECK(pmon.getRepetitionCounter() == 3);
 
 		ServiceTests::reset();
 		Services.reset();
