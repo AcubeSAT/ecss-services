@@ -323,7 +323,7 @@ bool HousekeepingService::hasNonExistingStructInternalError(ParameterReportStruc
 	}
 	return false;
 }
-bool HousekeepingService::hasAlreadyExistingParameterError(const HousekeepingStructure& housekeepingStruct, ParameterReportStructureId id, const Message& request) {
+bool HousekeepingService::hasAlreadyExistingParameterError(const HousekeepingStructure& housekeepingStruct, ParameterId id, const Message& request) {
 	if (existsInVector(housekeepingStruct.simplyCommutatedParameterIds, id)) {
 		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter);
 		return true;
