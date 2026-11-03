@@ -9,7 +9,7 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 
 Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(const Time::DefaultCUC& currentTime) {
 
-	if (!scheduledActivities.empty() && currentTime >= scheduledActivities.front().requestReleaseTime) {
+	if ((!scheduledActivities.empty()) && currentTime >= scheduledActivities.front().requestReleaseTime) {
 		ScheduledActivity activity = scheduledActivities.front();
 		scheduledActivities.pop_front();
 
@@ -198,12 +198,17 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
+		if (matchedActivities.full()) {
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			continue;
+		}
+
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                             return receivedRequestID != currentElement.requestID;
 		                                             });
 
-		if (requestIDMatch != scheduledActivities.end() && !matchedActivities.full()) {
+		if (requestIDMatch != scheduledActivities.end()) {
 			matchedActivities.push_back(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
@@ -229,12 +234,17 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
+		if (matchedActivities.full()) {
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			continue;
+		}
+
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                       return receivedRequestID != currentElement.requestID;
 		                                       });
 
-		if (requestIDMatch != scheduledActivities.end() && !matchedActivities.full()) {
+		if (requestIDMatch != scheduledActivities.end()) {
 			matchedActivities.push_back(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);

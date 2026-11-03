@@ -26,27 +26,20 @@ void EventActionService::addEventActionDefinitions(Message& message) {
 		const ApplicationProcessId applicationID = message.read<ApplicationProcessId>();
 		EventDefinitionId eventDefinitionID = message.read<EventDefinitionId>();
 		const EventActionDefinition temporaryEventActionDefinition(applicationID, eventDefinitionID, message);
-		bool canBeAdded = true; // NOLINT(misc-const-correctness)
 
-		auto it = std::find_if(eventActionDefinitionMap.begin(), eventActionDefinitionMap.end(), [&](const auto& element) {
-			if (element.first == eventDefinitionID) {
-				if (element.second.enabled) {
-					canBeAdded = false;
-					ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
-				} else {
-					eventActionDefinitionMap.erase(eventDefinitionID);
-				}
-				return true;
-			}
-			return false;
-		});
-		if (canBeAdded) {
-			if (eventActionDefinitionMap.size() == ECSSEventActionStructMapSize) {
-				ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
+		const auto existingDefinition = eventActionDefinitionMap.find(eventDefinitionID);
+		if (existingDefinition != eventActionDefinitionMap.end()) {
+			if (existingDefinition->second.enabled) {
+				ErrorHandler::reportError(message, ErrorHandler::EventActionEnabledError);
 				continue;
 			}
-			eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
+			eventActionDefinitionMap.erase(existingDefinition);
 		}
+		if (eventActionDefinitionMap.full()) {
+			ErrorHandler::reportError(message, ErrorHandler::EventActionDefinitionsMapIsFull);
+			continue;
+		}
+		eventActionDefinitionMap.insert(std::make_pair(eventDefinitionID, temporaryEventActionDefinition));
 	}
 }
 

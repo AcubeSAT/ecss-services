@@ -8,10 +8,17 @@
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
+static constexpr ParameterId ExpectedValueCheckId = 0;
+static constexpr ParameterId ExpectedValueCheckMonitoredParameterId = 8;
+static constexpr ParameterId LimitCheckId = 1;
+static constexpr ParameterId LimitCheckMonitoredParameterId = 6;
+static constexpr ParameterId DeltaCheckId = 2;
+static constexpr ParameterId DeltaCheckMonitoredParameterId = 9;
+
 struct Fixtures {
-	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(8, 5, 10, 8, 0);
-	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(6, 5, 2, 1, 9, 2);
-	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(9, 5, 5, 3, 3, 11, 4);
+	PMONExpectedValueCheck monitoringDefinition1 = PMONExpectedValueCheck(ExpectedValueCheckMonitoredParameterId, 5, 10, 8, 0);
+	PMONLimitCheck monitoringDefinition2 = PMONLimitCheck(LimitCheckMonitoredParameterId, 5, 2, 1, 9, 2);
+	PMONDeltaCheck monitoringDefinition3 = PMONDeltaCheck(DeltaCheckMonitoredParameterId, 5, 5, 3, 3, 11, 4);
 	PMONDeltaCheck monitoringDefinition4 = PMONDeltaCheck(7, 5, 5, 3, 3, 11, 4);
 
 	/*
@@ -47,9 +54,9 @@ struct Fixtures {
 void initialiseParameterMonitoringDefinitions() {
 	// Reset fixtures to the defaults set up by the constructor
 	Fixtures::reset();
-	onBoardMonitoringService.addPMONExpectedValueCheck(0, etl::ref(Fixtures::getInstance().monitoringDefinition1));
-	onBoardMonitoringService.addPMONLimitCheck(1, etl::ref(Fixtures::getInstance().monitoringDefinition2));
-	onBoardMonitoringService.addPMONDeltaCheck(2, etl::ref(Fixtures::getInstance().monitoringDefinition3));
+	onBoardMonitoringService.addPMONExpectedValueCheck(ExpectedValueCheckId, etl::ref(Fixtures::getInstance().monitoringDefinition1));
+	onBoardMonitoringService.addPMONLimitCheck(LimitCheckId, etl::ref(Fixtures::getInstance().monitoringDefinition2));
+	onBoardMonitoringService.addPMONDeltaCheck(DeltaCheckId, etl::ref(Fixtures::getInstance().monitoringDefinition3));
 	onBoardMonitoringService.addPMONDeltaCheck(3, etl::ref(Fixtures::getInstance().monitoringDefinition4));
 }
 
@@ -211,44 +218,55 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 	}
 }
 
-static constexpr ParameterId ExpectedValueCheckId = 0;
-static constexpr ParameterId ExpectedValueCheckMonitoredParameterId = 8;
-static constexpr ParameterId LimitCheckId = 1;
-static constexpr ParameterId LimitCheckMonitoredParameterId = 6;
-static constexpr ParameterId DeltaCheckId = 2;
-static constexpr ParameterId DeltaCheckMonitoredParameterId = 9;
+static constexpr ParameterId ExistingParameterId = 0;
 static constexpr ParameterId NonExistingParameterId = ECSSParameterCount + 1;
+static constexpr ParameterId NewPMONId = 10;
+static constexpr ParameterId SecondNewPMONId = 11;
 static constexpr auto UnknownCheckType = static_cast<PMON::CheckType>(4);
+
+static constexpr PMONRepetitionNumber NewRepetitionNumber = 7;
+static constexpr PMONBitMask NewMask = 1;
+static constexpr PMONExpectedValue NewExpectedValue = 2;
+static constexpr EventDefinitionId NewUnexpectedValueEvent = 9;
+static constexpr PMONLimit NewLowLimit = 4;
+static constexpr EventDefinitionId NewBelowLowLimitEvent = 9;
+static constexpr PMONLimit NewHighLimit = 10;
+static constexpr EventDefinitionId NewAboveHighLimitEvent = 11;
+static constexpr DeltaThreshold NewLowDeltaThreshold = 2;
+static constexpr EventDefinitionId NewBelowLowThresholdEvent = 1;
+static constexpr DeltaThreshold NewHighDeltaThreshold = 8;
+static constexpr EventDefinitionId NewAboveHighThresholdEvent = 2;
+static constexpr NumberOfConsecutiveDeltaChecks NewNumberOfConsecutiveDeltaChecks = 5;
 
 static void appendCommonFields(Message& request, ParameterId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) {
 	request.append<ParameterId>(PMONId);
 	request.append<ParameterId>(monitoredParameterId);
-	request.append<PMONRepetitionNumber>(7);
+	request.append<PMONRepetitionNumber>(NewRepetitionNumber);
 	request.append<PMON::CheckType>(checkType);
 }
 
 static void appendExpectedValueCheck(Message& request, ParameterId PMONId, ParameterId monitoredParameterId) {
 	appendCommonFields(request, PMONId, monitoredParameterId, PMON::CheckType::ExpectedValue);
-	request.append<PMONBitMask>(1);
-	request.append<PMONExpectedValue>(2);
-	request.append<EventDefinitionId>(9);
+	request.append<PMONBitMask>(NewMask);
+	request.append<PMONExpectedValue>(NewExpectedValue);
+	request.append<EventDefinitionId>(NewUnexpectedValueEvent);
 }
 
 static void appendLimitCheck(Message& request, ParameterId PMONId, ParameterId monitoredParameterId, PMONLimit lowLimit, PMONLimit highLimit) {
 	appendCommonFields(request, PMONId, monitoredParameterId, PMON::CheckType::Limit);
 	request.append<PMONLimit>(lowLimit);
-	request.append<EventDefinitionId>(9);
+	request.append<EventDefinitionId>(NewBelowLowLimitEvent);
 	request.append<PMONLimit>(highLimit);
-	request.append<EventDefinitionId>(11);
+	request.append<EventDefinitionId>(NewAboveHighLimitEvent);
 }
 
 static void appendDeltaCheck(Message& request, ParameterId PMONId, ParameterId monitoredParameterId, DeltaThreshold lowDeltaThreshold, DeltaThreshold highDeltaThreshold) {
 	appendCommonFields(request, PMONId, monitoredParameterId, PMON::CheckType::Delta);
 	request.append<DeltaThreshold>(lowDeltaThreshold);
-	request.append<EventDefinitionId>(1);
+	request.append<EventDefinitionId>(NewBelowLowThresholdEvent);
 	request.append<DeltaThreshold>(highDeltaThreshold);
-	request.append<EventDefinitionId>(2);
-	request.append<NumberOfConsecutiveDeltaChecks>(5);
+	request.append<EventDefinitionId>(NewAboveHighThresholdEvent);
+	request.append<NumberOfConsecutiveDeltaChecks>(NewNumberOfConsecutiveDeltaChecks);
 }
 
 TEST_CASE("Add Parameter Monitoring Definitions") {
@@ -302,25 +320,23 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(2);
-		appendExpectedValueCheck(request, 10, 0);
-		appendDeltaCheck(request, 11, NonExistingParameterId, 2, 8);
+		appendExpectedValueCheck(request, NewPMONId, ExistingParameterId);
+		appendDeltaCheck(request, SecondNewPMONId, NonExistingParameterId, NewLowDeltaThreshold, NewHighDeltaThreshold);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 2);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ParameterMonitoringListIsFull) == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ParameterMonitoringListIsFull) == 2);
 		ServiceTests::reset();
 		Services.reset();
 	}
 
 	SECTION("Parameter Monitoring Definition already exists") {
-		initialiseParameterMonitoringDefinitions();
-
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
-		request.appendUint16(1);
-		appendExpectedValueCheck(request, ExpectedValueCheckId, 0);
+		request.appendUint16(2);
+		appendExpectedValueCheck(request, NewPMONId, ExistingParameterId);
+		appendExpectedValueCheck(request, NewPMONId, ExistingParameterId);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -334,7 +350,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(1);
-		appendExpectedValueCheck(request, 0, NonExistingParameterId);
+		appendExpectedValueCheck(request, NewPMONId, NonExistingParameterId);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -407,15 +423,20 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	}
 
 	SECTION("Valid Instructions After Rejected Instructions") {
+		const ParameterId PMONIdWithNonExistingParameter = 10;
+		const ParameterId PMONIdWithWrongLimits = 11;
+		const ParameterId addedDeltaCheckId = 12;
+		const ParameterId addedExpectedValueCheckId = 13;
+
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(5);
-		appendLimitCheck(request, 10, NonExistingParameterId, 4, 10);
-		appendLimitCheck(request, 11, 0, 10, 4);
-		appendDeltaCheck(request, 12, 0, 2, 8);
-		appendExpectedValueCheck(request, 12, 0);
-		appendExpectedValueCheck(request, 13, 0);
+		appendLimitCheck(request, PMONIdWithNonExistingParameter, NonExistingParameterId, NewLowLimit, NewHighLimit);
+		appendLimitCheck(request, PMONIdWithWrongLimits, ExistingParameterId, NewHighLimit, NewLowLimit);
+		appendDeltaCheck(request, addedDeltaCheckId, ExistingParameterId, NewLowDeltaThreshold, NewHighDeltaThreshold);
+		appendExpectedValueCheck(request, addedDeltaCheckId, ExistingParameterId);
+		appendExpectedValueCheck(request, addedExpectedValueCheckId, ExistingParameterId);
 
 		MessageParser::execute(request);
 
@@ -423,20 +444,20 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::GetNonExistingParameterMonitoringDefinition) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::AddAlreadyExistingParameter) == 1);
-		CHECK(onBoardMonitoringService.getCount(10) == 0);
-		CHECK(onBoardMonitoringService.getCount(11) == 0);
-		REQUIRE(onBoardMonitoringService.getCount(12) == 1);
-		REQUIRE(onBoardMonitoringService.getCount(13) == 1);
+		CHECK(onBoardMonitoringService.getCount(PMONIdWithNonExistingParameter) == 0);
+		CHECK(onBoardMonitoringService.getCount(PMONIdWithWrongLimits) == 0);
+		REQUIRE(onBoardMonitoringService.getCount(addedDeltaCheckId) == 1);
+		REQUIRE(onBoardMonitoringService.getCount(addedExpectedValueCheckId) == 1);
 
-		auto& deltaCheck = static_cast<PMONDeltaCheck&>(onBoardMonitoringService.getPMONDefinition(12).get());
+		auto& deltaCheck = dynamic_cast<PMONDeltaCheck&>(onBoardMonitoringService.getPMONDefinition(addedDeltaCheckId).get());
 		CHECK(deltaCheck.checkType == PMON::CheckType::Delta);
-		CHECK(deltaCheck.getLowDeltaThreshold() == 2);
-		CHECK(deltaCheck.getHighDeltaThreshold() == 8);
+		CHECK(deltaCheck.getLowDeltaThreshold() == NewLowDeltaThreshold);
+		CHECK(deltaCheck.getHighDeltaThreshold() == NewHighDeltaThreshold);
 
-		auto& expectedValueCheck = static_cast<PMONExpectedValueCheck&>(onBoardMonitoringService.getPMONDefinition(13).get());
+		auto& expectedValueCheck = dynamic_cast<PMONExpectedValueCheck&>(onBoardMonitoringService.getPMONDefinition(addedExpectedValueCheckId).get());
 		CHECK(expectedValueCheck.checkType == PMON::CheckType::ExpectedValue);
-		CHECK(expectedValueCheck.getMask() == 1);
-		CHECK(expectedValueCheck.getExpectedValue() == 2);
+		CHECK(expectedValueCheck.getMask() == NewMask);
+		CHECK(expectedValueCheck.getExpectedValue() == NewExpectedValue);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -447,15 +468,15 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(2);
-		appendCommonFields(request, 10, 0, UnknownCheckType);
-		appendLimitCheck(request, 11, 0, 4, 10);
+		appendCommonFields(request, NewPMONId, NonExistingParameterId, UnknownCheckType);
+		appendLimitCheck(request, SecondNewPMONId, ExistingParameterId, NewLowLimit, NewHighLimit);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::PMONCheckTypeMissing) == 1);
-		CHECK(onBoardMonitoringService.getCount(10) == 0);
-		CHECK(onBoardMonitoringService.getCount(11) == 0);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::PMONCheckTypeInvalid) == 1);
+		CHECK(onBoardMonitoringService.getCount(NewPMONId) == 0);
+		CHECK(onBoardMonitoringService.getCount(SecondNewPMONId) == 0);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -466,13 +487,32 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(100);
-		appendLimitCheck(request, 10, 0, 4, 10);
+		appendLimitCheck(request, NewPMONId, ExistingParameterId, NewLowLimit, NewHighLimit);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::MessageTooShort) == 1);
-		CHECK(onBoardMonitoringService.getCount(10) == 1);
+		CHECK(onBoardMonitoringService.getCount(NewPMONId) == 1);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Request That Ends Inside An Instruction") {
+		Message request =
+		    Message(OnBoardMonitoringService::ServiceType,
+		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(2);
+		appendLimitCheck(request, NewPMONId, ExistingParameterId, NewLowLimit, NewHighLimit);
+		appendCommonFields(request, SecondNewPMONId, ExistingParameterId, PMON::CheckType::ExpectedValue);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::MessageTooShort) == 1);
+		CHECK(onBoardMonitoringService.getCount(NewPMONId) == 1);
+		CHECK(onBoardMonitoringService.getCount(SecondNewPMONId) == 0);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -684,24 +724,22 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 	SECTION("Check Type Different From The One In The Definition") {
 		initialiseParameterMonitoringDefinitions();
+		auto& definition = dynamic_cast<PMONExpectedValueCheck&>(onBoardMonitoringService.getPMONDefinition(ExpectedValueCheckId).get());
+		const PMONExpectedValueCheck definitionBefore = definition;
 
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(1);
-		appendLimitCheck(request, ExpectedValueCheckId, ExpectedValueCheckMonitoredParameterId, 4, 10);
+		appendLimitCheck(request, ExpectedValueCheckId, ExpectedValueCheckMonitoredParameterId, NewLowLimit, NewHighLimit);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DifferentParameterMonitoringDefinitionAndCheckType) == 1);
-
-		auto& baseDefinition = onBoardMonitoringService.getPMONDefinition(ExpectedValueCheckId).get();
-		auto& unchangedDefinition = static_cast<PMONExpectedValueCheck&>(baseDefinition);
-
-		CHECK(unchangedDefinition.repetitionNumber == 5);
-		CHECK(unchangedDefinition.expectedValue == 10);
-		CHECK(unchangedDefinition.mask == 8);
-		CHECK(unchangedDefinition.unexpectedValueEvent == 0);
+		CHECK(definition.repetitionNumber == definitionBefore.repetitionNumber);
+		CHECK(definition.expectedValue == definitionBefore.expectedValue);
+		CHECK(definition.mask == definitionBefore.mask);
+		CHECK(definition.unexpectedValueEvent == definitionBefore.unexpectedValueEvent);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -710,8 +748,8 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("High Threshold Is Lower Than Low Threshold") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		ParameterId PMONId = 2;
-		ParameterId monitoredParameterId = 9;
+		ParameterId PMONId = DeltaCheckId;
+		ParameterId monitoredParameterId = DeltaCheckMonitoredParameterId;
 		PMONRepetitionNumber repetitionNumber = 5;
 		DeltaThreshold lowDeltaThreshold = 8;
 		DeltaThreshold highDeltaThreshold = 2;
@@ -750,12 +788,12 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(7);
 		appendExpectedValueCheck(request, PMONIdNotInList, ExpectedValueCheckMonitoredParameterId);
-		appendLimitCheck(request, PMONIdNotInList, LimitCheckMonitoredParameterId, 4, 10);
-		appendDeltaCheck(request, PMONIdNotInList, DeltaCheckMonitoredParameterId, 4, 10);
-		appendLimitCheck(request, LimitCheckId, wrongMonitoredParameterId, 4, 10);
-		appendLimitCheck(request, ExpectedValueCheckId, ExpectedValueCheckMonitoredParameterId, 4, 10);
-		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, 10, 4);
-		appendDeltaCheck(request, DeltaCheckId, DeltaCheckMonitoredParameterId, 2, 8);
+		appendLimitCheck(request, PMONIdNotInList, LimitCheckMonitoredParameterId, NewLowLimit, NewHighLimit);
+		appendDeltaCheck(request, PMONIdNotInList, DeltaCheckMonitoredParameterId, NewLowDeltaThreshold, NewHighDeltaThreshold);
+		appendLimitCheck(request, LimitCheckId, wrongMonitoredParameterId, NewLowLimit, NewHighLimit);
+		appendLimitCheck(request, ExpectedValueCheckId, ExpectedValueCheckMonitoredParameterId, NewLowLimit, NewHighLimit);
+		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, NewHighLimit, NewLowLimit);
+		appendDeltaCheck(request, DeltaCheckId, DeltaCheckMonitoredParameterId, NewLowDeltaThreshold, NewHighDeltaThreshold);
 
 		MessageParser::execute(request);
 
@@ -766,11 +804,11 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
 
 		auto& baseDefinition = onBoardMonitoringService.getPMONDefinition(DeltaCheckId).get();
-		auto& modifiedDefinition = static_cast<PMONDeltaCheck&>(baseDefinition);
+		auto& modifiedDefinition = dynamic_cast<PMONDeltaCheck&>(baseDefinition);
 
-		CHECK(modifiedDefinition.repetitionNumber == 7);
-		CHECK(modifiedDefinition.lowDeltaThreshold == 2);
-		CHECK(modifiedDefinition.highDeltaThreshold == 8);
+		CHECK(modifiedDefinition.repetitionNumber == NewRepetitionNumber);
+		CHECK(modifiedDefinition.lowDeltaThreshold == NewLowDeltaThreshold);
+		CHECK(modifiedDefinition.highDeltaThreshold == NewHighDeltaThreshold);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -778,30 +816,32 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 	SECTION("Rejected Instruction Leaves The Definition Unchanged") {
 		initialiseParameterMonitoringDefinitions();
-		auto& limitCheck = onBoardMonitoringService.getPMONDefinition(LimitCheckId).get();
-		auto& deltaCheck = onBoardMonitoringService.getPMONDefinition(DeltaCheckId).get();
+		auto& limitCheck = dynamic_cast<PMONLimitCheck&>(onBoardMonitoringService.getPMONDefinition(LimitCheckId).get());
+		auto& deltaCheck = dynamic_cast<PMONDeltaCheck&>(onBoardMonitoringService.getPMONDefinition(DeltaCheckId).get());
 		limitCheck.repetitionCounter = 3;
 		limitCheck.checkingStatus = PMON::WithinLimits;
 		deltaCheck.repetitionCounter = 3;
 		deltaCheck.checkingStatus = PMON::WithinThreshold;
+		const PMONLimitCheck limitCheckBefore = limitCheck;
+		const PMONDeltaCheck deltaCheckBefore = deltaCheck;
 
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(2);
-		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, 10, 4);
-		appendDeltaCheck(request, DeltaCheckId, DeltaCheckMonitoredParameterId, 8, 2);
+		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, NewHighLimit, NewLowLimit);
+		appendDeltaCheck(request, DeltaCheckId, DeltaCheckMonitoredParameterId, NewHighDeltaThreshold, NewLowDeltaThreshold);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 2);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighLimitIsLowerThanLowLimit) == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
-		CHECK(limitCheck.repetitionNumber == 5);
-		CHECK(limitCheck.repetitionCounter == 3);
-		CHECK(limitCheck.checkingStatus == PMON::WithinLimits);
-		CHECK(deltaCheck.repetitionNumber == 5);
-		CHECK(deltaCheck.repetitionCounter == 3);
-		CHECK(deltaCheck.checkingStatus == PMON::WithinThreshold);
+		CHECK(limitCheck.repetitionNumber == limitCheckBefore.repetitionNumber);
+		CHECK(limitCheck.repetitionCounter == limitCheckBefore.repetitionCounter);
+		CHECK(limitCheck.checkingStatus == limitCheckBefore.checkingStatus);
+		CHECK(deltaCheck.repetitionNumber == deltaCheckBefore.repetitionNumber);
+		CHECK(deltaCheck.repetitionCounter == deltaCheckBefore.repetitionCounter);
+		CHECK(deltaCheck.checkingStatus == deltaCheckBefore.checkingStatus);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -809,24 +849,22 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 	SECTION("Unknown Check Type Stops The Request") {
 		initialiseParameterMonitoringDefinitions();
+		auto& definition = dynamic_cast<PMONLimitCheck&>(onBoardMonitoringService.getPMONDefinition(LimitCheckId).get());
+		const PMONLimitCheck definitionBefore = definition;
 
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(2);
 		appendCommonFields(request, LimitCheckId, LimitCheckMonitoredParameterId, UnknownCheckType);
-		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, 4, 10);
+		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, NewLowLimit, NewHighLimit);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::DifferentParameterMonitoringDefinitionAndCheckType) == 1);
-
-		auto& baseDefinition = onBoardMonitoringService.getPMONDefinition(LimitCheckId).get();
-		auto& unchangedDefinition = static_cast<PMONLimitCheck&>(baseDefinition);
-
-		CHECK(unchangedDefinition.repetitionNumber == 5);
-		CHECK(unchangedDefinition.lowLimit == 2);
-		CHECK(unchangedDefinition.highLimit == 9);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::PMONCheckTypeInvalid) == 1);
+		CHECK(definition.repetitionNumber == definitionBefore.repetitionNumber);
+		CHECK(definition.lowLimit == definitionBefore.lowLimit);
+		CHECK(definition.highLimit == definitionBefore.highLimit);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -838,13 +876,35 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(100);
-		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, 4, 10);
+		appendLimitCheck(request, LimitCheckId, LimitCheckMonitoredParameterId, NewLowLimit, NewHighLimit);
 
 		MessageParser::execute(request);
 
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::MessageTooShort) == 1);
-		CHECK(onBoardMonitoringService.getPMONDefinition(LimitCheckId).get().repetitionNumber == 7);
+		CHECK(onBoardMonitoringService.getPMONDefinition(LimitCheckId).get().repetitionNumber == NewRepetitionNumber);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Request That Ends Inside An Instruction") {
+		initialiseParameterMonitoringDefinitions();
+		auto& definition = dynamic_cast<PMONExpectedValueCheck&>(onBoardMonitoringService.getPMONDefinition(ExpectedValueCheckId).get());
+		const PMONExpectedValueCheck definitionBefore = definition;
+
+		Message request = Message(OnBoardMonitoringService::ServiceType,
+		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(1);
+		appendCommonFields(request, ExpectedValueCheckId, ExpectedValueCheckMonitoredParameterId, PMON::CheckType::ExpectedValue);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::MessageTooShort) == 1);
+		CHECK(definition.repetitionNumber == definitionBefore.repetitionNumber);
+		CHECK(definition.expectedValue == definitionBefore.expectedValue);
+		CHECK(definition.mask == definitionBefore.mask);
 
 		ServiceTests::reset();
 		Services.reset();

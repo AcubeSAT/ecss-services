@@ -62,17 +62,36 @@ void OnBoardMonitoringService::deleteAllParameterMonitoringDefinitions(const Mes
 	parameterMonitoringList.clear();
 }
 
+bool OnBoardMonitoringService::canReadCriteria(const Message& message, PMON::CheckType checkType) {
+	uint16_t criteriaSize = 0;
+	switch (checkType) {
+		case PMON::CheckType::Limit:
+			criteriaSize = 2 * (sizeof(PMONLimit) + sizeof(EventDefinitionId));
+			break;
+		case PMON::CheckType::ExpectedValue:
+			criteriaSize = sizeof(PMONBitMask) + sizeof(PMONExpectedValue) + sizeof(EventDefinitionId);
+			break;
+		case PMON::CheckType::Delta:
+			criteriaSize = 2 * (sizeof(DeltaThreshold) + sizeof(EventDefinitionId)) + sizeof(NumberOfConsecutiveDeltaChecks);
+			break;
+		default:
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::PMONCheckTypeInvalid);
+			return false;
+	}
+	return ErrorHandler::assertRequest(message.readPosition + criteriaSize <= message.dataSize, message, ErrorHandler::MessageTooShort);
+}
+
 bool OnBoardMonitoringService::canAddDefinition(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId) const {
-	if (!Services.parameterManagement.parameterExists(monitoredParameterId)) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
+	if (parameterMonitoringList.full()) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
 		return false;
 	}
-	if (parameterMonitoringList.find(PMONId) != parameterMonitoringList.end()) {
+	if (parameterMonitoringList.contains(PMONId)) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::AddAlreadyExistingParameter);
 		return false;
 	}
-	if (parameterMonitoringList.full()) {
-		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
+	if (!Services.parameterManagement.parameterExists(monitoredParameterId)) {
+		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 		return false;
 	}
 	return true;
@@ -92,6 +111,9 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		const auto currentCheckType = message.read<PMON::CheckType>();
+		if (not canReadCriteria(message, currentCheckType)) {
+			return;
+		}
 		const bool canBeAdded = canAddDefinition(message, currentPMONId, currentMonitoredParameterId);
 
 		switch (currentCheckType) {
@@ -151,9 +173,6 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 				break;
 			}
 			default:
-				if (canBeAdded) {
-					ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::PMONCheckTypeMissing);
-				}
 				return;
 		}
 	}
@@ -210,6 +229,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		const auto currentCheckType = message.read<PMON::CheckType>();
+		if (not canReadCriteria(message, currentCheckType)) {
+			return;
+		}
 		const auto definition = findDefinitionToModify(message, currentPMONId, currentMonitoredParameterId, currentCheckType);
 
 		switch (currentCheckType) {

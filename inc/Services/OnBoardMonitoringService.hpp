@@ -66,6 +66,14 @@ private:
 	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
 
 	/**
+	 * Checks that the check type of a TC[12,5] or TC[12,7] instruction is known, and that the request contains the
+	 * check type dependent criteria of that instruction.
+	 *
+	 * @return True: if the criteria of the instruction can be read.
+	 */
+	static bool canReadCriteria(const Message& message, PMON::CheckType checkType);
+
+	/**
 	 * Performs the error checking of a TC[12,5] instruction that does not depend on its check type.
 	 *
 	 * @return True: if the instruction passes all the necessary error checking.
@@ -199,7 +207,8 @@ public:
 	/**
 	 * TC[12,5]
 	 * Adds a parameter monitoring definition for each valid instruction. Each rejected instruction gets a failed start
-	 * of execution notification, and an instruction with an unknown check type also ends the request.
+	 * of execution notification. An instruction with an unknown check type, or one that the request ends inside, also
+	 * ends the request.
 	 */
 	void addParameterMonitoringDefinitions(Message& message);
 
@@ -211,7 +220,8 @@ public:
 	/**
 	 * TC[12,7]
 	 * Modifies the parameter monitoring definition of each valid instruction. Each rejected instruction gets a failed
-	 * start of execution notification, and an instruction with an unknown check type also ends the request.
+	 * start of execution notification. An instruction with an unknown check type, or one that the request ends inside,
+	 * also ends the request.
 	 */
 	void modifyParameterMonitoringDefinitions(Message& message);
 

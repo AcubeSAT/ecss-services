@@ -433,9 +433,10 @@ public:
 		 */
 		RepositoryPathLeadsToFile = 62,
 		/**
-		 * PMON Check Type is requested, but it is missing or not one of the known check types (ST[12])
+		 * Attempt to add or modify a parameter monitoring definition, but the instruction refers to an unknown check
+		 * type (ST[12])
 		 */
-		 PMONCheckTypeMissing = 63,
+		PMONCheckTypeInvalid = 63,
 		/**
 		 * Attempt to load, dump, or check a memory area whose data length exceeds the transfer buffer (ST[06])
 		 */

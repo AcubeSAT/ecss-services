@@ -1,6 +1,7 @@
 #include <Message.hpp>
 #include <catch2/catch_all.hpp>
 #include <cstring>
+#include <limits>
 #include <vector>
 #include "Helpers/CRCHelper.hpp"
 #include "Helpers/TimeGetter.hpp"
@@ -258,8 +259,8 @@ static std::vector<uint8_t> createPacket(Message::PacketType packetType, uint32_
 	packet[4] = (packetDataFieldSize - 1) >> 8;
 	packet[5] = (packetDataFieldSize - 1) & 0xFF;
 	packet[6] = ECSSPUSVersion << 4;
-	packet[7] = 17;
-	packet[8] = 1;
+	packet[7] = TestService::ServiceType;
+	packet[8] = TestService::MessageType::AreYouAliveTest;
 
 	if constexpr (ECSSCRCIncluded) {
 		uint16_t crc = CRCHelper::calculateCRC(packet.data(), packet.size() - CRCHelper::CRCField);
@@ -279,11 +280,11 @@ TEST_CASE("Packet whose data does not fit in a message returns empty message", "
 
 		std::vector<uint8_t> packetThatFits = createPacket(packetType, otherFields + ECSSMaxMessageSize);
 		Message message = MessageParser::parse(packetThatFits.data(), packetThatFits.size());
-		CHECK(message.serviceType == 17);
+		CHECK(message.serviceType == TestService::ServiceType);
 		CHECK(message.dataSize == ECSSMaxMessageSize);
 		CHECK(ServiceTests::hasNoErrors());
 
-		uint32_t const largestPacketDataFieldSize = 65536;
+		uint32_t const largestPacketDataFieldSize = std::numeric_limits<uint16_t>::max() + 1;
 		for (uint32_t packetDataFieldSize: {otherFields + ECSSMaxMessageSize + 1U, largestPacketDataFieldSize}) {
 			std::vector<uint8_t> packet = createPacket(packetType, packetDataFieldSize);
 			Message rejectedMessage = MessageParser::parse(packet.data(), packet.size());

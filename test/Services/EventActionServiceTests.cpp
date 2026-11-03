@@ -30,19 +30,29 @@ void initializeEventActionDefinitions() {
 	}
 }
 
-static void addEventAction(EventDefinitionId eventDefinitionID, const Message& action, uint16_t requestSize = ECSSTCRequestStringSize) {
+static constexpr ApplicationProcessId EventApplicationID = 0;
+static constexpr uint16_t NoPadding = 0;
+
+/**
+ * Appends a TC[19,1] instruction, with @p action padded to @p paddedSize bytes as its request.
+ */
+static void appendEventAction(Message& addDefinitions, ApplicationProcessId applicationID, EventDefinitionId eventDefinitionID, const Message& action, uint16_t paddedSize = ECSSTCRequestStringSize) {
+	addDefinitions.append<ApplicationProcessId>(applicationID);
+	addDefinitions.append<EventDefinitionId>(eventDefinitionID);
+	addDefinitions.appendMessage(action, paddedSize);
+}
+
+static void addEventAction(EventDefinitionId eventDefinitionID, const Message& action, uint16_t paddedSize = ECSSTCRequestStringSize) {
 	Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 	addDefinition.appendUint8(1);
-	addDefinition.append<ApplicationProcessId>(0);
-	addDefinition.append<EventDefinitionId>(eventDefinitionID);
-	addDefinition.appendMessage(action, requestSize);
+	appendEventAction(addDefinition, EventApplicationID, eventDefinitionID, action, paddedSize);
 	MessageParser::execute(addDefinition);
 }
 
 static void enableEventAction(EventDefinitionId eventDefinitionID) {
 	Message enableDefinition(EventActionService::ServiceType, EventActionService::MessageType::EnableEventAction, Message::TC, 0);
 	enableDefinition.appendUint8(1);
-	enableDefinition.append<ApplicationProcessId>(0);
+	enableDefinition.append<ApplicationProcessId>(EventApplicationID);
 	enableDefinition.append<EventDefinitionId>(eventDefinitionID);
 	MessageParser::execute(enableDefinition);
 }
@@ -123,28 +133,27 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	}
 
 	SECTION("Add an event action definition that is already enabled") {
+		const EventDefinitionId enabledEventDefinitionID = 3;
+		const EventDefinitionId newEventDefinitionID = 4;
+		const ApplicationProcessId rejectedApplicationID = 5;
+		const ApplicationProcessId newApplicationID = 1;
 		const Message action(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 0);
-		addEventAction(3, action);
-		enableEventAction(3);
+		addEventAction(enabledEventDefinitionID, action);
+		enableEventAction(enabledEventDefinitionID);
 
-		String<ECSSTCRequestStringSize> rejectedData = "456";
-		String<ECSSTCRequestStringSize> data = "789";
+		const Message otherAction(TestService::ServiceType, TestService::MessageType::OnBoardConnectionTest, Message::TC, 0);
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
-		addDefinitions.append<ApplicationProcessId>(5);
-		addDefinitions.append<EventDefinitionId>(3);
-		addDefinitions.appendFixedString(rejectedData);
-		addDefinitions.append<ApplicationProcessId>(1);
-		addDefinitions.append<EventDefinitionId>(4);
-		addDefinitions.appendFixedString(data);
+		appendEventAction(addDefinitions, rejectedApplicationID, enabledEventDefinitionID, otherAction);
+		appendEventAction(addDefinitions, newApplicationID, newEventDefinitionID, otherAction);
 		MessageParser::execute(addDefinitions);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::EventActionEnabledError));
 		CHECK(ServiceTests::countErrors() == 1);
 		CHECK(eventActionService.eventActionDefinitionMap.size() == 2);
-		REQUIRE(eventActionService.eventActionDefinitionMap.count(4) == 1);
-		CHECK(eventActionService.eventActionDefinitionMap.find(4)->second.applicationID == 1);
-		CHECK(eventActionService.eventActionDefinitionMap.find(4)->second.request.substr(0, 3) == data);
+		REQUIRE(eventActionService.eventActionDefinitionMap.count(newEventDefinitionID) == 1);
+		CHECK(eventActionService.eventActionDefinitionMap.find(newEventDefinitionID)->second.applicationID == newApplicationID);
+		CHECK(eventActionService.eventActionDefinitionMap.find(newEventDefinitionID)->second.request == MessageParser::composeECSS(otherAction, ECSSTCRequestStringSize));
 
 		ServiceTests::reset();
 	}
@@ -161,14 +170,13 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 			message.resetRead();
 		}
 
+		const EventDefinitionId newEventDefinitionID = ECSSEventActionStructMapSize;
+		const EventDefinitionId otherNewEventDefinitionID = ECSSEventActionStructMapSize + 1;
+		const Message action(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 0);
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
-		addDefinitions.append<ApplicationProcessId>(1);
-		addDefinitions.append<EventDefinitionId>(100);
-		addDefinitions.appendFixedString(data);
-		addDefinitions.append<ApplicationProcessId>(0);
-		addDefinitions.append<EventDefinitionId>(101);
-		addDefinitions.appendFixedString(data);
+		appendEventAction(addDefinitions, EventApplicationID, newEventDefinitionID, action);
+		appendEventAction(addDefinitions, EventApplicationID, otherNewEventDefinitionID, action);
 		MessageParser::execute(addDefinitions);
 
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::EventActionDefinitionsMapIsFull) == 2);
@@ -177,32 +185,29 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	}
 
 	SECTION("Request that declares more event-action definitions than it contains") {
-		String<ECSSTCRequestStringSize> data = "123";
+		const EventDefinitionId eventDefinitionID = 1;
+		const Message action(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 0);
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
-		addDefinitions.append<ApplicationProcessId>(0);
-		addDefinitions.append<EventDefinitionId>(1);
-		addDefinitions.appendFixedString(data);
+		appendEventAction(addDefinitions, EventApplicationID, eventDefinitionID, action);
 		MessageParser::execute(addDefinitions);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::MessageTooShort));
 		CHECK(ServiceTests::countErrors() == 1);
 		CHECK(eventActionService.eventActionDefinitionMap.size() == 1);
-		CHECK(eventActionService.eventActionDefinitionMap.count(1) == 1);
+		CHECK(eventActionService.eventActionDefinitionMap.count(eventDefinitionID) == 1);
 
 		ServiceTests::reset();
 	}
 
-	SECTION("Short nested request that is not in the last instruction") {
+	SECTION("Only the last instruction can have an unpadded request") {
+		const EventDefinitionId eventDefinitionID = 1;
+		const EventDefinitionId otherEventDefinitionID = 2;
 		const Message action(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 0);
 		Message addDefinitions(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinitions.appendUint8(2);
-		addDefinitions.append<ApplicationProcessId>(0);
-		addDefinitions.append<EventDefinitionId>(1);
-		addDefinitions.appendMessage(action, 0);
-		addDefinitions.append<ApplicationProcessId>(0);
-		addDefinitions.append<EventDefinitionId>(2);
-		addDefinitions.appendMessage(action, 0);
+		appendEventAction(addDefinitions, EventApplicationID, eventDefinitionID, action, NoPadding);
+		appendEventAction(addDefinitions, EventApplicationID, otherEventDefinitionID, action, NoPadding);
 		MessageParser::execute(addDefinitions);
 
 		CHECK(ServiceTests::thrownError(ErrorHandler::MessageTooShort));
@@ -213,10 +218,11 @@ TEST_CASE("Add event-action definitions TC[19,1]", "[service][st19]") {
 	}
 
 	SECTION("Nested request that ends inside its secondary header") {
+		const EventDefinitionId eventDefinitionID = 1;
 		Message addDefinition(EventActionService::ServiceType, EventActionService::MessageType::AddEventAction, Message::TC, 0);
 		addDefinition.appendUint8(1);
-		addDefinition.append<ApplicationProcessId>(0);
-		addDefinition.append<EventDefinitionId>(1);
+		addDefinition.append<ApplicationProcessId>(EventApplicationID);
+		addDefinition.append<EventDefinitionId>(eventDefinitionID);
 		addDefinition.appendUint32(0);
 		MessageParser::execute(addDefinition);
 
@@ -500,37 +506,42 @@ TEST_CASE("Disable event-action function TC[19,9]", "[service][st19]") {
 
 TEST_CASE("Execute a TC request", "[service][st19]") {
 	SECTION("Action: Delete the event-action definition that follows it") {
+		const EventDefinitionId deletingEventDefinitionID = 20;
+		const EventDefinitionId followingEventDefinitionID = 21;
+		const EventDefinitionId lastEventDefinitionID = 22;
 		const Message otherAction(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 0);
 		Message deleteDefinition(EventActionService::ServiceType, EventActionService::MessageType::DeleteEventAction, Message::TC, 0);
 		deleteDefinition.appendUint8(1);
-		deleteDefinition.append<ApplicationProcessId>(0);
-		deleteDefinition.append<EventDefinitionId>(21);
+		deleteDefinition.append<ApplicationProcessId>(EventApplicationID);
+		deleteDefinition.append<EventDefinitionId>(followingEventDefinitionID);
 
-		addEventAction(20, deleteDefinition);
-		addEventAction(21, otherAction);
-		addEventAction(22, otherAction);
-		enableEventAction(20);
-		enableEventAction(22);
+		addEventAction(deletingEventDefinitionID, deleteDefinition);
+		addEventAction(followingEventDefinitionID, otherAction);
+		addEventAction(lastEventDefinitionID, otherAction);
+		enableEventAction(deletingEventDefinitionID);
+		enableEventAction(lastEventDefinitionID);
 
-		eventActionService.executeAction(20);
+		eventActionService.executeAction(deletingEventDefinitionID);
 
 		CHECK(ServiceTests::count() == 0);
-		CHECK(eventActionService.eventActionDefinitionMap.count(21) == 0);
+		CHECK(eventActionService.eventActionDefinitionMap.count(followingEventDefinitionID) == 0);
 		CHECK(eventActionService.eventActionDefinitionMap.size() == 2);
 
 		ServiceTests::reset();
 	}
 
 	SECTION("Action: Delete all event-action definitions") {
+		const EventDefinitionId deletingEventDefinitionID = 20;
+		const EventDefinitionId otherEventDefinitionID = 21;
 		const Message otherAction(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 0);
 		const Message deleteAllDefinitions(EventActionService::ServiceType, EventActionService::MessageType::DeleteAllEventAction, Message::TC, 0);
 
-		addEventAction(20, deleteAllDefinitions);
-		addEventAction(21, otherAction);
-		enableEventAction(20);
-		enableEventAction(21);
+		addEventAction(deletingEventDefinitionID, deleteAllDefinitions);
+		addEventAction(otherEventDefinitionID, otherAction);
+		enableEventAction(deletingEventDefinitionID);
+		enableEventAction(otherEventDefinitionID);
 
-		eventActionService.executeAction(20);
+		eventActionService.executeAction(deletingEventDefinitionID);
 
 		CHECK(ServiceTests::count() == 0);
 		CHECK(eventActionService.eventActionDefinitionMap.empty());
@@ -541,9 +552,10 @@ TEST_CASE("Execute a TC request", "[service][st19]") {
 	SECTION("Action: Request with no padding after its data") {
 		const Message action(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, 0);
 
-		addEventAction(20, action, 0);
-		enableEventAction(20);
-		eventActionService.executeAction(20);
+		const EventDefinitionId eventDefinitionID = 20;
+		addEventAction(eventDefinitionID, action, NoPadding);
+		enableEventAction(eventDefinitionID);
+		eventActionService.executeAction(eventDefinitionID);
 
 		REQUIRE(ServiceTests::hasOneMessage());
 		CHECK(ServiceTests::get(0).serviceType == TestService::ServiceType);
