@@ -6,12 +6,10 @@
 TEST_CASE("Getting a reference of a parameter") {
 	SECTION("Valid parameter requested") {
 		ParameterId parameterId = 7;
-		REQUIRE(static_cast<Parameter<uint16_t>&>(Services.parameterManagement.getParameter(parameterId)->get())
-		            .getValue() == 55);
+		REQUIRE(Services.parameterManagement.getParameter(parameterId)->get().getValueAsUint64() == 55);
 
 		parameterId = 11;
-		REQUIRE(static_cast<Parameter<uint16_t>&>(Services.parameterManagement.getParameter(parameterId)->get())
-		            .getValue() == 1);
+		REQUIRE(Services.parameterManagement.getParameter(parameterId)->get().getValueAsUint64() == 1);
 	}
 
 	SECTION("Invalid parameter requested") {
