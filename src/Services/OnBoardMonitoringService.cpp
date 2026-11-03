@@ -11,7 +11,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 
 	uint16_t const numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
-		const ParameterId currentId = message.read<ParameterId>();
+		const PMONDefinitionId currentId = message.read<PMONDefinitionId>();
 		auto definition = parameterMonitoringList.find(currentId);
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
@@ -30,7 +30,7 @@ void OnBoardMonitoringService::disableParameterMonitoringDefinitions(Message& me
 
 	uint16_t const numberOfPMONDefinitions = message.readUint16();
 	for (uint16_t i = 0; i < numberOfPMONDefinitions; i++) {
-		const ParameterId currentId = message.read<ParameterId>();
+		const PMONDefinitionId currentId = message.read<PMONDefinitionId>();
 		auto definition = parameterMonitoringList.find(currentId);
 		if (definition == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(
@@ -81,7 +81,7 @@ bool OnBoardMonitoringService::canReadCriteria(const Message& message, PMON::Che
 	return ErrorHandler::assertRequest(message.readPosition + criteriaSize <= message.dataSize, message, ErrorHandler::MessageTooShort);
 }
 
-bool OnBoardMonitoringService::canAddDefinition(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId) const {
+bool OnBoardMonitoringService::canAddDefinition(const Message& message, PMONDefinitionId PMONId, ParameterId monitoredParameterId) const {
 	if (parameterMonitoringList.full()) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ParameterMonitoringListIsFull);
 		return false;
@@ -107,7 +107,7 @@ void OnBoardMonitoringService::addParameterMonitoringDefinitions(Message& messag
 			return;
 		}
 
-		ParameterId currentPMONId = message.read<ParameterId>();
+		PMONDefinitionId currentPMONId = message.read<PMONDefinitionId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		const auto currentCheckType = message.read<PMON::CheckType>();
@@ -182,7 +182,7 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 	message.assertTC(ServiceType, DeleteParameterMonitoringDefinitions);
 	uint16_t numberOfIds = message.readUint16();
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		ParameterId currentPMONId = message.read<ParameterId>();
+		PMONDefinitionId currentPMONId = message.read<PMONDefinitionId>();
 
 		if (parameterMonitoringList.find(currentPMONId) == parameterMonitoringList.end()) {
 			ErrorHandler::reportError(message, ErrorHandler::InvalidRequestToDeleteParameterMonitoringDefinition);
@@ -198,7 +198,7 @@ void OnBoardMonitoringService::deleteParameterMonitoringDefinitions(Message& mes
 	}
 }
 
-etl::optional<etl::reference_wrapper<PMON>> OnBoardMonitoringService::findDefinitionToModify(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) const {
+etl::optional<etl::reference_wrapper<PMON>> OnBoardMonitoringService::findDefinitionToModify(const Message& message, PMONDefinitionId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) const {
 	const auto definition = parameterMonitoringList.find(PMONId);
 	if (definition == parameterMonitoringList.end()) {
 		ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::ModifyParameterNotInTheParameterMonitoringList);
@@ -225,7 +225,7 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 			return;
 		}
 
-		ParameterId currentPMONId = message.read<ParameterId>();
+		PMONDefinitionId currentPMONId = message.read<PMONDefinitionId>();
 		ParameterId currentMonitoredParameterId = message.read<ParameterId>();
 		PMONRepetitionNumber currentPMONRepetitionNumber = message.read<PMONRepetitionNumber>();
 		const auto currentCheckType = message.read<PMON::CheckType>();
@@ -321,7 +321,7 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 	pmonDefinitionReport.appendUint16(numberOfIds);
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		auto currentPMONId = message.read<ParameterId>();
+		auto currentPMONId = message.read<PMONDefinitionId>();
 
 		auto it = parameterMonitoringList.find(currentPMONId);
 		if (it == parameterMonitoringList.end()) {
@@ -331,7 +331,7 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 
 		PMON& pmon = it->second.get();
 
-		pmonDefinitionReport.append<ParameterId>(currentPMONId);
+		pmonDefinitionReport.append<PMONDefinitionId>(currentPMONId);
 		pmonDefinitionReport.append<ParameterId>(pmon.monitoredParameterId);
 		pmonDefinitionReport.appendBoolean(pmon.monitoringEnabled);
 		pmonDefinitionReport.append<PMONRepetitionNumber>(pmon.repetitionNumber);

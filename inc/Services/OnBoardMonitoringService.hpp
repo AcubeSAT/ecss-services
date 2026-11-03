@@ -22,7 +22,7 @@ private:
 	/**
 	 * Flat map storing the parameter monitoring definitions.
 	 */
-	etl::flat_map<uint16_t, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
+	etl::flat_map<PMONDefinitionId, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
 	 * Maximum number of checks for each Limit Check.
@@ -42,7 +42,7 @@ private:
 	/**
 	 * The size of the fields that start each TC[12,5] and TC[12,7] instruction.
 	 */
-	static constexpr uint16_t InstructionHeaderSize = 2 * sizeof(ParameterId) + sizeof(PMONRepetitionNumber) + sizeof(PMON::CheckType);
+	static constexpr uint16_t InstructionHeaderSize = sizeof(PMONDefinitionId) + sizeof(ParameterId) + sizeof(PMONRepetitionNumber) + sizeof(PMON::CheckType);
 
 	/**
 	 * This vector is used as a mean of storing the PMON Definitons
@@ -78,14 +78,14 @@ private:
 	 *
 	 * @return True: if the instruction passes all the necessary error checking.
 	 */
-	bool canAddDefinition(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId) const;
+	bool canAddDefinition(const Message& message, PMONDefinitionId PMONId, ParameterId monitoredParameterId) const;
 
 	/**
 	 * Performs the error checking of a TC[12,7] instruction that does not depend on its check type's criteria.
 	 *
 	 * @return The definition to modify, if the instruction passes all the necessary error checking.
 	 */
-	etl::optional<etl::reference_wrapper<PMON>> findDefinitionToModify(const Message& message, ParameterId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) const;
+	etl::optional<etl::reference_wrapper<PMON>> findDefinitionToModify(const Message& message, PMONDefinitionId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) const;
 
 public:
 	inline static constexpr ServiceTypeNum ServiceType = 12;
@@ -124,26 +124,26 @@ public:
 	/**
 	 * Adds a new Parameter Monitoring Limit Check to the parameter monitoring list.
 	 */
-	void addPMONLimitCheck(ParameterId PMONId, PMONLimitCheck& limitCheck) {
+	void addPMONLimitCheck(PMONDefinitionId PMONId, PMONLimitCheck& limitCheck) {
 		limitChecks.push_back(limitCheck);
-		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(limitChecks.back())));
+		parameterMonitoringList.insert(etl::pair<const PMONDefinitionId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(limitChecks.back())));
 	}
 
 
 	/**
 	 * Adds a new Parameter Monitoring Expected Value Check to the parameter monitoring list.
 	 */
-	void addPMONExpectedValueCheck(ParameterId PMONId, PMONExpectedValueCheck& expectedValueCheck) {
+	void addPMONExpectedValueCheck(PMONDefinitionId PMONId, PMONExpectedValueCheck& expectedValueCheck) {
 		expectedValueChecks.push_back(expectedValueCheck);
-		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(expectedValueChecks.back())));
+		parameterMonitoringList.insert(etl::pair<const PMONDefinitionId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(expectedValueChecks.back())));
 	}
 
 	/**
 	 * Adds a new Parameter Monitoring Delta Check to the parameter monitoring list.
 	 */
-	void addPMONDeltaCheck(ParameterId PMONId, PMONDeltaCheck& deltaCheck) {
+	void addPMONDeltaCheck(PMONDefinitionId PMONId, PMONDeltaCheck& deltaCheck) {
 		deltaChecks.push_back(deltaCheck);
-		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(deltaChecks.back())));
+		parameterMonitoringList.insert(etl::pair<const PMONDefinitionId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(deltaChecks.back())));
 	}
 
 	/**
@@ -157,7 +157,7 @@ public:
 	 * @param PMONId
 	 * @return Parameter Monitoring definition
 	 */
-	etl::reference_wrapper<PMON> getPMONDefinition(ParameterId PMONId) {
+	etl::reference_wrapper<PMON> getPMONDefinition(PMONDefinitionId PMONId) {
 		return parameterMonitoringList.at(PMONId);
 	}
 
@@ -171,7 +171,7 @@ public:
 	/**
 	 * @return The number of occurrences of the specified key in the parameter monitoring list.
 	 */
-	uint16_t getCount(uint16_t key) const {
+	uint16_t getCount(PMONDefinitionId key) const {
 		return parameterMonitoringList.count(key);
 	}
 

@@ -8,11 +8,11 @@
 
 OnBoardMonitoringService& onBoardMonitoringService = Services.onBoardMonitoringService;
 
-static constexpr ParameterId ExpectedValueCheckId = 0;
+static constexpr PMONDefinitionId ExpectedValueCheckId = 0;
 static constexpr ParameterId ExpectedValueCheckMonitoredParameterId = 8;
-static constexpr ParameterId LimitCheckId = 1;
+static constexpr PMONDefinitionId LimitCheckId = 1;
 static constexpr ParameterId LimitCheckMonitoredParameterId = 6;
-static constexpr ParameterId DeltaCheckId = 2;
+static constexpr PMONDefinitionId DeltaCheckId = 2;
 static constexpr ParameterId DeltaCheckMonitoredParameterId = 9;
 
 struct Fixtures {
@@ -69,10 +69,10 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
-		etl::array<ParameterId, 3> PMONIds = {0, 1, 2};
-		request.append<ParameterId>(PMONIds[0]);
-		request.append<ParameterId>(PMONIds[1]);
-		request.append<ParameterId>(PMONIds[2]);
+		etl::array<PMONDefinitionId, 3> PMONIds = {0, 1, 2};
+		request.append<PMONDefinitionId>(PMONIds[0]);
+		request.append<PMONDefinitionId>(PMONIds[1]);
+		request.append<PMONDefinitionId>(PMONIds[2]);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 0);
@@ -95,10 +95,10 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<ParameterId, 4> PMONIds = {0, 10, 1};
-		request.append<ParameterId>(PMONIds[0]);
-		request.append<ParameterId>(PMONIds[1]);
-		request.append<ParameterId>(PMONIds[2]);
+		etl::array<PMONDefinitionId, 4> PMONIds = {0, 10, 1};
+		request.append<PMONDefinitionId>(PMONIds[0]);
+		request.append<PMONDefinitionId>(PMONIds[1]);
+		request.append<PMONDefinitionId>(PMONIds[2]);
 
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
@@ -121,10 +121,10 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 3;
 		request.appendUint16(numberOfIds);
-		etl::array<ParameterId, 3> PMONIds = {0, 1, 2};
-		request.append<ParameterId>(PMONIds[0]);
-		request.append<ParameterId>(PMONIds[1]);
-		request.append<ParameterId>(PMONIds[2]);
+		etl::array<PMONDefinitionId, 3> PMONIds = {0, 1, 2};
+		request.append<PMONDefinitionId>(PMONIds[0]);
+		request.append<PMONDefinitionId>(PMONIds[1]);
+		request.append<PMONDefinitionId>(PMONIds[2]);
 		onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[1]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled = true;
@@ -148,11 +148,11 @@ TEST_CASE("Disable Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::DisableParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 4;
 		request.appendUint16(numberOfIds);
-		etl::array<ParameterId, 4> PMONIds = {0, 10, 1, 2};
-		request.append<ParameterId>(PMONIds[0]);
-		request.append<ParameterId>(PMONIds[1]);
-		request.append<ParameterId>(PMONIds[2]);
-		request.append<ParameterId>(PMONIds[3]);
+		etl::array<PMONDefinitionId, 4> PMONIds = {0, 10, 1, 2};
+		request.append<PMONDefinitionId>(PMONIds[0]);
+		request.append<PMONDefinitionId>(PMONIds[1]);
+		request.append<PMONDefinitionId>(PMONIds[2]);
+		request.append<PMONDefinitionId>(PMONIds[3]);
 		onBoardMonitoringService.getPMONDefinition(PMONIds[0]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[2]).get().monitoringEnabled = true;
 		onBoardMonitoringService.getPMONDefinition(PMONIds[3]).get().monitoringEnabled = true;
@@ -220,8 +220,8 @@ TEST_CASE("Delete all Parameter Monitoring Definitions") {
 
 static constexpr ParameterId ExistingParameterId = 0;
 static constexpr ParameterId NonExistingParameterId = ECSSParameterCount + 1;
-static constexpr ParameterId NewPMONId = 10;
-static constexpr ParameterId SecondNewPMONId = 11;
+static constexpr PMONDefinitionId NewPMONId = 10;
+static constexpr PMONDefinitionId SecondNewPMONId = 11;
 static constexpr auto UnknownCheckType = static_cast<PMON::CheckType>(4);
 
 static constexpr PMONRepetitionNumber NewRepetitionNumber = 7;
@@ -238,21 +238,21 @@ static constexpr DeltaThreshold NewHighDeltaThreshold = 8;
 static constexpr EventDefinitionId NewAboveHighThresholdEvent = 2;
 static constexpr NumberOfConsecutiveDeltaChecks NewNumberOfConsecutiveDeltaChecks = 5;
 
-static void appendCommonFields(Message& request, ParameterId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) {
-	request.append<ParameterId>(PMONId);
+static void appendCommonFields(Message& request, PMONDefinitionId PMONId, ParameterId monitoredParameterId, PMON::CheckType checkType) {
+	request.append<PMONDefinitionId>(PMONId);
 	request.append<ParameterId>(monitoredParameterId);
 	request.append<PMONRepetitionNumber>(NewRepetitionNumber);
 	request.append<PMON::CheckType>(checkType);
 }
 
-static void appendExpectedValueCheck(Message& request, ParameterId PMONId, ParameterId monitoredParameterId) {
+static void appendExpectedValueCheck(Message& request, PMONDefinitionId PMONId, ParameterId monitoredParameterId) {
 	appendCommonFields(request, PMONId, monitoredParameterId, PMON::CheckType::ExpectedValue);
 	request.append<PMONBitMask>(NewMask);
 	request.append<PMONExpectedValue>(NewExpectedValue);
 	request.append<EventDefinitionId>(NewUnexpectedValueEvent);
 }
 
-static void appendLimitCheck(Message& request, ParameterId PMONId, ParameterId monitoredParameterId, PMONLimit lowLimit, PMONLimit highLimit) {
+static void appendLimitCheck(Message& request, PMONDefinitionId PMONId, ParameterId monitoredParameterId, PMONLimit lowLimit, PMONLimit highLimit) {
 	appendCommonFields(request, PMONId, monitoredParameterId, PMON::CheckType::Limit);
 	request.append<PMONLimit>(lowLimit);
 	request.append<EventDefinitionId>(NewBelowLowLimitEvent);
@@ -260,7 +260,7 @@ static void appendLimitCheck(Message& request, ParameterId PMONId, ParameterId m
 	request.append<EventDefinitionId>(NewAboveHighLimitEvent);
 }
 
-static void appendDeltaCheck(Message& request, ParameterId PMONId, ParameterId monitoredParameterId, DeltaThreshold lowDeltaThreshold, DeltaThreshold highDeltaThreshold) {
+static void appendDeltaCheck(Message& request, PMONDefinitionId PMONId, ParameterId monitoredParameterId, DeltaThreshold lowDeltaThreshold, DeltaThreshold highDeltaThreshold) {
 	appendCommonFields(request, PMONId, monitoredParameterId, PMON::CheckType::Delta);
 	request.append<DeltaThreshold>(lowDeltaThreshold);
 	request.append<EventDefinitionId>(NewBelowLowThresholdEvent);
@@ -276,7 +276,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		uint16_t numberOfIds = 1;
 		request.appendUint16(numberOfIds);
-		ParameterId PMONId = 0;
+		PMONDefinitionId PMONId = 0;
 		ParameterId monitoredParameterId = 0;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 3;
@@ -361,7 +361,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 
 	SECTION("High limit is lower than low limit") {
 		uint16_t numberOfIds = 1;
-		ParameterId PMONId = 0;
+		PMONDefinitionId PMONId = 0;
 		ParameterId monitoredParameterId = 0;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 6;
@@ -373,7 +373,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		request.append<ParameterId>(PMONId);
+		request.append<PMONDefinitionId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
 		request.append<PMON::CheckType>(PMON::CheckType::Limit);
@@ -391,7 +391,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 
 	SECTION("High threshold is lower than low threshold") {
 		uint16_t numberOfIds = 1;
-		ParameterId PMONId = 0;
+		PMONDefinitionId PMONId = 0;
 		ParameterId monitoredParameterId = 0;
 		PMONRepetitionNumber repetitionNumber = 5;
 		DeltaThreshold lowDeltaThreshold = 8;
@@ -404,7 +404,7 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		request.append<ParameterId>(PMONId);
+		request.append<PMONDefinitionId>(PMONId);
 		request.appendUint16(monitoredParameterId);
 		request.appendUint16(repetitionNumber);
 		request.append<PMON::CheckType>(PMON::CheckType::Delta);
@@ -423,10 +423,10 @@ TEST_CASE("Add Parameter Monitoring Definitions") {
 	}
 
 	SECTION("Valid Instructions After Rejected Instructions") {
-		const ParameterId PMONIdWithNonExistingParameter = 10;
-		const ParameterId PMONIdWithWrongLimits = 11;
-		const ParameterId addedDeltaCheckId = 12;
-		const ParameterId addedExpectedValueCheckId = 13;
+		const PMONDefinitionId PMONIdWithNonExistingParameter = 10;
+		const PMONDefinitionId PMONIdWithWrongLimits = 11;
+		const PMONDefinitionId addedDeltaCheckId = 12;
+		const PMONDefinitionId addedExpectedValueCheckId = 13;
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
@@ -523,7 +523,7 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 	SECTION("Valid request to Delete Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		const uint16_t numberOfIds = 2;
-		etl::array<uint16_t, numberOfIds> PMONIds = {2, 3};
+		etl::array<PMONDefinitionId, numberOfIds> PMONIds = {2, 3};
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
@@ -544,7 +544,7 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 	SECTION("Invalid request to Delete Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		const uint16_t numberOfIds = 1;
-		uint16_t PMONId = 0;
+		PMONDefinitionId PMONId = 0;
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
@@ -564,7 +564,7 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 	SECTION("One valid and one invalid request to Delete Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		const uint16_t numberOfIds = 2;
-		etl::array<uint16_t, numberOfIds> PMONIds = {0, 1};
+		etl::array<PMONDefinitionId, numberOfIds> PMONIds = {0, 1};
 
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
@@ -591,7 +591,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("Valid Request to Modify Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		ParameterId PMONId = 1;
+		PMONDefinitionId PMONId = 1;
 		ParameterId monitoredParameterId = 6;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 4;
@@ -602,7 +602,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		request.append<ParameterId>(PMONId);
+		request.append<PMONDefinitionId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
 		request.append<PMON::CheckType>(PMON::CheckType::Limit);
@@ -632,7 +632,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("Modify Parameter Not In The Parameter Monitoring List") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		ParameterId PMONIdNotInList = 100;
+		PMONDefinitionId PMONIdNotInList = 100;
 		ParameterId monitoredParameterId = 7;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 4;
@@ -643,7 +643,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		request.append<ParameterId>(PMONIdNotInList);
+		request.append<PMONDefinitionId>(PMONIdNotInList);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
 		request.append<PMON::CheckType>(PMON::CheckType::Limit);
@@ -663,7 +663,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("Different Parameter Monitoring Definition And Monitored Parameter") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		ParameterId existingPMONId = 1;
+		PMONDefinitionId existingPMONId = 1;
 		ParameterId wrongMonitoredParameterId = 999;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 4;
@@ -674,7 +674,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		request.append<ParameterId>(existingPMONId);
+		request.append<PMONDefinitionId>(existingPMONId);
 		request.append<ParameterId>(wrongMonitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
 		request.append<PMON::CheckType>(PMON::CheckType::Limit);
@@ -694,7 +694,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("High Limit Is Lower Than Low Limit") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		ParameterId PMONId = 1;
+		PMONDefinitionId PMONId = 1;
 		ParameterId monitoredParameterId = 6;
 		PMONRepetitionNumber repetitionNumber = 5;
 		PMONLimit lowLimit = 10;
@@ -705,7 +705,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		Message request = Message(OnBoardMonitoringService::ServiceType,
 		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		request.append<ParameterId>(PMONId);
+		request.append<PMONDefinitionId>(PMONId);
 		request.append<ParameterId>(monitoredParameterId);
 		request.append<PMONRepetitionNumber>(repetitionNumber);
 		request.append<PMON::CheckType> (PMON::CheckType::Limit);
@@ -748,7 +748,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("High Threshold Is Lower Than Low Threshold") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		ParameterId PMONId = DeltaCheckId;
+		PMONDefinitionId PMONId = DeltaCheckId;
 		ParameterId monitoredParameterId = DeltaCheckMonitoredParameterId;
 		PMONRepetitionNumber repetitionNumber = 5;
 		DeltaThreshold lowDeltaThreshold = 8;
@@ -761,7 +761,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		request.append<ParameterId>(PMONId);
+		request.append<PMONDefinitionId>(PMONId);
 		request.appendUint16(monitoredParameterId);
 		request.appendUint16(repetitionNumber);
 		request.append<PMON::CheckType>(PMON::CheckType::Delta);
@@ -781,7 +781,7 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 
 	SECTION("Valid Instruction After Rejected Instructions") {
 		initialiseParameterMonitoringDefinitions();
-		ParameterId PMONIdNotInList = 100;
+		PMONDefinitionId PMONIdNotInList = 100;
 		ParameterId wrongMonitoredParameterId = 999;
 
 		Message request = Message(OnBoardMonitoringService::ServiceType,
@@ -919,7 +919,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 4> PMONIds = {0, 1, 2, 3};
+		etl::array<PMONDefinitionId, 4> PMONIds = {0, 1, 2, 3};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		request.appendEnum16(PMONIds[2]);
@@ -999,7 +999,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 	SECTION("Invalid request to report Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		uint16_t PMONId = 5;
+		PMONDefinitionId PMONId = 5;
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
@@ -1019,7 +1019,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
 		request.appendUint16(numberOfIds);
-		etl::array<uint16_t, 2> PMONIds = {0, 5};
+		etl::array<PMONDefinitionId, 2> PMONIds = {0, 5};
 		request.appendEnum16(PMONIds[0]);
 		request.appendEnum16(PMONIds[1]);
 		MessageParser::execute(request);
