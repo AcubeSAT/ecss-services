@@ -340,7 +340,7 @@ public:
 
 	/**
 	 * Returns the delta per second between the current value and the previous one.
-	 * If no time has passed since the previous value, it returns NaN.
+	 * If the time since the previous value is zero or negative, it returns NaN.
 	 */
 	double getDeltaPerSecond(double currentValue) const {
 		if (previousTimestamp.has_value()) {
@@ -348,7 +348,7 @@ public:
 			auto duration = TimeGetter::getCurrentTimeDefaultCUC() - *previousTimestamp;
 			double deltaSeconds = std::chrono::duration<double>(duration).count();
 
-			if (deltaSeconds == 0) {
+			if (deltaSeconds <= 0) {
 				return std::numeric_limits<double>::quiet_NaN();
 			}
 			return delta / deltaSeconds;

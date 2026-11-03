@@ -1158,12 +1158,17 @@ TEST_CASE("Delta Check Perform Check") {
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
 
+		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 30));
+		param.setValue(125);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 16, 0));
 		param.setValue(280);
 		pmon.highDeltaThreshold = std::numeric_limits<DeltaThreshold>::quiet_NaN();
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
-		CHECK(pmon.getRepetitionCounter() == 3);
+		CHECK(pmon.getRepetitionCounter() == 4);
 
 		ServiceTests::reset();
 		Services.reset();
