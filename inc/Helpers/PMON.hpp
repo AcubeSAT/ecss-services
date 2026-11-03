@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PMON_HPP
 #define ECSS_SERVICES_PMON_HPP
 #include <cstdint>
+#include <limits>
 #include "Helpers/Parameter.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
@@ -339,6 +340,7 @@ public:
 
 	/**
 	 * Returns the delta per second between the current value and the previous one.
+	 * If no time has passed since the previous value, it returns NaN.
 	 */
 	double getDeltaPerSecond(double currentValue) const {
 		if (previousTimestamp.has_value()) {
@@ -347,7 +349,7 @@ public:
 			double deltaSeconds = std::chrono::duration<double>(duration).count();
 
 			if (deltaSeconds == 0) {
-				return 0;
+				return std::numeric_limits<double>::quiet_NaN();
 			}
 			return delta / deltaSeconds;
 		}

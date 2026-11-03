@@ -1127,7 +1127,7 @@ TEST_CASE("Delta Check Perform Check") {
 		Services.reset();
 	}
 
-	SECTION("NaN value or threshold") {
+	SECTION("NaN value, delta or threshold") {
 		Parameter<float> param(10);
 		PMONDeltaCheck pmon(9, 5, 5, 3, 3, 11, 4);
 		pmon.monitoredParameter = etl::reference_wrapper<ParameterBase>(param);
@@ -1149,6 +1149,13 @@ TEST_CASE("Delta Check Perform Check") {
 		param.setValue(190);
 		pmon.performCheck();
 		CHECK(pmon.getCheckingStatus() == PMON::WithinThreshold);
+
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
+
+		param.setValue(200);
+		pmon.performCheck();
+		CHECK(pmon.getCheckingStatus() == PMON::Invalid);
 
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 16, 0));
 		param.setValue(280);
