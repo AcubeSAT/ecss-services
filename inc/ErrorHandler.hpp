@@ -446,6 +446,11 @@ public:
 		 * the one used in that parameter monitoring definition (ST[12]).
 		 */
 		DifferentParameterMonitoringDefinitionAndCheckType = 65,
+		/**
+		 * Attempt to report more scheduled activities than a time-based schedule detail or summary report can hold
+		 * (ST[11])
+		 */
+		TimeBasedScheduleReportIsFull = 66,
 	};
 
 	/**

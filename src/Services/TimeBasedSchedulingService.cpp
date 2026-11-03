@@ -199,7 +199,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		if (matchedActivities.full()) {
-			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			ErrorHandler::reportError(request, ErrorHandler::TimeBasedScheduleReportIsFull);
 			continue;
 		}
 
@@ -235,7 +235,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
 		if (matchedActivities.full()) {
-			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			ErrorHandler::reportError(request, ErrorHandler::TimeBasedScheduleReportIsFull);
 			continue;
 		}
 

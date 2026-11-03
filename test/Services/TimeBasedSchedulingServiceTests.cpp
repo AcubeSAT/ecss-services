@@ -419,7 +419,8 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		}
 
 		timeBasedService.detailReportActivitiesByID(receivedMessage);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == 1);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::TimeBasedScheduleReportIsFull) == 1);
 
 		Message response = ServiceTests::get(ServiceTests::count() - 1);
 		CHECK(response.messageType == TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
@@ -544,7 +545,8 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		}
 
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
-		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == 1);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::TimeBasedScheduleReportIsFull) == 1);
 
 		Message response = ServiceTests::get(ServiceTests::count() - 1);
 		CHECK(response.messageType == TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
