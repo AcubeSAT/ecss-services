@@ -135,6 +135,19 @@ void ErrorHandler::logError(ErrorType errorType) {
 }
 ```
 
+Failed ETL container checks, such as a push onto a full container, are logged only once the platform registers the
+logger in `EtlErrorLogger.hpp`, for example in its `ErrorHandler.cpp`:
+
+```cpp
+namespace {
+[[maybe_unused]] const int etlErrorLoggerRegistered = (registerEtlErrorLogger(), 0);
+}
+```
+
+The callback runs wherever the failing ETL call runs, interrupt handlers included, so the platform's logger must be safe
+to call from there. In builds that define `DEBUG`, ETL calls this callback instead of `assert()`, so a failed check halts
+only if the platform registers a callback that does.
+
 ### Using the Timer
 
 A significant portion of the PUS functionalities uses timestamps, for example in order to compare message reception times,
