@@ -225,6 +225,17 @@ TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	}
 }
 
+TEST_CASE("TC[11,15] Time shift an empty schedule", "[service][st11]") {
+	Services.reset();
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
+	receivedMessage.appendRelativeTime(GENERATE(-6789, 0, 6789));
+
+	MessageParser::execute(receivedMessage);
+
+	CHECK(ServiceTests::hasNoErrors());
+	CHECK(unit_test::Tester::scheduledActivities(timeBasedService).empty());
+}
+
 TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById, Message::TC, 1);

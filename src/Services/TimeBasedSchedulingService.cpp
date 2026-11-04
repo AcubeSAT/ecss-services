@@ -87,14 +87,12 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 
 	const Time::DefaultCUC current_time(TimeGetter::getCurrentTimeDefaultCUC());
 
-	const auto releaseTimes =
-	    etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end(),
-	                        [](ScheduledActivity const& leftSide, ScheduledActivity const& rightSide) {
-		                        return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
-	                        });
 	// todo (#267): Define what the time format is going to be
 	const Time::RelativeTime relativeOffset = request.readRelativeTime();
-	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
+	if (scheduledActivities.empty()) {
+		return;
+	}
+	if ((scheduledActivities.front().requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 		return;
 	}
