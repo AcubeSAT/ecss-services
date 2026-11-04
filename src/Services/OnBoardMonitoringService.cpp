@@ -187,9 +187,10 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 		}
 
 		PMON& pmon = it->second.get();
-		pmon.repetitionCounter = 0;
-		pmon.repetitionNumber = currentPMONRepetitionNumber;
-		pmon.checkingStatus = PMON::Unchecked;
+		if (static_cast<PMON::CheckType>(currentCheckType) != pmon.checkType) {
+			ErrorHandler::reportError(message, ErrorHandler::ExecutionStartErrorType::PMONCheckTypeMissing);
+			return;
+		}
 
 		switch (static_cast<PMON::CheckType>(currentCheckType)) {
 			case PMON::CheckType::Limit: {
@@ -247,6 +248,9 @@ void OnBoardMonitoringService::modifyParameterMonitoringDefinitions(Message& mes
 				break;
 			}
 		}
+		pmon.repetitionCounter = 0;
+		pmon.repetitionNumber = currentPMONRepetitionNumber;
+		pmon.checkingStatus = PMON::Unchecked;
 	}
 }
 

@@ -655,9 +655,9 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("High Threshold Is Lower Than Low Threshold") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 1;
-		ParameterId PMONId = 1;
-		ParameterId monitoredParameterId = 6;
-		PMONRepetitionNumber repetitionNumber = 5;
+		ParameterId PMONId = 2;
+		ParameterId monitoredParameterId = 9;
+		PMONRepetitionNumber repetitionNumber = 7;
 		DeltaThreshold lowDeltaThreshold = 8;
 		DeltaThreshold highDeltaThreshold = 2;
 		EventDefinitionId belowLowThresholdEventId = 1;
@@ -681,6 +681,37 @@ TEST_CASE("Modify Parameter Monitoring Definitions") {
 		MessageParser::execute(request);
 		CHECK(ServiceTests::count() == 1);
 		CHECK(ServiceTests::countThrownErrors(ErrorHandler::HighThresholdIsLowerThanLowThreshold) == 1);
+		CHECK(onBoardMonitoringService.getPMONDefinition(PMONId).get().repetitionNumber == 5);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Check type different from the definition's") {
+		initialiseParameterMonitoringDefinitions();
+		ParameterId PMONId = 0;
+		const PMON& definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
+		const PMONRepetitionNumber repetitionNumber = definition.repetitionNumber;
+		const PMONRepetitionNumber newRepetitionNumber = repetitionNumber + 1;
+
+		Message request = Message(OnBoardMonitoringService::ServiceType,
+		                          OnBoardMonitoringService::MessageType::ModifyParameterMonitoringDefinitions, Message::TC, 0);
+		request.appendUint16(1);
+		request.append<ParameterId>(PMONId);
+		request.append<ParameterId>(definition.monitoredParameterId);
+		request.append<PMONRepetitionNumber>(newRepetitionNumber);
+		request.append<PMON::CheckType>(PMON::CheckType::Limit);
+		request.append<PMONLimit>(4);
+		request.append<EventDefinitionId>(9);
+		request.append<PMONLimit>(10);
+		request.append<EventDefinitionId>(11);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::PMONCheckTypeMissing) == 1);
+		CHECK(definition.checkType == PMON::CheckType::ExpectedValue);
+		CHECK(definition.repetitionNumber == repetitionNumber);
 
 		ServiceTests::reset();
 		Services.reset();
