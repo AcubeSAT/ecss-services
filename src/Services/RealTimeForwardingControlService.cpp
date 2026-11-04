@@ -11,9 +11,11 @@ void RealTimeForwardingControlService::addAllReportsOfApplication(ApplicationPro
 }
 
 void RealTimeForwardingControlService::addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-	for (const auto& messageType: AllReportTypes::MessagesOfService.at(serviceType)) {
-		auto appServicePair = std::make_pair(applicationID, serviceType);
-		applicationProcessConfiguration.definitions[appServicePair].push_back(messageType);
+	auto& reportTypes = applicationProcessConfiguration.definitions[std::make_pair(applicationID, serviceType)];
+	for (const auto& reportType: AllReportTypes::MessagesOfService.at(serviceType)) {
+		if (std::find(reportTypes.begin(), reportTypes.end(), reportType) == reportTypes.end()) {
+			reportTypes.push_back(reportType);
+		}
 	}
 }
 
@@ -29,8 +31,11 @@ uint8_t RealTimeForwardingControlService::countServicesOfApplication(Application
 }
 
 uint8_t RealTimeForwardingControlService::countReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType) {
-	auto appServicePair = std::make_pair(applicationID, serviceType);
-	return applicationProcessConfiguration.definitions[appServicePair].size();
+	auto reportTypes = applicationProcessConfiguration.definitions.find(std::make_pair(applicationID, serviceType));
+	if (reportTypes == applicationProcessConfiguration.definitions.end()) {
+		return 0;
+	}
+	return reportTypes->second.size();
 }
 
 bool RealTimeForwardingControlService::checkAppControlled(const Message& request, ApplicationProcessId applicationId) {
@@ -71,7 +76,13 @@ bool RealTimeForwardingControlService::maxServiceTypesReached(const Message& req
 	return false;
 }
 
-bool RealTimeForwardingControlService::checkService(Message& request, ApplicationProcessId applicationID, uint8_t numOfMessages) {
+bool RealTimeForwardingControlService::checkService(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
+                                                    uint8_t numOfMessages) {
+	if (not AllReportTypes::MessagesOfService.contains(serviceType)) {
+		ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition);
+		request.skipBytes(numOfMessages);
+		return false;
+	}
 	if (maxServiceTypesReached(request, applicationID)) {
 		request.skipBytes(numOfMessages);
 		return false;
@@ -91,14 +102,7 @@ bool RealTimeForwardingControlService::maxReportTypesReached(const Message& requ
 bool RealTimeForwardingControlService::checkMessage(const Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType,
                                                     MessageTypeNum messageType) {
 	return !maxReportTypesReached(request, applicationID, serviceType) and
-	       !reportExistsInAppProcessConfiguration(applicationID, serviceType, messageType);
-}
-
-bool RealTimeForwardingControlService::reportExistsInAppProcessConfiguration(ApplicationProcessId applicationID, ServiceTypeNum serviceType,
-                                                                             MessageTypeNum messageType) {
-	auto key = std::make_pair(applicationID, serviceType);
-	auto& messages = applicationProcessConfiguration.definitions[key];
-	return std::find(messages.begin(), messages.end(), messageType) != messages.end();
+	       !isReportTypeEnabled(messageType, applicationID, serviceType);
 }
 
 void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(Message& request) {
@@ -124,7 +128,7 @@ void RealTimeForwardingControlService::addReportTypesToAppProcessConfiguration(M
 			const ServiceTypeNum serviceType = request.read<ServiceTypeNum>();
 			uint8_t const numOfMessages = request.readUint8();
 
-			if (not checkService(request, applicationID, numOfMessages)) {
+			if (not checkService(request, applicationID, serviceType, numOfMessages)) {
 				continue;
 			}
 

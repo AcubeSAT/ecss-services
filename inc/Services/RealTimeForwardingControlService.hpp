@@ -61,7 +61,7 @@ private:
 	void addAllReportsOfApplication(ApplicationProcessId applicationID);
 
 	/**
-	 * Adds all report types of the specified service type, to the application process configuration.
+	 * Adds every report type of the specified service type that is missing from the application process configuration.
 	 */
 	void addAllReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
 
@@ -74,12 +74,6 @@ private:
 	 * Counts the number of report types, stored for the specified service type.
 	 */
 	uint8_t countReportsOfService(ApplicationProcessId applicationID, ServiceTypeNum serviceType);
-
-	/**
-	 * Checks whether the specified message type already exists in the specified application process and service
-	 * type definition.
-	 */
-	bool reportExistsInAppProcessConfiguration(ApplicationProcessId applicationID, ServiceTypeNum serviceType, MessageTypeNum messageType);
 
 	/**
 	 * Performs the necessary error checking/logging for a specific application process ID. Also, skips the necessary
@@ -111,7 +105,7 @@ private:
 	 *
 	 * @return True: if the service type is valid and passes all the necessary error checking.
 	 */
-	bool checkService(Message& request, ApplicationProcessId applicationID, uint8_t numOfMessages);
+	bool checkService(Message& request, ApplicationProcessId applicationID, ServiceTypeNum serviceType, uint8_t numOfMessages);
 
 	/**
 	 * Checks if the maximum number of report type definitions per service type definition is reached.

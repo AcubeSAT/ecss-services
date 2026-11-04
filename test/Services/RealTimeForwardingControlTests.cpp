@@ -554,6 +554,88 @@ TEST_CASE("Add report types to the Application Process Configuration") {
 
 		ServiceTests::reset();
 	}
+
+	SECTION("Adding all report types of a service type again doesn't duplicate them") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, ApplicationId);
+		ApplicationProcessId applicationID1 = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		const uint8_t repetitions = 3;
+		request.appendUint8(repetitions);
+		for (uint8_t i = 0; i < repetitions; i++) {
+			request.append<ApplicationProcessId>(applicationID1);
+			request.appendUint8(1);
+			request.append<ServiceTypeNum>(RequestVerificationService::ServiceType);
+			request.appendUint8(0);
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto reportTypes = definitions.find(std::make_pair(applicationID1, RequestVerificationService::ServiceType));
+		REQUIRE(reportTypes != definitions.end());
+		CHECK(reportTypes->second == AllReportTypes::ST01Reports);
+
+		ServiceTests::reset();
+	}
+
+	SECTION("Adding all report types of a service type keeps the ones already added") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, ApplicationId);
+		ApplicationProcessId applicationID1 = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		request.appendUint8(1);
+		request.append<ApplicationProcessId>(applicationID1);
+		request.appendUint8(2);
+		request.append<ServiceTypeNum>(TimeBasedSchedulingService::ServiceType);
+		request.appendUint8(1);
+		request.append<MessageTypeNum>(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
+		request.append<ServiceTypeNum>(TimeBasedSchedulingService::ServiceType);
+		request.appendUint8(0);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+		auto reportTypes = definitions.find(std::make_pair(applicationID1, TimeBasedSchedulingService::ServiceType));
+		REQUIRE(reportTypes != definitions.end());
+		const AllReportTypes::ServiceDefinitionsVector expectedReportTypes = {
+		    TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById,
+		    TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport};
+		CHECK(reportTypes->second == expectedReportTypes);
+
+		ServiceTests::reset();
+	}
+
+	SECTION("Unknown service type") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::AddReportTypesToAppProcessConfiguration,
+		                Message::TC, ApplicationId);
+		ApplicationProcessId applicationID1 = 1;
+		realTimeForwarding.controlledApplications.push_back(applicationID1);
+		const ServiceTypeNum unknownServiceType = 99;
+		request.appendUint8(1);
+		request.append<ApplicationProcessId>(applicationID1);
+		request.appendUint8(2);
+		request.append<ServiceTypeNum>(unknownServiceType);
+		request.appendUint8(1);
+		request.append<MessageTypeNum>(1);
+		request.append<ServiceTypeNum>(EventReportService::ServiceType);
+		request.appendUint8(0);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::NonExistentServiceTypeDefinition) == 1);
+		auto& definitions = realTimeForwarding.applicationProcessConfiguration.definitions;
+		CHECK(definitions.find(std::make_pair(applicationID1, unknownServiceType)) == definitions.end());
+		CHECK(definitions.find(std::make_pair(applicationID1, EventReportService::ServiceType)) != definitions.end());
+
+		ServiceTests::reset();
+	}
 }
 
 ApplicationProcessId applicationsToFill[] = {1};
