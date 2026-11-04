@@ -448,6 +448,75 @@ TEST_CASE("Delete Parameter Monitoring Definitions") {
 	}
 }
 
+Message addLimitCheckRequest(ParameterId PMONId, PMONLimit lowLimit, PMONLimit highLimit) {
+	Message request(OnBoardMonitoringService::ServiceType,
+	                OnBoardMonitoringService::MessageType::AddParameterMonitoringDefinitions, Message::TC, 0);
+	request.appendUint16(1);
+	request.append<ParameterId>(PMONId);
+	request.append<ParameterId>(0);
+	request.append<PMONRepetitionNumber>(5);
+	request.append<PMON::CheckType>(PMON::CheckType::Limit);
+	request.append<PMONLimit>(lowLimit);
+	request.append<EventDefinitionId>(8);
+	request.append<PMONLimit>(highLimit);
+	request.append<EventDefinitionId>(10);
+	return request;
+}
+
+TEST_CASE("Deleted Parameter Monitoring Definitions free their check storage") {
+	SECTION("Adding after deleting all, more times than there are check slots") {
+		for (PMONLimit lowLimit = 0; lowLimit < 40; lowLimit++) {
+			Message addRequest = addLimitCheckRequest(0, lowLimit, lowLimit + 10);
+			MessageParser::execute(addRequest);
+			REQUIRE(dynamic_cast<PMONLimitCheck&>(onBoardMonitoringService.getPMONDefinition(0).get()).getLowLimit() == lowLimit);
+
+			Message deleteAllRequest(OnBoardMonitoringService::ServiceType,
+			                         OnBoardMonitoringService::MessageType::DeleteAllParameterMonitoringDefinitions, Message::TC, 0);
+			MessageParser::execute(deleteAllRequest);
+		}
+		CHECK(ServiceTests::count() == 0);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("A new definition takes a deleted one's slot and leaves the others intact") {
+		Message firstAddRequest = addLimitCheckRequest(0, 10, 20);
+		MessageParser::execute(firstAddRequest);
+		Message secondAddRequest = addLimitCheckRequest(1, 30, 40);
+		MessageParser::execute(secondAddRequest);
+		const PMON* deletedSlot = &onBoardMonitoringService.getPMONDefinition(1).get();
+
+		Message deleteRequest(OnBoardMonitoringService::ServiceType,
+		                      OnBoardMonitoringService::MessageType::DeleteParameterMonitoringDefinitions, Message::TC, 0);
+		deleteRequest.appendUint16(1);
+		deleteRequest.append<ParameterId>(1);
+		MessageParser::execute(deleteRequest);
+
+		Message thirdAddRequest = addLimitCheckRequest(2, 50, 60);
+		MessageParser::execute(thirdAddRequest);
+
+		CHECK(ServiceTests::count() == 0);
+		CHECK(&onBoardMonitoringService.getPMONDefinition(2).get() == deletedSlot);
+		CHECK(dynamic_cast<PMONLimitCheck&>(onBoardMonitoringService.getPMONDefinition(2).get()).getLowLimit() == 50);
+		CHECK(dynamic_cast<PMONLimitCheck&>(onBoardMonitoringService.getPMONDefinition(0).get()).getLowLimit() == 10);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Adding to a full list directly") {
+		initialiseParameterMonitoringDefinitions();
+		onBoardMonitoringService.addPMONLimitCheck(4, etl::ref(Fixtures::getInstance().monitoringDefinition2));
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::MapFull) == 1);
+		CHECK(onBoardMonitoringService.getCount(4) == 0);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
 TEST_CASE("Modify Parameter Monitoring Definitions") {
 	SECTION("Valid Request to Modify Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();

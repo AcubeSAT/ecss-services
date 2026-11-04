@@ -1,5 +1,6 @@
 #ifndef ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
 #define ECSS_SERVICES_ONBOARDMONITORINGSERVICE_HPP
+#include <algorithm>
 #include <cstdint>
 #include "ECSS_Definitions.hpp"
 #include "Helpers/PMON.hpp"
@@ -25,40 +26,49 @@ private:
 	etl::flat_map<uint16_t, etl::reference_wrapper<PMON>, ECSSMaxMonitoringDefinitions> parameterMonitoringList;
 
 	/**
-	 * Maximum number of checks for each Limit Check.
+	 * Storage for the limit checks that parameterMonitoringList refers to. A slot is reused once no definition refers
+	 * to it, so the storage never needs more slots than the list has entries.
 	 */
-	static constexpr uint8_t MaximumNumberOfChecksLimitCheck = 32;
+	etl::vector<PMONLimitCheck, ECSSMaxMonitoringDefinitions> limitChecks;
 
 	/**
-	 * Maximum number of checks for each Expected Value Check.
+	 * Storage for the expected value checks that parameterMonitoringList refers to, reused like limitChecks.
 	 */
-	static constexpr uint8_t MaximumNumberOfChecksExpectedValueCheck = 32;
+	etl::vector<PMONExpectedValueCheck, ECSSMaxMonitoringDefinitions> expectedValueChecks;
 
 	/**
-	 * Maximum number of checks for each Delta check.
+	 * Storage for the delta checks that parameterMonitoringList refers to, reused like limitChecks.
 	 */
-	static constexpr uint8_t MaximumNumberOfChecksDeltaCheck = 32;
+	etl::vector<PMONDeltaCheck, ECSSMaxMonitoringDefinitions> deltaChecks;
 
 	/**
-	 * This vector is used as a mean of storing the PMON Definitons
-	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
-	 * before they are added to the parameterMonitoringList.
+	 * @return true if a definition in the parameter monitoring list refers to the check.
 	 */
-	etl::vector<PMONLimitCheck, MaximumNumberOfChecksLimitCheck> limitChecks;
+	bool isInParameterMonitoringList(const PMON& check) const {
+		return std::any_of(parameterMonitoringList.begin(), parameterMonitoringList.end(),
+		                   [&check](const auto& definition) { return &definition.second.get() == &check; });
+	}
 
 	/**
-	 * This vector is used as a mean of storing the PMON Definitons
-	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
-	 * before they are added to the parameterMonitoringList.
+	 * Copies the check into a slot that no definition refers to, and adds it to the parameter monitoring list.
 	 */
-	etl::vector<PMONExpectedValueCheck, MaximumNumberOfChecksExpectedValueCheck> expectedValueChecks;
-
-	/**
-	 * This vector is used as a mean of storing the PMON Definitons
-	 * resulting from the addParameterMonitoringDefinitions method according to their Check Type
-	 * before they are added to the parameterMonitoringList.
-	 */
-	etl::vector<PMONDeltaCheck, MaximumNumberOfChecksDeltaCheck> deltaChecks;
+	template <typename Check>
+	void addPMON(ParameterId PMONId, etl::ivector<Check>& checks, const Check& check) {
+		if (not ASSERT_INTERNAL(not parameterMonitoringList.full(), ErrorHandler::InternalErrorType::MapFull)) {
+			return;
+		}
+		auto* slot = checks.begin();
+		while (slot != checks.end() and isInParameterMonitoringList(*slot)) {
+			slot++;
+		}
+		if (slot == checks.end()) {
+			checks.push_back(check);
+			slot = &checks.back();
+		} else {
+			*slot = check;
+		}
+		parameterMonitoringList.insert({PMONId, etl::ref<PMON>(*slot)});
+	}
 
 public:
 	inline static constexpr ServiceTypeNum ServiceType = 12;
@@ -97,26 +107,23 @@ public:
 	/**
 	 * Adds a new Parameter Monitoring Limit Check to the parameter monitoring list.
 	 */
-	void addPMONLimitCheck(ParameterId PMONId, PMONLimitCheck& limitCheck) {
-		limitChecks.push_back(limitCheck);
-		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(limitChecks.back())));
+	void addPMONLimitCheck(ParameterId PMONId, const PMONLimitCheck& limitCheck) {
+		addPMON(PMONId, limitChecks, limitCheck);
 	}
 
 
 	/**
 	 * Adds a new Parameter Monitoring Expected Value Check to the parameter monitoring list.
 	 */
-	void addPMONExpectedValueCheck(ParameterId PMONId, PMONExpectedValueCheck& expectedValueCheck) {
-		expectedValueChecks.push_back(expectedValueCheck);
-		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(expectedValueChecks.back())));
+	void addPMONExpectedValueCheck(ParameterId PMONId, const PMONExpectedValueCheck& expectedValueCheck) {
+		addPMON(PMONId, expectedValueChecks, expectedValueCheck);
 	}
 
 	/**
 	 * Adds a new Parameter Monitoring Delta Check to the parameter monitoring list.
 	 */
-	void addPMONDeltaCheck(ParameterId PMONId, PMONDeltaCheck& deltaCheck) {
-		deltaChecks.push_back(deltaCheck);
-		parameterMonitoringList.insert(etl::pair<const ParameterId, etl::reference_wrapper<PMON>>(PMONId, etl::ref(deltaChecks.back())));
+	void addPMONDeltaCheck(ParameterId PMONId, const PMONDeltaCheck& deltaCheck) {
+		addPMON(PMONId, deltaChecks, deltaCheck);
 	}
 
 	/**
