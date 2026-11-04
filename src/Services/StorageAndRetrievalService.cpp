@@ -196,13 +196,30 @@ bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
 
 void StorageAndRetrievalService::addPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
                                                 const PacketStore& packetStore) {
+	if (packetStoreExists(packetStoreId)) {
+		return;
+	}
+	if (not ASSERT_INTERNAL(not packetStores.full(), ErrorHandler::InternalErrorType::MapFull)) {
+		return;
+	}
 	packetStores.insert({packetStoreId, packetStore});
 }
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
                                                            const Time::DefaultCUC& timestamp) {
+	auto packetStore = packetStores.find(packetStoreId);
+	if (not ASSERT_INTERNAL(packetStore != packetStores.end(), ErrorHandler::InternalErrorType::ElementNotInArray)) {
+		return;
+	}
+	auto& telemetryPackets = packetStore->second.storedTelemetryPackets;
+	if (telemetryPackets.full()) {
+		if (packetStore->second.packetStoreType == PacketStore::Bounded) {
+			return;
+		}
+		telemetryPackets.pop_front();
+	}
 	Message tmPacket; // NOLINT(misc-const-correctness) as we might need to change
-	packetStores[packetStoreId].storedTelemetryPackets.push_back({timestamp, tmPacket});
+	telemetryPackets.push_back({timestamp, tmPacket});
 }
 
 void StorageAndRetrievalService::resetPacketStores() {

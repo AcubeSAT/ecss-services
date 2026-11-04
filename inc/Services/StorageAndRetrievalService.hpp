@@ -219,7 +219,8 @@ public:
 	void addPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const PacketStore& packetStore);
 
 	/**
-	 * Adds telemetry to the specified packet store and Time::DefaultCUC it.
+	 * Adds a telemetry packet with the given timestamp to the specified packet store. When the store is full, a
+	 * circular store drops its oldest packet and a bounded store discards the new one.
 	 */
 	void addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId, const Time::DefaultCUC& timestamp);
 

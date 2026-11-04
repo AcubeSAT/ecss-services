@@ -232,6 +232,63 @@ TEST_CASE("Creating packet stores") {
 	}
 }
 
+TEST_CASE("Adding packet stores and telemetry past capacity") {
+	constexpr int expectedErrors = 1;
+
+	SECTION("Adding a packet store to a full map") {
+		initializePacketStores();
+		const auto newPacketStoreId = invalidPacketStoreIds().front();
+		storageAndRetrieval.addPacketStore(newPacketStoreId, PacketStore());
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::MapFull) == expectedErrors);
+		CHECK(storageAndRetrieval.currentNumberOfPacketStores() == ECSSMaxPacketStores);
+		CHECK_FALSE(storageAndRetrieval.packetStoreExists(newPacketStoreId));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Adding telemetry to a packet store that doesn't exist") {
+		constexpr uint64_t packetTime = 1;
+		const auto missingPacketStoreId = invalidPacketStoreIds().front();
+		storageAndRetrieval.addTelemetryToPacketStore(missingPacketStoreId, Time::DefaultCUC(packetTime));
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::ElementNotInArray) == expectedErrors);
+		CHECK_FALSE(storageAndRetrieval.packetStoreExists(missingPacketStoreId));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Adding telemetry to full circular and bounded packet stores") {
+		constexpr size_t circularStoreIndex = 0;
+		constexpr size_t boundedStoreIndex = 1;
+		constexpr uint64_t firstPacketTime = 0;
+		constexpr uint64_t extraPackets = 2;
+		constexpr uint64_t packetCount = ECSSMaxPacketStoreSize + extraPackets;
+		constexpr uint64_t lastPacketTime = firstPacketTime + packetCount - 1;
+		constexpr uint64_t lastBoundedPacketTime = firstPacketTime + ECSSMaxPacketStoreSize - 1;
+		initializePacketStores();
+		const auto packetStoreIds = validPacketStoreIds();
+		for (uint64_t packetTime = firstPacketTime; packetTime <= lastPacketTime; packetTime++) {
+			storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[circularStoreIndex], Time::DefaultCUC(packetTime));
+			storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[boundedStoreIndex], Time::DefaultCUC(packetTime));
+		}
+
+		auto& circularPackets = storageAndRetrieval.getPacketStore(packetStoreIds[circularStoreIndex]).storedTelemetryPackets;
+		CHECK(circularPackets.size() == ECSSMaxPacketStoreSize);
+		CHECK(circularPackets.front().first == Time::DefaultCUC(firstPacketTime + extraPackets));
+		CHECK(circularPackets.back().first == Time::DefaultCUC(lastPacketTime));
+
+		auto& boundedPackets = storageAndRetrieval.getPacketStore(packetStoreIds[boundedStoreIndex]).storedTelemetryPackets;
+		CHECK(boundedPackets.size() == ECSSMaxPacketStoreSize);
+		CHECK(boundedPackets.back().first == Time::DefaultCUC(lastBoundedPacketTime));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
 TEST_CASE("Deleting packet stores") {
 	SECTION("Valid deletion of specified packet stores") {
 		initializePacketStores();
