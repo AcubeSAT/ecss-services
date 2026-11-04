@@ -1163,6 +1163,23 @@ TEST_CASE("Delete report types from the Application Process Configuration") {
 		ServiceTests::reset();
 	}
 
+	SECTION("Delete an application process that other application processes follow") {
+		Message request(RealTimeForwardingControlService::ServiceType,
+		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,
+		                Message::TC, ApplicationId);
+		deleteApplicationProcess(request);
+		initializeAppProcessForwardControlConfiguration();
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 0);
+		CHECK_FALSE(isApplicationEnabled(applicationsToFill[0]));
+		CHECK(isApplicationEnabled(2));
+		CHECK(isApplicationEnabled(3));
+
+		ServiceTests::reset();
+	}
+
 	SECTION("Delete a service type, from the application process configuration") {
 		Message request(RealTimeForwardingControlService::ServiceType,
 		                RealTimeForwardingControlService::MessageType::DeleteReportTypesFromAppProcessConfiguration,

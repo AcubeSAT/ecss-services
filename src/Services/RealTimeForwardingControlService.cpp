@@ -175,9 +175,11 @@ void RealTimeForwardingControlService::deleteApplicationProcess(ApplicationProce
 	auto& definitions = applicationProcessConfiguration.definitions;
 	auto iter = std::begin(definitions);
 	while (iter != definitions.end()) {
-		iter = std::find_if(
-		    std::begin(definitions), std::end(definitions), [applicationID](const auto& definition) { return applicationID == definition.first.first; });
-		definitions.erase(iter);
+		if (iter->first.first == applicationID) {
+			iter = definitions.erase(iter);
+		} else {
+			iter++;
+		}
 	}
 }
 
