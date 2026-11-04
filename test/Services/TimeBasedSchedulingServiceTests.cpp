@@ -142,6 +142,19 @@ TEST_CASE("Execute the first activity, removes it from the list and return the r
 	REQUIRE(iterationCount == 0);
 }
 
+/**
+ * Inserts an activity with its own TC[11,4], so that its sequence count tells it apart from other activities.
+ */
+static void insertActivity(const Message& request, const Time::DefaultCUC& releaseTime, SequenceCount sequenceCount) {
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, ApplicationId);
+	receivedMessage.packetSequenceCount = sequenceCount;
+	receivedMessage.appendUint16(1);
+	receivedMessage.appendDefaultCUCTimeStamp(releaseTime);
+	receivedMessage.appendMessage(request, ECSSTCRequestStringSize);
+
+	timeBasedService.insertActivities(receivedMessage);
+}
+
 TEST_CASE("TC[11,1] Enable Schedule Execution", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::EnableTimeBasedScheduleExecutionFunction, Message::TC, 1);
@@ -295,7 +308,97 @@ TEST_CASE("TC[11,7] Time shift activities by ID", "[service][st11]") {
 		receivedMessage.append<SequenceCount>(0);                                 // todo(#275): Remove the dummy sequence count
 
 		timeBasedService.timeShiftActivitiesByID(receivedMessage);
-		REQUIRE(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
+		REQUIRE(ServiceTests::thrownError(ErrorHandler::SubServiceExecutionStartError));
+	}
+}
+
+TEST_CASE("TC[11,7] Time shift activities by ID against the earliest activity", "[service][st11]") {
+	Services.reset();
+	const Time::DefaultCUC now(TimeGetter::getCurrentTimeDefaultCUC());
+	const Time::DefaultCUC earlierReleaseTime = now + 100s;
+	const Time::DefaultCUC laterReleaseTime = now + 1000s;
+	const SequenceCount earlierSequenceCount = 0;
+	const SequenceCount laterSequenceCount = 1;
+	const Message request(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, ApplicationId);
+	insertActivity(request, earlierReleaseTime, earlierSequenceCount);
+	insertActivity(request, laterReleaseTime, laterSequenceCount);
+
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById, Message::TC, 1);
+	receivedMessage.appendRelativeTime(-500);
+	auto appendRequestID = [&receivedMessage](ApplicationProcessId applicationID, SequenceCount sequenceCount) {
+		receivedMessage.append<ApplicationProcessUserId>(0);
+		receivedMessage.append<ApplicationProcessId>(applicationID);
+		receivedMessage.append<SequenceCount>(sequenceCount);
+	};
+
+	SECTION("The earliest activity would be released too early") {
+		receivedMessage.appendUint16(2);
+		appendRequestID(ApplicationId, earlierSequenceCount);
+		appendRequestID(ApplicationId, laterSequenceCount);
+
+		timeBasedService.timeShiftActivitiesByID(receivedMessage);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::SubServiceExecutionStartError));
+
+		const auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
+		REQUIRE(scheduledActivities.size() == 2);
+		CHECK(scheduledActivities.at(0)->requestReleaseTime == earlierReleaseTime);
+		CHECK(scheduledActivities.at(1)->requestReleaseTime == laterReleaseTime);
+	}
+
+	SECTION("Unknown request ID next to a valid instruction") {
+		const ApplicationProcessId unknownApplicationID = 80;
+		receivedMessage.appendUint16(2);
+		appendRequestID(unknownApplicationID, 0);
+		appendRequestID(ApplicationId, laterSequenceCount);
+
+		timeBasedService.timeShiftActivitiesByID(receivedMessage);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::InstructionExecutionStartError));
+
+		const auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
+		REQUIRE(scheduledActivities.size() == 2);
+		CHECK(scheduledActivities.at(0)->requestReleaseTime == earlierReleaseTime);
+		CHECK(scheduledActivities.at(1)->requestReleaseTime == laterReleaseTime - 500s);
+	}
+
+	SECTION("A later activity would wrap the release time counter") {
+		const SequenceCount lastSequenceCount = 2;
+		const Time::DefaultCUC lastReleaseTime = Time::DefaultCUC::max() - 1000s;
+		insertActivity(request, lastReleaseTime, lastSequenceCount);
+
+		Message wrappingShift(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftActivitiesById, Message::TC, 1);
+		wrappingShift.appendRelativeTime(2000);
+		wrappingShift.appendUint16(2);
+		wrappingShift.append<ApplicationProcessUserId>(0);
+		wrappingShift.append<ApplicationProcessId>(ApplicationId);
+		wrappingShift.append<SequenceCount>(earlierSequenceCount);
+		wrappingShift.append<ApplicationProcessUserId>(0);
+		wrappingShift.append<ApplicationProcessId>(ApplicationId);
+		wrappingShift.append<SequenceCount>(lastSequenceCount);
+
+		timeBasedService.timeShiftActivitiesByID(wrappingShift);
+		CHECK(ServiceTests::countErrors() == 1);
+		CHECK(ServiceTests::thrownError(ErrorHandler::SubServiceExecutionStartError));
+
+		const auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
+		REQUIRE(scheduledActivities.size() == 3);
+		CHECK(scheduledActivities.at(0)->requestReleaseTime == earlierReleaseTime);
+		CHECK(scheduledActivities.at(2)->requestReleaseTime == lastReleaseTime);
+	}
+
+	SECTION("Repeated request ID") {
+		receivedMessage.appendUint16(2);
+		appendRequestID(ApplicationId, laterSequenceCount);
+		appendRequestID(ApplicationId, laterSequenceCount);
+
+		timeBasedService.timeShiftActivitiesByID(receivedMessage);
+		CHECK(ServiceTests::hasNoErrors());
+
+		const auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
+		REQUIRE(scheduledActivities.size() == 2);
+		CHECK(scheduledActivities.at(0)->requestReleaseTime == earlierReleaseTime);
+		CHECK(scheduledActivities.at(1)->requestReleaseTime == laterReleaseTime - 500s);
 	}
 }
 

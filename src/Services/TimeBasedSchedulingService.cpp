@@ -2,6 +2,7 @@
 #ifdef SERVICE_TIMESCHEDULING
 
 #include "Services/TimeBasedSchedulingService.hpp"
+#include "etl/vector.h"
 
 TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
@@ -109,6 +110,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	const Time::DefaultCUC current_time(TimeGetter::getCurrentTimeDefaultCUC());
 
 	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
+	etl::vector<ScheduledActivity*, ECSSMaxNumberOfTimeSchedActivities> activitiesToShift;
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
@@ -121,16 +123,21 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 			                                       return receivedRequestID != currentElement.requestID;
 		                                       });
 
-		if (requestIDMatch != scheduledActivities.end()) {
-			if ((requestIDMatch->requestReleaseTime + relativeOffset) <
-			    (current_time + ECSSTimeMarginForActivation)) {
-				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
-			} else {
-				requestIDMatch->requestReleaseTime += relativeOffset;
-			}
-		} else {
+		if (requestIDMatch == scheduledActivities.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+		} else if (etl::find(activitiesToShift.begin(), activitiesToShift.end(), &*requestIDMatch) == activitiesToShift.end()) {
+			activitiesToShift.push_back(&*requestIDMatch);
 		}
+	}
+
+	if (etl::any_of(activitiesToShift.begin(), activitiesToShift.end(), [&](const ScheduledActivity* activity) {
+		    return (activity->requestReleaseTime + relativeOffset) < (current_time + ECSSTimeMarginForActivation);
+	    })) {
+		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
+		return;
+	}
+	for (auto* activity: activitiesToShift) {
+		activity->requestReleaseTime += relativeOffset;
 	}
 	sortActivitiesReleaseTime(scheduledActivities);
 }
