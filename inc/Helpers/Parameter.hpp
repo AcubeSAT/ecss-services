@@ -81,7 +81,7 @@ protected:
 			if (std::isnan(value)) {
 				return 0;
 			}
-			if (value >= static_cast<T>(std::numeric_limits<uint64_t>::max())) {
+			if (value >= static_cast<double>(std::numeric_limits<uint64_t>::max())) {
 				return std::numeric_limits<uint64_t>::max();
 			}
 			if (value <= static_cast<T>(std::numeric_limits<int64_t>::min())) {
