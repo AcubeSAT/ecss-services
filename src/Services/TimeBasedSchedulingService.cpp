@@ -76,7 +76,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			scheduledActivities.push_back(newActivity);
 		}
 	}
-	sortActivitiesReleaseTime(scheduledActivities);
+	scheduledActivities.sort();
 	notifyNewActivityAddition();
 }
 
@@ -87,7 +87,7 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 
 	const Time::DefaultCUC current_time(TimeGetter::getCurrentTimeDefaultCUC());
 
-	const auto releaseTimes = etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end(), ReleaseTimeLess());
+	const auto releaseTimes = etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end());
 	// todo (#267): Define what the time format is going to be
 	const Time::RelativeTime relativeOffset = request.readRelativeTime();
 	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
@@ -130,7 +130,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
-	sortActivitiesReleaseTime(scheduledActivities);
+	scheduledActivities.sort();
 }
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
@@ -192,12 +192,17 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
+		if (matchedActivities.full()) {
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			continue;
+		}
+
 		const auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                             [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                             return receivedRequestID != currentElement.requestID;
 		                                             });
 
-		if (requestIDMatch != scheduledActivities.end() && !matchedActivities.full()) {
+		if (requestIDMatch != scheduledActivities.end()) {
 			matchedActivities.insert(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
@@ -221,12 +226,17 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 		receivedRequestID.applicationID = request.read<ApplicationProcessId>();
 		receivedRequestID.sequenceCount = request.read<SequenceCount>();
 
+		if (matchedActivities.full()) {
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			continue;
+		}
+
 		auto requestIDMatch = etl::find_if_not(scheduledActivities.begin(), scheduledActivities.end(),
 		                                       [&receivedRequestID](ScheduledActivity const& currentElement) {
 			                                       return receivedRequestID != currentElement.requestID;
 		                                       });
 
-		if (requestIDMatch != scheduledActivities.end() && !matchedActivities.full()) {
+		if (requestIDMatch != scheduledActivities.end()) {
 			matchedActivities.insert(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);

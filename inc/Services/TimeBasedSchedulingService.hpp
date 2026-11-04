@@ -85,11 +85,9 @@ private:
 		Message request;                         ///< Hold the received command request
 		RequestID requestID;                     ///< Request ID, characteristic of the definition
 		Time::DefaultCUC requestReleaseTime{0}; ///< Keep the command release time
-	};
 
-	struct ReleaseTimeLess {
-		bool operator()(const ScheduledActivity& leftSide, const ScheduledActivity& rightSide) const {
-			return leftSide.requestReleaseTime < rightSide.requestReleaseTime;
+		bool operator<(const ScheduledActivity& rightSide) const {
+			return requestReleaseTime < rightSide.requestReleaseTime;
 		}
 	};
 
@@ -101,18 +99,7 @@ private:
 	 */
 	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> scheduledActivities;
 
-	typedef etl::reference_flat_multiset<const ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities, ReleaseTimeLess> ScheduledActivityReferences;
-
-	/**
-	 * @brief Sort the activities by their release time
-	 *
-	 * @details The ECSS standard requires that the activities are sorted in the TM message
-	 * response. Also it is better to have the activities sorted.
-	 */
-	inline static void
-	sortActivitiesReleaseTime(etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& schedActivities) {
-		schedActivities.sort(ReleaseTimeLess());
-	}
+	using ScheduledActivityReferences = etl::reference_flat_multiset<const ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>;
 
 	/**
 	 * @brief Define a friend in order to be able to access private members during testing
