@@ -65,6 +65,10 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			etl::array<uint8_t, ECSSTCRequestStringSize> requestData = {0};
 			request.readString(requestData.data(), ECSSTCRequestStringSize);
 			const Message receivedTCPacket = MessageParser::parseECSSTC(requestData.data());
+			if (receivedTCPacket.packetType != Message::TC) {
+				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+				continue;
+			}
 			ScheduledActivity newActivity;
 
 			newActivity.request = receivedTCPacket;

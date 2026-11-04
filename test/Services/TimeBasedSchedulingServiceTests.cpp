@@ -198,6 +198,29 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 	}
 }
 
+TEST_CASE("TC[11,4] Activity insertion with a request that fails to parse", "[service][st11]") {
+	Services.reset();
+	const Time::DefaultCUC now(TimeGetter::getCurrentTimeDefaultCUC());
+	const Message request(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, ApplicationId);
+	String<CCSDSMaxMessageSize> unparsableRequest = MessageParser::composeECSS(request, ECSSTCRequestStringSize);
+	unparsableRequest[0] = 0; // PUS version 0
+
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+	receivedMessage.appendUint16(2);
+	receivedMessage.appendDefaultCUCTimeStamp(now + 100s);
+	receivedMessage.appendString(unparsableRequest);
+	receivedMessage.appendDefaultCUCTimeStamp(now + 200s);
+	receivedMessage.appendMessage(request, ECSSTCRequestStringSize);
+
+	MessageParser::execute(receivedMessage);
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == 1);
+
+	const auto scheduledActivities = unit_test::Tester::scheduledActivities(timeBasedService);
+	REQUIRE(scheduledActivities.size() == 1);
+	CHECK(scheduledActivities.at(0)->requestReleaseTime == now + 200s);
+	CHECK(Message::isSameType(request, scheduledActivities.at(0)->request));
+}
+
 TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
 	Services.reset();
 	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::TimeShiftALlScheduledActivities, Message::TC, 1);
