@@ -232,6 +232,52 @@ TEST_CASE("Creating packet stores") {
 	}
 }
 
+TEST_CASE("Adding packet stores and telemetry past capacity") {
+	SECTION("Adding a packet store to a full map") {
+		initializePacketStores();
+		storageAndRetrieval.addPacketStore(invalidPacketStoreIds()[0], PacketStore());
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::MapFull) == 1);
+		CHECK(storageAndRetrieval.currentNumberOfPacketStores() == ECSSMaxPacketStores);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Adding telemetry to a packet store that doesn't exist") {
+		auto packetStoreId = invalidPacketStoreIds()[0];
+		storageAndRetrieval.addTelemetryToPacketStore(packetStoreId, Time::DefaultCUC(1));
+
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::InternalErrorType::ElementNotInArray) == 1);
+		CHECK_FALSE(storageAndRetrieval.packetStoreExists(packetStoreId));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
+	SECTION("Adding telemetry to full circular and bounded packet stores") {
+		initializePacketStores();
+		auto packetStoreIds = validPacketStoreIds();
+		const int packetCount = ECSSMaxPacketStoreSize + 2;
+		for (int i = 0; i < packetCount; i++) {
+			storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[0], Time::DefaultCUC(i));
+			storageAndRetrieval.addTelemetryToPacketStore(packetStoreIds[1], Time::DefaultCUC(i));
+		}
+
+		auto& circularPackets = storageAndRetrieval.getPacketStore(packetStoreIds[0]).storedTelemetryPackets;
+		CHECK(circularPackets.size() == ECSSMaxPacketStoreSize);
+		CHECK(circularPackets.front().first == Time::DefaultCUC(2));
+		CHECK(circularPackets.back().first == Time::DefaultCUC(packetCount - 1));
+
+		auto& boundedPackets = storageAndRetrieval.getPacketStore(packetStoreIds[1]).storedTelemetryPackets;
+		CHECK(boundedPackets.size() == ECSSMaxPacketStoreSize);
+		CHECK(boundedPackets.back().first == Time::DefaultCUC(ECSSMaxPacketStoreSize - 1));
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+}
+
 TEST_CASE("Deleting packet stores") {
 	SECTION("Valid deletion of specified packet stores") {
 		initializePacketStores();
