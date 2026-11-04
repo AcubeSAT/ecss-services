@@ -1,5 +1,7 @@
 /**
  * Configuration for the ETL standard library replacement
+ *
+ * Packaged with the library headers, so it also applies to code that uses them.
  */
 
 #ifndef ECSS_SERVICES_ETL_PROFILE_H
@@ -9,8 +11,5 @@
 #define ETL_CHECK_PUSH_POP
 #define ETL_LOG_ERRORS
 // Do not define ETL_THROW_EXCEPTIONS. ETL errors are logged, not thrown.
-
-// Only GCC is used as a compiler
-#include "etl/profiles/gcc_linux_x86.h"
 
 #endif // ECSS_SERVICES_ETL_PROFILE_H
