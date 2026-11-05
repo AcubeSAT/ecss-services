@@ -190,7 +190,8 @@ public:
 	 * number of activities in the current schedule has been reached, then an @ref
 	 * ErrorHandler::ExecutionStartErrorType is being issued.  Also if the release time of the
 	 * request is less than a set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
-	 * from the current time a @ref ErrorHandler::ExecutionStartErrorType is also issued.
+	 * from the current time a @ref ErrorHandler::ExecutionStartErrorType is also issued. If the
+	 * request fails to parse, a @ref ErrorHandler::ExecutionStartErrorType is also issued.
 	 */
 	void insertActivities(Message& request);
 
@@ -276,7 +277,8 @@ public:
 	/**
 	 * @brief TC[11,7] time-shift scheduled activities identified by a request identifier
 	 *
-	 * @details Time-shift certain activities by using the unique request identifier
+	 * @details Time-shift certain activities by using the unique request identifier. An activity
+	 * identified by more than one instruction is shifted once.
 	 * @param request Provide the received message as a parameter
 	 * @todo (#234) Definition of the time format is required
 	 * @throws ExecutionStartError If the requested time offset is less than the earliest
