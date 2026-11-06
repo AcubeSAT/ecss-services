@@ -105,6 +105,30 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+	SECTION("Enabling resets the repetition counter and keeps the repetition number") {
+		initialiseParameterMonitoringDefinitions();
+		constexpr uint16_t numberOfIds = 1;
+		constexpr ParameterId PMONId = 1;
+		constexpr PMONRepetitionNumber repetitionCounter = 3;
+		constexpr PMONRepetitionNumber resetRepetitionCounter = 0;
+		PMON& definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
+		const PMONRepetitionNumber repetitionNumber = definition.repetitionNumber;
+		definition.repetitionCounter = repetitionCounter;
+
+		Message request(OnBoardMonitoringService::ServiceType,
+		                OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, ApplicationId);
+		request.appendUint16(numberOfIds);
+		request.append<ParameterId>(PMONId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::hasNoErrors());
+		CHECK(definition.getRepetitionCounter() == resetRepetitionCounter);
+		CHECK(definition.getRepetitionNumber() == repetitionNumber);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
 
 TEST_CASE("Disable Parameter Monitoring Definitions") {
@@ -722,6 +746,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 2;
+		constexpr uint16_t numberOfReportedDefinitions = 1;
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
@@ -738,7 +763,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
 		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
-		CHECK(report.readUint16() == numberOfIds);
+		CHECK(report.readUint16() == numberOfReportedDefinitions);
 
 		auto definitionOpt0 = onBoardMonitoringService.getPMONDefinition(PMONIds[0]);
 		auto& pmon0 = definitionOpt0.get();
@@ -754,6 +779,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
 		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
+		CHECK(report.readPosition == report.dataSize);
 
 		ServiceTests::reset();
 		Services.reset();
