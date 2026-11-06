@@ -2,6 +2,7 @@
 #ifdef SERVICE_TIMESCHEDULING
 
 #include "Services/TimeBasedSchedulingService.hpp"
+#include "etl/vector.h"
 
 TimeBasedSchedulingService::TimeBasedSchedulingService() {
 	serviceType = TimeBasedSchedulingService::ServiceType;
@@ -64,6 +65,10 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			etl::array<uint8_t, ECSSTCRequestStringSize> requestData = {0};
 			request.readString(requestData.data(), ECSSTCRequestStringSize);
 			const Message receivedTCPacket = MessageParser::parseECSSTC(requestData.data());
+			if (receivedTCPacket.packetType != Message::TC) {
+				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+				continue;
+			}
 			ScheduledActivity newActivity;
 
 			newActivity.request = receivedTCPacket;
@@ -87,10 +92,12 @@ void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
 
 	const Time::DefaultCUC current_time(TimeGetter::getCurrentTimeDefaultCUC());
 
-	const auto releaseTimes = etl::minmax_element(scheduledActivities.begin(), scheduledActivities.end());
 	// todo (#267): Define what the time format is going to be
 	const Time::RelativeTime relativeOffset = request.readRelativeTime();
-	if ((releaseTimes.first->requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
+	if (scheduledActivities.empty()) {
+		return;
+	}
+	if ((scheduledActivities.front().requestReleaseTime + std::chrono::seconds(relativeOffset)) < (current_time + ECSSTimeMarginForActivation)) {
 		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
 		return;
 	}
@@ -107,6 +114,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	const Time::DefaultCUC current_time(TimeGetter::getCurrentTimeDefaultCUC());
 
 	auto relativeOffset = std::chrono::seconds(request.readRelativeTime());
+	etl::vector<ScheduledActivity*, ECSSMaxNumberOfTimeSchedActivities> activitiesToShift;
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		RequestID receivedRequestID;
@@ -119,16 +127,21 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 			                                       return receivedRequestID != currentElement.requestID;
 		                                       });
 
-		if (requestIDMatch != scheduledActivities.end()) {
-			if ((requestIDMatch->requestReleaseTime + relativeOffset) <
-			    (current_time + ECSSTimeMarginForActivation)) {
-				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
-			} else {
-				requestIDMatch->requestReleaseTime += relativeOffset;
-			}
-		} else {
+		if (requestIDMatch == scheduledActivities.end()) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+		} else if (etl::find(activitiesToShift.begin(), activitiesToShift.end(), &*requestIDMatch) == activitiesToShift.end()) {
+			activitiesToShift.push_back(&*requestIDMatch);
 		}
+	}
+
+	if (etl::any_of(activitiesToShift.begin(), activitiesToShift.end(), [&](const ScheduledActivity* activity) {
+		    return (activity->requestReleaseTime + relativeOffset) < (current_time + ECSSTimeMarginForActivation);
+	    })) {
+		ErrorHandler::reportError(request, ErrorHandler::SubServiceExecutionStartError);
+		return;
+	}
+	for (auto* activity: activitiesToShift) {
+		activity->requestReleaseTime += relativeOffset;
 	}
 	scheduledActivities.sort();
 }

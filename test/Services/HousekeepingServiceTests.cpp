@@ -195,6 +195,37 @@ TEST_CASE("Create housekeeping structure") {
 		Services.reset();
 	}
 
+	SECTION("Simply commutated parameter IDs above 255") {
+		Message request(HousekeepingService::ServiceType,
+		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
+		ParameterReportStructureId idToCreate = 2;
+		CollectionInterval interval = 7;
+		const ParameterId parameterId = 300;
+		const ParameterId parameterIdLowByte = static_cast<uint8_t>(parameterId);
+		uint16_t numOfSimplyCommutatedParams = 3;
+		etl::array<ParameterId, 3> simplyCommutatedIds = {parameterIdLowByte, parameterId, parameterId};
+
+		request.append<ParameterReportStructureId>(idToCreate);
+		request.append<CollectionInterval>(interval);
+		request.appendUint16(numOfSimplyCommutatedParams);
+		for (auto& id: simplyCommutatedIds) {
+			request.append<ParameterId>(id);
+		}
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::count() == 1);
+		CHECK(ServiceTests::countThrownErrors(ErrorHandler::ExecutionStartErrorType::AlreadyExistingParameter) == 1);
+		HousekeepingStructure newStruct = housekeepingService.housekeepingStructures[idToCreate];
+
+		REQUIRE(newStruct.simplyCommutatedParameterIds.size() == 2);
+		CHECK(newStruct.simplyCommutatedParameterIds[0] == parameterIdLowByte);
+		CHECK(newStruct.simplyCommutatedParameterIds[1] == parameterId);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
+
 	SECTION("Exceeding max number of simply commutated parameters") {
 		Message request(HousekeepingService::ServiceType,
 		                HousekeepingService::MessageType::CreateHousekeepingReportStructure, Message::TC, 1);
