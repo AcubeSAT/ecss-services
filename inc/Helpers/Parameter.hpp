@@ -67,7 +67,7 @@ protected:
 	DataType currentValue;
 
 public:
-	explicit Parameter(DataType initialValue) : currentValue(initialValue) {}
+	constexpr explicit Parameter(DataType initialValue) : currentValue(initialValue) {}
 
 	inline void setValue(DataType value) {
 		currentValue = value;

@@ -1,6 +1,7 @@
 #ifndef ECSS_SERVICES_PMON_HPP
 #define ECSS_SERVICES_PMON_HPP
 #include <cstdint>
+#include <limits>
 #include "Helpers/Parameter.hpp"
 #include "Message.hpp"
 #include "Service.hpp"
@@ -244,18 +245,21 @@ public:
 	 * This function first retrieves the current value of the monitored parameter.
 	 * It then checks if the current value is below the low limit, above the high limit, or within the limits.
 	 * Depending on the comparison, it sets the checking status to BelowLowLimit, AboveHighLimit, or WithinLimits.
+	 * If the current value is NaN, it sets the checking status to Invalid.
 	 *
 	 * @note This function overrides the pure virtual function in the base PMON class.
 	 */
 	void performCheck() override {
 		auto previousStatus = checkingStatus;
 		auto currentValue = monitoredParameter.get().getValueAsDouble();
-		if (currentValue < getLowLimit()) {
+		if ((getLowLimit() <= currentValue) && (currentValue <= getHighLimit())) {
+			checkingStatus = WithinLimits;
+		} else if (currentValue < getLowLimit()) {
 			checkingStatus = BelowLowLimit;
 		} else if (currentValue > getHighLimit()) {
 			checkingStatus = AboveHighLimit;
 		} else {
-			checkingStatus = WithinLimits;
+			checkingStatus = Invalid;
 		}
 
 		if (checkingStatus == previousStatus) {
@@ -336,6 +340,7 @@ public:
 
 	/**
 	 * Returns the delta per second between the current value and the previous one.
+	 * If the time since the previous value is zero or negative, it returns NaN.
 	 */
 	double getDeltaPerSecond(double currentValue) const {
 		if (previousTimestamp.has_value()) {
@@ -343,8 +348,8 @@ public:
 			auto duration = TimeGetter::getCurrentTimeDefaultCUC() - *previousTimestamp;
 			double deltaSeconds = std::chrono::duration<double>(duration).count();
 
-			if (deltaSeconds == 0) {
-				return 0;
+			if (deltaSeconds <= 0) {
+				return std::numeric_limits<double>::quiet_NaN();
 			}
 			return delta / deltaSeconds;
 		}
@@ -364,7 +369,7 @@ public:
 	 * This function first retrieves the current value of the monitored parameter and the current timestamp.
 	 * If there is a previous value, it calculates the delta per second between the current and previous values.
 	 * Depending on the delta per second, it sets the checking status to BelowLowThreshold, AboveHighThreshold, or WithinThreshold.
-	 * If there is no previous value, it sets the checking status to Invalid.
+	 * If there is no previous value or the delta per second is NaN, it sets the checking status to Invalid.
 	 *
 	 * After the check, the function updates the previous value and timestamp to the current ones.
 	 *
@@ -379,12 +384,14 @@ public:
 
 		if (hasOldValue()) {
 			double deltaPerSecond = getDeltaPerSecond(currentValue);
-			if (deltaPerSecond < getLowDeltaThreshold()) {
+			if ((getLowDeltaThreshold() <= deltaPerSecond) && (deltaPerSecond <= getHighDeltaThreshold())) {
+				checkingStatus = WithinThreshold;
+			} else if (deltaPerSecond < getLowDeltaThreshold()) {
 				checkingStatus = BelowLowThreshold;
 			} else if (deltaPerSecond > getHighDeltaThreshold()) {
 				checkingStatus = AboveHighThreshold;
 			} else {
-				checkingStatus = WithinThreshold;
+				checkingStatus = Invalid;
 			}
 		} else {
 			checkingStatus = Invalid;
