@@ -167,7 +167,7 @@ public:
 	 * @param request Telemetry (TM) or telecommand (TC) message
 	 * @return boolean True if the parameter exists, false otherwise
 	 */
-	static bool hasAlreadyExistingParameterError(const HousekeepingStructure& housekeepingStruct, ParameterReportStructureId id, const Message& request);
+	static bool hasAlreadyExistingParameterError(const HousekeepingStructure& housekeepingStruct, ParameterId id, const Message& request);
 
 	/**
 	 * Checks if the struct requested exists and if it exists reports execution error.
