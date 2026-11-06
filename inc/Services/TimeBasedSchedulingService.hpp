@@ -191,7 +191,9 @@ public:
 	 * ErrorHandler::ExecutionStartErrorType is being issued.  Also if the release time of the
 	 * request is less than a set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
 	 * from the current time a @ref ErrorHandler::ExecutionStartErrorType is also issued. If the
-	 * request fails to parse, a @ref ErrorHandler::ExecutionStartErrorType is also issued.
+	 * request fails to parse, a @ref ErrorHandler::ExecutionStartErrorType is also issued. If the
+	 * TC[11,4] has an application process ID other than @ref ApplicationId, a @ref
+	 * ErrorHandler::ExecutionStartErrorType is issued for each of its instructions.
 	 */
 	void insertActivities(Message& request);
 

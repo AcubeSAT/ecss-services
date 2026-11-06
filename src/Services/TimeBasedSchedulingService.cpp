@@ -11,12 +11,9 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(const Time::DefaultCUC& currentTime) {
 
 	if ((!scheduledActivities.empty()) && currentTime >= scheduledActivities.front().requestReleaseTime) {
-		ScheduledActivity activity = scheduledActivities.front();
+		Message request = scheduledActivities.front().request;
 		scheduledActivities.pop_front();
-
-		if (activity.requestID.applicationID == ApplicationId) {
-			MessageParser::execute(activity.request);
-		}
+		MessageParser::execute(request);
 	}
 
 	if (!scheduledActivities.empty()) {
@@ -60,7 +57,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 		const Time::DefaultCUC currentTime(TimeGetter::getCurrentTimeDefaultCUC());
 
 		const Time::DefaultCUC releaseTime(request.readDefaultCUCTimeStamp());
-		if ((scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
+		if ((request.applicationId != ApplicationId) || (scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 			request.skipBytes(ECSSTCRequestStringSize);
 		} else {

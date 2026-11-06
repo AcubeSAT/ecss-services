@@ -72,7 +72,7 @@ auto activityInsertion(TimeBasedSchedulingService& timeService) {
 		messagesPopulated = true; // Indicate initialized test messages
 	}
 
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, ApplicationId);
 	receivedMessage.appendUint16(4); // Total number of requests
 	receivedMessage.sourceId = 0;    // todo(#276): proper handling of sourceID when globally integrated
 
@@ -239,7 +239,7 @@ TEST_CASE("TC[11,4] Activity Insertion", "[service][st11]") {
 	REQUIRE(testMessage4.bytesEqualWith(scheduledActivities.at(3)->request));
 
 	SECTION("Error throw test") {
-		Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+		Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, ApplicationId);
 		receivedMessage.appendUint16(1); // Total number of requests
 
 		receivedMessage.appendDefaultCUCTimeStamp(currentTime - 155643s);
@@ -256,7 +256,7 @@ TEST_CASE("TC[11,4] Activity insertion with a request that fails to parse", "[se
 	String<CCSDSMaxMessageSize> unparsableRequest = MessageParser::composeECSS(request, ECSSTCRequestStringSize);
 	unparsableRequest[0] = 0; // PUS version 0
 
-	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, 1);
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, ApplicationId);
 	receivedMessage.appendUint16(2);
 	receivedMessage.appendDefaultCUCTimeStamp(now + 100s);
 	receivedMessage.appendString(unparsableRequest);
@@ -270,6 +270,26 @@ TEST_CASE("TC[11,4] Activity insertion with a request that fails to parse", "[se
 	REQUIRE(scheduledActivities.size() == 1);
 	CHECK(scheduledActivities.at(0)->requestReleaseTime == now + 200s);
 	CHECK(Message::isSameType(request, scheduledActivities.at(0)->request));
+}
+
+TEST_CASE("TC[11,4] Activity insertion addressed to another application process", "[service][st11]") {
+	Services.reset();
+	constexpr ApplicationProcessId otherApplicationId = ApplicationId + 1;
+	constexpr uint16_t numberOfInstructions = 2;
+	const Time::DefaultCUC releaseTime = TimeGetter::getCurrentTimeDefaultCUC() + 100s;
+	const Message request(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, ApplicationId);
+
+	Message receivedMessage(TimeBasedSchedulingService::ServiceType, TimeBasedSchedulingService::MessageType::InsertActivities, Message::TC, otherApplicationId);
+	receivedMessage.appendUint16(numberOfInstructions);
+	for (uint16_t i = 0; i < numberOfInstructions; i++) {
+		receivedMessage.appendDefaultCUCTimeStamp(releaseTime);
+		receivedMessage.appendMessage(request, ECSSTCRequestStringSize);
+	}
+
+	MessageParser::execute(receivedMessage);
+	CHECK(ServiceTests::countErrors() == numberOfInstructions);
+	CHECK(ServiceTests::countThrownErrors(ErrorHandler::InstructionExecutionStartError) == numberOfInstructions);
+	CHECK(unit_test::Tester::scheduledActivities(timeBasedService).empty());
 }
 
 TEST_CASE("TC[11,15] Time shift all scheduled activities", "[service][st11]") {
@@ -537,9 +557,9 @@ TEST_CASE("TC[11,9] Detail report scheduled activities by ID", "[service][st11]"
 		constexpr uint16_t numberOfInstructions = ECSSMaxNumberOfTimeSchedActivities + 1;
 		receivedMessage.appendUint16(numberOfInstructions);
 		for (uint16_t i = 0; i < numberOfInstructions; i++) {
-			receivedMessage.append<ApplicationProcessUserId>(0); // Source ID is not implemented
-			receivedMessage.append<ApplicationProcessId>(1);     // Application ID of the TC[11,4] in activityInsertion
-			receivedMessage.append<SequenceCount>(0);            // todo(#275): Remove the dummy sequence count
+			receivedMessage.append<ApplicationProcessUserId>(0);         // Source ID is not implemented
+			receivedMessage.append<ApplicationProcessId>(ApplicationId); // Application ID of the TC[11,4] in activityInsertion
+			receivedMessage.append<SequenceCount>(0);                    // todo(#275): Remove the dummy sequence count
 		}
 
 		timeBasedService.detailReportActivitiesByID(receivedMessage);
@@ -663,9 +683,9 @@ TEST_CASE("TC[11,12] Summary report scheduled activities by ID", "[service][st11
 		constexpr uint16_t numberOfInstructions = ECSSMaxNumberOfTimeSchedActivities + 1;
 		receivedMessage.appendUint16(numberOfInstructions);
 		for (uint16_t i = 0; i < numberOfInstructions; i++) {
-			receivedMessage.append<ApplicationProcessUserId>(0); // Source ID is not implemented
-			receivedMessage.append<ApplicationProcessId>(1);     // Application ID of the TC[11,4] in activityInsertion
-			receivedMessage.append<SequenceCount>(0);            // todo(#275): Remove the dummy sequence count
+			receivedMessage.append<ApplicationProcessUserId>(0);         // Source ID is not implemented
+			receivedMessage.append<ApplicationProcessId>(ApplicationId); // Application ID of the TC[11,4] in activityInsertion
+			receivedMessage.append<SequenceCount>(0);                    // todo(#275): Remove the dummy sequence count
 		}
 
 		timeBasedService.summaryReportActivitiesByID(receivedMessage);
