@@ -82,9 +82,14 @@ private:
 	 */
 	struct ScheduledActivity {
 		Message request;                         ///< Hold the received command request
-		RequestID requestID;                     ///< Request ID, characteristic of the definition
+		RequestID requestID;                     ///< The source ID, application process ID and sequence count of the request
 		Time::DefaultCUC requestReleaseTime{0}; ///< Keep the command release time
 	};
+
+	/**
+	 * The size of the release time of a TC[11,4] instruction, as Message::appendDefaultCUCTimeStamp() writes it
+	 */
+	inline static constexpr uint16_t ReleaseTimeSize = sizeof(uint32_t);
 
 	/**
 	 * @brief Hold the scheduled activities
@@ -122,8 +127,38 @@ private:
      */
 	void notifyNewActivityAddition();
 
+	/**
+	 * Finds the size of the request of the TC[11,4] instruction at the read position of @p request, from the packet
+	 * data length field of the request's primary header
+	 *
+	 * @return The size of the request, or 0 if the instruction runs past the end of @p request, in which case a
+	 * @ref ErrorHandler::MessageTooShort error is reported
+	 */
+	static uint16_t instructionRequestSize(const Message& request);
+
+	/**
+	 * Checks whether the TC[11,4] instruction with the given release time and request size can add an activity,
+	 * before its request is parsed
+	 */
+	bool canInsertActivity(const Message& request, const Time::DefaultCUC& releaseTime, uint16_t requestSize) const;
+
+	/**
+	 * Checks whether a parsed request is a TC addressed to this application process, of a type that this build executes
+	 */
+	static bool isExecutable(const Message& scheduledRequest);
+
 public:
 	inline static constexpr ServiceTypeNum ServiceType = 11;
+
+	/**
+	 * The size of the largest request, as a TC packet, that an activity can hold, so that a TM[11,10] can report a
+	 * full schedule
+	 */
+	inline static constexpr uint16_t MaxRequestSize =
+	    ((ECSSMaxMessageSize - sizeof(uint16_t)) / ECSSMaxNumberOfTimeSchedActivities) - ReleaseTimeSize;
+	static_assert((MaxRequestSize >= (CCSDSPrimaryHeaderSize + ECSSSecondaryTCHeaderSize + (ECSSCRCIncluded ? CRCHelper::CRCField : 0U))) &&
+	                  ((sizeof(uint16_t) + (static_cast<size_t>(ECSSMaxNumberOfTimeSchedActivities) * (ReleaseTimeSize + MaxRequestSize))) <= ECSSMaxMessageSize),
+	              "A TM[11,10] for a full schedule cannot fit a TC packet per activity");
 
 	enum MessageType : uint8_t {
 		EnableTimeBasedScheduleExecutionFunction = 1,
@@ -147,8 +182,14 @@ public:
 	TimeBasedSchedulingService();
 
 	/**
-	 * Removes the next activity from the schedule and executes its request.
-	 * @return the requestReleaseTime of next activity to be executed after this time
+	 * Removes every activity whose release time is not later than currentTime from the schedule, in the order of their
+	 * release times, and executes its request.
+	 *
+	 * If the time-based schedule execution function is disabled, each activity is removed without executing its
+	 * request, as ECSS 6.11.4.6 requires, and no report is generated for it. The function is disabled when the service
+	 * starts and after a TC[11,2] or TC[11,3], so nothing scheduled is executed until a TC[11,1] enables it.
+	 * @return the requestReleaseTime of the next activity, which is later than currentTime, or
+	 * Time::DefaultCUC::max() if the schedule is empty
 	 */
 	Time::DefaultCUC executeScheduledActivity(const Time::DefaultCUC& currentTime);
 
@@ -184,6 +225,15 @@ public:
 	 * by ascending order of their release time. This done to avoid confusion during the
 	 * execution of the schedule and also to make things easier whenever a release time sorted
 	 * report is requested by he corresponding service.
+	 *
+	 * Each instruction contains a release time and the request as a full TC packet, as ECSS 8.11.2.4 specifies. The
+	 * activity is identified by the source ID, application process ID and sequence count of its request.
+	 *
+	 * The checks performed on the request of each instruction, as ECSS 6.11.4.5f requires, are:
+	 * - the request is a TC packet that @ref MessageParser::parse accepts,
+	 * - the request is addressed to @ref ApplicationId,
+	 * - the request is at most @ref MaxRequestSize bytes long,
+	 * - @ref MessageParser::canExecute accepts the service type and message type of the request.
 	 * @param request Provide the received message as a parameter
 	 * @todo (#230) Definition of the time format is required
 	 * @throws ExecutionStartError If there is request to be inserted and the maximum
@@ -191,9 +241,11 @@ public:
 	 * ErrorHandler::ExecutionStartErrorType is being issued.  Also if the release time of the
 	 * request is less than a set time margin, defined in @ref ECSS_TIME_MARGIN_FOR_ACTIVATION,
 	 * from the current time a @ref ErrorHandler::ExecutionStartErrorType is also issued. If the
-	 * request fails to parse, a @ref ErrorHandler::ExecutionStartErrorType is also issued. If the
+	 * request fails any of the checks above, a @ref ErrorHandler::ExecutionStartErrorType is also issued. If the
 	 * TC[11,4] has an application process ID other than @ref ApplicationId, a @ref
 	 * ErrorHandler::ExecutionStartErrorType is issued for each of its instructions.
+	 * @throws AcceptanceError If an instruction runs past the end of the TC[11,4], a single @ref
+	 * ErrorHandler::MessageTooShort is issued and the rest of the TC[11,4] is not read.
 	 */
 	void insertActivities(Message& request);
 
@@ -224,7 +276,8 @@ public:
 	 * @brief TM[11,10] time-based schedule detail report
 	 *
 	 * @details Send a detailed report about the status of the activities listed
-	 * on the provided list. Generates a TM[11,10] response.
+	 * on the provided list. Generates a TM[11,10] response. Each activity is reported with its release time and its
+	 * request as a full TC packet.
 	 * @param listOfActivities Provide the list of activities that need to be reported on
 	 */
 	void timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities);

@@ -43,6 +43,23 @@ public:
 	static void execute(Message& message);
 
 	/**
+	 * Checks whether execute() dispatches a TC of the service type and message type of @p message to a service
+	 * compiled into this build
+	 *
+	 * @param message The TC to check
+	 * @return True if a service executes TCs of that type
+	 */
+	static bool canExecute(const Message& message);
+
+	/**
+	 * Finds the size of a CCSDS packet from the packet data length field of its primary header
+	 *
+	 * @param data The packet, of at least @ref CCSDSPrimaryHeaderSize bytes
+	 * @return The size of the packet, including its primary header
+	 */
+	static uint32_t packetSize(const uint8_t* data);
+
+	/**
 	 * Parse a message that contains the CCSDS and ECSS packet headers, as well as the data
 	 *
 	 * As defined in CCSDS 133.0-B-1

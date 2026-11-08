@@ -383,3 +383,42 @@ TEST_CASE("TM message initialization and consistency explicit constructor", "[Me
 	CHECK(parsedMessage.dataSize == message.dataSize);
 	CHECK(memcmp(parsedMessage.data.begin(), message.data.begin(), message.dataSize) == 0);
 }
+
+TEST_CASE("canExecute accepts the TC packets that execute dispatches", "[MessageParser]") {
+	bool allTypesMatch = true;
+
+	for (uint16_t serviceType = 0; serviceType <= std::numeric_limits<ServiceTypeNum>::max(); serviceType++) {
+		for (uint16_t messageType = 0; messageType <= std::numeric_limits<MessageTypeNum>::max(); messageType++) {
+			Message request(serviceType, messageType, Message::TC, ApplicationId);
+			MessageParser::execute(request);
+
+			const bool dispatched = not ServiceTests::thrownError(ErrorHandler::OtherMessageType);
+			if (MessageParser::canExecute(request) != dispatched) {
+				UNSCOPED_INFO("TC[" << serviceType << "," << messageType << "]");
+				allTypesMatch = false;
+			}
+			if (dispatched) {
+				Services.reset();
+			}
+			ServiceTests::resetErrors();
+		}
+	}
+
+	CHECK(allTypesMatch);
+}
+
+TEST_CASE("Packet size from the primary header", "[MessageParser]") {
+	SECTION("Composed packet") {
+		const Message request(TestService::ServiceType, TestService::MessageType::AreYouAliveTest, Message::TC, ApplicationId);
+		const String<CCSDSMaxMessageSize> packet = MessageParser::compose(request);
+
+		CHECK(MessageParser::packetSize(reinterpret_cast<const uint8_t*>(packet.data())) == packet.size());
+	}
+
+	SECTION("Largest packet data length") {
+		constexpr uint32_t largestPacketDataFieldSize = std::numeric_limits<uint16_t>::max() + 1;
+		const std::vector<uint8_t> packet = createPacket(Message::TC, largestPacketDataFieldSize);
+
+		CHECK(MessageParser::packetSize(packet.data()) == packet.size());
+	}
+}

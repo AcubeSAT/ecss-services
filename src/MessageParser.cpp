@@ -1,5 +1,7 @@
 #include "MessageParser.hpp"
 #include <ServicePool.hpp>
+#include <algorithm>
+#include <initializer_list>
 #include "ErrorHandler.hpp"
 #include "Helpers/CRCHelper.hpp"
 #include "Services/RequestVerificationService.hpp"
@@ -95,6 +97,153 @@ void MessageParser::execute(Message& message) { //cppcheck-suppress[constParamet
 	}
 }
 
+static bool isOneOf(MessageTypeNum messageType, std::initializer_list<MessageTypeNum> messageTypes) {
+	return std::find(messageTypes.begin(), messageTypes.end(), messageType) != messageTypes.end();
+}
+
+bool MessageParser::canExecute(const Message& message) {
+	const MessageTypeNum messageType = message.messageType;
+	switch (message.serviceType) {
+
+#ifdef SERVICE_HOUSEKEEPING
+		case HousekeepingService::ServiceType:
+			return isOneOf(messageType, {HousekeepingService::CreateHousekeepingReportStructure,
+			                             HousekeepingService::DeleteHousekeepingReportStructure,
+			                             HousekeepingService::EnablePeriodicHousekeepingParametersReport,
+			                             HousekeepingService::DisablePeriodicHousekeepingParametersReport,
+			                             HousekeepingService::ReportHousekeepingStructures,
+			                             HousekeepingService::GenerateOneShotHousekeepingReport,
+			                             HousekeepingService::AppendParametersToHousekeepingStructure,
+			                             HousekeepingService::ModifyCollectionIntervalOfStructures,
+			                             HousekeepingService::ReportHousekeepingPeriodicProperties});
+#endif
+
+#ifdef SERVICE_PARAMETERSTATISTICS
+		case ParameterStatisticsService::ServiceType:
+			return isOneOf(messageType, {ParameterStatisticsService::ReportParameterStatistics,
+			                             ParameterStatisticsService::ResetParameterStatistics,
+			                             ParameterStatisticsService::EnablePeriodicParameterReporting,
+			                             ParameterStatisticsService::DisablePeriodicParameterReporting,
+			                             ParameterStatisticsService::AddOrUpdateParameterStatisticsDefinitions,
+			                             ParameterStatisticsService::DeleteParameterStatisticsDefinitions,
+			                             ParameterStatisticsService::ReportParameterStatisticsDefinitions});
+#endif
+
+#ifdef SERVICE_EVENTREPORT
+		case EventReportService::ServiceType:
+			return isOneOf(messageType, {EventReportService::EnableReportGenerationOfEvents,
+			                             EventReportService::DisableReportGenerationOfEvents,
+			                             EventReportService::ReportListOfDisabledEvents});
+#endif
+
+#ifdef SERVICE_MEMORY
+		case MemoryManagementService::ServiceType:
+			return isOneOf(messageType, {MemoryManagementService::LoadRawMemoryDataAreas,
+			                             MemoryManagementService::DumpRawMemoryData,
+			                             MemoryManagementService::CheckRawMemoryData});
+#endif
+
+#ifdef SERVICE_FUNCTION
+		case FunctionManagementService::ServiceType:
+			return isOneOf(messageType, {FunctionManagementService::PerformFunction});
+#endif
+
+#ifdef SERVICE_TIMESCHEDULING
+		case TimeBasedSchedulingService::ServiceType:
+			return isOneOf(messageType, {TimeBasedSchedulingService::EnableTimeBasedScheduleExecutionFunction,
+			                             TimeBasedSchedulingService::DisableTimeBasedScheduleExecutionFunction,
+			                             TimeBasedSchedulingService::ResetTimeBasedSchedule,
+			                             TimeBasedSchedulingService::InsertActivities,
+			                             TimeBasedSchedulingService::DeleteActivitiesById,
+			                             TimeBasedSchedulingService::TimeShiftActivitiesById,
+			                             TimeBasedSchedulingService::DetailReportActivitiesById,
+			                             TimeBasedSchedulingService::ActivitiesSummaryReportById,
+			                             TimeBasedSchedulingService::TimeShiftALlScheduledActivities,
+			                             TimeBasedSchedulingService::DetailReportAllScheduledActivities});
+#endif
+
+#ifdef SERVICE_STORAGEANDRETRIEVAL
+		case StorageAndRetrievalService::ServiceType:
+			return isOneOf(messageType, {StorageAndRetrievalService::EnableStorageInPacketStores,
+			                             StorageAndRetrievalService::DisableStorageInPacketStores,
+			                             StorageAndRetrievalService::StartByTimeRangeRetrieval,
+			                             StorageAndRetrievalService::DeletePacketStoreContent,
+			                             StorageAndRetrievalService::ReportContentSummaryOfPacketStores,
+			                             StorageAndRetrievalService::ChangeOpenRetrievalStartingTime,
+			                             StorageAndRetrievalService::ResumeOpenRetrievalOfPacketStores,
+			                             StorageAndRetrievalService::SuspendOpenRetrievalOfPacketStores,
+			                             StorageAndRetrievalService::AbortByTimeRangeRetrieval,
+			                             StorageAndRetrievalService::ReportStatusOfPacketStores,
+			                             StorageAndRetrievalService::CreatePacketStores,
+			                             StorageAndRetrievalService::DeletePacketStores,
+			                             StorageAndRetrievalService::ReportConfigurationOfPacketStores,
+			                             StorageAndRetrievalService::CopyPacketsInTimeWindow,
+			                             StorageAndRetrievalService::ResizePacketStores,
+			                             StorageAndRetrievalService::ChangeTypeToCircular,
+			                             StorageAndRetrievalService::ChangeTypeToBounded,
+			                             StorageAndRetrievalService::ChangeVirtualChannel});
+#endif
+
+#ifdef SERVICE_ONBOARDMONITORING
+		case OnBoardMonitoringService::ServiceType:
+			return isOneOf(messageType, {OnBoardMonitoringService::EnableParameterMonitoringDefinitions,
+			                             OnBoardMonitoringService::DisableParameterMonitoringDefinitions,
+			                             OnBoardMonitoringService::ChangeMaximumTransitionReportingDelay,
+			                             OnBoardMonitoringService::DeleteAllParameterMonitoringDefinitions,
+			                             OnBoardMonitoringService::AddParameterMonitoringDefinitions,
+			                             OnBoardMonitoringService::DeleteParameterMonitoringDefinitions,
+			                             OnBoardMonitoringService::ModifyParameterMonitoringDefinitions,
+			                             OnBoardMonitoringService::ReportParameterMonitoringDefinitions});
+#endif
+
+#ifdef SERVICE_TEST
+		case TestService::ServiceType:
+			return isOneOf(messageType, {TestService::AreYouAliveTest, TestService::OnBoardConnectionTest});
+#endif
+
+#ifdef SERVICE_EVENTACTION
+		case EventActionService::ServiceType:
+			return isOneOf(messageType, {EventActionService::AddEventAction,
+			                             EventActionService::DeleteEventAction,
+			                             EventActionService::DeleteAllEventAction,
+			                             EventActionService::EnableEventAction,
+			                             EventActionService::DisableEventAction,
+			                             EventActionService::ReportStatusOfEachEventAction,
+			                             EventActionService::EnableEventActionFunction,
+			                             EventActionService::DisableEventActionFunction});
+#endif
+
+#ifdef SERVICE_PARAMETER
+		case ParameterService::ServiceType:
+			return isOneOf(messageType, {ParameterService::ReportParameterValues, ParameterService::SetParameterValues});
+#endif
+
+#ifdef SERVICE_REALTIMEFORWARDINGCONTROL
+		case RealTimeForwardingControlService::ServiceType:
+			return isOneOf(messageType, {RealTimeForwardingControlService::AddReportTypesToAppProcessConfiguration,
+			                             RealTimeForwardingControlService::DeleteReportTypesFromAppProcessConfiguration,
+			                             RealTimeForwardingControlService::ReportAppProcessConfigurationContent});
+#endif
+
+#ifdef SERVICE_FILE_MANAGEMENT
+		case FileManagementService::ServiceType:
+			return isOneOf(messageType, {FileManagementService::CreateFile,
+			                             FileManagementService::DeleteFile,
+			                             FileManagementService::ReportAttributes,
+			                             FileManagementService::LockFile,
+			                             FileManagementService::UnlockFile,
+			                             FileManagementService::CreateDirectory,
+			                             FileManagementService::DeleteDirectory});
+#endif
+		default:
+			return false;
+	}
+}
+
+uint32_t MessageParser::packetSize(const uint8_t* data) {
+	return CCSDSPrimaryHeaderSize + ((static_cast<uint32_t>(data[4]) << 8U) | data[5]) + 1U;
+}
+
 Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 	// TODO(#59): Proper error handling if assert fails
 	if (not ASSERT_INTERNAL(length >= CCSDSPrimaryHeaderSize, ErrorHandler::UnacceptablePacket)) {
@@ -103,7 +252,7 @@ Message MessageParser::parse(const uint8_t* data, uint32_t length) {
 
 	uint16_t const packetHeaderIdentification = (data[0] << 8) | data[1];
 	uint16_t const packetSequenceControl = (data[2] << 8) | data[3];
-	uint32_t const packetDataLength = ((data[4] << 8) | data[5]) + 1;
+	uint32_t const packetDataLength = packetSize(data) - CCSDSPrimaryHeaderSize;
 
 	// Individual fields of the CCSDS Space Packet primary header
 	uint8_t const versionNumber = data[0] >> 5;

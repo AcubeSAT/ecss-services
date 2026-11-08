@@ -261,6 +261,8 @@ void HousekeepingService::execute(Message& message) {
 		case ReportHousekeepingPeriodicProperties:
 			reportHousekeepingPeriodicProperties(message);
 			break;
+		default:
+			ErrorHandler::reportInternalError(ErrorHandler::OtherMessageType);
 	}
 }
 

@@ -9,11 +9,12 @@ TimeBasedSchedulingService::TimeBasedSchedulingService() {
 }
 
 Time::DefaultCUC TimeBasedSchedulingService::executeScheduledActivity(const Time::DefaultCUC& currentTime) {
-
-	if ((!scheduledActivities.empty()) && currentTime >= scheduledActivities.front().requestReleaseTime) {
+	while ((!scheduledActivities.empty()) && currentTime >= scheduledActivities.front().requestReleaseTime) {
 		Message request = scheduledActivities.front().request;
 		scheduledActivities.pop_front();
-		MessageParser::execute(request);
+		if (executionFunctionStatus) {
+			MessageParser::execute(request);
+		}
 	}
 
 	if (!scheduledActivities.empty()) {
@@ -54,34 +55,55 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
 		// todo (#229): Get the group ID first, if groups are used
-		const Time::DefaultCUC currentTime(TimeGetter::getCurrentTimeDefaultCUC());
-
-		const Time::DefaultCUC releaseTime(request.readDefaultCUCTimeStamp());
-		if ((request.applicationId != ApplicationId) || (scheduledActivities.available() == 0) || (releaseTime < (currentTime + ECSSTimeMarginForActivation))) {
-			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
-			request.skipBytes(ECSSTCRequestStringSize);
-		} else {
-			etl::array<uint8_t, ECSSTCRequestStringSize> requestData = {0};
-			request.readString(requestData.data(), ECSSTCRequestStringSize);
-			const Message receivedTCPacket = MessageParser::parseECSSTC(requestData.data());
-			if (receivedTCPacket.packetType != Message::TC) {
-				ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
-				continue;
-			}
-			ScheduledActivity newActivity;
-
-			newActivity.request = receivedTCPacket;
-			newActivity.requestReleaseTime = releaseTime;
-
-			newActivity.requestID.sourceID = request.sourceId;
-			newActivity.requestID.applicationID = request.applicationId;
-			newActivity.requestID.sequenceCount = request.packetSequenceCount;
-
-			scheduledActivities.push_back(newActivity);
+		const uint16_t requestSize = instructionRequestSize(request);
+		if (requestSize == 0) {
+			break;
 		}
+		const Time::DefaultCUC releaseTime(request.readDefaultCUCTimeStamp());
+		const uint8_t* const requestData = request.data.data() + request.readPosition;
+		request.skipBytes(requestSize);
+
+		if (not canInsertActivity(request, releaseTime, requestSize)) {
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			continue;
+		}
+		ScheduledActivity newActivity{MessageParser::parse(requestData, requestSize), {}, releaseTime};
+		if (not isExecutable(newActivity.request)) {
+			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
+			continue;
+		}
+
+		newActivity.requestID.sourceID = newActivity.request.sourceId;
+		newActivity.requestID.applicationID = newActivity.request.applicationId;
+		newActivity.requestID.sequenceCount = newActivity.request.packetSequenceCount;
+
+		scheduledActivities.push_back(newActivity);
 	}
 	sortActivitiesReleaseTime(scheduledActivities);
 	notifyNewActivityAddition();
+}
+
+uint16_t TimeBasedSchedulingService::instructionRequestSize(const Message& request) {
+	const uint32_t requestPosition = request.readPosition + ReleaseTimeSize;
+	if (not ErrorHandler::assertRequest((requestPosition + CCSDSPrimaryHeaderSize) <= request.dataSize, request, ErrorHandler::MessageTooShort)) {
+		return 0;
+	}
+	const uint32_t requestSize = MessageParser::packetSize(request.data.data() + requestPosition);
+	if (not ErrorHandler::assertRequest((requestPosition + requestSize) <= request.dataSize, request, ErrorHandler::MessageTooShort)) {
+		return 0;
+	}
+	return static_cast<uint16_t>(requestSize);
+}
+
+bool TimeBasedSchedulingService::canInsertActivity(const Message& request, const Time::DefaultCUC& releaseTime, uint16_t requestSize) const {
+	const Time::DefaultCUC currentTime(TimeGetter::getCurrentTimeDefaultCUC());
+	return (request.applicationId == ApplicationId) && (not scheduledActivities.full()) &&
+	       (releaseTime >= (currentTime + ECSSTimeMarginForActivation)) && (requestSize <= MaxRequestSize);
+}
+
+bool TimeBasedSchedulingService::isExecutable(const Message& scheduledRequest) {
+	return (scheduledRequest.packetType == Message::TC) && (scheduledRequest.applicationId == ApplicationId) &&
+	       MessageParser::canExecute(scheduledRequest);
 }
 
 void TimeBasedSchedulingService::timeShiftAllActivities(Message& request) {
@@ -185,7 +207,7 @@ void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<S
 
 	for (const auto& activity: listOfActivities) {
 		report.appendDefaultCUCTimeStamp(activity.requestReleaseTime); // todo (#267): Replace with the time parser
-		report.appendString(MessageParser::composeECSS(activity.request));
+		report.appendString(MessageParser::compose(activity.request));
 	}
 	storeMessage(report);
 }

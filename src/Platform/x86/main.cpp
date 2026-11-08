@@ -339,10 +339,10 @@ int main() {
 	receivedMsg.appendUint16(2); // Total number of requests
 
 	receivedMsg.append<Time::DefaultCUC>(Time::DefaultCUC(currentTime.asTAIseconds() + 1556435U));
-	receivedMsg.appendString(MessageParser::composeECSS(testMessage1));
+	receivedMsg.appendString(MessageParser::compose(testMessage1));
 
 	receivedMsg.append<Time::DefaultCUC>(Time::DefaultCUC(currentTime.asTAIseconds() + 1957232U));
-	receivedMsg.appendString(MessageParser::composeECSS(testMessage2));
+	receivedMsg.appendString(MessageParser::compose(testMessage2));
 	timeBasedSchedulingService.insertActivities(receivedMsg);
 
 	// Time shift activities
