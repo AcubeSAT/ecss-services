@@ -111,7 +111,7 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		constexpr ParameterId PMONId = 1;
 		constexpr PMONRepetitionNumber repetitionCounter = 3;
 		constexpr PMONRepetitionNumber resetRepetitionCounter = 0;
-		PMON& definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
+		auto& definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
 		const PMONRepetitionNumber repetitionNumber = definition.repetitionNumber;
 		definition.repetitionCounter = repetitionCounter;
 
