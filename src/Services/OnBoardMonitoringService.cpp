@@ -258,7 +258,7 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 
 	uint16_t numberOfDefinitions = 0;
 	for (uint16_t i = 0; i < numberOfIds; i++) {
-		if (parameterMonitoringList.find(message.read<ParameterId>()) != parameterMonitoringList.end()) {
+		if (parameterMonitoringList.contains(message.read<ParameterId>())) {
 			numberOfDefinitions++;
 		}
 	}
