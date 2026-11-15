@@ -2,10 +2,7 @@
 
 #ifdef SERVICE_EVENTREPORT
 
-#ifdef SERVICE_EVENTACTION
 #include <Services/EventReportService.hpp>
-#endif
-
 #include "Message.hpp"
 #include "ErrorHandler.hpp"
 #include "ServicePool.hpp"
