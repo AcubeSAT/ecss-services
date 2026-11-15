@@ -2,7 +2,10 @@
 
 #ifdef SERVICE_EVENTREPORT
 
+#ifdef SERVICE_EVENTACTION
 #include <Services/EventReportService.hpp>
+#endif
+
 #include "Message.hpp"
 #include "ErrorHandler.hpp"
 #include "ServicePool.hpp"
@@ -34,7 +37,10 @@ void EventReportService::informativeEventReport(Event eventID, const String<ECSS
 		Message report = createTM(EventReportService::MessageType::InformativeEventReport);
 		report.append<EventDefinitionId>(eventID);
 		report.appendEventData(data);
+
+		#ifdef SERVICE_EVENTACTION
 		Services.eventAction.executeAction(eventID);
+		#endif
 
 		storeMessage(report);
 	}
@@ -52,7 +58,10 @@ void EventReportService::lowSeverityAnomalyReport(Event eventID, const String<EC
 		report.append<EventDefinitionId>(eventID);
 		report.appendEventData(data);
 		lastLowSeverityReportID = static_cast<EventDefinitionId>(eventID);
+
+		#ifdef SERVICE_EVENTACTION
 		Services.eventAction.executeAction(eventID);
+		#endif
 
 		storeMessage(report);
 	}
@@ -70,7 +79,10 @@ void EventReportService::mediumSeverityAnomalyReport(Event eventID, const String
 		report.append<EventDefinitionId>(eventID);
 		report.appendEventData(data);
 		lastMediumSeverityReportID = static_cast<EventDefinitionId>(eventID);
+
+		#ifdef SERVICE_EVENTACTION
 		Services.eventAction.executeAction(eventID);
+		#endif
 
 		storeMessage(report);
 	}
@@ -88,7 +100,10 @@ void EventReportService::highSeverityAnomalyReport(Event eventID, const String<E
 		report.append<EventDefinitionId>(eventID);
 		report.appendEventData(data);
 		lastHighSeverityReportID = static_cast<EventDefinitionId>(eventID);
+
+		#ifdef SERVICE_EVENTACTION
 		Services.eventAction.executeAction(eventID);
+		#endif
 
 		storeMessage(report);
 	}
