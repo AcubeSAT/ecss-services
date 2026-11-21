@@ -1,6 +1,13 @@
 workflow:
   auto_cancel:
     on_new_commit: interruptible
+  rules:
+    # Let every master pipeline finish, so each merge's conan upload and pages deploy run
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      auto_cancel:
+        on_new_commit: none
+    # Only branch and tag pipelines, as before: with workflow rules, jobs without rules would also run in MR pipelines
+    - if: $CI_COMMIT_BRANCH || $CI_COMMIT_TAG
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
