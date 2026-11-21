@@ -30,6 +30,7 @@ check-build:
     - make -j$(nproc)
 
 .firmware:
+  interruptible: true
   image: spacedot/build-arm
   stage: build
   allow_failure: true
@@ -116,6 +117,7 @@ firmware-su:
     - make -j$(nproc)
 
 service-sizes:
+  interruptible: true
   image: spacedot/build-base
   stage: analyze
   dependencies:
