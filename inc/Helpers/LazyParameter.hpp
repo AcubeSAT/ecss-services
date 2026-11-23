@@ -78,7 +78,7 @@ public:
 		if constexpr (std::is_arithmetic_v<DataType> || std::is_enum_v<DataType>) {
 			return toDouble(getValue().value_or(fallback));
 		} else {
-			return 0;
+			return toDouble(fallback);
 		}
 	}
 
@@ -86,7 +86,7 @@ public:
 		if constexpr (std::is_arithmetic_v<DataType> || std::is_enum_v<DataType>) {
 			return toUint64(getValue().value_or(fallback));
 		} else {
-			return 0;
+			return toUint64(fallback);
 		}
 	}
 

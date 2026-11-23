@@ -48,7 +48,7 @@ public:
 	 * Converts the value of a parameter to a double.
 	 *
 	 * Some precision may be lost in the process. If the value is neither arithmetic nor enumerated,
-	 * then usually 0 is returned.
+	 * then NaN is returned.
 	 */
 	virtual double getValueAsDouble() = 0;
 
@@ -69,7 +69,7 @@ protected:
 		} else if constexpr (std::is_arithmetic_v<T>) {
 			return static_cast<double>(value);
 		} else {
-			return 0;
+			return std::numeric_limits<double>::quiet_NaN();
 		}
 	}
 

@@ -116,6 +116,6 @@ TEST_CASE("Get non-numeric value") {
 	Parameter<DefaultCUC> parameter(DefaultCUC(100_t));
 	ParameterBase& base = parameter;
 
-	CHECK(base.getValueAsDouble() == 0);
+	CHECK(std::isnan(base.getValueAsDouble()));
 	CHECK(base.getValueAsUint64() == 0);
 }

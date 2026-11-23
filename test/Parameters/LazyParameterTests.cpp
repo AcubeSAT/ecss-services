@@ -106,6 +106,20 @@ TEST_CASE("Lazy Parameter: Complex Types") {
 		});
 
 		CHECK(parameter.getValue().value() == Time::DefaultCUC{200_t});
-		CHECK(parameter.getValueAsDouble() == 0);
+		CHECK(std::isnan(parameter.getValueAsDouble()));
+	}
+
+	SECTION("Numeric conversions don't call the getter") {
+		constexpr uint64_t nonNumericValueAsUint64 = 0;
+		bool getterCalled = false;
+		parameter.setGetter([&getterCalled]() -> Time::DefaultCUC {
+			getterCalled = true;
+			return Time::DefaultCUC{};
+		});
+		ParameterBase& base = parameter;
+
+		CHECK(std::isnan(base.getValueAsDouble()));
+		CHECK(base.getValueAsUint64() == nonNumericValueAsUint64);
+		CHECK_FALSE(getterCalled);
 	}
 }
