@@ -203,6 +203,13 @@ public:
     static inline bool validateParameters(Event eventID);
 
 	/**
+	 * Validates that the id corresponds to a valid event
+	 * @param eventID
+	 * @return
+	 */
+	static inline bool isValid(EventDefinitionId eventID);
+
+	/**
 	 * Checks if the number of events included in a TC is larger than the number of events in this service.
 	 * Throws a InternalErrorType::LengthExceedsNumberOfEvents if false
 	 * @param tcNumberOfEvents the TC's number of events
