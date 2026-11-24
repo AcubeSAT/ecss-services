@@ -16,10 +16,6 @@ bool EventReportService::validateParameters(Event eventID) {
 }
 
 bool EventReportService::isValid(EventDefinitionId eventID) {
-	if (!isValid(static_cast<EventDefinitionId>(eventID))) {
-		ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType::InvalidEventID);
-		return false;
-	}
 	return true;
 }
 
