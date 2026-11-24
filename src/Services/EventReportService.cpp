@@ -15,6 +15,10 @@ bool EventReportService::validateParameters(Event eventID) {
 	return true;
 }
 
+bool EventReportService::isValid(EventDefinitionId eventID) {
+	return 0 <  eventID && eventID <= NumberOfEvents;
+}
+
 bool EventReportService::isNumberOfEventsValid(uint16_t tcNumberOfEvents) {
 	if (tcNumberOfEvents > NumberOfEvents) {
 		//Add ST[01] handling
