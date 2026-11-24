@@ -164,7 +164,7 @@ void StorageAndRetrievalService::createContentSummary(Message& report,
 
 	const uint16_t numOfPacketsToBeTransferred = std::count_if( // NOLINT(cppcoreguidelines-init-variables)
 	    std::begin(packetStores[packetStoreId].storedTelemetryPackets),
-	    std::end(packetStores[packetStoreId].storedTelemetryPackets), [this, &packetStoreId](auto packet) {
+	    std::end(packetStores[packetStoreId].storedTelemetryPackets), [this, &packetStoreId](const auto& packet) {
 		    return packet.first >= packetStores[packetStoreId].openRetrievalStartTimeTag;
 	    });
 	auto filledPercentage2 = static_cast<uint16_t>(static_cast<float>(numOfPacketsToBeTransferred) * 100 / ECSSMaxPacketStoreSize); // NOLINT(cppcoreguidelines-avoid-magic-numbers)
@@ -196,7 +196,9 @@ bool StorageAndRetrievalService::failedStartOfByTimeRangeRetrieval(
 
 void StorageAndRetrievalService::addPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
                                                 const PacketStore& packetStore) {
-	packetStores.insert({packetStoreId, packetStore});
+	if (not packetStoreExists(packetStoreId)) {
+		packetStores.emplace(packetStoreId, packetStore);
+	}
 }
 
 void StorageAndRetrievalService::addTelemetryToPacketStore(const String<ECSSPacketStoreIdSize>& packetStoreId,
@@ -536,14 +538,10 @@ void StorageAndRetrievalService::createPacketStores(Message& request) {
 			ErrorHandler::reportError(request, ErrorHandler::ExecutionStartErrorType::InvalidVirtualChannel);
 			continue;
 		}
-		PacketStore newPacketStore;
+		auto& newPacketStore = packetStores[idToCreate];
 		newPacketStore.sizeInBytes = packetStoreSize;
 		newPacketStore.packetStoreType = packetStoreType;
-		newPacketStore.storageStatus = false;
-		newPacketStore.byTimeRangeRetrievalStatus = false;
-		newPacketStore.openRetrievalStatus = PacketStore::Suspended;
 		newPacketStore.virtualChannel = virtualChannel;
-		packetStores.insert({idToCreate, newPacketStore});
 	}
 }
 
