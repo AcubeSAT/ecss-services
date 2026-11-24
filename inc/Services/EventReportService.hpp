@@ -205,7 +205,7 @@ public:
 	/**
 	 * Validates that the id corresponds to a valid event
 	 * @param eventID
-	 * @return
+	 * @return true if eventID is in the range of NumberOfEvents if else false
 	 */
 	static inline bool isValid(EventDefinitionId eventID);
 
