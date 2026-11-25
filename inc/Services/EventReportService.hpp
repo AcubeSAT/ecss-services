@@ -207,7 +207,7 @@ public:
 	 * @param eventID
 	 * @return true if eventID is in the range of NumberOfEvents if else false
 	 */
-	static inline bool isValid(EventDefinitionId eventID);
+	static bool isValid(EventDefinitionId eventID);
 
 	/**
 	 * Checks if the number of events included in a TC is larger than the number of events in this service.
