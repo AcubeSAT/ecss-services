@@ -174,7 +174,7 @@ on how to set up a project whose dependencies are managed by Conan.
 Edit your `conanfile.txt` or `conanfile.py` files to add the following dependency:
 ```
 [requires]
-ecss-services/1.1
+ecss-services/[~1.2]
 ```
 
 You can see more information about the available versions of the package at
