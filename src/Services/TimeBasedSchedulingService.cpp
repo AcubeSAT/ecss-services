@@ -80,7 +80,7 @@ void TimeBasedSchedulingService::insertActivities(Message& request) {
 			scheduledActivities.push_back(newActivity);
 		}
 	}
-	sortActivitiesReleaseTime(scheduledActivities);
+	scheduledActivities.sort();
 	notifyNewActivityAddition();
 }
 
@@ -142,7 +142,7 @@ void TimeBasedSchedulingService::timeShiftActivitiesByID(Message& request) {
 	for (auto* activity: activitiesToShift) {
 		activity->requestReleaseTime += relativeOffset;
 	}
-	sortActivitiesReleaseTime(scheduledActivities);
+	scheduledActivities.sort();
 }
 
 void TimeBasedSchedulingService::deleteActivitiesByID(Message& request) {
@@ -175,10 +175,10 @@ void TimeBasedSchedulingService::detailReportAllActivities(const Message& reques
 		return;
 	}
 
-	timeBasedScheduleDetailReport(scheduledActivities);
+	timeBasedScheduleDetailReport(ScheduledActivityReferences(scheduledActivities.begin(), scheduledActivities.end()));
 }
 
-void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
+void TimeBasedSchedulingService::timeBasedScheduleDetailReport(const ScheduledActivityReferences& listOfActivities) {
 	// todo (#228): (#229) append sub-schedule and group ID if they are defined
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduleReportById);
 	report.appendUint16(static_cast<uint16_t>(listOfActivities.size()));
@@ -195,7 +195,7 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 		return;
 	}
 
-	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
+	ScheduledActivityReferences matchedActivities;
 
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
@@ -215,13 +215,11 @@ void TimeBasedSchedulingService::detailReportActivitiesByID(Message& request) {
 		                                             });
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			matchedActivities.push_back(*requestIDMatch);
+			matchedActivities.insert(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
-
-	sortActivitiesReleaseTime(matchedActivities);
 
 	timeBasedScheduleDetailReport(matchedActivities);
 }
@@ -231,7 +229,7 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 		return;
 	}
 
-	etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities> matchedActivities;
+	ScheduledActivityReferences matchedActivities;
 
 	uint16_t iterationCount = request.readUint16();
 	while (iterationCount-- != 0) {
@@ -251,17 +249,16 @@ void TimeBasedSchedulingService::summaryReportActivitiesByID(Message& request) {
 		                                       });
 
 		if (requestIDMatch != scheduledActivities.end()) {
-			matchedActivities.push_back(*requestIDMatch);
+			matchedActivities.insert(*requestIDMatch);
 		} else {
 			ErrorHandler::reportError(request, ErrorHandler::InstructionExecutionStartError);
 		}
 	}
-	sortActivitiesReleaseTime(matchedActivities);
 
 	timeBasedScheduleSummaryReport(matchedActivities);
 }
 
-void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const etl::list<ScheduledActivity, ECSSMaxNumberOfTimeSchedActivities>& listOfActivities) {
+void TimeBasedSchedulingService::timeBasedScheduleSummaryReport(const ScheduledActivityReferences& listOfActivities) {
 	Message report = createTM(TimeBasedSchedulingService::MessageType::TimeBasedScheduledSummaryReport);
 
 	// todo (#228): append sub-schedule and group ID if they are defined

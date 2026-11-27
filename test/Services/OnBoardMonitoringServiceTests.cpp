@@ -112,6 +112,30 @@ TEST_CASE("Enable Parameter Monitoring Definitions") {
 		ServiceTests::reset();
 		Services.reset();
 	}
+	SECTION("Enabling resets the repetition counter and keeps the repetition number") {
+		initialiseParameterMonitoringDefinitions();
+		constexpr uint16_t numberOfIds = 1;
+		constexpr PMONDefinitionId PMONId = 1;
+		constexpr PMONRepetitionNumber repetitionCounter = 3;
+		constexpr PMONRepetitionNumber resetRepetitionCounter = 0;
+		auto& definition = onBoardMonitoringService.getPMONDefinition(PMONId).get();
+		const PMONRepetitionNumber repetitionNumber = definition.repetitionNumber;
+		definition.repetitionCounter = repetitionCounter;
+
+		Message request(OnBoardMonitoringService::ServiceType,
+		                OnBoardMonitoringService::MessageType::EnableParameterMonitoringDefinitions, Message::TC, ApplicationId);
+		request.appendUint16(numberOfIds);
+		request.append<PMONDefinitionId>(PMONId);
+
+		MessageParser::execute(request);
+
+		CHECK(ServiceTests::hasNoErrors());
+		CHECK(definition.getRepetitionCounter() == resetRepetitionCounter);
+		CHECK(definition.getRepetitionNumber() == repetitionNumber);
+
+		ServiceTests::reset();
+		Services.reset();
+	}
 }
 
 TEST_CASE("Disable Parameter Monitoring Definitions") {
@@ -1016,6 +1040,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 	SECTION("One invalid and one valid request to report Parameter Monitoring Definitions") {
 		initialiseParameterMonitoringDefinitions();
 		uint16_t numberOfIds = 2;
+		constexpr uint16_t numberOfReportedDefinitions = 1;
 		Message request =
 		    Message(OnBoardMonitoringService::ServiceType,
 		            OnBoardMonitoringService::MessageType::ReportParameterMonitoringDefinitions, Message::TC, 0);
@@ -1032,7 +1057,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.serviceType == OnBoardMonitoringService::ServiceType);
 		CHECK(report.messageType == OnBoardMonitoringService::MessageType::ParameterMonitoringDefinitionReport);
 		CHECK(report.readUint16() == onBoardMonitoringService.maximumTransitionReportingDelay);
-		CHECK(report.readUint16() == numberOfIds);
+		CHECK(report.readUint16() == numberOfReportedDefinitions);
 
 		auto definitionOpt0 = onBoardMonitoringService.getPMONDefinition(PMONIds[0]);
 		auto& pmon0 = definitionOpt0.get();
@@ -1048,6 +1073,7 @@ TEST_CASE("Report Parameter Monitoring Definitions") {
 		CHECK(report.read<PMONBitMask>() == expectedValueCheck.getMask());
 		CHECK(report.read<PMONExpectedValue>() == expectedValueCheck.getExpectedValue());
 		CHECK(report.read<EventDefinitionId>() == expectedValueCheck.getUnexpectedValueEvent());
+		CHECK(report.readPosition == report.dataSize);
 
 		ServiceTests::reset();
 		Services.reset();
@@ -1058,7 +1084,7 @@ TEST_CASE("Limit Check Behavior") {
 	SECTION("Value within limits") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
 		pmon.performCheck();
@@ -1075,7 +1101,7 @@ TEST_CASE("Limit Check Behavior") {
 	SECTION("Value below low limit") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(1);
 		REQUIRE(param.getValue() == 1);
@@ -1091,7 +1117,7 @@ TEST_CASE("Limit Check Behavior") {
 	SECTION("Value above high limit") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		REQUIRE(param.getValue() == 10);
@@ -1107,7 +1133,7 @@ TEST_CASE("Limit Check Behavior") {
 	SECTION("Repetition Counter Resets on Status Change") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
 		pmon.performCheck();
@@ -1144,7 +1170,7 @@ TEST_CASE("Limit Check Behavior") {
 	SECTION("Continuous Monitoring Within Limits") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition2;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		for (unsigned char i = 2; i <= 8; ++i) {
 			param.setValue(i);
@@ -1187,7 +1213,7 @@ TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Value matches expected value") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		pmon.mask = 0xFF;
@@ -1206,7 +1232,7 @@ TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Value does not match expected value") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
 		pmon.mask = 0xFF;
@@ -1225,7 +1251,7 @@ TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Status Changes from Unexpected to Expected") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(5);
 		pmon.mask = 0xFF;
@@ -1245,7 +1271,7 @@ TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Repetition Counter Resets on Status Change") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		pmon.mask = 0xFF;
@@ -1271,7 +1297,7 @@ TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Edge Cases for Parameter Values") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(0);
 		pmon.mask = 0xFF;
@@ -1292,7 +1318,7 @@ TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Mask with zeros (no bits set)") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		pmon.mask = 0x00;
@@ -1313,7 +1339,7 @@ TEST_CASE("Expected Value Check Behavior") {
 	SECTION("Mask with some bits set to zero") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition1;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint16_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(0xFF);
 		pmon.mask = 0b1111'0000;
@@ -1337,7 +1363,7 @@ TEST_CASE("Delta Check Perform Check") {
 	SECTION("Delta threshold checks including negative delta") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
@@ -1365,7 +1391,7 @@ TEST_CASE("Delta Check Perform Check") {
 	SECTION("Repetition Counter Behavior") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
@@ -1398,7 +1424,7 @@ TEST_CASE("Delta Check Perform Check") {
 	SECTION("Repetition Counter Resets on Status Change") {
 		initialiseParameterMonitoringDefinitions();
 		auto& pmon = Fixtures::getInstance().monitoringDefinition3;
-		auto& param = static_cast<Parameter<unsigned char>&>(pmon.monitoredParameter.get());
+		auto& param = dynamic_cast<Parameter<uint32_t>&>(pmon.monitoredParameter.get());
 
 		param.setValue(10);
 		ServiceTests::setMockTime(UTCTimestamp(2024, 4, 10, 10, 15, 0));
@@ -1479,9 +1505,9 @@ TEST_CASE("Check All Behavior") {
         auto& pmon3 = onBoardMonitoringService.getPMONDefinition(2).get();
     	auto& pmonDelta = static_cast<PMONDeltaCheck&>(pmon3);
 
-        auto& param1 = static_cast<Parameter<unsigned char>&>(pmon1.monitoredParameter.get());
-        auto& param2 = static_cast<Parameter<unsigned char>&>(pmon2.monitoredParameter.get());
-        auto& param3 = static_cast<Parameter<unsigned char>&>(pmon3.monitoredParameter.get());
+        auto& param1 = dynamic_cast<Parameter<uint16_t>&>(pmon1.monitoredParameter.get());
+        auto& param2 = dynamic_cast<Parameter<uint32_t>&>(pmon2.monitoredParameter.get());
+        auto& param3 = dynamic_cast<Parameter<uint32_t>&>(pmon3.monitoredParameter.get());
 
         param1.setValue(10);
         pmonExpected.mask = 0xFF;
@@ -1510,8 +1536,8 @@ TEST_CASE("Check All Behavior") {
     	auto& pmon2 = onBoardMonitoringService.getPMONDefinition(1).get();
     	auto& pmonLimit = static_cast<PMONLimitCheck&>(pmon2);
 
-    	auto& param1 = static_cast<Parameter<unsigned char>&>(pmon1.monitoredParameter.get());
-    	auto& param2 = static_cast<Parameter<unsigned char>&>(pmon2.monitoredParameter.get());
+    	auto& param1 = dynamic_cast<Parameter<uint16_t>&>(pmon1.monitoredParameter.get());
+    	auto& param2 = dynamic_cast<Parameter<uint32_t>&>(pmon2.monitoredParameter.get());
 
     	param1.setValue(10);
     	pmonExpected.mask = 0xFF;
@@ -1541,7 +1567,7 @@ TEST_CASE("Check All Behavior") {
     	auto& pmon1 = onBoardMonitoringService.getPMONDefinition(0).get();
     	auto& pmonExpected = static_cast<PMONExpectedValueCheck&>(pmon1);
 
-    	auto& param1 = static_cast<Parameter<unsigned char>&>(pmon1.monitoredParameter.get());
+    	auto& param1 = dynamic_cast<Parameter<uint16_t>&>(pmon1.monitoredParameter.get());
 
     	param1.setValue(10);
     	pmonExpected.mask = 0xFF;

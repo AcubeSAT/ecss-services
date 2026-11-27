@@ -1,3 +1,14 @@
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+  rules:
+    # Let every master pipeline finish, so each merge's conan upload and pages deploy run
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      auto_cancel:
+        on_new_commit: none
+    # Only branch and tag pipelines, as before: with workflow rules, jobs without rules would also run in MR pipelines
+    - if: $CI_COMMIT_BRANCH || $CI_COMMIT_TAG
+
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
@@ -9,6 +20,7 @@ stages:
 
 
 check-build:
+  interruptible: true
   image: spacedot/build-base
   stage: build
   variables:
@@ -25,6 +37,7 @@ check-build:
     - make -j$(nproc)
 
 .firmware:
+  interruptible: true
   image: spacedot/build-arm
   stage: build
   allow_failure: true
@@ -111,6 +124,7 @@ firmware-su:
     - make -j$(nproc)
 
 service-sizes:
+  interruptible: true
   image: spacedot/build-base
   stage: analyze
   dependencies:
@@ -127,6 +141,7 @@ service-sizes:
       - service-sizes/
 
 cppcheck:
+  interruptible: true
   image: spacedot/cppcheck:2.8
   stage: analyze
   before_script:
@@ -144,6 +159,7 @@ cppcheck:
       - ./cppcheck-html-report
 
 clang-tidy:
+  interruptible: true
   image: spacedot/clang-tools:13.0.0-html-1.4.1
   stage: analyze
   script:
@@ -166,6 +182,7 @@ clang-tidy:
       - ./clang-tidy-html-report
 
 clang-analyzer:
+   interruptible: true
    image: spacedot/clang-tools:13.0.0-html-1.4.1
    stage: analyze
    before_script:
@@ -183,6 +200,7 @@ clang-analyzer:
      paths:
        - ./scan-build-html-report
 doxygen:
+  interruptible: true
   image: spacedot/doxygen:1.9.4-4-awesomecss-1.6.0
   stage: analyze
   script:
@@ -192,6 +210,7 @@ doxygen:
     paths:
       - ./docs/html
 ikos:
+   interruptible: true
    image: spacedot/ikos:3.0
    stage: analyze
    before_script:
@@ -215,6 +234,7 @@ ikos:
      paths:
        - ./ikos-report
 tests:
+  interruptible: true
   image: spacedot/coverage:gcovr-6.0-lcov-1.15.5a0
   stage: test
   when: always
@@ -239,7 +259,23 @@ tests:
   artifacts:
     paths:
       - ./gcovr
+ubsan:
+  image: spacedot/coverage:gcovr-6.0-lcov-1.15.5a0
+  stage: test
+  when: always
+  variables:
+    UBSAN_OPTIONS: print_stacktrace=1
+  script:
+    - conan profile detect --force
+    - mkdir conan-build
+    - conan remote add conan https://artifactory.spacedot.gr/artifactory/api/conan/conan
+    - conan remote login -p $CONAN_PASSWORD conan $CONAN_USER
+    - conan install . --output-folder conan-build --build=missing
+    - cmake . -DCMAKE_CXX_FLAGS="-g -fsanitize=undefined,float-cast-overflow -fno-sanitize-recover=all" -DCMAKE_TOOLCHAIN_FILE=conan-build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+    - make tests -j$(nproc)
+    - ./tests --colour-mode ansi
 pages:
+  interruptible: false
   image: spacedot/build-base:latest
   stage: deploy
   script:
@@ -260,6 +296,7 @@ pages:
 
 
 conan:
+  interruptible: false
   image: spacedot/build-base
   stage: deploy
   script:

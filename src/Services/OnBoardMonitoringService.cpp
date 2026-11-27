@@ -18,7 +18,7 @@ void OnBoardMonitoringService::enableParameterMonitoringDefinitions(Message& mes
 			    message, ErrorHandler::ExecutionStartErrorType::GetNonExistingParameterMonitoringDefinition);
 			continue;
 		}
-		definition->second.get().repetitionNumber = 0;
+		definition->second.get().repetitionCounter = 0;
 		definition->second.get().monitoringEnabled = true;
 	}
 }
@@ -318,7 +318,16 @@ void OnBoardMonitoringService::reportParameterMonitoringDefinitions(Message& mes
 	Message pmonDefinitionReport(ServiceType, MessageType::ParameterMonitoringDefinitionReport, Message::TM, ApplicationId);
 	pmonDefinitionReport.appendUint16(maximumTransitionReportingDelay);
 	uint16_t numberOfIds = message.readUint16();
-	pmonDefinitionReport.appendUint16(numberOfIds);
+
+	uint16_t numberOfDefinitions = 0;
+	for (uint16_t i = 0; i < numberOfIds; i++) {
+		if (parameterMonitoringList.contains(message.read<PMONDefinitionId>())) {
+			numberOfDefinitions++;
+		}
+	}
+	pmonDefinitionReport.appendUint16(numberOfDefinitions);
+	message.resetRead();
+	message.skipBytes(sizeof(numberOfIds));
 
 	for (uint16_t i = 0; i < numberOfIds; i++) {
 		auto currentPMONId = message.read<PMONDefinitionId>();

@@ -65,6 +65,32 @@ TEST_CASE("Lazy Parameter: Messages") {
 	}
 }
 
+TEST_CASE("Lazy Parameter: Enumerated and negative float values") {
+	enum class ScopedEnum : int16_t { NegativeValue = -3, Value = 2 };
+
+	LazyParameter<ScopedEnum> enumParameter(ScopedEnum::NegativeValue);
+	ParameterBase& enumBase = enumParameter;
+
+	CHECK(enumBase.getValueAsDouble() == -3);
+	CHECK(enumBase.getValueAsUint64() == static_cast<uint64_t>(-3));
+
+	enumParameter.setGetter([]() -> auto{ return ScopedEnum::Value; });
+
+	CHECK(enumBase.getValueAsDouble() == 2);
+	CHECK(enumBase.getValueAsUint64() == 2);
+
+	LazyParameter<ScopedEnum> enumParameterWithoutFallback([]() -> auto{ return ScopedEnum::Value; });
+	LazyParameter<ScopedEnum> enumParameterWithoutGetter;
+
+	CHECK(enumParameterWithoutFallback.getValueAsDouble() == 2);
+	CHECK(enumParameterWithoutGetter.getValueAsDouble() == 0);
+
+	LazyParameter<float> floatParameter([]() -> auto{ return -12.5F; });
+	ParameterBase& floatBase = floatParameter;
+
+	CHECK(floatBase.getValueAsUint64() == static_cast<uint64_t>(-12));
+}
+
 TEST_CASE("Lazy Parameter: Complex Types") {
 	using namespace Time;
 
@@ -80,6 +106,20 @@ TEST_CASE("Lazy Parameter: Complex Types") {
 		});
 
 		CHECK(parameter.getValue().value() == Time::DefaultCUC{200_t});
-		CHECK(parameter.getValueAsDouble() == 0);
+		CHECK(std::isnan(parameter.getValueAsDouble()));
+	}
+
+	SECTION("Numeric conversions don't call the getter") {
+		constexpr uint64_t nonNumericValueAsUint64 = 0;
+		bool getterCalled = false;
+		parameter.setGetter([&getterCalled]() -> Time::DefaultCUC {
+			getterCalled = true;
+			return Time::DefaultCUC{};
+		});
+		ParameterBase& base = parameter;
+
+		CHECK(std::isnan(base.getValueAsDouble()));
+		CHECK(base.getValueAsUint64() == nonNumericValueAsUint64);
+		CHECK_FALSE(getterCalled);
 	}
 }
