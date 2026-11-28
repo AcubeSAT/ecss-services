@@ -568,6 +568,11 @@ public:
 	static void reportInternalError(InternalErrorType errorCode, const char* file = nullptr, int line = 0);
 
 	/**
+	 * Register a callback that logs failed ETL checks, such as a push onto a full container.
+	 */
+	static void registerEtlErrorLogger();
+
+	/**
 	 * Make an assertion, to ensure that a runtime condition is met.
 	 *
 	 * Reports a failure that occurred internally, not due to a failure of a received packet.

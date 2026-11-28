@@ -10,6 +10,9 @@
 #define ETL_VERBOSE_ERRORS
 #define ETL_CHECK_PUSH_POP
 #define ETL_LOG_ERRORS
-// Do not define ETL_THROW_EXCEPTIONS. ETL errors are logged, not thrown.
+
+#ifdef ETL_THROW_EXCEPTIONS
+#error "ETL C++ exceptions must remain disabled; use ETL_LOG_ERRORS only."
+#endif
 
 #endif // ECSS_SERVICES_ETL_PROFILE_H

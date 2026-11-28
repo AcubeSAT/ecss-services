@@ -2,6 +2,7 @@
 #include <ErrorHandler.hpp>
 #include <Logger.hpp>
 #include <ServicePool.hpp>
+#include <etl/error_handler.h>
 #include "Services/RequestVerificationService.hpp"
 
 template <>
@@ -65,4 +66,21 @@ void ErrorHandler::reportInternalError(ErrorHandler::InternalErrorType errorCode
 	if (suffix[0] != '\0') {
 		LOG_ERROR << suffix << ":" << line;
 	}
+}
+
+namespace {
+	void logEtlError(const etl::exception& etlError) {
+		etl::string<LOGGER_MAX_MESSAGE_SIZE> message;
+		message.append("ETL Error: ");
+		message.append(etlError.what());
+		message.append(" in file: ");
+		message.append(etlError.file_name());
+		message.append(" at line: ");
+		etl::to_string(etlError.line_number(), message, true);
+		Logger::log(Logger::error, message);
+	}
+} // namespace
+
+void ErrorHandler::registerEtlErrorLogger() {
+	etl::error_handler::set_callback<logEtlError>();
 }

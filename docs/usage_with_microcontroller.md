@@ -135,12 +135,12 @@ void ErrorHandler::logError(ErrorType errorType) {
 }
 ```
 
-Failed ETL container checks, such as a push onto a full container, are logged only once the platform registers the
-logger in `EtlErrorLogger.hpp`, for example in its `ErrorHandler.cpp`:
+Failed ETL container checks, such as a push onto a full container, are logged only once the platform calls
+`ErrorHandler::registerEtlErrorLogger()`, for example in its `ErrorHandler.cpp`:
 
 ```cpp
 namespace {
-[[maybe_unused]] const int etlErrorLoggerRegistered = (registerEtlErrorLogger(), 0);
+[[maybe_unused]] const int etlErrorLoggerRegistered = (ErrorHandler::registerEtlErrorLogger(), 0);
 }
 ```
 

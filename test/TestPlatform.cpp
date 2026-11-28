@@ -4,7 +4,6 @@
 #include <Logger.hpp>
 #include <Message.hpp>
 #include <Service.hpp>
-#include <EtlErrorLogger.hpp>
 #include <catch2/catch_all.hpp>
 #include "Helpers/Demangle.hpp"
 #include <filesystem>
@@ -28,7 +27,7 @@ Time::DefaultCUC TimeGetter::getCurrentTimeDefaultCUC() {
 }
 
 namespace {
-[[maybe_unused]] const int etlErrorLoggerRegistered = (registerEtlErrorLogger(), 0);
+[[maybe_unused]] const int etlErrorLoggerRegistered = (ErrorHandler::registerEtlErrorLogger(), 0);
 }
 
 // Explicit template specializations for the logError() function
